@@ -14,7 +14,7 @@ using Action = Astral.Quester.Classes.Action;
 
 namespace EntityPlugin.Actions
 {
-    class UseConsumable : Astral.Quester.Classes.Action
+    public class UseConsumable : Astral.Quester.Classes.Action
     {
         public override string ActionLabel
         {

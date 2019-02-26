@@ -1,14 +1,12 @@
-﻿using Astral.Quester.Classes;
-using EntityPlugin.Editors;
-using MyNW.Classes;
-using MyNW.Internals;
+﻿using MyNW.Classes;
+using Astral.Quester.Classes;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing.Design;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using static Astral.Quester.Classes.Condition;
+using System.Text.RegularExpressions;
+using MyNW.Internals;
 
 namespace EntityPlugin.Conditions
 {
@@ -22,7 +20,6 @@ namespace EntityPlugin.Conditions
         }
 
         [Description("ID (an internal untranslated name) of the Entity for the search (regex)")]
-        [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         public string EntityID { get; set; }
 
         public float Distance { get; set; }
@@ -42,21 +39,21 @@ namespace EntityPlugin.Conditions
                 //List<Entity> entityList = entities.Find((Entity x) => x.CombatDistance3 < Distance);
 
                 //string mess = "";
-                bool result = false;
-                switch (Sign)
+                bool    result = false;
+                switch(Sign)
                 {
                     case Relation.Equal:
                         return result = (closestEntity != null) && (closestEntity.Location.Distance3DFromPlayer == Distance);
-                    //mess = (result) ? Relation.Equal.ToString() : Relation.NotEqual.ToString();
-                    //break;
+                        //mess = (result) ? Relation.Equal.ToString() : Relation.NotEqual.ToString();
+                        //break;
                     case Relation.NotEqual:
                         return result = (closestEntity != null) && (closestEntity.Location.Distance3DFromPlayer != Distance);
-                    //mess = (result) ? Relation.NotEqual.ToString() : Relation.Equal.ToString();
-                    //break;
+                        //mess = (result) ? Relation.NotEqual.ToString() : Relation.Equal.ToString();
+                        //break;
                     case Relation.Inferior:
                         return result = (closestEntity != null) && (closestEntity.Location.Distance3DFromPlayer < Distance);
-                    //mess = ((result) ? "" : "Not")+ Relation.Inferior.ToString();
-                    //break;
+                        //mess = ((result) ? "" : "Not")+ Relation.Inferior.ToString();
+                        //break;
                     case Relation.Superior:
                         return result = (closestEntity == null) || (closestEntity.Location.Distance3DFromPlayer > Distance);
                         //mess = (result) ? Relation.Superior.ToString() : Relation.Inferior.ToString(); ;
@@ -94,8 +91,8 @@ namespace EntityPlugin.Conditions
         {
             get
             {
-                Entity closestEntity = Tools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
-
+               Entity closestEntity = Tools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+                
                 if (closestEntity.IsValid)
                 {
                     return string.Format("Found closect Entity [{0}] at the Distance = {1}",

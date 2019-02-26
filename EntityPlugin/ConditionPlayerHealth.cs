@@ -57,13 +57,13 @@ namespace EntityPlugin.Conditions
             get
             {
                 if (!EntityManager.LocalPlayer.IsValid)
-                    return "Palyer not valid";
+                    return "'LocalPlayer' not valid";
 
                 Character character = EntityManager.LocalPlayer.Character;
                 if (!character.IsValid)
-                    return "Palyer not valid";
+                    return "'LocalPlayer.Character' not valid";
 
-                float HealthPercent = (character.AttribsBasic.MaxHealth > 0) ? character.AttribsBasic.Health / character.AttribsBasic.MaxHealth : 0;
+                float HealthPercent = (character.AttribsBasic.MaxHealth > 0) ? 100 * character.AttribsBasic.Health / character.AttribsBasic.MaxHealth : 0;
 
                 return string.Format("PlayerHealth is {0} %", HealthPercent);
             }

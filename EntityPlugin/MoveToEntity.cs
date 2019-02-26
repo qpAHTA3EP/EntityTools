@@ -9,7 +9,6 @@ using Astral.Logic.Classes.Map;
 using Astral.Logic.NW;
 using Astral.Quester.Classes;
 using Astral.Quester.UIEditors;
-using EntityPlugin.Editors;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
@@ -48,7 +47,6 @@ namespace EntityPlugin.Actions
         }
 
         [Description("ID (an internal untranslated name) of the Entity for the search (regex)")]
-        [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         public string EntityID { get; set; }
 
         public float Distance { get; set; }
@@ -111,12 +109,11 @@ namespace EntityPlugin.Actions
             //    }
             //    return Action.ActionResult.Running;
             //}
-            if (!Approach.EntityByDistance(target, Distance, null))
+            if ((!StopOnApproached || (target.Location.Distance3DFromPlayer >= Distance)) && Approach.EntityByDistance(target, Distance, null))
             {
-                if (StopOnApproached && (target.Location.Distance3DFromPlayer < Distance))
-                    return Action.ActionResult.Completed;
+                return Action.ActionResult.Running;
             }
-            return Action.ActionResult.Running;
+            else return Action.ActionResult.Completed;
         }
 
         public override bool UseHotSpots => false;
@@ -145,6 +142,10 @@ namespace EntityPlugin.Actions
                 {
                     return new Action.ActionValidity("EntityID property not set.");
                 }
+                //if (!NPCInfos.Position.IsValid)
+                //{
+                //    return new Action.ActionValidity("NPCInfos property not set.");
+                //}
                 return new Action.ActionValidity();
             }
         }
