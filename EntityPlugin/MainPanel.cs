@@ -58,9 +58,15 @@ namespace EntityPlugin.Forms
 
         private void btnTest_Click(object sender, EventArgs e)
         {
-            UIEntitySelectForm.GetEntity(); 
+            Entity selectedEntity = UIEntitySelectForm.GetEntity(); 
 
-            ////Entity entity = new Entity(IntPtr.Zero);
+            if (selectedEntity != null && selectedEntity.IsValid)
+                MessageBox.Show($"Selected Entity is '{selectedEntity.Name}'" + Environment.NewLine +
+                        $"InternalName = [{selectedEntity.InternalName}]" + Environment.NewLine +
+                        $"NameUntranslated = [{selectedEntity.NameUntranslated}]");
+            else MessageBox.Show("Entity is not valid at the moment!");
+
+            //Entity entity = new Entity(IntPtr.Zero);
 
             //Astral.Quester.UIEditors.Forms.SelectList listEditor = new Astral.Quester.UIEditors.Forms.SelectList();
             //listEditor.MinimumSize = new System.Drawing.Size(1000, 500);

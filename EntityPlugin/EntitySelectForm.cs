@@ -13,35 +13,39 @@ namespace EntityPlugin.Forms
 {
     public partial class UIEntitySelectForm : Form
     {
+        private static UIEntitySelectForm selectForm;
+
         public UIEntitySelectForm()
         {
             InitializeComponent();
         }
 
-        public static void GetEntity()
+        public static Entity GetEntity()
         {
-            UIEntitySelectForm selectForm = new UIEntitySelectForm();
+            if(selectForm == null)
+                selectForm = new UIEntitySelectForm();
 
-            selectForm.dgwEntities.DataSource = EntityManager.GetEntities();
+            selectForm.dgvEntities.AutoGenerateColumns = false;
+            selectForm.dgvEntities.DataSource = EntityManager.GetEntities();
 
             selectForm.clmnName.DataPropertyName = "Name";
             selectForm.clmnInternalName.DataPropertyName = "InternalName";
             selectForm.clmnNameUntranslated.DataPropertyName = "NameUntranslated";
                         
             DialogResult dialogResult = selectForm.ShowDialog();
-            //if (dialogResult == DialogResult.OK)
-            //{
-            //    if (selectForm.dgwEntities.SelectedRows. != null)
-            //    {
-            //        Entity selectedEntity = listEditor.listitems.SelectedItem as Entity;
-            //        if (selectedEntity != null && selectedEntity.IsValid)
-            //            MessageBox.Show($"Selected Entity is '{selectedEntity.Name}'" + Environment.NewLine +
-            //                $"InternalName = [{selectedEntity.InternalName}]" + Environment.NewLine +
-            //                $"NameUntranslated = [{selectedEntity.NameUntranslated}]");
-            //        else MessageBox.Show("Entity is not valid at the moment!");
-            //    }
+            if (dialogResult == DialogResult.OK)
+            {
+                Entity selectedEntity = selectForm.dgvEntities.CurrentRow.DataBoundItem as Entity;
+                if (selectedEntity != null)
+                    return selectedEntity;
+            }
+            return new Entity(IntPtr.Zero);
+        }
 
-            //}
+        private void btnSelect_Click(object sender, EventArgs e)
+        {
+            this.DialogResult = DialogResult.OK;
+            Close();
         }
     }
 }
