@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing.Design;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Astral.Logic.Classes.Map;
 using Astral.Quester.Classes;
+using Astral.Quester.Forms;
+using Astral.Quester.UIEditors;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
@@ -59,6 +62,8 @@ namespace EntityPlugin.Actions
         }
 
         [Description("ID (an internal name) of the Consumable (regex)")]
+        /// Редактор ItemIdEditor является закрытым членом
+        ///[Editor(typeof(ItemIdEditor), typeof(UITypeEditor))]
         public string ConsumableID { get; set; }
 
         public override ActionResult Run()

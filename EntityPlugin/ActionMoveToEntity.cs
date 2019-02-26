@@ -97,26 +97,15 @@ namespace EntityPlugin.Actions
             if (!target.IsValid)
             {
                 Logger.WriteLine(string.Format("Entity [{0}] not founded.", EntityID));
-                return Action.ActionResult.Skip;
+                return Action.ActionResult.Fail;
             }
 
-            //if (target.IsValid && !(StopOnApproached && target.Location.Distance3DFromPlayer < Distance))
-            //{
-            //    if (InteractIfPossible && target.IsValid && target.InteractOption.IsValid && Approach.EntityForInteraction(target, null))
-            //    {
-            //        MyNW.Internals.Movements.StopNavTo();
-            //        Thread.Sleep(500);
-            //        target.Interact();
-            //        Thread.Sleep(InteractTime);
-            //    }
-            //    return Action.ActionResult.Running;
-            //}
-            if (!Approach.EntityByDistance(target, Distance, null))
+            if (target.Location.Distance3DFromPlayer > Distance || !StopOnApproached)
             {
-                if (StopOnApproached && (target.Location.Distance3DFromPlayer < Distance))
-                    return Action.ActionResult.Completed;
+                Approach.EntityByDistance(target, Distance, null);
+                return Action.ActionResult.Running;
             }
-            return Action.ActionResult.Running;
+            return Action.ActionResult.Completed;            
         }
 
         public override bool UseHotSpots => false;
