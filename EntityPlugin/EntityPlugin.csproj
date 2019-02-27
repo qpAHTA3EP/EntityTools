@@ -53,8 +53,9 @@
     <Compile Include="Actions\ActionInteractEntity.cs" />
     <Compile Include="Actions\ActionUseConsumable.cs" />
     <Compile Include="Conditions\ConditionEntityDistance.cs" />
-    <Compile Include="EntityPluginTools.cs" />
-    <Compile Include="ExtendedEntityManipulation.cs" />
+    <Compile Include="Conditions\ConsitionsIsEntityInCustomRegion.cs" />
+    <Compile Include="Tools\EntityPluginTools.cs" />
+    <Compile Include="EntityPlugin.cs" />
     <Compile Include="Forms\EntitySelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -75,7 +76,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Forms\EntityIdEditor.cs" />
+    <Compile Include="Tools\EntityIdEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\EntitySelectForm.resx">

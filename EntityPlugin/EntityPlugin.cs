@@ -6,9 +6,9 @@ using Astral.Forms;
 
 namespace EntityPlugin
 {
-    public class ExtendedEntityManipulation : Astral.Addons.Plugin
+    public class EntityPlugin : Astral.Addons.Plugin
     {
-        public override string Name => "ExtendedEntityManipulation";
+        public override string Name => "EntityPlugin";
 
         public override string Author => "MichaelProg";
 
