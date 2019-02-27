@@ -50,38 +50,38 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActionInteractEntity.cs" />
-    <Compile Include="ActionUseConsumable.cs" />
-    <Compile Include="ConditionEntityDistance.cs" />
+    <Compile Include="Actions\ActionInteractEntity.cs" />
+    <Compile Include="Actions\ActionUseConsumable.cs" />
+    <Compile Include="Conditions\ConditionEntityDistance.cs" />
     <Compile Include="EntityPluginTools.cs" />
     <Compile Include="ExtendedEntityManipulation.cs" />
-    <Compile Include="EntitySelectForm.cs">
+    <Compile Include="Forms\EntitySelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="EntitySelectForm.Designer.cs">
+    <Compile Include="Forms\EntitySelectForm.Designer.cs">
       <DependentUpon>EntitySelectForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MainPanel.cs">
+    <Compile Include="Forms\MainPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="MainPanel.Designer.cs">
+    <Compile Include="Forms\MainPanel.Designer.cs">
       <DependentUpon>MainPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="ActionMoveToEntity.cs" />
-    <Compile Include="ConditionPlayerHealth.cs" />
+    <Compile Include="Actions\ActionMoveToEntity.cs" />
+    <Compile Include="Conditions\ConditionPlayerHealth.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="EntityIdEditor.cs" />
+    <Compile Include="Forms\EntityIdEditor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="EntitySelectForm.resx">
+    <EmbeddedResource Include="Forms\EntitySelectForm.resx">
       <DependentUpon>EntitySelectForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MainPanel.resx">
+    <EmbeddedResource Include="Forms\MainPanel.resx">
       <DependentUpon>MainPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -89,5 +89,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
