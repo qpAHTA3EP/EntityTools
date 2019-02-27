@@ -36,13 +36,6 @@
     <Reference Include="Astral">
       <HintPath>D:\Games\Astral_RU_1\Astral.exe</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Utils.v18.1, Version=18.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>D:\Games\DevExpress\DevExpress.Utils.v18.1.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.XtraEditors.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.XtraEditors.v18.1.dll</HintPath>
-    </Reference>
     <Reference Include="MyNW">
       <HintPath>D:\Games\Astral_RU_1\MyNW.dll</HintPath>
     </Reference>

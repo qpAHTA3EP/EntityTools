@@ -1,12 +1,6 @@
 ﻿using MyNW.Classes;
 using MyNW.Internals;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace EntityPlugin.Forms
@@ -31,7 +25,7 @@ namespace EntityPlugin.Forms
             selectForm.clmnName.DataPropertyName = "Name";
             selectForm.clmnInternalName.DataPropertyName = "InternalName";
             selectForm.clmnNameUntranslated.DataPropertyName = "NameUntranslated";
-                        
+                       
             DialogResult dialogResult = selectForm.ShowDialog();
             if (dialogResult == DialogResult.OK)
             {
