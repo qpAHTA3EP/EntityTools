@@ -8,7 +8,8 @@ using System.Text;
 
 namespace EntityPlugin.Conditions
 {
-    public class PlayerHealth : Astral.Quester.Classes.Condition
+    [Serializable]
+    public class PlayerHealth : Condition
     {
         public float Value { get; set; }
 

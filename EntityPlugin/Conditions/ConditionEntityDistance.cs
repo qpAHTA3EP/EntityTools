@@ -12,6 +12,7 @@ using static Astral.Quester.Classes.Condition;
 
 namespace EntityPlugin.Conditions
 {
+    [Serializable]
     public class EntityDistance : Condition
     {
         public EntityDistance()
@@ -21,7 +22,7 @@ namespace EntityPlugin.Conditions
             Sign = Relation.Inferior;
         }
 
-        [Description("ID (an internal untranslated name) of the Entity for the search (regex)")]
+        [Description("ID (an untranslated name) of the Entity for the search (regex)")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         public string EntityID { get; set; }
 
@@ -47,16 +48,16 @@ namespace EntityPlugin.Conditions
                 {
                     case Relation.Equal:
                         return result = (closestEntity != null) && (closestEntity.Location.Distance3DFromPlayer == Distance);
-                    //mess = (result) ? Relation.Equal.ToString() : Relation.NotEqual.ToString();
-                    //break;
+                        //mess = (result) ? Relation.Equal.ToString() : Relation.NotEqual.ToString();
+                        //break;
                     case Relation.NotEqual:
                         return result = (closestEntity != null) && (closestEntity.Location.Distance3DFromPlayer != Distance);
-                    //mess = (result) ? Relation.NotEqual.ToString() : Relation.Equal.ToString();
-                    //break;
+                        //mess = (result) ? Relation.NotEqual.ToString() : Relation.Equal.ToString();
+                        //break;
                     case Relation.Inferior:
                         return result = (closestEntity != null) && (closestEntity.Location.Distance3DFromPlayer < Distance);
-                    //mess = ((result) ? "" : "Not")+ Relation.Inferior.ToString();
-                    //break;
+                        //mess = ((result) ? "" : "Not")+ Relation.Inferior.ToString();
+                        //break;
                     case Relation.Superior:
                         return result = (closestEntity == null) || (closestEntity.Location.Distance3DFromPlayer > Distance);
                         //mess = (result) ? Relation.Superior.ToString() : Relation.Inferior.ToString(); ;
