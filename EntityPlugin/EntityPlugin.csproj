@@ -33,9 +33,6 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Astral">
-      <HintPath>D:\Games\Astral_RU_1\Astral.exe</HintPath>
-    </Reference>
     <Reference Include="Astral-cleaned">
       <HintPath>D:\Games\Astral_RU_1\Astral-cleaned.exe</HintPath>
     </Reference>

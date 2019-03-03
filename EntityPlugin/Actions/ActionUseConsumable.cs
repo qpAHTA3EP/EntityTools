@@ -39,9 +39,9 @@ namespace EntityPlugin.Actions
             {
                 if (ConsumableID == string.Empty)
                 {
-                    return new Action.ActionValidity("ConsumableID property not set.");
+                    return new ActionValidity("ConsumableID property not set.");
                 }
-                return new Action.ActionValidity();
+                return new ActionValidity();
             }
         }
 
@@ -65,11 +65,11 @@ namespace EntityPlugin.Actions
         public override ActionResult Run()
         {
             if (!EntityManager.LocalPlayer.IsValid)
-                return Action.ActionResult.Skip;
+                return ActionResult.Skip;
 
             LocalPlayerEntity character = EntityManager.LocalPlayer;
             if (!character.IsValid)
-                return Action.ActionResult.Skip;
+                return ActionResult.Skip;
 
             foreach (InventorySlot inventorySlot in character.GetInventoryBagById(InvBagIDs.Potions).GetItems)
             {
@@ -77,10 +77,10 @@ namespace EntityPlugin.Actions
                 {
                     inventorySlot.Exec();
                     Thread.Sleep(500);
-                    return Action.ActionResult.Completed;
+                    return ActionResult.Completed;
                 }
             }
-            return Action.ActionResult.Fail;
+            return ActionResult.Fail;
         }
     }
 }
