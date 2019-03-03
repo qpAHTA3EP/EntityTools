@@ -36,6 +36,9 @@
     <Reference Include="Astral">
       <HintPath>D:\Games\Astral_RU_1\Astral.exe</HintPath>
     </Reference>
+    <Reference Include="Astral-cleaned">
+      <HintPath>D:\Games\Astral_RU_1\Astral-cleaned.exe</HintPath>
+    </Reference>
     <Reference Include="MyNW">
       <HintPath>D:\Games\Astral_RU_1\MyNW.dll</HintPath>
     </Reference>
@@ -54,6 +57,8 @@
     <Compile Include="Actions\ActionUseConsumable.cs" />
     <Compile Include="Conditions\ConditionEntityDistance.cs" />
     <Compile Include="Conditions\ConsitionsIsEntityInCustomRegion.cs" />
+    <Compile Include="Conditions\TeamMemberCount.cs" />
+    <Compile Include="Conditions\TeamMemberCountInCustomRegion.cs" />
     <Compile Include="Tools\EntityPluginTools.cs" />
     <Compile Include="EntityPlugin.cs" />
     <Compile Include="Forms\EntitySelectForm.cs">
