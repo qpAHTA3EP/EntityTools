@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
@@ -45,8 +46,8 @@ namespace EntityPlugin.Actions
         {
             EntityID = string.Empty;
             Distance = 0;
-            //InteractIfPossible = false;
-            //InteractTime = 2000;
+            InteractIfPossible = false;
+            InteractTime = 2000;
             IgnoreCombat = false;
         }
 
@@ -54,12 +55,19 @@ namespace EntityPlugin.Actions
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         public string EntityID { get; set; }
 
+        [Description("Distance to the Entity by which it is necessary to approach")]
         public float Distance { get; set; }
 
-        //public bool InteractIfPossible { get; set; }
+        [Description("Try interaction to Entity if possible")]
+        public bool InteractIfPossible { get; set; }
 
-        //public int InteractTime { get; set; }
+        [Description("Time to interact (ms)")]
+        public int InteractTime { get; set; }
 
+
+        [Description("Answers in dialog while interact with Entity")]
+        [Editor(typeof(DialogEditor), typeof(UITypeEditor))]
+        public List<string> Dialogs { get; set; }
 
         private bool _ignoreCombat;
         [Description("Enable IgnoreCombat profile value while playing action")]
@@ -92,9 +100,26 @@ namespace EntityPlugin.Actions
         {
             get
             {
-                //target = Tools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
-                if(target.IsValid)
-                    return !StopOnApproached && target.Location.Distance3DFromPlayer >= Distance;
+                if (string.IsNullOrEmpty(EntityID))
+                    target = new Entity(IntPtr.Zero);
+                else
+                    target = Tools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+
+                //в команде ChangeProfielValue:IgnoreCombat используется код:
+                //Combat.SetIgnoreCombat(IgnoreCombat, -1, 0);
+
+                //Нашел доступный способ управлять запретом боя
+                //Astral.Quester.API.IgnoreCombat = IgnoreCombat;
+
+                if (target.IsValid)
+                {
+                    if(target.Location.Distance3DFromPlayer >= Distance)
+                    {
+                        Astral.Quester.API.IgnoreCombat = _ignoreCombat;
+                        return false;
+                    }
+                    else return true;
+                }
                 else return false;
             }
         }
@@ -109,12 +134,48 @@ namespace EntityPlugin.Actions
                 return ActionResult.Fail;
             }
 
-            if (target.Location.Distance3DFromPlayer >= Distance || !StopOnApproached)
+            if (target.Location.Distance3DFromPlayer < Distance)
             {
-                //Approach.EntityByDistance(target, Distance, null);
-                return ActionResult.Running;
+                if (InteractIfPossible && target.IsValid && target.InteractOption.IsValid && Approach.EntityForInteraction(target, null))
+                {
+                    MyNW.Internals.Movements.StopNavTo();
+                    Thread.Sleep(500);
+                    target.Interact();
+                    Thread.Sleep(InteractTime);
+                    Interact.WaitForInteraction();
+                    if (Dialogs.Count > 0)
+                    {
+                        Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);
+                        while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count == 0)
+                        {
+                            if (timeout.IsTimedOut)
+                            {
+                                return ActionResult.Running;
+                            }
+                            Thread.Sleep(100);
+                        }
+                        Thread.Sleep(500);
+                        using (List<string>.Enumerator enumerator = Dialogs.GetEnumerator())
+                        {
+                            while (enumerator.MoveNext())
+                            {
+                                string key = enumerator.Current;
+                                EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.SelectOptionByKey(key, "");
+                                Thread.Sleep(1000);
+                            }
+                        }
+                    }
+                    EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
+                    target = new Entity(IntPtr.Zero);
+                }
+
+                Astral.Quester.API.IgnoreCombat = false;
+                if (StopOnApproached)
+                    return ActionResult.Completed;
             }
-            return ActionResult.Completed;
+
+            Astral.Quester.API.IgnoreCombat = false;
+            return ActionResult.Running;
         }
 
         public override bool UseHotSpots => false;
@@ -123,11 +184,6 @@ namespace EntityPlugin.Actions
         {
             get
             {
-                if (string.IsNullOrEmpty(EntityID))
-                    target = new Entity(IntPtr.Zero);
-                else
-                    target = Tools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
-
                 if (target.IsValid)
                 {
                     return target.Location.Clone();
@@ -140,7 +196,7 @@ namespace EntityPlugin.Actions
         {
             get
             {
-                if (EntityID == string.Empty)
+                if (string.IsNullOrEmpty(EntityID))
                 {
                     return new Action.ActionValidity("EntityID property not set.");
                 }

@@ -23,24 +23,23 @@ namespace EntityPlugin.Conditions
                     return false;
 
                 Character character = EntityManager.LocalPlayer.Character;
-                if ( !character.IsValid )
-                    return false;
-
-                float HealthPercent = (character.AttribsBasic.MaxHealth > 0) ? 100 * character.AttribsBasic.Health / character.AttribsBasic.MaxHealth : 0;
-
-                switch (Sign)
+                if (character.IsValid)
                 {
-                    case Relation.Equal:
-                        return HealthPercent == Value;
-                    case Relation.NotEqual:
-                        return HealthPercent != Value;
-                    case Relation.Inferior:
-                        return HealthPercent < Value;
-                    case Relation.Superior:
-                        return HealthPercent > Value;
-                    default:
-                        return false;
+                    switch (Sign)
+                    {
+                        case Relation.Equal:
+                            return character.AttribsBasic.HealthPercent == Value;
+                        case Relation.NotEqual:
+                            return character.AttribsBasic.HealthPercent != Value;
+                        case Relation.Inferior:
+                            return character.AttribsBasic.HealthPercent < Value;
+                        case Relation.Superior:
+                            return character.AttribsBasic.HealthPercent > Value;
+                        default:
+                            return false;
+                    }
                 }
+                return false;
             }
         }
 
@@ -50,7 +49,7 @@ namespace EntityPlugin.Conditions
 
         public override string ToString()
         {
-            return string.Format("Check if PlayerHealth {0} to {1}", Sign, Value);
+            return $"Check if PlayerHealth {Sign} to {Value}";
         }
 
          public override string TestInfos
@@ -64,9 +63,7 @@ namespace EntityPlugin.Conditions
                 if (!character.IsValid)
                     return "'LocalPlayer.Character' not valid";
 
-                float HealthPercent = (character.AttribsBasic.MaxHealth > 0) ? 100 * character.AttribsBasic.Health / character.AttribsBasic.MaxHealth : 0;
-
-                return string.Format("PlayerHealth is {0} %", HealthPercent);
+                return $"PlayerHealth is {character.AttribsBasic.HealthPercent} %";
             }
         }
     }

@@ -17,7 +17,7 @@ namespace EntityPlugin.Conditions
     {
         public EntityDistance()
         {
-            EntityID = "";
+            EntityID = string.Empty;
             Distance = 0;
             Sign = Relation.Inferior;
         }
@@ -35,45 +35,48 @@ namespace EntityPlugin.Conditions
         {
             get
             {
-                Entity closestEntity = Tools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
-
-                //if(entities.Count > 0)
-                //    closestEntity = entities.FindLast((Entity x) => (Regex.IsMatch(x.NameUntranslated, EntityID) && (x.CombatDistance < Distance))); 
-
-                //List<Entity> entityList = entities.Find((Entity x) => x.CombatDistance3 < Distance);
-
-                //string mess = "";
-                bool result = false;
-                switch (Sign)
+                if (!string.IsNullOrEmpty(EntityID))
                 {
-                    case Relation.Equal:
-                        return result = (closestEntity != null) && (closestEntity.Location.Distance3DFromPlayer == Distance);
+                    Entity closestEntity = Tools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+
+                    //if(entities.Count > 0)
+                    //    closestEntity = entities.FindLast((Entity x) => (Regex.IsMatch(x.NameUntranslated, EntityID) && (x.CombatDistance < Distance))); 
+
+                    //List<Entity> entityList = entities.Find((Entity x) => x.CombatDistance3 < Distance);
+
+                    //string mess = "";
+                    bool result = false;
+                    switch (Sign)
+                    {
+                        case Relation.Equal:
+                            return result = (closestEntity != null) && (closestEntity.Location.Distance3DFromPlayer == Distance);
                         //mess = (result) ? Relation.Equal.ToString() : Relation.NotEqual.ToString();
                         //break;
-                    case Relation.NotEqual:
-                        return result = (closestEntity != null) && (closestEntity.Location.Distance3DFromPlayer != Distance);
+                        case Relation.NotEqual:
+                            return result = (closestEntity != null) && (closestEntity.Location.Distance3DFromPlayer != Distance);
                         //mess = (result) ? Relation.NotEqual.ToString() : Relation.Equal.ToString();
                         //break;
-                    case Relation.Inferior:
-                        return result = (closestEntity != null) && (closestEntity.Location.Distance3DFromPlayer < Distance);
+                        case Relation.Inferior:
+                            return result = (closestEntity != null) && (closestEntity.Location.Distance3DFromPlayer < Distance);
                         //mess = ((result) ? "" : "Not")+ Relation.Inferior.ToString();
                         //break;
-                    case Relation.Superior:
-                        return result = (closestEntity == null) || (closestEntity.Location.Distance3DFromPlayer > Distance);
-                        //mess = (result) ? Relation.Superior.ToString() : Relation.Inferior.ToString(); ;
-                        //break;
+                        case Relation.Superior:
+                            return result = (closestEntity == null) || (closestEntity.Location.Distance3DFromPlayer > Distance);
+                            //mess = (result) ? Relation.Superior.ToString() : Relation.Inferior.ToString(); ;
+                            //break;
+                    }
+
+                    //if (Sign == Relation.Equal || Sign == Relation.NotEqual)
+                    //    mess = (closestEntity.CombatDistance == Distance) ? Relation.Equal.ToString(): Relation.NotEqual.ToString();
+                    //else if (Sign == Relation.Inferior || Sign == Relation.Superior)
+                    //    mess = (closestEntity.CombatDistance == Distance) ? Relation.Equal.ToString() : Relation.NotEqual.ToString();
+
+                    //Debug.WriteLine(string.Format("Entity [{1}] matched to [{2}] at the Distance = {3} that {4} to {5}", 
+                    //    closestEntity.NameUntranslated,                                
+                    //    EntityID, 
+                    //    closestEntity.CombatDistance,
+                    //    mess, Distance));
                 }
-
-                //if (Sign == Relation.Equal || Sign == Relation.NotEqual)
-                //    mess = (closestEntity.CombatDistance == Distance) ? Relation.Equal.ToString(): Relation.NotEqual.ToString();
-                //else if (Sign == Relation.Inferior || Sign == Relation.Superior)
-                //    mess = (closestEntity.CombatDistance == Distance) ? Relation.Equal.ToString() : Relation.NotEqual.ToString();
-
-                //Debug.WriteLine(string.Format("Entity [{1}] matched to [{2}] at the Distance = {3} that {4} to {5}", 
-                //    closestEntity.NameUntranslated,                                
-                //    EntityID, 
-                //    closestEntity.CombatDistance,
-                //    mess, Distance));
 
                 return false;
             }
