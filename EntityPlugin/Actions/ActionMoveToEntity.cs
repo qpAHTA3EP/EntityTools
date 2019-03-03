@@ -23,7 +23,7 @@ namespace EntityPlugin.Actions
         {
             get
             {
-                return string.Format("MoveToEntity [{0}]", EntityID);
+                return $"{GetType().Name} [{EntityID}]";
             }
         }
 
@@ -44,7 +44,7 @@ namespace EntityPlugin.Actions
             Distance = 0;
             //InteractIfPossible = false;
             //InteractTime = 2000;
-            //IgnoreCombat = false;
+            IgnoreCombat = false;
         }
 
         [Description("ID (an internal untranslated name) of the Entity for the search (regex)")]
@@ -57,8 +57,19 @@ namespace EntityPlugin.Actions
 
         //public int InteractTime { get; set; }
 
-        //[Description("Enable IgnoreCombat profile value while playing action")]
-        //public bool IgnoreCombat { get; set; }
+        [Description("Enable IgnoreCombat profile value while playing action")]
+        public bool IgnoreCombat
+        {
+            get
+            {
+
+                return _ignoreCombat;
+            }
+            set
+            {
+                _ignoreCombat = value;
+            }
+        }
 
         [Description("Complite an action when Entity had been approached (if true)")]
         public bool StopOnApproached { get; set; }
@@ -76,19 +87,8 @@ namespace EntityPlugin.Actions
                 if (!target.IsValid)
                 {
                     target = Tools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
-                    
-                    //foreach (Entity entity in from e in EntityManager.GetEntities()
-                    //                          orderby e.Location.Distance3D(NPCInfos.Position)
-                    //                          select e)
-                    //{
-                    //    if (entity.RelationToPlayer == EntityRelation.Friend && entity.Type == GlobalType.ENTITYCRITTER && (string.IsNullOrEmpty(NPCInfos.CostumeName) || entity.CostumeRef.CostumeName == NPCInfos.CostumeName))
-                    //    {
-                    //        target = entity;
-                    //        break;
-                    //    }
-                    //}
                 }
-                return target.IsValid && ( !StopOnApproached || target.Location.Distance3DFromPlayer >= Distance);
+                return target.IsValid && (!StopOnApproached || target.Location.Distance3DFromPlayer >= Distance);
             }
         }
 
@@ -96,16 +96,16 @@ namespace EntityPlugin.Actions
         {
             if (!target.IsValid)
             {
-                Logger.WriteLine(string.Format("Entity [{0}] not founded.", EntityID));
+                Logger.WriteLine($"Entity [{EntityID}] not founded.");
                 return Action.ActionResult.Fail;
             }
 
             if (target.Location.Distance3DFromPlayer > Distance || !StopOnApproached)
             {
-                Approach.EntityByDistance(target, Distance, null);
+                //Approach.EntityByDistance(target, Distance, null);
                 return Action.ActionResult.Running;
             }
-            return Action.ActionResult.Completed;            
+            return Action.ActionResult.Completed;
         }
 
         public override bool UseHotSpots => false;
@@ -140,5 +140,6 @@ namespace EntityPlugin.Actions
 
         [NonSerialized]
         private Entity target = new Entity(IntPtr.Zero);
+        private bool _ignoreCombat;
     }
 }

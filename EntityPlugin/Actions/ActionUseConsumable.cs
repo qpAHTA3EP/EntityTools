@@ -19,13 +19,13 @@ namespace EntityPlugin.Actions
         {
             get
             {
-                return String.Format("UseConsumable [{0}]", ConsumableID);
+                return $"{GetType().Name} [{ConsumableID}]";
             }
         }
 
         public override bool NeedToRun => true;
 
-        public override string InternalDisplayName => "UseConsumable";
+        public override string InternalDisplayName => GetType().Name;
 
         public override bool UseHotSpots => false;
 

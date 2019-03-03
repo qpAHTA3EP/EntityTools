@@ -20,16 +20,19 @@ namespace EntityPlugin
         public static Entity FindClosestEntity(List<Entity> entities, string entPattern)
         {
             Entity closestEntity = new Entity(IntPtr.Zero);
-            foreach (Entity entity in entities)
+            if (!string.IsNullOrEmpty(entPattern))
             {
-                if (Regex.IsMatch(entity.NameUntranslated, entPattern))
+                foreach (Entity entity in entities)
                 {
-                    if (closestEntity.IsValid)
+                    if (Regex.IsMatch(entity.NameUntranslated, entPattern))
                     {
-                        if (entity.Location.Distance3DFromPlayer < closestEntity.Location.Distance3DFromPlayer)
-                            closestEntity = entity;
+                        if (closestEntity.IsValid)
+                        {
+                            if (entity.Location.Distance3DFromPlayer < closestEntity.Location.Distance3DFromPlayer)
+                                closestEntity = entity;
+                        }
+                        else closestEntity = entity;
                     }
-                    else closestEntity = entity;
                 }
             }
             return closestEntity;

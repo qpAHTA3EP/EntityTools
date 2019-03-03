@@ -85,10 +85,7 @@ namespace EntityPlugin.Conditions
 
         public override string ToString()
         {
-            return string.Format("Entity [{0}] Distance {1} to {2}",
-                    EntityID,
-                    Sign,
-                    Distance);
+            return $"Entity [{EntityID}] Distance {Sign} to {Distance}";
         }
 
         public override string TestInfos
@@ -99,13 +96,11 @@ namespace EntityPlugin.Conditions
 
                 if (closestEntity.IsValid)
                 {
-                    return string.Format("Found closect Entity [{0}] at the Distance = {1}",
-                            closestEntity.NameUntranslated,
-                            closestEntity.Location.Distance3DFromPlayer);
+                    return $"Found closect Entity [{closestEntity.NameUntranslated}] at the Distance = {closestEntity.Location.Distance3DFromPlayer}";
                 }
                 else
                 {
-                    return string.Format("No one Entity matched to [{0}]", EntityID);
+                    return $"No one Entity matched to [{EntityID}]";
                 }
             }
         }
