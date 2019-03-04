@@ -69,23 +69,8 @@ namespace EntityPlugin.Actions
         [Editor(typeof(DialogEditor), typeof(UITypeEditor))]
         public List<string> Dialogs { get; set; }
 
-        private bool _ignoreCombat;
         [Description("Enable IgnoreCombat profile value while playing action")]
-        public bool IgnoreCombat
-        {
-            get
-            {
-                if (target.IsValid)
-                {
-                    return _ignoreCombat && (target.Location.Distance3DFromPlayer > Distance);
-                }
-                return _ignoreCombat;                
-            }
-            set
-            {
-                _ignoreCombat = value;
-            }
-        }
+        public bool IgnoreCombat { get; set; }
 
         [Description("Complite an action when Entity had been approached (if true)")]
         public bool StopOnApproached { get; set; }
@@ -94,7 +79,7 @@ namespace EntityPlugin.Actions
         {
         }
 
-        protected override bool IntenalConditions => (EntityID != string.Empty);
+        protected override bool IntenalConditions => !string.IsNullOrEmpty(EntityID) ;
 
         public override bool NeedToRun
         {
@@ -115,7 +100,7 @@ namespace EntityPlugin.Actions
                 {
                     if(target.Location.Distance3DFromPlayer >= Distance)
                     {
-                        Astral.Quester.API.IgnoreCombat = _ignoreCombat;
+                        Astral.Quester.API.IgnoreCombat = IgnoreCombat;
                         return false;
                     }
                     else return true;
@@ -133,6 +118,7 @@ namespace EntityPlugin.Actions
                 Logger.WriteLine($"Entity [{EntityID}] not founded.");
                 return ActionResult.Fail;
             }
+            ActionResult actnReslt = ActionResult.Running;
 
             if (target.Location.Distance3DFromPlayer < Distance)
             {
@@ -150,7 +136,8 @@ namespace EntityPlugin.Actions
                         {
                             if (timeout.IsTimedOut)
                             {
-                                return ActionResult.Running;
+                                actnReslt = ActionResult.Running;
+                                break;
                             }
                             Thread.Sleep(100);
                         }
@@ -171,11 +158,11 @@ namespace EntityPlugin.Actions
 
                 Astral.Quester.API.IgnoreCombat = false;
                 if (StopOnApproached)
-                    return ActionResult.Completed;
+                    actnReslt = ActionResult.Completed;
             }
 
             Astral.Quester.API.IgnoreCombat = false;
-            return ActionResult.Running;
+            return actnReslt;
         }
 
         public override bool UseHotSpots => false;
