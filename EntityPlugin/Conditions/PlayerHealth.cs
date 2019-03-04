@@ -49,7 +49,7 @@ namespace EntityPlugin.Conditions
 
         public override string ToString()
         {
-            return $"Check if PlayerHealth {Sign} to {Value}";
+            return $"Check if {GetType().Name} {Sign} to {Value}";
         }
 
          public override string TestInfos
@@ -63,7 +63,7 @@ namespace EntityPlugin.Conditions
                 if (!character.IsValid)
                     return "'LocalPlayer.Character' not valid";
 
-                return $"PlayerHealth is {character.AttribsBasic.HealthPercent} %";
+                return $"{GetType().Name} is {character.AttribsBasic.HealthPercent} %";
             }
         }
     }
