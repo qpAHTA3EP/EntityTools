@@ -43,7 +43,8 @@ namespace EntityPlugin.Conditions
             Tested = Condition.Presence.Equal;
             EntityID = string.Empty;
 
-            foreach (CustomRegion customRegion in Core.Profile.CustomRegions)
+            CustomRegionName = string.Empty;
+            foreach (CustomRegion customRegion in Astral.Quester.API.CurrentProfile.CustomRegions)
             {
                 if (customRegion.IsIn)
                 {
@@ -55,31 +56,34 @@ namespace EntityPlugin.Conditions
 
         public override string ToString()
         {
-            return "CustomRegion " + Tested + " " + CustomRegionName;
+            return $"{GetType().Name} [{CustomRegionName}]";
         }
 
         public override bool IsValid
         {
             get
             {
-                List<Entity> allEntities = EntityManager.GetEntities();
-
-                List<Entity> entities = allEntities.FindAll((Entity x) => Regex.IsMatch(x.NameUntranslated, EntityID));
-
-                foreach (Entity entity in entities)
+                if (!string.IsNullOrEmpty(EntityID) && !string.IsNullOrEmpty(CustomRegionName))
                 {
-                    foreach (CustomRegion customRegion in Core.Profile.CustomRegions)
+                    List<Entity> allEntities = EntityManager.GetEntities();
+
+                    List<Entity> entities = allEntities.FindAll((Entity x) => Regex.IsMatch(x.NameUntranslated, EntityID));
+
+                    foreach (Entity entity in entities)
                     {
-                        if (customRegion.Name == this.CustomRegionName)
+                        foreach (CustomRegion customRegion in Astral.Quester.API.CurrentProfile.CustomRegions)
                         {
-                            Condition.Presence tested = this.Tested;
-                            if (tested == Condition.Presence.Equal)
+                            if (customRegion.Name == this.CustomRegionName)
                             {
-                                return Tools.IsInCustomRegion(entity, customRegion);
-                            }
-                            if (tested == Condition.Presence.NotEquel)
-                            {
-                                return !Tools.IsInCustomRegion(entity, customRegion); ;
+                                Condition.Presence tested = this.Tested;
+                                if (tested == Condition.Presence.Equal)
+                                {
+                                    return Tools.IsInCustomRegion(entity, customRegion);
+                                }
+                                if (tested == Condition.Presence.NotEquel)
+                                {
+                                    return !Tools.IsInCustomRegion(entity, customRegion); ;
+                                }
                             }
                         }
                     }
@@ -92,23 +96,44 @@ namespace EntityPlugin.Conditions
         {
             get
             {
-                List<Entity> allEntities = EntityManager.GetEntities();
 
-                List<Entity> entities = allEntities.FindAll((Entity x) => Regex.IsMatch(x.NameUntranslated, EntityID));
-
-                string text = $"Entities [{EntityID}] are detected in custom regions :";
-
-                foreach (Entity entity in entities)
+                if (!string.IsNullOrEmpty(EntityID) && !string.IsNullOrEmpty(CustomRegionName))
                 {
-                    foreach (CustomRegion customRegion in Core.Profile.CustomRegions)
+                    List<Entity> allEntities = EntityManager.GetEntities();
+
+                    List<Entity> entities = allEntities.FindAll((Entity x) => Regex.IsMatch(x.NameUntranslated, EntityID));
+
+                    StringBuilder strBldr = new StringBuilder();
+                    strBldr.AppendLine();
+                    uint entCount = 0;
+
+                    foreach (Entity entity in entities)
                     {
-                        if (Tools.IsInCustomRegion(entity, customRegion))
+                        StringBuilder strBldr2 = new StringBuilder();
+
+                        foreach (CustomRegion customRegion in Astral.Quester.API.CurrentProfile.CustomRegions)
                         {
-                            text = text + customRegion.Name + Environment.NewLine;
+                            if (Tools.IsInCustomRegion(entity, customRegion))
+                            {
+                                if (strBldr2.Length > 0)
+                                    strBldr2.Append(", ");
+                                strBldr2.Append($"[{customRegion.Name}]");
+                            }
                         }
+                        if (strBldr2.Length > 0)
+                        {
+                            strBldr.AppendLine($"[{entity.InternalName}] is in CustomRegions: ").Append(strBldr2);
+                            entCount++;
+                        }
+
+
                     }
+                    strBldr.Insert(0, $"Total {entCount} Entities [{EntityID}] are detected in CustomRegion [{CustomRegionName}]:");
+
+
+                    return strBldr.ToString();
                 }
-                return text;
+                return "EntityID or CustomRegionName properties are not set";
             }
         }
 
