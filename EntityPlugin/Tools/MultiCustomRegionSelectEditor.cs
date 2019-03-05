@@ -35,6 +35,7 @@ namespace EntityPlugin.Editors
                     if (cr != null)
                         regions.Add(cr.Name);
                 }
+                return regions;
             }
             return value;
         }

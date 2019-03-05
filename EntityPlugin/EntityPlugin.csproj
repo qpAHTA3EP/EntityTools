@@ -38,11 +38,11 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.Utils.v18.1">
-      <HintPath>..\..\QuesterAssistant\QuesterAssistant\Temp\DevExpress.Utils.v18.1.dll</HintPath>
+      <HintPath>D:\Games\DevExpress\DevExpress.Utils.v18.1.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.XtraEditors.v18.1">
-      <HintPath>..\..\QuesterAssistant\QuesterAssistant\Temp\DevExpress.XtraEditors.v18.1.dll</HintPath>
+      <HintPath>D:\Games\DevExpress\DevExpress.XtraEditors.v18.1.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MyNW">
@@ -63,6 +63,7 @@
     <Compile Include="Actions\InteractEntity.cs" />
     <Compile Include="Conditions\EntityDistance.cs" />
     <Compile Include="Conditions\IsEntityInCustomRegion.cs" />
+    <Compile Include="Conditions\PartyCount.cs" />
     <Compile Include="Conditions\TeamMemberCount.cs" />
     <Compile Include="Conditions\TeamMemberCountInCustomRegion.cs" />
     <Compile Include="Tools\EntityPluginTools.cs" />

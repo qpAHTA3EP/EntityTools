@@ -23,6 +23,7 @@ namespace EntityPlugin.Conditions
         public Presence Tested { get; set; }
 
         //[Editor(typeof(CustomRegionEditor), typeof(UITypeEditor))]
+        [Description("CustomRegion names collection")]
         [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
         public List<string> CustomRegionNames { get; set; }
 
@@ -34,8 +35,8 @@ namespace EntityPlugin.Conditions
 
         public TeamMemberCountInCustomRegions()
         {
-            MemberCount = 3;
-            Sign = Relation.Inferior;
+            MemberCount = 0;
+            Sign = Relation.Superior;
 
             Tested = Presence.Equal;
 
@@ -53,17 +54,17 @@ namespace EntityPlugin.Conditions
         public override string ToString()
         {
             StringBuilder strBldr = new StringBuilder(GetType().Name);
-            switch (CustomRegionNames.Count)
-            {
-                case 0:
-                    break;
-                case 1:
-                    strBldr.Append($": [{CustomRegionNames[0]}]");
-                    break;
-                default:
-                    strBldr.Append($": [{CustomRegionNames[0]}] and {CustomRegionNames.Count-1} other");
-                    break;
-            }
+            //switch (CustomRegionNames.Count)
+            //{
+            //    case 0:
+            //        break;
+            //    case 1:
+            //        strBldr.Append($": [{CustomRegionNames[0]}]");
+            //        break;
+            //    default:
+            //        strBldr.Append($": [{CustomRegionNames[0]}] and {CustomRegionNames.Count-1} other");
+            //        break;
+            //}
 
             strBldr.Append($" {Sign} to {MemberCount}");
 
@@ -125,6 +126,18 @@ namespace EntityPlugin.Conditions
 
                     StringBuilder strBldr = new StringBuilder();
                     strBldr.AppendLine();
+                    //StringBuilder strBldr3 = new StringBuilder();
+                    //switch (CustomRegionNames.Count)
+                    //{
+                    //    case 0:
+                    //        break;
+                    //    case 1:
+                    //        strBldr3.Append($"[{CustomRegionNames[0]}]");
+                    //        break;
+                    //    default:
+                    //        strBldr3.Append($"[{CustomRegionNames[0]}] and {CustomRegionNames.Count - 1} other");
+                    //        break;
+                    //}
 
                     foreach (TeamMember member in EntityManager.LocalPlayer.PlayerTeam.Team.Members)
                     {
@@ -144,7 +157,7 @@ namespace EntityPlugin.Conditions
 
                             if (strBldr2.Length > 0)
                             {
-                                strBldr.AppendLine($"[{member.Entity.InternalName}] is in CustomRegions: ").Append(strBldr2);
+                                strBldr.AppendLine($"[{member.Entity.InternalName}] is in CustomRegion(s): ").Append(strBldr2);
                                 memsCount++;
                             }
                         }
@@ -152,12 +165,14 @@ namespace EntityPlugin.Conditions
 
                     if (Tested == Presence.Equal)
                     {
-                        strBldr.Insert(0, $"Total {memsCount} TeamMember are in CustomRegion [{CustomRegionNames}]:");
+                        //strBldr.Insert(0, $"Total {memsCount} TeamMember are in CustomRegions {{{strBldr3}}}:");
+                        strBldr.Insert(0, $"Total {memsCount} TeamMember are in {CustomRegionNames.Count} CustomRegion(s):");
                     }
                     else
                     {
                         memsCount = EntityManager.LocalPlayer.PlayerTeam.Team.MembersCount - 1 - memsCount;
-                        strBldr.Insert(0, $"Total {memsCount} TeamMember are not in CustomRegion [{CustomRegionNames}]:");
+                        //strBldr.Insert(0, $"Total {memsCount} TeamMember are not in CustomRegions {{{strBldr3}}}");
+                        strBldr.Insert(0, $"Total {memsCount} TeamMember are not in {CustomRegionNames.Count} CustomRegion(s):");
                     }
 
 

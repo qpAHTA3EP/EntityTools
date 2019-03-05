@@ -16,13 +16,7 @@ namespace EntityPlugin.Actions
 {
     public class InteractEntity : Astral.Quester.Classes.Action
     {
-        public override string ActionLabel
-        {
-            get
-            {
-                return "InteractEntity [" + this.Name + "]";
-            }
-        }
+        public override string ActionLabel => "[Depricated] InteractEntity [" + this.Name + "]";
 
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         public string Name { get; set; }
@@ -32,6 +26,8 @@ namespace EntityPlugin.Actions
         public int InteractTime { get; set; }
 
         public int SkipTime { get; set; }
+
+        public override string Category => "Depricated";
 
         public override void InternalReset()
         {
@@ -49,13 +45,7 @@ namespace EntityPlugin.Actions
         {
         }
 
-        protected override bool IntenalConditions
-        {
-            get
-            {
-                return true;
-            }
-        }
+        protected override bool IntenalConditions => true;
 
         public InteractEntity()
         {
@@ -77,13 +67,7 @@ namespace EntityPlugin.Actions
             }
         }
 
-        public override bool NeedToRun
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool NeedToRun => true;
 
         public override Astral.Quester.Classes.Action.ActionResult Run()
         {
@@ -139,21 +123,9 @@ namespace EntityPlugin.Actions
             return Astral.Quester.Classes.Action.ActionResult.Completed;
         }
 
-        protected override Vector3 InternalDestination
-        {
-            get
-            {
-                return new Vector3();
-            }
-        }
+        protected override Vector3 InternalDestination => new Vector3();
 
-         public override bool UseHotSpots
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public override bool UseHotSpots => false;
 
         public override void OnMapDraw(GraphicsNW graph)
         {
