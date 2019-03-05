@@ -27,28 +27,31 @@ namespace EntityPlugin.Conditions
     /// </summary>
 
     [Serializable]
-    public class IsEntityInCustomRegion : Condition
+    public class IsEntityInCustomRegions : Condition
     {
         public Condition.Presence Tested { get; set; }
 
-        [Editor(typeof(CustomRegionEditor), typeof(UITypeEditor))]
-        public string CustomRegionName { get; set; }
+        //[Editor(typeof(CustomRegionEditor), typeof(UITypeEditor))]
+        //public string CustomRegionName { get; set; }
+        [Description("CustomRegion names collection")]
+        [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
+        public List<string> CustomRegionNames { get; set; }
 
         [Description("ID (an untranslated name) of the Entity for the search (regex)")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         public string EntityID { get; set; }
 
-        public IsEntityInCustomRegion()
+        public IsEntityInCustomRegions()
         {
             Tested = Condition.Presence.Equal;
             EntityID = string.Empty;
 
-            CustomRegionName = string.Empty;
+            CustomRegionNames = new List<string>();
             foreach (CustomRegion customRegion in Astral.Quester.API.CurrentProfile.CustomRegions)
             {
                 if (customRegion.IsIn)
                 {
-                    CustomRegionName = customRegion.Name;
+                    CustomRegionNames.Add(customRegion.Name);
                     break;
                 }
             }
@@ -56,34 +59,33 @@ namespace EntityPlugin.Conditions
 
         public override string ToString()
         {
-            return $"{GetType().Name} [{CustomRegionName}]";
+            return GetType().Name;
         }
 
         public override bool IsValid
         {
             get
             {
-                if (!string.IsNullOrEmpty(EntityID) && !string.IsNullOrEmpty(CustomRegionName))
+                if (!string.IsNullOrEmpty(EntityID) && CustomRegionNames.Count > 0)
                 {
                     List<Entity> allEntities = EntityManager.GetEntities();
 
                     List<Entity> entities = allEntities.FindAll((Entity x) => Regex.IsMatch(x.NameUntranslated, EntityID));
 
+                    List<CustomRegion> customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) =>
+                                                               CustomRegionNames.Exists((string regName) => regName == cr.Name));
+
                     foreach (Entity entity in entities)
                     {
-                        foreach (CustomRegion customRegion in Astral.Quester.API.CurrentProfile.CustomRegions)
+                        foreach (CustomRegion cr in customRegions)
                         {
-                            if (customRegion.Name == this.CustomRegionName)
+                            if (Tested == Condition.Presence.Equal)
                             {
-                                Condition.Presence tested = this.Tested;
-                                if (tested == Condition.Presence.Equal)
-                                {
-                                    return Tools.IsInCustomRegion(entity, customRegion);
-                                }
-                                if (tested == Condition.Presence.NotEquel)
-                                {
-                                    return !Tools.IsInCustomRegion(entity, customRegion); ;
-                                }
+                                return Tools.IsInCustomRegion(entity, cr);
+                            }
+                            if (Tested == Condition.Presence.NotEquel)
+                            {
+                                return !Tools.IsInCustomRegion(entity, cr); ;
                             }
                         }
                     }
@@ -97,11 +99,14 @@ namespace EntityPlugin.Conditions
             get
             {
 
-                if (!string.IsNullOrEmpty(EntityID) && !string.IsNullOrEmpty(CustomRegionName))
+                if (!string.IsNullOrEmpty(EntityID) && CustomRegionNames.Count > 0)
                 {
                     List<Entity> allEntities = EntityManager.GetEntities();
 
                     List<Entity> entities = allEntities.FindAll((Entity x) => Regex.IsMatch(x.NameUntranslated, EntityID));
+
+                    List<CustomRegion> customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) =>
+                                                               CustomRegionNames.Exists((string regName) => regName == cr.Name));
 
                     StringBuilder strBldr = new StringBuilder();
                     strBldr.AppendLine();
@@ -111,7 +116,7 @@ namespace EntityPlugin.Conditions
                     {
                         StringBuilder strBldr2 = new StringBuilder();
 
-                        foreach (CustomRegion customRegion in Astral.Quester.API.CurrentProfile.CustomRegions)
+                        foreach (CustomRegion customRegion in customRegions)
                         {
                             if (Tools.IsInCustomRegion(entity, customRegion))
                             {
@@ -126,7 +131,7 @@ namespace EntityPlugin.Conditions
                             entCount++;
                         }
                     }
-                    strBldr.Insert(0, $"Total {entCount} Entities [{EntityID}] are detected in CustomRegion [{CustomRegionName}]:");
+                    strBldr.Insert(0, $"Total {entCount} Entities [{EntityID}] are detected in {CustomRegionNames.Count} CustomRegion:");
 
 
                     return strBldr.ToString();
