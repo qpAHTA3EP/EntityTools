@@ -28,7 +28,7 @@ namespace EntityPlugin.Conditions
         public List<string> CustomRegionNames { get; set; }
 
         [Description("Threshold value of the Team members for comparison by 'Sign'")]
-        public int MemberCount { get; set; }
+        public uint MemberCount { get; set; }
 
         [Description("The comparison type for 'MemberCount'")]
         public Relation Sign { get; set; }

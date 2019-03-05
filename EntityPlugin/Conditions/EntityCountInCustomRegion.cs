@@ -27,7 +27,7 @@ namespace EntityPlugin.Conditions
     /// </summary>
 
     [Serializable]
-    public class IsEntityInCustomRegions : Condition
+    public class EntityCountInCustomRegions : Condition
     {
         public Condition.Presence Tested { get; set; }
 
@@ -41,10 +41,19 @@ namespace EntityPlugin.Conditions
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         public string EntityID { get; set; }
 
-        public IsEntityInCustomRegions()
+        [Description("Threshold value of the Entity number for comparison by 'Sign'")]
+        public uint Value { get; set; }
+
+        [Description("The comparison type for 'Value'")]
+        public Relation Sign { get; set; }
+
+        public EntityCountInCustomRegions()
         {
             Tested = Condition.Presence.Equal;
             EntityID = string.Empty;
+
+            Value = 0;
+            Sign = Relation.Superior;
 
             CustomRegionNames = new List<string>();
             foreach (CustomRegion customRegion in Astral.Quester.API.CurrentProfile.CustomRegions)
@@ -59,7 +68,7 @@ namespace EntityPlugin.Conditions
 
         public override string ToString()
         {
-            return GetType().Name;
+            return $"{GetType().Name} {Sign} {Value}";
         }
 
         public override bool IsValid
@@ -68,26 +77,41 @@ namespace EntityPlugin.Conditions
             {
                 if (!string.IsNullOrEmpty(EntityID) && CustomRegionNames.Count > 0)
                 {
-                    List<Entity> allEntities = EntityManager.GetEntities();
-
-                    List<Entity> entities = allEntities.FindAll((Entity x) => Regex.IsMatch(x.NameUntranslated, EntityID));
+                    List<Entity> entities = EntityManager.GetEntities().FindAll((Entity x) => Regex.IsMatch(x.NameUntranslated, EntityID));
 
                     List<CustomRegion> customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) =>
                                                                CustomRegionNames.Exists((string regName) => regName == cr.Name));
+                    uint entCount = 0;
 
                     foreach (Entity entity in entities)
                     {
+                        bool match = false;
+
                         foreach (CustomRegion cr in customRegions)
                         {
-                            if (Tested == Condition.Presence.Equal)
+                            if (Tools.IsInCustomRegion(entity, cr))
                             {
-                                return Tools.IsInCustomRegion(entity, cr);
-                            }
-                            if (Tested == Condition.Presence.NotEquel)
-                            {
-                                return !Tools.IsInCustomRegion(entity, cr); ;
+                                match = true;
+                                break;
                             }
                         }
+
+                        if (Tested == Presence.Equal && match)
+                            entCount++;
+                        if (Tested == Presence.NotEquel && !match)
+                            entCount++;
+                    }
+
+                    switch(Sign)
+                    {
+                        case Relation.Equal:
+                            return entCount == Value;
+                        case Relation.NotEqual:
+                            return entCount != Value;
+                        case Relation.Inferior:
+                            return entCount < Value;
+                        case Relation.Superior:
+                            return entCount > Value;
                     }
                 }
                 return false;
@@ -101,9 +125,7 @@ namespace EntityPlugin.Conditions
 
                 if (!string.IsNullOrEmpty(EntityID) && CustomRegionNames.Count > 0)
                 {
-                    List<Entity> allEntities = EntityManager.GetEntities();
-
-                    List<Entity> entities = allEntities.FindAll((Entity x) => Regex.IsMatch(x.NameUntranslated, EntityID));
+                    List<Entity> entities = EntityManager.GetEntities().FindAll((Entity x) => Regex.IsMatch(x.NameUntranslated, EntityID));
 
                     List<CustomRegion> customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) =>
                                                                CustomRegionNames.Exists((string regName) => regName == cr.Name));
@@ -115,24 +137,30 @@ namespace EntityPlugin.Conditions
                     foreach (Entity entity in entities)
                     {
                         StringBuilder strBldr2 = new StringBuilder();
+                        bool match = false;
 
                         foreach (CustomRegion customRegion in customRegions)
                         {
                             if (Tools.IsInCustomRegion(entity, customRegion))
-                            {
-                                if (strBldr2.Length > 0)
-                                    strBldr2.Append(", ");
-                                strBldr2.Append($"[{customRegion.Name}]");
-                            }
+                                match = true;
+                            if (strBldr2.Length > 0)
+                                strBldr2.Append(", ");
+                            strBldr2.Append($"[{customRegion.Name}]");
                         }
-                        if (strBldr2.Length > 0)
-                        {
-                            strBldr.AppendLine($"[{entity.InternalName}] is in CustomRegions: ").Append(strBldr2);
-                            entCount++;
-                        }
-                    }
-                    strBldr.Insert(0, $"Total {entCount} Entities [{EntityID}] are detected in {CustomRegionNames.Count} CustomRegion:");
 
+                        if (Tested == Presence.Equal && match)
+                            entCount++;
+                        if (Tested == Presence.NotEquel && !match)
+                            entCount++;
+
+                        strBldr.Append($"[{entity.InternalName}] is in CustomRegions: ").Append(strBldr2).AppendLine();
+
+                    }
+
+                    if (Tested == Presence.Equal)
+                        strBldr.Insert(0, $"Total {entCount} Entities [{EntityID}] are detected in {CustomRegionNames.Count} CustomRegion:");
+                    if(Tested == Presence.NotEquel)
+                        strBldr.Insert(0, $"Total {entCount} Entities [{EntityID}] are detected out of {CustomRegionNames.Count} CustomRegion:");
 
                     return strBldr.ToString();
                 }

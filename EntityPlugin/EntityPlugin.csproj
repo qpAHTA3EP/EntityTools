@@ -62,7 +62,7 @@
   <ItemGroup>
     <Compile Include="Actions\InteractEntity.cs" />
     <Compile Include="Conditions\EntityDistance.cs" />
-    <Compile Include="Conditions\IsEntityInCustomRegion.cs" />
+    <Compile Include="Conditions\EntityCountInCustomRegion.cs" />
     <Compile Include="Conditions\PartyCount.cs" />
     <Compile Include="Conditions\TeamMemberCount.cs" />
     <Compile Include="Conditions\TeamMemberCountInCustomRegion.cs" />
