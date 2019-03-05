@@ -37,6 +37,14 @@
       <HintPath>D:\Games\Astral_RU_1\Astral-cleaned.exe</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="DevExpress.Utils.v18.1">
+      <HintPath>..\..\QuesterAssistant\QuesterAssistant\Temp\DevExpress.Utils.v18.1.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraEditors.v18.1">
+      <HintPath>..\..\QuesterAssistant\QuesterAssistant\Temp\DevExpress.XtraEditors.v18.1.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="MyNW">
       <HintPath>D:\Games\Astral_RU_1\MyNW.dll</HintPath>
       <Private>False</Private>
@@ -79,6 +87,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Tools\EntityIdEditor.cs" />
+    <Compile Include="Tools\MultiCustomRegionSelectEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\EntitySelectForm.resx">

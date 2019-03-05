@@ -16,10 +16,10 @@ namespace EntityPlugin.Conditions
 {
     /// <summary>
     /// Проверка наличия хотя бы одного объекта Entity, подпадающих под шаблон EntityID,
-    /// в регионе CustomRegion, заданным в CustomRegionName
+    /// в регионе CustomRegion, заданным в CustomRegionNames
     /// 
     /// Варианты реализации:
-    /// 1)  Подсчет количества подходящих объектов Entity в регионе CustomRegionName и 
+    /// 1)  Подсчет количества подходящих объектов Entity в регионе CustomRegionNames и 
     ///     сопоставление (больше/ меньше/равно)его с заданной величиной Value
     /// 2)  Тоже самое на со списком регионов CustomRegionNames:
     /// 2.1)    Проверка наличия подходящих объектов Entity в любом из CustomRegionNames
@@ -125,15 +125,13 @@ namespace EntityPlugin.Conditions
                             strBldr.AppendLine($"[{entity.InternalName}] is in CustomRegions: ").Append(strBldr2);
                             entCount++;
                         }
-
-
                     }
                     strBldr.Insert(0, $"Total {entCount} Entities [{EntityID}] are detected in CustomRegion [{CustomRegionName}]:");
 
 
                     return strBldr.ToString();
                 }
-                return "EntityID or CustomRegionName properties are not set";
+                return "EntityID or CustomRegionNames properties are not set";
             }
         }
 

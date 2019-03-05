@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Text;
 using System.Windows.Forms;
+using Astral.Quester.Classes;
 using MyNW.Classes;
+using MyNW.Internals;
+using static DevExpress.XtraEditors.BaseListBoxControl;
 
 namespace EntityPlugin.Forms
 {
@@ -50,43 +54,46 @@ namespace EntityPlugin.Forms
 
         private void btnTest_Click(object sender, EventArgs e)
         {
-            Entity selectedEntity = UIEntitySelectForm.GetEntity(); 
-
-            if (selectedEntity != null && selectedEntity.IsValid)
-                MessageBox.Show($"Selected Entity is '{selectedEntity.Name}'" + Environment.NewLine +
-                        $"InternalName = [{selectedEntity.InternalName}]" + Environment.NewLine +
-                        $"NameUntranslated = [{selectedEntity.NameUntranslated}]");
-            else MessageBox.Show("Entity is not valid at the moment!");
-
             //Entity entity = new Entity(IntPtr.Zero);
 
-            //Astral.Quester.UIEditors.Forms.SelectList listEditor = new Astral.Quester.UIEditors.Forms.SelectList();
+            Astral.Quester.UIEditors.Forms.SelectList listEditor = new Astral.Quester.UIEditors.Forms.SelectList();
             //listEditor.MinimumSize = new System.Drawing.Size(1000, 500);
 
-            //listEditor.listitems.DataSource = EntityManager.GetEntities();
-            //listEditor.listitems.DisplayMember = "Name";
-            //listEditor.listitems.ValueMember = "NameUntranslated";
-            /////Этот вариант вызывает обработчик listBoxControl_MouseMove
-            ////listEditor.listitems.MouseMove += listBoxControl_MouseMove; 
+            listEditor.Text = "CustomRegionSelect";
+            listEditor.listitems.DataSource = Astral.Quester.API.CurrentProfile.CustomRegions;
+            listEditor.listitems.DisplayMember = "Name";
+            listEditor.listitems.ToolTip = "Press Ctrl+LMB to select several CustomRegions";
 
-            ////ToolTipController toolTipController = new ToolTipController();
-            ////toolTipController.BeforeShow += listBoxControl_toolTipBeforShow;
-            ////listEditor.listitems.ToolTipController = toolTipController;
+            // Этот вариант вызывает обработчик listBoxControl_MouseMove
+            //listEditor.listitems.MouseMove += listBoxControl_MouseMove;
 
-            //DialogResult dialogResult = listEditor.ShowDialog();
-            //if (dialogResult == DialogResult.OK)
-            //{
-            //    if (listEditor.listitems.SelectedItem != null)
-            //    {
-            //        Entity selectedEntity = listEditor.listitems.SelectedItem as Entity;
-            //        if (selectedEntity != null && selectedEntity.IsValid)
-            //            MessageBox.Show($"Selected Entity is '{selectedEntity.Name}'" + Environment.NewLine +
-            //                $"InternalName = [{selectedEntity.InternalName}]" + Environment.NewLine +
-            //                $"NameUntranslated = [{selectedEntity.NameUntranslated}]");
-            //        else MessageBox.Show("Entity is not valid at the moment!");
-            //    }
+            //ToolTipController toolTipController = new ToolTipController();
+            //toolTipController.BeforeShow += listBoxControl_toolTipBeforShow;
+            //listEditor.listitems.ToolTipController = toolTipController;
 
-            //}
+            DialogResult dialogResult = listEditor.ShowDialog();
+            if (dialogResult == DialogResult.OK)
+            {
+                StringBuilder strBldr = new StringBuilder();
+
+                if (listEditor.listitems.SelectedItems.Count > 0)
+                {
+                    strBldr.AppendLine("Selected CustomRegions are:");
+
+                    foreach (CustomRegion item in listEditor.listitems.SelectedItems)
+                    {
+                        CustomRegion cr = item as CustomRegion;
+                        if (cr != null)
+                            strBldr.AppendLine(cr.Name);
+                        else strBldr.AppendLine($"Selected object [{item.ToString()}] can not be cast to CustomRegion");
+                    }
+                }
+
+                if (strBldr.Length == 0)
+                    strBldr.AppendLine("No one CustomRegion was selected");
+
+                MessageBox.Show(strBldr.ToString());
+            }
         }
     }
 }

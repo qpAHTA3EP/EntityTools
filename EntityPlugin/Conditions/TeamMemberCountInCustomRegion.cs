@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Text;
 using Astral.Quester.Classes;
 using Astral.Quester.UIEditors;
+using EntityPlugin.Editors;
 using MyNW.Classes;
 using MyNW.Internals;
 
@@ -11,17 +13,18 @@ namespace EntityPlugin.Conditions
 {
     /// <summary>
     /// Проверка наличия хотя бы одного члена группы (но не игрока)
-    /// в регионе CustomRegion, заданным в CustomRegionName
+    /// в регионе CustomRegion, заданным в CustomRegionNames
     /// </summary>
 
     [Serializable]
-    public class TeamMemberCountInCustomRegion : Condition
+    public class TeamMemberCountInCustomRegions : Condition
     {
         [Description("The relation of the character's location to the CustomRegion")]
         public Presence Tested { get; set; }
 
-        [Editor(typeof(CustomRegionEditor), typeof(UITypeEditor))]
-        public string CustomRegionName { get; set; }
+        //[Editor(typeof(CustomRegionEditor), typeof(UITypeEditor))]
+        [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
+        public List<string> CustomRegionNames { get; set; }
 
         [Description("Threshold value of the Team members for comparison by 'Sign'")]
         public int MemberCount { get; set; }
@@ -29,19 +32,19 @@ namespace EntityPlugin.Conditions
         [Description("The comparison type for 'MemberCount'")]
         public Relation Sign { get; set; }
 
-        public TeamMemberCountInCustomRegion()
+        public TeamMemberCountInCustomRegions()
         {
             MemberCount = 3;
             Sign = Relation.Inferior;
 
             Tested = Presence.Equal;
 
-            CustomRegionName = string.Empty;
+            CustomRegionNames = new List<string>();
             foreach (CustomRegion customRegion in Astral.Quester.API.CurrentProfile.CustomRegions)
             {
                 if (customRegion.IsIn)
                 {
-                    CustomRegionName = customRegion.Name;
+                    CustomRegionNames.Add(customRegion.Name);
                     break;
                 }
             }
@@ -49,22 +52,48 @@ namespace EntityPlugin.Conditions
 
         public override string ToString()
         {
-            return $"{GetType().Name} [{CustomRegionName}] {Sign} to {MemberCount}";
+            StringBuilder strBldr = new StringBuilder(GetType().Name);
+            switch (CustomRegionNames.Count)
+            {
+                case 0:
+                    break;
+                case 1:
+                    strBldr.Append($": [{CustomRegionNames[0]}]");
+                    break;
+                default:
+                    strBldr.Append($": [{CustomRegionNames[0]}] and {CustomRegionNames.Count-1} other");
+                    break;
+            }
+
+            strBldr.Append($" {Sign} to {MemberCount}");
+
+            return strBldr.ToString();
         }
 
         public override bool IsValid
         {
             get
             {
-                if (EntityManager.LocalPlayer.PlayerTeam.IsInTeam && !string.IsNullOrEmpty(CustomRegionName))
+                if (EntityManager.LocalPlayer.PlayerTeam.IsInTeam && CustomRegionNames.Count > 0)
                 {
                     uint memCount = 0;
-                    CustomRegion customRegion = Astral.Quester.API.CurrentProfile.CustomRegions.Find(CR => CR.Name == CustomRegionName);
+                    List <CustomRegion> customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) => 
+                                                                                    CustomRegionNames.Exists((string regName) => regName == cr.Name));
 
+                    
                     foreach (TeamMember member in EntityManager.LocalPlayer.PlayerTeam.Team.Members)
                     {
-                        if (member.InternalName != EntityManager.LocalPlayer.InternalName && Tools.IsInCustomRegion(member.Entity, customRegion))
-                            memCount++;
+                        if (member.InternalName != EntityManager.LocalPlayer.InternalName)
+                        {
+                            foreach (CustomRegion customRegion in customRegions)
+                            {
+                                if (Tools.IsInCustomRegion(member.Entity, customRegion))
+                                {
+                                    memCount++;
+                                    break;
+                                }
+                            }
+                        }
                     }
 
                     if (Tested == Presence.NotEquel)
@@ -97,30 +126,38 @@ namespace EntityPlugin.Conditions
                     StringBuilder strBldr = new StringBuilder();
                     strBldr.AppendLine();
 
-                    CustomRegion customRegion = Astral.Quester.API.CurrentProfile.CustomRegions.Find(CR => CR.Name == CustomRegionName);
-
                     foreach (TeamMember member in EntityManager.LocalPlayer.PlayerTeam.Team.Members)
                     {
                         if (member.InternalName != EntityManager.LocalPlayer.InternalName)
                         {
-                            if (Tools.IsInCustomRegion(member.Entity, customRegion))
+                            StringBuilder strBldr2 = new StringBuilder();
+                            foreach (CustomRegion customRegion in Astral.Quester.API.CurrentProfile.CustomRegions)
                             {
-                                strBldr.AppendLine($"[{member.InternalName}] is in [{customRegion.Name}]");
+                                if ( CustomRegionNames.Exists((string regName) => regName == customRegion.Name) &&
+                                        Tools.IsInCustomRegion(member.Entity, customRegion) )
+                                {
+                                    if (strBldr2.Length > 0)
+                                        strBldr2.Append(", ");
+                                    strBldr2.Append($"[{customRegion.Name}]");
+                                }
+                            }
+
+                            if (strBldr2.Length > 0)
+                            {
+                                strBldr.AppendLine($"[{member.Entity.InternalName}] is in CustomRegions: ").Append(strBldr2);
                                 memsCount++;
                             }
-                            else
-                                strBldr.AppendLine($"{member.InternalName} is not in [{customRegion.Name}]");
                         }
                     }
 
                     if (Tested == Presence.Equal)
                     {
-                        strBldr.Insert(0, $"Total {memsCount} TeamMember are in CustomRegion [{CustomRegionName}]:");
+                        strBldr.Insert(0, $"Total {memsCount} TeamMember are in CustomRegion [{CustomRegionNames}]:");
                     }
                     else
                     {
                         memsCount = EntityManager.LocalPlayer.PlayerTeam.Team.MembersCount - 1 - memsCount;
-                        strBldr.Insert(0, $"Total {memsCount} TeamMember are not in CustomRegion [{CustomRegionName}]:");
+                        strBldr.Insert(0, $"Total {memsCount} TeamMember are not in CustomRegion [{CustomRegionNames}]:");
                     }
 
 
