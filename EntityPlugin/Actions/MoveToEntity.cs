@@ -1,32 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
 using Astral;
 using Astral.Logic.Classes.Map;
-using Astral.Logic.NW;
-using Astral.Quester.Classes;
-using Astral.Quester.UIEditors;
 using EntityPlugin.Editors;
 using MyNW.Classes;
 using MyNW.Internals;
-using MyNW.Patchables.Enums;
 using Action = Astral.Quester.Classes.Action;
 
 namespace EntityPlugin.Actions
 {
     public class MoveToEntity : Astral.Quester.Classes.Action
     {
-        public override string ActionLabel
+        public MoveToEntity()
         {
-            get
-            {
-                return $"{GetType().Name} [{EntityID}]";
-            }
+            EntityID = string.Empty;
+            Distance = 30;
+            IgnoreCombat = true;
+            StopOnApproached = true;
         }
+
+        public override string ActionLabel => $"{GetType().Name} [{EntityID}]";
 
         public override void OnMapDraw(GraphicsNW graph)
         {
@@ -34,21 +28,45 @@ namespace EntityPlugin.Actions
 
         public override void InternalReset()
         {
-            if (string.IsNullOrEmpty(EntityID))                
+            if (string.IsNullOrEmpty(EntityID))
                 target = new Entity(IntPtr.Zero);
             else
                 target = Tools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
         }
 
+        protected override bool IntenalConditions => !string.IsNullOrEmpty(EntityID);
+
         public override string InternalDisplayName => string.Empty;
 
-        public MoveToEntity()
+        protected virtual ActionResult InternalInteraction ()
         {
-            EntityID = string.Empty;
-            Distance = 0;
-            InteractIfPossible = false;
-            InteractTime = 2000;
-            IgnoreCombat = false;
+            return ActionResult.Running;
+        }
+
+        public override bool UseHotSpots => true;
+
+        protected override Vector3 InternalDestination
+        {
+            get
+            {
+                if (target.IsValid && target.Location.IsValid)
+                {
+                    return target.Location.Clone();
+                }
+                return new Vector3();
+            }
+        }
+
+        protected override ActionValidity InternalValidity
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(EntityID))
+                {
+                    return new ActionValidity("EntityID property not set.");
+                }
+                return new ActionValidity();
+            }
         }
 
         [Description("ID (an internal untranslated name) of the Entity for the search (regex)")]
@@ -57,17 +75,6 @@ namespace EntityPlugin.Actions
 
         [Description("Distance to the Entity by which it is necessary to approach")]
         public float Distance { get; set; }
-
-        [Description("Try interaction to Entity if possible")]
-        public bool InteractIfPossible { get; set; }
-
-        [Description("Time to interact (ms)")]
-        public int InteractTime { get; set; }
-
-
-        [Description("Answers in dialog while interact with Entity")]
-        [Editor(typeof(DialogEditor), typeof(UITypeEditor))]
-        public List<string> Dialogs { get; set; }
 
         [Description("Enable IgnoreCombat profile value while playing action")]
         public bool IgnoreCombat { get; set; }
@@ -78,8 +85,6 @@ namespace EntityPlugin.Actions
         public override void GatherInfos()
         {
         }
-
-        protected override bool IntenalConditions => !string.IsNullOrEmpty(EntityID) ;
 
         public override bool NeedToRun
         {
@@ -98,7 +103,7 @@ namespace EntityPlugin.Actions
 
                 if (target.IsValid)
                 {
-                    if(target.Location.Distance3DFromPlayer >= Distance)
+                    if (target.Location.Distance3DFromPlayer >= Distance)
                     {
                         Astral.Quester.API.IgnoreCombat = IgnoreCombat;
                         return false;
@@ -122,41 +127,10 @@ namespace EntityPlugin.Actions
 
             if (target.Location.Distance3DFromPlayer < Distance)
             {
-                if (InteractIfPossible && target.IsValid && target.InteractOption.IsValid && Approach.EntityForInteraction(target, null))
-                {
-                    MyNW.Internals.Movements.StopNavTo();
-                    Thread.Sleep(500);
-                    target.Interact();
-                    Thread.Sleep(InteractTime);
-                    Interact.WaitForInteraction();
-                    if (Dialogs.Count > 0)
-                    {
-                        Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);
-                        while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count == 0)
-                        {
-                            if (timeout.IsTimedOut)
-                            {
-                                actnReslt = ActionResult.Running;
-                                break;
-                            }
-                            Thread.Sleep(100);
-                        }
-                        Thread.Sleep(500);
-                        using (List<string>.Enumerator enumerator = Dialogs.GetEnumerator())
-                        {
-                            while (enumerator.MoveNext())
-                            {
-                                string key = enumerator.Current;
-                                EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.SelectOptionByKey(key, "");
-                                Thread.Sleep(1000);
-                            }
-                        }
-                    }
-                    EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
-                    target = new Entity(IntPtr.Zero);
-                }
-
                 Astral.Quester.API.IgnoreCombat = false;
+
+                actnReslt = InternalInteraction();
+
                 if (StopOnApproached)
                     actnReslt = ActionResult.Completed;
             }
@@ -165,33 +139,7 @@ namespace EntityPlugin.Actions
             return actnReslt;
         }
 
-        public override bool UseHotSpots => false;
-
-        protected override Vector3 InternalDestination
-        {
-            get
-            {
-                if (target.IsValid)
-                {
-                    return target.Location.Clone();
-                }
-                return new Vector3();
-            }
-        }
-
-        protected override Action.ActionValidity InternalValidity
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(EntityID))
-                {
-                    return new Action.ActionValidity("EntityID property not set.");
-                }
-                return new Action.ActionValidity();
-            }
-        }
-
         [NonSerialized]
-        private Entity target = new Entity(IntPtr.Zero);
+        protected Entity target = new Entity(IntPtr.Zero);
     }
 }

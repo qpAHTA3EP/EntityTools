@@ -60,6 +60,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\InteractEntities.cs" />
     <Compile Include="Actions\InteractEntity.cs" />
     <Compile Include="Conditions\EntityDistance.cs" />
     <Compile Include="Conditions\EntityCountInCustomRegion.cs" />
@@ -89,6 +90,7 @@
     </Compile>
     <Compile Include="Tools\EntityIdEditor.cs" />
     <Compile Include="Tools\MultiCustomRegionSelectEditor.cs" />
+    <Compile Include="UCC\AbortCombatEntity.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\EntitySelectForm.resx">

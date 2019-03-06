@@ -19,7 +19,7 @@ namespace EntityPlugin.Conditions
         {
             EntityID = string.Empty;
             Distance = 0;
-            Sign = Relation.Inferior;
+            Sign = Relation.Superior;
         }
 
         [Description("ID (an untranslated name) of the Entity for the search (regex)")]
@@ -49,19 +49,19 @@ namespace EntityPlugin.Conditions
                     switch (Sign)
                     {
                         case Relation.Equal:
-                            return result = (closestEntity != null) && (closestEntity.Location.Distance3DFromPlayer == Distance);
+                            return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer == Distance);
                         //mess = (result) ? Relation.Equal.ToString() : Relation.NotEqual.ToString();
                         //break;
                         case Relation.NotEqual:
-                            return result = (closestEntity != null) && (closestEntity.Location.Distance3DFromPlayer != Distance);
+                            return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer != Distance);
                         //mess = (result) ? Relation.NotEqual.ToString() : Relation.Equal.ToString();
                         //break;
                         case Relation.Inferior:
-                            return result = (closestEntity != null) && (closestEntity.Location.Distance3DFromPlayer < Distance);
+                            return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer < Distance);
                         //mess = ((result) ? "" : "Not")+ Relation.Inferior.ToString();
                         //break;
                         case Relation.Superior:
-                            return result = (closestEntity == null) || (closestEntity.Location.Distance3DFromPlayer > Distance);
+                            return result = (closestEntity == null) || !closestEntity.IsValid || (closestEntity.Location.Distance3DFromPlayer > Distance);
                             //mess = (result) ? Relation.Superior.ToString() : Relation.Inferior.ToString(); ;
                             //break;
                     }
