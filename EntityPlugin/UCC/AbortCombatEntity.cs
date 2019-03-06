@@ -4,6 +4,7 @@ using System.Drawing.Design;
 using Astral.Classes;
 using Astral.Controllers;
 using Astral.Logic.NW;
+using Astral.Logic.UCC.Actions;
 using Astral.Logic.UCC.Classes;
 using Astral.Quester.FSM.States;
 using EntityPlugin;
@@ -12,15 +13,15 @@ using MyNW.Classes;
 using MyNW.Internals;
 using ns1;
 
-namespace Astral.Logic.UCC.Actions
+namespace EntityPlugin.UCC
 {
-    public class AbordCombatEntity : AbordCombat
+    public class AbordCombatEntity : UCCAction
     {
         public AbordCombatEntity()
         {
             EntityID = string.Empty;
             Distance = 0;
-            Sign = Ressources.Enums.Sign.Superior;
+            Sign = Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
             IgnoreCombatTime = 0;
             IgnoreCombatMinHP = 25;
         }
@@ -41,7 +42,7 @@ namespace Astral.Logic.UCC.Actions
         {
             get
             {
-                if (base.NeedToRun)
+                if (abordCombat.NeedToRun)
                 {
                     if (string.IsNullOrEmpty(EntityID))
                         entity = new Entity(IntPtr.Zero);
@@ -60,21 +61,21 @@ namespace Astral.Logic.UCC.Actions
             {
                 switch (Sign)
                 {
-                    case Ressources.Enums.Sign.Equal:
-                        if(entity.Location.Distance3DFromPlayer == Distance)
-                            return base.Run();
+                    case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
+                        if (entity.Location.Distance3DFromPlayer == Distance)
+                            return abordCombat.Run();
                         break;
-                    case Ressources.Enums.Sign.NotEqual:
+                    case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
                         if (entity.Location.Distance3DFromPlayer != Distance)
-                            return base.Run();
+                            return abordCombat.Run();
                         break;
-                    case Ressources.Enums.Sign.Inferior:
+                    case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
                         if (entity.Location.Distance3DFromPlayer < Distance)
-                            return base.Run();
+                            return abordCombat.Run();
                         break;
-                    case Ressources.Enums.Sign.Superior:
+                    case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
                         if (entity.Location.Distance3DFromPlayer > Distance)
-                            return base.Run();
+                            return abordCombat.Run();
                         break;
                 }
             }
@@ -86,11 +87,11 @@ namespace Astral.Logic.UCC.Actions
         [Browsable(false)]
         public new string ActionName { get; set; }
 
-        //[Description("How many time ignore combat in seconds (0 for infinite)")]
-        //public int IgnoreCombatTime { get; set; }
+        [Description("How many time ignore combat in seconds (0 for infinite)")]
+        public int IgnoreCombatTime { get => abordCombat.IgnoreCombatTime; set => abordCombat.IgnoreCombatTime = value; }
 
-        //[Description("Minimum health percent to enable combat again")]
-        //public int IgnoreCombatMinHP { get; set; }
+        [Description("Minimum health percent to enable combat again")]
+        public int IgnoreCombatMinHP { get => abordCombat.IgnoreCombatMinHP; set => abordCombat.IgnoreCombatMinHP = value; }
 
         [Description("ID (an untranslated name) of the Entity for the search (regex)")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
@@ -102,9 +103,11 @@ namespace Astral.Logic.UCC.Actions
 
         [Description("Distance comparison type to the closest Entity")]
         [Category("Entity")]
-        public Ressources.Enums.Sign Sign { get; set; }
+        public Astral.Logic.UCC.Ressources.Enums.Sign Sign { get; set; }
 
         [NonSerialized]
-        protected Entity entity;
+        protected Entity entity = new Entity(IntPtr.Zero);
+        [NonSerialized]
+        protected AbordCombat abordCombat = new AbordCombat();
     }
 }
