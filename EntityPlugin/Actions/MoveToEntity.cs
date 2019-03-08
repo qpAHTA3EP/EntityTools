@@ -18,6 +18,8 @@ namespace EntityPlugin.Actions
             Distance = 30;
             IgnoreCombat = true;
             StopOnApproached = true;
+            if (EntityManager.LocalPlayer.IsValid && EntityManager.LocalPlayer.Location.IsValid)
+                HotSpots.Add(EntityManager.LocalPlayer.Location.Clone());
         }
 
         public override string ActionLabel => $"{GetType().Name} [{EntityID}]";
@@ -31,7 +33,7 @@ namespace EntityPlugin.Actions
             if (string.IsNullOrEmpty(EntityID))
                 target = new Entity(IntPtr.Zero);
             else
-                target = Tools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+                target = EntityPluginTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
         }
 
         protected override bool IntenalConditions => !string.IsNullOrEmpty(EntityID);
@@ -93,7 +95,7 @@ namespace EntityPlugin.Actions
                 if (string.IsNullOrEmpty(EntityID))
                     target = new Entity(IntPtr.Zero);
                 else
-                    target = Tools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+                    target = EntityPluginTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
 
                 //в команде ChangeProfielValue:IgnoreCombat используется код:
                 //Combat.SetIgnoreCombat(IgnoreCombat, -1, 0);
@@ -116,7 +118,7 @@ namespace EntityPlugin.Actions
 
         public override ActionResult Run()
         {
-            //target = Tools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+            //target = EntityPluginTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
 
             if (!target.IsValid)
             {

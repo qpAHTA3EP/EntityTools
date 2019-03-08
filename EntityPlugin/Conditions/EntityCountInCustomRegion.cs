@@ -89,7 +89,7 @@ namespace EntityPlugin.Conditions
 
                         foreach (CustomRegion cr in customRegions)
                         {
-                            if (Tools.IsInCustomRegion(entity, cr))
+                            if (EntityPluginTools.IsInCustomRegion(entity, cr))
                             {
                                 match = true;
                                 break;
@@ -127,8 +127,8 @@ namespace EntityPlugin.Conditions
                 {
                     List<Entity> entities = EntityManager.GetEntities().FindAll((Entity x) => Regex.IsMatch(x.NameUntranslated, EntityID));
 
-                    List<CustomRegion> customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) =>
-                                                               CustomRegionNames.Exists((string regName) => regName == cr.Name));
+                    //List<CustomRegion> customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) =>
+                    //                                           CustomRegionNames.Exists((string regName) => regName == cr.Name));
 
                     StringBuilder strBldr = new StringBuilder();
                     strBldr.AppendLine();
@@ -139,9 +139,9 @@ namespace EntityPlugin.Conditions
                         StringBuilder strBldr2 = new StringBuilder();
                         bool match = false;
 
-                        foreach (CustomRegion customRegion in customRegions)
+                        foreach (CustomRegion customRegion in Astral.Quester.API.CurrentProfile.CustomRegions) //customRegions)
                         {
-                            if (Tools.IsInCustomRegion(entity, customRegion))
+                            if (EntityPluginTools.IsInCustomRegion(entity, customRegion))
                                 match = true;
                             if (strBldr2.Length > 0)
                                 strBldr2.Append(", ");

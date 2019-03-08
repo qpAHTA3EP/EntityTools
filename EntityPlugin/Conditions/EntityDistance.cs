@@ -3,12 +3,8 @@ using EntityPlugin.Editors;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Linq;
-using System.Text;
-using static Astral.Quester.Classes.Condition;
 
 namespace EntityPlugin.Conditions
 {
@@ -37,7 +33,7 @@ namespace EntityPlugin.Conditions
             {
                 if (!string.IsNullOrEmpty(EntityID))
                 {
-                    Entity closestEntity = Tools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+                    Entity closestEntity = EntityPluginTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
 
                     //if(entities.Count > 0)
                     //    closestEntity = entities.FindLast((Entity x) => (Regex.IsMatch(x.NameUntranslated, EntityID) && (x.CombatDistance < Distance))); 
@@ -95,7 +91,7 @@ namespace EntityPlugin.Conditions
         {
             get
             {
-                Entity closestEntity = Tools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+                Entity closestEntity = EntityPluginTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
 
                 if (closestEntity.IsValid)
                 {

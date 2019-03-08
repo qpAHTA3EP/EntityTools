@@ -47,9 +47,9 @@ namespace EntityPlugin.UCC
                     if (string.IsNullOrEmpty(EntityID))
                         entity = new Entity(IntPtr.Zero);
                     else
-                        entity = Tools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+                        entity = EntityPluginTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
 
-                    return (entity.IsValid && entity.Location.Distance3DFromPlayer >= Distance);
+                    return entity.IsValid;
                 }
                 return false;
             }

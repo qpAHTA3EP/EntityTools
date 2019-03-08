@@ -1,14 +1,17 @@
-﻿using Astral.Quester.Classes;
+﻿using Astral.Logic.NW;
+using Astral.Quester.Classes;
 using MyNW.Classes;
+using MyNW.Internals;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace EntityPlugin
 {
-    public static class Tools
+    public static class EntityPluginTools
     {
         /// <summary>
         /// Поиск Entity из коллекции entities, у которого поле NameUntranslated соответствует шаблону entPattern, 
@@ -74,6 +77,69 @@ namespace EntityPlugin
 
                 return location.X > vector.X && location.X < vector2.X && location.Y > vector.Y && location.Y < vector2.Y;
             }
+        }
+
+        /// <summary>
+        /// Перемещение персонажа на заданный инстанс
+        /// </summary>
+        /// <param name="instNum">Номер инстанса (экземпляра карты) на который нужно переместиться</param>
+        /// <returns></returns>
+        public static Instances.ChangeInstanceResult ChangeInstance(uint instNum = 0)
+        {
+
+            if (!MapTransfer.CanChangeInstance)
+            {
+                Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);
+                while (!MapTransfer.CanChangeInstance)
+                {
+                    if (EntityManager.LocalPlayer.InCombat)
+                    {
+                        return Instances.ChangeInstanceResult.Combat;
+                    }
+                    if (timeout.IsTimedOut)
+                    {
+                        return Instances.ChangeInstanceResult.CantChange;
+                    }
+                    Thread.Sleep(200);
+                }
+            }
+            if (EntityManager.LocalPlayer.InCombat)
+            {
+                return Instances.ChangeInstanceResult.Combat;
+            }
+            if (!MapTransfer.IsMapTransferFrameVisible())
+            {
+                MapTransfer.OpenMapTransferFrame();
+                Thread.Sleep(3000);
+            }
+
+            PossibleMapChoice mapInstance = MapTransfer.PossibleMapChoices.Find(pmc => pmc.InstanceIndex == instNum);
+
+            if (mapInstance != null && mapInstance.IsValid)
+            {
+                if (mapInstance.IsCurrent)
+                    return Instances.ChangeInstanceResult.Success;
+
+                if (!EntityManager.LocalPlayer.InCombat)
+                {
+                    Astral.Logger.WriteLine($"Change to instance {mapInstance.InstanceIndex} ...");
+                    mapInstance.Transfer();
+                    Thread.Sleep(7500);
+                    while (EntityManager.LocalPlayer.IsLoading)
+                    {
+                        Thread.Sleep(500);
+                    }
+                    if (MapTransfer.IsMapTransferFrameVisible())
+                    {
+                        MapTransfer.CloseMapTransferFrame();
+                    }
+                    return Instances.ChangeInstanceResult.Success;
+                }
+            }
+            MapTransfer.CloseMapTransferFrame();
+            Thread.Sleep(500);
+            
+            return Instances.ChangeInstanceResult.NoValidChoice;
         }
     }
 }
