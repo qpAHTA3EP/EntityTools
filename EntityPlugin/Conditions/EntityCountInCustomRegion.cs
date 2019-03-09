@@ -15,7 +15,7 @@ using MyNW.Internals;
 namespace EntityPlugin.Conditions
 {
     /// <summary>
-    /// Проверка наличия хотя бы одного объекта Entity, подпадающих под шаблон EntityID,
+    /// Проверка наличия хотя бы одного объекта Entity, подпадающих под шаблон Name,
     /// в регионе CustomRegion, заданным в CustomRegionNames
     /// 
     /// Варианты реализации:
@@ -164,7 +164,7 @@ namespace EntityPlugin.Conditions
 
                     return strBldr.ToString();
                 }
-                return "EntityID or CustomRegionNames properties are not set";
+                return "Name or CustomRegionNames properties are not set";
             }
         }
 

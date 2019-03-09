@@ -65,7 +65,7 @@ namespace EntityPlugin.Actions
             {
                 if (string.IsNullOrEmpty(EntityID))
                 {
-                    return new ActionValidity("EntityID property not set.");
+                    return new ActionValidity("Name property not set.");
                 }
                 return new ActionValidity();
             }
@@ -121,7 +121,7 @@ namespace EntityPlugin.Actions
 
         public override ActionResult Run()
         {
-            //target = EntityPluginTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+            //target = EntityPluginTools.FindClosestEntity(EntityManager.GetEntities(), Name);
 
             if (!target.IsValid)
             {

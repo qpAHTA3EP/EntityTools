@@ -36,7 +36,7 @@ namespace EntityPlugin.Conditions
                     Entity closestEntity = EntityPluginTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
 
                     //if(entities.Count > 0)
-                    //    closestEntity = entities.FindLast((Entity x) => (Regex.IsMatch(x.NameUntranslated, EntityID) && (x.CombatDistance < Distance))); 
+                    //    closestEntity = entities.FindLast((Entity x) => (Regex.IsMatch(x.NameUntranslated, Name) && (x.CombatDistance < Distance))); 
 
                     //List<Entity> entityList = entities.Find((Entity x) => x.CombatDistance3 < Distance);
 
@@ -69,7 +69,7 @@ namespace EntityPlugin.Conditions
 
                     //Debug.WriteLine(string.Format("Entity [{1}] matched to [{2}] at the Distance = {3} that {4} to {5}", 
                     //    closestEntity.NameUntranslated,                                
-                    //    EntityID, 
+                    //    Name, 
                     //    closestEntity.CombatDistance,
                     //    mess, Distance));
                 }
