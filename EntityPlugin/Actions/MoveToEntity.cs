@@ -18,8 +18,8 @@ namespace EntityPlugin.Actions
             Distance = 30;
             IgnoreCombat = true;
             StopOnApproached = true;
-            if (EntityManager.LocalPlayer.IsValid && EntityManager.LocalPlayer.Location.IsValid)
-                HotSpots.Add(EntityManager.LocalPlayer.Location.Clone());
+            //if (EntityManager.LocalPlayer.IsValid && EntityManager.LocalPlayer.Location.IsValid)
+            //    HotSpots.Add(EntityManager.LocalPlayer.Location.Clone());
         }
 
         public override string ActionLabel => $"{GetType().Name} [{EntityID}]";
@@ -86,6 +86,9 @@ namespace EntityPlugin.Actions
 
         public override void GatherInfos()
         {
+            //При активации данного кода в HotSpots неконтролируемо добавляются новые точки 
+            //if (EntityManager.LocalPlayer.IsValid && EntityManager.LocalPlayer.Location.IsValid)
+            //    HotSpots.Add(EntityManager.LocalPlayer.Location.Clone());
         }
 
         public override bool NeedToRun
@@ -136,8 +139,9 @@ namespace EntityPlugin.Actions
                 if (StopOnApproached)
                     actnReslt = ActionResult.Completed;
             }
+            else
+                Astral.Quester.API.IgnoreCombat = IgnoreCombat;
 
-            Astral.Quester.API.IgnoreCombat = false;
             return actnReslt;
         }
 

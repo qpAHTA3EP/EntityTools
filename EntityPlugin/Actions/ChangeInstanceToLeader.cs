@@ -16,7 +16,7 @@ namespace EntityPlugin.Actions
     [Serializable]
     public class ChangeInstanceToLeader : Astral.Quester.Classes.Action
     {
-        ChangeInstanceToLeader() :base()
+        public ChangeInstanceToLeader()
         {
             //MaxRunningTime = 1;
         }

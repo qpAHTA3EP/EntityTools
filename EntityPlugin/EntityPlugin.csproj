@@ -60,9 +60,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\ChangeInstanceToLeader.cs" />
     <Compile Include="Actions\InteractEntities.cs" />
     <Compile Include="Actions\InteractEntity.cs" />
-    <Compile Include="Actions\ChangeInstanceToLeader.cs" />
     <Compile Include="Conditions\EntityDistance.cs" />
     <Compile Include="Conditions\EntityCountInCustomRegion.cs" />
     <Compile Include="Conditions\PartyCount.cs" />
@@ -92,8 +92,6 @@
     </Compile>
     <Compile Include="Tools\EntityIdEditor.cs" />
     <Compile Include="Tools\MultiCustomRegionSelectEditor.cs" />
-    <Compile Include="UCC\AbortCombatEntity.cs" />
-    <Compile Include="UCC\CustomUCCAction.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\EntitySelectForm.resx">
@@ -107,6 +105,8 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="UCC\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
