@@ -91,9 +91,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Tools\EntityIdEditor.cs" />
-    <Compile Include="Tools\MultiCustomRegionSelectEditor.cs" />
-    <Compile Include="Tools\ShardEditor.cs" />
+    <Compile Include="Editors\EntityIdEditor.cs" />
+    <Compile Include="Editors\MultiCustomRegionSelectEditor.cs" />
+    <Compile Include="Editors\ShardEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\EntitySelectForm.resx">

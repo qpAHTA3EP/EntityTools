@@ -9,12 +9,11 @@ using System.Drawing.Design;
 using Astral.Quester.Forms;
 using Astral.Quester.UIEditors;
 
-namespace ScalarAddon
+namespace ValiablesAstralExtention
 {
-    public class AstralScalars : Astral.Addons.Plugin
+    public class VariablesAddon : Astral.Addons.Plugin
     {
-        private static int _val = 0;
-        private static String _name = String.Empty;
+        public static string LoggerPredicate = "[VariablesAddon]:";
 
         public override string Name => GetType().Name;
 
@@ -24,30 +23,7 @@ namespace ScalarAddon
 
         public override BasePanel Settings => new Forms.ScalarAddonPanel();
 
-        public static Dictionary<String, int> Scalars = new Dictionary<String, int>();
-
-        public static bool GetValue(String name, out int val)
-        {
-            val = _val;
-            return true;
-        }
-        public static int GetValue(String name)
-        {
-            if (name == _name)
-            {
-                return _val;
-            }
-            else return 0;
-        }
-
-        public static bool SetValue(String name, int val)
-        {
-            _val = val;
-            _name = name;
-            return true;
-        }
-
-        public override void OnBotStart()
+       public override void OnBotStart()
         {
             
         }

@@ -8,8 +8,9 @@ using Astral.Quester.Classes;
 using System.Drawing.Design;
 using Astral.Quester.Forms;
 using Astral.Quester.UIEditors;
+using ValiablesAstralExtention.Classes;
 
-namespace ScalarAddon
+namespace ValiablesAstralExtention
 {
     public class ScalarCondition : Astral.Quester.Classes.Condition
     {
@@ -17,7 +18,7 @@ namespace ScalarAddon
         [Description("Имя переменной")]
         public string VariableName { get; set; } = String.Empty;
 
-        //private Dictionary<String, int> Variables { get => AstralScalars.Scalars; }
+        //private Dictionary<String, int> Variables { get => VariablesAddon.Scalars; }
 
         [Description("Величина, сопоставляемая со значением переменной")]
         public int Value { get; set; } = 0;
@@ -36,16 +37,16 @@ namespace ScalarAddon
                 switch (this.Sign)
                 {
                     case Astral.Quester.Classes.Condition.Relation.Equal:
-                        return (AstralScalars.GetValue(this.VariableName) == this.Value);
+                        return (VariablesBase.GetValue(this.VariableName) == this.Value);
 
                     case Astral.Quester.Classes.Condition.Relation.NotEqual:
-                        return (AstralScalars.GetValue(this.VariableName) != this.Value);
+                        return (VariablesBase.GetValue(this.VariableName) != this.Value);
 
                     case Astral.Quester.Classes.Condition.Relation.Inferior:
-                        return (AstralScalars.GetValue(this.VariableName) < this.Value);
+                        return (VariablesBase.GetValue(this.VariableName) < this.Value);
 
                     case Astral.Quester.Classes.Condition.Relation.Superior:
-                        return (AstralScalars.GetValue(this.VariableName) > this.Value);
+                        return (VariablesBase.GetValue(this.VariableName) > this.Value);
                 }
                 return false;
             }
@@ -53,14 +54,13 @@ namespace ScalarAddon
 
         public override void Reset()
         {
-            AstralScalars.Scalars.Clear();
         }
 
         public override string TestInfos
         {
             get
             {
-                int val = AstralScalars.GetValue(VariableName);
+                int val = VariablesBase.GetValue(VariableName);
                 switch (this.Sign)
                 {
                     case Relation.Equal:

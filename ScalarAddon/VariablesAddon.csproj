@@ -7,7 +7,7 @@
     <ProjectGuid>{8C13462B-8B43-40A3-B4C1-EA351AE9F1C4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ScalarAddon</RootNamespace>
+    <RootNamespace>ValiablesAstralExtention</RootNamespace>
     <AssemblyName>ScalarAddon</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -71,9 +71,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AstralScalar.cs" />
-    <Compile Include="AstralScalarActions.cs" />
-    <Compile Include="AstralScalarConditions.cs" />
+    <Compile Include="Classes\VariablesItem.cs" />
+    <Compile Include="Classes\VariablesParcer.cs" />
+    <Compile Include="VariablesAddon.cs" />
+    <Compile Include="Actions\VarAction.cs" />
+    <Compile Include="Classes\VariablesBase.cs" />
+    <Compile Include="Conditions\AstralScalarConditions.cs" />
     <Compile Include="Forms\AstralScalarsEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -109,8 +112,6 @@
     <None Include="Resources\MathOp.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Actions\" />
-    <Folder Include="Conditions\" />
     <Folder Include="Editors\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

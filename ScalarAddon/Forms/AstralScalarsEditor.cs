@@ -7,11 +7,11 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace ScalarAddon.Forms
+namespace ValiablesAstralExtention.Forms
 {
-    public partial class AstralScalarsEditor : Form
+    public partial class VariablesEditor : Form
     {
-        public AstralScalarsEditor()
+        public VariablesEditor()
         {
             InitializeComponent();
         }

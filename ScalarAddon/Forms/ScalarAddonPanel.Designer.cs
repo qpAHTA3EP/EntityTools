@@ -1,4 +1,4 @@
-﻿namespace ScalarAddon.Forms
+﻿namespace ValiablesAstralExtention.Forms
 {
     partial class ScalarAddonPanel
     {
