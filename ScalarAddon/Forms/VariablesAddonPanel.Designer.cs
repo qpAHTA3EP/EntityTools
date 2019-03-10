@@ -1,6 +1,6 @@
 ﻿namespace ValiablesAstralExtention.Forms
 {
-    partial class ScalarAddonPanel
+    partial class VariablesAddonPanel
     {
         /// <summary> 
         /// Обязательная переменная конструктора.
@@ -43,7 +43,6 @@
             this.lblAuthor.Size = new System.Drawing.Size(97, 13);
             this.lblAuthor.TabIndex = 0;
             this.lblAuthor.Text = "Athor: MichaelProg";
-            this.lblAuthor.Click += new System.EventHandler(this.lblAuthor_Click);
             // 
             // btnTest
             // 
@@ -63,7 +62,6 @@
             this.btnSet.TabIndex = 2;
             this.btnSet.Text = "Set value";
             this.btnSet.UseVisualStyleBackColor = true;
-            this.btnSet.Click += new System.EventHandler(this.btnSet_Click);
             // 
             // numUdbValue
             // 
@@ -71,7 +69,6 @@
             this.numUdbValue.Name = "numUdbValue";
             this.numUdbValue.Size = new System.Drawing.Size(120, 20);
             this.numUdbValue.TabIndex = 3;
-            this.numUdbValue.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
             // 
             // ScalarAddonPanel
             // 

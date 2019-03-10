@@ -34,20 +34,20 @@ namespace ValiablesAstralExtention
         {
             get
             {
-                switch (this.Sign)
-                {
-                    case Astral.Quester.Classes.Condition.Relation.Equal:
-                        return (VariablesBase.GetValue(this.VariableName) == this.Value);
+                //switch (this.Sign)
+                //{
+                //    case Astral.Quester.Classes.Condition.Relation.Equal:
+                //        return (VariablesBase.GetValue(this.VariableName) == this.Value);
 
-                    case Astral.Quester.Classes.Condition.Relation.NotEqual:
-                        return (VariablesBase.GetValue(this.VariableName) != this.Value);
+                //    case Astral.Quester.Classes.Condition.Relation.NotEqual:
+                //        return (VariablesBase.GetValue(this.VariableName) != this.Value);
 
-                    case Astral.Quester.Classes.Condition.Relation.Inferior:
-                        return (VariablesBase.GetValue(this.VariableName) < this.Value);
+                //    case Astral.Quester.Classes.Condition.Relation.Inferior:
+                //        return (VariablesBase.GetValue(this.VariableName) < this.Value);
 
-                    case Astral.Quester.Classes.Condition.Relation.Superior:
-                        return (VariablesBase.GetValue(this.VariableName) > this.Value);
-                }
+                //    case Astral.Quester.Classes.Condition.Relation.Superior:
+                //        return (VariablesBase.GetValue(this.VariableName) > this.Value);
+                //}
                 return false;
             }
         }
@@ -60,30 +60,31 @@ namespace ValiablesAstralExtention
         {
             get
             {
-                int val = VariablesBase.GetValue(VariableName);
-                switch (this.Sign)
-                {
-                    case Relation.Equal:
-                        if (val == this.Value)
-                            return "Sign \"" + Relation.Equal.ToString() + "\" is True: variable [" + VariableName + "] " + Relation.Equal.ToString() + " " + Value.ToString();
-                        else return "Sign \"" + Relation.Equal.ToString() + "\" is False: variable [" + VariableName + "] = " + val.ToString() + " " + Relation.NotEqual.ToString() + " " + Value.ToString();
+                //int val = VariablesBase.GetValue(VariableName);
+                //switch (this.Sign)
+                //{
+                //    case Relation.Equal:
+                //        if (val == this.Value)
+                //            return "Sign \"" + Relation.Equal.ToString() + "\" is True: variable [" + VariableName + "] " + Relation.Equal.ToString() + " " + Value.ToString();
+                //        else return "Sign \"" + Relation.Equal.ToString() + "\" is False: variable [" + VariableName + "] = " + val.ToString() + " " + Relation.NotEqual.ToString() + " " + Value.ToString();
 
-                    case Relation.NotEqual:
-                        if (val != this.Value)
-                            return "Sign \"" + Relation.NotEqual.ToString() + "\" is True: variable [" + VariableName + "] = " + val.ToString() + " " + Relation.NotEqual.ToString() + " " + Value.ToString();
-                        else return "Sign \"" + Relation.NotEqual.ToString() + "\" is False: variable [" + VariableName + "] " + Relation.NotEqual.ToString() + " " + Value.ToString();
+                //    case Relation.NotEqual:
+                //        if (val != this.Value)
+                //            return "Sign \"" + Relation.NotEqual.ToString() + "\" is True: variable [" + VariableName + "] = " + val.ToString() + " " + Relation.NotEqual.ToString() + " " + Value.ToString();
+                //        else return "Sign \"" + Relation.NotEqual.ToString() + "\" is False: variable [" + VariableName + "] " + Relation.NotEqual.ToString() + " " + Value.ToString();
 
-                    case Relation.Inferior:
-                        if (val < this.Value)
-                            return "Sign \"" + Relation.Inferior.ToString() + "\" is True: variable [" + VariableName + "] = " + val.ToString() + " " + Relation.Inferior.ToString() + " " + Value.ToString();
-                        else return "Sign \"" + Relation.Inferior.ToString() + "\" is False: variable [" + VariableName + "] " + val.ToString() + " " + Relation.Superior.ToString() + " " + Value.ToString();
+                //    case Relation.Inferior:
+                //        if (val < this.Value)
+                //            return "Sign \"" + Relation.Inferior.ToString() + "\" is True: variable [" + VariableName + "] = " + val.ToString() + " " + Relation.Inferior.ToString() + " " + Value.ToString();
+                //        else return "Sign \"" + Relation.Inferior.ToString() + "\" is False: variable [" + VariableName + "] " + val.ToString() + " " + Relation.Superior.ToString() + " " + Value.ToString();
 
-                    case Relation.Superior:
-                        if (val > this.Value)
-                            return "Sign \"" + Relation.Superior.ToString() + "\" is True: variable [" + VariableName + "] = " + val.ToString() + " " + Relation.Superior.ToString() + " " + Value.ToString();
-                        else return "Sign \"" + Relation.Superior.ToString() + "\" is False: variable [" + VariableName + "] " + val.ToString() + " " + Relation.Inferior.ToString() + " " + Value.ToString();
-                }
-                return "Not Indefinite";
+                //    case Relation.Superior:
+                //        if (val > this.Value)
+                //            return "Sign \"" + Relation.Superior.ToString() + "\" is True: variable [" + VariableName + "] = " + val.ToString() + " " + Relation.Superior.ToString() + " " + Value.ToString();
+                //        else return "Sign \"" + Relation.Superior.ToString() + "\" is False: variable [" + VariableName + "] " + val.ToString() + " " + Relation.Inferior.ToString() + " " + Value.ToString();
+                //}
+                //return "Not Indefinite";
+                return string.Empty;
             }
         }
     }

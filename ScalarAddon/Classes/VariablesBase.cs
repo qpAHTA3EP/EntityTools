@@ -19,8 +19,7 @@ namespace ValiablesAstralExtention.Classes
 
         public static object GetValue(String name)
         {
-            object val = null;
-            if(Variables.TryGetValue(name, out val))
+            if(Variables.TryGetValue(name, out object val))
             {
                 Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} no variables named '{name}'");
             }

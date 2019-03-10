@@ -8,11 +8,14 @@ using Astral.Quester.Classes;
 using System.Drawing.Design;
 using Astral.Quester.Forms;
 using Astral.Quester.UIEditors;
+using ValiablesAstralExtention.Classes;
 
 namespace ValiablesAstralExtention
 {
     public class VariablesAddon : Astral.Addons.Plugin
     {
+        public static VariableCollection Variables = new VariableCollection();
+
         public static string LoggerPredicate = "[VariablesAddon]:";
 
         public override string Name => GetType().Name;
@@ -21,7 +24,7 @@ namespace ValiablesAstralExtention
 
         public override System.Drawing.Image Icon => Properties.Resources.MathOpIcon;
 
-        public override BasePanel Settings => new Forms.ScalarAddonPanel();
+        public override BasePanel Settings => new Forms.VariablesAddonPanel();
 
        public override void OnBotStart()
         {

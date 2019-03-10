@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ValiablesAstralExtention</RootNamespace>
-    <AssemblyName>ScalarAddon</AssemblyName>
+    <AssemblyName>VariablesAddon</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -50,15 +50,19 @@
   <ItemGroup>
     <Reference Include="Astral">
       <HintPath>D:\Games\Astral_RU_1\Astral.exe</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.Utils.v18.1">
       <HintPath>D:\Games\DevExpress\DevExpress.Utils.v18.1.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.XtraEditors.v18.1">
       <HintPath>D:\Games\DevExpress\DevExpress.XtraEditors.v18.1.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MyNW">
       <HintPath>D:\Games\Astral_RU_1\MyNW.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -77,17 +81,17 @@
     <Compile Include="Actions\VarAction.cs" />
     <Compile Include="Classes\VariablesBase.cs" />
     <Compile Include="Conditions\AstralScalarConditions.cs" />
-    <Compile Include="Forms\AstralScalarsEditor.cs">
+    <Compile Include="Forms\VariablesEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\AstralScalarsEditor.Designer.cs">
-      <DependentUpon>AstralScalarsEditor.cs</DependentUpon>
+    <Compile Include="Forms\VariablesEditor.Designer.cs">
+      <DependentUpon>VariablesEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\ScalarAddonPanel.cs">
+    <Compile Include="Forms\VariablesAddonPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Forms\ScalarAddonPanel.Designer.cs">
-      <DependentUpon>ScalarAddonPanel.cs</DependentUpon>
+    <Compile Include="Forms\VariablesAddonPanel.Designer.cs">
+      <DependentUpon>VariablesAddonPanel.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -97,11 +101,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Forms\AstralScalarsEditor.resx">
-      <DependentUpon>AstralScalarsEditor.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\VariablesEditor.resx">
+      <DependentUpon>VariablesEditor.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ScalarAddonPanel.resx">
-      <DependentUpon>ScalarAddonPanel.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\VariablesAddonPanel.resx">
+      <DependentUpon>VariablesAddonPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

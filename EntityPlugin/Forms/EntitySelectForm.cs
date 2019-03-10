@@ -29,8 +29,7 @@ namespace EntityPlugin.Forms
             DialogResult dialogResult = selectForm.ShowDialog();
             if (dialogResult == DialogResult.OK)
             {
-                Entity selectedEntity = selectForm.dgvEntities.CurrentRow.DataBoundItem as Entity;
-                if (selectedEntity != null)
+                if (selectForm.dgvEntities.CurrentRow.DataBoundItem is Entity selectedEntity)
                     return selectedEntity;
             }
             return new Entity(IntPtr.Zero);
