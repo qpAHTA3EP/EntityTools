@@ -391,7 +391,9 @@ namespace ValiablesAstralExtention.Classes
             _strValue = string.Empty;
         }
 
-
+        /// <summary>
+        /// Исходная неформатированная строка, содержащая вычисляемое выражение
+        /// </summary>
         private string _strValue = string.Empty;
         /// <summary>
         /// _itemId содержит идентификатор прeдметов(regex), количество которых подсчитывается

@@ -30,11 +30,11 @@
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dgvVariables = new System.Windows.Forms.DataGridView();
+            this.btnSave = new System.Windows.Forms.Button();
+            this.btnCancel = new System.Windows.Forms.Button();
             this.clmnName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.clmnType = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.clmnValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.btnSave = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvVariables)).BeginInit();
             this.SuspendLayout();
             // 
@@ -58,31 +58,6 @@
             this.dgvVariables.TabIndex = 0;
             this.dgvVariables.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgv_CellContentClick);
             // 
-            // clmnName
-            // 
-            this.clmnName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.clmnName.Frozen = true;
-            this.clmnName.HeaderText = "Name";
-            this.clmnName.Name = "clmnName";
-            this.clmnName.ToolTipText = "Имя переменной (The Name of the variable)";
-            this.clmnName.Width = 60;
-            // 
-            // clmnType
-            // 
-            this.clmnType.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.clmnType.HeaderText = "Type";
-            this.clmnType.Name = "clmnType";
-            this.clmnType.ToolTipText = "Тип переменной (The type of the variable)";
-            this.clmnType.Width = 39;
-            // 
-            // clmnValue
-            // 
-            this.clmnValue.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.clmnValue.HeaderText = "Value";
-            this.clmnValue.Name = "clmnValue";
-            this.clmnValue.ToolTipText = "Значение переменной (The value of the variable)";
-            this.clmnValue.Width = 59;
-            // 
             // btnSave
             // 
             this.btnSave.DialogResult = System.Windows.Forms.DialogResult.OK;
@@ -105,6 +80,28 @@
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            // 
+            // clmnName
+            // 
+            this.clmnName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.clmnName.Frozen = true;
+            this.clmnName.HeaderText = "Name";
+            this.clmnName.Name = "clmnName";
+            this.clmnName.ToolTipText = "Имя переменной (The Name of the variable)";
+            this.clmnName.Width = 60;
+            // 
+            // clmnType
+            // 
+            this.clmnType.HeaderText = "Type";
+            this.clmnType.Name = "clmnType";
+            // 
+            // clmnValue
+            // 
+            this.clmnValue.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.clmnValue.HeaderText = "Value";
+            this.clmnValue.Name = "clmnValue";
+            this.clmnValue.ToolTipText = "Значение переменной (The value of the variable)";
+            this.clmnValue.Width = 59;
             // 
             // VariablesEditor
             // 

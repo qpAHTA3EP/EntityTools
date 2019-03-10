@@ -17,37 +17,45 @@ namespace ValiablesAstralExtention.Forms
         public VariablesEditor()
         {
             InitializeComponent();
+            //
+            // clmnType
+            //
         }
 
-        public static bool Show(VariableCollection vars)
+        public static VariableItem GetVariable(VariableCollection vars)
         {
             if (varEditor == null)
+            {
                 varEditor = new VariablesEditor();
+                varEditor.clmnType.Items.Clear();
+                varEditor.clmnType.Items.AddRange(Enum.GetNames(typeof(VariableTypes)));
+            }
 
             if (vars != null)
             {
-                varEditor.dgvVariables.AutoGenerateColumns = true;
-                varEditor.dgvVariables.DataSource = vars.ToList();
-
-                varEditor.clmnName.DataPropertyName = "Key";
-                varEditor.clmnType.DataPropertyName = "Type";
-                //varEditor.clmnType.Items.Clear();
-                //varEditor.clmnType.Items.Add(VariableTypes.Boolean.ToString());
-                //varEditor.clmnType.Items.Add(VariableTypes.Integer.ToString());
-                //varEditor.clmnType.Items.Add(VariableTypes.DateTime.ToString());
-                //varEditor.clmnType.Items.Add(VariableTypes.String.ToString());
-                //varEditor.clmnType.Items.Add(VariableTypes.ItemsCount.ToString());
-
-                varEditor.clmnValue.DataPropertyName = "Value";
-
+                //
+                // Заполнение DataGridView значениями
+                //
+                foreach (VariableItem var in vars)
+                {
+                    DataGridViewRow dgvRow = new DataGridViewRow();
+                    dgvRow.Cells[varEditor.clmnName.DisplayIndex].Value = var.Key;
+                    dgvRow.Cells[varEditor.clmnType.DisplayIndex].Value = var.VarType;
+                    dgvRow.Cells[varEditor.clmnValue.DisplayIndex].Value = var.Value;
+                    dgvRow.Tag = var;
+                }
+                //
+                // отображение редактора переменных
+                //
                 DialogResult result = varEditor.ShowDialog();
                 if(result == DialogResult.OK)
                 {
-                    VariableItem var = varEditor.dgvVariables.CurrentRow.DataBoundItem as VariableItem;
-                    MessageBox.Show($"Selected variable is {{{var}}}");
+                    if(varEditor.dgvVariables.CurrentRow.Tag is VariableItem var)
+                        MessageBox.Show($"Selected variable is {{{var}}}");
+                    else MessageBox.Show($"Incorrect variable was selected");
                 }
             }
-            return false;
+            return null;
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
