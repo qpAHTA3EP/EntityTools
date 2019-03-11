@@ -15,7 +15,7 @@ using MyNW.Internals;
 namespace EntityPlugin.Conditions
 {
     /// <summary>
-    /// Проверка наличия хотя бы одного объекта Entity, подпадающих под шаблон Name,
+    /// Проверка наличия хотя бы одного объекта Entity, подпадающих под шаблон EntityID,
     /// в регионе CustomRegion, заданным в CustomRegionNames
     /// 
     /// Варианты реализации:

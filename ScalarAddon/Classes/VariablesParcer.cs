@@ -15,6 +15,13 @@ namespace AstralVars.Classes
                                       counterPattern = $"^{counterPredicate}{openBraces}(\\w*){closeBraces}$",
                                       counterTrimPattern = $"(^{counterPredicate}{openBraces})|({closeBraces}$)";
 
+        public static readonly VarTypes[] varTypes = {  VarTypes.Integer,
+                                                        VarTypes.Boolean,            
+                                                        VarTypes.String,
+                                                        VarTypes.DateTime,
+                                                        VarTypes.Counter };
+
+
         /// <summary>
         /// Получение идентификатора предмета (itemId) из выражения, заданного строкой
         /// </summary>

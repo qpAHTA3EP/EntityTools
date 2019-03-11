@@ -28,21 +28,22 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dgvVariables = new System.Windows.Forms.DataGridView();
-            this.btnSave = new System.Windows.Forms.Button();
+            this.btnSelect = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.clmnName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.clmnType = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.clmnValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dntReload = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvVariables)).BeginInit();
             this.SuspendLayout();
             // 
             // dgvVariables
             // 
             this.dgvVariables.AllowUserToOrderColumns = true;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.dgvVariables.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.dgvVariables.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dgvVariables.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -56,18 +57,19 @@
             this.dgvVariables.Name = "dgvVariables";
             this.dgvVariables.Size = new System.Drawing.Size(446, 386);
             this.dgvVariables.TabIndex = 0;
-            this.dgvVariables.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgv_CellContentClick);
+            this.dgvVariables.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.dgvVariables_CellValidating);
+            this.dgvVariables.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dgvVariables_DataError);
             // 
-            // btnSave
+            // btnSelect
             // 
-            this.btnSave.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.btnSave.Location = new System.Drawing.Point(303, 415);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(75, 23);
-            this.btnSave.TabIndex = 1;
-            this.btnSave.Text = "Save";
-            this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            this.btnSelect.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.btnSelect.Location = new System.Drawing.Point(303, 414);
+            this.btnSelect.Name = "btnSelect";
+            this.btnSelect.Size = new System.Drawing.Size(75, 23);
+            this.btnSelect.TabIndex = 1;
+            this.btnSelect.Text = "Select";
+            this.btnSelect.UseVisualStyleBackColor = true;
+            this.btnSelect.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // btnCancel
             // 
@@ -92,6 +94,7 @@
             // 
             // clmnType
             // 
+            this.clmnType.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
             this.clmnType.HeaderText = "Type";
             this.clmnType.Name = "clmnType";
             // 
@@ -103,13 +106,25 @@
             this.clmnValue.ToolTipText = "Значение переменной (The value of the variable)";
             this.clmnValue.Width = 59;
             // 
+            // dntReload
+            // 
+            this.dntReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.dntReload.Location = new System.Drawing.Point(13, 415);
+            this.dntReload.Name = "dntReload";
+            this.dntReload.Size = new System.Drawing.Size(75, 22);
+            this.dntReload.TabIndex = 3;
+            this.dntReload.Text = "Reload";
+            this.dntReload.UseVisualStyleBackColor = true;
+            this.dntReload.Click += new System.EventHandler(this.dntReload_Click);
+            // 
             // VariablesEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(471, 450);
+            this.Controls.Add(this.dntReload);
             this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.btnSave);
+            this.Controls.Add(this.btnSelect);
             this.Controls.Add(this.dgvVariables);
             this.Name = "VariablesEditor";
             this.Text = "Variables";
@@ -121,10 +136,11 @@
         #endregion
 
         private System.Windows.Forms.DataGridView dgvVariables;
-        private System.Windows.Forms.Button btnSave;
+        private System.Windows.Forms.Button btnSelect;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.DataGridViewTextBoxColumn clmnName;
         private System.Windows.Forms.DataGridViewComboBoxColumn clmnType;
         private System.Windows.Forms.DataGridViewTextBoxColumn clmnValue;
+        private System.Windows.Forms.Button dntReload;
     }
 }
