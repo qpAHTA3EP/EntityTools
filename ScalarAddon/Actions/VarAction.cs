@@ -22,7 +22,7 @@ namespace ValiablesAstralExtention
         public int Value { get; set; } = 0;
 
         [Description("Тип переменной")]
-        public VariableTypes Type = VariableTypes.Integer;
+        public VarTypes Type = VarTypes.Integer;
 
         public override string ActionLabel => GetType().Name;
 

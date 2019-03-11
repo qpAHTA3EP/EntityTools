@@ -22,13 +22,13 @@ namespace ValiablesAstralExtention.Forms
             //
         }
 
-        public static VariableItem GetVariable(VariableCollection vars)
+        public static Variable GetVariable(VariableCollection vars)
         {
             if (varEditor == null)
             {
                 varEditor = new VariablesEditor();
                 varEditor.clmnType.Items.Clear();
-                varEditor.clmnType.Items.AddRange(Enum.GetNames(typeof(VariableTypes)));
+                varEditor.clmnType.Items.AddRange(Enum.GetNames(typeof(VarTypes)));
             }
 
             if (vars != null)
@@ -36,7 +36,7 @@ namespace ValiablesAstralExtention.Forms
                 //
                 // Заполнение DataGridView значениями
                 //
-                foreach (VariableItem var in vars)
+                foreach (Variable var in vars)
                 {
                     DataGridViewRow dgvRow = new DataGridViewRow();
                     dgvRow.Cells[varEditor.clmnName.DisplayIndex].Value = var.Key;
@@ -50,7 +50,7 @@ namespace ValiablesAstralExtention.Forms
                 DialogResult result = varEditor.ShowDialog();
                 if(result == DialogResult.OK)
                 {
-                    if(varEditor.dgvVariables.CurrentRow.Tag is VariableItem var)
+                    if(varEditor.dgvVariables.CurrentRow.Tag is Variable var)
                         MessageBox.Show($"Selected variable is {{{var}}}");
                     else MessageBox.Show($"Incorrect variable was selected");
                 }

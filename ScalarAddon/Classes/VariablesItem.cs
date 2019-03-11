@@ -11,116 +11,116 @@ namespace ValiablesAstralExtention.Classes
     /// <summary>
     /// Перечисление типов переменных
     /// </summary>
-    public enum VariableTypes
+    public enum VarTypes
     {
         Boolean,
         Integer,
         String,
         //Numeric,
         DateTime,
-        ItemsCount
+        Counter
     }
 
     /// <summary>
     /// Элемент коллекции переменных
     /// </summary>
-    public abstract class VariableItem
+    public abstract class Variable
     {
         private static Random rand = new Random();
 
-        private VariableItem()
+        private Variable()
         {
             throw new NotImplementedException();
         }
-        protected VariableItem(VariableTypes tp)
+        protected Variable(VarTypes tp)
         {
             VarType = tp;            
             Key = $"Var{rand.Next()}";
         }
-        protected VariableItem(VariableTypes tp, String k)
+        protected Variable(VarTypes tp, String k)
         {
             VarType = tp;
             Key = k;
         }
 
         public string Key;
-        public readonly VariableTypes VarType;
+        public readonly VarTypes VarType;
         public abstract object Value { get; set; }
 
         /// <summary>
         /// Абстрактынй конструктор копий
         /// </summary>
         /// <returns>Копия объекта</returns>
-        public abstract VariableItem Clone();
+        public abstract Variable Clone();
 
         /// <summary>
         /// Конструирование объекта нужного типа
         /// </summary>
         /// <param name="tp">Тип объекта</param>
         /// <returns>Сконструированный объект</returns>
-        public static VariableItem Make(VariableTypes tp)
+        public static Variable Make(VarTypes tp)
         {
             switch (tp)
             {
-                case VariableTypes.Boolean:
-                    return new BooleanVariable();
-                case VariableTypes.Integer:
-                    return new IntVariable();
-                case VariableTypes.String:
-                    return new StringVariable();
-                case VariableTypes.ItemsCount:
-                    return new ItemsCountVariable();
-                case VariableTypes.DateTime:
-                    return new DateTimeVariable();
+                case VarTypes.Boolean:
+                    return new BoolVar();
+                case VarTypes.Integer:
+                    return new IntVar();
+                case VarTypes.String:
+                    return new StrVar();
+                case VarTypes.Counter:
+                    return new CounterVar();
+                case VarTypes.DateTime:
+                    return new DateTimeVar();
                 default:
                     return null;
             }
         }
 
-        public static VariableItem Make(VariableItem source)
+        public static Variable Make(Variable source)
         {
             return source.Clone();
         }
 
-        public static VariableItem Make(string k, bool val)
+        public static Variable Make(string k, bool val)
         {
-            return new BooleanVariable(k, val);
+            return new BoolVar(k, val);
         }
-        public static VariableItem Make(string k, int val)
+        public static Variable Make(string k, int val)
         {
-            return new IntVariable(k, val);
+            return new IntVar(k, val);
         }
-        public static VariableItem Make(string k, string val)
+        public static Variable Make(string k, string val)
         {
             if (int.TryParse(val, out int intVal))
-                return new IntVariable(k, intVal);
+                return new IntVar(k, intVal);
             else if (bool.TryParse(val, out bool boolVal))
-                return new BooleanVariable(k, boolVal);
+                return new BoolVar(k, boolVal);
             else if (DateTime.TryParse(val, out DateTime dtVal))
-                return new DateTimeVariable(k, dtVal);
+                return new DateTimeVar(k, dtVal);
             else if (VariablesParcer.GetItemID(val, out string itemId))
-                return new ItemsCountVariable(k, itemId);
+                return new CounterVar(k, itemId);
             else
-                return new StringVariable(k, val);
+                return new StrVar(k, val);
         }
-        public static VariableItem Make(string k, DateTime val)
+        public static Variable Make(string k, DateTime val)
         {
-            return new DateTimeVariable(k, val);
+            return new DateTimeVar(k, val);
         }
     }
 
     /// <summary>
     /// Булевая переменная 
     /// </summary>
-    public class BooleanVariable : VariableItem
+    public class BoolVar : Variable
     {
-        public BooleanVariable() : base(VariableTypes.Boolean) { }
-        public BooleanVariable(string k, bool val = false) : base(VariableTypes.Boolean)
+        public BoolVar() : base(VarTypes.Boolean) { }
+        public BoolVar(string k, bool val = false) : base(VarTypes.Boolean)
         {
             Key = k;
             _varValue = val;
         }
-        public BooleanVariable(string k, object val) : base(VariableTypes.Boolean)
+        public BoolVar(string k, object val) : base(VarTypes.Boolean)
         {
             Key = k;
             if (val != null)
@@ -163,9 +163,9 @@ namespace ValiablesAstralExtention.Classes
             }
         }
 
-        public override VariableItem Clone()
+        public override Variable Clone()
         {
-            return new BooleanVariable(Key, _varValue);
+            return new BoolVar(Key, _varValue);
         }
 
         public override string ToString()
@@ -177,15 +177,15 @@ namespace ValiablesAstralExtention.Classes
     /// <summary>
     /// Переменная - целое число
     /// </summary>
-    public class IntVariable : VariableItem
+    public class IntVar : Variable
     {
-        public IntVariable() : base(VariableTypes.Integer) {}
-        public IntVariable(string k, int val = 0) : base(VariableTypes.Integer)
+        public IntVar() : base(VarTypes.Integer) {}
+        public IntVar(string k, int val = 0) : base(VarTypes.Integer)
         {
             Key = k;
             _varValue = val;
         }
-        public IntVariable(string k, object val) : base(VariableTypes.Integer)
+        public IntVar(string k, object val) : base(VarTypes.Integer)
         {
             Key = k;
             if (val != null)
@@ -233,24 +233,24 @@ namespace ValiablesAstralExtention.Classes
             return _varValue.ToString();
         }
 
-        public override VariableItem Clone()
+        public override Variable Clone()
         {
-            return new IntVariable(Key, _varValue);
+            return new IntVar(Key, _varValue);
         }
     }
 
     /// <summary>
     /// Переменная - строка
     /// </summary>
-    public class StringVariable : VariableItem
+    public class StrVar : Variable
     {
-        public StringVariable() : base(VariableTypes.String) { }
-        public StringVariable(string k, string val = "") : base(VariableTypes.String)
+        public StrVar() : base(VarTypes.String) { }
+        public StrVar(string k, string val = "") : base(VarTypes.String)
         {
             Key = k;
             _varValue = val;
         }
-        public StringVariable(string k, object val) : base(VariableTypes.String)
+        public StrVar(string k, object val) : base(VarTypes.String)
         {
             Key = k;
             if (val != null)
@@ -277,29 +277,29 @@ namespace ValiablesAstralExtention.Classes
             return _varValue;
         }
 
-        public override VariableItem Clone()
+        public override Variable Clone()
         {
-            return new StringVariable(Key, _varValue);
+            return new StrVar(Key, _varValue);
         }
     }
 
     /// <summary>
     /// Переменная времени
     /// </summary>
-    public class DateTimeVariable : VariableItem
+    public class DateTimeVar : Variable
     {
-        public DateTimeVariable() : base(VariableTypes.DateTime) { }
-        public DateTimeVariable(string k) : base(VariableTypes.DateTime)
+        public DateTimeVar() : base(VarTypes.DateTime) { }
+        public DateTimeVar(string k) : base(VarTypes.DateTime)
         {
             Key = k;
             _dtValue = DateTime.Now;
         }
-        public DateTimeVariable(string k, DateTime val) : base(VariableTypes.DateTime)
+        public DateTimeVar(string k, DateTime val) : base(VarTypes.DateTime)
         {
             Key = k;
             _dtValue = val;
         }
-        public DateTimeVariable(string k, object val = null) : base(VariableTypes.DateTime)
+        public DateTimeVar(string k, object val = null) : base(VarTypes.DateTime)
         {
             Key = k;
             if (val != null)
@@ -347,31 +347,31 @@ namespace ValiablesAstralExtention.Classes
             return _dtValue.ToString();
         }
 
-        public override VariableItem Clone()
+        public override Variable Clone()
         {
-            return new DateTimeVariable(Key, _dtValue);
+            return new DateTimeVar(Key, _dtValue);
         }
     }
 
     /// <summary>
     /// Переменная - счетчик предметов 
     /// </summary>
-    public class ItemsCountVariable : VariableItem
+    public class CounterVar : Variable
     {
-        public ItemsCountVariable() : base(VariableTypes.ItemsCount) { }
-        public ItemsCountVariable(string k) : base(VariableTypes.ItemsCount)
+        public CounterVar() : base(VarTypes.Counter) { }
+        public CounterVar(string k) : base(VarTypes.Counter)
         {
             Key = k;
             _itemId = string.Empty;
             _strValue = string.Empty;
         }
-        public ItemsCountVariable(string k, string itemId) : base(VariableTypes.ItemsCount)
+        public CounterVar(string k, string itemId) : base(VarTypes.Counter)
         {
             Key = k;
             _itemId = itemId;
             _strValue = itemId;
         }
-        public ItemsCountVariable(string k, object val) : base(VariableTypes.ItemsCount)
+        public CounterVar(string k, object val) : base(VarTypes.Counter)
         {
             Key = k;
             if (val != null)
@@ -438,9 +438,9 @@ namespace ValiablesAstralExtention.Classes
             return _strValue;
         }
 
-        public override VariableItem Clone()
+        public override Variable Clone()
         {
-            ItemsCountVariable newItmCnt = new ItemsCountVariable(Key)
+            CounterVar newItmCnt = new CounterVar(Key)
             {
                 _itemId = _itemId,
                 _strValue = _strValue

@@ -8,9 +8,9 @@ namespace ValiablesAstralExtention.Classes
 {
     public class VariablesParcer
     {
-        protected static readonly string[] separators = { " ", "{", "(", "[", "]", ")", "}", "+", "-", "*", "/", "Numeric", "ItemsCount" };
-        protected static readonly string countPattern = @"^(ItemsCount|Items|NumericCount|Numeric|Count)\(\w*\)$",
-                                         countTrimPattern = @"(^(ItemsCount|Items|NumericCount|Numeric|Count)\()|(\)$)";
+        protected static readonly string[] separators = { " ", "{", "(", "[", "]", ")", "}", "+", "-", "*", "/", "Numeric", "Counter" };
+        protected static readonly string countPattern = @"^(Counter|Items|NumericCount|Numeric|Count)\(\w*\)$",
+                                         countTrimPattern = @"(^(Counter|Items|NumericCount|Numeric|Count)\()|(\)$)";
 
         /// <summary>
         /// Получение идентификатора предмета (itemId) из выражения, заданного строкой

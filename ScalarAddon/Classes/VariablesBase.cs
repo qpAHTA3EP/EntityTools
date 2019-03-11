@@ -51,9 +51,9 @@ namespace ValiablesAstralExtention.Classes
         }
     }
 
-    public class VariableCollection : KeyedCollection<string, VariableItem>
+    public class VariableCollection : KeyedCollection<string, Variable>
     {
-        protected override string GetKeyForItem(VariableItem item)
+        protected override string GetKeyForItem(Variable item)
         {
             return item.Key;
         }
