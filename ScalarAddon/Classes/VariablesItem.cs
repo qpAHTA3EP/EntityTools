@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace ValiablesAstralExtention.Classes
+namespace AstralVars.Classes
 {
     /// <summary>
     /// Перечисление типов переменных
@@ -148,17 +148,26 @@ namespace ValiablesAstralExtention.Classes
                 if (value is bool)
                 {
                     _varValue = (bool)value;
+
+                    #if AstralLoaded
                     Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Variable '{Key}' set to [{_varValue}] as {VarType}");
+                    #endif
                 }
                 else if (bool.TryParse(value.ToString(), out bool newValue))
                 {
                     _varValue = newValue;
+
+                    #if AstralLoaded
                     Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Variable '{Key}' set to [{_varValue}] as {VarType}");
+                    #endif
                 }
                 else
                 {
                     _varValue = false;
+
+                    #if AstralLoaded
                     Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Invalid value [{value}] to Variable '{Key}' type of {VarType}. Variable '{Key}' reseted to [{_varValue}].");
+                    #endif
                 }
             }
         }
@@ -213,17 +222,26 @@ namespace ValiablesAstralExtention.Classes
                 if (value is int)
                 {
                     _varValue = (int)value;
+                    
+#if AstralLoaded
                     Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Variable '{Key}' set to [{_varValue}] as {VarType}");
+#endif
                 }
                 else if (int.TryParse(value.ToString(), out int newValue))
                 {
                     _varValue = newValue;
+
+#if AstralLoaded
                     Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Variable '{Key}' set to [{_varValue}] as {VarType}");
+#endif
                 }
                 else
                 {
                     _varValue = 0;
+
+#if AstralLoaded
                     Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Invalid value [{value}] to Variable '{Key}' type of {VarType}. Variable '{Key}' reseted to [{_varValue}].");
+#endif
                 }
             }
         }
@@ -268,7 +286,10 @@ namespace ValiablesAstralExtention.Classes
             set
             {
                 _varValue = value.ToString();
+                
+#if AstralLoaded
                 Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Variable '{Key}' set to [{_varValue}] as {VarType}");
+#endif
             }
         }
 
@@ -327,7 +348,10 @@ namespace ValiablesAstralExtention.Classes
                 if (value is DateTime)
                 {
                     _dtValue = (DateTime)value;
+                    
+#if AstralLoaded
                     Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Variable '{Key}' set to [{_dtValue}] as {VarType}");
+#endif
                 }
                 else if (DateTime.TryParse(value.ToString(), out DateTime newValue))
                 {
@@ -337,7 +361,10 @@ namespace ValiablesAstralExtention.Classes
                 else
                 {
                     _dtValue = DateTime.Now;
+                    
+#if AstralLoaded
                     Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Invalid value [{value}] to Variable '{Key}' type of {VarType}. Variable '{Key}' reseted to [{_dtValue}].");
+#endif
                 }
             }
         }
@@ -365,11 +392,16 @@ namespace ValiablesAstralExtention.Classes
             _itemId = string.Empty;
             _strValue = string.Empty;
         }
-        public CounterVar(string k, string itemId) : base(VarTypes.Counter)
+        public CounterVar(string k, string val) : base(VarTypes.Counter)
         {
             Key = k;
-            _itemId = itemId;
-            _strValue = itemId;
+            if (VariablesParcer.GetItemID(val, out string newVal))
+            {
+                _itemId = newVal;
+                _strValue = val;
+                return;
+            }
+            _itemId = _strValue = val;
         }
         public CounterVar(string k, object val) : base(VarTypes.Counter)
         {
@@ -403,13 +435,15 @@ namespace ValiablesAstralExtention.Classes
         {
             get
             {
+#if AstralLoaded
                 uint num = 0;
-                if (!(string.IsNullOrEmpty(_itemId) && EntityManager.LocalPlayer.IsValid))
-                {
-                    List<InventorySlot> slotList = EntityManager.LocalPlayer.AllItems.FindAll(slot => Regex.IsMatch(slot.Item.ItemDef.InternalName, _itemId));
-                    foreach (InventorySlot invSlot in slotList)
-                        num += invSlot.Item.Count;
-                }
+                    if (!(string.IsNullOrEmpty(_itemId) && EntityManager.LocalPlayer.IsValid))
+                    {
+                        List<InventorySlot> slotList = EntityManager.LocalPlayer.AllItems.FindAll(slot => Regex.IsMatch(slot.Item.ItemDef.InternalName, _itemId));
+                        foreach (InventorySlot invSlot in slotList)
+                            num += invSlot.Item.Count;
+                    }
+#endif
                 return 0u;
             }
 
@@ -422,13 +456,19 @@ namespace ValiablesAstralExtention.Classes
                 { 
                     _itemId = newVal;
                     _strValue = inStr;
+                    
+#if AstralLoaded
                     Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Variable '{Key}' set to [{inStr}] as {VarType}");
+#endif
                 }
                 else
                 {
                     _itemId = string.Empty;
                     _strValue = string.Empty;
+
+#if AstralLoaded
                     Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Invalid value [{inStr}] to Variable '{Key}' type of {VarType}. Variable '{Key}' reseted to [{_itemId}].");
+#endif
                 }
             }
         }

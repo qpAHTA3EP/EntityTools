@@ -6,9 +6,9 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using ValiablesAstralExtention.Classes;
+using AstralVars.Classes;
 
-namespace ValiablesAstralExtention.Forms
+namespace AstralVars.Forms
 {
     public partial class VariablesEditor : Form
     {
@@ -27,26 +27,26 @@ namespace ValiablesAstralExtention.Forms
             if (varEditor == null)
             {
                 varEditor = new VariablesEditor();
+                varEditor.clmnType.DataSource = VarTypes;
                 varEditor.clmnType.Items.Clear();
                 varEditor.clmnType.Items.AddRange(Enum.GetNames(typeof(VarTypes)));
             }
 
             if (vars != null)
             {
-                //
                 // Заполнение DataGridView значениями
-                //
                 foreach (Variable var in vars)
                 {
-                    DataGridViewRow dgvRow = new DataGridViewRow();
-                    dgvRow.Cells[varEditor.clmnName.DisplayIndex].Value = var.Key;
-                    dgvRow.Cells[varEditor.clmnType.DisplayIndex].Value = var.VarType;
-                    dgvRow.Cells[varEditor.clmnValue.DisplayIndex].Value = var.Value;
-                    dgvRow.Tag = var;
+                    DataGridViewRow newRow = new DataGridViewRow();
+                    newRow.CreateCells(varEditor.dgvVariables);
+                    newRow.Cells[varEditor.clmnName.DisplayIndex].Value = var.Key;
+                    newRow.Cells[varEditor.clmnType.DisplayIndex].Value = var.VarType.ToString();
+                    newRow.Cells[varEditor.clmnValue.DisplayIndex].Value = var.Value;
+                    newRow.Tag = var;
+                    varEditor.dgvVariables.Rows.Add(newRow);                    
                 }
-                //
+                
                 // отображение редактора переменных
-                //
                 DialogResult result = varEditor.ShowDialog();
                 if(result == DialogResult.OK)
                 {

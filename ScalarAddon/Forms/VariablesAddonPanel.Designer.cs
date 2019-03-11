@@ -1,4 +1,4 @@
-﻿namespace ValiablesAstralExtention.Forms
+﻿namespace AstralVars.Forms
 {
     partial class VariablesAddonPanel
     {

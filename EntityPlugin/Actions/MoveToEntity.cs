@@ -51,7 +51,7 @@ namespace EntityPlugin.Actions
         {
             get
             {
-                if (target.IsValid && target.Location.IsValid)
+                if (target.IsValid && target.Location.IsValid && target.Location.Distance3DFromPlayer >= Distance)
                 {
                     return target.Location.Clone();
                 }

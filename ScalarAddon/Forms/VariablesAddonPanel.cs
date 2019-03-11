@@ -6,9 +6,9 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using ValiablesAstralExtention.Classes;
+using AstralVars.Classes;
 
-namespace ValiablesAstralExtention.Forms
+namespace AstralVars.Forms
 {
     public partial class VariablesAddonPanel : Astral.Forms.BasePanel
     {

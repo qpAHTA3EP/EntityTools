@@ -4,13 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace ValiablesAstralExtention.Classes
+namespace AstralVars.Classes
 {
     public class VariablesParcer
     {
-        protected static readonly string[] separators = { " ", "{", "(", "[", "]", ")", "}", "+", "-", "*", "/", "Numeric", "Counter" };
-        protected static readonly string countPattern = @"^(Counter|Items|NumericCount|Numeric|Count)\(\w*\)$",
-                                         countTrimPattern = @"(^(Counter|Items|NumericCount|Numeric|Count)\()|(\)$)";
+        public static readonly string[] separators = { " ", "{", "(", "[", "]", ")", "}", "+", "-", "*", "/", "Numeric", "NumericCount", "Counter", "Count", "Items", "ItemsCount" };
+        public static readonly string counterPredicate = @"(ItemsCount|Items|NumericCount|Numeric|Counter|Count)",
+                                      openBraces = @"(\[|\{|\()",
+                                      closeBraces = @"(\]|\}|\))",
+                                      counterPattern = $"^{counterPredicate}{openBraces}(\\w*){closeBraces}$",
+                                      counterTrimPattern = $"(^{counterPredicate}{openBraces})|({closeBraces}$)";
 
         /// <summary>
         /// Получение идентификатора предмета (itemId) из выражения, заданного строкой
@@ -25,14 +28,14 @@ namespace ValiablesAstralExtention.Classes
             string newVal = inStr as string;
             if (!string.IsNullOrEmpty(newVal))
             {
-                if (Regex.IsMatch(newVal, countPattern))
+                if (Regex.IsMatch(newVal, counterPattern))
                 {
 
                     //numName.Replace("Numeric", String.Empty);
                     //newVal = newVal.Substring(8, numName.Length - 9);
 
                     // Удаление идентификатора функтора :
-                    itemId = Regex.Replace(newVal, countTrimPattern, string.Empty);
+                    itemId = Regex.Replace(newVal, counterTrimPattern, string.Empty);
                 }
             }
             return string.IsNullOrEmpty(itemId);

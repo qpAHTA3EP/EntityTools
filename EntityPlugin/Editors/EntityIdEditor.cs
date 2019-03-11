@@ -16,7 +16,7 @@ namespace EntityPlugin.Editors
             {
                 return selectedEntity.NameUntranslated;
             }
-            return string.Empty;
+            return value;
         }
 
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)

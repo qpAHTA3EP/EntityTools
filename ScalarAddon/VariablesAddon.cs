@@ -8,9 +8,9 @@ using Astral.Quester.Classes;
 using System.Drawing.Design;
 using Astral.Quester.Forms;
 using Astral.Quester.UIEditors;
-using ValiablesAstralExtention.Classes;
+using AstralVars.Classes;
 
-namespace ValiablesAstralExtention
+namespace AstralVars
 {
     public class VariablesAddon : Astral.Addons.Plugin
     {
