@@ -78,6 +78,7 @@ namespace AstralVars.Forms
                         DataGridViewComboBoxCell cbCell = new DataGridViewComboBoxCell();
                         cbCell.Items.AddRange(new string[] { "True", "False"});
                         cbCell.DisplayStyle = DataGridViewComboBoxDisplayStyle.ComboBox;
+                        cbCell.FlatStyle = FlatStyle.Flat;
                         cbCell.Value = var.Value;
                         newRow.Cells[varEditor.clmnValue.DisplayIndex] = cbCell;
                         break;
