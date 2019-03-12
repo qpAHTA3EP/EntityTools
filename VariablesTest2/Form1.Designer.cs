@@ -33,6 +33,7 @@ namespace VariablesTest2
             this.button1 = new System.Windows.Forms.Button();
             this.helloWorldLabel = new System.Windows.Forms.Label();
             this.cbType = new System.Windows.Forms.ComboBox();
+            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
             this.SuspendLayout();
             // 
             // linkLabel1
@@ -60,7 +61,7 @@ namespace VariablesTest2
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(217, 156);
-            this.button1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.button1.Margin = new System.Windows.Forms.Padding(2);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(97, 28);
             this.button1.TabIndex = 2;
@@ -87,17 +88,27 @@ namespace VariablesTest2
             this.cbType.Size = new System.Drawing.Size(97, 21);
             this.cbType.TabIndex = 4;
             // 
+            // dateTimePicker1
+            // 
+            this.dateTimePicker1.CustomFormat = "dd.MM.yyyy - HH:mm";
+            this.dateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.dateTimePicker1.Location = new System.Drawing.Point(163, 127);
+            this.dateTimePicker1.Name = "dateTimePicker1";
+            this.dateTimePicker1.Size = new System.Drawing.Size(200, 20);
+            this.dateTimePicker1.TabIndex = 5;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(533, 292);
+            this.Controls.Add(this.dateTimePicker1);
             this.Controls.Add(this.cbType);
             this.Controls.Add(this.helloWorldLabel);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.debugInstructionsLabel);
             this.Controls.Add(this.linkLabel1);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Form1";
             this.Text = "Form1";
             this.ResumeLayout(false);
@@ -112,6 +123,7 @@ namespace VariablesTest2
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label helloWorldLabel;
         private System.Windows.Forms.ComboBox cbType;
+        private System.Windows.Forms.DateTimePicker dateTimePicker1;
     }
 }
 

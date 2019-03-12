@@ -18,9 +18,6 @@ namespace AstralVars.Forms
         public VariablesEditor()
         {
             InitializeComponent();
-            //
-            // clmnType
-            //
         }
 
         public static Variable GetVariable(VariableCollection vars)
@@ -35,6 +32,8 @@ namespace AstralVars.Forms
 
                 // Следующая реализация вызывает ошибку при попытке выбрать двугое значение в списке
                 //varEditor.clmnType.DataSource = VariablesParcer.varTypes;
+
+                varEditor.dgvVariables.ReadOnly = true;
 
                 varEditor.btnSelect.Text = "Select";
             }
@@ -72,6 +71,34 @@ namespace AstralVars.Forms
                 newRow.CreateCells(varEditor.dgvVariables);
                 newRow.Cells[varEditor.clmnName.DisplayIndex].Value = var.Key;
                 newRow.Cells[varEditor.clmnType.DisplayIndex].Value = var.VarType.ToString();
+                switch (var.VarType)
+                {
+                    case VarTypes.Boolean:
+                        //DataGridViewCheckBoxCell cbCell = new DataGridViewCheckBoxCell();
+                        DataGridViewComboBoxCell cbCell = new DataGridViewComboBoxCell();
+                        cbCell.Items.AddRange(new string[] { "True", "False"});
+                        cbCell.DisplayStyle = DataGridViewComboBoxDisplayStyle.ComboBox;
+                        cbCell.Value = var.Value;
+                        newRow.Cells[varEditor.clmnValue.DisplayIndex] = cbCell;
+                        break;
+                    case VarTypes.Integer:
+                        newRow.Cells[varEditor.clmnValue.DisplayIndex].Value = var.Value;
+                        //int.TryParse(newRow.Cells[varEditor.clmnValue.DisplayIndex].Value.ToString(), out int iRres);
+                        break;
+                    case VarTypes.DateTime:
+                        DataGridViewDateTimeCell dtCell = new DataGridViewDateTimeCell();
+                        dtCell.Value = var.Value;
+                        newRow.Cells[varEditor.clmnValue.DisplayIndex] = dtCell;
+                        //newRow.Cells[varEditor.clmnValue.DisplayIndex].Value = var.Value;
+                        //DateTime.TryParse(newRow.Cells[varEditor.clmnValue.DisplayIndex].Value.ToString(), out DateTime dtRes);
+                        break;
+                    case VarTypes.Counter:
+                        newRow.Cells[varEditor.clmnValue.DisplayIndex].Value = var.Value;
+                        //VariablesParcer.GetItemID(newRow.Cells[varEditor.clmnValue.DisplayIndex].Value.ToString(), out string stRes);
+                        break;
+                }
+
+
                 newRow.Cells[varEditor.clmnValue.DisplayIndex].Value = var.Value;
                 newRow.Tag = var;
                 varEditor.dgvVariables.Rows.Add(newRow);
@@ -123,12 +150,58 @@ namespace AstralVars.Forms
                 }
                 else if (e.ColumnIndex == clmnName.DisplayIndex)
                 {
-                    if(e.Cancel = string.IsNullOrEmpty(e.FormattedValue.ToString()))
+                    if(string.IsNullOrEmpty(e.FormattedValue.ToString()))
                     {
                         MessageBox.Show(varEditor, "Empty name for variable is not allowed", "Errors", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        e.Cancel = true;
                     }
 
                     // Добавить проверку уникальности имени переменной
+                    foreach(DataGridViewRow row in dgvVariables.Rows)
+                    {
+                        if (!row.IsNewRow && row.Index != e.RowIndex && e.FormattedValue.Equals(row.Cells[e.ColumnIndex].Value))
+                        {
+                            MessageBox.Show(varEditor, "Name of the variable should be unique!\n" +
+                                                       $"Variable '{e.FormattedValue}' already is present in the collection", "Errors", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            e.Cancel = true;
+                        }
+                    }
+                }
+                else if(e.ColumnIndex == clmnType.DisplayIndex)
+                {
+                    if(Enum.TryParse(dgvVariables.Rows[e.RowIndex].Cells[clmnType.DisplayIndex].Value.ToString(), true, out VarTypes newType))
+                    {
+                        DataGridViewRow row = dgvVariables.Rows[e.RowIndex];
+                        Variable oldVar = row.Tag as Variable;
+                        if(oldVar != null && oldVar.VarType != newType)
+                        {
+                            DialogResult dResult = MessageBox.Show(varEditor, $"You change type of variable '{row.Cells[clmnName.DisplayIndex].Value}' from '{oldVar.VarType}' to '{newType}'!\n" +
+                                                       $"The value of the variable would be erased!" +
+                                                       $"Confirm the changes", "Errors", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                            if (dResult == DialogResult.Yes)
+                            {
+                                switch (newType)
+                                {
+                                    case VarTypes.Boolean:
+                                        bool.TryParse(row.Cells[clmnValue.DisplayIndex].Value.ToString(), out bool bRes);
+                                        break;
+                                    case VarTypes.Integer:
+                                        int.TryParse(row.Cells[clmnValue.DisplayIndex].Value.ToString(), out int iRres);
+                                        break;
+                                    case VarTypes.DateTime:
+                                        DateTime.TryParse(row.Cells[clmnValue.DisplayIndex].Value.ToString(), out DateTime dtRes);
+                                        break;
+                                    case VarTypes.Counter:
+                                        VariablesParcer.GetItemID(row.Cells[clmnValue.DisplayIndex].Value.ToString(), out string stRes);
+                                        break;
+                                    case VarTypes.String:
+                                        break;
+                                }
+                            }
+                            else e.Cancel = true;
+                        }
+                    }
+                    else e.Cancel = true;
                 }
             }
         }
@@ -141,6 +214,21 @@ namespace AstralVars.Forms
         private void dntReload_Click(object sender, EventArgs e)
         {
             FillDgvVariables();
+        }
+
+        private void chbAllowEdit_CheckedChanged(object sender, EventArgs e)
+        {
+            dgvVariables.ReadOnly = !chbAllowEdit.Checked;
+        }
+
+        private void dgvVariables_ReadOnlyChanged(object sender, EventArgs e)
+        {
+            chbAllowEdit.Checked = !dgvVariables.ReadOnly;
+        }
+
+        private void VariablesEditor_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
