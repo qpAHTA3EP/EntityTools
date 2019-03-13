@@ -52,7 +52,6 @@ namespace VariablesTest2
 #endif
 #endregion
 
-
 #region [Тест 2] Проверка работы фабрики объектов-переменных
 #if TEST2
             VariablesAddon.Variables.Clear();

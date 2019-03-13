@@ -41,7 +41,7 @@
             // btnSelect
             // 
             this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelect.Location = new System.Drawing.Point(292, 427);
+            this.btnSelect.Location = new System.Drawing.Point(292, 449);
             this.btnSelect.Name = "btnSelect";
             this.btnSelect.Size = new System.Drawing.Size(102, 23);
             this.btnSelect.TabIndex = 0;
@@ -53,7 +53,7 @@
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(400, 427);
+            this.btnCancel.Location = new System.Drawing.Point(400, 449);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(102, 23);
             this.btnCancel.TabIndex = 0;
@@ -72,6 +72,8 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dgvEntities.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.dgvEntities.BackgroundColor = System.Drawing.SystemColors.Control;
+            this.dgvEntities.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dgvEntities.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvEntities.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.clmnName,
@@ -85,7 +87,7 @@
             this.dgvEntities.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvEntities.ShowEditingIcon = false;
             this.dgvEntities.ShowRowErrors = false;
-            this.dgvEntities.Size = new System.Drawing.Size(489, 396);
+            this.dgvEntities.Size = new System.Drawing.Size(489, 421);
             this.dgvEntities.TabIndex = 1;
             // 
             // clmnName
@@ -107,11 +109,10 @@
             // 
             // clmnNameUntranslated
             // 
-            this.clmnNameUntranslated.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.clmnNameUntranslated.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.clmnNameUntranslated.HeaderText = "NameUntranslated";
             this.clmnNameUntranslated.Name = "clmnNameUntranslated";
             this.clmnNameUntranslated.ReadOnly = true;
-            this.clmnNameUntranslated.Width = 120;
             // 
             // UIEntitySelectForm
             // 

@@ -32,20 +32,88 @@ namespace AstralVars.Classes
         {
             itemId = string.Empty;
 
-            string newVal = inStr as string;
-            if (!string.IsNullOrEmpty(newVal))
+            if (!string.IsNullOrEmpty(inStr))
             {
-                if (Regex.IsMatch(newVal, counterPattern))
+                if (Regex.IsMatch(inStr, counterPattern))
                 {
 
                     //numName.Replace("Numeric", String.Empty);
                     //newVal = newVal.Substring(8, numName.Length - 9);
 
-                    // Удаление идентификатора функтора :
-                    itemId = Regex.Replace(newVal, counterTrimPattern, string.Empty);
+                    // Удаление идентификатора функтора 
+                    itemId = Regex.Replace(inStr, counterTrimPattern, string.Empty);
+                }
+                //если ytn 
+                else itemId = inStr;
+            }
+            return !string.IsNullOrEmpty(itemId);
+        }
+
+        /// <summary>
+        /// Перевод строки в булевый тип.
+        /// Если в строке содержится "True" или целое число больше 0, тогда результат 'True' 
+        /// Строка, содержащая "False" или отрицательные целые числа и 0, считается 'False'
+        /// </summary>
+        /// <param name="inStr"></param>
+        /// <param name="result">результат преобразования</param>
+        /// <returns>Флаг успеха преобразования</returns>
+        public static bool TryParse(string inStr, out bool result)
+        {
+            bool succeded = false;
+            if (!bool.TryParse(inStr, out result))
+            {
+                if (int.TryParse(inStr, out int iRes))
+                {
+                    result = iRes > 0;
+                    succeded = true;
                 }
             }
-            return string.IsNullOrEmpty(itemId);
+            else succeded = true;
+            return succeded;
+        }
+
+        /// <summary>
+        /// Перевод строки в целое число.
+        /// </summary>
+        /// <param name="inStr"></param>
+        /// <param name="result">результат преобразования</param>
+        /// <returns>Флаг успеха преобразования</returns>
+        public static bool TryParse(string inStr, out int result)
+        {
+            if (int.TryParse(inStr, out result))
+                return true;
+            else
+            {
+                if (bool.TryParse(inStr, out bool bRes))
+                    result = (bRes) ? 1 : 0;
+                else result = 0;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Перевод строки в DateTime.
+        /// </summary>
+        /// <param name="inStr"></param>
+        /// <param name="result">результат преобразования</param>
+        /// <returns>Флаг успеха преобразования</returns>
+        public static bool TryParse(string inStr, out DateTime result)
+        {
+            if (DateTime.TryParse(inStr, out result))
+                return true;
+            else result = DateTime.MinValue;
+            return false;
+        }
+
+        /// <summary>
+        /// Перевод строки в тип 'Counter'.
+        /// </summary>
+        /// <param name="inStr"></param>
+        /// <param name="result">результат преобразования</param>
+        /// <returns>Флаг успеха преобразования</returns>
+        public static bool TryParse(string inStr, out string result)
+        {
+            return GetItemID(inStr, out result);
         }
     }
 }

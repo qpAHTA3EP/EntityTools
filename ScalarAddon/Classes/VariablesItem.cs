@@ -92,13 +92,13 @@ namespace AstralVars.Classes
         }
         public static Variable Make(string k, string val)
         {
-            if (int.TryParse(val, out int intVal))
+            if (VariablesParcer.TryParse(val, out int intVal))
                 return new IntVar(k, intVal);
-            else if (bool.TryParse(val, out bool boolVal))
+            else if (VariablesParcer.TryParse(val, out bool boolVal))
                 return new BoolVar(k, boolVal);
-            else if (DateTime.TryParse(val, out DateTime dtVal))
+            else if (VariablesParcer.TryParse(val, out DateTime dtVal))
                 return new DateTimeVar(k, dtVal);
-            else if (VariablesParcer.GetItemID(val, out string itemId))
+            else if (VariablesParcer.TryParse(val, out string itemId))
                 return new CounterVar(k, itemId);
             else
                 return new StrVar(k, val);
@@ -437,12 +437,12 @@ namespace AstralVars.Classes
             {
 #if AstralLoaded
                 uint num = 0;
-                    if (!(string.IsNullOrEmpty(_itemId) && EntityManager.LocalPlayer.IsValid))
-                    {
-                        List<InventorySlot> slotList = EntityManager.LocalPlayer.AllItems.FindAll(slot => Regex.IsMatch(slot.Item.ItemDef.InternalName, _itemId));
-                        foreach (InventorySlot invSlot in slotList)
-                            num += invSlot.Item.Count;
-                    }
+                if (!(string.IsNullOrEmpty(_itemId) && EntityManager.LocalPlayer.IsValid))
+                {
+                    List<InventorySlot> slotList = EntityManager.LocalPlayer.AllItems.FindAll(slot => Regex.IsMatch(slot.Item.ItemDef.InternalName, _itemId));
+                    foreach (InventorySlot invSlot in slotList)
+                        num += invSlot.Item.Count;
+                }
 #endif
                 return 0u;
             }

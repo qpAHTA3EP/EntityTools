@@ -45,7 +45,8 @@ namespace AstralVars.Forms
             Variable var = VariablesEditor.GetVariable(VariablesAddon.Variables);
 
             if (var != null)
-                MessageBox.Show($"Variables[{var.Key}] = {var.Value} type of {var.VarType}.\n It represent as string like '{var.ToString()}'");
+                MessageBox.Show($"Variables[{var.Key}] = {var.Value} type of {var.VarType}.\n" +
+                                $" It represent as string like '{var.ToString()}'");
         }
     }
 }

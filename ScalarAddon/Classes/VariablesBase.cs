@@ -58,5 +58,17 @@ namespace AstralVars.Classes
             return item.Key;
         }
 
+        /// <summary>
+        /// Установить переменной с именем 'key' значение 'val'
+        /// Если такой переменной нет в коллекции - она создается
+        /// Если тип переменной не совпадает - тип переменной меняется
+        /// </summary>
+        /// <param name="key">имя переменной</param>
+        /// <param name="val">новое значение</param>
+        /// <returns>true - если была добавлена новая переменная</returns>
+        public bool Set(string key, int val)
+        {
+            return false;
+        }
     }
 }

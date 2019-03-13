@@ -7,11 +7,25 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using AstralVars.Classes;
+using MyNW.Classes;
+using MyNW.Internals;
 
 namespace AstralVars.Forms
 {
     public partial class VariablesEditor : Form
     {
+        class Pair
+        {
+            public string Name { get; set; }
+            public string DisplayName { get; set; }
+        }
+        /// <summary>
+        /// Кэш Списока предметов с идентификаторами (InternalName), находящимися в сумке персонажа
+        /// Key -> InternalName
+        /// Value -> отображаемая в списке строка вида "InternalName [DisplayName]"
+        /// </summary>
+        private List<Pair> itemsDictionary = new List<Pair>();
+
         private static VariablesEditor varEditor;
         private VariableCollection varSource;
 
@@ -65,6 +79,26 @@ namespace AstralVars.Forms
                 varSource = vars;
 
             varEditor.dgvVariables.Rows.Clear();
+            itemsDictionary.Clear();
+
+#if AstralLoaded
+            List<InventorySlot> items = (EntityManager.LocalPlayer.IsValid) ? EntityManager.LocalPlayer.AllItems : new List<InventorySlot>();
+            
+            foreach (InventorySlot item in items)
+            {
+                string dispName = $"{item.Item.ItemDef.InternalName} [{item.Item.ItemDef.DisplayName}]";
+                itemsDictionary.Add(item.Item.ItemDef.InternalName, dispName);
+                //cbCell.Items.Add(dispName);
+            } 
+#else
+            itemsDictionary.Add(new Pair() { Name = "item_1", DisplayName = "item_1 [11]" });
+            itemsDictionary.Add(new Pair() { Name = "item_2", DisplayName = "item_2 [22]" });
+            itemsDictionary.Add(new Pair() { Name = "item_3", DisplayName = "item_3 [33]" });
+            itemsDictionary.Add(new Pair() { Name = "item_4", DisplayName = "item_4 [44]" });
+            itemsDictionary.Add(new Pair() { Name = "Artifactfood", DisplayName = "Artifactfood [Artifactfood_55]" });
+            itemsDictionary.Add(new Pair() { Name = "Gemfood", DisplayName = "Gemfood [Gemfood_55]" });
+#endif
+
             foreach (Variable var in varSource)
             {
                 DataGridViewRow newRow = new DataGridViewRow();
@@ -74,29 +108,84 @@ namespace AstralVars.Forms
                 switch (var.VarType)
                 {
                     case VarTypes.Boolean:
-                        //DataGridViewCheckBoxCell cbCell = new DataGridViewCheckBoxCell();
-                        DataGridViewComboBoxCell cbCell = new DataGridViewComboBoxCell();
-                        cbCell.Items.AddRange(new string[] { "True", "False"});
-                        cbCell.DisplayStyle = DataGridViewComboBoxDisplayStyle.ComboBox;
-                        cbCell.FlatStyle = FlatStyle.Flat;
-                        cbCell.Value = var.Value;
-                        newRow.Cells[varEditor.clmnValue.DisplayIndex] = cbCell;
-                        break;
+                        {
+                            DataGridViewComboBoxCell cbCell = newRow.Cells[varEditor.clmnValue.DisplayIndex] as DataGridViewComboBoxCell;
+                            bool newCellFlag = false;
+                            if (newCellFlag = cbCell == null)
+                                cbCell = new DataGridViewComboBoxCell();
+
+                            cbCell.Items.Clear();
+                            cbCell.Items.AddRange(new string[] { "False", "True" });
+                            cbCell.DisplayStyle = DataGridViewComboBoxDisplayStyle.ComboBox;
+                            cbCell.FlatStyle = FlatStyle.Flat;
+                            cbCell.Value = var.Value;
+
+                            if (newCellFlag)
+                                newRow.Cells[varEditor.clmnValue.DisplayIndex] = cbCell;
+                            break;
+                        }
                     case VarTypes.Integer:
-                        newRow.Cells[varEditor.clmnValue.DisplayIndex].Value = var.Value;
-                        //int.TryParse(newRow.Cells[varEditor.clmnValue.DisplayIndex].Value.ToString(), out int iRres);
-                        break;
+                        {
+                            DataGridViewTextBoxCell tbCell = newRow.Cells[varEditor.clmnValue.DisplayIndex] as DataGridViewTextBoxCell;
+                            bool newCellFlag = false;
+
+                            if (newCellFlag = tbCell == null)
+                                tbCell = new DataGridViewTextBoxCell();
+                            tbCell.Value = var.Value;
+
+                            if (newCellFlag)
+                                newRow.Cells[varEditor.clmnValue.DisplayIndex] = tbCell;
+                            break;
+                        }
                     case VarTypes.DateTime:
-                        DataGridViewDateTimeCell dtCell = new DataGridViewDateTimeCell();
-                        dtCell.Value = var.Value;
-                        newRow.Cells[varEditor.clmnValue.DisplayIndex] = dtCell;
-                        //newRow.Cells[varEditor.clmnValue.DisplayIndex].Value = var.Value;
-                        //DateTime.TryParse(newRow.Cells[varEditor.clmnValue.DisplayIndex].Value.ToString(), out DateTime dtRes);
-                        break;
+                        {
+                            DataGridViewDateTimeCell dtCell = newRow.Cells[varEditor.clmnValue.DisplayIndex] as DataGridViewDateTimeCell;
+                            bool newCellFlag = false;
+
+                            if (newCellFlag = dtCell == null)
+                                dtCell = new DataGridViewDateTimeCell();
+
+                            dtCell.Value = var.Value;
+
+                            if (newCellFlag)
+                                newRow.Cells[varEditor.clmnValue.DisplayIndex] = dtCell;
+                            break;
+                        }
+                    case VarTypes.String:
+                        {
+                            DataGridViewTextBoxCell tbCell = newRow.Cells[varEditor.clmnValue.DisplayIndex] as DataGridViewTextBoxCell;
+                            bool newCellFlag = false;
+
+                            if (newCellFlag = tbCell == null)
+                                tbCell = new DataGridViewTextBoxCell();
+                            tbCell.Value = var.Value;
+
+                            if (newCellFlag)
+                                newRow.Cells[varEditor.clmnValue.DisplayIndex] = tbCell;
+                            break;
+                        }
                     case VarTypes.Counter:
-                        newRow.Cells[varEditor.clmnValue.DisplayIndex].Value = var.Value;
-                        //VariablesParcer.GetItemID(newRow.Cells[varEditor.clmnValue.DisplayIndex].Value.ToString(), out string stRes);
-                        break;
+                        {
+                            DataGridViewComboBoxCell cbCell = newRow.Cells[varEditor.clmnValue.DisplayIndex] as DataGridViewComboBoxCell;
+                            bool newCellFlag = false;
+
+                            if (newCellFlag = cbCell == null)
+                                cbCell = new DataGridViewComboBoxCell();
+
+                            cbCell.Items.Clear();
+
+                            cbCell.DataSource = itemsDictionary;
+                            cbCell.DisplayMember = "DisplayName";
+                            cbCell.ValueMember = "Name";
+
+                            cbCell.DisplayStyle = DataGridViewComboBoxDisplayStyle.ComboBox;
+                            cbCell.FlatStyle = FlatStyle.Flat;
+                            cbCell.Value = var.Value;
+
+                            if (newCellFlag)
+                                newRow.Cells[varEditor.clmnValue.DisplayIndex] = cbCell;
+                            break;
+                        }
                 }
 
 
@@ -113,6 +202,11 @@ namespace AstralVars.Forms
 
         private void btnSave_Click(object sender, EventArgs e)
         {
+            foreach(DataGridViewRow row in dgvVariables.Rows)
+            {
+                if(VariablesAddon.Variables.Contains(row.Cells[clmnName.DisplayIndex].Value.ToString()))
+                    if(VariablesAddon.Variables[])
+            }
             DialogResult = DialogResult.OK;
         }
 
@@ -120,35 +214,37 @@ namespace AstralVars.Forms
         {
             if (!dgvVariables.Rows[e.RowIndex].IsNewRow)
             {
+                // Проверка валидности значения ячейки в столбце значений 'clmnValue'
                 if (e.ColumnIndex == clmnValue.DisplayIndex)
                 {
                     // пустая строка в качестве значения переменной - допускается
                     string val = e.FormattedValue.ToString();
                     if (!string.IsNullOrEmpty(val))
                     {
-                        if(Enum.TryParse(dgvVariables.Rows[e.RowIndex].Cells[clmnType.DisplayIndex].Value.ToString(), true, out VarTypes vType))
+                        if(Enum.TryParse(dgvVariables.Rows[e.RowIndex].Cells[clmnType.DisplayIndex].Value.ToString(), true, out VarTypes newVarType))
                         {
-                            switch (vType)
+                            switch (newVarType)
                             {
                                 case VarTypes.Boolean:
-                                    e.Cancel = !bool.TryParse(val, out bool bRes);
+                                    e.Cancel = !VariablesParcer.TryParse(val, out bool bRes);
                                     break;
                                 case VarTypes.Integer:
-                                    e.Cancel = !int.TryParse(val, out int iRres);
+                                    e.Cancel = !VariablesParcer.TryParse(val, out int iRres);
                                     break;
                                 case VarTypes.DateTime:
-                                    e.Cancel = !DateTime.TryParse(val, out DateTime dtRes);
+                                    e.Cancel = !VariablesParcer.TryParse(val, out DateTime dtRes);
                                     break;
                                 case VarTypes.Counter:
-                                    e.Cancel = !VariablesParcer.GetItemID(val, out string stRes);
+                                    e.Cancel = !VariablesParcer.TryParse(val, out string stRes);
                                     break;
                             }
 
                             if(e.Cancel)
-                                MessageBox.Show($"Invalid value '{val}' for variables type of '{vType}'");
+                                MessageBox.Show($"Invalid value '{val}' for variables type of '{newVarType}'");
                         }
                     }
                 }
+                // Проверка валидности значения ячейки в столбце имени переменной 'clmnName'
                 else if (e.ColumnIndex == clmnName.DisplayIndex)
                 {
                     if(string.IsNullOrEmpty(e.FormattedValue.ToString()))
@@ -168,35 +264,120 @@ namespace AstralVars.Forms
                         }
                     }
                 }
-                else if(e.ColumnIndex == clmnType.DisplayIndex)
+                // Проверка валидности значения ячейки в столбце типа переменной 'clmnType'
+                else if (e.ColumnIndex == clmnType.DisplayIndex)
                 {
-                    if(Enum.TryParse(dgvVariables.Rows[e.RowIndex].Cells[clmnType.DisplayIndex].Value.ToString(), true, out VarTypes newType))
+                    // Преобразование старого значения ячейки к VarType
+                    Enum.TryParse(dgvVariables.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString(), true, out VarTypes oldType);
+
+                    // Преобразование нового значения ячейки к VarType
+                    if (Enum.TryParse(e.FormattedValue.ToString(), true, out VarTypes newType))
                     {
                         DataGridViewRow row = dgvVariables.Rows[e.RowIndex];
-                        Variable oldVar = row.Tag as Variable;
-                        if(oldVar != null && oldVar.VarType != newType)
+                        if(oldType != newType)
                         {
-                            DialogResult dResult = MessageBox.Show(varEditor, $"You change type of variable '{row.Cells[clmnName.DisplayIndex].Value}' from '{oldVar.VarType}' to '{newType}'!\n" +
-                                                       $"The value of the variable would be erased!" +
-                                                       $"Confirm the changes", "Errors", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                            DialogResult dResult = MessageBox.Show(varEditor, $"You change type of variable '{row.Cells[clmnName.DisplayIndex].Value}' from '{oldType}' to '{newType}'!\n" +
+                                                       $"The value of the variable will be reset, if it cannot be converted to '{newType}'!\n" +
+                                                       $"Do you confirm the changes?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                             if (dResult == DialogResult.Yes)
                             {
                                 switch (newType)
                                 {
                                     case VarTypes.Boolean:
-                                        bool.TryParse(row.Cells[clmnValue.DisplayIndex].Value.ToString(), out bool bRes);
-                                        break;
+                                        {
+                                            VariablesParcer.TryParse(row.Cells[clmnValue.DisplayIndex].Value.ToString(), out bool bRes);
+
+                                            bool newCellFlag = !(row.Cells[varEditor.clmnValue.DisplayIndex] is DataGridViewComboBoxCell);
+
+                                            DataGridViewComboBoxCell cbCell;
+                                            if (newCellFlag)
+                                                cbCell = new DataGridViewComboBoxCell();
+                                            else
+                                            {
+                                                cbCell = row.Cells[varEditor.clmnValue.DisplayIndex] as DataGridViewComboBoxCell;
+                                                cbCell.DataSource = null;
+                                                cbCell.Items.Clear();
+                                            }
+                                            cbCell.Items.AddRange(new string[] { "False", "True" });
+                                            cbCell.DisplayStyle = DataGridViewComboBoxDisplayStyle.ComboBox;
+                                            cbCell.FlatStyle = FlatStyle.Flat;
+                                            cbCell.Value = bRes.ToString();
+
+                                            if (newCellFlag)
+                                                row.Cells[varEditor.clmnValue.DisplayIndex] = cbCell;
+                                            break;
+                                        }
                                     case VarTypes.Integer:
-                                        int.TryParse(row.Cells[clmnValue.DisplayIndex].Value.ToString(), out int iRres);
-                                        break;
+                                        {
+                                            VariablesParcer.TryParse(row.Cells[clmnValue.DisplayIndex].Value.ToString(), out int iRres);
+
+                                            bool newCellFlag = !(row.Cells[varEditor.clmnValue.DisplayIndex] is DataGridViewTextBoxCell && !(row.Cells[varEditor.clmnValue.DisplayIndex] is DataGridViewDateTimeCell));
+
+                                            DataGridViewTextBoxCell tbCell;
+                                            if (newCellFlag)
+                                                tbCell = new DataGridViewTextBoxCell();
+                                            else tbCell = row.Cells[varEditor.clmnValue.DisplayIndex] as DataGridViewTextBoxCell;
+                                            tbCell.Value = iRres;
+
+                                            if (newCellFlag)
+                                                row.Cells[varEditor.clmnValue.DisplayIndex] = tbCell;
+                                            break;
+                                        }
                                     case VarTypes.DateTime:
-                                        DateTime.TryParse(row.Cells[clmnValue.DisplayIndex].Value.ToString(), out DateTime dtRes);
-                                        break;
+                                        {
+                                            VariablesParcer.TryParse(row.Cells[clmnValue.DisplayIndex].Value.ToString(), out DateTime dtRes);
+
+                                            bool newCellFlag = !(row.Cells[varEditor.clmnValue.DisplayIndex] is DataGridViewDateTimeCell);
+
+                                            DataGridViewDateTimeCell dtCell;
+                                            if (newCellFlag)
+                                                dtCell = new DataGridViewDateTimeCell();
+                                            else dtCell = row.Cells[varEditor.clmnValue.DisplayIndex] as DataGridViewDateTimeCell;
+
+                                            dtCell.Value = dtRes;
+
+                                            if (newCellFlag)
+                                                row.Cells[varEditor.clmnValue.DisplayIndex] = dtCell;
+
+                                            break;
+                                        }
                                     case VarTypes.Counter:
-                                        VariablesParcer.GetItemID(row.Cells[clmnValue.DisplayIndex].Value.ToString(), out string stRes);
-                                        break;
+                                        {
+                                            VariablesParcer.TryParse(row.Cells[clmnValue.DisplayIndex].Value.ToString(), out string cntRes);
+
+                                            bool newCellFlag = !(row.Cells[varEditor.clmnValue.DisplayIndex] is DataGridViewComboBoxCell);
+
+                                            DataGridViewComboBoxCell cbCell;
+                                            if (newCellFlag)
+                                                cbCell = new DataGridViewComboBoxCell();
+                                            else cbCell = row.Cells[varEditor.clmnValue.DisplayIndex] as DataGridViewComboBoxCell; ;
+
+                                            if (cbCell.DataSource == null)
+                                                cbCell.Items.Clear();
+
+                                            cbCell.DataSource = itemsDictionary;
+                                            cbCell.DisplayMember = "Value";
+
+                                            cbCell.DisplayStyle = DataGridViewComboBoxDisplayStyle.ComboBox;
+                                            cbCell.FlatStyle = FlatStyle.Flat;
+                                            cbCell.Value = cntRes;
+
+                                            if (newCellFlag)
+                                                row.Cells[varEditor.clmnValue.DisplayIndex] = cbCell;
+
+                                            break;
+                                        }
                                     case VarTypes.String:
-                                        break;
+                                        {
+                                            bool newCellFlag = !(row.Cells[varEditor.clmnValue.DisplayIndex] is DataGridViewTextBoxCell && !(row.Cells[varEditor.clmnValue.DisplayIndex] is DataGridViewDateTimeCell));
+                                            if (newCellFlag)
+                                            {
+                                                DataGridViewTextBoxCell tbCell = new DataGridViewTextBoxCell();
+                                                tbCell.Value = row.Cells[varEditor.clmnValue.DisplayIndex].Value;
+                                                row.Cells[varEditor.clmnValue.DisplayIndex] = tbCell;
+                                            }
+                                            break;
+                                        }
                                 }
                             }
                             else e.Cancel = true;
@@ -207,11 +388,6 @@ namespace AstralVars.Forms
             }
         }
 
-        private void dgvVariables_DataError(object sender, DataGridViewDataErrorEventArgs e)
-        {
-
-        }
-
         private void dntReload_Click(object sender, EventArgs e)
         {
             FillDgvVariables();
@@ -220,16 +396,17 @@ namespace AstralVars.Forms
         private void chbAllowEdit_CheckedChanged(object sender, EventArgs e)
         {
             dgvVariables.ReadOnly = !chbAllowEdit.Checked;
+            if (dgvVariables.ReadOnly)
+                dgvVariables.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            else dgvVariables.SelectionMode = DataGridViewSelectionMode.CellSelect;
         }
 
         private void dgvVariables_ReadOnlyChanged(object sender, EventArgs e)
         {
             chbAllowEdit.Checked = !dgvVariables.ReadOnly;
-        }
-
-        private void VariablesEditor_Load(object sender, EventArgs e)
-        {
-
+            if (dgvVariables.ReadOnly)
+                dgvVariables.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            else dgvVariables.SelectionMode = DataGridViewSelectionMode.CellSelect;
         }
     }
 }

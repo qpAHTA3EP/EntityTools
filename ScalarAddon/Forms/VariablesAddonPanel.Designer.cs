@@ -30,15 +30,12 @@
         {
             this.lblAuthor = new System.Windows.Forms.Label();
             this.btnTest = new System.Windows.Forms.Button();
-            this.btnSet = new System.Windows.Forms.Button();
-            this.numUdbValue = new System.Windows.Forms.NumericUpDown();
-            ((System.ComponentModel.ISupportInitialize)(this.numUdbValue)).BeginInit();
             this.SuspendLayout();
             // 
             // lblAuthor
             // 
             this.lblAuthor.AutoSize = true;
-            this.lblAuthor.Location = new System.Drawing.Point(132, 0);
+            this.lblAuthor.Location = new System.Drawing.Point(131, 0);
             this.lblAuthor.Name = "lblAuthor";
             this.lblAuthor.Size = new System.Drawing.Size(97, 13);
             this.lblAuthor.TabIndex = 0;
@@ -54,32 +51,13 @@
             this.btnTest.UseVisualStyleBackColor = true;
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
-            // btnSet
-            // 
-            this.btnSet.Location = new System.Drawing.Point(143, 170);
-            this.btnSet.Name = "btnSet";
-            this.btnSet.Size = new System.Drawing.Size(75, 23);
-            this.btnSet.TabIndex = 2;
-            this.btnSet.Text = "Set value";
-            this.btnSet.UseVisualStyleBackColor = true;
-            // 
-            // numUdbValue
-            // 
-            this.numUdbValue.Location = new System.Drawing.Point(120, 144);
-            this.numUdbValue.Name = "numUdbValue";
-            this.numUdbValue.Size = new System.Drawing.Size(120, 20);
-            this.numUdbValue.TabIndex = 3;
-            // 
-            // ScalarAddonPanel
+            // VariablesAddonPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.numUdbValue);
-            this.Controls.Add(this.btnSet);
             this.Controls.Add(this.btnTest);
             this.Controls.Add(this.lblAuthor);
-            this.Name = "ScalarAddonPanel";
-            ((System.ComponentModel.ISupportInitialize)(this.numUdbValue)).EndInit();
+            this.Name = "VariablesAddonPanel";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -89,7 +67,5 @@
 
         private System.Windows.Forms.Label lblAuthor;
         private System.Windows.Forms.Button btnTest;
-        private System.Windows.Forms.Button btnSet;
-        private System.Windows.Forms.NumericUpDown numUdbValue;
     }
 }
