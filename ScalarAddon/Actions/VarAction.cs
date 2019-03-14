@@ -14,15 +14,12 @@ namespace AstralVars
 {
     public class VarAction : Astral.Quester.Classes.Action
     {
-        [Editor(typeof(ScalarNamesEditor), typeof(UITypeEditor))]
-        [Description("Имя переменной")]
-        public string Name { get; set; } = String.Empty;
+        [Editor(typeof(variableUiEditor), typeof(UITypeEditor))]
+        [Description("Идентификатор переменной")]
+        public Variable VariableName { get; set; }
 
         [Description("Значение переменной")]
-        public int Value { get; set; } = 0;
-
-        [Description("Тип переменной")]
-        public VarTypes Type = VarTypes.Integer;
+        public string Equation { get; set; } = string.Empty;
 
         public override string ActionLabel => GetType().Name;
 

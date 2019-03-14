@@ -200,16 +200,20 @@ namespace AstralVars.Forms
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            foreach(DataGridViewRow row in dgvVariables.Rows)
+            foreach (DataGridViewRow row in dgvVariables.Rows)
             {
-                if (row.IsNewRow ||
-                    row.Cells[clmnName.DisplayIndex].Value == null ||
+                if (row.IsNewRow)
+                    continue;
+
+                Variable var = null;
+                if (row.Cells[clmnName.DisplayIndex].Value == null ||
                     row.Cells[clmnType.DisplayIndex].Value == null ||
                     row.Cells[clmnValue.DisplayIndex].Value == null ||
-                    VariablesAddon.Variables.Set(row.Cells[clmnName.DisplayIndex].Value.ToString().Trim(),
+                    (var = VariablesAddon.Variables.Set(row.Cells[clmnName.DisplayIndex].Value.ToString().Trim(),
                                                  row.Cells[clmnType.DisplayIndex].Value,
-                                                 row.Cells[clmnValue.DisplayIndex].Value) == null)
+                                                 row.Cells[clmnValue.DisplayIndex].Value)) == null)
                 {
+                    row.Tag = null;
                     DialogResult dResult = MessageBox.Show(varEditor, $"Variable [{row.Index}]'{row.Cells[clmnName.DisplayIndex].Value}' is incorect.\n" +
                                                                        "It will be deleted from the collection." +
                                                                        "Do you want to correct it ?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -218,9 +222,14 @@ namespace AstralVars.Forms
                         DialogResult = DialogResult.Cancel;
                         dgvVariables.Rows[row.Index].Selected = true;
                     }
+                    else DialogResult = DialogResult.OK;
+                }
+                else
+                {
+                    row.Tag = var;
+                    DialogResult = DialogResult.OK;
                 }
             }
-            DialogResult = DialogResult.OK;
         }
 
         private void dgvVariables_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
@@ -458,12 +467,40 @@ namespace AstralVars.Forms
 
         private void dgvVariables_RowLeave(object sender, DataGridViewCellEventArgs e)
         {
-            //проверка валидности всей строки
+
         }
 
         private void dgvVariables_RowEnter(object sender, DataGridViewCellEventArgs e)
         {
-            btnSelect.Enabled = !(dgvVariables.Rows[e.RowIndex].IsNewRow);
+            bool valid = false;
+            DataGridViewRow row = dgvVariables.Rows[e.RowIndex];
+
+            valid = !(row.IsNewRow || VariablesAddon.Variables.Set(row.Cells[clmnName.DisplayIndex].Value.ToString().Trim(),
+                                                   row.Cells[clmnType.DisplayIndex].Value,
+                                                   row.Cells[clmnValue.DisplayIndex].Value) == null);
+            btnSelect.Enabled = valid;
+        }
+
+        private void dgvVariables_RowValidated(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void dgvVariables_CellValidated(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void dgvVariables_RowValidating(object sender, DataGridViewCellCancelEventArgs e)
+        {
+            bool valid = false;
+            DataGridViewRow row = dgvVariables.Rows[e.RowIndex];
+
+            valid = !(row.IsNewRow || VariablesAddon.Variables.Set(row.Cells[clmnName.DisplayIndex].Value.ToString().Trim(),
+                                                   row.Cells[clmnType.DisplayIndex].Value,
+                                                   row.Cells[clmnValue.DisplayIndex].Value) == null);
+            btnSelect.Enabled = valid;
+            e.Cancel = !valid;
         }
     }
 }

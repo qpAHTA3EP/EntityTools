@@ -65,8 +65,7 @@
             this.dgvVariables.TabIndex = 0;
             this.dgvVariables.ReadOnlyChanged += new System.EventHandler(this.dgvVariables_ReadOnlyChanged);
             this.dgvVariables.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.dgvVariables_CellValidating);
-            this.dgvVariables.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvVariables_RowEnter);
-            this.dgvVariables.RowLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvVariables_RowLeave);
+            this.dgvVariables.RowValidating += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dgvVariables_RowValidating);
             // 
             // clmnName
             // 

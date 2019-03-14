@@ -12,20 +12,14 @@ using AstralVars.Classes;
 
 namespace AstralVars
 {
-    public class ScalarCondition : Astral.Quester.Classes.Condition
+    public class CheckVariable : Astral.Quester.Classes.Condition
     {
-        [Editor(typeof(ScalarNamesEditor), typeof(UITypeEditor))]
-        [Description("Имя переменной")]
-        public string VariableName { get; set; } = String.Empty;
+        [Editor(typeof(variableUiEditor), typeof(UITypeEditor))]
+        [Description("Идентификатор переменной")]
+        public Variable VariableName { get; set; }
 
-        //private Dictionary<String, int> Variables { get => VariablesAddon.Scalars; }
-
-        [Description("Величина, сопоставляемая со значением переменной")]
-        public int Value { get; set; } = 0;
-
-        //[Editor(typeof(Astral.Quester.UIEditors.PositionEditor), typeof(System.Drawing.Design.UITypeEditor))]
-        //[Description("Final destination")]
-        //public Vector3 Position { set; get; } = new Vector3();
+        [Description("Выражение, сопоставляемая со значением переменной")]
+        public string Equation { get; set; } = string.Empty;
 
         [Description("Способ сопоставления Value со значением переменной")]
         public Relation Sign { get; set; } = Relation.Equal;

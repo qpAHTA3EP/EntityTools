@@ -9,6 +9,8 @@ using System.Drawing.Design;
 using Astral.Quester.Forms;
 using Astral.Quester.UIEditors;
 using AstralVars.Classes;
+using AstralVars.Forms;
+using AstralVars;
 
 namespace AstralVars
 {
@@ -51,15 +53,13 @@ namespace AstralVars
 
 namespace Astral.Quester.UIEditors
 {
-    internal class ScalarNamesEditor : UITypeEditor
+    internal class variableUiEditor : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            String varName = "TestVarName";
-            if (!string.IsNullOrEmpty(varName))
-            {
-                return varName;
-            }
+            Variable var = VariablesEditor.GetVariable(VariablesAddon.Variables);
+            if (var != null)
+                return var;
             return value;
         }
 

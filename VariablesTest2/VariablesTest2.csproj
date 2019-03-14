@@ -36,10 +36,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Astral">
-      <HintPath>..\..\QuesterAssistant\QuesterAssistant\Temp\Astral.exe</HintPath>
+      <HintPath>D:\Games\Astral_RU_1\Astral.exe</HintPath>
     </Reference>
     <Reference Include="MyNW">
-      <HintPath>..\..\QuesterAssistant\QuesterAssistant\Temp\MyNW.dll</HintPath>
+      <HintPath>D:\Games\Astral_RU_1\MyNW.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

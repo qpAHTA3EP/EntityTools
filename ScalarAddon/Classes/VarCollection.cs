@@ -126,12 +126,12 @@ namespace AstralVars.Classes
         /// null, если значение ключа 'key' было пустым или null</returns>
         public Variable Set(string key, object val)
         {
-            if (val is int)
-                return Set(key, (int)val);
-            if (val is bool)
-                return Set(key, (bool)val);
-            if (val is DateTime)
-                return Set(key, (DateTime)val);
+            if (VarParcer.TryParseStrict(val, out int iVal))
+                return Set(key, iVal);
+            if (VarParcer.TryParseStrict(val, out bool bVal))
+                return Set(key, bVal);
+            if (VarParcer.TryParseStrict(val, out DateTime dtVal))
+                return Set(key, dtVal);
             return Set(key, val.ToString());
         }
 
@@ -150,13 +150,22 @@ namespace AstralVars.Classes
             if (string.IsNullOrEmpty(key) || val == null)
                 return null;
             if (type == VarTypes.String)
-                return Set(key, val.ToString());
-            else if (val is int && type != VarTypes.Integer)
-                return Set(key, (int)val);
-            else if (val is bool && type != VarTypes.Boolean)
-                return Set(key, (bool)val);
-            else if (val is DateTime && type != VarTypes.DateTime)
-                return Set(key, (DateTime)val);
+                return Set(key.Trim(), val.ToString());
+            else if (type == VarTypes.Integer)
+            {
+                if (VarParcer.TryParseStrict(val, out int iVal))
+                    return Set(key.Trim(), iVal);
+            }
+            else if (type == VarTypes.Boolean)
+            {
+                if (VarParcer.TryParseStrict(val, out bool bVal))
+                    return Set(key.Trim(), bVal);
+            }
+            else if (type == VarTypes.DateTime)
+            {
+                if(VarParcer.TryParseStrict(val, out DateTime dtVal))
+                    return Set(key.Trim(), dtVal);
+            }
 
             throw new NotValidVarValueException($"Value '{val}' can not be converted to type '{type}' for variable '{key}'");
         }
@@ -172,11 +181,11 @@ namespace AstralVars.Classes
         /// null, если значение ключа 'key' было пустым или null</returns>
         public Variable Set(string key, object objType, object val)
         {
-            if (key == null || objType == null || val == null)
+            if (string.IsNullOrEmpty(key) || objType == null || val == null)
                 return null;
             if (VarParcer.GetType(objType, out VarTypes type))
             {
-                return Set(key, type, val);
+                return Set(key.Trim(), type, val);
             }
             throw new NotValidVarValueException($"Object '{objType}' can not be converted to type 'VarTypes' to set value for the variable '{key}'");
         }

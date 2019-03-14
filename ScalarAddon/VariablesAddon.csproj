@@ -83,7 +83,7 @@
     <Compile Include="VariablesAddon.cs" />
     <Compile Include="Actions\VarAction.cs" />
     <Compile Include="Classes\VarCollection.cs" />
-    <Compile Include="Conditions\AstralScalarConditions.cs" />
+    <Compile Include="Conditions\VarCondition.cs" />
     <Compile Include="Forms\VariablesEditor.cs">
       <SubType>Form</SubType>
     </Compile>
