@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AstralVars</RootNamespace>
     <AssemblyName>VariablesAddon</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -77,12 +77,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\VariablesItem.cs" />
-    <Compile Include="Classes\VariablesParcer.cs" />
+    <Compile Include="Classes\Variables.cs" />
+    <Compile Include="Classes\VarParcer.cs" />
     <Compile Include="Forms\DataGridViewDateTimeCell.cs" />
     <Compile Include="VariablesAddon.cs" />
     <Compile Include="Actions\VarAction.cs" />
-    <Compile Include="Classes\VariablesBase.cs" />
+    <Compile Include="Classes\VarCollection.cs" />
     <Compile Include="Conditions\AstralScalarConditions.cs" />
     <Compile Include="Forms\VariablesEditor.cs">
       <SubType>Form</SubType>

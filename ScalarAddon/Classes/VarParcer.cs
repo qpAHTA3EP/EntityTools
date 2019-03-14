@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace AstralVars.Classes
 {
-    public class VariablesParcer
+    public class VarParcer
     {
         public static readonly string[] separators = { " ", "{", "(", "[", "]", ")", "}", "+", "-", "*", "/", "Numeric", "NumericCount", "Counter", "Count", "Items", "ItemsCount" };
         public static readonly string counterPredicate = @"(ItemsCount|Items|NumericCount|Numeric|Counter|Count)",

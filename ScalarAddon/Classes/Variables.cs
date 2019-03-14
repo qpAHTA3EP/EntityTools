@@ -92,13 +92,13 @@ namespace AstralVars.Classes
         }
         public static Variable Make(string k, string val)
         {
-            if (VariablesParcer.TryParse(val, out int intVal))
+            if (VarParcer.TryParse(val, out int intVal))
                 return new IntVar(k, intVal);
-            else if (VariablesParcer.TryParse(val, out bool boolVal))
+            else if (VarParcer.TryParse(val, out bool boolVal))
                 return new BoolVar(k, boolVal);
-            else if (VariablesParcer.TryParse(val, out DateTime dtVal))
+            else if (VarParcer.TryParse(val, out DateTime dtVal))
                 return new DateTimeVar(k, dtVal);
-            else if (VariablesParcer.TryParse(val, out string itemId))
+            else if (VarParcer.TryParse(val, out string itemId))
                 return new CounterVar(k, itemId);
             else
                 return new StrVar(k, val);
@@ -395,7 +395,7 @@ namespace AstralVars.Classes
         public CounterVar(string k, string val) : base(VarTypes.Counter)
         {
             Key = k;
-            if (VariablesParcer.GetItemID(val, out string newVal))
+            if (VarParcer.GetItemID(val, out string newVal))
             {
                 _itemId = newVal;
                 _strValue = val;
@@ -411,7 +411,7 @@ namespace AstralVars.Classes
                 string inStr = val as string;
                 if (!string.IsNullOrEmpty(inStr))
                 {
-                    if (VariablesParcer.GetItemID(inStr, out string newVal))
+                    if (VarParcer.GetItemID(inStr, out string newVal))
                     {
                         _itemId = newVal;
                         _strValue = inStr;
@@ -452,7 +452,7 @@ namespace AstralVars.Classes
                 string inStr = value as string,
                        newVal = string.Empty;
 
-                if(VariablesParcer.GetItemID(inStr, out newVal))
+                if(VarParcer.GetItemID(inStr, out newVal))
                 { 
                     _itemId = newVal;
                     _strValue = inStr;

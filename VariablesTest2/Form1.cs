@@ -23,7 +23,7 @@ namespace VariablesTest2
         public Form1()
         {
             InitializeComponent();
-            cbType.DataSource = VariablesParcer.varTypes;
+            cbType.DataSource = VarParcer.varTypes;
         }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

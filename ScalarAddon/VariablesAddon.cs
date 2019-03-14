@@ -14,7 +14,7 @@ namespace AstralVars
 {
     public class VariablesAddon : Astral.Addons.Plugin
     {
-        public static VariableCollection Variables = new VariableCollection();
+        public static VarCollection Variables = new VarCollection();
 
         public static string LoggerPredicate = "[VariablesAddon]:";
 
