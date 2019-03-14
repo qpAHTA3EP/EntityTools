@@ -18,8 +18,9 @@ namespace AstralVars.Classes
         public static readonly VarTypes[] varTypes = {  VarTypes.Integer,
                                                         VarTypes.Boolean,            
                                                         VarTypes.String,
-                                                        VarTypes.DateTime,
-                                                        VarTypes.Counter };
+                                                        //VarTypes.Counter,
+                                                        VarTypes.DateTime
+                                                     };
 
 
         /// <summary>
@@ -50,6 +51,35 @@ namespace AstralVars.Classes
         }
 
         /// <summary>
+        /// Получение типа переменной VarTypes из строки
+        /// </summary>
+        /// <param name="inStr"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool GetType(string inStr, out VarTypes type)
+        {
+            return Enum.TryParse(inStr, true, out type);
+        }
+        /// <summary>
+        /// Получение типа переменной VarTypes из объекта
+        /// </summary>
+        /// <param name="inObj"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool GetType(object inObj, out VarTypes type)
+        {
+            if (inObj == null)
+                throw new ArgumentNullException();
+            if (inObj is VarTypes)
+            {
+                type = (VarTypes)inObj;
+                return true;
+            }
+            else return Enum.TryParse(inObj.ToString(), out type);
+        }
+
+
+        /// <summary>
         /// Перевод строки в булевый тип.
         /// Если в строке содержится "True" или целое число больше 0, тогда результат 'True' 
         /// Строка, содержащая "False" или отрицательные целые числа и 0, считается 'False'
@@ -71,6 +101,43 @@ namespace AstralVars.Classes
             else succeded = true;
             return succeded;
         }
+        /// <summary>
+        /// Перевод объекта в булевый тип.
+        /// Если объект - строка, содержащая "True" или целое число больше 0, тогда результат 'True' 
+        /// Строка, содержащая "False" или отрицательные целые числа и 0, считается 'False'
+        /// </summary>
+        /// <param name="inObj"></param>
+        /// <param name="result">результат преобразования</param>
+        /// <returns>Флаг успеха преобразования</returns>
+        public static bool TryParse(object inObj, out bool result)
+        {
+            if (inObj == null)
+                throw new ArgumentNullException();
+            if (inObj is bool)
+            {
+                result = (bool)inObj;
+                return true;
+            }
+            return TryParse(inObj.ToString(), out result);
+        }
+        /// <summary>
+        /// Строгое преобразование объекта в булевый тип.
+        /// Если объект - строка, содержащая "True" или "False", она будет преобразована в булевый тип
+        /// </summary>
+        /// <param name="inObj"></param>
+        /// <param name="result">результат преобразования</param>
+        /// <returns>Флаг успеха преобразования</returns>
+        public static bool TryParseStrict(object inObj, out bool result)
+        {
+            if (inObj == null)
+                throw new ArgumentNullException();
+            if (inObj is bool)
+            {
+                result = (bool)inObj;
+                return true;
+            }
+            else return bool.TryParse(inObj.ToString(), out result);
+        }
 
         /// <summary>
         /// Перевод строки в целое число.
@@ -82,13 +149,48 @@ namespace AstralVars.Classes
         {
             if (int.TryParse(inStr, out result))
                 return true;
-            else
+            else if (bool.TryParse(inStr, out bool bRes))
             {
-                if (bool.TryParse(inStr, out bool bRes))
-                    result = (bRes) ? 1 : 0;
-                else result = 0;
+                result = (bRes) ? 1 : 0;
+                return true;
             }
+            else result = 0;
             return false;
+        }
+        /// <summary>
+        /// Перевод объекта в целое число.
+        /// </summary>
+        /// <param name="inObj"></param>
+        /// <param name="result">результат преобразования</param>
+        /// <returns>Флаг успеха преобразования</returns>
+        public static bool TryParse(object inObj, out int result)
+        {
+            if (inObj == null)
+                throw new ArgumentNullException();
+            if (inObj is int)
+            {
+                result = (int)inObj;
+                return true;
+            }
+            else return TryParse(inObj.ToString(), out result);
+        }
+        /// <summary>
+        /// Строгое преобразование объекта в булевый тип.
+        /// Если объект - строка, целое число, она будет преобразована
+        /// </summary>
+        /// <param name="inObj"></param>
+        /// <param name="result">результат преобразования</param>
+        /// <returns>Флаг успеха преобразования</returns>
+        public static bool TryParseStrict(object inObj, out int result)
+        {
+            if (inObj == null)
+                throw new ArgumentNullException();
+            if (inObj is int)
+            {
+                result = (int)inObj;
+                return true;
+            }
+            else return int.TryParse(inObj.ToString(), out result);
         }
 
         /// <summary>
@@ -104,6 +206,34 @@ namespace AstralVars.Classes
             else result = DateTime.MinValue;
             return false;
         }
+        /// <summary>
+        /// Перевод объекта в DateTime.
+        /// </summary>
+        /// <param name="inObj"></param>
+        /// <param name="result">результат преобразования</param>
+        /// <returns>Флаг успеха преобразования</returns>
+        public static bool TryParse(object inObj, out DateTime result)
+        {
+            if (inObj == null)
+                throw new ArgumentNullException();
+            if (inObj is DateTime)
+            {
+                result = (DateTime)inObj;
+                return true;
+            }
+            else return TryParse(inObj.ToString(), out result);
+        }
+        /// <summary>
+        /// Строгое преобразование объекта в DateTime.
+        /// Если объект - строка, содержащая DateTime, она будет преобразована
+        /// </summary>
+        /// <param name="inObj"></param>
+        /// <param name="result">результат преобразования</param>
+        /// <returns>Флаг успеха преобразования</returns>
+        public static bool TryParseStrict(object inObj, out DateTime result)
+        {
+            return TryParse(inObj, out result);
+        }
 
         /// <summary>
         /// Перевод строки в тип 'Counter'.
@@ -111,9 +241,10 @@ namespace AstralVars.Classes
         /// <param name="inStr"></param>
         /// <param name="result">результат преобразования</param>
         /// <returns>Флаг успеха преобразования</returns>
-        public static bool TryParse(string inStr, out string result)
-        {
-            return GetItemID(inStr, out result);
-        }
+        //public static bool TryParse(string inStr, out string result)
+        //{
+        //    return GetItemID(inStr, out result);
+        //}
+
     }
 }

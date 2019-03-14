@@ -52,16 +52,17 @@ namespace AstralVars
 
         public override ActionResult Run()
         {
-            if (VariablesBase.SetValue(Name, Value))
-            {
-                Astral.Logger.WriteLine(ActionLabel + ':' + Name + " set to " + Value);
-                return Astral.Quester.Classes.Action.ActionResult.Completed;
-            }
-            else
-            {
-                Astral.Logger.WriteLine(ActionLabel + ':' + Name + " not set to " + Value);
-                return Astral.Quester.Classes.Action.ActionResult.Fail;
-            }
+            //if (VariablesAddon.Variables.Set(Name, Value))
+            //{
+            //    Astral.Logger.WriteLine(ActionLabel + ':' + Name + " set to " + Value);
+            //    return Astral.Quester.Classes.Action.ActionResult.Completed;
+            //}
+            //else
+            //{
+            //    Astral.Logger.WriteLine(ActionLabel + ':' + Name + " not set to " + Value);
+            //    return Astral.Quester.Classes.Action.ActionResult.Fail;
+            //}
+            return Astral.Quester.Classes.Action.ActionResult.Completed;
         }
     }
 }

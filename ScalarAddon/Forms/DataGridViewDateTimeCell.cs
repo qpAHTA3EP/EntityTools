@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AstralVars.Classes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -58,7 +59,7 @@ namespace AstralVars.Forms
             get
             {
                 // Use the current date and time as the default value.
-                return DateTime.Now;
+                return DateTimeVar.Default;
             }
         }
     }
@@ -98,7 +99,7 @@ namespace AstralVars.Forms
                         // In the case of an exception, just use the 
                         // default value so we're not left with a null
                         // value.
-                        this.Value = DateTime.Now;
+                        this.Value = DateTimeVar.Default;
                     }
                 }
             }

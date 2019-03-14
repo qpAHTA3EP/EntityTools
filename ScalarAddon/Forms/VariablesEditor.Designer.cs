@@ -30,14 +30,14 @@
         {
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dgvVariables = new System.Windows.Forms.DataGridView();
+            this.clmnName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.clmnType = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.clmnValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnSelect = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.dntReload = new System.Windows.Forms.Button();
             this.chbAllowEdit = new System.Windows.Forms.CheckBox();
-            this.clmnType = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.clmnValue = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.clmnName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dgvVariables)).BeginInit();
             this.SuspendLayout();
             // 
@@ -65,6 +65,31 @@
             this.dgvVariables.TabIndex = 0;
             this.dgvVariables.ReadOnlyChanged += new System.EventHandler(this.dgvVariables_ReadOnlyChanged);
             this.dgvVariables.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.dgvVariables_CellValidating);
+            this.dgvVariables.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvVariables_RowEnter);
+            this.dgvVariables.RowLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvVariables_RowLeave);
+            // 
+            // clmnName
+            // 
+            this.clmnName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.clmnName.Frozen = true;
+            this.clmnName.HeaderText = "Name";
+            this.clmnName.Name = "clmnName";
+            this.clmnName.ToolTipText = "Имя переменной (The Name of the variable)";
+            this.clmnName.Width = 60;
+            // 
+            // clmnType
+            // 
+            this.clmnType.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.clmnType.HeaderText = "Type";
+            this.clmnType.Name = "clmnType";
+            // 
+            // clmnValue
+            // 
+            this.clmnValue.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.clmnValue.HeaderText = "Value";
+            this.clmnValue.Name = "clmnValue";
+            this.clmnValue.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.clmnValue.ToolTipText = "Значение переменной (The value of the variable)";
             // 
             // btnSelect
             // 
@@ -111,22 +136,6 @@
             this.chbAllowEdit.UseVisualStyleBackColor = true;
             this.chbAllowEdit.CheckedChanged += new System.EventHandler(this.chbAllowEdit_CheckedChanged);
             // 
-            // clmnType
-            // 
-            this.clmnType.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.clmnType.HeaderText = "Type";
-            this.clmnType.Name = "clmnType";
-            // 
-            // clmnValue
-            // 
-            this.clmnValue.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.clmnValue.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.clmnValue.HeaderText = "Value";
-            this.clmnValue.Name = "clmnValue";
-            this.clmnValue.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.clmnValue.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this.clmnValue.ToolTipText = "Значение переменной (The value of the variable)";
-            // 
             // dataGridViewTextBoxColumn1
             // 
             this.dataGridViewTextBoxColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
@@ -134,16 +143,6 @@
             this.dataGridViewTextBoxColumn1.HeaderText = "Name";
             this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
             this.dataGridViewTextBoxColumn1.ToolTipText = "Имя переменной (The Name of the variable)";
-            this.dataGridViewTextBoxColumn1.Width = 60;
-            // 
-            // clmnName
-            // 
-            this.clmnName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.clmnName.Frozen = true;
-            this.clmnName.HeaderText = "Name";
-            this.clmnName.Name = "clmnName";
-            this.clmnName.ToolTipText = "Имя переменной (The Name of the variable)";
-            this.clmnName.Width = 60;
             // 
             // VariablesEditor
             // 
@@ -176,9 +175,9 @@
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button dntReload;
         private System.Windows.Forms.CheckBox chbAllowEdit;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
         private System.Windows.Forms.DataGridViewTextBoxColumn clmnName;
         private System.Windows.Forms.DataGridViewComboBoxColumn clmnType;
-        private System.Windows.Forms.DataGridViewComboBoxColumn clmnValue;
-        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn clmnValue;
     }
 }

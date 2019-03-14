@@ -17,8 +17,8 @@ namespace AstralVars.Classes
         Integer,
         String,
         //Numeric,
-        DateTime,
-        Counter
+        //Counter,
+        DateTime        
     }
 
     /// <summary>
@@ -68,8 +68,8 @@ namespace AstralVars.Classes
                     return new IntVar();
                 case VarTypes.String:
                     return new StrVar();
-                case VarTypes.Counter:
-                    return new CounterVar();
+                //case VarTypes.Counter:
+                //    return new CounterVar();
                 case VarTypes.DateTime:
                     return new DateTimeVar();
                 default:
@@ -81,7 +81,6 @@ namespace AstralVars.Classes
         {
             return source.Clone();
         }
-
         public static Variable Make(string k, bool val)
         {
             return new BoolVar(k, val);
@@ -89,6 +88,10 @@ namespace AstralVars.Classes
         public static Variable Make(string k, int val)
         {
             return new IntVar(k, val);
+        }
+        public static Variable Make(string k, DateTime val)
+        {
+            return new DateTimeVar(k, val);
         }
         public static Variable Make(string k, string val)
         {
@@ -98,14 +101,10 @@ namespace AstralVars.Classes
                 return new BoolVar(k, boolVal);
             else if (VarParcer.TryParse(val, out DateTime dtVal))
                 return new DateTimeVar(k, dtVal);
-            else if (VarParcer.TryParse(val, out string itemId))
-                return new CounterVar(k, itemId);
+            //else if (VarParcer.TryParse(val, out string itemId))
+            //    return new CounterVar(k, itemId);
             else
                 return new StrVar(k, val);
-        }
-        public static Variable Make(string k, DateTime val)
-        {
-            return new DateTimeVar(k, val);
         }
     }
 
@@ -139,6 +138,7 @@ namespace AstralVars.Classes
             _varValue = false;
         }
 
+        public static readonly bool Default = false;
         private bool _varValue;
         public override object Value
         {
@@ -213,6 +213,7 @@ namespace AstralVars.Classes
             _varValue = 0;
         }
 
+        public static readonly int Default = 0;
         private int _varValue;
         public override object Value
         {
@@ -279,6 +280,7 @@ namespace AstralVars.Classes
         }
 
 
+        public static readonly string Default = string.Empty;
         private string _varValue;
         public override object Value
         {
@@ -313,7 +315,7 @@ namespace AstralVars.Classes
         public DateTimeVar(string k) : base(VarTypes.DateTime)
         {
             Key = k;
-            _dtValue = DateTime.Now;
+            _dtValue = Default;
         }
         public DateTimeVar(string k, DateTime val) : base(VarTypes.DateTime)
         {
@@ -336,9 +338,10 @@ namespace AstralVars.Classes
                     return;
                 }
             }
-            _dtValue = DateTime.Now;
+            _dtValue = Default;
         }
 
+        public static readonly DateTime Default = DateTime.Now;
         private DateTime _dtValue;
         public override object Value
         {
@@ -360,7 +363,7 @@ namespace AstralVars.Classes
                 }
                 else
                 {
-                    _dtValue = DateTime.Now;
+                    _dtValue = Default;
                     
 #if AstralLoaded
                     Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Invalid value [{value}] to Variable '{Key}' type of {VarType}. Variable '{Key}' reseted to [{_dtValue}].");
@@ -383,110 +386,110 @@ namespace AstralVars.Classes
     /// <summary>
     /// Переменная - счетчик предметов 
     /// </summary>
-    public class CounterVar : Variable
-    {
-        public CounterVar() : base(VarTypes.Counter) { }
-        public CounterVar(string k) : base(VarTypes.Counter)
-        {
-            Key = k;
-            _itemId = string.Empty;
-            _strValue = string.Empty;
-        }
-        public CounterVar(string k, string val) : base(VarTypes.Counter)
-        {
-            Key = k;
-            if (VarParcer.GetItemID(val, out string newVal))
-            {
-                _itemId = newVal;
-                _strValue = val;
-                return;
-            }
-            _itemId = _strValue = val;
-        }
-        public CounterVar(string k, object val) : base(VarTypes.Counter)
-        {
-            Key = k;
-            if (val != null)
-            {
-                string inStr = val as string;
-                if (!string.IsNullOrEmpty(inStr))
-                {
-                    if (VarParcer.GetItemID(inStr, out string newVal))
-                    {
-                        _itemId = newVal;
-                        _strValue = inStr;
-                        return;
-                    }
-                }
-            }
-            _itemId = string.Empty;
-            _strValue = string.Empty;
-        }
+//    public class CounterVar : Variable
+//    {
+//        public CounterVar() : base(VarTypes.Counter) { }
+//        public CounterVar(string k) : base(VarTypes.Counter)
+//        {
+//            Key = k;
+//            _itemId = string.Empty;
+//            _strValue = string.Empty;
+//        }
+//        public CounterVar(string k, string val) : base(VarTypes.Counter)
+//        {
+//            Key = k;
+//            if (VarParcer.GetItemID(val, out string newVal))
+//            {
+//                _itemId = newVal;
+//                _strValue = val;
+//                return;
+//            }
+//            _itemId = _strValue = val;
+//        }
+//        public CounterVar(string k, object val) : base(VarTypes.Counter)
+//        {
+//            Key = k;
+//            if (val != null)
+//            {
+//                string inStr = val as string;
+//                if (!string.IsNullOrEmpty(inStr))
+//                {
+//                    if (VarParcer.GetItemID(inStr, out string newVal))
+//                    {
+//                        _itemId = newVal;
+//                        _strValue = inStr;
+//                        return;
+//                    }
+//                }
+//            }
+//            _itemId = string.Empty;
+//            _strValue = string.Empty;
+//        }
 
-        /// <summary>
-        /// Исходная неформатированная строка, содержащая вычисляемое выражение
-        /// </summary>
-        private string _strValue = string.Empty;
-        /// <summary>
-        /// _itemId содержит идентификатор прeдметов(regex), количество которых подсчитывается
-        /// </summary>
-        private string _itemId = string.Empty;
-        public override object Value
-        {
-            get
-            {
-#if AstralLoaded
-                uint num = 0;
-                if (!(string.IsNullOrEmpty(_itemId) && EntityManager.LocalPlayer.IsValid))
-                {
-                    List<InventorySlot> slotList = EntityManager.LocalPlayer.AllItems.FindAll(slot => Regex.IsMatch(slot.Item.ItemDef.InternalName, _itemId));
-                    foreach (InventorySlot invSlot in slotList)
-                        num += invSlot.Item.Count;
-                }
-#endif
-                return 0u;
-            }
+//        /// <summary>
+//        /// Исходная неформатированная строка, содержащая вычисляемое выражение
+//        /// </summary>
+//        private string _strValue = string.Empty;
+//        /// <summary>
+//        /// _itemId содержит идентификатор прeдметов(regex), количество которых подсчитывается
+//        /// </summary>
+//        private string _itemId = string.Empty;
+//        public override object Value
+//        {
+//            get
+//            {
+//#if AstralLoaded
+//                uint num = 0;
+//                if (!(string.IsNullOrEmpty(_itemId) && EntityManager.LocalPlayer.IsValid))
+//                {
+//                    List<InventorySlot> slotList = EntityManager.LocalPlayer.AllItems.FindAll(slot => Regex.IsMatch(slot.Item.ItemDef.InternalName, _itemId));
+//                    foreach (InventorySlot invSlot in slotList)
+//                        num += invSlot.Item.Count;
+//                }
+//#endif
+//                return 0u;
+//            }
 
-            set
-            {
-                string inStr = value as string,
-                       newVal = string.Empty;
+//            set
+//            {
+//                string inStr = value as string,
+//                       newVal = string.Empty;
 
-                if(VarParcer.GetItemID(inStr, out newVal))
-                { 
-                    _itemId = newVal;
-                    _strValue = inStr;
+//                if(VarParcer.GetItemID(inStr, out newVal))
+//                { 
+//                    _itemId = newVal;
+//                    _strValue = inStr;
                     
-#if AstralLoaded
-                    Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Variable '{Key}' set to [{inStr}] as {VarType}");
-#endif
-                }
-                else
-                {
-                    _itemId = string.Empty;
-                    _strValue = string.Empty;
+//#if AstralLoaded
+//                    Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Variable '{Key}' set to [{inStr}] as {VarType}");
+//#endif
+//                }
+//                else
+//                {
+//                    _itemId = string.Empty;
+//                    _strValue = string.Empty;
 
-#if AstralLoaded
-                    Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Invalid value [{inStr}] to Variable '{Key}' type of {VarType}. Variable '{Key}' reseted to [{_itemId}].");
-#endif
-                }
-            }
-        }
+//#if AstralLoaded
+//                    Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Invalid value [{inStr}] to Variable '{Key}' type of {VarType}. Variable '{Key}' reseted to [{_itemId}].");
+//#endif
+//                }
+//            }
+//        }
 
-        public override string ToString()
-        {
-            return _strValue;
-        }
+//        public override string ToString()
+//        {
+//            return _strValue;
+//        }
 
-        public override Variable Clone()
-        {
-            CounterVar newItmCnt = new CounterVar(Key)
-            {
-                _itemId = _itemId,
-                _strValue = _strValue
-            };
-            return newItmCnt;
-        }
-    }
+//        public override Variable Clone()
+//        {
+//            CounterVar newItmCnt = new CounterVar(Key)
+//            {
+//                _itemId = _itemId,
+//                _strValue = _strValue
+//            };
+//            return newItmCnt;
+//        }
+//    }
 
 }

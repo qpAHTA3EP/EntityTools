@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 
 namespace AstralVars.Classes
 {
@@ -8,7 +9,6 @@ namespace AstralVars.Classes
         {
             return item.Key;
         }
-
         /// <summary>
         /// Поиск переменной в коллекции по ключу 'key'
         /// </summary>
@@ -36,7 +36,7 @@ namespace AstralVars.Classes
         /// Если такой переменной нет в коллекции - она создается
         /// Если тип переменной не совпадает - тип переменной меняется
         /// </summary>
-        /// <param name="key">Имя (ключе) переменной. Пустое значение не докупскается.</param>
+        /// <param name="key">Имя (ключ) переменной. Пустое значение не докупскается.</param>
         /// <param name="val">Новое значение переменной</param>
         /// <returns>Переменная, добавленная в коллекцию.
         /// null, если значение ключа 'key' было пустым или null</returns>
@@ -64,7 +64,7 @@ namespace AstralVars.Classes
         /// Если такой переменной нет в коллекции - она создается
         /// Если тип переменной не совпадает - тип переменной меняется
         /// </summary>
-        /// <param name="key">Имя (ключе) переменной. Пустое значение не докупскается.</param>
+        /// <param name="key">Имя (ключ) переменной. Пустое значение не докупскается.</param>
         /// <param name="val">Новое значение переменной</param>
         /// <returns>Переменная, добавленная в коллекцию.
         /// null, если значение ключа 'key' было пустым или null</returns>
@@ -92,7 +92,7 @@ namespace AstralVars.Classes
         /// Если такой переменной нет в коллекции - она создается
         /// Если тип переменной не совпадает - тип переменной меняется
         /// </summary>
-        /// <param name="key">Имя (ключе) переменной. Пустое значение не докупскается.</param>
+        /// <param name="key">Имя (ключ) переменной. Пустое значение не докупскается.</param>
         /// <param name="val">Новое значение переменной</param>
         /// <returns>Переменная, добавленная в коллекцию.
         /// null, если значение ключа 'key' было пустым или null</returns>
@@ -116,6 +116,71 @@ namespace AstralVars.Classes
         }
 
         /// <summary>
+        /// Установить переменной с именем 'key' значение 'val'
+        /// Если такой переменной нет в коллекции - она создается
+        /// Если тип переменной не совпадает - тип переменной меняется
+        /// </summary>
+        /// <param name="key">Имя (ключ) переменной. Пустое значение не докупскается.</param>
+        /// <param name="val">Новое значение переменной</param>
+        /// <returns>Переменная, добавленная в коллекцию.
+        /// null, если значение ключа 'key' было пустым или null</returns>
+        public Variable Set(string key, object val)
+        {
+            if (val is int)
+                return Set(key, (int)val);
+            if (val is bool)
+                return Set(key, (bool)val);
+            if (val is DateTime)
+                return Set(key, (DateTime)val);
+            return Set(key, val.ToString());
+        }
+
+        /// <summary>
+        /// Установить переменной с именем 'key' значение 'val' с контролем типа на соответствие 'type'
+        /// Если значение 'val' и не может быть конвертировано к не соответствует типу 'type', генерируется исключение
+        /// Если такой переменной нет в коллекции - она создается
+        /// </summary>
+        /// <param name="key">Имя (ключ) переменной. Пустое значение не докупскается.</param>
+        /// <param name="type">Тип переменной, которому должна соответствовать перемееная</param>
+        /// <param name="val">Новое значение переменной</param>
+        /// <returns>Переменная, добавленная в коллекцию.
+        /// null, если значение ключа 'key' было пустым или null</returns>
+        public Variable Set(string key, VarTypes type, object val)
+        {
+            if (string.IsNullOrEmpty(key) || val == null)
+                return null;
+            if (type == VarTypes.String)
+                return Set(key, val.ToString());
+            else if (val is int && type != VarTypes.Integer)
+                return Set(key, (int)val);
+            else if (val is bool && type != VarTypes.Boolean)
+                return Set(key, (bool)val);
+            else if (val is DateTime && type != VarTypes.DateTime)
+                return Set(key, (DateTime)val);
+
+            throw new NotValidVarValueException($"Value '{val}' can not be converted to type '{type}' for variable '{key}'");
+        }
+        /// <summary>
+        /// Установить переменной с именем 'key' значение 'val' с контролем типа на соответствие 'type'
+        /// Если значение 'val' и не может быть конвертировано к не соответствует типу 'type', генерируется исключение
+        /// Если такой переменной нет в коллекции - она создается
+        /// </summary>
+        /// <param name="key">Имя (ключ) переменной. Пустое значение не докупскается.</param>
+        /// <param name="type">Тип переменной, которому должна соответствовать перемееная</param>
+        /// <param name="val">Новое значение переменной</param>
+        /// <returns>Переменная, добавленная в коллекцию.
+        /// null, если значение ключа 'key' было пустым или null</returns>
+        public Variable Set(string key, object objType, object val)
+        {
+            if (key == null || objType == null || val == null)
+                return null;
+            if (VarParcer.GetType(objType, out VarTypes type))
+            {
+                return Set(key, type, val);
+            }
+            throw new NotValidVarValueException($"Object '{objType}' can not be converted to type 'VarTypes' to set value for the variable '{key}'");
+        }
+        /// <summary>
         /// Добавление в коллекцию копию аргумента 'val'
         /// Если в коллекции имеется переменная с ключем 'vel.Key', её значение обновляется в соответствии с val
         /// </summary>
@@ -136,5 +201,14 @@ namespace AstralVars.Classes
             Add(var);
             return var;
         }
+    }
+
+    /// <summary>
+    /// Исключение, сообщающее о недопустимости значения переменной
+    /// </summary>
+    public class NotValidVarValueException : Exception
+    {
+        public NotValidVarValueException(string mess) : base(mess)
+        { }
     }
 }
