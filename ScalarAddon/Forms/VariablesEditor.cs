@@ -115,10 +115,10 @@ namespace AstralVars.Forms
                                 cbCell = new DataGridViewComboBoxCell();
 
                             cbCell.Items.Clear();
-                            cbCell.Items.AddRange(new string[] { "True", "False" });
+                            cbCell.Items.AddRange(new string[] { System.Boolean.TrueString, System.Boolean.FalseString });
                             cbCell.DisplayStyle = DataGridViewComboBoxDisplayStyle.ComboBox;
                             cbCell.FlatStyle = FlatStyle.Flat;
-                            cbCell.Value = var.Value;
+                            cbCell.Value = var.Value.ToString();
 
                             if (newCellFlag)
                                 newRow.Cells[varEditor.clmnValue.DisplayIndex] = cbCell;
@@ -196,25 +196,23 @@ namespace AstralVars.Forms
         private void btnCancel_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Cancel;
+            Close();
         }
 
-        private void btnSave_Click(object sender, EventArgs e)
+        private void btnSelect_Click(object sender, EventArgs e)
         {
             foreach (DataGridViewRow row in dgvVariables.Rows)
             {
                 if (row.IsNewRow)
                     continue;
-
+                
                 Variable var = null;
-                if (row.Cells[clmnName.DisplayIndex].Value == null ||
-                    row.Cells[clmnType.DisplayIndex].Value == null ||
-                    row.Cells[clmnValue.DisplayIndex].Value == null ||
-                    (var = VariablesAddon.Variables.Set(row.Cells[clmnName.DisplayIndex].Value.ToString().Trim(),
-                                                 row.Cells[clmnType.DisplayIndex].Value,
-                                                 row.Cells[clmnValue.DisplayIndex].Value)) == null)
+                if ((var = VariablesAddon.Variables.Set(row.Cells[clmnName.DisplayIndex].Value,
+                                                        row.Cells[clmnType.DisplayIndex].Value,
+                                                        row.Cells[clmnValue.DisplayIndex].Value)) == null)
                 {
                     row.Tag = null;
-                    DialogResult dResult = MessageBox.Show(varEditor, $"Variable [{row.Index}]'{row.Cells[clmnName.DisplayIndex].Value}' is incorect.\n" +
+                    DialogResult dResult = MessageBox.Show(varEditor, $"Variable [{row.Index+1}]'{row.Cells[clmnName.DisplayIndex].Value}' is incorect.\n" +
                                                                        "It will be deleted from the collection." +
                                                                        "Do you want to correct it ?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (dResult == DialogResult.Yes)
@@ -230,6 +228,8 @@ namespace AstralVars.Forms
                     DialogResult = DialogResult.OK;
                 }
             }
+            if (DialogResult == DialogResult.OK)
+                Close();
         }
 
         private void dgvVariables_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
@@ -348,7 +348,7 @@ namespace AstralVars.Forms
                                             cbCell.DataSource = null;
                                             cbCell.Items.Clear();
                                         }
-                                        cbCell.Items.AddRange(new string[] { "False", "True" });
+                                        cbCell.Items.AddRange(new string[] { System.Boolean.TrueString, System.Boolean.FalseString });
                                         cbCell.DisplayStyle = DataGridViewComboBoxDisplayStyle.ComboBox;
                                         cbCell.FlatStyle = FlatStyle.Flat;
                                         cbCell.Value = bRes.ToString();
@@ -453,54 +453,41 @@ namespace AstralVars.Forms
         {
             dgvVariables.ReadOnly = !chbAllowEdit.Checked;
             if (dgvVariables.ReadOnly)
+            {
                 dgvVariables.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            else dgvVariables.SelectionMode = DataGridViewSelectionMode.CellSelect;
+                dgvVariables.AllowUserToAddRows = false;
+            }
+            else
+            {
+                dgvVariables.SelectionMode = DataGridViewSelectionMode.CellSelect;
+                dgvVariables.AllowUserToAddRows = true;
+            }
         }
 
         private void dgvVariables_ReadOnlyChanged(object sender, EventArgs e)
         {
             chbAllowEdit.Checked = !dgvVariables.ReadOnly;
             if (dgvVariables.ReadOnly)
+            {
                 dgvVariables.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            else dgvVariables.SelectionMode = DataGridViewSelectionMode.CellSelect;
+                dgvVariables.AllowUserToAddRows = false;
+            }
+            else
+            {
+                dgvVariables.SelectionMode = DataGridViewSelectionMode.CellSelect;
+                dgvVariables.AllowUserToAddRows = true;
+            }
         }
 
-        private void dgvVariables_RowLeave(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void dgvVariables_RowEnter(object sender, DataGridViewCellEventArgs e)
-        {
-            bool valid = false;
-            DataGridViewRow row = dgvVariables.Rows[e.RowIndex];
-
-            valid = !(row.IsNewRow || VariablesAddon.Variables.Set(row.Cells[clmnName.DisplayIndex].Value.ToString().Trim(),
-                                                   row.Cells[clmnType.DisplayIndex].Value,
-                                                   row.Cells[clmnValue.DisplayIndex].Value) == null);
-            btnSelect.Enabled = valid;
-        }
-
-        private void dgvVariables_RowValidated(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void dgvVariables_CellValidated(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void dgvVariables_RowValidating(object sender, DataGridViewCellCancelEventArgs e)
+        private void dgvVariables_RowCanSelect(object sender, DataGridViewCellEventArgs e)
         {
             bool valid = false;
             DataGridViewRow row = dgvVariables.Rows[e.RowIndex];
 
-            valid = !(row.IsNewRow || VariablesAddon.Variables.Set(row.Cells[clmnName.DisplayIndex].Value.ToString().Trim(),
+            valid = !(row.IsNewRow && VariablesAddon.Variables.Set(row.Cells[clmnName.DisplayIndex].Value,
                                                    row.Cells[clmnType.DisplayIndex].Value,
                                                    row.Cells[clmnValue.DisplayIndex].Value) == null);
             btnSelect.Enabled = valid;
-            e.Cancel = !valid;
         }
     }
 }

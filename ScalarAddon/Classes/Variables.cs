@@ -106,6 +106,12 @@ namespace AstralVars.Classes
             else
                 return new StrVar(k, val);
         }
+
+        public override string ToString()
+        {
+            return $"{Key}:= ({VarType}){Value}";
+        }
+
     }
 
     /// <summary>
@@ -176,11 +182,6 @@ namespace AstralVars.Classes
         {
             return new BoolVar(Key, _varValue);
         }
-
-        public override string ToString()
-        {
-            return _varValue.ToString();
-        }
     }
 
     /// <summary>
@@ -247,11 +248,6 @@ namespace AstralVars.Classes
             }
         }
 
-        public override string ToString()
-        {
-            return _varValue.ToString();
-        }
-
         public override Variable Clone()
         {
             return new IntVar(Key, _varValue);
@@ -293,11 +289,6 @@ namespace AstralVars.Classes
                 Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Variable '{Key}' set to [{_varValue}] as {VarType}");
 #endif
             }
-        }
-
-        public override string ToString()
-        {
-            return _varValue;
         }
 
         public override Variable Clone()
@@ -370,11 +361,6 @@ namespace AstralVars.Classes
 #endif
                 }
             }
-        }
-
-        public override string ToString()
-        {
-            return _dtValue.ToString();
         }
 
         public override Variable Clone()
