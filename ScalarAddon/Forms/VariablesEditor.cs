@@ -61,9 +61,8 @@ namespace AstralVars.Forms
                 DialogResult result = varEditor.ShowDialog();
                 if (result == DialogResult.OK)
                 {
-                    if (varEditor.dgvVariables.CurrentRow.Tag is Variable var)
-                        MessageBox.Show($"Selected variable is {{{var}}}");
-                    else MessageBox.Show($"Incorrect variable was selected");
+                    if(varEditor.dgvVariables.CurrentRow.Tag is Variable var)
+                        return var;
                 }
             }
             return null;

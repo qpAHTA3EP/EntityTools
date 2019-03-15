@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace AstralVars.Classes
 {
+    [Serializable]
     public class VarCollection : KeyedCollection<string, Variable>
     {
         protected override string GetKeyForItem(Variable item)
@@ -25,9 +26,13 @@ namespace AstralVars.Classes
                 return false;
             }
 
-            if (Dictionary.TryGetValue(key, out val))
+            if (Dictionary != null && Dictionary.TryGetValue(key, out val))
+                return true;
+            else
+            {
+                val = null;
                 return false;
-            else return true;
+            }
         }
 
 
@@ -45,7 +50,7 @@ namespace AstralVars.Classes
             if (string.IsNullOrEmpty(key))
                 return null;
 
-            if (Dictionary.TryGetValue(key, out Variable var))
+            if (Dictionary != null && Dictionary.TryGetValue(key, out Variable var))
             {
                 if (var.VarType == VarTypes.Integer)
                 {
@@ -73,7 +78,7 @@ namespace AstralVars.Classes
             if (string.IsNullOrEmpty(key))
                 return null;
 
-            if (Dictionary.TryGetValue(key, out Variable var))
+            if (Dictionary != null && Dictionary.TryGetValue(key, out Variable var))
             {
                 if (var.VarType == VarTypes.Boolean)
                 {
@@ -101,7 +106,7 @@ namespace AstralVars.Classes
             if (string.IsNullOrEmpty(key))
                 return null;
 
-            if (Dictionary.TryGetValue(key, out Variable var))
+            if (Dictionary != null && Dictionary.TryGetValue(key, out Variable var))
             {
                 if (var.VarType == VarTypes.Boolean)
                 {
@@ -129,7 +134,7 @@ namespace AstralVars.Classes
             if (string.IsNullOrEmpty(key))
                 return null;
 
-            if (Dictionary.TryGetValue(key, out Variable var))
+            if (Dictionary != null && Dictionary.TryGetValue(key, out Variable var))
             {
                 if (var.VarType == VarTypes.String)
                 {
@@ -236,26 +241,34 @@ namespace AstralVars.Classes
                 return Set(key.ToString().Trim(), type, val);
             }
             throw new NotValidVarValueException($"Object '{objType}' can not be converted to type 'VarTypes' to set value for the variable '{key}'");
-        }        /// <summary>
-                 /// Добавление в коллекцию копию аргумента 'val'
-                 /// Если в коллекции имеется переменная с ключем 'vel.Key', её значение обновляется в соответствии с val
-                 /// </summary>
-                 /// <param name="val">Новое значение переменной</param>
-                 /// <returns>Переменная, добавленная в коллекцию</returns>
+        }        
+        /// <summary>
+        /// Добавление в коллекцию копию аргумента 'val'
+        /// Если в коллекции имеется переменная с ключем 'vel.Key', её значение обновляется в соответствии с val
+        /// </summary>
+        /// <param name="val">Новое значение переменной</param>
+        /// <returns>Переменная, добавленная в коллекцию</returns>
         public Variable Set(Variable val)
         {
-            if (val!= null && Dictionary.TryGetValue(val.Key, out Variable var))
+            if (val!= null)
             {
-                if (var.VarType == val.VarType)
+                if (Dictionary != null && Dictionary.TryGetValue(val.Key, out Variable var))
                 {
-                    var.Value = val;
+                    if (var.VarType == val.VarType)
+                    {
+                        var.Value = val;
+                        return var;
+                    }
+                    else Dictionary.Remove(val.Key);
+                }
+                else
+                {
+                    var = Variable.Make(val);
+                    Add(var);
                     return var;
                 }
-                else Dictionary.Remove(val.Key);
             }
-            var = Variable.Make(val);
-            Add(var);
-            return var;
+            return null;
         }
     }
 
