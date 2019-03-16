@@ -18,8 +18,6 @@ namespace EntityPlugin.Actions
             Distance = 30;
             IgnoreCombat = true;
             StopOnApproached = true;
-            //if (EntityManager.LocalPlayer.IsValid && EntityManager.LocalPlayer.Location.IsValid)
-            //    HotSpots.Add(EntityManager.LocalPlayer.Location.Clone());
         }
 
         public override string ActionLabel => $"{GetType().Name} [{EntityID}]";
@@ -51,7 +49,7 @@ namespace EntityPlugin.Actions
         {
             get
             {
-                if (target.IsValid && target.Location.IsValid)
+                if (target.IsValid && target.Location.IsValid && target.Location.Distance3DFromPlayer > Distance)
                 {
                     return target.Location.Clone();
                 }
@@ -65,7 +63,7 @@ namespace EntityPlugin.Actions
             {
                 if (string.IsNullOrEmpty(EntityID))
                 {
-                    return new ActionValidity("EntityID property not set.");
+                    return new ActionValidity($"{nameof(EntityID)} property not set.");
                 }
                 return new ActionValidity();
             }

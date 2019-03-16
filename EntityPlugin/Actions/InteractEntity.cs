@@ -16,7 +16,7 @@ namespace EntityPlugin.Actions
 {
     public class InteractEntity : Astral.Quester.Classes.Action
     {
-        public override string ActionLabel => "[Depricated] InteractEntity [" + this.Name + "]";
+        public override string ActionLabel => "[Deprecated] InteractEntity [" + this.Name + "]";
 
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         public string Name { get; set; }
@@ -27,7 +27,7 @@ namespace EntityPlugin.Actions
 
         public int SkipTime { get; set; }
 
-        public override string Category => "Depricated";
+        public override string Category => "Deprecated";
 
         public override void InternalReset()
         {
@@ -129,6 +129,16 @@ namespace EntityPlugin.Actions
 
         public override void OnMapDraw(GraphicsNW graph)
         {
+        }
+
+        public enum InteractionType
+        {
+            //Взаимодействие запрещено
+            Forbidden,
+            //Взаимодействовать если возможно
+            IfPossible,
+            //взаимодействие обязательно
+            Obliganory
         }
     }
 }

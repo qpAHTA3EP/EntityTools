@@ -42,6 +42,62 @@ namespace EntityPlugin
         }
 
         /// <summary>
+        /// Поиск Entity из коллекции entities, у которого поле NameUntranslated соответствует шаблону entPattern, 
+        /// и расположенного наиболее близко к персонажу 
+        /// </summary>
+        /// <param name="entities">Коллекция объектов Entity</param>
+        /// <param name="entPattern">Строка-шаблон, которому должно соответствовать NameUntranslated у искомого Entity</param>
+        /// <returns></returns>
+        public static Entity FindClosestInteractableEntity(List<Entity> entities, string entPattern)
+        {
+            Entity closestEntity = new Entity(IntPtr.Zero);
+            if (!string.IsNullOrEmpty(entPattern))
+            {
+                foreach (Entity entity in entities)
+                {
+                    if (Regex.IsMatch(entity.NameUntranslated, entPattern) && entity.InteractOption.IsValid)
+                    {
+                        if (closestEntity.IsValid)
+                        {
+                            if (entity.Location.Distance3DFromPlayer < closestEntity.Location.Distance3DFromPlayer)
+                                closestEntity = entity;
+                        }
+                        else closestEntity = entity;
+                    }
+                }
+            }
+            return closestEntity;
+        }
+
+        /// <summary>
+        /// Поиск Entity из коллекции entities, у которого поле NameUntranslated соответствует шаблону entPattern, 
+        /// и расположенного наиболее близко к персонажу 
+        /// </summary>
+        /// <param name="entities">Коллекция объектов Entity</param>
+        /// <param name="entPattern">Строка-шаблон, которому должно соответствовать NameUntranslated у искомого Entity</param>
+        /// <returns></returns>
+        public static Entity FindClosestUninteractableEntity(List<Entity> entities, string entPattern)
+        {
+            Entity closestEntity = new Entity(IntPtr.Zero);
+            if (!string.IsNullOrEmpty(entPattern))
+            {
+                foreach (Entity entity in entities)
+                {
+                    if (Regex.IsMatch(entity.NameUntranslated, entPattern) && !entity.InteractOption.IsValid)
+                    {
+                        if (closestEntity.IsValid)
+                        {
+                            if (entity.Location.Distance3DFromPlayer < closestEntity.Location.Distance3DFromPlayer)
+                                closestEntity = entity;
+                        }
+                        else closestEntity = entity;
+                    }
+                }
+            }
+            return closestEntity;
+        }
+
+        /// <summary>
         /// Проверка нахождения объекта entity в границах региона region
         /// </summary>
         /// <param name="entity">Объект Entity, местонахождение которого проверяется</param>
