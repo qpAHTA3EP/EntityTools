@@ -83,7 +83,9 @@
             this.dgvEntities.MultiSelect = false;
             this.dgvEntities.Name = "dgvEntities";
             this.dgvEntities.ReadOnly = true;
+            this.dgvEntities.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             this.dgvEntities.RowHeadersVisible = false;
+            this.dgvEntities.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.dgvEntities.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvEntities.ShowEditingIcon = false;
             this.dgvEntities.ShowRowErrors = false;

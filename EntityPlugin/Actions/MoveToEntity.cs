@@ -65,7 +65,7 @@ namespace EntityPlugin.Actions
             {
                 if (string.IsNullOrEmpty(EntityID))
                 {
-                    return new ActionValidity("Name property not set.");
+                    return new ActionValidity($"Рroperty '{nameof(EntityID)}' not set.");
                 }
                 return new ActionValidity();
             }
