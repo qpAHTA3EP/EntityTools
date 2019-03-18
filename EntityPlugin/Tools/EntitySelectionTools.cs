@@ -1,4 +1,5 @@
-﻿using Astral.Logic.NW;
+﻿using Astral.Classes;
+using Astral.Logic.NW;
 using Astral.Quester.Classes;
 using MyNW.Classes;
 using MyNW.Internals;
@@ -11,7 +12,7 @@ using System.Threading;
 
 namespace EntityPlugin
 {
-    public static class EntityPluginTools
+    public static class SelectionTools
     {
         /// <summary>
         /// Поиск Entity из коллекции entities, у которого поле NameUntranslated соответствует шаблону entPattern, 
@@ -20,11 +21,15 @@ namespace EntityPlugin
         /// <param name="entities">Коллекция объектов Entity</param>
         /// <param name="entPattern">Строка-шаблон, которому должно соответствовать NameUntranslated у искомого Entity</param>
         /// <returns></returns>
-        public static Entity FindClosestEntity(List<Entity> entities, string entPattern)
+        public static Entity FindClosestEntity(List<Entity> entities, string entPattern, TempBlackList<IntPtr> bkList = null)
         {
             Entity closestEntity = new Entity(IntPtr.Zero);
             if (!string.IsNullOrEmpty(entPattern))
             {
+                if (bkList != null)
+                {
+                    bkList = new TempBlackList<IntPtr>();
+                }
                 foreach (Entity entity in entities)
                 {
                     if (Regex.IsMatch(entity.NameUntranslated, entPattern))
@@ -47,15 +52,23 @@ namespace EntityPlugin
         /// </summary>
         /// <param name="entities">Коллекция объектов Entity</param>
         /// <param name="entPattern">Строка-шаблон, которому должно соответствовать NameUntranslated у искомого Entity</param>
+        /// <param name="bkList">Список исключений Entity, которые запрещено выбирать в качестве цели</param>
         /// <returns></returns>
-        public static Entity FindClosestInteractableEntity(List<Entity> entities, string entPattern)
+        public static Entity FindClosestInteractableEntity(List<Entity> entities, string entPattern, TempBlackList<IntPtr> bkList = null)
         {
             Entity closestEntity = new Entity(IntPtr.Zero);
             if (!string.IsNullOrEmpty(entPattern))
             {
+                if (bkList != null)
+                {
+                    bkList = new TempBlackList<IntPtr>();
+                }
                 foreach (Entity entity in entities)
                 {
-                    if (Regex.IsMatch(entity.NameUntranslated, entPattern) && entity.InteractOption.IsValid)
+                    if (entity.Critter.IsInteractable
+                        && Regex.IsMatch(entity.NameUntranslated, entPattern)
+                        && !bkList.IsBlackList(entity.Pointer)
+                        /* && entity.InteractOption.CanInteract()*/)
                     {
                         if (closestEntity.IsValid)
                         {
@@ -69,33 +82,33 @@ namespace EntityPlugin
             return closestEntity;
         }
 
-        /// <summary>
-        /// Поиск Entity из коллекции entities, у которого поле NameUntranslated соответствует шаблону entPattern, 
-        /// и расположенного наиболее близко к персонажу 
-        /// </summary>
-        /// <param name="entities">Коллекция объектов Entity</param>
-        /// <param name="entPattern">Строка-шаблон, которому должно соответствовать NameUntranslated у искомого Entity</param>
-        /// <returns></returns>
-        public static Entity FindClosestUninteractableEntity(List<Entity> entities, string entPattern)
-        {
-            Entity closestEntity = new Entity(IntPtr.Zero);
-            if (!string.IsNullOrEmpty(entPattern))
-            {
-                foreach (Entity entity in entities)
-                {
-                    if (Regex.IsMatch(entity.NameUntranslated, entPattern) && !entity.InteractOption.IsValid)
-                    {
-                        if (closestEntity.IsValid)
-                        {
-                            if (entity.Location.Distance3DFromPlayer < closestEntity.Location.Distance3DFromPlayer)
-                                closestEntity = entity;
-                        }
-                        else closestEntity = entity;
-                    }
-                }
-            }
-            return closestEntity;
-        }
+        ///// <summary>
+        ///// Поиск Entity из коллекции entities, у которого поле NameUntranslated соответствует шаблону entPattern, 
+        ///// и расположенного наиболее близко к персонажу 
+        ///// </summary>
+        ///// <param name="entities">Коллекция объектов Entity</param>
+        ///// <param name="entPattern">Строка-шаблон, которому должно соответствовать NameUntranslated у искомого Entity</param>
+        ///// <returns></returns>
+        //public static Entity FindClosestUninteractableEntity(List<Entity> entities, string entPattern)
+        //{
+        //    Entity closestEntity = new Entity(IntPtr.Zero);
+        //    if (!string.IsNullOrEmpty(entPattern))
+        //    {
+        //        foreach (Entity entity in entities)
+        //        {
+        //            if (Regex.IsMatch(entity.NameUntranslated, entPattern) && !entity.InteractOption.IsValid/* && !entity.InteractOption.CanInteract()*/)
+        //            {
+        //                if (closestEntity.IsValid)
+        //                {
+        //                    if (entity.Location.Distance3DFromPlayer < closestEntity.Location.Distance3DFromPlayer)
+        //                        closestEntity = entity;
+        //                }
+        //                else closestEntity = entity;
+        //            }
+        //        }
+        //    }
+        //    return closestEntity;
+        //}
 
         /// <summary>
         /// Проверка нахождения объекта entity в границах региона region
@@ -142,7 +155,6 @@ namespace EntityPlugin
         /// <returns></returns>
         public static Instances.ChangeInstanceResult ChangeInstance(uint instNum = 0)
         {
-
             if (!MapTransfer.CanChangeInstance)
             {
                 Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);

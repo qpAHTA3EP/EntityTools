@@ -73,7 +73,7 @@ namespace EntityPlugin.Actions
                     if (leader.MapName != player.MapName)
                         return ActionResult.Fail;
 
-                    Instances.ChangeInstanceResult changeInstanceResult = EntityPluginTools.ChangeInstance(leader.MapInstanceNumber);
+                    Instances.ChangeInstanceResult changeInstanceResult = SelectionTools.ChangeInstance(leader.MapInstanceNumber);
 
                     if (changeInstanceResult == Instances.ChangeInstanceResult.Combat)
                     {

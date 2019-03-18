@@ -88,7 +88,7 @@ namespace EntityPlugin.Conditions
                         {
                             foreach (CustomRegion customRegion in customRegions)
                             {
-                                if (EntityPluginTools.IsInCustomRegion(member.Entity, customRegion))
+                                if (SelectionTools.IsInCustomRegion(member.Entity, customRegion))
                                 {
                                     memCount++;
                                     break;
@@ -147,7 +147,7 @@ namespace EntityPlugin.Conditions
                             foreach (CustomRegion customRegion in Astral.Quester.API.CurrentProfile.CustomRegions)
                             {
                                 if ( CustomRegionNames.Exists((string regName) => regName == customRegion.Name) &&
-                                        EntityPluginTools.IsInCustomRegion(member.Entity, customRegion) )
+                                        SelectionTools.IsInCustomRegion(member.Entity, customRegion) )
                                 {
                                     if (strBldr2.Length > 0)
                                         strBldr2.Append(", ");

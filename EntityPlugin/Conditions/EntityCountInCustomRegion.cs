@@ -89,7 +89,7 @@ namespace EntityPlugin.Conditions
 
                         foreach (CustomRegion cr in customRegions)
                         {
-                            if (EntityPluginTools.IsInCustomRegion(entity, cr))
+                            if (SelectionTools.IsInCustomRegion(entity, cr))
                             {
                                 match = true;
                                 break;
@@ -141,7 +141,7 @@ namespace EntityPlugin.Conditions
 
                         foreach (CustomRegion customRegion in Astral.Quester.API.CurrentProfile.CustomRegions) //customRegions)
                         {
-                            if (EntityPluginTools.IsInCustomRegion(entity, customRegion))
+                            if (SelectionTools.IsInCustomRegion(entity, customRegion))
                                 match = true;
                             if (strBldr2.Length > 0)
                                 strBldr2.Append(", ");

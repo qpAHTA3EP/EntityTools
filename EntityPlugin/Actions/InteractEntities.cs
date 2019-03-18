@@ -4,11 +4,13 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.Threading;
 using Astral;
+using Astral.Classes;
 using Astral.Logic.Classes.Map;
 using Astral.Logic.NW;
 using Astral.Quester.Classes;
 using Astral.Quester.UIEditors;
 using EntityPlugin.Editors;
+using EntityPlugin.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
 using Action = Astral.Quester.Classes.Action;
@@ -18,26 +20,32 @@ namespace EntityPlugin.Actions
     public enum InteractionRequirement
     {
         /// <summary>
-        /// Выбирать цели, недоступные для взаимодействия
-        /// </summary>
-        Unavailable,
-        /// <summary>
-        /// Взаимодействие запрещено.
-        /// Выбираются все цели, но взаимодействие не производится
+        /// Взаимодействие не производится.
         /// </summary>
         Forbidden,
         /// <summary>
         /// Взаимодействовать, если возможно.
-        /// Выбираются все цели.
         /// </summary>
         IfPossible,
         /// <summary>
+        /// Взаимодействовать, если возможно, однократно.
+        /// </summary>
+        Once,
+        /// <summary>
         /// Взаимодействие обязательно.
-        /// Пропускаются цели, недоступные для взаимодействия
         /// </summary>
         Obligatory
     }
     
+    public enum InteractionMethod
+    {
+        Auto,
+        NPC,
+        //Node,
+        Generic,
+        SimulateFKey
+    }
+
     public class InteractEntities : Action
     {
         public InteractEntities() : base()
@@ -47,6 +55,7 @@ namespace EntityPlugin.Actions
             IgnoreCombat = true;
             StopOnApproached = true;
             InteractionRequirement = InteractionRequirement.IfPossible;
+            OneInteractionByEntity = false;
             InteractTime = 2000;
             Dialogs = new List<string>();
         }
@@ -61,11 +70,30 @@ namespace EntityPlugin.Actions
         [Description("Enable IgnoreCombat profile value while playing action")]
         public bool IgnoreCombat { get; set; }
 
+        //[Description("Interact each Entity only once time")]
+        //public bool OneInteractionByEntity { get; set; }
+
+        /// Список игнорируемых Entity, используемый, если InteractionRequirement=Once
+        [NonSerialized]
+        private TempBlackList<IntPtr> ignoredEntity;
+
         [Description("Complite an action when Entity had been approached (if true)")]
         public bool StopOnApproached { get; set; }
 
-        [Description("Try interaction to Entity if possible")]
+        [Description("Select the need for interaction\n" +
+            "'Forbidden' - No interaction is executed\n" +
+            "'IfPossible' - The interaction is executed if Entity is interactable\n" +
+            "'Once' - The interaction is executed only once, and the next time the Entity will be ignored\n" +
+            "'Obligatory' - Interaction is strongly needed. The interaction is repeated until the target is intractable.")]
         public InteractionRequirement InteractionRequirement { get; set; }
+
+        [Description("Select the interaction method\n" +
+            "'Auto' - Consistent use of all other interaction methods\n" +
+            "'NPC' - Interact with an Entity as an NPC\n" +
+        //    "'Node' - Interact with an Entity as an Node\n" +
+            "'Generic' - Interact with an entity using generic interaction method\n" +
+            "'SimulateFKey' - Force 'F' key press to interact an Entity")]
+        public InteractionMethod InteractionMethod { get; set; }
 
         [Description("Time to interact (ms)")]
         public int InteractTime { get; set; }
@@ -83,10 +111,11 @@ namespace EntityPlugin.Actions
 
         public override void InternalReset()
         {
+            ignoredEntity.Clear();
             if (string.IsNullOrEmpty(EntityID))
                 target = new Entity(IntPtr.Zero);
             else
-                target = EntityPluginTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+                target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
         }
 
         protected override bool IntenalConditions => !string.IsNullOrEmpty(EntityID);
@@ -136,20 +165,11 @@ namespace EntityPlugin.Actions
                 {
                     switch (InteractionRequirement)
                     {
-                        case InteractionRequirement.Forbidden:
-                            target = EntityPluginTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
-                            break;
-                        case InteractionRequirement.IfPossible:
-                            target = EntityPluginTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
-                            break;
-                        case InteractionRequirement.Unavailable:
-                            target = EntityPluginTools.FindClosestUninteractableEntity(EntityManager.GetEntities(), EntityID);
-                            break;
                         case InteractionRequirement.Obligatory:
-                            target = EntityPluginTools.FindClosestInteractableEntity(EntityManager.GetEntities(), EntityID);
+                            target = SelectionTools.FindClosestInteractableEntity(EntityManager.GetEntities(), EntityID, ignoredEntity);
                             break;
                         default:
-                            target = new Entity(IntPtr.Zero);
+                            target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, ignoredEntity);
                             break;
                     }
                 }
@@ -174,7 +194,7 @@ namespace EntityPlugin.Actions
 
         public override ActionResult Run()
         {
-            //target = EntityPluginTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+            //target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
 
             if (!target.IsValid)
             {
@@ -187,29 +207,19 @@ namespace EntityPlugin.Actions
             {
                 Astral.Quester.API.IgnoreCombat = false;
 
-                switch (InteractionRequirement)
+                if(InteractionRequirement != InteractionRequirement.Forbidden)
                 {
-                    case InteractionRequirement.Forbidden:
-                        actnReslt = InternalInteraction();
-                        break;
-                    case InteractionRequirement.IfPossible:
-                        actnReslt = InternalInteraction();
-                        break;
-                    case InteractionRequirement.Unavailable:
-                        actnReslt = ActionResult.Running;
-                        break;
-                    case InteractionRequirement.Obligatory:
-                        actnReslt = InternalInteraction();
-                        break;
-                    default:
-                        actnReslt = ActionResult.Running;
-                        break;
+
+                    actnReslt = InternalInteraction();
+
+                    if (StopOnApproached)
+                        actnReslt = ActionResult.Completed;
                 }
-
-                actnReslt = InternalInteraction();
-
-                if (StopOnApproached)
-                    actnReslt = ActionResult.Completed;
+                else
+                {
+                    if (StopOnApproached)
+                        actnReslt = ActionResult.Completed;
+                }
             }
             else
                 Astral.Quester.API.IgnoreCombat = IgnoreCombat;
@@ -221,40 +231,37 @@ namespace EntityPlugin.Actions
         {
             ActionResult actnReslt = ActionResult.Running;
 
-            if (InteractionRequirement == InteractionRequirement.IfPossible && target.IsValid && target.InteractOption.IsValid && Approach.EntityForInteraction(target, null))
+            switch (InteractionMethod)
             {
-                MyNW.Internals.Movements.StopNavTo();
-                Thread.Sleep(500);
-                target.Interact();
-                Thread.Sleep(InteractTime);
-                Interact.WaitForInteraction();
-                if (Dialogs.Count > 0)
-                {
-                    Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);
-                    while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count == 0)
+                case InteractionMethod.NPC:
+                    if(InteractionRequirement == InteractionRequirement.Once && !InteractionTools.InteractNPC(target, InteractTime, Dialogs))
                     {
-                        if (timeout.IsTimedOut)
-                        {
-                            actnReslt = ActionResult.Running;
-                            break;
-                        }
-                        Thread.Sleep(100);
+                        ignoredEntity.Add(target.Pointer);
+                        target = new Entity(IntPtr.Zero);
                     }
-                    Thread.Sleep(500);
-                    using (List<string>.Enumerator enumerator = Dialogs.GetEnumerator())
+                    break;
+                case InteractionMethod.Generic:
+                    if (InteractionRequirement == InteractionRequirement.Once && !InteractionTools.InteractGeneric(target, InteractTime, Dialogs))
                     {
-                        while (enumerator.MoveNext())
-                        {
-                            string key = enumerator.Current;
-                            EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.SelectOptionByKey(key, "");
-                            Thread.Sleep(1000);
-                        }
+                        ignoredEntity.Add(target.Pointer);
+                        target = new Entity(IntPtr.Zero);
                     }
-                }
-                EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
-                target = new Entity(IntPtr.Zero);
+                    break;
+                case InteractionMethod.SimulateFKey:
+                    InteractionTools.SimulateFKey(target, InteractTime, Dialogs);
+                    break;
+                default:
+                    InteractionTools.InteractGeneric(target, InteractTime, Dialogs);
+                    InteractionTools.InteractNPC(target, InteractTime, Dialogs);
+                    InteractionTools.SimulateFKey(target, InteractTime, Dialogs);
+                    break;
             }
             return actnReslt;
+        }
+
+        private Entity Entity(IntPtr zero)
+        {
+            throw new NotImplementedException();
         }
 
         [NonSerialized]

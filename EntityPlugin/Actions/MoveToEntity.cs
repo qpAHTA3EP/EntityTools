@@ -31,17 +31,13 @@ namespace EntityPlugin.Actions
             if (string.IsNullOrEmpty(EntityID))
                 target = new Entity(IntPtr.Zero);
             else
-                target = EntityPluginTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+                target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
         }
 
         protected override bool IntenalConditions => !string.IsNullOrEmpty(EntityID);
 
         public override string InternalDisplayName => string.Empty;
 
-        protected virtual ActionResult InternalInteraction ()
-        {
-            return ActionResult.Running;
-        }
 
         public override bool UseHotSpots => true;
 
@@ -96,7 +92,7 @@ namespace EntityPlugin.Actions
                 if (string.IsNullOrEmpty(EntityID))
                     target = new Entity(IntPtr.Zero);
                 else
-                    target = EntityPluginTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+                    target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
 
                 //в команде ChangeProfielValue:IgnoreCombat используется код:
                 //Combat.SetIgnoreCombat(IgnoreCombat, -1, 0);
@@ -119,28 +115,27 @@ namespace EntityPlugin.Actions
 
         public override ActionResult Run()
         {
-            //target = EntityPluginTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+            //target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
 
             if (!target.IsValid)
             {
                 Logger.WriteLine($"Entity [{EntityID}] not founded.");
                 return ActionResult.Fail;
             }
-            ActionResult actnReslt = ActionResult.Running;
 
             if (target.Location.Distance3DFromPlayer < Distance)
             {
                 Astral.Quester.API.IgnoreCombat = false;
 
-                actnReslt = InternalInteraction();
-
                 if (StopOnApproached)
-                    actnReslt = ActionResult.Completed;
+                    return ActionResult.Completed;
+                else return ActionResult.Running;
             }
             else
+            {
                 Astral.Quester.API.IgnoreCombat = IgnoreCombat;
-
-            return actnReslt;
+                return ActionResult.Running;
+            }
         }
 
         [NonSerialized]

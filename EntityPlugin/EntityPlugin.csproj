@@ -69,7 +69,8 @@
     <Compile Include="Conditions\TeamLeaderMapInstance.cs" />
     <Compile Include="Conditions\TeamMemberCount.cs" />
     <Compile Include="Conditions\TeamMemberCountInCustomRegion.cs" />
-    <Compile Include="Tools\EntityPluginTools.cs" />
+    <Compile Include="Tools\EntityInteractionTools.cs" />
+    <Compile Include="Tools\EntitySelectionTools.cs" />
     <Compile Include="EntityPlugin.cs" />
     <Compile Include="Forms\EntitySelectForm.cs">
       <SubType>Form</SubType>
