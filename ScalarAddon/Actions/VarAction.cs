@@ -15,11 +15,17 @@ namespace AstralVars
     public class VarAction : Astral.Quester.Classes.Action
     {
         [Editor(typeof(variableUiEditor), typeof(UITypeEditor))]
-        [Description("Идентификатор переменной")]
+        [Description("The Name of variable.\n" +
+            "Идентификатор переменной.")]
         public Variable VariableName { get; set; }
 
-        [Description("Значение переменной")]
+        [Description("An expression whose value is compared to a variable.\n" +
+            "Выражение, сопоставляемое с переменной.")]
         public string Equation { get; set; } = string.Empty;
+
+        [Description("How to compare the value of a variable with the result of an expression.\n" +
+            "Тип cопоставления переменной с результатом выражения")]
+        public Condition.Relation Sign { get; set; }
 
         public override string ActionLabel => GetType().Name;
 

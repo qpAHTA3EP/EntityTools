@@ -11,6 +11,7 @@ namespace AstralVars.Classes
     /// <summary>
     /// Перечисление типов переменных
     /// </summary>
+    [Serializable]
     public enum VarTypes
     {
         Boolean,
@@ -24,8 +25,10 @@ namespace AstralVars.Classes
     /// <summary>
     /// Элемент коллекции переменных
     /// </summary>
+    [Serializable]
     public abstract class Variable
     {
+        [NonSerialized]
         private static Random rand = new Random();
 
         private Variable()
@@ -106,11 +109,18 @@ namespace AstralVars.Classes
             else
                 return new StrVar(k, val);
         }
+
+        public override string ToString()
+        {
+            return $"{Key}:= ({VarType}){Value}";
+        }
+
     }
 
     /// <summary>
     /// Булевая переменная 
     /// </summary>
+    [Serializable]
     public class BoolVar : Variable
     {
         public BoolVar() : base(VarTypes.Boolean) { }
@@ -138,8 +148,12 @@ namespace AstralVars.Classes
             _varValue = false;
         }
 
+        [NonSerialized]
         public static readonly bool Default = false;
+
+        [NonSerialized]
         private bool _varValue;
+
         public override object Value
         {
             get => _varValue;
@@ -176,16 +190,12 @@ namespace AstralVars.Classes
         {
             return new BoolVar(Key, _varValue);
         }
-
-        public override string ToString()
-        {
-            return _varValue.ToString();
-        }
     }
 
     /// <summary>
     /// Переменная - целое число
     /// </summary>
+    [Serializable]
     public class IntVar : Variable
     {
         public IntVar() : base(VarTypes.Integer) {}
@@ -213,8 +223,12 @@ namespace AstralVars.Classes
             _varValue = 0;
         }
 
+        [NonSerialized]
         public static readonly int Default = 0;
+
+        [NonSerialized]
         private int _varValue;
+
         public override object Value
         {
             get => _varValue;
@@ -247,11 +261,6 @@ namespace AstralVars.Classes
             }
         }
 
-        public override string ToString()
-        {
-            return _varValue.ToString();
-        }
-
         public override Variable Clone()
         {
             return new IntVar(Key, _varValue);
@@ -261,6 +270,7 @@ namespace AstralVars.Classes
     /// <summary>
     /// Переменная - строка
     /// </summary>
+    [Serializable]
     public class StrVar : Variable
     {
         public StrVar() : base(VarTypes.String) { }
@@ -280,8 +290,12 @@ namespace AstralVars.Classes
         }
 
 
+        [NonSerialized]
         public static readonly string Default = string.Empty;
+
+        [NonSerialized]
         private string _varValue;
+
         public override object Value
         {
             get => _varValue;
@@ -295,11 +309,6 @@ namespace AstralVars.Classes
             }
         }
 
-        public override string ToString()
-        {
-            return _varValue;
-        }
-
         public override Variable Clone()
         {
             return new StrVar(Key, _varValue);
@@ -309,6 +318,7 @@ namespace AstralVars.Classes
     /// <summary>
     /// Переменная времени
     /// </summary>
+    [Serializable]
     public class DateTimeVar : Variable
     {
         public DateTimeVar() : base(VarTypes.DateTime) { }
@@ -341,8 +351,12 @@ namespace AstralVars.Classes
             _dtValue = Default;
         }
 
+        [NonSerialized]
         public static readonly DateTime Default = DateTime.Now;
+
+        [NonSerialized]
         private DateTime _dtValue;
+
         public override object Value
         {
             get => _dtValue;
@@ -370,11 +384,6 @@ namespace AstralVars.Classes
 #endif
                 }
             }
-        }
-
-        public override string ToString()
-        {
-            return _dtValue.ToString();
         }
 
         public override Variable Clone()

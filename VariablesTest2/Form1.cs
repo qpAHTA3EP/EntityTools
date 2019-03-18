@@ -77,17 +77,17 @@ namespace VariablesTest2
             VariablesAddon.Variables.Clear();
 
             VariablesAddon.Variables.Add(Variable.Make("Int", 99));
-            //VariablesAddon.Variables.Add(Variable.Make("intSt", "101"));
-            //VariablesAddon.Variables.Add(Variable.Make("bl", true));
-            //VariablesAddon.Variables.Add(Variable.Make("bls", "false"));
-            //VariablesAddon.Variables.Add(Variable.Make("dt", DateTime.UtcNow));
-            //VariablesAddon.Variables.Add(Variable.Make("dts", "20.01.2019"));
-            //VariablesAddon.Variables.Add(Variable.Make("vss", "Super"));
-            //VariablesAddon.Variables.Add(Variable.Make("12", "Count[Artifactfood]"));
-            //VariablesAddon.Variables.Add(Variable.Make("15", "Counter(Gemfood)"));
-            //VariablesAddon.Variables.Add(Variable.Make(VarTypes.Boolean));
-            //VariablesAddon.Variables.Add(Variable.Make(VarTypes.Integer));
-            //VariablesAddon.Variables.Add(Variable.Make(VarTypes.DateTime));
+            VariablesAddon.Variables.Add(Variable.Make("intSt", "101"));
+            VariablesAddon.Variables.Add(Variable.Make("bl", true));
+            VariablesAddon.Variables.Add(Variable.Make("bls", "false"));
+            VariablesAddon.Variables.Add(Variable.Make("dt", DateTime.UtcNow));
+            VariablesAddon.Variables.Add(Variable.Make("dts", "20.01.2019"));
+            VariablesAddon.Variables.Add(Variable.Make("vss", "Super"));
+            VariablesAddon.Variables.Add(Variable.Make("12", "Count[Artifactfood]"));
+            VariablesAddon.Variables.Add(Variable.Make("15", "Counter(Gemfood)"));
+            VariablesAddon.Variables.Add(Variable.Make(VarTypes.Boolean));
+            VariablesAddon.Variables.Add(Variable.Make(VarTypes.Integer));
+            VariablesAddon.Variables.Add(Variable.Make(VarTypes.DateTime));
 
             Variable var = VariablesEditor.GetVariable(VariablesAddon.Variables);
 #endif
