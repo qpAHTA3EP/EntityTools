@@ -4,14 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DF7F797E-DB7E-44F9-A96A-020CFDB3C51E}</ProjectGuid>
+    <ProjectGuid>{8C13462B-8B43-40A3-B4C1-EA351AE9F1C4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>EntityPlugin</RootNamespace>
-    <AssemblyName>EntityPlugin</AssemblyName>
+    <RootNamespace>AstralVars</RootNamespace>
+    <AssemblyName>VariablesAddon</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,11 +30,28 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Astral-cleaned">
-      <HintPath>D:\Games\Astral_RU_6\Astral-cleaned.exe</HintPath>
+    <Reference Include="Astral">
+      <HintPath>D:\Games\Astral_RU_1\Astral.exe</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.Utils.v18.1">
@@ -46,7 +63,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="MyNW">
-      <HintPath>D:\Games\Astral_RU_6\MyNW.dll</HintPath>
+      <HintPath>D:\Games\Astral_RU_1\MyNW.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -60,48 +77,38 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Actions\ChangeInstanceToLeader.cs" />
-    <Compile Include="Actions\InteractEntities.cs" />
-    <Compile Include="Actions\InteractEntity.cs" />
-    <Compile Include="Conditions\CheckShard.cs" />
-    <Compile Include="Conditions\EntityDistance.cs" />
-    <Compile Include="Conditions\EntityCountInCustomRegion.cs" />
-    <Compile Include="Conditions\PartyCount.cs" />
-    <Compile Include="Conditions\TeamLeaderMapInstance.cs" />
-    <Compile Include="Conditions\TeamMemberCount.cs" />
-    <Compile Include="Conditions\TeamMemberCountInCustomRegion.cs" />
-    <Compile Include="Tools\EntityInteractionTools.cs" />
-    <Compile Include="Tools\EntitySelectionTools.cs" />
-    <Compile Include="EntityPlugin.cs" />
-    <Compile Include="Forms\EntitySelectForm.cs">
+    <Compile Include="Classes\Variables.cs" />
+    <Compile Include="Classes\VarParcer.cs" />
+    <Compile Include="Forms\DataGridViewDateTimeCell.cs" />
+    <Compile Include="VariablesAddon.cs" />
+    <Compile Include="Actions\VarAction.cs" />
+    <Compile Include="Classes\VarCollection.cs" />
+    <Compile Include="Conditions\VarCondition.cs" />
+    <Compile Include="Forms\VariablesEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\EntitySelectForm.Designer.cs">
-      <DependentUpon>EntitySelectForm.cs</DependentUpon>
+    <Compile Include="Forms\VariablesEditor.Designer.cs">
+      <DependentUpon>VariablesEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\MainPanel.cs">
+    <Compile Include="Forms\VariablesAddonPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Forms\MainPanel.Designer.cs">
-      <DependentUpon>MainPanel.cs</DependentUpon>
+    <Compile Include="Forms\VariablesAddonPanel.Designer.cs">
+      <DependentUpon>VariablesAddonPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Actions\MoveToEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Editors\EntityIdEditor.cs" />
-    <Compile Include="Editors\MultiCustomRegionSelectEditor.cs" />
-    <Compile Include="Editors\ShardEditor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Forms\EntitySelectForm.resx">
-      <DependentUpon>EntitySelectForm.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\VariablesEditor.resx">
+      <DependentUpon>VariablesEditor.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\MainPanel.resx">
-      <DependentUpon>MainPanel.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\VariablesAddonPanel.resx">
+      <DependentUpon>VariablesAddonPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -109,7 +116,11 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="UCC\" />
+    <None Include="Properties\DataSources\AstralVars.Forms.VariablesEditor.datasource" />
+    <None Include="Resources\MathOp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Editors\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

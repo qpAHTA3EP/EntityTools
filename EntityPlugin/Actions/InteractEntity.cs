@@ -16,7 +16,7 @@ namespace EntityPlugin.Actions
 {
     public class InteractEntity : Astral.Quester.Classes.Action
     {
-        public override string ActionLabel => "[Deprecated] InteractEntity [" + this.Name + "]";
+        public override string ActionLabel => $"[{Properties.Resources.CategoryDeprecated}] {GetType().Name} [{Name}]";
 
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         public string Name { get; set; }
@@ -27,7 +27,7 @@ namespace EntityPlugin.Actions
 
         public int SkipTime { get; set; }
 
-        public override string Category => "Deprecated";
+        public override string Category => Properties.Resources.CategoryDeprecated;
 
         public override void InternalReset()
         {

@@ -18,7 +18,7 @@ namespace EntityPlugin.Conditions
     /// </summary>
 
     [Serializable]
-    public class TeamMemberCountInCustomRegions : Condition
+    public class TeamMembersCountInCustomRegions : Condition
     {
         [Description("The relation of the character's location to the CustomRegion")]
         public Presence Tested { get; set; }
@@ -34,7 +34,7 @@ namespace EntityPlugin.Conditions
         [Description("The comparison type for 'MemberCount'")]
         public Relation Sign { get; set; }
 
-        public TeamMemberCountInCustomRegions()
+        public TeamMembersCountInCustomRegions()
         {
             MemberCount = 0;
             Sign = Relation.Superior;

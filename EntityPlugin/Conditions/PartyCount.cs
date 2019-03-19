@@ -9,7 +9,8 @@ namespace EntityPlugin.Conditions
     {
         public PartyCount()
         {
-            //MessageBox.Show("This Conditions is deprecated. Use 'TeamMembersCount' or 'TeamMembersCountInCustomRegion' instead");
+            //MessageBox.Show($"This Conditions is deprecated. Use '{nameof(TeamMembersCount)}' or '{nameof(TeamMembersCountInCustomRegions)}' instead");
+            
             this.MemberCount = 0;
             this.Sign = Relation.Superior;
         }
@@ -20,13 +21,7 @@ namespace EntityPlugin.Conditions
 
         public override string ToString()
         {
-            return string.Concat(new object[]
-            {
-                "[Deprecated] Members is ",
-                this.Sign,
-                " ",
-                this.MemberCount
-            });
+            return $"[{Properties.Resources.CategoryDeprecated}] Members is {Sign} {MemberCount}";
         }
 
         public int MemberCount { get; set; }

@@ -8,7 +8,7 @@ namespace EntityPlugin
 {
     public class EntityPlugin : Astral.Addons.Plugin
     {
-        public override string Name => "EntityPlugin";
+        public override string Name => GetType().Name;
 
         public override string Author => "MichaelProg";
 

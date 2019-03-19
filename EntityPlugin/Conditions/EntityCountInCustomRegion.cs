@@ -165,7 +165,7 @@ namespace EntityPlugin.Conditions
 
                     return strBldr.ToString();
                 }
-                return "EntityID or CustomRegionNames properties are not set";
+                return "Name or CustomRegionNames properties are not set";
             }
         }
 
