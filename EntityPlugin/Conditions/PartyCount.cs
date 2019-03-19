@@ -9,7 +9,7 @@ namespace EntityPlugin.Conditions
     {
         public PartyCount()
         {
-            MessageBox.Show("This Conditions is deprecated. Use 'TeamMembersCount' or 'TeamMembersCountInCustomRegion' instead");
+            //MessageBox.Show("This Conditions is deprecated. Use 'TeamMembersCount' or 'TeamMembersCountInCustomRegion' instead");
             this.MemberCount = 0;
             this.Sign = Relation.Superior;
         }
