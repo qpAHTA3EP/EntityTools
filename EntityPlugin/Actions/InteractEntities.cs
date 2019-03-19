@@ -43,7 +43,9 @@ namespace EntityPlugin.Actions
         NPC,
         //Node,
         Generic,
-        SimulateFKey
+        SimulateFKey,
+        FollowAndInteractNPC,
+        FollowAndSimulateFKey
     }
 
     public class InteractEntities : Action
@@ -55,9 +57,10 @@ namespace EntityPlugin.Actions
             IgnoreCombat = true;
             StopOnApproached = true;
             InteractionRequirement = InteractionRequirement.IfPossible;
-            OneInteractionByEntity = false;
+            //OneInteractionByEntity = false;
             InteractTime = 2000;
             Dialogs = new List<string>();
+            ignoredEntity = new TempBlackList<IntPtr>();
         }
 
         [Description("ID (an internal untranslated name) of the Entity for the search (regex)")]
@@ -92,7 +95,9 @@ namespace EntityPlugin.Actions
             "'NPC' - Interact with an Entity as an NPC\n" +
         //    "'Node' - Interact with an Entity as an Node\n" +
             "'Generic' - Interact with an entity using generic interaction method\n" +
-            "'SimulateFKey' - Force 'F' key press to interact an Entity")]
+            "'SimulateFKey' - Force 'F' key press to interact an Entity\n" +
+            "'FollowAndInteractNPC' - Follows an entity and interacts with it again and again as long as the interaction is possible\n" +
+            "'FollowAndInteractNPC' - Follows an entity and interacts with it by simulation 'F' key press again and again as long as the interaction is possible")]
         public InteractionMethod InteractionMethod { get; set; }
 
         [Description("Time to interact (ms)")]
@@ -115,7 +120,15 @@ namespace EntityPlugin.Actions
             if (string.IsNullOrEmpty(EntityID))
                 target = new Entity(IntPtr.Zero);
             else
-                target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+                switch (InteractionRequirement)
+                {
+                    case InteractionRequirement.Obligatory:
+                        target = SelectionTools.FindClosestInteractableEntity(EntityManager.GetEntities(), EntityID, ignoredEntity);
+                        break;
+                    default:
+                        target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, ignoredEntity);
+                        break;
+                }
         }
 
         protected override bool IntenalConditions => !string.IsNullOrEmpty(EntityID);
@@ -130,7 +143,7 @@ namespace EntityPlugin.Actions
             {
                 if (target.IsValid && target.Location.IsValid && target.Location.Distance3DFromPlayer > Distance)
                 {
-                    return target.Location.Clone();
+                    return target.Location/*.Clone()*/;
                 }
                 return new Vector3();
             }
@@ -179,16 +192,9 @@ namespace EntityPlugin.Actions
                 //Нашел доступный способ управлять запретом боя
                 //Astral.Quester.API.IgnoreCombat = IgnoreCombat;
 
-                if (target.IsValid)
-                {
-                    if (target.Location.Distance3DFromPlayer >= Distance)
-                    {
-                        Astral.Quester.API.IgnoreCombat = IgnoreCombat;
-                        return false;
-                    }
-                    else return true;
-                }
-                else return false;
+                Astral.Quester.API.IgnoreCombat = IgnoreCombat;
+
+                return (target.IsValid && target.Location.Distance3DFromPlayer <= Distance);                
             }
         }
 
@@ -201,6 +207,7 @@ namespace EntityPlugin.Actions
                 Logger.WriteLine($"Entity [{EntityID}] not founded.");
                 return ActionResult.Fail;
             }
+
             ActionResult actnReslt = ActionResult.Running;
 
             if (target.Location.Distance3DFromPlayer < Distance)
@@ -209,7 +216,6 @@ namespace EntityPlugin.Actions
 
                 if(InteractionRequirement != InteractionRequirement.Forbidden)
                 {
-
                     actnReslt = InternalInteraction();
 
                     if (StopOnApproached)
@@ -229,8 +235,6 @@ namespace EntityPlugin.Actions
 
         protected ActionResult InternalInteraction()
         {
-            ActionResult actnReslt = ActionResult.Running;
-
             switch (InteractionMethod)
             {
                 case InteractionMethod.NPC:
@@ -238,6 +242,8 @@ namespace EntityPlugin.Actions
                     {
                         ignoredEntity.Add(target.Pointer);
                         target = new Entity(IntPtr.Zero);
+                        if (StopOnApproached)
+                            return ActionResult.Completed;
                     }
                     break;
                 case InteractionMethod.Generic:
@@ -245,18 +251,51 @@ namespace EntityPlugin.Actions
                     {
                         ignoredEntity.Add(target.Pointer);
                         target = new Entity(IntPtr.Zero);
+                        if (StopOnApproached)
+                            return ActionResult.Completed;
                     }
                     break;
                 case InteractionMethod.SimulateFKey:
-                    InteractionTools.SimulateFKey(target, InteractTime, Dialogs);
+                    if (InteractionRequirement == InteractionRequirement.Once && !InteractionTools.SimulateFKey(target, InteractTime, Dialogs))
+                    {
+                        ignoredEntity.Add(target.Pointer);
+                        target = new Entity(IntPtr.Zero);
+                        if (StopOnApproached)
+                            return ActionResult.Completed;
+                    }
+                    break;
+                case InteractionMethod.FollowAndInteractNPC:
+                    if (InteractionRequirement == InteractionRequirement.Once && !InteractionTools.FollowAndInteractNPC(target, InteractTime, Distance, Dialogs))
+                    {
+                        ignoredEntity.Add(target.Pointer);
+                        target = new Entity(IntPtr.Zero);
+                        if (StopOnApproached)
+                            return ActionResult.Completed;
+                    }
+                    break;
+                case InteractionMethod.FollowAndSimulateFKey:
+                    if (InteractionRequirement == InteractionRequirement.Once && !InteractionTools.FollowAndSimulateFKey(target, InteractTime, Distance, Dialogs))
+                    {
+                        ignoredEntity.Add(target.Pointer);
+                        target = new Entity(IntPtr.Zero);
+                        if (StopOnApproached)
+                            return ActionResult.Completed;
+                    }
                     break;
                 default:
-                    InteractionTools.InteractGeneric(target, InteractTime, Dialogs);
-                    InteractionTools.InteractNPC(target, InteractTime, Dialogs);
-                    InteractionTools.SimulateFKey(target, InteractTime, Dialogs);
+                    if (InteractionRequirement == InteractionRequirement.Once 
+                        && !(InteractionTools.InteractNPC(target, InteractTime, Dialogs) ||
+                        InteractionTools.InteractGeneric(target, InteractTime, Dialogs) ||
+                        InteractionTools.SimulateFKey(target, InteractTime, Dialogs)))
+                    {
+                        ignoredEntity.Add(target.Pointer);
+                        target = new Entity(IntPtr.Zero);
+                        if (StopOnApproached)
+                            return ActionResult.Completed;
+                    }
                     break;
             }
-            return actnReslt;
+            return ActionResult.Running;
         }
 
         private Entity Entity(IntPtr zero)

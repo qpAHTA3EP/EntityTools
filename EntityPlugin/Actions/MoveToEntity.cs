@@ -4,6 +4,7 @@ using System.Drawing.Design;
 using Astral;
 using Astral.Logic.Classes.Map;
 using EntityPlugin.Editors;
+using EntityPlugin.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
 using Action = Astral.Quester.Classes.Action;
@@ -47,7 +48,7 @@ namespace EntityPlugin.Actions
             {
                 if (target.IsValid && target.Location.IsValid && target.Location.Distance3DFromPlayer > Distance)
                 {
-                    return target.Location.Clone();
+                    return target.Location/*.Clone()*/;
                 }
                 return new Vector3();
             }
@@ -100,16 +101,8 @@ namespace EntityPlugin.Actions
                 //Нашел доступный способ управлять запретом боя
                 //Astral.Quester.API.IgnoreCombat = IgnoreCombat;
 
-                if (target.IsValid)
-                {
-                    if (target.Location.Distance3DFromPlayer >= Distance)
-                    {
-                        Astral.Quester.API.IgnoreCombat = IgnoreCombat;
-                        return false;
-                    }
-                    else return true;
-                }
-                else return false;
+                Astral.Quester.API.IgnoreCombat = IgnoreCombat;
+                return (target.IsValid) && (target.Location.Distance3DFromPlayer <= Distance);
             }
         }
 

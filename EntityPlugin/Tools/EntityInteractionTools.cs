@@ -20,19 +20,22 @@ namespace EntityPlugin.Tools
         /// <param name="interactTime">время взаимодействия</param>
         /// <param name="dialogs">пункты диалога</param>
         /// <returns>Повторное взаимодействие c target возможно</returns>
-        public static bool InteractNPC(Entity target, int interactTime, List<string> dialogs)
+        public static bool InteractNPC(Entity target, int interactTime = 1000, List<string> dialogs = null)
         {
             if (target != null && target.IsValid)
             {
                 bool result = false;
-                if (target.Critter.IsInteractable && target.InteractOption.IsValid && Approach.EntityForInteraction(target, null))
+                if (target.Critter.IsInteractable && target.InteractOption.IsValid/* && Approach.EntityByDistance(target, target.Critter.InteractDistance, null)/*Approach.EntityForInteraction(target, null)*/)
                 {
+                    target.Location.Face();
+                    target.Location.FaceYaw();
+
                     MyNW.Internals.Movements.StopNavTo();
-                    Thread.Sleep(500);
+                    //Thread.Sleep(500);
                     target.Interact();
                     Thread.Sleep(interactTime);
                     Interact.WaitForInteraction();
-                    if (dialogs.Count > 0)
+                    if (dialogs != null && dialogs.Count > 0)
                     {
                         Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(interactTime);
                         while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count == 0)
@@ -55,7 +58,7 @@ namespace EntityPlugin.Tools
                             }
                         }
                     }
-                    EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
+                    EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();                    
                     result = target.Critter.IsInteractable && target.InteractOption.IsValid && target.InteractOption.CanInteract();
                 }
                 return result;
@@ -63,6 +66,64 @@ namespace EntityPlugin.Tools
             return false;
         }
 
+        /// <summary>
+        /// Взаимодействие с Entity 
+        /// </summary>
+        /// <param name="target">цель взаимодействия</param>
+        /// <param name="interactTime">время взаимодействия</param>
+        /// <param name="distance">дистанция до Entity на которой необходимо выполнять взаимодействие</param>
+        /// <param name="dialogs">пункты диалога</param>
+        /// <returns>Повторное взаимодействие c target возможно</returns>
+        public static bool FollowAndInteractNPC(Entity target, int interactTime = 1000, float distance = 5, List<string> dialogs = null)
+        {
+            if (target != null && target.IsValid)
+            {
+                while (target.IsValid/* && target.InteractOption.IsValid*/)
+                {
+                    Approach.EntityByDistance(target, distance, null);
+
+                    target.Location.Face();
+                    target.Location.FaceYaw();
+
+                    MyNW.Internals.Movements.StopNavTo();
+                    //Thread.Sleep(500);
+                    target.Interact();
+                    Thread.Sleep(interactTime);
+                    Interact.WaitForInteraction();
+                    if (dialogs!=null && dialogs.Count > 0)
+                    {
+                        Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(interactTime);
+                        while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count == 0)
+                        {
+                            if (timeout.IsTimedOut)
+                            {
+                                break;
+                            }
+                            Thread.Sleep(100);
+                        }
+                        Thread.Sleep(500);
+                        using (List<string>.Enumerator enumerator = dialogs.GetEnumerator())
+                        {
+                            while (enumerator.MoveNext())
+                            {
+                                string key = enumerator.Current;
+                                EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.SelectOptionByKey(key, "");
+                                Thread.Sleep(1000);
+                            }
+                        }
+                    }
+                    EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
+
+                    if (!target.IsValid 
+                        || (target.Location.Distance3DFromPlayer <= distance 
+                        && !(target.Critter.IsInteractable && target.InteractOption.IsValid && target.InteractOption.CanInteract())))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return false;
+        }
         /// <summary>
         /// Взаимодействие с Entity как с Node
         /// Функции перемещения не задействованы
@@ -161,7 +222,7 @@ namespace EntityPlugin.Tools
         /// <param name="interactTime">время взаимодействия</param>
         /// <param name="dialogs">пункты диалога</param>
         /// <returns>Повторное взаимодействие c target возможно</returns>
-        public static bool InteractGeneric(Entity target, int interactTime, List<string> dialogs)
+        public static bool InteractGeneric(Entity target, int interactTime = 1000, List<string> dialogs = null)
         {
             if (target != null && target.IsValid)
             {
@@ -194,7 +255,7 @@ namespace EntityPlugin.Tools
                             }
                             Thread.Sleep(num);
                             Interact.WaitForInteraction();
-                            if (dialogs.Count > 0)
+                            if (dialogs!=null && dialogs.Count > 0)
                             {
                                 Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(num);
                                 while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count == 0)
@@ -249,25 +310,25 @@ namespace EntityPlugin.Tools
         /// <param name="interactTime">время взаимодействия</param>
         /// <param name="dialogs">пункты диалога</param>
         /// <returns>Повторное взаимодействие c target возможно</returns>
-        public static bool SimulateFKey(Entity target, int interactTime, List<string> dialogs)
+        public static bool SimulateFKey(Entity target, int interactTime = 1000, List<string> dialogs = null)
         {
             if (target != null && target.IsValid)
             {
                 target.Location.Face();
-                Thread.Sleep(300);
-                GameCommands.SimulateFKey();
+/*                Thread.Sleep(300);
+                GameCommands.SimulateFKey();*/
                 target.Location.Face();
                 target.Location.FaceYaw();
                 Thread.Sleep(300);
                 GameCommands.SimulateFKey();
                 Thread.Sleep(interactTime);
-                if (target.InteractOption.IsValid)
+                if (EntityManager.LocalPlayer.Player.InteractInfo.IsValid/*target.InteractOption.IsValid*/)
                 {
-                    if (target.InteractOption.CanInteract())
+                    /*if (target.CanInteract)
                     {
                         Thread.Sleep(interactTime);
-                    }
-                    if (dialogs.Count > 0)
+                    }*/
+                    if (dialogs != null && dialogs.Count > 0)
                     {
                         Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);
                         while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count == 0)
@@ -290,7 +351,69 @@ namespace EntityPlugin.Tools
                         }
                     }
                 }
-                return target.InteractOption.CanInteract();
+                return target.CanInteract;
+            }
+            return false;
+        }
+
+
+        /// <summary>
+        /// Взаимодействие с Entity как с Node
+        /// Функции перемещения не задействованы
+        /// </summary>
+        /// <param name="target">цель взаимодействия</param>
+        /// <param name="interactTime">время взаимодействия</param>
+        /// <param name="distance">дистанция до Entity на которой необходимо выполнять взаимодействие</param>
+        /// <param name="dialogs">пункты диалога</param>
+        /// <returns>Повторное взаимодействие c target возможно</returns>
+        public static bool FollowAndSimulateFKey(Entity target, int interactTime = 1000, float distance = 5, List<string> dialogs = null)
+        {
+            if (target != null && target.IsValid)
+            {
+                while (target != null && target.IsValid)
+                {
+                    Approach.EntityByDistance(target, distance, null);
+
+                    target.Location.Face();
+                    target.Location.FaceYaw();
+                    GameCommands.SimulateFKey();
+                    Thread.Sleep(interactTime);
+
+                    Approach.EntityByDistance(target, distance, null);
+                    GameCommands.SimulateFKey();
+                    Thread.Sleep(interactTime);
+
+                    if (EntityManager.LocalPlayer.Player.InteractInfo.IsValid)
+                    {
+
+                        if (dialogs != null && dialogs.Count > 0)
+                        {
+                            Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);
+                            while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count == 0)
+                            {
+                                if (timeout.IsTimedOut)
+                                {
+                                    break;
+                                }
+                                Thread.Sleep(100);
+                            }
+                            Thread.Sleep(500);
+                            using (List<string>.Enumerator enumerator = dialogs.GetEnumerator())
+                            {
+                                while (enumerator.MoveNext())
+                                {
+                                    string key = enumerator.Current;
+                                    EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.SelectOptionByKey(key, "");
+                                    Thread.Sleep(1000);
+                                }
+                            }
+                        }
+                    }
+                    if (!target.IsValid || (target.Location.Distance3DFromPlayer <= distance && !target.CanInteract))
+                    {
+                        return false;
+                    }
+                }
             }
             return false;
         }

@@ -10,7 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 
-namespace EntityPlugin
+namespace EntityPlugin.Tools
 {
     public static class SelectionTools
     {
@@ -26,13 +26,14 @@ namespace EntityPlugin
             Entity closestEntity = new Entity(IntPtr.Zero);
             if (!string.IsNullOrEmpty(entPattern))
             {
-                if (bkList != null)
+                if (bkList == null)
                 {
                     bkList = new TempBlackList<IntPtr>();
                 }
                 foreach (Entity entity in entities)
                 {
-                    if (Regex.IsMatch(entity.NameUntranslated, entPattern))
+                    if (Regex.IsMatch(entity.NameUntranslated, entPattern) 
+                        && !bkList.Contains(entity.Pointer))
                     {
                         if (closestEntity.IsValid)
                         {
@@ -59,7 +60,7 @@ namespace EntityPlugin
             Entity closestEntity = new Entity(IntPtr.Zero);
             if (!string.IsNullOrEmpty(entPattern))
             {
-                if (bkList != null)
+                if (bkList == null)
                 {
                     bkList = new TempBlackList<IntPtr>();
                 }

@@ -6,6 +6,7 @@ using System.Threading;
 using Astral.Logic.Classes.Map;
 using Astral.Logic.NW;
 using Astral.Quester.Classes;
+using EntityPlugin.Tools;
 using MyNW;
 using MyNW.Classes;
 using MyNW.Internals;

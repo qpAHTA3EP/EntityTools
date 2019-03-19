@@ -9,6 +9,7 @@ using Astral.Quester;
 using Astral.Quester.Classes;
 using Astral.Quester.UIEditors;
 using EntityPlugin.Editors;
+using EntityPlugin.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
 
