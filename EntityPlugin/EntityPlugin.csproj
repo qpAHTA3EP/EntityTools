@@ -33,8 +33,11 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Astral">
+      <HintPath>D:\Games\Astral_RU_1\Astral.exe</HintPath>
+    </Reference>
     <Reference Include="Astral-cleaned">
-      <HintPath>D:\Games\Astral_RU_6\Astral-cleaned.exe</HintPath>
+      <HintPath>D:\Games\Astral_RU_1\Astral-cleaned.exe</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.Utils.v18.1">
@@ -46,8 +49,11 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="MyNW">
-      <HintPath>D:\Games\Astral_RU_6\MyNW.dll</HintPath>
+      <HintPath>D:\Games\Astral_RU_1\MyNW.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="MyNW-cleaned">
+      <HintPath>D:\Games\Astral_RU_1\MyNW-cleaned.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
