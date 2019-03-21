@@ -252,7 +252,7 @@ namespace AstralVars.Forms
                                     e.Cancel = !VarParcer.TryParse(val, out bool bRes);
                                     break;
                                 case VarTypes.Number:
-                                    e.Cancel = !VarParcer.TryParse(val, out int iRres);
+                                    e.Cancel = !VarParcer.TryParse(val, out double nRres);
                                     break;
                                 case VarTypes.DateTime:
                                     e.Cancel = !VarParcer.TryParse(val, out DateTime dtRes);
@@ -359,9 +359,9 @@ namespace AstralVars.Forms
                                 case VarTypes.Number:
 
                                     {
-                                        int iRres = NumVar.Default;
+                                        double nRres = NumVar.Default;
                                         if (curRow.Cells[clmnValue.DisplayIndex].Value != null)
-                                            VarParcer.TryParse(curRow.Cells[clmnValue.DisplayIndex].Value.ToString(), out iRres);
+                                            VarParcer.TryParse(curRow.Cells[clmnValue.DisplayIndex].Value.ToString(), out nRres);
 
                                         bool newCellFlag = !(curRow.Cells[varEditor.clmnValue.DisplayIndex] is DataGridViewTextBoxCell && !(curRow.Cells[varEditor.clmnValue.DisplayIndex] is DataGridViewDateTimeCell));
 
@@ -369,7 +369,7 @@ namespace AstralVars.Forms
                                         if (newCellFlag)
                                             tbCell = new DataGridViewTextBoxCell();
                                         else tbCell = curRow.Cells[varEditor.clmnValue.DisplayIndex] as DataGridViewTextBoxCell;
-                                        tbCell.Value = iRres;
+                                        tbCell.Value = nRres;
 
                                         if (newCellFlag)
                                             curRow.Cells[varEditor.clmnValue.DisplayIndex] = tbCell;

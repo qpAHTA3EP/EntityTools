@@ -159,7 +159,7 @@ namespace AstralVars.Classes
         /// null, если значение ключа 'key' было пустым или null</returns>
         public Variable Set(string key, object val)
         {
-            if (VarParcer.TryParseStrict(val, out int iVal))
+            if (VarParcer.TryParseStrict(val, out double iVal))
                 return Set(key, iVal);
             if (VarParcer.TryParseStrict(val, out bool bVal))
                 return Set(key, bVal);
@@ -186,8 +186,8 @@ namespace AstralVars.Classes
                 return Set(key.Trim(), val.ToString());
             else if (type == VarTypes.Number)
             {
-                if (VarParcer.TryParseStrict(val, out int iVal))
-                    return Set(key.Trim(), iVal);
+                if (VarParcer.TryParseStrict(val, out double nVal))
+                    return Set(key.Trim(), nVal);
             }
             else if (type == VarTypes.Boolean)
             {
