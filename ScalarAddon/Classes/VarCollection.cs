@@ -52,7 +52,7 @@ namespace AstralVars.Classes
 
             if (Dictionary != null && Dictionary.TryGetValue(key, out Variable var))
             {
-                if (var.VarType == VarTypes.Integer)
+                if (var.VarType == VarTypes.Number)
                 {
                     var.Value = val;
                     return var;
@@ -184,7 +184,7 @@ namespace AstralVars.Classes
                 return null;
             if (type == VarTypes.String)
                 return Set(key.Trim(), val.ToString());
-            else if (type == VarTypes.Integer)
+            else if (type == VarTypes.Number)
             {
                 if (VarParcer.TryParseStrict(val, out int iVal))
                     return Set(key.Trim(), iVal);

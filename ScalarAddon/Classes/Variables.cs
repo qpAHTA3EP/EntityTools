@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml.Serialization;
 
 namespace AstralVars.Classes
 {
@@ -15,7 +16,7 @@ namespace AstralVars.Classes
     public enum VarTypes
     {
         Boolean,
-        Integer,
+        Number,
         String,
         //Numeric,
         //Counter,
@@ -26,6 +27,10 @@ namespace AstralVars.Classes
     /// Элемент коллекции переменных
     /// </summary>
     [Serializable]
+    [XmlInclude(typeof(NumVar))]
+    [XmlInclude(typeof(BoolVar))]
+    [XmlInclude(typeof(StrVar))]
+    [XmlInclude(typeof(DateTimeVar))]
     public abstract class Variable
     {
         [NonSerialized]
@@ -67,8 +72,8 @@ namespace AstralVars.Classes
             {
                 case VarTypes.Boolean:
                     return new BoolVar();
-                case VarTypes.Integer:
-                    return new IntVar();
+                case VarTypes.Number:
+                    return new NumVar();
                 case VarTypes.String:
                     return new StrVar();
                 //case VarTypes.Counter:
@@ -88,9 +93,9 @@ namespace AstralVars.Classes
         {
             return new BoolVar(k, val);
         }
-        public static Variable Make(string k, int val)
+        public static Variable Make(string k, double val)
         {
-            return new IntVar(k, val);
+            return new NumVar(k, val);
         }
         public static Variable Make(string k, DateTime val)
         {
@@ -98,8 +103,8 @@ namespace AstralVars.Classes
         }
         public static Variable Make(string k, string val)
         {
-            if (VarParcer.TryParse(val, out int intVal))
-                return new IntVar(k, intVal);
+            if (VarParcer.TryParse(val, out double numVal))
+                return new NumVar(k, numVal);
             else if (VarParcer.TryParse(val, out bool boolVal))
                 return new BoolVar(k, boolVal);
             else if (VarParcer.TryParse(val, out DateTime dtVal))
@@ -193,28 +198,28 @@ namespace AstralVars.Classes
     }
 
     /// <summary>
-    /// Переменная - целое число
+    /// Переменная - действительное число
     /// </summary>
     [Serializable]
-    public class IntVar : Variable
+    public class NumVar : Variable
     {
-        public IntVar() : base(VarTypes.Integer) {}
-        public IntVar(string k, int val = 0) : base(VarTypes.Integer)
+        public NumVar() : base(VarTypes.Number) {}
+        public NumVar(string k, double val = 0) : base(VarTypes.Number)
         {
             Key = k;
             _varValue = val;
         }
-        public IntVar(string k, object val) : base(VarTypes.Integer)
+        public NumVar(string k, object val) : base(VarTypes.Number)
         {
             Key = k;
             if (val != null)
             {
-                if (val is int)
+                if (val is double)
                 {
-                    _varValue = (int)val;
+                    _varValue = (double)val;
                     return;
                 }
-                else if (int.TryParse(val.ToString(), out int newValue))
+                else if (double.TryParse(val.ToString(), out double newValue))
                 {
                     _varValue = newValue;
                     return;
@@ -224,25 +229,25 @@ namespace AstralVars.Classes
         }
 
         [NonSerialized]
-        public static readonly int Default = 0;
+        public static readonly double Default = 0;
 
         [NonSerialized]
-        private int _varValue;
+        private double _varValue;
 
         public override object Value
         {
             get => _varValue;
             set
             {
-                if (value is int)
+                if (value is double)
                 {
-                    _varValue = (int)value;
+                    _varValue = (double)value;
                     
 #if AstralLoaded
                     Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Variable '{Key}' set to [{_varValue}] as {VarType}");
 #endif
                 }
-                else if (int.TryParse(value.ToString(), out int newValue))
+                else if (double.TryParse(value.ToString(), out double newValue))
                 {
                     _varValue = newValue;
 
@@ -263,7 +268,7 @@ namespace AstralVars.Classes
 
         public override Variable Clone()
         {
-            return new IntVar(Key, _varValue);
+            return new NumVar(Key, _varValue);
         }
     }
 

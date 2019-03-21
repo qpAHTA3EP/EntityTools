@@ -15,7 +15,7 @@ namespace AstralVars.Classes
                                       counterPattern = $"^{counterPredicate}{openBraces}(\\w*){closeBraces}$",
                                       counterTrimPattern = $"(^{counterPredicate}{openBraces})|({closeBraces}$)";
 
-        public static readonly VarTypes[] varTypes = {  VarTypes.Integer,
+        public static readonly VarTypes[] varTypes = {  VarTypes.Number,
                                                         VarTypes.Boolean,            
                                                         VarTypes.String,
                                                         //VarTypes.Counter,
@@ -92,9 +92,9 @@ namespace AstralVars.Classes
             bool succeded = false;
             if (!bool.TryParse(inStr, out result))
             {
-                if (int.TryParse(inStr, out int iRes))
+                if (double.TryParse(inStr, out double nRes))
                 {
-                    result = iRes > 0;
+                    result = nRes > 0;
                     succeded = true;
                 }
             }
@@ -145,9 +145,9 @@ namespace AstralVars.Classes
         /// <param name="inStr"></param>
         /// <param name="result">результат преобразования</param>
         /// <returns>Флаг успеха преобразования</returns>
-        public static bool TryParse(string inStr, out int result)
+        public static bool TryParse(string inStr, out double result)
         {
-            if (int.TryParse(inStr, out result))
+            if (double.TryParse(inStr, out result))
                 return true;
             else if (bool.TryParse(inStr, out bool bRes))
             {
@@ -163,13 +163,13 @@ namespace AstralVars.Classes
         /// <param name="inObj"></param>
         /// <param name="result">результат преобразования</param>
         /// <returns>Флаг успеха преобразования</returns>
-        public static bool TryParse(object inObj, out int result)
+        public static bool TryParse(object inObj, out double result)
         {
             if (inObj == null)
                 throw new ArgumentNullException();
-            if (inObj is int)
+            if (inObj is double)
             {
-                result = (int)inObj;
+                result = (double)inObj;
                 return true;
             }
             else return TryParse(inObj.ToString(), out result);
@@ -181,16 +181,16 @@ namespace AstralVars.Classes
         /// <param name="inObj"></param>
         /// <param name="result">результат преобразования</param>
         /// <returns>Флаг успеха преобразования</returns>
-        public static bool TryParseStrict(object inObj, out int result)
+        public static bool TryParseStrict(object inObj, out double result)
         {
             if (inObj == null)
                 throw new ArgumentNullException();
-            if (inObj is int)
+            if (inObj is double)
             {
-                result = (int)inObj;
+                result = (double)inObj;
                 return true;
             }
-            else return int.TryParse(inObj.ToString(), out result);
+            else return double.TryParse(inObj.ToString(), out result);
         }
 
         /// <summary>

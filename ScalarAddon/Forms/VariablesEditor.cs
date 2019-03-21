@@ -123,7 +123,7 @@ namespace AstralVars.Forms
                                 newRow.Cells[varEditor.clmnValue.DisplayIndex] = cbCell;
                             break;
                         }
-                    case VarTypes.Integer:
+                    case VarTypes.Number:
                         {
                             DataGridViewTextBoxCell tbCell = newRow.Cells[varEditor.clmnValue.DisplayIndex] as DataGridViewTextBoxCell;
                             bool newCellFlag = false;
@@ -251,7 +251,7 @@ namespace AstralVars.Forms
                                 case VarTypes.Boolean:
                                     e.Cancel = !VarParcer.TryParse(val, out bool bRes);
                                     break;
-                                case VarTypes.Integer:
+                                case VarTypes.Number:
                                     e.Cancel = !VarParcer.TryParse(val, out int iRres);
                                     break;
                                 case VarTypes.DateTime:
@@ -356,10 +356,10 @@ namespace AstralVars.Forms
                                             curRow.Cells[varEditor.clmnValue.DisplayIndex] = cbCell;
                                         break;
                                     }
-                                case VarTypes.Integer:
+                                case VarTypes.Number:
 
                                     {
-                                        int iRres = IntVar.Default;
+                                        int iRres = NumVar.Default;
                                         if (curRow.Cells[clmnValue.DisplayIndex].Value != null)
                                             VarParcer.TryParse(curRow.Cells[clmnValue.DisplayIndex].Value.ToString(), out iRres);
 

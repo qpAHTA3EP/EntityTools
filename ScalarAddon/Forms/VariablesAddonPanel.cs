@@ -31,7 +31,7 @@ namespace AstralVars.Forms
             VariablesAddon.Variables.Add(Variable.Make("12", "Count[Artifactfood]"));
             VariablesAddon.Variables.Add(Variable.Make("15", "Counter[Gemfood]"));
             VariablesAddon.Variables.Add(Variable.Make(VarTypes.Boolean));
-            VariablesAddon.Variables.Add(Variable.Make(VarTypes.Integer));
+            VariablesAddon.Variables.Add(Variable.Make(VarTypes.Number));
             VariablesAddon.Variables.Add(Variable.Make(VarTypes.DateTime));
 
             //StringBuilder strBldr = new StringBuilder();
