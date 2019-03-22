@@ -1,4 +1,5 @@
-﻿using MyNW.Classes;
+﻿using AstralVars.Expressions;
+using MyNW.Classes;
 using MyNW.Internals;
 using System;
 using System.Collections.Generic;
@@ -51,9 +52,22 @@ namespace AstralVars.Classes
             Key = k;
         }
 
+        /// <summary>
+        /// Имя (ключ) переменной
+        /// </summary>
         public string Key;
+        /// <summary>
+        /// Тип переменной
+        /// </summary>
         public readonly VarTypes VarType;
+        /// <summary>
+        /// Значение переменной
+        /// </summary>
         public abstract object Value { get; set; }
+        /// <summary>
+        /// внутренний тип данных переменной
+        /// </summary>
+        public abstract Type Type { get; }
 
         /// <summary>
         /// Абстрактынй конструктор копий
@@ -157,6 +171,9 @@ namespace AstralVars.Classes
         public static readonly bool Default = false;
 
         [NonSerialized]
+        public static readonly Type RealType = typeof(bool);
+
+        [NonSerialized]
         private bool _varValue;
 
         public override object Value
@@ -190,6 +207,14 @@ namespace AstralVars.Classes
                 }
             }
         }
+
+        public bool ReadValue
+        {
+            get => _varValue;
+            set => _varValue = value;
+        }
+
+        public override Type Type => _varValue.GetType();
 
         public override Variable Clone()
         {
@@ -232,6 +257,9 @@ namespace AstralVars.Classes
         public static readonly double Default = 0;
 
         [NonSerialized]
+        public static readonly Type RealType = typeof(double);
+
+        [NonSerialized]
         private double _varValue;
 
         public override object Value
@@ -266,6 +294,14 @@ namespace AstralVars.Classes
             }
         }
 
+        public double ReadValue
+        {
+            get => _varValue;
+            set => _varValue = value;
+        }
+
+        public override Type Type => _varValue.GetType();
+
         public override Variable Clone()
         {
             return new NumVar(Key, _varValue);
@@ -299,6 +335,9 @@ namespace AstralVars.Classes
         public static readonly string Default = string.Empty;
 
         [NonSerialized]
+        public static readonly Type RealType = typeof(string);
+
+        [NonSerialized]
         private string _varValue;
 
         public override object Value
@@ -313,6 +352,14 @@ namespace AstralVars.Classes
 #endif
             }
         }
+
+        public string ReadValue
+        {
+            get => _varValue;
+            set => _varValue = value;
+        }
+
+        public override Type Type => _varValue.GetType();
 
         public override Variable Clone()
         {
@@ -360,6 +407,9 @@ namespace AstralVars.Classes
         public static readonly DateTime Default = DateTime.Now;
 
         [NonSerialized]
+        public static readonly Type RealType = typeof(DateTime);
+
+        [NonSerialized]
         private DateTime _dtValue;
 
         public override object Value
@@ -390,6 +440,14 @@ namespace AstralVars.Classes
                 }
             }
         }
+
+        public DateTime ReadValue
+        {
+            get => _dtValue;
+            set => _dtValue = value;
+        }
+
+        public override Type Type => _dtValue.GetType();
 
         public override Variable Clone()
         {

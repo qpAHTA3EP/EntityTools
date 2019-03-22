@@ -1,0 +1,29 @@
+﻿using AstralVars.Classes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace AstralVars.Expressions
+{
+    public class NumberExpresstion : Expression<double>
+    {
+        public override bool IsValid => !string.IsNullOrEmpty(expression) && root != null;
+
+        public override bool Calcucate(out object result)
+        {
+            result = null;
+            double res = 0;
+            if (string.IsNullOrEmpty(expression))
+                return false;
+
+            if (root != null && root.Calculate(out res))
+            {
+                result = res;
+                return true;
+            }
+
+            return false;
+        }
+    }
+}

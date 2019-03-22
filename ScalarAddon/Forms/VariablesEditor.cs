@@ -273,6 +273,14 @@ namespace AstralVars.Forms
                         e.Cancel = true;
                     }
 
+                    if(!VarParcer.CheckVarName(e.FormattedValue.ToString()))
+                    {
+                        MessageBox.Show(varEditor, $"Name for variable '{e.FormattedValue}' is not allowed because contains forbiddent parts:\n"
+                                                    + VarParcer.ForbiddenNameParts,
+                                                    "Errors", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        e.Cancel = true;
+                    }
+
                     // Добавить проверку уникальности имени переменной
                     foreach(DataGridViewRow r in dgvVariables.Rows)
                     {
@@ -483,7 +491,9 @@ namespace AstralVars.Forms
             bool valid = false;
             DataGridViewRow row = dgvVariables.Rows[e.RowIndex];
 
-            valid = !(row.IsNewRow && VariablesAddon.Variables.Set(row.Cells[clmnName.DisplayIndex].Value,
+            valid = !(row.IsNewRow
+                      && VarParcer.CheckVarName(row.Cells[clmnName.DisplayIndex].Value)
+                      && VariablesAddon.Variables.Set(row.Cells[clmnName.DisplayIndex].Value,
                                                    row.Cells[clmnType.DisplayIndex].Value,
                                                    row.Cells[clmnValue.DisplayIndex].Value) == null);
             btnSelect.Enabled = valid;

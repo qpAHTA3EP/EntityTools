@@ -30,7 +30,7 @@ namespace VariablesTest2
         {
             StringBuilder strBldr = new StringBuilder();
 
-#region [Тест 1] Проверка работы шаблонов      
+            #region [Тест 1] Проверка работы шаблонов      
 #if TEST1
             string text = "ItemsCount(Aaafd)";
 
@@ -44,9 +44,9 @@ namespace VariablesTest2
             
             MessageBox.Show(strBldr.ToString());
 #endif
-#endregion
+            #endregion
 
-#region [Тест 2] Проверка работы фабрики объектов-переменных
+            #region [Тест 2] Проверка работы фабрики объектов-переменных
 #if TEST2
             VariablesAddon.Variables.Clear();
 
@@ -70,28 +70,30 @@ namespace VariablesTest2
             }
             MessageBox.Show(strBldr.ToString());
 #endif
-#endregion
+            #endregion
 
-#region [Тест 3] Проверка формы редактора переменных
+            #region [Тест 3] Проверка формы редактора переменных
 #if TEST3
-            VariablesAddon.Variables.Clear();
 
-            VariablesAddon.Variables.Add(Variable.Make("Int", 99));
-            VariablesAddon.Variables.Add(Variable.Make("intSt", "101"));
-            VariablesAddon.Variables.Add(Variable.Make("bl", true));
-            VariablesAddon.Variables.Add(Variable.Make("bls", "false"));
-            VariablesAddon.Variables.Add(Variable.Make("dt", DateTime.UtcNow));
-            VariablesAddon.Variables.Add(Variable.Make("dts", "20.01.2019"));
-            VariablesAddon.Variables.Add(Variable.Make("vss", "Super"));
-            VariablesAddon.Variables.Add(Variable.Make("12", "Count[Artifactfood]"));
-            VariablesAddon.Variables.Add(Variable.Make("15", "Counter(Gemfood)"));
-            VariablesAddon.Variables.Add(Variable.Make(VarTypes.Boolean));
-            VariablesAddon.Variables.Add(Variable.Make(VarTypes.Number));
-            VariablesAddon.Variables.Add(Variable.Make(VarTypes.DateTime));
+            if (VariablesAddon.Variables.Count == 0)
+            {
+                VariablesAddon.Variables.Add(Variable.Make("Int", 99));
+                VariablesAddon.Variables.Add(Variable.Make("intSt", "101"));
+                VariablesAddon.Variables.Add(Variable.Make("bl", true));
+                VariablesAddon.Variables.Add(Variable.Make("bls", "false"));
+                VariablesAddon.Variables.Add(Variable.Make("dt", DateTime.UtcNow));
+                VariablesAddon.Variables.Add(Variable.Make("dts", "20.01.2019"));
+                VariablesAddon.Variables.Add(Variable.Make("vss", "Super"));
+                VariablesAddon.Variables.Add(Variable.Make("12", "Count[Artifactfood]"));
+                VariablesAddon.Variables.Add(Variable.Make("15", "Counter(Gemfood)"));
+                VariablesAddon.Variables.Add(Variable.Make(VarTypes.Boolean));
+                VariablesAddon.Variables.Add(Variable.Make(VarTypes.Number));
+                VariablesAddon.Variables.Add(Variable.Make(VarTypes.DateTime));
+            }
 
             Variable var = VariablesEditor.GetVariable(VariablesAddon.Variables);
 #endif
-#endregion            
+            #endregion
         }
     }
 }

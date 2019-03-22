@@ -83,6 +83,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Expressions\Expression.cs" />
+    <Compile Include="Expressions\NumberExpresstion.cs" />
+    <Compile Include="Expressions\NumberOperand.cs" />
+    <Compile Include="Expressions\NumericOperators.cs" />
+    <Compile Include="Expressions\Term.cs" />
     <Compile Include="Classes\Variables.cs" />
     <Compile Include="Classes\VarParcer.cs" />
     <Compile Include="Forms\DataGridViewDateTimeCell.cs" />

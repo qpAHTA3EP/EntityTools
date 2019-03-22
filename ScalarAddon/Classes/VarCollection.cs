@@ -45,7 +45,7 @@ namespace AstralVars.Classes
         /// <param name="val">Новое значение переменной</param>
         /// <returns>Переменная, добавленная в коллекцию.
         /// null, если значение ключа 'key' было пустым или null</returns>
-        public Variable Set(string key, int val)
+        public Variable Set(string key, double val)
         {
             if (string.IsNullOrEmpty(key))
                 return null;

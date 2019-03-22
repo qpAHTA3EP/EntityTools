@@ -9,6 +9,47 @@ namespace AstralVars.Classes
     public class VarParcer
     {
         public static readonly string[] separators = { " ", "{", "(", "[", "]", ")", "}", "+", "-", "*", "/", "Numeric", "NumericCount", "Counter", "Count", "Items", "ItemsCount" };
+        public static readonly char[] forbiddenChar = { ' ', '{', '(', '[', ']', ')', '}', '<', '>',
+                                                               '+', '-', '*', '/', '^', '%',
+                                                               '#', '!', '`', '~', '$', '\\', '?',
+                                                               '_', '.', ',', '\'', ':', '\"', ';' };
+        public static readonly string[] forbiddenLiteral = {"AND", "OR", "NOT",
+                                                             "Numeric", "NumericCount", "Counter", "Count", "Items", "ItemsCount" };
+
+        private static string forbiddenNamePartsStr = "";
+        public static string ForbiddenNameParts
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(forbiddenNamePartsStr))
+                {
+                    StringBuilder strBldr = new StringBuilder();
+
+                    //strBldr.Append("{");
+
+                    //for (int i = 0; i < forbiddenNameParts.Length - 1; i++)
+                    //    strBldr.Append("'").Append(forbiddenNameParts[i]).Append("', ");
+
+
+                    //strBldr.Append("'").Append(forbiddenNameParts[forbiddenNameParts.Length - 1]).Append("'").Append("}");
+
+                    for (int i = 0; i < forbiddenChar.Length; i++)
+                    {
+                        strBldr.Append(forbiddenChar[i]).Append(' ');                        
+                    }
+
+
+                    for (int i = 0; i < forbiddenLiteral.Length; i++)
+                    {
+                        strBldr.Append("'").Append(forbiddenLiteral[i]).Append("'").Append(' ');
+                    }
+
+                    forbiddenNamePartsStr = strBldr.ToString();
+                }
+                return forbiddenNamePartsStr;
+            }
+        }
+
         public static readonly string counterPredicate = @"(ItemsCount|Items|NumericCount|Numeric|Counter|Count)",
                                       openBraces = @"(\[|\{|\()",
                                       closeBraces = @"(\]|\}|\))",
@@ -246,5 +287,32 @@ namespace AstralVars.Classes
         //    return GetItemID(inStr, out result);
         //}
 
+
+        /// <summary>
+        /// Проверка докустимости имени переменной.
+        /// </summary>
+        /// <param name="name">проверяемое имя</param>
+        /// <returns>Результат проверки:
+        /// True: корректное имя
+        /// False: имя некорректно</returns>
+        public static bool CheckVarName(string name)
+        {
+            if(string.IsNullOrEmpty(name))
+                return false;
+
+            if (name.LastIndexOfAny(forbiddenChar) >= 0)
+                return false;
+       
+            if(forbiddenLiteral.Contains(name))
+                return false;
+            
+            return true;
+        }
+        public static bool CheckVarName(object name)
+        {
+            if (name == null)
+                return false;
+            return CheckVarName(name.ToString());
+        }
     }
 }
