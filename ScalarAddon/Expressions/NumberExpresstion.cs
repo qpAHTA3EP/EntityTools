@@ -25,5 +25,19 @@ namespace AstralVars.Expressions
 
             return false;
         }
+
+        public override ParseStatus Parse()
+        {
+            ParseStatus status = new ParseStatus();
+            if(string.IsNullOrEmpty(expression))
+            {
+                status.Sucseeded = false;
+                status.Message = "Expression string is empty";
+                return status;
+            }
+
+
+            return status;
+        }
     }
 }
