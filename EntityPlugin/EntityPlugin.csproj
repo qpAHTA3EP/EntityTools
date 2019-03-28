@@ -54,6 +54,7 @@
     </Reference>
     <Reference Include="MyNW-cleaned">
       <HintPath>D:\Games\Astral_RU_1\MyNW-cleaned.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

@@ -28,24 +28,26 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnTest = new System.Windows.Forms.Button();
+            this.btnEntities = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // btnTest
+            // btnEntities
             // 
-            this.btnTest.Location = new System.Drawing.Point(3, 390);
-            this.btnTest.Name = "btnTest";
-            this.btnTest.Size = new System.Drawing.Size(364, 23);
-            this.btnTest.TabIndex = 0;
-            this.btnTest.Text = "Test";
-            this.btnTest.UseVisualStyleBackColor = true;
-            this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
+            this.btnEntities.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnEntities.Location = new System.Drawing.Point(3, 390);
+            this.btnEntities.Name = "btnEntities";
+            this.btnEntities.Size = new System.Drawing.Size(364, 23);
+            this.btnEntities.TabIndex = 0;
+            this.btnEntities.Text = "GetEntities";
+            this.btnEntities.UseVisualStyleBackColor = true;
+            this.btnEntities.Click += new System.EventHandler(this.btnEntities_Click);
             // 
             // MainPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.btnTest);
+            this.Controls.Add(this.btnEntities);
             this.Name = "MainPanel";
             this.ResumeLayout(false);
 
@@ -53,6 +55,6 @@
 
         #endregion
 
-        private System.Windows.Forms.Button btnTest;
+        private System.Windows.Forms.Button btnEntities;
     }
 }

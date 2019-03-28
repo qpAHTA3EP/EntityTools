@@ -97,7 +97,7 @@ namespace EntityPlugin.Actions
             "'Generic' - Interact with an entity using generic interaction method\n" +
             "'SimulateFKey' - Force 'F' key press to interact an Entity\n" +
             "'FollowAndInteractNPC' - Follows an entity and interacts with it again and again as long as the interaction is possible\n" +
-            "'FollowAndInteractNPC' - Follows an entity and interacts with it by simulation 'F' key press again and again as long as the interaction is possible")]
+            "'FollowAndSimulateFKey' - Follows an entity and interacts with it by simulation 'F' key press again and again as long as the interaction is possible")]
         public InteractionMethod InteractionMethod { get; set; }
 
         [Description("Time to interact (ms)")]

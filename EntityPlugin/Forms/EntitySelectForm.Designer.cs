@@ -1,6 +1,6 @@
 ﻿namespace EntityPlugin.Forms
 {
-    partial class UIEntitySelectForm
+    partial class EntitySelectForm
     {
         /// <summary>
         /// Required designer variable.
@@ -35,13 +35,14 @@
             this.clmnName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.clmnInternalName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.clmnNameUntranslated = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.clmnDistance = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEntities)).BeginInit();
             this.SuspendLayout();
             // 
             // btnSelect
             // 
             this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelect.Location = new System.Drawing.Point(292, 449);
+            this.btnSelect.Location = new System.Drawing.Point(562, 427);
             this.btnSelect.Name = "btnSelect";
             this.btnSelect.Size = new System.Drawing.Size(102, 23);
             this.btnSelect.TabIndex = 0;
@@ -53,7 +54,7 @@
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(400, 449);
+            this.btnCancel.Location = new System.Drawing.Point(670, 427);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(102, 23);
             this.btnCancel.TabIndex = 0;
@@ -64,7 +65,6 @@
             // 
             this.dgvEntities.AllowUserToAddRows = false;
             this.dgvEntities.AllowUserToDeleteRows = false;
-            this.dgvEntities.AllowUserToOrderColumns = true;
             this.dgvEntities.AllowUserToResizeRows = false;
             dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.dgvEntities.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
@@ -78,7 +78,8 @@
             this.dgvEntities.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.clmnName,
             this.clmnInternalName,
-            this.clmnNameUntranslated});
+            this.clmnNameUntranslated,
+            this.clmnDistance});
             this.dgvEntities.Location = new System.Drawing.Point(13, 13);
             this.dgvEntities.MultiSelect = false;
             this.dgvEntities.Name = "dgvEntities";
@@ -89,25 +90,25 @@
             this.dgvEntities.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvEntities.ShowEditingIcon = false;
             this.dgvEntities.ShowRowErrors = false;
-            this.dgvEntities.Size = new System.Drawing.Size(489, 421);
+            this.dgvEntities.Size = new System.Drawing.Size(759, 399);
             this.dgvEntities.TabIndex = 1;
             // 
             // clmnName
             // 
-            this.clmnName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.clmnName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
             this.clmnName.Frozen = true;
             this.clmnName.HeaderText = "Name";
             this.clmnName.Name = "clmnName";
             this.clmnName.ReadOnly = true;
-            this.clmnName.Width = 60;
+            this.clmnName.Width = 200;
             // 
             // clmnInternalName
             // 
-            this.clmnInternalName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.clmnInternalName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
             this.clmnInternalName.HeaderText = "InternalName";
             this.clmnInternalName.Name = "clmnInternalName";
             this.clmnInternalName.ReadOnly = true;
-            this.clmnInternalName.Width = 95;
+            this.clmnInternalName.Width = 200;
             // 
             // clmnNameUntranslated
             // 
@@ -116,19 +117,28 @@
             this.clmnNameUntranslated.Name = "clmnNameUntranslated";
             this.clmnNameUntranslated.ReadOnly = true;
             // 
-            // UIEntitySelectForm
+            // clmnDistance
+            // 
+            this.clmnDistance.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.clmnDistance.HeaderText = "Distance";
+            this.clmnDistance.Name = "clmnDistance";
+            this.clmnDistance.ReadOnly = true;
+            this.clmnDistance.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.clmnDistance.Width = 74;
+            // 
+            // EntitySelectForm
             // 
             this.AcceptButton = this.btnSelect;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(514, 484);
+            this.ClientSize = new System.Drawing.Size(784, 462);
             this.ControlBox = false;
             this.Controls.Add(this.dgvEntities);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnSelect);
-            this.MinimumSize = new System.Drawing.Size(400, 500);
-            this.Name = "UIEntitySelectForm";
+            this.MinimumSize = new System.Drawing.Size(500, 300);
+            this.Name = "EntitySelectForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "EntitySelectForm";
             ((System.ComponentModel.ISupportInitialize)(this.dgvEntities)).EndInit();
@@ -144,5 +154,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn clmnName;
         private System.Windows.Forms.DataGridViewTextBoxColumn clmnInternalName;
         private System.Windows.Forms.DataGridViewTextBoxColumn clmnNameUntranslated;
+        private System.Windows.Forms.DataGridViewTextBoxColumn clmnDistance;
     }
 }

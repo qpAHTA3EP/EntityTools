@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define Test_EntitySelectForm
+
+using System;
 using System.Text;
 using System.Windows.Forms;
 using Astral.Quester.Classes;
@@ -10,6 +12,8 @@ namespace EntityPlugin.Forms
 {
     public partial class MainPanel : Astral.Forms.BasePanel
     {
+        private EntitySelectForm.EntityDif entDif = new EntitySelectForm.EntityDif();
+
         public MainPanel() : base("EntityPlugin")
         {
             InitializeComponent();
@@ -52,8 +56,10 @@ namespace EntityPlugin.Forms
         //    e.ToolTip = tip;
         //}
 
-        private void btnTest_Click(object sender, EventArgs e)
+        private void btnEntities_Click(object sender, EventArgs e)
         {
+#region Test_MultiSelectCustomRegion
+#if Test_MultiSelectCustomRegion
             //Entity entity = new Entity(IntPtr.Zero);
 
             Astral.Quester.UIEditors.Forms.SelectList listEditor = new Astral.Quester.UIEditors.Forms.SelectList();
@@ -94,6 +100,20 @@ namespace EntityPlugin.Forms
 
                 MessageBox.Show(strBldr.ToString());
             }
+#endif
+#endregion
+
+#region Test_EntitySelectForm
+#if Test_EntitySelectForm
+            entDif = EntitySelectForm.GetEntity(entDif.NameUntranslated);
+
+            MessageBox.Show($"Selected Entity:\n" +
+                $"Name: {entDif.Name}\n" +
+                $"InternalName: {entDif.InternalName}\n" +
+                $"NameUntranslated: {entDif.NameUntranslated}");
+
+#endif
+#endregion
         }
     }
 }

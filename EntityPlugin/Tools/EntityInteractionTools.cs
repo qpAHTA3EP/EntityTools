@@ -409,10 +409,10 @@ namespace EntityPlugin.Tools
                             }
                         }
                     }
-                    if (!target.IsValid || (target.Location.Distance3DFromPlayer <= distance && !target.CanInteract))
-                    {
-                        return false;
-                    }
+                    //if (!target.IsValid || (target.Location.Distance3DFromPlayer <= distance/* && !target.CanInteract*/))
+                    //{
+                    //    return true;
+                    //}
                 }
             }
             return false;

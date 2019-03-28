@@ -6,11 +6,20 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace EntityPlugin.Conditions
 {
     public class CheckShard : Astral.Quester.Classes.Condition
     {
+        public CheckShard()
+        {
+            if (Game.CharacterSelectionData.CharacterChoices.IsValid && Game.CharacterSelectionData.CharacterChoices.LastPlayedCharacter.IsValid)
+            {
+                Name = Game.CharacterSelectionData.CharacterChoices.LastPlayedCharacter.ShardName;
+            }
+        }
+
         [Description("A name of the Shard")]
         [Editor(typeof(CurrentShardEditor), typeof(UITypeEditor))]
         public string Name { get; set; }

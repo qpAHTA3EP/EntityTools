@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using EntityPlugin.Forms;
 using MyNW.Classes;
+using static EntityPlugin.Forms.EntitySelectForm;
 
 namespace EntityPlugin.Editors
 {
@@ -10,11 +11,16 @@ namespace EntityPlugin.Editors
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            Entity selectedEntity = UIEntitySelectForm.GetEntity();
+            string oldVal = string.Empty;
 
-            if (selectedEntity != null && selectedEntity.IsValid)
+            if (value != null)
+                oldVal = value.ToString();
+
+            EntityDif selectedEntityDif = EntitySelectForm.GetEntity(oldVal);
+
+            if (selectedEntityDif != null)
             {
-                return selectedEntity.NameUntranslated;
+                return selectedEntityDif.NameUntranslated;
             }
             return value;
         }
