@@ -18,7 +18,7 @@ namespace EntityPlugin.Actions
             EntityID = string.Empty;
             Distance = 30;
             IgnoreCombat = true;
-            StopOnApproached = true;
+            StopOnApproached = false;
         }
 
         public override string ActionLabel => $"{GetType().Name} [{EntityID}]";
@@ -46,9 +46,9 @@ namespace EntityPlugin.Actions
         {
             get
             {
-                if (target.IsValid && target.Location.IsValid && target.Location.Distance3DFromPlayer > Distance)
+                if (target.IsValid/* && target.Location.IsValid && target.Location.Distance3DFromPlayer > Distance*/)
                 {
-                    return target.Location/*.Clone()*/;
+                    return target.Location.Clone();
                 }
                 return new Vector3();
             }

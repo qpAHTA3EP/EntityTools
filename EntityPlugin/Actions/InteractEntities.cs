@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define ShowDebugMsg
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
@@ -41,7 +43,6 @@ namespace EntityPlugin.Actions
     {
         Auto,
         NPC,
-        //Node,
         Generic,
         SimulateFKey,
         FollowAndInteractNPC,
@@ -55,9 +56,8 @@ namespace EntityPlugin.Actions
             EntityID = string.Empty;
             Distance = 30;
             IgnoreCombat = true;
-            StopOnApproached = true;
+            StopOnApproached = false;
             InteractionRequirement = InteractionRequirement.IfPossible;
-            //OneInteractionByEntity = false;
             InteractTime = 2000;
             Dialogs = new List<string>();
             ignoredEntity = new TempBlackList<IntPtr>();
@@ -73,10 +73,7 @@ namespace EntityPlugin.Actions
         [Description("Enable IgnoreCombat profile value while playing action")]
         public bool IgnoreCombat { get; set; }
 
-        //[Description("Interact each Entity only once time")]
-        //public bool OneInteractionByEntity { get; set; }
-
-        /// Список игнорируемых Entity, используемый, если InteractionRequirement=Once
+        /// Внутренний список игнорируемых Entity, используемый, если InteractionRequirement=Once
         [NonSerialized]
         private TempBlackList<IntPtr> ignoredEntity;
 
@@ -93,7 +90,6 @@ namespace EntityPlugin.Actions
         [Description("Select the interaction method\n" +
             "'Auto' - Consistent use of all other interaction methods\n" +
             "'NPC' - Interact with an Entity as an NPC\n" +
-        //    "'Node' - Interact with an Entity as an Node\n" +
             "'Generic' - Interact with an entity using generic interaction method\n" +
             "'SimulateFKey' - Force 'F' key press to interact an Entity\n" +
             "'FollowAndInteractNPC' - Follows an entity and interacts with it again and again as long as the interaction is possible\n" +
@@ -106,7 +102,6 @@ namespace EntityPlugin.Actions
         [Description("Answers in dialog while interact with Entity")]
         [Editor(typeof(DialogEditor), typeof(UITypeEditor))]
         public List<string> Dialogs { get; set; }
-
 
         public override string ActionLabel => $"{GetType().Name} [{EntityID}]";
 
@@ -141,9 +136,9 @@ namespace EntityPlugin.Actions
         {
             get
             {
-                if (target.IsValid && target.Location.IsValid && target.Location.Distance3DFromPlayer > Distance)
+                if (target.IsValid/* && target.Location.IsValid && target.Location.Distance3DFromPlayer > Distance*/)
                 {
-                    return target.Location/*.Clone()*/;
+                    return target.Location.Clone();
                 }
                 return new Vector3();
             }
@@ -176,15 +171,38 @@ namespace EntityPlugin.Actions
                     target = new Entity(IntPtr.Zero);
                 else
                 {
-                    switch (InteractionRequirement)
+                    if (!target.IsValid)
                     {
-                        case InteractionRequirement.Obligatory:
-                            target = SelectionTools.FindClosestInteractableEntity(EntityManager.GetEntities(), EntityID, ignoredEntity);
-                            break;
-                        default:
-                            target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, ignoredEntity);
-                            break;
+#if ShowDebugMsg
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(NeedToRun)}]: Target is not valid.");
+#endif
+                        switch (InteractionRequirement)
+                        {
+                            case InteractionRequirement.Obligatory:
+                                {
+
+                                    target = SelectionTools.FindClosestInteractableEntity(EntityManager.GetEntities(), EntityID, ignoredEntity);
+#if ShowDebugMsg
+                                    Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(NeedToRun)}]: Target [{target.Pointer}] was selected by '{nameof(SelectionTools.FindClosestInteractableEntity)}'");
+#endif
+                                    break;
+                                }
+                            default:
+                                {
+                                    target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, ignoredEntity);
+#if ShowDebugMsg
+                                    Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(NeedToRun)}]: Target [{target.Pointer}] was selected by '{nameof(SelectionTools.FindClosestEntity)}'");
+#endif
+                                    break;
+                                }
+                        }
                     }
+#if ShowDebugMsg
+                    else
+                    {
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(NeedToRun)}]: Target [{target.Pointer}] is valid");
+                    }
+#endif
                 }
                 //в команде ChangeProfielValue:IgnoreCombat используется код:
                 //Combat.SetIgnoreCombat(IgnoreCombat, -1, 0);
@@ -192,9 +210,18 @@ namespace EntityPlugin.Actions
                 //Нашел доступный способ управлять запретом боя
                 //Astral.Quester.API.IgnoreCombat = IgnoreCombat;
 
+#if ShowDebugMsg
+                Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(Run)}]: '{nameof(Astral.Quester.API.IgnoreCombat)}' set to {IgnoreCombat}");
+#endif
                 Astral.Quester.API.IgnoreCombat = IgnoreCombat;
 
+#if ShowDebugMsg
+                bool result = (target.IsValid && target.Location.Distance3DFromPlayer <= Distance);
+                Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(Run)}]: '{nameof(NeedToRun)}' returns {result}");
+                return result;
+#else
                 return (target.IsValid && target.Location.Distance3DFromPlayer <= Distance);                
+#endif
             }
         }
 
@@ -210,25 +237,35 @@ namespace EntityPlugin.Actions
 
             ActionResult actnReslt = ActionResult.Running;
 
-            if (target.Location.Distance3DFromPlayer < Distance)
+            if (target.Location.Distance3DFromPlayer <= Distance)
             {
+#if ShowDebugMsg
+                Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(Run)}]: '{nameof(Astral.Quester.API.IgnoreCombat)}' set to 'false'");
+#endif
                 Astral.Quester.API.IgnoreCombat = false;
 
-                if(InteractionRequirement != InteractionRequirement.Forbidden)
+                if (InteractionRequirement != InteractionRequirement.Forbidden)
                 {
                     actnReslt = InternalInteraction();
 
-                    if (StopOnApproached)
+                    if (StopOnApproached && !combat)
+                    {
                         actnReslt = ActionResult.Completed;
+                    }
                 }
                 else
                 {
-                    if (StopOnApproached)
+                    if (StopOnApproached && !combat)
                         actnReslt = ActionResult.Completed;
                 }
             }
             else
+            {
+#if ShowDebugMsg
+                Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(Run)}]: '{nameof(Astral.Quester.API.IgnoreCombat)}' set to '{IgnoreCombat}'");
+#endif
                 Astral.Quester.API.IgnoreCombat = IgnoreCombat;
+            }
 
             return actnReslt;
         }
@@ -238,62 +275,246 @@ namespace EntityPlugin.Actions
             switch (InteractionMethod)
             {
                 case InteractionMethod.NPC:
-                    if(InteractionRequirement == InteractionRequirement.Once && !InteractionTools.InteractNPC(target, InteractTime, Dialogs))
                     {
-                        ignoredEntity.Add(target.Pointer);
-                        target = new Entity(IntPtr.Zero);
-                        if (StopOnApproached)
-                            return ActionResult.Completed;
+#if ShowDebugMsg
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: call '{nameof(InteractionTools.InteractNPC)}'");
+
+                        bool result = InteractionTools.InteractNPC(target, InteractTime, Dialogs);
+
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Result of '{nameof(InteractionTools.InteractNPC)}' is {result}");
+
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Is in combat: {combat}");
+
+                        if (InteractionRequirement == InteractionRequirement.Once && !result && !combat)
+                        {
+                            Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Push entity '{target.Pointer}' to '{nameof(ignoredEntity)}'");
+
+                            ignoredEntity.Add(target.Pointer);
+
+                            Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Reset '{nameof(target)}'");
+
+                            target = new Entity(IntPtr.Zero);
+                            if (StopOnApproached && !combat)
+                            {
+                                Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Return {ActionResult.Completed}");
+                                return ActionResult.Completed;
+                            }
+                        }
+#else
+                        if (InteractionRequirement == InteractionRequirement.Once 
+                            && !combat
+                            && !InteractionTools.InteractNPC(target, InteractTime, Dialogs))
+                        {
+                            ignoredEntity.Add(target.Pointer);
+                            target = new Entity(IntPtr.Zero);
+                            if (StopOnApproached && !combat)
+                                return ActionResult.Completed;
+                        }
+#endif
+                        break;
                     }
-                    break;
                 case InteractionMethod.Generic:
-                    if (InteractionRequirement == InteractionRequirement.Once && !InteractionTools.InteractGeneric(target, InteractTime, Dialogs))
                     {
-                        ignoredEntity.Add(target.Pointer);
-                        target = new Entity(IntPtr.Zero);
-                        if (StopOnApproached)
-                            return ActionResult.Completed;
+#if ShowDebugMsg
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: call '{nameof(InteractionTools.InteractGeneric)}'");
+
+                        bool result = InteractionTools.InteractGeneric(target, InteractTime, Dialogs);
+
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Result of '{nameof(InteractionTools.InteractGeneric)}' is {result}");
+
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Is in combat: {combat}");
+
+                        if (InteractionRequirement == InteractionRequirement.Once && !result && !combat)
+                        {
+                            Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Push entity '{target.Pointer}' to '{nameof(ignoredEntity)}'");
+                            ignoredEntity.Add(target.Pointer);
+
+                            Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Reset '{nameof(target)}'");
+                            target = new Entity(IntPtr.Zero);
+
+                            if (StopOnApproached && !combat)
+                            {
+                                Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Return {ActionResult.Completed}");
+                                return ActionResult.Completed;
+                            }
+                        }
+#else
+                        if (InteractionRequirement == InteractionRequirement.Once 
+                            && !combat
+                            && !InteractionTools.InteractGeneric(target, InteractTime, Dialogs))
+                        {
+                            ignoredEntity.Add(target.Pointer);
+                            target = new Entity(IntPtr.Zero);
+                            if (StopOnApproached && !combat)
+                                return ActionResult.Completed;
+                        }
+#endif
+                        break;
                     }
-                    break;
                 case InteractionMethod.SimulateFKey:
-                    if (InteractionRequirement == InteractionRequirement.Once && !InteractionTools.SimulateFKey(target, InteractTime, Dialogs))
                     {
-                        ignoredEntity.Add(target.Pointer);
-                        target = new Entity(IntPtr.Zero);
-                        if (StopOnApproached)
-                            return ActionResult.Completed;
+#if ShowDebugMsg
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: call '{nameof(InteractionTools.SimulateFKey)}'");
+
+                        bool result = InteractionTools.SimulateFKey(target, InteractTime, Dialogs);
+
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Result of '{nameof(InteractionTools.SimulateFKey)}' is {result}");
+
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Is in combat: {combat}");
+
+                        if (InteractionRequirement == InteractionRequirement.Once && !result && !combat)
+                        {
+                            Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Push entity '{target.Pointer}' to '{nameof(ignoredEntity)}'");
+                            ignoredEntity.Add(target.Pointer);
+
+                            Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Reset '{nameof(target)}'");
+                            target = new Entity(IntPtr.Zero);
+
+                            if (StopOnApproached && !combat)
+                            {
+                                Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Return {ActionResult.Completed}");
+                                return ActionResult.Completed;
+                            }
+                        }
+#else
+                        if (InteractionRequirement == InteractionRequirement.Once
+                            && !combat
+                            && !InteractionTools.SimulateFKey(target, InteractTime, Dialogs))
+                        {
+                            ignoredEntity.Add(target.Pointer);
+                            target = new Entity(IntPtr.Zero);
+                            if (StopOnApproached && !combat)
+                                return ActionResult.Completed;
+                        }
+#endif
+                        break;
                     }
-                    break;
                 case InteractionMethod.FollowAndInteractNPC:
-                    if (InteractionRequirement == InteractionRequirement.Once && !InteractionTools.FollowAndInteractNPC(target, InteractTime, Distance, Dialogs))
-                    {
-                        ignoredEntity.Add(target.Pointer);
-                        target = new Entity(IntPtr.Zero);
-                        if (StopOnApproached)
-                            return ActionResult.Completed;
+                    { 
+#if ShowDebugMsg
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: call '{nameof(InteractionTools.FollowAndInteractNPC)}'");
+
+                        bool result = InteractionTools.FollowAndInteractNPC(target, InteractTime, Distance, Dialogs, new Func<Approach.BreakInfos>(CheckCombat));
+
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Result of '{nameof(InteractionTools.FollowAndInteractNPC)}' is {result}");
+
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Is in combat: {combat}");
+
+                        if (InteractionRequirement == InteractionRequirement.Once && !result && !combat)
+                        {
+                            Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Push entity '{target.Pointer}' to '{nameof(ignoredEntity)}'");
+                            ignoredEntity.Add(target.Pointer);
+
+                            Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Reset '{nameof(target)}'");
+                            target = new Entity(IntPtr.Zero);
+
+                            if (StopOnApproached && !combat)
+                            {
+                                Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Return {ActionResult.Completed}");
+                                return ActionResult.Completed;
+                            }
+                        }
+#else
+                        if (InteractionRequirement == InteractionRequirement.Once
+                            && !combat
+                            && !InteractionTools.FollowAndInteractNPC(target, InteractTime, Distance, Dialogs, new Func<Approach.BreakInfos>(CheckCombat)))
+                        {
+                            ignoredEntity.Add(target.Pointer);
+                            target = new Entity(IntPtr.Zero);
+                            if (StopOnApproached && !combat)
+                                return ActionResult.Completed;
+                        }
+#endif
+                        break;
                     }
-                    break;
                 case InteractionMethod.FollowAndSimulateFKey:
-                    if (InteractionRequirement == InteractionRequirement.Once && !InteractionTools.FollowAndSimulateFKey(target, InteractTime, Distance, Dialogs))
                     {
-                        ignoredEntity.Add(target.Pointer);
-                        target = new Entity(IntPtr.Zero);
-                        if (StopOnApproached)
-                            return ActionResult.Completed;
+#if ShowDebugMsg
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: call '{nameof(InteractionTools.FollowAndSimulateFKey)}'");
+
+                        bool result = InteractionTools.FollowAndSimulateFKey(target, InteractTime, Distance, Dialogs, new Func<Approach.BreakInfos>(CheckCombat));
+
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Result of '{nameof(InteractionTools.FollowAndSimulateFKey)}' is {result}");
+
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Is in combat: {combat}");
+
+                        if (InteractionRequirement == InteractionRequirement.Once && !result && !combat)
+                        {
+                            Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Push entity '{target.Pointer}' to '{nameof(ignoredEntity)}'");
+                            ignoredEntity.Add(target.Pointer);
+
+                            Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Reset '{nameof(target)}'");
+                            target = new Entity(IntPtr.Zero);
+
+                            if (StopOnApproached && !combat)
+                            {
+                                Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Return {ActionResult.Completed}");
+                                return ActionResult.Completed;
+                            }
+                        }
+#else
+                        if (InteractionRequirement == InteractionRequirement.Once 
+                            && !combat
+                            && !InteractionTools.FollowAndSimulateFKey(target, InteractTime, Distance, Dialogs, new Func<Approach.BreakInfos>(CheckCombat)))
+                        {
+                            ignoredEntity.Add(target.Pointer);
+                            target = new Entity(IntPtr.Zero);
+                            if (StopOnApproached && !combat)
+                                return ActionResult.Completed;
+                        }
+#endif
+                        break;
                     }
-                    break;
                 default:
-                    if (InteractionRequirement == InteractionRequirement.Once 
-                        && !(InteractionTools.InteractNPC(target, InteractTime, Dialogs) ||
-                        InteractionTools.InteractGeneric(target, InteractTime, Dialogs) ||
-                        InteractionTools.SimulateFKey(target, InteractTime, Dialogs)))
                     {
-                        ignoredEntity.Add(target.Pointer);
-                        target = new Entity(IntPtr.Zero);
-                        if (StopOnApproached)
-                            return ActionResult.Completed;
+#if ShowDebugMsg
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: call '{nameof(InteractionTools.InteractNPC)}'");
+                        bool result = false,
+                            partResult = InteractionTools.InteractNPC(target, InteractTime, Dialogs);
+                        result |= partResult;
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Result of '{nameof(InteractionTools.InteractNPC)}' is {partResult}");
+
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: call '{nameof(InteractionTools.InteractGeneric)}'");
+                        partResult = InteractionTools.InteractGeneric(target, InteractTime, Dialogs);
+                        result |= partResult;
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Result of '{nameof(InteractionTools.InteractGeneric)}' is {partResult}");
+
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: call '{nameof(InteractionTools.SimulateFKey)}'");
+                        partResult = InteractionTools.SimulateFKey(target, InteractTime, Dialogs);
+                        result |= partResult;
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Result of '{nameof(InteractionTools.SimulateFKey)}' is {partResult}");
+
+                        Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Is in combat: {combat}");
+
+                        if (InteractionRequirement == InteractionRequirement.Once && !result && !combat)
+                        {
+                            Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Push entity '{target.Pointer}' to '{nameof(ignoredEntity)}'");
+                            ignoredEntity.Add(target.Pointer);
+
+                            Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Reset '{nameof(target)}'");
+                            target = new Entity(IntPtr.Zero);
+
+                            if (StopOnApproached && !combat)
+                            {
+                                Astral.Logger.WriteLine($"[{GetType().Name}.{nameof(InternalInteraction)}]: Return {ActionResult.Completed}");
+                                return ActionResult.Completed;
+                            }
+                        }
+#else
+                        if (InteractionRequirement == InteractionRequirement.Once 
+                            && !combat
+                            && !(InteractionTools.InteractNPC(target, InteractTime, Dialogs) ||
+                            InteractionTools.InteractGeneric(target, InteractTime, Dialogs) ||
+                            InteractionTools.SimulateFKey(target, InteractTime, Dialogs)))
+                        {
+                            ignoredEntity.Add(target.Pointer);
+                            target = new Entity(IntPtr.Zero);
+                            if (StopOnApproached && !combat)
+                                return ActionResult.Completed;
+                        }
+#endif
+                        break;
                     }
-                    break;
             }
             return ActionResult.Running;
         }
@@ -302,6 +523,19 @@ namespace EntityPlugin.Actions
         {
             throw new NotImplementedException();
         }
+
+        private Approach.BreakInfos CheckCombat()
+        {
+            if (Attackers.List.Count > 0)
+            {
+                this.combat = true;
+                return Approach.BreakInfos.ApproachFail;
+            }
+            return Approach.BreakInfos.Continue;
+        }
+
+        [NonSerialized]
+        private bool combat;
 
         [NonSerialized]
         protected Entity target = new Entity(IntPtr.Zero);
