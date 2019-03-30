@@ -83,7 +83,7 @@ namespace EntityPlugin.Tools
             while (target != null && target.IsValid/* && !interactTimeout.IsTimedOut*//* && target.InteractOption.IsValid*/)
             {
 #if ShowDebugMsg
-                Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Call {nameof(Approach.EntityByDistance)}");
+                Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Call '{nameof(Approach.EntityByDistance)}'");
 #endif
                 if (Approach.EntityByDistance(target, distance, breakFunc))
                 {
@@ -91,18 +91,18 @@ namespace EntityPlugin.Tools
                     target.Location.Face();
                     target.Location.FaceYaw();
 #if ShowDebugMsg
-                    Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Call {nameof(MyNW.Internals.Movements.StopNavTo)}");
+                    Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Call '{nameof(MyNW.Internals.Movements.StopNavTo)}'");
 #endif
 
                     MyNW.Internals.Movements.StopNavTo();
                     //Thread.Sleep(500);
 #if ShowDebugMsg
-                    Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Call {nameof(target.Interact)}");
+                    Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Call '{nameof(target.Interact)}'");
 #endif
                     target.Interact();
                     Thread.Sleep(1000);//Thread.Sleep(interactTime);
 #if ShowDebugMsg
-                    Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Call {nameof(Interact.WaitForInteraction)}");
+                    Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Call '{nameof(Interact.WaitForInteraction)}'");
 #endif
                     Interact.WaitForInteraction();
                     if (dialogs != null && dialogs.Count > 0)
