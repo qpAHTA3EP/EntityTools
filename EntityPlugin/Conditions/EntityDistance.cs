@@ -34,7 +34,7 @@ namespace EntityPlugin.Conditions
             {
                 if (!string.IsNullOrEmpty(EntityID))
                 {
-                    Entity closestEntity = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+                    Entity closestEntity = SelectionTools.FindClosestEntityRegex(EntityManager.GetEntities(), EntityID);
 
                     //if(entities.Count > 0)
                     //    closestEntity = entities.FindLast((Entity x) => (Regex.IsMatch(x.NameUntranslated, Name) && (x.CombatDistance < Distance))); 
@@ -92,7 +92,7 @@ namespace EntityPlugin.Conditions
         {
             get
             {
-                Entity closestEntity = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+                Entity closestEntity = SelectionTools.FindClosestEntityRegex(EntityManager.GetEntities(), EntityID);
 
                 if (closestEntity.IsValid)
                 {

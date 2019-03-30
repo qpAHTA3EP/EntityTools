@@ -32,7 +32,7 @@ namespace EntityPlugin.Actions
             if (string.IsNullOrEmpty(EntityID))
                 target = new Entity(IntPtr.Zero);
             else
-                target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+                target = SelectionTools.FindClosestEntityRegex(EntityManager.GetEntities(), EntityID);
         }
 
         protected override bool IntenalConditions => !string.IsNullOrEmpty(EntityID);
@@ -93,7 +93,7 @@ namespace EntityPlugin.Actions
                 if (string.IsNullOrEmpty(EntityID))
                     target = new Entity(IntPtr.Zero);
                 else
-                    target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+                    target = SelectionTools.FindClosestEntityRegex(EntityManager.GetEntities(), EntityID);
 
                 //в команде ChangeProfielValue:IgnoreCombat используется код:
                 //Combat.SetIgnoreCombat(IgnoreCombat, -1, 0);
@@ -101,14 +101,22 @@ namespace EntityPlugin.Actions
                 //Нашел доступный способ управлять запретом боя
                 //Astral.Quester.API.IgnoreCombat = IgnoreCombat;
 
-                Astral.Quester.API.IgnoreCombat = IgnoreCombat;
-                return (target.IsValid) && (target.Location.Distance3DFromPlayer <= Distance);
+                if (target.IsValid)
+                {
+                    if (target.Location.Distance3DFromPlayer > Distance)
+                    {
+                        Astral.Quester.API.IgnoreCombat = IgnoreCombat;
+                        return false;
+                    }
+                    else return true;
+                }
+                return false;
             }
         }
 
         public override ActionResult Run()
         {
-            //target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID);
+            //target = SelectionTools.FindClosestEntityRegex(EntityManager.GetEntities(), EntityID);
 
             if (!target.IsValid)
             {

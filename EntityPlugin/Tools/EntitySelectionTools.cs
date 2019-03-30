@@ -1,4 +1,5 @@
 ﻿using Astral.Classes;
+using Astral.Classes.ItemFilter;
 using Astral.Logic.NW;
 using Astral.Quester.Classes;
 using MyNW.Classes;
@@ -21,7 +22,7 @@ namespace EntityPlugin.Tools
         /// <param name="entities">Коллекция объектов Entity</param>
         /// <param name="entPattern">Строка-шаблон, которому должно соответствовать NameUntranslated у искомого Entity</param>
         /// <returns></returns>
-        public static Entity FindClosestEntity(List<Entity> entities, string entPattern, TempBlackList<IntPtr> bkList = null)
+        public static Entity FindClosestEntityRegex(List<Entity> entities, string entPattern, TempBlackList<IntPtr> bkList = null)
         {
             Entity closestEntity = new Entity(IntPtr.Zero);
             if (!string.IsNullOrEmpty(entPattern))
@@ -46,7 +47,64 @@ namespace EntityPlugin.Tools
             }
             return closestEntity;
         }
+        public static Entity FindClosestEntity(List<Entity> entities, string entPattern, ItemFilterStringType type, TempBlackList<IntPtr> bkList = null)
+        {
+            Entity closestEntity = new Entity(IntPtr.Zero);
+            if (!string.IsNullOrEmpty(entPattern))
+            {
+                if (bkList == null)
+                {
+                    bkList = new TempBlackList<IntPtr>();
+                }
 
+                switch (type)
+                {
+                    case ItemFilterStringType.Simple:
+                        {
+                            if (entPattern[0]!='*')
+                            {
+                                // Поиск шаблона в началае 
+                                entPattern = entPattern.Trim('*');
+                                foreach (Entity entity in entities)
+                                {
+                                    if (entity.NameUntranslated.StartsWith(entPattern)
+                                        && !bkList.Contains(entity.Pointer))
+                                    {
+                                        if (closestEntity.IsValid)
+                                        {
+                                            if (entity.Location.Distance3DFromPlayer < closestEntity.Location.Distance3DFromPlayer)
+                                                closestEntity = entity;
+                                        }
+                                        else closestEntity = entity;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // Поиск любого вхождения шаблона
+                                entPattern = entPattern.Trim('*');
+                                foreach (Entity entity in entities)
+                                {
+                                    if (entity.NameUntranslated.Contains(entPattern)
+                                        && !bkList.Contains(entity.Pointer))
+                                    {
+                                        if (closestEntity.IsValid)
+                                        {
+                                            if (entity.Location.Distance3DFromPlayer < closestEntity.Location.Distance3DFromPlayer)
+                                                closestEntity = entity;
+                                        }
+                                        else closestEntity = entity;
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                    case ItemFilterStringType.Regex:
+                        return FindClosestEntityRegex(entities, entPattern,bkList);
+                }
+            }
+            return closestEntity;
+        }
         /// <summary>
         /// Поиск Entity из коллекции entities, у которого поле NameUntranslated соответствует шаблону entPattern, 
         /// и расположенного наиболее близко к персонажу 
@@ -55,7 +113,7 @@ namespace EntityPlugin.Tools
         /// <param name="entPattern">Строка-шаблон, которому должно соответствовать NameUntranslated у искомого Entity</param>
         /// <param name="bkList">Список исключений Entity, которые запрещено выбирать в качестве цели</param>
         /// <returns></returns>
-        public static Entity FindClosestInteractableEntity(List<Entity> entities, string entPattern, TempBlackList<IntPtr> bkList = null)
+        public static Entity FindClosestInteractableEntityRegex(List<Entity> entities, string entPattern, TempBlackList<IntPtr> bkList = null)
         {
             Entity closestEntity = new Entity(IntPtr.Zero);
             if (!string.IsNullOrEmpty(entPattern))
@@ -78,6 +136,66 @@ namespace EntityPlugin.Tools
                         }
                         else closestEntity = entity;
                     }
+                }
+            }
+            return closestEntity;
+        }
+        public static Entity FindClosestInteractableEntity(List<Entity> entities, string entPattern, ItemFilterStringType type, TempBlackList<IntPtr> bkList = null)
+        {
+            Entity closestEntity = new Entity(IntPtr.Zero);
+            if (!string.IsNullOrEmpty(entPattern))
+            {
+                if (bkList == null)
+                {
+                    bkList = new TempBlackList<IntPtr>();
+                }
+
+                switch (type)
+                {
+                    case ItemFilterStringType.Simple:
+                        {
+                            if (entPattern[0] != '*')
+                            {
+                                // Поиск шаблона в началае 
+                                entPattern = entPattern.Trim('*');
+                                foreach (Entity entity in entities)
+                                {
+                                    if (entity.Critter.IsInteractable
+                                        && entity.NameUntranslated.StartsWith(entPattern)
+                                        && !bkList.Contains(entity.Pointer))
+                                    {
+                                        if (closestEntity.IsValid)
+                                        {
+                                            if (entity.Location.Distance3DFromPlayer < closestEntity.Location.Distance3DFromPlayer)
+                                                closestEntity = entity;
+                                        }
+                                        else closestEntity = entity;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // Поиск любого вхождения шаблона
+                                entPattern = entPattern.Trim('*');
+                                foreach (Entity entity in entities)
+                                {
+                                    if (entity.Critter.IsInteractable
+                                        && entity.NameUntranslated.Contains(entPattern)
+                                        && !bkList.Contains(entity.Pointer))
+                                    {
+                                        if (closestEntity.IsValid)
+                                        {
+                                            if (entity.Location.Distance3DFromPlayer < closestEntity.Location.Distance3DFromPlayer)
+                                                closestEntity = entity;
+                                        }
+                                        else closestEntity = entity;
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                    case ItemFilterStringType.Regex:
+                        return FindClosestInteractableEntityRegex(entities, entPattern, bkList);
                 }
             }
             return closestEntity;
