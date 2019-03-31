@@ -83,7 +83,8 @@ namespace EntityPlugin.Tools
             while (target != null && target.IsValid/* && !interactTimeout.IsTimedOut*//* && target.InteractOption.IsValid*/)
             {
 #if ShowDebugMsg
-                Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Call '{nameof(Approach.EntityByDistance)}'");
+                if(EntityPlugin.DebugInfoEnabled)
+                    Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Call '{nameof(Approach.EntityByDistance)}'");
 #endif
                 if (Approach.EntityByDistance(target, distance, breakFunc))
                 {
@@ -91,24 +92,28 @@ namespace EntityPlugin.Tools
                     target.Location.Face();
                     target.Location.FaceYaw();
 #if ShowDebugMsg
-                    Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Call '{nameof(MyNW.Internals.Movements.StopNavTo)}'");
+                    if (EntityPlugin.DebugInfoEnabled)
+                        Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Call '{nameof(MyNW.Internals.Movements.StopNavTo)}'");
 #endif
 
                     MyNW.Internals.Movements.StopNavTo();
                     //Thread.Sleep(500);
 #if ShowDebugMsg
-                    Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Call '{nameof(target.Interact)}'");
+                    if (EntityPlugin.DebugInfoEnabled)
+                        Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Call '{nameof(target.Interact)}'");
 #endif
                     target.Interact();
                     Thread.Sleep(1000);//Thread.Sleep(interactTime);
 #if ShowDebugMsg
-                    Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Call '{nameof(Interact.WaitForInteraction)}'");
+                    if (EntityPlugin.DebugInfoEnabled)
+                        Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Call '{nameof(Interact.WaitForInteraction)}'");
 #endif
                     Interact.WaitForInteraction();
                     if (dialogs != null && dialogs.Count > 0)
                     {
 #if ShowDebugMsg
-                        Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Wait for Dialog's window appears");
+                        if (EntityPlugin.DebugInfoEnabled)
+                            Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Wait for Dialog's window appears");
 #endif
                         Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(interactTime);
                         while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count == 0)
@@ -121,7 +126,8 @@ namespace EntityPlugin.Tools
                         }
                         Thread.Sleep(500);
 #if ShowDebugMsg
-                        Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Processing Dialogs");
+                        if (EntityPlugin.DebugInfoEnabled)
+                            Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Processing Dialogs");
 #endif
                         using (List<string>.Enumerator enumerator = dialogs.GetEnumerator())
                         {
@@ -136,53 +142,59 @@ namespace EntityPlugin.Tools
                     EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
 
 #if ShowDebugMsg
-                    bool dist = false,
+                    if (EntityPlugin.DebugInfoEnabled)
+                    {
+                        bool dist = false,
                         tarIsIntearctable = false,
                         tarInteractOptionIsValid = false,
                         tarCanInteract = false;
 
-                    if (target.IsValid)
-                    {
-                        dist = target.Location.Distance3DFromPlayer <= distance;
-                        Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Check Distance({target.Location.Distance3DFromPlayer})<'{distance}': {dist}");
-                        tarIsIntearctable = target.Critter.IsInteractable;
-                        Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Check Target is Interactable: {tarIsIntearctable}");
-                        tarInteractOptionIsValid = target.InteractOption.IsValid;
-                        Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Check Target InteractOption is valid: {tarInteractOptionIsValid}");
-                        tarCanInteract = target.InteractOption.CanInteract();
-                        Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Check Target CanInteract: {tarCanInteract}");
-
-                        if (dist && !(tarIsIntearctable && tarInteractOptionIsValid && tarCanInteract))
+                        if (target.IsValid)
                         {
-                            Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Target cann't be interacted. Return 'false'");
+                            dist = target.Location.Distance3DFromPlayer <= distance;
+                            Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Check VisibilityDistance({target.Location.Distance3DFromPlayer})<'{distance}': {dist}");
+                            tarIsIntearctable = target.Critter.IsInteractable;
+                            Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Check Target is Interactable: {tarIsIntearctable}");
+                            tarInteractOptionIsValid = target.InteractOption.IsValid;
+                            Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Check Target InteractOption is valid: {tarInteractOptionIsValid}");
+                            tarCanInteract = target.InteractOption.CanInteract();
+                            Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Check Target CanInteract: {tarCanInteract}");
+
+                            if (dist && !(tarIsIntearctable && tarInteractOptionIsValid && tarCanInteract))
+                            {
+                                Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Target cann't be interacted. Return 'false'");
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Target is not valid. Return 'false'");
                             return false;
                         }
                     }
                     else
-                    {
-                        Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Target is not valid. Return 'false'");
-                        return false;
-                    }
-
-#else
-                    if (!target.IsValid 
-                        || (target.Location.Distance3DFromPlayer <= distance 
-                        && !(target.Critter.IsInteractable && target.InteractOption.IsValid && target.InteractOption.CanInteract())))
-                    {
-                        return false;
-                    }
 #endif
+                    { 
+                        if (!target.IsValid
+                            || (target.Location.Distance3DFromPlayer <= distance
+                            && !(target.Critter.IsInteractable && target.InteractOption.IsValid && target.InteractOption.CanInteract())))
+                        {
+                            return false;
+                        }
+                    }
                 }
                 else
                 {
 #if ShowDebugMsg
-                    Astral.Logger.WriteLine($"<{nameof(FollowAndSimulateFKey)}>: Approach to Target [{target.Pointer}] fail.");
+                    if (EntityPlugin.DebugInfoEnabled)
+                        Astral.Logger.WriteLine($"<{nameof(FollowAndSimulateFKey)}>: Approach to Target [{target.Pointer}] fail.");
 #endif
                     break;
                 }
             }
 #if ShowDebugMsg
-            Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Return 'false'");
+            if (EntityPlugin.DebugInfoEnabled)
+                Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Return 'false'");
 #endif
             return false;
         }
@@ -433,14 +445,16 @@ namespace EntityPlugin.Tools
             while (target != null && target.IsValid)
             {
 #if ShowDebugMsg
-                Astral.Logger.WriteLine($"<{nameof(FollowAndSimulateFKey)}>: Call '{nameof(Approach.EntityByDistance)}'");
+                if (EntityPlugin.DebugInfoEnabled)
+                    Astral.Logger.WriteLine($"<{nameof(FollowAndSimulateFKey)}>: Call '{nameof(Approach.EntityByDistance)}'");
 #endif
                 if (Approach.EntityByDistance(target, distance, breakFunc))
                 {
                     target.Location.Face();
                     target.Location.FaceYaw();
 #if ShowDebugMsg
-                    Astral.Logger.WriteLine($"<{nameof(FollowAndSimulateFKey)}>: Call '{nameof(GameCommands.SimulateFKey)}'");
+                    if (EntityPlugin.DebugInfoEnabled)
+                        Astral.Logger.WriteLine($"<{nameof(FollowAndSimulateFKey)}>: Call '{nameof(GameCommands.SimulateFKey)}'");
 #endif
                     GameCommands.SimulateFKey();
                     Thread.Sleep(interactTime);
@@ -455,7 +469,8 @@ namespace EntityPlugin.Tools
                         if (dialogs != null && dialogs.Count > 0)
                         {
 #if ShowDebugMsg
-                            Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Wait for Dialog's window appears");
+                            if (EntityPlugin.DebugInfoEnabled)
+                                Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Wait for Dialog's window appears");
 #endif
                             Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);
                             while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count == 0)
@@ -468,7 +483,8 @@ namespace EntityPlugin.Tools
                             }
                             Thread.Sleep(500);
 #if ShowDebugMsg
-                            Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Processing Dialogs");
+                            if (EntityPlugin.DebugInfoEnabled)
+                                Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Processing Dialogs");
 #endif
                             using (List<string>.Enumerator enumerator = dialogs.GetEnumerator())
                             {
@@ -482,49 +498,53 @@ namespace EntityPlugin.Tools
                         }
                     }
 #if ShowDebugMsg
-
-                    bool dist = false,
+                    if (EntityPlugin.DebugInfoEnabled)
+                    {
+                        bool dist = false,
                         //interactInfoIsValid = false,
                         tarCanInteract = false;
 
-                    if (target.IsValid)
-                    {
-                        dist = target.Location.Distance3DFromPlayer <= distance;
-                        Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Check Distance({target.Location.Distance3DFromPlayer})<'{distance}': {dist}");
-                        //interactInfoIsValid = EntityManager.LocalPlayer.Player.InteractInfo.IsValid;
-                        //Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Check {nameof(EntityManager.LocalPlayer.Player.InteractInfo)}: {interactInfoIsValid}");
-                        tarCanInteract = target.CanInteract;
-                        Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Check {nameof(target)}.{nameof(target.CanInteract)}: {tarCanInteract}");
-
-                        if (dist && tarCanInteract/* && !interactInfoIsValid*/)
+                        if (target.IsValid)
                         {
-                            Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Target cann't be interacted. Return 'false'");
+                            dist = target.Location.Distance3DFromPlayer <= distance;
+                            Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Check VisibilityDistance({target.Location.Distance3DFromPlayer})<'{distance}': {dist}");
+                            //interactInfoIsValid = EntityManager.LocalPlayer.Player.InteractInfo.IsValid;
+                            //Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Check {nameof(EntityManager.LocalPlayer.Player.InteractInfo)}: {interactInfoIsValid}");
+                            tarCanInteract = target.CanInteract;
+                            Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Check {nameof(target)}.{nameof(target.CanInteract)}: {tarCanInteract}");
+
+                            if (dist && tarCanInteract/* && !interactInfoIsValid*/)
+                            {
+                                Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Target cann't be interacted. Return 'false'");
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Target is not valid. Return 'false'");
                             return false;
                         }
                     }
                     else
-                    {
-                        Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Target is not valid. Return 'false'");
-                        return false;
-                    }
 
-#else
-                    if (!target.IsValid || (target.Location.Distance3DFromPlayer <= distance && !EntityManager.LocalPlayer.Player.InteractInfo.IsValid))
-                    {
-                        return false;
-                    }
 #endif
+                    {
+                        if (!target.IsValid || (target.Location.Distance3DFromPlayer <= distance && !EntityManager.LocalPlayer.Player.InteractInfo.IsValid))
+                            return false;
+                    }
                 }
                 else
                 {
 #if ShowDebugMsg
-                    Astral.Logger.WriteLine($"<{nameof(FollowAndSimulateFKey)}>: Approach to Target [{target.Pointer}] fail.");
+                    if (EntityPlugin.DebugInfoEnabled)
+                        Astral.Logger.WriteLine($"<{nameof(FollowAndSimulateFKey)}>: Approach to Target [{target.Pointer}] fail.");
 #endif
                     break;
                 }
             }
 #if ShowDebugMsg
-            Astral.Logger.WriteLine($"<{nameof(FollowAndSimulateFKey)}>: Return 'false'");
+            if (EntityPlugin.DebugInfoEnabled)
+                Astral.Logger.WriteLine($"<{nameof(FollowAndSimulateFKey)}>: Return 'false'");
 #endif
             return false;
         }

@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Drawing.Design;
 using Astral;
+using Astral.Classes.ItemFilter;
 using Astral.Logic.Classes.Map;
 using EntityPlugin.Editors;
 using EntityPlugin.Tools;
@@ -13,12 +14,43 @@ namespace EntityPlugin.Actions
 {
     public class MoveToEntity : Astral.Quester.Classes.Action
     {
+        [NonSerialized]
+        protected Entity target = new Entity(IntPtr.Zero);
+
+        [Description("Type of and EntityID:\n" +
+            "Simple: Simple test string with a mask (char '*' means any chars)\n" +
+            "Regex: Regular expression")]
+        public ItemFilterStringType EntityIdType { get; set; }
+
+        [Description("ID (an internal untranslated name) of the Entity for the search")]
+        [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
+        public string EntityID { get; set; }
+
+        [Description("VisibilityDistance to the Entity by which it is necessary to approach")]
+        public float Distance { get; set; }
+
+        [Description("Enable IgnoreCombat profile value while playing action")]
+        public bool IgnoreCombat { get; set; }
+
+        [Description("True: Complite an action when the object is closer than 'VisibilityDistance'\n" +
+                     "False: Follow an Entity regardless of its distance")]
+        public bool StopOnApproached { get; set; }
+
+        [Description("Check Entity's Region:\n" +
+            "True: All Entities located in the same Region as Player are ignored\n" +
+            "False: Entity's Region does not checked during search")]
+        public bool RegionCheck { get; set; }
+
         public MoveToEntity()
         {
             EntityID = string.Empty;
             Distance = 30;
             IgnoreCombat = true;
             StopOnApproached = false;
+            EntityIdType = ItemFilterStringType.Simple;
+
+            if (EntityManager.LocalPlayer.IsValid && EntityManager.LocalPlayer.Location.IsValid)
+                HotSpots.Add(EntityManager.LocalPlayer.Location.Clone());
         }
 
         public override string ActionLabel => $"{GetType().Name} [{EntityID}]";
@@ -32,7 +64,7 @@ namespace EntityPlugin.Actions
             if (string.IsNullOrEmpty(EntityID))
                 target = new Entity(IntPtr.Zero);
             else
-                target = SelectionTools.FindClosestEntityRegex(EntityManager.GetEntities(), EntityID);
+                target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, RegionCheck);
         }
 
         protected override bool IntenalConditions => !string.IsNullOrEmpty(EntityID);
@@ -46,7 +78,7 @@ namespace EntityPlugin.Actions
         {
             get
             {
-                if (target.IsValid/* && target.Location.IsValid && target.Location.Distance3DFromPlayer > Distance*/)
+                if (target.IsValid/* && target.Location.IsValid && target.Location.Distance3DFromPlayer > VisibilityDistance*/)
                 {
                     return target.Location.Clone();
                 }
@@ -66,19 +98,6 @@ namespace EntityPlugin.Actions
             }
         }
 
-        [Description("ID (an internal untranslated name) of the Entity for the search (regex)")]
-        [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
-        public string EntityID { get; set; }
-
-        [Description("Distance to the Entity by which it is necessary to approach")]
-        public float Distance { get; set; }
-
-        [Description("Enable IgnoreCombat profile value while playing action")]
-        public bool IgnoreCombat { get; set; }
-
-        [Description("Complite an action when Entity had been approached (if true)")]
-        public bool StopOnApproached { get; set; }
-
         public override void GatherInfos()
         {
             //При активации данного кода в HotSpots неконтролируемо добавляются новые точки 
@@ -93,7 +112,7 @@ namespace EntityPlugin.Actions
                 if (string.IsNullOrEmpty(EntityID))
                     target = new Entity(IntPtr.Zero);
                 else
-                    target = SelectionTools.FindClosestEntityRegex(EntityManager.GetEntities(), EntityID);
+                    target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, RegionCheck);
 
                 //в команде ChangeProfielValue:IgnoreCombat используется код:
                 //Combat.SetIgnoreCombat(IgnoreCombat, -1, 0);
@@ -116,8 +135,6 @@ namespace EntityPlugin.Actions
 
         public override ActionResult Run()
         {
-            //target = SelectionTools.FindClosestEntityRegex(EntityManager.GetEntities(), EntityID);
-
             if (!target.IsValid)
             {
                 Logger.WriteLine($"Entity [{EntityID}] not founded.");
@@ -138,8 +155,5 @@ namespace EntityPlugin.Actions
                 return ActionResult.Running;
             }
         }
-
-        [NonSerialized]
-        protected Entity target = new Entity(IntPtr.Zero);
     }
 }

@@ -32,6 +32,7 @@ namespace EntityPlugin.Actions
                         //!EntityManager.LocalPlayer.PlayerTeam.IsLeader;// &&
                         //EntityManager.LocalPlayer.PlayerTeam.Team.Leader.MapName == EntityManager.LocalPlayer.MapState.MapName &&
                         //EntityManager.LocalPlayer.PlayerTeam.Team.Leader.MapInstanceNumber != ;
+                
                 //Определение номера инстанса в PossibleMapChoice.InstanceIndex
                 //return Memory.MMemory.Read<uint>(base.Pointer + 40);
             }
@@ -74,9 +75,10 @@ namespace EntityPlugin.Actions
                     if (leader.MapName != player.MapName)
                         return ActionResult.Fail;
 
-                    Instances.ChangeInstanceResult changeInstanceResult = SelectionTools.ChangeInstance(leader.MapInstanceNumber);
+                    Instances.ChangeInstanceResult changeInstanceResult = CommonTools.ChangeInstance(leader.MapInstanceNumber);
 
-                    if (changeInstanceResult == Instances.ChangeInstanceResult.Combat)
+                    if (changeInstanceResult == Instances.ChangeInstanceResult.Combat 
+                        || changeInstanceResult == Instances.ChangeInstanceResult.CantChange)
                     {
                         return Action.ActionResult.Running;
                     }

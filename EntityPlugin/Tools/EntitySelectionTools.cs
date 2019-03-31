@@ -16,16 +16,19 @@ namespace EntityPlugin.Tools
     public static class SelectionTools
     {
         /// <summary>
-        /// Поиск Entity из коллекции entities, у которого поле NameUntranslated соответствует шаблону entPattern, 
-        /// и расположенного наиболее близко к персонажу 
+        /// Поиск ближайшего Entity из entities, 
+        /// у которого NameUntranslated соответствует шаблону регулярного выражения
+        /// и соответствующего остальным условиям
         /// </summary>
-        /// <param name="entities">Коллекция объектов Entity</param>
-        /// <param name="entPattern">Строка-шаблон, которому должно соответствовать NameUntranslated у искомого Entity</param>
-        /// <returns></returns>
-        public static Entity FindClosestEntityRegex(List<Entity> entities, string entPattern, TempBlackList<IntPtr> bkList = null)
+        /// <param name="entities">Исходная коллекция Entity</param>
+        /// <param name="entPattern">Шаблон, соответсвие которому ищется</param>
+        /// <param name="regionCheck">Флаг проверки соответствия региона Entity и региона игрока</param>
+        /// <param name="bkList">Список указателей запрещенных Entity</param>
+        /// <returns>Найденное Entity</returns>
+        public static Entity FindClosestEntityRegex(List<Entity> entities, string entPattern, bool regionCheck = false, TempBlackList<IntPtr> bkList = null)
         {
             Entity closestEntity = new Entity(IntPtr.Zero);
-            if (!string.IsNullOrEmpty(entPattern))
+            if (!string.IsNullOrEmpty(entPattern) && entities != null)
             {
                 if (bkList == null)
                 {
@@ -33,7 +36,8 @@ namespace EntityPlugin.Tools
                 }
                 foreach (Entity entity in entities)
                 {
-                    if (Regex.IsMatch(entity.NameUntranslated, entPattern) 
+                    if ((!regionCheck || entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+                        && Regex.IsMatch(entity.NameUntranslated, entPattern) 
                         && !bkList.Contains(entity.Pointer))
                     {
                         if (closestEntity.IsValid)
@@ -47,10 +51,20 @@ namespace EntityPlugin.Tools
             }
             return closestEntity;
         }
-        public static Entity FindClosestEntity(List<Entity> entities, string entPattern, ItemFilterStringType type, TempBlackList<IntPtr> bkList = null)
+
+        /// <summary>
+        /// Поиск ближайшего Entity из entities, соответствующего условиям
+        /// </summary>
+        /// <param name="entities">Исходная коллекция Entity</param>
+        /// <param name="entPattern">Шаблон, соответсвие которому ищется</param>
+        /// <param name="type">Тип шаблона</param>
+        /// <param name="regionCheck">Флаг проверки соответствия региона Entity и региона игрока</param>
+        /// <param name="bkList">Список указателей запрещенных Entity</param>
+        /// <returns>Найденное Entity</returns>
+        public static Entity FindClosestEntity(List<Entity> entities, string entPattern, ItemFilterStringType type = ItemFilterStringType.Simple, bool regionCheck = false, TempBlackList<IntPtr> bkList = null)
         {
             Entity closestEntity = new Entity(IntPtr.Zero);
-            if (!string.IsNullOrEmpty(entPattern))
+            if (!string.IsNullOrEmpty(entPattern) && entities != null)
             {
                 if (bkList == null)
                 {
@@ -68,6 +82,7 @@ namespace EntityPlugin.Tools
                                 foreach (Entity entity in entities)
                                 {
                                     if (entity.NameUntranslated.StartsWith(entPattern)
+                                        && (!regionCheck || entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                         && !bkList.Contains(entity.Pointer))
                                     {
                                         if (closestEntity.IsValid)
@@ -86,6 +101,7 @@ namespace EntityPlugin.Tools
                                 foreach (Entity entity in entities)
                                 {
                                     if (entity.NameUntranslated.Contains(entPattern)
+                                        && (!regionCheck || entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                         && !bkList.Contains(entity.Pointer))
                                     {
                                         if (closestEntity.IsValid)
@@ -100,23 +116,26 @@ namespace EntityPlugin.Tools
                             break;
                         }
                     case ItemFilterStringType.Regex:
-                        return FindClosestEntityRegex(entities, entPattern,bkList);
+                        return FindClosestEntityRegex(entities, entPattern, regionCheck, bkList);
                 }
             }
             return closestEntity;
         }
+
         /// <summary>
-        /// Поиск Entity из коллекции entities, у которого поле NameUntranslated соответствует шаблону entPattern, 
-        /// и расположенного наиболее близко к персонажу 
+        /// Поиск ближайшего Entity из entities, с которым можно взаимодействовать, 
+        /// у которого NameUntranslated соответствует шаблону регулярного выражения
+        /// и соответствующего остальным условиям
         /// </summary>
-        /// <param name="entities">Коллекция объектов Entity</param>
-        /// <param name="entPattern">Строка-шаблон, которому должно соответствовать NameUntranslated у искомого Entity</param>
-        /// <param name="bkList">Список исключений Entity, которые запрещено выбирать в качестве цели</param>
-        /// <returns></returns>
-        public static Entity FindClosestInteractableEntityRegex(List<Entity> entities, string entPattern, TempBlackList<IntPtr> bkList = null)
+        /// <param name="entities">Исходная коллекция Entity</param>
+        /// <param name="entPattern">Шаблон, соответсвие которому ищется</param>
+        /// <param name="regionCheck">Флаг проверки соответствия региона Entity и региона игрока</param>
+        /// <param name="bkList">Список указателей запрещенных Entity</param>
+        /// <returns>Найденное Entity</returns>
+        public static Entity FindClosestInteractableEntityRegex(List<Entity> entities, string entPattern, bool regionCheck = false, TempBlackList<IntPtr> bkList = null)
         {
             Entity closestEntity = new Entity(IntPtr.Zero);
-            if (!string.IsNullOrEmpty(entPattern))
+            if (!string.IsNullOrEmpty(entPattern) && entities != null)
             {
                 if (bkList == null)
                 {
@@ -125,6 +144,7 @@ namespace EntityPlugin.Tools
                 foreach (Entity entity in entities)
                 {
                     if (entity.Critter.IsInteractable
+                        && (!regionCheck || entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                         && Regex.IsMatch(entity.NameUntranslated, entPattern)
                         && !bkList.IsBlackList(entity.Pointer)
                         /* && entity.InteractOption.CanInteract()*/)
@@ -140,10 +160,22 @@ namespace EntityPlugin.Tools
             }
             return closestEntity;
         }
-        public static Entity FindClosestInteractableEntity(List<Entity> entities, string entPattern, ItemFilterStringType type, TempBlackList<IntPtr> bkList = null)
+
+        /// <summary>
+        /// Поиск ближайшего Entity из entities, с которым можно взаимодействовать, 
+        /// у которого NameUntranslated соответствует шаблону регулярного выражения
+        /// и соответствующего остальным условиям
+        /// </summary>
+        /// <param name="entities">Исходная коллекция Entity</param>
+        /// <param name="entPattern">Шаблон, соответсвие которому ищется</param>
+        /// <param name="type">Тип шаблона</param>
+        /// <param name="regionCheck">Флаг проверки соответствия региона Entity и региона игрока</param>
+        /// <param name="bkList">Список указателей запрещенных Entity</param>
+        /// <returns>Найденное Entity</returns>
+        public static Entity FindClosestInteractableEntity(List<Entity> entities, string entPattern, ItemFilterStringType type = ItemFilterStringType.Simple, bool regionCheck = false, TempBlackList<IntPtr> bkList = null)
         {
             Entity closestEntity = new Entity(IntPtr.Zero);
-            if (!string.IsNullOrEmpty(entPattern))
+            if (!string.IsNullOrEmpty(entPattern) && entities != null)
             {
                 if (bkList == null)
                 {
@@ -162,6 +194,7 @@ namespace EntityPlugin.Tools
                                 {
                                     if (entity.Critter.IsInteractable
                                         && entity.NameUntranslated.StartsWith(entPattern)
+                                        && (!regionCheck || entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                         && !bkList.Contains(entity.Pointer))
                                     {
                                         if (closestEntity.IsValid)
@@ -181,6 +214,7 @@ namespace EntityPlugin.Tools
                                 {
                                     if (entity.Critter.IsInteractable
                                         && entity.NameUntranslated.Contains(entPattern)
+                                        && (!regionCheck || entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                         && !bkList.Contains(entity.Pointer))
                                     {
                                         if (closestEntity.IsValid)
@@ -195,138 +229,61 @@ namespace EntityPlugin.Tools
                             break;
                         }
                     case ItemFilterStringType.Regex:
-                        return FindClosestInteractableEntityRegex(entities, entPattern, bkList);
+                        return FindClosestInteractableEntityRegex(entities, entPattern, regionCheck, bkList);
                 }
             }
             return closestEntity;
         }
 
-        ///// <summary>
-        ///// Поиск Entity из коллекции entities, у которого поле NameUntranslated соответствует шаблону entPattern, 
-        ///// и расположенного наиболее близко к персонажу 
-        ///// </summary>
-        ///// <param name="entities">Коллекция объектов Entity</param>
-        ///// <param name="entPattern">Строка-шаблон, которому должно соответствовать NameUntranslated у искомого Entity</param>
-        ///// <returns></returns>
-        //public static Entity FindClosestUninteractableEntity(List<Entity> entities, string entPattern)
-        //{
-        //    Entity closestEntity = new Entity(IntPtr.Zero);
-        //    if (!string.IsNullOrEmpty(entPattern))
-        //    {
-        //        foreach (Entity entity in entities)
-        //        {
-        //            if (Regex.IsMatch(entity.NameUntranslated, entPattern) && !entity.InteractOption.IsValid/* && !entity.InteractOption.CanInteract()*/)
-        //            {
-        //                if (closestEntity.IsValid)
-        //                {
-        //                    if (entity.Location.Distance3DFromPlayer < closestEntity.Location.Distance3DFromPlayer)
-        //                        closestEntity = entity;
-        //                }
-        //                else closestEntity = entity;
-        //            }
-        //        }
-        //    }
-        //    return closestEntity;
-        //}
-
         /// <summary>
-        /// Проверка нахождения объекта entity в границах региона region
+        /// Поиск всех Entity из entities, удовлетворяющих условиям
         /// </summary>
-        /// <param name="entity">Объект Entity, местонахождение которого проверяется</param>
-        /// <param name="region">CustomRegion </param>
-        /// <returns></returns>
-        public static bool IsInCustomRegion(Entity entity, CustomRegion region)
+        /// <param name="entities">Исходная коллекция Entity</param>
+        /// <param name="entPattern">Шаблон, соответсвие которому ищется</param>
+        /// <param name="type">Тип шаблона</param>
+        /// <param name="regionCheck">Флаг проверки соответствия региона Entity и региона игрока</param>
+        /// <param name="bkList">Список указателей запрещенных Entity</param>
+        /// <returns>Список найденных Entity</returns>
+        public static List<Entity> FindEntities(List<Entity> entities, string entPattern, ItemFilterStringType type = ItemFilterStringType.Simple, bool regionCheck = false, TempBlackList<IntPtr> bkList = null)
         {
-            if (region.Eliptic)
+            List<Entity> resultList = null;
+            if (!string.IsNullOrEmpty(entPattern) && entities != null)
             {
-                float x = region.Position.X;
-                float y = region.Position.Y;
-                float x2 = entity.X;
-                float y2 = entity.Y;
-                return (2f * (x2 - x) / (float)region.Width - 1f) * (2f * (x2 - x) / (float)region.Width - 1f) + (2f * (y2 - y) / (float)region.Height - 1f) * (2f * (y2 - y) / (float)region.Height - 1f) < 1f;
-            }
-            else
-            {
-                int num = region.Width;
-                int num2 = region.Height;
-                Vector3 vector = region.Position.Clone();
-                if (num < 0)
+                if (bkList == null)
                 {
-                    vector.X += (float)num;
-                    num *= -1;
+                    bkList = new TempBlackList<IntPtr>();
                 }
-                if (num2 < 0)
-                {
-                    vector.Y += (float)num2;
-                    num2 *= -1;
-                }
-                Vector3 vector2 = new Vector3(vector.X + (float)num, vector.Y + (float)num2, 0f);
-                Vector3 location = entity.Location;
 
-                return location.X > vector.X && location.X < vector2.X && location.Y > vector.Y && location.Y < vector2.Y;
-            }
-        }
-
-        /// <summary>
-        /// Перемещение персонажа на заданный инстанс
-        /// </summary>
-        /// <param name="instNum">Номер инстанса (экземпляра карты) на который нужно переместиться</param>
-        /// <returns></returns>
-        public static Instances.ChangeInstanceResult ChangeInstance(uint instNum = 0)
-        {
-            if (!MapTransfer.CanChangeInstance)
-            {
-                Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);
-                while (!MapTransfer.CanChangeInstance)
+                switch (type)
                 {
-                    if (EntityManager.LocalPlayer.InCombat)
-                    {
-                        return Instances.ChangeInstanceResult.Combat;
-                    }
-                    if (timeout.IsTimedOut)
-                    {
-                        return Instances.ChangeInstanceResult.CantChange;
-                    }
-                    Thread.Sleep(200);
+                    case ItemFilterStringType.Simple:
+                        {
+                            if (entPattern[0] != '*')
+                            {
+                                // Поиск шаблона в началае 
+                                entPattern = entPattern.Trim('*');
+                                resultList = entities.FindAll((Entity x) => (x.NameUntranslated.StartsWith(entPattern) 
+                                                                             && (!regionCheck || x.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+                                                                             && !bkList.Contains(x.Pointer)));
+                            }
+                            else
+                            {
+                                // Поиск любого вхождения шаблона
+                                entPattern = entPattern.Trim('*');
+                                resultList = entities.FindAll((Entity x) => x.NameUntranslated.Contains(entPattern)
+                                                                             && (!regionCheck || x.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+                                                                             && !bkList.Contains(x.Pointer));
+                            }
+                            break;
+                        }
+                    case ItemFilterStringType.Regex:
+                        resultList = entities.FindAll((Entity x) => Regex.IsMatch(x.NameUntranslated, entPattern)
+                                                                                  && (!regionCheck || x.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+                                                                                  && !bkList.Contains(x.Pointer));
+                        break;
                 }
             }
-            if (EntityManager.LocalPlayer.InCombat)
-            {
-                return Instances.ChangeInstanceResult.Combat;
-            }
-            if (!MapTransfer.IsMapTransferFrameVisible())
-            {
-                MapTransfer.OpenMapTransferFrame();
-                Thread.Sleep(3000);
-            }
-
-            PossibleMapChoice mapInstance = MapTransfer.PossibleMapChoices.Find(pmc => pmc.InstanceIndex == instNum);
-
-            if (mapInstance != null && mapInstance.IsValid)
-            {
-                if (mapInstance.IsCurrent)
-                    return Instances.ChangeInstanceResult.Success;
-
-                if (!EntityManager.LocalPlayer.InCombat)
-                {
-                    Astral.Logger.WriteLine($"Change to instance {mapInstance.InstanceIndex} ...");
-                    mapInstance.Transfer();
-                    Thread.Sleep(7500);
-                    while (EntityManager.LocalPlayer.IsLoading)
-                    {
-                        Thread.Sleep(500);
-                    }
-                    if (MapTransfer.IsMapTransferFrameVisible())
-                    {
-                        MapTransfer.CloseMapTransferFrame();
-                    }
-                    return Instances.ChangeInstanceResult.Success;
-                }
-            }
-            MapTransfer.CloseMapTransferFrame();
-            Thread.Sleep(500);
-            
-            return Instances.ChangeInstanceResult.NoValidChoice;
+            return resultList;
         }
     }
 }

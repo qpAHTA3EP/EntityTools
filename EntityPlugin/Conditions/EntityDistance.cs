@@ -1,4 +1,5 @@
-﻿using Astral.Quester.Classes;
+﻿using Astral.Classes.ItemFilter;
+using Astral.Quester.Classes;
 using EntityPlugin.Editors;
 using EntityPlugin.Tools;
 using MyNW.Classes;
@@ -17,15 +18,27 @@ namespace EntityPlugin.Conditions
             EntityID = string.Empty;
             Distance = 0;
             Sign = Relation.Superior;
+            EntityIdType = ItemFilterStringType.Simple;
+            RegionCheck = false;
         }
 
-        [Description("ID (an untranslated name) of the Entity for the search (regex)")]
+        [Description("Type of and EntityID:\n" +
+            "Simple: Simple test string with a mask (char '*' means any chars)\n" +
+            "Regex: Regular expression")]
+        public ItemFilterStringType EntityIdType { get; set; }
+
+        [Description("ID (an untranslated name) of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         public string EntityID { get; set; }
 
         public float Distance { get; set; }
 
-        [Description("Distance comparison type to the closest Entity")]
+        [Description("Check Entity's Region:\n" +
+            "True: Count Entity if it located in the same Region as Player\n" +
+            "False: Does not consider the region when counting Entities")]
+        public bool RegionCheck { get; set; }
+
+        [Description("VisibilityDistance comparison type to the closest Entity")]
         public Condition.Relation Sign { get; set; }
 
         public override bool IsValid
@@ -34,45 +47,20 @@ namespace EntityPlugin.Conditions
             {
                 if (!string.IsNullOrEmpty(EntityID))
                 {
-                    Entity closestEntity = SelectionTools.FindClosestEntityRegex(EntityManager.GetEntities(), EntityID);
+                    Entity closestEntity = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, RegionCheck);
 
-                    //if(entities.Count > 0)
-                    //    closestEntity = entities.FindLast((Entity x) => (Regex.IsMatch(x.NameUntranslated, Name) && (x.CombatDistance < Distance))); 
-
-                    //List<Entity> entityList = entities.Find((Entity x) => x.CombatDistance3 < Distance);
-
-                    //string mess = "";
                     bool result = false;
                     switch (Sign)
                     {
                         case Relation.Equal:
                             return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer == Distance);
-                        //mess = (result) ? Relation.Equal.ToString() : Relation.NotEqual.ToString();
-                        //break;
                         case Relation.NotEqual:
                             return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer != Distance);
-                        //mess = (result) ? Relation.NotEqual.ToString() : Relation.Equal.ToString();
-                        //break;
                         case Relation.Inferior:
                             return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer < Distance);
-                        //mess = ((result) ? "" : "Not")+ Relation.Inferior.ToString();
-                        //break;
                         case Relation.Superior:
                             return result = (closestEntity == null) || !closestEntity.IsValid || (closestEntity.Location.Distance3DFromPlayer > Distance);
-                            //mess = (result) ? Relation.Superior.ToString() : Relation.Inferior.ToString(); ;
-                            //break;
                     }
-
-                    //if (Sign == Relation.Equal || Sign == Relation.NotEqual)
-                    //    mess = (closestEntity.CombatDistance == Distance) ? Relation.Equal.ToString(): Relation.NotEqual.ToString();
-                    //else if (Sign == Relation.Inferior || Sign == Relation.Superior)
-                    //    mess = (closestEntity.CombatDistance == Distance) ? Relation.Equal.ToString() : Relation.NotEqual.ToString();
-
-                    //Debug.WriteLine(string.Format("Entity [{1}] matched to [{2}] at the Distance = {3} that {4} to {5}", 
-                    //    closestEntity.NameUntranslated,                                
-                    //    Name, 
-                    //    closestEntity.CombatDistance,
-                    //    mess, Distance));
                 }
 
                 return false;
@@ -85,18 +73,18 @@ namespace EntityPlugin.Conditions
 
         public override string ToString()
         {
-            return $"Entity [{EntityID}] Distance {Sign} to {Distance}";
+            return $"Entity [{EntityID}] VisibilityDistance {Sign} to {Distance}";
         }
 
         public override string TestInfos
         {
             get
             {
-                Entity closestEntity = SelectionTools.FindClosestEntityRegex(EntityManager.GetEntities(), EntityID);
+                Entity closestEntity = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, RegionCheck);
 
                 if (closestEntity.IsValid)
                 {
-                    return $"Found closect Entity [{closestEntity.NameUntranslated}] at the Distance = {closestEntity.Location.Distance3DFromPlayer}";
+                    return $"Found closect Entity [{closestEntity.NameUntranslated}] at the {nameof(Distance)} = {closestEntity.Location.Distance3DFromPlayer}";
                 }
                 else
                 {

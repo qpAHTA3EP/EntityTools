@@ -115,5 +115,15 @@ namespace EntityPlugin.Forms
 #endif
 #endregion
         }
+
+        private void ckbDebugInfo_CheckedChanged(object sender, EventArgs e)
+        {
+            EntityPlugin.DebugInfoEnabled = ckbDebugInfo.Checked;
+        }
+
+        private void MainPanel_Load(object sender, EventArgs e)
+        {
+            ckbDebugInfo.Checked = EntityPlugin.DebugInfoEnabled;
+        }
     }
 }

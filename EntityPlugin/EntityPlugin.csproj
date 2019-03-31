@@ -73,10 +73,13 @@
     <Compile Include="Conditions\CheckShard.cs" />
     <Compile Include="Conditions\EntityDistance.cs" />
     <Compile Include="Conditions\EntityCountInCustomRegion.cs" />
+    <Compile Include="Conditions\IsNodeTargetable.cs" />
     <Compile Include="Conditions\PartyCount.cs" />
     <Compile Include="Conditions\TeamLeaderMapInstance.cs" />
     <Compile Include="Conditions\TeamMemberCount.cs" />
     <Compile Include="Conditions\TeamMemberCountInCustomRegion.cs" />
+    <Compile Include="Editors\NodePositionEditor.cs" />
+    <Compile Include="Tools\CommonTools.cs" />
     <Compile Include="Tools\EntityInteractionTools.cs" />
     <Compile Include="Tools\EntitySelectionTools.cs" />
     <Compile Include="EntityPlugin.cs" />
@@ -116,6 +119,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Properties\DataSources\" />
     <Folder Include="UCC\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

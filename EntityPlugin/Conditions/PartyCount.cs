@@ -7,6 +7,10 @@ namespace EntityPlugin.Conditions
 {
     public class PartyCount : Condition
     {
+        public int MemberCount { get; set; }
+
+        public Relation Sign { get; set; }
+
         public PartyCount()
         {
             //MessageBox.Show($"This Conditions is deprecated. Use '{nameof(TeamMembersCount)}' or '{nameof(TeamMembersCountInCustomRegions)}' instead");
@@ -23,8 +27,6 @@ namespace EntityPlugin.Conditions
         {
             return $"[{Properties.Resources.CategoryDeprecated}] Members is {Sign} {MemberCount}";
         }
-
-        public int MemberCount { get; set; }
 
         public override bool IsValid
         {
@@ -53,7 +55,5 @@ namespace EntityPlugin.Conditions
                 return result;
             }
         }
-
-        public Relation Sign { get; set; }
     }
 }

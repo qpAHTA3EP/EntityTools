@@ -8,6 +8,8 @@ namespace EntityPlugin
 {
     public class EntityPlugin : Astral.Addons.Plugin
     {
+        public static bool DebugInfoEnabled { get; set; }
+
         public override string Name => GetType().Name;
 
         public override string Author => "MichaelProg";
@@ -16,24 +18,29 @@ namespace EntityPlugin
 
         public override BasePanel Settings => new Forms.MainPanel();
 
+        public EntityPlugin() : base ()
+        {
+            DebugInfoEnabled = false;
+        }
+
         public override void OnBotStart()
         {
-            
+
         }
 
         public override void OnBotStop()
         {
-            
+
         }
 
         public override void OnLoad()
         {
-            
+
         }
 
         public override void OnUnload()
         {
-            
+
         }
     }
 }
