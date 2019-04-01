@@ -106,11 +106,12 @@ namespace EntityPlugin.Forms
 #region Test_EntitySelectForm
 #if Test_EntitySelectForm
             entDif = EntitySelectForm.GetEntity(entDif.NameUntranslated);
-
-            MessageBox.Show($"Selected Entity:\n" +
-                $"Name: {entDif.Name}\n" +
-                $"InternalName: {entDif.InternalName}\n" +
-                $"NameUntranslated: {entDif.NameUntranslated}");
+            if (entDif != null)
+                MessageBox.Show($"Selected Entity:\n" +
+                    $"Name: {entDif.Name}\n" +
+                    $"InternalName: {entDif.InternalName}\n" +
+                    $"NameUntranslated: {entDif.NameUntranslated}");
+            else MessageBox.Show("No Entity was selected");
 
 #endif
 #endregion

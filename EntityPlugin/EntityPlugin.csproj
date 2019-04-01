@@ -58,7 +58,7 @@
     </Reference>
     <Reference Include="DevExpress.Utils.v18.1">
       <HintPath>D:\Games\DevExpress\DevExpress.Utils.v18.1.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.XtraBars.v18.1">
       <HintPath>D:\Games\DevExpress\DevExpress.XtraBars.v18.1.dll</HintPath>

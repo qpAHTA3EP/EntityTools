@@ -48,9 +48,6 @@ namespace EntityPlugin.Actions
             IgnoreCombat = true;
             StopOnApproached = false;
             EntityIdType = ItemFilterStringType.Simple;
-
-            if (EntityManager.LocalPlayer.IsValid && EntityManager.LocalPlayer.Location.IsValid)
-                HotSpots.Add(EntityManager.LocalPlayer.Location.Clone());
         }
 
         public override string ActionLabel => $"{GetType().Name} [{EntityID}]";

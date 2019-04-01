@@ -152,9 +152,6 @@ namespace EntityPlugin.Actions
             Dialogs = new List<string>();
             RegionCheck = false;
             ignoredEntity = new TempBlackList<IntPtr>();
-
-            if (EntityManager.LocalPlayer.IsValid && EntityManager.LocalPlayer.Location.IsValid)
-                HotSpots.Add(EntityManager.LocalPlayer.Location.Clone());
         }
 
         public override string ActionLabel => $"{GetType().Name} [{EntityID}]";
