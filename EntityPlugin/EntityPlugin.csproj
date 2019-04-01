@@ -40,12 +40,52 @@
       <HintPath>D:\Games\Astral_RU_1\Astral-cleaned.exe</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="DevExpress.Data.v18.1">
+      <HintPath>D:\Games\DevExpress\DevExpress.Data.v18.1.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Map.v18.1.Core">
+      <HintPath>D:\Games\DevExpress\DevExpress.Map.v18.1.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Mvvm.v18.1">
+      <HintPath>D:\Games\DevExpress\DevExpress.Mvvm.v18.1.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Printing.v18.1.Core">
+      <HintPath>D:\Games\DevExpress\DevExpress.Printing.v18.1.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="DevExpress.Utils.v18.1">
       <HintPath>D:\Games\DevExpress\DevExpress.Utils.v18.1.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraBars.v18.1">
+      <HintPath>D:\Games\DevExpress\DevExpress.XtraBars.v18.1.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.XtraEditors.v18.1">
       <HintPath>D:\Games\DevExpress\DevExpress.XtraEditors.v18.1.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraGrid.v18.1">
+      <HintPath>D:\Games\DevExpress\DevExpress.XtraGrid.v18.1.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraLayout.v18.1">
+      <HintPath>D:\Games\DevExpress\DevExpress.XtraLayout.v18.1.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraNavBar.v18.1">
+      <HintPath>D:\Games\DevExpress\DevExpress.XtraNavBar.v18.1.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraVerticalGrid.v18.1">
+      <HintPath>D:\Games\DevExpress\DevExpress.XtraVerticalGrid.v18.1.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraWizard.v18.1">
+      <HintPath>D:\Games\DevExpress\DevExpress.XtraWizard.v18.1.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MyNW">
@@ -79,6 +119,12 @@
     <Compile Include="Conditions\TeamMemberCount.cs" />
     <Compile Include="Conditions\TeamMemberCountInCustomRegion.cs" />
     <Compile Include="Editors\NodePositionEditor.cs" />
+    <Compile Include="Forms\NodeSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\NodeSelectForm.Designer.cs">
+      <DependentUpon>NodeSelectForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Tools\CommonTools.cs" />
     <Compile Include="Tools\EntityInteractionTools.cs" />
     <Compile Include="Tools\EntitySelectionTools.cs" />
