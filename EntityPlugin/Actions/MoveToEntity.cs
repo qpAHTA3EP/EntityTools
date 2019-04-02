@@ -26,13 +26,13 @@ namespace EntityPlugin.Actions
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         public string EntityID { get; set; }
 
-        [Description("VisibilityDistance to the Entity by which it is necessary to approach")]
+        [Description("Distance to the Entity by which it is necessary to approach")]
         public float Distance { get; set; }
 
         [Description("Enable IgnoreCombat profile value while playing action")]
         public bool IgnoreCombat { get; set; }
 
-        [Description("True: Complite an action when the object is closer than 'VisibilityDistance'\n" +
+        [Description("True: Complite an action when the object is closer than 'Distance'\n" +
                      "False: Follow an Entity regardless of its distance")]
         public bool StopOnApproached { get; set; }
 
@@ -75,7 +75,7 @@ namespace EntityPlugin.Actions
         {
             get
             {
-                if (target.IsValid/* && target.Location.IsValid && target.Location.Distance3DFromPlayer > VisibilityDistance*/)
+                if (target.IsValid/* && target.Location.IsValid && target.Location.Distance3DFromPlayer > Distance*/)
                 {
                     return target.Location.Clone();
                 }

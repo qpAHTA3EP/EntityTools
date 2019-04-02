@@ -92,7 +92,7 @@ namespace EntityPlugin.Actions
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         public string EntityID { get; set; }
 
-        [Description("VisibilityDistance to the Entity by which it is necessary to approach")]
+        [Description("Distance to the Entity by which it is necessary to approach")]
         public float Distance { get; set; }
 
         [Description("Enable IgnoreCombat profile value while playing action")]
@@ -187,7 +187,7 @@ namespace EntityPlugin.Actions
         {
             get
             {
-                if (target.IsValid/* && target.Location.IsValid && target.Location.Distance3DFromPlayer > VisibilityDistance*/)
+                if (target.IsValid/* && target.Location.IsValid && target.Location.Distance3DFromPlayer > Distance*/)
                 {
                     return target.Location.Clone();
                 }
@@ -271,7 +271,7 @@ namespace EntityPlugin.Actions
                     {
                         if (target.Location.Distance3DFromPlayer > Distance)
                         {
-                            Astral.Logger.WriteLine($"<{GetType().Name}.{nameof(Run)}>: VisibilityDistance to the Target is {target.Location.Distance3DFromPlayer} and >'{Distance}' therefore '{nameof(Astral.Quester.API.IgnoreCombat)}' set to {IgnoreCombat}");
+                            Astral.Logger.WriteLine($"<{GetType().Name}.{nameof(Run)}>: Distance to the Target is {target.Location.Distance3DFromPlayer} and >'{Distance}' therefore '{nameof(Astral.Quester.API.IgnoreCombat)}' set to {IgnoreCombat}");
                             Astral.Quester.API.IgnoreCombat = IgnoreCombat;
                             Astral.Logger.WriteLine($"<{GetType().Name}.{nameof(Run)}>: '{nameof(NeedToRun)}' returns 'false'");
                             return false;
