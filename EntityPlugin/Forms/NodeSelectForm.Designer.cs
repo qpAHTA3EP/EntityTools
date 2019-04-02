@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace EntityPlugin.Forms
 {
-    partial class NodeSelectForm
+    partial class TargetSelectForm
     {
         /// <summary>
         /// Required designer variable.

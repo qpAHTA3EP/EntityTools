@@ -11,19 +11,19 @@ using System.Windows.Forms;
 
 namespace EntityPlugin.Forms
 {
-    public partial class NodeSelectForm : XtraForm
+    public partial class TargetSelectForm : XtraForm
     {
 
-        static NodeSelectForm nodeSelectForm = null;
-        public NodeSelectForm()
+        static TargetSelectForm nodeSelectForm = null;
+        public TargetSelectForm()
         {
             InitializeComponent();
         }
 
-        public static DialogResult TargetNodeGuiRequest(string string_0, Form form_0 = null)
+        public static DialogResult TargetGuiRequest(string string_0, Form form_0 = null)
         {
             if (nodeSelectForm == null)
-                nodeSelectForm = new NodeSelectForm();
+                nodeSelectForm = new TargetSelectForm();
 
             try
             {
@@ -37,7 +37,7 @@ namespace EntityPlugin.Forms
                 Binds.RemoveAction(Keys.F12);
             }
 
-            //NodeSelectForm.Class113 @class = new NodeSelectForm.Class113();
+            //TargetSelectForm.Class113 @class = new TargetSelectForm.Class113();
             //@class.string_0 = string_0;
             //@class.dialogResult = DialogResult.Abort;
             //Action action = new Action(@class.method_0);
@@ -66,7 +66,7 @@ namespace EntityPlugin.Forms
         //{
         //    internal void method_0()
         //    {
-        //        NodeSelectForm form = new NodeSelectForm();
+        //        TargetSelectForm form = new TargetSelectForm();
         //        form.lblMessage.Text = this.string_0;
         //        Binds.AddAction(Keys.F12, new Action(form.btnOK.PerformClick));
         //        form.ShowDialog();

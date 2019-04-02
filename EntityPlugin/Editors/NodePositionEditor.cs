@@ -17,7 +17,7 @@ namespace EntityPlugin.Editors
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
             //while (MessageBox.Show("Target the node and press ok.", "Select node Posiotion", MessageBoxButtons.OKCancel) == DialogResult.OK)
-            while (NodeSelectForm.TargetNodeGuiRequest("Target the node and press ok.") == DialogResult.OK)
+            while (TargetSelectForm.TargetGuiRequest("Target the node and press ok.") == DialogResult.OK)
             {
                 if (EntityManager.LocalPlayer.Player.InteractStatus.pMouseOverNode != IntPtr.Zero)
                 {
