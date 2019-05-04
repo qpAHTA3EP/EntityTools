@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Drawing.Design;
 using Astral;
+using Astral.Classes;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.Classes.Map;
 using EntityPlugin.Editors;
@@ -17,28 +18,41 @@ namespace EntityPlugin.Actions
         [NonSerialized]
         protected Entity target = new Entity(IntPtr.Zero);
 
+        [NonSerialized]
+        protected Timeout timer = new Timeout(1000);
+
+        [NonSerialized]
+        [Description("Period of time until the closest entity is searched again")]
+        protected readonly int SearchTimeout = 1000;
+
         [Description("Type of and EntityID:\n" +
             "Simple: Simple test string with a mask (char '*' means any chars)\n" +
             "Regex: Regular expression")]
+        [Category("Entity")]
         public ItemFilterStringType EntityIdType { get; set; }
 
         [Description("ID (an internal untranslated name) of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
+        [Category("Entity")]
         public string EntityID { get; set; }
 
         [Description("VisibilityDistance to the Entity by which it is necessary to approach")]
+        [Category("Movement")]
         public float Distance { get; set; }
 
         [Description("Enable IgnoreCombat profile value while playing action")]
+        [Category("Movement")]
         public bool IgnoreCombat { get; set; }
 
         [Description("True: Complite an action when the object is closer than 'VisibilityDistance'\n" +
                      "False: Follow an Entity regardless of its distance")]
+        [Category("Movement")]
         public bool StopOnApproached { get; set; }
 
         [Description("Check Entity's Region:\n" +
             "True: All Entities located in the same Region as Player are ignored\n" +
             "False: Entity's Region does not checked during search")]
+        [Category("Entity")]
         public bool RegionCheck { get; set; }
 
         public MoveToEntity()
@@ -59,9 +73,15 @@ namespace EntityPlugin.Actions
         public override void InternalReset()
         {
             if (string.IsNullOrEmpty(EntityID))
+            {
                 target = new Entity(IntPtr.Zero);
+                timer.ChangeTime(SearchTimeout);
+            }
             else
+            {
                 target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, RegionCheck);
+                timer.ChangeTime(SearchTimeout);
+            }
         }
 
         protected override bool IntenalConditions => !string.IsNullOrEmpty(EntityID);
@@ -77,7 +97,9 @@ namespace EntityPlugin.Actions
             {
                 if (target.IsValid/* && target.Location.IsValid && target.Location.Distance3DFromPlayer > VisibilityDistance*/)
                 {
-                    return target.Location.Clone();
+                    if (target.Location.Distance3DFromPlayer > Distance)
+                        return target.Location.Clone();
+                    else return EntityManager.LocalPlayer.Location.Clone();
                 }
                 return new Vector3();
             }
@@ -108,8 +130,11 @@ namespace EntityPlugin.Actions
             {
                 if (string.IsNullOrEmpty(EntityID))
                     target = new Entity(IntPtr.Zero);
-                else
-                    target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, RegionCheck);
+                else if (target == null || !target.IsValid || timer.IsTimedOut)
+                    {
+                        target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, RegionCheck);
+                        timer.Reset();
+                    }
 
                 //в команде ChangeProfielValue:IgnoreCombat используется код:
                 //Combat.SetIgnoreCombat(IgnoreCombat, -1, 0);

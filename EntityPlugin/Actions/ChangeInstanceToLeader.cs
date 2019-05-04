@@ -84,10 +84,10 @@ namespace EntityPlugin.Actions
                     }
                     if (changeInstanceResult == Instances.ChangeInstanceResult.Success)
                     {
-                        //Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(7000);
+                        //Astral.Classes.Timeout SearchTimeout = new Astral.Classes.Timeout(7000);
                         //while (Core.GetNearesNodetPosition(EntityManager.LocalPlayer.Location, false).Distance3DFromPlayer > 100.0)
                         //{
-                        //    if (timeout.IsTimedOut)
+                        //    if (SearchTimeout.IsTimedOut)
                         //    {
                         //        Astral.Logger.WriteLine("Respawn point too far away the path, stop bot.");
                         //        Roles.ToggleRole(false);
