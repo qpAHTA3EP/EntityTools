@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.Drawing.Design;
 using Astral;
 using Astral.Classes;
@@ -68,6 +69,11 @@ namespace EntityPlugin.Actions
 
         public override void OnMapDraw(GraphicsNW graph)
         {
+            if (target.IsValid && target.Location.IsValid)
+            {
+                Brush beige = Brushes.Beige;
+                graph.drawFillEllipse(target.Location, new Size(10, 10), beige);
+            }
         }
 
         public override void InternalReset()
@@ -95,7 +101,7 @@ namespace EntityPlugin.Actions
         {
             get
             {
-                if (target.IsValid/* && target.Location.IsValid && target.Location.Distance3DFromPlayer > VisibilityDistance*/)
+                if (target.IsValid)
                 {
                     if (target.Location.Distance3DFromPlayer > Distance)
                         return target.Location.Clone();
@@ -117,41 +123,27 @@ namespace EntityPlugin.Actions
             }
         }
 
-        public override void GatherInfos()
-        {
-            //При активации данного кода в HotSpots неконтролируемо добавляются новые точки 
-            //if (EntityManager.LocalPlayer.IsValid && EntityManager.LocalPlayer.Location.IsValid)
-            //    HotSpots.Add(EntityManager.LocalPlayer.Location.Clone());
-        }
+        public override void GatherInfos() { }
 
         public override bool NeedToRun
         {
             get
             {
-                if (string.IsNullOrEmpty(EntityID))
-                    target = new Entity(IntPtr.Zero);
-                else if (target == null || !target.IsValid || timer.IsTimedOut)
-                    {
-                        target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, RegionCheck);
-                        timer.Reset();
-                    }
+                // Поиск Entity по таймеру
+                //if (string.IsNullOrEmpty(EntityID))
+                //    target = new Entity(IntPtr.Zero);
+                //else if (target == null || !target.IsValid || timer.IsTimedOut)
+                //{
+                //    target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, RegionCheck);
+                //    timer.Reset();
+                //}
 
-                //в команде ChangeProfielValue:IgnoreCombat используется код:
-                //Combat.SetIgnoreCombat(IgnoreCombat, -1, 0);
+                // Поиск Entity при каждой проверке
+                target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, RegionCheck);
 
-                //Нашел доступный способ управлять запретом боя
-                //Astral.Quester.API.IgnoreCombat = IgnoreCombat;
+                Astral.Quester.API.IgnoreCombat = IgnoreCombat;
 
-                if (target.IsValid)
-                {
-                    if (target.Location.Distance3DFromPlayer > Distance)
-                    {
-                        Astral.Quester.API.IgnoreCombat = IgnoreCombat;
-                        return false;
-                    }
-                    else return true;
-                }
-                return false;
+                return target != null && target.IsValid && (target.Location.Distance3DFromPlayer > Distance);
             }
         }
 
