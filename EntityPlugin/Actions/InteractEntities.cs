@@ -310,6 +310,7 @@ namespace EntityPlugin.Actions
                         }
                         else return true;
                     }
+                    else Astral.Quester.API.IgnoreCombat = IgnoreCombat;
                 }
                 return false;                
             }

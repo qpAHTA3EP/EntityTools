@@ -141,9 +141,18 @@ namespace EntityPlugin.Actions
                 // Поиск Entity при каждой проверке
                 target = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, RegionCheck);
 
-                Astral.Quester.API.IgnoreCombat = IgnoreCombat;
+                if(target != null && target.IsValid)
+                {
+                    if (target.Location.Distance3DFromPlayer > Distance)
+                    {
+                        Astral.Quester.API.IgnoreCombat = IgnoreCombat;
+                        return false;
+                    }
+                    else return true;
+                }
+                else Astral.Quester.API.IgnoreCombat = IgnoreCombat;
 
-                return target != null && target.IsValid && (target.Location.Distance3DFromPlayer > Distance);
+                return false;
             }
         }
 
