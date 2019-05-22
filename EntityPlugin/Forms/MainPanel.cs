@@ -1,9 +1,12 @@
-﻿#define Test_EntitySelectForm
+﻿//#define Test_EntitySelectForm
 
 using System;
+using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 using Astral.Quester.Classes;
+using EntityPlugin.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
 using static DevExpress.XtraEditors.BaseListBoxControl;
@@ -58,7 +61,7 @@ namespace EntityPlugin.Forms
 
         private void btnEntities_Click(object sender, EventArgs e)
         {
-#region Test_MultiSelectCustomRegion
+            #region Test_MultiSelectCustomRegion
 #if Test_MultiSelectCustomRegion
             //Entity entity = new Entity(IntPtr.Zero);
 
@@ -101,9 +104,9 @@ namespace EntityPlugin.Forms
                 MessageBox.Show(strBldr.ToString());
             }
 #endif
-#endregion
+            #endregion
 
-#region Test_EntitySelectForm
+            #region Test_EntitySelectForm
 #if Test_EntitySelectForm
             entDif = EntitySelectForm.GetEntity(entDif.NameUntranslated);
             if (entDif != null)
@@ -114,7 +117,7 @@ namespace EntityPlugin.Forms
             else MessageBox.Show("No Entity was selected");
 
 #endif
-#endregion
+            #endregion
         }
 
         private void ckbDebugInfo_CheckedChanged(object sender, EventArgs e)
@@ -125,6 +128,70 @@ namespace EntityPlugin.Forms
         private void MainPanel_Load(object sender, EventArgs e)
         {
             ckbDebugInfo.Checked = EntityPlugin.DebugInfoEnabled;
+
+            bteMissions.Properties.NullValuePrompt = Path.Combine(FileTools.defaulExportFolderMissions, FileTools.defaulFileMissions);
+            bteAuras.Properties.NullValuePrompt = Path.Combine(FileTools.defaulExportFolderAuras, FileTools.defaulFileAuras);
+        }
+
+        private void bte_ButtonClick(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
+        {
+            DevExpress.XtraEditors.ButtonEdit bte = sender as DevExpress.XtraEditors.ButtonEdit;
+            if (bte != null)
+            {
+                string fileName = string.Empty;
+
+                if (string.IsNullOrEmpty(bte.Text) || (bte.Text.IndexOfAny(Path.GetInvalidPathChars()) != -1))
+                {
+
+                    if (bte.Name == bteAuras.Name) fldrBroserDlg.SelectedPath = FileTools.defaulExportFolderAuras;
+                    if (bte.Name == bteMissions.Name) fldrBroserDlg.SelectedPath = FileTools.defaulExportFolderMissions;
+                }
+                else
+                {
+                    fldrBroserDlg.SelectedPath = Path.GetDirectoryName(bte.Text);
+                    fileName = Path.GetFileName(bte.Text);
+                }
+
+                if (fldrBroserDlg.ShowDialog() == DialogResult.OK)
+                {
+                    if (string.IsNullOrEmpty(fileName))
+                    {
+                        if (bte.Name == bteAuras.Name) bte.Text = Path.Combine(fldrBroserDlg.SelectedPath, FileTools.defaulFileAuras);
+                        if (bte.Name == bteMissions.Name) bte.Text = Path.Combine(fldrBroserDlg.SelectedPath, FileTools.defaulFileMissions);
+                    }
+                    else bte.Text = Path.Combine(fldrBroserDlg.SelectedPath, fileName);
+                }
+            }
+        }
+
+        private void btnAuras_Click(object sender, EventArgs e)
+        {
+            AurasWrapper auras = new AurasWrapper(EntityManager.LocalPlayer?.Character);
+
+            string fileName = FileTools.ReplaceMask(bteAuras.Text);
+
+            if (string.IsNullOrEmpty(fileName) || fileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+                fileName = Path.Combine(FileTools.defaulExportFolderAuras, FileTools.defaulFileAuras);
+
+            XmlSerializer serialiser = new XmlSerializer(typeof(AurasWrapper));
+            TextWriter FileStream = new StreamWriter(fileName);
+            serialiser.Serialize(FileStream, auras);
+            FileStream.Close();
+        }
+
+        private void btnMissions_Click(object sender, EventArgs e)
+        {
+            MissionsWrapper auras = new MissionsWrapper(EntityManager.LocalPlayer);
+
+            string fileName = FileTools.ReplaceMask(bteAuras.Text);
+
+            if (string.IsNullOrEmpty(fileName) || fileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+                fileName = Path.Combine(FileTools.defaulExportFolderMissions, FileTools.defaulFileMissions);
+
+            XmlSerializer serialiser = new XmlSerializer(typeof(MissionsWrapper));
+            TextWriter FileStream = new StreamWriter(fileName);
+            serialiser.Serialize(FileStream, auras);
+            FileStream.Close();
         }
     }
 }
