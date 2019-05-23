@@ -11,20 +11,25 @@ namespace EntityPlugin.Conditions
     public class TeamMembersCount : Condition
     {
         [Description("Threshold value of the VisibilityDistance from Player to the Team member for comparison by 'DistanceSign'")]
+        [Category("Tested")]
         public float Distance { get; set; }
 
         [Description("The comparison type for 'VisibilityDistance'")]
+        [Category("Tested")]
         public Relation DistanceSign { get; set; }
 
         [Description("Threshold value of the Team members for comparison by 'Sign'")]
+        [Category("Members")]
         public int MemberCount { get; set; }
 
         [Description("The comparison type for 'MemberCount'")]
+        [Category("Members")]
         public Relation Sign { get; set; }
 
         [Description("Check TeamMember's Region:\n" +
             "True: Count TeamMember if it located in the same Region as Player\n" +
             "False: Does not consider the region when counting TeamMembers")]
+        [Category("Tested")]
         public bool RegionCheck { get; set; }
 
         public TeamMembersCount()
@@ -44,67 +49,71 @@ namespace EntityPlugin.Conditions
         {
             get
             {
-                int membersCount = 0;
-                switch (DistanceSign)
+                if (EntityManager.LocalPlayer.PlayerTeam.IsInTeam)
                 {
-                    case Relation.Inferior:
-                        {
-                            membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.FindAll((TeamMember member) =>
-                                            (   member.InternalName != EntityManager.LocalPlayer.InternalName 
-                                                && (!RegionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                                && member.Entity.Location.Distance3DFromPlayer < Distance)
-                                            ).Count;                            
+                    int membersCount = 0;
+                    switch (DistanceSign)
+                    {
+                        case Relation.Inferior:
+                            {
+                                membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.FindAll((TeamMember member) =>
+                                                (member.InternalName != EntityManager.LocalPlayer.InternalName
+                                                    && (!RegionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+                                                    && member.Entity.Location.Distance3DFromPlayer < Distance)
+                                                ).Count;
 
+                                break;
+                            }
+                        case Relation.Superior:
+                            {
+                                membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.FindAll((TeamMember member) =>
+                                                (member.InternalName != EntityManager.LocalPlayer.InternalName
+                                                    && (!RegionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+                                                    && member.Entity.Location.Distance3DFromPlayer > Distance)
+                                                ).Count;
+                                break;
+                            }
+                        case Relation.Equal:
+                            {
+                                membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.FindAll((TeamMember member) =>
+                                                (member.InternalName != EntityManager.LocalPlayer.InternalName
+                                                    && (!RegionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+                                                    && member.Entity.Location.Distance3DFromPlayer == Distance)
+                                                ).Count;
+                                break;
+                            }
+                        case Relation.NotEqual:
+                            {
+                                membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.FindAll((TeamMember member) =>
+                                                (member.InternalName != EntityManager.LocalPlayer.InternalName
+                                                    && (!RegionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+                                                    && member.Entity.Location.Distance3DFromPlayer != Distance)
+                                                ).Count;
+                                break;
+                            }
+                    }
+                    bool result;
+                    switch (Sign)
+                    {
+                        case Condition.Relation.Equal:
+                            result = membersCount == MemberCount;
                             break;
-                        }
-                    case Relation.Superior:
-                        {
-                            membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.FindAll((TeamMember member) =>
-                                            (   member.InternalName != EntityManager.LocalPlayer.InternalName
-                                                && (!RegionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                                && member.Entity.Location.Distance3DFromPlayer > Distance)
-                                            ).Count;
+                        case Condition.Relation.NotEqual:
+                            result = membersCount != MemberCount;
                             break;
-                        }
-                    case Relation.Equal:
-                        {
-                            membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.FindAll((TeamMember member) =>
-                                            (   member.InternalName != EntityManager.LocalPlayer.InternalName
-                                                && (!RegionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                                && member.Entity.Location.Distance3DFromPlayer == Distance)
-                                            ).Count;
+                        case Condition.Relation.Inferior:
+                            result = membersCount < MemberCount;
                             break;
-                        }
-                    case Relation.NotEqual:
-                        {
-                            membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.FindAll((TeamMember member) =>
-                                            (   member.InternalName != EntityManager.LocalPlayer.InternalName
-                                                && (!RegionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                                && member.Entity.Location.Distance3DFromPlayer != Distance)
-                                            ).Count;
+                        case Condition.Relation.Superior:
+                            result = membersCount > MemberCount;
                             break;
-                        }
+                        default:
+                            result = false;
+                            break;
+                    }
+                    return result;
                 }
-                bool result;
-                switch (Sign)
-                {
-                    case Condition.Relation.Equal:
-                        result = membersCount == MemberCount;
-                        break;
-                    case Condition.Relation.NotEqual:
-                        result = membersCount != MemberCount;
-                        break;
-                    case Condition.Relation.Inferior:
-                        result = membersCount < MemberCount;
-                        break;
-                    case Condition.Relation.Superior:
-                        result = membersCount > MemberCount;
-                        break;
-                    default:
-                        result = false;
-                        break;
-                }
-                return result;
+                else return false;
             }
         }
 
@@ -127,7 +136,7 @@ namespace EntityPlugin.Conditions
                     {
                         if (member.InternalName != EntityManager.LocalPlayer.InternalName)
                         {
-                            strBldr.Append($"VisibilityDistance to [{member.InternalName}] is ").AppendFormat("{0:0.##}", member.Entity.Location.Distance3DFromPlayer);
+                            strBldr.Append($"Distance to [{member.InternalName}] is ").AppendFormat("{0:0.##}", member.Entity.Location.Distance3DFromPlayer);
                             if (RegionCheck)
                             {
                                 strBldr.Append($" (RegionCheck[{member.Entity.RegionInternalName}] ");
