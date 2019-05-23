@@ -168,13 +168,22 @@ namespace EntityPlugin.Forms
         {
             AurasWrapper auras = new AurasWrapper(EntityManager.LocalPlayer?.Character);
 
-            string fileName = FileTools.ReplaceMask(bteAuras.Text);
+            string fullFileName = FileTools.ReplaceMask(bteAuras.Text);
 
-            if (string.IsNullOrEmpty(fileName) || fileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
-                fileName = Path.Combine(FileTools.defaulExportFolderAuras, FileTools.defaulFileAuras);
+            if (string.IsNullOrEmpty(fullFileName) || fullFileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+            {
+                fullFileName = Path.Combine(FileTools.defaulExportFolderAuras, FileTools.defaulFileAuras);
+                MessageBox.Show("The specified filename is invalid.\n" +
+                                "Auras info will be saved in the file:\n" +
+                                fullFileName, "Caution!", MessageBoxButtons.OK);
+            }
+
+            if (!Directory.Exists(Path.GetDirectoryName(fullFileName)))
+                Directory.CreateDirectory(Path.GetDirectoryName(fullFileName));
+
 
             XmlSerializer serialiser = new XmlSerializer(typeof(AurasWrapper));
-            TextWriter FileStream = new StreamWriter(fileName);
+            TextWriter FileStream = new StreamWriter(fullFileName);
             serialiser.Serialize(FileStream, auras);
             FileStream.Close();
         }
@@ -183,13 +192,21 @@ namespace EntityPlugin.Forms
         {
             MissionsWrapper auras = new MissionsWrapper(EntityManager.LocalPlayer);
 
-            string fileName = FileTools.ReplaceMask(bteAuras.Text);
+            string fullFileName = FileTools.ReplaceMask(bteAuras.Text);
 
-            if (string.IsNullOrEmpty(fileName) || fileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
-                fileName = Path.Combine(FileTools.defaulExportFolderMissions, FileTools.defaulFileMissions);
+            if (string.IsNullOrEmpty(fullFileName) || fullFileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+            {
+                fullFileName = Path.Combine(FileTools.defaulExportFolderMissions, FileTools.defaulFileMissions);
+                MessageBox.Show("The specified filename is invalid.\n" +
+                    "Missions info will be saved in the file:\n" +
+                    fullFileName, "Caution!", MessageBoxButtons.OK);
+            }
+
+            if (!Directory.Exists(Path.GetDirectoryName(fullFileName)))
+                Directory.CreateDirectory(Path.GetDirectoryName(fullFileName));
 
             XmlSerializer serialiser = new XmlSerializer(typeof(MissionsWrapper));
-            TextWriter FileStream = new StreamWriter(fileName);
+            TextWriter FileStream = new StreamWriter(fullFileName);
             serialiser.Serialize(FileStream, auras);
             FileStream.Close();
         }

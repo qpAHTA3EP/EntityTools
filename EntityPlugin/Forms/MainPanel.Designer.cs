@@ -55,13 +55,14 @@ namespace EntityPlugin.Forms
             // 
             this.btnEntities.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnEntities.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnEntities.Location = new System.Drawing.Point(3, 113);
+            this.btnEntities.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnEntities.Location = new System.Drawing.Point(6, 113);
             this.btnEntities.Name = "btnEntities";
-            this.btnEntities.Size = new System.Drawing.Size(358, 23);
+            this.btnEntities.Size = new System.Drawing.Size(352, 23);
             this.btnEntities.TabIndex = 0;
             this.btnEntities.Text = "Open the list of the Entities";
             this.btnEntities.UseVisualStyleBackColor = true;
+            this.btnEntities.Visible = false;
             this.btnEntities.Click += new System.EventHandler(this.btnEntities_Click);
             // 
             // ckbDebugInfo
@@ -79,9 +80,9 @@ namespace EntityPlugin.Forms
             // 
             this.btnAuras.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAuras.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAuras.Location = new System.Drawing.Point(310, 26);
+            this.btnAuras.Location = new System.Drawing.Point(308, 26);
             this.btnAuras.Name = "btnAuras";
-            this.btnAuras.Size = new System.Drawing.Size(51, 23);
+            this.btnAuras.Size = new System.Drawing.Size(50, 23);
             this.btnAuras.TabIndex = 2;
             this.btnAuras.Text = "Export";
             this.btnAuras.UseVisualStyleBackColor = true;
@@ -90,7 +91,7 @@ namespace EntityPlugin.Forms
             // lblAuras
             // 
             this.lblAuras.AutoSize = true;
-            this.lblAuras.Location = new System.Drawing.Point(3, 12);
+            this.lblAuras.Location = new System.Drawing.Point(14, 12);
             this.lblAuras.Name = "lblAuras";
             this.lblAuras.Size = new System.Drawing.Size(142, 13);
             this.lblAuras.TabIndex = 3;
@@ -99,10 +100,10 @@ namespace EntityPlugin.Forms
             // btnMissions
             // 
             this.btnMissions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnMissions.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnMissions.Location = new System.Drawing.Point(310, 65);
+            this.btnMissions.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMissions.Location = new System.Drawing.Point(308, 65);
             this.btnMissions.Name = "btnMissions";
-            this.btnMissions.Size = new System.Drawing.Size(51, 23);
+            this.btnMissions.Size = new System.Drawing.Size(50, 23);
             this.btnMissions.TabIndex = 2;
             this.btnMissions.Text = "Export";
             this.btnMissions.UseVisualStyleBackColor = true;
@@ -111,7 +112,7 @@ namespace EntityPlugin.Forms
             // lblMissions
             // 
             this.lblMissions.AutoSize = true;
-            this.lblMissions.Location = new System.Drawing.Point(3, 51);
+            this.lblMissions.Location = new System.Drawing.Point(14, 51);
             this.lblMissions.Name = "lblMissions";
             this.lblMissions.Size = new System.Drawing.Size(153, 13);
             this.lblMissions.TabIndex = 3;
@@ -122,15 +123,14 @@ namespace EntityPlugin.Forms
             this.bteMissions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.bteMissions.EditValue = "";
-            this.bteMissions.Location = new System.Drawing.Point(3, 67);
+            this.bteMissions.Location = new System.Drawing.Point(6, 67);
             this.bteMissions.Name = "bteMissions";
             this.bteMissions.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton()});
             this.bteMissions.Properties.NullText = "Enter the Filename where store the Missions";
             this.bteMissions.Properties.NullValuePromptShowForEmptyValue = true;
             this.bteMissions.Properties.ReadOnly = true;
-            this.bteMissions.Properties.ButtonClick += new DevExpress.XtraEditors.Controls.ButtonPressedEventHandler(this.bte_ButtonClick);
-            this.bteMissions.Size = new System.Drawing.Size(301, 20);
+            this.bteMissions.Size = new System.Drawing.Size(296, 20);
             this.bteMissions.TabIndex = 6;
             this.bteMissions.ToolTip = "File name to store Missions of the current Character. Allow mask %character%, %ac" +
     "count%, %dateTime%.";
@@ -141,7 +141,7 @@ namespace EntityPlugin.Forms
             this.bteAuras.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.bteAuras.EditValue = "";
-            this.bteAuras.Location = new System.Drawing.Point(3, 28);
+            this.bteAuras.Location = new System.Drawing.Point(6, 28);
             this.bteAuras.Name = "bteAuras";
             this.bteAuras.Properties.AllowNullInput = DevExpress.Utils.DefaultBoolean.False;
             this.bteAuras.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
@@ -149,8 +149,7 @@ namespace EntityPlugin.Forms
             this.bteAuras.Properties.NullText = "Enter the Filename where store the Auras";
             this.bteAuras.Properties.NullValuePromptShowForEmptyValue = true;
             this.bteAuras.Properties.ReadOnly = true;
-            this.bteAuras.Properties.ButtonClick += new DevExpress.XtraEditors.Controls.ButtonPressedEventHandler(this.bte_ButtonClick);
-            this.bteAuras.Size = new System.Drawing.Size(301, 20);
+            this.bteAuras.Size = new System.Drawing.Size(296, 20);
             this.bteAuras.TabIndex = 6;
             this.bteAuras.TabStop = false;
             this.bteAuras.ToolTip = "File name to store Auras of the current Character. Allow mask %character%, %accou" +

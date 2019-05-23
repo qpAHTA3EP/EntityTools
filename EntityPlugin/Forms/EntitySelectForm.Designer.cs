@@ -120,7 +120,7 @@
             // clmnDistance
             // 
             this.clmnDistance.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this.clmnDistance.HeaderText = "VisibilityDistance";
+            this.clmnDistance.HeaderText = "Distance";
             this.clmnDistance.Name = "clmnDistance";
             this.clmnDistance.ReadOnly = true;
             this.clmnDistance.Resizable = System.Windows.Forms.DataGridViewTriState.False;
