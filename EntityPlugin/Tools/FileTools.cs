@@ -21,8 +21,8 @@ namespace EntityPlugin.Tools
 
         public static readonly string defaulExportFolderAuras = Path.Combine(Astral.Controllers.Directories.LogsPath, "Auras");
         public static readonly string defaulExportFolderMissions = Path.Combine(Astral.Controllers.Directories.LogsPath, "Missions");
-        public static readonly string defaulFileAuras = "Auras.txt";
-        public static readonly string defaulFileMissions = "Missions.txt";
+        public static readonly string defaulFileAuras = "Auras.xml";
+        public static readonly string defaulFileMissions = "Missions.xml";
 
         //public static bool ReplaceMask(ref string str)
         //{

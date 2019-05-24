@@ -22,46 +22,9 @@ namespace EntityPlugin.Forms
             InitializeComponent();
         }
 
-        //public void listBoxControl_MouseMove(object sender, MouseEventArgs e)
-        //{
-        //    DevExpress.XtraEditors.ListBoxControl listitems = sender as DevExpress.XtraEditors.ListBoxControl;
-        //    if (listitems != null)
-        //    {
-        //        int index = listitems.IndexFromPoint(e.Location);
-
-        //        if (index > listitems.Items.Count)
-        //        {
-        //            listitems.ToolTip = string.Empty;
-        //            return;
-        //        }
-
-        //        //Список Items оказывается пустым, т.к. данные берутся из DataSource
-        //        Entity selectedEntity = listitems.Items[index] as Entity;
-
-        //        string tip = String.Empty;
-
-        //        if (selectedEntity!=null && selectedEntity.IsValid)
-        //            tip = $"Name = [{selectedEntity.Name}]" + Environment.NewLine +
-        //                    $"InternalName = [{selectedEntity.InternalName}]" + Environment.NewLine +
-        //                    $"NameUntranslated = [{selectedEntity.NameUntranslated}]";
-
-        //        listitems.ToolTip = tip;
-        //    }
-        //}
-        //public void listBoxControl_toolTipBeforShow(object sender, ToolTipControllerShowEventArgs e)
-        //{
-        //    Entity selectedEntity = e.SelectedObject as Entity;
-        //    string tip = string.Empty;
-
-        //    if (selectedEntity != null && selectedEntity.IsValid)
-        //        tip = $"{selectedEntity.InternalName} [{selectedEntity.NameUntranslated}]";
-
-        //    e.ToolTip = tip;
-        //}
-
         private void btnEntities_Click(object sender, EventArgs e)
         {
-            #region Test_MultiSelectCustomRegion
+#region Test_MultiSelectCustomRegion
 #if Test_MultiSelectCustomRegion
             //Entity entity = new Entity(IntPtr.Zero);
 
@@ -104,9 +67,9 @@ namespace EntityPlugin.Forms
                 MessageBox.Show(strBldr.ToString());
             }
 #endif
-            #endregion
+#endregion
 
-            #region Test_EntitySelectForm
+#region Test_EntitySelectForm
 #if Test_EntitySelectForm
             entDif = EntitySelectForm.GetEntity(entDif.NameUntranslated);
             if (entDif != null)
@@ -117,7 +80,7 @@ namespace EntityPlugin.Forms
             else MessageBox.Show("No Entity was selected");
 
 #endif
-            #endregion
+#endregion
         }
 
         private void ckbDebugInfo_CheckedChanged(object sender, EventArgs e)

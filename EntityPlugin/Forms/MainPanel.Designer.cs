@@ -132,8 +132,8 @@ namespace EntityPlugin.Forms
             this.bteMissions.Properties.ReadOnly = true;
             this.bteMissions.Size = new System.Drawing.Size(296, 20);
             this.bteMissions.TabIndex = 6;
-            this.bteMissions.ToolTip = "File name to store Missions of the current Character. Allow mask %character%, %ac" +
-    "count%, %dateTime%.";
+            this.bteMissions.ToolTip = "File name to store Missions of the current Character. \r\nAllow mask %character%, %" +
+    "account%, %dateTime%.";
             this.bteMissions.ButtonClick += new DevExpress.XtraEditors.Controls.ButtonPressedEventHandler(this.bte_ButtonClick);
             // 
             // bteAuras
@@ -152,8 +152,8 @@ namespace EntityPlugin.Forms
             this.bteAuras.Size = new System.Drawing.Size(296, 20);
             this.bteAuras.TabIndex = 6;
             this.bteAuras.TabStop = false;
-            this.bteAuras.ToolTip = "File name to store Auras of the current Character. Allow mask %character%, %accou" +
-    "nt%, %dateTime%.";
+            this.bteAuras.ToolTip = "File name to store Auras of the current Character. \r\nAllow mask %character%, %acc" +
+    "ount%, %dateTime%.";
             this.bteAuras.ButtonClick += new DevExpress.XtraEditors.Controls.ButtonPressedEventHandler(this.bte_ButtonClick);
             // 
             // tbclMain
