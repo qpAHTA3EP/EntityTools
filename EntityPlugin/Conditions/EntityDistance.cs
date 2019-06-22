@@ -25,20 +25,25 @@ namespace EntityPlugin.Conditions
         [Description("Type of and EntityID:\n" +
             "Simple: Simple test string with a mask (char '*' means any chars)\n" +
             "Regex: Regular expression")]
+        [Category("Entity")]
         public ItemFilterStringType EntityIdType { get; set; }
 
         [Description("ID (an untranslated name) of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
+        [Category("Entity")]
         public string EntityID { get; set; }
 
+        [Category("Tested")]
         public float Distance { get; set; }
 
         [Description("Check Entity's Region:\n" +
             "True: Count Entity if it located in the same Region as Player\n" +
             "False: Does not consider the region when counting Entities")]
+        [Category("Tested")]
         public bool RegionCheck { get; set; }
 
         [Description("Distance comparison type to the closest Entity")]
+        [Category("Tested")]
         public Condition.Relation Sign { get; set; }
 
         public override bool IsValid
@@ -73,7 +78,7 @@ namespace EntityPlugin.Conditions
 
         public override string ToString()
         {
-            return $"Entity [{EntityID}] Distance {Sign} to {Distance}";
+            return $"Entity [{EntityID}] VisibilityDistance {Sign} to {Distance}";
         }
 
         public override string TestInfos

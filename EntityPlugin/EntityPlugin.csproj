@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -26,7 +26,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -37,8 +37,10 @@
       <HintPath>D:\Games\Astral_RU_1\Astral-cleaned.exe</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Data.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.Data.v18.1.dll</HintPath>
+    <Reference Include="DevExpress.Data.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Dialogs.v18.1.Core, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.Map.v18.1.Core">
@@ -53,16 +55,20 @@
       <HintPath>D:\Games\DevExpress\DevExpress.Printing.v18.1.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Utils.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.Utils.v18.1.dll</HintPath>
+    <Reference Include="DevExpress.Sparkline.v18.1.Core, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Utils.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.XtraBars.v18.1">
       <HintPath>D:\Games\DevExpress\DevExpress.XtraBars.v18.1.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraEditors.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.XtraEditors.v18.1.dll</HintPath>
+    <Reference Include="DevExpress.XtraDialogs.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraEditors.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.XtraGrid.v18.1">
@@ -75,6 +81,9 @@
     </Reference>
     <Reference Include="DevExpress.XtraNavBar.v18.1">
       <HintPath>D:\Games\DevExpress\DevExpress.XtraNavBar.v18.1.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraTreeList.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.XtraVerticalGrid.v18.1">
@@ -90,7 +99,10 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -103,7 +115,6 @@
     <Compile Include="Actions\ChangeInstanceToLeader.cs" />
     <Compile Include="Actions\InteractEntities.cs" />
     <Compile Include="Actions\InteractEntity.cs" />
-    <Compile Include="Actions\MoveToLeader.cs" />
     <Compile Include="Conditions\CheckShard.cs" />
     <Compile Include="Conditions\EntityDistance.cs" />
     <Compile Include="Conditions\EntityCountInCustomRegion.cs" />
@@ -119,6 +130,7 @@
     <Compile Include="Forms\NodeSelectForm.Designer.cs">
       <DependentUpon>NodeSelectForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\Auras.cs" />
     <Compile Include="Tools\CommonTools.cs" />
     <Compile Include="Tools\EntityInteractionTools.cs" />
@@ -155,13 +167,13 @@
     <EmbeddedResource Include="Forms\MainPanel.resx">
       <DependentUpon>MainPanel.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Classes\" />
     <Folder Include="Properties\DataSources\" />
     <Folder Include="UCC\" />
   </ItemGroup>

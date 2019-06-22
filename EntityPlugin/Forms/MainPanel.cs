@@ -1,7 +1,6 @@
-﻿#define Test_EntitySelectForm
+﻿//#define Test_EntitySelectForm
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -22,43 +21,6 @@ namespace EntityPlugin.Forms
         {
             InitializeComponent();
         }
-
-        //public void listBoxControl_MouseMove(object sender, MouseEventArgs e)
-        //{
-        //    DevExpress.XtraEditors.ListBoxControl listitems = sender as DevExpress.XtraEditors.ListBoxControl;
-        //    if (listitems != null)
-        //    {
-        //        int index = listitems.IndexFromPoint(e.Location);
-
-        //        if (index > listitems.Items.Count)
-        //        {
-        //            listitems.ToolTip = string.Empty;
-        //            return;
-        //        }
-
-        //        //Список Items оказывается пустым, т.к. данные берутся из DataSource
-        //        Entity selectedEntity = listitems.Items[index] as Entity;
-
-        //        string tip = String.Empty;
-
-        //        if (selectedEntity!=null && selectedEntity.IsValid)
-        //            tip = $"Name = [{selectedEntity.Name}]" + Environment.NewLine +
-        //                    $"InternalName = [{selectedEntity.InternalName}]" + Environment.NewLine +
-        //                    $"NameUntranslated = [{selectedEntity.NameUntranslated}]";
-
-        //        listitems.ToolTip = tip;
-        //    }
-        //}
-        //public void listBoxControl_toolTipBeforShow(object sender, ToolTipControllerShowEventArgs e)
-        //{
-        //    Entity selectedEntity = e.SelectedObject as Entity;
-        //    string tip = string.Empty;
-
-        //    if (selectedEntity != null && selectedEntity.IsValid)
-        //        tip = $"{selectedEntity.InternalName} [{selectedEntity.NameUntranslated}]";
-
-        //    e.ToolTip = tip;
-        //}
 
         private void btnEntities_Click(object sender, EventArgs e)
         {
@@ -129,25 +91,86 @@ namespace EntityPlugin.Forms
         private void MainPanel_Load(object sender, EventArgs e)
         {
             ckbDebugInfo.Checked = EntityPlugin.DebugInfoEnabled;
+
+            bteMissions.Properties.NullValuePrompt = Path.Combine(FileTools.defaulExportFolderMissions, FileTools.defaulFileMissions);
+            bteAuras.Properties.NullValuePrompt = Path.Combine(FileTools.defaulExportFolderAuras, FileTools.defaulFileAuras);
+        }
+
+        private void bte_ButtonClick(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
+        {
+            DevExpress.XtraEditors.ButtonEdit bte = sender as DevExpress.XtraEditors.ButtonEdit;
+            if (bte != null)
+            {
+                string fileName = string.Empty;
+
+                if (string.IsNullOrEmpty(bte.Text) || (bte.Text.IndexOfAny(Path.GetInvalidPathChars()) != -1))
+                {
+
+                    if (bte.Name == bteAuras.Name) fldrBroserDlg.SelectedPath = FileTools.defaulExportFolderAuras;
+                    if (bte.Name == bteMissions.Name) fldrBroserDlg.SelectedPath = FileTools.defaulExportFolderMissions;
+                }
+                else
+                {
+                    fldrBroserDlg.SelectedPath = Path.GetDirectoryName(bte.Text);
+                    fileName = Path.GetFileName(bte.Text);
+                }
+
+                if (fldrBroserDlg.ShowDialog() == DialogResult.OK)
+                {
+                    if (string.IsNullOrEmpty(fileName))
+                    {
+                        if (bte.Name == bteAuras.Name) bte.Text = Path.Combine(fldrBroserDlg.SelectedPath, FileTools.defaulFileAuras);
+                        if (bte.Name == bteMissions.Name) bte.Text = Path.Combine(fldrBroserDlg.SelectedPath, FileTools.defaulFileMissions);
+                    }
+                    else bte.Text = Path.Combine(fldrBroserDlg.SelectedPath, fileName);
+                }
+            }
         }
 
         private void btnAuras_Click(object sender, EventArgs e)
         {
             AurasWrapper auras = new AurasWrapper(EntityManager.LocalPlayer?.Character);
 
+            string fullFileName = FileTools.ReplaceMask(bteAuras.Text);
+
+            if (string.IsNullOrEmpty(fullFileName) || fullFileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+            {
+                fullFileName = Path.Combine(FileTools.defaulExportFolderAuras, FileTools.defaulFileAuras);
+                MessageBox.Show("The specified filename is invalid.\n" +
+                                "Auras info will be saved in the file:\n" +
+                                fullFileName, "Caution!", MessageBoxButtons.OK);
+            }
+
+            if (!Directory.Exists(Path.GetDirectoryName(fullFileName)))
+                Directory.CreateDirectory(Path.GetDirectoryName(fullFileName));
+
+
             XmlSerializer serialiser = new XmlSerializer(typeof(AurasWrapper));
-            TextWriter FileStream = new StreamWriter(@".\Auras.xml");
+            TextWriter FileStream = new StreamWriter(fullFileName);
             serialiser.Serialize(FileStream, auras);
             FileStream.Close();
         }
 
-        private void bntMissions_Click(object sender, EventArgs e)
+        private void btnMissions_Click(object sender, EventArgs e)
         {
-            MissionsWrapper missions = new MissionsWrapper(EntityManager.LocalPlayer);
+            MissionsWrapper auras = new MissionsWrapper(EntityManager.LocalPlayer);
+
+            string fullFileName = FileTools.ReplaceMask(bteAuras.Text);
+
+            if (string.IsNullOrEmpty(fullFileName) || fullFileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+            {
+                fullFileName = Path.Combine(FileTools.defaulExportFolderMissions, FileTools.defaulFileMissions);
+                MessageBox.Show("The specified filename is invalid.\n" +
+                    "Missions info will be saved in the file:\n" +
+                    fullFileName, "Caution!", MessageBoxButtons.OK);
+            }
+
+            if (!Directory.Exists(Path.GetDirectoryName(fullFileName)))
+                Directory.CreateDirectory(Path.GetDirectoryName(fullFileName));
 
             XmlSerializer serialiser = new XmlSerializer(typeof(MissionsWrapper));
-            TextWriter FileStream = new StreamWriter(@".\Missions.xml");
-            serialiser.Serialize(FileStream, missions);
+            TextWriter FileStream = new StreamWriter(fullFileName);
+            serialiser.Serialize(FileStream, auras);
             FileStream.Close();
         }
     }
