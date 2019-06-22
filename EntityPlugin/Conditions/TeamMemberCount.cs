@@ -10,10 +10,10 @@ namespace EntityPlugin.Conditions
     [Serializable]
     public class TeamMembersCount : Condition
     {
-        [Description("Threshold value of the VisibilityDistance from Player to the Team member for comparison by 'DistanceSign'")]
+        [Description("Threshold value of the Distance from Player to the Team member for comparison by 'DistanceSign'")]
         public float Distance { get; set; }
 
-        [Description("The comparison type for 'VisibilityDistance'")]
+        [Description("The comparison type for 'Distance'")]
         public Relation DistanceSign { get; set; }
 
         [Description("Threshold value of the Team members for comparison by 'Sign'")]
@@ -110,7 +110,7 @@ namespace EntityPlugin.Conditions
 
         public override string ToString()
         {
-            return $"{GetType().Name} {Sign} to {MemberCount} which VisibilityDistance {DistanceSign} to {Distance}";
+            return $"{GetType().Name} {Sign} to {MemberCount} which Distance {DistanceSign} to {Distance}";
         }
 
         public override string TestInfos
@@ -127,7 +127,7 @@ namespace EntityPlugin.Conditions
                     {
                         if (member.InternalName != EntityManager.LocalPlayer.InternalName)
                         {
-                            strBldr.Append($"VisibilityDistance to [{member.InternalName}] is ").AppendFormat("{0:0.##}", member.Entity.Location.Distance3DFromPlayer);
+                            strBldr.Append($"Distance to [{member.InternalName}] is ").AppendFormat("{0:0.##}", member.Entity.Location.Distance3DFromPlayer);
                             if (RegionCheck)
                             {
                                 strBldr.Append($" (RegionCheck[{member.Entity.RegionInternalName}] ");
@@ -159,7 +159,7 @@ namespace EntityPlugin.Conditions
                              
                         }
                     }
-                    return strBldr.Insert(0, $"Total {memsCount} TeamMember has VisibilityDistance from Player {DistanceSign} to {Distance}:").ToString();
+                    return strBldr.Insert(0, $"Total {memsCount} TeamMember has Distance from Player {DistanceSign} to {Distance}:").ToString();
                 }
                 else
                 {

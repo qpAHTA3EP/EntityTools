@@ -103,6 +103,7 @@
     <Compile Include="Actions\ChangeInstanceToLeader.cs" />
     <Compile Include="Actions\InteractEntities.cs" />
     <Compile Include="Actions\InteractEntity.cs" />
+    <Compile Include="Actions\MoveToLeader.cs" />
     <Compile Include="Conditions\CheckShard.cs" />
     <Compile Include="Conditions\EntityDistance.cs" />
     <Compile Include="Conditions\EntityCountInCustomRegion.cs" />
@@ -118,6 +119,7 @@
     <Compile Include="Forms\NodeSelectForm.Designer.cs">
       <DependentUpon>NodeSelectForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Tools\Auras.cs" />
     <Compile Include="Tools\CommonTools.cs" />
     <Compile Include="Tools\EntityInteractionTools.cs" />
     <Compile Include="Tools\EntitySelectionTools.cs" />
@@ -144,6 +146,7 @@
     <Compile Include="Editors\EntityIdEditor.cs" />
     <Compile Include="Editors\MultiCustomRegionSelectEditor.cs" />
     <Compile Include="Editors\ShardEditor.cs" />
+    <Compile Include="Tools\Missions.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\EntitySelectForm.resx">
@@ -158,6 +161,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Classes\" />
     <Folder Include="Properties\DataSources\" />
     <Folder Include="UCC\" />
   </ItemGroup>

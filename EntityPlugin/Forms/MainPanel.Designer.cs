@@ -30,6 +30,8 @@
         {
             this.btnEntities = new System.Windows.Forms.Button();
             this.ckbDebugInfo = new System.Windows.Forms.CheckBox();
+            this.btnAuras = new System.Windows.Forms.Button();
+            this.bntMissions = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnEntities
@@ -47,17 +49,39 @@
             // ckbDebugInfo
             // 
             this.ckbDebugInfo.AutoSize = true;
-            this.ckbDebugInfo.Location = new System.Drawing.Point(3, 43);
+            this.ckbDebugInfo.Location = new System.Drawing.Point(3, 3);
             this.ckbDebugInfo.Name = "ckbDebugInfo";
             this.ckbDebugInfo.Size = new System.Drawing.Size(200, 17);
             this.ckbDebugInfo.TabIndex = 1;
             this.ckbDebugInfo.Text = "Enable DubugInfo for InteractEntities";
             this.ckbDebugInfo.UseVisualStyleBackColor = true;
             // 
+            // btnAuras
+            // 
+            this.btnAuras.Location = new System.Drawing.Point(3, 26);
+            this.btnAuras.Name = "btnAuras";
+            this.btnAuras.Size = new System.Drawing.Size(75, 23);
+            this.btnAuras.TabIndex = 2;
+            this.btnAuras.Text = "Auras";
+            this.btnAuras.UseVisualStyleBackColor = true;
+            this.btnAuras.Click += new System.EventHandler(this.btnAuras_Click);
+            // 
+            // bntMissions
+            // 
+            this.bntMissions.Location = new System.Drawing.Point(3, 55);
+            this.bntMissions.Name = "bntMissions";
+            this.bntMissions.Size = new System.Drawing.Size(75, 23);
+            this.bntMissions.TabIndex = 2;
+            this.bntMissions.Text = "Missions";
+            this.bntMissions.UseVisualStyleBackColor = true;
+            this.bntMissions.Click += new System.EventHandler(this.bntMissions_Click);
+            // 
             // MainPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.bntMissions);
+            this.Controls.Add(this.btnAuras);
             this.Controls.Add(this.ckbDebugInfo);
             this.Controls.Add(this.btnEntities);
             this.Name = "MainPanel";
@@ -71,5 +95,7 @@
 
         private System.Windows.Forms.Button btnEntities;
         private System.Windows.Forms.CheckBox ckbDebugInfo;
+        private System.Windows.Forms.Button btnAuras;
+        private System.Windows.Forms.Button bntMissions;
     }
 }

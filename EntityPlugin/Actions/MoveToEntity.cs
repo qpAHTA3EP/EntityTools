@@ -37,7 +37,7 @@ namespace EntityPlugin.Actions
         [Category("Entity")]
         public string EntityID { get; set; }
 
-        [Description("VisibilityDistance to the Entity by which it is necessary to approach")]
+        [Description("Distance to the Entity by which it is necessary to approach")]
         [Category("Movement")]
         public float Distance { get; set; }
 
@@ -45,7 +45,7 @@ namespace EntityPlugin.Actions
         [Category("Movement")]
         public bool IgnoreCombat { get; set; }
 
-        [Description("True: Complite an action when the object is closer than 'VisibilityDistance'\n" +
+        [Description("True: Complite an action when the object is closer than 'Distance'\n" +
                      "False: Follow an Entity regardless of its distance")]
         [Category("Movement")]
         public bool StopOnApproached { get; set; }

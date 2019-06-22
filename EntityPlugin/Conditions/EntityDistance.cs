@@ -38,7 +38,7 @@ namespace EntityPlugin.Conditions
             "False: Does not consider the region when counting Entities")]
         public bool RegionCheck { get; set; }
 
-        [Description("VisibilityDistance comparison type to the closest Entity")]
+        [Description("Distance comparison type to the closest Entity")]
         public Condition.Relation Sign { get; set; }
 
         public override bool IsValid
@@ -73,7 +73,7 @@ namespace EntityPlugin.Conditions
 
         public override string ToString()
         {
-            return $"Entity [{EntityID}] VisibilityDistance {Sign} to {Distance}";
+            return $"Entity [{EntityID}] Distance {Sign} to {Distance}";
         }
 
         public override string TestInfos

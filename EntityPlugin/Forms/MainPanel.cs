@@ -1,9 +1,13 @@
 ﻿#define Test_EntitySelectForm
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 using Astral.Quester.Classes;
+using EntityPlugin.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
 using static DevExpress.XtraEditors.BaseListBoxControl;
@@ -125,6 +129,26 @@ namespace EntityPlugin.Forms
         private void MainPanel_Load(object sender, EventArgs e)
         {
             ckbDebugInfo.Checked = EntityPlugin.DebugInfoEnabled;
+        }
+
+        private void btnAuras_Click(object sender, EventArgs e)
+        {
+            AurasWrapper auras = new AurasWrapper(EntityManager.LocalPlayer?.Character);
+
+            XmlSerializer serialiser = new XmlSerializer(typeof(AurasWrapper));
+            TextWriter FileStream = new StreamWriter(@".\Auras.xml");
+            serialiser.Serialize(FileStream, auras);
+            FileStream.Close();
+        }
+
+        private void bntMissions_Click(object sender, EventArgs e)
+        {
+            MissionsWrapper missions = new MissionsWrapper(EntityManager.LocalPlayer);
+
+            XmlSerializer serialiser = new XmlSerializer(typeof(MissionsWrapper));
+            TextWriter FileStream = new StreamWriter(@".\Missions.xml");
+            serialiser.Serialize(FileStream, missions);
+            FileStream.Close();
         }
     }
 }
