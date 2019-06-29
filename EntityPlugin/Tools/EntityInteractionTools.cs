@@ -152,7 +152,7 @@ namespace EntityPlugin.Tools
                         if (target.IsValid)
                         {
                             dist = target.Location.Distance3DFromPlayer <= distance;
-                            Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Check VisibilityDistance({target.Location.Distance3DFromPlayer})<'{distance}': {dist}");
+                            Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Check Distance({target.Location.Distance3DFromPlayer})<'{distance}': {dist}");
                             tarIsIntearctable = target.Critter.IsInteractable;
                             Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Check Target is Interactable: {tarIsIntearctable}");
                             tarInteractOptionIsValid = target.InteractOption.IsValid;
@@ -507,7 +507,7 @@ namespace EntityPlugin.Tools
                         if (target.IsValid)
                         {
                             dist = target.Location.Distance3DFromPlayer <= distance;
-                            Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Check VisibilityDistance({target.Location.Distance3DFromPlayer})<'{distance}': {dist}");
+                            Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Check Distance({target.Location.Distance3DFromPlayer})<'{distance}': {dist}");
                             //interactInfoIsValid = EntityManager.LocalPlayer.Player.InteractInfo.IsValid;
                             //Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Check {nameof(EntityManager.LocalPlayer.Player.InteractInfo)}: {interactInfoIsValid}");
                             tarCanInteract = target.CanInteract;

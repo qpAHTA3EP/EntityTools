@@ -10,11 +10,11 @@ namespace EntityPlugin.Conditions
     [Serializable]
     public class TeamMembersCount : Condition
     {
-        [Description("Threshold value of the VisibilityDistance from Player to the Team member for comparison by 'DistanceSign'")]
+        [Description("Threshold value of the Distance from Player to the Team member for comparison by 'DistanceSign'")]
         [Category("Tested")]
         public float Distance { get; set; }
 
-        [Description("The comparison type for 'VisibilityDistance'")]
+        [Description("The comparison type for 'Distance'")]
         [Category("Tested")]
         public Relation DistanceSign { get; set; }
 
@@ -119,7 +119,7 @@ namespace EntityPlugin.Conditions
 
         public override string ToString()
         {
-            return $"{GetType().Name} {Sign} to {MemberCount} which VisibilityDistance {DistanceSign} to {Distance}";
+            return $"{GetType().Name} {Sign} to {MemberCount} which Distance {DistanceSign} to {Distance}";
         }
 
         public override string TestInfos
@@ -168,7 +168,7 @@ namespace EntityPlugin.Conditions
                              
                         }
                     }
-                    return strBldr.Insert(0, $"Total {memsCount} TeamMember has VisibilityDistance from Player {DistanceSign} to {Distance}:").ToString();
+                    return strBldr.Insert(0, $"Total {memsCount} TeamMember has Distance from Player {DistanceSign} to {Distance}:").ToString();
                 }
                 else
                 {

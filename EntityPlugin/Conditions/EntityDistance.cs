@@ -78,7 +78,7 @@ namespace EntityPlugin.Conditions
 
         public override string ToString()
         {
-            return $"Entity [{EntityID}] VisibilityDistance {Sign} to {Distance}";
+            return $"Entity [{EntityID}] Distance {Sign} to {Distance}";
         }
 
         public override string TestInfos

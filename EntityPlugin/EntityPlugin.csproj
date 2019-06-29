@@ -21,7 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -30,7 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Astral-cleaned">
@@ -114,16 +114,22 @@
   <ItemGroup>
     <Compile Include="Actions\ChangeInstanceToLeader.cs" />
     <Compile Include="Actions\InteractEntities.cs" />
-    <Compile Include="Actions\InteractEntity.cs" />
+    <Compile Include="Actions\Deprecated\InteractEntity.cs" />
     <Compile Include="Conditions\CheckShard.cs" />
     <Compile Include="Conditions\EntityDistance.cs" />
     <Compile Include="Conditions\EntityCountInCustomRegion.cs" />
     <Compile Include="Conditions\IsNodeTargetable.cs" />
-    <Compile Include="Conditions\PartyCount.cs" />
+    <Compile Include="Conditions\Deprecated\PartyCount.cs" />
     <Compile Include="Conditions\TeamLeaderMapInstance.cs" />
     <Compile Include="Conditions\TeamMemberCount.cs" />
     <Compile Include="Conditions\TeamMemberCountInCustomRegion.cs" />
     <Compile Include="Editors\NodePositionEditor.cs" />
+    <Compile Include="Forms\MultiSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\MultiSelectForm.Designer.cs">
+      <DependentUpon>MultiSelectForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\NodeSelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -166,6 +172,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MainPanel.resx">
       <DependentUpon>MainPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\MultiSelectForm.resx">
+      <DependentUpon>MultiSelectForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
