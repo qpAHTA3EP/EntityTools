@@ -136,6 +136,7 @@
     <Compile Include="Forms\NodeSelectForm.Designer.cs">
       <DependentUpon>NodeSelectForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="States\SpellStuckMonitor.cs" />
     <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\Auras.cs" />
     <Compile Include="Tools\CommonTools.cs" />

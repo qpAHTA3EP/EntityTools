@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Astral;
 using Astral.Forms;
 
 namespace EntityPlugin
@@ -10,7 +11,7 @@ namespace EntityPlugin
     {
         public static bool DebugInfoEnabled { get; set; }
 
-        public override string Name => GetType().Name;
+        public override string Name => "EntityPlugin";
 
         public override string Author => "MichaelProg";
 
@@ -35,12 +36,18 @@ namespace EntityPlugin
 
         public override void OnLoad()
         {
-
+            Astral.Quester.API.BeforeStartEngine += API_BeforeStartEngine;
         }
 
         public override void OnUnload()
         {
 
+        }
+
+        private void API_BeforeStartEngine(object sender, Astral.Logic.Classes.FSM.BeforeEngineStart e)
+        {
+            Astral.Quester.API.Engine.AddState(new States.SpellStuckMonitor());
+            Logger.WriteLine("SpellStuckMonitor activated");
         }
     }
 }
