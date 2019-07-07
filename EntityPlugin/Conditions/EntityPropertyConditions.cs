@@ -17,7 +17,7 @@ namespace EntityPlugin.Conditions
         public EntityProperty()
         {
             EntityID = string.Empty;
-            PropertType = EntityPropertType.Distance;
+            PropertyType = EntityPropertType.Distance;
             Value = 0;
             Sign = Relation.Superior;
             EntityIdType = ItemFilterStringType.Simple;
@@ -36,7 +36,7 @@ namespace EntityPlugin.Conditions
         public string EntityID { get; set; }
 
         [Category("Tested")]
-        EntityPropertType PropertType;
+        public EntityPropertType PropertyType { get; set; }
 
         [Category("Tested")]
         public float Value { get; set; }
@@ -60,7 +60,7 @@ namespace EntityPlugin.Conditions
                     Entity closestEntity = SelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, RegionCheck);
 
                     bool result = false;
-                    switch (PropertType)
+                    switch (PropertyType)
                     {
                         case EntityPropertType.Distance:
                             switch (Sign)
@@ -85,7 +85,7 @@ namespace EntityPlugin.Conditions
                                 case Relation.Inferior:
                                     return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent < Value);
                                 case Relation.Superior:
-                                    return result = (closestEntity == null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent > Value);
+                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent > Value);
                             }
                             break;
                         case EntityPropertType.ZAxis:
@@ -98,7 +98,7 @@ namespace EntityPlugin.Conditions
                                 case Relation.Inferior:
                                     return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z < Value);
                                 case Relation.Superior:
-                                    return result = (closestEntity == null) && closestEntity.IsValid && (closestEntity.Location.Z > Value);
+                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z > Value);
                             }
                             break;
                     }
@@ -114,7 +114,7 @@ namespace EntityPlugin.Conditions
 
         public override string ToString()
         {
-            return $"Entity [{EntityID}] {PropertType} {Sign} to {Value}";
+            return $"Entity [{EntityID}] {PropertyType} {Sign} to {Value}";
         }
 
         public override string TestInfos
@@ -126,8 +126,8 @@ namespace EntityPlugin.Conditions
                 if (closestEntity.IsValid)
                 {
                     StringBuilder sb = new StringBuilder("Found closect Entity");
-                    sb.Append(" [").Append(closestEntity.NameUntranslated).Append(']').Append(" which ").Append(PropertType).Append(" = ");
-                    switch(PropertType)
+                    sb.Append(" [").Append(closestEntity.NameUntranslated).Append(']').Append(" which ").Append(PropertyType).Append(" = ");
+                    switch(PropertyType)
                     {
                         case EntityPropertType.Distance:
                             sb.Append(closestEntity.Location.Distance3DFromPlayer);
@@ -145,7 +145,7 @@ namespace EntityPlugin.Conditions
                 {
                     StringBuilder sb = new StringBuilder("No one Entity matched to");
                     sb.Append(" [").Append(EntityID).Append(']');
-                    if (PropertType == EntityPropertType.Distance)
+                    if (PropertyType == EntityPropertType.Distance)
                         sb.AppendLine("The distance to the missing Entity is considered equal to infinity.");
                     return sb.ToString();
                 }

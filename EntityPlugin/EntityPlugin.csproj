@@ -121,10 +121,12 @@
     <Compile Include="Conditions\EntityCountInCustomRegion.cs" />
     <Compile Include="Conditions\IsNodeTargetable.cs" />
     <Compile Include="Conditions\Deprecated\PartyCount.cs" />
+    <Compile Include="Conditions\PlayerParagon.cs" />
     <Compile Include="Conditions\TeamLeaderMapInstance.cs" />
     <Compile Include="Conditions\TeamMemberCount.cs" />
     <Compile Include="Conditions\TeamMemberCountInCustomRegion.cs" />
     <Compile Include="Editors\NodePositionEditor.cs" />
+    <Compile Include="Editors\ParagonListEditor.cs" />
     <Compile Include="Forms\MultiSelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
