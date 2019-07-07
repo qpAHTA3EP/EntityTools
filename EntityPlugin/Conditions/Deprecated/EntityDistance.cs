@@ -37,8 +37,8 @@ namespace EntityPlugin.Conditions
         public float Distance { get; set; }
 
         [Description("Check Entity's Region:\n" +
-            "True: Count Entity if it located in the same Region as Player\n" +
-            "False: Does not consider the region when counting Entities")]
+            "True: Search an Entity only if it located in the same Region as Player\n" +
+            "False: Does not consider the region when searching Entities")]
         [Category("Tested")]
         public bool RegionCheck { get; set; }
 

@@ -11,11 +11,11 @@ namespace EntityPlugin
     {
         public static bool DebugInfoEnabled { get; set; }
 
-        public override string Name => "EntityPlugin";
+        public override string Name => "Entity Tools";
 
         public override string Author => "MichaelProg";
 
-        public override System.Drawing.Image Icon => null;
+        public override System.Drawing.Image Icon => Properties.Resources.EntityIcon;
 
         public override BasePanel Settings => new Forms.MainPanel();
 
@@ -26,12 +26,12 @@ namespace EntityPlugin
 
         public override void OnBotStart()
         {
-
+            
         }
 
         public override void OnBotStop()
         {
-
+            
         }
 
         public override void OnLoad()
@@ -46,8 +46,8 @@ namespace EntityPlugin
 
         private void API_BeforeStartEngine(object sender, Astral.Logic.Classes.FSM.BeforeEngineStart e)
         {
-            Astral.Quester.API.Engine.AddState(new States.SpellStuckMonitor());
-            Logger.WriteLine("SpellStuckMonitor activated");
+            States.SpellStuckMonitor.Activate();
         }
+
     }
 }

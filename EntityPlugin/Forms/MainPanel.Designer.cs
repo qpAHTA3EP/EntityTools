@@ -69,7 +69,8 @@ namespace EntityPlugin.Forms
             // 
             this.ckbDebugInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ckbDebugInfo.AutoSize = true;
-            this.ckbDebugInfo.Location = new System.Drawing.Point(3, 12);
+            this.ckbDebugInfo.Location = new System.Drawing.Point(12, 12);
+            this.ckbDebugInfo.Margin = new System.Windows.Forms.Padding(12);
             this.ckbDebugInfo.Name = "ckbDebugInfo";
             this.ckbDebugInfo.Size = new System.Drawing.Size(206, 17);
             this.ckbDebugInfo.TabIndex = 1;
@@ -122,7 +123,7 @@ namespace EntityPlugin.Forms
             // 
             this.bteMissions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.bteMissions.EditValue = "";
+            this.bteMissions.EditValue = ".\\Logs\\Missions\\%character%Missions.xml";
             this.bteMissions.Location = new System.Drawing.Point(6, 67);
             this.bteMissions.Name = "bteMissions";
             this.bteMissions.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
@@ -140,7 +141,7 @@ namespace EntityPlugin.Forms
             // 
             this.bteAuras.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.bteAuras.EditValue = "";
+            this.bteAuras.EditValue = ".\\Logs\\Auras\\%character%Auras.xml";
             this.bteAuras.Location = new System.Drawing.Point(6, 28);
             this.bteAuras.Name = "bteAuras";
             this.bteAuras.Properties.AllowNullInput = DevExpress.Utils.DefaultBoolean.False;

@@ -116,7 +116,8 @@
     <Compile Include="Actions\InteractEntities.cs" />
     <Compile Include="Actions\Deprecated\InteractEntity.cs" />
     <Compile Include="Conditions\CheckShard.cs" />
-    <Compile Include="Conditions\EntityDistance.cs" />
+    <Compile Include="Conditions\EntityPropertyConditions.cs" />
+    <Compile Include="Conditions\Deprecated\EntityDistance.cs" />
     <Compile Include="Conditions\EntityCountInCustomRegion.cs" />
     <Compile Include="Conditions\IsNodeTargetable.cs" />
     <Compile Include="Conditions\Deprecated\PartyCount.cs" />
@@ -186,6 +187,9 @@
   <ItemGroup>
     <Folder Include="Properties\DataSources\" />
     <Folder Include="UCC\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Entity_7_40х48.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
