@@ -33,8 +33,8 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Astral-cleaned">
-      <HintPath>D:\Games\Astral_RU_1\Astral-cleaned.exe</HintPath>
+    <Reference Include="Astral">
+      <HintPath>..\References\Astral.exe</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.Data.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
@@ -94,8 +94,8 @@
       <HintPath>D:\Games\DevExpress\DevExpress.XtraWizard.v18.1.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MyNW-cleaned">
-      <HintPath>D:\Games\Astral_RU_1\MyNW-cleaned.dll</HintPath>
+    <Reference Include="MyNW">
+      <HintPath>..\References\MyNW.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />

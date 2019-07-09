@@ -153,9 +153,9 @@ namespace EntityPlugin.Forms
 
         private void btnMissions_Click(object sender, EventArgs e)
         {
-            MissionsWrapper auras = new MissionsWrapper(EntityManager.LocalPlayer);
+            MissionsWrapper missions = new MissionsWrapper(EntityManager.LocalPlayer);
 
-            string fullFileName = FileTools.ReplaceMask(bteAuras.Text);
+            string fullFileName = FileTools.ReplaceMask(bteMissions.Text);
 
             if (string.IsNullOrEmpty(fullFileName) || fullFileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
             {
@@ -170,7 +170,7 @@ namespace EntityPlugin.Forms
 
             XmlSerializer serialiser = new XmlSerializer(typeof(MissionsWrapper));
             TextWriter FileStream = new StreamWriter(fullFileName);
-            serialiser.Serialize(FileStream, auras);
+            serialiser.Serialize(FileStream, missions);
             FileStream.Close();
         }
     }

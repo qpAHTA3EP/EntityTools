@@ -16,9 +16,20 @@ namespace EntityPlugin.States
 
         public override int Priority => 90;
         public override string DisplayName => GetType().Name;
-        public override bool NeedToRun => CheckTO.IsTimedOut && !EntityManager.LocalPlayer.InCombat;
+        private bool needToRun;
+        public override bool NeedToRun
+        {
+            get
+            {
+                if(!needToRun)
+                    needToRun = EntityManager.LocalPlayer.InCombat;
+                return needToRun && CheckTO.IsTimedOut && !EntityManager.LocalPlayer.InCombat;
+            }
+        }
+
         public override int CheckInterval => 3000;
         public override bool StopNavigator => false;
+        
 
         private static SpellStuckMonitor monitor = new SpellStuckMonitor();
 
@@ -52,7 +63,7 @@ namespace EntityPlugin.States
                         Logger.WriteLine($"[DEBUG] {GetType().Name}: Character class is '{player.Character.Class.Category}'");
 #endif
                         // Поиск ауры 'Devoted_Special_Channeldivinity'
-                        AttribMod mod = player.Character.Mods.Find(x => x.PowerDef.InternalName.Contains("Devoted_Special_Channeldivinity"));
+                        AttribModNet mod = player.Character.Mods.Find(x => x.PowerDef.InternalName.Contains("Devoted_Special_Channeldivinity"));
                         if (mod != null && mod.IsValid)
                         {    // отключение скила 'Channeldivinity'
                             GameCommands.Execute("specialClassPower 0");
@@ -94,7 +105,7 @@ namespace EntityPlugin.States
                         //#endif
 
                         // Поиск ауры 'Paladin_Special_Divinechampion_Feat_B'
-                        AttribMod mod = player.Character.Mods.Find(x => x.PowerDef.InternalName.Contains("Paladin_Special_Divinechampion_Feat_B"));
+                        AttribModNet mod = player.Character.Mods.Find(x => x.PowerDef.InternalName.Contains("Paladin_Special_Divinechampion_Feat_B"));
                         if (mod != null && mod.IsValid)
                         {
                             GameCommands.Execute("specialClassPower 1");
@@ -148,6 +159,12 @@ namespace EntityPlugin.States
             }
             
             CheckTO.Reset();
+
+            //сбрасываем флаг необходимости проверки
+            needToRun = false;
+#if DEBUG
+            Logger.WriteLine($"[DEBUG] {GetType().Name}: Wait Combat mode.");
+#endif
+            }
         }
     }
-}

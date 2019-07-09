@@ -56,13 +56,14 @@ namespace EntityPlugin.Tools
 
             if(character != null && character.IsValid)
             {
-                foreach (AttribMod def in character.Mods)
+                foreach (AttribModNet def in character.Mods)
                     if (def.PowerDef.IsValid)
                         Mods.Add(new Aura(def.PowerDef));
 
-                foreach(AttribModNet def in character.Buffs)
-                    if(def.PowerDef.IsValid)
-                        Mods.Add(new Aura(def.PowerDef));
+                // Исключено в Astral64
+                //foreach(AttribModNet def in character.Buffs)
+                //    if(def.PowerDef.IsValid)
+                //        Mods.Add(new Aura(def.PowerDef));
             }
         }
     }
