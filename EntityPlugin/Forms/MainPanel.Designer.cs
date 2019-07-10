@@ -43,6 +43,7 @@ namespace EntityPlugin.Forms
             this.tbclMain = new DevExpress.XtraTab.XtraTabControl();
             this.tabUtilities = new DevExpress.XtraTab.XtraTabPage();
             this.tabOptions = new DevExpress.XtraTab.XtraTabPage();
+            this.ckbSpellStuckMonitor = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.bteMissions.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bteAuras.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
@@ -53,12 +54,12 @@ namespace EntityPlugin.Forms
             // 
             // btnEntities
             // 
-            this.btnEntities.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.btnEntities.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.btnEntities.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnEntities.Location = new System.Drawing.Point(6, 113);
+            this.btnEntities.Location = new System.Drawing.Point(6, 104);
             this.btnEntities.Name = "btnEntities";
-            this.btnEntities.Size = new System.Drawing.Size(352, 23);
+            this.btnEntities.Size = new System.Drawing.Size(380, 23);
             this.btnEntities.TabIndex = 0;
             this.btnEntities.Text = "Open the list of the Entities";
             this.btnEntities.UseVisualStyleBackColor = true;
@@ -67,9 +68,8 @@ namespace EntityPlugin.Forms
             // 
             // ckbDebugInfo
             // 
-            this.ckbDebugInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ckbDebugInfo.AutoSize = true;
-            this.ckbDebugInfo.Location = new System.Drawing.Point(12, 12);
+            this.ckbDebugInfo.Location = new System.Drawing.Point(12, 9);
             this.ckbDebugInfo.Margin = new System.Windows.Forms.Padding(12);
             this.ckbDebugInfo.Name = "ckbDebugInfo";
             this.ckbDebugInfo.Size = new System.Drawing.Size(206, 17);
@@ -81,7 +81,7 @@ namespace EntityPlugin.Forms
             // 
             this.btnAuras.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAuras.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAuras.Location = new System.Drawing.Point(308, 26);
+            this.btnAuras.Location = new System.Drawing.Point(336, 26);
             this.btnAuras.Name = "btnAuras";
             this.btnAuras.Size = new System.Drawing.Size(50, 23);
             this.btnAuras.TabIndex = 2;
@@ -102,7 +102,7 @@ namespace EntityPlugin.Forms
             // 
             this.btnMissions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnMissions.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMissions.Location = new System.Drawing.Point(308, 65);
+            this.btnMissions.Location = new System.Drawing.Point(336, 65);
             this.btnMissions.Name = "btnMissions";
             this.btnMissions.Size = new System.Drawing.Size(50, 23);
             this.btnMissions.TabIndex = 2;
@@ -131,7 +131,7 @@ namespace EntityPlugin.Forms
             this.bteMissions.Properties.NullText = "Enter the Filename where store the Missions";
             this.bteMissions.Properties.NullValuePromptShowForEmptyValue = true;
             this.bteMissions.Properties.ReadOnly = true;
-            this.bteMissions.Size = new System.Drawing.Size(296, 20);
+            this.bteMissions.Size = new System.Drawing.Size(324, 20);
             this.bteMissions.TabIndex = 6;
             this.bteMissions.ToolTip = "File name to store Missions of the current Character. \r\nAllow mask %character%, %" +
     "account%, %dateTime%.";
@@ -150,7 +150,7 @@ namespace EntityPlugin.Forms
             this.bteAuras.Properties.NullText = "Enter the Filename where store the Auras";
             this.bteAuras.Properties.NullValuePromptShowForEmptyValue = true;
             this.bteAuras.Properties.ReadOnly = true;
-            this.bteAuras.Size = new System.Drawing.Size(296, 20);
+            this.bteAuras.Size = new System.Drawing.Size(324, 20);
             this.bteAuras.TabIndex = 6;
             this.bteAuras.TabStop = false;
             this.bteAuras.ToolTip = "File name to store Auras of the current Character. \r\nAllow mask %character%, %acc" +
@@ -163,7 +163,7 @@ namespace EntityPlugin.Forms
             this.tbclMain.Location = new System.Drawing.Point(0, 0);
             this.tbclMain.Name = "tbclMain";
             this.tbclMain.SelectedTabPage = this.tabUtilities;
-            this.tbclMain.Size = new System.Drawing.Size(370, 416);
+            this.tbclMain.Size = new System.Drawing.Size(398, 413);
             this.tbclMain.TabIndex = 7;
             this.tbclMain.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.tabUtilities,
@@ -179,15 +179,28 @@ namespace EntityPlugin.Forms
             this.tabUtilities.Controls.Add(this.lblMissions);
             this.tabUtilities.Controls.Add(this.btnAuras);
             this.tabUtilities.Name = "tabUtilities";
-            this.tabUtilities.Size = new System.Drawing.Size(364, 388);
+            this.tabUtilities.Size = new System.Drawing.Size(392, 385);
             this.tabUtilities.Text = "Utilities";
             // 
             // tabOptions
             // 
+            this.tabOptions.Controls.Add(this.ckbSpellStuckMonitor);
             this.tabOptions.Controls.Add(this.ckbDebugInfo);
             this.tabOptions.Name = "tabOptions";
-            this.tabOptions.Size = new System.Drawing.Size(364, 388);
+            this.tabOptions.Size = new System.Drawing.Size(392, 385);
             this.tabOptions.Text = "Options";
+            // 
+            // cbSpellStuckMonitor
+            // 
+            this.ckbSpellStuckMonitor.AutoSize = true;
+            this.ckbSpellStuckMonitor.Location = new System.Drawing.Point(12, 32);
+            this.ckbSpellStuckMonitor.Margin = new System.Windows.Forms.Padding(12);
+            this.ckbSpellStuckMonitor.Name = "cbSpellStuckMonitor";
+            this.ckbSpellStuckMonitor.Size = new System.Drawing.Size(145, 17);
+            this.ckbSpellStuckMonitor.TabIndex = 1;
+            this.ckbSpellStuckMonitor.Text = "Enable SpellStuckMonitor";
+            this.ckbSpellStuckMonitor.UseVisualStyleBackColor = true;
+            this.ckbSpellStuckMonitor.CheckedChanged += new System.EventHandler(this.cbSpellStuckMonitor_CheckedChanged);
             // 
             // MainPanel
             // 
@@ -195,6 +208,7 @@ namespace EntityPlugin.Forms
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.tbclMain);
             this.Name = "MainPanel";
+            this.Size = new System.Drawing.Size(398, 413);
             this.Load += new System.EventHandler(this.MainPanel_Load);
             ((System.ComponentModel.ISupportInitialize)(this.bteMissions.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bteAuras.Properties)).EndInit();
@@ -222,5 +236,6 @@ namespace EntityPlugin.Forms
         private DevExpress.XtraTab.XtraTabControl tbclMain;
         private DevExpress.XtraTab.XtraTabPage tabUtilities;
         private DevExpress.XtraTab.XtraTabPage tabOptions;
+        private System.Windows.Forms.CheckBox ckbSpellStuckMonitor;
     }
 }

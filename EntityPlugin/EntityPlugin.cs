@@ -36,18 +36,12 @@ namespace EntityPlugin
 
         public override void OnLoad()
         {
-            Astral.Quester.API.BeforeStartEngine += API_BeforeStartEngine;
+            States.SpellStuckMonitor.Activate = true;
         }
 
         public override void OnUnload()
         {
 
         }
-
-        private void API_BeforeStartEngine(object sender, Astral.Logic.Classes.FSM.BeforeEngineStart e)
-        {
-            States.SpellStuckMonitor.Activate();
-        }
-
     }
 }

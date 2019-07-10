@@ -32,6 +32,24 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Astral">
       <HintPath>..\References\Astral.exe</HintPath>
@@ -40,58 +58,10 @@
     <Reference Include="DevExpress.Data.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Dialogs.v18.1.Core, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Map.v18.1.Core">
-      <HintPath>D:\Games\DevExpress\DevExpress.Map.v18.1.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Mvvm.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.Mvvm.v18.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Printing.v18.1.Core">
-      <HintPath>D:\Games\DevExpress\DevExpress.Printing.v18.1.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Sparkline.v18.1.Core, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
-      <Private>False</Private>
-    </Reference>
     <Reference Include="DevExpress.Utils.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraBars.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.XtraBars.v18.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.XtraDialogs.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
     <Reference Include="DevExpress.XtraEditors.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.XtraGrid.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.XtraGrid.v18.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.XtraLayout.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.XtraLayout.v18.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.XtraNavBar.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.XtraNavBar.v18.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.XtraTreeList.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.XtraVerticalGrid.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.XtraVerticalGrid.v18.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.XtraWizard.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.XtraWizard.v18.1.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MyNW">

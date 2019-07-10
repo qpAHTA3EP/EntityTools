@@ -2,24 +2,23 @@
 
 using System;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using Astral.Quester.Classes;
+using EntityPlugin.States;
 using EntityPlugin.Tools;
-using MyNW.Classes;
 using MyNW.Internals;
-using static DevExpress.XtraEditors.BaseListBoxControl;
 
 namespace EntityPlugin.Forms
 {
-    public partial class MainPanel : Astral.Forms.BasePanel
+    public partial class MainPanel /*: UserControl */: Astral.Forms.BasePanel
     {
         private EntitySelectForm.EntityDif entDif = new EntitySelectForm.EntityDif();
 
-        public MainPanel() : base("EntityPlugin")
+        public MainPanel() : base("Entity Tools")
         {
             InitializeComponent();
+
+            ckbSpellStuckMonitor.Checked = States.SpellStuckMonitor.Activate;
         }
 
         private void btnEntities_Click(object sender, EventArgs e)
@@ -172,6 +171,11 @@ namespace EntityPlugin.Forms
             TextWriter FileStream = new StreamWriter(fullFileName);
             serialiser.Serialize(FileStream, missions);
             FileStream.Close();
+        }
+
+        private void cbSpellStuckMonitor_CheckedChanged(object sender, EventArgs e)
+        {
+            SpellStuckMonitor.Activate = ckbSpellStuckMonitor.Checked;
         }
     }
 }

@@ -29,24 +29,55 @@ namespace EntityPlugin.States
 
         public override int CheckInterval => 3000;
         public override bool StopNavigator => false;
-        
 
+        private static bool beforeStartEngineSubscribed = false;
         private static SpellStuckMonitor monitor = new SpellStuckMonitor();
 
-        public static void Activate()
+        public static bool Activate
         {
-            if (monitor == null)
-                monitor = new SpellStuckMonitor();
-            Astral.Quester.API.Engine.AddState(monitor);
-            Logger.WriteLine("SpellStuckMonitor activated");
+            get
+            {
+                return beforeStartEngineSubscribed || Astral.Quester.API.Engine.States.Contains(monitor);
+            }
+            set
+            {
+                if (value)
+                {
+                    if (!beforeStartEngineSubscribed)
+                    {
+                        Astral.Quester.API.BeforeStartEngine += API_BeforeStartEngine;
+                        beforeStartEngineSubscribed = true;
+                    }
+                    Logger.WriteLine("SpellStuckMonitor activated");
+                    if(Astral.Quester.API.Engine.Running)
+                        Start();
+                }
+                else
+                {
+                    // Попытка выгрузки State во время выполнения вызывает исключение
+                    //if (Astral.Quester.API.Engine.States.RemoveAll(state => state is SpellStuckMonitor) > 0)
+                    //    Logger.WriteLine("SpellStuckMonitor deactivated");
+                    //else Logger.WriteLine("SpellStuckMonitor deactivated FAILURE!");
+
+                    Astral.Quester.API.BeforeStartEngine -= API_BeforeStartEngine;
+                    beforeStartEngineSubscribed = false;
+                    if (Astral.Quester.API.Engine.Running)
+                        Logger.WriteLine("SpellStuckMonitor will be deactivated after the Astral will stop.");
+                    else Logger.WriteLine("SpellStuckMonitor deactivated");
+                }
+            }
+        }
+        private static void Start()
+        {
+            if (!Astral.Quester.API.Engine.States.Contains(monitor))
+                Astral.Quester.API.Engine.AddState(monitor);                
         }
 
-        public static void Deactivate()
+        private static void API_BeforeStartEngine(object sender, Astral.Logic.Classes.FSM.BeforeEngineStart e)
         {
-            if(Astral.Quester.API.Engine.States.Remove(monitor))
-                Logger.WriteLine("SpellStuckMonitor deactivated");
-            else Logger.WriteLine("SpellStuckMonitor deactivated FAILURE!");
+            Start();
         }
+
         public override void Run()
         {
 #if DEBUG
@@ -166,5 +197,5 @@ namespace EntityPlugin.States
             Logger.WriteLine($"[DEBUG] {GetType().Name}: Wait Combat mode.");
 #endif
             }
-        }
     }
+}
