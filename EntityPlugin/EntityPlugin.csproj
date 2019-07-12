@@ -17,87 +17,62 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Astral">
-      <HintPath>D:\Games\Astral_RU_1\Astral.exe</HintPath>
-    </Reference>
-    <Reference Include="Astral-cleaned">
-      <HintPath>D:\Games\Astral_RU_1\Astral-cleaned.exe</HintPath>
+      <HintPath>..\References\Astral.exe</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Data.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.Data.v18.1.dll</HintPath>
+    <Reference Include="DevExpress.Data.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Map.v18.1.Core">
-      <HintPath>D:\Games\DevExpress\DevExpress.Map.v18.1.Core.dll</HintPath>
+    <Reference Include="DevExpress.Utils.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Mvvm.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.Mvvm.v18.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Printing.v18.1.Core">
-      <HintPath>D:\Games\DevExpress\DevExpress.Printing.v18.1.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Utils.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.Utils.v18.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.XtraBars.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.XtraBars.v18.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.XtraEditors.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.XtraEditors.v18.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.XtraGrid.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.XtraGrid.v18.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.XtraLayout.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.XtraLayout.v18.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.XtraNavBar.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.XtraNavBar.v18.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.XtraVerticalGrid.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.XtraVerticalGrid.v18.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.XtraWizard.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.XtraWizard.v18.1.dll</HintPath>
+    <Reference Include="DevExpress.XtraEditors.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>False</Private>
     </Reference>
     <Reference Include="MyNW">
-      <HintPath>D:\Games\Astral_RU_1\MyNW.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="MyNW-cleaned">
-      <HintPath>D:\Games\Astral_RU_1\MyNW-cleaned.dll</HintPath>
+      <HintPath>..\References\MyNW.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -109,22 +84,34 @@
   <ItemGroup>
     <Compile Include="Actions\ChangeInstanceToLeader.cs" />
     <Compile Include="Actions\InteractEntities.cs" />
-    <Compile Include="Actions\InteractEntity.cs" />
+    <Compile Include="Actions\Deprecated\InteractEntity.cs" />
     <Compile Include="Conditions\CheckShard.cs" />
-    <Compile Include="Conditions\EntityDistance.cs" />
+    <Compile Include="Conditions\EntityPropertyConditions.cs" />
+    <Compile Include="Conditions\Deprecated\EntityDistance.cs" />
     <Compile Include="Conditions\EntityCountInCustomRegion.cs" />
     <Compile Include="Conditions\IsNodeTargetable.cs" />
-    <Compile Include="Conditions\PartyCount.cs" />
+    <Compile Include="Conditions\Deprecated\PartyCount.cs" />
+    <Compile Include="Conditions\PlayerParagon.cs" />
     <Compile Include="Conditions\TeamLeaderMapInstance.cs" />
     <Compile Include="Conditions\TeamMemberCount.cs" />
     <Compile Include="Conditions\TeamMemberCountInCustomRegion.cs" />
     <Compile Include="Editors\NodePositionEditor.cs" />
+    <Compile Include="Editors\ParagonListEditor.cs" />
+    <Compile Include="Forms\MultiSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\MultiSelectForm.Designer.cs">
+      <DependentUpon>MultiSelectForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\NodeSelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\NodeSelectForm.Designer.cs">
       <DependentUpon>NodeSelectForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="States\SpellStuckMonitor.cs" />
+    <Compile Include="Tools\FileTools.cs" />
+    <Compile Include="Tools\Auras.cs" />
     <Compile Include="Tools\CommonTools.cs" />
     <Compile Include="Tools\EntityInteractionTools.cs" />
     <Compile Include="Tools\EntitySelectionTools.cs" />
@@ -151,6 +138,7 @@
     <Compile Include="Editors\EntityIdEditor.cs" />
     <Compile Include="Editors\MultiCustomRegionSelectEditor.cs" />
     <Compile Include="Editors\ShardEditor.cs" />
+    <Compile Include="Tools\Missions.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\EntitySelectForm.resx">
@@ -159,6 +147,10 @@
     <EmbeddedResource Include="Forms\MainPanel.resx">
       <DependentUpon>MainPanel.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\MultiSelectForm.resx">
+      <DependentUpon>MultiSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -167,6 +159,9 @@
   <ItemGroup>
     <Folder Include="Properties\DataSources\" />
     <Folder Include="UCC\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Entity_7_40х48.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

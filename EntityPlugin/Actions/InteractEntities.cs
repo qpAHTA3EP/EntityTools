@@ -86,16 +86,20 @@ namespace EntityPlugin.Actions
         [Description("Type of the EntityID:\n" +
             "Simple: Simple test string with a mask (char '*' means any chars)\n" +
             "Regex: Regular expression")]
+        [Category("Entity")]
         public ItemFilterStringType EntityIdType { get; set; }
 
         [Description("ID (an internal untranslated name) of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
+        [Category("Entity")]
         public string EntityID { get; set; }
 
         [Description("Distance to the Entity by which it is necessary to approach")]
+        [Category("Movement")]
         public float Distance { get; set; }
 
         [Description("Enable IgnoreCombat profile value while playing action")]
+        [Category("Movement")]
         public bool IgnoreCombat { get; set; }
 
         /// Внутренний список игнорируемых Entity, используемый, если InteractionRequirement=Once
@@ -104,6 +108,7 @@ namespace EntityPlugin.Actions
 
         [Description("True: Complite an action when the Bot has approached and interacted with the Entity\n" +
                      "False: Continue executing the action after the Bot has approached and interacted with the Entity")]
+        [Category("Movement")]
         public bool StopOnApproached { get; set; }
 
         [Description("Select the need for interaction\n" +
@@ -111,6 +116,7 @@ namespace EntityPlugin.Actions
             "IfPossible: The interaction is executed if Entity is interactable\n" +
             "Once: The interaction is executed only once, and the next time the Entity will be ignored\n" +
             "Obligatory: Interaction is strongly needed. The interaction is repeated until the target is intractable.")]
+        [Category("Interaction")]
         public InteractionRequirement InteractionRequirement { get; set; }
 
         [Description("Select the interaction method\n" +
@@ -120,22 +126,27 @@ namespace EntityPlugin.Actions
             "SimulateFKey: Force 'F' key press to interact an Entity\n" +
             "FollowAndInteractNPC: Follows an entity and interacts with it again and again as long as the interaction is possible\n" +
             "FollowAndSimulateFKey: Follows an entity and interacts with it by simulation 'F' key press again and again as long as the interaction is possible")]
+        [Category("Interaction")]
         public InteractionMethod InteractionMethod { get; set; }
 
         [Description("Time to interact (ms)")]
+        [Category("Interaction")]
         public int InteractTime { get; set; }
 
         [Description("True: The attempt of the interaction is done prior to entering InCombat\n" +
             "False: Interact after combat completed")]
+        [Category("Interaction")]
         public bool TryInteractInCombat { get; set; }
 
         [Description("Answers in dialog while interact with Entity")]
         [Editor(typeof(DialogEditor), typeof(UITypeEditor))]
+        [Category("Interaction")]
         public List<string> Dialogs { get; set; }
 
         [Description("Check Entity's Region:\n" +
             "True: All Entities located in the same Region as Player are ignored\n" +
             "False: Entity's Region does not checked during search")]
+        [Category("Entity")]
         public bool RegionCheck { get; set; }
 
         public InteractEntities() : base()
@@ -189,7 +200,9 @@ namespace EntityPlugin.Actions
             {
                 if (target.IsValid/* && target.Location.IsValid && target.Location.Distance3DFromPlayer > Distance*/)
                 {
-                    return target.Location.Clone();
+                    if (target.Location.Distance3DFromPlayer > Distance)
+                        return target.Location.Clone();
+                    else return EntityManager.LocalPlayer.Location.Clone();
                 }
                 return new Vector3();
             }
@@ -297,6 +310,7 @@ namespace EntityPlugin.Actions
                         }
                         else return true;
                     }
+                    else Astral.Quester.API.IgnoreCombat = IgnoreCombat;
                 }
                 return false;                
             }

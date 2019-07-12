@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Astral;
 using Astral.Forms;
 
 namespace EntityPlugin
@@ -10,11 +11,11 @@ namespace EntityPlugin
     {
         public static bool DebugInfoEnabled { get; set; }
 
-        public override string Name => GetType().Name;
+        public override string Name => "Entity Tools";
 
         public override string Author => "MichaelProg";
 
-        public override System.Drawing.Image Icon => null;
+        public override System.Drawing.Image Icon => Properties.Resources.EntityIcon;
 
         public override BasePanel Settings => new Forms.MainPanel();
 
@@ -25,17 +26,17 @@ namespace EntityPlugin
 
         public override void OnBotStart()
         {
-
+            
         }
 
         public override void OnBotStop()
         {
-
+            
         }
 
         public override void OnLoad()
         {
-
+            States.SpellStuckMonitor.Activate = true;
         }
 
         public override void OnUnload()

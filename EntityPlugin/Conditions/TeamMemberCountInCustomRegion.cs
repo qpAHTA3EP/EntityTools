@@ -21,22 +21,27 @@ namespace EntityPlugin.Conditions
     public class TeamMembersCountInCustomRegions : Condition
     {
         [Description("The relation of the character's location to the CustomRegion")]
+        [Category("Location")]
         public Presence Tested { get; set; }
 
         //[Editor(typeof(CustomRegionEditor), typeof(UITypeEditor))]
         [Description("CustomRegion names collection")]
         [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
+        [Category("Location")]
         public List<string> CustomRegionNames { get; set; }
 
         [Description("Threshold value of the Team members for comparison by 'Sign'")]
+        [Category("Members")]
         public uint MemberCount { get; set; }
 
         [Description("The comparison type for 'MemberCount'")]
+        [Category("Members")]
         public Relation Sign { get; set; }
 
         [Description("Check TeamMember's Region (not the CustomRegion):\n" +
             "True: Count TeamMember if it located in the same Region as Player\n" +
             "False: Does not consider the region when counting TeamMembers")]
+        [Category("Location")]
         public bool RegionCheck { get; set; }
 
         public TeamMembersCountInCustomRegions()
@@ -72,42 +77,45 @@ namespace EntityPlugin.Conditions
         {
             get
             {
-                if (EntityManager.LocalPlayer.PlayerTeam.IsInTeam && CustomRegionNames.Count > 0)
+                if (EntityManager.LocalPlayer.PlayerTeam.IsInTeam)
                 {
-                    uint memCount = 0;
-                    List <CustomRegion> customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) => 
-                                                                                    CustomRegionNames.Exists((string regName) => regName == cr.Name));
-
-                    
-                    foreach (TeamMember member in EntityManager.LocalPlayer.PlayerTeam.Team.Members)
+                    if (EntityManager.LocalPlayer.PlayerTeam.IsInTeam && CustomRegionNames.Count > 0)
                     {
-                        if (member.InternalName != EntityManager.LocalPlayer.InternalName)
+                        uint memCount = 0;
+                        List<CustomRegion> customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) =>
+                                                                                       CustomRegionNames.Exists((string regName) => regName == cr.Name));
+
+
+                        foreach (TeamMember member in EntityManager.LocalPlayer.PlayerTeam.Team.Members)
                         {
-                            foreach (CustomRegion customRegion in customRegions)
+                            if (member.InternalName != EntityManager.LocalPlayer.InternalName)
                             {
-                                if ((!RegionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName) 
-                                    && CommonTools.IsInCustomRegion(member.Entity, customRegion))
+                                foreach (CustomRegion customRegion in customRegions)
                                 {
-                                    memCount++;
-                                    break;
+                                    if ((!RegionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+                                        && CommonTools.IsInCustomRegion(member.Entity, customRegion))
+                                    {
+                                        memCount++;
+                                        break;
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    if (Tested == Presence.NotEquel)
-                        memCount = EntityManager.LocalPlayer.PlayerTeam.Team.MembersCount - memCount;
+                        if (Tested == Presence.NotEquel)
+                            memCount = EntityManager.LocalPlayer.PlayerTeam.Team.MembersCount - memCount;
 
-                    switch (Sign)
-                    {
-                        case Relation.Equal:
-                            return memCount == MemberCount;
-                        case Relation.NotEqual:
-                            return memCount != MemberCount;
-                        case Relation.Inferior:
-                            return memCount < MemberCount;
-                        case Relation.Superior:
-                            return memCount > MemberCount;
+                        switch (Sign)
+                        {
+                            case Relation.Equal:
+                                return memCount == MemberCount;
+                            case Relation.NotEqual:
+                                return memCount != MemberCount;
+                            case Relation.Inferior:
+                                return memCount < MemberCount;
+                            case Relation.Superior:
+                                return memCount > MemberCount;
+                        }
                     }
                 }
                 return false;

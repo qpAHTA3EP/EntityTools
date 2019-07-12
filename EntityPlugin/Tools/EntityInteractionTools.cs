@@ -240,10 +240,10 @@ namespace EntityPlugin.Tools
         //        Interact.WaitForInteraction();
         //        if (this.Dialogs.Count > 0)
         //        {
-        //            Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);
+        //            Astral.Classes.Timeout SearchTimeout = new Astral.Classes.Timeout(5000);
         //            while (Class1.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count == 0)
         //            {
-        //                if (timeout.IsTimedOut)
+        //                if (SearchTimeout.IsTimedOut)
         //                {
         //                    return Action.ActionResult.Fail;
         //                }

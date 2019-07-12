@@ -66,7 +66,7 @@
             this.dgvEntities.AllowUserToAddRows = false;
             this.dgvEntities.AllowUserToDeleteRows = false;
             this.dgvEntities.AllowUserToResizeRows = false;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
             this.dgvEntities.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             this.dgvEntities.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
@@ -120,7 +120,7 @@
             // clmnDistance
             // 
             this.clmnDistance.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this.clmnDistance.HeaderText = "VisibilityDistance";
+            this.clmnDistance.HeaderText = "Distance";
             this.clmnDistance.Name = "clmnDistance";
             this.clmnDistance.ReadOnly = true;
             this.clmnDistance.Resizable = System.Windows.Forms.DataGridViewTriState.False;

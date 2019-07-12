@@ -31,30 +31,37 @@ namespace EntityPlugin.Conditions
     [Serializable]
     public class EntityCountInCustomRegions : Condition
     {
+        [Category("Location")]
         public Condition.Presence Tested { get; set; }
 
         [Description("CustomRegion names collection")]
         [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
+        [Category("Location")]
         public List<string> CustomRegionNames { get; set; }
 
         [Description("Type of the EntityID:\n" +
             "Simple: Simple test string with a mask (char '*' means any chars)\n" +
             "Regex: Regular expression")]
+        [Category("Entity")]
         public ItemFilterStringType EntityIdType { get; set; }
 
         [Description("Check Entity's Region:\n" +
             "True: Count Entity if it located in the same Region as Player\n" +
             "False: Does not consider the region when counting Entities")]
+        [Category("Location")]
         public bool RegionCheck { get; set; }
 
         [Description("ID (an untranslated name) of the Entity for the search (regex)")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
+        [Category("Entity")]
         public string EntityID { get; set; }
 
         [Description("Threshold value of the Entity number for comparison by 'Sign'")]
+        [Category("Tested")]
         public uint Value { get; set; }
 
         [Description("The comparison type for 'Value'")]
+        [Category("Tested")]
         public Relation Sign { get; set; }
 
         public EntityCountInCustomRegions()
