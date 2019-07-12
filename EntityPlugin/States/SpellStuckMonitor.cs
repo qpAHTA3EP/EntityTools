@@ -38,7 +38,7 @@ namespace EntityPlugin.States
 #if DEBUG
                 Logger.WriteLine($"[DEBUG] {GetType().Name}.{nameof(NeedToRun)}={needToRun && beforeStartEngineSubscribed && CheckTO.IsTimedOut && !EntityManager.LocalPlayer.InCombat}" +
                     $" because {nameof(needToRun)}[{needToRun}], {nameof(beforeStartEngineSubscribed)}[{beforeStartEngineSubscribed}]," +
-                    $" {nameof(EntityManager.LocalPlayer.InCombat)}[{EntityManager.LocalPlayer.InCombat}] ");
+                    $" Not{nameof(EntityManager.LocalPlayer.InCombat)}[{!EntityManager.LocalPlayer.InCombat}] ");
 #endif
                 return needToRun && beforeStartEngineSubscribed && CheckTO.IsTimedOut && !EntityManager.LocalPlayer.InCombat;
             }
@@ -110,31 +110,41 @@ namespace EntityPlugin.States
 #if DEBUG
                         Logger.WriteLine($"[DEBUG] {GetType().Name}: Character class is '{player.Character.Class.Category}'");
 #endif
-                        // Поиск ауры 'Devoted_Special_Channeldivinity'
-                        AttribModNet mod = player.Character.Mods.Find(x => x.PowerDef.InternalName.Contains(Cleric_Channeldivinity));
-                        if (mod != null && mod.IsValid)
-                        {    // отключение скила 'Channeldivinity'
-                            GameCommands.Execute("specialClassPower 0");
-                            Logger.WriteLine($"{GetType().Name}: Deactivate SpecialClassPower[{Cleric_Channeldivinity}]");
-                        }
-#if DEBUG
-                        else Logger.WriteLine($"[DEBUG] {GetType().Name}: SpecialClassPower[{Cleric_Channeldivinity}] not detected");
-#endif
-                        if (EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Cleric_Arbiter)
+                        // Флаги, предотвращающие повторное "выключение" умений
+                        bool searchChanneldivinity = true;
+                        bool searchArbiterMechanic = EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Cleric_Arbiter;
+                        foreach (AttribModNet mod in player.Character.Mods)
                         {
+                            // Поиск ауры 'Devoted_Special_Channeldivinity'
+                            if (searchChanneldivinity && mod.PowerDef.InternalName.Contains(Cleric_Channeldivinity))
+                            {    // отключение скила 'Channeldivinity'
+                                GameCommands.Execute("specialClassPower 0");
+                                Logger.WriteLine($"{GetType().Name}: Deactivate SpecialClassPower[{Cleric_Channeldivinity}]");
+                                searchChanneldivinity = false;
+                            }
+                            
                             // Поиск ауры 'Devoted_Mechanic_Dps_Scales_Radiant' или 'Devoted_Mechanic_Dps_Scales_Fire'
-                            mod = player.Character.Mods.Find(x => x.PowerDef.InternalName.Contains(Cleric_Arbiter_Mechanic));
-                            if (mod != null && mod.IsValid)
+                            if (searchArbiterMechanic && mod.PowerDef.InternalName.Contains(Cleric_Arbiter_Mechanic))
                             {
                                 GameCommands.Execute("specialClassPower 1");
                                 Thread.Sleep(100);
                                 GameCommands.Execute("specialClassPower 0");
                                 Logger.WriteLine($"{GetType().Name}: Convert '{Cleric_Arbiter_Mechanic}' to [Devinity]");
+                                searchArbiterMechanic = false;
                             }
-#if DEBUG
-                            else Logger.WriteLine($"[DEBUG] {GetType().Name}: Aura '{Cleric_Arbiter_Mechanic}' not detected");
-#endif
+
+                            if (!searchChanneldivinity && !searchArbiterMechanic)
+                                break;
                         }
+
+#if DEBUG
+                        //Если все Mods перебрали, а флаги не сброшены, значит соответствующие им умения неактивны
+                        if(searchChanneldivinity)
+                            Logger.WriteLine($"[DEBUG] {GetType().Name}: SpecialClassPower[{Cleric_Channeldivinity}] not detected");
+                        if (searchArbiterMechanic)
+                                Logger.WriteLine($"[DEBUG] {GetType().Name}: Aura '{Cleric_Arbiter_Mechanic}' not detected");
+#endif
+
                         break;
                     }
                 case CharClassCategory.OathboundPaladin:
@@ -142,7 +152,6 @@ namespace EntityPlugin.States
 #if DEBUG
                         Logger.WriteLine($"[DEBUG] {GetType().Name}: Character class is '{player.Character.Class.Category}'");
 #endif
-
                         // Если активно умение 'Paladin_Special_Divinepalisade'
                         //                        Power power = player.Character.Powers.Find(pow => pow.PowerDef.InternalName.StartsWith("Paladin_Special_Divinepalisade"));
                         //                        if (power != null && power.IsValid && power.IsActive)
@@ -153,17 +162,6 @@ namespace EntityPlugin.States
                         //#if DEBUG
                         //                        else Logger.WriteLine($"[DEBUG] {GetType().Name}: Power 'Paladin_Special_Divinepalisade' not active");
                         //#endif
-
-                        // Поиск ауры 'Paladin_Shift_Sanctuary' 
-                        AttribModNet mod = player.Character.Mods.Find(x => x.PowerDef.InternalName.Contains(Paladin_Shift));
-                        if (mod != null && mod.IsValid)
-                        {
-                            GameCommands.Execute("tacticalSpecial 0");
-                            Logger.WriteLine($"{GetType().Name}: Deactivate TacticalSpecial[{Paladin_Shift}]");
-                        }
-#if DEBUG
-                        else Logger.WriteLine($"[DEBUG] {GetType().Name}: Aura '{Paladin_Shift}' not detected");
-#endif
 
                         // Если активно умение "Paladin_Shift_Sanctuary"
                         //                            Power power = player.Character.Powers.Find(pow => pow.PowerDef.InternalName.StartsWith("Paladin_Shift_Sanctuary"));
@@ -176,25 +174,44 @@ namespace EntityPlugin.States
                         //                            else Logger.WriteLine($"[DEBUG] {GetType().Name}: TacticalSpecial[Paladin_Shift_Sanctuary] not active");
                         //#endif
 
-                        if (EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Paladin_Justicar)
+                        // Флаги, предотвращающие повторное "выключение" умений
+                        bool searchSanctuary = true;
+                        bool searchDivinechampion = EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Paladin_Justicar;
+
+                        foreach (AttribModNet mod in player.Character.Mods)
                         {
+
+                            // Поиск ауры 'Paladin_Shift_Sanctuary' 
+                            if (searchSanctuary && mod.PowerDef.InternalName.StartsWith(Paladin_Shift))
+                            {
+                                GameCommands.Execute("tacticalSpecial 0");
+                                Logger.WriteLine($"{GetType().Name}: Deactivate TacticalSpecial[{Paladin_Shift}]");
+                                searchSanctuary = false;
+                            }
+
                             // Поиск ауры 'Paladin_Special_Divinechampion_Feat_B' 
-                            mod = player.Character.Mods.Find(x => x.PowerDef.InternalName.Contains(Paladin_Justicar_Mechanic));
-                            if (mod != null && mod.IsValid)
+                            if (searchDivinechampion && mod.PowerDef.InternalName.StartsWith(Paladin_Justicar_Mechanic))
                             {
                                 GameCommands.Execute("specialClassPower 1");
                                 Thread.Sleep(100);
                                 GameCommands.Execute("specialClassPower 0");
                                 Logger.WriteLine($"{GetType().Name}: Deactivate SpecialClassPower[{Paladin_Justicar_Mechanic}]");
+                                searchDivinechampion = false;
                             }
-#if DEBUG
-                            else Logger.WriteLine($"[DEBUG] {GetType().Name}: Aura '{Paladin_Justicar_Mechanic}' not detected");
-#endif
+                            if (!searchSanctuary && !searchDivinechampion)
+                                break;
                         }
+#if DEBUG
+                        //Если все Mods перебрали, а флаги не сброшены, значит соответствующие им умения неактивны
+                        if (searchSanctuary)
+                            Logger.WriteLine($"[DEBUG] {GetType().Name}: Aura '{Paladin_Shift}' not detected");
+                        if (searchDivinechampion)
+                            Logger.WriteLine($"[DEBUG] {GetType().Name}: Aura '{Paladin_Justicar_Mechanic}' not detected");
+#endif
 
                         if (EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Paladin_Oathkeeper)
                         {
-                            // Если активно умение "Paladin_Special_Divinecall"
+                            // Поиск умения "Paladin_Special_Divinecall"
                             Power power = player.Character.Powers.Find(pow => pow.PowerDef.InternalName.StartsWith(Paladin_Oathkeeper_Mechanic));
                             if (power != null && power.IsValid && power.IsActive)
                             {
