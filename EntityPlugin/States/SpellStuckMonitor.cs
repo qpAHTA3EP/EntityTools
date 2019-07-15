@@ -12,19 +12,19 @@ namespace EntityPlugin.States
         /// <summary>
         /// Строковые идентификаторы отслеживаемых параметров Клирика
         /// </summary>
-        private static string Cleric_Arbiter = "Paragon_Divineoracle";      //Парагон "Арбитр" (ДД) ? Player_Secondary_DivineOracle
-        private static string Cleric_Arbiter_Mechanic = "Devoted_Mechanic_Dps_Scales"; //Часть идентификатора ауры лучистого/огненного усиления
-        private static string Cleric_Devout = "Paragon_Anointedchampion";   //Парагон "Благочестивец" (Хил)
-        private static string Cleric_Channeldivinity = "Devoted_Special_Channeldivinity"; //Умение "Сила с выше"
+        private static readonly string Cleric_Arbiter = "Paragon_Divineoracle";      //Парагон "Арбитр" (ДД) ? Player_Secondary_DivineOracle
+        private static readonly string Cleric_Arbiter_Mechanic = "Devoted_Mechanic_Dps_Scales"; //Часть идентификатора ауры лучистого/огненного усиления
+        private static readonly string Cleric_Devout = "Paragon_Anointedchampion";   //Парагон "Благочестивец" (Хил)
+        private static readonly string Cleric_Channeldivinity = "Devoted_Special_Channeldivinity"; //Умение "Сила с выше"
 
         /// <summary>
         /// Строковые идентификаторы отслеживаемых параметров Паладина
         /// </summary>
-        private static string Paladin_Justicar = "Paragon_Oathofprotection"; //Парагон "Юстициар" (Танк)
-        private static string Paladin_Justicar_Mechanic = "Paladin_Special_Divinechampion_Feat_B"; //Аура "Щита"
-        private static string Paladin_Oathkeeper = "Paragon_Oathofdevotion"; //Парагон "Клятвохранитель" (Хил)
-        private static string Paladin_Oathkeeper_Mechanic = "Paladin_Special_Divinecall"; //Умение "Сила с выше"
-        private static string Paladin_Shift = "Paladin_Shift_Sanctuary";     // Аура "Блок"
+        private static readonly string Paladin_Justicar = "Paragon_Oathofprotection"; //Парагон "Юстициар" (Танк)
+        private static readonly string Paladin_Justicar_Mechanic = "Paladin_Special_Divinechampion_Feat_B"; //Аура "Щита"
+        private static readonly string Paladin_Oathkeeper = "Paragon_Oathofdevotion"; //Парагон "Клятвохранитель" (Хил)
+        private static readonly string Paladin_Oathkeeper_Mechanic = "Paladin_Special_Divinecall"; //Умение "Сила с выше"
+        private static readonly string Paladin_Shift = "Paladin_Shift_Sanctuary";     // Аура "Блок"
 
         public override int Priority => 90;
         public override string DisplayName => GetType().Name;
@@ -33,7 +33,7 @@ namespace EntityPlugin.States
         {
             get
             {
-                if(!needToRun)
+                if (!needToRun)
                     needToRun = EntityManager.LocalPlayer.InCombat;
 #if DEBUG
                 Logger.WriteLine($"[DEBUG] {GetType().Name}.{nameof(NeedToRun)}={needToRun && beforeStartEngineSubscribed && CheckTO.IsTimedOut && !EntityManager.LocalPlayer.InCombat}" +
@@ -62,10 +62,11 @@ namespace EntityPlugin.States
                     if (!beforeStartEngineSubscribed)
                     {
                         Astral.Quester.API.BeforeStartEngine += API_BeforeStartEngine;
+                        Astral.Logic.UCC.API.AfterCallCombat += ArterCallCombat;
                         beforeStartEngineSubscribed = true;
                     }
                     Logger.WriteLine("SpellStuckMonitor activated");
-                    if(Astral.Quester.API.Engine.Running)
+                    if (Astral.Quester.API.Engine.Running)
                         LoadState();
                 }
                 else
@@ -76,6 +77,7 @@ namespace EntityPlugin.States
                     //else Logger.WriteLine("SpellStuckMonitor deactivated FAILURE!");
 
                     Astral.Quester.API.BeforeStartEngine -= API_BeforeStartEngine;
+                    Astral.Logic.UCC.API.AfterCallCombat -= ArterCallCombat;
                     beforeStartEngineSubscribed = false;
                     monitor.needToRun = false;
                     if (Astral.Quester.API.Engine.Running)
@@ -84,15 +86,22 @@ namespace EntityPlugin.States
                 }
             }
         }
+
         private static void LoadState()
         {
-            if ( !Astral.Quester.API.Engine.Running && !Astral.Quester.API.Engine.States.Contains(monitor))
-                Astral.Quester.API.Engine.AddState(monitor);                
+            if (!Astral.Quester.API.Engine.Running && !Astral.Quester.API.Engine.States.Contains(monitor))
+                Astral.Quester.API.Engine.AddState(monitor);
         }
 
         private static void API_BeforeStartEngine(object sender, Astral.Logic.Classes.FSM.BeforeEngineStart e)
         {
             LoadState();
+        }
+
+        //Евент активируется в момент активации UCC в боевом режиме
+        public static void ArterCallCombat(object sender, Astral.Logic.UCC.API.AfterCallCombatEventArgs arg)
+        {
+            monitor.needToRun = true;
         }
 
         public override void Run()
@@ -113,7 +122,9 @@ namespace EntityPlugin.States
                         // Флаги, предотвращающие повторное "выключение" умений
                         bool searchChanneldivinity = true;
                         bool searchArbiterMechanic = EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Cleric_Arbiter;
-                        foreach (AttribModNet mod in player.Character.Mods)
+                        // foreach (AttribModNet mod in player.Character.Mods) // x64 
+                        foreach (AttribMod mod in player.Character.Mods) // x32
+
                         {
                             // Поиск ауры 'Devoted_Special_Channeldivinity'
                             if (searchChanneldivinity && mod.PowerDef.InternalName.Contains(Cleric_Channeldivinity))
@@ -122,7 +133,7 @@ namespace EntityPlugin.States
                                 Logger.WriteLine($"{GetType().Name}: Deactivate SpecialClassPower[{Cleric_Channeldivinity}]");
                                 searchChanneldivinity = false;
                             }
-                            
+
                             // Поиск ауры 'Devoted_Mechanic_Dps_Scales_Radiant' или 'Devoted_Mechanic_Dps_Scales_Fire'
                             if (searchArbiterMechanic && mod.PowerDef.InternalName.Contains(Cleric_Arbiter_Mechanic))
                             {
@@ -139,10 +150,10 @@ namespace EntityPlugin.States
 
 #if DEBUG
                         //Если все Mods перебрали, а флаги не сброшены, значит соответствующие им умения неактивны
-                        if(searchChanneldivinity)
+                        if (searchChanneldivinity)
                             Logger.WriteLine($"[DEBUG] {GetType().Name}: SpecialClassPower[{Cleric_Channeldivinity}] not detected");
                         if (searchArbiterMechanic)
-                                Logger.WriteLine($"[DEBUG] {GetType().Name}: Aura '{Cleric_Arbiter_Mechanic}' not detected");
+                            Logger.WriteLine($"[DEBUG] {GetType().Name}: Aura '{Cleric_Arbiter_Mechanic}' not detected");
 #endif
 
                         break;
@@ -178,7 +189,8 @@ namespace EntityPlugin.States
                         bool searchSanctuary = true;
                         bool searchDivinechampion = EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Paladin_Justicar;
 
-                        foreach (AttribModNet mod in player.Character.Mods)
+                        //foreach (AttribModNet mod in player.Character.Mods) // x64
+                        foreach (AttribMod mod in player.Character.Mods) // x32
                         {
 
                             // Поиск ауры 'Paladin_Shift_Sanctuary' 
@@ -224,14 +236,14 @@ namespace EntityPlugin.States
                         }
                         break;
                     }
-                //default:
-                //    GameCommands.Execute("specialClassPower 0");
-                //    Logger.WriteLine($"{GetType().Name}: Execute 'specialClassPower 0'");
-                //    GameCommands.Execute("tacticalSpecial 0");
-                //    Logger.WriteLine($"{GetType().Name}: Execute 'tacticalSpecial 0'");
-                //    break;
+                    //default:
+                    //    GameCommands.Execute("specialClassPower 0");
+                    //    Logger.WriteLine($"{GetType().Name}: Execute 'specialClassPower 0'");
+                    //    GameCommands.Execute("tacticalSpecial 0");
+                    //    Logger.WriteLine($"{GetType().Name}: Execute 'tacticalSpecial 0'");
+                    //    break;
             }
-            
+
             //сбрасываем таймер проверки
             CheckTO.Reset();
 
@@ -240,6 +252,6 @@ namespace EntityPlugin.States
 #if DEBUG
             Logger.WriteLine($"[DEBUG] {GetType().Name}: Wait Combat mode.");
 #endif
-            }
+        }
     }
 }

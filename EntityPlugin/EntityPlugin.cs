@@ -36,7 +36,7 @@ namespace EntityPlugin
 
         public override void OnLoad()
         {
-            States.SpellStuckMonitor.Activate = true;
+            States.SpellStuckMonitor.Activate = true;            
         }
 
         public override void OnUnload()

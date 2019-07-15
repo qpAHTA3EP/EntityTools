@@ -37,7 +37,7 @@
     <OutputPath>bin\x64\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -52,7 +52,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Astral">
-      <HintPath>..\References\x64\Astral.exe</HintPath>
+      <HintPath>..\References\x32\Astral.exe</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.Data.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
@@ -65,7 +65,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="MyNW">
-      <HintPath>..\References\x64\MyNW.dll</HintPath>
+      <HintPath>..\References\x32\MyNW.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
