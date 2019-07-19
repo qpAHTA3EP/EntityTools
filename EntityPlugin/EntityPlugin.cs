@@ -26,7 +26,13 @@ namespace EntityPlugin
 
         public override void OnBotStart()
         {
-            
+#if DEBUG
+            // Вывод в лог всех States, загруженных в Engine, и их приоритетов
+            foreach (Astral.Logic.Classes.FSM.State state in Astral.Quester.API.Engine.States)
+            {
+                Logger.WriteLine($"{state.DisplayName} {state.Priority}");
+            }
+#endif
         }
 
         public override void OnBotStop()
@@ -36,12 +42,20 @@ namespace EntityPlugin
 
         public override void OnLoad()
         {
-            States.SpellStuckMonitor.Activate = true;            
+
+            States.SpellStuckMonitor.Activate = true;
+            States.SlideMonitor.Activate = true;
+#if CHANGE_WAYPOINT_DIST
+            States.SlideMonitor.DefaultChangeWaypointDist = Astral.API.CurrentSettings.ChangeWaypointDist;
+#endif
         }
 
         public override void OnUnload()
         {
-
+#if CHANGE_WAYPOINT_DIST
+           Astral.API.CurrentSettings.ChangeWaypointDist = States.SlideMonitor.DefaultChangeWaypointDist;
+#endif
         }
+
     }
 }

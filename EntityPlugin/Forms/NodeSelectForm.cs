@@ -14,75 +14,38 @@ namespace EntityPlugin.Forms
     public partial class TargetSelectForm : XtraForm
     {
 
-        static TargetSelectForm nodeSelectForm = null;
+        static TargetSelectForm selectForm = null;
         public TargetSelectForm()
         {
             InitializeComponent();
         }
 
-        public static DialogResult TargetGuiRequest(string string_0, Form form_0 = null)
+        public static DialogResult TargetGuiRequest(string caption, Form form_0 = null)
         {
-            if (nodeSelectForm == null)
-                nodeSelectForm = new TargetSelectForm();
+            if (selectForm == null)
+                selectForm = new TargetSelectForm();
 
             try
             {
-                nodeSelectForm.lblMessage.Text = string_0;
-                Binds.AddAction(Keys.F12, new Action(nodeSelectForm.btnOK.PerformClick));
-                return nodeSelectForm.ShowDialog();
+                selectForm.lblMessage.Text = caption;
+                Binds.AddAction(Keys.F12, new Action(selectForm.btnOK.PerformClick));
+                return selectForm.ShowDialog();
 
             }
             finally
             {
                 Binds.RemoveAction(Keys.F12);
             }
-
-            //TargetSelectForm.Class113 @class = new TargetSelectForm.Class113();
-            //@class.string_0 = string_0;
-            //@class.dialogResult = DialogResult.Abort;
-            //Action action = new Action(@class.method_0);
-            ////if (form_0 == null)
-            ////{
-            ////    form_0 = Astral.Controllers.Forms.Main;
-            ////}
-            //action();
-            //return @class.dialogResult;
         }
 
         private void btnOK_Click(object sender, EventArgs e)
         {
-            //this.flagOK = true;
             base.Close();
         }
-
-        //private bool flagOK;
 
         private SimpleButton btnOK;
 
         private LabelControl lblMessage;
-
-        //[CompilerGenerated]
-        //private sealed class Class113
-        //{
-        //    internal void method_0()
-        //    {
-        //        TargetSelectForm form = new TargetSelectForm();
-        //        form.lblMessage.Text = this.string_0;
-        //        Binds.AddAction(Keys.F12, new Action(form.btnOK.PerformClick));
-        //        form.ShowDialog();
-        //        Binds.RemoveAction(Keys.F12);
-        //        if (form.flagOK)
-        //        {
-        //            this.dialogResult = DialogResult.OK;
-        //            return;
-        //        }
-        //        this.dialogResult = DialogResult.Cancel;
-        //    }
-
-        //    public string string_0;
-
-        //    public DialogResult dialogResult;
-        //}
     }
 
 }

@@ -260,3 +260,4 @@ paket-files/
 __pycache__/
 *.pyc
 /ScalarAddon/Classes/Variables - копия.cs
+/EntityPlugin/Tools/Auras (2).cs

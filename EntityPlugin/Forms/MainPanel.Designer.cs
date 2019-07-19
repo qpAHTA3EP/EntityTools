@@ -163,11 +163,11 @@ namespace EntityPlugin.Forms
             this.tbclMain.Location = new System.Drawing.Point(0, 0);
             this.tbclMain.Name = "tbclMain";
             this.tbclMain.SelectedTabPage = this.tabUtilities;
-            this.tbclMain.Size = new System.Drawing.Size(398, 416);
+            this.tbclMain.Size = new System.Drawing.Size(398, 413);
             this.tbclMain.TabIndex = 7;
             this.tbclMain.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.tabOptions,
-            this.tabUtilities});
+		this.tabUtilities});
             // 
             // tabUtilities
             // 
@@ -179,7 +179,7 @@ namespace EntityPlugin.Forms
             this.tabUtilities.Controls.Add(this.lblMissions);
             this.tabUtilities.Controls.Add(this.btnAuras);
             this.tabUtilities.Name = "tabUtilities";
-            this.tabUtilities.Size = new System.Drawing.Size(392, 388);
+            this.tabUtilities.Size = new System.Drawing.Size(392, 385);
             this.tabUtilities.Text = "Utilities";
             // 
             // tabOptions
@@ -187,15 +187,15 @@ namespace EntityPlugin.Forms
             this.tabOptions.Controls.Add(this.ckbSpellStuckMonitor);
             this.tabOptions.Controls.Add(this.ckbDebugInfo);
             this.tabOptions.Name = "tabOptions";
-            this.tabOptions.Size = new System.Drawing.Size(392, 388);
+            this.tabOptions.Size = new System.Drawing.Size(392, 385);
             this.tabOptions.Text = "Options";
             // 
-            // ckbSpellStuckMonitor
+            // cbSpellStuckMonitor
             // 
             this.ckbSpellStuckMonitor.AutoSize = true;
             this.ckbSpellStuckMonitor.Location = new System.Drawing.Point(12, 32);
             this.ckbSpellStuckMonitor.Margin = new System.Windows.Forms.Padding(12);
-            this.ckbSpellStuckMonitor.Name = "ckbSpellStuckMonitor";
+            this.ckbSpellStuckMonitor.Name = "cbSpellStuckMonitor";
             this.ckbSpellStuckMonitor.Size = new System.Drawing.Size(145, 17);
             this.ckbSpellStuckMonitor.TabIndex = 1;
             this.ckbSpellStuckMonitor.Text = "Enable SpellStuckMonitor";
@@ -208,7 +208,7 @@ namespace EntityPlugin.Forms
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.tbclMain);
             this.Name = "MainPanel";
-            this.Size = new System.Drawing.Size(398, 416);
+            this.Size = new System.Drawing.Size(398, 413);
             this.Load += new System.EventHandler(this.MainPanel_Load);
             ((System.ComponentModel.ISupportInitialize)(this.bteMissions.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bteAuras.Properties)).EndInit();

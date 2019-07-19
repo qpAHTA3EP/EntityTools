@@ -85,6 +85,7 @@
     <Compile Include="Actions\ChangeInstanceToLeader.cs" />
     <Compile Include="Actions\InteractEntities.cs" />
     <Compile Include="Actions\Deprecated\InteractEntity.cs" />
+    <Compile Include="Actions\MoveToSea.cs" />
     <Compile Include="Conditions\CheckShard.cs" />
     <Compile Include="Conditions\EntityPropertyConditions.cs" />
     <Compile Include="Conditions\Deprecated\EntityDistance.cs" />
@@ -109,6 +110,7 @@
     <Compile Include="Forms\NodeSelectForm.Designer.cs">
       <DependentUpon>NodeSelectForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="States\SlideMonitor.cs" />
     <Compile Include="States\SpellStuckMonitor.cs" />
     <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\Auras.cs" />
@@ -149,6 +151,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MultiSelectForm.resx">
       <DependentUpon>MultiSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\NodeSelectForm.resx">
+      <DependentUpon>NodeSelectForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">

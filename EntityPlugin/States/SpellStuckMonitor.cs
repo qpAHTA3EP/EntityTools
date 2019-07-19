@@ -65,7 +65,7 @@ namespace EntityPlugin.States
                         Astral.Logic.UCC.API.AfterCallCombat += ArterCallCombat;
                         beforeStartEngineSubscribed = true;
                     }
-                    Logger.WriteLine("SpellStuckMonitor activated");
+                    Logger.WriteLine($"{typeof(SpellStuckMonitor).Name} activated");
                     if (Astral.Quester.API.Engine.Running)
                         LoadState();
                 }
@@ -81,8 +81,8 @@ namespace EntityPlugin.States
                     beforeStartEngineSubscribed = false;
                     monitor.needToRun = false;
                     if (Astral.Quester.API.Engine.Running)
-                        Logger.WriteLine("SpellStuckMonitor will be deactivated after the Astral will stop.");
-                    else Logger.WriteLine("SpellStuckMonitor deactivated");
+                        Logger.WriteLine($"{typeof(SpellStuckMonitor).Name} will be deactivated after the Astral will stop.");
+                    else Logger.WriteLine($"{typeof(SpellStuckMonitor).Name} deactivated");
                 }
             }
         }
@@ -107,7 +107,7 @@ namespace EntityPlugin.States
         public override void Run()
         {
 #if DEBUG
-            Logger.WriteLine($"[DEBUG] Play {GetType().Name}.{nameof(Run)}()");
+            Logger.WriteLine(Logger.LogType.Debug, $"Play {GetType().Name}.{nameof(Run)}()");
 #endif
 
             var player = EntityManager.LocalPlayer;
@@ -117,7 +117,7 @@ namespace EntityPlugin.States
                 case CharClassCategory.DevotedCleric:
                     {
 #if DEBUG
-                        Logger.WriteLine($"[DEBUG] {GetType().Name}: Character class is '{player.Character.Class.Category}'");
+                        Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: Character class is '{player.Character.Class.Category}'");
 #endif
                         // Флаги, предотвращающие повторное "выключение" умений
                         bool searchChanneldivinity = true;
@@ -151,9 +151,9 @@ namespace EntityPlugin.States
 #if DEBUG
                         //Если все Mods перебрали, а флаги не сброшены, значит соответствующие им умения неактивны
                         if (searchChanneldivinity)
-                            Logger.WriteLine($"[DEBUG] {GetType().Name}: SpecialClassPower[{Cleric_Channeldivinity}] not detected");
+                            Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: SpecialClassPower[{Cleric_Channeldivinity}] not detected");
                         if (searchArbiterMechanic)
-                            Logger.WriteLine($"[DEBUG] {GetType().Name}: Aura '{Cleric_Arbiter_Mechanic}' not detected");
+                            Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: Aura '{Cleric_Arbiter_Mechanic}' not detected");
 #endif
 
                         break;
@@ -161,7 +161,7 @@ namespace EntityPlugin.States
                 case CharClassCategory.OathboundPaladin:
                     {
 #if DEBUG
-                        Logger.WriteLine($"[DEBUG] {GetType().Name}: Character class is '{player.Character.Class.Category}'");
+                        Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: Character class is '{player.Character.Class.Category}'");
 #endif
                         // Если активно умение 'Paladin_Special_Divinepalisade'
                         //                        Power power = player.Character.Powers.Find(pow => pow.PowerDef.InternalName.StartsWith("Paladin_Special_Divinepalisade"));
@@ -216,9 +216,9 @@ namespace EntityPlugin.States
 #if DEBUG
                         //Если все Mods перебрали, а флаги не сброшены, значит соответствующие им умения неактивны
                         if (searchSanctuary)
-                            Logger.WriteLine($"[DEBUG] {GetType().Name}: Aura '{Paladin_Shift}' not detected");
+                            Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: Aura '{Paladin_Shift}' not detected");
                         if (searchDivinechampion)
-                            Logger.WriteLine($"[DEBUG] {GetType().Name}: Aura '{Paladin_Justicar_Mechanic}' not detected");
+                            Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: Aura '{Paladin_Justicar_Mechanic}' not detected");
 #endif
 
                         if (EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Paladin_Oathkeeper)
@@ -228,10 +228,10 @@ namespace EntityPlugin.States
                             if (power != null && power.IsValid && power.IsActive)
                             {
                                 GameCommands.Execute("specialClassPower 0");
-                                Logger.WriteLine($"{GetType().Name}: Deactivate SpecialClassPower[{Paladin_Oathkeeper_Mechanic}]");
+                                Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: Deactivate SpecialClassPower[{Paladin_Oathkeeper_Mechanic}]");
                             }
 #if DEBUG
-                            else Logger.WriteLine($"[DEBUG] {GetType().Name}: SpecialClassPower[{Paladin_Oathkeeper_Mechanic}] not active");
+                            else Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: SpecialClassPower[{Paladin_Oathkeeper_Mechanic}] not active");
 #endif
                         }
                         break;
@@ -250,7 +250,7 @@ namespace EntityPlugin.States
             //сбрасываем флаг необходимости проверки
             needToRun = false;
 #if DEBUG
-            Logger.WriteLine($"[DEBUG] {GetType().Name}: Wait Combat mode.");
+            Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: Wait Combat mode.");
 #endif
         }
     }
