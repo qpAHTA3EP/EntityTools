@@ -12,11 +12,11 @@ using MyNW.Classes;
 using MyNW.Internals;
 using Action = Astral.Quester.Classes.Action;
 
-namespace EntityPlugin.Actions
+namespace EntityPlugin.Actions.Deprecated
 {
     public class InteractEntity : Astral.Quester.Classes.Action
     {
-        public override string ActionLabel => $"[{Properties.Resources.CategoryDeprecated}] {GetType().Name} [{Name}]";
+        public override string ActionLabel => $"{GetType().Name} [{Name}]";
 
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         public string Name { get; set; }
@@ -29,30 +29,20 @@ namespace EntityPlugin.Actions
 
         public override string Category => Properties.Resources.CategoryDeprecated;
 
-        public override void InternalReset()
-        {
-        }
+        public override void InternalReset(){ }
 
-        public override string InternalDisplayName
-        {
-            get
-            {
-                return string.Empty;
-            }
-        }
+        public override string InternalDisplayName => string.Empty;
 
-        public override void GatherInfos()
-        {
-        }
+        public override void GatherInfos() { }
 
-        protected override bool IntenalConditions => true;
+        protected override bool IntenalConditions => false;
 
         public InteractEntity()
         {
-            this.Name = "";
-            this.Range = 15;
-            this.InteractTime = 4000;
-            this.SkipTime = 1000;
+            Name = "";
+            Range = 15;
+            InteractTime = 4000;
+            SkipTime = 1000;
         }
 
        protected override Astral.Quester.Classes.Action.ActionValidity InternalValidity
@@ -63,7 +53,7 @@ namespace EntityPlugin.Actions
                 {
                     return new Action.ActionValidity("Name property not set.");
                 }
-                return new Action.ActionValidity();
+                return new Action.ActionValidity($"Action 'InteractEntity' {Properties.Resources.CategoryDeprecated}. Use action '{typeof(InteractEntities).Name}'");
             }
         }
 

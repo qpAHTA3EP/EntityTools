@@ -85,7 +85,7 @@
     <Compile Include="Actions\ChangeInstanceToLeader.cs" />
     <Compile Include="Actions\InteractEntities.cs" />
     <Compile Include="Actions\Deprecated\InteractEntity.cs" />
-    <Compile Include="Actions\MoveToSea.cs" />
+    <Compile Include="Actions\Deprecated\MoveToSea.cs" />
     <Compile Include="Conditions\CheckShard.cs" />
     <Compile Include="Conditions\EntityPropertyConditions.cs" />
     <Compile Include="Conditions\Deprecated\EntityDistance.cs" />

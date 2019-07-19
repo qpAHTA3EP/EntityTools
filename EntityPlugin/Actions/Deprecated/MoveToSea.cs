@@ -12,8 +12,75 @@ using Astral.Quester.UIEditors;
 using MyNW.Classes;
 using MyNW.Internals;
 
-namespace MoveToSea
+namespace EntityPlugin.Actions.Deprecated
 {
+    [Serializable]
+    public class MoveToSea : Astral.Quester.Classes.Action
+    {
+        private Astral.Quester.Classes.Actions.MoveTo moveTo;
+
+        public MoveToSea() { }
+
+        public override string ActionLabel
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Desctiption))
+                    return $"SailTo";
+                else return $"Sail [" + Desctiption + ']';
+            }
+        }
+
+        public override string InternalDisplayName => string.Empty;
+        public override bool NeedToRun => moveTo.NeedToRun;
+        public override bool UseHotSpots => moveTo.UseHotSpots;
+        protected override bool IntenalConditions => false;
+        protected override Vector3 InternalDestination => moveTo.Position;
+        protected override ActionValidity InternalValidity
+        {
+            get
+            {
+                return new ActionValidity($"Action '{GetType().Name}' is {Properties.Resources.CategoryDeprecated}. " +
+                    $"Use action '{typeof(Astral.Quester.Classes.Actions.MoveTo).Name}' instead. " +
+                    $"The '{typeof(States.SlideMonitor)}' will filter the waypoint automatically.");
+            }
+        }
+
+        public override void InternalReset() { moveTo.InternalReset(); }
+
+        [Editor(typeof(PositionEditor), typeof(UITypeEditor))]
+        [Description("Final destination")]
+        public Vector3 Position => moveTo.Position;
+
+        [Description("Minimum distance between waypoints")]
+        public int Filter { get; set; } = 90;
+
+        [Description("Stop moving if True")]
+        public bool IgnoreCombat => moveTo.IgnoreCombat;
+
+        [Description("Description of the target location (not necessary)")]
+        public string Desctiption { get; set; }
+
+        public override ActionResult Run()
+        {
+            States.SlideMonitor.Activate = true;
+            return moveTo.Run();
+        }
+
+        public override void GatherInfos()
+        {
+            MessageBox.Show("Place mark on the InGame's map and press OK");
+            moveTo.Position = EntityManager.LocalPlayer.Player.MyFirstWaypoint.Position.Clone();
+        }
+
+
+        public override void OnMapDraw(GraphicsNW graph)
+        {
+            moveTo.OnMapDraw(graph);
+        }
+
+    }
+#if NO_SAIL_MONITOR
     [Serializable]
     public class MoveToSea : Astral.Quester.Classes.Action
     {
@@ -30,7 +97,7 @@ namespace MoveToSea
             {
                 if(string.IsNullOrEmpty(Desctiption))
                     return "SailTo";
-                else return "SailTo [" + Desctiption + ']';
+                else return "Sail [" + Desctiption + ']';
             }
         }
 
@@ -131,4 +198,5 @@ namespace MoveToSea
             graph.drawFillEllipse(Position.Clone(), new Size(10, 10), Brushes.Beige);
         }
     }
+#endif
 }
