@@ -122,8 +122,11 @@ namespace EntityPlugin.States
                         // Флаги, предотвращающие повторное "выключение" умений
                         bool searchChanneldivinity = true;
                         bool searchArbiterMechanic = EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Cleric_Arbiter;
+#if X64
                         foreach (AttribModNet mod in player.Character.Mods) // x64 
-                        //foreach (AttribMod mod in player.Character.Mods) // x32
+#elif X32
+                        foreach (AttribMod mod in player.Character.Mods) // x32
+#endif
 
                         {
                             // Поиск ауры 'Devoted_Special_Channeldivinity'
@@ -188,9 +191,11 @@ namespace EntityPlugin.States
                         // Флаги, предотвращающие повторное "выключение" умений
                         bool searchSanctuary = true;
                         bool searchDivinechampion = EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Paladin_Justicar;
-
+#if X64
                         foreach (AttribModNet mod in player.Character.Mods) // x64
-                        //foreach (AttribMod mod in player.Character.Mods) // x32
+#elif X32
+                        foreach (AttribMod mod in player.Character.Mods) // x32
+#endif
                         {
 
                             // Поиск ауры 'Paladin_Shift_Sanctuary' 

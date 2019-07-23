@@ -25,8 +25,7 @@ namespace AstralVars.Expressions
         {
             get
             {
-                T result;
-                if (Calculate(out result))
+                if (Calculate(out T result))
                     return result;
                 return null;
             }

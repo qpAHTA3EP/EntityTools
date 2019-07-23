@@ -45,14 +45,14 @@ namespace EntityPlugin
 
             States.SpellStuckMonitor.Activate = true;
             States.SlideMonitor.Activate = true;
-#if CHANGE_WAYPOINT_DIST
+#if CHANGE_WAYPOINT_DIST_SETTING
             States.SlideMonitor.DefaultChangeWaypointDist = Astral.API.CurrentSettings.ChangeWaypointDist;
 #endif
         }
 
         public override void OnUnload()
         {
-#if CHANGE_WAYPOINT_DIST
+#if CHANGE_WAYPOINT_DIST_SETTING
            Astral.API.CurrentSettings.ChangeWaypointDist = States.SlideMonitor.DefaultChangeWaypointDist;
 #endif
         }

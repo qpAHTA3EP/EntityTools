@@ -33,15 +33,15 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <OutputPath>bin\x86\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;X32</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
+    <OutputPath>bin\x86\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -51,15 +51,15 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <OutputPath>bin\x64\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;X64</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
+    <OutputPath>bin\x64\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -69,26 +69,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Astral">
-      <HintPath>D:\Games\Astral_RU_1\Astral.exe</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Astral-cleaned">
-      <HintPath>D:\Games\Astral_RU_1\Astral-cleaned.exe</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Utils.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.Utils.v18.1.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.XtraEditors.v18.1">
-      <HintPath>D:\Games\DevExpress\DevExpress.XtraEditors.v18.1.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\References\x64\Astral.exe</HintPath>
     </Reference>
     <Reference Include="MyNW">
-      <HintPath>D:\Games\Astral_RU_1\MyNW.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="MyNW-cleaned">
-      <HintPath>D:\Games\Astral_RU_1\MyNW-cleaned.dll</HintPath>
+      <HintPath>..\References\x64\MyNW.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -102,12 +86,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Expressions\Expression.cs" />
-    <Compile Include="Expressions\NumberExpresstion.cs" />
+    <Compile Include="Expressions\NumberExpression.cs" />
     <Compile Include="Expressions\NumberOperand.cs" />
     <Compile Include="Expressions\NumericOperators.cs" />
     <Compile Include="Expressions\Term.cs" />
     <Compile Include="Classes\Variables.cs" />
-    <Compile Include="Classes\VarParcer.cs" />
+    <Compile Include="Classes\Parser.cs" />
     <Compile Include="Forms\DataGridViewDateTimeCell.cs" />
     <Compile Include="VariablesAddon.cs" />
     <Compile Include="Actions\VarAction.cs" />

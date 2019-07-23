@@ -10,7 +10,7 @@ using MyNW.Internals;
 
 namespace EntityPlugin.Forms
 {
-    public partial class MainPanel /*: UserControl */: Astral.Forms.BasePanel
+    public partial class MainPanel : /* UserControl //*/ Astral.Forms.BasePanel
     {
         private EntitySelectForm.EntityDif entDif = new EntitySelectForm.EntityDif();
 
@@ -19,6 +19,8 @@ namespace EntityPlugin.Forms
             InitializeComponent();
 
             ckbSpellStuckMonitor.Checked = States.SpellStuckMonitor.Activate;
+            cbSlideMonitor.Checked = States.SlideMonitor.Activate;
+            gbSlideMonitor.Enabled = States.SlideMonitor.Activate;
         }
 
         private void btnEntities_Click(object sender, EventArgs e)
@@ -176,6 +178,32 @@ namespace EntityPlugin.Forms
         private void cbSpellStuckMonitor_CheckedChanged(object sender, EventArgs e)
         {
             SpellStuckMonitor.Activate = ckbSpellStuckMonitor.Checked;
+        }
+
+        private void seSlideFilter_EditValueChanged(object sender, EventArgs e)
+        {
+            SlideMonitor.Filter = (float)seSlideFilter.Value;
+        }
+
+        private void seTimerUnslide_EditValueChanged(object sender, EventArgs e)
+        {
+            SlideMonitor.CheckTimeNotSlide = (int)seTimerUnslide.Value;
+        }
+
+        private void seTimerSlide_EditValueChanged(object sender, EventArgs e)
+        {
+            SlideMonitor.CheckTimeNotSlide = (int)seTimerUnslide.Value;
+        }
+
+        private void gcbSlideMonitor_CustomButtonChecked(object sender, DevExpress.XtraBars.Docking2010.BaseButtonEventArgs e)
+        {
+
+        }
+
+        private void cbSlideMonitor_CheckedChanged(object sender, EventArgs e)
+        {
+            SlideMonitor.Activate = cbSlideMonitor.Checked;
+            gbSlideMonitor.Enabled = cbSlideMonitor.Checked;
         }
     }
 }

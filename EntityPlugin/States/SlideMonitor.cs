@@ -1,4 +1,4 @@
-﻿//#define CHANGE_WAYPOINT_DIST
+﻿//#define CHANGE_WAYPOINT_DIST_SETTING
 #define NEXT_WAYPOING
 
 using Astral;
@@ -20,13 +20,23 @@ namespace EntityPlugin.States
     {
         public override int Priority => 100;
         public override string DisplayName => typeof(SlideMonitor).Name;
-#if CHANGE_WAYPOINT_DIST
+#if CHANGE_WAYPOINT_DIST_SETTING
         public override bool NeedToRun => CheckTO.IsTimedOut;
 #else
         public override bool NeedToRun => (CheckTO.IsTimedOut && IsSliding);
 #endif
-        private int checkInterval = 3000;
+        /// <summary>
+        // Интервал между проверками ауры во время скольжения
+        /// </summary>
+        public static int CheckTimeSlide { get; set; } = 100;
+        /// <summary>
+        /// Интервал между проверками ауры без скольжения
+        /// </summary>
+        public static int CheckTimeNotSlide { get; set; } = 3000;
+
+        private int checkInterval;
         public override int CheckInterval => checkInterval;
+
         public override bool StopNavigator => false;
 
         /// <summary>
@@ -58,11 +68,12 @@ namespace EntityPlugin.States
         /// Cписок аур, указывающий на режим скольжения
         /// </summary>
         public static string[] SlidingAuras = { "M10_Becritter_Boat_Costume",   // Плавание под парусом (Море льда, Сошенстар в Чалте)
-                                                "Volume_Ground_Slippery"        // Скольжение на льду (Долина дворфов, ДЛВ)
+                                                "Volume_Ground_Slippery",        // Скольжение на льду (Долина дворфов, ДЛВ)
+                                                "Volume_Ground_Slippery_Playeronly" // Скольжение на льду (Гамбит иллюзиониста, Схватка)
                                               };     
         
         private static bool beforeStartEngineSubscribed = false;
-        private static SlideMonitor monitor = new SlideMonitor();
+        private static readonly SlideMonitor monitor = new SlideMonitor();
 
         public static bool Activate
         {
@@ -87,7 +98,7 @@ namespace EntityPlugin.States
                 else
                 {
                     // Выключение монитора
-#if CHANGE_WAYPOINT_DIST
+#if CHANGE_WAYPOINT_DIST_SETTING
                     Astral.API.CurrentSettings.ChangeWaypointDist = States.SlideMonitor.DefaultChangeWaypointDist;
 #endif
                     Astral.Quester.API.BeforeStartEngine -= API_BeforeStartEngine;
@@ -108,7 +119,7 @@ namespace EntityPlugin.States
         public override void Run()
         {
 #region CHANGE_WAYPOINT_DISTANCE
-#if CHANGE_WAYPOINT_DIST
+#if CHANGE_WAYPOINT_DIST_SETTING
             if (IsSliding)
             {
 #if DEBUG
@@ -216,7 +227,13 @@ namespace EntityPlugin.States
             get
             {
                 // Ищим любую ауру скольжения
-                AttribModNet mod = EntityManager.LocalPlayer.Character.Mods.Find(x => SlidingAuras.Contains(x.PowerDef.InternalName));
+#if X32
+                AttribMod mod = EntityManager.LocalPlayer.Character.Mods.Find(x => SlidingAuras.Contains(x.PowerDef.InternalName)); // х32
+#endif
+#if X64
+                AttribModNet mod = EntityManager.LocalPlayer.Character.Mods.Find(x => SlidingAuras.Contains(x.PowerDef.InternalName)); //х64
+#endif
+
 #if DEBUG
                 if (mod != null && mod.IsValid)
                     Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: Found sliding aura '{mod.PowerDef.InternalName}'");
@@ -224,15 +241,15 @@ namespace EntityPlugin.States
 #endif
                 if (mod != null && mod.IsValid)
                 {
-                    if (checkInterval > 100)
-                        CheckTO.ChangeTime(100);
-                    checkInterval = 100;
+                    if (checkInterval > CheckTimeSlide)
+                        CheckTO.ChangeTime(CheckTimeSlide);
+                    checkInterval = CheckTimeSlide;
                 }
                 else
                 {
-                    if (checkInterval < 3000)
-                        CheckTO.ChangeTime(3000);
-                    checkInterval = 3000;
+                    if (checkInterval < CheckTimeNotSlide)
+                        CheckTO.ChangeTime(CheckTimeNotSlide);
+                    checkInterval = CheckTimeNotSlide;
                 }
                 return (mod != null && mod.IsValid);
             }

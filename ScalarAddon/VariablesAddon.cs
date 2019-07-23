@@ -18,13 +18,13 @@ namespace AstralVars
     {
         public static VarCollection Variables = new VarCollection();
 
-        public static string LoggerPredicate = "[VariablesAddon]:";
+        public static string LoggerPredicate = nameof(VariablesAddon) + ':';
 
         public override string Name => GetType().Name;
 
         public override string Author => "MichaelProg";
 
-        public override System.Drawing.Image Icon => Properties.Resources.MathOpIcon;
+        public override System.Drawing.Image Icon => Properties.Resources.MathOp;
 
         public override BasePanel Settings => new Forms.VariablesAddonPanel();
 

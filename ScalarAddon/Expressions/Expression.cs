@@ -54,4 +54,15 @@ namespace AstralVars.Expressions
         public string Message = string.Empty;
         public int errorPosition = 0;
     }
+
+    public class ParseError : Exception
+    {
+        public ParseError(string mes = "", int pos = 0) : base(mes)
+        {
+            errorPosition = pos;
+        }
+
+        public int errorPosition = 0;
+    }
+
 }

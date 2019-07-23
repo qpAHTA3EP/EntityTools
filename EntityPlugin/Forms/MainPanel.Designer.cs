@@ -41,15 +41,30 @@ namespace EntityPlugin.Forms
             this.bteAuras = new DevExpress.XtraEditors.ButtonEdit();
             this.fldrBroserDlg = new System.Windows.Forms.FolderBrowserDialog();
             this.tbclMain = new DevExpress.XtraTab.XtraTabControl();
-            this.tabUtilities = new DevExpress.XtraTab.XtraTabPage();
             this.tabOptions = new DevExpress.XtraTab.XtraTabPage();
+            this.cbSlideMonitor = new System.Windows.Forms.CheckBox();
             this.ckbSpellStuckMonitor = new System.Windows.Forms.CheckBox();
+            this.gbSlideMonitor = new System.Windows.Forms.GroupBox();
+            this.seTimerSlide = new DevExpress.XtraEditors.SpinEdit();
+            this.lblTimerSlide = new System.Windows.Forms.Label();
+            this.lblSlideFilter = new System.Windows.Forms.Label();
+            this.lblTimerUnslide = new System.Windows.Forms.Label();
+            this.seTimerUnslide = new DevExpress.XtraEditors.SpinEdit();
+            this.seSlideFilter = new DevExpress.XtraEditors.SpinEdit();
+            this.lblSlideTimer = new System.Windows.Forms.Label();
+            this.tabUtilities = new DevExpress.XtraTab.XtraTabPage();
+            this.tbSlidingAuras = new System.Windows.Forms.TextBox();
+            this.lblSlidingAuras = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.bteMissions.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bteAuras.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
             this.tbclMain.SuspendLayout();
-            this.tabUtilities.SuspendLayout();
             this.tabOptions.SuspendLayout();
+            this.gbSlideMonitor.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.seTimerSlide.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.seTimerUnslide.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.seSlideFilter.Properties)).BeginInit();
+            this.tabUtilities.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnEntities
@@ -70,7 +85,6 @@ namespace EntityPlugin.Forms
             // 
             this.ckbDebugInfo.AutoSize = true;
             this.ckbDebugInfo.Location = new System.Drawing.Point(12, 9);
-            this.ckbDebugInfo.Margin = new System.Windows.Forms.Padding(12);
             this.ckbDebugInfo.Name = "ckbDebugInfo";
             this.ckbDebugInfo.Size = new System.Drawing.Size(206, 17);
             this.ckbDebugInfo.TabIndex = 1;
@@ -162,12 +176,161 @@ namespace EntityPlugin.Forms
             this.tbclMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbclMain.Location = new System.Drawing.Point(0, 0);
             this.tbclMain.Name = "tbclMain";
-            this.tbclMain.SelectedTabPage = this.tabUtilities;
-            this.tbclMain.Size = new System.Drawing.Size(398, 413);
+            this.tbclMain.SelectedTabPage = this.tabOptions;
+            this.tbclMain.Size = new System.Drawing.Size(398, 416);
             this.tbclMain.TabIndex = 7;
             this.tbclMain.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.tabOptions,
-		this.tabUtilities});
+            this.tabUtilities});
+            // 
+            // tabOptions
+            // 
+            this.tabOptions.Controls.Add(this.cbSlideMonitor);
+            this.tabOptions.Controls.Add(this.ckbSpellStuckMonitor);
+            this.tabOptions.Controls.Add(this.ckbDebugInfo);
+            this.tabOptions.Controls.Add(this.gbSlideMonitor);
+            this.tabOptions.Name = "tabOptions";
+            this.tabOptions.Size = new System.Drawing.Size(392, 388);
+            this.tabOptions.Text = "Options";
+            // 
+            // cbSlideMonitor
+            // 
+            this.cbSlideMonitor.AutoSize = true;
+            this.cbSlideMonitor.Location = new System.Drawing.Point(12, 55);
+            this.cbSlideMonitor.Name = "cbSlideMonitor";
+            this.cbSlideMonitor.Size = new System.Drawing.Size(119, 17);
+            this.cbSlideMonitor.TabIndex = 3;
+            this.cbSlideMonitor.Text = "Enable SlideMonitor";
+            this.cbSlideMonitor.UseVisualStyleBackColor = true;
+            this.cbSlideMonitor.CheckedChanged += new System.EventHandler(this.cbSlideMonitor_CheckedChanged);
+            // 
+            // ckbSpellStuckMonitor
+            // 
+            this.ckbSpellStuckMonitor.AutoSize = true;
+            this.ckbSpellStuckMonitor.Location = new System.Drawing.Point(12, 32);
+            this.ckbSpellStuckMonitor.Name = "ckbSpellStuckMonitor";
+            this.ckbSpellStuckMonitor.Size = new System.Drawing.Size(145, 17);
+            this.ckbSpellStuckMonitor.TabIndex = 1;
+            this.ckbSpellStuckMonitor.Text = "Enable SpellStuckMonitor";
+            this.ckbSpellStuckMonitor.UseVisualStyleBackColor = true;
+            this.ckbSpellStuckMonitor.CheckedChanged += new System.EventHandler(this.cbSpellStuckMonitor_CheckedChanged);
+            // 
+            // gbSlideMonitor
+            // 
+            this.gbSlideMonitor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbSlideMonitor.Controls.Add(this.tbSlidingAuras);
+            this.gbSlideMonitor.Controls.Add(this.seTimerSlide);
+            this.gbSlideMonitor.Controls.Add(this.lblTimerSlide);
+            this.gbSlideMonitor.Controls.Add(this.lblSlideFilter);
+            this.gbSlideMonitor.Controls.Add(this.lblSlidingAuras);
+            this.gbSlideMonitor.Controls.Add(this.lblTimerUnslide);
+            this.gbSlideMonitor.Controls.Add(this.seTimerUnslide);
+            this.gbSlideMonitor.Controls.Add(this.seSlideFilter);
+            this.gbSlideMonitor.Controls.Add(this.lblSlideTimer);
+            this.gbSlideMonitor.Location = new System.Drawing.Point(2, 57);
+            this.gbSlideMonitor.Name = "gbSlideMonitor";
+            this.gbSlideMonitor.Size = new System.Drawing.Size(387, 160);
+            this.gbSlideMonitor.TabIndex = 4;
+            this.gbSlideMonitor.TabStop = false;
+            // 
+            // seTimerSlide
+            // 
+            this.seTimerSlide.EditValue = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            this.seTimerSlide.Location = new System.Drawing.Point(77, 55);
+            this.seTimerSlide.Name = "seTimerSlide";
+            this.seTimerSlide.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.seTimerSlide.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.seTimerSlide.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
+            this.seTimerSlide.Properties.IsFloatValue = false;
+            this.seTimerSlide.Properties.Mask.EditMask = "N00";
+            this.seTimerSlide.Size = new System.Drawing.Size(56, 20);
+            this.seTimerSlide.TabIndex = 1;
+            this.seTimerSlide.EditValueChanged += new System.EventHandler(this.seTimerSlide_EditValueChanged);
+            // 
+            // lblTimerSlide
+            // 
+            this.lblTimerSlide.AutoSize = true;
+            this.lblTimerSlide.Location = new System.Drawing.Point(6, 58);
+            this.lblTimerSlide.Name = "lblTimerSlide";
+            this.lblTimerSlide.Size = new System.Drawing.Size(65, 13);
+            this.lblTimerSlide.TabIndex = 2;
+            this.lblTimerSlide.Text = "when sliding";
+            // 
+            // lblSlideFilter
+            // 
+            this.lblSlideFilter.AutoSize = true;
+            this.lblSlideFilter.Location = new System.Drawing.Point(6, 17);
+            this.lblSlideFilter.Name = "lblSlideFilter";
+            this.lblSlideFilter.Size = new System.Drawing.Size(198, 13);
+            this.lblSlideFilter.TabIndex = 2;
+            this.lblSlideFilter.Text = "Distance to target waypoint when slide:";
+            // 
+            // lblTimerUnslide
+            // 
+            this.lblTimerUnslide.AutoSize = true;
+            this.lblTimerUnslide.Location = new System.Drawing.Point(139, 58);
+            this.lblTimerUnslide.Name = "lblTimerUnslide";
+            this.lblTimerUnslide.Size = new System.Drawing.Size(84, 13);
+            this.lblTimerUnslide.TabIndex = 2;
+            this.lblTimerUnslide.Text = "when not sliding";
+            // 
+            // seTimerUnslide
+            // 
+            this.seTimerUnslide.EditValue = new decimal(new int[] {
+            3000,
+            0,
+            0,
+            0});
+            this.seTimerUnslide.Location = new System.Drawing.Point(229, 55);
+            this.seTimerUnslide.Name = "seTimerUnslide";
+            this.seTimerUnslide.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.seTimerUnslide.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.seTimerUnslide.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
+            this.seTimerUnslide.Properties.IsFloatValue = false;
+            this.seTimerUnslide.Properties.Mask.EditMask = "N00";
+            this.seTimerUnslide.Size = new System.Drawing.Size(56, 20);
+            this.seTimerUnslide.TabIndex = 1;
+            this.seTimerUnslide.EditValueChanged += new System.EventHandler(this.seTimerUnslide_EditValueChanged);
+            // 
+            // seSlideFilter
+            // 
+            this.seSlideFilter.EditValue = new decimal(new int[] {
+            60,
+            0,
+            0,
+            0});
+            this.seSlideFilter.Location = new System.Drawing.Point(210, 14);
+            this.seSlideFilter.Name = "seSlideFilter";
+            this.seSlideFilter.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.seSlideFilter.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.seSlideFilter.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
+            this.seSlideFilter.Properties.IsFloatValue = false;
+            this.seSlideFilter.Properties.Mask.EditMask = "N00";
+            this.seSlideFilter.Properties.MaxValue = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
+            this.seSlideFilter.Size = new System.Drawing.Size(56, 20);
+            this.seSlideFilter.TabIndex = 0;
+            this.seSlideFilter.EditValueChanged += new System.EventHandler(this.seSlideFilter_EditValueChanged);
+            // 
+            // lblSlideTimer
+            // 
+            this.lblSlideTimer.AutoSize = true;
+            this.lblSlideTimer.Location = new System.Drawing.Point(6, 39);
+            this.lblSlideTimer.Name = "lblSlideTimer";
+            this.lblSlideTimer.Size = new System.Drawing.Size(194, 13);
+            this.lblSlideTimer.TabIndex = 2;
+            this.lblSlideTimer.Text = "Time between aura check (millisecond):";
             // 
             // tabUtilities
             // 
@@ -179,28 +342,32 @@ namespace EntityPlugin.Forms
             this.tabUtilities.Controls.Add(this.lblMissions);
             this.tabUtilities.Controls.Add(this.btnAuras);
             this.tabUtilities.Name = "tabUtilities";
-            this.tabUtilities.Size = new System.Drawing.Size(392, 385);
+            this.tabUtilities.Size = new System.Drawing.Size(392, 388);
             this.tabUtilities.Text = "Utilities";
             // 
-            // tabOptions
+            // tbSlidingAuras
             // 
-            this.tabOptions.Controls.Add(this.ckbSpellStuckMonitor);
-            this.tabOptions.Controls.Add(this.ckbDebugInfo);
-            this.tabOptions.Name = "tabOptions";
-            this.tabOptions.Size = new System.Drawing.Size(392, 385);
-            this.tabOptions.Text = "Options";
+            this.tbSlidingAuras.AcceptsReturn = true;
+            this.tbSlidingAuras.AcceptsTab = true;
+            this.tbSlidingAuras.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbSlidingAuras.Location = new System.Drawing.Point(6, 94);
+            this.tbSlidingAuras.Multiline = true;
+            this.tbSlidingAuras.Name = "tbSlidingAuras";
+            this.tbSlidingAuras.Size = new System.Drawing.Size(375, 60);
+            this.tbSlidingAuras.TabIndex = 3;
+            this.tbSlidingAuras.Text = "M10_Becritter_Boat_Costume\r\nVolume_Ground_Slippery\r\nVolume_Ground_Slippery_Player" +
+    "only";
             // 
-            // cbSpellStuckMonitor
+            // lblSlidingAuras
             // 
-            this.ckbSpellStuckMonitor.AutoSize = true;
-            this.ckbSpellStuckMonitor.Location = new System.Drawing.Point(12, 32);
-            this.ckbSpellStuckMonitor.Margin = new System.Windows.Forms.Padding(12);
-            this.ckbSpellStuckMonitor.Name = "cbSpellStuckMonitor";
-            this.ckbSpellStuckMonitor.Size = new System.Drawing.Size(145, 17);
-            this.ckbSpellStuckMonitor.TabIndex = 1;
-            this.ckbSpellStuckMonitor.Text = "Enable SpellStuckMonitor";
-            this.ckbSpellStuckMonitor.UseVisualStyleBackColor = true;
-            this.ckbSpellStuckMonitor.CheckedChanged += new System.EventHandler(this.cbSpellStuckMonitor_CheckedChanged);
+            this.lblSlidingAuras.AutoSize = true;
+            this.lblSlidingAuras.Location = new System.Drawing.Point(6, 78);
+            this.lblSlidingAuras.Name = "lblSlidingAuras";
+            this.lblSlidingAuras.Size = new System.Drawing.Size(72, 13);
+            this.lblSlidingAuras.TabIndex = 2;
+            this.lblSlidingAuras.Text = "Sliding Auras:";
             // 
             // MainPanel
             // 
@@ -208,16 +375,21 @@ namespace EntityPlugin.Forms
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.tbclMain);
             this.Name = "MainPanel";
-            this.Size = new System.Drawing.Size(398, 413);
+            this.Size = new System.Drawing.Size(398, 416);
             this.Load += new System.EventHandler(this.MainPanel_Load);
             ((System.ComponentModel.ISupportInitialize)(this.bteMissions.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bteAuras.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).EndInit();
             this.tbclMain.ResumeLayout(false);
-            this.tabUtilities.ResumeLayout(false);
-            this.tabUtilities.PerformLayout();
             this.tabOptions.ResumeLayout(false);
             this.tabOptions.PerformLayout();
+            this.gbSlideMonitor.ResumeLayout(false);
+            this.gbSlideMonitor.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.seTimerSlide.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.seTimerUnslide.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.seSlideFilter.Properties)).EndInit();
+            this.tabUtilities.ResumeLayout(false);
+            this.tabUtilities.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -237,5 +409,16 @@ namespace EntityPlugin.Forms
         private DevExpress.XtraTab.XtraTabPage tabUtilities;
         private DevExpress.XtraTab.XtraTabPage tabOptions;
         private System.Windows.Forms.CheckBox ckbSpellStuckMonitor;
+        private System.Windows.Forms.Label lblTimerSlide;
+        private System.Windows.Forms.Label lblTimerUnslide;
+        private System.Windows.Forms.Label lblSlideTimer;
+        private System.Windows.Forms.Label lblSlideFilter;
+        private DevExpress.XtraEditors.SpinEdit seTimerSlide;
+        private DevExpress.XtraEditors.SpinEdit seTimerUnslide;
+        private DevExpress.XtraEditors.SpinEdit seSlideFilter;
+        private System.Windows.Forms.CheckBox cbSlideMonitor;
+        private System.Windows.Forms.GroupBox gbSlideMonitor;
+        private System.Windows.Forms.TextBox tbSlidingAuras;
+        private System.Windows.Forms.Label lblSlidingAuras;
     }
 }

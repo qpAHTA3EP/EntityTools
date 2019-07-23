@@ -159,11 +159,11 @@ namespace AstralVars.Classes
         /// null, если значение ключа 'key' было пустым или null</returns>
         public Variable Set(string key, object val)
         {
-            if (VarParcer.TryParseStrict(val, out double iVal))
+            if (Parser.TryParseStrict(val, out double iVal))
                 return Set(key, iVal);
-            if (VarParcer.TryParseStrict(val, out bool bVal))
+            if (Parser.TryParseStrict(val, out bool bVal))
                 return Set(key, bVal);
-            if (VarParcer.TryParseStrict(val, out DateTime dtVal))
+            if (Parser.TryParseStrict(val, out DateTime dtVal))
                 return Set(key, dtVal);
             return Set(key, val.ToString());
         }
@@ -186,17 +186,17 @@ namespace AstralVars.Classes
                 return Set(key.Trim(), val.ToString());
             else if (type == VarTypes.Number)
             {
-                if (VarParcer.TryParseStrict(val, out double nVal))
+                if (Parser.TryParseStrict(val, out double nVal))
                     return Set(key.Trim(), nVal);
             }
             else if (type == VarTypes.Boolean)
             {
-                if (VarParcer.TryParseStrict(val, out bool bVal))
+                if (Parser.TryParseStrict(val, out bool bVal))
                     return Set(key.Trim(), bVal);
             }
             else if (type == VarTypes.DateTime)
             {
-                if(VarParcer.TryParseStrict(val, out DateTime dtVal))
+                if(Parser.TryParseStrict(val, out DateTime dtVal))
                     return Set(key.Trim(), dtVal);
             }
 
@@ -216,7 +216,7 @@ namespace AstralVars.Classes
         {
             if (string.IsNullOrEmpty(key) || objType == null || val == null)
                 return null;
-            if (VarParcer.GetType(objType, out VarTypes type))
+            if (Parser.GetType(objType, out VarTypes type))
             {
                 return Set(key.Trim(), type, val);
             }
@@ -236,7 +236,7 @@ namespace AstralVars.Classes
         {
             if (key == null || objType == null || val == null)
                 return null;
-            if (VarParcer.GetType(objType, out VarTypes type))
+            if (Parser.GetType(objType, out VarTypes type))
             {
                 return Set(key.ToString().Trim(), type, val);
             }

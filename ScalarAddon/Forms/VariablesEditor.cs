@@ -45,7 +45,7 @@ namespace AstralVars.Forms
                 varEditor.clmnType.Items.AddRange(Enum.GetNames(typeof(VarTypes)));
 
                 // Следующая реализация вызывает ошибку при попытке выбрать двугое значение в списке
-                //varEditor.clmnType.DataSource = VarParcer.varTypes;
+                //varEditor.clmnType.DataSource = Parser.varTypes;
 
                 varEditor.dgvVariables.ReadOnly = true;
 
@@ -244,18 +244,18 @@ namespace AstralVars.Forms
                     if (!string.IsNullOrEmpty(val))
                     {
                         if( curRow.Cells[clmnType.DisplayIndex].Value != null &&
-                            VarParcer.GetType(curRow.Cells[clmnType.DisplayIndex].Value, out VarTypes newVarType))
+                            Parser.GetType(curRow.Cells[clmnType.DisplayIndex].Value, out VarTypes newVarType))
                         {
                             switch (newVarType)
                             {
                                 case VarTypes.Boolean:
-                                    e.Cancel = !VarParcer.TryParse(val, out bool bRes);
+                                    e.Cancel = !Parser.TryParse(val, out bool bRes);
                                     break;
                                 case VarTypes.Number:
-                                    e.Cancel = !VarParcer.TryParse(val, out double nRres);
+                                    e.Cancel = !Parser.TryParse(val, out double nRres);
                                     break;
                                 case VarTypes.DateTime:
-                                    e.Cancel = !VarParcer.TryParse(val, out DateTime dtRes);
+                                    e.Cancel = !Parser.TryParse(val, out DateTime dtRes);
                                     break;
                             }
 
@@ -273,10 +273,10 @@ namespace AstralVars.Forms
                         e.Cancel = true;
                     }
 
-                    if(!VarParcer.CheckVarName(e.FormattedValue.ToString()))
+                    if(!Parser.CheckVarName(e.FormattedValue.ToString()))
                     {
                         MessageBox.Show(varEditor, $"Name for variable '{e.FormattedValue}' is not allowed because contains forbiddent parts:\n"
-                                                    + VarParcer.ForbiddenNameParts,
+                                                    + Parser.ForbiddenNameParts,
                                                     "Errors", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         e.Cancel = true;
                     }
@@ -296,7 +296,7 @@ namespace AstralVars.Forms
                 else if (e.ColumnIndex == clmnType.DisplayIndex)
                 {
                     // Преобразование нового значения ячейки к VarType
-                    if (VarParcer.GetType(e.FormattedValue.ToString(), out VarTypes newType))
+                    if (Parser.GetType(e.FormattedValue.ToString(), out VarTypes newType))
                     {
                         bool needCheckValue = true;
                         VarTypes oldType = newType;
@@ -308,7 +308,7 @@ namespace AstralVars.Forms
                             oldType = newType;
                             needCheckValue = true;
                         }
-                        else if(VarParcer.GetType(curRow.Cells[e.ColumnIndex].Value, out oldType))
+                        else if(Parser.GetType(curRow.Cells[e.ColumnIndex].Value, out oldType))
                         {
                             if (oldType != newType)
                             {
@@ -342,7 +342,7 @@ namespace AstralVars.Forms
                                     {
                                         bool bRes = BoolVar.Default;
                                         if(curRow.Cells[clmnValue.DisplayIndex].Value != null)
-                                            VarParcer.TryParse(curRow.Cells[clmnValue.DisplayIndex].Value.ToString(), out bRes);
+                                            Parser.TryParse(curRow.Cells[clmnValue.DisplayIndex].Value.ToString(), out bRes);
 
                                         bool newCellFlag = !(curRow.Cells[varEditor.clmnValue.DisplayIndex] is DataGridViewComboBoxCell);
 
@@ -369,7 +369,7 @@ namespace AstralVars.Forms
                                     {
                                         double nRres = NumVar.Default;
                                         if (curRow.Cells[clmnValue.DisplayIndex].Value != null)
-                                            VarParcer.TryParse(curRow.Cells[clmnValue.DisplayIndex].Value.ToString(), out nRres);
+                                            Parser.TryParse(curRow.Cells[clmnValue.DisplayIndex].Value.ToString(), out nRres);
 
                                         bool newCellFlag = !(curRow.Cells[varEditor.clmnValue.DisplayIndex] is DataGridViewTextBoxCell && !(curRow.Cells[varEditor.clmnValue.DisplayIndex] is DataGridViewDateTimeCell));
 
@@ -387,7 +387,7 @@ namespace AstralVars.Forms
                                     {
                                         DateTime dtRes = DateTimeVar.Default;
                                         if (curRow.Cells[clmnValue.DisplayIndex].Value != null)
-                                            VarParcer.TryParse(curRow.Cells[clmnValue.DisplayIndex].Value.ToString(), out dtRes);
+                                            Parser.TryParse(curRow.Cells[clmnValue.DisplayIndex].Value.ToString(), out dtRes);
 
                                         bool newCellFlag = !(curRow.Cells[varEditor.clmnValue.DisplayIndex] is DataGridViewDateTimeCell);
 
@@ -405,7 +405,7 @@ namespace AstralVars.Forms
                                     }
                                 //case VarTypes.Counter:
                                 //    {
-                                //        VarParcer.TryParse(row.Cells[clmnValue.DisplayIndex].Value.ToString(), out string cntRes);
+                                //        Parser.TryParse(row.Cells[clmnValue.DisplayIndex].Value.ToString(), out string cntRes);
 
                                 //        bool newCellFlag = !(row.Cells[varEditor.clmnValue.DisplayIndex] is DataGridViewComboBoxCell);
 
@@ -492,7 +492,7 @@ namespace AstralVars.Forms
             DataGridViewRow row = dgvVariables.Rows[e.RowIndex];
 
             valid = !(row.IsNewRow
-                      && VarParcer.CheckVarName(row.Cells[clmnName.DisplayIndex].Value)
+                      && Parser.CheckVarName(row.Cells[clmnName.DisplayIndex].Value)
                       && VariablesAddon.Variables.Set(row.Cells[clmnName.DisplayIndex].Value,
                                                    row.Cells[clmnType.DisplayIndex].Value,
                                                    row.Cells[clmnValue.DisplayIndex].Value) == null);

@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace AstralVars.Classes
 {
-    public class VarParcer
+    public class Parser
     {
         public static readonly string[] separators = { " ", "{", "(", "[", "]", ")", "}", "+", "-", "*", "/", "Numeric", "NumericCount", "Counter", "Count", "Items", "ItemsCount" };
         public static readonly char[] forbiddenChar = { ' ', '{', '(', '[', ']', ')', '}', '<', '>',
@@ -17,6 +17,9 @@ namespace AstralVars.Classes
                                                              "Numeric", "NumericCount", "Counter", "Count", "Items", "ItemsCount" };
 
         private static string forbiddenNamePartsStr = "";
+        /// <summary>
+        /// список символов и из сочетаний, использование которых недопустимо в имени переменной
+        /// </summary>
         public static string ForbiddenNameParts
         {
             get
@@ -50,18 +53,176 @@ namespace AstralVars.Classes
             }
         }
 
-        public static readonly string counterPredicate = @"(ItemsCount|Items|NumericCount|Numeric|Counter|Count)",
+        /*public static readonly string counterPredicate = @"(ItemsCount|Items|NumericCount|Numeric|Counter|Count)",
                                       openBraces = @"(\[|\{|\()",
                                       closeBraces = @"(\]|\}|\))",
                                       counterPattern = $"^{counterPredicate}{openBraces}(\\w*){closeBraces}$",
-                                      counterTrimPattern = $"(^{counterPredicate}{openBraces})|({closeBraces}$)";
+                                      counterTrimPattern = $"(^{counterPredicate}{openBraces})|({closeBraces}$)";*/
 
+        /// <summary>
+        /// Символов
+        /// </summary>
+        public class Simbols
+        {
+            /// <summary>
+            /// Открывающие скобки
+            /// </summary>
+            public static readonly char openRoundBrace = '(';
+            public static readonly char openSquereBrace = '[';
+            public static readonly char openCurlyBrace = '{';
+            public static readonly char[] openBraces = { openRoundBrace, openSquereBrace, openCurlyBrace };
+            /// <summary>
+            /// Проверка символа на совпадения с открывающей скобкой
+            /// </summary>
+            /// <param name="c"></param>
+            /// <returns></returns>
+            public static bool IsOpenBraces(char c)
+            {
+                return openBraces.Contains(c);
+            }
+            /// <summary>
+            /// Проверка символа на совпадения с скобкой, начинающей группу
+            /// </summary>
+            /// <param name="c"></param>
+            /// <returns></returns>
+            public static bool IsOpenGroupBraces(char c)
+            {
+                return c == openRoundBrace;
+            }
+            /// <summary>
+            /// Закрывающие скобки
+            /// </summary>
+            public static readonly char closeRoundBrace = ')';
+            public static readonly char closeSquereBrace = ']';
+            public static readonly char closeCurlyBrace = '}';
+            public static readonly char[] closeBraces = { closeRoundBrace, closeSquereBrace, closeCurlyBrace };
+            /// <summary>
+            /// Проверка символа на совпадения с закрывающей скобкой
+            /// </summary>
+            /// <param name="c"></param>
+            /// <returns></returns>
+            public static bool IsCloseBraces(char c)
+            {
+                return closeBraces.Contains(c);
+            }
+            /// <summary>
+            /// Проверка символа на совпадения со скобкой, закгрывающей группу
+            /// </summary>
+            /// <param name="c"></param>
+            /// <returns></returns>
+            public static bool IsCloseGroupBraces(char c)
+            {
+                return c == closeRoundBrace;
+            }
+
+            /// <summary>
+            /// Проверка символа на совпадения с открывающей или закрывающей скобкой
+            /// </summary>
+            /// <param name="c"></param>
+            /// <returns></returns>
+            public static bool IsBraces(char c)
+            {
+                return openBraces.Contains(c) || closeBraces.Contains(c);
+            }
+
+            /// <summary>
+            /// Символ подчеркивания
+            /// </summary>
+            public static readonly char Underscore = '_';
+            /// <summary>
+            /// Проверка символа на соответствие символу подчеркивания Underscore
+            /// </summary>
+            /// <param name="c"></param>
+            /// <returns></returns>
+            public static bool IsUnderscore(char c)
+            {
+                return c == Underscore;
+            }
+
+            /// <summary>
+            /// Системный [Десятичный разделитель]
+            /// </summary>
+            public static readonly char NumberDecimalSeparator = System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator[0];
+            /// <summary>
+            /// Проверка символа на соответствие десятичному разделителю
+            /// </summary>
+            /// <param name="c"></param>
+            /// <returns></returns>
+            public static bool IsNumberDecimalSeparator(char c)
+            {
+                return c == '.' || c == ',';
+            }
+            /// <summary>
+            /// замена некорректного [Десятичного разделителя] на системный
+            /// </summary>
+            /// <param name="input"></param>
+            /// <returns></returns>
+            public static string CorrectNumberDecimalSeparator(ref string input)
+            {
+                if (NumberDecimalSeparator == '.')
+                    return input.Replace(',', NumberDecimalSeparator);
+                else return input.Replace('.', NumberDecimalSeparator);
+            }
+
+            /// <summary>
+            /// Список смволов, обозначающих математические операторы
+            /// </summary>
+            public static readonly char[] MathOperator = { '-', '+', '*', '/', '%' };
+            /// <summary>
+            /// Проверка символа на принадлежность к математическим опреаторам
+            /// </summary>
+            /// <param name="c"></param>
+            /// <returns></returns>
+            public static bool IsMathOperator(char c)
+            {
+                return MathOperator.Contains(c);
+            }
+        }
+
+ 
         public static readonly VarTypes[] varTypes = {  VarTypes.Number,
                                                         VarTypes.Boolean,            
                                                         VarTypes.String,
                                                         //VarTypes.Counter,
                                                         VarTypes.DateTime
                                                      };
+
+        /// <summary>
+        /// Символ подстановки "*", заещающий ноль или несколько алфавитно-цифровых символов в идентификаторе предмета (ItemId)
+        /// </summary>
+        public static readonly char WildcardAny = '*';
+        /// <summary>
+        /// Символ подстановки "?", заещающий один алфавитно-цифровой символ в идентификаторе предмета (ItemId)
+        /// </summary>
+        public static readonly char WildcardOne = '?';
+        /// <summary>
+        /// Проверка символа на совпадение с символом подстановки
+        /// </summary>
+        /// <param name="c"></param>
+        /// <returns></returns>
+        public static bool IsWildcard(char c)
+        {
+            return c == WildcardAny || c == WildcardOne;
+        }
+
+
+        /// <summary>
+        /// Предикаты функторов
+        /// </summary>
+        public class Predicates
+        {
+            /// <summary>
+            /// Счетчик
+            /// </summary>
+            public static readonly string Counter = "Counter";
+        }
+
+
+
+
+
+
+
 
 
         /// <summary>
@@ -70,26 +231,26 @@ namespace AstralVars.Classes
         /// <param name="inStr">Строка, содержащая выражение</param>
         /// <param name="itemId">Возвращаемое значение идентификатора передмета или пустая строка, если inStr не соответствует шаблону</param>
         /// <returns>true</returns>
-        public static bool GetItemID(string inStr, out string itemId)
-        {
-            itemId = string.Empty;
+        //public static bool GetItemID(string inStr, out string itemId)
+        //{
+        //    itemId = string.Empty;
 
-            if (!string.IsNullOrEmpty(inStr))
-            {
-                if (Regex.IsMatch(inStr, counterPattern))
-                {
+        //    if (!string.IsNullOrEmpty(inStr))
+        //    {
+        //        if (Regex.IsMatch(inStr, counterPattern))
+        //        {
 
-                    //numName.Replace("Numeric", String.Empty);
-                    //newVal = newVal.Substring(8, numName.Length - 9);
+        //            //numName.Replace("Numeric", String.Empty);
+        //            //newVal = newVal.Substring(8, numName.Length - 9);
 
-                    // Удаление идентификатора функтора 
-                    itemId = Regex.Replace(inStr, counterTrimPattern, string.Empty);
-                }
-                //если ytn 
-                else itemId = inStr;
-            }
-            return !string.IsNullOrEmpty(itemId);
-        }
+        //            // Удаление идентификатора функтора 
+        //            itemId = Regex.Replace(inStr, counterTrimPattern, string.Empty);
+        //        }
+        //        //если ytn 
+        //        else itemId = inStr;
+        //    }
+        //    return !string.IsNullOrEmpty(itemId);
+        //}
 
         /// <summary>
         /// Получение типа переменной VarTypes из строки
@@ -118,7 +279,6 @@ namespace AstralVars.Classes
             }
             else return Enum.TryParse(inObj.ToString(), out type);
         }
-
 
         /// <summary>
         /// Перевод строки в булевый тип.

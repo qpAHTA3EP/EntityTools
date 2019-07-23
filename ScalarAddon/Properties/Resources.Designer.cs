@@ -63,9 +63,9 @@ namespace AstralVars.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap MathOpIcon {
+        internal static System.Drawing.Bitmap MathOp {
             get {
-                object obj = ResourceManager.GetObject("MathOpIcon", resourceCulture);
+                object obj = ResourceManager.GetObject("MathOp", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

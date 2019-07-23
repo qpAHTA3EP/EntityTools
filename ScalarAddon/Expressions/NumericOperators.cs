@@ -78,8 +78,18 @@ namespace AstralVars.Expressions.Numbers
     /// <summary>
     /// Счетчик внутриигновый предметов в сумке персонажа, заданных шаблоном ItemId
     /// </summary>
-    public class Counter : UnOperator<double>
+    public class CounterNode : UnOperator<double>
     {
+        /// <summary>
+        /// Идентификатор предметов
+        /// </summary>
+        public string ItemId { get; set; }
+
+        public CounterNode(string id)
+        {
+            ItemId = id;
+        }
+
         public override bool Calculate(out double result)
         {
             throw new NotImplementedException("Операция подсчета числа предметов не реализована");

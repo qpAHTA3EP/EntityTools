@@ -29,7 +29,6 @@ namespace VariablesTest2
         private void InitializeComponent()
         {
             this.button1 = new System.Windows.Forms.Button();
-            this.cbType = new System.Windows.Forms.ComboBox();
             this.tbExpression = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
@@ -44,14 +43,6 @@ namespace VariablesTest2
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // cbType
-            // 
-            this.cbType.FormattingEnabled = true;
-            this.cbType.Location = new System.Drawing.Point(217, 100);
-            this.cbType.Name = "cbType";
-            this.cbType.Size = new System.Drawing.Size(97, 21);
-            this.cbType.TabIndex = 4;
-            // 
             // tbExpression
             // 
             this.tbExpression.Location = new System.Drawing.Point(12, 12);
@@ -65,7 +56,6 @@ namespace VariablesTest2
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(533, 292);
             this.Controls.Add(this.tbExpression);
-            this.Controls.Add(this.cbType);
             this.Controls.Add(this.button1);
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Form1";
@@ -77,7 +67,6 @@ namespace VariablesTest2
 
         #endregion
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.ComboBox cbType;
         private System.Windows.Forms.TextBox tbExpression;
     }
 }

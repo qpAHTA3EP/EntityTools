@@ -55,11 +55,13 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Astral">
-      <HintPath>D:\Games\Astral_RU_1\Astral.exe</HintPath>
+    <Reference Include="Astral, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\x64\Astral.exe</HintPath>
     </Reference>
-    <Reference Include="MyNW">
-      <HintPath>D:\Games\Astral_RU_1\MyNW.dll</HintPath>
+    <Reference Include="MyNW, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\x64\MyNW.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

@@ -17,7 +17,7 @@ namespace EntityPlugin.Actions.Deprecated
     [Serializable]
     public class MoveToSea : Astral.Quester.Classes.Action
     {
-        private Astral.Quester.Classes.Actions.MoveTo moveTo;
+        private Astral.Quester.Classes.Actions.MoveTo moveTo = new Astral.Quester.Classes.Actions.MoveTo();
 
         public MoveToSea() { }
 
@@ -31,6 +31,8 @@ namespace EntityPlugin.Actions.Deprecated
             }
         }
 
+        public override string Category => Properties.Resources.CategoryDeprecated;
+
         public override string InternalDisplayName => string.Empty;
         public override bool NeedToRun => moveTo.NeedToRun;
         public override bool UseHotSpots => moveTo.UseHotSpots;
@@ -40,8 +42,8 @@ namespace EntityPlugin.Actions.Deprecated
         {
             get
             {
-                return new ActionValidity($"Action '{GetType().Name}' is {Properties.Resources.CategoryDeprecated}. " +
-                    $"Use action '{typeof(Astral.Quester.Classes.Actions.MoveTo).Name}' instead. " +
+                return new ActionValidity($"Action '{GetType().Name}' is {Properties.Resources.CategoryDeprecated}.\n" +
+                    $"Use action '{typeof(Astral.Quester.Classes.Actions.MoveTo).Name}' instead.\n" +
                     $"The '{typeof(States.SlideMonitor)}' will filter the waypoint automatically.");
             }
         }
@@ -50,13 +52,33 @@ namespace EntityPlugin.Actions.Deprecated
 
         [Editor(typeof(PositionEditor), typeof(UITypeEditor))]
         [Description("Final destination")]
-        public Vector3 Position => moveTo.Position;
+        public Vector3 Position
+        {
+            get
+            {
+                return moveTo.Position;
+            }
+            set
+            {
+                moveTo.Position = value;
+            }
+        }
 
         [Description("Minimum distance between waypoints")]
         public int Filter { get; set; } = 90;
 
         [Description("Stop moving if True")]
-        public bool IgnoreCombat => moveTo.IgnoreCombat;
+        public bool IgnoreCombat
+        {
+            get
+            {
+                return moveTo.IgnoreCombat;
+            }
+            set
+            {
+                moveTo.IgnoreCombat = value;
+            }
+        }
 
         [Description("Description of the target location (not necessary)")]
         public string Desctiption { get; set; }
