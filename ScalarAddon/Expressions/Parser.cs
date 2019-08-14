@@ -1,10 +1,11 @@
-﻿using System;
+﻿using AstralVars.Classes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace AstralVars.Classes
+namespace AstralVars.Expressions
 {
     public class Parser
     {
@@ -12,7 +13,7 @@ namespace AstralVars.Classes
         public static readonly char[] forbiddenChar = { ' ', '{', '(', '[', ']', ')', '}', '<', '>',
                                                                '+', '-', '*', '/', '^', '%',
                                                                '#', '!', '`', '~', '$', '\\', '?',
-                                                               '_', '.', ',', '\'', ':', '\"', ';' };
+                                                               '.', ',', '\'', ':', '\"', ';' };
         public static readonly string[] forbiddenLiteral = {"AND", "OR", "NOT",
                                                              "Numeric", "NumericCount", "Counter", "Count", "Items", "ItemsCount" };
 
@@ -60,14 +61,70 @@ namespace AstralVars.Classes
                                       counterTrimPattern = $"(^{counterPredicate}{openBraces})|({closeBraces}$)";*/
 
         /// <summary>
+        /// Проверка допустимости имени в качестве названия переменной
+        /// Название недопустимо, если содержит запреденные символы или совпадает с именами функторов
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static bool IsForbidden(string name)
+        {
+            return name.IndexOfAny(forbiddenChar) >= 0
+                || name.Equals(Predicates.CountItem)
+                || name.Equals(Predicates.CountNumeric)
+                || name.Equals(Predicates.Random);
+        }
+
+        /// <summary>
+        /// Перечисление типов операторов
+        /// </summary>
+        public enum MathOperatorType
+        {
+            NOP, // нет операции (пустое значение)
+            Addition, // Сложение
+            Substruction, // Вычетание
+            Multiplication, // Умножение
+            Division, // Деление
+            Remainder // Взятие остатка от деления
+        }
+
+        /// <summary>
         /// Символов
         /// </summary>
-        public class Simbols
+        public class Symbols
         {
+            /// <summary>
+            /// Символ табуляции - горизонтальный отступ
+            /// </summary>
+            public static readonly char Tab = '\t';
+
+            /// <summary>
+            /// Проверка символа на принадлежность к буквам английского или русского алфавита
+            /// </summary>
+            /// <param name="c"></param>
+            /// <returns></returns>
+            public static bool IsLetter(char c)
+            {
+                return ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z')) 
+                    || ((c >= 'а') && (c <= 'я')) || (c == 'ё') || ((c >= 'А') && (c <= 'Я')) || (c == 'Ё');
+            }
+
+            /// <summary>
+            /// Проверка символа на принадлежность к буквам английского или русского алфавита
+            /// или к цифрам
+            /// </summary>
+            /// <param name="c"></param>
+            /// <returns></returns>
+            public static bool IsLetterOrDigit(char c)
+            {
+                return ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z'))
+                    || ((c >= 'а') && (c <= 'я')) || (c == 'ё') || ((c >= 'А') && (c <= 'Я')) || (c == 'Ё')
+                    || ((c >= '0') && (c <= '9'));
+            }
             /// <summary>
             /// Открывающие скобки
             /// </summary>
             public static readonly char openRoundBrace = '(';
+            public static readonly char openGroupBrace = openRoundBrace;
             public static readonly char openSquereBrace = '[';
             public static readonly char openCurlyBrace = '{';
             public static readonly char[] openBraces = { openRoundBrace, openSquereBrace, openCurlyBrace };
@@ -90,9 +147,42 @@ namespace AstralVars.Classes
                 return c == openRoundBrace;
             }
             /// <summary>
+            /// Удаляет пустые символы и первую встреченную открывающую скобку в начале строки
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public static bool TrimOpenGroupBracesAndWhiteSpace(ref string expression)
+            {
+                if (string.IsNullOrEmpty(expression) || string.IsNullOrWhiteSpace(expression))
+                    return false;
+                bool trimBrace = false;
+                int i;
+                for(i = 0; i < expression.Length; i++)
+                {
+                    if (char.IsWhiteSpace(expression[i]))
+                        continue;
+                    else if (IsOpenGroupBraces(expression[i]) && !trimBrace)
+                    {
+                        trimBrace = true;// Запоминаем, что скобка уже пропущена
+                        continue;
+                    }
+                    else break;
+                }
+
+                if(i > 0 && i < expression.Length + 1 && trimBrace)
+                {
+                    expression = expression.Remove(0, i);
+                    return true;
+                }
+
+                return false;
+            }
+
+            /// <summary>
             /// Закрывающие скобки
             /// </summary>
             public static readonly char closeRoundBrace = ')';
+            public static readonly char closeGroupBrace = closeRoundBrace;
             public static readonly char closeSquereBrace = ']';
             public static readonly char closeCurlyBrace = '}';
             public static readonly char[] closeBraces = { closeRoundBrace, closeSquereBrace, closeCurlyBrace };
@@ -106,7 +196,7 @@ namespace AstralVars.Classes
                 return closeBraces.Contains(c);
             }
             /// <summary>
-            /// Проверка символа на совпадения со скобкой, закгрывающей группу
+            /// Проверка символа на совпадения со скобкой, закрывающей группу
             /// </summary>
             /// <param name="c"></param>
             /// <returns></returns>
@@ -114,7 +204,37 @@ namespace AstralVars.Classes
             {
                 return c == closeRoundBrace;
             }
+            /// <summary>
+            /// Удаляет пустые символы и первую встреченную закрывающую скобку в начале строки
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public static bool TrimCloseGroupBracesAndWhiteSpace(ref string expression)
+            {
+                if (string.IsNullOrEmpty(expression) || string.IsNullOrWhiteSpace(expression))
+                    return false;
+                bool trimBrace = false;
+                int i;
+                for (i = 0; i < expression.Length; i++)
+                {
+                    if (char.IsWhiteSpace(expression[i]))
+                        continue;
+                    else if (IsCloseGroupBraces(expression[i]) && !trimBrace)
+                    {
+                        trimBrace = true; // запоминаем, что скобка уже встретилась
+                        continue;
+                    }
+                    else break;
+                }
 
+                if (i > 0 && i < expression.Length + 1 && trimBrace)
+                {
+                    expression = expression.Remove(0, i);
+                    return true;
+                }
+
+                return false;
+            }
             /// <summary>
             /// Проверка символа на совпадения с открывающей или закрывающей скобкой
             /// </summary>
@@ -165,6 +285,30 @@ namespace AstralVars.Classes
             }
 
             /// <summary>
+            /// Определение типа математического оператора, соответствующего символу
+            /// </summary>
+            /// <param name="c"></param>
+            /// <returns></returns>
+            public static MathOperatorType GetMathOperatorType(char c)
+            {
+                switch(c)
+                {
+                    case '+':
+                        return MathOperatorType.Addition;
+                    case '-':
+                        return MathOperatorType.Substruction;
+                    case '*':
+                        return MathOperatorType.Multiplication;
+                    case '/':
+                        return MathOperatorType.Division;
+                    case '%':
+                        return MathOperatorType.Remainder;
+                    default:
+                        return MathOperatorType.NOP;
+                }
+            }
+
+            /// <summary>
             /// Список смволов, обозначающих математические операторы
             /// </summary>
             public static readonly char[] MathOperator = { '-', '+', '*', '/', '%' };
@@ -177,33 +321,118 @@ namespace AstralVars.Classes
             {
                 return MathOperator.Contains(c);
             }
-        }
+            /// <summary>
+            /// Проверка символа на принадлежность аддитивным операторам: '+', '-'
+            /// </summary>
+            /// <param name="c"></param>
+            /// <returns></returns>
+            public static bool IsAdditionOperator(char c)
+            {
+                return c == '+' || c == '-';
+            }
+            /// <summary>
+            /// Проверка символа на принадлежность аддитивным операторам: '+', '-'
+            /// </summary>
+            /// <param name="c"></param>
+            /// <returns></returns>
+            public static bool IsMultiplicationOperator(char c)
+            {
+                return c == '*' || c == '/' || c == '%';
+            }
+            public static bool IsMultiplicationOperator(MathOperatorType c)
+            {
+                return c == MathOperatorType.Multiplication 
+					|| c == MathOperatorType.Division 
+					|| c == MathOperatorType.Remainder;
+            }            
+			/// <summary>
+            /// Удаляет пустые символы и  первый встреченный MultiplicationOperator в начале строки
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public static MathOperatorType TrimMultiplicationOperatorAndWhiteSpace(ref string expression)
+            {
+                if (string.IsNullOrEmpty(expression))
+                    return MathOperatorType.NOP;
 
- 
-        public static readonly VarTypes[] varTypes = {  VarTypes.Number,
-                                                        VarTypes.Boolean,            
-                                                        VarTypes.String,
-                                                        //VarTypes.Counter,
-                                                        VarTypes.DateTime
-                                                     };
+                char oper = '\u0000'; 
+                int i;
+                for (i = 0; i < expression.Length; i++)
+                {
+                    if (char.IsWhiteSpace(expression[i]))
+                        continue;
+                    else if (IsMultiplicationOperator(expression[i]))
+                    {
+                        if (oper == '\u0000')
+                            oper = expression[i];// сохраняем первый оператор
+                        else break; // символ оператора встречается второй раз
+                        continue;
+                    }
+                    else break;
+                }
 
-        /// <summary>
-        /// Символ подстановки "*", заещающий ноль или несколько алфавитно-цифровых символов в идентификаторе предмета (ItemId)
-        /// </summary>
-        public static readonly char WildcardAny = '*';
-        /// <summary>
-        /// Символ подстановки "?", заещающий один алфавитно-цифровой символ в идентификаторе предмета (ItemId)
-        /// </summary>
-        public static readonly char WildcardOne = '?';
-        /// <summary>
-        /// Проверка символа на совпадение с символом подстановки
-        /// </summary>
-        /// <param name="c"></param>
-        /// <returns></returns>
-        public static bool IsWildcard(char c)
-        {
-            return c == WildcardAny || c == WildcardOne;
-        }
+                if (i > 0 && i < expression.Length + 1)
+                {
+                    expression = expression.Remove(0, i);
+                    return GetMathOperatorType(oper);
+                }
+
+                return MathOperatorType.NOP;
+            }
+            /// <summary>
+            /// Удаляет пустые символы и первый встреченный AdditionOperator в начале строки
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public static MathOperatorType TrimAdditionOperatorAndWhiteSpace(ref string expression)
+            {
+                if (string.IsNullOrEmpty(expression))
+                    return MathOperatorType.NOP;
+
+                char oper = '\u0000'; 
+                int i;
+                for (i = 0; i < expression.Length; i++)
+                {
+                    if (char.IsWhiteSpace(expression[i]))
+                        continue;
+                    else if (IsAdditionOperator(expression[i]))
+                    {
+                        if (oper == '\u0000')
+                            oper = expression[i];// сохраняем первый оператор
+                        else break; // символ оператора встречается второй раз
+
+                        continue;
+                    }
+                    else break;
+                }
+
+                if (i > 0 && i < expression.Length + 1)
+                {
+                    expression = expression.Remove(0, i);
+                    return GetMathOperatorType(oper);
+                }
+
+                return MathOperatorType.NOP;
+            }
+
+            /// <summary>
+            /// Символ подстановки "*", заещающий ноль или несколько алфавитно-цифровых символов в идентификаторе предмета (ItemId)
+            /// </summary>
+            public static readonly char WildcardAny = '*';
+            /// <summary>
+            /// Символ подстановки "?", заещающий один алфавитно-цифровой символ в идентификаторе предмета (ItemId)
+            /// </summary>
+            public static readonly char WildcardOne = '?';
+            /// <summary>
+            /// Проверка символа на совпадение с символом подстановки
+            /// </summary>
+            /// <param name="c"></param>
+            /// <returns></returns>
+            public static bool IsWildcard(char c)
+            {
+                return c == WildcardAny || c == WildcardOne;
+            }
+        }//class Symbol
 
 
         /// <summary>
@@ -212,10 +441,20 @@ namespace AstralVars.Classes
         public class Predicates
         {
             /// <summary>
-            /// Счетчик
+            /// Счетчик Items
             /// </summary>
-            public static readonly string Counter = "Counter";
-        }
+            public static readonly string CountItem = "ItemCount";
+
+            /// <summary>
+            /// Счетчик Numerics
+            /// </summary>
+            public static readonly string CountNumeric = "NumericCount";
+
+            /// <summary>
+            /// Генератор случайных чисел
+            /// </summary>
+            public static readonly string Random = "Random";
+        }//class Predicates
 
 
 
@@ -225,6 +464,15 @@ namespace AstralVars.Classes
 
 
 
+
+
+
+        public static readonly VarTypes[] varTypes = {  VarTypes.Number,
+                                                        VarTypes.Boolean,            
+                                                        VarTypes.String,
+                                                        //VarTypes.Counter,
+                                                        VarTypes.DateTime
+                                                     };
         /// <summary>
         /// Получение идентификатора предмета (itemId) из выражения, заданного строкой
         /// </summary>

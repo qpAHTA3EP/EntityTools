@@ -36,7 +36,7 @@ namespace EntityPlugin.States
                 if (!needToRun)
                     needToRun = EntityManager.LocalPlayer.InCombat;
 #if DEBUG
-                Logger.WriteLine($"[DEBUG] {GetType().Name}.{nameof(NeedToRun)}={needToRun && beforeStartEngineSubscribed && CheckTO.IsTimedOut && !EntityManager.LocalPlayer.InCombat}" +
+                Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}.{nameof(NeedToRun)}={needToRun && beforeStartEngineSubscribed && CheckTO.IsTimedOut && !EntityManager.LocalPlayer.InCombat}" +
                     $" because {nameof(needToRun)}[{needToRun}], {nameof(beforeStartEngineSubscribed)}[{beforeStartEngineSubscribed}]," +
                     $" Not{nameof(EntityManager.LocalPlayer.InCombat)}[{!EntityManager.LocalPlayer.InCombat}] ");
 #endif

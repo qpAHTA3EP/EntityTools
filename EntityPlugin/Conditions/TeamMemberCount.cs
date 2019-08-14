@@ -49,7 +49,8 @@ namespace EntityPlugin.Conditions
         {
             get
             {
-                if (EntityManager.LocalPlayer.PlayerTeam.IsInTeam)
+                if (EntityManager.LocalPlayer.PlayerTeam?.IsInTeam == true
+                    && EntityManager.LocalPlayer.PlayerTeam?.Team?.MembersCount > 1)
                 {
                     int membersCount = 0;
                     switch (DistanceSign)
@@ -126,7 +127,8 @@ namespace EntityPlugin.Conditions
         {
             get
             {
-                if (EntityManager.LocalPlayer.PlayerTeam.IsInTeam)
+                if (EntityManager.LocalPlayer.PlayerTeam?.IsInTeam == true
+                    && EntityManager.LocalPlayer.PlayerTeam?.Team?.MembersCount > 1)
                 {
                     int memsCount = 0;
                     StringBuilder strBldr = new StringBuilder();

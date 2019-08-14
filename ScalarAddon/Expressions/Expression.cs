@@ -31,7 +31,7 @@ namespace AstralVars.Expressions
         /// Лексический разбор выражения и построение Абстрактного синтаксического дерева
         /// </summary>
         /// <returns>Объект, описывающий результат разбора</returns>
-        public abstract ParseStatus Parse();
+        public abstract AST Parse();
 
         public override string ToString()
         {
@@ -44,25 +44,59 @@ namespace AstralVars.Expressions
         /// <summary>
         /// Корень Абстрактного синтаксического дерева
         /// </summary>
-        protected Term<T> root;
+        protected AstNode<T> root;
     }
 
 
-    public class ParseStatus
+    /// <summary>
+    /// Класс ошибки разбора выражения
+    /// </summary>
+    public class BaseParseError : Exception
     {
-        public bool Sucseeded = false;
-        public string Message = string.Empty;
-        public int errorPosition = 0;
-    }
+        /// <summary>
+        /// Список ошибок проверки вложенных правил (элементов правила)
+        /// </summary>
+        public List<BaseParseError> ErrorStack;
 
-    public class ParseError : Exception
-    {
-        public ParseError(string mes = "", int pos = 0) : base(mes)
+        public BaseParseError(List<BaseParseError> subErrors = null, string mes = "", string expr = "") : base(mes)
         {
-            errorPosition = pos;
+            if (subErrors != null)
+                ErrorStack = subErrors;
+            expression = expr;
         }
+        public BaseParseError(string mes = "", string expr = "") : base(mes)
+        {
+            ErrorStack = new List<BaseParseError>();
+            expression = expr;
+        }
+        public string expression;
+    }
 
-        public int errorPosition = 0;
+    /// <summary>
+    /// Класс неустранимой ошибки разбора выражения
+    /// получение которой не повзоляет продолжить разбор выражения expression
+    /// </summary>
+    public class FatalParseError : BaseParseError
+    {
+        public FatalParseError(List<BaseParseError> subErrors = null, string mes = "", string expr = "") : base(subErrors, mes, expr)
+        { }
+
+        public FatalParseError(string mes = "", string expr = "") : base(mes, expr)
+        { }
+    }
+
+    /// <summary>
+    /// Класс ошибки разбора выражения
+    /// получение которой не препятствует разбору выражения expression
+    /// и проверке других правил или элементов правила
+    /// </summary>
+    public class ParseError : BaseParseError
+    {
+        public ParseError(List<BaseParseError> subErrors = null, string mes = "", string expr = "") : base(subErrors, mes, expr)
+        { }
+
+        public ParseError(string mes = "", string expr = "") : base(mes, expr)
+        { }
     }
 
 }

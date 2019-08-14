@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AstralVars.Expressions;
+using System;
 using System.Collections.ObjectModel;
 
 namespace AstralVars.Classes

@@ -34,7 +34,7 @@ namespace VariablesTest2
             try
             {
                 string expression = tbExpression.Text;
-                result = NumberExpresstion.ParseNumber(ref expression);
+                result = NumberExpression.ParseNumber(ref expression);
                 MessageBox.Show($"Result is [{result.Result}]\n" +
                     $"Unparsed expression is [{expression}]");
             }

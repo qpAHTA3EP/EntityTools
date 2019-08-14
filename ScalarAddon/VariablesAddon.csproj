@@ -85,13 +85,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Expressions\AstBase.cs" />
     <Compile Include="Expressions\Expression.cs" />
     <Compile Include="Expressions\NumberExpression.cs" />
+    <Compile Include="Expressions\NumberFunctors.cs" />
     <Compile Include="Expressions\NumberOperand.cs" />
-    <Compile Include="Expressions\NumericOperators.cs" />
-    <Compile Include="Expressions\Term.cs" />
+    <Compile Include="Expressions\NumericMathOperators.cs" />
     <Compile Include="Classes\Variables.cs" />
-    <Compile Include="Classes\Parser.cs" />
+    <Compile Include="Expressions\Parser.cs" />
     <Compile Include="Forms\DataGridViewDateTimeCell.cs" />
     <Compile Include="VariablesAddon.cs" />
     <Compile Include="Actions\VarAction.cs" />

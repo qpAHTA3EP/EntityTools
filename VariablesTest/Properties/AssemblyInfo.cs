@@ -1,18 +1,17 @@
-﻿using System.Resources;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("EntityPlugin")]
+[assembly: AssemblyTitle("VariablesTest")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("EntityPlugin")]
-[assembly: AssemblyCopyright("MichaelProg ©  2019")]
-[assembly: AssemblyTrademark("MichaelProg")]
+[assembly: AssemblyProduct("VariablesTest")]
+[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -21,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("df7f797e-db7e-44f9-a96a-020cfdb3c51e")]
+[assembly: Guid("406d2398-5fc7-41f3-b5b4-07e0ac273c69")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -33,9 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.1.6.0")]
-#pragma warning disable CS7035 // The specified version string does not conform to the recommended format - major.minor.build.revision
-[assembly: AssemblyFileVersion("0.1.6.0")]
-#pragma warning restore CS7035 // The specified version string does not conform to the recommended format - major.minor.build.revision
-[assembly: NeutralResourcesLanguage("en")]
-
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]

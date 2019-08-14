@@ -185,7 +185,7 @@ namespace AstralVars.Classes
                 {
                     _varValue = (bool)value;
 
-                    #if AstralLoaded
+                    #if ASTRAL_LOGGER
                     Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Variable '{Key}' set to [{_varValue}] as {VarType}");
                     #endif
                 }
@@ -193,7 +193,7 @@ namespace AstralVars.Classes
                 {
                     _varValue = newValue;
 
-                    #if AstralLoaded
+                    #if ASTRAL_LOGGER
                     Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Variable '{Key}' set to [{_varValue}] as {VarType}");
                     #endif
                 }
@@ -201,7 +201,7 @@ namespace AstralVars.Classes
                 {
                     _varValue = false;
 
-                    #if AstralLoaded
+                    #if ASTRAL_LOGGER
                     Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Invalid value [{value}] to Variable '{Key}' type of {VarType}. Variable '{Key}' reseted to [{_varValue}].");
                     #endif
                 }
@@ -271,7 +271,7 @@ namespace AstralVars.Classes
                 {
                     _varValue = (double)value;
                     
-#if AstralLoaded
+#if ASTRAL_LOGGER
                     Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Variable '{Key}' set to [{_varValue}] as {VarType}");
 #endif
                 }
@@ -279,7 +279,7 @@ namespace AstralVars.Classes
                 {
                     _varValue = newValue;
 
-#if AstralLoaded
+#if ASTRAL_LOGGER
                     Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Variable '{Key}' set to [{_varValue}] as {VarType}");
 #endif
                 }
@@ -287,7 +287,7 @@ namespace AstralVars.Classes
                 {
                     _varValue = 0;
 
-#if AstralLoaded
+#if ASTRAL_LOGGER
                     Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Invalid value [{value}] to Variable '{Key}' type of {VarType}. Variable '{Key}' reseted to [{_varValue}].");
 #endif
                 }
@@ -347,7 +347,7 @@ namespace AstralVars.Classes
             {
                 _varValue = value.ToString();
                 
-#if AstralLoaded
+#if ASTRAL_LOGGER
                 Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Variable '{Key}' set to [{_varValue}] as {VarType}");
 #endif
             }
@@ -421,7 +421,7 @@ namespace AstralVars.Classes
                 {
                     _dtValue = (DateTime)value;
                     
-#if AstralLoaded
+#if ASTRAL_LOGGER
                     Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Variable '{Key}' set to [{_dtValue}] as {VarType}");
 #endif
                 }
@@ -434,7 +434,7 @@ namespace AstralVars.Classes
                 {
                     _dtValue = Default;
                     
-#if AstralLoaded
+#if ASTRAL_LOGGER
                     Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Invalid value [{value}] to Variable '{Key}' type of {VarType}. Variable '{Key}' reseted to [{_dtValue}].");
 #endif
                 }
@@ -510,7 +510,7 @@ namespace AstralVars.Classes
 //        {
 //            get
 //            {
-//#if AstralLoaded
+//#if ASTRAL_LOADED
 //                uint num = 0;
 //                if (!(string.IsNullOrEmpty(_itemId) && EntityManager.LocalPlayer.IsValid))
 //                {
@@ -532,7 +532,7 @@ namespace AstralVars.Classes
 //                    _itemId = newVal;
 //                    _strValue = inStr;
                     
-//#if AstralLoaded
+//#if ASTRAL_LOGGER
 //                    Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Variable '{Key}' set to [{inStr}] as {VarType}");
 //#endif
 //                }
@@ -541,7 +541,7 @@ namespace AstralVars.Classes
 //                    _itemId = string.Empty;
 //                    _strValue = string.Empty;
 
-//#if AstralLoaded
+//#if ASTRAL_LOGGER
 //                    Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Invalid value [{inStr}] to Variable '{Key}' type of {VarType}. Variable '{Key}' reseted to [{_itemId}].");
 //#endif
 //                }

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using AstralVars.Classes;
+using AstralVars.Expressions;
 using MyNW.Classes;
 using MyNW.Internals;
 
@@ -80,7 +81,7 @@ namespace AstralVars.Forms
             varEditor.dgvVariables.Rows.Clear();
             //itemsDictionary.Clear();
 
-#if AstralLoaded
+#if ASTRAL_LOADED
             //List<InventorySlot> items = (EntityManager.LocalPlayer.IsValid) ? EntityManager.LocalPlayer.AllItems : new List<InventorySlot>();
             
             //foreach (InventorySlot item in items)
@@ -163,28 +164,6 @@ namespace AstralVars.Forms
                                 newRow.Cells[varEditor.clmnValue.DisplayIndex] = tbCell;
                             break;
                         }
-                    //case VarTypes.Counter:
-                    //    {
-                    //        DataGridViewComboBoxCell cbCell = newRow.Cells[varEditor.clmnValue.DisplayIndex] as DataGridViewComboBoxCell;
-                    //        bool newCellFlag = false;
-
-                    //        if (newCellFlag = cbCell == null)
-                    //            cbCell = new DataGridViewComboBoxCell();
-
-                    //        cbCell.Items.Clear();
-
-                    //        cbCell.DataSource = itemsDictionary;
-                    //        cbCell.DisplayMember = "DisplayName";
-                    //        cbCell.ValueMember = "Name";
-
-                    //        cbCell.DisplayStyle = DataGridViewComboBoxDisplayStyle.ComboBox;
-                    //        cbCell.FlatStyle = FlatStyle.Flat;
-                    //        cbCell.Value = var.Value;
-
-                    //        if (newCellFlag)
-                    //            newRow.Cells[varEditor.clmnValue.DisplayIndex] = cbCell;
-                    //        break;
-                    //    }
                 }
 
                 newRow.Tag = var;

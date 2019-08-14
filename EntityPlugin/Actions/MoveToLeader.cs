@@ -26,11 +26,11 @@ namespace EntityPlugin.Actions
         [Category("Movement")]
         public bool StopOnApproached { get; set; }
 
-        [Description("Check player is the member of the Team:\n" +
-            "True: If the player is not a team member then an action stops ('Position' is ignored).\n" +
-            "False: If the player is not a team member the player move to the 'Position'")]
-        [Category("Entity")]
-        public bool PartyCheck { get; set; }
+        //[Description("Check player is the member of the Team:\n" +
+        //    "True: If the player is not a team member then an action stops ('Position' is ignored).\n" +
+        //    "False: If the player is not a team member the player move to the 'Position'")]
+        //[Category("Entity")]
+        //public bool PartyCheck { get; set; }
 
         public Vector3 Position { get; set; }
 
@@ -39,28 +39,22 @@ namespace EntityPlugin.Actions
             Position = new Vector3();
             Distance = 30;
             IgnoreCombat = true;
-            PartyCheck = true;
+            //PartyCheck = true;
             StopOnApproached = false;
         }
-
-
 
         public override string ActionLabel => GetType().Name;
 
         public override void OnMapDraw(GraphicsNW graph)
         {
-            if (EntityManager.LocalPlayer?.PlayerTeam?.Team?.MembersCount > 1)
-            {
-                Brush beige = Brushes.Beige;
-                graph.drawFillEllipse(EntityManager.LocalPlayer?.PlayerTeam?.Team?.Leader.Entity.Location, new Size(10, 10), beige);
-            }
+            graph.drawFillEllipse(InternalDestination, new Size(10, 10), Brushes.Beige);
         }
 
         public override void InternalReset()
         {
         }
 
-        protected override bool IntenalConditions => true;
+        protected override bool IntenalConditions => Position.IsValid;
 
         public override string InternalDisplayName => string.Empty;
 
@@ -71,13 +65,12 @@ namespace EntityPlugin.Actions
         {
             get
             {
-                if (PartyCheck)
+                if (EntityManager.LocalPlayer.PlayerTeam.IsInTeam 
+                    && !EntityManager.LocalPlayer.PlayerTeam.IsLeader)
                 {
-                    if (EntityManager.LocalPlayer?.PlayerTeam?.Team?.MembersCount > 1)
-                        return EntityManager.LocalPlayer?.PlayerTeam?.Team?.Leader.Entity.Location.Clone();
-                    else return new Vector3();
+                    return EntityManager.LocalPlayer.PlayerTeam.Team?.Leader?.Entity.Location.Clone();
                 }
-                else return Position.Clone();
+                return Position.Clone();
             }
         }
 
@@ -85,9 +78,9 @@ namespace EntityPlugin.Actions
         {
             get
             {
-                if (PartyCheck || Position.IsValid)
-                    return new ActionValidity($"Property '{nameof(Position)}' is not set.");
-                else return new ActionValidity();
+                if (Position.IsValid)
+                    return new ActionValidity();
+                else return new ActionValidity($"Property '{nameof(Position)}' is not set.");
             }
         }
 
@@ -97,30 +90,18 @@ namespace EntityPlugin.Actions
         {
             get
             {
-                if (PartyCheck)
+                if (InternalDestination.Distance3DFromPlayer > Distance )
                 {
-                    if (EntityManager.LocalPlayer.PlayerTeam.Team.Leader.Entity.Location.Distance3DFromPlayer > Distance)
-                    {
-                        Astral.Quester.API.IgnoreCombat = IgnoreCombat;
-                        return false;
-                    }
-                    else return true;
+                    Astral.Quester.API.IgnoreCombat = IgnoreCombat;
+                    return false;
                 }
-                else Astral.Quester.API.IgnoreCombat = IgnoreCombat;
-
-                return false;
+                else return true;
             }
         }
 
         public override ActionResult Run()
         {
-            if (!target.IsValid)
-            {
-                Logger.WriteLine($"Entity [{EntityID}] not founded.");
-                return ActionResult.Fail;
-            }
-
-            if (target.Location.Distance3DFromPlayer < Distance)
+            if (InternalDestination.Distance3DFromPlayer < Distance)
             {
                 Astral.Quester.API.IgnoreCombat = false;
 

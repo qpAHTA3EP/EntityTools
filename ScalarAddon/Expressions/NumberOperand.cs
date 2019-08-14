@@ -4,16 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AstralVars.Expressions.Numbers
+namespace AstralVars.Expressions
 {
     /// <summary>
-    /// Числовая константа
+    /// Лист AST - числова константа
     /// </summary>
-    public class ConstantNode : Term<double>
+    public class NumberConstantNode : AstNode<double>
     {
         protected double val;
 
-        public ConstantNode(double v = 0)
+        public NumberConstantNode(double v = 0)
         {
             val = v;
         }
@@ -24,21 +24,27 @@ namespace AstralVars.Expressions.Numbers
             return true;
         }
 
-        public override uint Priority { get => 1; }
+        public override string Description(string prefix = "")
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(prefix).Append(GetType().Name).Append(" {").Append(val).Append('}');
+            return sb.ToString();
+            //return $"{GetType().Name} {{{val}}}";
+        }
     }
 
     /// <summary>
-    /// Числовая переменная - ссылка на Variable
+    /// Лист AST, - Числовая переменная (ссылка на Variable)
     /// </summary>
-    public class VariableNode : Term<double>
+    public class NumberVariableNode : AstNode<double>
     {
         protected NumVar val;
 
-        public VariableNode()
+        public NumberVariableNode()
         {
             val = new NumVar();
         }
-        public VariableNode(string var_name)
+        public NumberVariableNode(string var_name)
         {
             val = new NumVar(var_name);
         }
@@ -49,6 +55,12 @@ namespace AstralVars.Expressions.Numbers
             return true;
         }
 
-        public override uint Priority { get => 1; }
+        public override string Description(string prefix = "")
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(prefix).Append(GetType().Name).Append(" {Key='").Append(val.Key).Append("', Value=").Append(val.Value).Append('}');
+            return sb.ToString();
+            //return $"{GetType().Name} {{Key='{val.Key}', Value={val.Value}}}";
+        }
     }
 }
