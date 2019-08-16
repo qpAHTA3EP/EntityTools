@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AstralVars.Expressions
+namespace AstralVariables.Expressions
 {
     /// <summary>
     /// Абстрактный узел Абстрактного синтаксического дерева (Abstract syntas Tree)    /// 
@@ -15,9 +15,9 @@ namespace AstralVars.Expressions
         /// </summary>
         public abstract object Result { get; }
 
-        public virtual string Description(string prefix = "")
+        public virtual string Description(int indent = 0)
         {
-            return prefix + string.Empty;
+            return string.Empty;
         }
     }
 
@@ -52,18 +52,18 @@ namespace AstralVars.Expressions
     /// <typeparam name="T"></typeparam>
     public abstract class BinOperator<T> : AstNode<T>
     {
-        //protected AstNode<T> root;
+        //protected AstNode<T> ast;
         protected AstNode<T> leftOperand;
         protected AstNode<T> rightOperand;
 
-        public override string Description(string prefix = "")
+        public override string Description(int indent = 0)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append(prefix).Append(GetType().Name).Append(':');
-            sb.AppendLine().Append(prefix).Append('{');
-            sb.AppendLine().Append(leftOperand.Description(string.IsNullOrEmpty(prefix) ? Parser.Symbols.Tab.ToString() : prefix + prefix));
-            sb.AppendLine().Append(rightOperand.Description(string.IsNullOrEmpty(prefix) ? Parser.Symbols.Tab.ToString() : prefix + prefix));
-            sb.AppendLine().Append(prefix).Append('}');
+            sb.AppendCopies(Parser.Indent, indent).Append(GetType().Name).Append(':');
+            sb.AppendLine().AppendCopies(Parser.Indent, indent).Append('{');
+            sb.AppendLine().Append(leftOperand.Description(indent+1));
+            sb.AppendLine().Append(rightOperand.Description(indent + 1));
+            sb.AppendLine().AppendCopies(Parser.Indent, indent).Append('}');
             return sb.ToString();
 
             //return prefix + GetType().Name + ":\n" +
@@ -79,16 +79,16 @@ namespace AstralVars.Expressions
     /// <typeparam name="T"></typeparam>
     public abstract class UnOperator<T> : AstNode<T>
     {
-        //protected AstNode<T> root;
+        //protected AstNode<T> ast;
         protected AstNode<T> Operand;
 
-        public override string Description(string prefix = "")
+        public override string Description(int indent = 0)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append(prefix).Append(GetType().Name).Append(':');
-            sb.AppendLine().Append(prefix).Append('{');
-            sb.AppendLine().Append(Operand.Description(string.IsNullOrEmpty(prefix) ? Parser.Symbols.Tab.ToString() : prefix + prefix));
-            sb.AppendLine().Append(prefix).Append('}');
+            sb.AppendCopies(Parser.Indent, indent).Append(GetType().Name).Append(':');
+            sb.AppendLine().AppendCopies(Parser.Indent, indent).Append('{');
+            sb.AppendLine().Append(Operand.Description(indent + 1));
+            sb.AppendLine().AppendCopies(Parser.Indent, indent).Append('}');
             return sb.ToString();
 
             //return prefix + GetType().Name + ":\n" +

@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("EntityPlugin")]
+[assembly: AssemblyTitle("EntityTools")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("EntityPlugin")]
+[assembly: AssemblyProduct("EntityTools")]
 [assembly: AssemblyCopyright("MichaelProg ©  2019")]
 [assembly: AssemblyTrademark("MichaelProg")]
 [assembly: AssemblyCulture("")]

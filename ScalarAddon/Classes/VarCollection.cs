@@ -1,8 +1,8 @@
-﻿using AstralVars.Expressions;
+﻿using AstralVariables.Expressions;
 using System;
 using System.Collections.ObjectModel;
 
-namespace AstralVars.Classes
+namespace AstralVariables.Classes
 {
     [Serializable]
     public class VarCollection : KeyedCollection<string, Variable>

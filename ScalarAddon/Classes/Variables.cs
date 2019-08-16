@@ -1,4 +1,4 @@
-﻿using AstralVars.Expressions;
+﻿using AstralVariables.Expressions;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
-namespace AstralVars.Classes
+namespace AstralVariables.Classes
 {
     /// <summary>
     /// Перечисление типов переменных
@@ -428,7 +428,7 @@ namespace AstralVars.Classes
                 else if (DateTime.TryParse(value.ToString(), out DateTime newValue))
                 {
                     _dtValue = newValue;
-                    Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Variable '{Key}' set to [{_dtValue}] as {VarType}");
+                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesAddon)} Variable '{Key}' set to [{_dtValue}] as {VarType}");
                 }
                 else
                 {

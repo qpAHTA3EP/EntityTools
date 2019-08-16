@@ -1,19 +1,15 @@
-﻿using AstralVars.Classes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 
-namespace AstralVars.Expressions
+namespace AstralVariables.Expressions.Operand
 {
     /// <summary>
     /// Лист AST - числова константа
     /// </summary>
-    public class NumberConstantNode : AstNode<double>
+    public class NumberConstant : AstNode<double>
     {
         protected double val;
 
-        public NumberConstantNode(double v = 0)
+        public NumberConstant(double v = 0)
         {
             val = v;
         }
@@ -24,10 +20,10 @@ namespace AstralVars.Expressions
             return true;
         }
 
-        public override string Description(string prefix = "")
+        public override string Description(int indent = 0)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append(prefix).Append(GetType().Name).Append(" {").Append(val).Append('}');
+            sb.Insert(sb.Length, Parser.Indent, indent).Append(GetType().Name).Append(" {").Append(val).Append('}');
             return sb.ToString();
             //return $"{GetType().Name} {{{val}}}";
         }
@@ -36,31 +32,39 @@ namespace AstralVars.Expressions
     /// <summary>
     /// Лист AST, - Числовая переменная (ссылка на Variable)
     /// </summary>
-    public class NumberVariableNode : AstNode<double>
+    public class NumberVariable : AstNode<double>
     {
-        protected NumVar val;
+        //protected NumVar val;
+        protected string variableName;
 
-        public NumberVariableNode()
+        public NumberVariable()
         {
-            val = new NumVar();
+            //val = new NumVar();
         }
-        public NumberVariableNode(string var_name)
+        public NumberVariable(string var_name)
         {
-            val = new NumVar(var_name);
+            //val = new NumVar(var_name);
+            variableName = var_name;
         }
 
         public override bool Calculate(out double result)
         {
-            result = val.ReadValue;
-            return true;
+            //result = val.ReadValue;
+
+            if(VariablesAddon.Variables.TryGetValue(variableName, out result))
+                return true;
+            else
+            {
+                result = 0;
+                return true;
+            }
         }
 
-        public override string Description(string prefix = "")
+        public override string Description(int indent = 0)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append(prefix).Append(GetType().Name).Append(" {Key='").Append(val.Key).Append("', Value=").Append(val.Value).Append('}');
-            return sb.ToString();
-            //return $"{GetType().Name} {{Key='{val.Key}', Value={val.Value}}}";
+            sb.Insert(sb.Length, Parser.Indent, indent).Append(GetType().Name).Append(" {Key='").Append(variableName).Append("', Value=").Append(Result).Append('}');
+            return sb.ToString();            
         }
     }
 }

@@ -1,8 +1,9 @@
-﻿using System;
+﻿using AstralVariables.Expressions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NumberAstNode = AstralVars.Expressions.AstNode<double>;
+using NumberAstNode = AstralVariables.Expressions.AstNode<double>;
 
 namespace VariablesTest
 {
@@ -26,7 +27,7 @@ namespace VariablesTest
             //                         "$12316",
             //                         "`s;lsdkg"
             //                       };
-            //ParseMethod testedParseMethod = AstralVars.Expressions.NumberExpression.ParseNumber;
+            //ParseMethod testedParseMethod = AstralVariables.Expressions.NumberExpression.ParseNumber;
             //Console.WriteLine("===================ParseNumber==================");
             #endregion
             #region ParseVariable
@@ -40,7 +41,7 @@ namespace VariablesTest
             //                         "sdfl_ + ldfj22",
             //                         "*gfrrr"
             //                       };
-            //ParseMethod testedParseMethod = AstralVars.Expressions.NumberExpression.ParseVariable;
+            //ParseMethod testedParseMethod = AstralVariables.Expressions.NumberExpression.ParseVariable;
             //Console.WriteLine("===================ParseVariable================");
             #endregion
             #region ParseValue
@@ -61,17 +62,17 @@ namespace VariablesTest
             //                         "sdfl_ + ldfj22",
             //                         "*gfrrr"
             //                       };
-            //ParseMethod testedParseMethod = AstralVars.Expressions.NumberExpression.ParseValue;
+            //ParseMethod testedParseMethod = AstralVariables.Expressions.NumberExpression.ParseValue;
             //Console.WriteLine("===================ParseVariable================");
             #endregion
             #region ParseItemCount
-            //string[] expressions = { "12345.67",
+            //string[] expressions = { /*"12345.67",
             //                         "2_sdfe_w234",
             //                         "sdfe_w234",
             //                         "$12316",
             //                         "`s;lsdkg",
             //                         "sdfl_ + ldfj22",
-            //                         "*gfrrr",
+            //                         "*gfrrr",*/
             //                         "ItemCount",
             //                         "ItemCout(sdf)",
             //                         "ItemCount()",
@@ -82,7 +83,7 @@ namespace VariablesTest
             //                         "ItemCount(58d)",
             //                         "ItemCount(.*df)",
             //                       };
-            //ParseMethod testedParseMethod = AstralVars.Expressions.NumberExpression.ParseItemCount;
+            //ParseMethod testedParseMethod = AstralVariables.Expressions.NumberExpression.ParseItemCount;
             //Console.WriteLine("===================ParseItemCount===============");
             #endregion
             #region ParseNumericCount
@@ -103,7 +104,7 @@ namespace VariablesTest
             //                         "NumericCount(58d)",
             //                         "NumericCount(.*df)",
             //                       };
-            //ParseMethod testedParseMethod = AstralVars.Expressions.NumberExpression.ParseNumericCount;
+            //ParseMethod testedParseMethod = AstralVariables.Expressions.NumberExpression.ParseNumericCount;
             //Console.WriteLine("===================ParseNumericCount============");
             #endregion
             #region ParseRandom
@@ -114,15 +115,18 @@ namespace VariablesTest
             //                         "`s;lsdkg",
             //                         "sdfl_ + ldfj22",
             //                         "*gfrrr",
-            //                         "Random()",
+            //                         "Random( )",
             //                         "Rancom(",
-            //                         "Random)",
+            //                         "Random )",
             //                         "Random(e)",
-            //                         "Random(5)",
-            //                         "Random(58d)",
-            //                         "Random(*df)",
+            //                         "Random (  5)",
+            //                         "Random (58d )",
+            //                         "Random(*df  )",
+            //                         "Random(5 + 19)",
+            //                         "Random( 64*df)",
+            //                         "Random( 64*(df+55) ) ",
             //                       };
-            //ParseMethod testedParseMethod = AstralVars.Expressions.NumberExpression.ParseValue;
+            //ParseMethod testedParseMethod = AstralVariables.Expressions.NumberExpression.ParseRandom;
             //Console.WriteLine("===================ParseRandom==================");
             #endregion
             #region ParseMultiplication
@@ -189,11 +193,108 @@ namespace VariablesTest
             //                         " (aasdf - 234 / (d + 4956)",
             //                         " (aasdf - 234 / d + 4956)",/**/
             //                       };
-            //ParseMethod testedParseMethod = AstralVars.Expressions.NumberExpression.ParseMultiplication;
+            //ParseMethod testedParseMethod = AstralVariables.Expressions.NumberExpression.ParseMultiplication;
             //Console.WriteLine("=================ParseMultiplication============");
             #endregion
             #region ParseAddition
-            string[] expressions = { /*"12345.67",
+            //string[] expressions = { "12345.67",
+            //                         "12345,67",
+            //                         "12345,",
+            //                         "29348487;",
+            //                         "12345)",
+            //                         "12345,)",
+            //                         "341(",
+            //                         "341.(",
+            //                         "12345 6789",
+            //                         "12345+",
+            //                         "2_sdfe_w234",
+            //                         "sdfe_w234",
+            //                         "$12316",                                     
+            //                         "`s;lsdkg",
+            //                         "12345.67 * ldfj22",
+            //                         "ldfj22 * 12345.67",
+            //                         "12345.67 * ldfj22 / 4.67",
+            //                         "sdfl_ * ldfj22",
+            //                         "sdfl_ / ldfj22 / 5987",
+            //                         "sdfl_ * NumericCount(5)",
+            //                         "NumericCount(5)",
+            //                         "NumericCount(5) * sdfl_ * NumericCount(5)",
+            //                         "*gfrrr",
+            //                         "NumericCount",
+            //                         "NumerCount(sdf)",
+            //                         "NumericCount()",
+            //                         "NumericCount(",
+            //                         "NumericCount)",
+            //                         "NumericCount(e)",
+            //                         "NumericCount(5)",
+            //                         "NumericCount(58d)",
+            //                         "NumericCount(.*df)",
+            //                         "ItemCount",
+            //                         "ItemCout(sdf)",
+            //                         "ItemCount()",
+            //                         "ItemCount(",
+            //                         "ItemCount)",
+            //                         "ItemCount(e)",
+            //                         "ItemCount(5)",
+            //                         "ItemCount(58d)",
+            //                         "ItemCount(.*df)",
+            //                         "( 5 )",
+            //                         " ( asdf_3 )",
+            //                         "( 654",
+            //                         ") asdf",
+            //                         "(asdf ( 234)",
+            //                         " aasdf ( 234 + d)",
+            //                         " aasdf + ( 234 + d)",
+            //                         " aasdf * ( 234 + d)",
+            //                         " (aasdf + ( 234) + d)",
+            //                         " (aasdf - 234) + d)",
+            //                         "( (aasdf - 234) + d)",
+            //                         " (aasdf - 234) / d)",
+            //                         " ((aasdf - 234) / d)",
+            //                         " (aasdf - 234) / (d + 4956)",
+            //                         " (aasdf - 234) / d + 4956)",
+            //                         " (aasdf - 234) / (d + 4956",
+            //                         " (aasdf - 234 / (d + 4956)",
+            //                         " (aasdf - 234 / d + 4956)",
+            //                         "5 + asd_2 - 123 + _alskdj"
+            //                       };
+            //ParseMethod testedParseMethod = AstralVariables.Expressions.NumberExpression.ParseAddition;
+            //Console.WriteLine("=================ParseAddition============");
+            #endregion
+            #region ParseBracketedAddition
+            //string[] expressions = { /*"( 5 )",
+            //                         " ( asdf_3 )",
+            //                         "( 654",
+            //                         " 654 )",
+            //                         " (   (654 ))",
+            //                         ") asdf", */
+            //                         "(asdf ( 234)",
+            //                       };
+            //ParseMethod testedParseMethod = AstralVariables.Expressions.NumberExpression.ParseBracketedAddition;
+            //Console.WriteLine("=============ParseBracketedAddition=============");
+            #endregion
+
+            //for (int i = 0; i < expressions.Length; i++)
+            //{
+            //    Console.WriteLine($"Test {i}.");
+            //    TestParse(ref expressions[i], testedParseMethod);
+            //    Console.WriteLine("================================================");
+            //    Console.ReadKey();
+            //}
+
+            //Console.WriteLine("Press 'Enter' to start manual input or 'Anykey' to finish");
+            //while (Console.ReadKey().Key == ConsoleKey.Enter)
+            //{
+
+            //    Console.WriteLine("================================================");
+            //    Console.WriteLine("Enter expression:");
+            //    string expression = Console.ReadLine();
+            //    TestParse(ref expression, AstralVariables.Expressions.NumberExpression.ParseVariable);
+            //    Console.WriteLine("Press 'Enter' to repeat manual input or 'Anykey' to finish");
+            //}
+
+            #region Expression.Parse
+            string[] expressions = { "12345.67",
                                      "12345,67",
                                      "12345,",
                                      "29348487;",
@@ -205,7 +306,7 @@ namespace VariablesTest
                                      "12345+",
                                      "2_sdfe_w234",
                                      "sdfe_w234",
-                                     "$12316",                                     
+                                     "$12316",
                                      "`s;lsdkg",
                                      "12345.67 * ldfj22",
                                      "ldfj22 * 12345.67",
@@ -213,6 +314,7 @@ namespace VariablesTest
                                      "sdfl_ * ldfj22",
                                      "sdfl_ / ldfj22 / 5987",
                                      "sdfl_ * NumericCount(5)",
+                                     "NumericCount(5)",
                                      "NumericCount(5) * sdfl_ * NumericCount(5)",
                                      "*gfrrr",
                                      "NumericCount",
@@ -250,43 +352,37 @@ namespace VariablesTest
                                      " (aasdf - 234) / d + 4956)",
                                      " (aasdf - 234) / (d + 4956",
                                      " (aasdf - 234 / (d + 4956)",
-                                     " (aasdf - 234 / d + 4956)",/**/
+                                     " (aasdf - 234 / d + 4956)",
                                      "5 + asd_2 - 123 + _alskdj"
                                    };
-            ParseMethod testedParseMethod = AstralVars.Expressions.NumberExpression.ParseAddition;
-            Console.WriteLine("=================ParseAddition============");
-            #endregion
-            #region ParseBracketedAddition
-            //string[] expressions = { /*"( 5 )",
-            //                         " ( asdf_3 )",
-            //                         "( 654",
-            //                         " 654 )",
-            //                         " (   (654 ))",
-            //                         ") asdf", */
-            //                         "(asdf ( 234)",
-            //                       };
-            //ParseMethod testedParseMethod = AstralVars.Expressions.NumberExpression.ParseBracketedAddition;
-            //Console.WriteLine("=============ParseBracketedAddition=============");
-            #endregion
+            ParseMethod testedParseMethod = AstralVariables.Expressions.NumberExpression.ParseAddition;
+            Console.WriteLine("=================Expression.Parse()===============");
+            NumberExpression numExpr = new NumberExpression();
+
 
             for (int i = 0; i < expressions.Length; i++)
             {
                 Console.WriteLine($"Test {i}.");
-                TestParse(ref expressions[i], testedParseMethod);
+                numExpr.Expression = expressions[i];
+                bool result = numExpr.Parse();
+                Console.WriteLine($"Parse expression: {numExpr.Expression}");
+                if (result)
+                {
+                    Console.WriteLine($"Parse suceedeed\n" +
+                      $"  Type = {numExpr.AST?.GetType().Name}\n" +
+                      $"  Description = {numExpr.AST?.Description()}");
+                }
+                else
+                {
+                    Console.WriteLine($"Parse faild");
+                    PrintErrorMessage(numExpr.parseError);
+                }
                 Console.WriteLine("================================================");
                 Console.ReadKey();
             }
 
-            Console.WriteLine("Press 'Enter' to start manual input or 'Anykey' to finish");
-            while (Console.ReadKey().Key == ConsoleKey.Enter)
-            {
-
-                Console.WriteLine("================================================");
-                Console.WriteLine("Enter expression:");
-                string expression = Console.ReadLine();
-                TestParse(ref expression, AstralVars.Expressions.NumberExpression.ParseVariable);
-                Console.WriteLine("Press 'Enter' to repeat manual input or 'Anykey' to finish");
-            }
+            Console.ReadKey();
+            #endregion
         }
         private delegate NumberAstNode ParseMethod(ref string expression);
 
@@ -298,17 +394,27 @@ namespace VariablesTest
                 NumberAstNode node = parseMethod(ref expression);
                 Console.WriteLine($"Parse result:\n" +
                     $"  Type = {node.GetType().Name}\n" +
-                    $"  Result = {node.Result}\n"+
-                    $"  Description = {node.Description("  ")}");
+                    $"  Result = {node.Result}\n" +
+                    $"  Description = {node.Description()}");
                 Console.WriteLine($"Unparsed string is: {expression}");
             }
-            catch (AstralVars.Expressions.ParseError e)
+            catch (AstralVariables.Expressions.BaseParseError e)
             {
                 Console.WriteLine("-------------------ParseError-------------------");
-                Console.WriteLine(e.Message);
                 Console.WriteLine($"In the expression: {e.expression}");
                 Console.WriteLine($"At the positions: {expression.Length - e.expression.Length}");
+                Console.WriteLine($"Error message:");
+                PrintErrorMessage(e);
                 Console.WriteLine("------------------------------------------------");
+            }
+        }
+
+        private static void PrintErrorMessage(BaseParseError e, int indent = 0)
+        {
+            Console.WriteLine(Parser.MakeIndent(indent) + e.Message);
+            foreach(BaseParseError e2 in e.ErrorStack)
+            {
+                PrintErrorMessage(e2, indent + 1);
             }
         }
     }

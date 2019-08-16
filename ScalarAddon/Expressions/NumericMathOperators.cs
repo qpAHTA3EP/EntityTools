@@ -1,11 +1,6 @@
-﻿using AstralVars.Classes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NumberAstNode = AstralVars.Expressions.AstNode<double>;
+﻿using NumberAstNode = AstralVariables.Expressions.AstNode<double>;
 
-namespace AstralVars.Expressions
+namespace AstralVariables.Expressions.Operators
 {
     /// <summary>
     /// Операция сложения чисел
@@ -23,7 +18,7 @@ namespace AstralVars.Expressions
             if (leftOperand == null && rightOperand == null)
                 return false;
             if (leftOperand != null && leftOperand.Calculate(out double lRes))
-                result += 0;
+                result += lRes;
             if (rightOperand != null && rightOperand.Calculate(out double rRes))
                 result += rRes;
 
@@ -47,7 +42,7 @@ namespace AstralVars.Expressions
             if (leftOperand == null && rightOperand == null)
                 return false;
             if (leftOperand != null && leftOperand.Calculate(out double lRes))
-                result += lRes;
+                result = lRes;
             if (rightOperand != null && rightOperand.Calculate(out double rRes))
                 result -= rRes;
 
@@ -113,15 +108,21 @@ namespace AstralVars.Expressions
             if (leftOperand == null || rightOperand == null)
                 return false;
             if (leftOperand.Calculate(out double lRes) && rightOperand.Calculate(out double rRes))
+            {
                 if (rRes != 0)
+                {
                     result = lRes / rRes;
+                    return true;
+                }
+                else result = double.MaxValue;
+            }
 
             return false;
         }
     }
 
     /// <summary>
-    /// Операция деления чисел
+    /// Операция взятия остатка от деления чисел
     /// </summary>
     public class Remainde : BinOperator<double>
     {
@@ -136,9 +137,14 @@ namespace AstralVars.Expressions
             if (leftOperand == null || rightOperand == null)
                 return false;
             if (leftOperand.Calculate(out double lRes) && rightOperand.Calculate(out double rRes))
+            {
                 if (rRes != 0)
+                {
                     result = lRes % rRes;
-
+                    return true;
+                }
+                else result = 0;
+            }
             return false;
         }
     }

@@ -7,8 +7,8 @@
     <ProjectGuid>{8C13462B-8B43-40A3-B4C1-EA351AE9F1C4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AstralVars</RootNamespace>
-    <AssemblyName>VariablesAddon</AssemblyName>
+    <RootNamespace>AstralVariables</RootNamespace>
+    <AssemblyName>VariableTools</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -17,8 +17,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;X32</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
@@ -26,7 +26,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -42,7 +42,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;X32</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -52,7 +52,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;X64</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;X64, ASTRAL</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -60,7 +60,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;X64, ASTRAL</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
@@ -85,25 +85,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\VarCollection.cs" />
+    <Compile Include="Classes\Variables.cs" />
+    <Compile Include="Editors\variableSelectUiEditor.cs" />
     <Compile Include="Expressions\AstBase.cs" />
     <Compile Include="Expressions\Expression.cs" />
     <Compile Include="Expressions\NumberExpression.cs" />
     <Compile Include="Expressions\NumberFunctors.cs" />
     <Compile Include="Expressions\NumberOperand.cs" />
     <Compile Include="Expressions\NumericMathOperators.cs" />
-    <Compile Include="Classes\Variables.cs" />
     <Compile Include="Expressions\Parser.cs" />
     <Compile Include="Forms\DataGridViewDateTimeCell.cs" />
-    <Compile Include="VariablesAddon.cs" />
-    <Compile Include="Actions\VarAction.cs" />
-    <Compile Include="Classes\VarCollection.cs" />
-    <Compile Include="Conditions\VarCondition.cs" />
     <Compile Include="Forms\VariablesEditor.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\VariablesEditor.Designer.cs">
       <DependentUpon>VariablesEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="VariablesAddon.cs" />
+    <Compile Include="Actions\SetVariable.cs" />
+    <Compile Include="Conditions\CheсkEquations.cs" />
     <Compile Include="Forms\VariablesAddonPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -118,11 +119,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Forms\VariablesEditor.resx">
-      <DependentUpon>VariablesEditor.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\VariablesAddonPanel.resx">
       <DependentUpon>VariablesAddonPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\VariablesEditor.resx">
+      <DependentUpon>VariablesEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -133,8 +134,6 @@
     <None Include="Properties\DataSources\AstralVars.Forms.VariablesEditor.datasource" />
     <None Include="Resources\MathOp.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Editors\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

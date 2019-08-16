@@ -8,19 +8,20 @@ using Astral.Quester.Classes;
 using System.Drawing.Design;
 using Astral.Quester.Forms;
 using Astral.Quester.UIEditors;
-using AstralVars.Classes;
-using AstralVars.Forms;
-using AstralVars;
+using AstralVariables.Forms;
+using AstralVariables;
 
-namespace AstralVars
+namespace AstralVariables
 {
     public class VariablesAddon : Astral.Addons.Plugin
     {
-        public static VarCollection Variables = new VarCollection();
+        //public static VarCollection Variables = new VarCollection();
 
-        public static string LoggerPredicate = nameof(VariablesAddon) + ':';
+        public static Dictionary<string, double> Variables = new Dictionary<string, double>();
 
-        public override string Name => GetType().Name;
+        //public static string LoggerPredicate = nameof(VariablesAddon) + ':';
+
+        public override string Name => "Variable Tools";
 
         public override string Author => "MichaelProg";
 
@@ -49,23 +50,3 @@ namespace AstralVars
         }
     }
  }
-
-
-namespace Astral.Quester.UIEditors
-{
-    internal class variableUiEditor : UITypeEditor
-    {
-        public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
-        {
-            Variable var = VariablesEditor.GetVariable(VariablesAddon.Variables);
-            if (var != null)
-                return var;
-            return value;
-        }
-
-        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
-        {
-            return UITypeEditorEditStyle.Modal;
-        }
-    }
-}

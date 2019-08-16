@@ -1,4 +1,4 @@
-﻿namespace AstralVars.Forms
+﻿namespace AstralVariables.Forms
 {
     partial class VariablesAddonPanel
     {

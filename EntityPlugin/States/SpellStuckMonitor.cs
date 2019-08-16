@@ -130,7 +130,7 @@ namespace EntityPlugin.States
 
                         {
                             // Поиск ауры 'Devoted_Special_Channeldivinity'
-                            if (searchChanneldivinity && mod.PowerDef.InternalName.Contains(Cleric_Channeldivinity))
+                            if (searchChanneldivinity && mod.PowerDef.InternalName.StartsWith(Cleric_Channeldivinity))
                             {    // отключение скила 'Channeldivinity'
                                 GameCommands.Execute("specialClassPower 0");
                                 Logger.WriteLine($"{GetType().Name}: Deactivate SpecialClassPower[{Cleric_Channeldivinity}]");
@@ -138,7 +138,7 @@ namespace EntityPlugin.States
                             }
 
                             // Поиск ауры 'Devoted_Mechanic_Dps_Scales_Radiant' или 'Devoted_Mechanic_Dps_Scales_Fire'
-                            if (searchArbiterMechanic && mod.PowerDef.InternalName.Contains(Cleric_Arbiter_Mechanic))
+                            if (searchArbiterMechanic && mod.PowerDef.InternalName.StartsWith(Cleric_Arbiter_Mechanic))
                             {
                                 GameCommands.Execute("specialClassPower 1");
                                 Thread.Sleep(100);

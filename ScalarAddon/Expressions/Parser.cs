@@ -1,11 +1,11 @@
-﻿using AstralVars.Classes;
+﻿using AstralVariables.Classes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace AstralVars.Expressions
+namespace AstralVariables.Expressions
 {
     public class Parser
     {
@@ -73,6 +73,28 @@ namespace AstralVars.Expressions
                 || name.Equals(Predicates.CountNumeric)
                 || name.Equals(Predicates.Random);
         }
+
+        /// <summary>
+        /// Стандартный отступ текста
+        /// </summary>
+        public static readonly string Indent = "  ";
+
+        public static string MakeIndent(int indent)
+        {
+            if (indent > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < indent; i++)
+                    sb.Append(Indent);
+                return sb.ToString();
+            }
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Конец строки
+        /// </summary>
+        public static readonly string LineEnd = "\r\n";
 
         /// <summary>
         /// Перечисление типов операторов
@@ -589,7 +611,7 @@ namespace AstralVars.Expressions
         }
 
         /// <summary>
-        /// Перевод строки в целое число.
+        /// Перевод строки в число.
         /// </summary>
         /// <param name="inStr"></param>
         /// <param name="result">результат преобразования</param>
@@ -607,7 +629,7 @@ namespace AstralVars.Expressions
             return false;
         }
         /// <summary>
-        /// Перевод объекта в целое число.
+        /// Перевод объекта в число.
         /// </summary>
         /// <param name="inObj"></param>
         /// <param name="result">результат преобразования</param>
@@ -621,7 +643,11 @@ namespace AstralVars.Expressions
                 result = (double)inObj;
                 return true;
             }
-            else return TryParse(inObj.ToString(), out result);
+            else
+            {
+                string str = inObj.ToString();
+                return TryParse(Parser.Symbols.CorrectNumberDecimalSeparator(ref str), out result);
+            }
         }
         /// <summary>
         /// Строгое преобразование объекта в булевый тип.
@@ -639,7 +665,11 @@ namespace AstralVars.Expressions
                 result = (double)inObj;
                 return true;
             }
-            else return double.TryParse(inObj.ToString(), out result);
+            else
+            {
+                string str = inObj.ToString();
+                return double.TryParse(Parser.Symbols.CorrectNumberDecimalSeparator(ref str), out result);
+            }
         }
 
         /// <summary>
@@ -705,7 +735,7 @@ namespace AstralVars.Expressions
         /// False: имя некорректно</returns>
         public static bool CheckVarName(string name)
         {
-            if(string.IsNullOrEmpty(name))
+            if(string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name))
                 return false;
 
             if (name.LastIndexOfAny(forbiddenChar) >= 0)
@@ -721,6 +751,32 @@ namespace AstralVars.Expressions
             if (name == null)
                 return false;
             return CheckVarName(name.ToString());
+        }
+    }
+
+    public static class StandartClassExtention
+    {
+        public static string AddCopies(this string str, string indent, int count = 0)
+        {
+            if (count > 0)
+            {
+                StringBuilder sb = new StringBuilder(str);
+                for (int i = 0; i < count; i++)
+                    sb.Append(indent);
+                return sb.ToString();
+            }
+            return str;
+        }
+
+        public static StringBuilder AppendCopies(this StringBuilder sb, string indent, int count = 0)
+        {
+            if (count > 0)
+            {
+                for (int i = 0; i < count; i++)
+                    sb.Append(indent);
+                return sb;
+            }
+            return sb;
         }
     }
 }

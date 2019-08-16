@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AstralVars.Expressions
+namespace AstralVariables.Expressions
 {
     /// <summary>
     /// Класс, описывающий и вычисляющий результат выражение
@@ -13,7 +13,24 @@ namespace AstralVars.Expressions
         /// <summary>
         /// Исходное строковое представление выражения
         /// </summary>
-        protected string expression;
+        protected string _expression;
+        public string Expression
+        {
+            get => _expression;
+            set
+            {
+                if (value != _expression)
+                {
+                    ResetInternal();
+                    _expression = value;
+                    Parse();
+                }
+            }
+        }
+        protected virtual void ResetInternal()
+        {
+            parseError = null;
+        }
 
         /// <summary>
         /// Флаг корректности выражения и успешного формирования Абстрактного синтаксического дерева
@@ -30,13 +47,26 @@ namespace AstralVars.Expressions
         /// <summary>
         /// Лексический разбор выражения и построение Абстрактного синтаксического дерева
         /// </summary>
-        /// <returns>Объект, описывающий результат разбора</returns>
-        public abstract AST Parse();
+        /// <returns>Флаг успешности разбора</returns>
+        public abstract bool Parse(string newExpression = "");
+
+        /// <summary>
+        /// Ошибка разбора выражения expression
+        /// возникшая при выполнении Parse()
+        /// </summary>
+        public BaseParseError parseError { get; protected set; }
 
         public override string ToString()
         {
-            return expression;
+            return Expression;
         }
+
+        /// <summary>
+        /// Описание выражения
+        /// </summary>
+        /// <param name="indent">Отступ от начала строки</param>
+        /// <returns></returns>
+        public abstract string Description(int indent);
     }
 
     public abstract class Expression<T> : AbstractExpression
@@ -44,7 +74,63 @@ namespace AstralVars.Expressions
         /// <summary>
         /// Корень Абстрактного синтаксического дерева
         /// </summary>
-        protected AstNode<T> root;
+        protected AstNode<T> ast;
+        public  AstNode<T> AST { get => ast; }
+
+        protected override void ResetInternal()
+        {
+            base.ResetInternal();
+            ast = null;
+        }
+
+
+        /// <summary>
+        /// Вычисление результата выражения
+        /// </summary>
+        /// <param name="result">результат вычисления</param>
+        /// <returns>True: вычисление произведено успешно</returns>
+        public abstract bool Calcucate(out T result);
+        public override bool Calcucate(out object result)
+        {
+            result = null;
+            if (Calcucate(out T res))
+            {
+                result = res;
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Описание выражения
+        /// </summary>
+        /// <param name="pref"></param>
+        /// <returns></returns>
+        public override string Description(int indent = 0)
+        {
+            if (IsValid)
+                return AST.Description(indent);
+            else
+            {
+                if (parseError == null)
+                    return DescribeErrorMessage(parseError, indent);
+            }
+            return string.Empty;
+        }
+
+        private string DescribeErrorMessage(BaseParseError e, int indent = 0, StringBuilder sb = null)
+        {
+            if (sb == null)
+                sb = new StringBuilder();
+            sb.AppendLine().Insert(sb.Length, Parser.Indent, indent).Append(e.Message);
+            foreach (BaseParseError e2 in e.ErrorStack)
+            {
+                DescribeErrorMessage(e2, indent, sb);
+            }
+
+            return sb.ToString();
+        }
     }
 
 
@@ -64,7 +150,7 @@ namespace AstralVars.Expressions
                 ErrorStack = subErrors;
             expression = expr;
         }
-        public BaseParseError(string mes = "", string expr = "") : base(mes)
+        public BaseParseError(string mes = "", string expr = "") : base (mes)
         {
             ErrorStack = new List<BaseParseError>();
             expression = expr;
@@ -74,7 +160,7 @@ namespace AstralVars.Expressions
 
     /// <summary>
     /// Класс неустранимой ошибки разбора выражения
-    /// получение которой не повзоляет продолжить разбор выражения expression
+    /// получение которой не повзоляет продолжить разбор выражения Expression
     /// </summary>
     public class FatalParseError : BaseParseError
     {
@@ -87,7 +173,7 @@ namespace AstralVars.Expressions
 
     /// <summary>
     /// Класс ошибки разбора выражения
-    /// получение которой не препятствует разбору выражения expression
+    /// получение которой не препятствует разбору выражения Expression
     /// и проверке других правил или элементов правила
     /// </summary>
     public class ParseError : BaseParseError
