@@ -45,16 +45,17 @@ namespace EntityPlugin.Forms
             this.cbSlideMonitor = new System.Windows.Forms.CheckBox();
             this.ckbSpellStuckMonitor = new System.Windows.Forms.CheckBox();
             this.gbSlideMonitor = new System.Windows.Forms.GroupBox();
+            this.tbSlidingAuras = new System.Windows.Forms.TextBox();
             this.seTimerSlide = new DevExpress.XtraEditors.SpinEdit();
             this.lblTimerSlide = new System.Windows.Forms.Label();
             this.lblSlideFilter = new System.Windows.Forms.Label();
+            this.lblSlidingAuras = new System.Windows.Forms.Label();
             this.lblTimerUnslide = new System.Windows.Forms.Label();
             this.seTimerUnslide = new DevExpress.XtraEditors.SpinEdit();
             this.seSlideFilter = new DevExpress.XtraEditors.SpinEdit();
             this.lblSlideTimer = new System.Windows.Forms.Label();
             this.tabUtilities = new DevExpress.XtraTab.XtraTabPage();
-            this.tbSlidingAuras = new System.Windows.Forms.TextBox();
-            this.lblSlidingAuras = new System.Windows.Forms.Label();
+            this.btnUiViewer = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.bteMissions.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bteAuras.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
@@ -72,7 +73,7 @@ namespace EntityPlugin.Forms
             this.btnEntities.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.btnEntities.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnEntities.Location = new System.Drawing.Point(6, 104);
+            this.btnEntities.Location = new System.Drawing.Point(6, 135);
             this.btnEntities.Name = "btnEntities";
             this.btnEntities.Size = new System.Drawing.Size(380, 23);
             this.btnEntities.TabIndex = 0;
@@ -234,6 +235,21 @@ namespace EntityPlugin.Forms
             this.gbSlideMonitor.TabIndex = 4;
             this.gbSlideMonitor.TabStop = false;
             // 
+            // tbSlidingAuras
+            // 
+            this.tbSlidingAuras.AcceptsReturn = true;
+            this.tbSlidingAuras.AcceptsTab = true;
+            this.tbSlidingAuras.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbSlidingAuras.Location = new System.Drawing.Point(6, 94);
+            this.tbSlidingAuras.Multiline = true;
+            this.tbSlidingAuras.Name = "tbSlidingAuras";
+            this.tbSlidingAuras.Size = new System.Drawing.Size(375, 60);
+            this.tbSlidingAuras.TabIndex = 3;
+            this.tbSlidingAuras.Text = "M10_Becritter_Boat_Costume\r\nVolume_Ground_Slippery\r\nVolume_Ground_Slippery_Player" +
+    "only";
+            // 
             // seTimerSlide
             // 
             this.seTimerSlide.EditValue = new decimal(new int[] {
@@ -270,6 +286,15 @@ namespace EntityPlugin.Forms
             this.lblSlideFilter.Size = new System.Drawing.Size(198, 13);
             this.lblSlideFilter.TabIndex = 2;
             this.lblSlideFilter.Text = "Distance to target waypoint when slide:";
+            // 
+            // lblSlidingAuras
+            // 
+            this.lblSlidingAuras.AutoSize = true;
+            this.lblSlidingAuras.Location = new System.Drawing.Point(6, 78);
+            this.lblSlidingAuras.Name = "lblSlidingAuras";
+            this.lblSlidingAuras.Size = new System.Drawing.Size(72, 13);
+            this.lblSlidingAuras.TabIndex = 2;
+            this.lblSlidingAuras.Text = "Sliding Auras:";
             // 
             // lblTimerUnslide
             // 
@@ -336,6 +361,7 @@ namespace EntityPlugin.Forms
             // 
             this.tabUtilities.Controls.Add(this.lblAuras);
             this.tabUtilities.Controls.Add(this.btnMissions);
+            this.tabUtilities.Controls.Add(this.btnUiViewer);
             this.tabUtilities.Controls.Add(this.btnEntities);
             this.tabUtilities.Controls.Add(this.bteMissions);
             this.tabUtilities.Controls.Add(this.bteAuras);
@@ -345,29 +371,18 @@ namespace EntityPlugin.Forms
             this.tabUtilities.Size = new System.Drawing.Size(392, 388);
             this.tabUtilities.Text = "Utilities";
             // 
-            // tbSlidingAuras
+            // btnUiViewer
             // 
-            this.tbSlidingAuras.AcceptsReturn = true;
-            this.tbSlidingAuras.AcceptsTab = true;
-            this.tbSlidingAuras.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.btnUiViewer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbSlidingAuras.Location = new System.Drawing.Point(6, 94);
-            this.tbSlidingAuras.Multiline = true;
-            this.tbSlidingAuras.Name = "tbSlidingAuras";
-            this.tbSlidingAuras.Size = new System.Drawing.Size(375, 60);
-            this.tbSlidingAuras.TabIndex = 3;
-            this.tbSlidingAuras.Text = "M10_Becritter_Boat_Costume\r\nVolume_Ground_Slippery\r\nVolume_Ground_Slippery_Player" +
-    "only";
-            // 
-            // lblSlidingAuras
-            // 
-            this.lblSlidingAuras.AutoSize = true;
-            this.lblSlidingAuras.Location = new System.Drawing.Point(6, 78);
-            this.lblSlidingAuras.Name = "lblSlidingAuras";
-            this.lblSlidingAuras.Size = new System.Drawing.Size(72, 13);
-            this.lblSlidingAuras.TabIndex = 2;
-            this.lblSlidingAuras.Text = "Sliding Auras:";
+            this.btnUiViewer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnUiViewer.Location = new System.Drawing.Point(6, 106);
+            this.btnUiViewer.Name = "btnUiViewer";
+            this.btnUiViewer.Size = new System.Drawing.Size(380, 23);
+            this.btnUiViewer.TabIndex = 0;
+            this.btnUiViewer.Text = "UI Viewer";
+            this.btnUiViewer.UseVisualStyleBackColor = true;
+            this.btnUiViewer.Click += new System.EventHandler(this.btnUiViewer_Click);
             // 
             // MainPanel
             // 
@@ -420,5 +435,6 @@ namespace EntityPlugin.Forms
         private System.Windows.Forms.GroupBox gbSlideMonitor;
         private System.Windows.Forms.TextBox tbSlidingAuras;
         private System.Windows.Forms.Label lblSlidingAuras;
+        private System.Windows.Forms.Button btnUiViewer;
     }
 }

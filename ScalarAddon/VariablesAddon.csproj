@@ -70,12 +70,34 @@
   <ItemGroup>
     <Reference Include="Astral">
       <HintPath>..\References\x64\Astral.exe</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Data.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Printing.v18.1.Core, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Sparkline.v18.1.Core, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Utils.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraBars.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraEditors.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
     </Reference>
     <Reference Include="MyNW">
       <HintPath>..\References\x64\MyNW.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -87,7 +109,8 @@
   <ItemGroup>
     <Compile Include="Classes\VarCollection.cs" />
     <Compile Include="Classes\Variables.cs" />
-    <Compile Include="Editors\variableSelectUiEditor.cs" />
+    <Compile Include="Editors\EquationUiEditor.cs" />
+    <Compile Include="Editors\VariableSelectUiEditor.cs" />
     <Compile Include="Expressions\AstBase.cs" />
     <Compile Include="Expressions\Expression.cs" />
     <Compile Include="Expressions\NumberExpression.cs" />
@@ -96,6 +119,12 @@
     <Compile Include="Expressions\NumericMathOperators.cs" />
     <Compile Include="Expressions\Parser.cs" />
     <Compile Include="Forms\DataGridViewDateTimeCell.cs" />
+    <Compile Include="Forms\EquationEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\EquationEditor.Designer.cs">
+      <DependentUpon>EquationEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\VariablesEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -119,12 +148,16 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Forms\EquationEditor.resx">
+      <DependentUpon>EquationEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\VariablesAddonPanel.resx">
       <DependentUpon>VariablesAddonPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\VariablesEditor.resx">
       <DependentUpon>VariablesEditor.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

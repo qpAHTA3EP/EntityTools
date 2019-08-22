@@ -40,7 +40,7 @@ namespace AstralVariables.Forms
         //    }
         //    return string.Empty;
         //}
-        public static string GetVariable(string var)
+        public static string GetVariable(string var_name = "")
         {
             if (varEditor == null)
             {
@@ -54,7 +54,7 @@ namespace AstralVariables.Forms
             }
 
             // Заполнение DataGridView значениями
-            varEditor.FillDgvVariables(var);
+            varEditor.FillDgvVariables(var_name);
 
             // отображение редактора переменных
             DialogResult result = varEditor.ShowDialog();

@@ -205,5 +205,10 @@ namespace EntityPlugin.Forms
             SlideMonitor.Activate = cbSlideMonitor.Checked;
             gbSlideMonitor.Enabled = cbSlideMonitor.Checked;
         }
+
+        private void btnUiViewer_Click(object sender, EventArgs e)
+        {
+            UIViewer.GetUiGen();
+        }
     }
 }

@@ -1,9 +1,4 @@
-﻿using AstralVariables.Classes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
+﻿using System;
 using static AstralVariables.Expressions.Parser;
 using NumberAstNode = AstralVariables.Expressions.AstNode<double>;
 using ErrorList = System.Collections.Generic.List<AstralVariables.Expressions.BaseParseError>;
@@ -11,12 +6,14 @@ using AstralVariables.Expressions.Operand;
 using AstralVariables.Expressions.Functions;
 using AstralVariables.Expressions.Operators;
 using System.Diagnostics;
+using System.Xml.Serialization;
 
 namespace AstralVariables.Expressions
 {
     public class NumberExpression : Expression<double>
     {
-        public override bool IsValid => !string.IsNullOrEmpty(Expression) && !string.IsNullOrWhiteSpace(Expression) && (ast != null);
+        [XmlIgnore]
+        public override bool IsValid => !string.IsNullOrEmpty(expression) && !string.IsNullOrWhiteSpace(expression) && (ast != null);
 
         public override bool Calcucate(out double result)
         {
@@ -36,13 +33,13 @@ namespace AstralVariables.Expressions
                 result = res;
 #if DEBUG
                 stopwatch.Stop();
-                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesAddon)}: Calculate '{_expression}' time: {stopwatch.ElapsedMilliseconds} ms");
+                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesAddon)}: Calculate '{expression}' time: {stopwatch.ElapsedMilliseconds} ms");
 #endif
                 return true;
             }
 #if DEBUG
             stopwatch.Stop();
-            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesAddon)}: Calculate '{_expression}' time: {stopwatch.ElapsedMilliseconds} ms");
+            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesAddon)}: Calculate '{expression}' time: {stopwatch.ElapsedMilliseconds} ms");
 #endif
             return false;
         }
@@ -60,15 +57,15 @@ namespace AstralVariables.Expressions
             stopwatch.Start();
 #endif
             if (!string.IsNullOrEmpty(newExpression) && !string.IsNullOrWhiteSpace(newExpression))
-                Expression = newExpression;
-            else if (string.IsNullOrEmpty(Expression) || string.IsNullOrWhiteSpace(Expression))
+                expression = newExpression;
+            else if (string.IsNullOrEmpty(expression) || string.IsNullOrWhiteSpace(expression))
             {
                 ast = null;
-                parseError = new FatalParseError("Parse: Expression string is empty");
+                ParseError = new FatalParseError("Parse: Expression string is empty");
                 return false;
             }
 
-            string expr = Expression;
+            string expr = expression;
             ast = null;
             try
             {
@@ -76,17 +73,20 @@ namespace AstralVariables.Expressions
             }
             catch(BaseParseError e)
             {
-                parseError = e;
+                ParseError = e;
                 return false;
             }
 #if DEBUG
             stopwatch.Stop();
-            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesAddon)}: Parse '{_expression}' time: {stopwatch.ElapsedMilliseconds} ms");
+            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesAddon)}: Parse '{expression}' time: {stopwatch.ElapsedMilliseconds} ms");
 #endif
-            if (!string.IsNullOrWhiteSpace(expr) && !string.IsNullOrEmpty(Expression))
+            // После разбора выражения строка expr должна остаться пустой
+            // в противном случае выражение содержит ошибку
+            if (!string.IsNullOrWhiteSpace(expr) && !string.IsNullOrEmpty(expr))
             {
+                ast = null;
                 expr = expr.TrimStart();
-                parseError = new FatalParseError($"Parse: Undefined symbol at position {Expression.Length - expr?.Length}" , expr);
+                ParseError = new FatalParseError($"Parse: Undefined symbol at position {expression.Length - expr?.Length}" , expr);
                 return false;
             }
 
@@ -98,14 +98,14 @@ namespace AstralVariables.Expressions
         /// В случае успеха соответствующая числу подстрока удаляется из expression
         /// В противном случае генерируется исключение ParseError
         /// </summary>
-        /// <param name="expression"></param>
+        /// <param name="expr"></param>
         /// <returns>Узел синтаксического дерева NumberNode</returns>
-        public static NumberConstant ParseNumber(ref string expression)
+        public static NumberConstant ParseNumber(ref string expr)
         {
-            string exprBackup = expression;
-            expression = expression.TrimStart();
+            string exprBackup = expr;
+            expr = expr.TrimStart();
 
-            if (string.IsNullOrWhiteSpace(expression) || string.IsNullOrEmpty(expression))
+            if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
                 throw new FatalParseError("ParseNumber: Expression string is empty");
 
             try
@@ -120,78 +120,78 @@ namespace AstralVariables.Expressions
                 //Match match = Regex.Match(expression, @"^\d+((,|.)?\d)?");
                 //
                 // Поиск путем анализа символов строки
-                for (; i < expression.Length;i++)
+                for (; i < expr.Length;i++)
                 {
-                    if (char.IsDigit(expression[i]))
+                    if (char.IsDigit(expr[i]))
                     {
                         continue;
                     }
 
-                    if (char.IsWhiteSpace(expression[i]))
+                    if (char.IsWhiteSpace(expr[i]))
                         // Найден провел
                         // Следовательно число закончилось на предыдущем символе
                         break;
 
-                    if (Parser.Symbols.IsMathOperator(expression[i]))
+                    if (Parser.Symbols.IsMathOperator(expr[i]))
                         // Найден математический оператор
                         // Следовательно число закончилось на предыдущем символе
                         break;
 
 
-                    if (Parser.Symbols.IsCloseBraces(expression[i]))
+                    if (Parser.Symbols.IsCloseBraces(expr[i]))
                         // Найдена закрывающая скобка
                         // Следовательно число закончилось на предыдущем символе
                         break;
 
 
-                    if (Parser.Symbols.IsNumberDecimalSeparator(expression[i]))
+                    if (Parser.Symbols.IsNumberDecimalSeparator(expr[i]))
                     {
                         if (numDecimalSeparator > 1)
                         {
                             // Десятичный разделитель встретился второй раз, 
                             // Это является недопустимым
                             // Следовательно входная строка не содержит числа или некорректна
-                            throw new FatalParseError($"ParseNumber: Have '{expression[i]}' when there should be 'Digit' or the end of {{Number}}", expression.Substring(i));
+                            throw new FatalParseError($"ParseNumber: Have '{expr[i]}' when there should be 'Digit' or the end of {{Number}}", expr.Substring(i));
                         }
                         numDecimalSeparator++;
                         continue;
                     }
 
-                    if (Parser.Symbols.IsUnderscore(expression[i])
-                        || Parser.Symbols.IsLetter(expression[i]))
+                    if (Parser.Symbols.IsUnderscore(expr[i])
+                        || Parser.Symbols.IsLetter(expr[i]))
                     {
                         // Встретился символ подчеркивания '_'
                         // или буква или любой символ, не входящий в числовой литерал
                         // Следовательно входная строка не содержит числа
-                        throw new ParseError($"ParseNumber: Have '{expression[i]}' when there should be 'Digit' or the end of {{Number}}", expression.Substring(i));
+                        throw new ParseError($"ParseNumber: Have '{expr[i]}' when there should be 'Digit' or the end of {{Number}}", expr.Substring(i));
                     }
 
                     // Встретился недопустимый символ 
-                    throw new FatalParseError($"ParseNumber: Have forbidden symbol '{expression[i]}' when there should be 'Digit' or the end of {{Number}}", expression.Substring(i));
+                    throw new FatalParseError($"ParseNumber: Have forbidden symbol '{expr[i]}' when there should be 'Digit' or the end of {{Number}}", expr.Substring(i));
                 }
 
                 if (i == 0)
-                    throw new ParseError($"ParseNumber: {{Number}} does not found at the beginning of the expression", expression);
+                    throw new ParseError($"ParseNumber: {{Number}} does not found at the beginning of the expression", expr);
 
                 // попытка преобразовать часть строки в число
                 double value;
                 bool parseSucceeded = false;
                 if (numDecimalSeparator > 0)
-                     parseSucceeded = double.TryParse(Parser.Symbols.CorrectNumberDecimalSeparator(ref expression).Substring(0, i), out value);
-                else parseSucceeded = double.TryParse(expression.Substring(0, i), out value);
+                     parseSucceeded = double.TryParse(Parser.Symbols.CorrectNumberDecimalSeparator(ref expr).Substring(0, i), out value);
+                else parseSucceeded = double.TryParse(expr.Substring(0, i), out value);
 
                 if (parseSucceeded)
                 {
                     // удаление распознанной подстроки из входного выражения 
-                    expression = expression.Remove(0, i);
+                    expr = expr.Remove(0, i);
                     // конструирование листового узла синтаксического дерева
                     return new NumberConstant(value);
                 }
-                else throw new ParseError("ParseNumber: Unsucceeded", expression);
+                else throw new ParseError("ParseNumber: Unsucceeded", expr);
             }
             catch (Exception e)
             {
-                expression = exprBackup;
+                expr = exprBackup;
                 throw e;
             }
         }
@@ -201,77 +201,77 @@ namespace AstralVariables.Expressions
         /// В случае успеха соответствующая переменной подстрока удаляется из expression
         /// В противном случае генерируется исключение ParseError
         /// </summary>
-        /// <param name="expression"></param>
+        /// <param name="expr"></param>
         /// <returns>Узел синтаксического дерева NumberVariable</returns>
-        public static NumberVariable ParseVariable(ref string expression)
+        public static NumberVariable ParseVariable(ref string expr)
         {
-            string exprBackup = expression;
+            string exprBackup = expr;
 
-            if (string.IsNullOrWhiteSpace(expression) || string.IsNullOrEmpty(expression))
+            if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
                 throw new FatalParseError("ParseVariable: Expression string is empty");
 
-            expression = expression.TrimStart();
+            expr = expr.TrimStart();
 
             try
             {
                 // Индекс символа во входной строке
                 int i;
                 // Поиск путем анализа символов строки
-                for (i = 0; i < expression.Length; i++)
+                for (i = 0; i < expr.Length; i++)
                 {
-                    if (Parser.Symbols.IsLetterOrDigit(expression[i]))
+                    if (Parser.Symbols.IsLetterOrDigit(expr[i]))
                         continue;
 
-                    if (Parser.Symbols.IsUnderscore(expression[i]))
+                    if (Parser.Symbols.IsUnderscore(expr[i]))
                         continue;
 
-                    if (Parser.Symbols.IsMathOperator(expression[i]))
+                    if (Parser.Symbols.IsMathOperator(expr[i]))
                         // Обнаружен математический оператор 
                         // Следовательно Имя переменной закончилось на предыдущем символе
                         break;                    
 
-                    if (char.IsWhiteSpace(expression[i]))
+                    if (char.IsWhiteSpace(expr[i]))
                         // Обнаружен пробел
                         // Следовательно Имя переменной закончилось на предыдущем символе
                         break;
 
-                    if (Parser.Symbols.IsCloseGroupBraces(expression[i]))
+                    if (Parser.Symbols.IsCloseGroupBraces(expr[i]))
                         // Найдена закрывающая скобка
                         // Следовательно Имя переменной закончилось на предыдущем символе
                         break;
 
-                    if (Parser.Symbols.IsOpenGroupBraces(expression[i]))
+                    if (Parser.Symbols.IsOpenGroupBraces(expr[i]))
                     {
                         // Встретилась открывающая скобка
                         // Следовательно входная строка некорректна
-                        throw new FatalParseError($"ParseVariable: Unexpeted symbol '{expression[i]}'", expression.Substring(i));
+                        throw new FatalParseError($"ParseVariable: Unexpeted symbol '{expr[i]}'", expr.Substring(i));
                     }
 
                     // Встретился недопустимый символ
                     // Следовательно входная строка некорректна
-                    throw new FatalParseError($"ParseVariable: Symbol '{expression[i]}' is forbiden in the name of {{Variable}}", expression.Substring(i));
+                    throw new FatalParseError($"ParseVariable: Symbol '{expr[i]}' is forbiden in the name of {{Variable}}", expr.Substring(i));
                 }
 
                 if (i == 0)
-                    throw new ParseError("ParseVariable: {Variable} does not found at the beginning of the expression", expression.Substring(i));
+                    throw new ParseError("ParseVariable: {Variable} does not found at the beginning of the expression", expr.Substring(i));
 
                 // Извлечение названия переменной из подстроки
-                string var_name = expression.Substring(0, i);
+                string var_name = expr.Substring(0, i);
                 if (Parser.IsForbidden(var_name))
-                    throw new FatalParseError($"ParseVariable: Name {{{var_name}}} if forbidden", expression);
+                    throw new FatalParseError($"ParseVariable: Name {{{var_name}}} if forbidden", expr);
 
                 if (!string.IsNullOrWhiteSpace(var_name) && !string.IsNullOrEmpty(var_name))
                 {
                     // удаление распознанной подстроки из входного выражения 
-                    expression = expression.Remove(0, i);
+                    expr = expr.Remove(0, i);
                     // конструирование листового узла синтаксического дерева
                     return new NumberVariable(var_name);
                 }
-                else throw new ParseError("ParseVariable: Unsucceeded", expression.Substring(i));
+                else throw new ParseError("ParseVariable: Unsucceeded", expr.Substring(i));
             }
             catch(Exception e)
             {
-                expression = exprBackup;
+                expr = exprBackup;
                 throw e;
             }
         }
@@ -281,15 +281,15 @@ namespace AstralVariables.Expressions
         /// Value = Number
         ///       | Variable
         /// </summary>
-        /// <param name="expression"></param>
+        /// <param name="expr"></param>
         /// <returns></returns>
-        public static NumberAstNode ParseValue(ref string expression)
+        public static NumberAstNode ParseValue(ref string expr)
         {
-            string exprBackup = expression;
+            string exprBackup = expr;
             //StringBuilder errorMess = new StringBuilder();
             ErrorList subError = new ErrorList();
 
-            if (string.IsNullOrWhiteSpace(expression) || string.IsNullOrEmpty(expression))
+            if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
                 throw new FatalParseError("ParseValue: Expression string is empty");
 
             try
@@ -297,39 +297,39 @@ namespace AstralVariables.Expressions
                 try
                 {
                     // Пытаетмся извлечь числовую константу Value = Number
-                    return ParseNumber(ref expression);
+                    return ParseNumber(ref expr);
                 }
                 catch (ParseError numErr)
                 {
                     //errorMess.AppendLine(numErr.Message)/*.Append("in expression: ").Append(expression*/;
                     subError.Add(numErr);
 
-                    expression = exprBackup;
+                    expr = exprBackup;
                     // Пытаемся извлечь переменную Value = Variable
                     try
                     {
-                        return ParseVariable(ref expression);
+                        return ParseVariable(ref expr);
                     }
                     catch (ParseError varErr)
                     {
                         //errorMess.AppendLine(varErr.Message)/*.Append("in expression: ").Append(expression)*/;
                         subError.Add(varErr);
 
-                        expression = exprBackup;
+                        expr = exprBackup;
                     }
                 }
             }
             catch(FatalParseError fatErr)
             {
-                expression = exprBackup;
+                expr = exprBackup;
                 subError.Add(fatErr);
                 throw new FatalParseError(subError, "ParseValue: Fatal error", fatErr.expression);
             }
 
-            expression = exprBackup;
+            expr = exprBackup;
             //errorMess.Insert(0, "ParseValue: No {Number} or {Variable} was found\n");
             //throw new ParseError(subError, errorMess.ToString(), expression);
-            throw new ParseError(subError, "ParseValue: No {Number} or {Variable} was found", expression);
+            throw new ParseError(subError, "ParseValue: No {Number} or {Variable} was found", expr);
         }
 
 
@@ -338,72 +338,72 @@ namespace AstralVariables.Expressions
         /// В случае успеха соответствующая идентификатору предмета подстрока (ItemId) удаляется из expression
         /// В противном случае генерируется исключение ParseError
         /// </summary>
-        /// <param name="expression"></param>
+        /// <param name="expr"></param>
         /// <returns>Идентификатор предмета ItemId</returns>
-        public static string ParseId(ref string expression)
+        public static string ParseId(ref string expr)
         {
 
-            if (string.IsNullOrWhiteSpace(expression) || string.IsNullOrEmpty(expression))
+            if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
                 throw new FatalParseError("ParseItemId: Expression string is empty");
 
-            expression = expression.TrimStart();
+            expr = expr.TrimStart();
 
             // Индекс символа во входной строке
             int i = 0;
 
             // Поиск путем анализа символов строки
-            for (; i < expression.Length; i++)
+            for (; i < expr.Length; i++)
             {
-                if (Parser.Symbols.IsLetterOrDigit(expression[i]))
+                if (Parser.Symbols.IsLetterOrDigit(expr[i]))
                     continue;
 
-                if (Parser.Symbols.IsUnderscore(expression[i]))
+                if (Parser.Symbols.IsUnderscore(expr[i]))
                     continue;
 
                 //if (Parser.IsWildcard(expression[i]))
                 //    continue;
 
-                if (char.IsWhiteSpace(expression[i]))
+                if (char.IsWhiteSpace(expr[i]))
                     // Найден пробел
                     // Следовательно  ItemId закончился на предыдущем символе
                     break;
 
-                if (Parser.Symbols.IsCloseBraces(expression[i]))
+                if (Parser.Symbols.IsCloseBraces(expr[i]))
                     // Найдена закрывающая скобка
                     // Следовательно ItemId закончился на предыдущем символе
                     break;
 
-                if (Parser.Symbols.IsOpenBraces(expression[i]))
+                if (Parser.Symbols.IsOpenBraces(expr[i]))
                 {
                     // Найдена открывающая скобка
                     // Следовательно входная строка некорректна
-                    throw new FatalParseError($"ParseItemId: Have '{expression[i]}' when there should be the end of {{ItemId}}", expression.Substring(i));
+                    throw new FatalParseError($"ParseItemId: Have '{expr[i]}' when there should be the end of {{ItemId}}", expr.Substring(i));
                 }
 
-                if (Parser.Symbols.IsMathOperator(expression[i]))
+                if (Parser.Symbols.IsMathOperator(expr[i]))
                 {
                     // Найден символ математического оператора
                     // Математический операции над идентификаторами не допускаются
                     // Следовательно входная строка некорректна
-                    throw new FatalParseError("ParseItemId: Have {MathOperator} when there should be the end of {ItemId}", expression.Substring(i));
+                    throw new FatalParseError("ParseItemId: Have {MathOperator} when there should be the end of {ItemId}", expr.Substring(i));
                 }
 
-                throw new FatalParseError($"ParseItemId: Have '{expression[i]}' when there should be {{ItemId}}", expression.Substring(i));
+                throw new FatalParseError($"ParseItemId: Have '{expr[i]}' when there should be {{ItemId}}", expr.Substring(i));
             }
 
             if (i == 0)
-                throw new ParseError("ParseItemId: {ItemId} does not found at the beginning of the expression", expression);
+                throw new ParseError("ParseItemId: {ItemId} does not found at the beginning of the expression", expr);
 
             // Извлечение названия переменной из подстроки
-            string itemId = expression.Substring(0, i);
+            string itemId = expr.Substring(0, i);
             if (!string.IsNullOrWhiteSpace(itemId) && !string.IsNullOrEmpty(itemId))
             {
                 // удаление распознанной подстроки из входного выражения 
-                expression = expression.Remove(0, i);
+                expr = expr.Remove(0, i);
                 // конструирование листового узла синтаксического дерева
                 return itemId;
             }
-            else throw new ParseError("ParseItemId: Unsucceeded", expression);
+            else throw new ParseError("ParseItemId: Unsucceeded", expr);
         }
 
         /// <summary>
@@ -411,22 +411,22 @@ namespace AstralVariables.Expressions
         /// Addition = Multiplication
         ///     | Multiplication ('+' | '-') Addition
         /// </summary>
-        /// <param name="expression"></param>
+        /// <param name="expr"></param>
         /// <returns></returns>
-        public static NumberAstNode ParseAddition(ref string expression)
+        public static NumberAstNode ParseAddition(ref string expr)
         {
-            string exprBackup = expression;
+            string exprBackup = expr;
             ErrorList subError = new ErrorList();
             //StringBuilder errorMess = new StringBuilder();
 
-            if (string.IsNullOrWhiteSpace(expression) || string.IsNullOrEmpty(expression))
+            if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
                 throw new FatalParseError("ParseAddition: Expression string is empty");
 
             try
             {
-                NumberAstNode leftOperand = ParseMultiplication(ref expression);
+                NumberAstNode leftOperand = ParseMultiplication(ref expr);
                 
-				MathOperatorType operatorType = Parser.Symbols.TrimAdditionOperatorAndWhiteSpace(ref expression);
+				MathOperatorType operatorType = Parser.Symbols.TrimAdditionOperatorAndWhiteSpace(ref expr);
 				if(operatorType == MathOperatorType.NOP)
 				{
                     // Математический оператор не найден
@@ -441,7 +441,7 @@ namespace AstralVariables.Expressions
 				{
 					// Найден Математический оператор
 					// Пробуем извлечь правый операнд
-					NumberAstNode rightOperand = ParseAddition(ref expression);
+					NumberAstNode rightOperand = ParseAddition(ref expr);
 					
 					///
 					/// Конструируем узел дерева
@@ -452,13 +452,13 @@ namespace AstralVariables.Expressions
             }
             catch (FatalParseError fatErr)
             {
-                expression = exprBackup;
+                expr = exprBackup;
                 subError.Add(fatErr);
                 throw new FatalParseError(subError, "ParseAddition: Fatal error", fatErr.expression);
             }
             catch (Exception e)
             {
-                expression = exprBackup;
+                expr = exprBackup;
                 throw e;
             }
 
@@ -468,57 +468,57 @@ namespace AstralVariables.Expressions
         /// <summary>
         /// Разбор строки соответствующей '(' Addition ')' 
         /// </summary>
-        /// <param name="expression"></param>
+        /// <param name="expr"></param>
         /// <returns></returns>
-		public static NumberAstNode ParseBracketedAddition(ref string expression)
+		public static NumberAstNode ParseBracketedAddition(ref string expr)
 		{
-            string exprBackup = expression;
+            string exprBackup = expr;
 
-			if (string.IsNullOrWhiteSpace(expression) || string.IsNullOrEmpty(expression))
+			if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
                 throw new FatalParseError("ParseBracketedAddition: Expression string is empty");
 
             try
             {
                 // Ищем открывающу скобку '('
-                if (Parser.Symbols.TrimOpenGroupBracesAndWhiteSpace(ref expression))
+                if (Parser.Symbols.TrimOpenGroupBracesAndWhiteSpace(ref expr))
                 {
                     NumberAstNode addNode = null;
                     // Нашли и удалили открывающую скобку '('
                     try
                     {
                         // Извлекаем Addition
-                        addNode = ParseAddition(ref expression);
+                        addNode = ParseAddition(ref expr);
                     }
                     catch (ParseError e)
                     {
                         // После открывающей скобки не найдено выражение, соответствующее правилу Addition 
                         // Следовательно входная строка не соответствует выражению '(' Addition ')' 
                         // Восстанавливаем входную строку 
-                        expression = exprBackup;
+                        expr = exprBackup;
                         throw e;
                     }
 
                     // Ищем и удаляем закрывающую скобку ')' после Addition
-                    if (Parser.Symbols.TrimCloseGroupBracesAndWhiteSpace(ref expression))
+                    if (Parser.Symbols.TrimCloseGroupBracesAndWhiteSpace(ref expr))
                         return addNode;
                     else
                     {
                         // Закрывающая скобка не найдена
                         // следовательно входная строка не соответствует '(' Addition ')'
-                        throw new FatalParseError($"ParseBracketedAddition: not found '{Parser.Symbols.closeGroupBrace}'", expression);
+                        throw new FatalParseError($"ParseBracketedAddition: not found '{Parser.Symbols.closeGroupBrace}'", expr);
                     }
                 }
                 else
                 {
                     // Открывающая '(' скобка не найдена
                     // следовательно входная строка не соответствует '(' Addition ')'
-                    throw new ParseError($"ParseBracketedAddition: not found '{Parser.Symbols.openGroupBrace}'", expression);
+                    throw new ParseError($"ParseBracketedAddition: not found '{Parser.Symbols.openGroupBrace}'", expr);
                 }
             }
             catch(ParseError e)
             {
                 // Восстанавливаем входную строку 
-                expression = exprBackup;
+                expr = exprBackup;
                 throw e;
             }
         }
@@ -532,27 +532,27 @@ namespace AstralVariables.Expressions
         ///                | Function
         ///                | Value
         /// </summary>
-        /// <param name="expression"></param>
+        /// <param name="expr"></param>
         /// <returns></returns>
-        public static NumberAstNode ParseMultiplication(ref string expression)
+        public static NumberAstNode ParseMultiplication(ref string expr)
         {
-            return ParseMultiplication(ref expression, null);
+            return ParseMultiplication(ref expr, null);
         }
-        public static NumberAstNode ParseMultiplication(ref string expression, NumberAstNode left)
+        public static NumberAstNode ParseMultiplication(ref string expr, NumberAstNode left)
         {
-            string exprBackup = expression;
+            string exprBackup = expr;
 			NumberAstNode leftOperand = left;
             ErrorList subError = new ErrorList();
             //StringBuilder errorMess = new StringBuilder();
 
-            expression = expression.TrimStart();
+            expr = expr.TrimStart();
 
             try
             {
                 if(leftOperand == null)
 				{
 					// Левый операнд не был задан при вызове метода
-					if (string.IsNullOrWhiteSpace(expression) || string.IsNullOrEmpty(expression))
+					if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
                         throw new FatalParseError("ParseMultiplication: Expression string is empty");
 
                     // Пробуем извлечь левый операнд вида '(' Addition ')' 
@@ -561,7 +561,7 @@ namespace AstralVariables.Expressions
                         try
                         {
                             // Извлекаем '(' Addition ')' 
-                            leftOperand = ParseBracketedAddition(ref expression);
+                            leftOperand = ParseBracketedAddition(ref expr);
                         }
                         catch (ParseError brAdditionErr)
                         {
@@ -570,13 +570,13 @@ namespace AstralVariables.Expressions
 
                             // Входная строка не содержит выражения, соответствующего '(' Addition ')' 
                             // Восстанавливаем входную строку 
-                            expression = exprBackup;
+                            expr = exprBackup;
 
                             // Пробуем извлечь левый операнд типа Function
                             try
                             {
                                 //  Пробуем извлечь левый операнд вида Function
-                                leftOperand = ParseFunction(ref expression);
+                                leftOperand = ParseFunction(ref expr);
                             }
                             catch (ParseError funErr)
                             {
@@ -585,12 +585,12 @@ namespace AstralVariables.Expressions
 
                                 // Входная строка не содержит выражения, соответствующего Function 
                                 // Восстанавливаем входную строку 
-                                expression = exprBackup;
+                                expr = exprBackup;
 
                                 // Извлекаем Value
                                 try
                                 {
-                                    leftOperand = ParseValue(ref expression);
+                                    leftOperand = ParseValue(ref expr);
                                 }
                                 catch (ParseError valErr)
                                 {
@@ -601,14 +601,14 @@ namespace AstralVariables.Expressions
                                     // Восстанавливаем входную строку 
                                     //errorMess.Insert(0, "ParseMultiplication: No {BracketedAddition}, {Function} or {Value} was found where should be {LeftOperand}:\n");
                                     //throw new ParseError(subErrors, errorMess.ToString(), expression);
-                                    throw new ParseError(subError, "ParseMultiplication: No {BracketedAddition}, {Function} or {Value} was found where should be {LeftOperand}", expression);
+                                    throw new ParseError(subError, "ParseMultiplication: No {BracketedAddition}, {Function} or {Value} was found where should be {LeftOperand}", expr);
                                 }
                             }
                         }
                     }
                     catch (FatalParseError fatErr)
                     {
-                        expression = exprBackup;
+                        expr = exprBackup;
                         subError.Add(fatErr);
                         throw new FatalParseError(subError, "ParseMultiplication: Fatal error", fatErr.expression);
                     }
@@ -616,18 +616,18 @@ namespace AstralVariables.Expressions
 
                     if (leftOperand == null)
                     {
-                        expression = exprBackup;
+                        expr = exprBackup;
                         //errorMess.Insert(0, "ParseMultiplication: {LeftOperand} not found:\n");
                         //throw new ParseError(errorMess.ToString(), expression);
-                        throw new ParseError(subError, "ParseMultiplication: {LeftOperand} not found", expression);
+                        throw new ParseError(subError, "ParseMultiplication: {LeftOperand} not found", expr);
                     }
 					
                     ///
                     /// Проверяем правую часть правила Multiplication
                     ///		
-					if (string.IsNullOrWhiteSpace(expression) || string.IsNullOrEmpty(expression))
+					if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
                         return leftOperand;
-					else return ParseMultiplication(ref expression, leftOperand);					
+					else return ParseMultiplication(ref expr, leftOperand);					
 				}
 				else
 				{
@@ -636,12 +636,12 @@ namespace AstralVariables.Expressions
 					///
 					/// Извлекаем математический оператор
 					///
-					MathOperatorType operatorType = Parser.Symbols.TrimMultiplicationOperatorAndWhiteSpace(ref expression);
+					MathOperatorType operatorType = Parser.Symbols.TrimMultiplicationOperatorAndWhiteSpace(ref expr);
 					if(operatorType != MathOperatorType.NOP)
 					{
 						// Найден математический оператор
 						// Сохраняем резервную копию входной строки без математического оператора
-						string exprBackup2 = expression;
+						string exprBackup2 = expr;
 						
 						NumberAstNode rightOperand = null;
 
@@ -650,7 +650,7 @@ namespace AstralVariables.Expressions
                             try
                             {
                                 // Пробуем извлечь второй опренад вида '(' Addition ')' 
-                                rightOperand = ParseBracketedAddition(ref expression);
+                                rightOperand = ParseBracketedAddition(ref expr);
                             }
                             catch (ParseError brAddErr)
                             {
@@ -661,7 +661,7 @@ namespace AstralVariables.Expressions
                                 // Пробуем извлеч второй операнд типа Function
                                 try
                                 {
-                                    rightOperand = ParseFunction(ref expression);
+                                    rightOperand = ParseFunction(ref expr);
                                 }
                                 catch (ParseError funErr)
                                 {
@@ -670,12 +670,12 @@ namespace AstralVariables.Expressions
                                     subError.Add(funErr);
 
                                     // Восстанавливаем входную строку
-                                    expression = exprBackup2;
+                                    expr = exprBackup2;
 
                                     // Пробуем извлеч второй операнд типа Value
                                     try
                                     {
-                                        rightOperand = ParseValue(ref expression);
+                                        rightOperand = ParseValue(ref expr);
                                     }
                                     catch (ParseError valErr)
                                     {
@@ -683,14 +683,14 @@ namespace AstralVariables.Expressions
                                         //errorMess.AppendLine(/*).Append(Parser.Symbols.Tab).Append(*/valErr.Message);
                                         //errorMess.Insert(0, "ParseMultiplication: No {BracketedAddition}, {Function} or {Value} was found where should be {RightOperand}:\n");
                                         //throw new ParseError(errorMess.ToString(), expression);
-                                        throw new ParseError(subError, "ParseMultiplication: No {BracketedAddition}, {Function} or {Value} was found where should be {RightOperand}", expression);
+                                        throw new ParseError(subError, "ParseMultiplication: No {BracketedAddition}, {Function} or {Value} was found where should be {RightOperand}", expr);
                                     }
                                 }
                             }
                         }
                         catch (FatalParseError fatErr)
                         {
-                            expression = exprBackup;
+                            expr = exprBackup;
                             subError.Add(fatErr);
                             throw new FatalParseError(subError, "ParseMultiplication: Fatal error", fatErr.expression);
                         }
@@ -703,11 +703,11 @@ namespace AstralVariables.Expressions
                         {
                             //errorMess.Insert(0, "ParseMultiplication: {RightOperand} not found:\n");
                             //throw new ParseError(errorMess.ToString(), expression);
-                            throw new FatalParseError(subError, "ParseMultiplication: {RightOperand} not found", expression);
+                            throw new FatalParseError(subError, "ParseMultiplication: {RightOperand} not found", expr);
                         }
 					
 						leftOperand = CreateOperatorNode(operatorType, leftOperand, rightOperand);
-						return ParseMultiplication(ref expression, leftOperand);
+						return ParseMultiplication(ref expr, leftOperand);
 					}
                     else
                     {
@@ -727,7 +727,7 @@ namespace AstralVariables.Expressions
             catch (Exception e)
 			{
 				// Восстанавливаем входную строку
-				expression = exprBackup;
+				expr = exprBackup;
 				throw e;
 			}
         }
@@ -735,41 +735,41 @@ namespace AstralVariables.Expressions
         /// <summary>
         /// Обработка правила Function
         /// </summary>
-        /// <param name="expression"></param>
+        /// <param name="expr"></param>
         /// <returns>Узел синтаксического дерева NumberAstNode</returns>
-        public static NumberAstNode ParseFunction(ref string expression)
+        public static NumberAstNode ParseFunction(ref string expr)
         {
-            string exprBackup = expression;
+            string exprBackup = expr;
             ErrorList subErrors = new ErrorList();
             
             try
             { 
                 try
                 {
-                    return ParseItemCount(ref expression);
+                    return ParseItemCount(ref expr);
                 }
                 catch (ParseError itemCntErr)
                 {
-                    expression = exprBackup;
+                    expr = exprBackup;
                     subErrors.Add(itemCntErr);
                     //errorMess.AppendLine(/*).Append(Parser.Symbols.Tab).Append(*/itemCntErr.Message);
 
                     try
                     {
-                        return ParseNumericCount(ref expression);
+                        return ParseNumericCount(ref expr);
                     }
                     catch (ParseError numCntErr)
                     {
-                        expression = exprBackup;
+                        expr = exprBackup;
                         subErrors.Add(numCntErr);
                         //errorMess.AppendLine(/*).Append(Parser.Symbols.Tab).Append(*/numCntErr.Message);
                         try
                         {
-                            return ParseRandom(ref expression);
+                            return ParseRandom(ref expr);
                         }
                         catch (ParseError rndErr)
                         {
-                            expression = exprBackup;
+                            expr = exprBackup;
                             subErrors.Add(rndErr);
                             //errorMess.AppendLine(/*).Append(Parser.Symbols.Tab).Append(*/rndErr.Message);
                         }
@@ -778,17 +778,17 @@ namespace AstralVariables.Expressions
             }
             catch (FatalParseError fatErr)
             {
-                expression = exprBackup;
+                expr = exprBackup;
                 subErrors.Add(fatErr);
                 throw new FatalParseError(subErrors, "ParseMultiplication: Fatal error", fatErr.expression);
             }
 
-            expression = exprBackup;
+            expr = exprBackup;
             
             //errorMess.Insert(0, "ParseFunction: No {ItemCount}, {NumericCount} or {Random} functor was found:\n");
             //throw new ParseError(errorMess.ToString(), expression);
             
-            throw new ParseError(subErrors, "ParseFunction: No {ItemCount}, {NumericCount} or {Random} functor was found", expression);
+            throw new ParseError(subErrors, "ParseFunction: No {ItemCount}, {NumericCount} or {Random} functor was found", expr);
         }
 
         /// <summary>
@@ -796,64 +796,64 @@ namespace AstralVariables.Expressions
         /// В случае успеха соответствующая функции подстрока удаляется из expression
         /// В противном случае генерируется исключение ParseError
         /// </summary>
-        /// <param name="expression"></param>
+        /// <param name="expr"></param>
         /// <returns>Узел синтаксического дерева ItemCount</returns>
-        public static ItemCount ParseItemCount(ref string expression)
+        public static ItemCount ParseItemCount(ref string expr)
         {
-            string exprBackup = expression;
+            string exprBackup = expr;
 
             try
             {
-                if (string.IsNullOrWhiteSpace(expression) || string.IsNullOrEmpty(expression))
+                if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
                 {
                     throw new FatalParseError("ParseItemCount: Expression string is empty");
                 }
 
-                expression = expression.TrimStart();
+                expr = expr.TrimStart();
 
-                if (expression.StartsWith(Parser.Predicates.CountItem, StringComparison.OrdinalIgnoreCase))
+                if (expr.StartsWith(Parser.Predicates.CountItem, StringComparison.OrdinalIgnoreCase))
                 {
-                    expression = expression.Substring(Parser.Predicates.CountItem.Length);
+                    expr = expr.Substring(Parser.Predicates.CountItem.Length);
 
-                    if(Parser.Symbols.TrimOpenGroupBracesAndWhiteSpace(ref expression))
+                    if(Parser.Symbols.TrimOpenGroupBracesAndWhiteSpace(ref expr))
                     {
                         try
                         {
-                            string id = ParseId(ref expression);
+                            string id = ParseId(ref expr);
 
-                            if (Parser.Symbols.TrimCloseGroupBracesAndWhiteSpace(ref expression))
+                            if (Parser.Symbols.TrimCloseGroupBracesAndWhiteSpace(ref expr))
                                 return new ItemCount(id);
-                            else throw new FatalParseError($"ParseItemCount: '{Parser.Symbols.closeGroupBrace}' does not found after {{ItemId}}", expression);
+                            else throw new FatalParseError($"ParseItemCount: '{Parser.Symbols.closeGroupBrace}' does not found after {{ItemId}}", expr);
                         }
                         catch(BaseParseError idErr)
                         {
-                            throw new FatalParseError(new ErrorList {idErr}, $"ParseItemCount: {{ItemId}} does not found after '{Parser.Symbols.openGroupBrace}'", expression);
+                            throw new FatalParseError(new ErrorList {idErr}, $"ParseItemCount: {{ItemId}} does not found after '{Parser.Symbols.openGroupBrace}'", expr);
                         }
                     }
-                    else throw new FatalParseError($"ParseItemCount: '{Parser.Symbols.openGroupBrace}' does not found after {{{Parser.Predicates.CountItem}}} predicate", expression);
+                    else throw new FatalParseError($"ParseItemCount: '{Parser.Symbols.openGroupBrace}' does not found after {{{Parser.Predicates.CountItem}}} predicate", expr);
                 }
-                else throw new ParseError($"ParseItemCount: Predicate {{{Parser.Predicates.CountItem}}} does not found at the beginning of the expression", expression);
+                else throw new ParseError($"ParseItemCount: Predicate {{{Parser.Predicates.CountItem}}} does not found at the beginning of the expression", expr);
             }
             catch (Exception e)
             {
-                expression = exprBackup;
+                expr = exprBackup;
                 throw e;
             }
         }
-        public static ItemCount ParseRegexItemCount(ref string expression)
+        public static ItemCount ParseRegexItemCount(ref string expr)
         {
-            string exprBackup = expression;
+            string exprBackup = expr;
 
             try
             {
-                if (string.IsNullOrWhiteSpace(expression) || string.IsNullOrEmpty(expression))
+                if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
                 {
                     throw new FatalParseError("Expression string is empty");
                 }
 
-                expression = expression.TrimStart();
+                expr = expr.TrimStart();
 
-                if (expression.StartsWith(Parser.Predicates.CountItem, StringComparison.OrdinalIgnoreCase))
+                if (expr.StartsWith(Parser.Predicates.CountItem, StringComparison.OrdinalIgnoreCase))
                 {
                     // Обнаружен предикативны литерал CountItem
                     int i = Parser.Predicates.CountItem.Length;
@@ -877,9 +877,9 @@ namespace AstralVariables.Expressions
                     bool possibleParseErrorFlag = false;
 
                     // Производим поиск первой открывающей и финальной закрывающей скобок
-                    for (; i < expression.Length; i++)
+                    for (; i < expr.Length; i++)
                     {
-                        if (Parser.Symbols.IsOpenGroupBraces(expression[i]) // '('
+                        if (Parser.Symbols.IsOpenGroupBraces(expr[i]) // '('
                             && !possibleParseErrorFlag)
                         {
                             if (openRoundBrace == 0)
@@ -887,15 +887,15 @@ namespace AstralVariables.Expressions
                                 openBraceInd = i;
                             openRoundBrace++;
                         }
-                        else if (Parser.Symbols.IsCloseGroupBraces(expression[i])) // ')'
+                        else if (Parser.Symbols.IsCloseGroupBraces(expr[i])) // ')'
                             closeRoundBrace++;
                         // Проверяем является ли текущий символ алфавитно-цифровым, подчеркиванием или знаком подстановки
-                        else if ((Parser.Symbols.IsLetterOrDigit(expression[i]) || Parser.Symbols.IsUnderscore(expression[i]) || Parser.Symbols.IsWildcard(expression[i]))
+                        else if ((Parser.Symbols.IsLetterOrDigit(expr[i]) || Parser.Symbols.IsUnderscore(expr[i]) || Parser.Symbols.IsWildcard(expr[i]))
                                 && !possibleParseErrorFlag)
                         {
                             idCharNumber++;
                         }
-                        else if (char.IsWhiteSpace(expression[i]))
+                        else if (char.IsWhiteSpace(expr[i]))
                         {
                             // Если число значимых симвлов аргумента больше 0,
                             // следовательно обнаруженный пробел находится в середине строки-аргумента
@@ -906,7 +906,7 @@ namespace AstralVariables.Expressions
                         else
                         {
                             if (possibleParseErrorFlag)
-                                throw new FatalParseError($"ParseItemCount: Have '{expression[i]}' when there should be '{Parser.Symbols.closeRoundBrace}'", expression);
+                                throw new FatalParseError($"ParseItemCount: Have '{expr[i]}' when there should be '{Parser.Symbols.closeRoundBrace}'", expr);
                             idCharNumber++;
                         }
 
@@ -916,13 +916,13 @@ namespace AstralVariables.Expressions
                             // Найдена финальная закрывающая скобка для списка аргументов Counter
 
                             if ((i - openBraceInd - 1) < 1)
-                                throw new FatalParseError("ParseItemCount: {ItemId} is Empty string", expression.Substring(i));
+                                throw new FatalParseError("ParseItemCount: {ItemId} is Empty string", expr.Substring(i));
 
                             // Извлекаем строку аргументов
-                            string arg = expression.Substring(openBraceInd + 1, i - openBraceInd - 1);
+                            string arg = expr.Substring(openBraceInd + 1, i - openBraceInd - 1);
 
                             // Удалени распознанной подстроки из expression
-                            expression = expression.Remove(0, i + 1);
+                            expr = expr.Remove(0, i + 1);
 
                             // формирование узла синтаксического дерева
                             return new ItemCount(arg);
@@ -932,19 +932,19 @@ namespace AstralVariables.Expressions
                         {
                             // Число открывающих скобок меньше числа закрывающих
                             // Следовательно входнаяая строка некорректна
-                            throw new FatalParseError($"ParseItemCount: Have '{Parser.Symbols.closeGroupBrace}' when there should be {{ItemId}}", expression);
+                            throw new FatalParseError($"ParseItemCount: Have '{Parser.Symbols.closeGroupBrace}' when there should be {{ItemId}}", expr);
                         }
                     }
 
                     // Неожиданное окончание входной строки
-                    throw new FatalParseError($"ParseItemCount: Open braces is {openRoundBrace}. Close Braces is {closeRoundBrace}. Unexpected end of expression", expression);
+                    throw new FatalParseError($"ParseItemCount: Open braces is {openRoundBrace}. Close Braces is {closeRoundBrace}. Unexpected end of expression", expr);
 
                 }
-                else throw new ParseError($"ParseItemCount: Predicate {{{Parser.Predicates.CountItem}}} does not found at the beginning of the expression", expression);
+                else throw new ParseError($"ParseItemCount: Predicate {{{Parser.Predicates.CountItem}}} does not found at the beginning of the expression", expr);
             }
             catch (Exception e)
             {
-                expression = exprBackup;
+                expr = exprBackup;
                 throw e;
             }
         }
@@ -954,65 +954,65 @@ namespace AstralVariables.Expressions
         /// В случае успеха соответствующая функции подстрока удаляется из expression
         /// В противном случае генерируется исключение ParseError
         /// </summary>
-        /// <param name="expression"></param>
+        /// <param name="expr"></param>
         /// <returns>Узел синтаксического дерева NumericCount</returns>
-        public static NumericCount ParseNumericCount(ref string expression)
+        public static NumericCount ParseNumericCount(ref string expr)
         {
-            string exprBackup = expression;
+            string exprBackup = expr;
 
             try
             {
-                if (string.IsNullOrWhiteSpace(expression) || string.IsNullOrEmpty(expression))
+                if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
                 {
                     throw new FatalParseError("ParseNumericCount: Expression string is empty");
                 }
 
-                expression = expression.TrimStart();
+                expr = expr.TrimStart();
 
-                if (expression.StartsWith(Parser.Predicates.CountNumeric, StringComparison.OrdinalIgnoreCase))
+                if (expr.StartsWith(Parser.Predicates.CountNumeric, StringComparison.OrdinalIgnoreCase))
                 {
                     // Обнаружен предикативны литерал CountNumeric
-                    expression = expression.Substring(Parser.Predicates.CountNumeric.Length);
+                    expr = expr.Substring(Parser.Predicates.CountNumeric.Length);
 
-                    if (Parser.Symbols.TrimOpenGroupBracesAndWhiteSpace(ref expression))
+                    if (Parser.Symbols.TrimOpenGroupBracesAndWhiteSpace(ref expr))
                     {
                         try
                         {
-                            string id = ParseId(ref expression);
+                            string id = ParseId(ref expr);
 
-                            if (Parser.Symbols.TrimCloseGroupBracesAndWhiteSpace(ref expression))
+                            if (Parser.Symbols.TrimCloseGroupBracesAndWhiteSpace(ref expr))
                                 return new NumericCount(id);
-                            else throw new FatalParseError($"ParseNumericCount: '{Parser.Symbols.closeGroupBrace}' does not found after {{NumericId}}", expression);
+                            else throw new FatalParseError($"ParseNumericCount: '{Parser.Symbols.closeGroupBrace}' does not found after {{NumericId}}", expr);
                         }
                         catch (BaseParseError idErr)
                         {
-                            throw new FatalParseError(new ErrorList { idErr }, $"ParseItemCount: {{NumericId}} does not found after '{Parser.Symbols.openGroupBrace}'", expression);
+                            throw new FatalParseError(new ErrorList { idErr }, $"ParseItemCount: {{NumericId}} does not found after '{Parser.Symbols.openGroupBrace}'", expr);
                         }
                     }
-                    else throw new FatalParseError($"ParseNumericCount: '{Parser.Symbols.openGroupBrace}' does not found after {{{Parser.Predicates.CountNumeric}}} predicate", expression);
+                    else throw new FatalParseError($"ParseNumericCount: '{Parser.Symbols.openGroupBrace}' does not found after {{{Parser.Predicates.CountNumeric}}} predicate", expr);
                 }
-                else throw new ParseError($"ParseNumericCount: Predicate {{{Parser.Predicates.CountNumeric}}} does not found at the beginning of the expression", expression);
+                else throw new ParseError($"ParseNumericCount: Predicate {{{Parser.Predicates.CountNumeric}}} does not found at the beginning of the expression", expr);
             }
             catch (Exception e)
             {
-                expression = exprBackup;
+                expr = exprBackup;
                 throw e;
             }
         }
-        public static NumericCount ParseRegexNumericCount(ref string expression)
+        public static NumericCount ParseRegexNumericCount(ref string expr)
         {
-            string exprBackup = expression;
+            string exprBackup = expr;
 
             try
             {
-                if (string.IsNullOrWhiteSpace(expression) || string.IsNullOrEmpty(expression))
+                if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
                 {
                     throw new FatalParseError("ParseNumericCount: Expression string is empty");
                 }
 
-                expression = expression.TrimStart();
+                expr = expr.TrimStart();
 
-                if (expression.StartsWith(Parser.Predicates.CountNumeric, StringComparison.OrdinalIgnoreCase))
+                if (expr.StartsWith(Parser.Predicates.CountNumeric, StringComparison.OrdinalIgnoreCase))
                 {
                     // Обнаружен предикативны литерал CountNumeric
                     int i = Parser.Predicates.CountNumeric.Length;
@@ -1036,9 +1036,9 @@ namespace AstralVariables.Expressions
                     bool possibleParseErrorFlag = false;
 
                     // Производим поиск первой открывающей и финальной закрывающей скобок
-                    for (; i < expression.Length; i++)
+                    for (; i < expr.Length; i++)
                     {
-                        if (Parser.Symbols.IsOpenGroupBraces(expression[i]) // '('
+                        if (Parser.Symbols.IsOpenGroupBraces(expr[i]) // '('
                             && !possibleParseErrorFlag)
                         {
                             if (openRoundBrace == 0)
@@ -1046,15 +1046,15 @@ namespace AstralVariables.Expressions
                                 openBraceInd = i;
                             openRoundBrace++;
                         }
-                        else if (Parser.Symbols.IsCloseGroupBraces(expression[i])) // ')'
+                        else if (Parser.Symbols.IsCloseGroupBraces(expr[i])) // ')'
                             closeRoundBrace++;
                         // Проверяем является ли текущий символ алфавитно-цифровым, подчеркиванием или знаком подстановки
-                        else if ((Parser.Symbols.IsLetterOrDigit(expression[i]) || Parser.Symbols.IsUnderscore(expression[i]) || Parser.Symbols.IsWildcard(expression[i]))
+                        else if ((Parser.Symbols.IsLetterOrDigit(expr[i]) || Parser.Symbols.IsUnderscore(expr[i]) || Parser.Symbols.IsWildcard(expr[i]))
                                 && !possibleParseErrorFlag)
                         {
                             idCharNumber++;
                         }
-                        else if (char.IsWhiteSpace(expression[i]))
+                        else if (char.IsWhiteSpace(expr[i]))
                         {
                             // Если число значимых символов аргумента больше 0,
                             // следовательно обнаруженный пробел находится в середине строки-аргумента
@@ -1065,7 +1065,7 @@ namespace AstralVariables.Expressions
                         else
                         {
                             if (possibleParseErrorFlag)
-                                throw new FatalParseError($"ParseNumericCount: Have '{expression[i]}' when there should be '{Parser.Symbols.closeRoundBrace}'", expression);
+                                throw new FatalParseError($"ParseNumericCount: Have '{expr[i]}' when there should be '{Parser.Symbols.closeRoundBrace}'", expr);
                             idCharNumber++;
                         }
 
@@ -1074,13 +1074,13 @@ namespace AstralVariables.Expressions
                         {
                             // Найдена финальная закрывающая скобка для списка аргументов Counter
                             if ((i - openBraceInd - 1) < 1)
-                                throw new FatalParseError("ParseNumericCount: {NumericId} is Empty string", expression.Substring(i));
+                                throw new FatalParseError("ParseNumericCount: {NumericId} is Empty string", expr.Substring(i));
 
                             // Извлекаем строку аргументов
-                            string arg = expression.Substring(openBraceInd + 1, i - openBraceInd - 1);
+                            string arg = expr.Substring(openBraceInd + 1, i - openBraceInd - 1);
 
                             // Удалени распознанной подстроки из expression
-                            expression = expression.Remove(0, i + 1);
+                            expr = expr.Remove(0, i + 1);
 
                             // формирование узла синтаксического дерева
                             return new NumericCount(arg);
@@ -1090,18 +1090,18 @@ namespace AstralVariables.Expressions
                         {
                             // Число открывающих скобок меньше числа закрывающих
                             // Следовательно входнаяая строка некорректна
-                            throw new FatalParseError($"ParseNumericCount: Have '{Parser.Symbols.closeGroupBrace}' when there should be {{NumericId}}", expression);
+                            throw new FatalParseError($"ParseNumericCount: Have '{Parser.Symbols.closeGroupBrace}' when there should be {{NumericId}}", expr);
                         }
                     }
 
                     // Неожиданное окончание входной строки
-                    throw new FatalParseError($"ParseNumericCount: Open braces is {openRoundBrace}. Close Braces is {closeRoundBrace}. Unexpected end of expression", expression);
+                    throw new FatalParseError($"ParseNumericCount: Open braces is {openRoundBrace}. Close Braces is {closeRoundBrace}. Unexpected end of expression", expr);
                 }
-                else throw new ParseError($"ParseNumericCount: Predicate {{{Parser.Predicates.CountNumeric}}} does not found at the beginning of the expression", expression);
+                else throw new ParseError($"ParseNumericCount: Predicate {{{Parser.Predicates.CountNumeric}}} does not found at the beginning of the expression", expr);
             }
             catch (Exception e)
             {
-                expression = exprBackup;
+                expr = exprBackup;
                 throw e;
             }
         }
@@ -1111,29 +1111,29 @@ namespace AstralVariables.Expressions
         /// В случае успеха соответствующая функции подстрока удаляется из expression
         /// В противном случае генерируется исключение ParseError
         /// </summary>
-        /// <param name="expression"></param>
+        /// <param name="expr"></param>
         /// <returns>Узел синтаксического дерева RandomNumber</returns>
-        public static RandomNumber ParseRandom(ref string expression)
+        public static RandomNumber ParseRandom(ref string expr)
         {
-            string exprBackup = expression;
+            string exprBackup = expr;
             ErrorList subErrors = new ErrorList();
 
             try
             {
-                if (string.IsNullOrWhiteSpace(expression) || string.IsNullOrEmpty(expression))
+                if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
                 {
                     throw new FatalParseError("ParseRandom: Expression string is empty");
                 }
 
-                expression = expression.TrimStart();
+                expr = expr.TrimStart();
 
-                if (expression.StartsWith(Parser.Predicates.Random, StringComparison.OrdinalIgnoreCase))
+                if (expr.StartsWith(Parser.Predicates.Random, StringComparison.OrdinalIgnoreCase))
                 {
                     // Обнаружен предикативный литерал 'Random'
-                    expression = expression.Substring(Parser.Predicates.Random.Length);
+                    expr = expr.Substring(Parser.Predicates.Random.Length);
 
                     // Ищем открывающую скобку '('
-                    if (Parser.Symbols.TrimOpenGroupBracesAndWhiteSpace(ref expression))
+                    if (Parser.Symbols.TrimOpenGroupBracesAndWhiteSpace(ref expr))
 					{
 						// Найдена открывающая скобка '('
 						
@@ -1141,7 +1141,7 @@ namespace AstralVariables.Expressions
 						NumberAstNode operand = null;
 						try
 						{
-							operand = ParseAddition(ref expression);
+							operand = ParseAddition(ref expr);
 						}
 						catch (ParseError opErr)
 						{
@@ -1151,7 +1151,7 @@ namespace AstralVariables.Expressions
                         }
 						
 						// Ищем закрывающую скобку ')'
-						if(Parser.Symbols.TrimCloseGroupBracesAndWhiteSpace(ref expression))
+						if(Parser.Symbols.TrimCloseGroupBracesAndWhiteSpace(ref expr))
 						{
 							// Найдена закрывающая скобка ')'
 							
@@ -1163,21 +1163,21 @@ namespace AstralVariables.Expressions
 							// Закрывающая скобка ')' не найдена
 							// следовательно входная строка не соответствует правилу Random
 							// Восстанавливаем входную строку
-							throw new FatalParseError(subErrors, $"ParseRandom: Symbol '{Parser.Symbols.closeGroupBrace}' does not found", expression);
+							throw new FatalParseError(subErrors, $"ParseRandom: Symbol '{Parser.Symbols.closeGroupBrace}' does not found", expr);
 
                         }
 					}
 					else
 					{
 						// Открывающая скобка '(' не найдена
-						throw new FatalParseError($"ParseRandom: Symbol '{Parser.Symbols.openGroupBrace}' does not found after {{{Parser.Predicates.Random}}} predicate", expression);
+						throw new FatalParseError($"ParseRandom: Symbol '{Parser.Symbols.openGroupBrace}' does not found after {{{Parser.Predicates.Random}}} predicate", expr);
 					}
                 }
-                else throw new ParseError($"ParseRandom: Predicate {{{Parser.Predicates.Random}}} does not found at the beginning of the expression", expression);
+                else throw new ParseError($"ParseRandom: Predicate {{{Parser.Predicates.Random}}} does not found at the beginning of the expression", expr);
             }
             catch (Exception e)
             {
-                expression = exprBackup;
+                expr = exprBackup;
                 throw e;
             }
         }

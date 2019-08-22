@@ -2,39 +2,44 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace AstralVariables.Expressions
 {
     /// <summary>
     /// Класс, описывающий и вычисляющий результат выражение
     /// </summary>
+    [Serializable]
     public abstract class AbstractExpression
     {
+        [NonSerialized]
+        protected string expression;
         /// <summary>
         /// Исходное строковое представление выражения
         /// </summary>
-        protected string _expression;
+        [XmlText]
         public string Expression
         {
-            get => _expression;
+            get => expression;
             set
             {
-                if (value != _expression)
+                if (value != expression)
                 {
                     ResetInternal();
-                    _expression = value;
+                    expression = value;
                     Parse();
                 }
             }
         }
         protected virtual void ResetInternal()
         {
-            parseError = null;
+            ParseError = null;
         }
 
         /// <summary>
         /// Флаг корректности выражения и успешного формирования Абстрактного синтаксического дерева
         /// </summary>
+        [XmlIgnore]
         public abstract bool IsValid { get; }
 
         /// <summary>
@@ -54,11 +59,12 @@ namespace AstralVariables.Expressions
         /// Ошибка разбора выражения expression
         /// возникшая при выполнении Parse()
         /// </summary>
-        public BaseParseError parseError { get; protected set; }
+        [XmlIgnore]
+        public BaseParseError ParseError { get; protected set; }
 
         public override string ToString()
         {
-            return Expression;
+            return expression;
         }
 
         /// <summary>
@@ -74,15 +80,16 @@ namespace AstralVariables.Expressions
         /// <summary>
         /// Корень Абстрактного синтаксического дерева
         /// </summary>
+        [XmlIgnore]
         protected AstNode<T> ast;
-        public  AstNode<T> AST { get => ast; }
+        [XmlIgnore]
+        public AstNode<T> AST { get => ast; }
 
         protected override void ResetInternal()
         {
             base.ResetInternal();
             ast = null;
         }
-
 
         /// <summary>
         /// Вычисление результата выражения
@@ -113,8 +120,8 @@ namespace AstralVariables.Expressions
                 return AST.Description(indent);
             else
             {
-                if (parseError == null)
-                    return DescribeErrorMessage(parseError, indent);
+                if (ParseError == null)
+                    return DescribeErrorMessage(ParseError, indent);
             }
             return string.Empty;
         }

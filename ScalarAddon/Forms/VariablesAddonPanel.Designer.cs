@@ -35,7 +35,7 @@
             // lblAuthor
             // 
             this.lblAuthor.AutoSize = true;
-            this.lblAuthor.Location = new System.Drawing.Point(131, 0);
+            this.lblAuthor.Location = new System.Drawing.Point(131, 12);
             this.lblAuthor.Name = "lblAuthor";
             this.lblAuthor.Size = new System.Drawing.Size(97, 13);
             this.lblAuthor.TabIndex = 0;
@@ -58,6 +58,7 @@
             this.Controls.Add(this.btnTest);
             this.Controls.Add(this.lblAuthor);
             this.Name = "VariablesAddonPanel";
+            this.Size = new System.Drawing.Size(367, 307);
             this.ResumeLayout(false);
             this.PerformLayout();
 

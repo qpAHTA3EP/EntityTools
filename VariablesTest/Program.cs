@@ -375,7 +375,7 @@ namespace VariablesTest
                 else
                 {
                     Console.WriteLine($"Parse faild");
-                    PrintErrorMessage(numExpr.parseError);
+                    PrintErrorMessage(numExpr.ParseError);
                 }
                 Console.WriteLine("================================================");
                 Console.ReadKey();
