@@ -46,9 +46,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ScalarAddon\VariablesAddon.csproj">
+    <ProjectReference Include="..\ScalarAddon\VariablesTools.csproj">
       <Project>{8c13462b-8b43-40a3-b4c1-ea351ae9f1c4}</Project>
-      <Name>VariablesAddon</Name>
+      <Name>VariablesTools</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

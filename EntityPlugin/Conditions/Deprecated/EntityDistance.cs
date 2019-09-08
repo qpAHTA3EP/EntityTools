@@ -1,14 +1,14 @@
 ﻿using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
-using EntityPlugin.Editors;
-using EntityPlugin.Tools;
+using EntityTools.Editors;
+using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 
-namespace EntityPlugin.Conditions
+namespace EntityTools.Conditions
 {
     [Serializable]
     public class EntityDistance : Condition

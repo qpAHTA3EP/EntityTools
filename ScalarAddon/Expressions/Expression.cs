@@ -120,7 +120,7 @@ namespace AstralVariables.Expressions
                 return AST.Description(indent);
             else
             {
-                if (ParseError == null)
+                if (ParseError != null)
                     return DescribeErrorMessage(ParseError, indent);
             }
             return string.Empty;
@@ -130,7 +130,7 @@ namespace AstralVariables.Expressions
         {
             if (sb == null)
                 sb = new StringBuilder();
-            sb.AppendLine().Insert(sb.Length, Parser.Indent, indent).Append(e.Message);
+            sb.Insert(sb.Length, Parser.Indent, indent).Append(e.Message).AppendLine();
             foreach (BaseParseError e2 in e.ErrorStack)
             {
                 DescribeErrorMessage(e2, indent, sb);

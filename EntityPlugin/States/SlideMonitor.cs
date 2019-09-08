@@ -14,12 +14,12 @@ using System.Linq;
 using System.Threading;
 
 
-namespace EntityPlugin.States
+namespace EntityTools.States
 {
     class SlideMonitor : Astral.Logic.Classes.FSM.State
     {
         public override int Priority => 100;
-        public override string DisplayName => typeof(SlideMonitor).Name;
+        public override string DisplayName => GetType().Name;
 #if CHANGE_WAYPOINT_DIST_SETTING
         public override bool NeedToRun => CheckTO.IsTimedOut;
 #else
@@ -122,14 +122,14 @@ namespace EntityPlugin.States
 #if CHANGE_WAYPOINT_DIST_SETTING
             if (IsSliding)
             {
-#if DEBUG
+#if DEBUG_SLIDEMONITOR
                 Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: Set ChangeWaypointDist = {Filter}");
 #endif
                 Astral.API.CurrentSettings.ChangeWaypointDist = Filter;
             }
             else
             {
-#if DEBUG
+#if DEBUG_SLIDEMONITOR
                 Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: Set ChangeWaypointDist = {DefaultChangeWaypointDist}");
 #endif
                 Astral.API.CurrentSettings.ChangeWaypointDist = DefaultChangeWaypointDist;
@@ -142,7 +142,7 @@ namespace EntityPlugin.States
                 && !Astral.Quester.API.Engine.Navigation.IsLastWaypoints)
             {
                 //Astral.Quester.API.Engine.Navigation.Wait = true;
-#if DEBUG
+#if DEBUG_SLIDEMONITOR
                 int prevWPIndex = Astral.Quester.API.Engine.Navigation.CurrentWaypointIndex;
 #endif
                 while (Astral.Quester.API.Engine.Navigation.NextWaypointDistance <= Filter 
@@ -150,7 +150,7 @@ namespace EntityPlugin.States
                 {
                     Astral.Quester.API.Engine.Navigation.SetNextWaypoint();
                 }
-#if DEBUG
+#if DEBUG_SLIDEMONITOR
                 Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: Skip {Astral.Quester.API.Engine.Navigation.CurrentWaypointIndex- prevWPIndex} of waipoints. CurrentWaypointIndex{Astral.Quester.API.Engine.Navigation.CurrentWaypointIndex}");
 #endif
                 //Astral.Quester.API.Engine.Navigation.Wait = false;
@@ -164,7 +164,7 @@ namespace EntityPlugin.States
 
             try
             {
-#if DEBUG
+#if DEBUG_SLIDEMONITOR
                 Logger.WriteLine(Logger.LogType.Debug, $"[{GetType().Name}] Befor Filtering: Waipoints number={Astral.Quester.API.Engine.Navigation.road.Waypoints.Count}; " +
                                  $"CurrentWaypointIndex={Astral.Quester.API.Engine.Navigation.CurrentWaypointIndex}; " +
                                  $"TotalDistanceToDest={Astral.Quester.API.Engine.Navigation.TotalDistanceToDest}");
@@ -178,7 +178,7 @@ namespace EntityPlugin.States
                     newRoad.Waypoints = waypoints;
                     Astral.Quester.API.Engine.Navigation.road = newRoad;
                     Astral.Quester.API.Engine.Navigation.Start();
-#if DEBUG
+#if DEBUG_SLIDEMONITOR
                     Logger.WriteLine(Logger.LogType.Debug, $"[{GetType().Name}] After Filtering: Waipoints number={Astral.Quester.API.Engine.Navigation.road.Waypoints.Count}; " +
                                      $"CurrentWaypointIndex={Astral.Quester.API.Engine.Navigation.CurrentWaypointIndex}; " +
                                      $"TotalDistanceToDest={Astral.Quester.API.Engine.Navigation.TotalDistanceToDest}");
@@ -234,7 +234,7 @@ namespace EntityPlugin.States
                 AttribModNet mod = EntityManager.LocalPlayer.Character.Mods.Find(x => SlidingAuras.Contains(x.PowerDef.InternalName)); //х64
 #endif
 
-#if DEBUG
+#if DEBUG_SLIDEMONITOR
                 if (mod != null && mod.IsValid)
                     Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: Found sliding aura '{mod.PowerDef.InternalName}'");
                 else Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}:  No sliding auras was found");

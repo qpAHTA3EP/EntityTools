@@ -51,7 +51,7 @@ namespace AstralVariables.Expressions.Operand
         {
             //result = val.ReadValue;
 
-            if(VariablesAddon.Variables.TryGetValue(variableName, out result))
+            if(VariablesTools.Variables.TryGetValue(variableName, out result))
                 return true;
             else
             {

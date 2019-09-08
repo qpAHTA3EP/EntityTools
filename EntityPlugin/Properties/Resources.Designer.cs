@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace EntityPlugin.Properties {
+namespace EntityTools.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace EntityPlugin.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("EntityPlugin.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("EntityTools.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -76,6 +76,84 @@ namespace EntityPlugin.Properties {
             get {
                 object obj = ResourceManager.GetObject("EntityIcon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Insignia_Barbed {
+            get {
+                object obj = ResourceManager.GetObject("Insignia_Barbed", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Insignia_Crescent {
+            get {
+                object obj = ResourceManager.GetObject("Insignia_Crescent", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Insignia_Enlightened {
+            get {
+                object obj = ResourceManager.GetObject("Insignia_Enlightened", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Insignia_Illuminated {
+            get {
+                object obj = ResourceManager.GetObject("Insignia_Illuminated", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Insignia_Regal {
+            get {
+                object obj = ResourceManager.GetObject("Insignia_Regal", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Insignia_Universal {
+            get {
+                object obj = ResourceManager.GetObject("Insignia_Universal", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;ArrayOfMountBonusesDef xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&gt;
+        ///&lt;MountBonusesDef&gt;
+        ///&lt;Barbed&gt;1&lt;/Barbed&gt;
+        ///&lt;Crescent&gt;2&lt;/Crescent&gt;
+        ///&lt;InternalName&gt;Survivors_Blessing&lt;/InternalName&gt;
+        ///&lt;NameGL&gt;Survivor&amp;apos;s Blessing&lt;/NameGL&gt;
+        ///&lt;NameRU&gt;Благословение выжившего&lt;/NameRU&gt;
+        ///&lt;DescriptionGL&gt;Whenever you Deflect an attack, you are healed for 1% of your maximum Hit Points over 5 seconds&lt;/DescriptionGL&gt;
+        ///&lt;DescriptionRU&gt;При каж [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string MountBonuses {
+            get {
+                return ResourceManager.GetString("MountBonuses", resourceCulture);
             }
         }
     }

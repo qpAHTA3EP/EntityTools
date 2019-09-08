@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace EntityPlugin.Tools
+namespace EntityTools.Tools
 {
     [Serializable]
     public class MissionNode

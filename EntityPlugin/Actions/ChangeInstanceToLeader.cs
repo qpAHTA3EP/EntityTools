@@ -6,13 +6,13 @@ using System.Threading;
 using Astral.Logic.Classes.Map;
 using Astral.Logic.NW;
 using Astral.Quester.Classes;
-using EntityPlugin.Tools;
+using EntityTools.Tools;
 using MyNW;
 using MyNW.Classes;
 using MyNW.Internals;
 using Action = Astral.Quester.Classes.Action;
 
-namespace EntityPlugin.Actions
+namespace EntityTools.Actions
 {
     [Serializable]
     public class ChangeInstanceToLeader : Astral.Quester.Classes.Action

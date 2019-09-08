@@ -1,25 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Astral;
-using Astral.Forms;
+﻿using Astral.Forms;
+using EntityTools.Tools;
 
-namespace EntityPlugin
+namespace EntityTools
 {
-    public class EntityPlugin : Astral.Addons.Plugin
+    public class EntityTools : Astral.Addons.Plugin
     {
         public static bool DebugInfoEnabled { get; set; }
-
         public override string Name => "Entity Tools";
-
         public override string Author => "MichaelProg";
-
         public override System.Drawing.Image Icon => Properties.Resources.EntityIcon;
 
-        public override BasePanel Settings => new Forms.MainPanel();
+        private BasePanel panel = null;
+        public override BasePanel Settings
+        {
+            get
+            {
+                if (panel == null)
+                    panel = new Forms.MainPanel();
+                return panel;
+            }
+        }
 
-        public EntityPlugin() : base ()
+        public EntityPluginSettings PluginSettings {get;} = new EntityPluginSettings();
+
+        public EntityTools() : base ()
         {
             DebugInfoEnabled = false;
         }
@@ -28,10 +32,10 @@ namespace EntityPlugin
         {
 #if DEBUG
             // Вывод в лог всех States, загруженных в Engine, и их приоритетов
-            foreach (Astral.Logic.Classes.FSM.State state in Astral.Quester.API.Engine.States)
-            {
-                Logger.WriteLine($"{state.DisplayName} {state.Priority}");
-            }
+            //foreach (Astral.Logic.Classes.FSM.State state in Astral.Quester.API.Engine.States)
+            //{
+            //    Logger.WriteLine($"{state.DisplayName} {state.Priority}");
+            //}
 #endif
         }
 

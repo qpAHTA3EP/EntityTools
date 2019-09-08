@@ -1,15 +1,17 @@
 ﻿using Astral.Classes;
 using Astral.Logic.Classes.Map;
+using Astral.Quester.UIEditors;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Design;
 using System.Linq;
 using System.Text;
 
-namespace EntityPlugin.Actions
+namespace EntityTools.Actions
 {
     public class MoveToLeader : Astral.Quester.Classes.Action
     {
@@ -32,6 +34,7 @@ namespace EntityPlugin.Actions
         //[Category("Entity")]
         //public bool PartyCheck { get; set; }
 
+        [Editor(typeof(PositionEditor), typeof(UITypeEditor))]
         public Vector3 Position { get; set; }
 
         public MoveToLeader()
@@ -43,7 +46,16 @@ namespace EntityPlugin.Actions
             StopOnApproached = false;
         }
 
-        public override string ActionLabel => GetType().Name;
+        public override string ActionLabel
+        {
+            get
+            {
+                if (EntityManager.LocalPlayer.PlayerTeam.IsInTeam
+                    && !EntityManager.LocalPlayer.PlayerTeam.IsLeader)
+                        return $"{GetType().Name}: {EntityManager.LocalPlayer.PlayerTeam.Team.Leader.InternalName}";
+                return GetType().Name;
+            }
+        }
 
         public override void OnMapDraw(GraphicsNW graph)
         {
@@ -54,7 +66,15 @@ namespace EntityPlugin.Actions
         {
         }
 
-        protected override bool IntenalConditions => Position.IsValid;
+        protected override bool IntenalConditions
+        {
+            get
+            {
+                return Position.IsValid 
+                        || (EntityManager.LocalPlayer.PlayerTeam.IsInTeam
+                            && !EntityManager.LocalPlayer.PlayerTeam.IsLeader);
+            }
+        }
 
         public override string InternalDisplayName => string.Empty;
 

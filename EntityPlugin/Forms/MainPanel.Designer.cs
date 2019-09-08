@@ -1,7 +1,7 @@
-﻿using EntityPlugin.Tools;
+﻿using EntityTools.Tools;
 using System.IO;
 
-namespace EntityPlugin.Forms
+namespace EntityTools.Forms
 {
     partial class MainPanel
     {
@@ -31,6 +31,7 @@ namespace EntityPlugin.Forms
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.btnEntities = new System.Windows.Forms.Button();
             this.ckbDebugInfo = new System.Windows.Forms.CheckBox();
             this.btnAuras = new System.Windows.Forms.Button();
@@ -42,6 +43,7 @@ namespace EntityPlugin.Forms
             this.fldrBroserDlg = new System.Windows.Forms.FolderBrowserDialog();
             this.tbclMain = new DevExpress.XtraTab.XtraTabControl();
             this.tabOptions = new DevExpress.XtraTab.XtraTabPage();
+            this.cbEnchantHelperActivator = new System.Windows.Forms.CheckBox();
             this.cbSlideMonitor = new System.Windows.Forms.CheckBox();
             this.ckbSpellStuckMonitor = new System.Windows.Forms.CheckBox();
             this.gbSlideMonitor = new System.Windows.Forms.GroupBox();
@@ -55,7 +57,11 @@ namespace EntityPlugin.Forms
             this.seSlideFilter = new DevExpress.XtraEditors.SpinEdit();
             this.lblSlideTimer = new System.Windows.Forms.Label();
             this.tabUtilities = new DevExpress.XtraTab.XtraTabPage();
+            this.btnInterfaces = new System.Windows.Forms.Button();
             this.btnUiViewer = new System.Windows.Forms.Button();
+            this.bteInterfaces = new DevExpress.XtraEditors.ButtonEdit();
+            this.lblInterfaces = new System.Windows.Forms.Label();
+            this.sbSettings = new System.Windows.Forms.BindingSource(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.bteMissions.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bteAuras.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
@@ -66,18 +72,21 @@ namespace EntityPlugin.Forms
             ((System.ComponentModel.ISupportInitialize)(this.seTimerUnslide.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seSlideFilter.Properties)).BeginInit();
             this.tabUtilities.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.bteInterfaces.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.sbSettings)).BeginInit();
             this.SuspendLayout();
             // 
             // btnEntities
             // 
             this.btnEntities.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnEntities.Enabled = false;
             this.btnEntities.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnEntities.Location = new System.Drawing.Point(6, 135);
+            this.btnEntities.Location = new System.Drawing.Point(6, 185);
             this.btnEntities.Name = "btnEntities";
-            this.btnEntities.Size = new System.Drawing.Size(380, 23);
+            this.btnEntities.Size = new System.Drawing.Size(352, 23);
             this.btnEntities.TabIndex = 0;
-            this.btnEntities.Text = "Open the list of the Entities";
+            this.btnEntities.Text = "Test";
             this.btnEntities.UseVisualStyleBackColor = true;
             this.btnEntities.Visible = false;
             this.btnEntities.Click += new System.EventHandler(this.btnEntities_Click);
@@ -96,7 +105,7 @@ namespace EntityPlugin.Forms
             // 
             this.btnAuras.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAuras.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAuras.Location = new System.Drawing.Point(336, 26);
+            this.btnAuras.Location = new System.Drawing.Point(308, 26);
             this.btnAuras.Name = "btnAuras";
             this.btnAuras.Size = new System.Drawing.Size(50, 23);
             this.btnAuras.TabIndex = 2;
@@ -109,15 +118,15 @@ namespace EntityPlugin.Forms
             this.lblAuras.AutoSize = true;
             this.lblAuras.Location = new System.Drawing.Point(14, 12);
             this.lblAuras.Name = "lblAuras";
-            this.lblAuras.Size = new System.Drawing.Size(142, 13);
+            this.lblAuras.Size = new System.Drawing.Size(161, 13);
             this.lblAuras.TabIndex = 3;
-            this.lblAuras.Text = "Export current Auras to file:";
+            this.lblAuras.Text = "Export current Auras to the file:";
             // 
             // btnMissions
             // 
             this.btnMissions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnMissions.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMissions.Location = new System.Drawing.Point(336, 65);
+            this.btnMissions.Location = new System.Drawing.Point(308, 65);
             this.btnMissions.Name = "btnMissions";
             this.btnMissions.Size = new System.Drawing.Size(50, 23);
             this.btnMissions.TabIndex = 2;
@@ -130,15 +139,15 @@ namespace EntityPlugin.Forms
             this.lblMissions.AutoSize = true;
             this.lblMissions.Location = new System.Drawing.Point(14, 51);
             this.lblMissions.Name = "lblMissions";
-            this.lblMissions.Size = new System.Drawing.Size(153, 13);
+            this.lblMissions.Size = new System.Drawing.Size(172, 13);
             this.lblMissions.TabIndex = 3;
-            this.lblMissions.Text = "Export current Missions to file:";
+            this.lblMissions.Text = "Export current Missions to the file:";
             // 
             // bteMissions
             // 
             this.bteMissions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.bteMissions.EditValue = ".\\Logs\\Missions\\%character%Missions.xml";
+            this.bteMissions.EditValue = ".\\Logs\\Missions\\%character%_Missions.xml";
             this.bteMissions.Location = new System.Drawing.Point(6, 67);
             this.bteMissions.Name = "bteMissions";
             this.bteMissions.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
@@ -146,7 +155,7 @@ namespace EntityPlugin.Forms
             this.bteMissions.Properties.NullText = "Enter the Filename where store the Missions";
             this.bteMissions.Properties.NullValuePromptShowForEmptyValue = true;
             this.bteMissions.Properties.ReadOnly = true;
-            this.bteMissions.Size = new System.Drawing.Size(324, 20);
+            this.bteMissions.Size = new System.Drawing.Size(296, 20);
             this.bteMissions.TabIndex = 6;
             this.bteMissions.ToolTip = "File name to store Missions of the current Character. \r\nAllow mask %character%, %" +
     "account%, %dateTime%.";
@@ -156,7 +165,7 @@ namespace EntityPlugin.Forms
             // 
             this.bteAuras.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.bteAuras.EditValue = ".\\Logs\\Auras\\%character%Auras.xml";
+            this.bteAuras.EditValue = ".\\Logs\\Auras\\%character%_Auras.xml";
             this.bteAuras.Location = new System.Drawing.Point(6, 28);
             this.bteAuras.Name = "bteAuras";
             this.bteAuras.Properties.AllowNullInput = DevExpress.Utils.DefaultBoolean.False;
@@ -165,7 +174,7 @@ namespace EntityPlugin.Forms
             this.bteAuras.Properties.NullText = "Enter the Filename where store the Auras";
             this.bteAuras.Properties.NullValuePromptShowForEmptyValue = true;
             this.bteAuras.Properties.ReadOnly = true;
-            this.bteAuras.Size = new System.Drawing.Size(324, 20);
+            this.bteAuras.Size = new System.Drawing.Size(296, 20);
             this.bteAuras.TabIndex = 6;
             this.bteAuras.TabStop = false;
             this.bteAuras.ToolTip = "File name to store Auras of the current Character. \r\nAllow mask %character%, %acc" +
@@ -178,7 +187,7 @@ namespace EntityPlugin.Forms
             this.tbclMain.Location = new System.Drawing.Point(0, 0);
             this.tbclMain.Name = "tbclMain";
             this.tbclMain.SelectedTabPage = this.tabOptions;
-            this.tbclMain.Size = new System.Drawing.Size(398, 416);
+            this.tbclMain.Size = new System.Drawing.Size(367, 307);
             this.tbclMain.TabIndex = 7;
             this.tbclMain.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.tabOptions,
@@ -186,13 +195,25 @@ namespace EntityPlugin.Forms
             // 
             // tabOptions
             // 
+            this.tabOptions.Controls.Add(this.cbEnchantHelperActivator);
             this.tabOptions.Controls.Add(this.cbSlideMonitor);
             this.tabOptions.Controls.Add(this.ckbSpellStuckMonitor);
             this.tabOptions.Controls.Add(this.ckbDebugInfo);
             this.tabOptions.Controls.Add(this.gbSlideMonitor);
             this.tabOptions.Name = "tabOptions";
-            this.tabOptions.Size = new System.Drawing.Size(392, 388);
+            this.tabOptions.Size = new System.Drawing.Size(361, 279);
             this.tabOptions.Text = "Options";
+            // 
+            // cbEnchantHelperActivator
+            // 
+            this.cbEnchantHelperActivator.AutoSize = true;
+            this.cbEnchantHelperActivator.Location = new System.Drawing.Point(12, 223);
+            this.cbEnchantHelperActivator.Name = "cbEnchantHelperActivator";
+            this.cbEnchantHelperActivator.Size = new System.Drawing.Size(131, 17);
+            this.cbEnchantHelperActivator.TabIndex = 9;
+            this.cbEnchantHelperActivator.Text = "Enable EnchantHelper";
+            this.cbEnchantHelperActivator.UseVisualStyleBackColor = true;
+            this.cbEnchantHelperActivator.CheckedChanged += new System.EventHandler(this.cbEnchantHelperActivator_CheckedChanged);
             // 
             // cbSlideMonitor
             // 
@@ -231,7 +252,7 @@ namespace EntityPlugin.Forms
             this.gbSlideMonitor.Controls.Add(this.lblSlideTimer);
             this.gbSlideMonitor.Location = new System.Drawing.Point(2, 57);
             this.gbSlideMonitor.Name = "gbSlideMonitor";
-            this.gbSlideMonitor.Size = new System.Drawing.Size(387, 160);
+            this.gbSlideMonitor.Size = new System.Drawing.Size(356, 160);
             this.gbSlideMonitor.TabIndex = 4;
             this.gbSlideMonitor.TabStop = false;
             // 
@@ -245,10 +266,11 @@ namespace EntityPlugin.Forms
             this.tbSlidingAuras.Location = new System.Drawing.Point(6, 94);
             this.tbSlidingAuras.Multiline = true;
             this.tbSlidingAuras.Name = "tbSlidingAuras";
-            this.tbSlidingAuras.Size = new System.Drawing.Size(375, 60);
+            this.tbSlidingAuras.Size = new System.Drawing.Size(344, 60);
             this.tbSlidingAuras.TabIndex = 3;
             this.tbSlidingAuras.Text = "M10_Becritter_Boat_Costume\r\nVolume_Ground_Slippery\r\nVolume_Ground_Slippery_Player" +
     "only";
+            this.tbSlidingAuras.Visible = false;
             // 
             // seTimerSlide
             // 
@@ -360,29 +382,71 @@ namespace EntityPlugin.Forms
             // tabUtilities
             // 
             this.tabUtilities.Controls.Add(this.lblAuras);
+            this.tabUtilities.Controls.Add(this.btnInterfaces);
             this.tabUtilities.Controls.Add(this.btnMissions);
             this.tabUtilities.Controls.Add(this.btnUiViewer);
             this.tabUtilities.Controls.Add(this.btnEntities);
+            this.tabUtilities.Controls.Add(this.bteInterfaces);
             this.tabUtilities.Controls.Add(this.bteMissions);
             this.tabUtilities.Controls.Add(this.bteAuras);
+            this.tabUtilities.Controls.Add(this.lblInterfaces);
             this.tabUtilities.Controls.Add(this.lblMissions);
             this.tabUtilities.Controls.Add(this.btnAuras);
             this.tabUtilities.Name = "tabUtilities";
-            this.tabUtilities.Size = new System.Drawing.Size(392, 388);
+            this.tabUtilities.Size = new System.Drawing.Size(361, 279);
             this.tabUtilities.Text = "Utilities";
+            // 
+            // btnInterfaces
+            // 
+            this.btnInterfaces.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnInterfaces.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnInterfaces.Location = new System.Drawing.Point(308, 104);
+            this.btnInterfaces.Name = "btnInterfaces";
+            this.btnInterfaces.Size = new System.Drawing.Size(50, 23);
+            this.btnInterfaces.TabIndex = 2;
+            this.btnInterfaces.Text = "Export";
+            this.btnInterfaces.UseVisualStyleBackColor = true;
+            this.btnInterfaces.Click += new System.EventHandler(this.btnInterfaces_Click);
             // 
             // btnUiViewer
             // 
             this.btnUiViewer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.btnUiViewer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnUiViewer.Location = new System.Drawing.Point(6, 106);
+            this.btnUiViewer.Location = new System.Drawing.Point(6, 156);
             this.btnUiViewer.Name = "btnUiViewer";
-            this.btnUiViewer.Size = new System.Drawing.Size(380, 23);
+            this.btnUiViewer.Size = new System.Drawing.Size(352, 23);
             this.btnUiViewer.TabIndex = 0;
             this.btnUiViewer.Text = "UI Viewer";
             this.btnUiViewer.UseVisualStyleBackColor = true;
             this.btnUiViewer.Click += new System.EventHandler(this.btnUiViewer_Click);
+            // 
+            // bteInterfaces
+            // 
+            this.bteInterfaces.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.bteInterfaces.EditValue = ".\\Logs\\Interfaces\\%character%_Interfaces.xml";
+            this.bteInterfaces.Location = new System.Drawing.Point(6, 106);
+            this.bteInterfaces.Name = "bteInterfaces";
+            this.bteInterfaces.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton()});
+            this.bteInterfaces.Properties.NullText = "Enter the Filename where store the Missions";
+            this.bteInterfaces.Properties.NullValuePromptShowForEmptyValue = true;
+            this.bteInterfaces.Properties.ReadOnly = true;
+            this.bteInterfaces.Size = new System.Drawing.Size(296, 20);
+            this.bteInterfaces.TabIndex = 6;
+            this.bteInterfaces.ToolTip = "File name to store Game Interfaces. \r\nAllow mask %character%, %account%, %dateTim" +
+    "e%.";
+            this.bteInterfaces.ButtonClick += new DevExpress.XtraEditors.Controls.ButtonPressedEventHandler(this.bte_ButtonClick);
+            // 
+            // lblInterfaces
+            // 
+            this.lblInterfaces.AutoSize = true;
+            this.lblInterfaces.Location = new System.Drawing.Point(14, 90);
+            this.lblInterfaces.Name = "lblInterfaces";
+            this.lblInterfaces.Size = new System.Drawing.Size(216, 13);
+            this.lblInterfaces.TabIndex = 3;
+            this.lblInterfaces.Text = "Export Game Interfaces (UIGen) to the file:";
             // 
             // MainPanel
             // 
@@ -390,7 +454,7 @@ namespace EntityPlugin.Forms
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.tbclMain);
             this.Name = "MainPanel";
-            this.Size = new System.Drawing.Size(398, 416);
+            this.Size = new System.Drawing.Size(367, 307);
             this.Load += new System.EventHandler(this.MainPanel_Load);
             ((System.ComponentModel.ISupportInitialize)(this.bteMissions.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bteAuras.Properties)).EndInit();
@@ -405,6 +469,8 @@ namespace EntityPlugin.Forms
             ((System.ComponentModel.ISupportInitialize)(this.seSlideFilter.Properties)).EndInit();
             this.tabUtilities.ResumeLayout(false);
             this.tabUtilities.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.bteInterfaces.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.sbSettings)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -436,5 +502,10 @@ namespace EntityPlugin.Forms
         private System.Windows.Forms.TextBox tbSlidingAuras;
         private System.Windows.Forms.Label lblSlidingAuras;
         private System.Windows.Forms.Button btnUiViewer;
+        private System.Windows.Forms.BindingSource sbSettings;
+        private System.Windows.Forms.CheckBox cbEnchantHelperActivator;
+        private System.Windows.Forms.Button btnInterfaces;
+        private DevExpress.XtraEditors.ButtonEdit bteInterfaces;
+        private System.Windows.Forms.Label lblInterfaces;
     }
 }

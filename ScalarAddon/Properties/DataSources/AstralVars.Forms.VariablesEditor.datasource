@@ -6,5 +6,5 @@
     cause the file to be unrecognizable by the program.
 -->
 <GenericObjectDataSource DisplayName="VariablesEditor" Version="1.0" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
-   <TypeInfo>AstralVars.Forms.VariablesEditor, VariablesAddon, Version=0.0.0.1, Culture=neutral, PublicKeyToken=null</TypeInfo>
+   <TypeInfo>AstralVariables.Forms.VariablesEditor, VariablesAddon, Version=0.0.0.1, Culture=neutral, PublicKeyToken=null</TypeInfo>
 </GenericObjectDataSource>

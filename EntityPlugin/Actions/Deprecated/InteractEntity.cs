@@ -7,18 +7,17 @@ using Astral;
 using Astral.Logic.Classes.Map;
 using Astral.Logic.NW;
 using Astral.Quester.Classes;
-using EntityPlugin.Editors;
+using EntityTools.Editors;
 using MyNW.Classes;
 using MyNW.Internals;
 using Action = Astral.Quester.Classes.Action;
 
-namespace EntityPlugin.Actions.Deprecated
+namespace EntityTools.Actions.Deprecated
 {
     public class InteractEntity : Astral.Quester.Classes.Action
     {
         public override string ActionLabel => $"{GetType().Name} [{Name}]";
 
-        [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         public string Name { get; set; }
 
         public int Range { get; set; }
@@ -117,18 +116,6 @@ namespace EntityPlugin.Actions.Deprecated
 
         public override bool UseHotSpots => false;
 
-        public override void OnMapDraw(GraphicsNW graph)
-        {
-        }
-
-        public enum InteractionType
-        {
-            //Взаимодействие запрещено
-            Forbidden,
-            //Взаимодействовать если возможно
-            IfPossible,
-            //взаимодействие обязательно
-            Obliganory
-        }
+        public override void OnMapDraw(GraphicsNW graph){ }
     }
 }

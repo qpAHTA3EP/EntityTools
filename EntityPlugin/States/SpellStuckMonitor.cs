@@ -5,7 +5,7 @@ using MyNW.Patchables.Enums;
 using System.Linq;
 using System.Threading;
 
-namespace EntityPlugin.States
+namespace EntityTools.States
 {
     public class SpellStuckMonitor : Astral.Logic.Classes.FSM.State
     {
@@ -35,7 +35,7 @@ namespace EntityPlugin.States
             {
                 if (!needToRun)
                     needToRun = EntityManager.LocalPlayer.InCombat;
-#if DEBUG
+#if DEBUG_SPELLSTUCKMONITOR
                 Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}.{nameof(NeedToRun)}={needToRun && beforeStartEngineSubscribed && CheckTO.IsTimedOut && !EntityManager.LocalPlayer.InCombat}" +
                     $" because {nameof(needToRun)}[{needToRun}], {nameof(beforeStartEngineSubscribed)}[{beforeStartEngineSubscribed}]," +
                     $" Not{nameof(EntityManager.LocalPlayer.InCombat)}[{!EntityManager.LocalPlayer.InCombat}] ");
@@ -43,7 +43,7 @@ namespace EntityPlugin.States
                 return needToRun && beforeStartEngineSubscribed && CheckTO.IsTimedOut && !EntityManager.LocalPlayer.InCombat;
             }
         }
-        public override int CheckInterval => 3000;
+        public override int CheckInterval => 1000;
         public override bool StopNavigator => false;
 
         private static bool beforeStartEngineSubscribed = false;
@@ -116,7 +116,7 @@ namespace EntityPlugin.States
             {
                 case CharClassCategory.DevotedCleric:
                     {
-#if DEBUG
+#if DEBUG_SPELLSTUCKMONITOR
                         Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: Character class is '{player.Character.Class.Category}'");
 #endif
                         // Флаги, предотвращающие повторное "выключение" умений
@@ -151,7 +151,7 @@ namespace EntityPlugin.States
                                 break;
                         }
 
-#if DEBUG
+#if DEBUG_SPELLSTUCKMONITOR
                         //Если все Mods перебрали, а флаги не сброшены, значит соответствующие им умения неактивны
                         if (searchChanneldivinity)
                             Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: SpecialClassPower[{Cleric_Channeldivinity}] not detected");
@@ -163,7 +163,7 @@ namespace EntityPlugin.States
                     }
                 case CharClassCategory.OathboundPaladin:
                     {
-#if DEBUG
+#if DEBUG_SPELLSTUCKMONITOR
                         Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: Character class is '{player.Character.Class.Category}'");
 #endif
                         // Если активно умение 'Paladin_Special_Divinepalisade'
@@ -173,8 +173,8 @@ namespace EntityPlugin.States
                         //                            GameCommands.Execute("specialClassPower 0");
                         //                            Logger.WriteLine($"{GetType().Name}: Deactivate 'Paladin_Special_Divinepalisade'");
                         //                        }
-                        //#if DEBUG
-                        //                        else Logger.WriteLine($"[DEBUG] {GetType().Name}: Power 'Paladin_Special_Divinepalisade' not active");
+                        //#if DEBUG_SPELLSTUCKMONITOR
+                        //                        else Logger.WriteLine($"[DEBUG_SPELLSTUCKMONITOR] {GetType().Name}: Power 'Paladin_Special_Divinepalisade' not active");
                         //#endif
 
                         // Если активно умение "Paladin_Shift_Sanctuary"
@@ -184,8 +184,8 @@ namespace EntityPlugin.States
                         //                                GameCommands.Execute("tacticalSpecial 0");
                         //                                Logger.WriteLine($"{GetType().Name}: Deactivate TacticalSpecial[Paladin_Shift_Sanctuary]");
                         //                            }
-                        //#if DEBUG
-                        //                            else Logger.WriteLine($"[DEBUG] {GetType().Name}: TacticalSpecial[Paladin_Shift_Sanctuary] not active");
+                        //#if DEBUG_SPELLSTUCKMONITOR
+                        //                            else Logger.WriteLine($"[DEBUG_SPELLSTUCKMONITOR] {GetType().Name}: TacticalSpecial[Paladin_Shift_Sanctuary] not active");
                         //#endif
 
                         // Флаги, предотвращающие повторное "выключение" умений
@@ -218,7 +218,7 @@ namespace EntityPlugin.States
                             if (!searchSanctuary && !searchDivinechampion)
                                 break;
                         }
-#if DEBUG
+#if DEBUG_SPELLSTUCKMONITOR
                         //Если все Mods перебрали, а флаги не сброшены, значит соответствующие им умения неактивны
                         if (searchSanctuary)
                             Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: Aura '{Paladin_Shift}' not detected");
@@ -235,7 +235,7 @@ namespace EntityPlugin.States
                                 GameCommands.Execute("specialClassPower 0");
                                 Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: Deactivate SpecialClassPower[{Paladin_Oathkeeper_Mechanic}]");
                             }
-#if DEBUG
+#if DEBUG_SPELLSTUCKMONITOR
                             else Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: SpecialClassPower[{Paladin_Oathkeeper_Mechanic}] not active");
 #endif
                         }
@@ -254,7 +254,7 @@ namespace EntityPlugin.States
 
             //сбрасываем флаг необходимости проверки
             needToRun = false;
-#if DEBUG
+#if DEBUG_SPELLSTUCKMONITOR
             Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}: Wait Combat mode.");
 #endif
         }

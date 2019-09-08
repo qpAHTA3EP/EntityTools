@@ -6,13 +6,13 @@ using Astral;
 using Astral.Classes;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.Classes.Map;
-using EntityPlugin.Editors;
-using EntityPlugin.Tools;
+using EntityTools.Editors;
+using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
 using Action = Astral.Quester.Classes.Action;
 
-namespace EntityPlugin.Actions
+namespace EntityTools.Actions
 {
     public class MoveToEntity : Astral.Quester.Classes.Action
     {

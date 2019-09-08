@@ -5,7 +5,7 @@ using Astral.Quester.Classes;
 using MyNW.Classes;
 using MyNW.Internals;
 
-namespace EntityPlugin.Conditions
+namespace EntityTools.Conditions
 {
     [Serializable]
     public class TeamMembersCount : Condition

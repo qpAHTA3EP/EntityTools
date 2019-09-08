@@ -1,14 +1,17 @@
 ﻿//#define Test_EntitySelectForm
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using EntityPlugin.States;
-using EntityPlugin.Tools;
+using EntityTools.States;
+using EntityTools.Tools;
+using MyNW.Classes;
 using MyNW.Internals;
 
-namespace EntityPlugin.Forms
+namespace EntityTools.Forms
 {
     public partial class MainPanel : /* UserControl //*/ Astral.Forms.BasePanel
     {
@@ -25,7 +28,7 @@ namespace EntityPlugin.Forms
 
         private void btnEntities_Click(object sender, EventArgs e)
         {
-#region Test_MultiSelectCustomRegion
+            #region Test_MultiSelectCustomRegion
 #if Test_MultiSelectCustomRegion
             //Entity entity = new Entity(IntPtr.Zero);
 
@@ -68,9 +71,9 @@ namespace EntityPlugin.Forms
                 MessageBox.Show(strBldr.ToString());
             }
 #endif
-#endregion
+            #endregion
 
-#region Test_EntitySelectForm
+            #region Test_EntitySelectForm
 #if Test_EntitySelectForm
             entDif = EntitySelectForm.GetEntity(entDif.NameUntranslated);
             if (entDif != null)
@@ -81,17 +84,47 @@ namespace EntityPlugin.Forms
             else MessageBox.Show("No Entity was selected");
 
 #endif
-#endregion
+            #endregion
+
+            #region Test_InsertInsignia
+            //// Ищем все неэкипированные инсигнии (впервый раз)
+            //List<InventorySlot> freeInsignias = EntityManager.LocalPlayer.BagsItems.FindAll(slot => slot.Item.ItemDef.InternalName.StartsWith("Insignia"));
+            //// сортировка списка "инсигний";
+            //freeInsignias.Sort(Actions.InsertInsignia.InsigniaQualityDescendingComparison);
+
+            //StringBuilder sb = new StringBuilder();
+            //foreach(InventorySlot slot in freeInsignias)
+            //{
+            //    sb./*Append(slot.Item.ItemDef.DisplayName).*/Append('[').Append(slot.Item.ItemDef.InternalName).Append("] number is ").Append(slot.Item.Count).AppendLine();
+            //}
+            //MessageBox.Show(sb.ToString());
+
+            //InventorySlot insigniaSlot = InsertInsignia(freeInsignias);
+
+            //if (insigniaSlot != null)
+            //{
+            //    sb.Clear();
+            //    sb.Append("InsigniaSlot.IsValid=").Append(insigniaSlot.IsValid).AppendLine();
+            //    sb.Append("InsigniaSlot.Filled=").Append(insigniaSlot.Filled).AppendLine();
+            //    sb.Append("InsigniaSlot.Item.IsValid=").Append(insigniaSlot.Item.IsValid).AppendLine();
+            //    sb.Append("InsigniaSlot.Item.ItemDef.IsValid=").Append(insigniaSlot.Item.ItemDef.IsValid).AppendLine();
+            //    sb.Append("InsigniaSlot.Item.ItemDef.InternalName=").Append(insigniaSlot.Item.ItemDef.InternalName).AppendLine();
+
+            //    MessageBox.Show(sb.ToString());
+            //}
+            #endregion
+
+            InsigniaBonusSelectForm.GetMountBonuses();
         }
 
         private void ckbDebugInfo_CheckedChanged(object sender, EventArgs e)
         {
-            EntityPlugin.DebugInfoEnabled = ckbDebugInfo.Checked;
+            EntityTools.DebugInfoEnabled = ckbDebugInfo.Checked;
         }
 
         private void MainPanel_Load(object sender, EventArgs e)
         {
-            ckbDebugInfo.Checked = EntityPlugin.DebugInfoEnabled;
+            ckbDebugInfo.Checked = EntityTools.DebugInfoEnabled;
 
             bteMissions.Properties.NullValuePrompt = Path.Combine(FileTools.defaulExportFolderMissions, FileTools.defaulFileMissions);
             bteAuras.Properties.NullValuePrompt = Path.Combine(FileTools.defaulExportFolderAuras, FileTools.defaulFileAuras);
@@ -150,6 +183,9 @@ namespace EntityPlugin.Forms
             TextWriter FileStream = new StreamWriter(fullFileName);
             serialiser.Serialize(FileStream, auras);
             FileStream.Close();
+
+            if (MessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?", $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                System.Diagnostics.Process.Start(fullFileName);
         }
 
         private void btnMissions_Click(object sender, EventArgs e)
@@ -173,6 +209,36 @@ namespace EntityPlugin.Forms
             TextWriter FileStream = new StreamWriter(fullFileName);
             serialiser.Serialize(FileStream, missions);
             FileStream.Close();
+
+            if(MessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?", $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                System.Diagnostics.Process.Start(fullFileName);
+        }
+
+        private void btnInterfaces_Click(object sender, EventArgs e)
+        {
+            InterfaceWrapper Interfaces = new InterfaceWrapper();
+
+            string fullFileName = FileTools.ReplaceMask(bteInterfaces.Text);
+
+            if (string.IsNullOrEmpty(fullFileName) || fullFileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+            {
+                fullFileName = Path.Combine(FileTools.defaultExportFolderInterfaces, FileTools.defaulFileInterfaces);
+                MessageBox.Show("The specified filename is invalid.\n" +
+                    "Missions info will be saved in the file:\n" +
+                    fullFileName, "Caution!", MessageBoxButtons.OK);
+            }
+
+            if (!Directory.Exists(Path.GetDirectoryName(fullFileName)))
+                Directory.CreateDirectory(Path.GetDirectoryName(fullFileName));
+
+            XmlSerializer serialiser = new XmlSerializer(typeof(InterfaceWrapper));
+            TextWriter FileStream = new StreamWriter(fullFileName);
+            serialiser.Serialize(FileStream, Interfaces);
+            FileStream.Close();
+
+            if (MessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?", $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                System.Diagnostics.Process.Start(fullFileName);
+
         }
 
         private void cbSpellStuckMonitor_CheckedChanged(object sender, EventArgs e)
@@ -208,7 +274,110 @@ namespace EntityPlugin.Forms
 
         private void btnUiViewer_Click(object sender, EventArgs e)
         {
+            #region Перенесено в btnInterfaces_Click(...)
+            //InterfaceWrapper Interfaces = new InterfaceWrapper();
+
+            //string fullFileName = Path.Combine(FileTools.defaultExportFolderInterfaces, FileTools.defaulFileInterfaces);
+
+            //if (!Directory.Exists(Path.GetDirectoryName(fullFileName)))
+            //    Directory.CreateDirectory(Path.GetDirectoryName(fullFileName));
+
+            //XmlSerializer serialiser = new XmlSerializer(typeof(InterfaceWrapper));
+            //TextWriter FileStream = new StreamWriter(fullFileName);
+            //serialiser.Serialize(FileStream, Interfaces);
+            //FileStream.Close();
+
+            //if (MessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?", $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            //    System.Diagnostics.Process.Start(fullFileName);
+            #endregion
+            #region Тест работы с UIGen.ButtonClick()
+            // Тест работы с UIGen.ButtonClick()
+
+            //UIGen uiGen = UIManager.GetUIGenByName("Playerstatus_Mounts_Subtab_Activemounts");
+            //if (uiGen != null)
+            //{
+            //    if (uiGen.IsValid && uiGen.IsVisible
+            //        && uiGen.Type == MyNW.Patchables.Enums.UIGenType.Button)
+            //        // Вызывает экстренное закрытие игрового клиента
+            //        uiGen.ButtonClick();
+            //    else MessageBox.Show($"Name={uiGen?.Name}\r\n\t IsValid={uiGen?.IsValid}\r\n\t IsVisible={uiGen?.IsVisible}\r\n\t Type={uiGen?.Type}");
+            //}
+            //else MessageBox.Show("'Playerstatus_Mounts_Subtab_Activemounts' not found");
+            #endregion
+            #region Тест формы отображения интерфейсов
             UIViewer.GetUiGen();
+            #endregion
+        }
+
+        private InventorySlot InsertInsignia(List<InventorySlot> freeInsignias = null)
+        {
+            // freeInsignias - Список всех неэкипированных инсигний (знаков скакунов)            
+
+            // Выбираем всех активных коней
+            List<InventorySlot> activeMounts = EntityManager.LocalPlayer.GetInventoryBagById(MyNW.Patchables.Enums.InvBagIDs.MountEquippedActiveSlots).GetItems;
+            //EntityManager.LocalPlayer.BagsItems.FindAll(slot => slot.BagId == MyNW.Patchables.Enums.InvBagIDs.MountEquippedActiveSlots);
+
+            foreach (InventorySlot mount in activeMounts)
+            {
+#if DEBUG_INSERTINSIGNIA
+                int insertedNum = 0;
+
+                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: Check mount '{mount.Item.ItemDef.InternalName}'");
+#endif
+                // Проверяем наличие свободного места для знака
+                foreach (ItemGemSlotDef insgnSlotDef in mount.Item.ItemDef.EffectiveItemGemSlots)
+                {
+                    // insgnSlotDef - описание слота
+                    // insgnSlot - слот знака
+                    ItemGemSlot insgnSlot = mount.Item.SpecialProps.GetGemSlotByIndex(insgnSlotDef.Index);
+                    if (insgnSlotDef != null && insgnSlotDef.IsValid
+                        && (insgnSlot == null || !insgnSlot.IsValid || !insgnSlot.SlottedItem.IsValid))
+                    {
+                        // обнаружен "пустой слот" знака скакуна
+#if DEBUG_INSERTINSIGNIA
+                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: Mount [{mount.Item.ItemDef.InternalName}] has free slot {insgnSlotDef.Index}");
+#endif
+                        // ищем подходящие инсигнии (знаки скакуна)
+                        if (freeInsignias == null || freeInsignias.Count == 0)
+                        {
+                            // Ищем все неэкипированные инсигнии (впервый раз)
+                            freeInsignias = EntityManager.LocalPlayer.BagsItems.FindAll(slot => slot.Item.ItemDef.InternalName.StartsWith("Insignia"));
+                            // сортировка списка "инсигний";
+                            freeInsignias.Sort(Actions.InsertInsignia.InsigniaQualityDescendingComparison);
+                            if (freeInsignias == null || freeInsignias.Count == 0)
+                            {
+                                // в инвентаре отсутствуют инсигнии
+#if DEBUG_INSERTINSIGNIA
+                                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: No one insignia found in the Bags");
+#endif
+                                return null;
+                            }
+                        }
+
+                        // Ищем первую попавшуюся подходящую инсигнию (знак скакуна)
+                        InventorySlot insignia = freeInsignias.Find(insgn => (insgnSlotDef.Type == (uint)Tools.MountInsignias.InsigniaType.Universal || insgn.Item.ItemDef.GemType == insgnSlotDef.Type));
+
+                        // экипируем найденный знак
+                        if (insignia != null && insignia.IsValid)
+                        {
+                            mount.Item.GemThisItem(insignia.Item, insgnSlotDef.Index);
+                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: Insert '{insignia.Item.ItemDef.InternalName}' at the slot {insgnSlotDef.Index} of [{mount.Item.ItemDef.InternalName}]");
+#if DEBUG_INSERTINSIGNIA
+                            insertedNum++;
+#endif
+                            return insignia;
+                        }
+                    }
+
+                }
+            }
+
+            return null;
+        }
+
+        private void cbEnchantHelperActivator_CheckedChanged(object sender, EventArgs e)
+        {
+            EnchantHelper.Enabled = cbEnchantHelperActivator.Checked;
         }
     }
 }

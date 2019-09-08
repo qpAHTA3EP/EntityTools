@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.Windows.Forms;
 
-namespace EntityPlugin.Editors
+namespace EntityTools.Editors
 {
     public class CurrentShardEditor : UITypeEditor
     {

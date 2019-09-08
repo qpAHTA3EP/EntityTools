@@ -75,7 +75,7 @@ namespace AstralVariables.Forms
             else
                 sb.AppendLine($"Parse faild!");
 
-            sb.AppendLine().Append(expression.Description());
+            sb.Append(expression.Description()).AppendLine();
 
             if(expression.IsValid)
                 MessageBox.Show(this,sb.ToString(), "Suceedeed", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);

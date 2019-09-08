@@ -40,7 +40,7 @@ namespace AstralVariables.Expressions.Functions
         public override string Description(int indent = 0)
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine().Insert(sb.Length, Parser.Indent, indent).Append(GetType().Name).Append(" {Id='").Append(ItemId).Append("' Value=").Append(Result).Append('}');
+            sb.Insert(sb.Length, Parser.Indent, indent).Append(GetType().Name).Append(" {Id='").Append(ItemId).Append("' Value=").Append(Result).AppendLine("}");
             return sb.ToString();
             //return $"{GetType().Name} {{Id='{ItemId}'}}";
         }
@@ -112,8 +112,8 @@ namespace AstralVariables.Expressions.Functions
             sb.Insert(sb.Length, Parser.Indent, indent).Append(GetType().Name).Append(" { Max = ");
             if(Operand != null)
             {
-                sb.AppendLine().Append(Operand.Description(indent + 1));
-                sb.AppendLine().Insert(sb.Length, Parser.Indent, indent).Append('}');
+                sb.Append(Operand.Description(indent + 1)).AppendLine();
+                sb.Insert(sb.Length, Parser.Indent, indent).Append('}').AppendLine();
             }
             else sb.Append(int.MaxValue).Append(" }");
             return sb.ToString();

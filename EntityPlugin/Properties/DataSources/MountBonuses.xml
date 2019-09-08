@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfMountBonusesDef xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<MountBonusesDef>
+<Barbed>1</Barbed>
+<Crescent>2</Crescent>
+<InternalName>Survivors_Blessing</InternalName>
+<NameGL>Survivor&apos;s Blessing</NameGL>
+<NameRU>Благословение выжившего</NameRU>
+<DescriptionGL>Whenever you Deflect an attack, you are healed for 1% of your maximum Hit Points over 5 seconds</DescriptionGL>
+<DescriptionRU>При каждом парировании атаки Вы восстанавливаете 1% от максимума хитов в течении 5 секунд</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Enlightened>2</Enlightened>
+<Crescent>1</Crescent>
+<InternalName>Barbarians_Revelry</InternalName>
+<NameGL>Barbarian&apos;s Revelry</NameGL>
+<NameRU>Блаженство варвара</NameRU>
+<DescriptionGL>Whenever you perform a Critical Strike, you are healed for 1% of your maximum Hit Points</DescriptionGL>
+<DescriptionRU>При выполнении критического удара Вы восстанавливаете 1% от максимума хитов</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Regal>2</Regal>
+<Enlightened>1</Enlightened>
+<InternalName>Warlords_Inspiration</InternalName>
+<NameGL>Warlord&apos;s Inspiration</NameGL>
+<NameRU>Вдохновение полководца</NameRU>
+<DescriptionGL>Your summoned Companion does 20% more damage</DescriptionGL>
+<DescriptionRU>Призванный Вами спутник наносит на 20% больше урона</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Enlightened>2</Enlightened>
+<Illuminated>1</Illuminated>
+<InternalName>Champions_Return</InternalName>
+<NameGL>Champion&apos;s Return</NameGL>
+<NameRU>Возвращение рыцаря</NameRU>
+<DescriptionGL>Whenever you are reduced to 50% Hit Points, you instantly recover 10% of your Stamina and are healed for 10% of your maximum Hit Points over 10 seconds This effect can only occur once every 60 seconds</DescriptionGL>
+<DescriptionRU>Каждый раз, когда у Вас остаётся 50% хитов, Вы мгновенно восстанавливаете 10% от вашей бодрости и 10% от Вашего максимума хитов в течении 10 секунд Срабатывает не чаще 1 раза в 60 секунд</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Enlightened>1</Enlightened>
+<Crescent>2</Crescent>
+<InternalName>Slayers_Bloodlust</InternalName>
+<NameGL>Slayer&apos;s Bloodlust</NameGL>
+<NameRU>Кровожадность истребителя</NameRU>
+<DescriptionGL>Whenever you kill a target, you gain 500 Critical Strike for 5 seconds</DescriptionGL>
+<DescriptionRU>При каждом убийстве цели Вы получаете +500 к вероятности критического удара на 5 секунд</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Regal>2</Regal>
+<Illuminated>1</Illuminated>
+<InternalName>Combatants_Maneuver</InternalName>
+<NameGL>Combatant&apos;s Maneuver</NameGL>
+<NameRU>Маневр бойца</NameRU>
+<DescriptionGL>Whenever you control an enemy, you gain 2500 Combat Advantage damage for 10 seconds</DescriptionGL>
+<DescriptionRU>При каждом контроле над врагом Вы получаете бонус 2500 к урону от боевого преимущества на 10 секунд</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Illuminated>2</Illuminated>
+<Crescent>1</Crescent>
+<InternalName>Oppressors_Reprieve</InternalName>
+<NameGL>Oppressor&apos;s Reprieve</NameGL>
+<NameRU>Облегчение для угнетателя</NameRU>
+<DescriptionGL>Whenever you are Stunned, Knocked, or Rooted, you are healed for 5% of your maximum Hit Points over 5 seconds</DescriptionGL>
+<DescriptionRU>При каждом оглушении, сбивании с ног или обездвиживании Вы восстанавливаете 5% от максимума хитов в течении 5 секунд</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Regal>1</Regal>
+<Crescent>2</Crescent>
+<InternalName>Knights_Rebuke</InternalName>
+<NameGL>Knight&apos;s Rebuke</NameGL>
+<NameRU>Отпор рыцаря</NameRU>
+<DescriptionGL>Whenever you receive Combat Advantage damage from an attack, you are healed for 15% of your maximum Hit Points over 5s</DescriptionGL>
+<DescriptionRU>При каждом получении урона от боевого преимущества во время атаки Вы восстанавливаете 1,5% от максимума хитов в течении 5 секунд</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Regal>1</Regal>
+<Barbed>1</Barbed>
+<Illuminated>1</Illuminated>
+<InternalName>Shepherds_Devotion</InternalName>
+<NameGL>Shepherd&apos;s Devotion</NameGL>
+<NameRU>Преданность пастыря</NameRU>
+<DescriptionGL>Whenever you use a Daily power, you and your teammates&apos; Defense is increased by 1500, and their Movement Speed is increased by 10%</DescriptionGL>
+<DescriptionRU>При каждом использовании Вами ежедневного умения оборона у Вас и Ваших соратников повышается на 1500, а их скорость движения - на 10%</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Barbed>1</Barbed>
+<Enlightened>1</Enlightened>
+<Crescent>1</Crescent>
+<InternalName>Cavalrys_Warning</InternalName>
+<NameGL>Cavalry&apos;s Warning</NameGL>
+<NameRU>Предупреждение кавалерии</NameRU>
+<DescriptionGL>Whenever you activate a Mount Combat Power, you gain 1000 to all of your ratings for 10 seconds</DescriptionGL>
+<DescriptionRU>При каждой активации боевого умения скакуна Вы получаете прибавку 1000 ко всем показателям на 10 секунд</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Regal>1</Regal>
+<Enlightened>2</Enlightened>
+<InternalName>Assassins_Covenant</InternalName>
+<NameGL>Assassin&apos;s Covenant</NameGL>
+<NameRU>Соглашение убийцы</NameRU>
+<DescriptionGL>You lose 1000 of your Defense, Deflection, Critical Avoidance, and Awareness You gain 1000 Accuracy, Armor Penetration, Critical Strike and Combat Advantage</DescriptionGL>
+<DescriptionRU>Вы теряете 1000 единиц обороны, парирования, критического уклонения и осведомлённости Вы получаете +1000 к точности, проникающему урону, вероятности критического удара и боевому преимуществу</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Enlightened>3</Enlightened>
+<InternalName>Travelers_Treasures</InternalName>
+<NameGL>Traveler&apos;s Treasures</NameGL>
+<NameRU>Сокровища путешественника</NameRU>
+<DescriptionGL>You have a chance after killing a foe to find Rough Astral Diamonds</DescriptionGL>
+<DescriptionRU>Убивая врага, Вы с некоторой вероятностью можете найти астральные алмазы</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Barbed>2</Barbed>
+<Crescent>1</Crescent>
+<InternalName>Victims_Preservation</InternalName>
+<NameGL>Victim&apos;s Preservation</NameGL>
+<NameRU>Сохранение жертвы</NameRU>
+<DescriptionGL>Whenever you take greater than 35% of your Maximum Hit Points in pre-mitigated damage from a single blow, you gain 2500 Defense, Critical Avoidance, Awareness, and Deflect 5 seconds This effect can occur once every 10 seconds</DescriptionGL>
+<DescriptionRU>Каждый раз, когда Вы получаете более 35% от максимума хитов при заранее сниженном уроне от одного удара, Вы получаете +2500 к обороне, критическому уклонению, парированию и осведомленности на 5 секунд Этот эффект срабатывает не чаще 1 раза в 10 секунд</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Barbed>2</Barbed>
+<Enlightened>1</Enlightened>
+<InternalName>Magistrates_Patience</InternalName>
+<NameGL>Magistrate&apos;s Patience</NameGL>
+<NameRU>Терпение судьи</NameRU>
+<DescriptionGL>Whenever you receive damage from a Critical Strike, you gain 2500 Critical Avoidance and up to 4 teammates receive 2500 Defense for 5 seconds This can trigger once every 10 seconds</DescriptionGL>
+<DescriptionRU>При каждом получении урона от критического удара Вы получаете +2500 к критическому уклонению, а максимум 4 соратника получают +2500 к обороне на 5 секунд эффект срабатывает только раз в 10 секунд</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Regal>2</Regal>
+<Barbed>1</Barbed>
+<InternalName>Protectors_Camaraderie</InternalName>
+<NameGL>Protector&apos;s Camaraderie</NameGL>
+<NameRU>Товарищество защитника</NameRU>
+<DescriptionGL>Whenever your summoned Companion attacks, you gain 200 Armor Penetration and Defense for 10 seconds Maximum of 5 stacks</DescriptionGL>
+<DescriptionRU>При каждой атаке Вашего призванного спутника Вы получаете +200 к проникающему урону и обороне на 10 секунд Максимум - 5 единиц</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Barbed>2</Barbed>
+<Illuminated>1</Illuminated>
+<InternalName>Artificers_Persuasion</InternalName>
+<NameGL>Artificer&apos;s Persuasion</NameGL>
+<NameRU>Убеждение декорщика</NameRU>
+<DescriptionGL>Whenever you use an Artifact power, your cooldowns are reduced by 2 seconds</DescriptionGL>
+<DescriptionRU>При каждом использовании артефактного умения период восстановления Ваших умений уменьшается на 2 секунды</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Regal>1</Regal>
+<Illuminated>1</Illuminated>
+<Crescent>1</Crescent>
+<InternalName>Wanderers_Fortune</InternalName>
+<NameGL>Wanderer&apos;s Fortune</NameGL>
+<NameRU>Удача скитальца</NameRU>
+<DescriptionGL>You have a chance after killing a foe to find a Refining Stone</DescriptionGL>
+<DescriptionRU>Убивая врага, Вы с некоторой вероятностью можете найти очищающий камень</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Regal>1</Regal>
+<Illuminated>2</Illuminated>
+<InternalName>Alchemists_Invigoration</InternalName>
+<NameGL>Alchemist&apos;s Invigoration</NameGL>
+<NameRU>Укрепляющее для алхимика</NameRU>
+<DescriptionGL>Whenever you drink a Healing Potion, you are granted 2500 more Defense for 10 seconds</DescriptionGL>
+<DescriptionRU>При каждом выпивании зелья лечения Вы получаете прибавку 2500 к обороне на 10 секунд</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Regal>1</Regal>
+<Enlightened>1</Enlightened>
+<Illuminated>1</Illuminated>
+<InternalName>Gladiators_Guile</InternalName>
+<NameGL>Gladiator&apos;s Guile</NameGL>
+<NameRU>Хитрость гладиатора</NameRU>
+<DescriptionGL>When your Stamina is above 75%, you move 10% faster When your Stamina is below 25%, gain 10% Stamina Gain</DescriptionGL>
+<DescriptionRU>Когда у Вас больше 75% бодрости, Вы передвигаетесь на 10% быстрее Когда у Вас меньше 25% бодрости, Вы получаете прибавку к бодрости в разиере 10%</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Barbed>1</Barbed>
+<Illuminated>2</Illuminated>
+<InternalName>Berserkers_Rage</InternalName>
+<NameGL>Berserker&apos;s Rage</NameGL>
+<NameRU>Ярость берсерка</NameRU>
+<DescriptionGL>When your Action Points are over 90% full, gain 2500 Critical Strike While your Action Points are below 10% full, gain 2500 Deflection</DescriptionGL>
+<DescriptionRU>Если у Вас более 90% очков действия, Вы получаете +2500 к вероятности критического удара Если у Вас менее 10% очков действия, Вы получаете +2500 к парировани</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Enlightened>1</Enlightened>
+<Illuminated>1</Illuminated>
+<InternalName>Champions_Struggle</InternalName>
+<NameGL>Champion&apos;s Struggle</NameGL>
+<NameRU>Борьба рыцаря</NameRU>
+<DescriptionGL>Whenever you are reduced to 50% Hit Points, you instantly recover 5% of your Stamina and are healed for 5% of your maximum Hit Points over 10 seconds This effect can only occur once every 60 seconds</DescriptionGL>
+<DescriptionRU>Каждый раз, когда у Вас остаётся 50% хитов, Вы мгновенно восстанавливаете 5% от Вашей бодрости и 5% от Вашего максимума хитов в течении 10 секунд Этот эффект срабатывает не чаще 1 раза в 60 секунд</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Regal>1</Regal>
+<Enlightened>1</Enlightened>
+<InternalName>Warlords_Encouragement</InternalName>
+<NameGL>Warlord&apos;s Encouragement</NameGL>
+<NameRU>Воодушевление полководца</NameRU>
+<DescriptionGL>Your summoned Companion does 5% more damage</DescriptionGL>
+<DescriptionRU>Призванный Вами спутник наносит на 5% больше урона</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Barbed>1</Barbed>
+<Illuminated>1</Illuminated>
+<InternalName>Berserkers_Anger</InternalName>
+<NameGL>Berserker&apos;s Anger</NameGL>
+<NameRU>Гнев берскерка</NameRU>
+<DescriptionGL>When your Action Points are over 90% full, gain 500 Critical Strike While your Action Points are below 10% full, gain 500 Deflection</DescriptionGL>
+<DescriptionRU>Если у Вас более 90% очков действия, Вы получаете +500 к вероятности критического удара Если у Вас менее 10% очков действия, Вы получаете +500 к парированию</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Barbed>1</Barbed>
+<Crescent>1</Crescent>
+<InternalName>Survivors_Gift</InternalName>
+<NameGL>Survivor&apos;s Gift</NameGL>
+<NameRU>Дар выжившего</NameRU>
+<DescriptionGL>Whenever you Deflect an attack, you are healed for 15% of your maximum Hit Points over 5 seconds</DescriptionGL>
+<DescriptionRU>При каждом парировании атаки Вы восстанавливаете 1,5% от максимума хитов в течении 5 секун</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Regal>1</Regal>
+<Barbed>1</Barbed>
+<InternalName>Protectors_Friendship</InternalName>
+<NameGL>Protector&apos;s Friendship</NameGL>
+<NameRU>Дружба защитника</NameRU>
+<DescriptionGL>Whenever your summoned Companion attacks, you gain 50 Armor Penetration and Defense for 10 seconds Maximum of 5 stacks</DescriptionGL>
+<DescriptionRU>При каждой атаке Вашего призванного спутника Вы получаете +50 к принмкающему урону и обороне на 10 секунд Максимум - 5 единиц</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Enlightened>1</Enlightened>
+<Crescent>1</Crescent>
+<InternalName>Barbarians_Delight</InternalName>
+<NameGL>Barbarian&apos;s Delight</NameGL>
+<NameRU>При выполнении критического удара Вы восстанавливаете 1% от максимума хитов</NameRU>
+<DescriptionGL>Whenever you perform a Critical Strike, you are healed for 1% of your maximum Hit Points</DescriptionGL>
+<DescriptionRU>При выполнении критического удара Вы восстанавливаете 1% от максимума хитов</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Regal>1</Regal>
+<Crescent>1</Crescent>
+<InternalName>Knights_Defense</InternalName>
+<NameGL>Knight&apos;s Defense</NameGL>
+<NameRU>При каждом получении урона от боевого преимущества во время атаки Вы восстанавливаете 1,5% от максимума хитов в течении 5 секунд</NameRU>
+<DescriptionGL>Whenever you receive Combat Advantage damage from an attack, you are healed for 075% of your Maximum Hit Points over 5 seconds</DescriptionGL>
+<DescriptionRU>При каждом получении урона от боевого преимущества во время атаки Вы восстанавливаете 1,5% от максимума хитов в течении 5 секунд</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Regal>1</Regal>
+<Illuminated>1</Illuminated>
+<InternalName>Alchemists_Refresher</InternalName>
+<NameGL>Alchemist&apos;s Refresher</NameGL>
+<NameRU>Освежающее для алхимика</NameRU>
+<DescriptionGL>Whenever you drink a Healing Potion, you are granted 500 more defense for 10 seconds</DescriptionGL>
+<DescriptionRU>При каждом выпивании зелья лечения Вы получаете прибавку 500 к обороне на 10 секунд</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Illuminated>1</Illuminated>
+<Crescent>1</Crescent>
+<InternalName>Oppressors_Respite</InternalName>
+<NameGL>Oppressor&apos;s Respite</NameGL>
+<NameRU>Передышка для угнетателя</NameRU>
+<DescriptionGL>Whenever you are Stunned, Knocked, or Rooted, you are healed for 15% of your maximum Hit Points over 5 seconds</DescriptionGL>
+<DescriptionRU>При каждом оглушении, сбивании с ног или обездвиживании Вы восстанавливаете 1,5% от максимума хитов в течении 5 секунд</DescriptionRU>
+</MountBonusesDef>
+<MountBonusesDef>
+<Barbed>1</Barbed>
+<Enlightened>1</Enlightened>
+<InternalName>Magistrates_Restraint</InternalName>
+<NameGL>Magistrate&apos;s Restraint</NameGL>
+<NameRU>Сдержанность судьи</NameRU>
+<DescriptionGL>Whenever you receive damage from a Critical Strike, you gain 2500 Critical Avoidance and up to 4 teammates receive 2500 Defense for 5 seconds This can trigger once every 10 seconds</DescriptionGL>
+<DescriptionRU>При каждом получении урона от критического удара Вы получаете +2500 к критическому уклонению, а максимум 4 соратника получают +2500 к обороне на 5 секунд Эффект срабатывает только раз в 10 секунд</DescriptionRU>
+</MountBonusesDef>
+</ArrayOfMountBonusesDef>

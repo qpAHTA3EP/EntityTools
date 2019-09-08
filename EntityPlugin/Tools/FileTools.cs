@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace EntityPlugin.Tools
+namespace EntityTools.Tools
 {
     public class FileTools
     {
@@ -19,8 +19,10 @@ namespace EntityPlugin.Tools
         public static readonly string MaskAD = "%AD%";
         public static readonly string MaskRAD = "%rAD%";
 
+        public static readonly string defaultExportFolderInterfaces = Path.Combine(Astral.Controllers.Directories.LogsPath, "Interfaces");
         public static readonly string defaulExportFolderAuras = Path.Combine(Astral.Controllers.Directories.LogsPath, "Auras");
         public static readonly string defaulExportFolderMissions = Path.Combine(Astral.Controllers.Directories.LogsPath, "Missions");
+        public static readonly string defaulFileInterfaces = "Interfaces.xml";
         public static readonly string defaulFileAuras = "Auras.xml";
         public static readonly string defaulFileMissions = "Missions.xml";
 

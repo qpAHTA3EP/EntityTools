@@ -1,11 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using EntityPlugin.Forms;
+using EntityTools.Forms;
 using MyNW.Classes;
-using static EntityPlugin.Forms.EntitySelectForm;
+using static EntityTools.Forms.EntitySelectForm;
 
-namespace EntityPlugin.Editors
+namespace EntityTools.Editors
 {
     public class EntityIdEditor : UITypeEditor
     {

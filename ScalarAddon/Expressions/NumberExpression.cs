@@ -33,13 +33,13 @@ namespace AstralVariables.Expressions
                 result = res;
 #if DEBUG
                 stopwatch.Stop();
-                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesAddon)}: Calculate '{expression}' time: {stopwatch.ElapsedMilliseconds} ms");
+                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: Calculate '{expression}' time: {stopwatch.ElapsedMilliseconds} ms");
 #endif
                 return true;
             }
 #if DEBUG
             stopwatch.Stop();
-            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesAddon)}: Calculate '{expression}' time: {stopwatch.ElapsedMilliseconds} ms");
+            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: Calculate '{expression}' time: {stopwatch.ElapsedMilliseconds} ms");
 #endif
             return false;
         }
@@ -78,7 +78,7 @@ namespace AstralVariables.Expressions
             }
 #if DEBUG
             stopwatch.Stop();
-            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesAddon)}: Parse '{expression}' time: {stopwatch.ElapsedMilliseconds} ms");
+            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: Parse '{expression}' time: {stopwatch.ElapsedMilliseconds} ms");
 #endif
             // После разбора выражения строка expr должна остаться пустой
             // в противном случае выражение содержит ошибку
@@ -286,7 +286,6 @@ namespace AstralVariables.Expressions
         public static NumberAstNode ParseValue(ref string expr)
         {
             string exprBackup = expr;
-            //StringBuilder errorMess = new StringBuilder();
             ErrorList subError = new ErrorList();
 
             if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
@@ -301,7 +300,6 @@ namespace AstralVariables.Expressions
                 }
                 catch (ParseError numErr)
                 {
-                    //errorMess.AppendLine(numErr.Message)/*.Append("in expression: ").Append(expression*/;
                     subError.Add(numErr);
 
                     expr = exprBackup;
@@ -312,7 +310,6 @@ namespace AstralVariables.Expressions
                     }
                     catch (ParseError varErr)
                     {
-                        //errorMess.AppendLine(varErr.Message)/*.Append("in expression: ").Append(expression)*/;
                         subError.Add(varErr);
 
                         expr = exprBackup;
@@ -565,7 +562,7 @@ namespace AstralVariables.Expressions
                         }
                         catch (ParseError brAdditionErr)
                         {
-                            //errorMess.AppendLine(/*).Append(Parser.Symbols.Tab).Append(*/brAdditionErr.Message)/*.Append(" in expression: ").Append(expression)*/;
+                            //errorMess.Append(/*).Append(Parser.Symbols.Tab).Append(*/brAdditionErr.Message)/*.Append(" in expression: ").Append(expression).AppendLine()*/;
                             subError.Add(brAdditionErr);
 
                             // Входная строка не содержит выражения, соответствующего '(' Addition ')' 
@@ -580,7 +577,7 @@ namespace AstralVariables.Expressions
                             }
                             catch (ParseError funErr)
                             {
-                                //errorMess.AppendLine(/*).Append(Parser.Symbols.Tab).Append(*/funErr.Message)/*.Append(" in expression: ").Append(expression)*/;
+                                //errorMess.Append(/*).Append(Parser.Symbols.Tab).Append(*/funErr.Message)/*.Append(" in expression: ").Append(expression).AppendLine()*/;
                                 subError.Add(funErr);
 
                                 // Входная строка не содержит выражения, соответствующего Function 
@@ -594,7 +591,7 @@ namespace AstralVariables.Expressions
                                 }
                                 catch (ParseError valErr)
                                 {
-                                    //errorMess.AppendLine(/*).Append(Parser.Symbols.Tab).Append(*/valErr.Message)/*.Append(" in expression: ").Append(expression)*/;
+                                    //errorMess.Append(/*).Append(Parser.Symbols.Tab).Append(*/valErr.Message)/*.Append(" in expression: ").Append(expression).AppendLine()*/;
                                     subError.Add(valErr);
 
                                     // Входная строка не содержит выражения, соответствующего Value 
@@ -655,7 +652,7 @@ namespace AstralVariables.Expressions
                             catch (ParseError brAddErr)
                             {
                                 // Входная строка не содержит выражения, соответствующего '(' Addition ')'
-                                //errorMess.AppendLine(/*).Append(Parser.Symbols.Tab).Append(*/brAddErr.Message);
+                                //errorMess.Append(/*).Append(Parser.Symbols.Tab).Append(*/brAddErr.Message).AppendLine();
                                 subError.Add(brAddErr);
 
                                 // Пробуем извлеч второй операнд типа Function
@@ -666,7 +663,7 @@ namespace AstralVariables.Expressions
                                 catch (ParseError funErr)
                                 {
                                     // Входная строка не содержит выражения, соответствующего Value
-                                    //errorMess.AppendLine(/*).Append(Parser.Symbols.Tab).Append(*/funErr.Message);
+                                    //errorMess.Append(/*).Append(Parser.Symbols.Tab).Append(*/funErr.Message).AppendLine();
                                     subError.Add(funErr);
 
                                     // Восстанавливаем входную строку
@@ -680,7 +677,7 @@ namespace AstralVariables.Expressions
                                     catch (ParseError valErr)
                                     {
                                         subError.Add(valErr);
-                                        //errorMess.AppendLine(/*).Append(Parser.Symbols.Tab).Append(*/valErr.Message);
+                                        //errorMess.Append(/*).Append(Parser.Symbols.Tab).Append(*/valErr.Message).AppendLine();
                                         //errorMess.Insert(0, "ParseMultiplication: No {BracketedAddition}, {Function} or {Value} was found where should be {RightOperand}:\n");
                                         //throw new ParseError(errorMess.ToString(), expression);
                                         throw new ParseError(subError, "ParseMultiplication: No {BracketedAddition}, {Function} or {Value} was found where should be {RightOperand}", expr);
@@ -752,7 +749,7 @@ namespace AstralVariables.Expressions
                 {
                     expr = exprBackup;
                     subErrors.Add(itemCntErr);
-                    //errorMess.AppendLine(/*).Append(Parser.Symbols.Tab).Append(*/itemCntErr.Message);
+                    //errorMess.Append(/*).Append(Parser.Symbols.Tab).Append(*/itemCntErr.Message).AppendLine();
 
                     try
                     {
@@ -762,7 +759,7 @@ namespace AstralVariables.Expressions
                     {
                         expr = exprBackup;
                         subErrors.Add(numCntErr);
-                        //errorMess.AppendLine(/*).Append(Parser.Symbols.Tab).Append(*/numCntErr.Message);
+                        //errorMess.Append(/*).Append(Parser.Symbols.Tab).Append(*/numCntErr.Message).AppendLine();
                         try
                         {
                             return ParseRandom(ref expr);
@@ -771,7 +768,7 @@ namespace AstralVariables.Expressions
                         {
                             expr = exprBackup;
                             subErrors.Add(rndErr);
-                            //errorMess.AppendLine(/*).Append(Parser.Symbols.Tab).Append(*/rndErr.Message);
+                            //errorMess.Append(/*).Append(Parser.Symbols.Tab).Append(*/rndErr.Message).AppendLine();
                         }
                     }
                 }

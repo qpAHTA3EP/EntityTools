@@ -72,7 +72,7 @@ namespace AstralVariables.Forms
             varEditor.dgvVariables.Rows.Clear();
 
             int curVarInd = -1;
-            foreach (var v in VariablesAddon.Variables.ToList())
+            foreach (var v in VariablesTools.Variables.ToList())
             {
                 DataGridViewRow newRow = new DataGridViewRow();
                 newRow.CreateCells(varEditor.dgvVariables);
@@ -107,7 +107,7 @@ namespace AstralVariables.Forms
             //    if (Parser.TryParse(row.Cells[clmnValue.DisplayIndex].Value, out double var_val)
             //        && !Parser.IsForbidden(var_name))
             //    {
-            //        VariablesAddon.Variables[var_name] = var_val;
+            //        VariablesTools.Variables[var_name] = var_val;
             //    }
             //    else
             //    {
@@ -121,7 +121,7 @@ namespace AstralVariables.Forms
             //        }
             //        else DialogResult = DialogResult.OK;
             //    }
-            //    //if ((var_name = VariablesAddon.Variables.Set(,
+            //    //if ((var_name = VariablesTools.Variables.Set(,
             //    //                                        row.Cells[clmnValue.DisplayIndex].Value)) == null)
             //    //{
             //    //    row.Tag = null;

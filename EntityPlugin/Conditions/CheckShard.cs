@@ -1,4 +1,4 @@
-﻿using EntityPlugin.Editors;
+﻿using EntityTools.Editors;
 using MyNW.Internals;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace EntityPlugin.Conditions
+namespace EntityTools.Conditions
 {
     public class CheckShard : Astral.Quester.Classes.Condition
     {
@@ -20,7 +20,7 @@ namespace EntityPlugin.Conditions
             }
         }
 
-        [Description("A name of the Shard")]
+        [Description("A name of the Shard (GameServer)")]
         [Editor(typeof(CurrentShardEditor), typeof(UITypeEditor))]
         public string Name { get; set; }
 
@@ -34,9 +34,7 @@ namespace EntityPlugin.Conditions
             }
         }
 
-        public override void Reset()
-        {
-        }
+        public override void Reset(){ }
 
         public override string ToString()
         {

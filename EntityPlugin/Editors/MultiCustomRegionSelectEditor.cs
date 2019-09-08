@@ -5,11 +5,11 @@ using System.Drawing.Design;
 using System.Windows.Forms;
 using Astral.Quester.Classes;
 using DevExpress.XtraEditors.Controls;
-using EntityPlugin.Forms;
+using EntityTools.Forms;
 using MyNW.Classes;
 
 
-namespace EntityPlugin.Editors
+namespace EntityTools.Editors
 {
     class MultiCustomRegionSelectEditor : UITypeEditor
     {

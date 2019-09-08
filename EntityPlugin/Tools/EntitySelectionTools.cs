@@ -11,7 +11,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 
-namespace EntityPlugin.Tools
+namespace EntityTools.Tools
 {
     public static class SelectionTools
     {

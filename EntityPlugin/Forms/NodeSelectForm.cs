@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace EntityPlugin.Forms
+namespace EntityTools.Forms
 {
     public partial class TargetSelectForm : XtraForm
     {

@@ -13,7 +13,7 @@ using AstralVariables;
 
 namespace AstralVariables
 {
-    public class VariablesAddon : Astral.Addons.Plugin
+    public class VariablesTools : Astral.Addons.Plugin
     {
         //public static VarCollection Variables = new VarCollection();
 

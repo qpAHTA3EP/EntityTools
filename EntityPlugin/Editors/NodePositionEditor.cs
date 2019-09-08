@@ -1,5 +1,5 @@
 ﻿using Astral.Controllers;
-using EntityPlugin.Forms;
+using EntityTools.Forms;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace EntityPlugin.Editors
+namespace EntityTools.Editors
 {
     class NodePositionEditor : UITypeEditor
     {

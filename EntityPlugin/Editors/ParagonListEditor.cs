@@ -1,11 +1,11 @@
-﻿using EntityPlugin.Forms;
+﻿using EntityTools.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Windows.Forms;
 
-namespace EntityPlugin.Editors
+namespace EntityTools.Editors
 {
     class ParagonListEditor : UITypeEditor
     {

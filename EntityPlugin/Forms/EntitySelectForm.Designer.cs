@@ -1,4 +1,4 @@
-﻿namespace EntityPlugin.Forms
+﻿namespace EntityTools.Forms
 {
     partial class EntitySelectForm
     {

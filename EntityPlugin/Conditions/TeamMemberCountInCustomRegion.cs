@@ -5,12 +5,12 @@ using System.Drawing.Design;
 using System.Text;
 using Astral.Quester.Classes;
 using Astral.Quester.UIEditors;
-using EntityPlugin.Editors;
-using EntityPlugin.Tools;
+using EntityTools.Editors;
+using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
 
-namespace EntityPlugin.Conditions
+namespace EntityTools.Conditions
 {
     /// <summary>
     /// Проверка наличия хотя бы одного члена группы (но не игрока)

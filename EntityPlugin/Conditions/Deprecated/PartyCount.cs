@@ -3,7 +3,7 @@ using System.Windows.Forms;
 using Astral.Quester.Classes;
 using MyNW.Internals;
 
-namespace EntityPlugin.Conditions
+namespace EntityTools.Conditions
 {
     public class PartyCount : Condition
     {
@@ -13,10 +13,8 @@ namespace EntityPlugin.Conditions
 
         public PartyCount()
         {
-            //MessageBox.Show($"This Conditions is deprecated. Use '{nameof(TeamMembersCount)}' or '{nameof(TeamMembersCountInCustomRegions)}' instead");
-            
-            this.MemberCount = 0;
-            this.Sign = Relation.Superior;
+            MemberCount = 0;
+            Sign = Relation.Superior;
         }
 
         public override void Reset()

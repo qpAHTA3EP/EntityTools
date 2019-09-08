@@ -12,7 +12,7 @@ using Astral.Quester.UIEditors;
 using MyNW.Classes;
 using MyNW.Internals;
 
-namespace EntityPlugin.Actions.Deprecated
+namespace EntityTools.Actions.Deprecated
 {
     [Serializable]
     public class MoveToSea : Astral.Quester.Classes.Action
@@ -54,14 +54,8 @@ namespace EntityPlugin.Actions.Deprecated
         [Description("Final destination")]
         public Vector3 Position
         {
-            get
-            {
-                return moveTo.Position;
-            }
-            set
-            {
-                moveTo.Position = value;
-            }
+            get => moveTo.Position;
+            set => moveTo.Position = value;
         }
 
         [Description("Minimum distance between waypoints")]
@@ -70,14 +64,8 @@ namespace EntityPlugin.Actions.Deprecated
         [Description("Stop moving if True")]
         public bool IgnoreCombat
         {
-            get
-            {
-                return moveTo.IgnoreCombat;
-            }
-            set
-            {
-                moveTo.IgnoreCombat = value;
-            }
+            get => moveTo.IgnoreCombat;
+            set => moveTo.IgnoreCombat = value;
         }
 
         [Description("Description of the target location (not necessary)")]

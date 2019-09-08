@@ -59,11 +59,11 @@ namespace AstralVariables.Expressions
         public override string Description(int indent = 0)
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendCopies(Parser.Indent, indent).Append(GetType().Name).Append(':');
-            sb.AppendLine().AppendCopies(Parser.Indent, indent).Append('{');
-            sb.AppendLine().Append(leftOperand.Description(indent+1));
-            sb.AppendLine().Append(rightOperand.Description(indent + 1));
-            sb.AppendLine().AppendCopies(Parser.Indent, indent).Append('}');
+            sb.AppendCopies(Parser.Indent, indent).Append(GetType().Name).Append(':').AppendLine();
+            sb.AppendCopies(Parser.Indent, indent).Append('{').AppendLine();
+            sb.Append(leftOperand.Description(indent+1)).AppendLine();
+            sb.Append(rightOperand.Description(indent + 1)).AppendLine();
+            sb.AppendCopies(Parser.Indent, indent).Append('}').AppendLine();
             return sb.ToString();
 
             //return prefix + GetType().Name + ":\n" +
@@ -85,10 +85,10 @@ namespace AstralVariables.Expressions
         public override string Description(int indent = 0)
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendCopies(Parser.Indent, indent).Append(GetType().Name).Append(':');
-            sb.AppendLine().AppendCopies(Parser.Indent, indent).Append('{');
-            sb.AppendLine().Append(Operand.Description(indent + 1));
-            sb.AppendLine().AppendCopies(Parser.Indent, indent).Append('}');
+            sb.AppendCopies(Parser.Indent, indent).Append(GetType().Name).Append(':').AppendLine();
+            sb.AppendCopies(Parser.Indent, indent).Append('{').AppendLine();
+            sb.Append(Operand.Description(indent + 1)).AppendLine();
+            sb.AppendCopies(Parser.Indent, indent).Append('}').AppendLine();
             return sb.ToString();
 
             //return prefix + GetType().Name + ":\n" +

@@ -428,7 +428,7 @@ namespace AstralVariables.Classes
                 else if (DateTime.TryParse(value.ToString(), out DateTime newValue))
                 {
                     _dtValue = newValue;
-                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesAddon)} Variable '{Key}' set to [{_dtValue}] as {VarType}");
+                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)} Variable '{Key}' set to [{_dtValue}] as {VarType}");
                 }
                 else
                 {

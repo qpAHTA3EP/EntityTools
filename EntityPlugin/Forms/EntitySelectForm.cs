@@ -4,16 +4,23 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace EntityPlugin.Forms
+namespace EntityTools.Forms
 {
     public partial class EntitySelectForm : Form
     {
+        private static EntitySelectForm selectForm;
+
+        public EntitySelectForm()
+        {
+            InitializeComponent();
+        }
+
         /// <summary>
         /// краткое описание объекта Entity
         /// </summary>
         public class EntityDif
         {
-            public IntPtr ptr = IntPtr.Zero;
+            public Entity entity = new Entity(IntPtr.Zero);
             public string Name = string.Empty;
             public string NameUntranslated = string.Empty;
             public string InternalName = string.Empty;
@@ -35,7 +42,7 @@ namespace EntityPlugin.Forms
             foreach(Entity entity in EntityManager.GetEntities())
             {
                 entityDifs.Add(new EntityDif() {
-                        ptr = entity.Pointer,
+                        entity = entity,
                         Name = entity.Name,
                         NameUntranslated = entity.NameUntranslated,
                         InternalName = entity.InternalName,
@@ -44,32 +51,65 @@ namespace EntityPlugin.Forms
             }
         }
 
-        private static EntitySelectForm selectForm;
-
-        public EntitySelectForm()
+        private void FillEntitiesDgv(string currentEntityId = "")
         {
-            InitializeComponent();
+            if (currentEntityId == string.Empty && dgvEntities.CurrentRow != null && !dgvEntities.CurrentRow.IsNewRow)
+                currentEntityId = dgvEntities.CurrentRow.Cells[clmnNameUntranslated.DisplayIndex].Value.ToString(); 
+
+            dgvEntities.DataSource = null;
+
+            clmnName.DataPropertyName = string.Empty;
+            clmnInternalName.DataPropertyName = string.Empty;
+            clmnNameUntranslated.DataPropertyName = string.Empty;
+
+            dgvEntities.Rows.Clear();
+
+            int currentInd = -1;
+            foreach (Entity entity in EntityManager.GetEntities())
+            {
+                DataGridViewRow row = new DataGridViewRow();
+                row.CreateCells(dgvEntities);
+                row.Cells[clmnName.DisplayIndex].Value = entity.Name;
+                row.Cells[clmnNameUntranslated.DisplayIndex].Value = entity.NameUntranslated;
+                row.Cells[clmnInternalName.DisplayIndex].Value = entity.InternalName;
+                row.Cells[clmnDistance.DisplayIndex].Value = entity.Location.Distance3DFromPlayer;
+                row.Tag = entity;
+
+                int ind = dgvEntities.Rows.Add(row);
+
+                if (entity.NameUntranslated == currentEntityId)
+                    currentInd = ind;
+            }
+
+            if (currentInd >= 0 && currentInd < dgvEntities.RowCount)
+                dgvEntities.Rows[currentInd].Cells[0].Selected = true;
         }
 
-        public static Entity GetEntity()
+
+        public static EntityDif GetEntity()
         {
             if(selectForm == null)
                 selectForm = new EntitySelectForm();
 
-            selectForm.dgvEntities.AutoGenerateColumns = false;
-            selectForm.dgvEntities.DataSource = EntityManager.GetEntities();
+            selectForm.FillEntitiesDgv();
 
-            selectForm.clmnName.DataPropertyName = "Name";
-            selectForm.clmnInternalName.DataPropertyName = "InternalName";
-            selectForm.clmnNameUntranslated.DataPropertyName = "NameUntranslated";
-                       
             DialogResult dialogResult = selectForm.ShowDialog();
             if (dialogResult == DialogResult.OK)
             {
-                if (selectForm.dgvEntities.CurrentRow.DataBoundItem is Entity selectedEntity)
-                    return selectedEntity;
+                if (!selectForm.dgvEntities.CurrentRow.IsNewRow)
+                {
+                    return new EntityDif
+                    {
+                        entity = selectForm.dgvEntities.CurrentRow.Tag as Entity,
+                        Name = selectForm.dgvEntities.CurrentRow.Cells[selectForm.clmnName.DisplayIndex].Value.ToString(),
+                        NameUntranslated = selectForm.dgvEntities.CurrentRow.Cells[selectForm.clmnNameUntranslated.DisplayIndex].Value.ToString(),
+                        InternalName = selectForm.dgvEntities.CurrentRow.Cells[selectForm.clmnInternalName.DisplayIndex].Value.ToString(),
+                        Distance = (double)selectForm.dgvEntities.CurrentRow.Cells[selectForm.clmnDistance.DisplayIndex].Value
+                    };
+                }
             }
-            return new Entity(IntPtr.Zero);
+
+            return null;
         }
 
         public static EntityDif GetEntity(string entityUntrName)
@@ -77,45 +117,27 @@ namespace EntityPlugin.Forms
             if (selectForm == null)
                 selectForm = new EntitySelectForm();
 
-            selectForm.dgvEntities.Rows.Clear();
-
-            int currentInd = -1;
-            foreach (Entity entity in EntityManager.GetEntities())
-            {
-                DataGridViewRow row = new DataGridViewRow();
-                row.CreateCells(selectForm.dgvEntities);
-                row.Cells[selectForm.clmnName.DisplayIndex].Value = entity.Name;
-                row.Cells[selectForm.clmnNameUntranslated.DisplayIndex].Value = entity.NameUntranslated;
-                row.Cells[selectForm.clmnInternalName.DisplayIndex].Value = entity.InternalName;
-                row.Cells[selectForm.clmnDistance.DisplayIndex].Value = entity.Location.Distance3DFromPlayer;
-                row.Tag = entity;
-
-                int ind = selectForm.dgvEntities.Rows.Add(row);
-
-                if (entity.NameUntranslated == entityUntrName)
-                    currentInd = ind;
-            }
-
-            if (currentInd >= 0 && currentInd < selectForm.dgvEntities.RowCount)
-                selectForm.dgvEntities.Rows[currentInd].Cells[0].Selected = true;
+            selectForm.FillEntitiesDgv(entityUntrName);
 
             if (selectForm.dgvEntities.RowCount > 1)
             {
                 DialogResult dialogResult = selectForm.ShowDialog();
                 if (dialogResult == DialogResult.OK)
                 {
-                    if (selectForm.dgvEntities.CurrentRow.Tag is Entity selectedEntity)
+                    if (!selectForm.dgvEntities.CurrentRow.IsNewRow)
                     {
-                        return new EntityDif()
+                        return new EntityDif
                         {
-                            ptr = selectedEntity.Pointer,
-                            Name = selectedEntity.Name,
-                            InternalName = selectedEntity.InternalName,
-                            NameUntranslated = selectedEntity.NameUntranslated,
-                            Distance = selectedEntity.Location.Distance3DFromPlayer
+                            entity = selectForm.dgvEntities.CurrentRow.Tag as Entity,
+                            Name = selectForm.dgvEntities.CurrentRow.Cells[selectForm.clmnName.DisplayIndex].Value.ToString(),
+                            NameUntranslated = selectForm.dgvEntities.CurrentRow.Cells[selectForm.clmnNameUntranslated.DisplayIndex].Value.ToString(),
+                            InternalName = selectForm.dgvEntities.CurrentRow.Cells[selectForm.clmnInternalName.DisplayIndex].Value.ToString(),
+                            Distance = (double)selectForm.dgvEntities.CurrentRow.Cells[selectForm.clmnDistance.DisplayIndex].Value
                         };
                     }
                 }
+
+                return new EntityDif();
             }
             return null;
         }

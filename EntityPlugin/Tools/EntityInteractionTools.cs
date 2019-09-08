@@ -11,7 +11,7 @@ using System.Threading;
 using static Astral.Logic.NW.Approach;
 using static Astral.Quester.Classes.Action;
 
-namespace EntityPlugin.Tools
+namespace EntityTools.Tools
 {
     public static class InteractionTools
     {
@@ -83,7 +83,7 @@ namespace EntityPlugin.Tools
             while (target != null && target.IsValid/* && !interactTimeout.IsTimedOut*//* && target.InteractOption.IsValid*/)
             {
 #if ShowDebugMsg
-                if(EntityPlugin.DebugInfoEnabled)
+                if(EntityTools.DebugInfoEnabled)
                     Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Call '{nameof(Approach.EntityByDistance)}'");
 #endif
                 if (Approach.EntityByDistance(target, distance, breakFunc))
@@ -92,27 +92,27 @@ namespace EntityPlugin.Tools
                     target.Location.Face();
                     target.Location.FaceYaw();
 #if ShowDebugMsg
-                    if (EntityPlugin.DebugInfoEnabled)
+                    if (EntityTools.DebugInfoEnabled)
                         Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Call '{nameof(MyNW.Internals.Movements.StopNavTo)}'");
 #endif
 
                     MyNW.Internals.Movements.StopNavTo();
                     //Thread.Sleep(500);
 #if ShowDebugMsg
-                    if (EntityPlugin.DebugInfoEnabled)
+                    if (EntityTools.DebugInfoEnabled)
                         Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Call '{nameof(target.Interact)}'");
 #endif
                     target.Interact();
                     Thread.Sleep(1000);//Thread.Sleep(interactTime);
 #if ShowDebugMsg
-                    if (EntityPlugin.DebugInfoEnabled)
+                    if (EntityTools.DebugInfoEnabled)
                         Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Call '{nameof(Interact.WaitForInteraction)}'");
 #endif
                     Interact.WaitForInteraction();
                     if (dialogs != null && dialogs.Count > 0)
                     {
 #if ShowDebugMsg
-                        if (EntityPlugin.DebugInfoEnabled)
+                        if (EntityTools.DebugInfoEnabled)
                             Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Wait for Dialog's window appears");
 #endif
                         Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(interactTime);
@@ -126,7 +126,7 @@ namespace EntityPlugin.Tools
                         }
                         Thread.Sleep(500);
 #if ShowDebugMsg
-                        if (EntityPlugin.DebugInfoEnabled)
+                        if (EntityTools.DebugInfoEnabled)
                             Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Processing Dialogs");
 #endif
                         using (List<string>.Enumerator enumerator = dialogs.GetEnumerator())
@@ -142,7 +142,7 @@ namespace EntityPlugin.Tools
                     EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
 
 #if ShowDebugMsg
-                    if (EntityPlugin.DebugInfoEnabled)
+                    if (EntityTools.DebugInfoEnabled)
                     {
                         bool dist = false,
                         tarIsIntearctable = false,
@@ -186,14 +186,14 @@ namespace EntityPlugin.Tools
                 else
                 {
 #if ShowDebugMsg
-                    if (EntityPlugin.DebugInfoEnabled)
+                    if (EntityTools.DebugInfoEnabled)
                         Astral.Logger.WriteLine($"<{nameof(FollowAndSimulateFKey)}>: Approach to Target [{target.Pointer}] fail.");
 #endif
                     break;
                 }
             }
 #if ShowDebugMsg
-            if (EntityPlugin.DebugInfoEnabled)
+            if (EntityTools.DebugInfoEnabled)
                 Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Return 'false'");
 #endif
             return false;
@@ -445,7 +445,7 @@ namespace EntityPlugin.Tools
             while (target != null && target.IsValid)
             {
 #if ShowDebugMsg
-                if (EntityPlugin.DebugInfoEnabled)
+                if (EntityTools.DebugInfoEnabled)
                     Astral.Logger.WriteLine($"<{nameof(FollowAndSimulateFKey)}>: Call '{nameof(Approach.EntityByDistance)}'");
 #endif
                 if (Approach.EntityByDistance(target, distance, breakFunc))
@@ -453,7 +453,7 @@ namespace EntityPlugin.Tools
                     target.Location.Face();
                     target.Location.FaceYaw();
 #if ShowDebugMsg
-                    if (EntityPlugin.DebugInfoEnabled)
+                    if (EntityTools.DebugInfoEnabled)
                         Astral.Logger.WriteLine($"<{nameof(FollowAndSimulateFKey)}>: Call '{nameof(GameCommands.SimulateFKey)}'");
 #endif
                     GameCommands.SimulateFKey();
@@ -469,7 +469,7 @@ namespace EntityPlugin.Tools
                         if (dialogs != null && dialogs.Count > 0)
                         {
 #if ShowDebugMsg
-                            if (EntityPlugin.DebugInfoEnabled)
+                            if (EntityTools.DebugInfoEnabled)
                                 Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Wait for Dialog's window appears");
 #endif
                             Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);
@@ -483,7 +483,7 @@ namespace EntityPlugin.Tools
                             }
                             Thread.Sleep(500);
 #if ShowDebugMsg
-                            if (EntityPlugin.DebugInfoEnabled)
+                            if (EntityTools.DebugInfoEnabled)
                                 Astral.Logger.WriteLine($"<{nameof(FollowAndInteractNPC)}>: Processing Dialogs");
 #endif
                             using (List<string>.Enumerator enumerator = dialogs.GetEnumerator())
@@ -498,7 +498,7 @@ namespace EntityPlugin.Tools
                         }
                     }
 #if ShowDebugMsg
-                    if (EntityPlugin.DebugInfoEnabled)
+                    if (EntityTools.DebugInfoEnabled)
                     {
                         bool dist = false,
                         //interactInfoIsValid = false,
@@ -536,14 +536,14 @@ namespace EntityPlugin.Tools
                 else
                 {
 #if ShowDebugMsg
-                    if (EntityPlugin.DebugInfoEnabled)
+                    if (EntityTools.DebugInfoEnabled)
                         Astral.Logger.WriteLine($"<{nameof(FollowAndSimulateFKey)}>: Approach to Target [{target.Pointer}] fail.");
 #endif
                     break;
                 }
             }
 #if ShowDebugMsg
-            if (EntityPlugin.DebugInfoEnabled)
+            if (EntityTools.DebugInfoEnabled)
                 Astral.Logger.WriteLine($"<{nameof(FollowAndSimulateFKey)}>: Return 'false'");
 #endif
             return false;

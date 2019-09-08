@@ -8,9 +8,9 @@ using System.Linq;
 using System.Windows.Forms;
 using DevExpress.XtraEditors;
 
-namespace EntityPlugin.Forms
+namespace EntityTools.Forms
 {
-    public partial class MultiSelectForm : DevExpress.XtraEditors.XtraForm
+    public partial class MultiSelectForm :XtraForm
     {
         internal int SelectColumnInd { get => clmnSelect.DisplayIndex; }
         internal int ItemsNamesColumnInd { get => clmnItemsNames.DisplayIndex; }

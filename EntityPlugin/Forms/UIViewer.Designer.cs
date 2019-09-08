@@ -1,4 +1,4 @@
-﻿namespace EntityPlugin.Forms
+﻿namespace EntityTools.Forms
 {
     partial class UIViewer
     {
@@ -35,6 +35,8 @@
             this.filterName = new System.Windows.Forms.TextBox();
             this.btnFill = new System.Windows.Forms.Button();
             this.lblFilterName = new System.Windows.Forms.Label();
+            this.cbSort = new System.Windows.Forms.CheckBox();
+            this.lblGenTime = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -44,18 +46,23 @@
             // tvInterfaces
             // 
             this.tvInterfaces.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tvInterfaces.FullRowSelect = true;
             this.tvInterfaces.Location = new System.Drawing.Point(0, 0);
             this.tvInterfaces.Name = "tvInterfaces";
-            this.tvInterfaces.Size = new System.Drawing.Size(400, 340);
+            this.tvInterfaces.Size = new System.Drawing.Size(310, 340);
             this.tvInterfaces.TabIndex = 0;
+            this.tvInterfaces.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvInterfaces_AfterSelect);
             // 
             // pgProperties
             // 
+            this.pgProperties.CommandsVisibleIfAvailable = false;
             this.pgProperties.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pgProperties.HelpVisible = false;
             this.pgProperties.Location = new System.Drawing.Point(0, 0);
             this.pgProperties.Name = "pgProperties";
-            this.pgProperties.Size = new System.Drawing.Size(372, 340);
+            this.pgProperties.Size = new System.Drawing.Size(307, 340);
             this.pgProperties.TabIndex = 1;
+            this.pgProperties.ToolbarVisible = false;
             // 
             // splitContainer
             // 
@@ -72,8 +79,8 @@
             // splitContainer.Panel2
             // 
             this.splitContainer.Panel2.Controls.Add(this.pgProperties);
-            this.splitContainer.Size = new System.Drawing.Size(776, 340);
-            this.splitContainer.SplitterDistance = 400;
+            this.splitContainer.Size = new System.Drawing.Size(621, 340);
+            this.splitContainer.SplitterDistance = 310;
             this.splitContainer.TabIndex = 2;
             // 
             // filterVisibleOnly
@@ -82,11 +89,11 @@
             this.filterVisibleOnly.AutoSize = true;
             this.filterVisibleOnly.Checked = true;
             this.filterVisibleOnly.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.filterVisibleOnly.Location = new System.Drawing.Point(432, 15);
+            this.filterVisibleOnly.Location = new System.Drawing.Point(329, 15);
             this.filterVisibleOnly.Name = "filterVisibleOnly";
-            this.filterVisibleOnly.Size = new System.Drawing.Size(156, 17);
+            this.filterVisibleOnly.Size = new System.Drawing.Size(78, 17);
             this.filterVisibleOnly.TabIndex = 3;
-            this.filterVisibleOnly.Text = "Show only visible interfaces";
+            this.filterVisibleOnly.Text = "Visible only";
             this.filterVisibleOnly.UseVisualStyleBackColor = true;
             // 
             // filterName
@@ -95,13 +102,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.filterName.Location = new System.Drawing.Point(114, 13);
             this.filterName.Name = "filterName";
-            this.filterName.Size = new System.Drawing.Size(298, 20);
+            this.filterName.Size = new System.Drawing.Size(209, 21);
             this.filterName.TabIndex = 4;
+            this.filterName.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.filterName_KeyPress);
             // 
             // btnFill
             // 
             this.btnFill.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnFill.Location = new System.Drawing.Point(713, 11);
+            this.btnFill.Location = new System.Drawing.Point(558, 11);
             this.btnFill.Name = "btnFill";
             this.btnFill.Size = new System.Drawing.Size(75, 23);
             this.btnFill.TabIndex = 5;
@@ -114,18 +122,41 @@
             this.lblFilterName.AutoSize = true;
             this.lblFilterName.Location = new System.Drawing.Point(12, 16);
             this.lblFilterName.Name = "lblFilterName";
-            this.lblFilterName.Size = new System.Drawing.Size(96, 13);
+            this.lblFilterName.Size = new System.Drawing.Size(102, 13);
             this.lblFilterName.TabIndex = 6;
             this.lblFilterName.Text = "Filter by name part:";
+            // 
+            // cbSort
+            // 
+            this.cbSort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbSort.AutoSize = true;
+            this.cbSort.Checked = true;
+            this.cbSort.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbSort.Location = new System.Drawing.Point(412, 17);
+            this.cbSort.Name = "cbSort";
+            this.cbSort.Size = new System.Drawing.Size(46, 17);
+            this.cbSort.TabIndex = 3;
+            this.cbSort.Text = "Sort";
+            this.cbSort.UseVisualStyleBackColor = true;
+            // 
+            // lblGenTime
+            // 
+            this.lblGenTime.AutoSize = true;
+            this.lblGenTime.Location = new System.Drawing.Point(12, 405);
+            this.lblGenTime.Name = "lblGenTime";
+            this.lblGenTime.Size = new System.Drawing.Size(0, 13);
+            this.lblGenTime.TabIndex = 7;
             // 
             // UIViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(645, 450);
+            this.Controls.Add(this.lblGenTime);
             this.Controls.Add(this.lblFilterName);
             this.Controls.Add(this.btnFill);
             this.Controls.Add(this.filterName);
+            this.Controls.Add(this.cbSort);
             this.Controls.Add(this.filterVisibleOnly);
             this.Controls.Add(this.splitContainer);
             this.Name = "UIViewer";
@@ -149,5 +180,7 @@
         private System.Windows.Forms.TextBox filterName;
         private System.Windows.Forms.Button btnFill;
         private System.Windows.Forms.Label lblFilterName;
+        private System.Windows.Forms.CheckBox cbSort;
+        private System.Windows.Forms.Label lblGenTime;
     }
 }
