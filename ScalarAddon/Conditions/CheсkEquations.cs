@@ -5,9 +5,11 @@ using Astral.Quester.Forms;
 using AstralVariables.Expressions;
 using System.Text;
 using AstralVariables.Editors;
+using System;
 
 namespace AstralVariables.Conditions
 {
+    [Serializable]
     public class CheсkEquations : Astral.Quester.Classes.Condition
     {
         private NumberExpression equation1 = new NumberExpression(),

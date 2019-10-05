@@ -1,16 +1,13 @@
 ﻿using Astral.Logic.NW;
-using Astral.Quester.UIEditors;
-using EntityPlugin.Editors;
+using EntityTools.Editors;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Linq;
 using System.Text;
 
-namespace EntityPlugin.Conditions
+namespace EntityTools.Conditions
 {
     public enum NodeState
     {
@@ -46,17 +43,13 @@ namespace EntityPlugin.Conditions
 
         private bool getNode()
         {
-            //foreach (TargetableNode targetableNode in EntityManager.LocalPlayer.Player.InteractStatus.TargetableNodes)
-            //{
-            //    if (targetableNode.WorldInteractionNode.Location.Distance3D(NodePosition) < 1.0)
-            //    {
-            //        currentNode = new Interact.DynaNode(targetableNode.WorldInteractionNode.Key);
-            //        return true;
-            //    }
-            //}
             TargetableNode targetableNode = EntityManager.LocalPlayer.Player.InteractStatus.TargetableNodes.Find((TargetableNode node) => (node.WorldInteractionNode.Location.Distance3D(Position) < 1.0));
-            currentNode = new Interact.DynaNode(targetableNode.WorldInteractionNode.Key);
-            return currentNode.Node.IsValid;
+            if (targetableNode != null && targetableNode.IsValid)
+            {
+                currentNode = new Interact.DynaNode(targetableNode.WorldInteractionNode.Key);
+                return currentNode.Node.IsValid;
+            }
+            return false;
         }
         
         public override bool IsValid

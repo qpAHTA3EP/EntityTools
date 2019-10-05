@@ -14,6 +14,7 @@ using Action = Astral.Quester.Classes.Action;
 
 namespace EntityTools.Actions
 {
+    [Serializable]
     public class MoveToEntity : Astral.Quester.Classes.Action
     {
         [NonSerialized]

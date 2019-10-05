@@ -147,5 +147,11 @@ namespace EntityTools.Forms
             this.DialogResult = DialogResult.OK;
             Close();
         }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            DialogResult = DialogResult.Cancel;
+            Close();
+        }
     }
 }

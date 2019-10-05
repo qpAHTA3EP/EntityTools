@@ -2,12 +2,14 @@
 using AstralVariables.Editors;
 using AstralVariables.Expressions;
 using MyNW.Classes;
+using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Xml.Serialization;
 
 namespace AstralVariables.Actions
 {
+    [Serializable]
     public class SetVariable : Astral.Quester.Classes.Action
     {
         [XmlIgnore]

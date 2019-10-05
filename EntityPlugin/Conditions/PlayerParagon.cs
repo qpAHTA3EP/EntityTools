@@ -4,75 +4,50 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Serialization;
+using EntityTools.Tools;
+using System.ComponentModel;
+using System.Drawing.Design;
+using MyNW.Classes;
+using EntityTools.Editors;
 
-namespace EntityPlugin.Conditions
+namespace EntityTools.Conditions
 {
-    //public class PlayerParagon : Condition
-    //{
+    [Serializable]
+    public class PlayerParagon : Condition
+    {
 
-    //    public List<string> PlayerParagons = new List<string>();
+        [Editor(typeof(ParagonSelectEditor), typeof(UITypeEditor))]
+        [Description("Select one or several paragons")]
+        public SelectedParagons Paragons { get; set; } = new SelectedParagons();
 
-    //    public override bool IsValid
-    //    {
-    //        get
-    //        {
-    //            return PlayerParagons.Contains(EntityManager.LocalPlayer.Character?.CurrentPowerTreeBuild?.SecondaryPaths?.FirstOrDefault()?.Path?.PowerTree?.Name);
-    //        //switch (EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name)
-    //        //{
-    //        //    case "Paragon_Masterofflame":
-    //        //        return ParagonCategory.CW_Masterofflame;
+        public Condition.Presence Tested { get; set; }
 
-    //            //    case "Paragon_Spellstormmage":
-    //            //        return ParagonCategory.CW_Spellstormmage;
+        [XmlIgnore]
+        public override bool IsValid
+        {
+            get
+            {
+                return Paragons.IsValid;
+            }
+        }
 
-    //            //    case "Paragon_Divineoracle":
-    //            //        return ParagonCategory.DC_Divineoracle;
+        public override void Reset() { }
 
-    //            //    case "Paragon_Anointedchampion":
-    //            //        return ParagonCategory.DC_Anointedchampion;
+        public override string ToString()
+        {
+            return GetType().Name;
+        }
 
-    //            //    case "Paragon_Swordmaster":
-    //            //        return ParagonCategory.GW_Swordmaster;
-
-    //            //    case "Paragon_Ironvanguard_Gwf":
-    //            //        return ParagonCategory.GW_Ironvanguard;
-
-    //            //    case "Paragon_Swordmaster_Gf":
-    //            //        return ParagonCategory.GF_Swordmaster;
-
-    //            //    case "Paragon_Ironvanguard":
-    //            //        return ParagonCategory.GF_Ironvanguard;
-
-    //            //    case "Paragon_Stormwarden":
-    //            //        return ParagonCategory.HR_Stormwarden;
-
-    //            //    case "Paragon_Pathfinder":
-    //            //        return ParagonCategory.HR_Pathfinder;
-
-    //            //    case "Paragon_Oathofdevotion":
-    //            //        return ParagonCategory.OP_Oathofdevotion;
-
-    //            //    case "Paragon_Oathofprotection":
-    //            //        return ParagonCategory.OP_Oathofprotection;
-
-    //            //    case "Paragon_Hellbringer":
-    //            //        return ParagonCategory.SW_Hellbringer;
-
-    //            //    case "Paragon_Soulbinder":
-    //            //        return ParagonCategory.SW_Soulbinder;
-
-    //            //    case "Paragon_Whisperknife":
-    //            //        return ParagonCategory.TR_Whisperknife;
-
-    //            //    case "Paragon_Masterinfiltrator":
-    //            //        return ParagonCategory.TR_Masterinfiltrator;
-
-    //            //    default:
-    //            //        return ParagonCategory.Unknown;
-    //            //}
-    //        }
-    //    }
-
-    //    public override void Reset() { }
-    //}
+        public override string TestInfos
+        {
+            get
+            {
+                AdditionalCharacterPath currentParagon = EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault();
+                if (currentParagon != null && currentParagon.IsValid)
+                    return $"Current Paragon is '{currentParagon.Path.DisplayName}({currentParagon.Path.Name})'";
+                return "No valid information";
+            }
+        }
+    }
 }

@@ -80,20 +80,19 @@ namespace EntityTools.Forms
             // 
             this.btnEntities.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnEntities.Enabled = false;
             this.btnEntities.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnEntities.Location = new System.Drawing.Point(6, 185);
+            this.btnEntities.Location = new System.Drawing.Point(6, 175);
             this.btnEntities.Name = "btnEntities";
             this.btnEntities.Size = new System.Drawing.Size(352, 23);
             this.btnEntities.TabIndex = 0;
             this.btnEntities.Text = "Test";
             this.btnEntities.UseVisualStyleBackColor = true;
-            this.btnEntities.Visible = false;
             this.btnEntities.Click += new System.EventHandler(this.btnEntities_Click);
             // 
             // ckbDebugInfo
             // 
             this.ckbDebugInfo.AutoSize = true;
+            this.ckbDebugInfo.Enabled = false;
             this.ckbDebugInfo.Location = new System.Drawing.Point(12, 9);
             this.ckbDebugInfo.Name = "ckbDebugInfo";
             this.ckbDebugInfo.Size = new System.Drawing.Size(206, 17);
@@ -413,7 +412,7 @@ namespace EntityTools.Forms
             this.btnUiViewer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.btnUiViewer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnUiViewer.Location = new System.Drawing.Point(6, 156);
+            this.btnUiViewer.Location = new System.Drawing.Point(6, 146);
             this.btnUiViewer.Name = "btnUiViewer";
             this.btnUiViewer.Size = new System.Drawing.Size(352, 23);
             this.btnUiViewer.TabIndex = 0;

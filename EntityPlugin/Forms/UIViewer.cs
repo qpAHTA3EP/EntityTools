@@ -2,6 +2,7 @@
 
 using DevExpress.XtraEditors;
 using MyNW.Classes;
+using MyNW.Internals;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,7 +17,7 @@ namespace EntityTools.Forms
 {
     public partial class UIViewer :  XtraForm //*/Form
     {
-        private static UIViewer uiViewer;
+        //private static UIViewer uiViewer;
 
         public UIViewer()
         {
@@ -25,8 +26,11 @@ namespace EntityTools.Forms
 
         public static void GetUiGen(UIGen parentUiGen = null)
         {
-            if (uiViewer == null)
-                uiViewer = new UIViewer();
+            //if (uiViewer == null)
+            //    uiViewer = new UIViewer();
+            //uiViewer.Show();
+
+            UIViewer uiViewer = new UIViewer();
             uiViewer.Show();
         }
 
@@ -328,6 +332,12 @@ namespace EntityTools.Forms
             // запрет на ввод любых символов отличных от алфавитно-цифровых
             if (!char.IsLetterOrDigit(e.KeyChar))
                 e.Handled = true;
+        }
+
+        private void btnExecute_Click(object sender, EventArgs e)
+        {
+            if(!string.IsNullOrEmpty(tbCommand.Text))
+                GameCommands.Execute(tbCommand.Text);
         }
     }
 }

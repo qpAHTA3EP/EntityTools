@@ -13,12 +13,14 @@ using System.Text;
 
 namespace EntityTools.Conditions
 {
+    [Serializable]
     public enum CampaignTaskState
     {
         Completed,
         NotCompleted
     }
 
+    [Serializable]
     public class CheckCampaignTask : Astral.Quester.Classes.Condition
     {
         public override void Reset() { }

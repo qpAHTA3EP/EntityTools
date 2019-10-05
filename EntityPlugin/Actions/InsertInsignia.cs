@@ -1,5 +1,6 @@
 ﻿#define DEBUG_INSERTINSIGNIA
 
+using System;
 using System.Collections.Generic;
 using Astral.Logic.Classes.Map;
 using EntityTools.Tools.MountInsignias;
@@ -9,6 +10,7 @@ using MyNW.Patchables.Enums;
 
 namespace EntityTools.Actions
 {
+    [Serializable]
     public class InsertInsignia : Astral.Quester.Classes.Action
     {
         #region Inherited
@@ -61,10 +63,19 @@ namespace EntityTools.Actions
                         if (freeInsignias == null || freeInsignias.Count == 0)
                         {
                             // Ищем в сумке все неэкипированные инсигнии (впервый раз)
-                            freeInsignias = EntityManager.LocalPlayer.BagsItems.FindAll(slot => slot.Item.ItemDef.InternalName.StartsWith("Insignia"));
-                            // сортировка списка "инсигний";
-                            freeInsignias.Sort(InsigniaQualityDescendingComparison);
-                            if (freeInsignias==null || freeInsignias.Count == 1)
+                            freeInsignias = EntityManager.LocalPlayer.BagsItems.FindAll(slot =>
+                                                                                            slot.Item.ItemDef.Categories.Contains(ItemCategory.Insignia)
+                                                                                            /* Вариант 2*/
+                                                                                            //slot.Item.ItemDef.Type == ItemType.Gem
+                                                                                            //&& (slot.Item.ItemDef.GemType == (uint)InsigniaType.Barbed 
+                                                                                            //    || slot.Item.ItemDef.GemType == (uint)InsigniaType.Crescent
+                                                                                            //    || slot.Item.ItemDef.GemType == (uint)InsigniaType.Enlightened
+                                                                                            //    || slot.Item.ItemDef.GemType == (uint)InsigniaType.Illuminated
+                                                                                            //    || slot.Item.ItemDef.GemType == (uint)InsigniaType.Regal)
+                                                                                            /* Вариант 3*/
+                                                                                            //slot.Item.ItemDef.InternalName.StartsWith("Insignia", System.StringComparison.OrdinalIgnoreCase)
+                                                                                        );
+                            if (freeInsignias==null || freeInsignias.Count == 0)
                             {
                                 // в инвентаре отсутствуют инсигнии
 #if DEBUG_INSERTINSIGNIA
@@ -72,6 +83,8 @@ namespace EntityTools.Actions
 #endif
                                 return ActionResult.Skip;
                             }
+                            // сортировка списка "инсигний";
+                            freeInsignias.Sort(InsigniaQualityDescendingComparison);
                         }
 
                         // Ищем первую попавшуюся подходящую инсигнию (знак скакуна)

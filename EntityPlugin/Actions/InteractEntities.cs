@@ -20,6 +20,7 @@ namespace EntityTools.Actions
     /// <summary>
     /// Перечисление 
     /// </summary>
+    [Serializable]
     public enum InteractionRequirement
     {
         /// <summary>
@@ -39,10 +40,11 @@ namespace EntityTools.Actions
         /// </summary>
         Obligatory
     }
-    
+
     /// <summary>
     /// Перечисление методов взаимодействия с Entity
     /// </summary>
+    [Serializable]
     public enum InteractionMethod
     {
         /// <summary>
@@ -71,6 +73,7 @@ namespace EntityTools.Actions
         FollowAndSimulateFKey
     }
 
+    [Serializable]
     public class InteractEntities : Astral.Quester.Classes.Action
     {
 

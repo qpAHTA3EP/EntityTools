@@ -20,7 +20,15 @@ namespace EntityTools.Forms
         private BindingList<ParagonMountBonusPriorityDef> MountBonusPriorityList;
         //private Dictionary<PlayerClassParagonType, MountBonusPriorityDef> MountBonusPriorityList = new Dictionary<PlayerClassParagonType, MountBonusPriorityDef>();
 
+        private static MountBonusPriorityListForm bonusListForm;
 
+        public static void GetBonusList()
+        {
+            if (bonusListForm == null)
+                bonusListForm = new MountBonusPriorityListForm();
+
+            bonusListForm.Show();
+        }
 
         /// <summary>
         /// Словарь соответствия индексов элементов компонента PlayersClass

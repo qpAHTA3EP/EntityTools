@@ -10,6 +10,7 @@ using System.Windows.Forms;
 
 namespace EntityTools.Conditions
 {
+    [Serializable]
     public class CheckShard : Astral.Quester.Classes.Condition
     {
         public CheckShard()

@@ -37,6 +37,9 @@
             this.lblFilterName = new System.Windows.Forms.Label();
             this.cbSort = new System.Windows.Forms.CheckBox();
             this.lblGenTime = new System.Windows.Forms.Label();
+            this.tbCommand = new System.Windows.Forms.TextBox();
+            this.btnExecute = new System.Windows.Forms.Button();
+            this.lblCommand = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -142,18 +145,50 @@
             // lblGenTime
             // 
             this.lblGenTime.AutoSize = true;
-            this.lblGenTime.Location = new System.Drawing.Point(12, 405);
+            this.lblGenTime.Location = new System.Drawing.Point(464, 18);
             this.lblGenTime.Name = "lblGenTime";
             this.lblGenTime.Size = new System.Drawing.Size(0, 13);
             this.lblGenTime.TabIndex = 7;
+            // 
+            // tbCommand
+            // 
+            this.tbCommand.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbCommand.Location = new System.Drawing.Point(115, 406);
+            this.tbCommand.Name = "tbCommand";
+            this.tbCommand.Size = new System.Drawing.Size(438, 21);
+            this.tbCommand.TabIndex = 8;
+            // 
+            // btnExecute
+            // 
+            this.btnExecute.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnExecute.Location = new System.Drawing.Point(559, 404);
+            this.btnExecute.Name = "btnExecute";
+            this.btnExecute.Size = new System.Drawing.Size(75, 23);
+            this.btnExecute.TabIndex = 5;
+            this.btnExecute.Text = "Execute";
+            this.btnExecute.UseVisualStyleBackColor = true;
+            this.btnExecute.Click += new System.EventHandler(this.btnExecute_Click);
+            // 
+            // lblCommand
+            // 
+            this.lblCommand.AutoSize = true;
+            this.lblCommand.Location = new System.Drawing.Point(12, 409);
+            this.lblCommand.Name = "lblCommand";
+            this.lblCommand.Size = new System.Drawing.Size(97, 13);
+            this.lblCommand.TabIndex = 6;
+            this.lblCommand.Text = "Console command:";
             // 
             // UIViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(645, 450);
+            this.ClientSize = new System.Drawing.Size(645, 439);
+            this.Controls.Add(this.tbCommand);
             this.Controls.Add(this.lblGenTime);
+            this.Controls.Add(this.lblCommand);
             this.Controls.Add(this.lblFilterName);
+            this.Controls.Add(this.btnExecute);
             this.Controls.Add(this.btnFill);
             this.Controls.Add(this.filterName);
             this.Controls.Add(this.cbSort);
@@ -182,5 +217,8 @@
         private System.Windows.Forms.Label lblFilterName;
         private System.Windows.Forms.CheckBox cbSort;
         private System.Windows.Forms.Label lblGenTime;
+        private System.Windows.Forms.TextBox tbCommand;
+        private System.Windows.Forms.Button btnExecute;
+        private System.Windows.Forms.Label lblCommand;
     }
 }

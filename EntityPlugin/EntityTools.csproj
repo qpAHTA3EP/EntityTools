@@ -17,49 +17,38 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;X64</DefineConstants>
+    <OutputPath>bin\x32\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;X32</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE;X64</DefineConstants>
+    <DefineConstants>TRACE;X32</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>bin\x64\</OutputPath>
     <DefineConstants>TRACE;DEBUG;X64</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>bin\x64\</OutputPath>
     <DefineConstants>TRACE;X64</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>MichaelProg.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Astral, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
@@ -103,16 +92,25 @@
     <Compile Include="Actions\MoveToLeader.cs" />
     <Compile Include="Conditions\CheckCampaignTask.cs" />
     <Compile Include="Conditions\CheckShard.cs" />
+    <Compile Include="Conditions\ComplexCondition.cs" />
     <Compile Include="Conditions\EntityPropertyConditions.cs" />
     <Compile Include="Conditions\Deprecated\EntityDistance.cs" />
     <Compile Include="Conditions\EntityCountInCustomRegion.cs" />
     <Compile Include="Conditions\Deprecated\PartyCount.cs" />
+    <Compile Include="Conditions\PlayerParagon.cs" />
     <Compile Include="Conditions\TeamLeaderMapInstance.cs" />
     <Compile Include="Conditions\TeamMemberCount.cs" />
     <Compile Include="Conditions\TeamMemberCountInCustomRegion.cs" />
     <Compile Include="Editors\CampaignTaskEditor.cs" />
+    <Compile Include="Editors\ConditionListEditor.cs" />
     <Compile Include="Editors\NodePositionEditor.cs" />
     <Compile Include="Editors\ParagonListEditor.cs" />
+    <Compile Include="Forms\ConditionsListForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ConditionsListForm.Designer.cs">
+      <DependentUpon>ConditionsListForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\InsigniaBonusSelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -137,6 +135,12 @@
     <Compile Include="Forms\NodeSelectForm.Designer.cs">
       <DependentUpon>NodeSelectForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\PlayerParagonSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\PlayerParagonSelectForm.Designer.cs">
+      <DependentUpon>PlayerParagonSelectForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\UIViewer.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -146,6 +150,8 @@
     <Compile Include="States\SlideMonitor.cs" />
     <Compile Include="States\SlideMonitorSettings.cs" />
     <Compile Include="States\SpellStuckMonitor.cs" />
+    <Compile Include="Tools\CollectionTypeConverter.cs" />
+    <Compile Include="Tools\CopyHelper.cs" />
     <Compile Include="Tools\EnchantHelper.cs" />
     <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\Auras.cs" />
@@ -180,12 +186,15 @@
     <Compile Include="Tools\MountInsignias\MountBonusesDef.cs" />
     <Compile Include="Tools\MountInsignias\MountBonusPriorityDef.cs" />
     <Compile Include="Tools\MountInsignias\ParagonMountBonusPriorityDef.cs" />
-    <Compile Include="Tools\PlayerClassParagon.cs" />
+    <Compile Include="Tools\ParagonTools.cs" />
     <Compile Include="Tools\SettingsTools.cs" />
     <Compile Include="Tools\Struct.cs" />
     <Compile Include="Tools\UIInterfacesTools.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Forms\ConditionsListForm.resx">
+      <DependentUpon>ConditionsListForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\EntitySelectForm.resx">
       <DependentUpon>EntitySelectForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -204,6 +213,9 @@
     <EmbeddedResource Include="Forms\NodeSelectForm.resx">
       <DependentUpon>NodeSelectForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PlayerParagonSelectForm.resx">
+      <DependentUpon>PlayerParagonSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\UIViewer.resx">
       <DependentUpon>UIViewer.cs</DependentUpon>
     </EmbeddedResource>
@@ -214,6 +226,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Tools\Extensions\" />
     <Folder Include="UCC\" />
   </ItemGroup>
   <ItemGroup>
@@ -238,7 +251,6 @@
     <None Include="Images\Icons_Inventory_Enchantments_Insignia_Illuminated.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="MichaelProg.pfx" />
     <None Include="Properties\DataSources\MountBonuses.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

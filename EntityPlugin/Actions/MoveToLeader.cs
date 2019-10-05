@@ -13,6 +13,7 @@ using System.Text;
 
 namespace EntityTools.Actions
 {
+    [Serializable]
     public class MoveToLeader : Astral.Quester.Classes.Action
     {
         [Description("Distance to the Team Leader by which it is necessary to approach")]

@@ -31,15 +31,15 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.cbPlayersClass = new System.Windows.Forms.ComboBox();
             this.dgvBonusPriorityList = new System.Windows.Forms.DataGridView();
+            this.clmnBonusName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.clmnNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.clmnButton = new System.Windows.Forms.DataGridViewButtonColumn();
             this.btnDown = new System.Windows.Forms.Button();
             this.bntUp = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.lbClasses = new System.Windows.Forms.Label();
             this.btnRemove = new System.Windows.Forms.Button();
-            this.clmnBonusName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.clmnNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.clmnButton = new System.Windows.Forms.DataGridViewButtonColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dgvBonusPriorityList)).BeginInit();
             this.SuspendLayout();
             // 
@@ -72,6 +72,42 @@
             this.dgvBonusPriorityList.Size = new System.Drawing.Size(482, 218);
             this.dgvBonusPriorityList.TabIndex = 1;
             this.dgvBonusPriorityList.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvBonusPriorityList_CellClick);
+            // 
+            // clmnBonusName
+            // 
+            this.clmnBonusName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.clmnBonusName.HeaderText = "Bonus Name";
+            this.clmnBonusName.Name = "clmnBonusName";
+            this.clmnBonusName.ReadOnly = true;
+            this.clmnBonusName.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // clmnNumber
+            // 
+            this.clmnNumber.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle2.Format = "N0";
+            dataGridViewCellStyle2.NullValue = "1";
+            this.clmnNumber.DefaultCellStyle = dataGridViewCellStyle2;
+            this.clmnNumber.FillWeight = 40F;
+            this.clmnNumber.HeaderText = "Num";
+            this.clmnNumber.MinimumWidth = 40;
+            this.clmnNumber.Name = "clmnNumber";
+            this.clmnNumber.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.clmnNumber.ToolTipText = "Number of bonuses at the same time";
+            this.clmnNumber.Width = 40;
+            // 
+            // clmnButton
+            // 
+            this.clmnButton.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
+            this.clmnButton.FillWeight = 23F;
+            this.clmnButton.HeaderText = "";
+            this.clmnButton.MinimumWidth = 23;
+            this.clmnButton.Name = "clmnButton";
+            this.clmnButton.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.clmnButton.Text = "...";
+            this.clmnButton.ToolTipText = "Select insignia bonus";
+            this.clmnButton.UseColumnTextForButtonValue = true;
+            this.clmnButton.Width = 23;
             // 
             // btnDown
             // 
@@ -128,46 +164,10 @@
             this.btnRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnRemove.Location = new System.Drawing.Point(74, 282);
             this.btnRemove.Name = "btnRemove";
-            this.btnRemove.Size = new System.Drawing.Size(75, 23);
+            this.btnRemove.Size = new System.Drawing.Size(23, 23);
             this.btnRemove.TabIndex = 2;
             this.btnRemove.Text = "Remove";
             this.btnRemove.UseVisualStyleBackColor = true;
-            // 
-            // clmnBonusName
-            // 
-            this.clmnBonusName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.clmnBonusName.HeaderText = "Bonus Name";
-            this.clmnBonusName.Name = "clmnBonusName";
-            this.clmnBonusName.ReadOnly = true;
-            this.clmnBonusName.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // clmnNumber
-            // 
-            this.clmnNumber.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle2.Format = "N0";
-            dataGridViewCellStyle2.NullValue = "1";
-            this.clmnNumber.DefaultCellStyle = dataGridViewCellStyle2;
-            this.clmnNumber.FillWeight = 40F;
-            this.clmnNumber.HeaderText = "Num";
-            this.clmnNumber.MinimumWidth = 40;
-            this.clmnNumber.Name = "clmnNumber";
-            this.clmnNumber.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.clmnNumber.ToolTipText = "Number of bonuses at the same time";
-            this.clmnNumber.Width = 40;
-            // 
-            // clmnButton
-            // 
-            this.clmnButton.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
-            this.clmnButton.FillWeight = 23F;
-            this.clmnButton.HeaderText = "";
-            this.clmnButton.MinimumWidth = 23;
-            this.clmnButton.Name = "clmnButton";
-            this.clmnButton.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.clmnButton.Text = "...";
-            this.clmnButton.ToolTipText = "Select insignia bonus";
-            this.clmnButton.UseColumnTextForButtonValue = true;
-            this.clmnButton.Width = 23;
             // 
             // MountBonusPriorityListForm
             // 
@@ -187,7 +187,7 @@
             this.Controls.Add(this.cbPlayersClass);
             this.MinimumSize = new System.Drawing.Size(380, 324);
             this.Name = "MountBonusPriorityListForm";
-            this.Text = "MountBonusPriorityListForm";
+            this.Text = "MountBonusList";
             ((System.ComponentModel.ISupportInitialize)(this.dgvBonusPriorityList)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

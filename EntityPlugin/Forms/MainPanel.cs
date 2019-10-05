@@ -114,7 +114,26 @@ namespace EntityTools.Forms
             //}
             #endregion
 
-            InsigniaBonusSelectForm.GetMountBonuses();
+            #region Test_MountBonusPriority
+            //MountBonusPriorityListForm.GetBonusList();
+            #endregion
+
+            #region Test_ComplexCondition
+            ConditionListForm listEditor = new ConditionListForm();
+            var condList = listEditor.GetConditionList();
+            if (condList != null)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (var cond in condList)
+                {
+                    sb.AppendLine(cond.ToString());
+                }
+                MessageBox.Show(sb.ToString());
+            }
+            else MessageBox.Show("Conditions is empty");
+
+
+            #endregion
         }
 
         private void ckbDebugInfo_CheckedChanged(object sender, EventArgs e)

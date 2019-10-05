@@ -10,6 +10,7 @@ using System.Xml.Serialization;
 
 namespace AstralVariables.Expressions
 {
+    [Serializable]
     public class NumberExpression : Expression<double>
     {
         [XmlIgnore]
