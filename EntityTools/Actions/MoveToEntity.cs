@@ -21,9 +21,9 @@ namespace EntityTools.Actions
         [NonSerialized]
         protected Entity target = new Entity(IntPtr.Zero);
 
-        [NonSerialized]
-        [Description("Period of time until the closest entity is searched again")]
-        protected readonly int SearchTimeout = 1000;
+        //[NonSerialized]
+        //[Description("Period of time until the closest entity is searched again")]
+        //protected readonly int SearchTimeout = 1000;
 
         [Description("ID (an internal untranslated name) of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
@@ -43,92 +43,51 @@ namespace EntityTools.Actions
         [Description("Check Entity's Ingame Region (Not CustomRegion):\n" +
             "True: Only Entities located in the same Region as Player are detected\n" +
             "False: Entity's Region does not checked during search")]
-        [Category("Entity")]
+        [Category("Entity optional checks")]
         public bool RegionCheck { get; set; } = false;
 
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
-        [Category("Entity")]
+        [Category("Entity optional checks")]
         public bool HealthCheck { get; set; } = true;
+
+        [Description("True: Do not change the target Entity while it is alive or until the Bot within 'Distance' of it\n" +
+                    "False: Constantly scan an area and target the nearest Entity")]
+        [Category("Entity optional checks")]
+        public bool HoldTargetEntity { get; set; } = true;
 
         [Description("The maximum distance from the character within which the Entity is searched\n" +
             "The default value is 0, which disables distance checking")]
-        [Category("Entity")]
+        [Category("Entity optional checks")]
         public float ReactionRange { get; set; } = 0;
 
         [Description("CustomRegion names collection")]
         [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
-        [Category("Entity")]
+        [Category("Entity optional checks")]
         public List<string> CustomRegionNames { get; set; } = new List<string>();
 
         [Description("Distance to the Entity by which it is necessary to approach")]
-        [Category("Movement")]
+        [Category("Interruptions")]
         public float Distance { get; set; } = 30;
 
-        [Description("Enable IgnoreCombat profile value while playing action")]
-        [Category("Movement")]
+        [Description("Enable 'IgnoreCombat' profile value while playing action")]
+        [Category("Interruptions")]
         public bool IgnoreCombat { get; set; } = true;
+
+        //[Description("True: Clear the list the enemies (cache) attacking the player before engage combat")]
+        //[Category("Interruptions")]
+        //public bool ClearAttackersCache { get; set; } = true;
 
         [Description("True: Complite an action when the object is closer than 'Distance'\n" +
                      "False: Follow an Entity regardless of its distance")]
-        [Category("Movement")]
+        [Category("Interruptions")]
         public bool StopOnApproached { get; set; } = false;
 
-        public MoveToEntity() { }
-
-        public override string ActionLabel => $"{GetType().Name} [{EntityID}]";
-
-        public override void OnMapDraw(GraphicsNW graph)
-        {
-            if (target.IsValid && target.Location.IsValid)
-            {
-                Brush beige = Brushes.Beige;
-                graph.drawFillEllipse(target.Location, new Size(10, 10), beige);
-            }
-        }
-
-        public override void InternalReset()
-        {
-            if (string.IsNullOrEmpty(EntityID))
-                target = new Entity(IntPtr.Zero);
-            else
-                target = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, HealthCheck, ReactionRange, RegionCheck, CustomRegionNames);
-        }
-
-        protected override bool IntenalConditions => !string.IsNullOrEmpty(EntityID);
-
-        public override string InternalDisplayName => GetType().Name;
-
-        public override bool UseHotSpots => true;
-
-        protected override Vector3 InternalDestination
-        {
-            get
-            {
-                if (target.IsValid)
-                {
-                    if (target.Location.Distance3DFromPlayer > Distance)
-                        return target.Location.Clone();
-                    else return EntityManager.LocalPlayer.Location.Clone();
-                }
-                return new Vector3();
-            }
-        }
-
-        protected override ActionValidity InternalValidity
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(EntityID))
-                {
-                    return new ActionValidity($"Рroperty '{nameof(EntityID)}' not set.");
-                }
-                return new ActionValidity();
-            }
-        }
-
-        public override void GatherInfos() { }
+        [Description("True: Clear the list of attackers and attack the target Entity when it is approached\n" +
+            "This option is ignored if 'IgnoreCombat' does not set")]
+        [Category("Interruptions")]
+        public bool AttackTargetEntity { get; set; } = true;
 
         public override bool NeedToRun
         {
@@ -144,20 +103,33 @@ namespace EntityTools.Actions
                 //}
 
                 // Поиск Entity при каждой проверке
-                target = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, HealthCheck, ReactionRange, RegionCheck, CustomRegionNames);
+                //Команда работает с 2 - мя целями:
+                //1 - я цель (target) определяет навигацию. Если она фиксированная(HoldTargetEntity), то не сбрасывается пока жива и не достигнута
+                //2 - я ближайшая цель (closest) управляет флагом IgnoreCombat
+                //Если HoldTargetEntity ВЫКЛЮЧЕН, то обе цели совпадают - это ближайшая цель 
 
-                if(target != null && target.IsValid)
+                Entity closestEntity = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, HealthCheck, ReactionRange, RegionCheck, CustomRegionNames);
+
+                if (!HoldTargetEntity || target == null || !target.IsValid || (HealthCheck && target.IsDead))
+                        target = closestEntity;
+
+                if (IgnoreCombat && closestEntity != null && closestEntity.IsValid
+                    && !(HealthCheck && closestEntity.IsDead)
+                    && (closestEntity.Location.Distance3DFromPlayer <= Distance))
                 {
-                    if (target.Location.Distance3DFromPlayer > Distance)
+                    Astral.Logic.NW.Attackers.List.Clear();
+                    if (AttackTargetEntity)
                     {
-                        Astral.Quester.API.IgnoreCombat = IgnoreCombat;
-                        return false;
+                        Astral.Logic.NW.Attackers.List.Add(closestEntity);
+                        Astral.Quester.API.IgnoreCombat = false;
+                        Astral.Logic.NW.Combats.CombatUnit(closestEntity, null);
                     }
-                    else return true;
+                    else Astral.Quester.API.IgnoreCombat = false;
                 }
-                else Astral.Quester.API.IgnoreCombat = IgnoreCombat;
+                else if(IgnoreCombat)
+                    Astral.Quester.API.IgnoreCombat = true;
 
-                return false;
+                return (target != null && target.IsValid && (target.Location.Distance3DFromPlayer < Distance));
             }
         }
 
@@ -169,19 +141,66 @@ namespace EntityTools.Actions
                 return ActionResult.Fail;
             }
 
-            if (target.Location.Distance3DFromPlayer < Distance)
-            {
-                Astral.Quester.API.IgnoreCombat = false;
+            // Вариант реализации со сбросом флага IgnoreCombat в Run()
+            //if (target.Location.Distance3DFromPlayer < Distance)
+            //{
+            //    Astral.Quester.API.IgnoreCombat = false;
 
-                if (StopOnApproached)
-                    return ActionResult.Completed;
-                else return ActionResult.Running;
-            }
-            else
+            //    if (StopOnApproached)
+            //        return ActionResult.Completed;
+            //    else return ActionResult.Running;
+            //}
+            //else
+            //{
+            //    if (IgnoreCombat)
+            //        Astral.Quester.API.IgnoreCombat = IgnoreCombat;
+            //    return ActionResult.Running;
+            //}
+
+            // Вариант реализации со сбросом флага IgnoreCombat в NeedToRun
+            if (StopOnApproached)
+                return ActionResult.Completed;
+            else return ActionResult.Running;
+        }
+
+        public MoveToEntity() { }
+        public override string ActionLabel => $"{GetType().Name} [{EntityID}]";
+        public override void OnMapDraw(GraphicsNW graph)
+        {
+            if (target.IsValid && target.Location.IsValid)
             {
-                Astral.Quester.API.IgnoreCombat = IgnoreCombat;
-                return ActionResult.Running;
+                Brush beige = Brushes.Beige;
+                graph.drawFillEllipse(target.Location, new Size(10, 10), beige);
             }
         }
+        public override void InternalReset() { }
+        protected override bool IntenalConditions => !string.IsNullOrEmpty(EntityID);
+        public override string InternalDisplayName => GetType().Name;
+        public override bool UseHotSpots => true;
+        protected override Vector3 InternalDestination
+        {
+            get
+            {
+                if (target != null && target.IsValid)
+                {
+                    if (target.Location.Distance3DFromPlayer > Distance)
+                        return target.Location.Clone();
+                    else return EntityManager.LocalPlayer.Location.Clone();
+                }
+                return new Vector3();
+            }
+        }
+        protected override ActionValidity InternalValidity
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(EntityID))
+                {
+                    return new ActionValidity($"Рroperty '{nameof(EntityID)}' not set.");
+                }
+                return new ActionValidity();
+            }
+        }
+        public override void GatherInfos() { }
     }
 }

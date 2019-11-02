@@ -15,61 +15,47 @@ namespace EntityTools.Conditions
     [Serializable]
     public class EntityProperty : Condition
     {
-        public EntityProperty()
-        {
-            EntityID = string.Empty;
-            PropertyType = EntityPropertyType.Distance;
-            Value = 0;
-            Sign = Relation.Superior;
-            EntityIdType = ItemFilterStringType.Simple;
-            EntityNameType = EntityNameType.NameUntranslated;
-            RegionCheck = false;
-            HealthCheck = true;
+        [Description("ID (an untranslated name) of the Entity for the search")]
+        [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
+        [Category("Entity")]
+        public string EntityID { get; set; } = string.Empty;
 
-            CustomRegionNames = new List<string>();
-        }
+        [Description("The switcher of the Entity filed which compared to the property EntityID")]
+        [Category("Entity")]
+        public EntityNameType EntityNameType { get; set; } = EntityNameType.NameUntranslated;
 
         [Description("Type of and EntityID:\n" +
             "Simple: Simple test string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
-        public ItemFilterStringType EntityIdType { get; set; }
-
-        [Description("ID (an untranslated name) of the Entity for the search")]
-        [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
-        [Category("Entity")]
-        public string EntityID { get; set; }
-
-        [Description("Check if Entity's health greater than zero:\n" +
-            "True: Only Entities with nonzero health are detected\n" +
-            "False: Entity's health does not checked during search")]
-        [Category("Entity")]
-        public bool HealthCheck { get; set; }
-
-        [Description("CustomRegion names collection")]
-        [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
-        [Category("Entity")]
-        public List<string> CustomRegionNames { get; set; }
-
-        [Description("The switcher of the Entity filed which compared to the property EntityID")]
-        [Category("Entity")]
-        public EntityNameType EntityNameType { get; set; }
-
-        [Category("Tested")]
-        public EntityPropertyType PropertyType { get; set; }
-
-        [Category("Tested")]
-        public float Value { get; set; }
+        public ItemFilterStringType EntityIdType { get; set; } = ItemFilterStringType.Simple;
 
         [Description("Check Entity's Region:\n" +
             "True: Search an Entity only if it located in the same Region as Player\n" +
             "False: Does not consider the region when searching Entities")]
-        [Category("Entity")]
-        public bool RegionCheck { get; set; }
+        [Category("Entity optional checks")]
+        public bool RegionCheck { get; set; } = false;
+
+        [Description("Check if Entity's health greater than zero:\n" +
+            "True: Only Entities with nonzero health are detected\n" +
+            "False: Entity's health does not checked during search")]
+        [Category("Entity optional checks")]
+        public bool HealthCheck { get; set; } = true;
+
+        [Description("CustomRegion names collection")]
+        [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
+        [Category("Entity optional checks")]
+        public List<string> CustomRegionNames { get; set; } = new List<string>();
+
+        [Category("Tested")]
+        public EntityPropertyType PropertyType { get; set; } = EntityPropertyType.Distance;
+
+        [Category("Tested")]
+        public float Value { get; set; } = 0;
 
         [Description("Value comparison type to the closest Entity")]
         [Category("Tested")]
-        public Condition.Relation Sign { get; set; }
+        public Condition.Relation Sign { get; set; } = Relation.Superior;
 
         public override bool IsValid
         {
@@ -128,15 +114,6 @@ namespace EntityTools.Conditions
             }
         }
 
-        public override void Reset()
-        {
-        }
-
-        public override string ToString()
-        {
-            return $"Entity [{EntityID}] {PropertyType} {Sign} to {Value}";
-        }
-
         public override string TestInfos
         {
             get
@@ -171,6 +148,14 @@ namespace EntityTools.Conditions
                 }
             }
         }
+
+        public override void Reset() { }
+        public override string ToString()
+        {
+            return $"Entity [{EntityID}] {PropertyType} {Sign} to {Value}";
+        }
+
+        public EntityProperty() { }
     }
 
     public enum EntityPropertyType

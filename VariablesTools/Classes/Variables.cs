@@ -428,7 +428,7 @@ namespace AstralVariables.Classes
                 else if (DateTime.TryParse(value.ToString(), out DateTime newValue))
                 {
                     _dtValue = newValue;
-                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)} Variable '{Key}' set to [{_dtValue}] as {VarType}");
+                    Astral.Logger.WriteLine($"{GetType().Name} Variable '{Key}' set to [{_dtValue}] as {VarType}");
                 }
                 else
                 {
@@ -533,7 +533,7 @@ namespace AstralVariables.Classes
 //                    _strValue = inStr;
                     
 //#if ASTRAL_LOGGER
-//                    Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Variable '{Key}' set to [{inStr}] as {VarType}");
+//                    Astral.Logger.WriteLine($"{VariablesTools.LoggerPredicate} Variable '{Key}' set to [{inStr}] as {VarType}");
 //#endif
 //                }
 //                else
@@ -542,7 +542,7 @@ namespace AstralVariables.Classes
 //                    _strValue = string.Empty;
 
 //#if ASTRAL_LOGGER
-//                    Astral.Logger.WriteLine($"{VariablesAddon.LoggerPredicate} Invalid value [{inStr}] to Variable '{Key}' type of {VarType}. Variable '{Key}' reseted to [{_itemId}].");
+//                    Astral.Logger.WriteLine($"{VariablesTools.LoggerPredicate} Invalid value [{inStr}] to Variable '{Key}' type of {VarType}. Variable '{Key}' reseted to [{_itemId}].");
 //#endif
 //                }
 //            }

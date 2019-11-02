@@ -17,16 +17,16 @@ namespace EntityTools.Actions
     public class MoveToLeader : Astral.Quester.Classes.Action
     {
         [Description("Distance to the Team Leader by which it is necessary to approach")]
-        [Category("Movement")]
+        [Category("Interruptions")]
         public float Distance { get; set; }
 
         [Description("Enable IgnoreCombat profile value while playing action")]
-        [Category("Movement")]
+        [Category("Interruptions")]
         public bool IgnoreCombat { get; set; }
 
         [Description("True: Complite an action when the Team Leader is closer than 'Distance'\n" +
                      "False: Follow an Team Leader regardless of its distance")]
-        [Category("Movement")]
+        [Category("Interruptions")]
         public bool StopOnApproached { get; set; }
 
         //[Description("Check player is the member of the Team:\n" +
@@ -113,26 +113,31 @@ namespace EntityTools.Actions
             {
                 if (InternalDestination.Distance3DFromPlayer > Distance )
                 {
-                    Astral.Quester.API.IgnoreCombat = IgnoreCombat;
+                    if(IgnoreCombat)
+                        Astral.Quester.API.IgnoreCombat = true;
                     return false;
                 }
-                else return true;
+                else
+                {
+                    if (IgnoreCombat)
+                        Astral.Quester.API.IgnoreCombat = false;
+                    return true;
+                }
             }
         }
 
         public override ActionResult Run()
         {
-            if (InternalDestination.Distance3DFromPlayer < Distance)
+            if (InternalDestination.Distance3DFromPlayer <= Distance)
             {
-                Astral.Quester.API.IgnoreCombat = false;
-
                 if (StopOnApproached)
                     return ActionResult.Completed;
                 else return ActionResult.Running;
             }
             else
             {
-                Astral.Quester.API.IgnoreCombat = IgnoreCombat;
+                if (IgnoreCombat)
+                    Astral.Quester.API.IgnoreCombat = true;
                 return ActionResult.Running;
             }
         }

@@ -31,13 +31,10 @@ namespace EntityTools.Conditions
     [Serializable]
     public class EntityCountInCustomRegions : Condition
     {
-        [Category("Location")]
-        public Condition.Presence Tested { get; set; }
-
-        [Description("CustomRegion names collection")]
-        [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
-        [Category("Location")]
-        public List<string> CustomRegionNames { get; set; }
+        [Description("ID (an untranslated name) of the Entity for the search (regex)")]
+        [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
+        [Category("Entity")]
+        public string EntityID { get; set; }
 
         [Description("Type of the EntityID:\n" +
             "Simple: Simple test string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
@@ -52,19 +49,14 @@ namespace EntityTools.Conditions
         [Description("Check Entity's Region:\n" +
             "True: Count Entity if it located in the same Region as Player\n" +
             "False: Does not consider the region when counting Entities")]
-        [Category("Entity")]
+        [Category("Entity optional checks")]
         public bool RegionCheck { get; set; }
 
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
-        [Category("Entity")]
+        [Category("Entity optional checks")]
         public bool HealthCheck { get; set; }
-
-        [Description("ID (an untranslated name) of the Entity for the search (regex)")]
-        [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
-        [Category("Entity")]
-        public string EntityID { get; set; }
 
         [Description("Threshold value of the Entity number for comparison by 'Sign'")]
         [Category("Tested")]
@@ -73,6 +65,14 @@ namespace EntityTools.Conditions
         [Description("The comparison type for 'Value'")]
         [Category("Tested")]
         public Relation Sign { get; set; }
+
+        [Category("Location")]
+        public Condition.Presence Tested { get; set; }
+
+        [Description("CustomRegion names collection")]
+        [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
+        [Category("Location")]
+        public List<string> CustomRegionNames { get; set; }
 
         public EntityCountInCustomRegions()
         {

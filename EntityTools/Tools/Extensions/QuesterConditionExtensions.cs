@@ -1,5 +1,6 @@
 ﻿using Astral.Controllers;
 using Astral.Quester.Classes;
+using MyNW.Classes;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -42,4 +43,4 @@ namespace EntityTools.Tools.Extensions
         //}
         #endregion
     }
-}
+

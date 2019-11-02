@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using Astral;
@@ -18,6 +19,7 @@ using EntityTools.Editors;
 using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
+using static Astral.Logger;
 
 namespace EntityTools.Actions
 {
@@ -42,38 +44,44 @@ namespace EntityTools.Actions
         [Description("Check Entity's Ingame Region (Not CustomRegion):\n" +
             "True: Only Entities located in the same Region as Player are detected\n" +
             "False: Entity's Region does not checked during search")]
-        [Category("Entity")]
+        [Category("Entity optional checks")]
         public bool RegionCheck { get; set; }
 
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
-        [Category("Entity")]
+        [Category("Entity optional checks")]
         public bool HealthCheck { get; set; } = true;
+
+        [Description("True: Do not change the target Entity while it is alive or until the Bot within Distance of it\n" +
+                    "False: Constantly scan an area and target the nearest Entity")]
+        [Category("Entity optional checks")]
+        public bool HoldTargetEntity { get; set; } = true;
 
         [Description("Check if Entity is moving:\n" +
             "True: Only standing Entities are detected\n" +
             "False: Both moving and stationary Entities are detected")]
-        [Category("Entity")]
+        [Category("Entity optional checks")]
         public bool SkipMoving { get; set; } = false;
 
         [Description("The maximum distance from the character within which the Entity is searched\n" +
             "The default value is 0, which disables distance checking")]
-        [Category("Entity")]
+        [Category("Entity optional checks")]
         public float ReactionRange { get; set; } = 150;
 
         [Description("CustomRegion names collection")]
         [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
-        [Category("Entity")]
+        [Category("Entity optional checks")]
         public List<string> CustomRegionNames { get; set; } = new List<string>();
 
-        //[Description("Distance to the Entity by which it is necessary to approach")]
-        //[Category("Movement")]
-        //public float Distance { get; set; }
+        [Description("Distance to the Entity by which it is necessary to approach to disable 'IgnoreCombat' mode\n" +
+            "Ignored if 'IgnoreCombat' does not True")]
+        [Category("Interruptions")]
+        public float CombatDistance { get; set; } = 30;
 
-        //[Description("Enable IgnoreCombat profile value while playing action")]
-        //[Category("Movement")]
-        //public bool IgnoreCombat { get; set; }
+        [Description("Enable IgnoreCombat mode while distance to the closest Entity greater then 'CombatDistance'")]
+        [Category("Interruptions")]
+        public bool IgnoreCombat { get; set; } = true;
 
         ///// Внутренний список игнорируемых Entity, используемый, если InteractionRequirement=Once
         //[NonSerialized]
@@ -104,11 +112,11 @@ namespace EntityTools.Actions
 
         [Category("Interaction")]
         [Description("Only one interaction with Entity is possible in 'InteractitTimeout' period")]
-        public bool InteractitOnce { get; set; } = false;
+        public bool InteractOnce { get; set; } = false;
 
         [Category("Interaction")]
         [Description("Interaction timeout (sec) if InteractitOnce flag is set")]
-        public int InteractitTimeout { get; set; } = 60;
+        public int InteractingTimeout { get; set; } = 60;
 
         [Description("Time to interact (ms)")]
         [Category("Interaction")]
@@ -125,7 +133,11 @@ namespace EntityTools.Actions
         public List<string> Dialogs { get; set; } = new List<string>();
 
         [NonSerialized]
-        private TempBlackList<IntPtr> talked = new TempBlackList<IntPtr>();
+        //(1) private TempBlackList<IntPtr> blackList = new TempBlackList<IntPtr>();
+        /*(2)*/ private TempBlackList<uint> blackList = new TempBlackList<uint>();
+        /*(3) private TempBlackList<BlackEntityDef> talked = new TempBlackList<BlackEntityDef>();*/
+        /*(4) private List<BlackEntityDef> blackList = new List<BlackEntityDef>();*/
+
         [NonSerialized]
         private bool combat;
         [NonSerialized]
@@ -139,11 +151,36 @@ namespace EntityTools.Actions
         {
             get
             {
-                Vector3 playerLoc = EntityManager.LocalPlayer.Location;
-                target = EntitySelectionTools.FindClosestContactEntity(EntityID, EntityIdType, EntityNameType, HealthCheck, ReactionRange, RegionCheck, CustomRegionNames, talked);
-
-                if (target != null && target.IsValid)
+                if (!HoldTargetEntity || target == null || !target.IsValid || (HealthCheck && target.IsDead))
                 {
+                    Entity entity = EntitySelectionTools.FindClosestContactEntity(EntityID, EntityIdType, EntityNameType, 
+                                                                HealthCheck, ReactionRange, RegionCheck, CustomRegionNames,
+                                                                IsNotInBlackList);
+
+                    if (entity != null && entity.IsValid)
+                        target = new Entity(entity.Pointer);
+                    else
+                    {
+                        target = null;
+                        return false;
+                    }
+                }
+
+                 if (target != null && target.IsValid && !(HealthCheck && target.IsDead))
+                {
+                    if (IgnoreCombat)
+                    {
+                        if (target.Location.Distance3DFromPlayer > CombatDistance)
+                        {
+                            Astral.Quester.API.IgnoreCombat = true;
+                            return false;
+                        }
+                        else
+                        {
+                            Astral.Logic.NW.Attackers.List.Clear();
+                            Astral.Quester.API.IgnoreCombat = false;
+                        }
+                    }
                     initialPos = target.Location/*.Clone()*/;
                     return true;
                 }
@@ -154,57 +191,81 @@ namespace EntityTools.Actions
 
         public override ActionResult Run()
         {
-            moved = false;
-            combat = false;
-            if (Approach.EntityForInteraction(target, new Func<Approach.BreakInfos>(CheckCombat)))
+            try
             {
-                target.Interact();
-                Thread.Sleep(InteractTime);
-                Interact.WaitForInteraction();
-                if (Dialogs.Count > 0)
+                moved = false;
+                combat = false;
+                if (Approach.EntityForInteraction(target, new Func<Approach.BreakInfos>(CheckCombat)))
                 {
-                    Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);
-                    while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count == 0)
+                    target.Interact();
+                    Thread.Sleep(InteractTime);
+                    Interact.WaitForInteraction();
+                    if (Dialogs.Count > 0)
                     {
-                        if (timeout.IsTimedOut)
+                        Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);
+                        while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count == 0)
                         {
-                            return ActionResult.Fail;
+                            if (timeout.IsTimedOut)
+                            {
+                                return ActionResult.Fail;
+                            }
+                            Thread.Sleep(100);
                         }
-                        Thread.Sleep(100);
-                    }
-                    Thread.Sleep(500);
-                    using (List<string>.Enumerator enumerator = Dialogs.GetEnumerator())
-                    {
-                        while (enumerator.MoveNext())
+                        Thread.Sleep(500);
+                        using (List<string>.Enumerator enumerator = Dialogs.GetEnumerator())
                         {
-                            string key = enumerator.Current;
-                            EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.SelectOptionByKey(key, "");
-                            Thread.Sleep(1000);
+                            while (enumerator.MoveNext())
+                            {
+                                string key = enumerator.Current;
+                                EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.SelectOptionByKey(key, "");
+                                Thread.Sleep(1000);
+                            }
+                            goto IL_FA;
                         }
-                        goto IL_FA;
+                        return ActionResult.Fail;
                     }
+                    IL_FA:
+                    EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
+                    return ActionResult.Completed;
+                }
+                if (combat)
+                {
+                    return ActionResult.Running;
+                }
+                if (!SkipMoving || moved)
+                {
+                    Logger.WriteLine("Entity moved, skip...");
                     return ActionResult.Fail;
                 }
-                IL_FA:
-                EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
-                if (InteractitOnce)
-                {
-                    talked.Add(target.Pointer, InteractitTimeout);
-                }
-                target = new Entity(IntPtr.Zero);
-                return ActionResult.Completed;
-            }
-            if (combat)
-            {
-                return ActionResult.Running;
-            }
-            if (moved)
-            {
-                Logger.WriteLine("Entity moved, skip...");
-                talked.Add(target.Pointer, InteractitTimeout);
                 return ActionResult.Fail;
             }
-            return ActionResult.Fail;
+            finally
+            {
+                if (InteractOnce)
+                    PushToBlackList(target);
+                target = new Entity(IntPtr.Zero);
+            }
+        }
+
+        internal bool IsNotInBlackList(Entity ent)
+        {
+            /* 2 */
+            return !blackList.Contains(ent.ContainerId);
+
+            /* 4
+            BlackEntityDef def = blackList.Find(x => x.Equals(ent));
+            if (def != null && def.IsTimedOut)
+            {
+                blackList.Remove(def);
+                return true;
+            }
+            return def == null; */
+        }
+
+        internal void PushToBlackList(Entity ent)
+        {
+            /* 2 */
+            blackList.Add(target.ContainerId, InteractingTimeout);
         }
 
         private Approach.BreakInfos CheckCombat()
@@ -225,9 +286,18 @@ namespace EntityTools.Actions
         public InteractEntities() { }
         public override string ActionLabel => $"{GetType().Name} [{EntityID}]";
         public override string InternalDisplayName => GetType().Name;
-        protected override Vector3 InternalDestination => new Vector3();
+        protected override Vector3 InternalDestination
+        {
+            get
+            {
+                if (target != null && target.IsValid
+                    && IgnoreCombat && (target.Location.Distance3DFromPlayer > CombatDistance))
+                        return target.Location.Clone();
+                return new Vector3();
+            }
+        }
         public override bool UseHotSpots => true;
-        protected override bool IntenalConditions => true;
+        protected override bool IntenalConditions => !string.IsNullOrEmpty(EntityID);
         public override void OnMapDraw(GraphicsNW graph)
         {
             if (target != null && target.IsValid)
@@ -236,10 +306,7 @@ namespace EntityTools.Actions
                 graph.drawFillEllipse(target.Location, new Size(10, 10), beige);
             }
         }
-        public override void InternalReset()
-        {
-            target = new Entity(IntPtr.Zero);
-        }
+        public override void InternalReset() { }
         protected override ActionValidity InternalValidity
         {
             get
@@ -269,6 +336,76 @@ namespace EntityTools.Actions
             {
                 DialogEdit.Show(Dialogs);
             }
+        }
+    }
+
+    /// <summary>
+    /// Упрощенное описание игнорируемых Entity для черного списка 
+    /// </summary>
+    internal class BlackEntityDef
+    {
+        public BlackEntityDef(Entity ent, int t = 0)
+        {
+            if (ent != null)
+            {
+                id = ent.ContainerId;
+                ptr = ent.Pointer;
+                pos = ent.Location.Clone();
+            }
+            else
+            {
+                id = 0;
+                ptr = IntPtr.Zero;
+                pos = new Vector3();
+            }
+
+            if (t > 0)
+                timeout = new Astral.Classes.Timeout(t);
+        }
+
+        internal Astral.Classes.Timeout timeout;
+        internal uint id;
+        internal IntPtr ptr;
+        internal Vector3 pos;
+
+        public bool IsTimedOut
+        {
+            get
+            {
+                if(timeout != null)
+                    return timeout.IsTimedOut;
+                return false;
+            }
+        }
+
+        public bool Equals(BlackEntityDef bkEnt)
+        {
+            return id == bkEnt.id
+                    || ptr == bkEnt.ptr
+                    || pos.Distance3D(bkEnt.pos) <= 1;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is BlackEntityDef bkEnt)
+            {
+                return id == bkEnt.id
+                    || ptr == bkEnt.ptr
+                    || pos.Distance3D(bkEnt.pos) <= 1;
+            }
+            if (obj is Entity ent)
+            {
+                return id == ent.ContainerId
+                    || ptr == ent.Pointer
+                    || pos.Distance3D(ent.Location) <= 1;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return id.GetHashCode() & ptr.GetHashCode() & pos.GetHashCode();
+            //return base.GetHashCode();
         }
     }
 }

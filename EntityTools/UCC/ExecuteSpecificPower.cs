@@ -26,23 +26,6 @@ namespace EntityTools.UCC
 {
     public class ExecuteSpecificPower : UCCAction
     {
-        public ExecuteSpecificPower()
-        {
-            Target = Astral.Logic.UCC.Ressources.Enums.Unit.Player;
-        }
-
-        public override UCCAction Clone()
-        {
-            return base.BaseClone(new ExecuteSpecificPower
-            {
-                PowerId = this.PowerId,
-                CheckPowerCooldown = this.CheckPowerCooldown,
-                CheckInTray = this.CheckInTray
-            });
-        }
-
-        private Power power = null;
-
         [Editor(typeof(PowerAllIdEditor), typeof(UITypeEditor))]
         [Category("Required")]
         public string PowerId { get; set; }
@@ -87,6 +70,12 @@ namespace EntityTools.UCC
             }
         }
 
+        [Browsable(false)]
+        public new string ActionName { get; set; }
+
+        private Power power = null;
+        private static readonly Type movementsType = ReflectionHelper.GetTypeByName("Astral.Logic.UCC.Controllers.Movements", true);
+
         public override bool NeedToRun
         {
             get
@@ -109,8 +98,6 @@ namespace EntityTools.UCC
                         && (!CheckInTray || power.IsInTray);
             }
         }
-
-        private static readonly Type movementsType = ReflectionHelper.GetTypeByName("Astral.Logic.UCC.Controllers.Movements", true);
 
         public override bool Run()
         {
@@ -199,7 +186,7 @@ namespace EntityTools.UCC
                 if (!powerDef.GroundTargeted && !powerDef.Categories.Contains(PowerCategory.IgnorePitch))
                 {
                     entity.Location.Face();
-                Powers.ExecPower(power, entity, true);
+                    Powers.ExecPower(power, entity, true);
                 }
                 else
                 {
@@ -219,12 +206,25 @@ namespace EntityTools.UCC
             return true;
         }
 
+        public ExecuteSpecificPower()
+        {
+            Target = Astral.Logic.UCC.Ressources.Enums.Unit.Player;
+        }
+        public override UCCAction Clone()
+        {
+            return base.BaseClone(new ExecuteSpecificPower
+            {
+                PowerId = this.PowerId,
+                CheckPowerCooldown = this.CheckPowerCooldown,
+                CheckInTray = this.CheckInTray
+            });
+        }
         public override string ToString()
         {
-            if (power == null || !power.IsValid)
+            if (! string.IsNullOrEmpty(PowerId) && (power == null || !power.IsValid))
                 power = Powers.GetPowerByInternalName(PowerId);
 
-            if (power.IsValid)
+            if (power != null && power.IsValid)
             {
                 string str = string.Empty;
                 if (CheckInTray && Slotted)
@@ -238,8 +238,5 @@ namespace EntityTools.UCC
 
             return "Unknow Power";
         }
-
-        [Browsable(false)]
-        public new string ActionName { get; set; }
     }
 }

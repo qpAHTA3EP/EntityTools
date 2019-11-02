@@ -50,6 +50,9 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AStar">
       <HintPath>..\References\x64\AStar.dll</HintPath>
@@ -139,7 +142,6 @@
     <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\Auras.cs" />
     <Compile Include="Tools\CommonTools.cs" />
-    <Compile Include="Tools\EntityInteractionTools.cs" />
     <Compile Include="Tools\EntitySelectionTools.cs" />
     <Compile Include="EntityPlugin.cs" />
     <Compile Include="Forms\EntitySelectForm.cs">
@@ -175,10 +177,11 @@
     <Compile Include="Tools\SettingsTools.cs" />
     <Compile Include="Tools\Struct.cs" />
     <Compile Include="Tools\UIInterfacesTools.cs" />
-    <Compile Include="UCC\ExecuteSpecificPower.cs" />
-    <Compile Include="UCC\UseItem.cs" />
+    <Compile Include="UCC\ApproachEntity.cs" />
     <Compile Include="UCC\AbortCombatWaitingOnTeam.cs" />
     <Compile Include="UCC\AbortCombatEntity.cs" />
+    <Compile Include="UCC\ExecuteSpecificPower.cs" />
+    <Compile Include="UCC\UseItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\EntitySelectForm.resx">
@@ -230,7 +233,6 @@
     <None Include="Images\Icons_Inventory_Enchantments_Insignia_Illuminated.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="Properties\DataSources\MountBonuses.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

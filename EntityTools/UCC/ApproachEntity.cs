@@ -17,16 +17,8 @@ using MyNW.Internals;
 
 namespace EntityTools.UCC
 {
-    public class AbortCombatEntity : UCCAction
+    public class ApproachEntity : UCCAction
     {
-        [Description("How many time ignore combat in seconds (0 for infinite)")]
-        [Category("Interruption")]
-        public int IgnoreCombatTime { get => abordCombat.IgnoreCombatTime; set => abordCombat.IgnoreCombatTime = value; }
-
-        [Description("Minimum health percent to enable combat again")]
-        [Category("Interruption")]
-        public int IgnoreCombatMinHP { get => abordCombat.IgnoreCombatMinHP; set => abordCombat.IgnoreCombatMinHP = value; }
-
         [Description("ID (an untranslated name) of the Entity for the search (regex)")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
@@ -45,22 +37,26 @@ namespace EntityTools.UCC
         [Description("Check Entity's Ingame Region (Not CustomRegion):\n" +
             "True: Only Entities located in the same Region as Player are detected\n" +
             "False: Entity's Region does not checked during search")]
-        [Category("Entity")]
-        public bool RegionCheck { get; set; } = false;
+        [Category("Entity optional checks")]
+        public bool RegionCheck { get; set; } = true;
 
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
-        [Category("Entity")]
+        [Category("Entity optional checks")]
         public bool HealthCheck { get; set; } = true;
 
-        [Description("Distance to the closest Entity")]
-        [Category("Required")]
-        public float EntityDistance { get; set; } = 0;
+        [Description("The maximum distance from the character within which the Entity is searched\n" +
+            "The default value is 0, which disables distance checking")]
+        [Category("Entity optional checks")]
+        public float ReactionRange { get; set; } = 30;
 
-        [Description("Distance comparison type to the closest Entity")]
         [Category("Required")]
-        public Astral.Logic.UCC.Ressources.Enums.Sign DistanceSign { get; set; } = Astral.Logic.UCC.Ressources.Enums.Sign.Inferior;
+        public float EntityRadius { get; set; } = 12;
+
+
+        [Browsable(false)]
+        public new string ActionName { get; set; }
 
         public override bool NeedToRun
         {
@@ -69,18 +65,7 @@ namespace EntityTools.UCC
                 if (!string.IsNullOrEmpty(EntityID))
                 {
                     entity = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, HealthCheck, Range, RegionCheck);
-
-                    switch (DistanceSign)
-                    {
-                        case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
-                            return entity.Location.Distance3DFromPlayer == EntityDistance;
-                        case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
-                            return entity.Location.Distance3DFromPlayer != EntityDistance;
-                        case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
-                            return entity.Location.Distance3DFromPlayer < EntityDistance;
-                        case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
-                            return entity.Location.Distance3DFromPlayer > EntityDistance;
-                    }
+                    return entity != null && entity.IsValid && !(HealthCheck && entity.IsDead) && entity.CombatDistance > EntityRadius;
                 }
                 return false;
             }
@@ -88,12 +73,17 @@ namespace EntityTools.UCC
 
         public override bool Run()
         {
-            if (!entity.IsValid && !(HealthCheck && entity.IsDead))
-                return abordCombat.Run();
-            return true;
+            return Approach.EntityByDistance(entity, EntityRadius);
         }
 
-        public AbortCombatEntity()
+        public override string ToString()
+        {
+            if (string.IsNullOrEmpty(EntityID))
+                return GetType().Name;
+            else return GetType().Name + " [" + EntityID + ']';
+        }
+
+        public ApproachEntity()
         {
             Target = Astral.Logic.UCC.Ressources.Enums.Unit.Player;
         }
@@ -101,25 +91,16 @@ namespace EntityTools.UCC
         {
             return base.BaseClone(new AbortCombatEntity
             {
-                IgnoreCombatMinHP = this.IgnoreCombatMinHP,
-                IgnoreCombatTime = this.IgnoreCombatTime,
                 EntityID = this.EntityID,
                 EntityIdType = this.EntityIdType,
                 EntityNameType = this.EntityNameType,
                 RegionCheck = this.RegionCheck,
                 HealthCheck = this.HealthCheck,
-                EntityDistance = this.EntityDistance,
-                DistanceSign = this.DistanceSign
+                EntityDistance = this.EntityRadius,
             });
         }
-        public override string ToString() => GetType().Name + " [" + EntityID + ']';
-
-        [Browsable(false)]
-        public new string ActionName { get; set; }
 
         [NonSerialized]
         protected Entity entity = new Entity(IntPtr.Zero);
-        [NonSerialized]
-        protected AbordCombat abordCombat = new AbordCombat();
     }
 }
