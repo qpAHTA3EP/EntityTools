@@ -38,6 +38,7 @@ namespace EntityTools.Editors
             {
                 if (context.Instance is MoveToEntity mte)
                 {
+                    mte.InternalReset();
                     sb.Append("EntityID: ").AppendLine(mte.EntityID);
                     sb.AppendLine();
                     sb.Append("NeedToRun: ").AppendLine(mte.NeedToRun.ToString());
@@ -80,6 +81,7 @@ namespace EntityTools.Editors
                 }
                 else if (context.Instance is InteractEntities ie)
                 {
+                    ie.InternalReset();
                     sb.Append("EntityID: ").AppendLine(ie.EntityID);
                     sb.AppendLine();
                     sb.Append("NeedToRun: ").AppendLine(ie.NeedToRun.ToString());

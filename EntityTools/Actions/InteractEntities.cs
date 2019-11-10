@@ -312,7 +312,10 @@ namespace EntityTools.Actions
                 graph.drawFillEllipse(target.Location, new Size(10, 10), beige);
             }
         }
-        public override void InternalReset() { }
+        public override void InternalReset()
+        {
+            target = null;
+        }
         protected override ActionValidity InternalValidity
         {
             get
