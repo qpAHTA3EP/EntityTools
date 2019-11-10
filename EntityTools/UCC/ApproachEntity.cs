@@ -17,6 +17,7 @@ using MyNW.Internals;
 
 namespace EntityTools.UCC
 {
+    [Serializable]
     public class ApproachEntity : UCCAction
     {
         [Description("ID (an untranslated name) of the Entity for the search (regex)")]
@@ -54,9 +55,8 @@ namespace EntityTools.UCC
         [Category("Required")]
         public float EntityRadius { get; set; } = 12;
 
-
-        [Browsable(false)]
-        public new string ActionName { get; set; }
+        //[Browsable(false)]
+        //public new string ActionName { get; set; }
 
         public override bool NeedToRun
         {
@@ -89,14 +89,14 @@ namespace EntityTools.UCC
         }
         public override UCCAction Clone()
         {
-            return base.BaseClone(new AbortCombatEntity
+            return base.BaseClone(new ApproachEntity
             {
                 EntityID = this.EntityID,
                 EntityIdType = this.EntityIdType,
                 EntityNameType = this.EntityNameType,
                 RegionCheck = this.RegionCheck,
                 HealthCheck = this.HealthCheck,
-                EntityDistance = this.EntityRadius,
+                EntityRadius = this.EntityRadius,
             });
         }
 

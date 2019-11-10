@@ -17,6 +17,7 @@ using MyNW.Internals;
 
 namespace EntityTools.UCC
 {
+    [Serializable]
     public class AbortCombatEntity : UCCAction
     {
         [Description("How many time ignore combat in seconds (0 for infinite)")]
@@ -27,7 +28,7 @@ namespace EntityTools.UCC
         [Category("Interruption")]
         public int IgnoreCombatMinHP { get => abordCombat.IgnoreCombatMinHP; set => abordCombat.IgnoreCombatMinHP = value; }
 
-        [Description("ID (an untranslated name) of the Entity for the search (regex)")]
+        [Description("ID of the Entity for the search (regex)")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
         public string EntityID { get; set; } = string.Empty;
@@ -114,8 +115,8 @@ namespace EntityTools.UCC
         }
         public override string ToString() => GetType().Name + " [" + EntityID + ']';
 
-        [Browsable(false)]
-        public new string ActionName { get; set; }
+        //[Browsable(false)]
+        //public new string ActionName { get; set; }
 
         [NonSerialized]
         protected Entity entity = new Entity(IntPtr.Zero);

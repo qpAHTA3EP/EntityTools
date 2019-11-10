@@ -1,4 +1,4 @@
-﻿namespace AstralVariables.Forms
+﻿namespace VariableTools.Forms
 {
     partial class VariablesAddonPanel
     {
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.lblAuthor = new System.Windows.Forms.Label();
-            this.btnTest = new System.Windows.Forms.Button();
+            this.btnVariables = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lblAuthor
@@ -41,24 +41,24 @@
             this.lblAuthor.TabIndex = 0;
             this.lblAuthor.Text = "Athor: MichaelProg";
             // 
-            // btnTest
+            // btnVariables
             // 
-            this.btnTest.Location = new System.Drawing.Point(143, 37);
-            this.btnTest.Name = "btnTest";
-            this.btnTest.Size = new System.Drawing.Size(75, 23);
-            this.btnTest.TabIndex = 1;
-            this.btnTest.Text = "Test";
-            this.btnTest.UseVisualStyleBackColor = true;
-            this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
+            this.btnVariables.Location = new System.Drawing.Point(143, 37);
+            this.btnVariables.Name = "btnVariables";
+            this.btnVariables.Size = new System.Drawing.Size(75, 23);
+            this.btnVariables.TabIndex = 1;
+            this.btnVariables.Text = "Variables";
+            this.btnVariables.UseVisualStyleBackColor = true;
+            this.btnVariables.Click += new System.EventHandler(this.btnVariables_Click);
             // 
             // VariablesAddonPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.btnTest);
+            this.Controls.Add(this.btnVariables);
             this.Controls.Add(this.lblAuthor);
             this.Name = "VariablesAddonPanel";
-            this.Size = new System.Drawing.Size(367, 307);
+            this.Size = new System.Drawing.Size(370, 416);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -67,6 +67,6 @@
         #endregion
 
         private System.Windows.Forms.Label lblAuthor;
-        private System.Windows.Forms.Button btnTest;
+        private System.Windows.Forms.Button btnVariables;
     }
 }

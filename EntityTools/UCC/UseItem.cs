@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Xml.Serialization;
 using Astral.Classes;
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;
@@ -21,6 +22,7 @@ using MyNW.Patchables.Enums;
 
 namespace EntityTools.UCC
 {
+    [Serializable]
     public class UseItemSpecial : UCCAction
     {
         public UseItemSpecial()
@@ -42,10 +44,13 @@ namespace EntityTools.UCC
         /// Тип местоположения простого шаблона в имени предмета
         /// </summary>
         private enum PatternPos { None, Full, Start, End, Middle }
+        [XmlIgnore]
         private PatternPos patternPos = PatternPos.None;
 
-        private string itemId;
-        private string itemIdTrimmed;
+        [XmlIgnore]
+        private string itemId = string.Empty;
+        [XmlIgnore]
+        private string itemIdTrimmed = string.Empty;
         [Editor(typeof(ItemIdEditor), typeof(UITypeEditor))]
         [Category("Item")]
         public string ItemId
@@ -146,9 +151,10 @@ namespace EntityTools.UCC
 
         public override string ToString() => GetType().Name + " [" + ItemId + ']';
 
-        [Browsable(false)]
-        public new string ActionName { get; set; }
+        //[Browsable(false)]
+        //public new string ActionName { get; set; }
 
+        [XmlIgnore]
         private InventorySlot itemSlotChache = null;
 
         /// <summary>
@@ -172,7 +178,7 @@ namespace EntityTools.UCC
             {
                 if (ItemIdType == ItemFilterStringType.Simple)
                     return itemSlotChache = EntityManager.LocalPlayer.GetInventoryBagById(BagId).GetItems.Find(itemIdSimpleComparer);
-                else return itemSlotChache = EntityManager.LocalPlayer.GetInventoryBagById(BagId).GetItems.Find(itemIdSimpleComparer);
+                else return itemSlotChache = EntityManager.LocalPlayer.GetInventoryBagById(BagId).GetItems.Find(itemIdRegexComparer);
             }
         }
 

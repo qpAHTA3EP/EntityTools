@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
+using NumberAST = VariableTools.Expressions.AstNode<double>;
 
-namespace AstralVariables.Expressions
+namespace VariableTools.Expressions
 {
     /// <summary>
     /// Класс, описывающий и вычисляющий результат выражение
@@ -13,21 +14,26 @@ namespace AstralVariables.Expressions
     public abstract class AbstractExpression
     {
         [NonSerialized]
-        protected string expression;
+        // Текст выражения в исходом виде, заданном пользователем
+        protected string text;
+        [NonSerialized]
+        // Текст выражения без пробельных символов
+        protected string shortText;
         /// <summary>
-        /// Исходное строковое представление выражения
+        /// Исходное текстовое представление выражения
         /// </summary>
         [XmlText]
-        public string Expression
+        public virtual string Text
         {
-            get => expression;
+            get => text;
             set
             {
-                if (value != expression)
+                if (value != text)
                 {
                     ResetInternal();
-                    expression = value;
-                    Parse();
+                    text = value;
+                    Parser.DeleteWhiteSpaces(text, out shortText);
+                    //Parse();
                 }
             }
         }
@@ -53,18 +59,19 @@ namespace AstralVariables.Expressions
         /// Лексический разбор выражения и построение Абстрактного синтаксического дерева
         /// </summary>
         /// <returns>Флаг успешности разбора</returns>
-        public abstract bool Parse(string newExpression = "");
+        protected abstract bool Parse();
 
+        protected BaseParseError parseError = null;
         /// <summary>
         /// Ошибка разбора выражения expression
         /// возникшая при выполнении Parse()
         /// </summary>
         [XmlIgnore]
-        public BaseParseError ParseError { get; protected set; }
+        public BaseParseError ParseError { get => parseError; protected set => parseError = value; }
 
         public override string ToString()
         {
-            return expression;
+            return text;
         }
 
         /// <summary>
@@ -84,6 +91,12 @@ namespace AstralVariables.Expressions
         protected AstNode<T> ast;
         [XmlIgnore]
         public AstNode<T> AST { get => ast; }
+
+        /// <summary>
+        /// Кэш абстрактных синтаксических деревьев
+        /// Предназначенная для сокращения времени на разбор одинаковых АСТ
+        /// </summary>
+        protected static Dictionary<string, AstNode<T>> astCollection = new Dictionary<string, AstNode<T>>();
 
         protected override void ResetInternal()
         {

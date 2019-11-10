@@ -63,13 +63,16 @@
       <HintPath>..\References\x64\Astral.exe</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Data.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+    <Reference Include="DevExpress.Data.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Utils.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+    <Reference Include="DevExpress.Utils.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.XtraEditors.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
     <Reference Include="MyNW, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
@@ -98,6 +101,7 @@
     <Compile Include="Actions\MoveToLeader.cs" />
     <Compile Include="Conditions\CheckCampaignTask.cs" />
     <Compile Include="Conditions\CheckGameGUICondition.cs" />
+    <Compile Include="Conditions\CheckNode.cs" />
     <Compile Include="Conditions\CheckShard.cs" />
     <Compile Include="Conditions\EntityPropertyConditions.cs" />
     <Compile Include="Conditions\Deprecated\EntityDistance.cs" />
@@ -107,7 +111,18 @@
     <Compile Include="Conditions\TeamMemberCount.cs" />
     <Compile Include="Conditions\TeamMemberCountInCustomRegion.cs" />
     <Compile Include="Editors\CampaignTaskEditor.cs" />
+    <Compile Include="Editors\ConditionListEditor.cs" />
+    <Compile Include="Editors\EntityTestEditor.cs" />
+    <Compile Include="Editors\NodePositionEditor.cs" />
+    <Compile Include="Editors\PositionNodeEditor.cs" />
+    <Compile Include="Editors\UccActionEditor.cs" />
     <Compile Include="Editors\UiIdEditor.cs" />
+    <Compile Include="Forms\ConditionsListForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ConditionsListForm.Designer.cs">
+      <DependentUpon>ConditionsListForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\InsigniaBonusSelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -125,6 +140,18 @@
     </Compile>
     <Compile Include="Forms\MultiSelectForm.Designer.cs">
       <DependentUpon>MultiSelectForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\NodeSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\NodeSelectForm.Designer.cs">
+      <DependentUpon>NodeSelectForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\PositionEditorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\PositionEditorForm.designer.cs">
+      <DependentUpon>PositionEditorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\UIViewer.cs">
       <SubType>Form</SubType>
@@ -166,7 +193,6 @@
     <Compile Include="Editors\EntityIdEditor.cs" />
     <Compile Include="Editors\MultiCustomRegionSelectEditor.cs" />
     <Compile Include="Editors\ShardEditor.cs" />
-    <Compile Include="Tools\Graph.cs" />
     <Compile Include="Tools\Missions.cs" />
     <Compile Include="Tools\MountInsignias\Enums.cs" />
     <Compile Include="Tools\MountInsignias\MountBonusesDef.cs" />
@@ -176,14 +202,23 @@
     <Compile Include="Tools\ReflectionHelper.cs" />
     <Compile Include="Tools\SettingsTools.cs" />
     <Compile Include="Tools\Struct.cs" />
+    <Compile Include="Tools\UCCExtensions\UCCEditorExtensions.cs" />
     <Compile Include="Tools\UIInterfacesTools.cs" />
+    <Compile Include="UCC\DodgeFromEntity.cs" />
     <Compile Include="UCC\ApproachEntity.cs" />
     <Compile Include="UCC\AbortCombatWaitingOnTeam.cs" />
     <Compile Include="UCC\AbortCombatEntity.cs" />
+    <Compile Include="UCC\Conditions\UCCConditionEntityCheck.cs" />
+    <Compile Include="UCC\Conditions\UCCConditionGameUICheck.cs" />
     <Compile Include="UCC\ExecuteSpecificPower.cs" />
+    <Compile Include="UCC\SpecializedUCCAction.cs" />
     <Compile Include="UCC\UseItem.cs" />
+    <Compile Include="UCC\Conditions\CustomUCCCondition.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Forms\ConditionsListForm.resx">
+      <DependentUpon>ConditionsListForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\EntitySelectForm.resx">
       <DependentUpon>EntitySelectForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -198,6 +233,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MultiSelectForm.resx">
       <DependentUpon>MultiSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\NodeSelectForm.resx">
+      <DependentUpon>NodeSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PositionEditorForm.resx">
+      <DependentUpon>PositionEditorForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\UIViewer.resx">
       <DependentUpon>UIViewer.cs</DependentUpon>

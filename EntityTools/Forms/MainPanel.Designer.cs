@@ -32,7 +32,7 @@ namespace EntityTools.Forms
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.btnEntities = new System.Windows.Forms.Button();
+            this.btnUccEditor = new System.Windows.Forms.Button();
             this.btnAuras = new System.Windows.Forms.Button();
             this.lblAuras = new System.Windows.Forms.Label();
             this.btnMissions = new System.Windows.Forms.Button();
@@ -79,18 +79,19 @@ namespace EntityTools.Forms
             ((System.ComponentModel.ISupportInitialize)(this.sbSettings)).BeginInit();
             this.SuspendLayout();
             // 
-            // btnEntities
+            // btnUccEditor
             // 
-            this.btnEntities.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.btnUccEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnEntities.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnEntities.Location = new System.Drawing.Point(6, 362);
-            this.btnEntities.Name = "btnEntities";
-            this.btnEntities.Size = new System.Drawing.Size(355, 23);
-            this.btnEntities.TabIndex = 0;
-            this.btnEntities.Text = "Test";
-            this.btnEntities.UseVisualStyleBackColor = true;
-            this.btnEntities.Click += new System.EventHandler(this.btnTest_Click);
+            this.btnUccEditor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnUccEditor.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnUccEditor.Location = new System.Drawing.Point(4, 297);
+            this.btnUccEditor.Name = "btnUccEditor";
+            this.btnUccEditor.Size = new System.Drawing.Size(355, 40);
+            this.btnUccEditor.TabIndex = 0;
+            this.btnUccEditor.Text = "Extended UCC Editor";
+            this.btnUccEditor.UseVisualStyleBackColor = true;
+            this.btnUccEditor.Click += new System.EventHandler(this.btnUccEditor_Click);
             // 
             // btnAuras
             // 
@@ -177,12 +178,12 @@ namespace EntityTools.Forms
             this.tbclMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbclMain.Location = new System.Drawing.Point(0, 0);
             this.tbclMain.Name = "tbclMain";
-            this.tbclMain.SelectedTabPage = this.tabOptions;
+            this.tbclMain.SelectedTabPage = this.tabUtilities;
             this.tbclMain.Size = new System.Drawing.Size(370, 416);
             this.tbclMain.TabIndex = 7;
             this.tbclMain.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
-            this.tabOptions,
-            this.tabUtilities});
+            this.tabUtilities,
+            this.tabOptions});
             // 
             // tabOptions
             // 
@@ -375,7 +376,7 @@ namespace EntityTools.Forms
             this.tabUtilities.Controls.Add(this.btnInterfaces);
             this.tabUtilities.Controls.Add(this.btnMissions);
             this.tabUtilities.Controls.Add(this.btnUiViewer);
-            this.tabUtilities.Controls.Add(this.btnEntities);
+            this.tabUtilities.Controls.Add(this.btnUccEditor);
             this.tabUtilities.Controls.Add(this.bteStates);
             this.tabUtilities.Controls.Add(this.bteInterfaces);
             this.tabUtilities.Controls.Add(this.bteMissions);
@@ -417,9 +418,10 @@ namespace EntityTools.Forms
             this.btnUiViewer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.btnUiViewer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnUiViewer.Location = new System.Drawing.Point(6, 333);
+            this.btnUiViewer.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnUiViewer.Location = new System.Drawing.Point(4, 343);
             this.btnUiViewer.Name = "btnUiViewer";
-            this.btnUiViewer.Size = new System.Drawing.Size(355, 23);
+            this.btnUiViewer.Size = new System.Drawing.Size(355, 40);
             this.btnUiViewer.TabIndex = 0;
             this.btnUiViewer.Text = "UI Viewer";
             this.btnUiViewer.UseVisualStyleBackColor = true;
@@ -509,7 +511,7 @@ namespace EntityTools.Forms
 
         #endregion
 
-        private System.Windows.Forms.Button btnEntities;
+        private System.Windows.Forms.Button btnUccEditor;
         private System.Windows.Forms.Button btnAuras;
         private System.Windows.Forms.Label lblAuras;
         private System.Windows.Forms.Button btnMissions;

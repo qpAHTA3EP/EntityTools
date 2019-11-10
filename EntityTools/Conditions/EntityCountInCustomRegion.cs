@@ -31,7 +31,7 @@ namespace EntityTools.Conditions
     [Serializable]
     public class EntityCountInCustomRegions : Condition
     {
-        [Description("ID (an untranslated name) of the Entity for the search (regex)")]
+        [Description("ID of the Entity for the search (regex)")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
         public string EntityID { get; set; }

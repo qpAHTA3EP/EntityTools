@@ -18,6 +18,7 @@ using static Astral.Quester.Classes.Condition;
 
 namespace EntityTools.UCC
 {
+    [Serializable]
     public class AbortCombatWaitingOnTeam : UCCAction
     {
         public AbortCombatWaitingOnTeam()
@@ -127,8 +128,8 @@ namespace EntityTools.UCC
 
         public override string ToString() => GetType().Name;
 
-        [Browsable(false)]
-        public new string ActionName { get; set; }
+        //[Browsable(false)]
+        //public new string ActionName { get; set; }
 
         [NonSerialized]
         protected AbordCombat abordCombat = new AbordCombat();

@@ -46,7 +46,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ScalarAddon\VariablesTools.csproj">
+    <ProjectReference Include="..\VariablesTools\VariablesTools.csproj">
       <Project>{8c13462b-8b43-40a3-b4c1-ea351ae9f1c4}</Project>
       <Name>VariablesTools</Name>
     </ProjectReference>

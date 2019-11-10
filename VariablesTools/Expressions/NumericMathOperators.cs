@@ -1,6 +1,6 @@
-﻿using NumberAstNode = AstralVariables.Expressions.AstNode<double>;
+﻿using NumberAstNode = VariableTools.Expressions.AstNode<double>;
 
-namespace AstralVariables.Expressions.Operators
+namespace VariableTools.Expressions.Operators
 {
     /// <summary>
     /// Операция сложения чисел

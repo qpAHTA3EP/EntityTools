@@ -1,15 +1,25 @@
 ﻿using Astral.Forms;
+using Astral.Logic.UCC;
+using Astral.Logic.UCC.Forms;
 using EntityTools.Tools;
+using System;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace EntityTools
 {
     public class EntityTools : Astral.Addons.Plugin
     {
+        //public EntityPluginSettings PluginSettings {get;} = new EntityPluginSettings();
+
+        public EntityTools() : base()
+        {
+            DebugInfoEnabled = false;
+        }
         public static bool DebugInfoEnabled { get; set; }
         public override string Name => "Entity Tools";
         public override string Author => "MichaelProg";
         public override System.Drawing.Image Icon => Properties.Resources.EntityIcon;
-
         private BasePanel panel = null;
         public override BasePanel Settings
         {
@@ -21,45 +31,132 @@ namespace EntityTools
             }
         }
 
-        public EntityPluginSettings PluginSettings {get;} = new EntityPluginSettings();
+        public override void OnBotStart() { }
 
-        public EntityTools() : base ()
-        {
-            DebugInfoEnabled = false;
-        }
-
-        public override void OnBotStart()
-        {
-#if DEBUG
-            // Вывод в лог всех States, загруженных в Engine, и их приоритетов
-            //foreach (Astral.Logic.Classes.FSM.State state in Astral.Quester.API.Engine.States)
-            //{
-            //    Logger.WriteLine($"{state.DisplayName} {state.Priority}");
-            //}
-#endif
-        }
-
-        public override void OnBotStop()
-        {
-            
-        }
+        public override void OnBotStop() { }
 
         public override void OnLoad()
         {
-
             States.SpellStuckMonitor.Activate = true;
             States.SlideMonitor.Activate = false;
-#if CHANGE_WAYPOINT_DIST_SETTING
-            States.SlideMonitor.DefaultChangeWaypointDist = Astral.API.CurrentSettings.ChangeWaypointDist;
-#endif
+
+            #region Подмена обработчика кнопки вызова редактора UCC
+            // Кнопка вызова редактора UCC на панели MainUCC
+            // Astral.Logic.UCC.Panels.MainUCC.b_Editor
+
+            //Astral.Forms.Main mainForm = null;
+            //foreach (Form form in Application.OpenForms)
+            //{
+            //    if (form is Astral.Forms.Main)
+            //    {
+            //        mainForm = (Astral.Forms.Main)form;
+            //        break;
+            //    }
+            //}
+            //if(mainForm != null)
+            //{
+
+            //}
+
+            #endregion
         }
 
-        public override void OnUnload()
+        public override void OnUnload() { }
+
+        #region Подмена обработчика кнопки "Combats"
+        //// Старый обработчик из Astral.Forms.Panels.Main
+        ////private void \u0003(object \u0002, TileItemEventArgs \u0003)
+        ////{
+        ////	for (;;)
+        ////	{
+        ////		if (!false)
+        ////		{
+        ////			if (Roles.CurrentRole.Name == "Professions")
+        ////			{
+        ////				goto IL_10;
+        ////			}
+        ////          Forms.ShowPanel(new \u001E.\u0003());
+        ////			if (!false)
+        ////			{
+        ////				return;
+        ////			}
+        ////			goto IL_10;
+        ////		}
+        ////		IL_18:
+        ////		if (7 == 0)
+        ////		{
+        ////			continue;
+        ////		}
+        ////		if (8 != 0)
+        ////		{
+        ////			break;
+        ////		}
+        ////		IL_10:
+        ////		XtraMessageBox.Show("Not configurable with professions role.");
+        ////		goto IL_18;
+        ////	}
+        ////}
+
+        //// Фрагмент инициализации "кнопки" "Combats"
+        ////this.\u0007.AppearanceItem.Normal.BackColor = Color.MediumPurple;
+        ////this.\u0007.AppearanceItem.Normal.BackColor2 = Color.SlateBlue;
+        ////this.\u0007.AppearanceItem.Normal.BorderColor = Color.MediumPurple;
+        ////this.\u0007.AppearanceItem.Normal.Options.UseBackColor = true;
+        ////this.\u0007.AppearanceItem.Normal.Options.UseBorderColor = true;
+        ////tileItemElement3.Image = \u0001.combat;
+        ////tileItemElement3.ImageAlignment = 5;
+        ////tileItemElement3.Text = "Combats";
+        ////this.\u0007.Elements.Add(tileItemElement3);
+        ////this.\u0007.Name = "tileItem3";
+        ////this.\u0007.ItemClick += new TileItemClickEventHandler(this.\u0003);
+
+        ///// <summary>
+        ///// Главная форма Astral'a
+        ///// </summary>
+        //private Astral.Forms.Main mainForm = null;
+        ///// <summary>
+        ///// Главная панель Astral'a (Main)
+        ///// </summary>
+        //private Astral.Forms.Panels.Main mainPanel = null;
+
+        //public void SubscribeEvent_MainPanel_CombatTile_Click()
+        //{
+        //    // Поиск главной формы 
+        //    do
+        //    {
+        //        foreach (Form form in Application.OpenForms)
+        //        {
+        //            if (form is Astral.Forms.Main)
+        //            {
+        //                mainForm = (Astral.Forms.Main)form;
+        //                break;
+        //            }
+        //        }
+        //        Thread.Sleep(500);
+        //    }
+        //    while (mainForm != null);
+
+        //    // поиск главной панели
+        //    if (mainForm != null)
+        //    {
+        //        do
+        //        {
+        //            if(mainForm.main)
+        //            Thread.Sleep(500);
+        //        }
+        //        while (mainPanel != null);
+        //    }
+        //}
+        #endregion
+
+        #region Новый обработчика кнопки вызова редактора UCC
+        private void ucc_Editor_Click(object sender, EventArgs e)
         {
-#if CHANGE_WAYPOINT_DIST_SETTING
-           Astral.API.CurrentSettings.ChangeWaypointDist = States.SlideMonitor.DefaultChangeWaypointDist;
-#endif
-        }
+            MessageBox.Show("ucc_Editor_Click(...)");
 
+            Editor uccEditor = new Editor(Core.Get.mProfil, false);
+            uccEditor.ShowDialog();
+        }
+        #endregion
     }
 }

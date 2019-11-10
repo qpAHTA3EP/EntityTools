@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AstralVariables.Expressions
+namespace VariableTools.Expressions
 {
     /// <summary>
     /// Абстрактный узел Абстрактного синтаксического дерева (Abstract syntas Tree)    /// 
@@ -63,7 +63,7 @@ namespace AstralVariables.Expressions
             sb.AppendCopies(Parser.Indent, indent).Append('{').AppendLine();
             sb.Append(leftOperand.Description(indent+1)).AppendLine();
             sb.Append(rightOperand.Description(indent + 1)).AppendLine();
-            sb.AppendCopies(Parser.Indent, indent).Append('}').AppendLine();
+            sb.AppendCopies(Parser.Indent, indent).Append('}')/*.AppendLine()*/;
             return sb.ToString();
 
             //return prefix + GetType().Name + ":\n" +
@@ -88,7 +88,7 @@ namespace AstralVariables.Expressions
             sb.AppendCopies(Parser.Indent, indent).Append(GetType().Name).Append(':').AppendLine();
             sb.AppendCopies(Parser.Indent, indent).Append('{').AppendLine();
             sb.Append(Operand.Description(indent + 1)).AppendLine();
-            sb.AppendCopies(Parser.Indent, indent).Append('}').AppendLine();
+            sb.AppendCopies(Parser.Indent, indent).Append('}')/*.AppendLine()*/;
             return sb.ToString();
 
             //return prefix + GetType().Name + ":\n" +

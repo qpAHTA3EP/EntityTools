@@ -1,14 +1,8 @@
-﻿using AstralVariables.Expressions;
-using MyNW.Classes;
-using MyNW.Internals;
+﻿using VariableTools.Expressions;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
-namespace AstralVariables.Classes
+namespace VariableTools.Classes
 {
     /// <summary>
     /// Перечисление типов переменных

@@ -1,8 +1,8 @@
-﻿using AstralVariables.Classes;
+﻿using VariableTools.Classes;
 using System;
 using System.Windows.Forms;
 
-namespace AstralVariables.Forms
+namespace VariableTools.Forms
 {
     public class DataGridViewDateTimeCell : DataGridViewTextBoxCell
     {

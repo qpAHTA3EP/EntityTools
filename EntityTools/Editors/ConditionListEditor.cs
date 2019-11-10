@@ -7,18 +7,19 @@ using Astral.Quester.Classes;
 using DevExpress.XtraEditors.Controls;
 using EntityTools.Forms;
 using MyNW.Classes;
-using ConditionList = System.Collections.Generic.List<Astral.Quester.Classes.Condition>;
+using ConditionList = System.Collections.Generic.List<EntityTools.UCC.Conditions.CustomUCCCondition>;
 
 
 namespace EntityTools.Editors
 {
-    class ConditionListEditor : UITypeEditor
+    class UCCConditionListEditor : UITypeEditor
     {
-        //internal static ConditionListForm listEditor = null;
+        internal static ConditionListForm listEditor = null;
 
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            ConditionListForm listEditor = new ConditionListForm();
+            if(listEditor == null)
+                listEditor = new ConditionListForm();
 
             ConditionList newConditions = listEditor.GetConditionList(value as ConditionList);
 

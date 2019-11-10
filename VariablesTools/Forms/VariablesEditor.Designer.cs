@@ -1,4 +1,4 @@
-﻿namespace AstralVariables.Forms
+﻿namespace VariableTools.Forms
 {
     partial class VariablesEditor
     {
@@ -43,7 +43,7 @@
             // 
             // dgvVariables
             // 
-            this.dgvVariables.AllowUserToOrderColumns = true;
+            this.dgvVariables.AllowUserToAddRows = false;
             this.dgvVariables.AllowUserToResizeRows = false;
             dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.dgvVariables.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
@@ -129,7 +129,7 @@
             this.chbAllowEdit.AutoSize = true;
             this.chbAllowEdit.Location = new System.Drawing.Point(79, 419);
             this.chbAllowEdit.Name = "chbAllowEdit";
-            this.chbAllowEdit.Size = new System.Drawing.Size(80, 17);
+            this.chbAllowEdit.Size = new System.Drawing.Size(79, 17);
             this.chbAllowEdit.TabIndex = 4;
             this.chbAllowEdit.Text = "Enable Edit";
             this.chbAllowEdit.UseVisualStyleBackColor = true;

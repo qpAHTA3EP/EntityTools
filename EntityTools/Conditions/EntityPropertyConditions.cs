@@ -15,7 +15,7 @@ namespace EntityTools.Conditions
     [Serializable]
     public class EntityProperty : Condition
     {
-        [Description("ID (an untranslated name) of the Entity for the search")]
+        [Description("ID of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
         public string EntityID { get; set; } = string.Empty;
@@ -157,11 +157,4 @@ namespace EntityTools.Conditions
 
         public EntityProperty() { }
     }
-
-    public enum EntityPropertyType
-        {
-            Distance,
-            ZAxis,
-            HealthPercent
-        }
 }

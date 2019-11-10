@@ -1,17 +1,13 @@
-﻿using AstralVariables.Expressions;
+﻿using VariableTools.Expressions;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Astral.Quester.Forms;
+using DevExpress.XtraEditors;
 
-namespace AstralVariables.Forms
+namespace VariableTools.Forms
 {
-    public partial class EquationEditor : Form
+    public partial class EquationEditor : XtraForm //*/Form
     {
         private static NumberExpression expression;
         private static EquationEditor equationEditor;
@@ -27,7 +23,7 @@ namespace AstralVariables.Forms
             if (equationEditor == null)
                 equationEditor = new EquationEditor();
 
-            equationEditor.tbExpression.Text = expression.Expression;
+            equationEditor.tbExpression.Text = expression.Text;
 
             DialogResult dResult = equationEditor.ShowDialog();
             if (dResult == DialogResult.OK)
@@ -67,24 +63,31 @@ namespace AstralVariables.Forms
                 tbExpression.AppendText(" "+var_name);
         }
 
-        private void btnParse_Click(object sender, EventArgs e)
+        private void btnValidate_Click(object sender, EventArgs e)
         {
             StringBuilder sb = new StringBuilder();
-            if (expression.Parse(tbExpression.Text))
-                sb.AppendLine($"Parse suceedeed!");
+            string caption;
+            bool ok = NumberExpression.Validate(tbExpression.Text, out string description);
+            if (ok)
+            {
+                sb.AppendLine($"Equation is correct!");
+                caption = "Suceedeed";
+            }
             else
-                sb.AppendLine($"Parse faild!");
-
-            sb.Append(expression.Description()).AppendLine();
-
-            if(expression.IsValid)
-                MessageBox.Show(this,sb.ToString(), "Suceedeed", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-            else MessageBox.Show(this, sb.ToString(), "Fail", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            {
+                sb.AppendLine($"Equation is incorrect!");
+                caption = "Fail";
+            }
+            sb.Append(description);
+            sb.AppendLine();
+            if(ok)
+                XtraMessageBox.Show(this, sb.ToString(), caption, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+            else XtraMessageBox.Show(this, sb.ToString(), caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            expression.Expression = tbExpression.Text.Trim();
+            expression.Text = tbExpression.Text.Trim();
             DialogResult = DialogResult.OK;
             Close();
         }

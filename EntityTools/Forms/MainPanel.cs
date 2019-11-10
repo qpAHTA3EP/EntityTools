@@ -2,18 +2,15 @@
 //#define DUMP_TEST
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using Astral.Logic.UCC.Classes;
-using DevExpress.XtraEditors;
 using EntityTools.States;
 using EntityTools.Tools;
-using MyNW.Classes;
 using MyNW.Internals;
+using EntityTools.Tools.UCCExtensions;
+using System.Reflection;
 
 namespace EntityTools.Forms
 {
@@ -146,30 +143,15 @@ namespace EntityTools.Forms
             ReflectionHelper.DumpClassMethod(typeof(TestClass), "TestClass");
 #endif
             #endregion
+        }
 
-
-            //Astral.Quester.Forms.Editor qEditor = null;
-            //foreach (Form form in Application.OpenForms)
-            //{
-            //    if (form is Astral.Quester.Forms.Editor)
-            //    {
-            //        qEditor = (Astral.Quester.Forms.Editor)form;
-            //        break;
-            //    }
-            //}
-
-            //if (qEditor != null)
-            //{
-            //    // Включаем кнопку "Вставки условия"
-            //    if (ReflectionHelper.GetFieldValue(qEditor, "b_PasteCond", out object btnPaste))
-            //    {
-            //        ReflectionHelper.GetPropertyValue(btnPaste, "Enabled", out object result, BindingFlags.Public, false);
-            //        ReflectionHelper.GetPropertyValue(btnPaste, "Enabled", out result, BindingFlags.Public, true);
-
-            //        ReflectionHelper.SetPropertyValue(btnPaste, "Enabled", true, BindingFlags.Public, false);
-            //        ReflectionHelper.SetPropertyValue(btnPaste, "Enabled", true, BindingFlags.Public, true);
-            //    }                
-            //}
+        private void btnUccEditor_Click(object sender, EventArgs e)
+        {
+            Astral.Logic.UCC.Forms.Editor uccEditor = null;
+            if (UCCEditorExtensions.GetUccEditor(ref uccEditor))
+            {
+                uccEditor.Show();
+            }
         }
 
 
@@ -350,39 +332,7 @@ namespace EntityTools.Forms
 
         private void btnUiViewer_Click(object sender, EventArgs e)
         {
-            #region Перенесено в btnInterfaces_Click(...)
-            //InterfaceWrapper Interfaces = new InterfaceWrapper();
-
-            //string fullFileName = Path.Combine(FileTools.defaultExportFolderInterfaces, FileTools.defaulFileInterfaces);
-
-            //if (!Directory.Exists(Path.GetDirectoryName(fullFileName)))
-            //    Directory.CreateDirectory(Path.GetDirectoryName(fullFileName));
-
-            //XmlSerializer serialiser = new XmlSerializer(typeof(InterfaceWrapper));
-            //TextWriter FileStream = new StreamWriter(fullFileName);
-            //serialiser.Serialize(FileStream, Interfaces);
-            //FileStream.Close();
-
-            //if (MessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?", $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
-            //    System.Diagnostics.Process.Start(fullFileName);
-            #endregion
-            #region Тест работы с UIGen.ButtonClick()
-            // Тест работы с UIGen.ButtonClick()
-
-            //UIGen uiGen = UIManager.GetUIGenByName("Playerstatus_Mounts_Subtab_Activemounts");
-            //if (uiGen != null)
-            //{
-            //    if (uiGen.IsValid && uiGen.IsVisible
-            //        && uiGen.Type == MyNW.Patchables.Enums.UIGenType.Button)
-            //        // Вызывает экстренное закрытие игрового клиента
-            //        uiGen.ButtonClick();
-            //    else MessageBox.Show($"Name={uiGen?.Name}\r\n\t IsValid={uiGen?.IsValid}\r\n\t IsVisible={uiGen?.IsVisible}\r\n\t Type={uiGen?.Type}");
-            //}
-            //else MessageBox.Show("'Playerstatus_Mounts_Subtab_Activemounts' not found");
-            #endregion
-            #region Тест формы отображения интерфейсов
             UIViewer.GetUiGen();
-            #endregion
         }
 
         private void cbEnchantHelperActivator_CheckedChanged(object sender, EventArgs e)

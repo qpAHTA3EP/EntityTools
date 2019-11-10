@@ -1,10 +1,10 @@
 ﻿
-using AstralVariables.Forms;
+using VariableTools.Forms;
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 
-namespace AstralVariables.Editors
+namespace VariableTools.Editors
 {
     class VariableSelectUiEditor : UITypeEditor
     {

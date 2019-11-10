@@ -12,8 +12,38 @@ namespace EntityTools.Tools
     /// <typeparam name="B"></typeparam>
     public struct Pair<A, B>
     {
+        public Pair(A a, B b)
+        {
+            First = a;
+            Second = b;
+        }
+
         public A First;
         public B Second;
+    }
+
+    public struct ReadonlyPair<A, B>
+    {
+        public ReadonlyPair(A a, B b)
+        {
+            First = a;
+            Second = b;
+        }
+
+        public ReadonlyPair(ReadonlyPair<A, B> p)
+        {
+            First = p.First;
+            Second = p.Second;
+        }
+
+        public ReadonlyPair(Pair<A, B> p)
+        {
+            First = p.First;
+            Second = p.Second;
+        }
+
+        public readonly A First;
+        public readonly B Second;
     }
 
     /// <summar>

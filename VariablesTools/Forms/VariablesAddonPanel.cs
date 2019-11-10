@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using AstralVariables.Classes;
-using AstralVariables.Expressions;
 
-namespace AstralVariables.Forms
+namespace VariableTools.Forms
 {
     public partial class VariablesAddonPanel : /* UserControl // */ Astral.Forms.BasePanel
     {
@@ -18,12 +10,9 @@ namespace AstralVariables.Forms
             InitializeComponent();
         }
 
-        private void btnTest_Click(object sender, EventArgs e)
+        private void btnVariables_Click(object sender, EventArgs e)
         {
-            NumberExpression numExpr = EquationEditor.GetExpression();
-
-            if (numExpr != null)
-                MessageBox.Show(numExpr.Expression, numExpr.Description());
+            VariablesEditor.Show(true);
         }
     }
 }

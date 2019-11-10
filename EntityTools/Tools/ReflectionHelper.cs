@@ -8,9 +8,15 @@ using System.Windows.Forms;
 
 namespace EntityTools.Tools
 {
+    /// <summary>
+    /// Основано на статье 
+    /// Обращение к private методам, свойствам, полям и подписка на события с помощью Reflection в .NET [C#]
+    /// Andrey Fedorov
+    /// http://www.bizkit.ru/2018/05/30/14102/
+    /// </summary>
     public static class ReflectionHelper
     {
-        public static BindingFlags Flags = BindingFlags.Instance
+        public static BindingFlags DefaultFlags = BindingFlags.Instance
                                    | BindingFlags.Static
                                    | BindingFlags.GetProperty
                                    | BindingFlags.SetProperty
@@ -34,7 +40,7 @@ namespace EntityTools.Tools
 
             if (BaseType)
             {
-                type = type.BaseType; // BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);//  BindingFlags.GetField | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+                type = type.BaseType;
             }
             return GetListOfMethods(type, flags);
         }
@@ -47,7 +53,7 @@ namespace EntityTools.Tools
         /// <returns></returns>
         public static MethodInfo[] GetListOfMethods(Type type, BindingFlags flags = BindingFlags.Default)
         {
-            flags = Flags | flags;
+            flags = DefaultFlags | flags;
             // get all public static methods of MyClass type
             MethodInfo[] methodInfos = type.GetMethods(flags);
 
@@ -69,7 +75,7 @@ namespace EntityTools.Tools
 
             FieldInfo[] fields = null;
 
-            flags = Flags | flags;
+            flags = DefaultFlags | flags;
             if (BaseType)
             {
                 type = type.BaseType;
@@ -88,7 +94,7 @@ namespace EntityTools.Tools
         public static FieldInfo GetFieldInfo(Type type, string fieldName, BindingFlags flags = BindingFlags.Default)
         {
             if (flags == BindingFlags.Default)
-                flags = Flags;
+                flags = DefaultFlags;
             FieldInfo[] fields = type.GetFields(flags);
             if (fields != null)
             {
@@ -120,6 +126,8 @@ namespace EntityTools.Tools
             return null;
         }
 
+
+
         /// <summary>
         /// Задать значение <see cref="value"> совойству <see cref="propName"> объекта <see cref="obj">.
         /// </summary>
@@ -136,12 +144,12 @@ namespace EntityTools.Tools
             Type type = obj.GetType();
 
             if (flags == BindingFlags.Default)
-                flags = Flags;
+                flags = DefaultFlags;
 
-            PropertyInfo pi = type.GetProperty(propName, flags | BindingFlags.GetProperty);//GetPrivateFieldInfo(type, fieldName, flags);
+            PropertyInfo pi = type.GetProperty(propName, flags | BindingFlags.Instance);//GetPrivateFieldInfo(type, fieldName, flags);
             if (pi != null)
             {
-                MethodInfo[] accessors = pi.GetAccessors(true);
+                MethodInfo[] accessors = pi.GetAccessors((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
                 if (accessors != null && accessors.Length == 2)
                 {
                     object[] arg = new object[] { value };
@@ -160,43 +168,58 @@ namespace EntityTools.Tools
                 return false;
 
             if (flags == BindingFlags.Default)
-                flags = Flags;
+                flags = DefaultFlags | BindingFlags.Instance;
 
-            PropertyInfo pi = type.GetProperty(propName, flags | BindingFlags.GetProperty);//GetPrivateFieldInfo(type, fieldName, flags);
+            PropertyInfo pi = type.GetProperty(propName, flags | BindingFlags.Instance);//GetPrivateFieldInfo(type, fieldName, flags);
             if (pi == null)
-                return SetBasePropertyValue(type.BaseType, obj, propName, value, flags);
+                return SetBasePropertyValue(type.BaseType, obj, propName, value, flags | BindingFlags.Instance);
             else
             {
-                MethodInfo[] accessors = pi.GetAccessors(true);
+                MethodInfo[] accessors = pi.GetAccessors((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
                 if (accessors != null && accessors.Length == 2)
                 {
                     object[] arg = new object[] { value };
                     accessors[1]?.Invoke(obj, arg);
                     return true;
                 }
-            }
-            
+            }            
 
             return false;
         }
 
         /// <summary>
-        /// Задать значение <see cref="value"> статическому совойству <see cref="propName"> типа <see cref="type">.
+        /// Задать значение <see cref="value"> статическому совойству <see cref="propName">, объявленному в типе <see cref="type">.
         /// </summary>
-        /// <param name="type">The Type that has the private property</param>
-        /// <param name="propName">The name of the private property</param>
-        /// <param name="value">The instance from which to read the private value.</param>
         /// <returns>The value of the property boxed as an object.</returns>
-        public static bool SetStaticPropertyValue(Type type, string propName, object value, BindingFlags flags = BindingFlags.Default, bool BaseType = false)
+        public static bool SetStaticPropertyValue(Type type, string propName, object value, BindingFlags flags = BindingFlags.Default, bool searchBaseRecursive = false)
         {
+            //if (flags == BindingFlags.Default)
+            //    flags = DefaultFlags;
+            //if (BaseType)
+            //{
+            //    type = type.BaseType;
+            //}
+            //object[] arg = new object[] { value };
+            //return ExecStaticMethod(type, "set_" + propName, ref arg, out object result, flags | BindingFlags.Static | BindingFlags.InvokeMethod, false);
+
             if (flags == BindingFlags.Default)
-                flags = Flags;
-            if (BaseType)
+                flags = DefaultFlags | BindingFlags.Static;
+
+            PropertyInfo pi = type.GetProperty(propName, flags | BindingFlags.Static);//GetPrivateFieldInfo(type, fieldName, flags);
+            if (pi != null)
             {
-                type = type.BaseType;
+                MethodInfo[] accessors = pi.GetAccessors((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
+                if (accessors != null && accessors.Length == 2)
+                {
+                    object[] arg = new object[] { value };
+                    accessors[1]?.Invoke(null, arg);
+                    return true;
+                }
             }
-            object[] arg = new object[] { value };
-            return ExecStaticMethod(type, "set_" + propName, ref arg, out object result, flags | BindingFlags.Static | BindingFlags.InvokeMethod, false);
+            else if (searchBaseRecursive)
+                return SetBasePropertyValue(type.BaseType, null, propName, value, flags);
+
+            return false;
         }
 
         /// <summary>
@@ -216,12 +239,12 @@ namespace EntityTools.Tools
             Type type = obj.GetType();
 
             if (flags == BindingFlags.Default)
-                flags = Flags;
+                flags = DefaultFlags | BindingFlags.Instance;
 
-            PropertyInfo pi = type.GetProperty(propName, flags | BindingFlags.GetProperty);
+            PropertyInfo pi = type.GetProperty(propName, flags);
             if (pi != null)
             {
-                MethodInfo getter = pi.GetGetMethod();
+                MethodInfo getter = pi.GetGetMethod((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
                 if(getter != null)
                 {
                     object[] arg = new object[] { };
@@ -242,14 +265,14 @@ namespace EntityTools.Tools
                 return false;
 
             if (flags == BindingFlags.Default)
-                flags = Flags;
+                flags = DefaultFlags;
 
-            PropertyInfo pi = type.GetProperty(propName, flags | BindingFlags.GetProperty);
+            PropertyInfo pi = type.GetProperty(propName, flags);
             if (pi == null)
                 return GetBasePropertyValue(type.BaseType, obj, propName, out result, flags);
             else
             {
-                MethodInfo[] accessors = pi.GetAccessors(true);
+                MethodInfo[] accessors = pi.GetAccessors((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
                 if (accessors != null && accessors.Length > 0)
                 {
                     object[] arg = new object[] { };
@@ -271,21 +294,40 @@ namespace EntityTools.Tools
         /// <summary>
         /// Получить значение статического свойства <see cref="propName"> типа <see cref="type">
         /// </summary>
-        /// <param name="type">The Type that has the private property</param>
-        /// <param name="propName">The name of the private property</param>
         /// <returns>The value of the property boxed as an object.</returns>
-        public static bool GetStaticPropertyValue(Type type, string propName, out object result, BindingFlags flags = BindingFlags.Default, bool BaseType = false)
+        public static bool GetStaticPropertyValue(Type type, string propName, out object result, BindingFlags flags = BindingFlags.Default, bool searchBaseRecursive = false)
         {
-            result = null;
-            if (flags == BindingFlags.Default)
-                flags = Flags;
-            if (BaseType)
-            {
-                type = type.BaseType;
-            }
-            object[] arg = new object[] { };
+            //result = null;
+            //if (flags == BindingFlags.Default)
+            //    flags = DefaultFlags;
+            //if (BaseType)
+            //{
+            //    type = type.BaseType;
+            //}
+            //object[] arg = new object[] { };
 
-            return ExecStaticMethod(type, "get_" + propName, ref arg, out result, flags | BindingFlags.Static | BindingFlags.InvokeMethod, false);
+            //return ExecStaticMethod(type, "get_" + propName, ref arg, out result, flags | BindingFlags.Static | BindingFlags.InvokeMethod, false);
+
+            result = null;
+
+            if (flags == BindingFlags.Default)
+                flags = DefaultFlags | BindingFlags.Static;
+
+            PropertyInfo pi = type.GetProperty(propName, flags);
+            if (pi != null)
+            {
+                MethodInfo getter = pi.GetGetMethod((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
+                if (getter != null)
+                {
+                    object[] arg = new object[] { };
+                    result = getter.Invoke(null, arg);
+                    return true;
+                }
+            }
+            else if (searchBaseRecursive)
+                return GetBasePropertyValue(type.BaseType, null, propName, out result, flags);
+
+            return false;
         }
 
 
@@ -301,7 +343,7 @@ namespace EntityTools.Tools
         public static bool SetFieldValue(object obj, string fieldName, object value, BindingFlags flags = BindingFlags.Default, bool BaseType = false)
         {
             if (flags == BindingFlags.Default)
-                flags = Flags;
+                flags = DefaultFlags;
 
             if (obj == null)
                 return false;
@@ -332,7 +374,7 @@ namespace EntityTools.Tools
         public static bool SetStaticFieldValue(Type type, string fieldName, object value, BindingFlags flags = BindingFlags.Default, bool BaseType = false)
         {
             if (flags == BindingFlags.Default)
-                flags = Flags;
+                flags = DefaultFlags;
             if (BaseType)
             {
                 type = type.BaseType;
@@ -362,7 +404,7 @@ namespace EntityTools.Tools
             Type type = obj.GetType();
 
             if (flags == BindingFlags.Default)
-                flags = Flags;
+                flags = DefaultFlags;
 
             if (BaseType)
             {
@@ -389,7 +431,7 @@ namespace EntityTools.Tools
         {
             result = null;
             if (flags == BindingFlags.Default)
-                flags = Flags;
+                flags = DefaultFlags;
             if (BaseType)
             {
                 type = type.BaseType;
@@ -415,7 +457,7 @@ namespace EntityTools.Tools
         /// <param name="flags"></param>
         /// <param name="BaseType"></param>
         /// <returns></returns>
-        public static bool ExecMethod(object obj, string methodName, ref Object[] arguments, out object result, BindingFlags flags = BindingFlags.Default, bool BaseType = false)
+        public static bool ExecMethod(object obj, string methodName, object[] arguments, out object result, BindingFlags flags = BindingFlags.Default, bool BaseType = false)
         {
             result = null;
 
@@ -424,9 +466,8 @@ namespace EntityTools.Tools
             Type type = obj.GetType();
 
             if (flags == BindingFlags.Default)
-                flags = Flags;
+                flags = DefaultFlags;
 
-            flags = Flags | flags;
             if (BaseType)
             {
                 type = type.BaseType;
@@ -450,12 +491,12 @@ namespace EntityTools.Tools
         /// <param name="flags"></param>
         /// <param name="BaseType"></param>
         /// <returns></returns>
-        public static bool ExecStaticMethod(Type type, string MethodName, ref Object[] arguments, out object result, BindingFlags flags = BindingFlags.Default, bool BaseType = false)
+        public static bool ExecStaticMethod(Type type, string MethodName, object[] arguments, out object result, BindingFlags flags = BindingFlags.Default, bool BaseType = false)
         {
             result = null;
 
             if (flags == BindingFlags.Default)
-                flags = Flags;
+                flags = DefaultFlags;
 
             if (BaseType)
             {
@@ -472,87 +513,117 @@ namespace EntityTools.Tools
         }
 
 
-        /// <summary>
-        /// Подписка на событие
-        /// </summary>
-        /// <param name="obj">Объект класса в котором создано событие</param>
-        /// <param name="control">Control в котром формируется событие. Скажем, кнопка</param>
-        /// <param name="typeHandler">делегат: typeof(...)</param>
-        /// <param name="EventName"></param>
-        /// <param name="method">метод, который будет вызываться при возникновении события</param>
-        /// <param name="IsConsole"></param>
-        public static void SubscribeEvent(object obj, Type control, Type typeHandler, string EventName, MethodInfo method, bool IsConsole = false)
-        {
-            EventInfo eventInfo = control.GetEvent(EventName); //"Load"
-                                                               // Create the delegate on the test class because that's where the
-                                                               // method is. This corresponds with `new EventHandler(test.WriteTrace)`.
-                                                               //Type type = typeof(EventHandler);
-            Delegate handler;
-            if (IsConsole)
-            {
-                handler = Delegate.CreateDelegate(typeHandler, null, method);
-                eventInfo.AddEventHandler(obj, handler);
-            }
-            else
-            {
-                handler = Delegate.CreateDelegate(typeHandler, obj, method);
-                eventInfo.AddEventHandler(control, handler);
-            }
-        }
 
         /// <summary>
         /// Подписка на событие
         /// </summary>
-        /// <param name="obj">Объект класса в котором создано событие</param>
-        /// <param name="control">Control в котром формируется событие. Скажем, кнопка</param>
-        /// <param name="typeHandler">делегат: typeof(...)</param>
-        /// <param name="EventName"></param>
-        /// <param name="method">метод, который будет вызываться при возникновении события</param>
-        public static void SubscribeEvent(object obj, Control control, Type typeHandler, string EventName, MethodInfo method)
+        /// <param name="source">Объект, генерируеющий событие</param>
+        /// <param name="eventName">Название события</param>
+        /// <param name="target">Объект-подписчик (слушатель)</param>
+        /// <param name="methodName">Название метода объекта-подписчика, вызываемого при возникновении события</param>
+        /// <param name="searchBase">Искать ли объявления в базовых классах</param>
+        /// <param name="sourceFlags"></param>
+        /// <param name="targetFlags"></param>
+        /// <returns></returns>
+        public static bool SubscribeEvent(Object source, string eventName, Object target, string methodName, bool searchBase = false, BindingFlags sourceFlags = BindingFlags.Default, BindingFlags targetFlags = BindingFlags.Default)
         {
-            if (typeof(Control).IsAssignableFrom(control.GetType()))
+            if (source != null && !string.IsNullOrEmpty(eventName)
+                && target != null && !string.IsNullOrEmpty(methodName))
             {
-                SubscribeEvent(obj, control.GetType(), typeHandler, EventName, method);
+                EventInfo eventInfo = (sourceFlags == BindingFlags.Default) ? source.GetType().GetEvent(eventName)
+                                                    : source.GetType().GetEvent(eventName, sourceFlags);
+
+                MethodInfo methodInfo = (targetFlags == BindingFlags.Default) ? target.GetType().GetMethod(methodName)
+                                                    : target.GetType().GetMethod(methodName, targetFlags);
+
+                if (eventInfo != null && methodInfo != null)
+                {
+                    Delegate @delegate = Delegate.CreateDelegate(eventInfo.EventHandlerType, target, methodInfo);
+
+                    eventInfo.AddEventHandler(source, @delegate);
+
+                    return true;
+                }
             }
+            return false;
+        }
+        public static bool SubscribeEventStatic(Object source, string eventName, Type target, string methodName, bool searchBase = false, BindingFlags sourceFlags = BindingFlags.Default, BindingFlags targetFlags = BindingFlags.Default)
+        {
+            if (source != null && !string.IsNullOrEmpty(eventName)
+                && target != null && !string.IsNullOrEmpty(methodName))
+            {
+                EventInfo eventInfo = (sourceFlags == BindingFlags.Default) ? source.GetType().GetEvent(eventName)
+                                                    : source.GetType().GetEvent(eventName, sourceFlags);
+
+                MethodInfo methodInfo = (targetFlags == BindingFlags.Default) ? target.GetMethod(methodName)
+                                                    : target.GetMethod(methodName, targetFlags | BindingFlags.Static);
+
+                if (eventInfo != null && methodInfo != null)
+                {
+                    Delegate @delegate = Delegate.CreateDelegate(eventInfo.EventHandlerType, null, methodInfo);
+
+                    eventInfo.AddEventHandler(source, @delegate);
+
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
-        /// Отписка от события
+        /// Отказ от подписки на событие
         /// </summary>
-        /// <param name="obj">Объект, на событие которого подписываемся</param>
-        /// <param name="control"></param>
-        /// <param name="typeHandler"></param>
-        /// <param name="EventName"></param>
-        /// <param name="method"></param>
-        /// <param name="IsConsole"></param>
-        public static void UnSubscribeEvent(object obj, Type control, Type typeHandler, string EventName, MethodInfo method, bool IsConsole = false)
+        /// <param name="source">Объект, генерируеющий событие</param>
+        /// <param name="eventName">Название события</param>
+        /// <param name="target">Объект-подписчик (слушатель)</param>
+        /// <param name="methodName">Название метода объекта-подписчика, вызываемого при возникновении события</param>
+        /// <param name="searchBase">Искать ли объявления в базовых классах</param>
+        /// <param name="sourceFlags"></param>
+        /// <param name="targetFlags"></param>
+        /// <returns></returns>
+        public static bool UnsubscribeEvent(Object source, string eventName, Object target, string methodName, bool searchBase = false, BindingFlags sourceFlags = BindingFlags.Default, BindingFlags targetFlags = BindingFlags.Default)
         {
-            if (obj != null)
+            if (source != null && !string.IsNullOrEmpty(eventName)
+                && target != null && !string.IsNullOrEmpty(methodName))
             {
-                EventInfo eventInfo = control.GetEvent(EventName);
-                //Type type = typeof(EventHandler);
-                if (IsConsole)
+                EventInfo eventInfo = (sourceFlags == BindingFlags.Default) ? source.GetType().GetEvent(eventName)
+                                                    : source.GetType().GetEvent(eventName, sourceFlags);
+
+                MethodInfo methodInfo = (targetFlags == BindingFlags.Default) ? target.GetType().GetMethod(methodName)
+                                                    : target.GetType().GetMethod(methodName, targetFlags);
+
+                if (eventInfo != null && methodInfo != null)
                 {
-                    Delegate handler = Delegate.CreateDelegate(typeHandler, null, method);
-                    // detach the event handler
-                    if (handler != null)
-                        eventInfo.RemoveEventHandler(obj, handler);
-                }
-                else
-                {
-                    Delegate handler = Delegate.CreateDelegate(typeHandler, obj, method);
-                    // detach the event handler
-                    if (handler != null)
-                        eventInfo.RemoveEventHandler(control, handler);
+                    Delegate @delegate = Delegate.CreateDelegate(eventInfo.EventHandlerType, target, methodInfo);
+
+                    eventInfo.RemoveEventHandler(source, @delegate);
+
+                    return true;
                 }
             }
+            return false;
         }
-        public static void UnSubscribeEvent(object obj, Control control, Type typeHandler, string EventName, MethodInfo method)
+        public static bool UnsubscribeEventStatic(Object source, string eventName, Type target, string methodName, bool searchBase = false, BindingFlags sourceFlags = BindingFlags.Default, BindingFlags targetFlags = BindingFlags.Default)
         {
-            if (typeof(Control).IsAssignableFrom(control.GetType()))
+            if (source != null && !string.IsNullOrEmpty(eventName)
+                && target != null && !string.IsNullOrEmpty(methodName))
             {
-                UnSubscribeEvent(obj, control.GetType(), typeHandler, EventName, method);
+                EventInfo eventInfo = (sourceFlags == BindingFlags.Default) ? source.GetType().GetEvent(eventName)
+                                                    : source.GetType().GetEvent(eventName, sourceFlags);
+
+                MethodInfo methodInfo = (targetFlags == BindingFlags.Default) ? target.GetMethod(methodName)
+                                                    : target.GetMethod(methodName, targetFlags | BindingFlags.Static);
+
+                if (eventInfo != null && methodInfo != null)
+                {
+                    Delegate @delegate = Delegate.CreateDelegate(eventInfo.EventHandlerType, null, methodInfo);
+
+                    eventInfo.RemoveEventHandler(source, @delegate);
+
+                    return true;
+                }
             }
+            return false;
         }
 
         //public static void DumpAssembly(string path, string methodName)

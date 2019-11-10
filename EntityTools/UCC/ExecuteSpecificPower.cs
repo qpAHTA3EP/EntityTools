@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Xml.Serialization;
 using Astral.Classes;
@@ -24,11 +25,12 @@ using MyNW.Patchables.Enums;
 
 namespace EntityTools.UCC
 {
+    [Serializable]
     public class ExecuteSpecificPower : UCCAction
     {
         [Editor(typeof(PowerAllIdEditor), typeof(UITypeEditor))]
         [Category("Required")]
-        public string PowerId { get; set; }
+        public string PowerId { get; set; } = string.Empty;
 
         [Category("Required")]
         public bool CheckPowerCooldown { get; set; } = false;
@@ -42,7 +44,7 @@ namespace EntityTools.UCC
         {
             get
             {
-                if (power == null || !power.IsValid)
+                if (!string.IsNullOrEmpty(PowerId) && (power == null || !power.IsValid))
                     power = Powers.GetPowerByInternalName(PowerId);
                 return power?.IsInTray == true;
             }
@@ -70,12 +72,13 @@ namespace EntityTools.UCC
             }
         }
 
-        [Browsable(false)]
-        public new string ActionName { get; set; }
-
+        [XmlIgnore]
         private Power power = null;
-        private static readonly Type movementsType = ReflectionHelper.GetTypeByName("Astral.Logic.UCC.Controllers.Movements", true);
+        [XmlIgnore]
+        private static Type movementsType = null;
 
+        [Browsable(false)]
+        [XmlIgnore]
         public override bool NeedToRun
         {
             get
@@ -93,7 +96,7 @@ namespace EntityTools.UCC
                 //}
 
                 return PowerId.Length > 0 
-                        && power.IsValid 
+                        && power!= null && power.IsValid 
                         && (!CheckPowerCooldown || power.IsOnCooldown())
                         && (!CheckInTray || power.IsInTray);
             }
@@ -101,6 +104,9 @@ namespace EntityTools.UCC
 
         public override bool Run()
         {
+            if (movementsType == null)
+                movementsType = ReflectionHelper.GetTypeByName("Astral.Logic.UCC.Controllers.Movements", true);
+
             //if(power == null && !power.IsValid)
             //    power = Powers.GetPowerByInternalName(PowerId);
 
@@ -226,14 +232,14 @@ namespace EntityTools.UCC
 
             if (power != null && power.IsValid)
             {
-                string str = string.Empty;
+                StringBuilder str = new StringBuilder();
                 if (CheckInTray && Slotted)
-                    str += "[Slotted] ";
+                    str.Append("[Slotted] ");
                 if (power.EffectivePowerDef().DisplayName.Length > 0)
-                     str += power.EffectivePowerDef().DisplayName;
-                else str += power.EffectivePowerDef().InternalName;
+                    str.Append(power.EffectivePowerDef().DisplayName);
+                else str.Append(power.EffectivePowerDef().InternalName);
 
-                return str;
+                return str.ToString();
             }
 
             return "Unknow Power";

@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NumberAstNode = AstralVariables.Expressions.AstNode<double>;
+using NumberAstNode = VariableTools.Expressions.AstNode<double>;
 
-namespace AstralVariables.Expressions.Functions
+namespace VariableTools.Expressions.Functions
 {
 
     /// <summary>
@@ -28,7 +28,7 @@ namespace AstralVariables.Expressions.Functions
         {
             result = 0;
 #if ASTRAL
-            foreach (InventorySlot slot in EntityManager.LocalPlayer.BagsItems)
+            foreach (InventorySlot slot in EntityManager.LocalPlayer.AllItems)
             {
                 if (slot.Item?.ItemDef?.InternalName == ItemId)
                     result += slot.Item.Count;
@@ -40,7 +40,7 @@ namespace AstralVariables.Expressions.Functions
         public override string Description(int indent = 0)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Insert(sb.Length, Parser.Indent, indent).Append(GetType().Name).Append(" {Id='").Append(ItemId).Append("' Value=").Append(Result).AppendLine("}");
+            sb.Insert(sb.Length, Parser.Indent, indent).Append(GetType().Name).Append(" {Id='").Append(ItemId).Append("' Value=").Append(Result).Append("}");
             return sb.ToString();
             //return $"{GetType().Name} {{Id='{ItemId}'}}";
         }

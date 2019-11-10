@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
+using System.Xml.Serialization;
 using Astral;
 using Astral.Classes;
 using Astral.Classes.ItemFilter;
@@ -19,13 +20,13 @@ namespace EntityTools.Actions
     public class MoveToEntity : Astral.Quester.Classes.Action
     {
         [NonSerialized]
-        protected Entity target = new Entity(IntPtr.Zero);
+        internal Entity target = new Entity(IntPtr.Zero);
 
         //[NonSerialized]
         //[Description("Period of time until the closest entity is searched again")]
         //protected readonly int SearchTimeout = 1000;
 
-        [Description("ID (an internal untranslated name) of the Entity for the search")]
+        [Description("ID of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
         public string EntityID { get; set; } = string.Empty;
@@ -88,6 +89,11 @@ namespace EntityTools.Actions
             "This option is ignored if 'IgnoreCombat' does not set")]
         [Category("Interruptions")]
         public bool AttackTargetEntity { get; set; } = true;
+
+        [XmlIgnore]
+        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
+        [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
+        public string TestInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>";
 
         public override bool NeedToRun
         {

@@ -1,26 +1,35 @@
-﻿using System;
-using static AstralVariables.Expressions.Parser;
-using NumberAstNode = AstralVariables.Expressions.AstNode<double>;
-using ErrorList = System.Collections.Generic.List<AstralVariables.Expressions.BaseParseError>;
-using AstralVariables.Expressions.Operand;
-using AstralVariables.Expressions.Functions;
-using AstralVariables.Expressions.Operators;
+﻿#define DEBUG_ADDITION_INFO
+
+using System;
+using static VariableTools.Expressions.Parser;
+using NumberAstNode = VariableTools.Expressions.AstNode<double>;
+using ErrorList = System.Collections.Generic.List<VariableTools.Expressions.BaseParseError>;
+using VariableTools.Expressions.Operand;
+using VariableTools.Expressions.Functions;
+using VariableTools.Expressions.Operators;
 using System.Diagnostics;
 using System.Xml.Serialization;
 
-namespace AstralVariables.Expressions
+namespace VariableTools.Expressions
 {
     [Serializable]
     public class NumberExpression : Expression<double>
     {
         [XmlIgnore]
-        public override bool IsValid => !string.IsNullOrEmpty(expression) && !string.IsNullOrWhiteSpace(expression) && (ast != null);
+        public override bool IsValid
+        {
+            get
+            {
+                return !string.IsNullOrEmpty(text) && !string.IsNullOrWhiteSpace(text) 
+                    && (ast != null || Parse(shortText, out ast, out parseError, true));
+            }
+        }
 
         public override bool Calcucate(out double result)
         {
             result = 0;
 
-            if (string.IsNullOrEmpty(Expression) || string.IsNullOrWhiteSpace(Expression))
+            if (string.IsNullOrEmpty(Text) || string.IsNullOrWhiteSpace(Text))
                 return false;
 
             if (ast == null)
@@ -34,64 +43,172 @@ namespace AstralVariables.Expressions
                 result = res;
 #if DEBUG
                 stopwatch.Stop();
-                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: Calculate '{expression}' time: {stopwatch.ElapsedMilliseconds} ms");
+                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: Expression({GetHashCode().ToString("X8")}) '{text}' result is {res}. Calculating time: {stopwatch.ElapsedMilliseconds} ms");
+                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: Expression({GetHashCode().ToString("X8")}) has AST({ast.GetHashCode().ToString("X8")})");
+
+#if DEBUG_ADDITION_INFO
+                if (VariablesTools.Variables.Count > 0)
+                {
+                    using (var varEnemer = VariablesTools.Variables.GetEnumerator())
+                    {
+                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: ======================================");
+                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: <Variables>:");
+                        while (varEnemer.MoveNext())
+                        {
+                            //Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: '{varEnemer.Current.Key}' = {varEnemer.Current.Value}");
+                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: '{varEnemer.Current.Name}' = {varEnemer.Current.Value}");
+                        }
+                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: ======================================");
+                    }
+                }
+                else Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: <Variables> is empty.");
+
+#endif
 #endif
                 return true;
             }
 #if DEBUG
             stopwatch.Stop();
-            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: Calculate '{expression}' time: {stopwatch.ElapsedMilliseconds} ms");
+            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: Expression({GetHashCode().ToString("X8")}) '{text}' calculation FAILED. Calculating time: {stopwatch.ElapsedMilliseconds} ms");
+            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: Expression({GetHashCode().ToString("X8")}) has AST({ast.GetHashCode().ToString("X8")})");
 #endif
             return false;
         }
+
 
         /// <summary>
         /// Синтаксический разбор выражения expression 
         /// и построение Абстрактного синтаксического дерева (AST)
         /// </summary>
-        /// <param name="newExpression">Новое значение Expression. Если не задано - производится разбор прежнего значения Expression</param>
+        /// <param name="expression">Новое значение Expression. Если не задано - производится разбор прежнего значения Expression</param>
         /// <returns></returns>
-        public override bool Parse(string newExpression = "")
+        protected override bool Parse()
         {
 #if DEBUG
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 #endif
-            if (!string.IsNullOrEmpty(newExpression) && !string.IsNullOrWhiteSpace(newExpression))
-                expression = newExpression;
-            else if (string.IsNullOrEmpty(expression) || string.IsNullOrWhiteSpace(expression))
-            {
-                ast = null;
-                ParseError = new FatalParseError("Parse: Expression string is empty");
-                return false;
-            }
-
-            string expr = expression;
-            ast = null;
-            try
-            {
-                ast = ParseAddition(ref expr);
-            }
-            catch(BaseParseError e)
-            {
-                ParseError = e;
-                return false;
-            }
+            bool result = Parse(shortText, out ast, out parseError, true);
 #if DEBUG
             stopwatch.Stop();
-            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: Parse '{expression}' time: {stopwatch.ElapsedMilliseconds} ms");
+            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: Expression({GetHashCode().ToString("X8")}) '{text}' parsing time: {stopwatch.ElapsedMilliseconds} ms");
+            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: Expression({GetHashCode().ToString("X8")}) has AST({ast.GetHashCode().ToString("X8")})");
+
+#if DEBUG_ADDITION_INFO
+            using (var astEnemer = astCollection.GetEnumerator())
+            {
+                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: ======================================");
+                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: <astCollection>:");
+                while (astEnemer.MoveNext())
+                {
+                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: '{astEnemer.Current.Key}' => has AST({astEnemer.Current.Value.GetHashCode().ToString("X8")})");
+                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, astEnemer.Current.Value.Description(2));
+                }
+                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: ======================================");
+            }
 #endif
-            // После разбора выражения строка expr должна остаться пустой
-            // в противном случае выражение содержит ошибку
-            if (!string.IsNullOrWhiteSpace(expr) && !string.IsNullOrEmpty(expr))
+#endif
+            return result;
+        }
+
+
+        /// <summary>
+        /// Синтаксический разбор выражения <see cref="expression">
+        /// и построение Абстрактного синтаксического дерева <see cref="ast">
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="ast"></param>
+        /// <param name="error"></param>
+        /// <param name="unspaced">Флаг, указывающий на то, что строка expression не содержет лишних пробелов</param>
+        /// <returns></returns>
+        protected static bool Parse(string expression, out NumberAstNode ast, out BaseParseError error, bool unspaced = false)
+        {
+            if (string.IsNullOrEmpty(expression) || string.IsNullOrWhiteSpace(expression))
             {
                 ast = null;
-                expr = expr.TrimStart();
-                ParseError = new FatalParseError($"Parse: Undefined symbol at position {expression.Length - expr?.Length}" , expr);
+                error = new FatalParseError("Parse: Expression string is empty");
                 return false;
             }
 
-            return ast != null;
+            string shortExpression;
+            if (!unspaced)
+            {// Удаляем лишние пробельные символы
+                int forbInd = Parser.DeleteWhiteSpaces(expression, out shortExpression);
+                // shortExpression - выражение без лишних пробельных символов
+                if (forbInd >= 0)
+                {
+                    ast = null;
+                    error = new FatalParseError("Parse: Expression contains forbidden symbol at position " + forbInd);
+                    return false;
+                }
+            }
+            else shortExpression = expression;
+
+            string astKey = shortExpression;
+
+            // Проверяем наличие ast в кэше
+            if (astCollection.TryGetValue(astKey, out ast))
+            {
+                error = null;
+                return true;
+            }
+
+            // Пытаемся построить синтаксическое дерева
+            ast = null;
+            error = null;
+            try
+            {
+                ast = ParseAddition(ref shortExpression);
+            }
+            catch (BaseParseError e)
+            {
+                error = e;
+                return false;
+            }
+
+            // После разбора выражения строка shortExpression должна остаться пустой
+            // в противном случае выражение содержит ошибку
+            if (!string.IsNullOrWhiteSpace(shortExpression) && !string.IsNullOrEmpty(shortExpression))
+            {
+                ast = null;
+                error = new FatalParseError($"Parse: Undefined symbol at position {expression.Length - shortExpression?.Length}", shortExpression);
+                return false;
+            }
+
+            if (ast != null)
+            {
+                if (astCollection.ContainsKey(astKey))
+                    astCollection[astKey] = ast;
+                else astCollection.Add(astKey, ast);
+                return true;
+            }
+            else
+            {
+                ast = null;
+                error = new BaseParseError("Parse: unknown error", shortExpression);
+                return false;
+            }
+
+        }
+
+        /// <summary>
+        /// Проверка корректности входной строки
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="desription">описание результата</param>
+        /// <returns></returns>
+        public static bool Validate(string input, out string desription)
+        {
+            if (Parse(input, out NumberAstNode ast, out BaseParseError error))
+            {
+                desription = ast.Description();
+                return true;
+            }
+            else
+            {
+                desription = error.Message;
+                return false;
+            }
         }
 
         /// <summary>
@@ -101,7 +218,7 @@ namespace AstralVariables.Expressions
         /// </summary>
         /// <param name="expr"></param>
         /// <returns>Узел синтаксического дерева NumberNode</returns>
-        public static NumberConstant ParseNumber(ref string expr)
+        protected static NumberConstant ParseNumber(ref string expr)
         {
             string exprBackup = expr;
             expr = expr.TrimStart();
@@ -204,7 +321,7 @@ namespace AstralVariables.Expressions
         /// </summary>
         /// <param name="expr"></param>
         /// <returns>Узел синтаксического дерева NumberVariable</returns>
-        public static NumberVariable ParseVariable(ref string expr)
+        protected static NumberVariable ParseVariable(ref string expr)
         {
             string exprBackup = expr;
 
@@ -284,7 +401,7 @@ namespace AstralVariables.Expressions
         /// </summary>
         /// <param name="expr"></param>
         /// <returns></returns>
-        public static NumberAstNode ParseValue(ref string expr)
+        protected static NumberAstNode ParseValue(ref string expr)
         {
             string exprBackup = expr;
             ErrorList subError = new ErrorList();
@@ -338,7 +455,7 @@ namespace AstralVariables.Expressions
         /// </summary>
         /// <param name="expr"></param>
         /// <returns>Идентификатор предмета ItemId</returns>
-        public static string ParseId(ref string expr)
+        protected static string ParseId(ref string expr)
         {
 
             if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
@@ -411,7 +528,7 @@ namespace AstralVariables.Expressions
         /// </summary>
         /// <param name="expr"></param>
         /// <returns></returns>
-        public static NumberAstNode ParseAddition(ref string expr)
+        protected static NumberAstNode ParseAddition(ref string expr)
         {
             string exprBackup = expr;
             ErrorList subError = new ErrorList();
@@ -468,7 +585,7 @@ namespace AstralVariables.Expressions
         /// </summary>
         /// <param name="expr"></param>
         /// <returns></returns>
-		public static NumberAstNode ParseBracketedAddition(ref string expr)
+		protected static NumberAstNode ParseBracketedAddition(ref string expr)
 		{
             string exprBackup = expr;
 
@@ -532,11 +649,11 @@ namespace AstralVariables.Expressions
         /// </summary>
         /// <param name="expr"></param>
         /// <returns></returns>
-        public static NumberAstNode ParseMultiplication(ref string expr)
+        protected static NumberAstNode ParseMultiplication(ref string expr)
         {
             return ParseMultiplication(ref expr, null);
         }
-        public static NumberAstNode ParseMultiplication(ref string expr, NumberAstNode left)
+        protected static NumberAstNode ParseMultiplication(ref string expr, NumberAstNode left)
         {
             string exprBackup = expr;
 			NumberAstNode leftOperand = left;
@@ -735,7 +852,7 @@ namespace AstralVariables.Expressions
         /// </summary>
         /// <param name="expr"></param>
         /// <returns>Узел синтаксического дерева NumberAstNode</returns>
-        public static NumberAstNode ParseFunction(ref string expr)
+        protected static NumberAstNode ParseFunction(ref string expr)
         {
             string exprBackup = expr;
             ErrorList subErrors = new ErrorList();
@@ -796,7 +913,7 @@ namespace AstralVariables.Expressions
         /// </summary>
         /// <param name="expr"></param>
         /// <returns>Узел синтаксического дерева ItemCount</returns>
-        public static ItemCount ParseItemCount(ref string expr)
+        protected static ItemCount ParseItemCount(ref string expr)
         {
             string exprBackup = expr;
 
@@ -838,7 +955,7 @@ namespace AstralVariables.Expressions
                 throw e;
             }
         }
-        public static ItemCount ParseRegexItemCount(ref string expr)
+        protected static ItemCount ParseRegexItemCount(ref string expr)
         {
             string exprBackup = expr;
 
@@ -954,7 +1071,7 @@ namespace AstralVariables.Expressions
         /// </summary>
         /// <param name="expr"></param>
         /// <returns>Узел синтаксического дерева NumericCount</returns>
-        public static NumericCount ParseNumericCount(ref string expr)
+        protected static NumericCount ParseNumericCount(ref string expr)
         {
             string exprBackup = expr;
 
@@ -997,7 +1114,7 @@ namespace AstralVariables.Expressions
                 throw e;
             }
         }
-        public static NumericCount ParseRegexNumericCount(ref string expr)
+        protected static NumericCount ParseRegexNumericCount(ref string expr)
         {
             string exprBackup = expr;
 
@@ -1111,7 +1228,7 @@ namespace AstralVariables.Expressions
         /// </summary>
         /// <param name="expr"></param>
         /// <returns>Узел синтаксического дерева RandomNumber</returns>
-        public static RandomNumber ParseRandom(ref string expr)
+        protected static RandomNumber ParseRandom(ref string expr)
         {
             string exprBackup = expr;
             ErrorList subErrors = new ErrorList();
@@ -1187,7 +1304,7 @@ namespace AstralVariables.Expressions
         /// <param name="leftNode"></param>
         /// <param name="rightNode"></param>
         /// <returns></returns>
-        public static NumberAstNode CreateOperatorNode(MathOperatorType opType, NumberAstNode leftNode, NumberAstNode rightNode)
+        protected static NumberAstNode CreateOperatorNode(MathOperatorType opType, NumberAstNode leftNode, NumberAstNode rightNode)
         {
             if (leftNode == null)
                 throw new FatalParseError("CreateOperatorNode: Have null when there should be {LeftOperand}");

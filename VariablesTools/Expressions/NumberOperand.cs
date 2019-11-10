@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace AstralVariables.Expressions.Operand
+namespace VariableTools.Expressions.Operand
 {
     /// <summary>
     /// Лист AST - числова константа

@@ -83,5 +83,14 @@ namespace EntityTools.Tools
         FollowAndSimulateFKey
     }
 
-
+    /// <summary>
+    /// Перечисление 
+    /// </summary>
+    [Serializable]
+    public enum EntityPropertyType
+    {
+        Distance,
+        ZAxis,
+        HealthPercent
+    }
 }

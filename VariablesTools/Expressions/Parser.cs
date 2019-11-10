@@ -1,11 +1,9 @@
-﻿using AstralVariables.Classes;
+﻿using VariableTools.Classes;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 
-namespace AstralVariables.Expressions
+namespace VariableTools.Expressions
 {
     public class Parser
     {
@@ -751,6 +749,109 @@ namespace AstralVariables.Expressions
             if (name == null)
                 return false;
             return CheckVarName(name.ToString());
+        }
+
+        /// <summary>
+        /// Удаляет все бесполезные пробелы из <see cref="input"> и помещает результат в <see cref="out">
+        /// Корректность входной строки не проверяется
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="result"></param>
+        /// <returns>индек некорректного символа входной строки начиная с 0
+        /// возвращает -1, если результат корректен</returns>
+        public static int DeleteWhiteSpaces(string input, out string result)
+        {
+            if(string.IsNullOrEmpty(input))
+            {
+                result = string.Empty;
+                return 0;
+            }
+
+            /// Недопустимой является комбирация (\w|.|,|_)\s(\w|.|,|_)
+            /// где \w - любой алфавитно-цифровой символ
+            ///     \s - любой символ пробела
+            /// Другая недопустимая комбинация -
+            /// десятичный разделить между нецифровыми символами \D(.|,)\D
+            /// где \D - не цифровой символ
+
+            // Буфер, в который копируются значащие символы
+            char[] buffer = new char[input.Length];
+            // количество скопированных символов (индекс последнего скопированного символа)
+            int copiedChars = 0;
+
+            for(int i = 0; i < input.Length; i++)
+            {
+                // пропускаем пробелы и символы-разделители
+                while (i < input.Length
+                    && (char.IsWhiteSpace(input[i])
+                        || char.IsSeparator(input[i])))
+                        i++;
+                
+                // Копируем числа, переменные или функторы
+                while ( i < input.Length
+                        && ( Symbols.IsLetterOrDigit(input[i])
+                             || Symbols.IsUnderscore(input[i])
+                             || Symbols.IsNumberDecimalSeparator(input[i])))
+                {
+                    buffer[copiedChars] = input[i];
+                    i++;
+                    copiedChars++;
+                }
+
+                // пропускаем пробелы и символы-разделители
+                while (i < input.Length
+                    && (char.IsWhiteSpace(input[i])
+                        || char.IsSeparator(input[i])))
+                    i++;
+
+                // Анализируем встреченный символ
+                // если встретился алфавитно-цифровой символ, десятичный разделитель или подсеркивание ('_')
+                // значит мы встретили комбинацию "(\w|.|,|_)\s(\w|.|,|_)" 
+                if ( i < input.Length
+                     && (Symbols.IsLetterOrDigit(input[i])
+                            || Symbols.IsUnderscore(input[i])
+                            || Symbols.IsNumberDecimalSeparator(input[i])))
+                {
+                    // добавляем в выходную строку пробел
+                    buffer[copiedChars] = ' ';
+                    copiedChars++;
+                    // добавляем в выходную строку найденный символ
+                    buffer[copiedChars] = input[i];
+                    copiedChars++;
+                    continue;
+                }
+
+                // Копируем скобки и математические операторы операторы
+                if ( i < input.Length
+                     && (Symbols.IsMathOperator(input[i])
+                         || Symbols.IsBraces(input[i])))
+                {
+                    buffer[copiedChars] = input[i];
+                    copiedChars++;
+                    continue;
+                }
+
+                if (i < input.Length
+                    && (char.IsWhiteSpace(input[i])
+                        || char.IsSeparator(input[i])))
+                    continue;
+
+                if (i < input.Length)
+                {
+                    // Если мы добрались сюда, то во входной строке содержатся некорректные символы
+                    result = string.Empty;
+                    return i;
+                }
+            }
+
+            if(copiedChars > 0)
+            {
+                result = new string(buffer, 0, copiedChars);
+                return -1;
+            }
+
+            result = string.Empty;
+            return 0;
         }
     }
 

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Forms;
-using AstralVariables.Expressions;
+using VariableTools.Expressions;
+using DevExpress.XtraEditors;
 using VarCollection = System.Collections.Generic.Dictionary<string, double>;
 
-namespace AstralVariables.Forms
+namespace VariableTools.Forms
 {
-    public partial class VariablesEditor : Form
+    public partial class VariablesEditor : XtraForm //*/Form
     {
         private static VariablesEditor varEditor;
 
@@ -15,43 +16,72 @@ namespace AstralVariables.Forms
             InitializeComponent();
         }
 
-        //public static string GetVariable(VarCollection vars)
-        //{
-        //    if (varEditor == null)
-        //    {
-        //        varEditor = new VariablesEditor();
+        public static void Show(bool allowEdit = false)
+        {
+            if (varEditor == null)
+            {
+                varEditor = new VariablesEditor();
 
-        //        varEditor.chbAllowEdit.Visible = false;
+                varEditor.chbAllowEdit.Visible = allowEdit;
 
-        //        varEditor.dgvVariables.ReadOnly = true;
+                varEditor.dgvVariables.ReadOnly = !allowEdit;
 
-        //        varEditor.btnSelect.Text = "Select";
-        //    }
+                if (allowEdit)
+                {
+                    varEditor.btnSelect.Visible = true;
+                    varEditor.btnSelect.Text = "Save";
+                    varEditor.btnCancel.Visible = true;
+                    varEditor.btnCancel.Text = "Cancel";
+                }
+                else
+                {
+                    varEditor.btnSelect.Visible = false;
+                    varEditor.btnSelect.Text = string.Empty;
+                    varEditor.btnCancel.Visible = true;
+                    varEditor.btnCancel.Text = "Close";
+                }
+            }
 
-        //    if (vars != null)
-        //    {
-        //        // Заполнение DataGridView значениями
-        //        varEditor.FillDgvVariables(vars);
+            // Заполнение DataGridView значениями
+            varEditor.FillDgvVariables();
 
-        //        // отображение редактора переменных
-        //        DialogResult result = varEditor.ShowDialog();
-        //        if (result == DialogResult.OK)
-        //            return varEditor.dgvVariables.CurrentRow.Cells[varEditor.clmnName.DisplayIndex].Value.ToString();
-        //    }
-        //    return string.Empty;
-        //}
+            // отображение редактора переменных
+            DialogResult result = varEditor.ShowDialog();
+            if (allowEdit && result == DialogResult.OK)
+            {
+                // Сохраняем значение переменных в коллекцию
+                VariablesTools.Variables.Clear();
+                foreach(DataGridViewRow row in varEditor.dgvVariables.Rows)
+                {
+                    if (Parser.TryParse(row.Cells[varEditor.clmnValue.DisplayIndex].Value, out double newValue))
+                        newValue = 0;
+
+                    // Реализация через Dictionary<string, double>
+                    //if(VariablesTools.Variables.ContainsKey(row.Cells[varEditor.clmnName.DisplayIndex].Value.ToString()))
+                    //    VariablesTools.Variables[row.Cells[varEditor.clmnName.DisplayIndex].Value.ToString()] = newValue;
+                    //else VariablesTools.Variables.Add(row.Cells[varEditor.clmnName.DisplayIndex].Value.ToString(), newValue);
+
+                    // Реализация через VariableCollection
+                    if (!VariablesTools.Variables.TryAdd(row.Cells[varEditor.clmnName.DisplayIndex].Value.ToString(), newValue))
+                        VariablesTools.Variables.Add(row.Cells[varEditor.clmnName.DisplayIndex].Value.ToString(), newValue);
+                }
+            }
+        }
+
         public static string GetVariable(string var_name = "")
         {
             if (varEditor == null)
             {
                 varEditor = new VariablesEditor();
 
-                varEditor.chbAllowEdit.Visible = false;
-
-                varEditor.dgvVariables.ReadOnly = true;
-
-                varEditor.btnSelect.Text = "Select";
             }
+            varEditor.chbAllowEdit.Visible = false;
+            varEditor.dgvVariables.ReadOnly = true;
+
+            varEditor.btnSelect.Visible = true;
+            varEditor.btnSelect.Text = "Select";
+            varEditor.btnCancel.Visible = true;
+            varEditor.btnCancel.Text = "Cancel";
 
             // Заполнение DataGridView значениями
             varEditor.FillDgvVariables(var_name);
@@ -76,12 +106,14 @@ namespace AstralVariables.Forms
             {
                 DataGridViewRow newRow = new DataGridViewRow();
                 newRow.CreateCells(varEditor.dgvVariables);
-                newRow.Cells[varEditor.clmnName.DisplayIndex].Value = v.Key;
+                //newRow.Cells[varEditor.clmnName.DisplayIndex].Value = v.Key;
+                newRow.Cells[varEditor.clmnName.DisplayIndex].Value = v.Name;
 
                 newRow.Cells[varEditor.clmnValue.DisplayIndex].Value = v.Value;
                 int ind = varEditor.dgvVariables.Rows.Add(newRow);
 
-                if (v.Key == cur_var) 
+                //if (v.Key == cur_var) 
+                if (v.Name == cur_var)
                     curVarInd = ind; // сохраняем индекс строки выбранной переменной
             }
 

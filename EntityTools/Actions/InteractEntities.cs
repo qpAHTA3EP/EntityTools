@@ -6,6 +6,7 @@ using System.Drawing.Design;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 using Astral;
 using Astral.Classes;
 using Astral.Classes.ItemFilter;
@@ -32,7 +33,7 @@ namespace EntityTools.Actions
         [Category("Entity")]
         public ItemFilterStringType EntityIdType { get; set; } = ItemFilterStringType.Simple;
 
-        [Description("ID (an internal untranslated name) of the Entity for the search")]
+        [Description("ID of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
         public string EntityID { get; set; } = string.Empty;
@@ -132,6 +133,11 @@ namespace EntityTools.Actions
         [Category("Interaction")]
         public List<string> Dialogs { get; set; } = new List<string>();
 
+        [XmlIgnore]
+        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
+        [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
+        public string TestInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>";
+
         [NonSerialized]
         //(1) private TempBlackList<IntPtr> blackList = new TempBlackList<IntPtr>();
         /*(2)*/ private TempBlackList<uint> blackList = new TempBlackList<uint>();
@@ -143,7 +149,7 @@ namespace EntityTools.Actions
         [NonSerialized]
         private bool moved;
         [NonSerialized]
-        private Entity target = new Entity(IntPtr.Zero);
+        internal Entity target = new Entity(IntPtr.Zero);
         [NonSerialized]
         private Vector3 initialPos = new Vector3();
 

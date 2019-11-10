@@ -1,4 +1,4 @@
-﻿namespace AstralVariables.Forms
+﻿namespace VariableTools.Forms
 {
     partial class EquationEditor
     {
@@ -32,7 +32,7 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.tbExpression = new System.Windows.Forms.TextBox();
-            this.btnParse = new System.Windows.Forms.Button();
+            this.btnValidate = new System.Windows.Forms.Button();
             this.dtnInsert = new DevExpress.XtraEditors.DropDownButton();
             this.popInsert = new DevExpress.XtraBars.PopupMenu(this.components);
             this.btnInsVarible = new DevExpress.XtraBars.BarButtonItem();
@@ -82,16 +82,16 @@
             this.tbExpression.Size = new System.Drawing.Size(408, 189);
             this.tbExpression.TabIndex = 5;
             // 
-            // btnParse
+            // btnValidate
             // 
-            this.btnParse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnParse.Location = new System.Drawing.Point(153, 217);
-            this.btnParse.Name = "btnParse";
-            this.btnParse.Size = new System.Drawing.Size(60, 23);
-            this.btnParse.TabIndex = 3;
-            this.btnParse.Text = "Parse";
-            this.btnParse.UseVisualStyleBackColor = true;
-            this.btnParse.Click += new System.EventHandler(this.btnParse_Click);
+            this.btnValidate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnValidate.Location = new System.Drawing.Point(153, 217);
+            this.btnValidate.Name = "btnValidate";
+            this.btnValidate.Size = new System.Drawing.Size(60, 23);
+            this.btnValidate.TabIndex = 3;
+            this.btnValidate.Text = "Validate";
+            this.btnValidate.UseVisualStyleBackColor = true;
+            this.btnValidate.Click += new System.EventHandler(this.btnValidate_Click);
             // 
             // dtnInsert
             // 
@@ -256,7 +256,7 @@
             this.Controls.Add(this.dtnInsert);
             this.Controls.Add(this.tbExpression);
             this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.btnParse);
+            this.Controls.Add(this.btnValidate);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.barDockControlLeft);
             this.Controls.Add(this.barDockControlRight);
@@ -265,7 +265,7 @@
             this.MinimumSize = new System.Drawing.Size(440, 150);
             this.Name = "EquationEditor";
             this.ShowIcon = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "EquationEditor";
             ((System.ComponentModel.ISupportInitialize)(this.popInsert)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).EndInit();
@@ -279,7 +279,7 @@
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.TextBox tbExpression;
-        private System.Windows.Forms.Button btnParse;
+        private System.Windows.Forms.Button btnValidate;
         private DevExpress.XtraEditors.DropDownButton dtnInsert;
         private DevExpress.XtraBars.PopupMenu popInsert;
         private DevExpress.XtraBars.BarManager barManager;
