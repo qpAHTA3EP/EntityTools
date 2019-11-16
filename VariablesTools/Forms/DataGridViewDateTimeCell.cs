@@ -56,7 +56,7 @@ namespace VariableTools.Forms
             get
             {
                 // Use the current date and time as the default value.
-                return DateTimeVar.Default;
+                return DateTime.Today;
             }
         }
     }
@@ -96,7 +96,7 @@ namespace VariableTools.Forms
                         // In the case of an exception, just use the 
                         // default value so we're not left with a null
                         // value.
-                        this.Value = DateTimeVar.Default;
+                        this.Value = DateTime.Today;
                     }
                 }
             }

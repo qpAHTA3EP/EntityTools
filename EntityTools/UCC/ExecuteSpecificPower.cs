@@ -73,6 +73,10 @@ namespace EntityTools.UCC
         }
 
         [XmlIgnore]
+        [Browsable(false)]
+        public new string ActionName { get; set; }
+
+        [XmlIgnore]
         private Power power = null;
         [XmlIgnore]
         private static Type movementsType = null;

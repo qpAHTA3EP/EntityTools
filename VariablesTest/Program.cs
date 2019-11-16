@@ -1,9 +1,9 @@
-﻿using AstralVariables.Expressions;
+﻿using VariableTools.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NumberAstNode = AstralVariables.Expressions.AstNode<double>;
+using NumberAstNode = VariableTools.Expressions.AstNode<double>;
 
 namespace VariablesTest
 {
@@ -355,7 +355,7 @@ namespace VariablesTest
                                      " (aasdf - 234 / d + 4956)",
                                      "5 + asd_2 - 123 + _alskdj"
                                    };
-            ParseMethod testedParseMethod = AstralVariables.Expressions.NumberExpression.ParseAddition;
+            ParseMethod testedParseMethod = VariableTools.Expressions.NumberExpression.ParseAddition;
             Console.WriteLine("=================Expression.Parse()===============");
             NumberExpression numExpr = new NumberExpression();
 
@@ -398,7 +398,7 @@ namespace VariablesTest
                     $"  Description = {node.Description()}");
                 Console.WriteLine($"Unparsed string is: {expression}");
             }
-            catch (AstralVariables.Expressions.BaseParseError e)
+            catch (BaseParseError e)
             {
                 Console.WriteLine("-------------------ParseError-------------------");
                 Console.WriteLine($"In the expression: {e.expression}");

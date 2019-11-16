@@ -151,8 +151,9 @@ namespace EntityTools.UCC
 
         public override string ToString() => GetType().Name + " [" + ItemId + ']';
 
-        //[Browsable(false)]
-        //public new string ActionName { get; set; }
+        [XmlIgnore]
+        [Browsable(false)]
+        public new string ActionName { get; set; }
 
         [XmlIgnore]
         private InventorySlot itemSlotChache = null;

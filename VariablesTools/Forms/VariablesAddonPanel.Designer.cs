@@ -49,7 +49,6 @@
             this.btnVariables.TabIndex = 1;
             this.btnVariables.Text = "Variables";
             this.btnVariables.UseVisualStyleBackColor = true;
-            this.btnVariables.Click += new System.EventHandler(this.btnVariables_Click);
             // 
             // VariablesAddonPanel
             // 

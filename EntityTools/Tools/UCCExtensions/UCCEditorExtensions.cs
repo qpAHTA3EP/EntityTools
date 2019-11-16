@@ -129,6 +129,12 @@ namespace EntityTools.Tools.UCCExtensions
             return false;
         }
         // Метод замещающий AddClass.Show(Type t)
+        internal static object Show(Type type)
+        {
+            if (GetUccAction(out UCCAction action))
+                return action;
+            else return null;
+        }
         internal static bool GetUccAction(out UCCAction action, AddClass editor = null)
         {
             action = null;

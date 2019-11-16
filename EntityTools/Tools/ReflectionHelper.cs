@@ -511,6 +511,35 @@ namespace EntityTools.Tools
             }
             return false;
         }
+        public static bool ExecStaticMethodByArgs(Type type, string MethodName, object[] arguments, out object result, BindingFlags flags = BindingFlags.Default, bool BaseType = false)
+        {
+            result = null;
+
+            if (flags == BindingFlags.Default)
+                flags = DefaultFlags;
+
+            if (BaseType)
+            {
+                type = type.BaseType;
+            }
+
+            Type[] types;
+            if (arguments != null && arguments.Length > 0)
+            {
+                types = new Type[arguments.Length];
+                for (int i = 0; i < arguments.Length; i++)
+                    types[i] = arguments[i].GetType();
+            }
+            else types = new Type[] { };
+
+            MethodInfo methodInfo = type.GetMethod(MethodName, flags | BindingFlags.Static, null, types, null);
+            if (methodInfo != null)
+            {
+                result = methodInfo.Invoke(null, arguments);
+                return true;
+            }
+            return false;
+        }
 
 
 

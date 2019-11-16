@@ -110,7 +110,6 @@
   <ItemGroup>
     <Compile Include="Classes\VariableCollection.cs" />
     <Compile Include="Classes\VariableContainer.cs" />
-    <Compile Include="Classes\Variables.cs" />
     <Compile Include="Editors\EquationUiEditor.cs" />
     <Compile Include="Editors\VariableSelectUiEditor.cs" />
     <Compile Include="Expressions\AstBase.cs" />
@@ -177,12 +176,6 @@
   <ItemGroup>
     <None Include="Properties\DataSources\AstralVars.Forms.VariablesEditor.datasource" />
     <None Include="Resources\MathOp.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\EntityTools\EntityTools.csproj">
-      <Project>{DF7F797E-DB7E-44F9-A96A-020CFDB3C51E}</Project>
-      <Name>EntityTools</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -53,7 +53,7 @@ namespace VariableTools.Conditions
             get
             {
 #if DEBUG
-                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}::{ToString()}");
+                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}::{ToString()}");
 #endif
                 if (equation1.Calcucate(out double res1) && equation2.Calcucate(out double res2))
                 {

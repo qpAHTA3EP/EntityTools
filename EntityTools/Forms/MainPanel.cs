@@ -143,6 +143,10 @@ namespace EntityTools.Forms
             ReflectionHelper.DumpClassMethod(typeof(TestClass), "TestClass");
 #endif
             #endregion
+
+            #region Login
+            //ReflectionHelper.ExecStaticMethodByArgs(typeof(MyNW.Internals.Injection), "\u0001", new object[] { "--", "--" }, out object res);
+            #endregion
         }
 
         private void btnUccEditor_Click(object sender, EventArgs e)

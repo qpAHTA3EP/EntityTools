@@ -527,7 +527,7 @@ namespace VariableTools.Classes
 //                    _strValue = inStr;
                     
 //#if ASTRAL_LOGGER
-//                    Astral.Logger.WriteLine($"{VariablesTools.LoggerPredicate} Variable '{Key}' set to [{inStr}] as {VarType}");
+//                    Astral.Logger.WriteLine($"{VariableTools.LoggerPredicate} Variable '{Key}' set to [{inStr}] as {VarType}");
 //#endif
 //                }
 //                else
@@ -536,7 +536,7 @@ namespace VariableTools.Classes
 //                    _strValue = string.Empty;
 
 //#if ASTRAL_LOGGER
-//                    Astral.Logger.WriteLine($"{VariablesTools.LoggerPredicate} Invalid value [{inStr}] to Variable '{Key}' type of {VarType}. Variable '{Key}' reseted to [{_itemId}].");
+//                    Astral.Logger.WriteLine($"{VariableTools.LoggerPredicate} Invalid value [{inStr}] to Variable '{Key}' type of {VarType}. Variable '{Key}' reseted to [{_itemId}].");
 //#endif
 //                }
 //            }

@@ -1,6 +1,6 @@
 ﻿namespace VariableTools.Forms
 {
-    partial class ExtendedVariablesAddonPanel
+    partial class ExtendedVariablesToolsPanel
     {
         /// <summary> 
         /// Обязательная переменная конструктора.
@@ -31,19 +31,24 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dgvVariables = new System.Windows.Forms.DataGridView();
-            this.clmnSave = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.clmnScope = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.clmnName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.clmnValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dntLoad = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.lblAuthor = new System.Windows.Forms.Label();
+            this.bntAdd = new System.Windows.Forms.Button();
+            this.btnDelete = new System.Windows.Forms.Button();
+            this.clmnSave = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.clmnProfileScope = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.clmnAccScope = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.clmnQualifier = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.clmnName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.clmnValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dgvVariables)).BeginInit();
             this.SuspendLayout();
             // 
             // dgvVariables
             // 
             this.dgvVariables.AllowUserToAddRows = false;
+            this.dgvVariables.AllowUserToDeleteRows = false;
             this.dgvVariables.AllowUserToResizeRows = false;
             dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.dgvVariables.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
@@ -55,16 +60,82 @@
             this.dgvVariables.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.dgvVariables.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.clmnSave,
-            this.clmnScope,
+            this.clmnProfileScope,
+            this.clmnAccScope,
+            this.clmnQualifier,
             this.clmnName,
             this.clmnValue});
             this.dgvVariables.Location = new System.Drawing.Point(3, 3);
             this.dgvVariables.MultiSelect = false;
             this.dgvVariables.Name = "dgvVariables";
+            this.dgvVariables.RowHeadersVisible = false;
             this.dgvVariables.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.dgvVariables.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.dgvVariables.Size = new System.Drawing.Size(734, 381);
             this.dgvVariables.TabIndex = 1;
+            this.dgvVariables.CellValidated += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvVariables_CellValidated);
+            this.dgvVariables.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.dgvVariables_CellValidating);
+            // 
+            // dntLoad
+            // 
+            this.dntLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.dntLoad.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.dntLoad.Location = new System.Drawing.Point(611, 390);
+            this.dntLoad.Name = "dntLoad";
+            this.dntLoad.Size = new System.Drawing.Size(60, 22);
+            this.dntLoad.TabIndex = 6;
+            this.dntLoad.Text = "Load";
+            this.dntLoad.UseVisualStyleBackColor = true;
+            this.dntLoad.Click += new System.EventHandler(this.dntLoad_Click);
+            // 
+            // btnSave
+            // 
+            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSave.Location = new System.Drawing.Point(677, 390);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(60, 23);
+            this.btnSave.TabIndex = 4;
+            this.btnSave.Text = "Save";
+            this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            // 
+            // lblAuthor
+            // 
+            this.lblAuthor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblAuthor.AutoSize = true;
+            this.lblAuthor.Location = new System.Drawing.Point(293, 395);
+            this.lblAuthor.Name = "lblAuthor";
+            this.lblAuthor.Size = new System.Drawing.Size(171, 13);
+            this.lblAuthor.TabIndex = 7;
+            this.lblAuthor.Text = "VariableTools from MichaelProg (c)";
+            this.lblAuthor.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // bntAdd
+            // 
+            this.bntAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.bntAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bntAdd.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.bntAdd.Location = new System.Drawing.Point(3, 390);
+            this.bntAdd.Name = "bntAdd";
+            this.bntAdd.Size = new System.Drawing.Size(60, 22);
+            this.bntAdd.TabIndex = 6;
+            this.bntAdd.Text = "Add";
+            this.bntAdd.UseVisualStyleBackColor = true;
+            this.bntAdd.Click += new System.EventHandler(this.bntAdd_Click);
+            // 
+            // btnDelete
+            // 
+            this.btnDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDelete.Location = new System.Drawing.Point(69, 390);
+            this.btnDelete.Name = "btnDelete";
+            this.btnDelete.Size = new System.Drawing.Size(60, 22);
+            this.btnDelete.TabIndex = 6;
+            this.btnDelete.Text = "Delete";
+            this.btnDelete.UseVisualStyleBackColor = true;
+            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
             // clmnSave
             // 
@@ -75,25 +146,51 @@
             this.clmnSave.MinimumWidth = 36;
             this.clmnSave.Name = "clmnSave";
             this.clmnSave.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.clmnSave.ToolTipText = "Флаг необходимости сохранения переменной в файл.\\nThe Flag to save the variable t" +
+    "o a file";
             this.clmnSave.Width = 36;
             // 
-            // clmnScope
+            // clmnProfileScope
             // 
-            this.clmnScope.FillWeight = 50F;
-            this.clmnScope.Frozen = true;
-            this.clmnScope.HeaderText = "Scope";
-            this.clmnScope.MinimumWidth = 50;
-            this.clmnScope.Name = "clmnScope";
-            this.clmnScope.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.clmnScope.Width = 50;
+            this.clmnProfileScope.FillWeight = 36F;
+            this.clmnProfileScope.Frozen = true;
+            this.clmnProfileScope.HeaderText = "Pr.Scope";
+            this.clmnProfileScope.MinimumWidth = 36;
+            this.clmnProfileScope.Name = "clmnProfileScope";
+            this.clmnProfileScope.ToolTipText = "Флаг ограничивающий видимость переменной текущим профилем.\\nThe Flag to scope the" +
+    " variable for the current quester-profile only";
+            this.clmnProfileScope.Width = 63;
+            // 
+            // clmnAccScope
+            // 
+            this.clmnAccScope.FillWeight = 85F;
+            this.clmnAccScope.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.clmnAccScope.Frozen = true;
+            this.clmnAccScope.HeaderText = "Acc.Scope";
+            this.clmnAccScope.MinimumWidth = 85;
+            this.clmnAccScope.Name = "clmnAccScope";
+            this.clmnAccScope.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.clmnAccScope.ToolTipText = "Ограничение области видимости переменной для персонажей аккаунта\\nThe scope of th" +
+    "e variable for the accounts or characters";
+            this.clmnAccScope.Width = 85;
+            // 
+            // clmnQualifier
+            // 
+            this.clmnQualifier.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.clmnQualifier.HeaderText = "Qualifier";
+            this.clmnQualifier.MinimumWidth = 100;
+            this.clmnQualifier.Name = "clmnQualifier";
+            this.clmnQualifier.ReadOnly = true;
+            this.clmnQualifier.ToolTipText = "видимости\\nThe scope identificator";
             // 
             // clmnName
             // 
-            this.clmnName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.clmnName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.None;
             this.clmnName.HeaderText = "Name";
             this.clmnName.MinimumWidth = 60;
             this.clmnName.Name = "clmnName";
-            this.clmnName.ToolTipText = "Имя переменной (The Name of the variable)";
+            this.clmnName.ToolTipText = "Имя переменной\\nThe Name of the variable";
+            this.clmnName.Width = 200;
             // 
             // clmnValue
             // 
@@ -105,51 +202,22 @@
             this.clmnValue.HeaderText = "Value";
             this.clmnValue.MinimumWidth = 30;
             this.clmnValue.Name = "clmnValue";
-            this.clmnValue.ToolTipText = "Значение переменной (The value of the variable)";
+            this.clmnValue.ToolTipText = "Значение переменной\\nThe value of the variable";
             // 
-            // dntLoad
-            // 
-            this.dntLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.dntLoad.Location = new System.Drawing.Point(611, 391);
-            this.dntLoad.Name = "dntLoad";
-            this.dntLoad.Size = new System.Drawing.Size(60, 22);
-            this.dntLoad.TabIndex = 6;
-            this.dntLoad.Text = "Load";
-            this.dntLoad.UseVisualStyleBackColor = true;
-            this.dntLoad.Click += new System.EventHandler(this.dntReload_Click);
-            // 
-            // btnSave
-            // 
-            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.Location = new System.Drawing.Point(677, 390);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(60, 23);
-            this.btnSave.TabIndex = 4;
-            this.btnSave.Text = "Save";
-            this.btnSave.UseVisualStyleBackColor = true;
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
-            // 
-            // lblAuthor
-            // 
-            this.lblAuthor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.lblAuthor.AutoSize = true;
-            this.lblAuthor.Location = new System.Drawing.Point(3, 394);
-            this.lblAuthor.Name = "lblAuthor";
-            this.lblAuthor.Size = new System.Drawing.Size(97, 13);
-            this.lblAuthor.TabIndex = 7;
-            this.lblAuthor.Text = "Athor: MichaelProg";
-            // 
-            // ExtendedVariablesAddonPanel
+            // ExtendedVariablesToolsPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.lblAuthor);
+            this.Controls.Add(this.btnDelete);
+            this.Controls.Add(this.bntAdd);
             this.Controls.Add(this.dntLoad);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.dgvVariables);
-            this.Name = "ExtendedVariablesAddonPanel";
+            this.Name = "ExtendedVariablesToolsPanel";
             this.Size = new System.Drawing.Size(740, 416);
             this.Load += new System.EventHandler(this.ExtendedVariablesAddonPanel_Load);
+            this.Leave += new System.EventHandler(this.ExtendedVariablesAddonPanel_Leave);
             ((System.ComponentModel.ISupportInitialize)(this.dgvVariables)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -159,12 +227,16 @@
         #endregion
 
         private System.Windows.Forms.DataGridView dgvVariables;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn clmnSave;
-        private System.Windows.Forms.DataGridViewComboBoxColumn clmnScope;
-        private System.Windows.Forms.DataGridViewTextBoxColumn clmnName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn clmnValue;
         private System.Windows.Forms.Button dntLoad;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Label lblAuthor;
+        private System.Windows.Forms.Button bntAdd;
+        private System.Windows.Forms.Button btnDelete;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn clmnSave;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn clmnProfileScope;
+        private System.Windows.Forms.DataGridViewComboBoxColumn clmnAccScope;
+        private System.Windows.Forms.DataGridViewTextBoxColumn clmnQualifier;
+        private System.Windows.Forms.DataGridViewTextBoxColumn clmnName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn clmnValue;
     }
 }

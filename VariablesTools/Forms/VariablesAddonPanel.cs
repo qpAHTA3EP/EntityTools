@@ -9,10 +9,5 @@ namespace VariableTools.Forms
         {
             InitializeComponent();
         }
-
-        private void btnVariables_Click(object sender, EventArgs e)
-        {
-            VariablesEditor.Show(true);
-        }
     }
 }

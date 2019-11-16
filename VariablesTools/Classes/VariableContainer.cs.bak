@@ -1,0 +1,145 @@
+﻿using MyNW.Internals;
+using System;
+using static VariableTools.Classes.VariableCollection;
+
+namespace VariableTools.Classes
+{
+    /// <summary>
+    /// Область видимости переменной
+    /// </summary>
+    public enum VariableScopeType
+    {
+        /// <summary>
+        /// Видима в пределах одного квестер-профиля
+        /// </summary>
+        Local,
+        /// <summary>
+        /// Видима одному персонажу аккаунта
+        /// </summary>
+        Character,
+        /// <summary>
+        /// Видима всем персонажам аккаунта
+        /// </summary>
+        Account,
+        /// <summary>
+        /// Область видимости не ограничена
+        /// </summary>
+        Global
+    }
+
+    [Serializable]
+    public class VariableContainer
+    {
+        public VariableContainer() { }
+        public VariableContainer(string n, double v = 0, VariableScopeType s = VariableScopeType.Local)
+        {
+            name = n;
+            val = v;
+            scope = s;
+            qualifier = GetScopeQualifier(scope);
+        }
+
+        /// <summary>
+        /// Идентификатор переменной к коллекции
+        /// </summary>
+        internal VariableKey Key => new VariableKey(name, qualifier);
+
+        private string name = string.Empty;
+        /// <summary>
+        /// Имя переменной
+        /// </summary>
+        public string Name
+        {
+            get => name;
+            set
+            {
+                if(name != value)
+                {
+                    VariablesTools.Variables.ChangeItemKey(this, new VariableKey(name, qualifier));
+                    name = value;
+                }
+            }
+        }
+
+        private double val = 0;
+        /// <summary>
+        /// Значение переменной
+        /// </summary>
+        public double Value
+        {
+            get
+            {
+                if (IsValid)
+                    return val;
+                return 0;
+            }
+            set => val = value;
+        }
+
+        private VariableScopeType scope = VariableScopeType.Global;
+        /// <summary>
+        /// Переключатель области видимости переменной
+        /// </summary>
+        public VariableScopeType Scope
+        {
+            get => scope;
+            set
+            {
+                VariablesTools.Variables.ChangeItemKey(this, new VariableKey(name, GetScopeQualifier(value)));
+                qualifier = GetScopeQualifier(value);
+                scope = value;
+            }
+        }
+
+
+        public static string GetScopeQualifier(VariableScopeType vsq)
+        {
+            switch (vsq)
+            {
+                case VariableScopeType.Character:
+                    return EntityManager.LocalPlayer.InternalName;
+                case VariableScopeType.Account:
+                    return EntityManager.LocalPlayer.AccountLoginUsername;
+                case VariableScopeType.Local:
+                    return Astral.API.CurrentSettings.LastQuesterProfile;
+                case VariableScopeType.Global:
+                    return string.Empty;
+                default:
+                    return string.Empty;
+            }
+        }
+
+        protected string qualifier = string.Empty;
+        /// <summary>
+        /// Идентификатор области видимости переменной
+        /// </summary>
+        public string ScopeQualifier { get => qualifier; }
+
+        /// <summary>
+        /// Флаг сохранения в файл при закрытии Астрала
+        /// </summary>
+        public bool Save { get; set; }
+
+        /// <summary>
+        /// Проверка видимости переменной в данной области видимости
+        /// </summary>
+        public bool IsValid
+        {
+            get
+            {
+                switch (scope)
+                {
+                    case VariableScopeType.Character:
+                        return qualifier == EntityManager.LocalPlayer.InternalName;
+                    case VariableScopeType.Account:
+                        return qualifier == EntityManager.LocalPlayer.AccountLoginUsername;
+                    case VariableScopeType.Local:
+                        return qualifier == Astral.API.CurrentSettings.LastQuesterProfile;
+                    case VariableScopeType.Global:
+                        return true;
+                }
+                return false;
+            }
+        }
+    }
+}

@@ -43,25 +43,25 @@ namespace VariableTools.Expressions
                 result = res;
 #if DEBUG
                 stopwatch.Stop();
-                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: Expression({GetHashCode().ToString("X8")}) '{text}' result is {res}. Calculating time: {stopwatch.ElapsedMilliseconds} ms");
-                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: Expression({GetHashCode().ToString("X8")}) has AST({ast.GetHashCode().ToString("X8")})");
+                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: Expression({GetHashCode().ToString("X8")}) '{text}' result is {res}. Calculating time: {stopwatch.ElapsedMilliseconds} ms");
+                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: Expression({GetHashCode().ToString("X8")}) has AST({ast.GetHashCode().ToString("X8")})");
 
 #if DEBUG_ADDITION_INFO
-                if (VariablesTools.Variables.Count > 0)
+                if (VariableTools.Variables.Count > 0)
                 {
-                    using (var varEnemer = VariablesTools.Variables.GetEnumerator())
+                    using (var varEnemer = VariableTools.Variables.GetEnumerator())
                     {
-                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: ======================================");
-                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: <Variables>:");
+                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: ======================================");
+                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: <Variables>:");
                         while (varEnemer.MoveNext())
                         {
-                            //Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: '{varEnemer.Current.Key}' = {varEnemer.Current.Value}");
-                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: '{varEnemer.Current.Name}' = {varEnemer.Current.Value}");
+                            //Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: '{varEnemer.Current.Key}' = {varEnemer.Current.Value}");
+                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: '{varEnemer.Current.Name}' = {varEnemer.Current.Value}");
                         }
-                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: ======================================");
+                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: ======================================");
                     }
                 }
-                else Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: <Variables> is empty.");
+                else Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: <Variables> is empty.");
 
 #endif
 #endif
@@ -69,8 +69,8 @@ namespace VariableTools.Expressions
             }
 #if DEBUG
             stopwatch.Stop();
-            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: Expression({GetHashCode().ToString("X8")}) '{text}' calculation FAILED. Calculating time: {stopwatch.ElapsedMilliseconds} ms");
-            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: Expression({GetHashCode().ToString("X8")}) has AST({ast.GetHashCode().ToString("X8")})");
+            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: Expression({GetHashCode().ToString("X8")}) '{text}' calculation FAILED. Calculating time: {stopwatch.ElapsedMilliseconds} ms");
+            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: Expression({GetHashCode().ToString("X8")}) has AST({ast.GetHashCode().ToString("X8")})");
 #endif
             return false;
         }
@@ -91,21 +91,23 @@ namespace VariableTools.Expressions
             bool result = Parse(shortText, out ast, out parseError, true);
 #if DEBUG
             stopwatch.Stop();
-            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: Expression({GetHashCode().ToString("X8")}) '{text}' parsing time: {stopwatch.ElapsedMilliseconds} ms");
-            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: Expression({GetHashCode().ToString("X8")}) has AST({ast.GetHashCode().ToString("X8")})");
+            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: Expression({GetHashCode().ToString("X8")}) '{text}' parsing time: {stopwatch.ElapsedMilliseconds} ms");
+            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: Expression({GetHashCode().ToString("X8")}) has AST({ast.GetHashCode().ToString("X8")})");
 
 #if DEBUG_ADDITION_INFO
-            using (var astEnemer = astCollection.GetEnumerator())
-            {
-                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: ======================================");
-                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: <astCollection>:");
-                while (astEnemer.MoveNext())
+            if(astCollection.Count > 0)
+                using (var astEnemer = astCollection.GetEnumerator())
                 {
-                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: '{astEnemer.Current.Key}' => has AST({astEnemer.Current.Value.GetHashCode().ToString("X8")})");
-                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, astEnemer.Current.Value.Description(2));
+                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: ======================================");
+                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: <astCollection>:");
+                    while (astEnemer.MoveNext())
+                    {
+                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: '{astEnemer.Current.Key}' => has AST({astEnemer.Current.Value.GetHashCode().ToString("X8")})");
+                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, astEnemer.Current.Value.Description(2));
+                    }
+                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: ======================================");
                 }
-                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariablesTools)}: ======================================");
-            }
+            else Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: <astCollection> is empty:");
 #endif
 #endif
             return result;

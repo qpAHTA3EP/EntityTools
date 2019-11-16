@@ -23,14 +23,16 @@ namespace EntityTools.UCC
     /// UCC-команда со списком специальных условий
     /// </summary>
     [Serializable]
+    
     public class SpecializedUCCAction : UCCAction
     {
-        [Category("Required")]
+        [Category("Managed Action")]
         [Editor(typeof(UccActionEditor), typeof(UITypeEditor))]
         [Description("Основная ucc-команда, которой транслируется вызов")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
         public UCCAction CurrentAction { get; set; }
 
-        [Category("Required")]
+        [Category("Custom Conditions")]
         [Description("Список нестандартных условий, реализованных в плагинах")]
         [Editor(typeof(UCCConditionListEditor), typeof(UITypeEditor))]
         public List<CustomUCCCondition> CustomConditions { get; set; }

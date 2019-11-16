@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Xml.Serialization;
 using Astral.Classes;
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;
@@ -128,8 +129,9 @@ namespace EntityTools.UCC
 
         public override string ToString() => GetType().Name;
 
-        //[Browsable(false)]
-        //public new string ActionName { get; set; }
+        [XmlIgnore]
+        [Browsable(false)]
+        public new string ActionName { get; set; }
 
         [NonSerialized]
         protected AbordCombat abordCombat = new AbordCombat();

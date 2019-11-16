@@ -51,7 +51,7 @@ namespace VariableTools.Expressions.Operand
         {
             //result = val.ReadValue;
 
-            if(VariablesTools.Variables.TryGetValue(variableName, out result))
+            if(VariableTools.Variables.TryGetValue(out result, variableName))
                 return true;
             else
             {

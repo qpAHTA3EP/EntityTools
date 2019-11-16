@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;
 using Astral.Logic.NW;
@@ -60,6 +61,7 @@ namespace EntityTools.UCC
         [Category("Required")]
         public Enums.DodgeDirection Direction { get; set; }
 
+        [XmlIgnore]
         [Browsable(false)]
         public new string ActionName { get; set; } = string.Empty;
 

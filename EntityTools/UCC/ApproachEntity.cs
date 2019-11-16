@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Xml.Serialization;
 using Astral.Classes;
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;
@@ -55,8 +56,9 @@ namespace EntityTools.UCC
         [Category("Required")]
         public float EntityRadius { get; set; } = 12;
 
-        //[Browsable(false)]
-        //public new string ActionName { get; set; }
+        [XmlIgnore]
+        [Browsable(false)]
+        public new string ActionName { get; set; }
 
         public override bool NeedToRun
         {

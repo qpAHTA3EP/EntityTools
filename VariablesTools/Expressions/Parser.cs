@@ -8,10 +8,7 @@ namespace VariableTools.Expressions
     public class Parser
     {
         public static readonly string[] separators = { " ", "{", "(", "[", "]", ")", "}", "+", "-", "*", "/", "Numeric", "NumericCount", "Counter", "Count", "Items", "ItemsCount" };
-        public static readonly char[] forbiddenChar = { ' ', '{', '(', '[', ']', ')', '}', '<', '>',
-                                                               '+', '-', '*', '/', '^', '%',
-                                                               '#', '!', '`', '~', '$', '\\', '?',
-                                                               '.', ',', '\'', ':', '\"', ';' };
+
         public static readonly string[] forbiddenLiteral = {"AND", "OR", "NOT",
                                                              "Numeric", "NumericCount", "Counter", "Count", "Items", "ItemsCount" };
 
@@ -35,9 +32,9 @@ namespace VariableTools.Expressions
 
                     //strBldr.Append("'").Append(forbiddenNameParts[forbiddenNameParts.Length - 1]).Append("'").Append("}");
 
-                    for (int i = 0; i < forbiddenChar.Length; i++)
+                    for (int i = 0; i < Symbols.forbiddenChar.Length; i++)
                     {
-                        strBldr.Append(forbiddenChar[i]).Append(' ');                        
+                        strBldr.Append(Symbols.forbiddenChar[i]).Append(' ');                        
                     }
 
 
@@ -66,10 +63,47 @@ namespace VariableTools.Expressions
         /// <returns></returns>
         public static bool IsForbidden(string name)
         {
-            return name.IndexOfAny(forbiddenChar) >= 0
+            return name.IndexOfAny(Symbols.forbiddenChar) >= 0
                 || name.Equals(Predicates.CountItem)
                 || name.Equals(Predicates.CountNumeric)
                 || name.Equals(Predicates.Random);
+        }
+
+        /// <summary>
+        /// Проверка корректности имени имени переменной и 
+        /// замена запрещенных символов
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="newName"></param>
+        /// <returns>True, если имя было исправлено</returns>
+        public static bool CorrectForbiddenName(string name, out string newName)
+        {
+            if ( name.Equals(Predicates.CountItem)
+                || name.Equals(Predicates.CountNumeric)
+                || name.Equals(Predicates.Random))
+            {
+                newName = Symbols.Underscore + name;
+                return true;
+            }
+
+            bool corrected = false;
+            char[]  nameChars = name.ToCharArray();
+            for (int i = 0; i < nameChars.Length; i++)
+            {
+                if (Symbols.IsForbidden(nameChars[i])
+                    || Char.IsWhiteSpace(nameChars[i])
+                    || Char.IsSeparator(nameChars[i]))
+                {
+                    nameChars[i] = Symbols.Underscore;
+                    corrected = true;
+                }
+            }
+
+            if (corrected)
+                newName = new string(nameChars);
+            else newName = string.Empty;
+
+            return corrected;
         }
 
         /// <summary>
@@ -112,6 +146,20 @@ namespace VariableTools.Expressions
         /// </summary>
         public class Symbols
         {
+            public static readonly char[] forbiddenChar = { ' ', '{', '(', '[', ']', ')', '}', '<', '>',
+                                                               '+', '-', '*', '/', '^', '%',
+                                                               '№', '#', '@', '!', '~', '$', '&', '|', '\\', '?',
+                                                               '.', ',', ':', '\'', '`', '\"', ';', '=' };
+
+            public static bool IsForbidden(char c)
+            {
+                foreach (char fc in forbiddenChar)
+                    if (fc == c)
+                        return true;
+
+                return false;
+            }
+
             /// <summary>
             /// Символ табуляции - горизонтальный отступ
             /// </summary>
@@ -477,77 +525,6 @@ namespace VariableTools.Expressions
         }//class Predicates
 
 
-
-
-
-
-
-
-
-
-
-
-        public static readonly VarTypes[] varTypes = {  VarTypes.Number,
-                                                        VarTypes.Boolean,            
-                                                        VarTypes.String,
-                                                        //VarTypes.Counter,
-                                                        VarTypes.DateTime
-                                                     };
-        /// <summary>
-        /// Получение идентификатора предмета (itemId) из выражения, заданного строкой
-        /// </summary>
-        /// <param name="inStr">Строка, содержащая выражение</param>
-        /// <param name="itemId">Возвращаемое значение идентификатора передмета или пустая строка, если inStr не соответствует шаблону</param>
-        /// <returns>true</returns>
-        //public static bool GetItemID(string inStr, out string itemId)
-        //{
-        //    itemId = string.Empty;
-
-        //    if (!string.IsNullOrEmpty(inStr))
-        //    {
-        //        if (Regex.IsMatch(inStr, counterPattern))
-        //        {
-
-        //            //numName.Replace("Numeric", String.Empty);
-        //            //newVal = newVal.Substring(8, numName.Length - 9);
-
-        //            // Удаление идентификатора функтора 
-        //            itemId = Regex.Replace(inStr, counterTrimPattern, string.Empty);
-        //        }
-        //        //если ytn 
-        //        else itemId = inStr;
-        //    }
-        //    return !string.IsNullOrEmpty(itemId);
-        //}
-
-        /// <summary>
-        /// Получение типа переменной VarTypes из строки
-        /// </summary>
-        /// <param name="inStr"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public static bool GetType(string inStr, out VarTypes type)
-        {
-            return Enum.TryParse(inStr, true, out type);
-        }
-        /// <summary>
-        /// Получение типа переменной VarTypes из объекта
-        /// </summary>
-        /// <param name="inObj"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public static bool GetType(object inObj, out VarTypes type)
-        {
-            if (inObj == null)
-                throw new ArgumentNullException();
-            if (inObj is VarTypes)
-            {
-                type = (VarTypes)inObj;
-                return true;
-            }
-            else return Enum.TryParse(inObj.ToString(), out type);
-        }
-
         /// <summary>
         /// Перевод строки в булевый тип.
         /// Если в строке содержится "True" или целое число больше 0, тогда результат 'True' 
@@ -581,10 +558,13 @@ namespace VariableTools.Expressions
         public static bool TryParse(object inObj, out bool result)
         {
             if (inObj == null)
-                throw new ArgumentNullException();
-            if (inObj is bool)
             {
-                result = (bool)inObj;
+                result = false;
+                return false;
+            }
+            if (inObj is bool b)
+            {
+                result = b;
                 return true;
             }
             return TryParse(inObj.ToString(), out result);
@@ -599,10 +579,13 @@ namespace VariableTools.Expressions
         public static bool TryParseStrict(object inObj, out bool result)
         {
             if (inObj == null)
-                throw new ArgumentNullException();
-            if (inObj is bool)
             {
-                result = (bool)inObj;
+                result = false;
+                return false;
+            }
+            if (inObj is bool b )
+            {
+                result = b;
                 return true;
             }
             else return bool.TryParse(inObj.ToString(), out result);
@@ -635,10 +618,13 @@ namespace VariableTools.Expressions
         public static bool TryParse(object inObj, out double result)
         {
             if (inObj == null)
-                throw new ArgumentNullException();
-            if (inObj is double)
             {
-                result = (double)inObj;
+                result = 0;
+                return false;
+            }
+            if (inObj is double d)
+            {
+                result = d;
                 return true;
             }
             else
@@ -657,10 +643,13 @@ namespace VariableTools.Expressions
         public static bool TryParseStrict(object inObj, out double result)
         {
             if (inObj == null)
-                throw new ArgumentNullException();
-            if (inObj is double)
             {
-                result = (double)inObj;
+                result = 0;
+                return false;
+            }
+            if (inObj is double d)
+            {
+                result = d;
                 return true;
             }
             else
@@ -692,10 +681,13 @@ namespace VariableTools.Expressions
         public static bool TryParse(object inObj, out DateTime result)
         {
             if (inObj == null)
-                throw new ArgumentNullException();
-            if (inObj is DateTime)
             {
-                result = (DateTime)inObj;
+                result = DateTime.MinValue;
+                return false;
+            }
+            if (inObj is DateTime dt)
+            {
+                result = dt;
                 return true;
             }
             else return TryParse(inObj.ToString(), out result);
@@ -712,44 +704,6 @@ namespace VariableTools.Expressions
             return TryParse(inObj, out result);
         }
 
-        /// <summary>
-        /// Перевод строки в тип 'Counter'.
-        /// </summary>
-        /// <param name="inStr"></param>
-        /// <param name="result">результат преобразования</param>
-        /// <returns>Флаг успеха преобразования</returns>
-        //public static bool TryParse(string inStr, out string result)
-        //{
-        //    return GetItemID(inStr, out result);
-        //}
-
-
-        /// <summary>
-        /// Проверка докустимости имени переменной.
-        /// </summary>
-        /// <param name="name">проверяемое имя</param>
-        /// <returns>Результат проверки:
-        /// True: корректное имя
-        /// False: имя некорректно</returns>
-        public static bool CheckVarName(string name)
-        {
-            if(string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name))
-                return false;
-
-            if (name.LastIndexOfAny(forbiddenChar) >= 0)
-                return false;
-       
-            if(forbiddenLiteral.Contains(name))
-                return false;
-            
-            return true;
-        }
-        public static bool CheckVarName(object name)
-        {
-            if (name == null)
-                return false;
-            return CheckVarName(name.ToString());
-        }
 
         /// <summary>
         /// Удаляет все бесполезные пробелы из <see cref="input"> и помещает результат в <see cref="out">

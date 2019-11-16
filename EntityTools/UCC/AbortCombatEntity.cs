@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Xml.Serialization;
 using Astral.Classes;
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;
@@ -89,15 +90,14 @@ namespace EntityTools.UCC
 
         public override bool Run()
         {
-            if (!entity.IsValid && !(HealthCheck && entity.IsDead))
-                return abordCombat.Run();
-            return true;
+            return abordCombat.Run();
         }
 
         public AbortCombatEntity()
         {
             Target = Astral.Logic.UCC.Ressources.Enums.Unit.Player;
         }
+
         public override UCCAction Clone()
         {
             return base.BaseClone(new AbortCombatEntity
@@ -115,8 +115,9 @@ namespace EntityTools.UCC
         }
         public override string ToString() => GetType().Name + " [" + EntityID + ']';
 
-        //[Browsable(false)]
-        //public new string ActionName { get; set; }
+        [XmlIgnore]
+        [Browsable(false)]
+        public new string ActionName { get; set; }
 
         [NonSerialized]
         protected Entity entity = new Entity(IntPtr.Zero);

@@ -41,8 +41,15 @@ namespace EntityTools.Forms
             this.bteAuras = new DevExpress.XtraEditors.ButtonEdit();
             this.fldrBroserDlg = new System.Windows.Forms.FolderBrowserDialog();
             this.tbclMain = new DevExpress.XtraTab.XtraTabControl();
+            this.tabUtilities = new DevExpress.XtraTab.XtraTabPage();
+            this.btnStates = new System.Windows.Forms.Button();
+            this.btnInterfaces = new System.Windows.Forms.Button();
+            this.btnUiViewer = new System.Windows.Forms.Button();
+            this.bteStates = new DevExpress.XtraEditors.ButtonEdit();
+            this.bteInterfaces = new DevExpress.XtraEditors.ButtonEdit();
+            this.lblState = new System.Windows.Forms.Label();
+            this.lblInterfaces = new System.Windows.Forms.Label();
             this.tabOptions = new DevExpress.XtraTab.XtraTabPage();
-            this.cbEnchantHelperActivator = new System.Windows.Forms.CheckBox();
             this.cbSlideMonitor = new System.Windows.Forms.CheckBox();
             this.ckbSpellStuckMonitor = new System.Windows.Forms.CheckBox();
             this.gbSlideMonitor = new System.Windows.Forms.GroupBox();
@@ -55,27 +62,21 @@ namespace EntityTools.Forms
             this.seTimerUnslide = new DevExpress.XtraEditors.SpinEdit();
             this.seSlideFilter = new DevExpress.XtraEditors.SpinEdit();
             this.lblSlideTimer = new System.Windows.Forms.Label();
-            this.tabUtilities = new DevExpress.XtraTab.XtraTabPage();
-            this.btnStates = new System.Windows.Forms.Button();
-            this.btnInterfaces = new System.Windows.Forms.Button();
-            this.btnUiViewer = new System.Windows.Forms.Button();
-            this.bteStates = new DevExpress.XtraEditors.ButtonEdit();
-            this.bteInterfaces = new DevExpress.XtraEditors.ButtonEdit();
-            this.lblState = new System.Windows.Forms.Label();
-            this.lblInterfaces = new System.Windows.Forms.Label();
             this.sbSettings = new System.Windows.Forms.BindingSource(this.components);
+            this.cbEnchantHelperActivator = new System.Windows.Forms.CheckBox();
+            this.btnTest = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.bteMissions.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bteAuras.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
             this.tbclMain.SuspendLayout();
+            this.tabUtilities.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.bteStates.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bteInterfaces.Properties)).BeginInit();
             this.tabOptions.SuspendLayout();
             this.gbSlideMonitor.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.seTimerSlide.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seTimerUnslide.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seSlideFilter.Properties)).BeginInit();
-            this.tabUtilities.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.bteStates.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bteInterfaces.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.sbSettings)).BeginInit();
             this.SuspendLayout();
             // 
@@ -83,6 +84,7 @@ namespace EntityTools.Forms
             // 
             this.btnUccEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnUccEditor.Enabled = false;
             this.btnUccEditor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUccEditor.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.btnUccEditor.Location = new System.Drawing.Point(4, 297);
@@ -91,6 +93,7 @@ namespace EntityTools.Forms
             this.btnUccEditor.TabIndex = 0;
             this.btnUccEditor.Text = "Extended UCC Editor";
             this.btnUccEditor.UseVisualStyleBackColor = true;
+            this.btnUccEditor.Visible = false;
             this.btnUccEditor.Click += new System.EventHandler(this.btnUccEditor_Click);
             // 
             // btnAuras
@@ -185,26 +188,128 @@ namespace EntityTools.Forms
             this.tabUtilities,
             this.tabOptions});
             // 
+            // tabUtilities
+            // 
+            this.tabUtilities.Controls.Add(this.cbEnchantHelperActivator);
+            this.tabUtilities.Controls.Add(this.lblAuras);
+            this.tabUtilities.Controls.Add(this.btnTest);
+            this.tabUtilities.Controls.Add(this.btnStates);
+            this.tabUtilities.Controls.Add(this.btnInterfaces);
+            this.tabUtilities.Controls.Add(this.btnMissions);
+            this.tabUtilities.Controls.Add(this.btnUiViewer);
+            this.tabUtilities.Controls.Add(this.btnUccEditor);
+            this.tabUtilities.Controls.Add(this.bteStates);
+            this.tabUtilities.Controls.Add(this.bteInterfaces);
+            this.tabUtilities.Controls.Add(this.bteMissions);
+            this.tabUtilities.Controls.Add(this.bteAuras);
+            this.tabUtilities.Controls.Add(this.lblState);
+            this.tabUtilities.Controls.Add(this.lblInterfaces);
+            this.tabUtilities.Controls.Add(this.lblMissions);
+            this.tabUtilities.Controls.Add(this.btnAuras);
+            this.tabUtilities.Name = "tabUtilities";
+            this.tabUtilities.Size = new System.Drawing.Size(364, 388);
+            this.tabUtilities.Text = "Utilities";
+            // 
+            // btnStates
+            // 
+            this.btnStates.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnStates.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnStates.Location = new System.Drawing.Point(311, 143);
+            this.btnStates.Name = "btnStates";
+            this.btnStates.Size = new System.Drawing.Size(50, 23);
+            this.btnStates.TabIndex = 2;
+            this.btnStates.Text = "Export";
+            this.btnStates.UseVisualStyleBackColor = true;
+            this.btnStates.Click += new System.EventHandler(this.btnStates_Click);
+            // 
+            // btnInterfaces
+            // 
+            this.btnInterfaces.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnInterfaces.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnInterfaces.Location = new System.Drawing.Point(311, 104);
+            this.btnInterfaces.Name = "btnInterfaces";
+            this.btnInterfaces.Size = new System.Drawing.Size(50, 23);
+            this.btnInterfaces.TabIndex = 2;
+            this.btnInterfaces.Text = "Export";
+            this.btnInterfaces.UseVisualStyleBackColor = true;
+            this.btnInterfaces.Click += new System.EventHandler(this.btnInterfaces_Click);
+            // 
+            // btnUiViewer
+            // 
+            this.btnUiViewer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnUiViewer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnUiViewer.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnUiViewer.Location = new System.Drawing.Point(4, 343);
+            this.btnUiViewer.Name = "btnUiViewer";
+            this.btnUiViewer.Size = new System.Drawing.Size(355, 40);
+            this.btnUiViewer.TabIndex = 0;
+            this.btnUiViewer.Text = "UI Viewer";
+            this.btnUiViewer.UseVisualStyleBackColor = true;
+            this.btnUiViewer.Click += new System.EventHandler(this.btnUiViewer_Click);
+            // 
+            // bteStates
+            // 
+            this.bteStates.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.bteStates.EditValue = ".\\Logs\\States\\%character%_States.xml";
+            this.bteStates.Location = new System.Drawing.Point(6, 145);
+            this.bteStates.Name = "bteStates";
+            this.bteStates.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton()});
+            this.bteStates.Properties.NullText = "Enter the Filename where store the Missions";
+            this.bteStates.Properties.NullValuePromptShowForEmptyValue = true;
+            this.bteStates.Properties.ReadOnly = true;
+            this.bteStates.Size = new System.Drawing.Size(299, 20);
+            this.bteStates.TabIndex = 6;
+            this.bteStates.ToolTip = "File name to store engine States. \r\nAllow mask %character%, %account%, %dateTime%" +
+    ".";
+            this.bteStates.ButtonClick += new DevExpress.XtraEditors.Controls.ButtonPressedEventHandler(this.bte_ButtonClick);
+            // 
+            // bteInterfaces
+            // 
+            this.bteInterfaces.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.bteInterfaces.EditValue = ".\\Logs\\Interfaces\\%character%_Interfaces.xml";
+            this.bteInterfaces.Location = new System.Drawing.Point(6, 106);
+            this.bteInterfaces.Name = "bteInterfaces";
+            this.bteInterfaces.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton()});
+            this.bteInterfaces.Properties.NullText = "Enter the Filename where store the Missions";
+            this.bteInterfaces.Properties.NullValuePromptShowForEmptyValue = true;
+            this.bteInterfaces.Properties.ReadOnly = true;
+            this.bteInterfaces.Size = new System.Drawing.Size(299, 20);
+            this.bteInterfaces.TabIndex = 6;
+            this.bteInterfaces.ToolTip = "File name to store Game Interfaces. \r\nAllow mask %character%, %account%, %dateTim" +
+    "e%.";
+            this.bteInterfaces.ButtonClick += new DevExpress.XtraEditors.Controls.ButtonPressedEventHandler(this.bte_ButtonClick);
+            // 
+            // lblState
+            // 
+            this.lblState.AutoSize = true;
+            this.lblState.Location = new System.Drawing.Point(14, 129);
+            this.lblState.Name = "lblState";
+            this.lblState.Size = new System.Drawing.Size(196, 13);
+            this.lblState.TabIndex = 3;
+            this.lblState.Text = "Export loaded engine States to the file:";
+            // 
+            // lblInterfaces
+            // 
+            this.lblInterfaces.AutoSize = true;
+            this.lblInterfaces.Location = new System.Drawing.Point(14, 90);
+            this.lblInterfaces.Name = "lblInterfaces";
+            this.lblInterfaces.Size = new System.Drawing.Size(216, 13);
+            this.lblInterfaces.TabIndex = 3;
+            this.lblInterfaces.Text = "Export Game Interfaces (UIGen) to the file:";
+            // 
             // tabOptions
             // 
-            this.tabOptions.Controls.Add(this.cbEnchantHelperActivator);
             this.tabOptions.Controls.Add(this.cbSlideMonitor);
             this.tabOptions.Controls.Add(this.ckbSpellStuckMonitor);
             this.tabOptions.Controls.Add(this.gbSlideMonitor);
             this.tabOptions.Name = "tabOptions";
             this.tabOptions.Size = new System.Drawing.Size(364, 388);
             this.tabOptions.Text = "Options";
-            // 
-            // cbEnchantHelperActivator
-            // 
-            this.cbEnchantHelperActivator.AutoSize = true;
-            this.cbEnchantHelperActivator.Location = new System.Drawing.Point(12, 9);
-            this.cbEnchantHelperActivator.Name = "cbEnchantHelperActivator";
-            this.cbEnchantHelperActivator.Size = new System.Drawing.Size(131, 17);
-            this.cbEnchantHelperActivator.TabIndex = 9;
-            this.cbEnchantHelperActivator.Text = "Enable EnchantHelper";
-            this.cbEnchantHelperActivator.UseVisualStyleBackColor = true;
-            this.cbEnchantHelperActivator.CheckedChanged += new System.EventHandler(this.cbEnchantHelperActivator_CheckedChanged);
             // 
             // cbSlideMonitor
             // 
@@ -369,117 +474,27 @@ namespace EntityTools.Forms
             this.lblSlideTimer.TabIndex = 2;
             this.lblSlideTimer.Text = "Time between aura check (millisecond):";
             // 
-            // tabUtilities
+            // cbEnchantHelperActivator
             // 
-            this.tabUtilities.Controls.Add(this.lblAuras);
-            this.tabUtilities.Controls.Add(this.btnStates);
-            this.tabUtilities.Controls.Add(this.btnInterfaces);
-            this.tabUtilities.Controls.Add(this.btnMissions);
-            this.tabUtilities.Controls.Add(this.btnUiViewer);
-            this.tabUtilities.Controls.Add(this.btnUccEditor);
-            this.tabUtilities.Controls.Add(this.bteStates);
-            this.tabUtilities.Controls.Add(this.bteInterfaces);
-            this.tabUtilities.Controls.Add(this.bteMissions);
-            this.tabUtilities.Controls.Add(this.bteAuras);
-            this.tabUtilities.Controls.Add(this.lblState);
-            this.tabUtilities.Controls.Add(this.lblInterfaces);
-            this.tabUtilities.Controls.Add(this.lblMissions);
-            this.tabUtilities.Controls.Add(this.btnAuras);
-            this.tabUtilities.Name = "tabUtilities";
-            this.tabUtilities.Size = new System.Drawing.Size(364, 388);
-            this.tabUtilities.Text = "Utilities";
+            this.cbEnchantHelperActivator.AutoSize = true;
+            this.cbEnchantHelperActivator.Location = new System.Drawing.Point(6, 187);
+            this.cbEnchantHelperActivator.Name = "cbEnchantHelperActivator";
+            this.cbEnchantHelperActivator.Size = new System.Drawing.Size(131, 17);
+            this.cbEnchantHelperActivator.TabIndex = 10;
+            this.cbEnchantHelperActivator.Text = "Enable EnchantHelper";
+            this.cbEnchantHelperActivator.UseVisualStyleBackColor = true;
             // 
-            // btnStates
+            // btnTest
             // 
-            this.btnStates.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnStates.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnStates.Location = new System.Drawing.Point(311, 143);
-            this.btnStates.Name = "btnStates";
-            this.btnStates.Size = new System.Drawing.Size(50, 23);
-            this.btnStates.TabIndex = 2;
-            this.btnStates.Text = "Export";
-            this.btnStates.UseVisualStyleBackColor = true;
-            this.btnStates.Click += new System.EventHandler(this.btnStates_Click);
-            // 
-            // btnInterfaces
-            // 
-            this.btnInterfaces.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnInterfaces.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnInterfaces.Location = new System.Drawing.Point(311, 104);
-            this.btnInterfaces.Name = "btnInterfaces";
-            this.btnInterfaces.Size = new System.Drawing.Size(50, 23);
-            this.btnInterfaces.TabIndex = 2;
-            this.btnInterfaces.Text = "Export";
-            this.btnInterfaces.UseVisualStyleBackColor = true;
-            this.btnInterfaces.Click += new System.EventHandler(this.btnInterfaces_Click);
-            // 
-            // btnUiViewer
-            // 
-            this.btnUiViewer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnUiViewer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnUiViewer.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnUiViewer.Location = new System.Drawing.Point(4, 343);
-            this.btnUiViewer.Name = "btnUiViewer";
-            this.btnUiViewer.Size = new System.Drawing.Size(355, 40);
-            this.btnUiViewer.TabIndex = 0;
-            this.btnUiViewer.Text = "UI Viewer";
-            this.btnUiViewer.UseVisualStyleBackColor = true;
-            this.btnUiViewer.Click += new System.EventHandler(this.btnUiViewer_Click);
-            // 
-            // bteStates
-            // 
-            this.bteStates.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.bteStates.EditValue = ".\\Logs\\States\\%character%_States.xml";
-            this.bteStates.Location = new System.Drawing.Point(6, 145);
-            this.bteStates.Name = "bteStates";
-            this.bteStates.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton()});
-            this.bteStates.Properties.NullText = "Enter the Filename where store the Missions";
-            this.bteStates.Properties.NullValuePromptShowForEmptyValue = true;
-            this.bteStates.Properties.ReadOnly = true;
-            this.bteStates.Size = new System.Drawing.Size(299, 20);
-            this.bteStates.TabIndex = 6;
-            this.bteStates.ToolTip = "File name to store engine States. \r\nAllow mask %character%, %account%, %dateTime%" +
-    ".";
-            this.bteStates.ButtonClick += new DevExpress.XtraEditors.Controls.ButtonPressedEventHandler(this.bte_ButtonClick);
-            // 
-            // bteInterfaces
-            // 
-            this.bteInterfaces.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.bteInterfaces.EditValue = ".\\Logs\\Interfaces\\%character%_Interfaces.xml";
-            this.bteInterfaces.Location = new System.Drawing.Point(6, 106);
-            this.bteInterfaces.Name = "bteInterfaces";
-            this.bteInterfaces.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton()});
-            this.bteInterfaces.Properties.NullText = "Enter the Filename where store the Missions";
-            this.bteInterfaces.Properties.NullValuePromptShowForEmptyValue = true;
-            this.bteInterfaces.Properties.ReadOnly = true;
-            this.bteInterfaces.Size = new System.Drawing.Size(299, 20);
-            this.bteInterfaces.TabIndex = 6;
-            this.bteInterfaces.ToolTip = "File name to store Game Interfaces. \r\nAllow mask %character%, %account%, %dateTim" +
-    "e%.";
-            this.bteInterfaces.ButtonClick += new DevExpress.XtraEditors.Controls.ButtonPressedEventHandler(this.bte_ButtonClick);
-            // 
-            // lblState
-            // 
-            this.lblState.AutoSize = true;
-            this.lblState.Location = new System.Drawing.Point(14, 129);
-            this.lblState.Name = "lblState";
-            this.lblState.Size = new System.Drawing.Size(196, 13);
-            this.lblState.TabIndex = 3;
-            this.lblState.Text = "Export loaded engine States to the file:";
-            // 
-            // lblInterfaces
-            // 
-            this.lblInterfaces.AutoSize = true;
-            this.lblInterfaces.Location = new System.Drawing.Point(14, 90);
-            this.lblInterfaces.Name = "lblInterfaces";
-            this.lblInterfaces.Size = new System.Drawing.Size(216, 13);
-            this.lblInterfaces.TabIndex = 3;
-            this.lblInterfaces.Text = "Export Game Interfaces (UIGen) to the file:";
+            this.btnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnTest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnTest.Location = new System.Drawing.Point(309, 314);
+            this.btnTest.Name = "btnTest";
+            this.btnTest.Size = new System.Drawing.Size(50, 23);
+            this.btnTest.TabIndex = 2;
+            this.btnTest.Text = "Test";
+            this.btnTest.UseVisualStyleBackColor = true;
+            this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
             // MainPanel
             // 
@@ -493,6 +508,10 @@ namespace EntityTools.Forms
             ((System.ComponentModel.ISupportInitialize)(this.bteAuras.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).EndInit();
             this.tbclMain.ResumeLayout(false);
+            this.tabUtilities.ResumeLayout(false);
+            this.tabUtilities.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.bteStates.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.bteInterfaces.Properties)).EndInit();
             this.tabOptions.ResumeLayout(false);
             this.tabOptions.PerformLayout();
             this.gbSlideMonitor.ResumeLayout(false);
@@ -500,10 +519,6 @@ namespace EntityTools.Forms
             ((System.ComponentModel.ISupportInitialize)(this.seTimerSlide.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seTimerUnslide.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seSlideFilter.Properties)).EndInit();
-            this.tabUtilities.ResumeLayout(false);
-            this.tabUtilities.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.bteStates.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bteInterfaces.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.sbSettings)).EndInit();
             this.ResumeLayout(false);
 
@@ -536,12 +551,13 @@ namespace EntityTools.Forms
         private System.Windows.Forms.Label lblSlidingAuras;
         private System.Windows.Forms.Button btnUiViewer;
         private System.Windows.Forms.BindingSource sbSettings;
-        private System.Windows.Forms.CheckBox cbEnchantHelperActivator;
         private System.Windows.Forms.Button btnInterfaces;
         private DevExpress.XtraEditors.ButtonEdit bteInterfaces;
         private System.Windows.Forms.Label lblInterfaces;
         private System.Windows.Forms.Button btnStates;
         private DevExpress.XtraEditors.ButtonEdit bteStates;
         private System.Windows.Forms.Label lblState;
+        private System.Windows.Forms.CheckBox cbEnchantHelperActivator;
+        private System.Windows.Forms.Button btnTest;
     }
 }
