@@ -16,7 +16,7 @@ namespace EntityTools.Actions
         #region Inherited
         public override string ActionLabel => GetType().Name;
         public override bool NeedToRun => true;
-        public override string InternalDisplayName => GetType().Name;
+        public override string InternalDisplayName => string.Empty;
         public override bool UseHotSpots => false;
         protected override bool IntenalConditions => true;
         protected override Vector3 InternalDestination => new Vector3();

@@ -193,9 +193,9 @@ namespace VariableTools.Expressions
             /// </summary>
             public static readonly char openRoundBrace = '(';
             public static readonly char openGroupBrace = openRoundBrace;
-            public static readonly char openSquereBrace = '[';
+            public static readonly char openSquareBrace = '[';
             public static readonly char openCurlyBrace = '{';
-            public static readonly char[] openBraces = { openRoundBrace, openSquereBrace, openCurlyBrace };
+            public static readonly char[] openBraces = { openRoundBrace, openSquareBrace, openCurlyBrace };
             /// <summary>
             /// Проверка символа на совпадения с открывающей скобкой
             /// </summary>
@@ -205,6 +205,7 @@ namespace VariableTools.Expressions
             {
                 return openBraces.Contains(c);
             }
+
             /// <summary>
             /// Проверка символа на совпадения с скобкой, начинающей группу
             /// </summary>
@@ -215,6 +216,14 @@ namespace VariableTools.Expressions
                 return c == openRoundBrace;
             }
             /// <summary>
+            /// Проверка символа на совпадения с открывающей квадратной скобкой '['
+            /// </summary>
+            /// <param name="c"></param>
+            /// <returns></returns>
+            public static bool IsOpenSquareBraces(char c)
+            {
+                return openBraces.Contains(c);
+            }            /// <summary>
             /// Удаляет пустые символы и первую встреченную открывающую скобку в начале строки
             /// </summary>
             /// <param name="expression"></param>
@@ -245,15 +254,46 @@ namespace VariableTools.Expressions
 
                 return false;
             }
+            /// <summary>
+            /// Удаляет пустые символы и первую встреченную открывающую квадратну скобку в начале строки
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public static bool TrimOpenSquareBracesAndWhiteSpace(ref string expression)
+            {
+                if (string.IsNullOrEmpty(expression) || string.IsNullOrWhiteSpace(expression))
+                    return false;
+                bool trimBrace = false;
+                int i;
+                for (i = 0; i < expression.Length; i++)
+                {
+                    if (char.IsWhiteSpace(expression[i]))
+                        continue;
+                    else if (expression[i] == openSquareBrace && !trimBrace)
+                    {
+                        trimBrace = true;// Запоминаем, что скобка уже пропущена
+                        continue;
+                    }
+                    else break;
+                }
+
+                if (i > 0 && i < expression.Length + 1 && trimBrace)
+                {
+                    expression = expression.Remove(0, i);
+                    return true;
+                }
+
+                return false;
+            }
 
             /// <summary>
             /// Закрывающие скобки
             /// </summary>
             public static readonly char closeRoundBrace = ')';
             public static readonly char closeGroupBrace = closeRoundBrace;
-            public static readonly char closeSquereBrace = ']';
+            public static readonly char closeSquareBrace = ']';
             public static readonly char closeCurlyBrace = '}';
-            public static readonly char[] closeBraces = { closeRoundBrace, closeSquereBrace, closeCurlyBrace };
+            public static readonly char[] closeBraces = { closeRoundBrace, closeSquareBrace, closeCurlyBrace };
             /// <summary>
             /// Проверка символа на совпадения с закрывающей скобкой
             /// </summary>
@@ -271,6 +311,15 @@ namespace VariableTools.Expressions
             public static bool IsCloseGroupBraces(char c)
             {
                 return c == closeRoundBrace;
+            }
+            /// <summary>
+            /// Проверка символа на совпадения со закрывающй квадратной скобкой ']'
+            /// </summary>
+            /// <param name="c"></param>
+            /// <returns></returns>
+            public static bool IsCloseSquareBraces(char c)
+            {
+                return c == closeSquareBrace;
             }
             /// <summary>
             /// Удаляет пустые символы и первую встреченную закрывающую скобку в начале строки
@@ -303,6 +352,38 @@ namespace VariableTools.Expressions
 
                 return false;
             }
+            /// <summary>
+            /// Удаляет пустые символы и первую встреченную закрывающую квадратную скобку в начале строки
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public static bool TrimCloseSquareBracesAndWhiteSpace(ref string expression)
+            {
+                if (string.IsNullOrEmpty(expression) || string.IsNullOrWhiteSpace(expression))
+                    return false;
+                bool trimBrace = false;
+                int i;
+                for (i = 0; i < expression.Length; i++)
+                {
+                    if (char.IsWhiteSpace(expression[i]))
+                        continue;
+                    else if (expression[i] == closeSquareBrace && !trimBrace)
+                    {
+                        trimBrace = true; // запоминаем, что скобка уже встретилась
+                        continue;
+                    }
+                    else break;
+                }
+
+                if (i > 0 && i < expression.Length + 1 && trimBrace)
+                {
+                    expression = expression.Remove(0, i);
+                    return true;
+                }
+
+                return false;
+            }
+
             /// <summary>
             /// Проверка символа на совпадения с открывающей или закрывающей скобкой
             /// </summary>
@@ -350,6 +431,38 @@ namespace VariableTools.Expressions
                 if (NumberDecimalSeparator == '.')
                     return input.Replace(',', NumberDecimalSeparator);
                 else return input.Replace('.', NumberDecimalSeparator);
+            }
+
+            /// <summary>
+            /// Удаляет пустые символы и первую встреченную запятую ',' в начале строки
+            /// </summary>
+            /// <param name="expression"></param>
+            /// <returns></returns>
+            public static bool TrimCommaAndWhiteSpace(ref string expression)
+            {
+                if (string.IsNullOrEmpty(expression) || string.IsNullOrWhiteSpace(expression))
+                    return false;
+                bool trimComma = false;
+                int i;
+                for (i = 0; i < expression.Length; i++)
+                {
+                    if (char.IsWhiteSpace(expression[i]))
+                        continue;
+                    else if (expression[i] == ',' && !trimComma)
+                    {
+                        trimComma = true; // запоминаем, что запятая ',' уже встретилась
+                        continue;
+                    }
+                    else break;
+                }
+
+                if (i > 0 && i < expression.Length + 1 && trimComma)
+                {
+                    expression = expression.Remove(0, i);
+                    return true;
+                }
+
+                return false;
             }
 
             /// <summary>
@@ -547,6 +660,7 @@ namespace VariableTools.Expressions
             else succeded = true;
             return succeded;
         }
+
         /// <summary>
         /// Перевод объекта в булевый тип.
         /// Если объект - строка, содержащая "True" или целое число больше 0, тогда результат 'True' 
@@ -704,6 +818,49 @@ namespace VariableTools.Expressions
             return TryParse(inObj, out result);
         }
 
+        /// <summary>
+        /// преобразование объекта в AccountScopeType
+        /// </summary>
+        /// <param name="inObj"></param>
+        /// <param name="scope"></param>
+        /// <returns></returns>
+        public static bool TryParse(object inObj, out AccountScopeType scope)
+        {
+            scope = AccountScopeType.Global;
+
+            if (inObj == null)
+                return false;
+
+            if(inObj is AccountScopeType sc)
+            {
+                scope = sc;
+                return true;
+            }
+
+            return Enum.TryParse(inObj.ToString(), out scope);
+        }
+
+        /// <summary>
+        /// Преобразование объекта в AccountScopeType
+        /// </summary>
+        /// <param name="inStr"></param>
+        /// <param name="result">результат преобразования</param>
+        /// <returns>Флаг успеха преобразования</returns>
+        public static bool TryParse(object inObj, out ProfileScopeType scope)
+        {
+            scope = ProfileScopeType.Common;
+
+            if (inObj == null)
+                return false;
+
+            if (inObj is ProfileScopeType sc)
+            {
+                scope = sc;
+                return true;
+            }
+
+            return Enum.TryParse(inObj.ToString(), out scope);
+        }
 
         /// <summary>
         /// Удаляет все бесполезные пробелы из <see cref="input"> и помещает результат в <see cref="out">

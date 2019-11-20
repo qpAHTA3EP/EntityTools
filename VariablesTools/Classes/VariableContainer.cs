@@ -18,9 +18,9 @@ namespace VariableTools.Classes
     public enum AccountScopeType
     {
         /// <summary>
-        /// Видима в пределах одного квестер-профиля
+        /// Не задано (некорректно)
         /// </summary>
-        //Local,
+        //Undefined,
         /// <summary>
         /// Видима одному персонажу аккаунта
         /// </summary>
@@ -35,11 +35,27 @@ namespace VariableTools.Classes
         Global
     }
 
+    /// <summary>
+    /// Область видимости переменной
+    /// </summary>
+    [Serializable]
+    public enum ProfileScopeType
+    {
+        /// <summary>
+        /// Область видимости ограничена текущим профилем
+        /// </summary>
+        Profile,
+        /// <summary>
+        /// Область видимости не ограничена
+        /// </summary>
+        Common
+    }
+
     [Serializable]
     public class VariableContainer : ISerializable, IXmlSerializable
     {
         public VariableContainer() { }
-        public VariableContainer(string n, double v = 0, AccountScopeType asq = AccountScopeType.Global, bool psq = false)
+        public VariableContainer(double v, string n, AccountScopeType asq = AccountScopeType.Global, ProfileScopeType psq = ProfileScopeType.Common)
         {
             name = n;
             val = v;
@@ -53,7 +69,7 @@ namespace VariableTools.Classes
         /// </summary>
         [XmlIgnore]
         [Browsable(false)]
-        internal VariableKey Key => new VariableKey(name, qualifier);
+        internal VariableKey Key => new VariableKey(name, accountScope, profileScope);
 
 
         [XmlIgnore]
@@ -69,7 +85,7 @@ namespace VariableTools.Classes
                 if(name != value)
                 {
                     if (VariableTools.Variables.ContainsKey(Key))
-                        VariableTools.Variables.ChangeItemKey(this, new VariableKey(value, qualifier));
+                        VariableTools.Variables.ChangeItemKey(this, new VariableKey(value, accountScope, profileScope));
                     name = value;
                 }
             }
@@ -103,31 +119,33 @@ namespace VariableTools.Classes
             {
                 if (accountScope != value)
                 {
-                    string newQualifier = VariableTools.GetScopeQualifier(value, profileScope);
+                    //string newQualifier = VariableTools.GetScopeQualifier(value, profileScope);
+                    VariableKey newKey = new VariableKey(name, value, profileScope);
                     if (VariableTools.Variables.ContainsKey(Key))
-                        VariableTools.Variables.ChangeItemKey(this, new VariableKey(name, newQualifier));
-                    qualifier = newQualifier;
+                        VariableTools.Variables.ChangeItemKey(this, newKey);
+                    qualifier = newKey.Qualifier;
                     accountScope = value;
                 }
             }
         }
 
         [XmlIgnore]
-        private bool profileScope = false;
+        private ProfileScopeType profileScope = ProfileScopeType.Common;
         /// <summary>
         /// Переключатель области видимости для квестер-профиля
         /// </summary>
-        public bool ProfileScope
+        public ProfileScopeType ProfileScope
         {
             get => profileScope;
             set
             {
                 if(profileScope != value)
                 {
-                    string newQualifier = VariableTools.GetScopeQualifier(accountScope, value);
+                    //string newQualifier = VariableTools.GetScopeQualifier(accountScope, value);
+                    VariableKey newKey = new VariableKey(name, accountScope, value);
                     if (VariableTools.Variables.ContainsKey(Key))
-                        VariableTools.Variables.ChangeItemKey(this, new VariableKey(name, newQualifier));
-                    qualifier = newQualifier;
+                        VariableTools.Variables.ChangeItemKey(this, newKey);
+                    qualifier = newKey.Qualifier;
                     profileScope = value;
                 }
             }
@@ -171,11 +189,19 @@ namespace VariableTools.Classes
         {
             if (string.IsNullOrEmpty(name))
                 return "Undefined";
-            else if(ProfileScope)
-                return $"{name}[{AccountScope}, Profile]";
-            else return $"{name}[{AccountScope}]";
+            else return $"{name}[{accountScope}, {profileScope}]";
         }
 
+        internal void ChangeScopeImplementation(VariableContainer item, VariableKey newKey)
+        {
+            if(!Object.ReferenceEquals(this, item))
+            {
+                name = newKey.Name;
+                accountScope = newKey.AccountScope;
+                profileScope = newKey.ProfileScope;
+                qualifier = newKey.Qualifier;
+            }
+        }
 
         #region ISerializable
         /// <summary>
@@ -198,9 +224,9 @@ namespace VariableTools.Classes
                 accountScope = AccountScopeType.Global;
 
             string prof_str = info.GetString(nameof(ProfileScope));
-            if (bool.TryParse(prof_str, out bool p))
+            if (Parser.TryParse(prof_str, out ProfileScopeType p))
                 ProfileScope = p;
-            else ProfileScope = false;
+            else ProfileScope = ProfileScopeType.Common;
 
             qualifier = info.GetString(nameof(ScopeQualifier));
         }
@@ -256,9 +282,15 @@ namespace VariableTools.Classes
                             break;
                         case "ProfileScope":
                             string prof_str = reader.ReadElementString(nameof(ProfileScope));
-                            if (Parser.TryParse(prof_str, out bool p))
+                            if (Parser.TryParse(prof_str, out ProfileScopeType p))
                                 profileScope = p;
-                            else profileScope = false;
+                            else if (Parser.TryParse(prof_str, out bool p_bool))
+                            {
+                                if (p_bool)
+                                    profileScope = ProfileScopeType.Profile;
+                                else profileScope = ProfileScopeType.Common;
+                            }
+                            else profileScope = ProfileScopeType.Common;
                             break;
                         case "ScopeQualifier":
                             qualifier = reader.ReadElementContentAsString(nameof(ScopeQualifier), "");

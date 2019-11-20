@@ -1,11 +1,15 @@
-﻿using System;
+﻿using DevExpress.XtraEditors;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Runtime.Serialization;
+using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using VariableTools.Expressions;
 
 namespace VariableTools.Classes
 {
@@ -15,21 +19,100 @@ namespace VariableTools.Classes
         /// <summary>
         /// Ключ идентифицирующий переменную в коллекцию
         /// </summary>
-        internal class VariableKey
+        [Serializable]
+        public class VariableKey
         {
             internal VariableKey() { }
-            internal VariableKey(string n, string q)
+            //internal VariableKey(string n, string q)
+            //{
+            //    Name = n;
+            //    Qualifier = q;
+            //}
+            public VariableKey(string n, AccountScopeType asc, ProfileScopeType psc)
             {
-                Name = n;
-                Qualifier = q;
+                name = n;
+                accountScope = asc;
+                profileScope = psc;
+                Qualifier = VariableTools.GetScopeQualifier(asc, psc);
             }
 
-            internal string Name = string.Empty;
-            internal string Qualifier = string.Empty;
+            private AccountScopeType accountScope = AccountScopeType.Global;
+            private ProfileScopeType profileScope = ProfileScopeType.Common;
+            private string name = string.Empty;
+
+            [Description("Имя переменной.\n" +
+                         "The Name of the Variable")]
+            public string Name
+            {
+                get => name;
+                set 
+                {
+                    if (name != value)
+                    {
+                        if (Parser.CorrectForbiddenName(value, out string corrected))
+                        {
+                            // Имя переменной некорректно
+                            // Запрашиваем замену
+                            if (XtraMessageBox.Show($"Задано недопустимое имя переменно '{value}'!\n" +
+                                                    $"Хотите его исправить на '{corrected}'?\n" +
+                                                    $"The name '{value}' is incorrect! \n" +
+                                                    $"Whould you like to change it to '{corrected}'?",
+                                                    "Warring", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
+                            {
+                                // Пользователь не согласился заменить некорректное имя переменной
+                                name = value;
+                            }
+                            else
+                            {
+                                // Пользователь согласился заменить имя переменной на корректное
+                                name = corrected;
+                            }
+                        }
+                        else name = value;
+                    }
+                }
+            }
+
+            [Description("Идентификатор видимости переменной в профиле Квестера.\n" +
+                "The Scope of the Variable for the quester-profiles")]
+            public ProfileScopeType ProfileScope
+            {
+                get => profileScope;
+                set
+                {
+                    if (profileScope != value)
+                    {
+                        Qualifier = VariableTools.GetScopeQualifier(accountScope, value);
+                        profileScope = value;
+                    }
+                }
+            }
+
+
+            [Description("Идентификатор видимости переменной по отношению к персонажам аккаунта.\n" +
+                "The Scope of the Variable for the characters of the accounts")]
+            public AccountScopeType AccountScope
+            {
+                get => accountScope;
+                set
+                {
+                    if (accountScope != value)
+                    {
+                        Qualifier = VariableTools.GetScopeQualifier(value, profileScope);
+                        accountScope = value;
+                    }
+                }
+            }
+
+            [Description("Идентификатор области видимости переменной\n" +
+                "Scope qualifier of the Variable")]
+            [XmlIgnore]
+            public string Qualifier { get; protected set; } = string.Empty;
+
 
             public override bool Equals(object obj)
             {
-                if(obj is VariableKey vKey)
+                if (obj is VariableKey vKey)
                 {
                     return Name == vKey.Name
                         && Qualifier == vKey.Qualifier;
@@ -39,41 +122,78 @@ namespace VariableTools.Classes
 
             public override int GetHashCode()
             {
-                return Name.GetHashCode() & Qualifier.GetHashCode();
+                return Name.GetHashCode() ^ Qualifier.GetHashCode();
+            }
+
+            public override string ToString()
+            {
+                return $"{Name}[{AccountScope}, {ProfileScope}]";
             }
         }
+
 
         /// <summary>
         /// Обертка идентифицирующая переменную
         /// </summary>
-        internal class VariableScopeIdentifier
-        {
-            public VariableScopeIdentifier() { }
-            public VariableScopeIdentifier(string name, AccountScopeType asc, bool psc)
-            {
-                Name = name;
-                AccountScope = asc;
-                ProfileScope = psc;
-            }
+        //[Serializable]
+        //public class VariableScopeIdentifier
+        //{
+        //    public VariableScopeIdentifier() { }
+        //    public VariableScopeIdentifier(string name, AccountScopeType asc, bool psc)
+        //    {
+        //        Name = name;
+        //        AccountScope = asc;
+        //        ProfileScope = psc;
+        //    }
 
-            public string Name { get; set; }
-            public bool ProfileScope { get; set; }
-            public AccountScopeType AccountScope { get; set; }
+        //    public string Name { get; set; }
+        //    public bool ProfileScope { get; set; }
+        //    public AccountScopeType AccountScope { get; set; }
 
-            public bool Equals(VariableScopeIdentifier id)
-            {
-                return Name == id.Name
-                    && AccountScope == id.AccountScope
-                    && ProfileScope == id.ProfileScope;
-            }
-        }
+        //    public bool Equals(VariableScopeIdentifier id)
+        //    {
+        //        return Name == id.Name
+        //            && AccountScope == id.AccountScope
+        //            && ProfileScope == id.ProfileScope;
+        //    }
+
+        //    public override string ToString()
+        //    {
+        //        if (string.IsNullOrEmpty(Name))
+        //            return "Undefined";
+        //        else if (ProfileScope)
+        //            return $"{Name}[{AccountScope}, Profile]";
+        //        else return $"{Name}[{AccountScope}]";
+        //    }
+        //}
 
         /// <summary>
         /// Класс-коллекция переменных
         /// </summary>
         internal class InternalVariableCollection : KeyedCollection<VariableKey, VariableContainer>
         {
-            internal InternalVariableCollection() : base() { }
+            internal class VariableKeyComparer : IEqualityComparer<VariableKey>
+            {
+                public bool Equals(VariableKey x, VariableKey y)
+                {
+                    if (x == null || y == null)
+                        return false;
+                    else return x.Name == y.Name
+                            && x.ProfileScope == y.ProfileScope
+                            && x.AccountScope == y.AccountScope;
+                }
+
+                public int GetHashCode(VariableKey obj)
+                {
+                    if (obj is VariableKey key)
+                    {
+                        return key.Name.GetHashCode() ^ key.Qualifier.GetHashCode();
+                    }
+                    else return obj.GetHashCode();
+                }
+            }
+
+            internal InternalVariableCollection() : base(new VariableKeyComparer(), 1) { }
 
             protected override VariableKey GetKeyForItem(VariableContainer item)
             {
@@ -116,9 +236,27 @@ namespace VariableTools.Classes
 
         private InternalVariableCollection collection = new InternalVariableCollection();
 
+        /// <summary>
+        /// Объявление делегата, уведомляющего контейнеры переменных об изменении идентификаторов
+        /// </summary>
+        /// <param name="oldKey"></param>
+        /// <param name="newKey"></param>
+        delegate void NotifyVariableChangeScopeDelegat(VariableContainer oldKey, VariableKey newKey);
+
+        NotifyVariableChangeScopeDelegat NotifyVariableChangeScope;
+
+
         internal void ChangeItemKey(VariableContainer item, VariableKey newKey)
         {
-            collection.ChangeItemKey(item, newKey);
+            if (item != null && newKey != null)
+            {
+                if (collection.ContainsKey(item.Key))
+                {
+                    collection.ChangeItemKey(item, newKey);
+                    if(NotifyVariableChangeScope != null)
+                        NotifyVariableChangeScope.Invoke(item, newKey);
+                }
+            }
         }
 
         internal bool TryGetValue(out double value, VariableKey key)
@@ -145,30 +283,38 @@ namespace VariableTools.Classes
         public bool TryGetValue(out VariableContainer value, string name)
         {
             value = null;
-            if (!collection.TryGetValue(new VariableKey(name, VariableTools.GetScopeQualifier(AccountScopeType.Character, true)), out value))
-                if (!collection.TryGetValue(new VariableKey(name, VariableTools.GetScopeQualifier(AccountScopeType.Character, false)), out value))
-                    if (!collection.TryGetValue(new VariableKey(name, VariableTools.GetScopeQualifier(AccountScopeType.Account, true)), out value))
-                        if (!collection.TryGetValue(new VariableKey(name, VariableTools.GetScopeQualifier(AccountScopeType.Account, false)), out value))
-                            if(!collection.TryGetValue(new VariableKey(name, VariableTools.GetScopeQualifier(AccountScopeType.Global, true)), out value))
-                                collection.TryGetValue(new VariableKey(name, VariableTools.GetScopeQualifier(AccountScopeType.Global, false)), out value);
+            if (!collection.TryGetValue(new VariableKey(name, AccountScopeType.Character, ProfileScopeType.Profile), out value))
+                if (!collection.TryGetValue(new VariableKey(name, AccountScopeType.Character, ProfileScopeType.Common), out value))
+                    if (!collection.TryGetValue(new VariableKey(name, AccountScopeType.Account, ProfileScopeType.Profile), out value))
+                        if (!collection.TryGetValue(new VariableKey(name, AccountScopeType.Account, ProfileScopeType.Common), out value))
+                            if(!collection.TryGetValue(new VariableKey(name, AccountScopeType.Global, ProfileScopeType.Profile), out value))
+                                collection.TryGetValue(new VariableKey(name, AccountScopeType.Global, ProfileScopeType.Common), out value);
             return value != null;
         }
 
-        public VariableContainer TryAdd(double value, string name, AccountScopeType accScope = AccountScopeType.Global, bool profScope = false)
+        public bool TryGetValue(out VariableContainer value, string name, AccountScopeType accScope = AccountScopeType.Global, ProfileScopeType profScope = ProfileScopeType.Common)
         {
-            VariableKey key = new VariableKey(name, VariableTools.GetScopeQualifier(accScope, profScope));
-            if(collection.Contains(key))
-            {
-                collection[key].Value = value;
-                return collection[key];
-            }
-            else
-            {
-                VariableContainer var = new VariableContainer(name, value, accScope);
-                collection.Add(var);
-                return var;
-            }         
+            if (collection.TryGetValue(new VariableKey(name, accScope, profScope), out value))
+                return true;
+            else return false;
         }
+
+        //public VariableContainer TryAdd(double value, string name, AccountScopeType accScope = AccountScopeType.Global, bool profScope = false)
+        //{
+        //    VariableKey key = new VariableKey(name, accScope, profScope);
+        //    if(collection.Contains(key))
+        //    {
+        //        collection[key].Value = value;
+        //        return collection[key];
+        //    }
+        //    else
+        //    {
+        //        VariableContainer var = new VariableContainer(name, value, accScope);
+        //        collection.Add(var);
+        //        NotifyVariableChangeScope += var.ChangeScopeImplementation;
+        //        return var;
+        //    }         
+        //}
 
         public bool TryAdd(VariableContainer variable)
         {
@@ -181,25 +327,25 @@ namespace VariableTools.Classes
             else
             {
                 collection.Add(variable);
+                NotifyVariableChangeScope += variable.ChangeScopeImplementation;
                 return collection.Contains(variable);
             }
         }
 
-        public VariableContainer Add(string name, double value, AccountScopeType accScope = AccountScopeType.Character, bool profScope = false)
+        public VariableContainer Add(double value, string name, AccountScopeType accScope = AccountScopeType.Character, ProfileScopeType profScope = ProfileScopeType.Common)
         {
-            VariableContainer var = TryAdd(value, name, accScope, profScope);
-            if (var != null)
+            if (collection.TryGetValue(new VariableKey(name, accScope, profScope), out VariableContainer varContainer))
             {
-                var.Value = value;
-                return var;
+                varContainer.Value = value;
+                return varContainer;
             }
             else
             {
-                VariableContainer newVal = new VariableContainer(name, value, accScope, profScope);
-                collection.Add(newVal);
-                return newVal;
+                VariableContainer newVar = new VariableContainer(value, name, accScope, profScope);
+                collection.Add(newVar);
+                NotifyVariableChangeScope += newVar.ChangeScopeImplementation;
+                return newVar;
             }
-
         }
 
         public VariableContainer this[string name]
@@ -213,11 +359,11 @@ namespace VariableTools.Classes
             }
         }
 
-        public VariableContainer this[string name , AccountScopeType accScope, bool profScope]
+        public VariableContainer this[string name , AccountScopeType accScope, ProfileScopeType profScope]
         {
             get
             {
-                if (collection.TryGetValue(new VariableKey(name, VariableTools.GetScopeQualifier(accScope, profScope)), out VariableContainer var))
+                if (collection.TryGetValue(new VariableKey(name, accScope, profScope), out VariableContainer var))
                     return var;
                 return null;
             }
@@ -252,6 +398,12 @@ namespace VariableTools.Classes
         public void Clear()
         {
             collection.Clear();
+            NotifyVariableChangeScope = null;
+        }
+
+        public bool Remove(VariableKey key)
+        {
+            return collection.Remove(key);
         }
 
         public int Count => collection.Count;
@@ -287,8 +439,7 @@ namespace VariableTools.Classes
             {
                 if(enumerator.Current.ObjectType == typeof(VariableContainer))
                 {
-                    VariableContainer var = enumerator.Current.Value as VariableContainer;
-                    if(var != null && var.Save)
+                    if (enumerator.Current.Value is VariableContainer var && var.Save)
                         collection.Add(var);
                 }
             }
@@ -311,18 +462,8 @@ namespace VariableTools.Classes
 
         public bool Add(object obj)
         {
-            if(obj is VariableContainer variable)
-                if (collection.ContainsKey(variable.Key))
-                {
-                    collection[variable.Key].Value = variable.Value;
-                    collection[variable.Key].Save = variable.Save;
-                    return true;
-                }
-                else
-                {
-                    collection.Add(variable);
-                    return collection.Contains(variable);
-                }
+            if (obj is VariableContainer variable)
+                return TryAdd(variable);
             return false;
         }
         #endregion

@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows.Forms;
 using Astral.Quester.Forms;
 using DevExpress.XtraEditors;
+using VariableTools.Classes;
 
 namespace VariableTools.Forms
 {
@@ -58,9 +59,12 @@ namespace VariableTools.Forms
 
         private void btnInsVarible_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
-            string var_name = VariablesEditor.GetVariable("");
-            if (!string.IsNullOrEmpty(var_name))
-                tbExpression.AppendText(" "+var_name);
+            VariableCollection.VariableKey key = VariablesSelectForm.GetVariable();
+
+            if (key != null)
+            {
+                tbExpression.AppendText(" " + key.ToString());
+            }
         }
 
         private void btnValidate_Click(object sender, EventArgs e)

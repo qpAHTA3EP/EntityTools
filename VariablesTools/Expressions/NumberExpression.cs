@@ -9,6 +9,7 @@ using VariableTools.Expressions.Functions;
 using VariableTools.Expressions.Operators;
 using System.Diagnostics;
 using System.Xml.Serialization;
+using VariableTools.Classes;
 
 namespace VariableTools.Expressions
 {
@@ -43,34 +44,41 @@ namespace VariableTools.Expressions
                 result = res;
 #if DEBUG
                 stopwatch.Stop();
-                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: Expression({GetHashCode().ToString("X8")}) '{text}' result is {res}. Calculating time: {stopwatch.ElapsedMilliseconds} ms");
-                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: Expression({GetHashCode().ToString("X8")}) has AST({ast.GetHashCode().ToString("X8")})");
+                if (VariableTools.DebugMessage)
+                {
+                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: Expression({GetHashCode().ToString("X8")}) '{text}' result is {res}. Calculating time: {stopwatch.ElapsedMilliseconds} ms");
+                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: Expression({GetHashCode().ToString("X8")}) has AST({ast.GetHashCode().ToString("X8")})");
 
 #if DEBUG_ADDITION_INFO
-                if (VariableTools.Variables.Count > 0)
-                {
-                    using (var varEnemer = VariableTools.Variables.GetEnumerator())
+
+                    if (VariableTools.Variables.Count > 0)
                     {
-                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: ======================================");
-                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: <Variables>:");
-                        while (varEnemer.MoveNext())
+                        using (var varEnemer = VariableTools.Variables.GetEnumerator())
                         {
-                            //Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: '{varEnemer.Current.Key}' = {varEnemer.Current.Value}");
-                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: '{varEnemer.Current.Name}' = {varEnemer.Current.Value}");
+                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: ======================================");
+                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: <Variables>:");
+                            while (varEnemer.MoveNext())
+                            {
+                                //Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: '{varEnemer.Current.Key}' = {varEnemer.Current.Value}");
+                                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: '{varEnemer.Current.Name}' = {varEnemer.Current.Value}");
+                            }
+                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: ======================================");
                         }
-                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: ======================================");
                     }
-                }
-                else Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: <Variables> is empty.");
+                    else Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: <Variables> is empty.");
 
 #endif
+                }
 #endif
                 return true;
             }
 #if DEBUG
             stopwatch.Stop();
-            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: Expression({GetHashCode().ToString("X8")}) '{text}' calculation FAILED. Calculating time: {stopwatch.ElapsedMilliseconds} ms");
-            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: Expression({GetHashCode().ToString("X8")}) has AST({ast.GetHashCode().ToString("X8")})");
+            if (VariableTools.DebugMessage)
+            {
+                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: Expression({GetHashCode().ToString("X8")}) '{text}' calculation FAILED. Calculating time: {stopwatch.ElapsedMilliseconds} ms");
+                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: Expression({GetHashCode().ToString("X8")}) has AST({ast.GetHashCode().ToString("X8")})");
+            }
 #endif
             return false;
         }
@@ -91,24 +99,27 @@ namespace VariableTools.Expressions
             bool result = Parse(shortText, out ast, out parseError, true);
 #if DEBUG
             stopwatch.Stop();
-            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: Expression({GetHashCode().ToString("X8")}) '{text}' parsing time: {stopwatch.ElapsedMilliseconds} ms");
-            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: Expression({GetHashCode().ToString("X8")}) has AST({ast.GetHashCode().ToString("X8")})");
+            if (VariableTools.DebugMessage)
+            {
+                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: Expression({GetHashCode().ToString("X8")}) '{text}' parsing time: {stopwatch.ElapsedMilliseconds} ms");
+                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: Expression({GetHashCode().ToString("X8")}) has AST({ast.GetHashCode().ToString("X8")})");
 
 #if DEBUG_ADDITION_INFO
-            if(astCollection.Count > 0)
-                using (var astEnemer = astCollection.GetEnumerator())
-                {
-                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: ======================================");
-                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: <astCollection>:");
-                    while (astEnemer.MoveNext())
+                if (astCollection.Count > 0)
+                    using (var astEnemer = astCollection.GetEnumerator())
                     {
-                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: '{astEnemer.Current.Key}' => has AST({astEnemer.Current.Value.GetHashCode().ToString("X8")})");
-                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, astEnemer.Current.Value.Description(2));
+                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: ======================================");
+                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: <astCollection>:");
+                        while (astEnemer.MoveNext())
+                        {
+                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: '{astEnemer.Current.Key}' => has AST({astEnemer.Current.Value.GetHashCode().ToString("X8")})");
+                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, astEnemer.Current.Value.Description(2));
+                        }
+                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: ======================================");
                     }
-                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: ======================================");
-                }
-            else Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: <astCollection> is empty:");
+                else Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}: <astCollection> is empty:");
 #endif
+            }
 #endif
             return result;
         }
@@ -320,6 +331,13 @@ namespace VariableTools.Expressions
         /// Извлечение имени переменной из входной строки expression
         /// В случае успеха соответствующая переменной подстрока удаляется из expression
         /// В противном случае генерируется исключение ParseError
+        /// Variable = VarName
+        ///          | VarName '[' AccountScope ']'
+        ///          | VarName '[' ProfileScope ']'
+        ///          | VarName '[' AccountScope ',' ProfileScope ']'
+        /// где 
+        /// AccountScope = 'Global' | 'Account' | 'Character' 
+        /// ProfileScope = 'Profile' | 'Common'
         /// </summary>
         /// <param name="expr"></param>
         /// <returns>Узел синтаксического дерева NumberVariable</returns>
@@ -348,7 +366,7 @@ namespace VariableTools.Expressions
                     if (Parser.Symbols.IsMathOperator(expr[i]))
                         // Обнаружен математический оператор 
                         // Следовательно Имя переменной закончилось на предыдущем символе
-                        break;                    
+                        break;
 
                     if (char.IsWhiteSpace(expr[i]))
                         // Обнаружен пробел
@@ -358,6 +376,12 @@ namespace VariableTools.Expressions
                     if (Parser.Symbols.IsCloseGroupBraces(expr[i]))
                         // Найдена закрывающая скобка
                         // Следовательно Имя переменной закончилось на предыдущем символе
+                        break;
+
+                    if (Parser.Symbols.IsOpenSquareBraces(expr[i]))
+                        // Найдена открывающая квадратная скобка
+                        // Следовательно Имя переменной закончилось на предыдущем символе и 
+                        // началось перечисление квалифицирующих признаков области видимости
                         break;
 
                     if (Parser.Symbols.IsOpenGroupBraces(expr[i]))
@@ -384,17 +408,193 @@ namespace VariableTools.Expressions
                 {
                     // удаление распознанной подстроки из входного выражения 
                     expr = expr.Remove(0, i);
+
+                    // проверяем наличие квалифицирующих признаков области видимости
+                    if(Parser.Symbols.TrimOpenSquareBracesAndWhiteSpace(ref expr))
+                    {
+                        // Найдена открывающая квадратная скобка
+                        // Пробуем извлечь AccountScope
+                        if(ParseAccountScope(ref expr, out AccountScopeType accScope))
+                        {
+                            if(Parser.Symbols.TrimCommaAndWhiteSpace(ref expr))
+                            {
+                                // После AccountScope найдена запятая
+                                // Поэтому ищем ProfileScope
+                                if (ParseProfileScope(ref expr, out ProfileScopeType profScope))
+                                {
+                                    // найден ProfileScope
+                                    // Ищем закрывающую скобку
+                                    if(Parser.Symbols.TrimCloseSquareBracesAndWhiteSpace(ref expr))
+                                    {
+                                        // Найдена закрывающая квадратная скобка
+                                        // конструирование листового узла синтаксического дерева
+                                        return new NumberVariable(var_name, accScope, profScope);
+                                    }
+                                    else throw new FatalParseError($"ParseVariable: not found '{Parser.Symbols.closeSquareBrace}'", expr);
+                                }
+                                else throw new FatalParseError($"ParseVariable: not found '{typeof(ProfileScopeType).Name}'", expr);
+                            }
+                            // Запятая не найдена. ищем закрывающую скобку 
+                            else if (Parser.Symbols.TrimCloseSquareBracesAndWhiteSpace(ref expr))
+                            {
+                                // Найдена закрывающая скобка
+                                // конструирование листового узла синтаксического дерева
+                                return new NumberVariable(var_name, accScope, ProfileScopeType.Common);
+                            }
+                            else throw new FatalParseError($"ParseVariable: not found '{Parser.Symbols.closeSquareBrace}'", expr);
+                        }
+                        else if (ParseProfileScope(ref expr, out ProfileScopeType profScope))
+                        {
+                            // найден ProfileScope
+                            if (Parser.Symbols.TrimCommaAndWhiteSpace(ref expr))
+                            {
+                                // После  ProfileScope найдена запятая
+                                // Поэтому ищем AccountScope
+                                if (ParseAccountScope(ref expr, out accScope))
+                                {
+                                    // найден AccountScope
+                                    // Ищем закрывающую скобку
+                                    if (Parser.Symbols.TrimCloseSquareBracesAndWhiteSpace(ref expr))
+                                    {
+                                        // Найдена закрывающая квадратная скобка
+                                        // конструирование листового узла синтаксического дерева
+                                        return new NumberVariable(var_name, accScope, profScope);
+                                    }
+                                    else throw new FatalParseError($"ParseVariable: not found '{Parser.Symbols.closeSquareBrace}'", expr);
+                                }
+                                else throw new FatalParseError($"ParseVariable: not found '{typeof(AccountScopeType).Name}'", expr);
+                            }
+                            // Запятая не найдена. ищем закрывающую скобку 
+                            else if (Parser.Symbols.TrimCloseSquareBracesAndWhiteSpace(ref expr))
+                            {
+                                // Найдена закрывающая квадратная скобка
+                                // конструирование листового узла синтаксического дерева
+                                return new NumberVariable(var_name, AccountScopeType.Global, profScope);
+                            }
+                            else throw new FatalParseError($"ParseVariable: not found '{Parser.Symbols.closeSquareBrace}'", expr);
+                        }
+                        else throw new FatalParseError($"ParseVariable: not found '{typeof(AccountScopeType).Name}' and '{typeof(ProfileScopeType).Name}' after {Parser.Symbols.openSquareBrace}", expr);
+                    }
+
                     // конструирование листового узла синтаксического дерева
-                    return new NumberVariable(var_name);
+                    return new NumberVariable(var_name, AccountScopeType.Global, ProfileScopeType.Common);
                 }
                 else throw new ParseError("ParseVariable: Unsucceeded", expr.Substring(i));
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 expr = exprBackup;
                 throw e;
             }
         }
+        protected static bool ParseAccountScope(ref string expr, out AccountScopeType accountScope)
+        {
+            accountScope = AccountScopeType.Global;
+            if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
+                return false;
+
+            string str = expr.TrimStart();
+            foreach (AccountScopeType aScp in Enum.GetValues(typeof(AccountScopeType)))
+            {
+                if (str.StartsWith(aScp.ToString(), StringComparison.OrdinalIgnoreCase))
+                {
+                    accountScope = aScp;
+                    expr = str.Substring(aScp.ToString().Length);
+                    return true;
+                }
+            }
+            return false;
+        }
+        protected static bool ParseProfileScope(ref string expr, out ProfileScopeType profScope)
+        {
+            profScope = ProfileScopeType.Common;
+            if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
+                return false;
+
+            string str = expr.TrimStart();
+            foreach (ProfileScopeType pScp in Enum.GetValues(typeof(ProfileScopeType)))
+            {
+                if (str.StartsWith(pScp.ToString(), StringComparison.OrdinalIgnoreCase))
+                {
+                    profScope = pScp;
+                    expr = str.Substring(pScp.ToString().Length);
+                    return true;
+                }
+            }
+            return false;
+        }
+        //protected static NumberVariable ParseVariable(ref string expr)
+        //{
+        //    string exprBackup = expr;
+
+        //    if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
+        //        throw new FatalParseError("ParseVariable: Expression string is empty");
+
+        //    expr = expr.TrimStart();
+
+        //    try
+        //    {
+        //        // Индекс символа во входной строке
+        //        int i;
+        //        // Поиск путем анализа символов строки
+        //        for (i = 0; i < expr.Length; i++)
+        //        {
+        //            if (Parser.Symbols.IsLetterOrDigit(expr[i]))
+        //                continue;
+
+        //            if (Parser.Symbols.IsUnderscore(expr[i]))
+        //                continue;
+
+        //            if (Parser.Symbols.IsMathOperator(expr[i]))
+        //                // Обнаружен математический оператор 
+        //                // Следовательно Имя переменной закончилось на предыдущем символе
+        //                break;                    
+
+        //            if (char.IsWhiteSpace(expr[i]))
+        //                // Обнаружен пробел
+        //                // Следовательно Имя переменной закончилось на предыдущем символе
+        //                break;
+
+        //            if (Parser.Symbols.IsCloseGroupBraces(expr[i]))
+        //                // Найдена закрывающая скобка
+        //                // Следовательно Имя переменной закончилось на предыдущем символе
+        //                break;
+
+        //            if (Parser.Symbols.IsOpenGroupBraces(expr[i]))
+        //            {
+        //                // Встретилась открывающая скобка
+        //                // Следовательно входная строка некорректна
+        //                throw new FatalParseError($"ParseVariable: Unexpeted symbol '{expr[i]}'", expr.Substring(i));
+        //            }
+
+        //            // Встретился недопустимый символ
+        //            // Следовательно входная строка некорректна
+        //            throw new FatalParseError($"ParseVariable: Symbol '{expr[i]}' is forbiden in the name of {{Variable}}", expr.Substring(i));
+        //        }
+
+        //        if (i == 0)
+        //            throw new ParseError("ParseVariable: {Variable} does not found at the beginning of the expression", expr.Substring(i));
+
+        //        // Извлечение названия переменной из подстроки
+        //        string var_name = expr.Substring(0, i);
+        //        if (Parser.IsForbidden(var_name))
+        //            throw new FatalParseError($"ParseVariable: Name {{{var_name}}} if forbidden", expr);
+
+        //        if (!string.IsNullOrWhiteSpace(var_name) && !string.IsNullOrEmpty(var_name))
+        //        {
+        //            // удаление распознанной подстроки из входного выражения 
+        //            expr = expr.Remove(0, i);
+        //            // конструирование листового узла синтаксического дерева
+        //            return new NumberVariable(var_name);
+        //        }
+        //        else throw new ParseError("ParseVariable: Unsucceeded", expr.Substring(i));
+        //    }
+        //    catch(Exception e)
+        //    {
+        //        expr = exprBackup;
+        //        throw e;
+        //    }
+        //}
 
         /// <summary>
         /// Обработка правила
@@ -461,7 +661,7 @@ namespace VariableTools.Expressions
         {
 
             if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
-                throw new FatalParseError("ParseItemId: Expression string is empty");
+                throw new FatalParseError("ParseId: Expression string is empty");
 
             expr = expr.TrimStart();
 
@@ -494,7 +694,7 @@ namespace VariableTools.Expressions
                 {
                     // Найдена открывающая скобка
                     // Следовательно входная строка некорректна
-                    throw new FatalParseError($"ParseItemId: Have '{expr[i]}' when there should be the end of {{ItemId}}", expr.Substring(i));
+                    throw new FatalParseError($"ParseId: Have '{expr[i]}' when there should be the end of {{ItemId}}", expr.Substring(i));
                 }
 
                 if (Parser.Symbols.IsMathOperator(expr[i]))
@@ -502,14 +702,14 @@ namespace VariableTools.Expressions
                     // Найден символ математического оператора
                     // Математический операции над идентификаторами не допускаются
                     // Следовательно входная строка некорректна
-                    throw new FatalParseError("ParseItemId: Have {MathOperator} when there should be the end of {ItemId}", expr.Substring(i));
+                    throw new FatalParseError("ParseId: Have {MathOperator} when there should be the end of {ItemId}", expr.Substring(i));
                 }
 
-                throw new FatalParseError($"ParseItemId: Have '{expr[i]}' when there should be {{ItemId}}", expr.Substring(i));
+                throw new FatalParseError($"ParseId: Have '{expr[i]}' when there should be {{ItemId}}", expr.Substring(i));
             }
 
             if (i == 0)
-                throw new ParseError("ParseItemId: {ItemId} does not found at the beginning of the expression", expr);
+                throw new ParseError("ParseId: {ItemId} does not found at the beginning of the expression", expr);
 
             // Извлечение названия переменной из подстроки
             string itemId = expr.Substring(0, i);

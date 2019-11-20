@@ -32,6 +32,8 @@ namespace VariableTools
         }
         #endregion
 
+        public static bool DebugMessage { get; set; }
+
         public static void SaveToFile()
         {
             string fullFileName = Path.Combine(Astral.Controllers.Directories.SettingsPath, nameof(VariableTools), "Variables.xml");
@@ -80,8 +82,7 @@ namespace VariableTools
                     XmlSerializer serialiser = new XmlSerializer(typeof(VariableCollection));
                     using (StreamReader file = new StreamReader(fullFileName))
                     {
-                        VariableCollection vars = serialiser.Deserialize(file) as VariableCollection;
-                        if (vars != null)
+                        if (serialiser.Deserialize(file) is VariableCollection vars)
                         {
                             Variables = vars;
                             Logger.WriteLine(Logger.LogType.Debug, $"{nameof(VariableTools)}: Load {Variables.Count} variables from file \"{fullFileName}\".");
@@ -105,41 +106,53 @@ namespace VariableTools
         internal static VariableCollection Variables = new VariableCollection();
 
         internal static StringBuilder sb = new StringBuilder();
-        public static string GetScopeQualifier(AccountScopeType asq, bool psq)
+        public static string GetScopeQualifier(AccountScopeType asq, ProfileScopeType psq)
         {
             sb.Clear();
             // Подстрока с относительным путем к профилю
-            if (psq)
+            if (psq == ProfileScopeType.Profile)
             {
-                if (Astral.API.CurrentSettings.LastQuesterProfile.IndexOf(Astral.Controllers.Directories.ProfilesPath) >= 0
-                    && Astral.Controllers.Directories.ProfilesPath.Length < Astral.API.CurrentSettings.LastQuesterProfile.Length)
+                if (Astral.API.CurrentSettings.LastQuesterProfile.StartsWith(Astral.Controllers.Directories.ProfilesPath))
                         sb.Append(Astral.API.CurrentSettings.LastQuesterProfile.Substring(Astral.Controllers.Directories.ProfilesPath.Length));
                 else sb.Append(Astral.API.CurrentSettings.LastQuesterProfile);
                 if (asq != AccountScopeType.Global)
                     sb.Append("&&");
             }
 
-            
-            switch (asq)
+
+            if (asq == AccountScopeType.Character)
             {
-                case AccountScopeType.Character:
-                    if (EntityManager.LocalPlayer.IsValid)
-                        sb.Append(EntityManager.LocalPlayer.InternalName);
-                    else if(GetLastLoggedCharacter(out string charName))
-                        sb.Append(charName);
-                    else throw new InvalidOperationException("Unable to set AccountScope to 'Character' because of character is not in the Game!");
-                    break;
-                case AccountScopeType.Account:
-                    if (!string.IsNullOrEmpty(EntityManager.LocalPlayer.AccountLoginUsername))
-                        sb.Append(EntityManager.LocalPlayer.AccountLoginUsername);
-                    else if (GetLastLoggedAccount(out string account))
-                        sb.Append(account);
-                    else throw new InvalidOperationException("Unable to set AccountScope to 'Account' because of character is not in the Game!");
-                    break;
-                //case AccountScopeType.Global:
-                //    return profQualif;
-                //default:
-                //    return profQualif;
+                //if (EntityManager.LocalPlayer.IsValid)
+                if(!string.IsNullOrEmpty(EntityManager.LocalPlayer.InternalName))
+                    sb.Append(EntityManager.LocalPlayer.InternalName);
+                else if (GetLastLoggedCharacter(out string charName)
+                         && GetLastLoggedAccount(out string accName))
+                {
+                    sb.Append(charName).Append(accName);
+                    Logger.WriteLine(Logger.LogType.Debug, "ScopeQualifier constracted with LastPlayedCharacter because of character is not in the Game!");
+                }
+                else
+                {
+                    //throw new InvalidOperationException("Unable to set AccountScope to 'Character' because of character is not in the Game!");
+                    Logger.WriteLine(Logger.LogType.Debug, "Unable to constract ScopeQualifier with scope 'Character' because of character is not in the Game!");
+                    return string.Empty;
+                }
+            }
+            else if (asq == AccountScopeType.Account)
+            { 
+                if (!string.IsNullOrEmpty(EntityManager.LocalPlayer.AccountLoginUsername))
+                    sb.Append(EntityManager.LocalPlayer.AccountLoginUsername);
+                else if (GetLastLoggedAccount(out string account))
+                {
+                    sb.Append(account);
+                    Logger.WriteLine(Logger.LogType.Debug, "ScopeQualifier constracted with LastPlayedAccount because the Game is not logged in!");
+                }
+                else
+                {
+                    //throw new InvalidOperationException("Unable to set AccountScope to 'Account' because of character is not in the Game!");
+                    Logger.WriteLine(Logger.LogType.Debug, "Unable to constract ScopeQualifier with scope 'Account' because the Game is not logged in!");
+                    return string.Empty;
+                }
             }
             return sb.ToString();
         }
@@ -152,7 +165,7 @@ namespace VariableTools
         /// </summary>
         /// <param name="charName"></param>
         /// <returns></returns>
-        internal static bool GetLastLoggedCharacter(out string charName)
+        private static bool GetLastLoggedCharacter(out string charName)
         {
             charName = string.Empty;
             if(charFiledInfo == null)
@@ -169,7 +182,7 @@ namespace VariableTools
         /// </summary>
         /// <param name="account"></param>
         /// <returns></returns>
-        internal static bool GetLastLoggedAccount(out string account)
+        private static bool GetLastLoggedAccount(out string account)
         {
             account = string.Empty;
             if(accFieldInfo == null)

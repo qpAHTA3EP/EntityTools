@@ -58,55 +58,6 @@ namespace EntityTools.Actions
             }
         }
 
-        public override void OnMapDraw(GraphicsNW graph)
-        {
-            graph.drawFillEllipse(InternalDestination, new Size(10, 10), Brushes.Beige);
-        }
-
-        public override void InternalReset()
-        {
-        }
-
-        protected override bool IntenalConditions
-        {
-            get
-            {
-                return Position.IsValid 
-                        || (EntityManager.LocalPlayer.PlayerTeam.IsInTeam
-                            && !EntityManager.LocalPlayer.PlayerTeam.IsLeader);
-            }
-        }
-
-        public override string InternalDisplayName => string.Empty;
-
-
-        public override bool UseHotSpots => true;
-
-        protected override Vector3 InternalDestination
-        {
-            get
-            {
-                if (EntityManager.LocalPlayer.PlayerTeam.IsInTeam 
-                    && !EntityManager.LocalPlayer.PlayerTeam.IsLeader)
-                {
-                    return EntityManager.LocalPlayer.PlayerTeam.Team?.Leader?.Entity.Location.Clone();
-                }
-                return Position.Clone();
-            }
-        }
-
-        protected override ActionValidity InternalValidity
-        {
-            get
-            {
-                if (Position.IsValid)
-                    return new ActionValidity();
-                else return new ActionValidity($"Property '{nameof(Position)}' is not set.");
-            }
-        }
-
-        public override void GatherInfos() { }
-
         public override bool NeedToRun
         {
             get
@@ -141,5 +92,44 @@ namespace EntityTools.Actions
                 return ActionResult.Running;
             }
         }
+
+        protected override bool IntenalConditions
+        {
+            get
+            {
+                return Position.IsValid
+                        || (EntityManager.LocalPlayer.PlayerTeam.IsInTeam
+                            && !EntityManager.LocalPlayer.PlayerTeam.IsLeader);
+            }
+        }
+        public override void OnMapDraw(GraphicsNW graph)
+        {
+            graph.drawFillEllipse(InternalDestination, new Size(10, 10), Brushes.Beige);
+        }
+        public override void InternalReset() { }
+        public override string InternalDisplayName => string.Empty;
+        public override bool UseHotSpots => true;
+        protected override Vector3 InternalDestination
+        {
+            get
+            {
+                if (EntityManager.LocalPlayer.PlayerTeam.IsInTeam
+                    && !EntityManager.LocalPlayer.PlayerTeam.IsLeader)
+                {
+                    return EntityManager.LocalPlayer.PlayerTeam.Team?.Leader?.Entity.Location.Clone();
+                }
+                return Position.Clone();
+            }
+        }
+        protected override ActionValidity InternalValidity
+        {
+            get
+            {
+                if (Position.IsValid)
+                    return new ActionValidity();
+                else return new ActionValidity($"Property '{nameof(Position)}' is not set.");
+            }
+        }
+        public override void GatherInfos() { }
     }
 }

@@ -294,7 +294,7 @@ namespace VariablesTest
             //}
 
             #region Expression.Parse
-            string[] expressions = { "12345.67",
+            string[] expressions = { /*"12345.67",
                                      "12345,67",
                                      "12345,",
                                      "29348487;",
@@ -306,7 +306,17 @@ namespace VariablesTest
                                      "12345+",
                                      "2_sdfe_w234",
                                      "sdfe_w234",
-                                     "$12316",
+                                     " sdfe_w234  ",
+                                     "sdfe_w234 [",
+                                     "sdfe_w234 []",*/
+                                     "sdfe_w234 [Account]",
+                                     "sdfe_w234 [Character]",
+                                     "sdfe_w234 [Global]",
+                                     "sdfe_w234 [Common]",
+                                     "sdfe_w234 [Profile]",
+                                     "sdfe_w234 [Character, Profile]",
+                                     "sdfe_w234 [  Character  , Profile ] ",
+                                     /*"$12316",
                                      "`s;lsdkg",
                                      "12345.67 * ldfj22",
                                      "ldfj22 * 12345.67",
@@ -353,34 +363,42 @@ namespace VariablesTest
                                      " (aasdf - 234) / (d + 4956",
                                      " (aasdf - 234 / (d + 4956)",
                                      " (aasdf - 234 / d + 4956)",
-                                     "5 + asd_2 - 123 + _alskdj"
+                                     "5 + asd_2 - 123 + _alskdj"*/
                                    };
-            ParseMethod testedParseMethod = VariableTools.Expressions.NumberExpression.ParseAddition;
-            Console.WriteLine("=================Expression.Parse()===============");
-            NumberExpression numExpr = new NumberExpression();
+            //Console.WriteLine("=================Expression.Parse()===============");
+            //NumberExpression numExpr = new NumberExpression();
 
 
+            //for (int i = 0; i < expressions.Length; i++)
+            //{
+            //    Console.WriteLine($"Test {i}.");
+            //    numExpr.Text = expressions[i];
+            //    bool result = numExpr.IsValid;
+            //    Console.WriteLine($"Parse expression: {numExpr.Text}");
+            //    if (result)
+            //    {
+            //        Console.WriteLine($"Parse suceedeed\n" +
+            //          $"  Type = {numExpr.AST?.GetType().Name}\n" +
+            //          $"  Description = {numExpr.AST?.Description()}");
+            //    }
+            //    else
+            //    {
+            //        Console.WriteLine($"Parse faild");
+            //        PrintErrorMessage(numExpr.ParseError);
+            //    }
+            //    Console.WriteLine("================================================");
+
+            //Console.ReadKey();
+            //}
+
+            ParseMethod testedParseMethod = VariableTools.Expressions.NumberExpression.ParseVariable;
             for (int i = 0; i < expressions.Length; i++)
             {
                 Console.WriteLine($"Test {i}.");
-                numExpr.Expression = expressions[i];
-                bool result = numExpr.Parse();
-                Console.WriteLine($"Parse expression: {numExpr.Expression}");
-                if (result)
-                {
-                    Console.WriteLine($"Parse suceedeed\n" +
-                      $"  Type = {numExpr.AST?.GetType().Name}\n" +
-                      $"  Description = {numExpr.AST?.Description()}");
-                }
-                else
-                {
-                    Console.WriteLine($"Parse faild");
-                    PrintErrorMessage(numExpr.ParseError);
-                }
+                TestParse(ref expressions[i], testedParseMethod);
                 Console.WriteLine("================================================");
                 Console.ReadKey();
             }
-
             Console.ReadKey();
             #endregion
         }

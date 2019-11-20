@@ -12,26 +12,39 @@ namespace VariableTools.Editors
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            //VariableContainer varContainer = null;
-            //if (context.Container is SetVariable setVar)
-            //    varContainer = setVar.variableContainer;
-
-            //if (varContainer != null && varContainer.IsValid)
+            //if (value is string str)
             //{
-            //    VariablesEditor.GetVariable(varContainer);
-            //    if (varContainer != null)
+            //    AccountScopeType accScope = AccountScopeType.Global;
+            //    ProfileScopeType profScope = ProfileScopeType.Common;
+            //    if (context.Container is SetVariable setVariable)
             //    {
-            //        setVar.variableContainer = varContainer;
-            //        setVar.
+            //        accScope = setVariable.AccountScope;
+            //        profScope = setVariable.ProfileScope;
             //    }
+            //    else setVariable = null;
+
+
+            //    VariableCollection.VariableKey key = VariablesSelectForm.GetVariable(value.ToString(), accScope, profScope);
+            //    if (key != null)
+            //    {
+            //        if (setVariable != null)
+            //        {
+            //            setVariable.AccountScope = key.AccountScope;
+            //            setVariable.ProfileScope = key.ProfileScope;
+            //        }
+            //        return key.Name;
+            //    }
+            //    return value;
             //}
-            //else
+            if(value is VariableCollection.VariableKey key)
             {
-                string var_name = VariablesEditor.GetVariable(value.ToString());
-                if (!string.IsNullOrEmpty(var_name) || !string.IsNullOrWhiteSpace(var_name))
-                    return var_name;
-                return value;
+                VariableCollection.VariableKey newKey = VariablesSelectForm.GetVariable(key);
+                if (newKey != null)
+                {
+                    return newKey;
+                }
             }
+            return value;
         }
 
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)

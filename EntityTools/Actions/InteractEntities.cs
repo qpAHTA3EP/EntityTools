@@ -291,7 +291,7 @@ namespace EntityTools.Actions
 
         public InteractEntities() { }
         public override string ActionLabel => $"{GetType().Name} [{EntityID}]";
-        public override string InternalDisplayName => GetType().Name;
+        public override string InternalDisplayName => string.Empty;
         protected override Vector3 InternalDestination
         {
             get

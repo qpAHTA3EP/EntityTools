@@ -184,7 +184,7 @@ namespace EntityTools.Actions
             target = null;
         }
         protected override bool IntenalConditions => !string.IsNullOrEmpty(EntityID);
-        public override string InternalDisplayName => GetType().Name;
+        public override string InternalDisplayName => string.Empty;
         public override bool UseHotSpots => true;
         protected override Vector3 InternalDestination
         {
