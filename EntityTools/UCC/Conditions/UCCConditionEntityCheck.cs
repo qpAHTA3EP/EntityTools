@@ -6,11 +6,13 @@ using MyNW.Classes;
 using MyNW.Internals;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Xml.Serialization;
 using static Astral.Quester.Classes.Condition;
+using Astral.Logic.UCC.Ressources;
 
 namespace EntityTools.UCC.Conditions
 {
-    public class UCCConditionEntityCheck : CustomUCCCondition
+    public class UCCConditionEntityCheck : UCCCondition
     {
         [Description("ID (an untranslated name) of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
@@ -30,37 +32,31 @@ namespace EntityTools.UCC.Conditions
         [Description("Check Entity's Region:\n" +
             "True: Search an Entity only if it located in the same Region as Player\n" +
             "False: Does not consider the region when searching Entities")]
-        [Category("Entity optional checks")]
+        [Category("Entity")]
         public bool RegionCheck { get; set; } = false;
 
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
-        [Category("Entity optional checks")]
+        [Category("Entity")]
         public bool HealthCheck { get; set; } = true;
 
         [Description("The maximum distance from the character within which the Entity is searched\n" +
             "The default value is 0, which disables distance checking")]
-        [Category("Entity optional checks")]
+        [Category("Entity")]
         public float ReactionRange { get; set; } = 0;
 
-        //[Description("CustomRegion names collection")]
-        //[Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
-        //[Category("Entity optional checks")]
-        //public List<string> CustomRegionNames { get; set; } = new List<string>();
-
-        [Category("Tested")]
         public EntityPropertyType PropertyType { get; set; } = EntityPropertyType.Distance;
 
-        [Category("Tested")]
-        public float Value { get; set; } = 0;
+        public float PropertyValue { get; set; } = 0;
 
-        [Description("Value comparison type to the closest Entity")]
-        [Category("Tested")]
-        public Relation Sign { get; set; } = Relation.Superior;
+        [XmlIgnore]
+        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
+        [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
+        [Category("Entity")]
+        public string TestInfo { get; } = "Нажми '...' =>";
 
-        [Browsable(false)]
-        public override bool IsOK(UCCAction refAction = null)
+        public new bool IsOK(UCCAction refAction = null)
         {
             if (!string.IsNullOrEmpty(EntityID))
             {
@@ -70,43 +66,46 @@ namespace EntityTools.UCC.Conditions
                 switch (PropertyType)
                 {
                     case EntityPropertyType.Distance:
-                        switch (Sign)
-                        {
-                            case Relation.Equal:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer == Value);
-                            case Relation.NotEqual:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer != Value);
-                            case Relation.Inferior:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer < Value);
-                            case Relation.Superior:
-                                return result = (closestEntity == null) || !closestEntity.IsValid || (closestEntity.Location.Distance3DFromPlayer > Value);
-                        }
+                        //if(float.TryParse(Value, out float distance))
+                            switch (Sign)
+                            {
+                                case Enums.Sign.Equal:
+                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer == PropertyValue);
+                                case Enums.Sign.NotEqual:
+                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer != PropertyValue);
+                                case Enums.Sign.Inferior:
+                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer < PropertyValue);
+                                case Enums.Sign.Superior:
+                                    return result = (closestEntity == null) || !closestEntity.IsValid || (closestEntity.Location.Distance3DFromPlayer > PropertyValue);
+                            }
                         break;
                     case EntityPropertyType.HealthPercent:
-                        switch (Sign)
-                        {
-                            case Relation.Equal:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent == Value);
-                            case Relation.NotEqual:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent != Value);
-                            case Relation.Inferior:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent < Value);
-                            case Relation.Superior:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent > Value);
-                        }
+                        //if (float.TryParse(Value, out float hp))
+                            switch (Sign)
+                            {
+                                case Enums.Sign.Equal:
+                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent == PropertyValue);
+                                case Enums.Sign.NotEqual:
+                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent != PropertyValue);
+                                case Enums.Sign.Inferior:
+                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent < PropertyValue);
+                                case Enums.Sign.Superior:
+                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent > PropertyValue);
+                            }
                         break;
                     case EntityPropertyType.ZAxis:
-                        switch (Sign)
-                        {
-                            case Relation.Equal:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z == Value);
-                            case Relation.NotEqual:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z != Value);
-                            case Relation.Inferior:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z < Value);
-                            case Relation.Superior:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z > Value);
-                        }
+                        //if (float.TryParse(Value, out float z))
+                            switch (Sign)
+                            {
+                                case Enums.Sign.Equal:
+                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z == PropertyValue);
+                                case Enums.Sign.NotEqual:
+                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z != PropertyValue);
+                                case Enums.Sign.Inferior:
+                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z < PropertyValue);
+                                case Enums.Sign.Superior:
+                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z > PropertyValue);
+                            }
                         break;
                 }
             }
@@ -118,5 +117,19 @@ namespace EntityTools.UCC.Conditions
         {
             return $"EntityCheck [{EntityID}]";
         }
+
+        #region Hide Inherited Properties
+        [XmlIgnore]
+        [Browsable(false)]
+        public new string Value { get; set; }
+
+        [XmlIgnore]
+        [Browsable(false)]
+        public new Enums.Unit Target { get; set; }
+
+        [XmlIgnore]
+        [Browsable(false)]
+        public new Enums.ActionCond Tested { get; set; }
+        #endregion
     }
 }

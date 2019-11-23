@@ -34,11 +34,13 @@ namespace VariableTools.Classes
                 accountScope = asc;
                 profileScope = psc;
                 Qualifier = VariableTools.GetScopeQualifier(asc, psc);
+                valid = !Parser.IsForbidden(name);
             }
 
             private AccountScopeType accountScope = AccountScopeType.Global;
             private ProfileScopeType profileScope = ProfileScopeType.Common;
             private string name = string.Empty;
+            private bool valid = false;
 
             [Description("Имя переменной.\n" +
                          "The Name of the Variable")]
@@ -61,14 +63,20 @@ namespace VariableTools.Classes
                             {
                                 // Пользователь не согласился заменить некорректное имя переменной
                                 name = value;
+                                valid = false;
                             }
                             else
                             {
                                 // Пользователь согласился заменить имя переменной на корректное
                                 name = corrected;
+                                valid = true;
                             }
                         }
-                        else name = value;
+                        else
+                        {
+                            name = value;
+                            valid = true;
+                        }
                     }
                 }
             }
@@ -87,7 +95,6 @@ namespace VariableTools.Classes
                     }
                 }
             }
-
 
             [Description("Идентификатор видимости переменной по отношению к персонажам аккаунта.\n" +
                 "The Scope of the Variable for the characters of the accounts")]
@@ -109,6 +116,11 @@ namespace VariableTools.Classes
             [XmlIgnore]
             public string Qualifier { get; protected set; } = string.Empty;
 
+            [XmlIgnore]
+            public bool IsValid
+            {
+                get => valid;
+                protected set => valid = value; }
 
             public override bool Equals(object obj)
             {

@@ -7,13 +7,14 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using EntityTools.UCC.Conditions;
-using ConditionList = System.Collections.Generic.List<EntityTools.UCC.Conditions.CustomUCCCondition>;
+using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
+using Astral.Logic.UCC.Classes;
 
 namespace EntityTools.Forms
 {
     public partial class ConditionListForm : XtraForm //*/Form
     {
-        private CustomUCCCondition conditionCopy;
+        private UCCCondition conditionCopy;
 
         public ConditionListForm()
         {
@@ -22,8 +23,7 @@ namespace EntityTools.Forms
 
         private void bntAdd_Click(object sender, EventArgs e)
         {
-            CustomUCCCondition condition = AddAction.Show(typeof(CustomUCCCondition)) as CustomUCCCondition;
-            if (condition != null)
+            if (AddAction.Show(typeof(UCCCondition)) is UCCCondition condition)
             {
                 Conditions.Items.Add(condition);
                 Conditions.SelectedItem = condition;
@@ -44,8 +44,7 @@ namespace EntityTools.Forms
         private void btnCopy_Click(object sender, EventArgs e)
         {
             conditionCopy = null;
-            CustomUCCCondition cond = Conditions.SelectedItem as CustomUCCCondition;
-            if (cond != null)
+            if (Conditions.SelectedItem is UCCCondition cond)
             {
                 conditionCopy = CopyHelper.CreateDeepCopy(cond); // Этот метод быстрее
                 //conditionCopy = CopyHelper.CreateXmlCopy(cond); // Этот метод дольше
@@ -57,7 +56,7 @@ namespace EntityTools.Forms
         {
             if (conditionCopy != null)
             {
-                CustomUCCCondition cond = CopyHelper.CreateDeepCopy(conditionCopy);
+                UCCCondition cond = CopyHelper.CreateDeepCopy(conditionCopy);
                 //CustomUCCCondition cond = CopyHelper.CreateXmlCopy(conditionCopy); // Этот метод дольше
                 Conditions.Items.Add(cond); // Этот метод быстрее
 
@@ -67,12 +66,12 @@ namespace EntityTools.Forms
 
         private void btnTest_Click(object sender, EventArgs e)
         {
-            CustomUCCCondition cond = (Conditions.Items.Count > 0) ? Conditions.SelectedItem as CustomUCCCondition : null;
+            UCCCondition cond = (Conditions.Items.Count > 0) ? Conditions.SelectedItem as UCCCondition : null;
             if (cond != null)
             {
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine(cond.ToString()).AppendLine();
-                sb.Append("Result: ").Append(cond.IsOK().ToString());
+                sb.Append("Result: ").Append(cond.IsOK(null).ToString());
 
                 //MessageBox.Show(sb.ToString());
                 XtraMessageBox.Show(sb.ToString());
@@ -98,8 +97,7 @@ namespace EntityTools.Forms
 
         private void Conditions_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            Condition condition = Conditions.SelectedItem as Condition;
-            if (condition != null)
+            if (Conditions.SelectedItem is Condition condition)
             {
                 condition.Locked = (e.NewValue == CheckState.Checked);
             }
@@ -117,7 +115,7 @@ namespace EntityTools.Forms
             if (conditions != null)
             {
                 // Отображаем список условий
-                foreach (CustomUCCCondition condition in conditions)
+                foreach (UCCCondition condition in conditions)
                 {
                     int ind = Conditions.Items.Add(CopyHelper.CreateDeepCopy(condition));
                     Conditions.SetItemChecked(ind, condition.Locked);
@@ -132,8 +130,7 @@ namespace EntityTools.Forms
                 ConditionList newConditions = new ConditionList();
                 foreach (object item in Conditions.Items)
                 {
-                    CustomUCCCondition condition = item as CustomUCCCondition;
-                    if (condition != null)
+                    if (item is UCCCondition condition)
                         newConditions.Add(condition);
                 }
 

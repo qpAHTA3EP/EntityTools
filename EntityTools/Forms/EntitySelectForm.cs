@@ -162,5 +162,12 @@ namespace EntityTools.Forms
             DialogResult = DialogResult.Cancel;
             Close();
         }
+
+        private void btnReload_Click(object sender, EventArgs e)
+        {
+            string entityUntrName = (dgvEntities.CurrentRow != null) ? dgvEntities.CurrentRow.Cells[selectForm.clmnNameUntranslated.DisplayIndex].Value.ToString() : string.Empty;
+
+            FillEntitiesDgv(entityUntrName);
+        }
     }
 }

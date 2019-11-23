@@ -16,9 +16,9 @@ namespace VariableTools.Actions
     [Serializable]
     public class SetVariable : Astral.Quester.Classes.Action
     {
-        [XmlIgnore]
-        private bool variableNameOk = false;
         //[XmlIgnore]
+        //private bool variableNameOk = false;
+        ////[XmlIgnore]
         //private string variableName = string.Empty;
         //[XmlIgnore]
         //internal VariableContainer variableContainer = new VariableContainer();
@@ -77,19 +77,19 @@ namespace VariableTools.Actions
                             //variableContainer = null;
 
                             key.Name = value;
-                            variableNameOk = false;
+                            //variableNameOk = false;
                         }
                         else
                         {
                             // Пользователь согласился заменить имя переменной на корректное
                             key.Name = corrected;
-                            variableNameOk = true;
+                            //variableNameOk = true;
                         }
                     }
                     else
                     {
                         key.Name = value;
-                        variableNameOk = true;
+                        //variableNameOk = true;
                     }
                 }
             }
@@ -131,7 +131,7 @@ namespace VariableTools.Actions
 
         public override ActionResult Run()
         {
-            if (variableNameOk && equation.IsValid)
+            if (/*variableNameOk*/ Key.IsValid && equation.IsValid)
             {
                 if (equation.Calcucate(out double result))
                 {
@@ -202,7 +202,7 @@ namespace VariableTools.Actions
 
         public override string InternalDisplayName => string.Empty;
         public override bool UseHotSpots => false;
-        protected override bool IntenalConditions => variableNameOk && equation.IsValid;
+        protected override bool IntenalConditions => /*variableNameOk*/ Key != null && Key.IsValid && equation.IsValid;
         protected override Vector3 InternalDestination => new Vector3();
         protected override ActionValidity InternalValidity
         {
@@ -210,13 +210,13 @@ namespace VariableTools.Actions
             {
                 if (equation.IsValid)
                 {
-                    if (variableNameOk)
+                    if (/*variableNameOk*/ Key.IsValid)
                         return new ActionValidity();
                     else return new ActionValidity("The name of the {Variable} contains forbidden symbols or equals to Function name");
                 }
                 else
                 {
-                    if (variableNameOk)
+                    if (/*variableNameOk*/ Key.IsValid)
                         return new ActionValidity("Equation is incorrect");
                     else return new ActionValidity("Equation is incorrect.\n" +
                         "The name of the {Variable} contains forbidden symbols or equals to Function name");

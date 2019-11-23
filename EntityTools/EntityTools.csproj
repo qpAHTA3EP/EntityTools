@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.19.1119.0922</AssemblyVersion>
+    <AssemblyVersion>0.19.1122.1427</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -100,6 +100,7 @@
     <Compile Include="Actions\InteractEntities.cs" />
     <Compile Include="Actions\Deprecated\InteractEntity.cs" />
     <Compile Include="Actions\MoveToLeader.cs" />
+    <Compile Include="Actions\PickUpMissionExt.cs" />
     <Compile Include="Conditions\CheckCampaignTask.cs" />
     <Compile Include="Conditions\CheckGameGUICondition.cs" />
     <Compile Include="Conditions\CheckNode.cs" />
@@ -115,7 +116,6 @@
     <Compile Include="Editors\ConditionListEditor.cs" />
     <Compile Include="Editors\EntityTestEditor.cs" />
     <Compile Include="Editors\NodePositionEditor.cs" />
-    <Compile Include="Editors\PositionNodeEditor.cs" />
     <Compile Include="Editors\UccActionEditor.cs" />
     <Compile Include="Editors\UiIdEditor.cs" />
     <Compile Include="Forms\ConditionsListForm.cs">
@@ -142,17 +142,11 @@
     <Compile Include="Forms\MultiSelectForm.Designer.cs">
       <DependentUpon>MultiSelectForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\NodeSelectForm.cs">
+    <Compile Include="Forms\TargetSelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\NodeSelectForm.Designer.cs">
-      <DependentUpon>NodeSelectForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\PositionEditorForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\PositionEditorForm.designer.cs">
-      <DependentUpon>PositionEditorForm.cs</DependentUpon>
+    <Compile Include="Forms\TargetSelectForm.Designer.cs">
+      <DependentUpon>TargetSelectForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\UIViewer.cs">
       <SubType>Form</SubType>
@@ -166,6 +160,7 @@
     <Compile Include="Tools\CollectionTypeConverter.cs" />
     <Compile Include="Tools\CopyHelper.cs" />
     <Compile Include="Tools\EnchantHelper.cs" />
+    <Compile Include="Tools\EntityCache.cs" />
     <Compile Include="Tools\Enums.cs" />
     <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\Auras.cs" />
@@ -214,7 +209,6 @@
     <Compile Include="UCC\ExecuteSpecificPower.cs" />
     <Compile Include="UCC\SpecializedUCCAction.cs" />
     <Compile Include="UCC\UseItem.cs" />
-    <Compile Include="UCC\Conditions\CustomUCCCondition.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\ConditionsListForm.resx">
@@ -235,11 +229,8 @@
     <EmbeddedResource Include="Forms\MultiSelectForm.resx">
       <DependentUpon>MultiSelectForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\NodeSelectForm.resx">
-      <DependentUpon>NodeSelectForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\PositionEditorForm.resx">
-      <DependentUpon>PositionEditorForm.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\TargetSelectForm.resx">
+      <DependentUpon>TargetSelectForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\UIViewer.resx">
       <DependentUpon>UIViewer.cs</DependentUpon>

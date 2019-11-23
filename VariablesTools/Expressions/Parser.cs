@@ -63,7 +63,8 @@ namespace VariableTools.Expressions
         /// <returns></returns>
         public static bool IsForbidden(string name)
         {
-            return name.IndexOfAny(Symbols.forbiddenChar) >= 0
+            return string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name)
+                || name.IndexOfAny(Symbols.forbiddenChar) >= 0
                 || name.Equals(Predicates.CountItem)
                 || name.Equals(Predicates.CountNumeric)
                 || name.Equals(Predicates.Random);
@@ -82,7 +83,7 @@ namespace VariableTools.Expressions
                 || name.Equals(Predicates.CountNumeric)
                 || name.Equals(Predicates.Random))
             {
-                newName = Symbols.Underscore + name;
+                newName = name + Symbols.Underscore;
                 return true;
             }
 

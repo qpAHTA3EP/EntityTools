@@ -73,13 +73,10 @@ namespace EntityTools.UCC
         }
 
         [XmlIgnore]
-        [Browsable(false)]
-        public new string ActionName { get; set; }
-
-        [XmlIgnore]
         private Power power = null;
         [XmlIgnore]
         private static Type movementsType = null;
+
 
         [Browsable(false)]
         [XmlIgnore]
@@ -248,5 +245,15 @@ namespace EntityTools.UCC
 
             return "Unknow Power";
         }
+
+        #region Hide Inherited Properties
+        [XmlIgnore]
+        [Browsable(false)]
+        public new Astral.Logic.UCC.Ressources.Enums.Unit Target { get; set; }
+
+        [XmlIgnore]
+        [Browsable(false)]
+        public new string ActionName { get; set; }
+        #endregion
     }
 }

@@ -1,46 +1,59 @@
-﻿using Astral.Classes.ItemFilter;
-using Astral.Logic.UCC.Classes;
+﻿using Astral.Logic.UCC.Classes;
+using Astral.Logic.UCC.Ressources;
 using EntityTools.Editors;
 using EntityTools.Tools;
 using MyNW.Classes;
-using MyNW.Internals;
 using System.ComponentModel;
 using System.Drawing.Design;
-using static Astral.Quester.Classes.Condition;
+using System.Xml.Serialization;
 
 namespace EntityTools.UCC.Conditions
 {
-    public class UCCConditionGameUICheck : CustomUCCCondition
+    public class UCCConditionGameUICheck : UCCCondition
     {
-        private string _uiGenID = "Team_Maptransferchoice_Waitingonteamlabel";
+        private string uiGenID = "Team_Maptransferchoice_Waitingonteamlabel";
         private UIGen uiGen;
 
         [Description("The Identifier of the Ingame user interface element")]
         [Editor(typeof(UiIdEditor), typeof(UITypeEditor))]
         public string UiGenID
         {
-            get { return _uiGenID; }
+            get { return uiGenID; }
             set
             {
-                if (_uiGenID != value)
+                if (uiGenID != value)
                 {
                     uiGen = MyNW.Internals.UIManager.AllUIGen.Find(x => x.Name == value);
-                    if (uiGen != null)
-                        _uiGenID = value;
+                    uiGenID = value;
                 }
             }
         }
 
-        public UiGenCheckType Tested { get; set; } = UiGenCheckType.IsVisible;
 
+        public UiGenCheckType Check { get; set; } = UiGenCheckType.IsVisible;
+
+
+        #region Hide Inherited Properties
+        [XmlIgnore]
         [Browsable(false)]
-        public override bool IsOK(UCCAction refAction = null)
+        public new string Value { get; set; } = string.Empty;
+
+        [XmlIgnore]
+        [Browsable(false)]
+        public new Enums.Unit Target { get; set; }
+
+        [XmlIgnore]
+        [Browsable(false)]
+        public new Enums.ActionCond Tested { get; set; }
+        #endregion
+
+        public new bool IsOK(UCCAction refAction = null)
         {
-            if (uiGen == null && !string.IsNullOrEmpty(_uiGenID))
-                uiGen = MyNW.Internals.UIManager.AllUIGen.Find(x => x.Name == _uiGenID);
+            if (uiGen == null && !string.IsNullOrEmpty(uiGenID))
+                uiGen = MyNW.Internals.UIManager.AllUIGen.Find(x => x.Name == uiGenID);
             if (uiGen != null && uiGen.IsValid)
             {
-                switch (Tested)
+                switch (Check)
                 {
                     case UiGenCheckType.IsVisible:
                         return uiGen.IsVisible;
@@ -53,7 +66,7 @@ namespace EntityTools.UCC.Conditions
 
         public override string ToString()
         {
-            return $"{GetType().Name} [{UiGenID}]";
+            return $"GameUICheck [{UiGenID}]";
         }
     }
 }

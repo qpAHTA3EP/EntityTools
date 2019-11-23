@@ -53,7 +53,7 @@ namespace EntityTools.Editors
 
                     // список всех Entity, удовлетворяющих условиям
                     List<Entity> entities = EntitySelectionTools.FindAllEntities(EntityManager.GetEntities(), mte.EntityID, mte.EntityIdType, mte.EntityNameType,
-                        mte.HealthCheck, mte.RegionCheck, mte.CustomRegionNames, 
+                        mte.HealthCheck, mte.RegionCheck, mte.CustomRegionNames,
                         (Entity e) => mte.ReactionRange == 0 || e.Location.Distance3DFromPlayer < mte.ReactionRange);
                     // Количество Entity, удовлетворяющих условиям
                     sb.Append("Founded Entities: ").AppendLine(entities.Count.ToString());
@@ -64,20 +64,20 @@ namespace EntityTools.Editors
                     if (mte.target != null && mte.target.IsValid)
                     {
                         sb.Append("ClosectEntity: ").AppendLine(mte.target.ToString());
-                        sb.Append("\t\tName: ").AppendLine(mte.target.Name);
-                        sb.Append("\t\tInternalName: ").AppendLine(mte.target.InternalName);
-                        sb.Append("\t\tNameUntranslated: ").AppendLine(mte.target.NameUntranslated);
-                        sb.Append("[").Append(!(mte.HealthCheck && mte.target.IsDead) ? "+" : "-")
-                            .Append("]\tIsDead: ").AppendLine(mte.target.IsDead.ToString());
-                        sb.Append("[").Append((!mte.RegionCheck || mte.target.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName) ? "+" : "-")
-                            .Append("]\tRegion: '").Append(mte.target.RegionInternalName).AppendLine("'");
-                        sb.Append("\t\tLocation: ").AppendLine(mte.target.Location.ToString());
-                        sb.Append("[").Append((mte.ReactionRange == 0 || mte.target.Location.Distance3DFromPlayer < mte.ReactionRange) ? "+" : "-")
-                            .Append("]\tDistance: ").AppendLine(mte.target.Location.Distance3DFromPlayer.ToString());
+                        sb.Append("\tName: ").AppendLine(mte.target.Name);
+                        sb.Append("\tInternalName: ").AppendLine(mte.target.InternalName);
+                        sb.Append("\tNameUntranslated: ").AppendLine(mte.target.NameUntranslated);
+                        sb.Append("\t[").Append(!(mte.HealthCheck && mte.target.IsDead) ? "+" : "-")
+                            .Append("]IsDead: ").AppendLine(mte.target.IsDead.ToString());
+                        sb.Append("\t[").Append((!mte.RegionCheck || mte.target.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName) ? "+" : "-")
+                            .Append("]Region: '").Append(mte.target.RegionInternalName).AppendLine("'");
+                        sb.Append("\tLocation: ").AppendLine(mte.target.Location.ToString());
+                        sb.Append("\t[").Append((mte.ReactionRange == 0 || mte.target.Location.Distance3DFromPlayer < mte.ReactionRange) ? "+" : "-")
+                            .Append("]Distance: ").AppendLine(mte.target.Location.Distance3DFromPlayer.ToString());
                     }
-                    else sb.AppendLine("No Entity found");
+                    else sb.AppendLine("Closest Entity not found!");
 
-                    XtraMessageBox.Show(sb.ToString(), "Test of '"+ mte.ToString() + '\'');                    
+                    XtraMessageBox.Show(sb.ToString(), "Test of '" + mte.ToString() + '\'');
                 }
                 else if (context.Instance is InteractEntities ie)
                 {
@@ -106,31 +106,59 @@ namespace EntityTools.Editors
                     if (ie.target != null && ie.target.IsValid)
                     {
                         sb.Append("ClosectEntity: ").AppendLine(ie.target.ToString());
-                        sb.Append("\t\tName: ").AppendLine(ie.target.Name);
-                        sb.Append("\t\tInternalName: ").AppendLine(ie.target.InternalName);
-                        sb.Append("\t\tNameUntranslated: ").AppendLine(ie.target.NameUntranslated);
-                        sb.Append("[").Append(!(ie.HealthCheck && ie.target.IsDead) ? "+" : "-")
-                            .Append("]\tIsDead: ").AppendLine(ie.target.IsDead.ToString());
-                        sb.Append("[").Append((!ie.RegionCheck || ie.target.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName) ? "+" : "-")
-                            .Append("]\tRegion: '").Append(ie.target.RegionInternalName).AppendLine("'");
-                        sb.Append("\t\tLocation: ").AppendLine(ie.target.Location.ToString());
-                        sb.Append("[").Append((ie.ReactionRange == 0 || ie.target.Location.Distance3DFromPlayer < ie.ReactionRange) ? "+" : "-")
-                            .Append("]\tDistance: ").AppendLine(ie.target.Location.Distance3DFromPlayer.ToString());
+                        sb.Append("\tName: ").AppendLine(ie.target.Name);
+                        sb.Append("\tInternalName: ").AppendLine(ie.target.InternalName);
+                        sb.Append("\tNameUntranslated: ").AppendLine(ie.target.NameUntranslated);
+                        sb.Append("\t[").Append(!(ie.HealthCheck && ie.target.IsDead) ? "+" : "-")
+                            .Append("]IsDead: ").AppendLine(ie.target.IsDead.ToString());
+                        sb.Append("\t[").Append((!ie.RegionCheck || ie.target.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName) ? "+" : "-")
+                            .Append("]Region: '").Append(ie.target.RegionInternalName).AppendLine("'");
+                        sb.Append("\tLocation: ").AppendLine(ie.target.Location.ToString());
+                        sb.Append("\t[").Append((ie.ReactionRange == 0 || ie.target.Location.Distance3DFromPlayer < ie.ReactionRange) ? "+" : "-")
+                            .Append("]Distance: ").AppendLine(ie.target.Location.Distance3DFromPlayer.ToString());
                     }
-                    else sb.AppendLine("No Entity found");
-
-                    XtraMessageBox.Show(sb.ToString(), "Test of '" + ie.ToString() + '\'');
+                    else sb.AppendLine("Closest Entity not found!");
                 }
-                //else if (context.Instance is EntityProperty)
-                //    NameType = ((EntityProperty)context.Instance).EntityNameType;
-                //else if (context.Instance is EntityProperty)
-                //    NameType = ((EntityProperty)context.Instance).EntityNameType;
-                //else if (context.Instance is EntityCountInCustomRegions)
-                //    NameType = ((EntityCountInCustomRegions)context.Instance).EntityNameType;
-                //else if (context.Instance is AbortCombatEntity)
-                //    NameType = ((AbortCombatEntity)context.Instance).EntityNameType;
-                //else if (context.Instance is InteractNPCext)
-                //    nameType = ((InteractNPCext)context.Instance).NameType;                
+                else if (ReflectionHelper.GetPropertyValue(context.Instance, "EntityID", out object entityId)
+                        && ReflectionHelper.GetPropertyValue(context.Instance, "EntityNameType", out object entityNameType)
+                        && ReflectionHelper.GetPropertyValue(context.Instance, "EntityIdType", out object entityIdType))
+                {
+                    sb.Append("EntityID: ").AppendLine(entityId.ToString());
+                    sb.AppendLine();
+
+                    bool regionCheck = ReflectionHelper.GetPropertyValue(context.Instance, "RegionCheck", out object regionCheckObj) ? (bool)regionCheckObj : false;
+                    bool healthCheck = ReflectionHelper.GetPropertyValue(context.Instance, "HealthCheck", out object healthCheckObj) ? (bool)healthCheckObj : false;
+                    float reactionRange = ReflectionHelper.GetPropertyValue(context.Instance, "ReactionRange", out object reactionRangeObj) ? (float)reactionRangeObj : 0;
+
+                    List <Entity> entities = EntitySelectionTools.FindAllEntities(EntityManager.GetEntities(), entityId.ToString(), (ItemFilterStringType)entityIdType,
+                                            (EntityNameType)entityNameType, healthCheck, regionCheck, null,
+                                            (Entity e) => reactionRange == 0f || e.Location.Distance3DFromPlayer < reactionRange);
+
+                    // Количество Entity, удовлетворяющих условиям
+                    sb.Append("Founded Entities: ").AppendLine(entities.Count.ToString());
+                    sb.AppendLine();
+
+                    // Ближайшее Entity
+                    Entity target = EntitySelectionTools.FindClosestEntity(entities, entityId.ToString(), (ItemFilterStringType)entityIdType,
+                                            (EntityNameType)entityNameType, healthCheck, reactionRange, regionCheck, null);
+                    if (target != null && target.IsValid)
+                    {
+                        sb.Append("ClosectEntity: ").AppendLine(target.ToString());
+                        sb.Append("\tName: ").AppendLine(target.Name);
+                        sb.Append("\tInternalName: ").AppendLine(target.InternalName);
+                        sb.Append("\tNameUntranslated: ").AppendLine(target.NameUntranslated);
+                        sb.Append("\t[").Append(!(healthCheck && target.IsDead) ? "+" : "-")
+                            .Append("]IsDead: ").AppendLine(target.IsDead.ToString());
+                        sb.Append("\t[").Append((!regionCheck || target.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName) ? "+" : "-")
+                            .Append("]Region: '").Append(target.RegionInternalName).AppendLine("'");
+                        sb.Append("\tLocation: ").AppendLine(target.Location.ToString());
+                        sb.Append("\t[").Append((reactionRange == 0 || target.Location.Distance3DFromPlayer < reactionRange) ? "+" : "-")
+                            .Append("]Distance: ").AppendLine(target.Location.Distance3DFromPlayer.ToString());
+                    }
+                    else sb.AppendLine("Closest Entity not found!");
+                }
+                else sb.Append("Unable recognize test context!");
+                XtraMessageBox.Show(sb.ToString(), "Test of '" + context.Instance.ToString() + '\'');
             }
             return value;
         }

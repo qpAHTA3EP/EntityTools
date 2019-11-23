@@ -129,11 +129,17 @@ namespace EntityTools.UCC
 
         public override string ToString() => GetType().Name;
 
+        [NonSerialized]
+        protected AbordCombat abordCombat = new AbordCombat();
+
+        #region Hide Inherited Properties
+        [XmlIgnore]
+        [Browsable(false)]
+        public new Astral.Logic.UCC.Ressources.Enums.Unit Target { get; set; }
+
         [XmlIgnore]
         [Browsable(false)]
         public new string ActionName { get; set; }
-
-        [NonSerialized]
-        protected AbordCombat abordCombat = new AbordCombat();
+        #endregion
     }
 }

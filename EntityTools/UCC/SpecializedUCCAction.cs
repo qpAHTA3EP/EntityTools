@@ -9,6 +9,7 @@ using Astral.Controllers;
 using Astral.Logic.NW;
 using Astral.Logic.UCC.Actions;
 using Astral.Logic.UCC.Classes;
+using Astral.Logic.UCC.Ressources;
 using Astral.Quester.FSM.States;
 using EntityTools;
 using EntityTools.Editors;
@@ -35,7 +36,7 @@ namespace EntityTools.UCC
         [Category("Custom Conditions")]
         [Description("Список нестандартных условий, реализованных в плагинах")]
         [Editor(typeof(UCCConditionListEditor), typeof(UITypeEditor))]
-        public List<CustomUCCCondition> CustomConditions { get; set; }
+        public List<UCCCondition> CustomConditions { get; set; }
 
         public override bool NeedToRun
         {
@@ -54,19 +55,7 @@ namespace EntityTools.UCC
         {
             if (CurrentAction != null)
                 return "(SP) " + CurrentAction.ToString();
-            else return "Property 'CurrentAction' do not selected";
-        }
-
-        public SpecializedUCCAction()
-        {
-            Target = Astral.Logic.UCC.Ressources.Enums.Unit.Player;
-        }
-        public override UCCAction Clone()
-        {
-            return base.BaseClone(new SpecializedUCCAction()
-            {
-                CurrentAction = this.CurrentAction
-            });
+            else return "Property 'CurrentAction' does not set !";
         }
 
         // Переопределение унаследованных свойств
@@ -80,7 +69,7 @@ namespace EntityTools.UCC
                     {
                         int lockedNum = 0;
                         int okUnlockedNum = 0;
-                        foreach (CustomUCCCondition c in CustomConditions)
+                        foreach (UCCCondition c in CustomConditions)
                         {
                             if (c.Locked)
                             {
@@ -99,7 +88,7 @@ namespace EntityTools.UCC
                     else
                     {
                         // Проверка всех условий
-                        foreach (CustomUCCCondition c in CustomConditions)
+                        foreach (UCCCondition c in CustomConditions)
                             if (!c.IsOK(this))
                                 return false;
 
@@ -109,6 +98,22 @@ namespace EntityTools.UCC
                 return false;
             }
         }
+
+        public SpecializedUCCAction()
+        {
+            Target = Astral.Logic.UCC.Ressources.Enums.Unit.Player;
+        }
+        public override UCCAction Clone()
+        {
+            return base.BaseClone(new SpecializedUCCAction()
+            {
+                CurrentAction = this.CurrentAction
+            });
+        }
+
+        #region Hide Inherited Properties
+        [XmlIgnore]
+        [Browsable(false)]
         public new int Random
         {
             get => (CurrentAction == null) ? 0 : CurrentAction.Random;
@@ -119,16 +124,20 @@ namespace EntityTools.UCC
                 base.Random = value;
             }
         }
-        public new bool OneCondMustGood
-        {
-            get => (CurrentAction == null) ? false : CurrentAction.OneCondMustGood;
-            set
-            {
-                if (CurrentAction != null)
-                    CurrentAction.OneCondMustGood = value;
-                base.OneCondMustGood = value;
-            }
-        }
+        //[XmlIgnore]
+        //[Browsable(false)]
+        //public new bool OneCondMustGood
+        //{
+        //    get => (CurrentAction == null) ? false : CurrentAction.OneCondMustGood;
+        //    set
+        //    {
+        //        if (CurrentAction != null)
+        //            CurrentAction.OneCondMustGood = value;
+        //        base.OneCondMustGood = value;
+        //    }
+        //}
+        [XmlIgnore]
+        [Browsable(false)]
         public new int Range
         {
             get => (CurrentAction == null) ? 0 : CurrentAction.Range;
@@ -140,6 +149,8 @@ namespace EntityTools.UCC
             }
         }
 
+        [XmlIgnore]
+        [Browsable(false)]
         public new int CoolDown
         {
             get => (CurrentAction == null) ? 0 : CurrentAction.CoolDown;
@@ -150,6 +161,8 @@ namespace EntityTools.UCC
                 base.CoolDown = value;
             }
         }
+        [XmlIgnore]
+        [Browsable(false)]
         public new Astral.Logic.UCC.Ressources.Enums.Unit Target
         {
             get => (CurrentAction == null) ? Astral.Logic.UCC.Ressources.Enums.Unit.Player : CurrentAction.Target;
@@ -160,16 +173,11 @@ namespace EntityTools.UCC
                 base.Target = value;
             }
         }
-        //public string Label { get; }
-        //public bool TempAction { get; set; }
-        //public bool Enabled { get; set; }
-        //public Timeout CurrentTimeout { get; set; }
-        //public int Timer { get; set; }
 
-        // Без данного свойства в окне параметров команды отображается бесполезное свойство 'Name'
+        // Без данного свойства в окне параметров команды отображается бесполезное свойство 'ActionName'
         [XmlIgnore]
         [Browsable(false)]
         public new string ActionName { get; set; } = string.Empty;
-
+        #endregion
     }
 }

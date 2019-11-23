@@ -21,14 +21,6 @@ namespace EntityTools.UCC
     [Serializable]
     public class AbortCombatEntity : UCCAction
     {
-        [Description("How many time ignore combat in seconds (0 for infinite)")]
-        [Category("Interruption")]
-        public int IgnoreCombatTime { get => abordCombat.IgnoreCombatTime; set => abordCombat.IgnoreCombatTime = value; }
-
-        [Description("Minimum health percent to enable combat again")]
-        [Category("Interruption")]
-        public int IgnoreCombatMinHP { get => abordCombat.IgnoreCombatMinHP; set => abordCombat.IgnoreCombatMinHP = value; }
-
         [Description("ID of the Entity for the search (regex)")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
@@ -63,6 +55,20 @@ namespace EntityTools.UCC
         [Description("Distance comparison type to the closest Entity")]
         [Category("Required")]
         public Astral.Logic.UCC.Ressources.Enums.Sign DistanceSign { get; set; } = Astral.Logic.UCC.Ressources.Enums.Sign.Inferior;
+
+        [XmlIgnore]
+        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
+        [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
+        //[Category("Entity")]
+        public string TestInfo { get; } = "Нажми '...' =>";
+
+        [Description("How many time ignore combat in seconds (0 for infinite)")]
+        [Category("Interruption")]
+        public int IgnoreCombatTime { get => abordCombat.IgnoreCombatTime; set => abordCombat.IgnoreCombatTime = value; }
+
+        [Description("Minimum health percent to enable combat again")]
+        [Category("Interruption")]
+        public int IgnoreCombatMinHP { get => abordCombat.IgnoreCombatMinHP; set => abordCombat.IgnoreCombatMinHP = value; }
 
         public override bool NeedToRun
         {
@@ -115,13 +121,19 @@ namespace EntityTools.UCC
         }
         public override string ToString() => GetType().Name + " [" + EntityID + ']';
 
-        [XmlIgnore]
-        [Browsable(false)]
-        public new string ActionName { get; set; }
-
         [NonSerialized]
         protected Entity entity = new Entity(IntPtr.Zero);
         [NonSerialized]
         protected AbordCombat abordCombat = new AbordCombat();
+
+        #region Hide Inherited Properties
+        [XmlIgnore]
+        [Browsable(false)]
+        public new Astral.Logic.UCC.Ressources.Enums.Unit Target { get; set; }
+
+        [XmlIgnore]
+        [Browsable(false)]
+        public new string ActionName { get; set; }
+        #endregion
     }
 }

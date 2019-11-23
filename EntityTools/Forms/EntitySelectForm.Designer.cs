@@ -36,12 +36,15 @@
             this.clmnInternalName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.clmnNameUntranslated = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.clmnDistance = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.btnReload = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEntities)).BeginInit();
             this.SuspendLayout();
             // 
             // btnSelect
             // 
             this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSelect.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.btnSelect.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSelect.Location = new System.Drawing.Point(562, 427);
             this.btnSelect.Name = "btnSelect";
             this.btnSelect.Size = new System.Drawing.Size(102, 23);
@@ -54,6 +57,7 @@
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancel.Location = new System.Drawing.Point(670, 427);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(102, 23);
@@ -127,6 +131,18 @@
             this.clmnDistance.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.clmnDistance.Width = 74;
             // 
+            // btnReload
+            // 
+            this.btnReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnReload.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnReload.Location = new System.Drawing.Point(13, 427);
+            this.btnReload.Name = "btnReload";
+            this.btnReload.Size = new System.Drawing.Size(102, 23);
+            this.btnReload.TabIndex = 0;
+            this.btnReload.Text = "Reload";
+            this.btnReload.UseVisualStyleBackColor = true;
+            this.btnReload.Click += new System.EventHandler(this.btnReload_Click);
+            // 
             // EntitySelectForm
             // 
             this.AcceptButton = this.btnSelect;
@@ -136,6 +152,7 @@
             this.ClientSize = new System.Drawing.Size(784, 462);
             this.ControlBox = false;
             this.Controls.Add(this.dgvEntities);
+            this.Controls.Add(this.btnReload);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnSelect);
             this.MinimumSize = new System.Drawing.Size(500, 300);
@@ -156,5 +173,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn clmnInternalName;
         private System.Windows.Forms.DataGridViewTextBoxColumn clmnNameUntranslated;
         private System.Windows.Forms.DataGridViewTextBoxColumn clmnDistance;
+        private System.Windows.Forms.Button btnReload;
     }
 }

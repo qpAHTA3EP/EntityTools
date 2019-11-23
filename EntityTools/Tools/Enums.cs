@@ -93,4 +93,11 @@ namespace EntityTools.Tools
         ZAxis,
         HealthPercent
     }
+
+    /// <summary>
+    /// Тип местоположения простого шаблона в имени предмета
+    /// </summary>
+    public enum SimplePatternPos { None, Full, Start, End, Middle }
+
+
 }

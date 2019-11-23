@@ -127,5 +127,76 @@ namespace EntityTools.Tools
 
             return Instances.ChangeInstanceResult.NoValidChoice;
         }
+
+        /// <summary>
+        /// Jпределяем местоположение простого шаблона matchText в идентификаторе pattern
+        /// </summary>
+        /// <param name="pattern"></param>
+        /// <param name="matchText"></param>
+        /// <returns></returns>
+        public static SimplePatternPos GetSimplePatternPos(string pattern, out string matchText)
+        {
+            matchText = string.Empty;
+            SimplePatternPos patternPos = SimplePatternPos.None;
+            if(!string.IsNullOrEmpty(pattern))
+                if (pattern[0] == '*')
+                {
+                    if (pattern[pattern.Length - 1] == '*')
+                    {
+                        patternPos = SimplePatternPos.Middle;
+                        matchText = pattern.Trim('*');
+                    }
+                    else
+                    {
+                        patternPos = SimplePatternPos.End;
+                        matchText = pattern.TrimStart('*');
+                    }
+                }
+                else
+                {
+                    if (pattern[pattern.Length - 1] == '*')
+                    {
+                        patternPos = SimplePatternPos.Start;
+                        matchText = pattern.TrimEnd('*');
+                    }
+                    else
+                    {
+                        patternPos = SimplePatternPos.Full;
+                        matchText = pattern;
+                    }
+                }
+            return patternPos;
+        }
+
+        /// <summary>
+        /// Поиск вхождения подстроки строки с учетом заданного положения
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="patternPos"></param>
+        /// <param name="trimedPattern"></param>
+        /// <returns></returns>
+        public static bool SimpleTextComparer(string text, SimplePatternPos patternPos, string trimedPattern)
+        {
+            if (string.IsNullOrEmpty(text))
+                if (string.IsNullOrEmpty(trimedPattern))
+                    return true;
+                else return false;
+            else if (string.IsNullOrEmpty(trimedPattern))
+                return false;            
+
+            switch (patternPos)
+            {
+                case SimplePatternPos.Start:
+                    return text.StartsWith(trimedPattern);
+                case SimplePatternPos.Middle:
+                    return text.Contains(trimedPattern);
+                case SimplePatternPos.End:
+                    return text.EndsWith(trimedPattern);
+                case SimplePatternPos.Full:
+                    return text == trimedPattern;
+                default:
+                    return text == trimedPattern;
+            }
+        }
     }
 }

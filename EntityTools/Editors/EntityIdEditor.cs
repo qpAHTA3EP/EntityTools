@@ -8,6 +8,7 @@ using EntityTools.Conditions;
 using static EntityTools.Forms.EntitySelectForm;
 using EntityTools.UCC;
 using EntityTools.Actions.Deprecated;
+using EntityTools.UCC.Conditions;
 
 namespace EntityTools.Editors
 {
@@ -20,20 +21,23 @@ namespace EntityTools.Editors
 
             if (context.Instance != null)
             {
-                if (context.Instance is MoveToEntity)
-                    nameType = ((MoveToEntity)context.Instance).EntityNameType;
-                else if (context.Instance is InteractEntities)
-                    nameType = ((InteractEntities)context.Instance).EntityNameType;
-                else if (context.Instance is EntityProperty)
-                    nameType = ((EntityProperty)context.Instance).EntityNameType;
-                else if (context.Instance is EntityProperty)
-                    nameType = ((EntityProperty)context.Instance).EntityNameType;
-                else if (context.Instance is EntityCountInCustomRegions)
-                    nameType = ((EntityCountInCustomRegions)context.Instance).EntityNameType;
-                else if (context.Instance is AbortCombatEntity)
-                    nameType = ((AbortCombatEntity)context.Instance).EntityNameType;
-                //else if (context.Instance is InteractNPCext)
-                //    nameType = ((InteractNPCext)context.Instance).NameType;                
+                if (context.Instance is MoveToEntity moveToEntity) 
+                    nameType = moveToEntity.EntityNameType;
+                else if (context.Instance is InteractEntities interactEntities)
+                    nameType = interactEntities.EntityNameType;
+                else if (context.Instance is EntityProperty entityProperty)
+                    nameType = entityProperty.EntityNameType;
+                else if (context.Instance is EntityCountInCustomRegions entityCountInCustomRegions)
+                    nameType = entityCountInCustomRegions.EntityNameType;
+                else if (context.Instance is AbortCombatEntity abortCombatEntity)
+                    nameType = abortCombatEntity.EntityNameType;
+                else if (context.Instance is DodgeFromEntity dodgeFromEntity)
+                    nameType = dodgeFromEntity.EntityNameType;
+                else if (context.Instance is UCCConditionEntityCheck uccConditionEntityCheck) 
+                    nameType = uccConditionEntityCheck.EntityNameType;
+                else if(ReflectionHelper.GetPropertyValue(context.Instance, "EntityNameType", out object entityNameTypeObj)
+                        && entityNameTypeObj is EntityNameType entityNameType)
+                           nameType = entityNameType;
             }
 
             if (value != null)

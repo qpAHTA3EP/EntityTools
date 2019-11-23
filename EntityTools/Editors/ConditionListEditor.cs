@@ -7,7 +7,7 @@ using Astral.Quester.Classes;
 using DevExpress.XtraEditors.Controls;
 using EntityTools.Forms;
 using MyNW.Classes;
-using ConditionList = System.Collections.Generic.List<EntityTools.UCC.Conditions.CustomUCCCondition>;
+using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 
 
 namespace EntityTools.Editors

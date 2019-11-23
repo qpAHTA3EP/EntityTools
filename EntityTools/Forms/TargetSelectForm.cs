@@ -30,7 +30,6 @@ namespace EntityTools.Forms
                 selectForm.lblMessage.Text = caption;
                 Binds.AddAction(Keys.F12, new Action(selectForm.btnOK.PerformClick));
                 return selectForm.ShowDialog();
-
             }
             finally
             {

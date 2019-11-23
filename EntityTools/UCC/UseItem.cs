@@ -40,12 +40,8 @@ namespace EntityTools.UCC
             });
         }
 
-        /// <summary>
-        /// Тип местоположения простого шаблона в имени предмета
-        /// </summary>
-        private enum PatternPos { None, Full, Start, End, Middle }
         [XmlIgnore]
-        private PatternPos patternPos = PatternPos.None;
+        private SimplePatternPos patternPos = SimplePatternPos.None;
 
         [XmlIgnore]
         private string itemId = string.Empty;
@@ -63,32 +59,7 @@ namespace EntityTools.UCC
                     if (ItemIdType == ItemFilterStringType.Simple)
                     {
                         // определяем местоположение простого шаблона ItemId в идентификаторе предмета
-                        if (value[0] == '*')
-                        {
-                            if (value[value.Length - 1] == '*')
-                            {
-                                patternPos = PatternPos.Middle;
-                                itemIdTrimmed = value.Trim('*');
-                            }
-                            else
-                            {
-                                patternPos = PatternPos.End;
-                                itemIdTrimmed = value.TrimStart('*');
-                            }
-                        }
-                        else
-                        {
-                            if (value[value.Length - 1] == '*')
-                            {
-                                patternPos = PatternPos.Middle;
-                                itemIdTrimmed = value.TrimEnd('*');
-                            }
-                            else
-                            {
-                                patternPos = PatternPos.End;
-                                itemIdTrimmed = value;
-                            }
-                        }
+                        patternPos = CommonTools.GetSimplePatternPos(value, out itemIdTrimmed);                        
                     }
                     itemId = value;
                 }
@@ -188,13 +159,13 @@ namespace EntityTools.UCC
         {
             switch(patternPos)
             {
-                case PatternPos.Start:
+                case SimplePatternPos.Start:
                     return iSlot.Item.ItemDef.InternalName.StartsWith(itemIdTrimmed);
-                case PatternPos.Middle:
+                case SimplePatternPos.Middle:
                     return iSlot.Item.ItemDef.InternalName.Contains(itemIdTrimmed);
-                case PatternPos.End:
+                case SimplePatternPos.End:
                     return iSlot.Item.ItemDef.InternalName.EndsWith(itemIdTrimmed);
-                case PatternPos.Full:
+                case SimplePatternPos.Full:
                     return iSlot.Item.ItemDef.InternalName == itemId;
                 default:
                     return false;

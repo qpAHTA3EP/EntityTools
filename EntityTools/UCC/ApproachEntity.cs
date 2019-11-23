@@ -39,26 +39,28 @@ namespace EntityTools.UCC
         [Description("Check Entity's Ingame Region (Not CustomRegion):\n" +
             "True: Only Entities located in the same Region as Player are detected\n" +
             "False: Entity's Region does not checked during search")]
-        [Category("Entity optional checks")]
+        [Category("Entity")]
         public bool RegionCheck { get; set; } = true;
 
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
-        [Category("Entity optional checks")]
+        [Category("Entity")]
         public bool HealthCheck { get; set; } = true;
+
+        [Category("Entity")]
+        public float EntityRadius { get; set; } = 12;
 
         [Description("The maximum distance from the character within which the Entity is searched\n" +
             "The default value is 0, which disables distance checking")]
-        [Category("Entity optional checks")]
+        //[Category("Entity")]
         public float ReactionRange { get; set; } = 30;
 
-        [Category("Required")]
-        public float EntityRadius { get; set; } = 12;
-
         [XmlIgnore]
-        [Browsable(false)]
-        public new string ActionName { get; set; }
+        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
+        [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
+        //[Category("Entity")]
+        public string TestInfo { get; } = "Нажми '...' =>";
 
         public override bool NeedToRun
         {
@@ -104,5 +106,15 @@ namespace EntityTools.UCC
 
         [NonSerialized]
         protected Entity entity = new Entity(IntPtr.Zero);
+
+        #region Hide Inherited Properties
+        [XmlIgnore]
+        [Browsable(false)]
+        public new Astral.Logic.UCC.Ressources.Enums.Unit Target { get; set; }
+
+        [XmlIgnore]
+        [Browsable(false)]
+        public new string ActionName { get; set; } = string.Empty;
+        #endregion
     }
 }
