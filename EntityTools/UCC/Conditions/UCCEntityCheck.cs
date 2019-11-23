@@ -12,7 +12,7 @@ using Astral.Logic.UCC.Ressources;
 
 namespace EntityTools.UCC.Conditions
 {
-    public class UCCConditionEntityCheck : UCCCondition
+    public class UCCEntityCheck : UCCCondition
     {
         [Description("ID (an untranslated name) of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]

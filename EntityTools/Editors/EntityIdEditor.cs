@@ -33,7 +33,7 @@ namespace EntityTools.Editors
                     nameType = abortCombatEntity.EntityNameType;
                 else if (context.Instance is DodgeFromEntity dodgeFromEntity)
                     nameType = dodgeFromEntity.EntityNameType;
-                else if (context.Instance is UCCConditionEntityCheck uccConditionEntityCheck) 
+                else if (context.Instance is UCCEntityCheck uccConditionEntityCheck) 
                     nameType = uccConditionEntityCheck.EntityNameType;
                 else if(ReflectionHelper.GetPropertyValue(context.Instance, "EntityNameType", out object entityNameTypeObj)
                         && entityNameTypeObj is EntityNameType entityNameType)

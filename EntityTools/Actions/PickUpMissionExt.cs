@@ -156,8 +156,9 @@ namespace EntityTools.Actions
                             Thread.Sleep(100);
                         }
 
-                        string mission_id = string.Empty;
+                        CommonTools.FocusForm(typeof(Editor));
 
+                        string mission_id = string.Empty;
                         if (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count != 0)
                         {
                             // выбор пункта меню, соответствующего миссии

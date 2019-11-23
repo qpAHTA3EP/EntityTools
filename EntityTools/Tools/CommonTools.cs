@@ -7,10 +7,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace EntityTools.Tools
 {
-    class CommonTools
+    public static class CommonTools
     {
         /// <summary>
         /// Проверка нахождения объекта entity в границах региона region
@@ -197,6 +198,16 @@ namespace EntityTools.Tools
                 default:
                     return text == trimedPattern;
             }
+        }
+
+        public static void FocusForm(Type t)
+        {
+            foreach (Form f in Application.OpenForms)
+                if (f.GetType() == t)
+                {
+                    f.Focus();
+                    return;
+                }                   
         }
     }
 }

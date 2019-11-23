@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 
 namespace EntityTools.UCC.Conditions
 {
-    public class UCCConditionGameUICheck : UCCCondition
+    public class UCCGameUICheck : UCCCondition
     {
         private string uiGenID = "Team_Maptransferchoice_Waitingonteamlabel";
         private UIGen uiGen;

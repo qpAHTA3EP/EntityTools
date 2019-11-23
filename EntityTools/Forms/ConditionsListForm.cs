@@ -26,7 +26,7 @@ namespace EntityTools.Forms
             if (AddAction.Show(typeof(UCCCondition)) is UCCCondition condition)
             {
                 Conditions.Items.Add(condition);
-                Conditions.SelectedItem = condition;
+                Conditions.SelectedItem = condition;                
             }
 
         }
@@ -69,12 +69,18 @@ namespace EntityTools.Forms
             UCCCondition cond = (Conditions.Items.Count > 0) ? Conditions.SelectedItem as UCCCondition : null;
             if (cond != null)
             {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendLine(cond.ToString()).AppendLine();
-                sb.Append("Result: ").Append(cond.IsOK(null).ToString());
+                //StringBuilder sb = new StringBuilder();
+                //sb.AppendLine(cond.ToString()).AppendLine();
+                //sb.Append("Result: ").Append(cond.IsOK(null).ToString());
 
-                //MessageBox.Show(sb.ToString());
-                XtraMessageBox.Show(sb.ToString());
+                ////MessageBox.Show(sb.ToString());
+                //XtraMessageBox.Show(sb.ToString());                
+
+                if (cond.IsOK(null))
+                    XtraMessageBox.Show(string.Concat(cond, "\nResult: True"));
+                else
+                    XtraMessageBox.Show(string.Concat(cond, "\nResult: False"));
+
             }
         }
 
@@ -97,7 +103,7 @@ namespace EntityTools.Forms
 
         private void Conditions_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            if (Conditions.SelectedItem is Condition condition)
+            if (Conditions.SelectedItem is UCCCondition condition)
             {
                 condition.Locked = (e.NewValue == CheckState.Checked);
             }
