@@ -24,7 +24,11 @@ namespace EntityTools.Tools
         /// <summary>
         /// Невидимый
         /// </summary>
-        IsHidden
+        IsHidden,
+        /// <summary>
+        /// Проверка значений свойства 
+        /// </summary>
+        Property
     }
 
     /// <summary>

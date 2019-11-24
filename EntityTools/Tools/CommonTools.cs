@@ -176,7 +176,7 @@ namespace EntityTools.Tools
         /// <param name="patternPos"></param>
         /// <param name="trimedPattern"></param>
         /// <returns></returns>
-        public static bool SimpleTextComparer(string text, SimplePatternPos patternPos, string trimedPattern)
+        public static bool SimpleMaskTextComparer(string text, SimplePatternPos patternPos, string trimedPattern)
         {
             if (string.IsNullOrEmpty(text))
                 if (string.IsNullOrEmpty(trimedPattern))
@@ -199,6 +199,16 @@ namespace EntityTools.Tools
                     return text == trimedPattern;
             }
         }
+        public static bool SimpleMaskTextComparer(string text, string pattern)
+        {
+            SimplePatternPos patternPos = GetSimplePatternPos(pattern, out string matchText);
+            return SimpleMaskTextComparer(text, patternPos, matchText);
+        }
+        public static bool CompareToSimplePattern(this string @this, string pattern)
+        {
+            return SimpleMaskTextComparer(@this, pattern);
+        }
+
 
         public static void FocusForm(Type t)
         {

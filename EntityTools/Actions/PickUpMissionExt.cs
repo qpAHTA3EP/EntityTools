@@ -251,7 +251,7 @@ namespace EntityTools.Actions
                 foreach (InventoryBag bag in EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.RewardBags)
                     foreach(InventorySlot iSlot in bag.GetItems)
                     {
-                        if (CommonTools.SimpleTextComparer(iSlot.Item.ItemDef.InternalName, patternPos, trimedRewardItem))
+                        if (CommonTools.SimpleMaskTextComparer(iSlot.Item.ItemDef.InternalName, patternPos, trimedRewardItem))
                             return true;
                     }
             }

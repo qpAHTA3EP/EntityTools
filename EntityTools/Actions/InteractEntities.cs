@@ -17,6 +17,7 @@ using Astral.Quester.UIEditors;
 using Astral.Quester.UIEditors.Forms;
 using DevExpress.XtraEditors;
 using EntityTools.Editors;
+using EntityTools.Forms;
 using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
@@ -172,7 +173,7 @@ namespace EntityTools.Actions
                     }
                 }
 
-                 if (target != null && target.IsValid && !(HealthCheck && target.IsDead))
+                if (target != null && target.IsValid && !(HealthCheck && target.IsDead))
                 {
                     if (IgnoreCombat)
                     {
@@ -190,6 +191,8 @@ namespace EntityTools.Actions
                     initialPos = target.Location/*.Clone()*/;
                     return true;
                 }
+                else if(IgnoreCombat)
+                    Astral.Quester.API.IgnoreCombat = true;
 
                 return false;
             }
@@ -233,6 +236,10 @@ namespace EntityTools.Actions
                     IL_FA:
                     EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
                     return ActionResult.Completed;
+                }
+                if (IgnoreCombat)
+                {
+                    Astral.Quester.API.IgnoreCombat = false;
                 }
                 if (combat)
                 {
@@ -329,7 +336,8 @@ namespace EntityTools.Actions
         }
         public override void GatherInfos()
         {
-            XtraMessageBox.Show("Target Entity and press ok.");
+            //XtraMessageBox.Show("Target Entity and press ok.");
+            TargetSelectForm.TargetGuiRequest("Target Entity and press ok.");
             Entity betterEntityToInteract = Interact.GetBetterEntityToInteract();
             if (betterEntityToInteract.IsValid)
             {

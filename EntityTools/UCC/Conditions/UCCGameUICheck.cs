@@ -1,10 +1,13 @@
-﻿using Astral.Logic.UCC.Classes;
+﻿using Astral.Classes.ItemFilter;
+using Astral.Logic.UCC.Classes;
 using Astral.Logic.UCC.Ressources;
+using Astral.Quester.Classes;
 using EntityTools.Editors;
 using EntityTools.Tools;
 using MyNW.Classes;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
 namespace EntityTools.UCC.Conditions
@@ -28,6 +31,26 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
+
+        [Description("The Name of the GUI element's property which is checked\n" +
+                     "Ignored if property 'Tested' is not equals to 'Property'")]
+        [Category("GuiProperty")]
+        public string UiGenProperty { get; set; }
+
+        [Description("The Value of the GUI element's property which is checked\n" +
+                     "Ignored if property 'Tested' is not equals to 'Property'")]
+        [Category("GuiProperty")]
+        public string UiGenPropertyValue { get; set; } = string.Empty;
+
+        [Description("Type of and UiGenPropertyValue:\n" +
+                     "Simple: Simple test string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
+                     "Regex: Regular expression\n" +
+                     "Ignored if property 'Tested' is not equals to 'Property'")]
+        [Category("GuiProperty")]
+        public ItemFilterStringType UiGenPropertyValueType { get; set; } = ItemFilterStringType.Simple;
+
+        [Category("GuiProperty")]
+        public Condition.Presence PropertySign { get; set; } = Condition.Presence.Equal;
 
 
         public UiGenCheckType Check { get; set; } = UiGenCheckType.IsVisible;
@@ -59,6 +82,19 @@ namespace EntityTools.UCC.Conditions
                         return uiGen.IsVisible;
                     case UiGenCheckType.IsHidden:
                         return !uiGen.IsVisible;
+                    case UiGenCheckType.Property:
+                        if (uiGen.IsVisible)
+                        {
+                            bool result = false;
+                            foreach (var uiVar in uiGen.Vars)
+                                if (uiVar.IsValid && uiVar.Name == UiGenProperty)
+                                {
+                                    result = CheckUiGenPropertyValue(uiVar);
+                                    break;
+                                }
+                            return result;
+                        }
+                        break;
                 }
             }
             return false;
@@ -68,5 +104,29 @@ namespace EntityTools.UCC.Conditions
         {
             return $"GameUICheck [{UiGenID}]";
         }
+
+        private bool CheckUiGenPropertyValue(UIVar uiVar)
+        {
+            if (uiVar == null || !uiVar.IsValid)
+                return false;
+
+            bool result = false;
+            if (string.IsNullOrEmpty(uiVar.Value) && string.IsNullOrEmpty(UiGenPropertyValue))
+                result = true;
+            else switch (UiGenPropertyValueType)
+                {
+                    case ItemFilterStringType.Simple:
+                        result = uiVar.Value.CompareToSimplePattern(UiGenPropertyValue);
+                        break;
+                    case ItemFilterStringType.Regex:
+                        result = Regex.IsMatch(uiVar.Value, UiGenPropertyValue);
+                        break;
+                }
+
+            if (PropertySign == Condition.Presence.Equal)
+                return result;
+            else return !result;
+        }
+
     }
 }

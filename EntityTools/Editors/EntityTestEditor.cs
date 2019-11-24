@@ -77,7 +77,7 @@ namespace EntityTools.Editors
                     }
                     else sb.AppendLine("Closest Entity not found!");
 
-                    XtraMessageBox.Show(sb.ToString(), "Test of '" + mte.ToString() + '\'');
+                    //XtraMessageBox.Show(sb.ToString(), "Test of '" + mte.ToString() + '\'');
                 }
                 else if (context.Instance is InteractEntities ie)
                 {
