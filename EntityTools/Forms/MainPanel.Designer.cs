@@ -42,6 +42,8 @@ namespace EntityTools.Forms
             this.fldrBroserDlg = new System.Windows.Forms.FolderBrowserDialog();
             this.tbclMain = new DevExpress.XtraTab.XtraTabControl();
             this.tabUtilities = new DevExpress.XtraTab.XtraTabPage();
+            this.cbEnchantHelperActivator = new System.Windows.Forms.CheckBox();
+            this.btnTest = new System.Windows.Forms.Button();
             this.btnStates = new System.Windows.Forms.Button();
             this.btnInterfaces = new System.Windows.Forms.Button();
             this.btnUiViewer = new System.Windows.Forms.Button();
@@ -63,8 +65,6 @@ namespace EntityTools.Forms
             this.seSlideFilter = new DevExpress.XtraEditors.SpinEdit();
             this.lblSlideTimer = new System.Windows.Forms.Label();
             this.sbSettings = new System.Windows.Forms.BindingSource(this.components);
-            this.cbEnchantHelperActivator = new System.Windows.Forms.CheckBox();
-            this.btnTest = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.bteMissions.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bteAuras.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
@@ -209,6 +209,29 @@ namespace EntityTools.Forms
             this.tabUtilities.Name = "tabUtilities";
             this.tabUtilities.Size = new System.Drawing.Size(364, 388);
             this.tabUtilities.Text = "Utilities";
+            // 
+            // cbEnchantHelperActivator
+            // 
+            this.cbEnchantHelperActivator.AutoSize = true;
+            this.cbEnchantHelperActivator.Location = new System.Drawing.Point(6, 187);
+            this.cbEnchantHelperActivator.Name = "cbEnchantHelperActivator";
+            this.cbEnchantHelperActivator.Size = new System.Drawing.Size(131, 17);
+            this.cbEnchantHelperActivator.TabIndex = 10;
+            this.cbEnchantHelperActivator.Text = "Enable EnchantHelper";
+            this.cbEnchantHelperActivator.UseVisualStyleBackColor = true;
+            this.cbEnchantHelperActivator.CheckedChanged += new System.EventHandler(this.cbEnchantHelperActivator_CheckedChanged);
+            // 
+            // btnTest
+            // 
+            this.btnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnTest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnTest.Location = new System.Drawing.Point(309, 314);
+            this.btnTest.Name = "btnTest";
+            this.btnTest.Size = new System.Drawing.Size(50, 23);
+            this.btnTest.TabIndex = 2;
+            this.btnTest.Text = "Test";
+            this.btnTest.UseVisualStyleBackColor = true;
+            this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
             // btnStates
             // 
@@ -473,28 +496,6 @@ namespace EntityTools.Forms
             this.lblSlideTimer.Size = new System.Drawing.Size(194, 13);
             this.lblSlideTimer.TabIndex = 2;
             this.lblSlideTimer.Text = "Time between aura check (millisecond):";
-            // 
-            // cbEnchantHelperActivator
-            // 
-            this.cbEnchantHelperActivator.AutoSize = true;
-            this.cbEnchantHelperActivator.Location = new System.Drawing.Point(6, 187);
-            this.cbEnchantHelperActivator.Name = "cbEnchantHelperActivator";
-            this.cbEnchantHelperActivator.Size = new System.Drawing.Size(131, 17);
-            this.cbEnchantHelperActivator.TabIndex = 10;
-            this.cbEnchantHelperActivator.Text = "Enable EnchantHelper";
-            this.cbEnchantHelperActivator.UseVisualStyleBackColor = true;
-            // 
-            // btnTest
-            // 
-            this.btnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnTest.Location = new System.Drawing.Point(309, 314);
-            this.btnTest.Name = "btnTest";
-            this.btnTest.Size = new System.Drawing.Size(50, 23);
-            this.btnTest.TabIndex = 2;
-            this.btnTest.Text = "Test";
-            this.btnTest.UseVisualStyleBackColor = true;
-            this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
             // MainPanel
             // 

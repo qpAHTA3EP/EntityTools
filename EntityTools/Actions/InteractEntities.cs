@@ -237,7 +237,7 @@ namespace EntityTools.Actions
                     EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
                     return ActionResult.Completed;
                 }
-                if (IgnoreCombat)
+                if (IgnoreCombat && target.Location.Distance3DFromPlayer <= CombatDistance)
                 {
                     Astral.Quester.API.IgnoreCombat = false;
                 }

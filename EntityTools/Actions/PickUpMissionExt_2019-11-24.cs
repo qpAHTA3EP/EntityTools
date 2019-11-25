@@ -5,17 +5,22 @@ using System.Drawing;
 using System.Drawing.Design;
 using System.Threading;
 using System.Xml.Serialization;
+using Astral.Logic;
 using Astral.Logic.Classes.Map;
 using Astral.Logic.NW;
 using Astral.Quester.Forms;
 using Astral.Quester.UIEditors;
 using MyNW.Classes;
+using Astral.Quester.Classes;
 using Astral;
 using MyNW.Internals;
 using EntityTools.Forms;
 using System.Collections.Generic;
 using MyNW.Patchables.Enums;
 using EntityTools.Tools;
+using DevExpress.XtraEditors;
+//using ns1;
+//using ns7;
 
 namespace EntityTools.Actions
 {
@@ -34,8 +39,6 @@ namespace EntityTools.Actions
         public Astral.Quester.Classes.NPCInfos Giver { get; set; } = new Astral.Quester.Classes.NPCInfos();
 
         public bool CloseContactDialog { get; set; } = false;
-
-        public float InteractDistance { get; set; } = 0f;
 
         [Editor(typeof(RewardsEditor), typeof(UITypeEditor))]
         [Description("Item that is requered in rewards to PickUpMission\n" +
@@ -140,9 +143,7 @@ namespace EntityTools.Actions
                     };
                 
                     // Взаимодействие с betterEntityToInteract, чтобы открыть диалоговое окно
-                    if (betterEntityToInteract.CombatDistance3 <= ((InteractDistance <= 0) ?
-                        Math.Max(7f, betterEntityToInteract.InteractOption.InteractDistance) : Math.Max(InteractDistance, betterEntityToInteract.InteractOption.InteractDistance))
-                        || Approach.EntityForInteraction(betterEntityToInteract, null))
+                    if (Approach.EntityForInteraction(betterEntityToInteract, null))
                     {
                         betterEntityToInteract.Interact();
                         Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(3000);
@@ -295,7 +296,7 @@ namespace EntityTools.Actions
             }
             else
             {
-                // В наградах отсутствуют обязательные итемы - отказываемся от миссии.
+                // Обязательные миссии не найдены - отказываемся
                 if (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.HasOptionByKey("ViewOfferedMission.Back"))
                 {
                     EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.SelectOptionByKey("ViewOfferedMission.Back", "");
@@ -335,8 +336,7 @@ namespace EntityTools.Actions
                     && Giver.RegionName == EntityManager.LocalPlayer.RegionInternalName)
                 {
                     // Проверяем расстояние до цели и возможность взаимодействия в квестодателем
-                    if (/*!entity.CanInteract || */(entity.CombatDistance3 > ((InteractDistance == 0) ? 
-                        Math.Max(7f, entity.InteractOption.InteractDistance) : Math.Max(InteractDistance, entity.InteractOption.InteractDistance))))
+                    if (!entity.CanInteract || (entity.CombatDistance > entity.InteractOption.InteractDistance))
                         // Включение навигации с целью приближения к персонажу и вступления с ним во взаимодействие
                         if (!Approach.EntityForInteraction(entity, null))
                             return Missions.MissionInteractResult.Error;
@@ -391,76 +391,20 @@ namespace EntityTools.Actions
         /// <returns></returns>
         private static ContactDialogOption GetMissionOption(string missionName)
         {
-            Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);
-            while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.IsValid
-                    && !timeout.IsTimedOut)
+            if (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.IsValid)
             {
-                // Диалоговое окно открыто
-                //Проверяем статус экрана 
-                if(EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.ScreenType == ScreenType.MissionOffer)
+                using (List<ContactDialogOption>.Enumerator enumerator = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.GetEnumerator())
                 {
-                    // Открыт экран принятия миссии
-                    // На экране принятия миссии узнать из АПИ, к какой миссии он относится, - нельзя
-                    // поэтому отказываемся принять миссию, чтобы вернуться к списку
-                    if (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.HasOptionByKey("ViewOfferedMission.Back"))
+                    while (enumerator.MoveNext())
                     {
-                        EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.SelectOptionByKey("ViewOfferedMission.Back", "");
-                        while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.ScreenType == ScreenType.MissionOffer)
+                        ContactDialogOption contactDialogOption = enumerator.Current;
+                        if (!contactDialogOption.CannotChoose && (contactDialogOption.Key.Contains(missionName + "_") || contactDialogOption.Key.EndsWith(missionName)))
                         {
-                            if (timeout.IsTimedOut)
-                            {
-                                return new ContactDialogOption(IntPtr.Zero);
-                            }
-                            Thread.Sleep(100);
-                        }
-                    }
-                }
-                if (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.ScreenType == ScreenType.Buttons)
-                {
-                    // Обычный разговор
-                    // ContactDialog.ScreenType = Buttons
-                    // Не содержит 
-                    // ContactDialog.Options[].Key:
-                    // SpecialDialog.action_1 - Цифра означает пункт диалога. 
-                    // Последний пункт "обычно" соответствует возврату в предыдущее меню
-                    if (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count > 0
-                        && EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.HasOptionByKey("SpecialDialog.action_" + (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count-1)))
-                    {
-                        // Пытаемся вернуться к предыдущему пункту вызвав последний пункт диалога
-                        EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.SelectOptionByKey("SpecialDialog.action_" + (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count - 1), "");
-                        while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.ScreenType == ScreenType.Buttons)
-                        {
-                            if (timeout.IsTimedOut)
-                            {
-                                return new ContactDialogOption(IntPtr.Zero);
-                            }
-                            Thread.Sleep(100);
-                        }
-                    }
-                }
-                if (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.ScreenType == ScreenType.List)
-                {
-                    // Открыт экран списка пунктов диалога
-                    // ContactDialog.ScreenType = List
-                    // ContactDialog.Options[].Key:
-                    // OptionList.Exit - Закрыть диалоговое окно
-
-                    using (List<ContactDialogOption>.Enumerator enumerator = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.GetEnumerator())
-                    {
-                        // Открыт экран со списком ответов
-                        // Ищем пункт диалога, соответствующий заданной миссии
-                        while (enumerator.MoveNext())
-                        {
-                            ContactDialogOption contactDialogOption = enumerator.Current;
-                            if (!contactDialogOption.CannotChoose && (contactDialogOption.Key.Contains(missionName + "_") || contactDialogOption.Key.EndsWith(missionName)))
-                            {
-                                return contactDialogOption;
-                            }
+                            return contactDialogOption;
                         }
 
-                        // Пункт диалога, соответствующий миссии не найден
-                        return new ContactDialogOption(IntPtr.Zero);
                     }
+                    return new ContactDialogOption(IntPtr.Zero);
                 }
             }
             return new ContactDialogOption(IntPtr.Zero);
