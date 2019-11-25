@@ -13,6 +13,21 @@ namespace EntityTools.Tools
     }
 
     /// <summary>
+    /// Переключатель множетв Entity в которых производится поиск
+    /// </summary>
+    public enum EntitySetType
+    {
+        /// <summary>
+        /// Все Entity из EntityManager.GetEntities()
+        /// </summary>
+        Complete,
+        /// <summary>
+        /// Entity из подмножеств NearbyContacts и NearbyInteractCritterEnts
+        /// </summary>
+        Contacts
+    }
+
+    /// <summary>
     /// Перечисление типов проверки внутриигровых интрейфейсов
     /// </summary>
     public enum UiGenCheckType

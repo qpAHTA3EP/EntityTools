@@ -76,6 +76,13 @@ namespace EntityTools.Actions
         [Category("Entity optional checks")]
         public List<string> CustomRegionNames { get; set; } = new List<string>();
 
+        [Description("A subset of entities that are searched for a target\n" +
+            "Contacts: Only interactable Entities\n" +
+            "Complete: All possible Entities")]
+        [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
+        [Category("Entity optional checks")]
+        public EntitySetType EntitySetType { get; set; } = EntitySetType.Contacts;
+
         [Description("Distance to the Entity by which it is necessary to approach to disable 'IgnoreCombat' mode\n" +
             "Ignored if 'IgnoreCombat' does not True")]
         [Category("Interruptions")]
@@ -160,7 +167,11 @@ namespace EntityTools.Actions
             {
                 if (!HoldTargetEntity || target == null || !target.IsValid || (HealthCheck && target.IsDead))
                 {
-                    Entity entity = EntitySelectionTools.FindClosestContactEntity(EntityID, EntityIdType, EntityNameType, 
+                    Entity entity = (EntitySetType == EntitySetType.Contacts) ? 
+                                    EntitySelectionTools.FindClosestContactEntity(EntityID, EntityIdType, EntityNameType, 
+                                                                HealthCheck, ReactionRange, RegionCheck, CustomRegionNames,
+                                                                IsNotInBlackList) :
+                                    EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType,
                                                                 HealthCheck, ReactionRange, RegionCheck, CustomRegionNames,
                                                                 IsNotInBlackList);
 
