@@ -17,6 +17,7 @@ using Astral.Quester.UIEditors;
 using Astral.Quester.UIEditors.Forms;
 using DevExpress.XtraEditors;
 using EntityTools.Editors;
+using EntityTools.Enums;
 using EntityTools.Forms;
 using EntityTools.Tools;
 using MyNW.Classes;

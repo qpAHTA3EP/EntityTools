@@ -9,6 +9,7 @@ using Astral.Classes;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.Classes.Map;
 using EntityTools.Editors;
+using EntityTools.Enums;
 using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;

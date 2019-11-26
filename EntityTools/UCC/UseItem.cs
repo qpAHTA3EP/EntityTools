@@ -15,6 +15,7 @@ using Astral.Quester.FSM.States;
 using Astral.Quester.UIEditors;
 using EntityTools;
 using EntityTools.Editors;
+using EntityTools.Enums;
 using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;

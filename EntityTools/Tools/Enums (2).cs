@@ -1,7 +1,32 @@
 ﻿using System;
 
-namespace EntityTools.Enums
+namespace EntityTools.Tools
 {
+    /// <summary>
+    /// Перечисление полей Entity, по которым производится поиск
+    /// </summary>
+    [Serializable]
+    public enum EntityNameType
+    {
+        NameUntranslated,
+        InternalName
+    }
+
+    /// <summary>
+    /// Переключатель множетв Entity в которых производится поиск
+    /// </summary>
+    public enum EntitySetType
+    {
+        /// <summary>
+        /// Все Entity из EntityManager.GetEntities()
+        /// </summary>
+        Complete,
+        /// <summary>
+        /// Entity из подмножеств NearbyContacts и NearbyInteractCritterEnts
+        /// </summary>
+        Contacts
+    }
+
     /// <summary>
     /// Перечисление типов проверки внутриигровых интрейфейсов
     /// </summary>
@@ -77,34 +102,21 @@ namespace EntityTools.Enums
         FollowAndSimulateFKey
     }
 
-
+    /// <summary>
+    /// Перечисление 
+    /// </summary>
+    [Serializable]
+    public enum EntityPropertyType
+    {
+        Distance,
+        ZAxis,
+        HealthPercent
+    }
 
     /// <summary>
-    /// Тип местоположения простого шаблона(подстроки) в исходной строке
+    /// Тип местоположения простого шаблона в имени предмета
     /// </summary>
-    public enum SimplePatternPos
-    {
-        /// <summary>
-        /// Не задано, некорректное значение
-        /// </summary>
-        None,
-        /// <summary>
-        /// Полное совпадение
-        /// </summary>
-        Full,
-        /// <summary>
-        /// В начале строки
-        /// </summary>
-        Start,
-        /// <summary>
-        /// В конце строки
-        /// </summary>
-        End,
-        /// <summary>
-        /// В середине строки
-        /// </summary>
-        Middle
-    }
+    public enum SimplePatternPos { None, Full, Start, End, Middle }
 
 
 }

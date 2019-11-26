@@ -1,6 +1,7 @@
 ﻿using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
 using EntityTools.Editors;
+using EntityTools.Enums;
 using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;

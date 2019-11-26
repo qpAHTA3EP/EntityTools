@@ -1,5 +1,6 @@
 ﻿using Astral.Logic.NW;
 using Astral.Quester.Classes;
+using EntityTools.Enums;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;

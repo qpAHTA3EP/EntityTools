@@ -4,7 +4,7 @@ using Astral.Quester.Classes;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
-
+using EntityTools.Enums;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -12,7 +12,6 @@ namespace EntityTools.Tools
 {
     public static class EntitySelectionTools
     {
-        public delegate bool MatchPatternDelegate(Entity entity, string str);
         public delegate bool SpecialCheckDelegate(Entity entity);
 
         /// <summary>

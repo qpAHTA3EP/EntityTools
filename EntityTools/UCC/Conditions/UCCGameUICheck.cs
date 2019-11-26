@@ -3,6 +3,7 @@ using Astral.Logic.UCC.Classes;
 using Astral.Logic.UCC.Ressources;
 using Astral.Quester.Classes;
 using EntityTools.Editors;
+using EntityTools.Enums;
 using EntityTools.Tools;
 using MyNW.Classes;
 using System.ComponentModel;
@@ -63,11 +64,11 @@ namespace EntityTools.UCC.Conditions
 
         [XmlIgnore]
         [Browsable(false)]
-        public new Enums.Unit Target { get; set; }
+        public new Astral.Logic.UCC.Ressources.Enums.Unit Target { get; set; }
 
         [XmlIgnore]
         [Browsable(false)]
-        public new Enums.ActionCond Tested { get; set; }
+        public new Astral.Logic.UCC.Ressources.Enums.ActionCond Tested { get; set; }
         #endregion
 
         public new bool IsOK(UCCAction refAction = null)

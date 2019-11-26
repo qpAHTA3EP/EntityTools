@@ -58,13 +58,13 @@ namespace EntityTools.UCC
             {
                 switch (Target)
                 {
-                    case Enums.Unit.Player:
+                    case Astral.Logic.UCC.Ressources.Enums.Unit.Player:
                         return EntityManager.LocalPlayer;
-                    case Enums.Unit.MostInjuredAlly:
+                    case Astral.Logic.UCC.Ressources.Enums.Unit.MostInjuredAlly:
                         return ActionsPlayer.MostInjuredAlly;
-                    case Enums.Unit.StrongestAdd:
+                    case Astral.Logic.UCC.Ressources.Enums.Unit.StrongestAdd:
                         return ActionsPlayer.AnAdd;
-                    case Enums.Unit.StrongestTeamMember:
+                    case Astral.Logic.UCC.Ressources.Enums.Unit.StrongestTeamMember:
                         return ActionsPlayer.StrongestTeamMember;
                     default:
                         return Core.CurrentTarget;
@@ -118,19 +118,19 @@ namespace EntityTools.UCC
                 return false;
             Power entActivatedPower = power.EntGetActivatedPower();
             PowerDef powerDef = entActivatedPower.EntGetActivatedPower().EffectivePowerDef();
-            if (base.Target != Enums.Unit.Player)
+            if (base.Target != Astral.Logic.UCC.Ressources.Enums.Unit.Player)
             {
                 switch (Target)
                 {
-                    case Enums.Unit.MostInjuredAlly:
+                    case Astral.Logic.UCC.Ressources.Enums.Unit.MostInjuredAlly:
                         ReflectionHelper.SetStaticFieldValue(movementsType, "SpecificTarget", ActionsPlayer.MostInjuredAlly, BindingFlags.Static|BindingFlags.SetField);
                         //Astral.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.MostInjuredAlly;
                         break;
-                    case Enums.Unit.StrongestAdd:
+                    case Astral.Logic.UCC.Ressources.Enums.Unit.StrongestAdd:
                         ReflectionHelper.SetStaticFieldValue(movementsType, "SpecificTarget", ActionsPlayer.AnAdd, BindingFlags.Static | BindingFlags.SetField);
                         //Astral.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.AnAdd;
                         break;
-                    case Enums.Unit.StrongestTeamMember:
+                    case Astral.Logic.UCC.Ressources.Enums.Unit.StrongestTeamMember:
                         ReflectionHelper.SetStaticFieldValue(movementsType, "SpecificTarget", ActionsPlayer.StrongestTeamMember, BindingFlags.Static | BindingFlags.SetField);
                         //Astral.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.StrongestTeamMember;
                         break;

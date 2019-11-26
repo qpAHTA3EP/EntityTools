@@ -13,6 +13,7 @@ using Astral.Logic.UCC.Actions;
 using Astral.Logic.UCC.Classes;
 using Astral.Logic.UCC.Ressources;
 using EntityTools.Editors;
+using EntityTools.Enums;
 using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;

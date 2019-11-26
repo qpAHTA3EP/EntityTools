@@ -14,6 +14,7 @@ using MyNW.Internals;
 using System.Collections.Generic;
 using System.Text;
 using DevExpress.XtraEditors;
+using EntityTools.Enums;
 
 namespace EntityTools.Editors
 {

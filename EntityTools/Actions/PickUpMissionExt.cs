@@ -16,6 +16,7 @@ using EntityTools.Forms;
 using System.Collections.Generic;
 using MyNW.Patchables.Enums;
 using EntityTools.Tools;
+using EntityTools.Enums;
 
 namespace EntityTools.Actions
 {

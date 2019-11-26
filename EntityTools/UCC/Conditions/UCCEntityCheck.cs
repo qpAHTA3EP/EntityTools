@@ -9,6 +9,7 @@ using System.Drawing.Design;
 using System.Xml.Serialization;
 using static Astral.Quester.Classes.Condition;
 using Astral.Logic.UCC.Ressources;
+using EntityTools.Enums;
 
 namespace EntityTools.UCC.Conditions
 {
@@ -69,13 +70,13 @@ namespace EntityTools.UCC.Conditions
                         //if(float.TryParse(Value, out float distance))
                             switch (Sign)
                             {
-                                case Enums.Sign.Equal:
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
                                     return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer == PropertyValue);
-                                case Enums.Sign.NotEqual:
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
                                     return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer != PropertyValue);
-                                case Enums.Sign.Inferior:
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
                                     return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer < PropertyValue);
-                                case Enums.Sign.Superior:
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
                                     return result = (closestEntity == null) || !closestEntity.IsValid || (closestEntity.Location.Distance3DFromPlayer > PropertyValue);
                             }
                         break;
@@ -83,13 +84,13 @@ namespace EntityTools.UCC.Conditions
                         //if (float.TryParse(Value, out float hp))
                             switch (Sign)
                             {
-                                case Enums.Sign.Equal:
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
                                     return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent == PropertyValue);
-                                case Enums.Sign.NotEqual:
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
                                     return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent != PropertyValue);
-                                case Enums.Sign.Inferior:
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
                                     return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent < PropertyValue);
-                                case Enums.Sign.Superior:
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
                                     return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent > PropertyValue);
                             }
                         break;
@@ -97,13 +98,13 @@ namespace EntityTools.UCC.Conditions
                         //if (float.TryParse(Value, out float z))
                             switch (Sign)
                             {
-                                case Enums.Sign.Equal:
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
                                     return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z == PropertyValue);
-                                case Enums.Sign.NotEqual:
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
                                     return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z != PropertyValue);
-                                case Enums.Sign.Inferior:
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
                                     return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z < PropertyValue);
-                                case Enums.Sign.Superior:
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
                                     return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z > PropertyValue);
                             }
                         break;
@@ -125,11 +126,11 @@ namespace EntityTools.UCC.Conditions
 
         [XmlIgnore]
         [Browsable(false)]
-        public new Enums.Unit Target { get; set; }
+        public new Astral.Logic.UCC.Ressources.Enums.Unit Target { get; set; }
 
         [XmlIgnore]
         [Browsable(false)]
-        public new Enums.ActionCond Tested { get; set; }
+        public new Astral.Logic.UCC.Ressources.Enums.ActionCond Tested { get; set; }
         #endregion
     }
 }

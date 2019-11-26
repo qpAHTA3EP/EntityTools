@@ -9,6 +9,7 @@ using static EntityTools.Forms.EntitySelectForm;
 using EntityTools.UCC;
 using EntityTools.Actions.Deprecated;
 using EntityTools.UCC.Conditions;
+using EntityTools.Enums;
 
 namespace EntityTools.Editors
 {

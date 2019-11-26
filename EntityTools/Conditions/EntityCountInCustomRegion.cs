@@ -10,6 +10,7 @@ using Astral.Quester;
 using Astral.Quester.Classes;
 using Astral.Quester.UIEditors;
 using EntityTools.Editors;
+using EntityTools.Enums;
 using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;

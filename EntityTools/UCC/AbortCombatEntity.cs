@@ -12,6 +12,7 @@ using Astral.Logic.UCC.Classes;
 using Astral.Quester.FSM.States;
 using EntityTools;
 using EntityTools.Editors;
+using EntityTools.Enums;
 using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;

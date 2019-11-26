@@ -30,7 +30,7 @@ namespace EntityTools.UCC.Conditions
         #region Hide Inherited Properties
         [XmlIgnore]
         [Browsable(false)]
-        public new Enums.Sign Sign { get; set; }
+        public new Astral.Logic.UCC.Ressources.Enums.Sign Sign { get; set; }
 
         [XmlIgnore]
         [Browsable(false)]
@@ -38,11 +38,11 @@ namespace EntityTools.UCC.Conditions
 
         [XmlIgnore]
         [Browsable(false)]
-        public new Enums.Unit Target { get; set; }
+        public new Astral.Logic.UCC.Ressources.Enums.Unit Target { get; set; }
 
         [XmlIgnore]
         [Browsable(false)]
-        public new Enums.ActionCond Tested { get; set; }
+        public new Astral.Logic.UCC.Ressources.Enums.ActionCond Tested { get; set; }
         #endregion
     }
 }

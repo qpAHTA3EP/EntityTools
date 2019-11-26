@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.19.1125.1603</AssemblyVersion>
+    <AssemblyVersion>0.19.1126.0913</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -161,7 +161,12 @@
     <Compile Include="Tools\CollectionTypeConverter.cs" />
     <Compile Include="Tools\CopyHelper.cs" />
     <Compile Include="Tools\EnchantHelper.cs" />
-    <Compile Include="Tools\EntityCache.cs" />
+    <Compile Include="Tools\Entities\EntityCache.cs" />
+    <Compile Include="Tools\Entities\EntityComparerToOptions.cs" />
+    <Compile Include="Tools\Entities\EntityComparerToPattern.cs" />
+    <Compile Include="Tools\Entities\Enums.cs" />
+    <Compile Include="Tools\Entities\CachedSearch.cs" />
+    <Compile Include="Tools\Entities\UncachedSearch.cs" />
     <Compile Include="Tools\Enums.cs" />
     <Compile Include="Tools\Export\FileTools.cs" />
     <Compile Include="Tools\Export\Auras.cs" />
@@ -244,7 +249,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Tools\Extensions\" />
+    <Folder Include="Extensions\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\Entity_7_40х48.png" />
