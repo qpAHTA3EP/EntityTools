@@ -20,6 +20,7 @@ using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Forms;
 using EntityTools.Tools;
+using EntityTools.Tools.Entities;
 using MyNW.Classes;
 using MyNW.Internals;
 using static Astral.Logger;
@@ -27,20 +28,20 @@ using static Astral.Logger;
 namespace EntityTools.Actions
 {
     [Serializable]
-    public class InteractEntities : Astral.Quester.Classes.Action
+    public class InteractEntitiesCached : Astral.Quester.Classes.Action
     {
 #if PROFILING
         public static int RunCount = 0;
         public static void ResetWatch()
         {
             RunCount = 0;
-            Logger.WriteLine(Logger.LogType.Debug, $"InteractEntities::ResetWatch()");
+            Logger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesCached::ResetWatch()");
         }
 
         public static void LogWatch()
         {
-            if(RunCount > 0)
-                Logger.WriteLine(Logger.LogType.Debug, $"InteractEntities: RunCount: {RunCount}");
+            if (RunCount > 0)
+                Logger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesCached: RunCount: {RunCount}");
         }
 #endif
         [Description("Type of the EntityID:\n" +
@@ -86,10 +87,30 @@ namespace EntityTools.Actions
         [Category("Entity optional checks")]
         public float ReactionRange { get; set; } = 150;
 
+        [XmlIgnore]
+        private List<string> customRegionNames = null;
+        [XmlIgnore]
+        private List<CustomRegion> customRegions = null;
+
         [Description("CustomRegion names collection")]
         [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
         [Category("Entity optional checks")]
-        public List<string> CustomRegionNames { get; set; } = new List<string>();
+        public List<string> CustomRegionNames
+        {
+            get => customRegionNames;
+            set
+            {
+                if(customRegionNames != value)
+                {
+                    if (value != null
+                        && value.Count > 0)
+                        customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) =>
+                                    value.Exists((string regName) => regName == cr.Name));
+
+                    customRegionNames = value;
+                }
+            }
+        }
 
         [Description("A subset of entities that are searched for a target\n" +
             "Contacts: Only interactable Entities\n" +
@@ -182,12 +203,8 @@ namespace EntityTools.Actions
             {
                 if (!HoldTargetEntity || target == null || !target.IsValid || (HealthCheck && target.IsDead))
                 {
-                    Entity entity = (EntitySetType == EntitySetType.Contacts) ? 
-                                    EntitySelectionTools.FindClosestContactEntity(EntityID, EntityIdType, EntityNameType, 
-                                                                HealthCheck, ReactionRange, RegionCheck, CustomRegionNames,
-                                                                IsNotInBlackList) :
-                                    EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType,
-                                                                HealthCheck, ReactionRange, RegionCheck, CustomRegionNames,
+                    Entity entity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType,
+                                                                HealthCheck, ReactionRange, RegionCheck, customRegions,
                                                                 IsNotInBlackList);
 
                     if (entity != null && entity.IsValid)
@@ -195,6 +212,8 @@ namespace EntityTools.Actions
                     else
                     {
                         target = null;
+                        if (IgnoreCombat)
+                            Astral.Quester.API.IgnoreCombat = true;
                         return false;
                     }
                 }
@@ -325,7 +344,7 @@ namespace EntityTools.Actions
             return Approach.BreakInfos.Continue;
         }
 
-        public InteractEntities() { }
+        public InteractEntitiesCached() { }
         public override string ActionLabel => $"{GetType().Name} [{EntityID}]";
         public override string InternalDisplayName => string.Empty;
         protected override Vector3 InternalDestination
@@ -383,75 +402,4 @@ namespace EntityTools.Actions
                 DialogEdit.Show(Dialogs);
             }
         }
-    }
-
-    /// <summary>
-    /// Упрощенное описание игнорируемых Entity для черного списка 
-    /// </summary>
-    internal class BlackEntityDef
-    {
-        public BlackEntityDef(Entity ent, int t = 0)
-        {
-            if (ent != null)
-            {
-                id = ent.ContainerId;
-                ptr = ent.Pointer;
-                pos = ent.Location.Clone();
-            }
-            else
-            {
-                id = 0;
-                ptr = IntPtr.Zero;
-                pos = new Vector3();
-            }
-
-            if (t > 0)
-                timeout = new Astral.Classes.Timeout(t);
-        }
-
-        internal Astral.Classes.Timeout timeout;
-        internal uint id;
-        internal IntPtr ptr;
-        internal Vector3 pos;
-
-        public bool IsTimedOut
-        {
-            get
-            {
-                if(timeout != null)
-                    return timeout.IsTimedOut;
-                return false;
-            }
-        }
-
-        public bool Equals(BlackEntityDef bkEnt)
-        {
-            return id == bkEnt.id
-                    || ptr == bkEnt.ptr
-                    || pos.Distance3D(bkEnt.pos) <= 1;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is BlackEntityDef bkEnt)
-            {
-                return id == bkEnt.id
-                    || ptr == bkEnt.ptr
-                    || pos.Distance3D(bkEnt.pos) <= 1;
-            }
-            if (obj is Entity ent)
-            {
-                return id == ent.ContainerId
-                    || ptr == ent.Pointer
-                    || pos.Distance3D(ent.Location) <= 1;
-            }
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return id.GetHashCode() & ptr.GetHashCode() & pos.GetHashCode();
-            //return base.GetHashCode();
-        }
-    }
-}
+    }}

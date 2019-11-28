@@ -1,7 +1,9 @@
 ﻿using Astral.Forms;
 using Astral.Logic.UCC;
 using Astral.Logic.UCC.Forms;
+using EntityTools.Actions;
 using EntityTools.Tools;
+using EntityTools.Tools.Entities;
 using System;
 using System.Threading;
 using System.Windows.Forms;
@@ -31,34 +33,38 @@ namespace EntityTools
             }
         }
 
-        public override void OnBotStart() { }
+        public override void OnBotStart()
+        {
+#if PROFILING
+            InteractEntities.ResetWatch();
+            InteractEntitiesCached.ResetWatch();
+            InteractEntities.ResetWatch();
+            EntitySelectionTools.ResetWatch();
+            SearchCached.ResetWatch();
+            EntityCache.ResetWatch();
+            EntityCacheRecord.ResetWatch();
+            SearchDirect.ResetWatch();
+#endif
+        }
 
-        public override void OnBotStop() { }
+        public override void OnBotStop()
+        {
+#if PROFILING
+            InteractEntities.LogWatch();
+            InteractEntitiesCached.LogWatch();
+            InteractEntities.LogWatch();
+            EntitySelectionTools.LogWatch();
+            SearchCached.LogWatch();
+            EntityCache.LogWatch();
+            EntityCacheRecord.LogWatch();
+            SearchDirect.LogWatch();
+#endif
+        }
 
         public override void OnLoad()
         {
             States.SpellStuckMonitor.Activate = true;
             States.SlideMonitor.Activate = false;
-
-            #region Подмена обработчика кнопки вызова редактора UCC
-            // Кнопка вызова редактора UCC на панели MainUCC
-            // Astral.Logic.UCC.Panels.MainUCC.b_Editor
-
-            //Astral.Forms.Main mainForm = null;
-            //foreach (Form form in Application.OpenForms)
-            //{
-            //    if (form is Astral.Forms.Main)
-            //    {
-            //        mainForm = (Astral.Forms.Main)form;
-            //        break;
-            //    }
-            //}
-            //if(mainForm != null)
-            //{
-
-            //}
-
-            #endregion
         }
 
         public override void OnUnload() { }

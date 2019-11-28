@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.19.1126.0913</AssemblyVersion>
+    <AssemblyVersion>0.19.1128.1349</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,7 +36,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;X64</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;X64, PROFILING</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -97,21 +97,19 @@
   <ItemGroup>
     <Compile Include="Actions\ChangeInstanceToLeader.cs" />
     <Compile Include="Actions\InsertInsignia.cs" />
-    <Compile Include="Actions\InteractEntities.cs" />
     <Compile Include="Actions\Deprecated\InteractEntity.cs" />
+    <Compile Include="Actions\InteractEntitiesCachedTimeout.cs" />
     <Compile Include="Actions\MoveToLeader.cs" />
     <Compile Include="Actions\PickUpMissionExt.cs" />
     <Compile Include="Conditions\CheckCampaignTask.cs" />
     <Compile Include="Conditions\CheckGameGUICondition.cs" />
-    <Compile Include="Conditions\CheckNode.cs" />
     <Compile Include="Conditions\CheckShard.cs" />
-    <Compile Include="Conditions\EntityPropertyConditions.cs" />
+    <Compile Include="Conditions\EntityPropertyConditionsCachedTimeout.cs" />
     <Compile Include="Conditions\Deprecated\EntityDistance.cs" />
-    <Compile Include="Conditions\EntityCountInCustomRegion.cs" />
+    <Compile Include="Conditions\EntityCountInCustomRegionCachedTimeout.cs" />
     <Compile Include="Conditions\Deprecated\PartyCount.cs" />
     <Compile Include="Conditions\TeamLeaderMapInstance.cs" />
     <Compile Include="Conditions\TeamMemberCount.cs" />
-    <Compile Include="Conditions\TeamMemberCountInCustomRegion.cs" />
     <Compile Include="Editors\CampaignTaskEditor.cs" />
     <Compile Include="Editors\EnyTypeEditor.cs" />
     <Compile Include="Editors\ConditionListEditor.cs" />
@@ -165,8 +163,8 @@
     <Compile Include="Tools\Entities\EntityComparerToOptions.cs" />
     <Compile Include="Tools\Entities\EntityComparerToPattern.cs" />
     <Compile Include="Tools\Entities\Enums.cs" />
-    <Compile Include="Tools\Entities\CachedSearch.cs" />
-    <Compile Include="Tools\Entities\UncachedSearch.cs" />
+    <Compile Include="Tools\Entities\SearchCached.cs" />
+    <Compile Include="Tools\Entities\SearchDirect.cs" />
     <Compile Include="Tools\Enums.cs" />
     <Compile Include="Tools\Export\FileTools.cs" />
     <Compile Include="Tools\Export\Auras.cs" />
@@ -185,7 +183,7 @@
     <Compile Include="Forms\MainPanel.Designer.cs">
       <DependentUpon>MainPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Actions\MoveToEntity.cs" />
+    <Compile Include="Actions\MoveToEntityCachedTimeout.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

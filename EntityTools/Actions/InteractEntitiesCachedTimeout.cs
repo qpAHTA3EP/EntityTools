@@ -20,6 +20,7 @@ using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Forms;
 using EntityTools.Tools;
+using EntityTools.Tools.Entities;
 using MyNW.Classes;
 using MyNW.Internals;
 using static Astral.Logger;
@@ -34,13 +35,13 @@ namespace EntityTools.Actions
         public static void ResetWatch()
         {
             RunCount = 0;
-            Logger.WriteLine(Logger.LogType.Debug, $"InteractEntities::ResetWatch()");
+            Logger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesCachedTimeout::ResetWatch()");
         }
 
         public static void LogWatch()
         {
-            if(RunCount > 0)
-                Logger.WriteLine(Logger.LogType.Debug, $"InteractEntities: RunCount: {RunCount}");
+            if (RunCount > 0)
+                Logger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesCachedTimeout: RunCount: {RunCount}");
         }
 #endif
         [Description("Type of the EntityID:\n" +
@@ -62,7 +63,7 @@ namespace EntityTools.Actions
             "True: Only Entities located in the same Region as Player are detected\n" +
             "False: Entity's Region does not checked during search")]
         [Category("Entity optional checks")]
-        public bool RegionCheck { get; set; }
+        public bool RegionCheck { get; set; } = false;
 
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
@@ -82,14 +83,34 @@ namespace EntityTools.Actions
         public bool SkipMoving { get; set; } = false;
 
         [Description("The maximum distance from the character within which the Entity is searched\n" +
-            "The default value is 0, which disables distance checking")]
+            "The default value is 150, which disables distance checking")]
         [Category("Entity optional checks")]
         public float ReactionRange { get; set; } = 150;
+
+        [XmlIgnore]
+        private List<string> customRegionNames = null;
+        [XmlIgnore]
+        private List<CustomRegion> customRegions = null;
 
         [Description("CustomRegion names collection")]
         [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
         [Category("Entity optional checks")]
-        public List<string> CustomRegionNames { get; set; } = new List<string>();
+        public List<string> CustomRegionNames
+        {
+            get => customRegionNames;
+            set
+            {
+                if(customRegionNames != value)
+                {
+                    if (value != null
+                        && value.Count > 0)
+                        customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) =>
+                                    value.Exists((string regName) => regName == cr.Name));
+
+                    customRegionNames = value;
+                }
+            }
+        }
 
         [Description("A subset of entities that are searched for a target\n" +
             "Contacts: Only interactable Entities\n" +
@@ -107,33 +128,6 @@ namespace EntityTools.Actions
         [Category("Interruptions")]
         public bool IgnoreCombat { get; set; } = true;
 
-        ///// Внутренний список игнорируемых Entity, используемый, если InteractionRequirement=Once
-        //[NonSerialized]
-        //private TempBlackList<IntPtr> ignoredEntity;
-
-        //[Description("True: Complite an action when the Bot has approached and interacted with the Entity\n" +
-        //             "False: Continue executing the action after the Bot has approached and interacted with the Entity")]
-        //[Category("Movement")]
-        //public bool StopOnApproached { get; set; }
-
-        //[Description("Select the need for interaction\n" +
-        //    "Forbidden: No interaction is executed\n" +
-        //    "IfPossible: The interaction is executed if Entity is interactable\n" +
-        //    "Once: The interaction is executed only once, and the next time the Entity will be ignored\n" +
-        //    "Obligatory: Interaction is strongly needed. The interaction is repeated until the target is intractable.")]
-        //[Category("Interaction")]
-        //public InteractionRequirement InteractionRequirement { get; set; }
-
-        //[Description("Select the interaction method\n" +
-        //    "Auto: Consistent use of all other interaction methods\n" +
-        //    "NPC: Interact with an Entity as an NPC\n" +
-        //    "Generic: Interact with an entity using generic interaction method\n" +
-        //    "SimulateFKey: Force 'F' key press to interact an Entity\n" +
-        //    "FollowAndInteractNPC: Follows an entity and interacts with it again and again as long as the interaction is possible\n" +
-        //    "FollowAndSimulateFKey: Follows an entity and interacts with it by simulation 'F' key press again and again as long as the interaction is possible")]
-        //[Category("Interaction")]
-        //public InteractionMethod InteractionMethod { get; set; }
-
         [Category("Interaction")]
         [Description("Only one interaction with Entity is possible in 'InteractitTimeout' period")]
         public bool InteractOnce { get; set; } = false;
@@ -145,11 +139,6 @@ namespace EntityTools.Actions
         [Description("Time to interact (ms)")]
         [Category("Interaction")]
         public int InteractTime { get; set; } = 2000;
-
-        //[Description("True: The attempt of the interaction is done prior to entering InCombat\n" +
-        //    "False: Interact after combat completed")]
-        //[Category("Interaction")]
-        //public bool TryInteractInCombat { get; set; } = true;
 
         [Description("Answers in dialog while interact with Entity")]
         [Editor(typeof(DialogEditor), typeof(UITypeEditor))]
@@ -176,25 +165,31 @@ namespace EntityTools.Actions
         [NonSerialized]
         private Vector3 initialPos = new Vector3();
 
+        [XmlIgnore]
+        private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(500);
+
+        [Description("Time between searches of the Entity (ms)")]
+        public int SearchTimeInterval { get; set; } = 500;
+
         public override bool NeedToRun
         {
             get
             {
-                if (!HoldTargetEntity || target == null || !target.IsValid || (HealthCheck && target.IsDead))
+                if (timeout.IsTimedOut 
+                    && (!HoldTargetEntity || target == null || !target.IsValid || (HealthCheck && target.IsDead)))
                 {
-                    Entity entity = (EntitySetType == EntitySetType.Contacts) ? 
-                                    EntitySelectionTools.FindClosestContactEntity(EntityID, EntityIdType, EntityNameType, 
-                                                                HealthCheck, ReactionRange, RegionCheck, CustomRegionNames,
-                                                                IsNotInBlackList) :
-                                    EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType,
-                                                                HealthCheck, ReactionRange, RegionCheck, CustomRegionNames,
+                    Entity closestEntity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType,
+                                                                HealthCheck, ReactionRange, RegionCheck, customRegions,
                                                                 IsNotInBlackList);
+                    timeout.ChangeTime(SearchTimeInterval);
 
-                    if (entity != null && entity.IsValid)
-                        target = new Entity(entity.Pointer);
+                    if (closestEntity != null && closestEntity.IsValid)
+                        target = new Entity(closestEntity.Pointer);
                     else
                     {
                         target = null;
+                        if (IgnoreCombat)
+                            Astral.Quester.API.IgnoreCombat = true;
                         return false;
                     }
                 }
@@ -348,10 +343,7 @@ namespace EntityTools.Actions
                 graph.drawFillEllipse(target.Location, new Size(10, 10), beige);
             }
         }
-        public override void InternalReset()
-        {
-            target = null;
-        }
+        public override void InternalReset() { }
         protected override ActionValidity InternalValidity
         {
             get
@@ -382,76 +374,6 @@ namespace EntityTools.Actions
             {
                 DialogEdit.Show(Dialogs);
             }
-        }
-    }
-
-    /// <summary>
-    /// Упрощенное описание игнорируемых Entity для черного списка 
-    /// </summary>
-    internal class BlackEntityDef
-    {
-        public BlackEntityDef(Entity ent, int t = 0)
-        {
-            if (ent != null)
-            {
-                id = ent.ContainerId;
-                ptr = ent.Pointer;
-                pos = ent.Location.Clone();
-            }
-            else
-            {
-                id = 0;
-                ptr = IntPtr.Zero;
-                pos = new Vector3();
-            }
-
-            if (t > 0)
-                timeout = new Astral.Classes.Timeout(t);
-        }
-
-        internal Astral.Classes.Timeout timeout;
-        internal uint id;
-        internal IntPtr ptr;
-        internal Vector3 pos;
-
-        public bool IsTimedOut
-        {
-            get
-            {
-                if(timeout != null)
-                    return timeout.IsTimedOut;
-                return false;
-            }
-        }
-
-        public bool Equals(BlackEntityDef bkEnt)
-        {
-            return id == bkEnt.id
-                    || ptr == bkEnt.ptr
-                    || pos.Distance3D(bkEnt.pos) <= 1;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is BlackEntityDef bkEnt)
-            {
-                return id == bkEnt.id
-                    || ptr == bkEnt.ptr
-                    || pos.Distance3D(bkEnt.pos) <= 1;
-            }
-            if (obj is Entity ent)
-            {
-                return id == ent.ContainerId
-                    || ptr == ent.Pointer
-                    || pos.Distance3D(ent.Location) <= 1;
-            }
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return id.GetHashCode() & ptr.GetHashCode() & pos.GetHashCode();
-            //return base.GetHashCode();
         }
     }
 }

@@ -4,15 +4,97 @@ using Astral.Quester.Classes;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
+using System.Linq;
 using EntityTools.Enums;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
+using Astral;
 
 namespace EntityTools.Tools
 {
     public static class EntitySelectionTools
     {
         public delegate bool SpecialCheckDelegate(Entity entity);
+
+#if PROFILING
+        private static readonly long interval = 10000;
+
+        private static Stopwatch stopwatch = new Stopwatch();
+        private static Stopwatch cntStopwatch = new Stopwatch();
+        private static int Count = 0;
+        private static TimeSpan MinTime = TimeSpan.MaxValue;
+        private static TimeSpan MaxTime = TimeSpan.MinValue;
+
+        private static int ContactCount = 0;
+        private static TimeSpan ContactMinTime = TimeSpan.MaxValue;
+        private static TimeSpan ContactMaxTime = TimeSpan.MinValue;
+
+        private static Dictionary<long, long> frequencyDistribution = new Dictionary<long, long>();
+        private static Dictionary<long, long> contactFrequencyDistribution = new Dictionary<long, long>();
+
+        public static void ResetWatch()
+        {
+            ContactCount = 0;
+            Count = 0;
+            MinTime = TimeSpan.MaxValue;
+            MaxTime = TimeSpan.MinValue;
+            ContactMinTime = TimeSpan.MaxValue;
+            ContactMaxTime = TimeSpan.MinValue;
+            stopwatch.Reset();
+            cntStopwatch.Reset();
+            frequencyDistribution.Clear();
+            contactFrequencyDistribution.Clear();
+            Logger.WriteLine(Logger.LogType.Debug, $"UncachedSearch::ResetWatch()");
+        }
+
+        public static void LogWatch()
+        {
+            if (Count > 0)
+            {
+                double avrgTime = (double)stopwatch.ElapsedMilliseconds / (double)Count;
+                double avrgTicks = (double)stopwatch.ElapsedTicks / (double)Count;
+                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tCount: {Count}, TotalTime: {stopwatch.Elapsed}({stopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
+                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tMinTime: {MinTime.TotalMilliseconds.ToString("N3")} ms ({MinTime.Ticks.ToString("N0")} ticks)");
+                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tMaxTime: {MaxTime.TotalMilliseconds.ToString("N3")} ms ({MaxTime.Ticks.ToString("N0")} ticks)");
+                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tAverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
+                if (frequencyDistribution.Count > 0)
+                {
+                    Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FrequencyDistribution:");
+                    var list = frequencyDistribution.ToList();
+                    list.Sort((KeyValuePair<long, long> l, KeyValuePair<long, long> r) => { return (int)l.Key - (int)r.Key; });
+                    foreach (var i in list)
+                        Logger.WriteLine(Logger.LogType.Debug, $"\t\t{((double)i.Key * (double)interval / 10000d).ToString("N3")} := {i.Value.ToString("N0")}");
+                }
+                //Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity(): Count: {Count}, TotalTime: {stopwatch.Elapsed}({stopwatch.ElapsedMilliseconds.ToString("N3")} ms), MinTime: {MinTime.TotalMilliseconds.ToString("N3")} ms ({MinTime.Ticks.ToString("N0")} ticks), MaxTime: {MaxTime.TotalMilliseconds.ToString("N3")} ms ({MaxTime.Ticks.ToString("N0")} ticks) , AverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
+                //foreach (var i in frequencyDistribution)
+                //    Logger.WriteLine(Logger.LogType.Debug, $"FrequencyDistribution[{((double)i.Key * (double)interval / 10000d).ToString("N3")}] := {i.Value.ToString("N0")}");
+            }
+            else Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity(): Count: 0");
+            if (ContactCount > 0)
+            {
+                double avrgTime = (double)cntStopwatch.ElapsedMilliseconds / (double)ContactCount;
+                double avrgTicks = (double)cntStopwatch.ElapsedTicks / (double)ContactCount;
+                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tCount: {ContactCount}, TotalTime: {cntStopwatch.Elapsed}({cntStopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
+                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tMinTime: {ContactMinTime.TotalMilliseconds.ToString("N3")} ms ({ContactMinTime.Ticks.ToString("N0")} ticks)");
+                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tMaxTime: {ContactMaxTime.TotalMilliseconds.ToString("N3")} ms ({ContactMaxTime.Ticks.ToString("N0")} ticks)");
+                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tAverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
+                if (contactFrequencyDistribution.Count > 0)
+                {
+                    Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::ContactFrequencyDistribution:");
+                    var list = contactFrequencyDistribution.ToList();
+                    list.Sort((KeyValuePair<long, long> l, KeyValuePair<long, long> r) => { return (int)l.Key - (int)r.Key; });
+                    foreach (var i in list)
+                        Logger.WriteLine(Logger.LogType.Debug, $"\t\t{((double)i.Key * (double)interval / 10000d).ToString("N3")} := {i.Value.ToString("N0")}");
+                }
+                //Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity(): Count: {ContactCount}, TotalTime: {cntStopwatch.Elapsed}({cntStopwatch.ElapsedMilliseconds.ToString("N3")} ms), MinTime: {ContactMinTime.TotalMilliseconds.ToString("N3")} ms ({ContactMinTime.Ticks.ToString("N0")} ticks), MaxTime: {ContactMaxTime.TotalMilliseconds.ToString("N3")} ms ({ContactMaxTime.Ticks.ToString("N0")} ticks) , AverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
+                //foreach (var i in contactFrequencyDistribution)
+                //    Logger.WriteLine(Logger.LogType.Debug, $"ContactFrequencyDistribution[{((double)i.Key * (double)interval / 10000d).ToString("N3")}] := {i.Value.ToString("N0")}");
+            }
+            else Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity(): Count: 0");
+        }
+#endif
+
 
         /// <summary>
         /// Поиск ближайшего Entity из entities, соответствующего условиям
@@ -30,32 +112,57 @@ namespace EntityTools.Tools
         /// <returns>Найденное Entity</returns>
         public static Entity FindClosestEntity(List<Entity> entities, string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, bool healthCheck = false, float range = 0, bool regionCheck = false, List<string> customRegionNames = null, SpecialCheckDelegate specialCheck = null, bool interactable = false)
         {
-            Entity closestEntity = new Entity(IntPtr.Zero);
-            if (!string.IsNullOrEmpty(entPattern) && entities != null)
+#if PROFILING
+            Count++;
+            TimeSpan StartTime = stopwatch.Elapsed;
+            stopwatch.Start();
+            try
             {
-                switch(nameType)
+#endif
+                Entity closestEntity = new Entity(IntPtr.Zero);
+                if (!string.IsNullOrEmpty(entPattern) && entities != null)
                 {
-                    case EntityNameType.NameUntranslated:
-                        switch (strMatchType)
-                        {
-                            case ItemFilterStringType.Simple:
-                                return FindClosestEntitySimpleNameUntranslated(entities, entPattern, healthCheck, range, regionCheck, customRegionNames, specialCheck, interactable);
-                            case ItemFilterStringType.Regex:
-                                return FindClosestEntityRegexNameUntranslated(entities, entPattern, healthCheck, range, regionCheck, customRegionNames, specialCheck, interactable);
-                        }
-                        break;
-                    case EntityNameType.InternalName:
-                        switch(strMatchType)
-                        {
-                            case ItemFilterStringType.Simple:
-                                return FindClosestEntitySimpleNameInternal(entities, entPattern, healthCheck, range, regionCheck, customRegionNames, specialCheck, interactable);
-                            case ItemFilterStringType.Regex:
-                                return FindClosestEntityRegexNameInternal(entities, entPattern, healthCheck, range, regionCheck, customRegionNames, specialCheck, interactable);
-                        }
-                        break;
+                    switch (nameType)
+                    {
+
+                        case EntityNameType.NameUntranslated:
+                            switch (strMatchType)
+                            {
+                                case ItemFilterStringType.Simple:
+                                    return FindClosestEntitySimpleNameUntranslated(entities, entPattern, healthCheck, range, regionCheck, customRegionNames, specialCheck, interactable);
+                                case ItemFilterStringType.Regex:
+                                    return FindClosestEntityRegexNameUntranslated(entities, entPattern, healthCheck, range, regionCheck, customRegionNames, specialCheck, interactable);
+                            }
+                            break;
+                        case EntityNameType.InternalName:
+                            switch (strMatchType)
+                            {
+                                case ItemFilterStringType.Simple:
+                                    return FindClosestEntitySimpleNameInternal(entities, entPattern, healthCheck, range, regionCheck, customRegionNames, specialCheck, interactable);
+                                case ItemFilterStringType.Regex:
+                                    return FindClosestEntityRegexNameInternal(entities, entPattern, healthCheck, range, regionCheck, customRegionNames, specialCheck, interactable);
+                            }
+                            break;
+                    }
                 }
+                return closestEntity;
+#if PROFILING
             }
-            return closestEntity;
+            finally
+            {
+                stopwatch.Stop();
+                TimeSpan time = stopwatch.Elapsed.Subtract(StartTime);
+                if (time > MaxTime)
+                    MaxTime = time;
+                else if (time < MinTime)
+                    MinTime = time;
+
+                long i = Math.DivRem(time.Ticks, interval, out long rem);
+                if (frequencyDistribution.ContainsKey(i))
+                    frequencyDistribution[i] += 1;
+                else frequencyDistribution.Add(i, 1);
+            }
+#endif
         }
         /// <summary>
         /// Поиск ближайшего Entity из entities, соответствующего условиям
@@ -71,43 +178,71 @@ namespace EntityTools.Tools
         /// <returns>Найденное Entity</returns>
         public static Entity FindClosestContactEntity(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, bool healthCheck = false, float range = 0, bool regionCheck = false, List<string> customRegionNames = null, SpecialCheckDelegate specialCheck = null)
         {
-            List<Entity> entities = new List<Entity>();
 
-            foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts)
-            {
-                if (contact.Entity.IsValid)
+#if PROFILING
+            ContactCount++;
+            TimeSpan StartTime = cntStopwatch.Elapsed;
+            cntStopwatch.Start();
+            try
+            { 
+#endif
+                List<Entity> entities = new List<Entity>();
+
+                foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts)
                 {
-                    if (specialCheck != null && !specialCheck(contact.Entity))
-                        continue;
+                    if (contact.Entity.IsValid)
+                    {
+                        if (specialCheck != null && !specialCheck(contact.Entity))
+                            continue;
 
-                    entities.Add(contact.Entity);
+                        entities.Add(contact.Entity);
+                    }
                 }
-            }
-            foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyInteractCritterEnts)
-            {
-                if (contact.Entity.IsValid)
+                foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyInteractCritterEnts)
                 {
-                    if (specialCheck != null && !specialCheck(contact.Entity))
-                        continue;
+                    if (contact.Entity.IsValid)
+                    {
+                        if (specialCheck != null && !specialCheck(contact.Entity))
+                            continue;
 
-                    entities.Add(contact.Entity);
+                        entities.Add(contact.Entity);
+                    }
                 }
+
+                return FindClosestEntity(entities, entPattern, strMatchType, nameType, healthCheck, range, regionCheck, customRegionNames, specialCheck, true);
+
+#if PROFILING
             }
-            return FindClosestEntity(entities, entPattern, strMatchType, nameType, healthCheck, range, regionCheck, customRegionNames, specialCheck, true);
+            finally
+            {
+                cntStopwatch.Stop();
+                TimeSpan time = cntStopwatch.Elapsed.Subtract(StartTime);
+                if (time > ContactMaxTime)
+                    ContactMaxTime = time;
+                else if (time < ContactMinTime)
+                    ContactMinTime = time;
+
+                
+                long i = Math.DivRem((long)time.Ticks, interval, out long rem);
+                if (contactFrequencyDistribution.ContainsKey(i))
+                    contactFrequencyDistribution[i] += 1;
+                else contactFrequencyDistribution.Add(i, 1);
+            }
+#endif        
         }
-        /// <summary>
-        /// Поиск ближайшего Entity из entities, 
-        /// у которого InternalName соответствует шаблону регулярного выражения
-        /// и соответствующего остальным условиям
-        /// </summary>
-        /// <param name="entities">Исходная коллекция Entity</param>
-        /// <param name="entPattern">Шаблон, соответсвие которому ищется</param>
-        /// <param name="healthCheck">>Флаг проверки очков HP у Entity</param>
-        /// <param name="range">Предельное расстояние поиска</param>
-        /// <param name="regionCheck">Флаг проверки соответствия региона Entity и региона игрока</param>
-        /// <param name="specialCheck">Функтор дополнительной проверки Entity, например наличия в черном списке</param>
-        /// <returns>Найденное Entity</returns>
-        private static Entity FindClosestEntityRegexNameInternal(List<Entity> entities, string entPattern, bool healthCheck = false, float range = 0, bool regionCheck = false, List<string> customRegionNames = null,SpecialCheckDelegate specialCheck = null, bool interactable = false)
+    /// <summary>
+    /// Поиск ближайшего Entity из entities, 
+    /// у которого InternalName соответствует шаблону регулярного выражения
+    /// и соответствующего остальным условиям
+    /// </summary>
+    /// <param name="entities">Исходная коллекция Entity</param>
+    /// <param name="entPattern">Шаблон, соответсвие которому ищется</param>
+    /// <param name="healthCheck">>Флаг проверки очков HP у Entity</param>
+    /// <param name="range">Предельное расстояние поиска</param>
+    /// <param name="regionCheck">Флаг проверки соответствия региона Entity и региона игрока</param>
+    /// <param name="specialCheck">Функтор дополнительной проверки Entity, например наличия в черном списке</param>
+    /// <returns>Найденное Entity</returns>
+    private static Entity FindClosestEntityRegexNameInternal(List<Entity> entities, string entPattern, bool healthCheck = false, float range = 0, bool regionCheck = false, List<string> customRegionNames = null,SpecialCheckDelegate specialCheck = null, bool interactable = false)
         {
             Entity closestEntity = new Entity(IntPtr.Zero);
 

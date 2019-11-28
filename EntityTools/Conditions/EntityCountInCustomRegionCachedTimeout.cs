@@ -13,6 +13,7 @@ using Astral.Quester.UIEditors;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Tools;
+using EntityTools.Tools.Entities;
 using MyNW.Classes;
 using MyNW.Internals;
 
@@ -21,13 +22,6 @@ namespace EntityTools.Conditions
     /// <summary>
     /// Проверка наличия хотя бы одного объекта Entity, подпадающих под шаблон EntityID,
     /// в регионе CustomRegion, заданным в CustomRegionNames
-    /// 
-    /// Варианты реализации:
-    /// 1)  Подсчет количества подходящих объектов Entity в регионе CustomRegionNames и 
-    ///     сопоставление (больше/ меньше/равно)его с заданной величиной Value
-    /// 2)  Тоже самое на со списком регионов CustomRegionNames:
-    /// 2.1)    Проверка наличия подходящих объектов Entity в любом из CustomRegionNames
-    /// 2.2)    Подсчет количества подходящих объектов Entity в любом из CustomRegionNames
     /// </summary>
 
     [Serializable]
@@ -48,6 +42,13 @@ namespace EntityTools.Conditions
         [Category("Entity")]
         public EntityNameType EntityNameType { get; set; } = EntityNameType.NameUntranslated;
 
+        [Description("A subset of entities that are searched for a target\n" +
+            "Contacts: Only interactable Entities\n" +
+            "Complete: All possible Entities")]
+        [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
+        [Category("Entity optional checks")]
+        public EntitySetType EntitySetType { get; set; } = EntitySetType.Contacts;
+
         [Description("Check Entity's Region:\n" +
             "True: Count Entity if it located in the same Region as Player\n" +
             "False: Does not consider the region when counting Entities")]
@@ -60,11 +61,11 @@ namespace EntityTools.Conditions
         [Category("Entity optional checks")]
         public bool HealthCheck { get; set; } = true;
 
-        [Description("Threshold value of the Entity number for comparison by 'Sign'")]
+        [Description("Threshold value to compare by 'Sign' with the number of the Entities")]
         [Category("Tested")]
         public uint Value { get; set; } = 0;
 
-        [Description("The comparison type for 'Value'")]
+        [Description("The comparison type for the number of the Entities with 'Value'")]
         [Category("Tested")]
         public Relation Sign { get; set; } = Relation.Superior;
 
@@ -78,7 +79,7 @@ namespace EntityTools.Conditions
 
         [Description("CustomRegion names collection")]
         [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
-        [Category("Entity optional checks")]
+        [Category("Location")]
         public List<string> CustomRegionNames
         {
             get => customRegionNames;
@@ -99,6 +100,11 @@ namespace EntityTools.Conditions
         [XmlIgnore]
         private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(500);
 
+        [Description("The maximum distance from the character within which the Entity is searched\n" +
+            "The default value is 0, which disables distance checking")]
+        //[Category("Entity optional checks")]
+        public float ReactionRange { get; set; } = 0;
+
         [Description("Time between searches of the Entity (ms)")]
         public int SearchTimeInterval { get; set; } = 500;
 
@@ -107,34 +113,42 @@ namespace EntityTools.Conditions
             return $"{GetType().Name} {Sign} {Value}";
         }
 
+        [XmlIgnore]
+        List<Entity> entities = null;
+
         public override bool IsValid
         {
             get
             {
                 if (!string.IsNullOrEmpty(EntityID) && CustomRegionNames.Count > 0)
                 {
-                    List<Entity> entities = EntitySelectionTools.FindAllEntities(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, HealthCheck, RegionCheck, CustomRegionNames);
-
+                    if (timeout.IsTimedOut)
+                    {
+                        entities = SearchCached.FindAllEntity(EntityID, EntityIdType, EntityNameType, EntitySetType,
+                           HealthCheck, ReactionRange, RegionCheck, customRegions);
+                        timeout.ChangeTime(SearchTimeInterval);
+                    }
                     uint entCount = 0;
 
-                    foreach (Entity entity in entities)
-                    {
-                        bool match = false;
-
-                        foreach (CustomRegion cr in customRegions)
+                    if(entities != null)
+                        foreach (Entity entity in entities)
                         {
-                            if (CommonTools.IsInCustomRegion(entity, cr))
-                            {
-                                match = true;
-                                break;
-                            }
-                        }
+                            bool match = false;
 
-                        if (Tested == Presence.Equal && match)
-                            entCount++;
-                        if (Tested == Presence.NotEquel && !match)
-                            entCount++;
-                    }
+                            foreach (CustomRegion cr in customRegions)
+                            {
+                                if (CommonTools.IsInCustomRegion(entity, cr))
+                                {
+                                    match = true;
+                                    break;
+                                }
+                            }
+
+                            if (Tested == Presence.Equal && match)
+                                entCount++;
+                            if (Tested == Presence.NotEquel && !match)
+                                entCount++;
+                        }
 
                     switch(Sign)
                     {
