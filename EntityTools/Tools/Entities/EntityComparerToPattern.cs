@@ -14,7 +14,7 @@ namespace EntityTools.Tools.Entities
     /// Класс, инкапсулирующие все базовые проверки Entity на соответствие шаблону
     /// 
     /// </summary>
-    internal class EntityComparerToPattern
+    public class EntityComparerToPattern
     {
         private string pattern = string.Empty;
 

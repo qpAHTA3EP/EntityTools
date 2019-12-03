@@ -117,6 +117,52 @@ namespace EntityTools.Tools.Entities
         }
 
         /// <summary>
+        /// Формирование списка Entities, соответствующих ключу
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="action">Функтор действия, которое нужно выполнить над Entity, удовлетворяющем условиям</param>
+        /// <returns></returns>
+        public static List<Entity> GetEntities(CacheRecordKey key, Action<Entity> action = null)
+        {
+            if (key == null)
+                return null;
+#if PROFILING
+            Count++;
+            TimeSpan StartTime = stopwatch.Elapsed;
+            stopwatch.Start();
+            try
+            {
+#endif
+                if (action != null)
+                    return EntityManager.GetEntities()?.FindAll((Entity e) =>
+                    {
+                        if (key.Comparer.Check(e))
+                        {
+                            action(e);
+                            return true;
+                        }
+                        else return false;
+                    });
+                else return EntityManager.GetEntities()?.FindAll(key.Comparer.Check);
+#if PROFILING
+            }
+            finally
+            {
+                stopwatch.Stop();
+                TimeSpan time = stopwatch.Elapsed.Subtract(StartTime);
+                if (time > MaxTime)
+                {
+                    MaxTime = time;
+                    WorseTryNumber = Count;
+                }
+                else if (time < MinTime)
+                    MinTime = time;
+
+            }
+#endif
+        }
+
+        /// <summary>
         /// Формирование списка Entities, способных к взаимодействию и соответствующих шаблону
         /// </summary>
         /// <param name="entPattern">Шаблон, которому должен соответствовать идентификатор (имя) Entity, заданные параметном </param>
@@ -186,5 +232,73 @@ namespace EntityTools.Tools.Entities
 #endif
         }
 
+        /// <summary>
+        /// Формирование списка Entities, способных к взаимодействию и соответствующих ключу
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="action">Функтор действия, которое нужно выполнить над Entity, удовлетворяющем условиям</param>
+        /// <returns></returns>
+        public static List<Entity> GetContactEntities(CacheRecordKey key, Action<Entity> action = null)
+        {
+            if (key == null)
+                return null;
+#if PROFILING
+            ContactCount++;
+            TimeSpan StartTime = cntStopwatch.Elapsed;
+            cntStopwatch.Start();
+            try
+            {
+#endif
+                List<Entity> entities = new List<Entity>();
+
+                if (action != null)
+                {
+                    foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts)
+                    {
+                        if (contact.Entity.IsValid && key.Comparer.Check(contact.Entity))
+                        {
+                            action(contact.Entity);
+                            entities.Add(contact.Entity);
+                        }
+                    }
+                    foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyInteractCritterEnts)
+                    {
+                        if (contact.Entity.IsValid && key.Comparer.Check(contact.Entity))
+                        {
+                            action(contact.Entity);
+                            entities.Add(contact.Entity);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts)
+                    {
+                        if (contact.Entity.IsValid && key.Comparer.Check(contact.Entity))
+                            entities.Add(contact.Entity);
+                    }
+                    foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyInteractCritterEnts)
+                    {
+                        if (contact.Entity.IsValid && key.Comparer.Check(contact.Entity))
+                            entities.Add(contact.Entity);
+                    }
+                }
+                return entities;
+#if PROFILING
+            }
+            finally
+            {
+                cntStopwatch.Stop();
+                TimeSpan time = cntStopwatch.Elapsed.Subtract(StartTime);
+                if (time > ContactMaxTime)
+                {
+                    ContactMaxTime = time;
+                    ContactWorseTryNumber = ContactCount;
+                }
+                else if (time < ContactMinTime)
+                    ContactMinTime = time;
+            }
+#endif
+        }
     }
 }

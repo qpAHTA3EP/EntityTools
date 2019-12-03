@@ -44,20 +44,56 @@ namespace EntityTools.Actions
                 Logger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesCachedTimeout: RunCount: {RunCount}");
         }
 #endif
+        [Description("ID of the Entity for the search")]
+        [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
+        [Category("Entity")]
+        public string EntityID
+        {
+            get => entityId;
+            set
+            {
+                if (entityId != value)
+                {
+                    entityId = value;
+                    if (!string.IsNullOrEmpty(entityId))
+                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    else Comparer = null;
+
+                }
+            }
+        }
+
         [Description("Type of the EntityID:\n" +
             "Simple: Simple test string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
-        public ItemFilterStringType EntityIdType { get; set; } = ItemFilterStringType.Simple;
-
-        [Description("ID of the Entity for the search")]
-        [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
-        [Category("Entity")]
-        public string EntityID { get; set; } = string.Empty;
+        public ItemFilterStringType EntityIdType
+        {
+            get => entityIdType;
+            set
+            {
+                if(entityIdType != value)
+                { 
+                    entityIdType = value;
+                    Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                }
+            }
+        }
 
         [Description("The switcher of the Entity filed which compared to the property EntityID")]
         [Category("Entity")]
-        public EntityNameType EntityNameType { get; set; } = EntityNameType.InternalName;
+        public EntityNameType EntityNameType
+        {
+            get => entityNameType;
+            set
+            {
+                if(entityNameType != value)
+                { 
+                    entityNameType = value;
+                    Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                }
+            }
+        }
 
         [Description("Check Entity's Ingame Region (Not CustomRegion):\n" +
             "True: Only Entities located in the same Region as Player are detected\n" +
@@ -87,11 +123,6 @@ namespace EntityTools.Actions
         [Category("Optional")]
         public float ReactionRange { get; set; } = 150;
 
-        [XmlIgnore]
-        private List<string> customRegionNames = null;
-        [XmlIgnore]
-        private List<CustomRegion> customRegions = null;
-
         [Description("CustomRegion names collection")]
         [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
         [Category("Optional")]
@@ -100,7 +131,7 @@ namespace EntityTools.Actions
             get => customRegionNames;
             set
             {
-                if(customRegionNames != value)
+                if (customRegionNames != value)
                 {
                     if (value != null
                         && value.Count > 0)
@@ -118,6 +149,10 @@ namespace EntityTools.Actions
         [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
         [Category("Optional")]
         public EntitySetType EntitySetType { get; set; } = EntitySetType.Contacts;
+
+        [Description("Time between searches of the Entity (ms)")]
+        [Category("Optional")]
+        public int SearchTimeInterval { get; set; } = 100;
 
         [Description("Distance to the Entity by which it is necessary to approach to disable 'IgnoreCombat' mode\n" +
             "Ignored if 'IgnoreCombat' does not True")]
@@ -152,7 +187,8 @@ namespace EntityTools.Actions
 
         [NonSerialized]
         //(1) private TempBlackList<IntPtr> blackList = new TempBlackList<IntPtr>();
-        /*(2)*/ private TempBlackList<uint> blackList = new TempBlackList<uint>();
+        /*(2)*/
+        private TempBlackList<uint> blackList = new TempBlackList<uint>();
         /*(3) private TempBlackList<BlackEntityDef> talked = new TempBlackList<BlackEntityDef>();*/
         /*(4) private List<BlackEntityDef> blackList = new List<BlackEntityDef>();*/
 
@@ -167,24 +203,34 @@ namespace EntityTools.Actions
 
         [XmlIgnore]
         private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(500);
+        [XmlIgnore]
+        private ItemFilterStringType entityIdType = ItemFilterStringType.Simple;
+        [XmlIgnore]
+        private string entityId = string.Empty;
+        [XmlIgnore]
+        private EntityNameType entityNameType = EntityNameType.InternalName;
+        [XmlIgnore]
+        private EntityComparerToPattern Comparer = null;
+        [XmlIgnore]
+        private List<string> customRegionNames = null;
+        [XmlIgnore]
+        private List<CustomRegion> customRegions = null;
 
-        [Description("Time between searches of the Entity (ms)")]
-        public int SearchTimeInterval { get; set; } = 500;
 
         public override bool NeedToRun
         {
             get
             {
-                if (timeout.IsTimedOut 
-                    && (!HoldTargetEntity || target == null || !target.IsValid || (HealthCheck && target.IsDead)))
+                if (timeout.IsTimedOut
+                    && (!HoldTargetEntity || !Validate(target) || (HealthCheck && target.IsDead)))
                 {
-                    Entity closestEntity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType,
+                    Entity closestEntity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType,
                                                                 HealthCheck, ReactionRange, RegionCheck, customRegions,
                                                                 IsNotInBlackList);
                     timeout.ChangeTime(SearchTimeInterval);
 
                     if (closestEntity != null && closestEntity.IsValid)
-                        target = new Entity(closestEntity.Pointer);
+                        target = closestEntity;
                     else
                     {
                         target = null;
@@ -194,7 +240,7 @@ namespace EntityTools.Actions
                     }
                 }
 
-                if (target != null && target.IsValid && !(HealthCheck && target.IsDead))
+                if (Validate(target) && !(HealthCheck && target.IsDead))
                 {
                     if (IgnoreCombat)
                     {
@@ -212,7 +258,7 @@ namespace EntityTools.Actions
                     initialPos = target.Location/*.Clone()*/;
                     return true;
                 }
-                else if(IgnoreCombat)
+                else if (IgnoreCombat)
                     Astral.Quester.API.IgnoreCombat = true;
 
                 return false;
@@ -320,16 +366,21 @@ namespace EntityTools.Actions
             return Approach.BreakInfos.Continue;
         }
 
+        private bool Validate(Entity e)
+        {
+            return e != null && Comparer.Check(e);
+        }
+
         public InteractEntities() { }
-        public override string ActionLabel => $"{GetType().Name} [{EntityID}]";
+        public override string ActionLabel => $"{GetType().Name} [{entityId}]";
         public override string InternalDisplayName => string.Empty;
         protected override Vector3 InternalDestination
         {
             get
             {
-                if (target != null && target.IsValid
+                if (Validate(target)
                     && IgnoreCombat && (target.Location.Distance3DFromPlayer > CombatDistance))
-                        return target.Location.Clone();
+                    return target.Location.Clone();
                 return new Vector3();
             }
         }
@@ -337,7 +388,7 @@ namespace EntityTools.Actions
         protected override bool IntenalConditions => !string.IsNullOrEmpty(EntityID);
         public override void OnMapDraw(GraphicsNW graph)
         {
-            if (target != null && target.IsValid)
+            if (Validate(target))
             {
                 Brush beige = Brushes.Beige;
                 graph.drawFillEllipse(target.Location, new Size(10, 10), beige);
@@ -348,7 +399,7 @@ namespace EntityTools.Actions
         {
             get
             {
-                if (string.IsNullOrEmpty(EntityID))
+                if (string.IsNullOrEmpty(entityId))
                 {
                     return new ActionValidity("EntityID property not set.");
                 }
@@ -363,8 +414,8 @@ namespace EntityTools.Actions
             if (betterEntityToInteract.IsValid)
             {
                 if (EntityNameType == EntityNameType.NameUntranslated)
-                    EntityID = betterEntityToInteract.NameUntranslated;
-                else EntityID = betterEntityToInteract.InternalName;
+                    entityId = betterEntityToInteract.NameUntranslated;
+                else entityId = betterEntityToInteract.InternalName;
                 if (base.HotSpots.Count == 0)
                 {
                     base.HotSpots.Add(betterEntityToInteract.Location.Clone());

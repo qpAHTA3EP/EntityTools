@@ -22,17 +22,52 @@ namespace EntityTools.Conditions
         [Description("ID of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
-        public string EntityID { get; set; } = string.Empty;
+        public string EntityID
+        {
+            get => entityId;
+            set
+            {
+                if (entityId != value)
+                {
+                    entityId = value;
+                    if (!string.IsNullOrEmpty(entityId))
+                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    else Comparer = null;
+                }
+            }
+        }
 
         [Description("The switcher of the Entity filed which compared to the property EntityID")]
         [Category("Entity")]
-        public EntityNameType EntityNameType { get; set; } = EntityNameType.NameUntranslated;
+        public EntityNameType EntityNameType
+        {
+            get => entityNameType;
+            set
+            {
+                if (entityNameType != value)
+                {
+                    entityNameType = value;
+                    Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                }
+            }
+        }
 
         [Description("Type of and EntityID:\n" +
             "Simple: Simple test string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
-        public ItemFilterStringType EntityIdType { get; set; } = ItemFilterStringType.Simple;
+        public ItemFilterStringType EntityIdType
+        {
+            get => entityIdType;
+            set
+            {
+                if (entityIdType != value)
+                {
+                    entityIdType = value;
+                    Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                }
+            }
+        }
 
         [Description("Check Entity's Region:\n" +
             "True: Search an Entity only if it located in the same Region as Player\n" +
@@ -58,14 +93,9 @@ namespace EntityTools.Conditions
         [Category("Entity optional checks")]
         public float ReactionRange { get; set; } = 0;
 
-        [XmlIgnore]
-        private List<string> customRegionNames = null;
-        [XmlIgnore]
-        private List<CustomRegion> customRegions = null;
-
         [Description("CustomRegion names collection")]
         [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
-        [Category("Entity optional checks")]
+        [Category("Optional")]
         public List<string> CustomRegionNames
         {
             get => customRegionNames;
@@ -93,14 +123,28 @@ namespace EntityTools.Conditions
         [Category("Tested")]
         public Condition.Relation Sign { get; set; } = Relation.Superior;
 
-        [XmlIgnore]
-        private Timeout timeout = new Timeout(500);
-
         [Description("Time between searches of the Entity (ms)")]
-        public int SearchTimeInterval { get; set; } = 500;
+        [Category("Optional")]
+        public int SearchTimeInterval { get; set; } = 100;
+
 
         [XmlIgnore]
         Entity closestEntity = null;
+        [XmlIgnore]
+        private Timeout timeout = new Timeout(100);
+        [XmlIgnore]
+        private EntityComparerToPattern Comparer = null;
+        [XmlIgnore]
+        private string entityId = string.Empty;
+        [XmlIgnore]
+        private EntityNameType entityNameType = EntityNameType.NameUntranslated;
+        [XmlIgnore]
+        private ItemFilterStringType entityIdType = ItemFilterStringType.Simple;
+        [XmlIgnore]
+        private List<string> customRegionNames = null;
+        [XmlIgnore]
+        private List<CustomRegion> customRegions = null;
+
 
         public override bool IsValid
         {
@@ -109,12 +153,13 @@ namespace EntityTools.Conditions
                 if (timeout.IsTimedOut)
                 {
                     if (!string.IsNullOrEmpty(EntityID))
-                        closestEntity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType,
+                        closestEntity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType,
                                                                 HealthCheck, ReactionRange, RegionCheck, customRegions);
 
                     timeout.ChangeTime(SearchTimeInterval);
                 }
-                if (closestEntity != null && closestEntity.IsValid)
+
+                if (Validate(closestEntity))
                 {
                     bool result = false;
                     switch (PropertyType)
@@ -170,14 +215,14 @@ namespace EntityTools.Conditions
         {
             get
             {
-                Entity closestEntity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType,
+                closestEntity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType,
                                                         HealthCheck, 0, RegionCheck, customRegions);
 
-                if (closestEntity!= null && closestEntity.IsValid)
+                if (Validate(closestEntity))
                 {
                     StringBuilder sb = new StringBuilder("Found closect Entity");
                     sb.Append(" [").Append(closestEntity.NameUntranslated).Append(']').Append(" which ").Append(PropertyType).Append(" = ");
-                    switch(PropertyType)
+                    switch (PropertyType)
                     {
                         case EntityPropertyType.Distance:
                             sb.Append(closestEntity.Location.Distance3DFromPlayer);
@@ -202,10 +247,16 @@ namespace EntityTools.Conditions
             }
         }
 
+        private bool Validate(Entity e)
+        {
+            return e != null && Comparer.Check(e);
+        }
+
+
         public override void Reset() { }
         public override string ToString()
         {
-            return $"Entity [{EntityID}] {PropertyType} {Sign} to {Value}";
+            return $"Entity [{entityId}] {PropertyType} {Sign} to {Value}";
         }
 
         public EntityProperty() { }

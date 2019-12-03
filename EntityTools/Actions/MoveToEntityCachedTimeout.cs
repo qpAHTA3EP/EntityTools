@@ -22,44 +22,76 @@ namespace EntityTools.Actions
     [Serializable]
     public class MoveToEntity : Astral.Quester.Classes.Action
     {
-        [NonSerialized]
-        internal Entity target = new Entity(IntPtr.Zero);
-
         [Description("ID of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
-        public string EntityID { get; set; } = string.Empty;
+        public string EntityID
+        {
+            get => entityId;
+            set
+            {
+                if (entityId != value)
+                {
+                    entityId = value;
+                    if (!string.IsNullOrEmpty(entityId))
+                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    else Comparer = null;
+                }
+            }
+        }
 
         [Description("Type of and EntityID:\n" +
             "Simple: Simple test string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
-        public ItemFilterStringType EntityIdType { get; set; } = ItemFilterStringType.Simple;
+        public ItemFilterStringType EntityIdType
+        {
+            get => entityIdType;
+            set
+            {
+                if (entityIdType != value)
+                {
+                    entityIdType = value;
+                    Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                }
+            }
+        }
 
         [Description("The switcher of the Entity filed which compared to the property EntityID")]
         [Category("Entity")]
-        public EntityNameType EntityNameType { get; set; } = EntityNameType.NameUntranslated;
+        public EntityNameType EntityNameType
+        {
+            get => entityNameType;
+            set
+            {
+                if(entityNameType != value)
+                { 
+                    entityNameType = value;
+                    Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                }
+            }
+        }
 
         [Description("Check Entity's Ingame Region (Not CustomRegion):\n" +
             "True: Only Entities located in the same Region as Player are detected\n" +
             "False: Entity's Region does not checked during search")]
-        [Category("Entity optional checks")]
+        [Category("Optional")]
         public bool RegionCheck { get; set; } = false;
 
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
-        [Category("Entity optional checks")]
+        [Category("Optional")]
         public bool HealthCheck { get; set; } = true;
 
         [Description("True: Do not change the target Entity while it is alive or until the Bot within 'Distance' of it\n" +
                     "False: Constantly scan an area and target the nearest Entity")]
-        [Category("Entity optional checks")]
+        [Category("Optional")]
         public bool HoldTargetEntity { get; set; } = true;
 
         [Description("The maximum distance from the character within which the Entity is searched\n" +
             "The default value is 0, which disables distance checking")]
-        [Category("Entity optional checks")]
+        [Category("Optional")]
         public float ReactionRange { get; set; } = 0;
 
         [XmlIgnore]
@@ -69,7 +101,7 @@ namespace EntityTools.Actions
 
         [Description("CustomRegion names collection")]
         [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
-        [Category("Entity optional checks")]
+        [Category("Optional")]
         public List<string> CustomRegionNames
         {
             get => customRegionNames;
@@ -86,6 +118,10 @@ namespace EntityTools.Actions
                 }
             }
         }
+
+        [Description("Time between searches of the Entity (ms)")]
+        [Category("Optional")]
+        public int SearchTimeInterval { get; set; } = 100;
 
         [Description("Distance to the Entity by which it is necessary to approach")]
         [Category("Interruptions")]
@@ -110,12 +146,6 @@ namespace EntityTools.Actions
         [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
         public string TestInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>";
 
-        [XmlIgnore]
-        private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(500);
-
-        [Description("Time between searches of the Entity (ms)")]
-        public int SearchTimeInterval { get; set; } = 500;
-
         public override bool NeedToRun
         {
             get
@@ -128,15 +158,15 @@ namespace EntityTools.Actions
                 Entity closestEntity = null;
                 if (timeout.IsTimedOut)
                 {
-                    closestEntity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType.Complete,
+                    closestEntity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete,
                                                                 HealthCheck, ReactionRange, RegionCheck, customRegions);
                     timeout.ChangeTime(SearchTimeInterval);
                 }
 
-                if (!HoldTargetEntity || target == null || !target.IsValid || (HealthCheck && target.IsDead))
-                        target = closestEntity;
+                if (!HoldTargetEntity || !Validate(target) || (HealthCheck && target.IsDead))
+                    target = closestEntity;
 
-                if (IgnoreCombat && closestEntity != null && closestEntity.IsValid
+                if (IgnoreCombat && Validate(closestEntity)
                     && !(HealthCheck && closestEntity.IsDead)
                     && (closestEntity.Location.Distance3DFromPlayer <= Distance))
                 {
@@ -149,20 +179,20 @@ namespace EntityTools.Actions
                     }
                     else Astral.Quester.API.IgnoreCombat = false;
                 }
-                else if(IgnoreCombat)
+                else if (IgnoreCombat)
                     Astral.Quester.API.IgnoreCombat = true;
 
-                return (target != null && target.IsValid && (target.Location.Distance3DFromPlayer < Distance));
+                return (Validate(target) && (target.Location.Distance3DFromPlayer < Distance));
             }
         }
 
         public override ActionResult Run()
         {
-            if (!target.IsValid)
-            {
-                Logger.WriteLine($"Entity [{EntityID}] not founded.");
-                return ActionResult.Fail;
-            }
+            //if (!Validate(target))
+            //{
+            //    Logger.WriteLine($"Entity [{EntityID}] not founded.");
+            //    return ActionResult.Fail;
+            //}
 
             // Вариант реализации со сбросом флага IgnoreCombat в Run()
             //if (target.Location.Distance3DFromPlayer < Distance)
@@ -186,25 +216,43 @@ namespace EntityTools.Actions
             else return ActionResult.Running;
         }
 
+        private bool Validate(Entity e)
+        {
+            return e != null && Comparer.Check(e);
+        }
+
+        [XmlIgnore]
+        private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(500);
+        [XmlIgnore]
+        private string entityId = string.Empty;
+        [XmlIgnore]
+        private ItemFilterStringType entityIdType = ItemFilterStringType.Simple;
+        [XmlIgnore]
+        private EntityNameType entityNameType = EntityNameType.NameUntranslated;
+        [XmlIgnore]
+        internal Entity target = new Entity(IntPtr.Zero);
+        [XmlIgnore]
+        private EntityComparerToPattern Comparer = null;
+
         public MoveToEntity() { }
-        public override string ActionLabel => $"{GetType().Name} [{EntityID}]";
+        public override string ActionLabel => $"{GetType().Name} [{entityId}]";
         public override void OnMapDraw(GraphicsNW graph)
         {
-            if (target.IsValid && target.Location.IsValid)
+            if (Validate(target) && target.Location.IsValid)
             {
                 Brush beige = Brushes.Beige;
                 graph.drawFillEllipse(target.Location, new Size(10, 10), beige);
             }
         }
         public override void InternalReset() { }
-        protected override bool IntenalConditions => !string.IsNullOrEmpty(EntityID);
+        protected override bool IntenalConditions => !string.IsNullOrEmpty(entityId);
         public override string InternalDisplayName => string.Empty;
         public override bool UseHotSpots => true;
         protected override Vector3 InternalDestination
         {
             get
             {
-                if (target != null && target.IsValid)
+                if (Validate(target))
                 {
                     if (target.Location.Distance3DFromPlayer > Distance)
                         return target.Location.Clone();
@@ -217,9 +265,9 @@ namespace EntityTools.Actions
         {
             get
             {
-                if (string.IsNullOrEmpty(EntityID))
+                if (string.IsNullOrEmpty(entityId))
                 {
-                    return new ActionValidity($"Рroperty '{nameof(EntityID)}' not set.");
+                    return new ActionValidity($"EntityID property not set.");
                 }
                 return new ActionValidity();
             }

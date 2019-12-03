@@ -27,21 +27,55 @@ namespace EntityTools.Conditions
     [Serializable]
     public class EntityCount : Condition
     {
-        [Description("ID of the Entity for the search (regex)")]
+        [Description("ID of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
-        public string EntityID { get; set; } = string.Empty;
+        public string EntityID
+        {
+            get => entityId;
+            set
+            {
+                if (entityId != value)
+                {
+                    entityId = value;
+                    if (!string.IsNullOrEmpty(entityId))
+                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    else Comparer = null;
+                }
+            }
+        }
 
-        [Description("Type of the EntityID:\n" +
+        [Description("The switcher of the Entity filed which compared to the property EntityID")]
+        [Category("Entity")]
+        public EntityNameType EntityNameType
+        {
+            get => entityNameType;
+            set
+            {
+                if (entityNameType != value)
+                {
+                    entityNameType = value;
+                    Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                }
+            }
+        }
+
+        [Description("Type of and EntityID:\n" +
             "Simple: Simple test string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
-        public ItemFilterStringType EntityIdType { get; set; } = ItemFilterStringType.Simple;
-
-        [Description("The switcher of the Entity field which compared to the property EntityID")]
-        [Category("Entity")]
-        public EntityNameType EntityNameType { get; set; } = EntityNameType.NameUntranslated;
-
+        public ItemFilterStringType EntityIdType
+        {
+            get => entityIdType;
+            set
+            {
+                if (entityIdType != value)
+                {
+                    entityIdType = value;
+                    Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                }
+            }
+        }
         [Description("A subset of entities that are searched for a target\n" +
             "Contacts: Only interactable Entities\n" +
             "Complete: All possible Entities")]
@@ -72,11 +106,6 @@ namespace EntityTools.Conditions
         [Category("Location")]
         public Condition.Presence Tested { get; set; } = Condition.Presence.Equal;
 
-        [XmlIgnore]
-        private List<string> customRegionNames = null;
-        [XmlIgnore]
-        private List<CustomRegion> customRegions = null;
-
         [Description("The list of the CustomRegions where Entities is counted")]
         [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
         [Category("Location")]
@@ -97,17 +126,15 @@ namespace EntityTools.Conditions
             }
         }
 
-        [XmlIgnore]
-        private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(500);
 
         [Description("The maximum distance from the character within which the Entity is searched\n" +
             "The default value is 0, which disables distance checking")]
         [Category("Optional")]
         public float ReactionRange { get; set; } = 0;
 
-        [Description("Time between searches of the Entity (ms)")]
-        [Category("Optional")]
-        public int SearchTimeInterval { get; set; } = 500;
+        //[Description("Time between searches of the Entity (ms)")]
+        //[Category("Optional")]
+        //public int SearchTimeInterval { get; set; } = 100;
 
         public override string ToString()
         {
@@ -116,6 +143,22 @@ namespace EntityTools.Conditions
 
         [XmlIgnore]
         List<Entity> entities = null;
+        [XmlIgnore]
+        private EntityComparerToPattern Comparer = null;
+        //[XmlIgnore]
+        //private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(100);
+        [XmlIgnore]
+        private string entityId = string.Empty;
+        [XmlIgnore]
+        private EntityNameType entityNameType = EntityNameType.NameUntranslated;
+        [XmlIgnore]
+        private ItemFilterStringType entityIdType = ItemFilterStringType.Simple;
+        [XmlIgnore]
+        private List<string> customRegionNames = null;
+        [XmlIgnore]
+        private List<CustomRegion> customRegions = null;
+
+
 
         public override bool IsValid
         {
@@ -123,11 +166,11 @@ namespace EntityTools.Conditions
             {
                 if (!string.IsNullOrEmpty(EntityID))
                 {
-                    if (timeout.IsTimedOut)
+                    //if (timeout.IsTimedOut)
                     {
-                        entities = SearchCached.FindAllEntity(EntityID, EntityIdType, EntityNameType, EntitySetType,
+                        entities = SearchCached.FindAllEntity(entityId, entityIdType, entityNameType, EntitySetType,
                            HealthCheck, ReactionRange, RegionCheck, customRegions);
-                        timeout.ChangeTime(SearchTimeInterval);
+                        //timeout.ChangeTime(SearchTimeInterval);
                     }
 
                     uint entCount = 0;
@@ -174,7 +217,7 @@ namespace EntityTools.Conditions
             {
                 if (!string.IsNullOrEmpty(EntityID))
                 {
-                    List<Entity> entities = SearchCached.FindAllEntity(EntityID, EntityIdType, EntityNameType, EntitySetType,
+                    entities = SearchCached.FindAllEntity(entityId, entityIdType, entityNameType, EntitySetType,
                            HealthCheck, ReactionRange, RegionCheck, customRegions);
 
                     StringBuilder strBldr = new StringBuilder();
@@ -217,7 +260,7 @@ namespace EntityTools.Conditions
         }
 
 
-        public EntityCount() { }
         public override void Reset() { }
+        public EntityCount() { }
     }
 }

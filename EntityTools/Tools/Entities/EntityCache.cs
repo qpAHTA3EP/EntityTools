@@ -13,13 +13,17 @@ namespace EntityTools.Tools.Entities
 {
     public class CacheRecordKey
     {
-        public CacheRecordKey() { }
+        public CacheRecordKey()
+        {
+            Comparer = new EntityComparerToPattern(Pattern, MatchType, NameType);
+        }
         public CacheRecordKey(string p, ItemFilterStringType mp = ItemFilterStringType.Simple, EntityNameType nt = EntityNameType.NameUntranslated, EntitySetType est = EntitySetType.Complete)
         {
             Pattern = p;
             MatchType = mp;
             NameType = nt;
             EntitySetType = est;
+            Comparer = new EntityComparerToPattern(Pattern, MatchType, NameType);
         }
 
 
@@ -27,6 +31,7 @@ namespace EntityTools.Tools.Entities
         public readonly ItemFilterStringType MatchType = ItemFilterStringType.Simple;
         public readonly EntityNameType NameType = EntityNameType.NameUntranslated;
         public readonly EntitySetType EntitySetType = EntitySetType.Complete;
+        public readonly EntityComparerToPattern Comparer = null;
 
         public override bool Equals(object otherObj)
         {
@@ -91,17 +96,8 @@ namespace EntityTools.Tools.Entities
         {
             get
             {
-
                 if (Timer.IsTimedOut)
                     Regen();
-                //else
-                //{
-                //    // Удаление невалидных сущностей
-                //    entities.RemoveAll((Entity e) => !e.IsValid);
-                //    if (entities.Count == 0)
-                //        Regen();
-                //}
-
                 return entities;
             }
         }
@@ -116,8 +112,8 @@ namespace EntityTools.Tools.Entities
 #endif
             List<Entity> entts;
             if (Key.EntitySetType == EntitySetType.Complete)
-                entts = SearchDirect.GetEntities(Key.Pattern, Key.MatchType, Key.NameType);
-            else entts = SearchDirect.GetContactEntities(Key.Pattern, Key.MatchType, Key.NameType);
+                entts = SearchDirect.GetEntities(Key);
+            else entts = SearchDirect.GetContactEntities(Key);
 
             if (entts != null)
                 entities = entts;
@@ -137,8 +133,8 @@ namespace EntityTools.Tools.Entities
 #endif
             List<Entity> entts;
             if (Key.EntitySetType == EntitySetType.Complete)
-                entts = SearchDirect.GetEntities(Key.Pattern, Key.MatchType, Key.NameType, action);
-            else entts = SearchDirect.GetContactEntities(Key.Pattern, Key.MatchType, Key.NameType, action);
+                entts = SearchDirect.GetEntities(Key, action);
+            else entts = SearchDirect.GetContactEntities(Key, action);
 
             if (entts != null)
                 entities = entts;
@@ -166,7 +162,7 @@ namespace EntityTools.Tools.Entities
                 // в противном случае - удаляется из коллекции
                 entities.RemoveAll((Entity e) =>
                                     {
-                                        if (e.IsValid)
+                                        if (Key.Comparer.Check(e))
                                         {
                                             action(e);
                                             return false;
@@ -211,12 +207,12 @@ namespace EntityTools.Tools.Entities
         /// <summary>
         /// Интервал времени между обновлениями кэша
         /// </summary>
-        public static int ChacheTime { get; set; } = 5000;
+        public static int ChacheTime { get; set; } = 500;
 
         /// <summary>
         /// Интервал времени между обновлениями кэша во время боя
         /// </summary>
-        public static int CombatChacheTime { get; set; } = 500;
+        public static int CombatChacheTime { get; set; } = 200;
 
         protected override CacheRecordKey GetKeyForItem(EntityCacheRecord item)
         {

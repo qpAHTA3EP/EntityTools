@@ -150,7 +150,7 @@
         internal System.Windows.Forms.Label lbl;
         internal System.Windows.Forms.DataGridView dgvItems;
         internal System.Windows.Forms.DataGridViewTextBoxColumn clmnItemsNames;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn clmnSelect;
-        private System.Windows.Forms.DataGridViewTextBoxColumn clmnItems;
+        internal System.Windows.Forms.DataGridViewCheckBoxColumn clmnSelect;
+        internal System.Windows.Forms.DataGridViewTextBoxColumn clmnItems;
     }
 }
