@@ -8,7 +8,7 @@ using System.Drawing.Design;
 
 namespace EntityTools.UCC.Conditions
 {
-    public class UCCQuesterCheck : UCCCondition
+    public class UCCQuesterCheck : UCCCondition, ICustomUCCCondition
     {
         internal class QuesterConditionEditor : EnyTypeEditor<Condition>
         { }
@@ -17,10 +17,14 @@ namespace EntityTools.UCC.Conditions
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public Condition Condition { get; set; } = null;
 
-        public new bool IsOK(UCCAction refAction = null)
+        #region ICustomUCCCondition
+        bool ICustomUCCCondition.IsOk(UCCAction refAction = null)
         {
             return Condition?.IsValid == true;
         }
+
+        bool ICustomUCCCondition.Loked { get => base.Locked; set => base.Locked = value; }
+        #endregion
 
         public override string ToString()
         {

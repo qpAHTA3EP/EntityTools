@@ -28,10 +28,10 @@ namespace EntityTools.Editors
                     nameType = interactEntities.EntityNameType;
                 else if (context.Instance is EntityProperty entityProperty)
                     nameType = entityProperty.EntityNameType;
-                else if (context.Instance is EntityCountInCustomRegions entityCountInCustomRegions)
+                else if (context.Instance is EntityCount entityCountInCustomRegions)
                     nameType = entityCountInCustomRegions.EntityNameType;
-                else if (context.Instance is AbortCombatEntity abortCombatEntity)
-                    nameType = abortCombatEntity.EntityNameType;
+                //else if (context.Instance is AbortCombatEntity abortCombatEntity)
+                //    nameType = abortCombatEntity.EntityNameType;
                 else if (context.Instance is DodgeFromEntity dodgeFromEntity)
                     nameType = dodgeFromEntity.EntityNameType;
                 else if (context.Instance is UCCEntityCheck uccConditionEntityCheck) 

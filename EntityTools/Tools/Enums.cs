@@ -106,5 +106,20 @@ namespace EntityTools.Enums
         Middle
     }
 
+    [Serializable]
+    public enum LogicRule
+    {
+        Conjunction,
+        Disjunction
+    }
 
+    /// <summary>
+    /// список команд для смены настроек бота
+    /// </summary>
+    [Serializable]
+    public enum PluginSettingsCommand
+    {
+        DisableSlideMonitor,
+        DisableSpellStuckMonitor
+    }
 }

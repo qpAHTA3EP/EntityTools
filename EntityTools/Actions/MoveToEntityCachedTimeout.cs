@@ -81,7 +81,7 @@ namespace EntityTools.Actions
                         && value.Count > 0)
                         customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) =>
                                     value.Exists((string regName) => regName == cr.Name));
-
+                    else customRegions = null;
                     customRegionNames = value;
                 }
             }

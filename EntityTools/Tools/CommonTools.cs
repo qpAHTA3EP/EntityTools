@@ -175,29 +175,29 @@ namespace EntityTools.Tools
         /// </summary>
         /// <param name="text"></param>
         /// <param name="patternPos"></param>
-        /// <param name="trimedPattern"></param>
+        /// <param name="pattern"></param>
         /// <returns></returns>
-        public static bool SimpleMaskTextComparer(string text, SimplePatternPos patternPos, string trimedPattern)
+        public static bool SimpleMaskTextComparer(string text, SimplePatternPos patternPos, string pattern)
         {
             if (string.IsNullOrEmpty(text))
-                if (string.IsNullOrEmpty(trimedPattern))
+                if (string.IsNullOrEmpty(pattern))
                     return true;
                 else return false;
-            else if (string.IsNullOrEmpty(trimedPattern))
+            else if (string.IsNullOrEmpty(pattern))
                 return false;            
 
             switch (patternPos)
             {
                 case SimplePatternPos.Start:
-                    return text.StartsWith(trimedPattern);
+                    return text.StartsWith(pattern);
                 case SimplePatternPos.Middle:
-                    return text.Contains(trimedPattern);
+                    return text.Contains(pattern);
                 case SimplePatternPos.End:
-                    return text.EndsWith(trimedPattern);
+                    return text.EndsWith(pattern);
                 case SimplePatternPos.Full:
-                    return text == trimedPattern;
+                    return text == pattern;
                 default:
-                    return text == trimedPattern;
+                    return text == pattern;
             }
         }
         public static bool SimpleMaskTextComparer(string text, string pattern)

@@ -23,10 +23,12 @@ namespace EntityTools.Tools
         private static Stopwatch stopwatch = new Stopwatch();
         private static Stopwatch cntStopwatch = new Stopwatch();
         private static int Count = 0;
+        private static int WorseTryNumber = 0;
         private static TimeSpan MinTime = TimeSpan.MaxValue;
         private static TimeSpan MaxTime = TimeSpan.MinValue;
 
         private static int ContactCount = 0;
+        private static int ContactWorseTryNumber = 0;
         private static TimeSpan ContactMinTime = TimeSpan.MaxValue;
         private static TimeSpan ContactMaxTime = TimeSpan.MinValue;
 
@@ -36,7 +38,9 @@ namespace EntityTools.Tools
         public static void ResetWatch()
         {
             ContactCount = 0;
+            ContactWorseTryNumber = 0;
             Count = 0;
+            WorseTryNumber = 0;
             MinTime = TimeSpan.MaxValue;
             MaxTime = TimeSpan.MinValue;
             ContactMinTime = TimeSpan.MaxValue;
@@ -54,7 +58,9 @@ namespace EntityTools.Tools
             {
                 double avrgTime = (double)stopwatch.ElapsedMilliseconds / (double)Count;
                 double avrgTicks = (double)stopwatch.ElapsedTicks / (double)Count;
-                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tCount: {Count}, TotalTime: {stopwatch.Elapsed}({stopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
+                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tCount: {Count}");
+                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tWorseTryNumber: {WorseTryNumber}");
+                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tTotalTime: {stopwatch.Elapsed}({stopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
                 Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tMinTime: {MinTime.TotalMilliseconds.ToString("N3")} ms ({MinTime.Ticks.ToString("N0")} ticks)");
                 Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tMaxTime: {MaxTime.TotalMilliseconds.ToString("N3")} ms ({MaxTime.Ticks.ToString("N0")} ticks)");
                 Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tAverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
@@ -75,7 +81,9 @@ namespace EntityTools.Tools
             {
                 double avrgTime = (double)cntStopwatch.ElapsedMilliseconds / (double)ContactCount;
                 double avrgTicks = (double)cntStopwatch.ElapsedTicks / (double)ContactCount;
-                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tCount: {ContactCount}, TotalTime: {cntStopwatch.Elapsed}({cntStopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
+                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tCount: {ContactCount}");
+                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tWorseTryNumber: {ContactWorseTryNumber}");
+                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tTotalTime: {cntStopwatch.Elapsed}({cntStopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
                 Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tMinTime: {ContactMinTime.TotalMilliseconds.ToString("N3")} ms ({ContactMinTime.Ticks.ToString("N0")} ticks)");
                 Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tMaxTime: {ContactMaxTime.TotalMilliseconds.ToString("N3")} ms ({ContactMaxTime.Ticks.ToString("N0")} ticks)");
                 Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tAverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
@@ -153,7 +161,10 @@ namespace EntityTools.Tools
                 stopwatch.Stop();
                 TimeSpan time = stopwatch.Elapsed.Subtract(StartTime);
                 if (time > MaxTime)
+                {
                     MaxTime = time;
+                    WorseTryNumber = Count;
+                }
                 else if (time < MinTime)
                     MinTime = time;
 
@@ -218,7 +229,10 @@ namespace EntityTools.Tools
                 cntStopwatch.Stop();
                 TimeSpan time = cntStopwatch.Elapsed.Subtract(StartTime);
                 if (time > ContactMaxTime)
+                {
                     ContactMaxTime = time;
+                    ContactWorseTryNumber = ContactCount;
+                }
                 else if (time < ContactMinTime)
                     ContactMinTime = time;
 

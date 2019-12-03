@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.19.1128.1349</AssemblyVersion>
+    <AssemblyVersion>0.19.1130.1243</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -99,14 +99,15 @@
     <Compile Include="Actions\InsertInsignia.cs" />
     <Compile Include="Actions\Deprecated\InteractEntity.cs" />
     <Compile Include="Actions\InteractEntitiesCachedTimeout.cs" />
+    <Compile Include="Actions\ChangePluginSettings.cs" />
     <Compile Include="Actions\MoveToLeader.cs" />
     <Compile Include="Actions\PickUpMissionExt.cs" />
     <Compile Include="Conditions\CheckCampaignTask.cs" />
     <Compile Include="Conditions\CheckGameGUICondition.cs" />
     <Compile Include="Conditions\CheckShard.cs" />
-    <Compile Include="Conditions\EntityPropertyConditionsCachedTimeout.cs" />
+    <Compile Include="Conditions\EntityPropertyCachedTimeout.cs" />
     <Compile Include="Conditions\Deprecated\EntityDistance.cs" />
-    <Compile Include="Conditions\EntityCountInCustomRegionCachedTimeout.cs" />
+    <Compile Include="Conditions\EntityCountCachedTimeout.cs" />
     <Compile Include="Conditions\Deprecated\PartyCount.cs" />
     <Compile Include="Conditions\TeamLeaderMapInstance.cs" />
     <Compile Include="Conditions\TeamMemberCount.cs" />
@@ -204,11 +205,10 @@
     <Compile Include="Tools\Struct.cs" />
     <Compile Include="Tools\UCCExtensions\UCCEditorExtensions.cs" />
     <Compile Include="Tools\Export\GameUITools.cs" />
+    <Compile Include="UCC\Conditions\ICustomUCCCondition.cs" />
     <Compile Include="UCC\Conditions\UCCQuesterCheck.cs" />
     <Compile Include="UCC\DodgeFromEntity.cs" />
     <Compile Include="UCC\ApproachEntity.cs" />
-    <Compile Include="UCC\AbortCombatWaitingOnTeam.cs" />
-    <Compile Include="UCC\AbortCombatEntity.cs" />
     <Compile Include="UCC\Conditions\UCCEntityCheck.cs" />
     <Compile Include="UCC\Conditions\UCCGameUICheck.cs" />
     <Compile Include="UCC\ExecuteSpecificPower.cs" />

@@ -66,8 +66,8 @@ namespace EntityTools.Conditions
 
         public override string ToString()
         {
-            StringBuilder strBldr = new StringBuilder(GetType().Name);
-
+            StringBuilder strBldr = new StringBuilder("[Deprecated] ");
+            strBldr.Append(GetType().Name);
             strBldr.Append($" {Sign} to {MemberCount}");
 
             return strBldr.ToString();
@@ -185,8 +185,6 @@ namespace EntityTools.Conditions
             }
         }
 
-        public override void Reset()
-        {
-        }
+        public override void Reset() { }
     }
 }

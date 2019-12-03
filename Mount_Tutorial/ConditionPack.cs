@@ -10,6 +10,12 @@ using ConditionList = System.Collections.Generic.List<Astral.Quester.Classes.Con
 namespace EntityTools.Conditions
 {
 
+    [Serializable]
+    public enum ConditionCheck
+    {
+        Conjunction,
+        Disjunction
+    }
 
     [Serializable]
     public class ConditionPack : Astral.Quester.Classes.Condition
@@ -26,7 +32,6 @@ namespace EntityTools.Conditions
         public ConditionCheck Tested { get; set; }
 
         [Description("The list of the Conditions")]
-        [TypeConverter(typeof(CollectionTypeConverter))]
         [Editor(typeof(ConditionListEditor), typeof(UITypeEditor))]
         public ConditionList Conditions { get; set; } = new ConditionList();
 

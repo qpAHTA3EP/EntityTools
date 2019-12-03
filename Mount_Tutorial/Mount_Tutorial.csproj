@@ -39,6 +39,13 @@
       <HintPath>..\References\x64\Astral.exe</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="DevExpress.Data.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Utils.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraEditors.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
     <Reference Include="MyNW">
       <HintPath>..\References\x64\MyNW.dll</HintPath>
       <Private>True</Private>
@@ -56,6 +63,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConditionListEditor.cs" />
+    <Compile Include="ConditionPack.cs" />
+    <Compile Include="ConditionsListForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConditionsListForm.designer.cs">
+      <DependentUpon>ConditionsListForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CopyHelper.cs" />
     <Compile Include="HorseEquipTutorialAction.cs" />
     <Compile Include="Instruments.cs" />
     <Compile Include="MountEquipTutorialPlugin.cs" />
@@ -68,6 +84,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ConditionsListForm.resx">
+      <DependentUpon>ConditionsListForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainPanel.resx">
       <DependentUpon>MainPanel.cs</DependentUpon>
     </EmbeddedResource>

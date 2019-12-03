@@ -13,6 +13,7 @@ using Astral.Logic.UCC.Ressources;
 using Astral.Quester.FSM.States;
 using EntityTools;
 using EntityTools.Editors;
+using EntityTools.Enums;
 using EntityTools.Tools;
 using EntityTools.UCC.Conditions;
 using MyNW.Classes;
@@ -31,72 +32,97 @@ namespace EntityTools.UCC
         [Editor(typeof(UccActionEditor), typeof(UITypeEditor))]
         [Description("Основная ucc-команда, которой транслируется вызов")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public UCCAction CurrentAction { get; set; }
+        public UCCAction ManagedAction { get; set; }
 
         [Category("Custom Conditions")]
         [Description("Список нестандартных условий, реализованных в плагинах")]
         [Editor(typeof(UCCConditionListEditor), typeof(UITypeEditor))]
         public List<UCCCondition> CustomConditions { get; set; }
 
+        [Category("Custom Conditions")]
+        [Description("The negation of the result of the ConditionPack")]
+        public bool Not { get; set; }
+
+        [Category("Custom Conditions")]
+        [Description("Logical rule of the Conditions checks\n" +
+            "Conjunction: All Conditions have to be True (Logical AND)\n" +
+            "Disjunction: At least one of the Conditions have to be True (Logical OR)")]
+        public LogicRule CustomConditionCheck { get; set; }
+
         public override bool NeedToRun
         {
             get
             {
-                return CurrentAction?.NeedToRun == true;
+                if (ManagedAction != null)
+                {
+                    if (!ManagedAction.NeedToRun)
+                        return false;
+
+                    if (CustomConditions != null && CustomConditions.Count > 0)
+                        if (CustomConditionCheck == LogicRule.Disjunction)
+                        {
+                            int lockedNum = 0;
+                            int okUnlockedNum = 0;
+                            foreach (UCCCondition c in CustomConditions)
+                            {
+                                if (c is ICustomUCCCondition iCond)
+                                {
+                                    if (iCond.Loked)
+                                    {
+                                        if (!iCond.IsOk(this))
+                                            return false;
+                                        lockedNum++;
+                                    }
+                                    else if (c.IsOK(this))
+                                        okUnlockedNum++;
+                                }
+                                else
+                                {
+                                    if (c.Locked)
+                                    {
+                                        if (!c.IsOK(this))
+                                            return false;
+                                        lockedNum++;
+                                    }
+                                    else if (c.IsOK(this))
+                                        okUnlockedNum++;
+                                }
+                            }
+
+                            // Если множетство незалоченных условий пустое, тогда условие истино
+                            // Если оно НЕ пустое, тогда должно встретиться хотя бы одно истиное
+                            return (CustomConditions.Count > lockedNum) ? okUnlockedNum > 0 : true;
+                        }
+                        else
+                        {
+                            // Проверка всех условий
+                            foreach (UCCCondition c in CustomConditions)
+                                if (c is ICustomUCCCondition iCond)
+                                {
+                                    if (!iCond.IsOk(this))
+                                        return false;
+                                }
+                                else if (!c.IsOK(this))
+                                    return false;
+
+                            return true;
+                        }
+                }
+
+                return false;
             }
         }
 
         public override bool Run()
         {
-            return CurrentAction?.Run() == true;
+            return ManagedAction?.Run() == true;
         }
 
         public override string ToString()
         {
-            if (CurrentAction != null)
-                return "(SP) " + CurrentAction.ToString();
+            if (ManagedAction != null)
+                return "(SP) " + ManagedAction.ToString();
             else return "Property 'CurrentAction' does not set !";
-        }
-
-        // Переопределение унаследованных свойств
-        public new bool ConditionsAreOK
-        {
-            get
-            {
-                if (base.ConditionsAreOK)
-                {
-                    if (OneCondMustGood)
-                    {
-                        int lockedNum = 0;
-                        int okUnlockedNum = 0;
-                        foreach (UCCCondition c in CustomConditions)
-                        {
-                            if (c.Locked)
-                            {
-                                if (!c.IsOK(this))
-                                    return false;
-                                lockedNum++;
-                            }
-                            else if (c.IsOK(this))
-                                okUnlockedNum++;
-                        }
-
-                        // Если множетство незалоченных условий пустое, тогда условие истино
-                        // Если оно НЕ пустое, тогда должно встретиться хотя бы одно истиное
-                        return (CustomConditions.Count > lockedNum) ? okUnlockedNum > 0 : true;
-                    }
-                    else
-                    {
-                        // Проверка всех условий
-                        foreach (UCCCondition c in CustomConditions)
-                            if (!c.IsOK(this))
-                                return false;
-
-                        return true;
-                    }
-                }
-                return false;
-            }
         }
 
         public SpecializedUCCAction()
@@ -107,7 +133,7 @@ namespace EntityTools.UCC
         {
             return base.BaseClone(new SpecializedUCCAction()
             {
-                CurrentAction = this.CurrentAction
+                ManagedAction = this.ManagedAction
             });
         }
 
@@ -116,11 +142,11 @@ namespace EntityTools.UCC
         [Browsable(false)]
         public new int Random
         {
-            get => (CurrentAction == null) ? 0 : CurrentAction.Random;
+            get => (ManagedAction == null) ? 0 : ManagedAction.Random;
             set
             {
-                if(CurrentAction != null)
-                    CurrentAction.Random = value;
+                if(ManagedAction != null)
+                    ManagedAction.Random = value;
                 base.Random = value;
             }
         }
@@ -140,11 +166,11 @@ namespace EntityTools.UCC
         [Browsable(false)]
         public new int Range
         {
-            get => (CurrentAction == null) ? 0 : CurrentAction.Range;
+            get => (ManagedAction == null) ? 0 : ManagedAction.Range;
             set
             {
-                if (CurrentAction != null)
-                    CurrentAction.Range = value;
+                if (ManagedAction != null)
+                    ManagedAction.Range = value;
                 base.Range = value;
             }
         }
@@ -153,11 +179,11 @@ namespace EntityTools.UCC
         [Browsable(false)]
         public new int CoolDown
         {
-            get => (CurrentAction == null) ? 0 : CurrentAction.CoolDown;
+            get => (ManagedAction == null) ? 0 : ManagedAction.CoolDown;
             set
             {
-                if (CurrentAction != null)
-                    CurrentAction.CoolDown = value;
+                if (ManagedAction != null)
+                    ManagedAction.CoolDown = value;
                 base.CoolDown = value;
             }
         }
@@ -165,11 +191,11 @@ namespace EntityTools.UCC
         [Browsable(false)]
         public new Astral.Logic.UCC.Ressources.Enums.Unit Target
         {
-            get => (CurrentAction == null) ? Astral.Logic.UCC.Ressources.Enums.Unit.Player : CurrentAction.Target;
+            get => (ManagedAction == null) ? Astral.Logic.UCC.Ressources.Enums.Unit.Player : ManagedAction.Target;
             set
             {
-                if (CurrentAction != null)
-                    CurrentAction.Target = value;
+                if (ManagedAction != null)
+                    ManagedAction.Target = value;
                 base.Target = value;
             }
         }

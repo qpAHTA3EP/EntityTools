@@ -25,7 +25,7 @@ namespace EntityTools.Conditions
     /// </summary>
 
     [Serializable]
-    public class EntityCountInCustomRegions : Condition
+    public class EntityCount : Condition
     {
         [Description("ID of the Entity for the search (regex)")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
@@ -38,7 +38,7 @@ namespace EntityTools.Conditions
         [Category("Entity")]
         public ItemFilterStringType EntityIdType { get; set; } = ItemFilterStringType.Simple;
 
-        [Description("The switcher of the Entity filed which compared to the property EntityID")]
+        [Description("The switcher of the Entity field which compared to the property EntityID")]
         [Category("Entity")]
         public EntityNameType EntityNameType { get; set; } = EntityNameType.NameUntranslated;
 
@@ -46,19 +46,19 @@ namespace EntityTools.Conditions
             "Contacts: Only interactable Entities\n" +
             "Complete: All possible Entities")]
         [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
-        [Category("Entity optional checks")]
-        public EntitySetType EntitySetType { get; set; } = EntitySetType.Contacts;
+        [Category("Optional")]
+        public EntitySetType EntitySetType { get; set; } = EntitySetType.Complete;
 
         [Description("Check Entity's Region:\n" +
             "True: Count Entity if it located in the same Region as Player\n" +
             "False: Does not consider the region when counting Entities")]
-        [Category("Entity optional checks")]
+        [Category("Optional")]
         public bool RegionCheck { get; set; } = false;
 
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
-        [Category("Entity optional checks")]
+        [Category("Optional")]
         public bool HealthCheck { get; set; } = true;
 
         [Description("Threshold value to compare by 'Sign' with the number of the Entities")]
@@ -77,7 +77,7 @@ namespace EntityTools.Conditions
         [XmlIgnore]
         private List<CustomRegion> customRegions = null;
 
-        [Description("CustomRegion names collection")]
+        [Description("The list of the CustomRegions where Entities is counted")]
         [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
         [Category("Location")]
         public List<string> CustomRegionNames
@@ -91,7 +91,7 @@ namespace EntityTools.Conditions
                         && value.Count > 0)
                         customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) =>
                                     value.Exists((string regName) => regName == cr.Name));
-
+                    else customRegions = null;
                     customRegionNames = value;
                 }
             }
@@ -102,10 +102,11 @@ namespace EntityTools.Conditions
 
         [Description("The maximum distance from the character within which the Entity is searched\n" +
             "The default value is 0, which disables distance checking")]
-        //[Category("Entity optional checks")]
+        [Category("Optional")]
         public float ReactionRange { get; set; } = 0;
 
         [Description("Time between searches of the Entity (ms)")]
+        [Category("Optional")]
         public int SearchTimeInterval { get; set; } = 500;
 
         public override string ToString()
@@ -120,7 +121,7 @@ namespace EntityTools.Conditions
         {
             get
             {
-                if (!string.IsNullOrEmpty(EntityID) && CustomRegionNames.Count > 0)
+                if (!string.IsNullOrEmpty(EntityID))
                 {
                     if (timeout.IsTimedOut)
                     {
@@ -128,6 +129,7 @@ namespace EntityTools.Conditions
                            HealthCheck, ReactionRange, RegionCheck, customRegions);
                         timeout.ChangeTime(SearchTimeInterval);
                     }
+
                     uint entCount = 0;
 
                     if(entities != null)
@@ -170,9 +172,10 @@ namespace EntityTools.Conditions
         {
             get
             {
-                if (!string.IsNullOrEmpty(EntityID) && CustomRegionNames.Count > 0)
+                if (!string.IsNullOrEmpty(EntityID))
                 {
-                    List<Entity> entities = EntitySelectionTools.FindAllEntities(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, HealthCheck, RegionCheck, CustomRegionNames);
+                    List<Entity> entities = SearchCached.FindAllEntity(EntityID, EntityIdType, EntityNameType, EntitySetType,
+                           HealthCheck, ReactionRange, RegionCheck, customRegions);
 
                     StringBuilder strBldr = new StringBuilder();
                     strBldr.AppendLine();
@@ -214,7 +217,7 @@ namespace EntityTools.Conditions
         }
 
 
-        public EntityCountInCustomRegions() { }
+        public EntityCount() { }
         public override void Reset() { }
     }
 }

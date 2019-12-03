@@ -13,7 +13,7 @@ using EntityTools.Enums;
 
 namespace EntityTools.UCC.Conditions
 {
-    public class UCCEntityCheck : UCCCondition
+    public class UCCEntityCheck : UCCCondition, ICustomUCCCondition
     {
         [Description("ID (an untranslated name) of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
@@ -57,7 +57,8 @@ namespace EntityTools.UCC.Conditions
         [Category("Entity")]
         public string TestInfo { get; } = "Нажми '...' =>";
 
-        public new bool IsOK(UCCAction refAction = null)
+        #region ICustomUCCCondition
+        bool ICustomUCCCondition.IsOk(UCCAction refAction = null)
         {
             if (!string.IsNullOrEmpty(EntityID))
             {
@@ -68,45 +69,45 @@ namespace EntityTools.UCC.Conditions
                 {
                     case EntityPropertyType.Distance:
                         //if(float.TryParse(Value, out float distance))
-                            switch (Sign)
-                            {
-                                case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
-                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer == PropertyValue);
-                                case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
-                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer != PropertyValue);
-                                case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
-                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer < PropertyValue);
-                                case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
-                                    return result = (closestEntity == null) || !closestEntity.IsValid || (closestEntity.Location.Distance3DFromPlayer > PropertyValue);
-                            }
+                        switch (Sign)
+                        {
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
+                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer == PropertyValue);
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
+                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer != PropertyValue);
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
+                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer < PropertyValue);
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
+                                return result = (closestEntity == null) || !closestEntity.IsValid || (closestEntity.Location.Distance3DFromPlayer > PropertyValue);
+                        }
                         break;
                     case EntityPropertyType.HealthPercent:
                         //if (float.TryParse(Value, out float hp))
-                            switch (Sign)
-                            {
-                                case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
-                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent == PropertyValue);
-                                case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
-                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent != PropertyValue);
-                                case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
-                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent < PropertyValue);
-                                case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
-                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent > PropertyValue);
-                            }
+                        switch (Sign)
+                        {
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
+                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent == PropertyValue);
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
+                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent != PropertyValue);
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
+                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent < PropertyValue);
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
+                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent > PropertyValue);
+                        }
                         break;
                     case EntityPropertyType.ZAxis:
                         //if (float.TryParse(Value, out float z))
-                            switch (Sign)
-                            {
-                                case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
-                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z == PropertyValue);
-                                case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
-                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z != PropertyValue);
-                                case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
-                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z < PropertyValue);
-                                case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
-                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z > PropertyValue);
-                            }
+                        switch (Sign)
+                        {
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
+                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z == PropertyValue);
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
+                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z != PropertyValue);
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
+                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z < PropertyValue);
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
+                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z > PropertyValue);
+                        }
                         break;
                 }
             }
@@ -114,9 +115,17 @@ namespace EntityTools.UCC.Conditions
             return false;
         }
 
+        bool ICustomUCCCondition.Loked { get => base.Locked; set => base.Locked = value; }
+        #endregion
+
         public override string ToString()
         {
             return $"EntityCheck [{EntityID}]";
+        }
+
+        public UCCEntityCheck()
+        {
+            Sign = Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
         }
 
         #region Hide Inherited Properties

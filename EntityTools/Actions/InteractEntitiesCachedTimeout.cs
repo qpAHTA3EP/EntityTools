@@ -62,29 +62,29 @@ namespace EntityTools.Actions
         [Description("Check Entity's Ingame Region (Not CustomRegion):\n" +
             "True: Only Entities located in the same Region as Player are detected\n" +
             "False: Entity's Region does not checked during search")]
-        [Category("Entity optional checks")]
+        [Category("Optional")]
         public bool RegionCheck { get; set; } = false;
 
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
-        [Category("Entity optional checks")]
+        [Category("Optional")]
         public bool HealthCheck { get; set; } = true;
 
         [Description("True: Do not change the target Entity while it is alive or until the Bot within Distance of it\n" +
                     "False: Constantly scan an area and target the nearest Entity")]
-        [Category("Entity optional checks")]
+        [Category("Optional")]
         public bool HoldTargetEntity { get; set; } = true;
 
         [Description("Check if Entity is moving:\n" +
             "True: Only standing Entities are detected\n" +
             "False: Both moving and stationary Entities are detected")]
-        [Category("Entity optional checks")]
+        [Category("Optional")]
         public bool SkipMoving { get; set; } = false;
 
         [Description("The maximum distance from the character within which the Entity is searched\n" +
-            "The default value is 150, which disables distance checking")]
-        [Category("Entity optional checks")]
+            "The value equals 0(zero) disables distance checking")]
+        [Category("Optional")]
         public float ReactionRange { get; set; } = 150;
 
         [XmlIgnore]
@@ -94,7 +94,7 @@ namespace EntityTools.Actions
 
         [Description("CustomRegion names collection")]
         [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
-        [Category("Entity optional checks")]
+        [Category("Optional")]
         public List<string> CustomRegionNames
         {
             get => customRegionNames;
@@ -106,7 +106,7 @@ namespace EntityTools.Actions
                         && value.Count > 0)
                         customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) =>
                                     value.Exists((string regName) => regName == cr.Name));
-
+                    else customRegions = null;
                     customRegionNames = value;
                 }
             }
@@ -116,7 +116,7 @@ namespace EntityTools.Actions
             "Contacts: Only interactable Entities\n" +
             "Complete: All possible Entities")]
         [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
-        [Category("Entity optional checks")]
+        [Category("Optional")]
         public EntitySetType EntitySetType { get; set; } = EntitySetType.Contacts;
 
         [Description("Distance to the Entity by which it is necessary to approach to disable 'IgnoreCombat' mode\n" +
@@ -269,7 +269,7 @@ namespace EntityTools.Actions
                 {
                     return ActionResult.Running;
                 }
-                if (!SkipMoving || moved)
+                if (moved)
                 {
                     Logger.WriteLine("Entity moved, skip...");
                     return ActionResult.Fail;

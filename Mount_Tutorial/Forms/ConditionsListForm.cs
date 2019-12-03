@@ -1,14 +1,13 @@
 ﻿using Astral.Quester.Classes;
 using Astral.Quester.Forms;
 using DevExpress.XtraEditors;
-using EntityTools.Tools;
 using System;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
-using EntityTools.UCC.Conditions;
-using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
+using ConditionList = System.Collections.Generic.List<Astral.Quester.Classes.Condition>;
 using Astral.Logic.UCC.Classes;
+using EntityTools.Tools;
 
 namespace EntityTools.Forms
 {
@@ -66,7 +65,7 @@ namespace EntityTools.Forms
 
         private void btnTest_Click(object sender, EventArgs e)
         {
-            ICustomUCCCondition cond = (Conditions.Items.Count > 0) ? Conditions.SelectedItem as ICustomUCCCondition : null;
+            Condition cond = (Conditions.Items.Count > 0) ? Conditions.SelectedItem as Condition : null;
             if (cond != null)
             {
                 //StringBuilder sb = new StringBuilder();
@@ -76,7 +75,7 @@ namespace EntityTools.Forms
                 ////MessageBox.Show(sb.ToString());
                 //XtraMessageBox.Show(sb.ToString());                
 
-                if (cond.IsOk(null))
+                if (cond.Validate(null))
                     XtraMessageBox.Show(string.Concat(cond, "\nResult: True"));
                 else
                     XtraMessageBox.Show(string.Concat(cond, "\nResult: False"));

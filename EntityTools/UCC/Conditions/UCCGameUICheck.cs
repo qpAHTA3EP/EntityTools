@@ -13,7 +13,7 @@ using System.Xml.Serialization;
 
 namespace EntityTools.UCC.Conditions
 {
-    public class UCCGameUICheck : UCCCondition
+    public class UCCGameUICheck : UCCCondition, ICustomUCCCondition
     {
         private string uiGenID = "Team_Maptransferchoice_Waitingonteamlabel";
         private UIGen uiGen;
@@ -57,21 +57,8 @@ namespace EntityTools.UCC.Conditions
         public UiGenCheckType Check { get; set; } = UiGenCheckType.IsVisible;
 
 
-        #region Hide Inherited Properties
-        [XmlIgnore]
-        [Browsable(false)]
-        public new string Value { get; set; } = string.Empty;
-
-        [XmlIgnore]
-        [Browsable(false)]
-        public new Astral.Logic.UCC.Ressources.Enums.Unit Target { get; set; }
-
-        [XmlIgnore]
-        [Browsable(false)]
-        public new Astral.Logic.UCC.Ressources.Enums.ActionCond Tested { get; set; }
-        #endregion
-
-        public new bool IsOK(UCCAction refAction = null)
+        #region ICustomUCCCondition
+        bool ICustomUCCCondition.IsOk(UCCAction refAction = null)
         {
             if (uiGen == null && !string.IsNullOrEmpty(uiGenID))
                 uiGen = MyNW.Internals.UIManager.AllUIGen.Find(x => x.Name == uiGenID);
@@ -101,6 +88,10 @@ namespace EntityTools.UCC.Conditions
             return false;
         }
 
+        bool ICustomUCCCondition.Loked { get => base.Locked; set => base.Locked = value; }
+        #endregion
+
+
         public override string ToString()
         {
             return $"GameUICheck [{UiGenID}]";
@@ -128,6 +119,20 @@ namespace EntityTools.UCC.Conditions
                 return result;
             else return !result;
         }
+
+        #region Hide Inherited Properties
+        [XmlIgnore]
+        [Browsable(false)]
+        public new string Value { get; set; } = string.Empty;
+
+        [XmlIgnore]
+        [Browsable(false)]
+        public new Astral.Logic.UCC.Ressources.Enums.Unit Target { get; set; }
+
+        [XmlIgnore]
+        [Browsable(false)]
+        public new Astral.Logic.UCC.Ressources.Enums.ActionCond Tested { get; set; }
+        #endregion
 
     }
 }

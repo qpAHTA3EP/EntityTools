@@ -17,10 +17,12 @@ namespace EntityTools.Tools.Entities
         private static Stopwatch stopwatch = new Stopwatch();
         private static Stopwatch cntStopwatch = new Stopwatch();
         private static int Count = 0;
+        private static int WorseTryNumber = 0;
         private static TimeSpan MinTime = TimeSpan.MaxValue;
         private static TimeSpan MaxTime = TimeSpan.MinValue;
 
         private static int ContactCount = 0;
+        private static int ContactWorseTryNumber = 0;
         private static TimeSpan ContactMinTime = TimeSpan.MaxValue;
         private static TimeSpan ContactMaxTime = TimeSpan.MinValue;
 
@@ -28,6 +30,8 @@ namespace EntityTools.Tools.Entities
         {
             ContactCount = 0;
             Count = 0;
+            WorseTryNumber = 0;
+            ContactWorseTryNumber = 0;
             MinTime = TimeSpan.MaxValue;
             MaxTime = TimeSpan.MinValue;
             ContactMinTime = TimeSpan.MaxValue;
@@ -101,7 +105,10 @@ namespace EntityTools.Tools.Entities
                 stopwatch.Stop();
                 TimeSpan time = stopwatch.Elapsed.Subtract(StartTime);
                 if (time > MaxTime)
+                {
                     MaxTime = time;
+                    WorseTryNumber = Count;
+                }
                 else if (time < MinTime)
                     MinTime = time;
 
@@ -169,7 +176,10 @@ namespace EntityTools.Tools.Entities
                 cntStopwatch.Stop();
                 TimeSpan time = cntStopwatch.Elapsed.Subtract(StartTime);
                 if (time > ContactMaxTime)
+                {
                     ContactMaxTime = time;
+                    ContactWorseTryNumber = ContactCount;
+                }
                 else if (time < ContactMinTime)
                     ContactMinTime = time;
             }

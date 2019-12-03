@@ -13,7 +13,7 @@ using MyNW.Internals;
 namespace EntityTools.Conditions
 {
     [Serializable]
-    public class TeamMembersCount2 : Condition
+    public class TeamMembersCount : Condition
     {
         [XmlIgnore]
         private List<string> customRegionNames = null;
@@ -34,37 +34,37 @@ namespace EntityTools.Conditions
                         && value.Count > 0)
                         customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) =>
                                     value.Exists((string regName) => regName == cr.Name));
-
+                    else customRegions = null;
                     customRegionNames = value;
                 }
             }
         }
 
-        [Description("The relation of the character's location to the CustomRegion\n" +
-            "Equals: Count only members located IN the CustomRegions\n" +
-            "NotEquals: Count only members located OUT the CustomRegions")]
+        [Description("The Check of the Team member's location relative to the custom regions\n" +
+            "Equals: Count only members located WITHIN the CustomRegions\n" +
+            "NotEquals: Count only members located OUTSIDE the CustomRegions")]
         [Category("Location")]
-        public Presence CustomRegionRelation { get; set; } = Presence.Equal;
+        public Presence CustomRegionCheck { get; set; } = Presence.Equal;
 
-        [Description("Threshold value of the Distance from Player to the Team member for comparison by 'DistanceSign'")]
+        [Description("The Value which is compared by 'DistanceSign' with the distance between Player and Team member")]
         [Category("Distance")]
         public float Distance { get; set; } = 0;
 
-        [Description("The comparison type for 'Distance'")]
+        [Description("Option specifies the comparison of the distance to the group member")]
         [Category("Distance")]
         public Relation DistanceSign { get; set; } = Relation.Superior;
 
-        [Description("Threshold value of the Team members for comparison by 'Sign'")]
+        [Description("The Value which is compared by 'Sign' with the counted Team members")]
         [Category("Members")]
         public int MemberCount { get; set; } = 3;
 
-        [Description("The comparison type for 'MemberCount'")]
+        [Description("Option specifies the comparison of 'MemberCount' and the counted Team members")]
         [Category("Members")]
         public Relation Sign { get; set; } = Relation.Inferior;
 
-        [Description("Check TeamMember's Region:\n" +
-            "True: Count TeamMember if it located in the same Region as Player\n" +
-            "False: Does not consider the region when counting TeamMembers")]
+        [Description("The Check of the Team member's Region (not CustomRegion)):\n" +
+            "True: Count Team member if it is located in the same Region as Player\n" +
+            "False: Does not consider the region when counting Team members")]
         [Category("Members")]
         public bool RegionCheck { get; set; } = false;
 
@@ -166,7 +166,8 @@ namespace EntityTools.Conditions
 
         public override string ToString()
         {
-            return $"{GetType().Name} {Sign} to {MemberCount} which Distance {DistanceSign} to {Distance}";
+            //return $"{GetType().Name} {Sign} to {MemberCount} which Distance {DistanceSign} to {Distance}";
+            return $"{GetType().Name} {Sign} to {MemberCount}";
         }
 
         public override string TestInfos
@@ -184,67 +185,68 @@ namespace EntityTools.Conditions
                     {
                         if (member.InternalName != EntityManager.LocalPlayer.InternalName)
                         {
-                            strBldr.Append($"Distance to [{member.InternalName}] is ").AppendFormat("{0:0.##}", member.Entity.Location.Distance3DFromPlayer);
+                            strBldr.AppendLine(member.InternalName);
+                            strBldr.AppendFormat("\tDistance: {0:0.##}", member.Entity.Location.Distance3DFromPlayer).AppendLine();
+
                             if (RegionCheck)
                             {
-                                strBldr.Append($" (RegionCheck[{member.Entity.RegionInternalName}] ");
+                                strBldr.Append($"\tRegionCheck[").Append(member.Entity.RegionInternalName).Append("]: ");
                                 if(member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                    strBldr.Append("succeeded)");
-                                else strBldr.Append("fail)");
+                                    strBldr.AppendLine("succeeded");
+                                else strBldr.AppendLine("fail");
                             }
 
                             StringBuilder strBldr2 = new StringBuilder();
                             bool match = false;
 
-                            foreach (CustomRegion customRegion in Astral.Quester.API.CurrentProfile.CustomRegions) //customRegions)
+                            if (customRegions != null && customRegions.Count > 0)
                             {
-                                if (CommonTools.IsInCustomRegion(member.Entity, customRegion))
-                                {
-                                    match = true;
-                                    if (strBldr2.Length > 0)
-                                        strBldr2.Append(", ");
-                                    strBldr2.Append($"[{customRegion.Name}]");
-                                }
+                                foreach (CustomRegion cr in customRegions)
+                                    if (CommonTools.IsInCustomRegion(member.Entity, cr))
+                                    {
+                                        match = true;
+                                        if (strBldr2.Length > 0)
+                                            strBldr2.Append(", ");
+                                        strBldr2.Append($"[{cr.Name}]");
+                                    }
+                                strBldr.Append("\tCustomRegions: ").Append(strBldr2).AppendLine();
                             }
-                            strBldr.Append($"[{member.InternalName}] is in CustomRegions: ").Append(strBldr2);
-
-
 
                             switch (DistanceSign)
                             {
                                 case Relation.Inferior:
                                     if (member.Entity.Location.Distance3DFromPlayer < Distance)
                                     {
-                                        if (CustomRegionRelation == Presence.Equal && match)
+                                        if (CustomRegionCheck == Presence.Equal && match)
                                             memsCount++;
-                                        if (CustomRegionRelation == Presence.NotEquel && !match)
+                                        if (CustomRegionCheck == Presence.NotEquel && !match)
                                             memsCount++;
                                     }
                                     break;
                                 case Relation.Superior:
                                     if (member.Entity.Location.Distance3DFromPlayer > Distance)
                                     {
-                                        if (CustomRegionRelation == Presence.Equal && match)
+                                        if (CustomRegionCheck == Presence.Equal && match)
                                             memsCount++;
-                                        if (CustomRegionRelation == Presence.NotEquel && !match)
+                                        if (CustomRegionCheck == Presence.NotEquel && !match)
                                             memsCount++;
                                     }
                                     break;
                                 case Relation.Equal:
                                     if (member.Entity.Location.Distance3DFromPlayer == Distance)
                                     {
-                                        if (CustomRegionRelation == Presence.Equal && match)
+                                        if (CustomRegionCheck == Presence.Equal && match)
                                             memsCount++;
-                                        if (CustomRegionRelation == Presence.NotEquel && !match)
+                                        if (CustomRegionCheck == Presence.NotEquel && !match)
                                             memsCount++;
                                     }
                                     break;
                                 case Relation.NotEqual:
                                     if (member.Entity.Location.Distance3DFromPlayer != Distance)
                                     {
-                                        if (CustomRegionRelation == Presence.Equal && match)
+                                        if (CustomRegionCheck == Presence.Equal && match)
                                             memsCount++;
-                                        if (CustomRegionRelation == Presence.NotEquel && !match)
+                                        if (CustomRegionCheck == Presence.NotEquel && !match)
                                             memsCount++;
                                     }
                                     break;
@@ -252,7 +254,7 @@ namespace EntityTools.Conditions
                              
                         }
                     }
-                    return strBldr.Insert(0, $"Total {memsCount} TeamMember has Distance from Player {DistanceSign} to {Distance}:").ToString();
+                    return strBldr.Insert(0, $"Total {memsCount} Team members matches to the conditions.").ToString();
                 }
                 else
                 {
@@ -261,7 +263,7 @@ namespace EntityTools.Conditions
             }
         }
 
-        public TeamMembersCount2() { }
+        public TeamMembersCount() { }
         public override void Reset() { }
     }
 }

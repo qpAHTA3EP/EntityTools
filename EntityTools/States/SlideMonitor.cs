@@ -66,7 +66,7 @@ namespace EntityTools.States
                     if (!beforeStartEngineSubscribed)
                     {
                         Astral.Quester.API.BeforeStartEngine += API_BeforeStartEngine;
-                        beforeStartEngineSubscribed = true;
+                        beforeStartEngineSubscribed = true;                        
                     }
                     Logger.WriteLine($"{typeof(SlideMonitor).Name} activated"); 
                     if (Astral.Quester.API.Engine.Running && !Astral.Quester.API.Engine.States.Contains(monitor))

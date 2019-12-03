@@ -70,19 +70,23 @@ namespace EntityTools.Editors
         /// <param name="dgv"></param>
         internal void GetSelectedRegions(DataGridView dgv)
         {
+            if (regions != null)
+                regions.Clear();
+            else regions = new List<string>();
+            
             int indSelect = dgv.Columns.Contains("clmnSelect") ? dgv.Columns["clmnSelect"].DisplayIndex : -1;
             int indItems = dgv.Columns.Contains("clmnItems") ? dgv.Columns["clmnItems"].DisplayIndex : -1;
             if (indSelect == -1 || indItems == -1)
                 return;
 
-            regions.Clear();
+                
             foreach (DataGridViewRow row in listEditor.dgvItems.Rows)
             {
                 if (row.Cells[indSelect].Value.Equals(true))
                 {
                     regions.Add(row.Cells[indItems].Value.ToString());
                 }
-            }
+            }            
         }
 
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)

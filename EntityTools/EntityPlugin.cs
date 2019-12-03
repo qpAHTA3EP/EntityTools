@@ -37,8 +37,8 @@ namespace EntityTools
         {
 #if PROFILING
             InteractEntities.ResetWatch();
-            InteractEntitiesCached.ResetWatch();
-            InteractEntities.ResetWatch();
+            //InteractEntitiesCached.ResetWatch();
+            //InteractEntitiesCachedTimeout.ResetWatch();
             EntitySelectionTools.ResetWatch();
             SearchCached.ResetWatch();
             EntityCache.ResetWatch();
@@ -51,8 +51,8 @@ namespace EntityTools
         {
 #if PROFILING
             InteractEntities.LogWatch();
-            InteractEntitiesCached.LogWatch();
-            InteractEntities.LogWatch();
+            //InteractEntitiesCached.LogWatch();
+            //InteractEntitiesCachedTimeout.LogWatch();
             EntitySelectionTools.LogWatch();
             SearchCached.LogWatch();
             EntityCache.LogWatch();

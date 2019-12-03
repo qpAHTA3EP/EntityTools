@@ -3,6 +3,7 @@ using Astral.Classes;
 using Astral.Classes.ItemFilter;
 using EntityTools.Enums;
 using MyNW.Classes;
+using MyNW.Internals;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -75,7 +76,10 @@ namespace EntityTools.Tools.Entities
         public EntityCacheRecord(string p, ItemFilterStringType mp = ItemFilterStringType.Simple, EntityNameType nt = EntityNameType.NameUntranslated, EntitySetType est = EntitySetType.Complete)
         {
             Key = new CacheRecordKey(p, mp, nt, est);
-            Timer = new Timeout(EntityCache.ChacheTime);
+            if (EntityManager.LocalPlayer.InCombat
+                && !Astral.Quester.API.IgnoreCombat)
+                    Timer = new Timeout(EntityCache.CombatChacheTime);
+            else Timer = new Timeout(EntityCache.ChacheTime);
         }
 
         public CacheRecordKey Key { get; }
@@ -121,7 +125,10 @@ namespace EntityTools.Tools.Entities
 #if PROFILING
             EntitiesCount += entities.Count;
 #endif
-            Timer.ChangeTime(EntityCache.ChacheTime);
+            if (EntityManager.LocalPlayer.InCombat
+                && !Astral.Quester.API.IgnoreCombat)
+                    Timer = new Timeout(EntityCache.ChacheTime);
+            else Timer = new Timeout(EntityCache.CombatChacheTime);
         }
         public void Regen(Action<Entity> action)
         {
@@ -139,7 +146,10 @@ namespace EntityTools.Tools.Entities
 #if PROFILING
             EntitiesCount += entities.Count;
 #endif
-            Timer.ChangeTime(EntityCache.ChacheTime);
+            if (EntityManager.LocalPlayer.InCombat
+                && !Astral.Quester.API.IgnoreCombat)
+                    Timer = new Timeout(EntityCache.ChacheTime);
+            else Timer = new Timeout(EntityCache.CombatChacheTime);
         }
 
         /// <summary>
@@ -202,6 +212,11 @@ namespace EntityTools.Tools.Entities
         /// Интервал времени между обновлениями кэша
         /// </summary>
         public static int ChacheTime { get; set; } = 5000;
+
+        /// <summary>
+        /// Интервал времени между обновлениями кэша во время боя
+        /// </summary>
+        public static int CombatChacheTime { get; set; } = 500;
 
         protected override CacheRecordKey GetKeyForItem(EntityCacheRecord item)
         {

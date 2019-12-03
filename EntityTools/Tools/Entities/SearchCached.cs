@@ -18,6 +18,7 @@ namespace EntityTools.Tools.Entities
 
         private static Stopwatch stopwatch = new Stopwatch();
         private static int Count = 0;
+        private static int WorseTryNumber = 0;
         private static TimeSpan MinTime = TimeSpan.MaxValue;
         private static TimeSpan MaxTime = TimeSpan.MinValue;
         private static Dictionary<long, long> frequencyDistribution = new Dictionary<long, long>();
@@ -26,6 +27,7 @@ namespace EntityTools.Tools.Entities
         public static void ResetWatch()
         {
             Count = 0;
+            WorseTryNumber = 0;
             MinTime = TimeSpan.MaxValue;
             MaxTime = TimeSpan.MinValue;
             stopwatch.Reset();
@@ -158,7 +160,10 @@ namespace EntityTools.Tools.Entities
                 stopwatch.Stop();
                 TimeSpan time = stopwatch.Elapsed.Subtract(StartTime);
                 if (time > MaxTime)
+                {
                     MaxTime = time;
+                    WorseTryNumber = Count;
+                }
                 else if (time < MinTime)
                     MinTime = time;
 

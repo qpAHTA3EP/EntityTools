@@ -51,11 +51,14 @@ namespace EntityTools.Actions
             {
                 if (Giver.MapName == EntityManager.LocalPlayer.MapState.MapName
                     && Giver.RegionName == EntityManager.LocalPlayer.RegionInternalName
-                    && Giver.Position.Distance3DFromPlayer < 50)
+                    && Giver.Position.Distance3DFromPlayer < Math.Max(InteractDistance, 20f))
                 {
                     foreach (ContactInfo contactInfo in EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts)
                     {
-                        if (Giver.IsMatching(contactInfo.Entity))
+                        if (Giver.IsMatching(contactInfo.Entity)
+                            && ((contactInfo.Entity.Location.Distance3DFromPlayer < Math.Max(InteractDistance, 20f)
+                                    && Astral.Logic.General.ZAxisDiffFromPlayer(contactInfo.Entity.Location) < 10.0) 
+                                || contactInfo.Entity.CanInteract))
                         {
                             giverContactInfo = contactInfo;
                             return true;

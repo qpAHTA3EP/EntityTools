@@ -51,7 +51,7 @@ namespace EntityTools.Conditions
             "Complete: All possible Entities")]
         [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
         [Category("Entity optional checks")]
-        public EntitySetType EntitySetType { get; set; } = EntitySetType.Contacts;
+        public EntitySetType EntitySetType { get; set; } = EntitySetType.Complete;
 
         [Description("The maximum distance from the character within which the Entity is searched\n" +
             "The default value is 0, which disables distance checking")]
@@ -77,7 +77,7 @@ namespace EntityTools.Conditions
                         && value.Count > 0)
                         customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) =>
                                     value.Exists((string regName) => regName == cr.Name));
-
+                    else customRegions = null;
                     customRegionNames = value;
                 }
             }
@@ -173,7 +173,7 @@ namespace EntityTools.Conditions
                 Entity closestEntity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType,
                                                         HealthCheck, 0, RegionCheck, customRegions);
 
-                if (closestEntity.IsValid)
+                if (closestEntity!= null && closestEntity.IsValid)
                 {
                     StringBuilder sb = new StringBuilder("Found closect Entity");
                     sb.Append(" [").Append(closestEntity.NameUntranslated).Append(']').Append(" which ").Append(PropertyType).Append(" = ");

@@ -1,20 +1,19 @@
 ﻿using Astral.Quester.Classes;
 using Astral.Quester.Forms;
 using DevExpress.XtraEditors;
-using EntityTools.Tools;
 using System;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
-using EntityTools.UCC.Conditions;
-using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
+using ConditionList = System.Collections.Generic.List<Astral.Quester.Classes.Condition>;
 using Astral.Logic.UCC.Classes;
+using EntityTools.Tools;
 
 namespace EntityTools.Forms
 {
     public partial class ConditionListForm : XtraForm //*/Form
     {
-        private UCCCondition conditionCopy;
+        private Condition conditionCopy;
 
         public ConditionListForm()
         {
@@ -44,7 +43,7 @@ namespace EntityTools.Forms
         private void btnCopy_Click(object sender, EventArgs e)
         {
             conditionCopy = null;
-            if (Conditions.SelectedItem is UCCCondition cond)
+            if (Conditions.SelectedItem is Condition cond)
             {
                 conditionCopy = CopyHelper.CreateDeepCopy(cond); // Этот метод быстрее
                 //conditionCopy = CopyHelper.CreateXmlCopy(cond); // Этот метод дольше
@@ -56,7 +55,7 @@ namespace EntityTools.Forms
         {
             if (conditionCopy != null)
             {
-                UCCCondition cond = CopyHelper.CreateDeepCopy(conditionCopy);
+                Condition cond = CopyHelper.CreateDeepCopy(conditionCopy);
                 //CustomUCCCondition cond = CopyHelper.CreateXmlCopy(conditionCopy); // Этот метод дольше
                 Conditions.Items.Add(cond); // Этот метод быстрее
 
@@ -66,17 +65,10 @@ namespace EntityTools.Forms
 
         private void btnTest_Click(object sender, EventArgs e)
         {
-            ICustomUCCCondition cond = (Conditions.Items.Count > 0) ? Conditions.SelectedItem as ICustomUCCCondition : null;
-            if (cond != null)
+            if (Conditions.Items.Count > 0
+                && Conditions.SelectedItem is Condition cond)
             {
-                //StringBuilder sb = new StringBuilder();
-                //sb.AppendLine(cond.ToString()).AppendLine();
-                //sb.Append("Result: ").Append(cond.IsOK(null).ToString());
-
-                ////MessageBox.Show(sb.ToString());
-                //XtraMessageBox.Show(sb.ToString());                
-
-                if (cond.IsOk(null))
+                if (cond.IsValid)
                     XtraMessageBox.Show(string.Concat(cond, "\nResult: True"));
                 else
                     XtraMessageBox.Show(string.Concat(cond, "\nResult: False"));
@@ -121,7 +113,7 @@ namespace EntityTools.Forms
             if (conditions != null)
             {
                 // Отображаем список условий
-                foreach (UCCCondition condition in conditions)
+                foreach (Condition condition in conditions)
                 {
                     int ind = Conditions.Items.Add(CopyHelper.CreateDeepCopy(condition));
                     Conditions.SetItemChecked(ind, condition.Locked);
@@ -136,7 +128,7 @@ namespace EntityTools.Forms
                 ConditionList newConditions = new ConditionList();
                 foreach (object item in Conditions.Items)
                 {
-                    if (item is UCCCondition condition)
+                    if (item is Condition condition)
                         newConditions.Add(condition);
                 }
 
