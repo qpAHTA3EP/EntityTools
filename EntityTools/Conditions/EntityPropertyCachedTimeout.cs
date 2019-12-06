@@ -131,7 +131,7 @@ namespace EntityTools.Conditions
         [XmlIgnore]
         Entity closestEntity = null;
         [XmlIgnore]
-        private Timeout timeout = new Timeout(100);
+        private Timeout timeout = new Timeout(0);
         [XmlIgnore]
         private EntityComparerToPattern Comparer = null;
         [XmlIgnore]
@@ -150,7 +150,7 @@ namespace EntityTools.Conditions
         {
             get
             {
-                if (timeout.IsTimedOut)
+                if (timeout.IsTimedOut || (closestEntity!=null && !Validate(closestEntity)))
                 {
                     if (!string.IsNullOrEmpty(EntityID))
                         closestEntity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType,
@@ -239,7 +239,7 @@ namespace EntityTools.Conditions
                 else
                 {
                     StringBuilder sb = new StringBuilder("No one Entity matched to");
-                    sb.Append(" [").Append(EntityID).Append(']').AppendLine();
+                    sb.Append(" [").Append(entityId).Append(']').AppendLine();
                     if (PropertyType == EntityPropertyType.Distance)
                         sb.AppendLine("The distance to the missing Entity is considered equal to infinity.");
                     return sb.ToString();

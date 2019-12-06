@@ -156,7 +156,7 @@ namespace EntityTools.Actions
                 //Если HoldTargetEntity ВЫКЛЮЧЕН, то обе цели совпадают - это ближайшая цель 
 
                 Entity closestEntity = null;
-                if (timeout.IsTimedOut)
+                if (timeout.IsTimedOut || (target!= null && !Validate(target)))
                 {
                     closestEntity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete,
                                                                 HealthCheck, ReactionRange, RegionCheck, customRegions);
@@ -210,9 +210,21 @@ namespace EntityTools.Actions
             //    return ActionResult.Running;
             //}
 
+            if (IgnoreCombat)
+            {
+                Astral.Logic.NW.Attackers.List.Clear();
+                if (AttackTargetEntity)
+                {
+                    Astral.Logic.NW.Attackers.List.Add(target);
+                    Astral.Quester.API.IgnoreCombat = false;
+                    Astral.Logic.NW.Combats.CombatUnit(target, null);
+                }
+                else Astral.Quester.API.IgnoreCombat = false;
+            }
+
             // Вариант реализации со сбросом флага IgnoreCombat в NeedToRun
             if (StopOnApproached)
-                return ActionResult.Completed;
+            return ActionResult.Completed;
             else return ActionResult.Running;
         }
 
@@ -222,7 +234,7 @@ namespace EntityTools.Actions
         }
 
         [XmlIgnore]
-        private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(500);
+        private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
         [XmlIgnore]
         private string entityId = string.Empty;
         [XmlIgnore]

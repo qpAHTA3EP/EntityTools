@@ -1,5 +1,6 @@
 ﻿using DevExpress.XtraEditors;
 using EntityTools.Tools.MountInsignias;
+using MyNW.Classes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -33,8 +34,7 @@ namespace EntityTools.Forms
             {
                 for(int i =0; i< insigniaBonusesForm.BonusList.Items.Count; i++)
                 {
-                    MountBonusDef itemBonus = insigniaBonusesForm.BonusList.Items[i] as MountBonusDef;
-                    if (itemBonus != null && itemBonus.InternalName == bonus.InternalName)
+                    if (insigniaBonusesForm.BonusList.Items[i] is MountBonusDef itemBonus && itemBonus.InternalName == bonus.InternalName)
                     {
                         insigniaBonusesForm.BonusList.SelectedIndex = i;
                         break;
@@ -90,9 +90,8 @@ namespace EntityTools.Forms
 
         private void BonusList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            MountBonusDef currentBonus = BonusList.SelectedItem as MountBonusDef;
-            
-            if(currentBonus != null)
+
+            if (BonusList.SelectedItem is MountBonusDef currentBonus)
             {
                 Description.Text = currentBonus.Description;
 
@@ -183,5 +182,50 @@ namespace EntityTools.Forms
             }
             else BonusList.DataSource = mountBonuses;
         }
+
+        // Примерный код подсчета слотов для инсигний каждого вида у скакуна
+        //void CountIns()
+        //{
+        //    int barb = 0,
+        //            cres = 0,
+        //            illum = 0,
+        //            enl = 0,
+        //            reg = 0,
+        //            univ = 0;
+
+
+        //    foreach (InventorySlot mount in activeMounts)
+        //    {
+        //        foreach (ItemGemSlotDef insgnSlotDef in mount.Item.ItemDef.EffectiveItemGemSlots)
+        //        {
+        //            // insgnSlotDef - описание слота в скакуне
+        //            // insgnMountSlot - слот знака в скакуне
+        //            ItemGemSlot insgnMountSlot = mount.Item.SpecialProps.GetGemSlotByIndex(insgnSlotDef.Index);
+
+        //            switch(insgnSlotDef.Type) //== (uint)InsigniaType.Universal
+        //            {
+        //                case (uint)InsigniaType.Barbed:
+        //                    barb++;
+        //                    break;
+        //                case (uint)InsigniaType.Crescent:
+        //                    cres++;
+        //                    break;
+        //                case (uint)InsigniaType.Enlightened:
+        //                    enl++;
+        //                    break;
+        //                case (uint)InsigniaType.Illuminated:
+        //                    illum++;
+        //                    break;
+        //                case (uint)InsigniaType.Regal:
+        //                    reg++;
+        //                    break;
+        //                case (uint)InsigniaType.Universal:
+        //                    univ++;
+        //                    break;
+        //            }
+        //        }
+        //    }
+        //}
+
     }
 }

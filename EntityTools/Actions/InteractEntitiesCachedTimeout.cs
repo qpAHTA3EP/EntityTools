@@ -202,7 +202,7 @@ namespace EntityTools.Actions
         private Vector3 initialPos = new Vector3();
 
         [XmlIgnore]
-        private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(500);
+        private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
         [XmlIgnore]
         private ItemFilterStringType entityIdType = ItemFilterStringType.Simple;
         [XmlIgnore]
@@ -221,24 +221,35 @@ namespace EntityTools.Actions
         {
             get
             {
-                if (timeout.IsTimedOut
-                    && (!HoldTargetEntity || !Validate(target) || (HealthCheck && target.IsDead)))
-                {
-                    Entity closestEntity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType,
-                                                                HealthCheck, ReactionRange, RegionCheck, customRegions,
-                                                                IsNotInBlackList);
-                    timeout.ChangeTime(SearchTimeInterval);
+                //if (timeout.IsTimedOut
+                //    && (!HoldTargetEntity || !Validate(target) || (HealthCheck && target.IsDead)))
+                //{
+                //    Entity closestEntity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType,
+                //                                                HealthCheck, ReactionRange, RegionCheck, customRegions,
+                //                                                IsNotInBlackList);
+                //    timeout.ChangeTime(SearchTimeInterval);
 
-                    if (closestEntity != null && closestEntity.IsValid)
-                        target = closestEntity;
-                    else
-                    {
-                        target = null;
-                        if (IgnoreCombat)
-                            Astral.Quester.API.IgnoreCombat = true;
-                        return false;
-                    }
+                //    if (closestEntity != null && closestEntity.IsValid)
+                //        target = closestEntity;
+                //    else
+                //    {
+                //        target = null;
+                //        if (IgnoreCombat)
+                //            Astral.Quester.API.IgnoreCombat = true;
+                //        return false;
+                //    }
+                //}
+
+                Entity closestEntity = null;
+                if (timeout.IsTimedOut || (target != null && !Validate(target)))
+                {
+                    closestEntity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete,
+                                                                HealthCheck, ReactionRange, RegionCheck, customRegions);
+                    timeout.ChangeTime(SearchTimeInterval);
                 }
+
+                if (!HoldTargetEntity || !Validate(target) || (HealthCheck && target.IsDead))
+                    target = closestEntity;
 
                 if (Validate(target) && !(HealthCheck && target.IsDead))
                 {
@@ -257,6 +268,13 @@ namespace EntityTools.Actions
                     }
                     initialPos = target.Location/*.Clone()*/;
                     return true;
+                }
+                else if (IgnoreCombat && Validate(closestEntity)
+                         && !(HealthCheck && closestEntity.IsDead)
+                         && (closestEntity.Location.Distance3DFromPlayer <= CombatDistance))
+                {
+                    Astral.Logic.NW.Attackers.List.Clear();
+                    Astral.Quester.API.IgnoreCombat = false;
                 }
                 else if (IgnoreCombat)
                     Astral.Quester.API.IgnoreCombat = true;

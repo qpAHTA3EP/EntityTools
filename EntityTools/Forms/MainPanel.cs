@@ -117,6 +117,7 @@ namespace EntityTools.Forms
 
             #region Test_MountBonusPriority
             //MountBonusPriorityListForm.GetBonusList();
+            InsigniaBonusSelectForm.GetMountBonuses();
             #endregion
 
             #region Test_ComplexCondition
@@ -167,8 +168,7 @@ namespace EntityTools.Forms
 
         private void bte_ButtonClick(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
         {
-            DevExpress.XtraEditors.ButtonEdit bte = sender as DevExpress.XtraEditors.ButtonEdit;
-            if (bte != null)
+            if (sender is DevExpress.XtraEditors.ButtonEdit bte)
             {
                 string fileName = string.Empty;
 

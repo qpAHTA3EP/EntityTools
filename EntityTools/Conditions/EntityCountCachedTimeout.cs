@@ -146,7 +146,7 @@ namespace EntityTools.Conditions
         [XmlIgnore]
         private EntityComparerToPattern Comparer = null;
         //[XmlIgnore]
-        //private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(100);
+        //private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
         [XmlIgnore]
         private string entityId = string.Empty;
         [XmlIgnore]
@@ -221,41 +221,49 @@ namespace EntityTools.Conditions
                            HealthCheck, ReactionRange, RegionCheck, customRegions);
 
                     StringBuilder strBldr = new StringBuilder();
-                    strBldr.AppendLine();
                     uint entCount = 0;
 
-                    foreach (Entity entity in entities)
+                    if (entities != null)
                     {
-                        StringBuilder strBldr2 = new StringBuilder();
-                        bool match = false;
-
-                        foreach (CustomRegion customRegion in Astral.Quester.API.CurrentProfile.CustomRegions)
+                        if (customRegions != null && customRegions.Count > 0)
                         {
-                            if (CommonTools.IsInCustomRegion(entity, customRegion))
+                            strBldr.AppendLine();
+                            foreach (Entity entity in entities)
                             {
-                                match = true;
-                                if (strBldr2.Length > 0)
-                                    strBldr2.Append(", ");
-                                strBldr2.Append($"[{customRegion.Name}]");
+                                StringBuilder strBldr2 = new StringBuilder();
+                                bool match = false;
+
+                                foreach (CustomRegion customRegion in Astral.Quester.API.CurrentProfile.CustomRegions)
+                                {
+                                    if (CommonTools.IsInCustomRegion(entity, customRegion))
+                                    {
+                                        match = true;
+                                        if (strBldr2.Length > 0)
+                                            strBldr2.Append(", ");
+                                        strBldr2.Append($"[{customRegion.Name}]");
+                                    }
+                                }
+
+                                if (Tested == Presence.Equal && match)
+                                    entCount++;
+                                if (Tested == Presence.NotEquel && !match)
+                                    entCount++;
+
+                                strBldr.Append($"[{entity.InternalName}] is in CustomRegions: ").Append(strBldr2).AppendLine();
                             }
+
+                            if (Tested == Presence.Equal)
+                                strBldr.Insert(0, $"Total {entCount} Entities [{entityId}] are detected in {customRegions.Count} CustomRegion:");
+                            if (Tested == Presence.NotEquel)
+                                strBldr.Insert(0, $"Total {entCount} Entities [{entityId}] are detected out of {customRegions.Count} CustomRegion:");
                         }
-
-                        if (Tested == Presence.Equal && match)
-                            entCount++;
-                        if (Tested == Presence.NotEquel && !match)
-                            entCount++;
-
-                        strBldr.Append($"[{entity.InternalName}] is in CustomRegions: ").Append(strBldr2).AppendLine();
+                        else strBldr.Append($"Total {entities.Count} Entities [{entityId}] are detected");
                     }
-
-                    if (Tested == Presence.Equal)
-                        strBldr.Insert(0, $"Total {entCount} Entities [{EntityID}] are detected in {CustomRegionNames.Count} CustomRegion:");
-                    if(Tested == Presence.NotEquel)
-                        strBldr.Insert(0, $"Total {entCount} Entities [{EntityID}] are detected out of {CustomRegionNames.Count} CustomRegion:");
+                    else strBldr.Append($"No Entity [{entityId}] was found.");
 
                     return strBldr.ToString();
                 }
-                return $"'{nameof(EntityID)}' or '{nameof(CustomRegionNames)}' properties are not set";
+                return $"Proeprty '{nameof(EntityID)}' does not set !";
             }
         }
 
