@@ -3,6 +3,7 @@ using Astral.Logic.Classes.Map;
 using Astral.Quester.UIEditors;
 using EntityTools.Enums;
 using EntityTools.States;
+using EntityTools.Tools.Entities;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
@@ -46,6 +47,27 @@ namespace EntityTools.Actions
                             return ActionResult.Completed;
                         }
                         else return ActionResult.Fail;
+                    case PluginSettingsCommand.DisableUnstuckSpell:
+                        if (bool.TryParse(Value, out result))
+                        {
+                            UnstuckSpellTask.Activate = !result;
+                            return ActionResult.Completed;
+                        }
+                        else return ActionResult.Fail;
+                    case PluginSettingsCommand.EntityCacheTime:
+                        if (int.TryParse(Value, out int timer))
+                        {
+                            if(timer >= 1)
+                                EntityCache.ChacheTime = timer;
+                        }
+                        return ActionResult.Fail;
+                    case PluginSettingsCommand.EntityCacheCombatTime:
+                        if (int.TryParse(Value, out timer))
+                        {
+                            if (timer >= 1)
+                                EntityCache.CombatChacheTime = timer;
+                        }
+                        return ActionResult.Fail;
                 }
             }
             return ActionResult.Skip;
@@ -70,11 +92,28 @@ namespace EntityTools.Actions
                 {
                     case PluginSettingsCommand.DisableSlideMonitor:
                         if (!bool.TryParse(Value, out bool result))
-                            return new ActionValidity("Value is incorrect!");
+                            return new ActionValidity("Value is incorrect!\n" +
+                                "The boolean is required.");
                         break;
                     case PluginSettingsCommand.DisableSpellStuckMonitor:
                         if (!bool.TryParse(Value, out result))
-                            return new ActionValidity("Value is incorrect!");
+                            return new ActionValidity("Value is incorrect!\n" +
+                                "The boolean is required.");
+                        break;
+                    case PluginSettingsCommand.DisableUnstuckSpell:
+                        if (!bool.TryParse(Value, out result))
+                            return new ActionValidity("Value is incorrect!\n" +
+                                "The boolean is required.");
+                        break;
+                    case PluginSettingsCommand.EntityCacheTime:
+                        if (!int.TryParse(Value, out int timer) || timer < 1)
+                            return new ActionValidity("Value is incorrect!\n" +
+                                "The positive integer greter 1 is required.");
+                        break;
+                    case PluginSettingsCommand.EntityCacheCombatTime:
+                        if (!int.TryParse(Value, out timer))
+                            return new ActionValidity("Value is incorrect!\n" +
+                                "The positive integer greter 1 is required.");
                         break;
                 }
                 return new ActionValidity();

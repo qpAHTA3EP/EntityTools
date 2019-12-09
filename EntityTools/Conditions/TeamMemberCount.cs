@@ -30,11 +30,7 @@ namespace EntityTools.Conditions
             {
                 if (customRegionNames != value)
                 {
-                    if (value != null
-                        && value.Count > 0)
-                        customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) =>
-                                    value.Exists((string regName) => regName == cr.Name));
-                    else customRegions = null;
+                    customRegions = CustomRegionTools.GetCustomRegions(value);
                     customRegionNames = value;
                 }
             }
@@ -68,16 +64,16 @@ namespace EntityTools.Conditions
         [Category("Members")]
         public bool RegionCheck { get; set; } = false;
 
-        [XmlIgnore]
-        private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(500);
-
         [Description("Time between searches of the TeamMembers (ms)")]
         public int SearchTimeInterval { get; set; } = 500;
+
+        [NonSerialized]
+        private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(500);
 
         /// <summary>
         /// Кэшированное число членов группы, удовлетворяющих критериям
         /// </summary>
-        [XmlIgnore]
+        [NonSerialized]
         int membersCount = 0;
 
         public override bool IsValid
@@ -100,7 +96,7 @@ namespace EntityTools.Conditions
                                                     (member.InternalName != EntityManager.LocalPlayer.InternalName
                                                         && (!RegionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                                         && member.Entity.Location.Distance3DFromPlayer < Distance
-                                                        && (customRegions == null || customRegions.Find((CustomRegion cr) => CommonTools.IsInCustomRegion(member.Entity, cr)) != null))
+                                                        && (customRegions == null || customRegions.Find((CustomRegion cr) => member.Entity.Within(cr)) != null))
                                                     ).Count;
 
                                     break;
@@ -111,7 +107,7 @@ namespace EntityTools.Conditions
                                                     (member.InternalName != EntityManager.LocalPlayer.InternalName
                                                         && (!RegionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                                         && member.Entity.Location.Distance3DFromPlayer > Distance
-                                                        && (customRegions == null || customRegions.Find((CustomRegion cr) => CommonTools.IsInCustomRegion(member.Entity, cr)) != null))
+                                                        && (customRegions == null || customRegions.Find((CustomRegion cr) => member.Entity.Within(cr)) != null))
                                                     ).Count;
                                     break;
                                 }
@@ -121,7 +117,7 @@ namespace EntityTools.Conditions
                                                     (member.InternalName != EntityManager.LocalPlayer.InternalName
                                                         && (!RegionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                                         && member.Entity.Location.Distance3DFromPlayer == Distance
-                                                        && (customRegions == null || customRegions.Find((CustomRegion cr) => CommonTools.IsInCustomRegion(member.Entity, cr)) != null))
+                                                        && (customRegions == null || customRegions.Find((CustomRegion cr) => member.Entity.Within(cr)) != null))
                                                     ).Count;
                                     break;
                                 }
@@ -131,7 +127,7 @@ namespace EntityTools.Conditions
                                                     (member.InternalName != EntityManager.LocalPlayer.InternalName
                                                         && (!RegionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                                         && member.Entity.Location.Distance3DFromPlayer != Distance
-                                                        && (customRegions == null || customRegions.Find((CustomRegion cr) => CommonTools.IsInCustomRegion(member.Entity, cr)) != null))
+                                                        && (customRegions == null || customRegions.Find((CustomRegion cr) => member.Entity.Within(cr)) != null))
                                                     ).Count;
                                     break;
                                 }
@@ -202,7 +198,7 @@ namespace EntityTools.Conditions
                             if (customRegions != null && customRegions.Count > 0)
                             {
                                 foreach (CustomRegion cr in customRegions)
-                                    if (CommonTools.IsInCustomRegion(member.Entity, cr))
+                                    if (member.Entity.Within(cr))
                                     {
                                         match = true;
                                         if (strBldr2.Length > 0)

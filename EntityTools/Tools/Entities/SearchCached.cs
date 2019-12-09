@@ -96,24 +96,28 @@ namespace EntityTools.Tools.Entities
 #endif
                 // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
                 float closestDistance = (range == 0) ? float.MaxValue : range;
-                List<Entity> entities = null;
+                List<Entity> entities = new List<Entity>();
                 Action<Entity> evaluateAction;
 
                 // Конструируем функтор для поиска Entity в соответствии с доп. условиями
-                if (customRegions == null)
+                if (customRegions != null && customRegions.Count > 0)
                 {
                     if (specialCheck == null)
                         evaluateAction = (Entity e) =>
                         {
                             if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                && (!healthCheck || !e.IsDead))
+                                && (!healthCheck || !e.IsDead)
+                                && (range == 0 || e.Location.Distance3DFromPlayer < range)
+                                && customRegions.Find((CustomRegion cr) => e.Within(cr)) != null)
                                 entities.Add(e);
                         };
                     else evaluateAction = (Entity e) =>
                     {
-                        if((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                && (!healthCheck || !e.IsDead)
-                                && specialCheck(e))
+                        if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+                            && (!healthCheck || !e.IsDead)
+                            && (range == 0 || e.Location.Distance3DFromPlayer < range)
+                            && customRegions.Find((CustomRegion cr) => e.Within(cr)) != null
+                            && specialCheck(e))
                             entities.Add(e);
                     };
                 }
@@ -122,17 +126,17 @@ namespace EntityTools.Tools.Entities
                     if (specialCheck == null)
                         evaluateAction = (Entity e) =>
                         {
-                            if((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+                            if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                 && (!healthCheck || !e.IsDead)
-                                && customRegions.Find((CustomRegion cr) => CommonTools.IsInCustomRegion(e, cr)) != null)
+                                && (range == 0 || e.Location.Distance3DFromPlayer < range))
                                 entities.Add(e);
                         };
                     else evaluateAction = (Entity e) =>
                     {
                         if((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                            && (!healthCheck || !e.IsDead)
-                            && customRegions.Find((CustomRegion cr) => CommonTools.IsInCustomRegion(e, cr)) != null
-                            && specialCheck(e))
+                                && (!healthCheck || !e.IsDead)
+                                && (range == 0 || e.Location.Distance3DFromPlayer < range)
+                                && specialCheck(e))
                             entities.Add(e);
                     };
                 }
@@ -206,46 +210,15 @@ namespace EntityTools.Tools.Entities
                 Action<Entity> evaluateAction;
 
                 // Конструируем функтор для поиска Entity в соответствии с доп. условиями
-                if (customRegions == null)
-                {
-                    if (specialCheck == null)
-                        evaluateAction = (Entity e) =>
-                        {
-                            if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                && (!healthCheck || !e.IsDead))
-                            {
-                                float eDistance = e.CombatDistance3;
-                                if (eDistance < closestDistance)
-                                {
-                                    closestEntity = e;
-                                    closestDistance = eDistance;
-                                }
-                            }
-                        };
-                    else evaluateAction = (Entity e) =>
-                    {
-                        if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                && (!healthCheck || !e.IsDead)
-                                && specialCheck(e))
-                        {
-                            float eDistance = e.CombatDistance3;
-                            if (eDistance < closestDistance)
-                            {
-                                closestEntity = e;
-                                closestDistance = eDistance;
-                            }
-                        }
-
-                    };
-                }
-                else
+                if (customRegions != null && customRegions.Count > 0)
                 {
                     if (specialCheck == null)
                         evaluateAction = (Entity e) =>
                         {
                             if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                 && (!healthCheck || !e.IsDead)
-                                && customRegions.Find((CustomRegion cr) => CommonTools.IsInCustomRegion(e, cr)) != null)
+                                && (range == 0 || e.Location.Distance3DFromPlayer < range)
+                                && customRegions.Find((CustomRegion cr) => e.Within(cr)) != null)
                             {
                                 float eDistance = e.CombatDistance3;
                                 if (eDistance < closestDistance)
@@ -259,7 +232,8 @@ namespace EntityTools.Tools.Entities
                     {
                         if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                             && (!healthCheck || !e.IsDead)
-                            && customRegions.Find((CustomRegion cr) => CommonTools.IsInCustomRegion(e, cr)) != null
+                            && (range == 0 || e.Location.Distance3DFromPlayer < range)
+                            && customRegions.Find((CustomRegion cr) => e.Within(cr)) != null
                             && specialCheck(e))
                         {
                             float eDistance = e.CombatDistance3;
@@ -269,6 +243,40 @@ namespace EntityTools.Tools.Entities
                                 closestDistance = eDistance;
                             }
                         }
+                    };
+                }
+                else
+                {
+                    if (specialCheck == null)
+                        evaluateAction = (Entity e) =>
+                        {
+                            if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+                                && (!healthCheck || !e.IsDead)
+                                && (range == 0 || e.Location.Distance3DFromPlayer < range))
+                            {
+                                float eDistance = e.CombatDistance3;
+                                if (eDistance < closestDistance)
+                                {
+                                    closestEntity = e;
+                                    closestDistance = eDistance;
+                                }
+                            }
+                        };
+                    else evaluateAction = (Entity e) =>
+                    {
+                        if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+                                && (!healthCheck || !e.IsDead)
+                                && (range == 0 || e.Location.Distance3DFromPlayer < range)
+                                && specialCheck(e))
+                        {
+                            float eDistance = e.CombatDistance3;
+                            if (eDistance < closestDistance)
+                            {
+                                closestEntity = e;
+                                closestDistance = eDistance;
+                            }
+                        }
+
                     };
                 }
 
@@ -303,106 +311,5 @@ namespace EntityTools.Tools.Entities
             }
 #endif
         }
-        //        {
-        //#if PROFILING
-        //            Count++;
-        //            TimeSpan StartTime = stopwatch.Elapsed;
-        //        stopwatch.Start();
-        //            try
-        //            {
-        //#endif
-        //                if (EntityCache.TryGetValue(out EntityCacheRecord cache, pattern, matchType, nameType, setType))
-        //                {
-        //                    // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
-        //                    float closestDistance = (range == 0) ? float.MaxValue : range;
-        //        Entity closestEntity = null;
-        //        Predicate<Entity> optionCheck;
-
-        //                    if (customRegions == null)
-        //                    {
-        //                        if (specialCheck == null)
-        //                            optionCheck = (Entity e) =>
-        //                            {
-        //                                return e.IsValid && (!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-        //                                    && (!healthCheck || !e.IsDead);
-        //                            };
-        //                        else optionCheck = (Entity e) =>
-        //                        {
-        //                            return e.IsValid && (!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-        //                                    && (!healthCheck || !e.IsDead)
-        //                                    && specialCheck(e);
-        //};
-        //                    }
-        //                    else
-        //                    {
-        //                        if (specialCheck == null)
-        //                            optionCheck = (Entity e) =>
-        //                            {
-        //                                return e.IsValid && (!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-        //                                    && (!healthCheck || !e.IsDead)
-        //                                    && customRegions.Find((CustomRegion cr) => CommonTools.IsInCustomRegion(e, cr)) != null;
-        //                            };
-        //                        else optionCheck = (Entity e) =>
-        //                        {
-        //                            return e.IsValid && (!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-        //                                && (!healthCheck || !e.IsDead)
-        //                                && customRegions.Find((CustomRegion cr) => CommonTools.IsInCustomRegion(e, cr)) != null
-        //                                && specialCheck(e);
-        //                        };
-        //                    }
-
-        //                    // Проверяем Entities
-        //                    foreach(Entity e in cache.Entities)
-        //                    {
-        //                        float eDistance = e.CombatDistance3;
-        //                        if (eDistance<closestDistance && optionCheck(e))
-        //                        {
-        //                            closestEntity = e;
-        //                            closestDistance = eDistance;
-        //                        }
-        //                    }
-
-        //                    if (closestEntity == null)
-        //                    {
-        //                        if(cache.Timer.Left > EntityCache.ChacheTime* 0.7)
-        //                        {
-        //                            // Не найдено ни одного Entity
-        //                            // при этом до обновления Кэша осталось менее 30% времени.
-        //                            // Пробуем обновить кэш и повторить поиск 
-        //                            cache.Regen();
-        //                            foreach (Entity e in cache.Entities)
-        //                            {
-        //                                float eDistance = e.CombatDistance3;
-        //                                if (eDistance<closestDistance && optionCheck(e))
-        //                                {
-        //                                    closestEntity = e;
-        //                                    closestDistance = eDistance;
-        //                                }
-        //                            }
-        //                        }
-        //                    }
-
-        //                    return closestEntity;
-        //                }
-        //                else return null;
-        //#if PROFILING
-        //            }
-        //            finally
-        //            {
-        //                stopwatch.Stop();
-        //                TimeSpan time = stopwatch.Elapsed.Subtract(StartTime);
-        //                if (time > MaxTime)
-        //                    MaxTime = time;
-        //                else if (time<MinTime)
-        //                    MinTime = time;
-
-        //                long i = Math.DivRem(time.Ticks, interval, out long rem);
-        //                if (frequencyDistribution.ContainsKey(i))
-        //                    frequencyDistribution[i] += 1;
-        //                else frequencyDistribution.Add(i, 1);
-        //            }
-        //#endif
-        //        }
-
     }
 }

@@ -271,7 +271,7 @@ namespace EntityTools.Tools
                     if ((!regionCheck || entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                         && (!healthCheck || !entity.IsDead)
                         && (!interactable || entity.Critter.IsInteractable)
-                        && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => CommonTools.IsInCustomRegion(entity, cr)) > 0)
+                        && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => entity.Within(cr)) > 0)
                         && (range == 0 || entity.Location.Distance3DFromPlayer < range)
                         && Regex.IsMatch(entity.InternalName, entPattern) 
                         && (specialCheck == null || specialCheck(entity)))
@@ -315,7 +315,7 @@ namespace EntityTools.Tools
                     if ((!regionCheck || entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                         && (!healthCheck || !entity.IsDead)
                         && (!interactable || entity.Critter.IsInteractable)
-                        && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => CommonTools.IsInCustomRegion(entity, cr)) > 0)
+                        && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => entity.Within(cr)) > 0)
                         && (range == 0 || entity.Location.Distance3DFromPlayer < range)
                         && Regex.IsMatch(entity.NameUntranslated, entPattern)
                         && (specialCheck == null || specialCheck(entity)))
@@ -360,7 +360,7 @@ namespace EntityTools.Tools
                         if ((range == 0 || entity.Location.Distance3DFromPlayer < range)
                             && (!healthCheck || !entity.IsDead)
                             && (!interactable || entity.Critter.IsInteractable)
-                            && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => CommonTools.IsInCustomRegion(entity, cr)) >= 0)
+                            && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => entity.Within(cr)) >= 0)
                             && entity.InternalName.StartsWith(entPattern)
                             && (!regionCheck || entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                             && (specialCheck == null || specialCheck(entity)))
@@ -383,7 +383,7 @@ namespace EntityTools.Tools
                         if ((range == 0 || entity.Location.Distance3DFromPlayer < range)
                             && (!healthCheck || !entity.IsDead)
                             && (!interactable || entity.Critter.IsInteractable)
-                            && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => CommonTools.IsInCustomRegion(entity, cr)) >= 0)
+                            && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => entity.Within(cr)) >= 0)
                             && entity.InternalName.Contains(entPattern)
                             && (!regionCheck || entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                             && (specialCheck == null || specialCheck(entity)))
@@ -430,7 +430,7 @@ namespace EntityTools.Tools
                         if ((range == 0 || entity.Location.Distance3DFromPlayer < range)
                             && (!healthCheck || !entity.IsDead)
                             && (!interactable || entity.Critter.IsInteractable)
-                            && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => CommonTools.IsInCustomRegion(entity, cr)) >= 0)
+                            && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => entity.Within(cr)) >= 0)
                             && entity.NameUntranslated.StartsWith(entPattern)
                             && (!regionCheck || entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                             && (specialCheck == null || specialCheck(entity)))
@@ -453,7 +453,7 @@ namespace EntityTools.Tools
                         if ((range == 0 || entity.Location.Distance3DFromPlayer < range)
                             && (!healthCheck || !entity.IsDead)
                             && (!interactable || entity.Critter.IsInteractable)
-                            && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => CommonTools.IsInCustomRegion(entity, cr)) >= 0)
+                            && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => entity.Within(cr)) >= 0)
                             && entity.NameUntranslated.Contains(entPattern)
                             && (!regionCheck || entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                             && (specialCheck == null || specialCheck(entity)))
@@ -569,21 +569,21 @@ namespace EntityTools.Tools
                 {
                     // Поиск шаблона в началае 
                     entPattern = entPattern.Trim('*');
-                    resultList = entities.FindAll((Entity ent) => (ent.NameUntranslated.StartsWith(entPattern)
-                                                                    && (!regionCheck || ent.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                                                    && (!healthCheck || !ent.IsDead)
-                                                                    && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => CommonTools.IsInCustomRegion(ent, cr)) >= 0)
-                                                                    && (specialCheck == null || specialCheck(ent))));
+                    resultList = entities.FindAll((Entity e) => (e.NameUntranslated.StartsWith(entPattern)
+                                                                    && (!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+                                                                    && (!healthCheck || !e.IsDead)
+                                                                    && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => e.Within(cr)) >= 0)
+                                                                    && (specialCheck == null || specialCheck(e))));
                 }
                 else
                 {
                     // Поиск любого вхождения шаблона
                     entPattern = entPattern.Trim('*');
-                    resultList = entities.FindAll((Entity ent) => (ent.NameUntranslated.Contains(entPattern)
-                                                                    && (!regionCheck || ent.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                                                    && (!healthCheck || !ent.IsDead)
-                                                                    && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => CommonTools.IsInCustomRegion(ent, cr)) >= 0)
-                                                                    && (specialCheck == null || specialCheck(ent))));
+                    resultList = entities.FindAll((Entity e) => (e.NameUntranslated.Contains(entPattern)
+                                                                    && (!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+                                                                    && (!healthCheck || !e.IsDead)
+                                                                    && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => e.Within(cr)) >= 0)
+                                                                    && (specialCheck == null || specialCheck(e))));
                 }
             }
             return resultList;
@@ -612,21 +612,21 @@ namespace EntityTools.Tools
                 {
                     // Поиск шаблона в началае 
                     entPattern = entPattern.Trim('*');
-                    resultList = entities.FindAll((Entity ent) => (ent.InternalName.StartsWith(entPattern)
-                                                                    && (!regionCheck || ent.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                                                    && (!healthCheck || !ent.IsDead)
-                                                                    && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => CommonTools.IsInCustomRegion(ent, cr)) >= 0)
-                                                                    && (specialCheck == null || specialCheck(ent))));
+                    resultList = entities.FindAll((Entity e) => (e.InternalName.StartsWith(entPattern)
+                                                                    && (!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+                                                                    && (!healthCheck || !e.IsDead)
+                                                                    && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => e.Within(cr)) >= 0)
+                                                                    && (specialCheck == null || specialCheck(e))));
                 }
                 else
                 {
                     // Поиск любого вхождения шаблона
                     entPattern = entPattern.Trim('*');
-                    resultList = entities.FindAll((Entity ent) => (ent.InternalName.Contains(entPattern)
-                                                                    && (!regionCheck || ent.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                                                    && (!healthCheck || !ent.IsDead)
-                                                                    && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => CommonTools.IsInCustomRegion(ent, cr)) >= 0)
-                                                                    && (specialCheck == null || specialCheck(ent))));
+                    resultList = entities.FindAll((Entity e) => (e.InternalName.Contains(entPattern)
+                                                                    && (!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+                                                                    && (!healthCheck || !e.IsDead)
+                                                                    && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => e.Within(cr)) >= 0)
+                                                                    && (specialCheck == null || specialCheck(e))));
                 }
 
             }
@@ -655,17 +655,17 @@ namespace EntityTools.Tools
 
                 switch(nameType)
                 {
-                    case EntityNameType.InternalName: resultList = entities.FindAll((Entity ent) => Regex.IsMatch(ent.InternalName, entPattern)
-                                                                                && (!regionCheck || ent.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                                                                && (!healthCheck || !ent.IsDead)
-                                                                                && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => CommonTools.IsInCustomRegion(ent, cr)) >= 0)
-                                                                                && (specialCheck == null || specialCheck(ent)));
+                    case EntityNameType.InternalName: resultList = entities.FindAll((Entity e) => Regex.IsMatch(e.InternalName, entPattern)
+                                                                                && (!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+                                                                                && (!healthCheck || !e.IsDead)
+                                                                                && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => e.Within(cr)) >= 0)
+                                                                                && (specialCheck == null || specialCheck(e)));
                         break;
-                    case EntityNameType.NameUntranslated: resultList = entities.FindAll((Entity ent) => Regex.IsMatch(ent.NameUntranslated, entPattern)
-                                                                                && (!regionCheck || ent.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                                                                && (!healthCheck || !ent.IsDead)
-                                                                                && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => CommonTools.IsInCustomRegion(ent, cr)) >= 0)
-                                                                                && (specialCheck == null || specialCheck(ent)));
+                    case EntityNameType.NameUntranslated: resultList = entities.FindAll((Entity e) => Regex.IsMatch(e.NameUntranslated, entPattern)
+                                                                                && (!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+                                                                                && (!healthCheck || !e.IsDead)
+                                                                                && (customRegions == null || customRegions.Count == 0 || customRegions.FindIndex(cr => e.Within(cr)) >= 0)
+                                                                                && (specialCheck == null || specialCheck(e)));
                         break;
                 }
             }

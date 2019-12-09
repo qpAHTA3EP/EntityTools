@@ -133,11 +133,7 @@ namespace EntityTools.Actions
             {
                 if (customRegionNames != value)
                 {
-                    if (value != null
-                        && value.Count > 0)
-                        customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) =>
-                                    value.Exists((string regName) => regName == cr.Name));
-                    else customRegions = null;
+                    customRegions = CustomRegionTools.GetCustomRegions(value);
                     customRegionNames = value;
                 }
             }
@@ -185,6 +181,9 @@ namespace EntityTools.Actions
         [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
         public string TestInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>";
 
+        [XmlIgnore]
+        internal EntityComparerToPattern Comparer { get; private set; } = null;
+
         [NonSerialized]
         //(1) private TempBlackList<IntPtr> blackList = new TempBlackList<IntPtr>();
         /*(2)*/
@@ -201,20 +200,18 @@ namespace EntityTools.Actions
         [NonSerialized]
         private Vector3 initialPos = new Vector3();
 
-        [XmlIgnore]
+        [NonSerialized]
         private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
-        [XmlIgnore]
+        [NonSerialized]
         private ItemFilterStringType entityIdType = ItemFilterStringType.Simple;
-        [XmlIgnore]
+        [NonSerialized]
         private string entityId = string.Empty;
-        [XmlIgnore]
+        [NonSerialized]
         private EntityNameType entityNameType = EntityNameType.InternalName;
-        [XmlIgnore]
-        private EntityComparerToPattern Comparer = null;
-        [XmlIgnore]
-        private List<string> customRegionNames = null;
-        [XmlIgnore]
-        private List<CustomRegion> customRegions = null;
+        [NonSerialized]
+        private List<string> customRegionNames = new List<string>();
+        [NonSerialized]
+        private List<CustomRegion> customRegions = new List<CustomRegion>();
 
 
         public override bool NeedToRun
@@ -241,7 +238,7 @@ namespace EntityTools.Actions
                 //}
 
                 Entity closestEntity = null;
-                if (timeout.IsTimedOut || (target != null && !Validate(target)))
+                if (timeout.IsTimedOut/* || (target != null && (!Validate(target) || (HealthCheck && target.IsDead)))*/)
                 {
                     closestEntity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete,
                                                                 HealthCheck, ReactionRange, RegionCheck, customRegions);
@@ -328,6 +325,7 @@ namespace EntityTools.Actions
                 if (IgnoreCombat && target.Location.Distance3DFromPlayer <= CombatDistance)
                 {
                     Astral.Quester.API.IgnoreCombat = false;
+                    return ActionResult.Running;
                 }
                 if (combat)
                 {
@@ -386,10 +384,9 @@ namespace EntityTools.Actions
 
         private bool Validate(Entity e)
         {
-            return e != null && Comparer.Check(e);
+            return e != null && e.IsValid && Comparer.Check(e);
         }
 
-        public InteractEntities() { }
         public override string ActionLabel => $"{GetType().Name} [{entityId}]";
         public override string InternalDisplayName => string.Empty;
         protected override Vector3 InternalDestination
@@ -403,7 +400,7 @@ namespace EntityTools.Actions
             }
         }
         public override bool UseHotSpots => true;
-        protected override bool IntenalConditions => !string.IsNullOrEmpty(EntityID);
+        protected override bool IntenalConditions => Comparer != null;//!string.IsNullOrEmpty(EntityID);
         public override void OnMapDraw(GraphicsNW graph)
         {
             if (Validate(target))
@@ -444,5 +441,7 @@ namespace EntityTools.Actions
                 DialogEdit.Show(Dialogs);
             }
         }
+
+        public InteractEntities() { }
     }
 }

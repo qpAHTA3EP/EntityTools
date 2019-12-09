@@ -43,13 +43,13 @@ namespace EntityTools.Tools.Entities
                 {
                     return (!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                             && (!healthCheck || !e.IsDead)
-                            && customRegions.Find((CustomRegion cr) => CommonTools.IsInCustomRegion(e, cr)) != null;
+                            && customRegions.Find((CustomRegion cr) => e.Within(cr)) != null;
                 };
             else Check = (Entity e) =>
                 {
                     return (!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                             && (!healthCheck || !e.IsDead)
-                            && customRegions.Find((CustomRegion cr) => CommonTools.IsInCustomRegion(e, cr)) != null
+                            && customRegions.Find((CustomRegion cr) => e.Within(cr)) != null
                             && specialCheck(e);
                 };
 
@@ -60,7 +60,7 @@ namespace EntityTools.Tools.Entities
             return e.CombatDistance2 <= Range
                     && !e.IsDead
                     && e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName
-                    && CustomRegions.Find((CustomRegion cr) => CommonTools.IsInCustomRegion(e, cr)) != null
+                    && CustomRegions.Find((CustomRegion cr) => e.Within(cr)) != null
                     && SpecialCheck(e);
         }
     }

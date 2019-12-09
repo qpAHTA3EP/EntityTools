@@ -55,7 +55,9 @@ namespace EntityTools.Conditions
                 if (entityNameType != value)
                 {
                     entityNameType = value;
-                    Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    if (!string.IsNullOrEmpty(entityId))
+                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    else Comparer = null;
                 }
             }
         }
@@ -72,7 +74,9 @@ namespace EntityTools.Conditions
                 if (entityIdType != value)
                 {
                     entityIdType = value;
-                    Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    if (!string.IsNullOrEmpty(entityId))
+                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    else Comparer = null;
                 }
             }
         }
@@ -141,22 +145,22 @@ namespace EntityTools.Conditions
             return $"{GetType().Name} {Sign} {Value}";
         }
 
-        [XmlIgnore]
+        [NonSerialized]
         List<Entity> entities = null;
-        [XmlIgnore]
+        [NonSerialized]
         private EntityComparerToPattern Comparer = null;
         //[XmlIgnore]
         //private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
-        [XmlIgnore]
+        [NonSerialized]
         private string entityId = string.Empty;
-        [XmlIgnore]
+        [NonSerialized]
         private EntityNameType entityNameType = EntityNameType.NameUntranslated;
-        [XmlIgnore]
+        [NonSerialized]
         private ItemFilterStringType entityIdType = ItemFilterStringType.Simple;
-        [XmlIgnore]
-        private List<string> customRegionNames = null;
-        [XmlIgnore]
-        private List<CustomRegion> customRegions = null;
+        [NonSerialized]
+        private List<string> customRegionNames = new List<string>();
+        [NonSerialized]
+        private List<CustomRegion> customRegions = new List<CustomRegion>();
 
 
 
@@ -169,31 +173,34 @@ namespace EntityTools.Conditions
                     //if (timeout.IsTimedOut)
                     {
                         entities = SearchCached.FindAllEntity(entityId, entityIdType, entityNameType, EntitySetType,
-                           HealthCheck, ReactionRange, RegionCheck, customRegions);
+                           HealthCheck, ReactionRange, RegionCheck/*, customRegions*/);
                         //timeout.ChangeTime(SearchTimeInterval);
                     }
 
                     uint entCount = 0;
 
-                    if(entities != null)
-                        foreach (Entity entity in entities)
-                        {
-                            bool match = false;
-
-                            foreach (CustomRegion cr in customRegions)
+                    if (entities != null)
+                    {
+                        if (customRegions != null && customRegions.Count > 0)
+                            foreach (Entity entity in entities)
                             {
-                                if (CommonTools.IsInCustomRegion(entity, cr))
+                                bool match = false;
+                                foreach (CustomRegion cr in customRegions)
                                 {
-                                    match = true;
-                                    break;
+                                    if (entity.Within(cr))
+                                    {
+                                        match = true;
+                                        break;
+                                    }
                                 }
-                            }
 
-                            if (Tested == Presence.Equal && match)
-                                entCount++;
-                            if (Tested == Presence.NotEquel && !match)
-                                entCount++;
-                        }
+                                if (Tested == Presence.Equal && match)
+                                    entCount++;
+                                if (Tested == Presence.NotEquel && !match)
+                                    entCount++;
+                            }
+                        else entCount = (uint)entities.Count;
+                    }
 
                     switch(Sign)
                     {
@@ -235,7 +242,7 @@ namespace EntityTools.Conditions
 
                                 foreach (CustomRegion customRegion in Astral.Quester.API.CurrentProfile.CustomRegions)
                                 {
-                                    if (CommonTools.IsInCustomRegion(entity, customRegion))
+                                    if (entity.Within(customRegion))
                                     {
                                         match = true;
                                         if (strBldr2.Length > 0)

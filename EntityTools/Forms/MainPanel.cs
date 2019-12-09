@@ -117,7 +117,7 @@ namespace EntityTools.Forms
 
             #region Test_MountBonusPriority
             //MountBonusPriorityListForm.GetBonusList();
-            InsigniaBonusSelectForm.GetMountBonuses();
+            //InsigniaBonusSelectForm.GetMountBonuses();
             #endregion
 
             #region Test_ComplexCondition
@@ -162,8 +162,8 @@ namespace EntityTools.Forms
 
         private void MainPanel_Load(object sender, EventArgs e)
         {
-            bteMissions.Properties.NullValuePrompt = Path.Combine(FileTools.defaulExportFolderMissions, FileTools.defaulFileMissions);
-            bteAuras.Properties.NullValuePrompt = Path.Combine(FileTools.defaulExportFolderAuras, FileTools.defaulFileAuras);
+            //bteMissions.Properties.NullValuePrompt = Path.Combine(FileTools.defaulExportFolderMissions, FileTools.defaulFileMissions);
+            //bteAuras.Properties.NullValuePrompt = Path.Combine(FileTools.defaulExportFolderAuras, FileTools.defaulFileAuras);
         }
 
         private void bte_ButtonClick(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
@@ -310,7 +310,8 @@ namespace EntityTools.Forms
 
         private void cbSpellStuckMonitor_CheckedChanged(object sender, EventArgs e)
         {
-            SpellStuckMonitor.Activate = false;// ckbSpellStuckMonitor.Checked;
+            //SpellStuckMonitor.Activate = false;// ckbSpellStuckMonitor.Checked;
+            UnstuckSpellTask.Activate = ckbSpellStuckMonitor.Checked;
         }
 
         private void seSlideFilter_EditValueChanged(object sender, EventArgs e)

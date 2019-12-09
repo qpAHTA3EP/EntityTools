@@ -15,6 +15,7 @@ using Astral.Logic.UCC.Ressources;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Tools;
+using EntityTools.Tools.Entities;
 using MyNW.Classes;
 using MyNW.Internals;
 
@@ -23,20 +24,59 @@ namespace EntityTools.UCC
     [Serializable]
     public class DodgeFromEntity : UCCAction
     {
-        [Description("ID of the Entity for the search (regex)")]
+        [Description("ID of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
-        public string EntityID { get; set; } = string.Empty;
+        public string EntityID
+        {
+            get => entityId;
+            set
+            {
+                if (entityId != value)
+                {
+                    entityId = value;
+                    if (!string.IsNullOrEmpty(entityId))
+                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    else Comparer = null;
+                }
+            }
+        }
 
         [Description("Type of and EntityID:\n" +
             "Simple: Simple test string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
-        public ItemFilterStringType EntityIdType { get; set; } = ItemFilterStringType.Simple;
+        public ItemFilterStringType EntityIdType
+        {
+            get => entityIdType;
+            set
+            {
+                if (entityIdType != value)
+                {
+                    entityIdType = value;
+                    if (!string.IsNullOrEmpty(entityId))
+                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    else Comparer = null;
+                }
+            }
+        }
 
         [Description("The switcher of the Entity filed which compared to the property EntityID")]
         [Category("Entity")]
-        public EntityNameType EntityNameType { get; set; } = EntityNameType.NameUntranslated;
+        public EntityNameType EntityNameType
+        {
+            get => entityNameType;
+            set
+            {
+                if (entityNameType != value)
+                {
+                    entityNameType = value;
+                    if (!string.IsNullOrEmpty(entityId))
+                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    else Comparer = null;
+                }
+            }
+        }
 
         [Category("Entity")]
         public float EntityRadius { get; set; } = 12;
@@ -78,9 +118,11 @@ namespace EntityTools.UCC
             {
                 if (!string.IsNullOrEmpty(EntityID))
                 {
-                    entity = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, HealthCheck, Range, RegionCheck);
+                    //entity = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, HealthCheck, Range, RegionCheck);
 
-                    return entity != null && entity.IsValid && entity.Location.Distance3DFromPlayer <= EntityRadius;//!Dodge.DisableDodge;
+                    entity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType.Complete, HealthCheck, Range, RegionCheck);
+
+                    return Validate(entity) && entity.Location.Distance3DFromPlayer <= EntityRadius;
                 }
                 return false;
             }
@@ -196,6 +238,14 @@ namespace EntityTools.UCC
             //return true;
         }
 
+        [XmlIgnore]
+        internal EntityComparerToPattern Comparer { get; private set; } = null;
+
+        private bool Validate(Entity e)
+        {
+            return e != null && e.IsValid && Comparer.Check(e);
+        }
+
         public override string ToString()
         {
             if (string.IsNullOrEmpty(EntityID))
@@ -208,6 +258,7 @@ namespace EntityTools.UCC
             Target = Astral.Logic.UCC.Ressources.Enums.Unit.Player;
             dodge.Direction = Astral.Logic.UCC.Ressources.Enums.DodgeDirection.DodgeSmart;
         }
+
         public override UCCAction Clone()
         {
             return base.BaseClone(new ApproachEntity
@@ -221,10 +272,10 @@ namespace EntityTools.UCC
             });
         }
 
-        private bool havewaitdel(Func<bool> del)
-        {
-            return del != null && del();
-        }
+        //private bool havewaitdel(Func<bool> del)
+        //{
+        //    return del != null && del();
+        //}
 
         //private bool pathtToLocIsInAOE(Vector3 start, Vector3 loc)
         //{
@@ -390,9 +441,15 @@ namespace EntityTools.UCC
         [NonSerialized]
         protected Entity entity = new Entity(IntPtr.Zero);
 
-        [NonSerialized]
-        private string spellNameCache = string.Empty;
+        //[NonSerialized]
+        //private string spellNameCache = string.Empty;
 
+        [NonSerialized]
+        private string entityId = string.Empty;
+        [NonSerialized]
+        private ItemFilterStringType entityIdType = ItemFilterStringType.Simple;
+        [NonSerialized]
+        private EntityNameType entityNameType = EntityNameType.NameUntranslated;
         [NonSerialized]
         private Dodge dodge = new Dodge();
 

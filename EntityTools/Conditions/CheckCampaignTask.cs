@@ -28,7 +28,6 @@ namespace EntityTools.Conditions
         [Editor(typeof(CampaignTaskEditor), typeof(UITypeEditor))]
         public CampaignTask Task { get; set; } = new CampaignTask();
 
-        //public DonationTaskState Tested { get; set; } = DonationTaskState.Completed;
         public CampaignTaskState Tested { get; set; } = CampaignTaskState.Completed;
 
         public override bool IsValid

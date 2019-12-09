@@ -47,7 +47,9 @@ namespace EntityTools.Conditions
                 if (entityNameType != value)
                 {
                     entityNameType = value;
-                    Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    if (!string.IsNullOrEmpty(entityId))
+                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    else Comparer = null;
                 }
             }
         }
@@ -64,7 +66,9 @@ namespace EntityTools.Conditions
                 if (entityIdType != value)
                 {
                     entityIdType = value;
-                    Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    if (!string.IsNullOrEmpty(entityId))
+                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    else Comparer = null;
                 }
             }
         }
@@ -103,11 +107,7 @@ namespace EntityTools.Conditions
             {
                 if (customRegionNames != value)
                 {
-                    if (value != null
-                        && value.Count > 0)
-                        customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) =>
-                                    value.Exists((string regName) => regName == cr.Name));
-                    else customRegions = null;
+                    customRegions = CustomRegionTools.GetCustomRegions(value);
                     customRegionNames = value;
                 }
             }
@@ -128,22 +128,22 @@ namespace EntityTools.Conditions
         public int SearchTimeInterval { get; set; } = 100;
 
 
-        [XmlIgnore]
+        [NonSerialized]
         Entity closestEntity = null;
-        [XmlIgnore]
+        [NonSerialized]
         private Timeout timeout = new Timeout(0);
-        [XmlIgnore]
+        [NonSerialized]
         private EntityComparerToPattern Comparer = null;
-        [XmlIgnore]
+        [NonSerialized]
         private string entityId = string.Empty;
-        [XmlIgnore]
+        [NonSerialized]
         private EntityNameType entityNameType = EntityNameType.NameUntranslated;
-        [XmlIgnore]
+        [NonSerialized]
         private ItemFilterStringType entityIdType = ItemFilterStringType.Simple;
-        [XmlIgnore]
-        private List<string> customRegionNames = null;
-        [XmlIgnore]
-        private List<CustomRegion> customRegions = null;
+        [NonSerialized]
+        private List<string> customRegionNames = new List<string>();
+        [NonSerialized]
+        private List<CustomRegion> customRegions = new List<CustomRegion>();
 
 
         public override bool IsValid
@@ -249,7 +249,7 @@ namespace EntityTools.Conditions
 
         private bool Validate(Entity e)
         {
-            return e != null && Comparer.Check(e);
+            return e != null && e.IsValid && Comparer.Check(e);
         }
 
 

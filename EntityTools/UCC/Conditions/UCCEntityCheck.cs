@@ -10,25 +10,66 @@ using System.Xml.Serialization;
 using static Astral.Quester.Classes.Condition;
 using Astral.Logic.UCC.Ressources;
 using EntityTools.Enums;
+using System;
+using EntityTools.Tools.Entities;
 
 namespace EntityTools.UCC.Conditions
 {
     public class UCCEntityCheck : UCCCondition, ICustomUCCCondition
     {
-        [Description("ID (an untranslated name) of the Entity for the search")]
+        [Description("ID of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
-        public string EntityID { get; set; } = string.Empty;
-
-        [Description("The switcher of the Entity filed which compared to the property EntityID")]
-        [Category("Entity")]
-        public EntityNameType EntityNameType { get; set; } = EntityNameType.NameUntranslated;
+        public string EntityID
+        {
+            get => entityId;
+            set
+            {
+                if (entityId != value)
+                {
+                    entityId = value;
+                    if (!string.IsNullOrEmpty(entityId))
+                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    else Comparer = null;
+                }
+            }
+        }
 
         [Description("Type of and EntityID:\n" +
             "Simple: Simple test string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
-        public ItemFilterStringType EntityIdType { get; set; } = ItemFilterStringType.Simple;
+        public ItemFilterStringType EntityIdType
+        {
+            get => entityIdType;
+            set
+            {
+                if (entityIdType != value)
+                {
+                    entityIdType = value;
+                    if (!string.IsNullOrEmpty(entityId))
+                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    else Comparer = null;
+                }
+            }
+        }
+
+        [Description("The switcher of the Entity filed which compared to the property EntityID")]
+        [Category("Entity")]
+        public EntityNameType EntityNameType
+        {
+            get => entityNameType;
+            set
+            {
+                if (entityNameType != value)
+                {
+                    entityNameType = value;
+                    if (!string.IsNullOrEmpty(entityId))
+                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    else Comparer = null;
+                }
+            }
+        }
 
         [Description("Check Entity's Region:\n" +
             "True: Search an Entity only if it located in the same Region as Player\n" +
@@ -62,7 +103,8 @@ namespace EntityTools.UCC.Conditions
         {
             if (!string.IsNullOrEmpty(EntityID))
             {
-                Entity closestEntity = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, HealthCheck, ReactionRange, RegionCheck, null);
+                //Entity closestEntity = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, HealthCheck, ReactionRange, RegionCheck, null);
+                Entity closestEntity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType.Complete, HealthCheck, ReactionRange, RegionCheck);
 
                 bool result = false;
                 switch (PropertyType)
@@ -118,6 +160,14 @@ namespace EntityTools.UCC.Conditions
         bool ICustomUCCCondition.Loked { get => base.Locked; set => base.Locked = value; }
         #endregion
 
+        [XmlIgnore]
+        internal EntityComparerToPattern Comparer { get; private set; } = null;
+
+        private bool Validate(Entity e)
+        {
+            return e != null && e.IsValid && Comparer.Check(e);
+        }
+
         public override string ToString()
         {
             return $"EntityCheck [{EntityID}]";
@@ -127,6 +177,14 @@ namespace EntityTools.UCC.Conditions
         {
             Sign = Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
         }
+
+        [NonSerialized]
+        private string entityId = string.Empty;
+        [NonSerialized]
+        private ItemFilterStringType entityIdType = ItemFilterStringType.Simple;
+        [NonSerialized]
+        private EntityNameType entityNameType = EntityNameType.NameUntranslated;
+        
 
         #region Hide Inherited Properties
         [XmlIgnore]

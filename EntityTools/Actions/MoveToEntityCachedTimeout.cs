@@ -15,6 +15,7 @@ using EntityTools.Tools;
 using EntityTools.Tools.Entities;
 using MyNW.Classes;
 using MyNW.Internals;
+using MyNW.Patchables.Enums;
 using Action = Astral.Quester.Classes.Action;
 
 namespace EntityTools.Actions
@@ -52,7 +53,9 @@ namespace EntityTools.Actions
                 if (entityIdType != value)
                 {
                     entityIdType = value;
-                    Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    if (!string.IsNullOrEmpty(entityId))
+                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    else Comparer = null;
                 }
             }
         }
@@ -67,7 +70,9 @@ namespace EntityTools.Actions
                 if(entityNameType != value)
                 { 
                     entityNameType = value;
-                    Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    if (!string.IsNullOrEmpty(entityId))
+                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    else Comparer = null;
                 }
             }
         }
@@ -94,11 +99,6 @@ namespace EntityTools.Actions
         [Category("Optional")]
         public float ReactionRange { get; set; } = 0;
 
-        [XmlIgnore]
-        private List<string> customRegionNames = null;
-        [XmlIgnore]
-        private List<CustomRegion> customRegions = null;
-
         [Description("CustomRegion names collection")]
         [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
         [Category("Optional")]
@@ -109,12 +109,10 @@ namespace EntityTools.Actions
             {
                 if (customRegionNames != value)
                 {
-                    if (value != null
-                        && value.Count > 0)
-                        customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) =>
-                                    value.Exists((string regName) => regName == cr.Name));
-                    else customRegions = null;
-                    customRegionNames = value;
+                    customRegions = CustomRegionTools.GetCustomRegions(value);
+                    if (!string.IsNullOrEmpty(entityId))
+                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    else Comparer = null;
                 }
             }
         }
@@ -156,7 +154,7 @@ namespace EntityTools.Actions
                 //Если HoldTargetEntity ВЫКЛЮЧЕН, то обе цели совпадают - это ближайшая цель 
 
                 Entity closestEntity = null;
-                if (timeout.IsTimedOut || (target!= null && !Validate(target)))
+                if (timeout.IsTimedOut/* || (target != null && (!Validate(target) || (HealthCheck && target.IsDead)))*/)
                 {
                     closestEntity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete,
                                                                 HealthCheck, ReactionRange, RegionCheck, customRegions);
@@ -166,12 +164,25 @@ namespace EntityTools.Actions
                 if (!HoldTargetEntity || !Validate(target) || (HealthCheck && target.IsDead))
                     target = closestEntity;
 
-                if (IgnoreCombat && Validate(closestEntity)
-                    && !(HealthCheck && closestEntity.IsDead)
-                    && (closestEntity.Location.Distance3DFromPlayer <= Distance))
+                if (IgnoreCombat && Validate(target)
+                    && !(HealthCheck && target.IsDead)
+                    && (target.Location.Distance3DFromPlayer <= Distance))
                 {
                     Astral.Logic.NW.Attackers.List.Clear();
-                    if (AttackTargetEntity)
+                    if (AttackTargetEntity && target.RelationToPlayer == EntityRelation.Foe)
+                    {
+                        Astral.Logic.NW.Attackers.List.Add(target);
+                        Astral.Quester.API.IgnoreCombat = false;
+                        Astral.Logic.NW.Combats.CombatUnit(target, null);
+                    }
+                    else Astral.Quester.API.IgnoreCombat = false;
+                }
+                else if (IgnoreCombat && Validate(closestEntity)
+                         && !(HealthCheck && closestEntity.IsDead)
+                         && (closestEntity.Location.Distance3DFromPlayer <= Distance))
+                {
+                    Astral.Logic.NW.Attackers.List.Clear();
+                    if (AttackTargetEntity && closestEntity.RelationToPlayer == EntityRelation.Foe)
                     {
                         Astral.Logic.NW.Attackers.List.Add(closestEntity);
                         Astral.Quester.API.IgnoreCombat = false;
@@ -228,23 +239,29 @@ namespace EntityTools.Actions
             else return ActionResult.Running;
         }
 
+        [XmlIgnore]
+        internal EntityComparerToPattern Comparer { get; private set; } = null;
+
         private bool Validate(Entity e)
         {
-            return e != null && Comparer.Check(e);
+            return e != null && e.IsValid && Comparer.Check(e);
         }
 
-        [XmlIgnore]
+        [NonSerialized]
         private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
-        [XmlIgnore]
+        [NonSerialized]
         private string entityId = string.Empty;
-        [XmlIgnore]
+        [NonSerialized]
         private ItemFilterStringType entityIdType = ItemFilterStringType.Simple;
-        [XmlIgnore]
+        [NonSerialized]
         private EntityNameType entityNameType = EntityNameType.NameUntranslated;
-        [XmlIgnore]
+        [NonSerialized]
         internal Entity target = new Entity(IntPtr.Zero);
-        [XmlIgnore]
-        private EntityComparerToPattern Comparer = null;
+
+        [NonSerialized]
+        private List<string> customRegionNames = new List<string>();
+        [NonSerialized]
+        private List<CustomRegion> customRegions = new List<CustomRegion>();
 
         public MoveToEntity() { }
         public override string ActionLabel => $"{GetType().Name} [{entityId}]";
@@ -257,7 +274,7 @@ namespace EntityTools.Actions
             }
         }
         public override void InternalReset() { }
-        protected override bool IntenalConditions => !string.IsNullOrEmpty(entityId);
+        protected override bool IntenalConditions => Comparer != null;//!string.IsNullOrEmpty(entityId);
         public override string InternalDisplayName => string.Empty;
         public override bool UseHotSpots => true;
         protected override Vector3 InternalDestination

@@ -81,15 +81,15 @@ namespace EntityTools.Tools.Entities
         public EntityCacheRecord(string p, ItemFilterStringType mp = ItemFilterStringType.Simple, EntityNameType nt = EntityNameType.NameUntranslated, EntitySetType est = EntitySetType.Complete)
         {
             Key = new CacheRecordKey(p, mp, nt, est);
-            if (EntityManager.LocalPlayer.InCombat
-                && !Astral.Quester.API.IgnoreCombat)
-                    Timer = new Timeout(EntityCache.CombatChacheTime);
-            else Timer = new Timeout(EntityCache.ChacheTime);
+            //if (EntityManager.LocalPlayer.InCombat
+            //    && !Astral.Quester.API.IgnoreCombat)
+            //        Timer = new Timeout(EntityCache.CombatChacheTime);
+            //else Timer = new Timeout(EntityCache.ChacheTime);
         }
 
         public CacheRecordKey Key { get; }
 
-        public Timeout Timer { get; private set; } = new Timeout(EntityCache.ChacheTime);
+        public Timeout Timer { get; private set; } = new Timeout(0);
 
         private List<Entity> entities = new List<Entity>();
         public List<Entity> Entities

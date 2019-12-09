@@ -41,13 +41,14 @@ namespace EntityTools.UCC
             });
         }
 
-        [XmlIgnore]
+        [NonSerialized]
         private SimplePatternPos patternPos = SimplePatternPos.None;
 
-        [XmlIgnore]
+        [NonSerialized]
         private string itemId = string.Empty;
-        [XmlIgnore]
+        [NonSerialized]
         private string itemIdTrimmed = string.Empty;
+
         [Editor(typeof(ItemIdEditor), typeof(UITypeEditor))]
         [Category("Item")]
         public string ItemId
@@ -127,7 +128,7 @@ namespace EntityTools.UCC
         [Browsable(false)]
         public new string ActionName { get; set; }
 
-        [XmlIgnore]
+        [NonSerialized]
         private InventorySlot itemSlotChache = null;
 
         /// <summary>

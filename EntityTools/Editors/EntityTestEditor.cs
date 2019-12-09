@@ -16,6 +16,8 @@ using System.Text;
 using DevExpress.XtraEditors;
 using EntityTools.Enums;
 using System.Threading.Tasks;
+using EntityTools.Tools.Entities;
+using Astral.Quester.Classes;
 
 namespace EntityTools.Editors
 {
@@ -34,13 +36,14 @@ namespace EntityTools.Editors
                     sb.AppendLine();
                     sb.Append("NeedToRun: ").AppendLine(mte.NeedToRun.ToString());
                     sb.AppendLine();
-
                     // список всех Entity, удовлетворяющих условиям
-                    List<Entity> entities = EntitySelectionTools.FindAllEntities(EntityManager.GetEntities(), mte.EntityID, mte.EntityIdType, mte.EntityNameType,
-                        mte.HealthCheck, mte.RegionCheck, mte.CustomRegionNames,
-                        (Entity e) => mte.ReactionRange == 0 || e.Location.Distance3DFromPlayer < mte.ReactionRange);
+                    List<Entity> entities = SearchCached.FindAllEntity(mte.EntityID, mte.EntityIdType, mte.EntityNameType, EntitySetType.Complete,
+                        mte.HealthCheck, mte.ReactionRange, mte.RegionCheck, CustomRegionTools.GetCustomRegions(mte.CustomRegionNames));
+
                     // Количество Entity, удовлетворяющих условиям
-                    sb.Append("Founded Entities: ").AppendLine(entities.Count.ToString());
+                    if (entities != null)
+                        sb.Append("Founded Entities: ").AppendLine(entities.Count.ToString());
+                    else sb.Append("Founded Entities: 0");
                     sb.AppendLine();
 
                     /// Ближайшее Entity (найдено при вызове mte.NeedToRun, поэтому строка ниже закомментирована)
@@ -80,11 +83,14 @@ namespace EntityTools.Editors
                     sb.AppendLine();
 
                     // список всех Entity, удовлетворяющих условиям
-                    List<Entity> entities = EntitySelectionTools.FindAllEntities(EntityManager.GetEntities(), ie.EntityID, ie.EntityIdType, ie.EntityNameType,
-                        ie.HealthCheck, ie.RegionCheck, ie.CustomRegionNames,
-                        (Entity e) => ie.ReactionRange == 0 || e.Location.Distance3DFromPlayer < ie.ReactionRange);
+                    List <Entity> entities = SearchCached.FindAllEntity(ie.EntityID, ie.EntityIdType, ie.EntityNameType, ie.EntitySetType,
+                                                                        ie.HealthCheck, ie.ReactionRange, ie.RegionCheck, CustomRegionTools.GetCustomRegions(ie.CustomRegionNames));
+
+
                     // Количество Entity, удовлетворяющих условиям
-                    sb.Append("Founded Entities: ").AppendLine(entities.Count.ToString());
+                    if (entities != null)
+                        sb.Append("Founded Entities: ").AppendLine(entities.Count.ToString());
+                    else sb.Append("Founded Entities: 0");
                     sb.AppendLine();
 
                     // Ближайшее Entity (найдено при вызове ie.NeedToRun, поэтому строка ниже закомментирована)
@@ -109,21 +115,25 @@ namespace EntityTools.Editors
                     sb.Append("EntityID: ").AppendLine(entityId.ToString());
                     sb.AppendLine();
 
+                    EntitySetType entitySet = ReflectionHelper.GetPropertyValue(context.Instance, "EntitySetType", out object entitySetObj) ? (EntitySetType)entitySetObj: EntitySetType.Complete;
                     bool regionCheck = ReflectionHelper.GetPropertyValue(context.Instance, "RegionCheck", out object regionCheckObj) ? (bool)regionCheckObj : false;
                     bool healthCheck = ReflectionHelper.GetPropertyValue(context.Instance, "HealthCheck", out object healthCheckObj) ? (bool)healthCheckObj : false;
                     float reactionRange = ReflectionHelper.GetPropertyValue(context.Instance, "ReactionRange", out object reactionRangeObj) ? (float)reactionRangeObj : 0;
+                    List<CustomRegion> customRegions = ReflectionHelper.GetFieldValue(context.Instance, "customRegions", out object customRegionsObj) ? customRegionsObj as List<CustomRegion> : null;
 
-                    List <Entity> entities = EntitySelectionTools.FindAllEntities(EntityManager.GetEntities(), entityId.ToString(), (ItemFilterStringType)entityIdType,
-                                            (EntityNameType)entityNameType, healthCheck, regionCheck, null,
-                                            (Entity e) => reactionRange == 0f || e.Location.Distance3DFromPlayer < reactionRange);
+
+                    List<Entity> entities = SearchCached.FindAllEntity(entityId.ToString(), (ItemFilterStringType)entityIdType, (EntityNameType)entityNameType, entitySet,
+                        healthCheck, reactionRange, regionCheck, customRegions);
 
                     // Количество Entity, удовлетворяющих условиям
-                    sb.Append("Founded Entities: ").AppendLine(entities.Count.ToString());
+                    if (entities != null)
+                        sb.Append("Founded Entities: ").AppendLine(entities.Count.ToString());
+                    else sb.Append("Founded Entities: 0");
                     sb.AppendLine();
 
                     // Ближайшее Entity
-                    Entity target = EntitySelectionTools.FindClosestEntity(entities, entityId.ToString(), (ItemFilterStringType)entityIdType,
-                                            (EntityNameType)entityNameType, healthCheck, reactionRange, regionCheck, null);
+                    Entity target = SearchCached.FindClosestEntity(entityId.ToString(), (ItemFilterStringType)entityIdType,
+                                            (EntityNameType)entityNameType, entitySet, healthCheck, reactionRange, regionCheck, customRegions);
                     if (target != null && target.IsValid)
                     {
                         sb.Append("ClosectEntity: ").AppendLine(target.ToString());

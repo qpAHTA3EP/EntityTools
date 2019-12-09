@@ -38,8 +38,8 @@ namespace EntityTools.UCC
         [Category("Required")]
         public bool CheckInTray { get; set; } = false;
 
-        [Browsable(false)]
         [XmlIgnore]
+        [Browsable(false)]
         public bool Slotted
         {
             get
@@ -50,8 +50,8 @@ namespace EntityTools.UCC
             }
         }
 
-        [Browsable(false)]
         [XmlIgnore]
+        [Browsable(false)]
         private Entity TargetEntity
         {
             get
@@ -72,14 +72,14 @@ namespace EntityTools.UCC
             }
         }
 
-        [XmlIgnore]
+        [NonSerialized]
         private Power power = null;
-        [XmlIgnore]
+        [NonSerialized]
         private static Type movementsType = null;
 
 
-        [Browsable(false)]
         [XmlIgnore]
+        [Browsable(false)]
         public override bool NeedToRun
         {
             get

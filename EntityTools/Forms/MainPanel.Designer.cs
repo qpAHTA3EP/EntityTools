@@ -231,6 +231,7 @@ namespace EntityTools.Forms
             this.btnTest.TabIndex = 2;
             this.btnTest.Text = "Test";
             this.btnTest.UseVisualStyleBackColor = true;
+            this.btnTest.Visible = false;
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
             // btnStates
@@ -342,12 +343,13 @@ namespace EntityTools.Forms
             this.cbSlideMonitor.TabIndex = 3;
             this.cbSlideMonitor.Text = "Enable SlideMonitor";
             this.cbSlideMonitor.UseVisualStyleBackColor = true;
+            this.cbSlideMonitor.Visible = false;
             this.cbSlideMonitor.CheckedChanged += new System.EventHandler(this.cbSlideMonitor_CheckedChanged);
             // 
             // ckbSpellStuckMonitor
             // 
             this.ckbSpellStuckMonitor.AutoSize = true;
-            this.ckbSpellStuckMonitor.Location = new System.Drawing.Point(12, 32);
+            this.ckbSpellStuckMonitor.Location = new System.Drawing.Point(12, 15);
             this.ckbSpellStuckMonitor.Name = "ckbSpellStuckMonitor";
             this.ckbSpellStuckMonitor.Size = new System.Drawing.Size(145, 17);
             this.ckbSpellStuckMonitor.TabIndex = 1;
@@ -373,6 +375,7 @@ namespace EntityTools.Forms
             this.gbSlideMonitor.Size = new System.Drawing.Size(359, 160);
             this.gbSlideMonitor.TabIndex = 4;
             this.gbSlideMonitor.TabStop = false;
+            this.gbSlideMonitor.Visible = false;
             // 
             // tbSlidingAuras
             // 

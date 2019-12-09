@@ -60,7 +60,7 @@
             // 
             this.splitContainer.Panel2.Controls.Add(this.Properties);
             this.splitContainer.Size = new System.Drawing.Size(560, 302);
-            this.splitContainer.SplitterDistance = 279;
+            this.splitContainer.SplitterDistance = 179;
             this.splitContainer.TabIndex = 3;
             // 
             // Conditions
@@ -70,7 +70,7 @@
             this.Conditions.FormattingEnabled = true;
             this.Conditions.Location = new System.Drawing.Point(0, 0);
             this.Conditions.Name = "Conditions";
-            this.Conditions.Size = new System.Drawing.Size(279, 302);
+            this.Conditions.Size = new System.Drawing.Size(179, 302);
             this.Conditions.TabIndex = 0;
             this.Conditions.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.Conditions_ItemCheck);
             this.Conditions.SelectedIndexChanged += new System.EventHandler(this.Conditions_SelectedIndexChanged);
@@ -81,7 +81,7 @@
             this.Properties.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Properties.Location = new System.Drawing.Point(0, 0);
             this.Properties.Name = "Properties";
-            this.Properties.Size = new System.Drawing.Size(277, 302);
+            this.Properties.Size = new System.Drawing.Size(377, 302);
             this.Properties.TabIndex = 1;
             this.Properties.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.Properties_PropertyValueChanged);
             // 
