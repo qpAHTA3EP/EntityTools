@@ -26,6 +26,8 @@ namespace EntityTools.UCC
     [Serializable]
     public class UseItemSpecial : UCCAction
     {
+        internal class InventoryBagsCheckedListBoxEditor : CheckedListBoxCommonEditor<InvBagIDs> { }
+
         public UseItemSpecial()
         {
             Target = Astral.Logic.UCC.Ressources.Enums.Unit.Player;
@@ -36,8 +38,12 @@ namespace EntityTools.UCC
         {
             return base.BaseClone(new UseItemSpecial
             {
-                ItemId = this.ItemId,
-                CheckItemCooldown = this.CheckItemCooldown
+                itemId = this.itemId,
+                itemIdTrimmed = this.itemIdTrimmed,
+                patternPos = this.patternPos,
+                ItemIdType = this.ItemIdType,
+                CheckItemCooldown = this.CheckItemCooldown,
+                Bags = this.Bags.Clone()
             });
         }
 
@@ -78,9 +84,36 @@ namespace EntityTools.UCC
         public bool CheckItemCooldown { get; set; } = false;
 
         [Category("Item")]
-        [Description("Identificator of the bag where Item wold be searched\n" +
+        [Description("Identificator of the bag where Item would be searched\n" +
             "When selected value is 'None' then item is rearched in the all inventories")]
-        public InvBagIDs BagId { get; set; } = InvBagIDs.PlayerBags;
+        [Browsable(false)]
+        public InvBagIDs BagId
+        {
+            get
+            {
+                if (Bags != null && Bags.Items.Count > 0)
+                    return Bags.Items[0];
+                else return InvBagIDs.None;
+            }
+            set
+            {
+                if (Bags == null)
+                {
+                    Bags = new CheckedListBoxCommonSelector<InvBagIDs>();
+                    Bags.Items.Add(value);
+                }
+                else
+                {
+                    if (!Bags.Items.Contains(value))
+                        Bags.Items.Add(value);
+                }
+            }
+        }
+
+        [Category("Item")]
+        [Description("Identificator of the bags where Item would be searched\n")]
+        [Editor(typeof(InventoryBagsCheckedListBoxEditor), typeof(UITypeEditor))]
+        public CheckedListBoxCommonSelector<InvBagIDs> Bags { get; set; } = new CheckedListBoxCommonSelector<InvBagIDs>();
 
         public override bool NeedToRun
         {
@@ -141,19 +174,38 @@ namespace EntityTools.UCC
                 && ((ItemIdType == ItemFilterStringType.Simple && itemIdSimpleComparer(itemSlotChache))
                     || (ItemIdType == ItemFilterStringType.Regex && itemIdRegexComparer(itemSlotChache))))
                 return itemSlotChache;
+            else itemSlotChache = null;
 
-            if (BagId == InvBagIDs.None)
+            if (Bags != null && Bags.Items.Count > 0)
             {
-                if (ItemIdType == ItemFilterStringType.Simple)
-                    return itemSlotChache = EntityManager.LocalPlayer.AllItems.Find(itemIdSimpleComparer);
-                else return itemSlotChache = EntityManager.LocalPlayer.AllItems.Find(itemIdRegexComparer);
+                InventorySlot iSlot = null;
+                foreach (InvBagIDs bagId in Bags.Items)
+                {
+                    if (bagId != InvBagIDs.None)
+                    {
+                        if (ItemIdType == ItemFilterStringType.Simple)
+                            iSlot = EntityManager.LocalPlayer.GetInventoryBagById(bagId).GetItems.Find(itemIdSimpleComparer);
+                        else iSlot = EntityManager.LocalPlayer.GetInventoryBagById(bagId).GetItems.Find(itemIdRegexComparer);
+
+                        if (iSlot != null && iSlot.IsValid && iSlot.Item.Count > 0)
+                            return itemSlotChache = iSlot;
+                    }
+                }
+                //if (BagId == InvBagIDs.None)
+                //{
+                //    if (ItemIdType == ItemFilterStringType.Simple)
+                //        return itemSlotChache = EntityManager.LocalPlayer.AllItems.Find(itemIdSimpleComparer);
+                //    else return itemSlotChache = EntityManager.LocalPlayer.AllItems.Find(itemIdRegexComparer);
+                //}
+                //else
+                //{
+                //    if (ItemIdType == ItemFilterStringType.Simple)
+                //        return itemSlotChache = EntityManager.LocalPlayer.GetInventoryBagById(BagId).GetItems.Find(itemIdSimpleComparer);
+                //    else return itemSlotChache = EntityManager.LocalPlayer.GetInventoryBagById(BagId).GetItems.Find(itemIdRegexComparer);
+                //}
             }
-            else
-            {
-                if (ItemIdType == ItemFilterStringType.Simple)
-                    return itemSlotChache = EntityManager.LocalPlayer.GetInventoryBagById(BagId).GetItems.Find(itemIdSimpleComparer);
-                else return itemSlotChache = EntityManager.LocalPlayer.GetInventoryBagById(BagId).GetItems.Find(itemIdRegexComparer);
-            }
+
+            return null;
         }
 
         // Функторы сравнения имени предмета в слоте iSlot с шаблоном
@@ -177,5 +229,11 @@ namespace EntityTools.UCC
         {
             return Regex.IsMatch(iSlot.Item.ItemDef.InternalName, itemId);
         }
+
+        #region Hide Inherited Properties
+        [XmlIgnore]
+        [Browsable(false)]
+        public new Astral.Logic.UCC.Ressources.Enums.Unit Target { get; set; }
+        #endregion
     }
 }

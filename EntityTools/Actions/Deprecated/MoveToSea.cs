@@ -1,4 +1,4 @@
-﻿#define NO_SAIL_MONITOR
+﻿//#define NO_SAIL_MONITOR
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

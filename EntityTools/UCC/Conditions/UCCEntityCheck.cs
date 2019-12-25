@@ -12,6 +12,7 @@ using Astral.Logic.UCC.Ressources;
 using EntityTools.Enums;
 using System;
 using EntityTools.Tools.Entities;
+using EntityTools.Tools.UCCExtensions;
 
 namespace EntityTools.UCC.Conditions
 {
@@ -74,19 +75,24 @@ namespace EntityTools.UCC.Conditions
         [Description("Check Entity's Region:\n" +
             "True: Search an Entity only if it located in the same Region as Player\n" +
             "False: Does not consider the region when searching Entities")]
-        [Category("Entity")]
+        [Category("Optional")]
         public bool RegionCheck { get; set; } = false;
 
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
-        [Category("Entity")]
+        [Category("Optional")]
         public bool HealthCheck { get; set; } = true;
 
         [Description("The maximum distance from the character within which the Entity is searched\n" +
             "The default value is 0, which disables distance checking")]
-        [Category("Entity")]
+        [Category("Optional")]
         public float ReactionRange { get; set; } = 0;
+
+        [Description("Aura which checked on the Entity")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        [Category("Optional")]
+        public AuraOption Aura { get; set; } = new AuraOption();
 
         public EntityPropertyType PropertyType { get; set; } = EntityPropertyType.Distance;
 
@@ -95,16 +101,20 @@ namespace EntityTools.UCC.Conditions
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
         [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
-        [Category("Entity")]
+        //[Category("Entity")]
         public string TestInfo { get; } = "Нажми '...' =>";
 
         #region ICustomUCCCondition
         bool ICustomUCCCondition.IsOk(UCCAction refAction = null)
         {
+            Entity closestEntity = refAction?.GetTarget();            
+
             if (!string.IsNullOrEmpty(EntityID))
             {
                 //Entity closestEntity = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, HealthCheck, ReactionRange, RegionCheck, null);
-                Entity closestEntity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType.Complete, HealthCheck, ReactionRange, RegionCheck);
+                if(closestEntity != null)
+                    closestEntity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType.Complete, 
+                                                                   HealthCheck, ReactionRange, RegionCheck, null, Aura.Checker);
 
                 bool result = false;
                 switch (PropertyType)
@@ -161,6 +171,7 @@ namespace EntityTools.UCC.Conditions
         #endregion
 
         [XmlIgnore]
+        [Browsable(false)]
         internal EntityComparerToPattern Comparer { get; private set; } = null;
 
         private bool Validate(Entity e)

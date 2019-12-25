@@ -133,7 +133,9 @@ namespace EntityTools.UCC
         {
             return base.BaseClone(new SpecializedUCCAction()
             {
-                ManagedAction = this.ManagedAction
+                ManagedAction = CopyHelper.CreateDeepCopy(this.ManagedAction),
+                CustomConditionCheck = this.CustomConditionCheck,
+                CustomConditions = new List<UCCCondition>(this.CustomConditions)
             });
         }
 

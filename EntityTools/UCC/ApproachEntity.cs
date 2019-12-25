@@ -77,24 +77,33 @@ namespace EntityTools.UCC
             }
         }
 
+        [Category("Entity")]
+        public float EntityRadius { get; set; } = 12;
+
         [Description("Check Entity's Ingame Region (Not CustomRegion):\n" +
             "True: Only Entities located in the same Region as Player are detected\n" +
             "False: Entity's Region does not checked during search")]
-        [Category("Entity")]
+        //[Category("Entity")]
+        [Category("Optional")]
         public bool RegionCheck { get; set; } = true;
 
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
-        [Category("Entity")]
+        //[Category("Entity")]
+        [Category("Optional")]
         public bool HealthCheck { get; set; } = true;
 
-        [Category("Entity")]
-        public float EntityRadius { get; set; } = 12;
+        [Description("Aura which checked on the Entity")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        //[Category("Entity")]
+        [Category("Optional")]
+        public AuraOption Aura { get; set; } = new AuraOption();
 
         [Description("The maximum distance from the character within which the Entity is searched\n" +
             "The default value is 0, which disables distance checking")]
         //[Category("Entity")]
+        [Category("Optional")]
         public float ReactionRange { get; set; } = 30;
 
         [XmlIgnore]
@@ -110,7 +119,7 @@ namespace EntityTools.UCC
                 if (!string.IsNullOrEmpty(EntityID))
                 {
                     //entity = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, HealthCheck, Range, RegionCheck);
-                    entity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType.Complete, HealthCheck, Range, RegionCheck);
+                    entity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType.Complete, HealthCheck, Range, RegionCheck, null, Aura.Checker);
                     return Validate(entity) && !(HealthCheck && entity.IsDead) && entity.CombatDistance > EntityRadius;
                 }
                 return false;
@@ -123,7 +132,29 @@ namespace EntityTools.UCC
         }
 
         [XmlIgnore]
+        [Browsable(false)]
         internal EntityComparerToPattern Comparer { get; private set; } = null;
+
+        [XmlIgnore]
+        [Browsable(false)]
+        public Entity UnitRef
+        {
+            get
+            {
+                if (Validate(entity))
+                    return entity;
+                else
+                {
+                    if (!string.IsNullOrEmpty(EntityID))
+                    {
+                        entity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType.Complete,
+                                                                HealthCheck, Range, RegionCheck, null, Aura.Checker);
+                        return entity;
+                    }
+                }
+                return null;
+            }
+        }
 
         private bool Validate(Entity e)
         {
@@ -145,12 +176,19 @@ namespace EntityTools.UCC
         {
             return base.BaseClone(new ApproachEntity
             {
-                EntityID = this.EntityID,
-                EntityIdType = this.EntityIdType,
-                EntityNameType = this.EntityNameType,
+                entityId = this.entityId,
+                entityIdType = this.entityIdType,
+                entityNameType = this.entityNameType,
                 RegionCheck = this.RegionCheck,
                 HealthCheck = this.HealthCheck,
                 EntityRadius = this.EntityRadius,
+                Aura = new AuraOption
+                {
+                    AuraName = this.Aura.AuraName,
+                    AuraNameType = this.Aura.AuraNameType,
+                    Sign = this.Aura.Sign,
+                    Stacks = this.Aura.Stacks
+                }
             });
         }
 

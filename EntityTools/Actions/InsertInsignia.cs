@@ -113,35 +113,47 @@ namespace EntityTools.Actions
         }
 
         /// <summary>
-        /// Сравнение инсигний по качеству, которое закодиновано последним символов идентификатора
-        /// Insignia_*_R[1-5];
+        /// Сравнение инсигний по качеству
         /// </summary>
         /// <param name="slot1"></param>
         /// <param name="slot2"></param>
         /// <returns></returns>
         internal static int InsigniaQualityDescendingComparison(InventorySlot slot1, InventorySlot slot2)
         {
-            char slot1Ends = '\u0000',
-                 slot2Ends = '\u0000';
-            if (slot1!= null && slot1.IsValid && slot1.Item.IsValid
-                && char.IsDigit(slot1Ends = slot1.Item.ItemDef.InternalName[slot1.Item.ItemDef.InternalName.Length - 1]))
+            //char slot1Ends = '\u0000',
+            //     slot2Ends = '\u0000';
+            //if (slot1!= null && slot1.IsValid && slot1.Item.IsValid
+            //    && char.IsDigit(slot1Ends = slot1.Item.ItemDef.InternalName[slot1.Item.ItemDef.InternalName.Length - 1]))
+            //{
+            //    // slot1 - валиден и последний символ идентификатора является числом
+            //    if (slot2!=null && slot2.IsValid && slot2.Item.IsValid
+            //        && char.IsDigit(slot2Ends= slot2.Item.ItemDef.InternalName[slot2.Item.ItemDef.InternalName.Length - 1]))
+            //    {
+            //        // slot2 - валиден и последний символ идентификатора является числом
+            //        return slot2Ends - slot1Ends;
+            //    }
+            //}
+            //else
+            //{
+            //    // slot1 - не валиден или последний символ идентификатора не является числом
+            //    if (slot2 != null && slot2.IsValid && slot2.Item.IsValid
+            //        && char.IsDigit(slot2Ends = slot2.Item.ItemDef.InternalName[slot2.Item.ItemDef.InternalName.Length - 1]))
+            //    {
+            //        return slot2Ends - '0';
+            //    }
+            //}
+            //// оба slot1 и slot2 являются невалидными. т.е. одинкаовыми
+
+            if (slot1 != null && slot1.IsValid && slot1.Item.IsValid && slot1.Item.Count > 0)
             {
-                // slot1 - валиден и последний символ идентификатора является числом
-                if (slot2!=null && slot2.IsValid && slot2.Item.IsValid
-                    && char.IsDigit(slot2Ends= slot2.Item.ItemDef.InternalName[slot2.Item.ItemDef.InternalName.Length - 1]))
-                {
-                    // slot2 - валиден и последний символ идентификатора является числом
-                    return slot2Ends - slot1Ends;
-                }
+                if (slot2 != null && slot2.IsValid && slot2.Item.IsValid && slot2.Item.Count > 0)
+                    return (int)slot2.Item.ItemDef.Quality - (int)slot1.Item.ItemDef.Quality;
+                else return -1;
             }
             else
             {
-                // slot1 - не валиден или последний символ идентификатора не является числом
-                if (slot2 != null && slot2.IsValid && slot2.Item.IsValid
-                    && char.IsDigit(slot2Ends = slot2.Item.ItemDef.InternalName[slot2.Item.ItemDef.InternalName.Length - 1]))
-                {
-                    return slot2Ends - '0';
-                }
+                if (slot2 != null && slot2.IsValid && slot2.Item.IsValid && slot2.Item.Count > 0)
+                    return 1;
             }
             // оба slot1 и slot2 являются невалидными. т.е. одинкаовыми
             return 0;

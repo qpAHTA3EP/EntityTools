@@ -13,8 +13,6 @@ namespace EntityTools.Tools.Entities
     /// </summary>
     public class EntityComparerToOptions
     {
-
-
         public Predicate<Entity> Check { get; private set; }
 
         private readonly float Range = 0;
@@ -63,5 +61,10 @@ namespace EntityTools.Tools.Entities
                     && CustomRegions.Find((CustomRegion cr) => e.Within(cr)) != null
                     && SpecialCheck(e);
         }
+    }
+
+    public class EntityAuraChecker
+    {
+
     }
 }

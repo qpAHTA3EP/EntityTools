@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.19.1209.0605</AssemblyVersion>
+    <AssemblyVersion>0.19.1223.1619</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -46,6 +46,7 @@
     </DocumentationFile>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\</OutputPath>
@@ -60,7 +61,8 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Entity_7.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AStar">
@@ -120,7 +122,8 @@
     <Compile Include="Conditions\TeamLeaderMapInstance.cs" />
     <Compile Include="Conditions\TeamMemberCount.cs" />
     <Compile Include="Editors\CampaignTaskEditor.cs" />
-    <Compile Include="Editors\EnyTypeEditor.cs" />
+    <Compile Include="Editors\CheckedListBoxCommonEditor.cs" />
+    <Compile Include="Editors\AddTypeCommonEditor.cs" />
     <Compile Include="Editors\ConditionListEditor.cs" />
     <Compile Include="Editors\EntityTestEditor.cs" />
     <Compile Include="Editors\NodePositionEditor.cs" />
@@ -162,10 +165,10 @@
     <Compile Include="Forms\UIViewer.Designer.cs">
       <DependentUpon>UIViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="States\SlideMonitor.cs" />
-    <Compile Include="States\SlideMonitorSettings.cs" />
+    <Compile Include="Patches\Patch.cs" />
+    <Compile Include="Patches\Patch_GraphicsNW.cs" />
     <Compile Include="States\UnstuckSpellTask.cs" />
-    <Compile Include="States\SpellStuckMonitor.cs" />
+    <Compile Include="Tools\AuraOption.cs" />
     <Compile Include="Tools\CollectionTypeConverter.cs" />
     <Compile Include="Tools\CopyHelper.cs" />
     <Compile Include="Tools\CustomRegionTools.cs" />
@@ -213,6 +216,7 @@
     <Compile Include="Tools\ReflectionHelper.cs" />
     <Compile Include="Tools\SettingsTools.cs" />
     <Compile Include="Tools\Struct.cs" />
+    <Compile Include="Tools\UCCExtensions\UCCActionExtention.cs" />
     <Compile Include="Tools\UCCExtensions\UCCEditorExtensions.cs" />
     <Compile Include="Tools\Export\GameUITools.cs" />
     <Compile Include="UCC\Conditions\ICustomUCCCondition.cs" />
@@ -257,6 +261,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Actions\Encripted\" />
     <Folder Include="Extensions\" />
   </ItemGroup>
   <ItemGroup>

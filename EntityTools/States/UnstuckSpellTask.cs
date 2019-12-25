@@ -1,5 +1,11 @@
-﻿#define DEBUG_SPELLSTUCKMONITOR
+﻿#if DEBUG
+#define DEBUG_SPELLSTUCKMONITOR
+#endif
+
+#define UnstuckSpell_Tasks
 using Astral;
+using Astral.Logic.Classes.FSM;
+using Astral.Logic.NW;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
@@ -30,9 +36,14 @@ namespace EntityTools.States
 
         public static int CheckInterval => 500;
 
+        #region Реализация через System.Threading.Tasks
+#if UnstuckSpell_Tasks
+        /// <summary>
+        /// Реализация через System.Threading.Tasks
+        /// и Astral.Logic.UCC.API.AfterCallCombat
+        /// </summary>
         private static Task monitor = null;
         private static bool afterCallCombatSubcription = false;
-
         public static bool Activate
         {
             get
@@ -48,12 +59,13 @@ namespace EntityTools.States
                         Astral.Logic.UCC.API.AfterCallCombat += ArterCallCombat;
                         afterCallCombatSubcription = true;
                     }
-                    Logger.WriteLine($"{nameof(UnstuckSpellTask)} activated");                    
+                    Logger.WriteLine($"{nameof(UnstuckSpellTask)} activated");
                 }
                 else
                 {
                     Astral.Logic.UCC.API.AfterCallCombat -= ArterCallCombat;
                     afterCallCombatSubcription = false;
+                    Logger.WriteLine($"{nameof(UnstuckSpellTask)} deactivated");
                 }
             }
         }
@@ -86,9 +98,23 @@ namespace EntityTools.States
                 {
                     bool result = !(EntityManager.LocalPlayer.InCombat
                             || Astral.Logic.NW.Attackers.InCombat
-                            || (Astral.Logic.UCC.Core.CurrentTarget != null && Astral.Logic.UCC.Core.CurrentTarget.IsValid));
+                            || (Astral.Logic.UCC.Core.CurrentTarget != null
+                                && Astral.Logic.UCC.Core.CurrentTarget.IsValid
+                                && !Astral.Logic.UCC.Core.CurrentTarget.IsDead
+                                && Astral.Logic.UCC.Core.CurrentTarget.Location.Distance3DFromPlayer < Astral.Quester.Core.Profile.KillRadius));
 #if DEBUG_SPELLSTUCKMONITOR
                     Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]::{nameof(NeedToRun)} = {result}");
+                    Logger.WriteLine(Logger.LogType.Debug, $"\tLocalPlayer.InCombat:\t{EntityManager.LocalPlayer.InCombat}");
+                    Logger.WriteLine(Logger.LogType.Debug, $"\tAttackers.InCombat:\t{Astral.Logic.NW.Attackers.InCombat}");
+                    if (Astral.Logic.UCC.Core.CurrentTarget == null)
+                        Logger.WriteLine(Logger.LogType.Debug, $"\tUCC.Core.CurrentTarget:\tnull");
+                    else
+                    {
+                        Logger.WriteLine(Logger.LogType.Debug, $"\tUCC.Core.CurrentTarget:\t{Astral.Logic.UCC.Core.CurrentTarget.ToString()}");
+                        Logger.WriteLine(Logger.LogType.Debug, $"\tUCC.Core.CurrentTarget.IsValid:\t{Astral.Logic.UCC.Core.CurrentTarget.IsValid}");
+                        Logger.WriteLine(Logger.LogType.Debug, $"\tUCC.Core.CurrentTarget.IsDead:\t{Astral.Logic.UCC.Core.CurrentTarget.IsDead}");
+                        Logger.WriteLine(Logger.LogType.Debug, $"\tUCC.Core.CurrentTarget.Distance:\t{Astral.Logic.UCC.Core.CurrentTarget.Location.Distance3DFromPlayer}");
+                    }
 #endif
                     return result;
                 }
@@ -104,6 +130,7 @@ namespace EntityTools.States
 #if DEBUG_SPELLSTUCKMONITOR
             Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]::Run() starts");
 #endif
+            Thread.Sleep(CheckInterval * 2);
             while (afterCallCombatSubcription)
             {
                 if (NeedToRun)
@@ -131,13 +158,15 @@ namespace EntityTools.States
         {
             var player = EntityManager.LocalPlayer;
 
+#if DEBUG_SPELLSTUCKMONITOR
+            Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpellTask)}::DisableSpells_AurasCheck()");
+            Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpellTask)}: Character class is '{player.Character.Class.Category}'");
+#endif
             switch (player.Character.Class.Category)
             {
                 case CharClassCategory.DevotedCleric:
                     {
-#if DEBUG_SPELLSTUCKMONITOR
-                        Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpellTask)}: Character class is '{player.Character.Class.Category}'");
-#endif
+
                         // Флаги, предотвращающие повторное "выключение" умений
                         bool searchChanneldivinity = true;
                         bool searchArbiterMechanic = EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Cleric_Arbiter;
@@ -178,9 +207,6 @@ namespace EntityTools.States
                     }
                 case CharClassCategory.OathboundPaladin:
                     {
-#if DEBUG_SPELLSTUCKMONITOR
-                        Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpellTask)}: Character class is '{player.Character.Class.Category}'");
-#endif
                         // Если активно умение 'Paladin_Special_Divinepalisade'
                         //                        Power power = player.Character.Powers.Find(pow => pow.PowerDef.InternalName.StartsWith("Paladin_Special_Divinepalisade"));
                         //                        if (power != null && power.IsValid && power.IsActive)
@@ -264,19 +290,20 @@ namespace EntityTools.States
 
         /// <summary>
         /// Отключение активных умений в зависимости от класса
-        /// Проверка ауры/активности умений не проводится
+        /// Проверка ауры/активности умений не проводится (Кроме паладина)
         /// </summary>
         private static void DisableSpells()
         {
             var player = EntityManager.LocalPlayer;
 
+#if DEBUG_SPELLSTUCKMONITOR
+            Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpellTask)}::DisableSpells_AurasCheck()");
+            Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpellTask)}: Character class is '{player.Character.Class.Category}'");
+#endif
             switch (player.Character.Class.Category)
             {
                 case CharClassCategory.DevotedCleric:
                     {
-#if DEBUG_SPELLSTUCKMONITOR
-                        Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]: Character class is '{player.Character.Class.Category}'");
-#endif
                         // Отключение скила 'Channeldivinity'
                         GameCommands.Execute("specialClassPower 0");
                         Logger.WriteLine($"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]: '{player.Character.Class.Category}' deactivate SpecialClassPower[{Cleric_Channeldivinity}]");
@@ -294,31 +321,185 @@ namespace EntityTools.States
                     }
                 case CharClassCategory.OathboundPaladin:
                     {
-#if DEBUG_SPELLSTUCKMONITOR
-                        Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]: Character class is '{player.Character.Class.Category}'");
-#endif
-                        // Поиск ауры 'Paladin_Shift_Sanctuary' 
+                        // Отключение 'Paladin_Shift_Sanctuary' 
                         GameCommands.Execute("tacticalSpecial 0");
-                        Logger.WriteLine($"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]: '{player.Character.Class.Category}' deactivate TacticalSpecial[{Paladin_Shift}]");
+                        Logger.WriteLine($"{nameof(UnstuckSpellTask)}: Deactivate TacticalSpecial[{Paladin_Shift}]");
 
-                        if (EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Paladin_Justicar)
+                        if (EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Paladin_Oathkeeper)
                         {
-                            // Поиск ауры 'Paladin_Special_Divinechampion_Feat_B' 
-                            GameCommands.Execute("specialClassPower 1");
-                            Thread.Sleep(100);
+                            // Paladin_Oathkeeper
+                            // Отключаем "Paladin_Special_Divinecall"
                             GameCommands.Execute("specialClassPower 0");
-                            Logger.WriteLine($"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]: '{player.Character.Class.Category}' deactivate SpecialClassPower[{Paladin_Justicar_Mechanic}]");
+                            Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]: '{player.Character.Class.Category}' deactivate SpecialClassPower[{Paladin_Oathkeeper_Mechanic}]");
                         }
                         else
                         {
-                            // Умение "Paladin_Special_Divinecall"
-                            GameCommands.Execute("specialClassPower 0");
-                            Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]: '{player.Character.Class.Category}' deactivate SpecialClassPower[{Paladin_Oathkeeper_Mechanic}]");
+                            // Paladin_Justicar
+                            // Поиск ауры 'Paladin_Special_Divinechampion_Feat_B' 
+                            foreach (AttribModNet mod in player.Character.Mods)
+                            {
+                                if (mod.PowerDef.InternalName.StartsWith(Paladin_Justicar_Mechanic))
+                                {
+                                    GameCommands.Execute("specialClassPower 1");
+                                    Thread.Sleep(100);
+                                    GameCommands.Execute("specialClassPower 0");
+                                    Logger.WriteLine($"{nameof(UnstuckSpellTask)}: Deactivate SpecialClassPower[{Paladin_Justicar_Mechanic}]");
+                                    break;
+                                }
+                            }
                         }
 
                         break;
                     }
             }
         }
+#endif
+        #endregion
+
+        #region Реализация через Astral.Quester.API.Engine.OnLeaveState
+#if UnstuckSpell_OnLeaveState
+        private static bool subscribed = false;
+        public static bool Activate
+        {
+            get
+            {
+                return subscribed;
+            }
+            set
+            {
+                if (value)
+                {
+                    if (!subscribed)
+                    {
+                        Astral.Quester.API.Engine.OnLeaveState += DisableSpellsDelegate;
+                        subscribed = true;
+                    Logger.WriteLine($"{nameof(UnstuckSpellTask)} activated");
+                    }
+                }
+                else
+                {
+                    Astral.Quester.API.Engine.OnLeaveState -= DisableSpellsDelegate;
+                    subscribed = false;
+                    Logger.WriteLine($"{nameof(UnstuckSpellTask)} deactivated");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Проверка состояния боя и необходимости "отключать умения"
+        /// </summary>
+        private static bool NeedToRun
+        {
+            get
+            {
+                if (subscribed)
+                {
+                    bool result = !(EntityManager.LocalPlayer.InCombat
+                            || Astral.Logic.NW.Attackers.InCombat
+                            /*|| (Astral.Logic.UCC.Core.CurrentTarget != null
+                                && Astral.Logic.UCC.Core.CurrentTarget.IsValid
+                                && !Astral.Logic.UCC.Core.CurrentTarget.IsDead
+                                && Astral.Logic.UCC.Core.CurrentTarget.Location.Distance3DFromPlayer < Astral.Quester.Core.Profile.KillRadius)*/);
+#if DEBUG_SPELLSTUCKMONITOR
+                    Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]::{nameof(NeedToRun)} = {result}");
+                    Logger.WriteLine(Logger.LogType.Debug, $"\tLocalPlayer.InCombat:\t{EntityManager.LocalPlayer.InCombat}");
+                    Logger.WriteLine(Logger.LogType.Debug, $"\tAttackers.InCombat:\t{Astral.Logic.NW.Attackers.InCombat}");
+                    /*if (Astral.Logic.UCC.Core.CurrentTarget == null)
+                        Logger.WriteLine(Logger.LogType.Debug, $"\tUCC.Core.CurrentTarget:\tnull");
+                    else
+                    {
+                        Logger.WriteLine(Logger.LogType.Debug, $"\tUCC.Core.CurrentTarget:\t{Astral.Logic.UCC.Core.CurrentTarget.ToString()}");
+                        Logger.WriteLine(Logger.LogType.Debug, $"\tUCC.Core.CurrentTarget.IsValid:\t{Astral.Logic.UCC.Core.CurrentTarget.IsValid}");
+                        Logger.WriteLine(Logger.LogType.Debug, $"\tUCC.Core.CurrentTarget.IsDead:\t{Astral.Logic.UCC.Core.CurrentTarget.IsDead}");
+                        Logger.WriteLine(Logger.LogType.Debug, $"\tUCC.Core.CurrentTarget.Distance:\t{Astral.Logic.UCC.Core.CurrentTarget.Location.Distance3DFromPlayer}");
+                    }*/
+#endif
+                    return result;
+                }
+                return false;
+            }
+        }
+
+        private static void DisableSpellsDelegate(object sender, Engine.EngineArgs e)
+        {
+            //if(e.state is Astral.Quester.FSM.States.Combat combat)
+            if(e.state.DisplayName == "Combat")
+            {
+#if DEBUG_SPELLSTUCKMONITOR
+                Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]: LeaveState '{e.state.DisplayName}' ... check UnstuckSpells");
+#endif
+                if (NeedToRun)
+                {
+                    var player = EntityManager.LocalPlayer;
+
+                    switch (player.Character.Class.Category)
+                    {
+                        case CharClassCategory.DevotedCleric:
+                            {
+#if DEBUG_SPELLSTUCKMONITOR
+                                Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]: Character class is '{player.Character.Class.Category}'");
+#endif
+                                // Отключение скила 'Channeldivinity'
+                                GameCommands.Execute("specialClassPower 0");
+                                Logger.WriteLine($"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]: '{player.Character.Class.Category}' deactivate SpecialClassPower[{Cleric_Channeldivinity}]");
+
+                                // Поиск ауры 'Devoted_Mechanic_Dps_Scales_Radiant' или 'Devoted_Mechanic_Dps_Scales_Fire'
+                                if (EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Cleric_Arbiter)
+                                {
+                                    GameCommands.Execute("specialClassPower 1");
+                                    Thread.Sleep(100);
+                                    GameCommands.Execute("specialClassPower 0");
+                                    Logger.WriteLine($"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]: '{player.Character.Class.Category}' convert '{Cleric_Arbiter_Mechanic}' to [Devinity]");
+                                }
+
+                                break;
+                            }
+                        case CharClassCategory.OathboundPaladin:
+                            {
+#if DEBUG_SPELLSTUCKMONITOR
+                                Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]: Character class is '{player.Character.Class.Category}'");
+#endif
+                                // Отключение 'Paladin_Shift_Sanctuary' 
+                                GameCommands.Execute("tacticalSpecial 0");
+                                Logger.WriteLine($"{nameof(UnstuckSpellTask)}: Deactivate TacticalSpecial[{Paladin_Shift}]");
+
+                                if (EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Paladin_Oathkeeper)
+                                {
+                                    // Paladin_Oathkeeper
+                                    // Отключаем "Paladin_Special_Divinecall"
+                                    GameCommands.Execute("specialClassPower 0");
+                                    Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]: '{player.Character.Class.Category}' deactivate SpecialClassPower[{Paladin_Oathkeeper_Mechanic}]");
+                                }
+                                else
+                                {
+                                    // Paladin_Justicar
+                                    // Поиск ауры 'Paladin_Special_Divinechampion_Feat_B' 
+                                    foreach (AttribModNet mod in player.Character.Mods)
+                                    {
+                                        if (mod.PowerDef.InternalName.StartsWith(Paladin_Justicar_Mechanic))
+                                        {
+                                            GameCommands.Execute("specialClassPower 1");
+                                            Thread.Sleep(100);
+                                            GameCommands.Execute("specialClassPower 0");
+                                            Logger.WriteLine($"{nameof(UnstuckSpellTask)}: Deactivate SpecialClassPower[{Paladin_Justicar_Mechanic}]");
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                break;
+                            }
+                    }
+                }
+#if DEBUG_SPELLSTUCKMONITOR
+                else Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]: Character is in Combat ... skip");
+#endif
+            }
+            //#if DEBUG_SPELLSTUCKMONITOR
+            //            else Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]: LeaveState '{e.state.DisplayName}' ... skip");
+            //#endif
+        }
+#endif
+        #endregion
     }
 }

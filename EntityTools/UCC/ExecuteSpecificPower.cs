@@ -223,7 +223,8 @@ namespace EntityTools.UCC
             {
                 PowerId = this.PowerId,
                 CheckPowerCooldown = this.CheckPowerCooldown,
-                CheckInTray = this.CheckInTray
+                CheckInTray = this.CheckInTray,
+                power = CopyHelper.CreateDeepCopy(this.power)
             });
         }
         public override string ToString()

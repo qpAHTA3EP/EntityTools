@@ -182,7 +182,7 @@ namespace EntityTools.Actions
                          && (closestEntity.Location.Distance3DFromPlayer <= Distance))
                 {
                     Astral.Logic.NW.Attackers.List.Clear();
-                    if (AttackTargetEntity && closestEntity.RelationToPlayer == EntityRelation.Foe)
+                    if (AttackTargetEntity && closestEntity.RelationToPlayer != EntityRelation.Friend)
                     {
                         Astral.Logic.NW.Attackers.List.Add(closestEntity);
                         Astral.Quester.API.IgnoreCombat = false;

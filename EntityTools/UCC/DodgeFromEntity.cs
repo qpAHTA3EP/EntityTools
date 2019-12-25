@@ -1,23 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Linq;
-using System.Threading;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
-using Astral.Controllers;
-using Astral.Logic;
-using Astral.Logic.NW;
 using Astral.Logic.UCC.Actions;
 using Astral.Logic.UCC.Classes;
-using Astral.Logic.UCC.Ressources;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Tools;
 using EntityTools.Tools.Entities;
 using MyNW.Classes;
-using MyNW.Internals;
 
 namespace EntityTools.UCC
 {
@@ -84,18 +76,27 @@ namespace EntityTools.UCC
         [Description("Check Entity's Ingame Region (Not CustomRegion):\n" +
             "True: Only Entities located in the same Region as Player are detected\n" +
             "False: Entity's Region does not checked during search")]
-        [Category("Entity")]
+        //[Category("Entity")]
+        [Category("Optional")]
         public bool RegionCheck { get; set; } = true;
 
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
-        [Category("Entity")]
+        //[Category("Entity")]
+        [Category("Optional")]
         public bool HealthCheck { get; set; } = true;
+
+        [Description("Aura which checked on the Entity")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        //[Category("Entity")]
+        [Category("Optional")]
+        public AuraOption Aura { get; set; } = new AuraOption();
 
         [Description("The maximum distance from the character within which the Entity is searched\n" +
             "The 0 (zero) value disables distance checking")]
-        [Category("Entity")]
+        //[Category("Entity")]
+        [Category("Optional")]
         public float ReactionRange { get; set; } = 30;
 
         [DisplayName("Moving time")]
@@ -118,9 +119,11 @@ namespace EntityTools.UCC
             {
                 if (!string.IsNullOrEmpty(EntityID))
                 {
-                    //entity = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, HealthCheck, Range, RegionCheck);
+                    //entity = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, 
+                    //                                                HealthCheck, Range, RegionCheck);
 
-                    entity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType.Complete, HealthCheck, Range, RegionCheck);
+                    entity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType.Complete, 
+                                                            HealthCheck, Range, RegionCheck);
 
                     return Validate(entity) && entity.Location.Distance3DFromPlayer <= EntityRadius;
                 }
@@ -238,9 +241,45 @@ namespace EntityTools.UCC
             //return true;
         }
 
+        /// <summary>
+        /// Функтор, предназначенный для проверки соответствия Entity
+        /// основным критериям: EntityID, EntityIdType, EntityNameType
+        /// </summary>
         [XmlIgnore]
+        [Browsable(false)]
         internal EntityComparerToPattern Comparer { get; private set; } = null;
 
+        /// <summary>
+        /// Ссылка на ближайший к персонажу Entity
+        /// </summary>
+        [XmlIgnore]
+        [Browsable(false)]
+        public Entity UnitRef
+        {
+            get
+            {
+                if (Validate(entity))
+                    return entity;
+                else
+                {
+                    if (!string.IsNullOrEmpty(EntityID))
+                    {
+                        entity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete,
+                                                                HealthCheck, Range, RegionCheck, null, Aura.Checker);
+                        return entity;
+                    }
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Проверка валидности цели
+        /// Флаг IsValid не гарантирует, что ранее найденный Entity ссылается на ту же сущность
+        /// поскольку игровой клиент может её подменить
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
         private bool Validate(Entity e)
         {
             return e != null && e.IsValid && Comparer.Check(e);
@@ -261,14 +300,22 @@ namespace EntityTools.UCC
 
         public override UCCAction Clone()
         {
-            return base.BaseClone(new ApproachEntity
+            return base.BaseClone(new DodgeFromEntity
             {
-                EntityID = this.EntityID,
-                EntityIdType = this.EntityIdType,
-                EntityNameType = this.EntityNameType,
+                entityId = this.entityId,
+                entityIdType = this.entityIdType,
+                entityNameType = this.entityNameType,
                 RegionCheck = this.RegionCheck,
                 HealthCheck = this.HealthCheck,
                 EntityRadius = this.EntityRadius,
+                dodge = this.dodge.Clone() as Dodge,
+                Aura = new AuraOption
+                {
+                    AuraName = this.Aura.AuraName,
+                    AuraNameType = this.Aura.AuraNameType,
+                    Sign = this.Aura.Sign,
+                    Stacks = this.Aura.Stacks
+                }
             });
         }
 
@@ -436,7 +483,6 @@ namespace EntityTools.UCC
         //    }
         //    return vector;
         //}
-
 
         [NonSerialized]
         protected Entity entity = new Entity(IntPtr.Zero);

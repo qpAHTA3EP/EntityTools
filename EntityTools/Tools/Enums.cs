@@ -120,9 +120,9 @@ namespace EntityTools.Enums
     public enum PluginSettingsCommand
     {
         DisableSlideMonitor,
-        DisableSpellStuckMonitor,
+        //DisableSpellStuckMonitor,
+        DisableUnstuckSpell,
         EntityCacheTime,
-        EntityCacheCombatTime,
-        DisableUnstuckSpell
+        EntityCacheCombatTime
     }
 }

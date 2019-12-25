@@ -22,7 +22,7 @@ namespace EntityTools.Forms
         {
             InitializeComponent();
 
-            ckbSpellStuckMonitor.Checked = States.SpellStuckMonitor.Activate;
+            ckbSpellStuckMonitor.Checked = States.UnstuckSpellTask.Activate;//States.SpellStuckMonitor.Activate;
             cbSlideMonitor.Checked = States.SlideMonitor.Activate;
             gbSlideMonitor.Enabled = States.SlideMonitor.Activate;
         }

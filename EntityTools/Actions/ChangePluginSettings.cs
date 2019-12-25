@@ -1,4 +1,5 @@
-﻿using Astral.Classes;
+﻿using Astral;
+using Astral.Classes;
 using Astral.Logic.Classes.Map;
 using Astral.Quester.UIEditors;
 using EntityTools.Enums;
@@ -36,17 +37,18 @@ namespace EntityTools.Actions
                     case PluginSettingsCommand.DisableSlideMonitor:
                         if (bool.TryParse(Value, out bool result))
                         {
-                            SlideMonitor.Activate = !result;
-                            return ActionResult.Completed;
+                            //SlideMonitor.Activate = !result;
+                            Logger.WriteLine(Logger.LogType.Debug, "SlideMonitor was removed. This command is deprecated");
+                            return ActionResult.Skip;
                         }
                         else return ActionResult.Fail;
-                    case PluginSettingsCommand.DisableSpellStuckMonitor:
-                        if (bool.TryParse(Value, out result))
-                        {
-                            SpellStuckMonitor.Activate = !result;
-                            return ActionResult.Completed;
-                        }
-                        else return ActionResult.Fail;
+                    //case PluginSettingsCommand.DisableSpellStuckMonitor:
+                    //    if (bool.TryParse(Value, out result))
+                    //    {
+                    //        SpellStuckMonitor.Activate = !result;
+                    //        return ActionResult.Completed;
+                    //    }
+                    //    else return ActionResult.Fail;
                     case PluginSettingsCommand.DisableUnstuckSpell:
                         if (bool.TryParse(Value, out result))
                         {
@@ -91,17 +93,18 @@ namespace EntityTools.Actions
                 switch (Command)
                 {
                     case PluginSettingsCommand.DisableSlideMonitor:
-                        if (!bool.TryParse(Value, out bool result))
+                        /*if (!bool.TryParse(Value, out bool result))
                             return new ActionValidity("Value is incorrect!\n" +
                                 "The boolean is required.");
-                        break;
-                    case PluginSettingsCommand.DisableSpellStuckMonitor:
-                        if (!bool.TryParse(Value, out result))
-                            return new ActionValidity("Value is incorrect!\n" +
-                                "The boolean is required.");
-                        break;
+                        break;*/
+                        return new ActionValidity("SlideMonitor was removed. This command is deprecated");
+                    //case PluginSettingsCommand.DisableSpellStuckMonitor:
+                    //    if (!bool.TryParse(Value, out result))
+                    //        return new ActionValidity("Value is incorrect!\n" +
+                    //            "The boolean is required.");
+                    //    break;
                     case PluginSettingsCommand.DisableUnstuckSpell:
-                        if (!bool.TryParse(Value, out result))
+                        if (!bool.TryParse(Value, out bool result))
                             return new ActionValidity("Value is incorrect!\n" +
                                 "The boolean is required.");
                         break;
