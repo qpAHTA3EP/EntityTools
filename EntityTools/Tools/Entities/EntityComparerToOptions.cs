@@ -23,6 +23,8 @@ namespace EntityTools.Tools.Entities
             Predicate<Entity> specialCheck = null)
         {
             Range = range;
+            CustomRegions = customRegions;
+            SpecialCheck = specialCheck;
             if (customRegions == null)
                 if (specialCheck == null)
                     Check = (Entity e) =>

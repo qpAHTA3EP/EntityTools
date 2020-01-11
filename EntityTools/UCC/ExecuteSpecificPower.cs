@@ -1,4 +1,8 @@
-﻿using System;
+﻿#if DEBUG
+#define DEBUT_ExecuteSpecificPower
+#endif
+#define REFLECTION_ACCESS
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
@@ -22,6 +26,8 @@ using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
+using Unit = Astral.Logic.UCC.Ressources.Enums.Unit;
+
 
 namespace EntityTools.UCC
 {
@@ -44,8 +50,11 @@ namespace EntityTools.UCC
         {
             get
             {
-                if (!string.IsNullOrEmpty(PowerId) && (power == null || !power.IsValid))
+                if (!Validate(power))
+                {
+                    attachedGameProcessId = Astral.API.AttachedGameProcess.Id;
                     power = Powers.GetPowerByInternalName(PowerId);
+                }
                 return power?.IsInTray == true;
             }
         }
@@ -58,13 +67,13 @@ namespace EntityTools.UCC
             {
                 switch (Target)
                 {
-                    case Astral.Logic.UCC.Ressources.Enums.Unit.Player:
+                    case Unit.Player:
                         return EntityManager.LocalPlayer;
-                    case Astral.Logic.UCC.Ressources.Enums.Unit.MostInjuredAlly:
+                    case Unit.MostInjuredAlly:
                         return ActionsPlayer.MostInjuredAlly;
-                    case Astral.Logic.UCC.Ressources.Enums.Unit.StrongestAdd:
+                    case Unit.StrongestAdd:
                         return ActionsPlayer.AnAdd;
-                    case Astral.Logic.UCC.Ressources.Enums.Unit.StrongestTeamMember:
+                    case Unit.StrongestTeamMember:
                         return ActionsPlayer.StrongestTeamMember;
                     default:
                         return Core.CurrentTarget;
@@ -72,71 +81,96 @@ namespace EntityTools.UCC
             }
         }
 
-        [NonSerialized]
-        private Power power = null;
-        [NonSerialized]
-        private static Type movementsType = null;
-
-
         [XmlIgnore]
         [Browsable(false)]
         public override bool NeedToRun
         {
             get
             {
-                if (power == null || !power.IsValid)
-                    power = Powers.GetPowerByInternalName(PowerId);
+                Power p = GetCurrentPower();
 
-                //if (!power.IsInTray)
-                //{
-                //    if (!ActionsPlayer.combatBLActions.Contains(this))
-                //    {
-                //        ActionsPlayer.combatBLActions.Add(this);
-                //    }
-                //    return false;
-                //}
-
-                return PowerId.Length > 0 
-                        && power!= null && power.IsValid 
-                        && (!CheckPowerCooldown || power.IsOnCooldown())
-                        && (!CheckInTray || power.IsInTray);
+                return Validate(p)
+                        && (!CheckPowerCooldown || !p.IsOnCooldown())
+                        && (!CheckInTray || p.IsInTray);
             }
         }
 
         public override bool Run()
         {
+#if DEBUT_ExecuteSpecificPower
+            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower::Run() starts");
+#endif
+#if REFLECTION_ACCESS
             if (movementsType == null)
-                movementsType = ReflectionHelper.GetTypeByName("Astral.Logic.UCC.Controllers.Movements", true);
+                movementsType = typeof(Astral.Logic.UCC.Controllers.Movements);//ReflectionHelper.GetTypeByName("Astral.Logic.UCC.Controllers.Movements", true);
+#endif
 
-            //if(power == null && !power.IsValid)
-            //    power = Powers.GetPowerByInternalName(PowerId);
+            Power currentPower = GetCurrentPower();
 
-            //return power.IsValid && Powers.SmartPowerExec(power);
-            if(power == null || !power.IsValid)
-                power = Powers.GetPowerByInternalName(PowerId);
-            if (power == null || !power.IsValid)
+            if (!Validate(currentPower))
+            {
+#if DEBUT_ExecuteSpecificPower
+                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to get Power '{PowerId}' by 'PowerId'");
+#endif
                 return false;
-            Power entActivatedPower = power.EntGetActivatedPower();
+            }
+            Power entActivatedPower = currentPower.EntGetActivatedPower();
             PowerDef powerDef = entActivatedPower.EntGetActivatedPower().EffectivePowerDef();
-            if (base.Target != Astral.Logic.UCC.Ressources.Enums.Unit.Player)
+            if (base.Target != Unit.Player)
             {
                 switch (Target)
                 {
-                    case Astral.Logic.UCC.Ressources.Enums.Unit.MostInjuredAlly:
-                        ReflectionHelper.SetStaticFieldValue(movementsType, "SpecificTarget", ActionsPlayer.MostInjuredAlly, BindingFlags.Static|BindingFlags.SetField);
-                        //Astral.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.MostInjuredAlly;
+                    case Unit.MostInjuredAlly:
+#if REFLECTION_ACCESS
+                        if (!ReflectionHelper.SetStaticPropertyValue(movementsType, "SpecificTarget", ActionsPlayer.MostInjuredAlly/*, BindingFlags.Static | BindingFlags.NonPublic*/))
+                        {
+#if DEBUT_ExecuteSpecificPower
+                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to set UCC.Controllers.Movements.SpecificTarget to 'MostInjuredAlly'");
+#endif
+                            return false;
+                        }
+#else
+                        Astral.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.MostInjuredAlly;
+#endif
                         break;
-                    case Astral.Logic.UCC.Ressources.Enums.Unit.StrongestAdd:
-                        ReflectionHelper.SetStaticFieldValue(movementsType, "SpecificTarget", ActionsPlayer.AnAdd, BindingFlags.Static | BindingFlags.SetField);
-                        //Astral.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.AnAdd;
+                    case Unit.StrongestAdd:
+#if REFLECTION_ACCESS
+                        if (!ReflectionHelper.SetStaticPropertyValue(movementsType, "SpecificTarget", ActionsPlayer.AnAdd/*, BindingFlags.Static | BindingFlags.NonPublic*/))
+                        {
+#if DEBUT_ExecuteSpecificPower
+                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to set UCC.Controllers.Movements.SpecificTarget to 'AnAdd'");
+#endif
+                            return false;
+                        }
+#else
+                        Astral.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.AnAdd;
+#endif
                         break;
-                    case Astral.Logic.UCC.Ressources.Enums.Unit.StrongestTeamMember:
-                        ReflectionHelper.SetStaticFieldValue(movementsType, "SpecificTarget", ActionsPlayer.StrongestTeamMember, BindingFlags.Static | BindingFlags.SetField);
-                        //Astral.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.StrongestTeamMember;
+                    case Unit.StrongestTeamMember:
+#if REFLECTION_ACCESS
+                        if (!ReflectionHelper.SetStaticPropertyValue(movementsType, "SpecificTarget", ActionsPlayer.StrongestTeamMember/*, BindingFlags.Static | BindingFlags.NonPublic*/))
+                        {
+#if DEBUG
+                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to set UCC.Controllers.Movements.SpecificTarget to 'StrongestTeamMember'");
+#endif
+                            return false;
+                        }
+#else
+                        Astral.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.StrongestTeamMember;
+#endif
                         break;
                     default:
-                        ReflectionHelper.SetStaticFieldValue(movementsType, "SpecificTarget", null, BindingFlags.Static | BindingFlags.SetField);
-                        //Astral.Logic.UCC.Controllers.Movements.SpecificTarget = null;
+#if REFLECTION_ACCESS
+                        if (!ReflectionHelper.SetStaticPropertyValue(movementsType, "SpecificTarget", null/*, BindingFlags.Static | BindingFlags.NonPublic*/))
+                        {
+#if DEBUT_ExecuteSpecificPower
+                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to set UCC.Controllers.Movements.SpecificTarget to 'null'");
+#endif
+                            return false;
+                        }
+#else
+                        Astral.Logic.UCC.Controllers.Movements.SpecificTarget = null;
+#endif
                         break;
                 }
                 int range = Powers.getEffectiveRange(powerDef);
@@ -150,9 +184,22 @@ namespace EntityTools.UCC
                     {
                         range = 7;
                     }
-                    ReflectionHelper.SetStaticFieldValue(typeof(Astral.Logic.UCC.Controllers.Movements), "RequireRange", range - 2, BindingFlags.Static | BindingFlags.SetField);
-                    //Astral.Logic.UCC.Controllers.Movements.RequireRange = num - 2;
+#if REFLECTION_ACCESS
+                    if (!ReflectionHelper.SetStaticPropertyValue(movementsType, "RequireRange", range - 2/*, BindingFlags.Static | BindingFlags.SetProperty*/))
+                    {
+#if DEBUT_ExecuteSpecificPower
+                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to set UCC.Controllers.Movements.RequireRange to '{range - 2}'");
+#endif
+                        return false;
+                    }
+#else
+                    Astral.Logic.UCC.Controllers.Movements.RequireRange = range - 2;
+#endif
+#if REFLECTION_ACCESS
                     while (ReflectionHelper.GetPropertyValue(movementsType, "RangeIsOk", out object RangeIsOk) && RangeIsOk.Equals(true))
+#else
+                    while (Astral.Logic.UCC.Controllers.Movements.RangeIsOk)
+#endif
                     {
                         if (Core.CurrentTarget.IsDead)
                         {
@@ -176,12 +223,12 @@ namespace EntityTools.UCC
             //{
             //    milseconds = Powers.getEffectiveTimeCharge(powerDef);
             //}
-            Entity entity = new Entity(TargetEntity.Pointer);
-            if (entity.ContainerId != EntityManager.LocalPlayer.ContainerId && !entity.Location.IsInYawFace)
+            Entity target = new Entity(TargetEntity.Pointer);
+            if (target.ContainerId != EntityManager.LocalPlayer.ContainerId && !target.Location.IsInYawFace)
             {
-                entity.Location.Face();
+                target.Location.Face();
                 Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(750);
-                while (!entity.Location.IsInYawFace && !timeout.IsTimedOut)
+                while (!target.Location.IsInYawFace && !timeout.IsTimedOut)
                 {
                     Thread.Sleep(20);
                 }
@@ -192,15 +239,21 @@ namespace EntityTools.UCC
             {
                 if (!powerDef.GroundTargeted && !powerDef.Categories.Contains(PowerCategory.IgnorePitch))
                 {
-                    entity.Location.Face();
-                    Powers.ExecPower(power, entity, true);
+                    target.Location.Face();
+#if DEBUT_ExecuteSpecificPower
+                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Activate ExecPower '{currentPower.PowerDef.InternalName}' on target {target.Name}[{target.InternalName}]");
+#endif
+                    Powers.ExecPower(currentPower, target, true);
                 }
                 else
                 {
-                    Vector3 location = entity.Location;
+                    Vector3 location = target.Location;
                     location.Z += 3f;
                     location.Face();
-                    Powers.ExecPower(power, location, true);
+#if DEBUT_ExecuteSpecificPower
+                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Activate ExecPower '{currentPower.PowerDef.InternalName}' on location <{location.X.ToString("0,4:N2")}, {location.Y.ToString("0,4:N2")}, {location.Z.ToString("0,4:N2")}>");
+#endif
+                    Powers.ExecPower(currentPower, location, true);
                 }                
             }
             catch
@@ -208,38 +261,41 @@ namespace EntityTools.UCC
             }
             finally
             {
-                Powers.ExecPower(power, entity, false);
+#if DEBUT_ExecuteSpecificPower
+                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Deactivate ExecPower '{currentPower.PowerDef.InternalName}' on target {target.Name}[{target.InternalName}]");
+#endif
+                Powers.ExecPower(currentPower, target, false);
             }
             return true;
         }
 
         public ExecuteSpecificPower()
         {
-            Target = Astral.Logic.UCC.Ressources.Enums.Unit.Player;
+            Target = Unit.Player;
+            movementsType = typeof(Astral.Logic.UCC.Controllers.Movements);
         }
+
         public override UCCAction Clone()
         {
             return base.BaseClone(new ExecuteSpecificPower
             {
                 PowerId = this.PowerId,
                 CheckPowerCooldown = this.CheckPowerCooldown,
-                CheckInTray = this.CheckInTray,
-                power = CopyHelper.CreateDeepCopy(this.power)
+                CheckInTray = this.CheckInTray
             });
         }
         public override string ToString()
         {
-            if (! string.IsNullOrEmpty(PowerId) && (power == null || !power.IsValid))
-                power = Powers.GetPowerByInternalName(PowerId);
+            Power currentPower = GetCurrentPower();
 
-            if (power != null && power.IsValid)
+            if (Validate(currentPower))
             {
                 StringBuilder str = new StringBuilder();
                 if (CheckInTray && Slotted)
                     str.Append("[Slotted] ");
-                if (power.EffectivePowerDef().DisplayName.Length > 0)
-                    str.Append(power.EffectivePowerDef().DisplayName);
-                else str.Append(power.EffectivePowerDef().InternalName);
+                if (currentPower.EffectivePowerDef().DisplayName.Length > 0)
+                    str.Append(currentPower.EffectivePowerDef().DisplayName);
+                else str.Append(currentPower.EffectivePowerDef().InternalName);
 
                 return str.ToString();
             }
@@ -247,14 +303,40 @@ namespace EntityTools.UCC
             return "Unknow Power";
         }
 
+        private bool Validate(Power p)
+        {
+            return attachedGameProcessId == Astral.API.AttachedGameProcess.Id
+                && p != null && p.IsValid && p.PowerDef.InternalName == PowerId;
+        }
+
+        private Power GetCurrentPower()
+        {
+            if (!Validate(power))
+            {
+                attachedGameProcessId = Astral.API.AttachedGameProcess.Id;
+                power = Powers.GetPowerByInternalName(PowerId);
+            }
+            return power;
+        }
+
+        [NonSerialized]
+        int attachedGameProcessId = 0;
+
+        [NonSerialized]
+        private Power power = null;
+#if REFLECTION_ACCESS
+        [NonSerialized]
+        private static Type movementsType = null;
+#endif
+
         #region Hide Inherited Properties
-        [XmlIgnore]
-        [Browsable(false)]
-        public new Astral.Logic.UCC.Ressources.Enums.Unit Target { get; set; }
+        //[XmlIgnore]
+        //[Browsable(false)]
+        //public new Unit Target { get; set; }
 
         [XmlIgnore]
         [Browsable(false)]
         public new string ActionName { get; set; }
-        #endregion
+#endregion
     }
 }

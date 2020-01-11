@@ -94,8 +94,8 @@ namespace EntityTools.Tools
 #endif
                 object input = o;
                 if (ReferenceEquals(o, null))
-                return o;
-            return (T)CreateDeepCopyInternal(new Dictionary<object, object>(), input);
+                    return o;
+                return (T)CreateDeepCopyInternal(new Dictionary<object, object>(), input);
 #if DEBUG
             }
             finally

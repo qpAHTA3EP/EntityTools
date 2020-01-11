@@ -64,7 +64,7 @@ namespace EntityTools.Actions
         }
 
         [Description("Type of the EntityID:\n" +
-            "Simple: Simple test string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
+            "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
         public ItemFilterStringType EntityIdType
@@ -123,8 +123,13 @@ namespace EntityTools.Actions
         [Category("Optional")]
         public float ReactionRange { get; set; } = 150;
 
+        [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
+            "The default value is 0, which disables ZAxis checking")]
+        [Category("Optional")]
+        public float ReactionZRange { get; set; } = 0;
+
         [Description("CustomRegion names collection")]
-        [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
+        [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
         [Category("Optional")]
         public List<string> CustomRegionNames
         {
@@ -142,7 +147,7 @@ namespace EntityTools.Actions
         [Description("A subset of entities that are searched for a target\n" +
             "Contacts: Only interactable Entities\n" +
             "Complete: All possible Entities")]
-        [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
+        [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
         [Category("Optional")]
         public EntitySetType EntitySetType { get; set; } = EntitySetType.Contacts;
 
@@ -218,30 +223,22 @@ namespace EntityTools.Actions
         {
             get
             {
-                //if (timeout.IsTimedOut
-                //    && (!HoldTargetEntity || !Validate(target) || (HealthCheck && target.IsDead)))
-                //{
-                //    Entity closestEntity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType,
-                //                                                HealthCheck, ReactionRange, RegionCheck, customRegions,
-                //                                                IsNotInBlackList);
-                //    timeout.ChangeTime(SearchTimeInterval);
+                if (customRegionNames != null && (customRegions == null || customRegions.Count != customRegionNames.Count))
+                    customRegions = CustomRegionTools.GetCustomRegions(customRegionNames);
 
-                //    if (closestEntity != null && closestEntity.IsValid)
-                //        target = closestEntity;
-                //    else
-                //    {
-                //        target = null;
-                //        if (IgnoreCombat)
-                //            Astral.Quester.API.IgnoreCombat = true;
-                //        return false;
-                //    }
-                //}
+                if (Comparer == null && !string.IsNullOrEmpty(entityId))
+                {
+#if DEBUG
+                    Logger.WriteLine(Logger.LogType.Debug, "InteractEntities::NeedToRun: Comparer is null. Initialize.");
+#endif
+                    Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                }
 
                 Entity closestEntity = null;
                 if (timeout.IsTimedOut/* || (target != null && (!Validate(target) || (HealthCheck && target.IsDead)))*/)
                 {
                     closestEntity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete,
-                                                                HealthCheck, ReactionRange, RegionCheck, customRegions);
+                                                                HealthCheck, ReactionRange, ReactionZRange, RegionCheck, customRegions);
                     timeout.ChangeTime(SearchTimeInterval);
                 }
 
@@ -289,8 +286,14 @@ namespace EntityTools.Actions
 #endif
                 moved = false;
                 combat = false;
+#if DEBUG
+                Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}::Run: Approach Entity[{target.Pointer.ToString("X8")}] for interaction");
+#endif
                 if (Approach.EntityForInteraction(target, new Func<Approach.BreakInfos>(CheckCombat)))
                 {
+#if DEBUG
+                    Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}::Run: Interact Entity[{target.Pointer.ToString("X8")}]");
+#endif
                     target.Interact();
                     Thread.Sleep(InteractTime);
                     Interact.WaitForInteraction();
@@ -324,15 +327,24 @@ namespace EntityTools.Actions
                 }
                 if (IgnoreCombat && target.Location.Distance3DFromPlayer <= CombatDistance)
                 {
+#if DEBUG
+                    Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}::Run: Engage combat");
+#endif
                     Astral.Quester.API.IgnoreCombat = false;
                     return ActionResult.Running;
                 }
                 if (combat)
                 {
+#if DEBUG
+                    Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}::Run: Player in combat...");
+#endif
                     return ActionResult.Running;
                 }
                 if (moved)
                 {
+#if DEBUG
+                    Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}::Run: Entity[{target.Pointer.ToString("X8")}] moved, skip...");
+#endif
                     Logger.WriteLine("Entity moved, skip...");
                     return ActionResult.Fail;
                 }
@@ -341,7 +353,13 @@ namespace EntityTools.Actions
             finally
             {
                 if (InteractOnce)
+                {
                     PushToBlackList(target);
+#if DEBUG
+                    Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}::Run: PushToBlackList Entity[{target.Pointer.ToString("X8")}]");
+#endif
+                }
+
                 target = new Entity(IntPtr.Zero);
             }
         }
@@ -424,7 +442,7 @@ namespace EntityTools.Actions
         public override void GatherInfos()
         {
             //XtraMessageBox.Show("Target Entity and press ok.");
-            TargetSelectForm.TargetGuiRequest("Target Entity and press ok.");
+            TargetSelectForm.TargetGuiRequest("Target Entity and press ok.", Application.OpenForms.Find<Astral.Quester.Forms.Editor>());
             Entity betterEntityToInteract = Interact.GetBetterEntityToInteract();
             if (betterEntityToInteract.IsValid)
             {

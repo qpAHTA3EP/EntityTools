@@ -1,5 +1,6 @@
 ﻿using Astral.Classes.ItemFilter;
 using Astral.Quester.UIEditors;
+using EntityTools.Editors;
 using EntityTools.Enums;
 using MyNW.Classes;
 using System;
@@ -18,7 +19,7 @@ namespace EntityTools.Tools
     public class AuraOption
     {
         [Description("An Identifier of the Aura which is checked on the the Entity")]
-        [Editor(typeof(AuraEditor), typeof(UITypeEditor))]
+        [Editor(typeof(AuraIdEditor), typeof(UITypeEditor))]
         public string AuraName
         {
             get => auraId;

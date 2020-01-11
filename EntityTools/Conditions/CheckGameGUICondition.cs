@@ -52,7 +52,7 @@ namespace EntityTools.Conditions
         public string UiGenPropertyValue { get; set; } = string.Empty;
 
         [Description("Type of and UiGenPropertyValue:\n" +
-                     "Simple: Simple test string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
+                     "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
                      "Regex: Regular expression\n" +
                      "Ignored if property 'Tested' is not equals to 'Property'")]
         [Category("GuiProperty")]

@@ -63,7 +63,7 @@ namespace EntityTools.Conditions
         }
 
         [Description("Type of and EntityID:\n" +
-            "Simple: Simple test string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
+            "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
         public ItemFilterStringType EntityIdType
@@ -83,7 +83,7 @@ namespace EntityTools.Conditions
         [Description("A subset of entities that are searched for a target\n" +
             "Contacts: Only interactable Entities\n" +
             "Complete: All possible Entities")]
-        [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
+        [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
         [Category("Optional")]
         public EntitySetType EntitySetType { get; set; } = EntitySetType.Complete;
 
@@ -111,7 +111,7 @@ namespace EntityTools.Conditions
         public Condition.Presence Tested { get; set; } = Condition.Presence.Equal;
 
         [Description("The list of the CustomRegions where Entities is counted")]
-        [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
+        [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
         [Category("Location")]
         public List<string> CustomRegionNames
         {
@@ -120,11 +120,7 @@ namespace EntityTools.Conditions
             {
                 if (customRegionNames != value)
                 {
-                    if (value != null
-                        && value.Count > 0)
-                        customRegions = Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) =>
-                                    value.Exists((string regName) => regName == cr.Name));
-                    else customRegions = null;
+                    customRegions = CustomRegionTools.GetCustomRegions(value);
                     customRegionNames = value;
                 }
             }
@@ -135,6 +131,11 @@ namespace EntityTools.Conditions
             "The default value is 0, which disables distance checking")]
         [Category("Optional")]
         public float ReactionRange { get; set; } = 0;
+
+        [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
+            "The default value is 0, which disables ZAxis checking")]
+        [Category("Optional")]
+        public float ReactionZRange { get; set; } = 0;
 
         //[Description("Time between searches of the Entity (ms)")]
         //[Category("Optional")]
@@ -170,10 +171,17 @@ namespace EntityTools.Conditions
             {
                 if (!string.IsNullOrEmpty(EntityID))
                 {
+                    if (customRegionNames != null && (customRegions == null || customRegions.Count != customRegionNames.Count))
+                        customRegions = CustomRegionTools.GetCustomRegions(customRegionNames);
+
+                    if (Comparer == null)
+                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+
+
                     //if (timeout.IsTimedOut)
                     {
                         entities = SearchCached.FindAllEntity(entityId, entityIdType, entityNameType, EntitySetType,
-                           HealthCheck, ReactionRange, RegionCheck/*, customRegions*/);
+                           HealthCheck, ReactionRange, ReactionZRange, RegionCheck, customRegions);
                         //timeout.ChangeTime(SearchTimeInterval);
                     }
 
@@ -224,8 +232,11 @@ namespace EntityTools.Conditions
             {
                 if (!string.IsNullOrEmpty(EntityID))
                 {
+                    if (customRegionNames != null && (customRegions == null || customRegions.Count != customRegionNames.Count))
+                        customRegions = CustomRegionTools.GetCustomRegions(customRegionNames);
+
                     entities = SearchCached.FindAllEntity(entityId, entityIdType, entityNameType, EntitySetType,
-                           HealthCheck, ReactionRange, RegionCheck, customRegions);
+                           HealthCheck, ReactionRange, ReactionZRange, RegionCheck, customRegions);
 
                     StringBuilder strBldr = new StringBuilder();
                     uint entCount = 0;

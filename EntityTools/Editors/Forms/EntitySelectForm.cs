@@ -102,8 +102,7 @@ namespace EntityTools.Forms
 
             selectForm.FillEntitiesDgv();
 
-            DialogResult dialogResult = selectForm.ShowDialog();
-            if (dialogResult == DialogResult.OK)
+            if (selectForm.ShowDialog() == DialogResult.OK)
             {
                 if (!selectForm.dgvEntities.CurrentRow.IsNewRow)
                 {

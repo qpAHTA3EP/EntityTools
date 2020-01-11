@@ -9,12 +9,15 @@ using System.Windows.Forms;
 using EntityTools.UCC.Conditions;
 using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 using Astral.Logic.UCC.Classes;
+using Astral.Controllers;
+using System.Collections.Generic;
+using EntityTools.Editors.Forms;
 
 namespace EntityTools.Forms
 {
     public partial class ConditionListForm : XtraForm //*/Form
     {
-        private UCCCondition conditionCopy;
+        private static UCCCondition conditionCopy;
 
         public ConditionListForm()
         {
@@ -23,12 +26,12 @@ namespace EntityTools.Forms
 
         private void bntAdd_Click(object sender, EventArgs e)
         {
-            if (AddAction.Show(typeof(UCCCondition)) is UCCCondition condition)
+            //if (AddAction.Show(typeof(UCCCondition)) is UCCCondition condition)
+            if(UnoSelectForm.GetAnItem<UCCCondition>(false) is UCCCondition condition)
             {
                 Conditions.Items.Add(condition);
-                Conditions.SelectedItem = condition;                
+                Conditions.SelectedItem = condition;  
             }
-
         }
 
         private void btnRemove_Click(object sender, EventArgs e)
@@ -66,21 +69,23 @@ namespace EntityTools.Forms
 
         private void btnTest_Click(object sender, EventArgs e)
         {
-            ICustomUCCCondition cond = (Conditions.Items.Count > 0) ? Conditions.SelectedItem as ICustomUCCCondition : null;
-            if (cond != null)
+            bool result = false;
+            string mess = string.Empty;
+            if (Conditions.Items.Count > 0)
             {
-                //StringBuilder sb = new StringBuilder();
-                //sb.AppendLine(cond.ToString()).AppendLine();
-                //sb.Append("Result: ").Append(cond.IsOK(null).ToString());
-
-                ////MessageBox.Show(sb.ToString());
-                //XtraMessageBox.Show(sb.ToString());                
-
-                if (cond.IsOk(null))
-                    XtraMessageBox.Show(string.Concat(cond, "\nResult: True"));
+                UCCCondition c = Conditions.SelectedItem as UCCCondition;
+                if (c is ICustomUCCCondition iCond)
+                {
+                    result = iCond.IsOK();
+                    mess = iCond.TestInfos();
+                }
                 else
-                    XtraMessageBox.Show(string.Concat(cond, "\nResult: False"));
+                {
+                    result = c.IsOK(null);
+                    mess = $"{c.Target} {c.Tested} : {c.Value}";
+                }
 
+                XtraMessageBox.Show($"{mess}\nResult: {result}");
             }
         }
 

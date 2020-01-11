@@ -64,7 +64,7 @@ namespace EntityTools
         public override void OnLoad()
         {
             //States.SpellStuckMonitor.Activate = true;
-            States.SlideMonitor.Activate = false;
+            //States.SlideMonitor.Activate = false;
             States.UnstuckSpellTask.Activate = true;
         }
 

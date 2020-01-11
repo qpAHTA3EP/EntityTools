@@ -31,14 +31,26 @@ namespace EntityTools.Editors
             {
                 if (context.Instance is MoveToEntity mte)
                 {
-                    mte.InternalReset();
                     sb.Append("EntityID: ").AppendLine(mte.EntityID);
+                    sb.Append("EntityIdType: ").AppendLine(mte.EntityIdType.ToString());
+                    sb.Append("EntityNameType: ").AppendLine(mte.EntityNameType.ToString());
+                    sb.Append("HealthCheck: ").AppendLine(mte.HealthCheck.ToString());
+                    sb.Append("ReactionRange: ").AppendLine(mte.ReactionRange.ToString());
+                    sb.Append("ReactionZRange: ").AppendLine(mte.ReactionZRange.ToString());
+                    sb.Append("RegionCheck: ").AppendLine(mte.RegionCheck.ToString());
+                    if(mte.CustomRegionNames != null && mte.CustomRegionNames.Count > 0)
+                    {
+                        sb.Append("RegionCheck: {").Append(mte.CustomRegionNames[0]);
+                        for (int i = 1; i < mte.CustomRegionNames.Count; i++)
+                            sb.Append(", ").Append(mte.CustomRegionNames[i]);
+                        sb.AppendLine("}");
+                    }
                     sb.AppendLine();
                     sb.Append("NeedToRun: ").AppendLine(mte.NeedToRun.ToString());
                     sb.AppendLine();
                     // список всех Entity, удовлетворяющих условиям
                     List<Entity> entities = SearchCached.FindAllEntity(mte.EntityID, mte.EntityIdType, mte.EntityNameType, EntitySetType.Complete,
-                        mte.HealthCheck, mte.ReactionRange, mte.RegionCheck, CustomRegionTools.GetCustomRegions(mte.CustomRegionNames));
+                        mte.HealthCheck, mte.ReactionRange, mte.ReactionZRange, mte.RegionCheck, CustomRegionTools.GetCustomRegions(mte.CustomRegionNames));
 
                     // Количество Entity, удовлетворяющих условиям
                     if (entities != null)
@@ -61,7 +73,7 @@ namespace EntityTools.Editors
                         //sb.Append("\tLocation: ").AppendLine(mte.target.Location.ToString());
                         //sb.Append("\t[").Append((mte.ReactionRange == 0 || mte.target.Location.Distance3DFromPlayer < mte.ReactionRange) ? "+" : "-")
                         //    .Append("]Distance: ").AppendLine(mte.target.Location.Distance3DFromPlayer.ToString());
-                        sb.Append("ClosectEntity: ").AppendLine(mte.target.ToString());
+                        sb.Append("Target: ").AppendLine(mte.target.ToString());
                         sb.Append("\tName: ").AppendLine(mte.target.Name);
                         sb.Append("\tInternalName: ").AppendLine(mte.target.InternalName);
                         sb.Append("\tNameUntranslated: ").AppendLine(mte.target.NameUntranslated);
@@ -69,6 +81,7 @@ namespace EntityTools.Editors
                         sb.Append("\tRegion: '").Append(mte.target.RegionInternalName).AppendLine("'");
                         sb.Append("\tLocation: ").AppendLine(mte.target.Location.ToString());
                         sb.Append("\tDistance: ").AppendLine(mte.target.Location.Distance3DFromPlayer.ToString());
+                        sb.Append("\tZAxisDiff: ").AppendLine(Astral.Logic.General.ZAxisDiffFromPlayer(mte.target.Location).ToString());
                     }
                     else sb.AppendLine("Closest Entity not found!");
 
@@ -78,13 +91,27 @@ namespace EntityTools.Editors
                 {
                     ie.InternalReset();
                     sb.Append("EntityID: ").AppendLine(ie.EntityID);
+                    sb.Append("EntityIdType: ").AppendLine(ie.EntityIdType.ToString());
+                    sb.Append("EntityNameType: ").AppendLine(ie.EntityNameType.ToString());
+                    sb.Append("EntitySetType: ").AppendLine(ie.EntitySetType.ToString());
+                    sb.Append("HealthCheck: ").AppendLine(ie.HealthCheck.ToString());
+                    sb.Append("ReactionRange: ").AppendLine(ie.ReactionRange.ToString());
+                    sb.Append("ReactionZRange: ").AppendLine(ie.ReactionZRange.ToString());
+                    sb.Append("RegionCheck: ").AppendLine(ie.RegionCheck.ToString());
+                    if (ie.CustomRegionNames != null && ie.CustomRegionNames.Count > 0)
+                    {
+                        sb.Append("RegionCheck: {").Append(ie.CustomRegionNames[0]);
+                        for (int i = 1; i < ie.CustomRegionNames.Count; i++)
+                            sb.Append(", ").Append(ie.CustomRegionNames[i]);
+                        sb.AppendLine("}");
+                    }
                     sb.AppendLine();
                     sb.Append("NeedToRun: ").AppendLine(ie.NeedToRun.ToString());
                     sb.AppendLine();
 
                     // список всех Entity, удовлетворяющих условиям
                     List <Entity> entities = SearchCached.FindAllEntity(ie.EntityID, ie.EntityIdType, ie.EntityNameType, ie.EntitySetType,
-                                                                        ie.HealthCheck, ie.ReactionRange, ie.RegionCheck, CustomRegionTools.GetCustomRegions(ie.CustomRegionNames));
+                                                                        ie.HealthCheck, ie.ReactionRange, ie.ReactionZRange, ie.RegionCheck, CustomRegionTools.GetCustomRegions(ie.CustomRegionNames));
 
 
                     // Количество Entity, удовлетворяющих условиям
@@ -97,7 +124,7 @@ namespace EntityTools.Editors
                     //target = EntitySelectionTools.FindClosestEntity(entities, EntityId, EntityIdType, NameType, HealthCheck, ReactionRange, RegionCheck, CustomRegionNames);
                     if (ie.target != null && ie.target.IsValid)
                     {
-                        sb.Append("ClosectEntity: ").AppendLine(ie.target.ToString());
+                        sb.Append("Target: ").AppendLine(ie.target.ToString());
                         sb.Append("\tName: ").AppendLine(ie.target.Name);
                         sb.Append("\tInternalName: ").AppendLine(ie.target.InternalName);
                         sb.Append("\tNameUntranslated: ").AppendLine(ie.target.NameUntranslated);
@@ -105,6 +132,7 @@ namespace EntityTools.Editors
                         sb.Append("\tRegion: '").Append(ie.target.RegionInternalName).AppendLine("'");
                         sb.Append("\tLocation: ").AppendLine(ie.target.Location.ToString());
                         sb.Append("\tDistance: ").AppendLine(ie.target.Location.Distance3DFromPlayer.ToString());
+                        sb.Append("\tZAxisDiff: ").AppendLine(Astral.Logic.General.ZAxisDiffFromPlayer(ie.target.Location).ToString());
                     }
                     else sb.AppendLine("Closest Entity not found!");
                 }
@@ -113,17 +141,34 @@ namespace EntityTools.Editors
                         && ReflectionHelper.GetPropertyValue(context.Instance, "EntityIdType", out object entityIdType))
                 {
                     sb.Append("EntityID: ").AppendLine(entityId.ToString());
-                    sb.AppendLine();
 
                     EntitySetType entitySet = ReflectionHelper.GetPropertyValue(context.Instance, "EntitySetType", out object entitySetObj) ? (EntitySetType)entitySetObj: EntitySetType.Complete;
                     bool regionCheck = ReflectionHelper.GetPropertyValue(context.Instance, "RegionCheck", out object regionCheckObj) ? (bool)regionCheckObj : false;
                     bool healthCheck = ReflectionHelper.GetPropertyValue(context.Instance, "HealthCheck", out object healthCheckObj) ? (bool)healthCheckObj : false;
                     float reactionRange = ReflectionHelper.GetPropertyValue(context.Instance, "ReactionRange", out object reactionRangeObj) ? (float)reactionRangeObj : 0;
+                    float reactionZRange = ReflectionHelper.GetPropertyValue(context.Instance, "ReactionZRange", out object reactionZRangeObj) ? (float)reactionZRangeObj : 0;
                     List<CustomRegion> customRegions = ReflectionHelper.GetFieldValue(context.Instance, "customRegions", out object customRegionsObj) ? customRegionsObj as List<CustomRegion> : null;
+                    AuraOption auraOption = ReflectionHelper.GetPropertyValue(context.Instance, "Aura", out object auraOptionObj) ? auraOptionObj as AuraOption : new AuraOption();
 
+                    sb.Append("EntityIdType: ").AppendLine(entityNameType.ToString());
+                    sb.Append("EntityNameType: ").AppendLine(entityIdType.ToString());
+                    sb.Append("EntitySetType: ").AppendLine(entitySetObj?.ToString() ?? "null");
+                    sb.Append("HealthCheck: ").AppendLine(healthCheckObj?.ToString() ?? "null");
+                    sb.Append("ReactionRange: ").AppendLine(reactionRangeObj?.ToString() ?? "null");
+                    sb.Append("ReactionZRange: ").AppendLine(reactionZRangeObj?.ToString() ?? "null");
+                    sb.Append("RegionCheck: ").AppendLine(regionCheckObj?.ToString() ?? "null");
+                    if (customRegions != null && customRegions.Count > 0)
+                    {
+                        sb.Append("RegionCheck: {").Append(customRegions[0].Name);
+                        for (int i = 1; i < customRegions.Count; i++)
+                            sb.Append(", ").Append(customRegions[i].Name);
+                        sb.AppendLine("}");
+                    }
+                    sb.Append("Aura: ").AppendLine(auraOptionObj?.ToString() ?? "null");
 
+                    sb.AppendLine();
                     List<Entity> entities = SearchCached.FindAllEntity(entityId.ToString(), (ItemFilterStringType)entityIdType, (EntityNameType)entityNameType, entitySet,
-                        healthCheck, reactionRange, regionCheck, customRegions);
+                        healthCheck, reactionRange, reactionZRange, regionCheck, customRegions, auraOption.Checker);
 
                     // Количество Entity, удовлетворяющих условиям
                     if (entities != null)
@@ -133,7 +178,7 @@ namespace EntityTools.Editors
 
                     // Ближайшее Entity
                     Entity target = SearchCached.FindClosestEntity(entityId.ToString(), (ItemFilterStringType)entityIdType,
-                                            (EntityNameType)entityNameType, entitySet, healthCheck, reactionRange, regionCheck, customRegions);
+                                            (EntityNameType)entityNameType, entitySet, healthCheck, reactionRange, reactionZRange, regionCheck, customRegions);
                     if (target != null && target.IsValid)
                     {
                         sb.Append("ClosectEntity: ").AppendLine(target.ToString());

@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.19.1223.1619</AssemblyVersion>
+    <AssemblyVersion>0.20.0109.1528</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,6 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,11 +33,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>D:\Astral\Astral_RU_1\Plugins\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;X64, PROFILING</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;X64</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -69,9 +71,8 @@
       <HintPath>..\References\x64\AStar.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Astral, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\x64\Astral.exe</HintPath>
+    <Reference Include="Astral_patched">
+      <HintPath>..\References\x64\Astral_patched.exe</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.Data.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
@@ -126,47 +127,79 @@
     <Compile Include="Editors\AddTypeCommonEditor.cs" />
     <Compile Include="Editors\ConditionListEditor.cs" />
     <Compile Include="Editors\EntityTestEditor.cs" />
-    <Compile Include="Editors\NodePositionEditor.cs" />
-    <Compile Include="Editors\UccActionEditor.cs" />
-    <Compile Include="Editors\UiIdEditor.cs" />
-    <Compile Include="Forms\ConditionsListForm.cs">
+    <Compile Include="Editors\Forms\AuraSelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\ConditionsListForm.Designer.cs">
+    <Compile Include="Editors\Forms\AuraSelectForm.Designer.cs">
+      <DependentUpon>AuraSelectForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\Forms\ConditionsListForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\Forms\ConditionsListForm.designer.cs">
       <DependentUpon>ConditionsListForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\InsigniaBonusSelectForm.cs">
+    <Compile Include="Editors\Forms\EntitySelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\InsigniaBonusSelectForm.Designer.cs">
+    <Compile Include="Editors\Forms\EntitySelectForm.Designer.cs">
+      <DependentUpon>EntitySelectForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\Forms\InsigniaBonusSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\Forms\InsigniaBonusSelectForm.Designer.cs">
       <DependentUpon>InsigniaBonusSelectForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\MountBonusPriorityListForm.cs">
+    <Compile Include="Editors\Forms\MainPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\Forms\MainPanel.Designer.cs">
+      <DependentUpon>MainPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\Forms\MountBonusPriorityListForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\MountBonusPriorityListForm.Designer.cs">
+    <Compile Include="Editors\Forms\MountBonusPriorityListForm.Designer.cs">
       <DependentUpon>MountBonusPriorityListForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\MultiSelectForm.cs">
+    <Compile Include="Editors\Forms\UnoSelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\MultiSelectForm.Designer.cs">
+    <Compile Include="Editors\Forms\UnoSelectForm.Designer.cs">
+      <DependentUpon>UnoSelectForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\Forms\MultiSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\Forms\MultiSelectForm.Designer.cs">
       <DependentUpon>MultiSelectForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\TargetSelectForm.cs">
+    <Compile Include="Editors\Forms\TargetSelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\TargetSelectForm.Designer.cs">
+    <Compile Include="Editors\Forms\TargetSelectForm.Designer.cs">
       <DependentUpon>TargetSelectForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\UIViewer.cs">
+    <Compile Include="Editors\Forms\UIViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\UIViewer.Designer.cs">
+    <Compile Include="Editors\Forms\UIViewer.Designer.cs">
       <DependentUpon>UIViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editors\NodePositionEditor.cs" />
+    <Compile Include="Editors\AuraIdEditor.cs" />
+    <Compile Include="Editors\UccGenericConditionEditor.cs" />
+    <Compile Include="Editors\UccActionEditor.cs" />
+    <Compile Include="Editors\UiIdEditor.cs" />
+    <Compile Include="Extensions\ListTExtentions.cs" />
     <Compile Include="Patches\Patch.cs" />
     <Compile Include="Patches\Patch_GraphicsNW.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="States\UnstuckSpellTask.cs" />
     <Compile Include="Tools\AuraOption.cs" />
     <Compile Include="Tools\CollectionTypeConverter.cs" />
@@ -174,7 +207,6 @@
     <Compile Include="Tools\CustomRegionTools.cs" />
     <Compile Include="Tools\EnchantHelper.cs" />
     <Compile Include="Tools\Entities\EntityCache.cs" />
-    <Compile Include="Tools\Entities\EntityComparerToOptions.cs" />
     <Compile Include="Tools\Entities\EntityComparerToPattern.cs" />
     <Compile Include="Tools\Entities\Enums.cs" />
     <Compile Include="Tools\Entities\SearchCached.cs" />
@@ -185,18 +217,6 @@
     <Compile Include="Tools\CommonTools.cs" />
     <Compile Include="Tools\EntitySelectionTools.cs" />
     <Compile Include="EntityPlugin.cs" />
-    <Compile Include="Forms\EntitySelectForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\EntitySelectForm.Designer.cs">
-      <DependentUpon>EntitySelectForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\MainPanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Forms\MainPanel.Designer.cs">
-      <DependentUpon>MainPanel.cs</DependentUpon>
-    </Compile>
     <Compile Include="Actions\MoveToEntityCachedTimeout.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -205,7 +225,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Editors\EntityIdEditor.cs" />
-    <Compile Include="Editors\MultiCustomRegionSelectEditor.cs" />
+    <Compile Include="Editors\CustomRegionListEditor.cs" />
     <Compile Include="Editors\ShardEditor.cs" />
     <Compile Include="Tools\Export\Missions.cs" />
     <Compile Include="Tools\MountInsignias\Enums.cs" />
@@ -219,7 +239,9 @@
     <Compile Include="Tools\UCCExtensions\UCCActionExtention.cs" />
     <Compile Include="Tools\UCCExtensions\UCCEditorExtensions.cs" />
     <Compile Include="Tools\Export\GameUITools.cs" />
+    <Compile Include="UCC\Conditions\UCCConditionPack.cs" />
     <Compile Include="UCC\Conditions\ICustomUCCCondition.cs" />
+    <Compile Include="UCC\Conditions\UCCTargetMatchEntity.cs" />
     <Compile Include="UCC\Conditions\UCCQuesterCheck.cs" />
     <Compile Include="UCC\DodgeFromEntity.cs" />
     <Compile Include="UCC\ApproachEntity.cs" />
@@ -227,31 +249,38 @@
     <Compile Include="UCC\Conditions\UCCGameUICheck.cs" />
     <Compile Include="UCC\ExecuteSpecificPower.cs" />
     <Compile Include="UCC\SpecializedUCCAction.cs" />
+    <Compile Include="UCC\Conditions\UCCGenericCondition.cs" />
     <Compile Include="UCC\UseItem.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Forms\ConditionsListForm.resx">
+    <EmbeddedResource Include="Editors\Forms\AuraSelectForm.resx">
+      <DependentUpon>AuraSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\Forms\ConditionsListForm.resx">
       <DependentUpon>ConditionsListForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\EntitySelectForm.resx">
+    <EmbeddedResource Include="Editors\Forms\EntitySelectForm.resx">
       <DependentUpon>EntitySelectForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\InsigniaBonusSelectForm.resx">
+    <EmbeddedResource Include="Editors\Forms\InsigniaBonusSelectForm.resx">
       <DependentUpon>InsigniaBonusSelectForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\MainPanel.resx">
+    <EmbeddedResource Include="Editors\Forms\MainPanel.resx">
       <DependentUpon>MainPanel.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\MountBonusPriorityListForm.resx">
+    <EmbeddedResource Include="Editors\Forms\MountBonusPriorityListForm.resx">
       <DependentUpon>MountBonusPriorityListForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\MultiSelectForm.resx">
+    <EmbeddedResource Include="Editors\Forms\UnoSelectForm.resx">
+      <DependentUpon>UnoSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\Forms\MultiSelectForm.resx">
       <DependentUpon>MultiSelectForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\TargetSelectForm.resx">
+    <EmbeddedResource Include="Editors\Forms\TargetSelectForm.resx">
       <DependentUpon>TargetSelectForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\UIViewer.resx">
+    <EmbeddedResource Include="Editors\Forms\UIViewer.resx">
       <DependentUpon>UIViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
@@ -262,10 +291,14 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Actions\Encripted\" />
-    <Folder Include="Extensions\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="Images\Entity_7_40х48.png" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\Icons_Inventory_Enchantments_Insignia_Barbed.png" />
@@ -286,10 +319,22 @@
     <None Include="Images\Icons_Inventory_Enchantments_Insignia_Illuminated.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Images\miniAdd" />
     <None Include="Properties\DataSources\MountBonuses.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Entity_7.ico" />
+    <None Include="Images\Astral\miniValid.png" />
+    <None Include="Images\Astral\miniSave.png" />
+    <None Include="Images\Astral\miniRemove.png" />
+    <None Include="Images\Astral\miniPlay.png" />
+    <None Include="Images\Astral\copy.png" />
+    <None Include="Images\Astral\paste.png" />
+    <None Include="Images\Astral\miniRefresh.png" />
+    <None Include="Images\Astral\miniDelete.png" />
+    <None Include="Images\Astral\miniAdd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Astral\miniTarget.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,6 +1,7 @@
 ﻿using Astral.Classes;
 using Astral.Logic.Classes.Map;
 using Astral.Quester.UIEditors;
+using DevExpress.XtraEditors;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
@@ -18,16 +19,16 @@ namespace EntityTools.Actions
     {
         [Description("Distance to the Team Leader by which it is necessary to approach")]
         [Category("Interruptions")]
-        public float Distance { get; set; }
+        public float Distance { get; set; } = 30;
 
         [Description("Enable IgnoreCombat profile value while playing action")]
         [Category("Interruptions")]
-        public bool IgnoreCombat { get; set; }
+        public bool IgnoreCombat { get; set; } = true;
 
         [Description("True: Complite an action when the Team Leader is closer than 'Distance'\n" +
                      "False: Follow an Team Leader regardless of its distance")]
         [Category("Interruptions")]
-        public bool StopOnApproached { get; set; }
+        public bool StopOnApproached { get; set; } = false;
 
         //[Description("Check player is the member of the Team:\n" +
         //    "True: If the player is not a team member then an action stops ('Position' is ignored).\n" +
@@ -36,16 +37,9 @@ namespace EntityTools.Actions
         //public bool PartyCheck { get; set; }
 
         [Editor(typeof(PositionEditor), typeof(UITypeEditor))]
-        public Vector3 Position { get; set; }
+        public Vector3 Position { get; set; } = new Vector3();
 
-        public MoveToLeader()
-        {
-            Position = new Vector3();
-            Distance = 30;
-            IgnoreCombat = true;
-            //PartyCheck = true;
-            StopOnApproached = false;
-        }
+        public MoveToLeader() { }
 
         public override string ActionLabel
         {
@@ -130,6 +124,10 @@ namespace EntityTools.Actions
                 else return new ActionValidity($"Property '{nameof(Position)}' is not set.");
             }
         }
-        public override void GatherInfos() { }
+        public override void GatherInfos()
+        {
+            XtraMessageBox.Show("Place the character on the default waypoint and press OK");
+            Position = EntityManager.LocalPlayer.Location.Clone();
+        }
     }
 }

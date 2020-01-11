@@ -16,6 +16,7 @@ namespace EntityTools.Editors
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
+
             //while (MessageBox.Show("Target the node and press ok.", "Select node Posiotion", MessageBoxButtons.OKCancel) == DialogResult.OK)
             while (TargetSelectForm.TargetGuiRequest("Target the node and press ok.") == DialogResult.OK)
             {
@@ -27,9 +28,7 @@ namespace EntityTools.Editors
                         {
                             TargetableNode targetableNode = enumerator.Current;
                             if (targetableNode.IsValid && targetableNode.IsMouseOver)
-                            {
                                 return targetableNode.WorldInteractionNode.Location.Clone();
-                            }
                         }
                     }
                 }

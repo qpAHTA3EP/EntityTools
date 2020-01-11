@@ -129,7 +129,7 @@ namespace EntityTools.Actions
 
         public override void GatherInfos()
         {
-            if(TargetSelectForm.TargetGuiRequest("Target mission giver and press ok.") == DialogResult.OK)
+            if(TargetSelectForm.TargetGuiRequest("Target mission giver and press ok.", Application.OpenForms.Find<Astral.Quester.Forms.Editor>()) == DialogResult.OK)
             {
                 Entity betterEntityToInteract = Interact.GetBetterEntityToInteract();
                 if (betterEntityToInteract.IsValid)

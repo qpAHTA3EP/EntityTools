@@ -1,4 +1,5 @@
-﻿using Astral.Logic.NW;
+﻿using System.Windows.Forms;
+using Astral.Logic.NW;
 using Astral.Quester.Classes;
 using EntityTools.Enums;
 using MyNW.Classes;
@@ -157,7 +158,6 @@ namespace EntityTools.Tools
             return SimpleMaskTextComparer(@this, pattern);
         }
 
-
         public static void FocusForm(Type t)
         {
             foreach (Form f in Application.OpenForms)
@@ -166,6 +166,17 @@ namespace EntityTools.Tools
                     f.Focus();
                     return;
                 }                   
+        }
+
+        public static Form Find<T>(this FormCollection forms)
+        {
+            Type searchedFormType = typeof(T);
+            foreach(Form form in forms)
+            {
+                if (searchedFormType.Equals(form))
+                    return form;
+            }
+            return null;
         }
     }
 }

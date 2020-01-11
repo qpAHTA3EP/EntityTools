@@ -11,6 +11,8 @@ namespace EntityTools.UCC.Conditions
     {
         bool Loked { get; set; }
 
-        bool IsOk(UCCAction refAction = null);
+        bool IsOK(UCCAction refAction = null);
+
+        string TestInfos(UCCAction refAction = null);
     }
 }

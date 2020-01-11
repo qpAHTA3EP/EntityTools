@@ -75,7 +75,7 @@ namespace EntityTools.UCC
         }
 
         [Description("Type of and ItemId:\n" +
-            "Simple: Simple test string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
+            "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Item")]
         public ItemFilterStringType ItemIdType { get; set; } = ItemFilterStringType.Simple;

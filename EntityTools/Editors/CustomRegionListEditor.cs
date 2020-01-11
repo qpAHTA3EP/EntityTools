@@ -11,7 +11,7 @@ using MyNW.Classes;
 
 namespace EntityTools.Editors
 {
-    class MultiCustomRegionSelectEditor : UITypeEditor
+    class CustomRegionListEditor : UITypeEditor
     {
         internal static MultiSelectForm listEditor = null;
 
@@ -23,7 +23,7 @@ namespace EntityTools.Editors
             {
                 listEditor = new MultiSelectForm
                 {
-                    Text = "Select CustomRegions",
+                    Text = "Select CustomRegions:",
                     FillGrid = FillRegion2Grid,
                     GetSelectedItems = GetSelectedRegions
                 };

@@ -42,7 +42,7 @@ namespace EntityTools.Actions
         }
 
         [Description("Type of and EntityID:\n" +
-            "Simple: Simple test string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
+            "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
         public ItemFilterStringType EntityIdType
@@ -99,8 +99,13 @@ namespace EntityTools.Actions
         [Category("Optional")]
         public float ReactionRange { get; set; } = 0;
 
+        [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
+            "The default value is 0, which disables ZAxis checking")]
+        [Category("Optional")]
+        public float ReactionZRange { get; set; } = 0;
+
         [Description("CustomRegion names collection")]
-        [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
+        [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
         [Category("Optional")]
         public List<string> CustomRegionNames
         {
@@ -110,9 +115,7 @@ namespace EntityTools.Actions
                 if (customRegionNames != value)
                 {
                     customRegions = CustomRegionTools.GetCustomRegions(value);
-                    if (!string.IsNullOrEmpty(entityId))
-                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
-                    else Comparer = null;
+                    customRegionNames = value;
                 }
             }
         }
@@ -149,15 +152,27 @@ namespace EntityTools.Actions
             get
             {
                 //Команда работает с 2 - мя целями:
-                //1 - я цель (target) определяет навигацию. Если она фиксированная(HoldTargetEntity), то не сбрасывается пока жива и не достигнута
+                //1 - я цель (target) определяет навигацию. Если она зафиксированная(HoldTargetEntity), то не сбрасывается пока жива и не достигнута
                 //2 - я ближайшая цель (closest) управляет флагом IgnoreCombat
                 //Если HoldTargetEntity ВЫКЛЮЧЕН, то обе цели совпадают - это ближайшая цель 
+
+                if (customRegionNames != null && (customRegions == null || customRegions.Count != customRegionNames.Count))
+                    customRegions = CustomRegionTools.GetCustomRegions(customRegionNames);
+
+                if (Comparer == null && !string.IsNullOrEmpty(entityId))
+                {
+#if DEBUG
+                    Logger.WriteLine(Logger.LogType.Debug, "MoveToEntity::NeedToRun: Comparer is null. Initialize.");
+#endif
+                    Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                }
+
 
                 Entity closestEntity = null;
                 if (timeout.IsTimedOut/* || (target != null && (!Validate(target) || (HealthCheck && target.IsDead)))*/)
                 {
                     closestEntity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete,
-                                                                HealthCheck, ReactionRange, RegionCheck, customRegions);
+                                                                HealthCheck, ReactionRange, ReactionZRange, RegionCheck, customRegions);
                     timeout.ChangeTime(SearchTimeInterval);
                 }
 

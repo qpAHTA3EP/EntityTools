@@ -1,5 +1,5 @@
 ﻿#if DEBUG
-#define DEBUG_SPELLSTUCKMONITOR
+//#define DEBUG_SPELLSTUCKMONITOR
 #endif
 
 #define UnstuckSpell_Tasks
@@ -9,6 +9,7 @@ using Astral.Logic.NW;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,7 +35,7 @@ namespace EntityTools.States
         private static readonly string Paladin_Oathkeeper_Mechanic = "Paladin_Special_Divinecall"; //Умение "Сила с выше"
         private static readonly string Paladin_Shift = "Paladin_Shift_Sanctuary";     // Аура "Блок"
 
-        public static int CheckInterval => 500;
+        public static readonly int CheckInterval = 500;
 
         #region Реализация через System.Threading.Tasks
 #if UnstuckSpell_Tasks
@@ -101,7 +102,7 @@ namespace EntityTools.States
                             || (Astral.Logic.UCC.Core.CurrentTarget != null
                                 && Astral.Logic.UCC.Core.CurrentTarget.IsValid
                                 && !Astral.Logic.UCC.Core.CurrentTarget.IsDead
-                                && Astral.Logic.UCC.Core.CurrentTarget.Location.Distance3DFromPlayer < Astral.Quester.Core.Profile.KillRadius));
+                                && Astral.Logic.UCC.Core.CurrentTarget.Location.Distance3DFromPlayer < Astral.Quester.API.CurrentProfile.KillRadius));
 #if DEBUG_SPELLSTUCKMONITOR
                     Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]::{nameof(NeedToRun)} = {result}");
                     Logger.WriteLine(Logger.LogType.Debug, $"\tLocalPlayer.InCombat:\t{EntityManager.LocalPlayer.InCombat}");
@@ -184,11 +185,18 @@ namespace EntityTools.States
                             // Поиск ауры 'Devoted_Mechanic_Dps_Scales_Radiant' или 'Devoted_Mechanic_Dps_Scales_Fire'
                             if (searchArbiterMechanic && mod.PowerDef.InternalName.StartsWith(Cleric_Arbiter_Mechanic))
                             {
-                                GameCommands.Execute("specialClassPower 1");
-                                Thread.Sleep(100);
-                                GameCommands.Execute("specialClassPower 0");
-                                Logger.WriteLine($"{nameof(UnstuckSpellTask)}: Convert '{Cleric_Arbiter_Mechanic}' to [Devinity]");
-                                searchArbiterMechanic = false;
+                                try
+                                {
+                                    GameCommands.Execute("specialClassPower 1");
+                                    Thread.Sleep(100);
+                                }
+                                catch { }
+                                finally
+                                {
+                                    GameCommands.Execute("specialClassPower 0");
+                                    Logger.WriteLine($"{nameof(UnstuckSpellTask)}: Convert '{Cleric_Arbiter_Mechanic}' to [Devinity]");
+                                    searchArbiterMechanic = false;
+                                }
                             }
 
                             if (!searchChanneldivinity && !searchArbiterMechanic)
@@ -247,11 +255,18 @@ namespace EntityTools.States
                             // Поиск ауры 'Paladin_Special_Divinechampion_Feat_B' 
                             if (searchDivinechampion && mod.PowerDef.InternalName.StartsWith(Paladin_Justicar_Mechanic))
                             {
-                                GameCommands.Execute("specialClassPower 1");
-                                Thread.Sleep(100);
-                                GameCommands.Execute("specialClassPower 0");
-                                Logger.WriteLine($"{nameof(UnstuckSpellTask)}: Deactivate SpecialClassPower[{Paladin_Justicar_Mechanic}]");
-                                searchDivinechampion = false;
+                                try
+                                {
+                                    GameCommands.Execute("specialClassPower 1");
+                                    Thread.Sleep(100);
+                                }
+                                catch { }
+                                finally
+                                {
+                                    GameCommands.Execute("specialClassPower 0");
+                                    Logger.WriteLine($"{nameof(UnstuckSpellTask)}: Deactivate SpecialClassPower[{Paladin_Justicar_Mechanic}]");
+                                    searchDivinechampion = false;
+                                }
                             }
                             if (!searchSanctuary && !searchDivinechampion)
                                 break;
@@ -311,10 +326,17 @@ namespace EntityTools.States
                         // Поиск ауры 'Devoted_Mechanic_Dps_Scales_Radiant' или 'Devoted_Mechanic_Dps_Scales_Fire'
                         if (EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Cleric_Arbiter)
                         {
-                            GameCommands.Execute("specialClassPower 1");
-                            Thread.Sleep(100);
-                            GameCommands.Execute("specialClassPower 0");
-                            Logger.WriteLine($"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]: '{player.Character.Class.Category}' convert '{Cleric_Arbiter_Mechanic}' to [Devinity]");
+                            try
+                            {
+                                GameCommands.Execute("specialClassPower 1");
+                                Thread.Sleep(100);
+                            }
+                            catch { }
+                            finally
+                            {
+                                GameCommands.Execute("specialClassPower 0");
+                                Logger.WriteLine($"{nameof(UnstuckSpellTask)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]: '{player.Character.Class.Category}' convert '{Cleric_Arbiter_Mechanic}' to [Devinity]");
+                            }
                         }
 
                         break;
@@ -340,10 +362,17 @@ namespace EntityTools.States
                             {
                                 if (mod.PowerDef.InternalName.StartsWith(Paladin_Justicar_Mechanic))
                                 {
-                                    GameCommands.Execute("specialClassPower 1");
-                                    Thread.Sleep(100);
-                                    GameCommands.Execute("specialClassPower 0");
-                                    Logger.WriteLine($"{nameof(UnstuckSpellTask)}: Deactivate SpecialClassPower[{Paladin_Justicar_Mechanic}]");
+                                    try
+                                    {
+                                        GameCommands.Execute("specialClassPower 1");
+                                        Thread.Sleep(100);
+                                    }
+                                    catch { }
+                                    finally
+                                    {
+                                        GameCommands.Execute("specialClassPower 0");
+                                        Logger.WriteLine($"{nameof(UnstuckSpellTask)}: Deactivate SpecialClassPower[{Paladin_Justicar_Mechanic}]");
+                                    }
                                     break;
                                 }
                             }

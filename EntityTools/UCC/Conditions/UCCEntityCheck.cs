@@ -13,6 +13,7 @@ using EntityTools.Enums;
 using System;
 using EntityTools.Tools.Entities;
 using EntityTools.Tools.UCCExtensions;
+using System.Text;
 
 namespace EntityTools.UCC.Conditions
 {
@@ -37,7 +38,7 @@ namespace EntityTools.UCC.Conditions
         }
 
         [Description("Type of and EntityID:\n" +
-            "Simple: Simple test string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
+            "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
         public ItemFilterStringType EntityIdType
@@ -89,6 +90,11 @@ namespace EntityTools.UCC.Conditions
         [Category("Optional")]
         public float ReactionRange { get; set; } = 0;
 
+        [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
+            "The default value is 0, which disables ZAxis checking")]
+        [Category("Optional")]
+        public float ReactionZRange { get; set; } = 0;
+
         [Description("Aura which checked on the Entity")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         [Category("Optional")]
@@ -105,69 +111,119 @@ namespace EntityTools.UCC.Conditions
         public string TestInfo { get; } = "Нажми '...' =>";
 
         #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOk(UCCAction refAction = null)
+        bool ICustomUCCCondition.IsOK(UCCAction refAction = null)
         {
-            Entity closestEntity = refAction?.GetTarget();            
+            Entity closestEntity = refAction?.GetTarget();
 
-            if (!string.IsNullOrEmpty(EntityID))
+            if (Comparer == null && !string.IsNullOrEmpty(entityId))
+                Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+
+            if (Comparer != null)//(!string.IsNullOrEmpty(EntityID))
             {
                 //Entity closestEntity = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, HealthCheck, ReactionRange, RegionCheck, null);
-                if(closestEntity != null)
+                if(!Validate(closestEntity))
                     closestEntity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType.Complete, 
-                                                                   HealthCheck, ReactionRange, RegionCheck, null, Aura.Checker);
+                                                                   HealthCheck, ReactionRange, ReactionZRange, RegionCheck, null, Aura.Checker);
 
                 bool result = false;
-                switch (PropertyType)
+                if (Validate(closestEntity))
                 {
-                    case EntityPropertyType.Distance:
-                        //if(float.TryParse(Value, out float distance))
-                        switch (Sign)
-                        {
-                            case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer == PropertyValue);
-                            case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer != PropertyValue);
-                            case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer < PropertyValue);
-                            case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
-                                return result = (closestEntity == null) || !closestEntity.IsValid || (closestEntity.Location.Distance3DFromPlayer > PropertyValue);
-                        }
-                        break;
-                    case EntityPropertyType.HealthPercent:
-                        //if (float.TryParse(Value, out float hp))
-                        switch (Sign)
-                        {
-                            case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent == PropertyValue);
-                            case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent != PropertyValue);
-                            case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent < PropertyValue);
-                            case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Character?.AttribsBasic?.HealthPercent > PropertyValue);
-                        }
-                        break;
-                    case EntityPropertyType.ZAxis:
-                        //if (float.TryParse(Value, out float z))
-                        switch (Sign)
-                        {
-                            case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z == PropertyValue);
-                            case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z != PropertyValue);
-                            case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z < PropertyValue);
-                            case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
-                                return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z > PropertyValue);
-                        }
-                        break;
+                    switch (PropertyType)
+                    {
+                        case EntityPropertyType.Distance:
+                            switch (Sign)
+                            {
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
+                                    return result = closestEntity.Location.Distance3DFromPlayer == PropertyValue;
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
+                                    return result = closestEntity.Location.Distance3DFromPlayer != PropertyValue;
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
+                                    return result = closestEntity.Location.Distance3DFromPlayer < PropertyValue;
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
+                                    return result = closestEntity.Location.Distance3DFromPlayer > PropertyValue;
+                            }
+                            break;
+                        case EntityPropertyType.HealthPercent:
+                            switch (Sign)
+                            {
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
+                                    return result = closestEntity.Character?.AttribsBasic?.HealthPercent == PropertyValue;
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
+                                    return result = closestEntity.Character?.AttribsBasic?.HealthPercent != PropertyValue;
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
+                                    return result = closestEntity.Character?.AttribsBasic?.HealthPercent < PropertyValue;
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
+                                    return result = closestEntity.Character?.AttribsBasic?.HealthPercent > PropertyValue;
+                            }
+                            break;
+                        case EntityPropertyType.ZAxis:
+                            switch (Sign)
+                            {
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
+                                    return result = closestEntity.Location.Z == PropertyValue;
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
+                                    return result = closestEntity.Location.Z != PropertyValue;
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
+                                    return result = closestEntity.Location.Z < PropertyValue;
+                                case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
+                                    return result = closestEntity.Location.Z > PropertyValue;
+                            }
+                            break;
+                    }
                 }
+                // Если Entity не найдено, условие будет истино в единственном случае:
+                else return PropertyType == EntityPropertyType.Distance 
+                            && Sign == Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
             }
 
             return false;
         }
 
         bool ICustomUCCCondition.Loked { get => base.Locked; set => base.Locked = value; }
+
+        string ICustomUCCCondition.TestInfos(UCCAction refAction)
+        {
+            Entity closestEntity = refAction?.GetTarget();
+
+            if (Comparer == null && !string.IsNullOrEmpty(entityId))
+                Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+
+            if (Comparer != null)//(!string.IsNullOrEmpty(EntityID))
+            {
+                //Entity closestEntity = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, HealthCheck, ReactionRange, RegionCheck, null);
+                if (!Validate(closestEntity))
+                    closestEntity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType.Complete,
+                                                                   HealthCheck, ReactionRange, ReactionZRange, RegionCheck, null, Aura.Checker);
+
+                if (Validate(closestEntity))
+                {
+                    StringBuilder sb = new StringBuilder("Found closect Entity");
+                    sb.Append(" [").Append(closestEntity.NameUntranslated).Append(']').Append(" which ").Append(PropertyType).Append(" = ");
+                    switch (PropertyType)
+                    {
+                        case EntityPropertyType.Distance:
+                            sb.Append(closestEntity.Location.Distance3DFromPlayer);
+                            break;
+                        case EntityPropertyType.ZAxis:
+                            sb.Append(closestEntity.Location.Z);
+                            break;
+                        case EntityPropertyType.HealthPercent:
+                            sb.Append(closestEntity.Character?.AttribsBasic?.HealthPercent);
+                            break;
+                    }
+                    return sb.ToString();
+                }
+                else
+                {
+                    StringBuilder sb = new StringBuilder("No one Entity matched to");
+                    sb.Append(" [").Append(entityId).Append(']').AppendLine();
+                    if (PropertyType == EntityPropertyType.Distance)
+                        sb.AppendLine("The distance to the missing Entity is considered equal to infinity.");
+                    return sb.ToString();
+                }
+            }
+            return "Condition options is invalid!";
+        }
         #endregion
 
         [XmlIgnore]

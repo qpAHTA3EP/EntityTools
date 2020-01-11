@@ -55,7 +55,7 @@ namespace EntityTools.Conditions
         }
 
         [Description("Type of and EntityID:\n" +
-            "Simple: Simple test string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
+            "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
         public ItemFilterStringType EntityIdType
@@ -76,20 +76,20 @@ namespace EntityTools.Conditions
         [Description("Check Entity's Region:\n" +
             "True: Search an Entity only if it located in the same Region as Player\n" +
             "False: Does not consider the region when searching Entities")]
-        [Category("Entity optional checks")]
+        [Category("Optional")]
         public bool RegionCheck { get; set; } = false;
 
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
-        [Category("Entity optional checks")]
+        [Category("Optional")]
         public bool HealthCheck { get; set; } = true;
 
         [Description("A subset of entities that are searched for a target\n" +
             "Contacts: Only interactable Entities\n" +
             "Complete: All possible Entities")]
-        [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
-        [Category("Entity optional checks")]
+        [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
+        [Category("Optional")]
         public EntitySetType EntitySetType { get; set; } = EntitySetType.Complete;
 
         [Description("The maximum distance from the character within which the Entity is searched\n" +
@@ -97,8 +97,13 @@ namespace EntityTools.Conditions
         [Category("Entity optional checks")]
         public float ReactionRange { get; set; } = 0;
 
+        [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
+            "The default value is 0, which disables ZAxis checking")]
+        [Category("Optional")]
+        public float ReactionZRange { get; set; } = 0;
+
         [Description("CustomRegion names collection")]
-        [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
+        [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
         [Category("Optional")]
         public List<string> CustomRegionNames
         {
@@ -152,9 +157,15 @@ namespace EntityTools.Conditions
             {
                 if (timeout.IsTimedOut || (closestEntity!=null && !Validate(closestEntity)))
                 {
+                    if (customRegionNames != null && (customRegions == null || customRegions.Count != customRegionNames.Count))
+                        customRegions = CustomRegionTools.GetCustomRegions(customRegionNames);
+
+                    if (Comparer == null && !string.IsNullOrEmpty(entityId))
+                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+
                     if (!string.IsNullOrEmpty(EntityID))
                         closestEntity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType,
-                                                                HealthCheck, ReactionRange, RegionCheck, customRegions);
+                                                                HealthCheck, ReactionRange, ReactionZRange, RegionCheck, customRegions);
 
                     timeout.ChangeTime(SearchTimeInterval);
                 }
@@ -194,13 +205,13 @@ namespace EntityTools.Conditions
                             switch (Sign)
                             {
                                 case Relation.Equal:
-                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z == Value);
+                                    return result = (closestEntity.Location.Z == Value);
                                 case Relation.NotEqual:
-                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z != Value);
+                                    return result = (closestEntity.Location.Z != Value);
                                 case Relation.Inferior:
-                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z < Value);
+                                    return result = (closestEntity.Location.Z < Value);
                                 case Relation.Superior:
-                                    return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Z > Value);
+                                    return result = (closestEntity.Location.Z > Value);
                             }
                             break;
                     }
@@ -215,8 +226,11 @@ namespace EntityTools.Conditions
         {
             get
             {
+                if (customRegionNames != null && (customRegions == null || customRegions.Count != customRegionNames.Count))
+                    customRegions = CustomRegionTools.GetCustomRegions(customRegionNames);
+
                 closestEntity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType,
-                                                        HealthCheck, 0, RegionCheck, customRegions);
+                                                        HealthCheck, ReactionRange, ReactionZRange, RegionCheck, customRegions);
 
                 if (Validate(closestEntity))
                 {

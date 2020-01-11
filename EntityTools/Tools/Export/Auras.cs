@@ -7,20 +7,20 @@ using System.Text;
 namespace EntityTools.Tools
 {
     [Serializable]
-    public class Aura
+    public class AuraDef
     {
         public string InternalName;
         public string DisplayName;
         public string Description;
 
-        public Aura()
+        public AuraDef()
         {
             InternalName = string.Empty;
             DisplayName = string.Empty;
             Description = string.Empty;
         }
 
-        public Aura(PowerDef def)
+        public AuraDef(PowerDef def)
         {
             if(def != null && def.IsValid)
             {
@@ -35,40 +35,29 @@ namespace EntityTools.Tools
                 Description = string.Empty;
             }
         }
+
+        public override string ToString()
+        {
+            return $"{DisplayName} [{InternalName}]";
+        }
     }
 
     [Serializable]
     public class AurasWrapper
     {
-        public List<Aura> Mods;
-        public List<Aura> Buffs;
+        public List<AuraDef> Mods = new List<AuraDef>();
 
-        public AurasWrapper()
-        {
-            Mods = new List<Aura>();
-            Buffs = new List<Aura>();
-        }
+        public AurasWrapper() { }
 
         public AurasWrapper(Character character)
         {
-            Mods = new List<Aura>();
-            Buffs = new List<Aura>();
+            Mods = new List<AuraDef>();
 
             if(character != null && character.IsValid)
             {
-#if X64
                 foreach (AttribModNet def in character.Mods) // х64
-#elif X32
-                foreach (AttribMod def in character.Mods) // х32
-#endif
-
-                if (def.PowerDef.IsValid)
-                        Mods.Add(new Aura(def.PowerDef));
-
-                // Исключено в Astral64
-                //foreach(AttribModNet def in character.Buffs)
-                //    if(def.PowerDef.IsValid)
-                //        Mods.Add(new Aura(def.PowerDef));
+                    if (def.PowerDef.IsValid)
+                            Mods.Add(new AuraDef(def.PowerDef));
             }
         }
     }

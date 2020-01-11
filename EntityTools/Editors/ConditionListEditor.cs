@@ -14,12 +14,9 @@ namespace EntityTools.Editors
 {
     class UCCConditionListEditor : UITypeEditor
     {
-        internal static ConditionListForm listEditor = null;
-
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            if(listEditor == null)
-                listEditor = new ConditionListForm();
+            ConditionListForm listEditor = new ConditionListForm();
 
             ConditionList newConditions = listEditor.GetConditionList(value as ConditionList);
 

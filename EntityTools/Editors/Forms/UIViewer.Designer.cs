@@ -114,11 +114,15 @@
             // btnFill
             // 
             this.btnFill.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnFill.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnFill.Image = global::EntityTools.Properties.Resources.Refresh;
+            this.btnFill.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnFill.Location = new System.Drawing.Point(558, 11);
             this.btnFill.Name = "btnFill";
             this.btnFill.Size = new System.Drawing.Size(75, 23);
             this.btnFill.TabIndex = 5;
             this.btnFill.Text = "Refresh";
+            this.btnFill.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnFill.UseVisualStyleBackColor = true;
             this.btnFill.Click += new System.EventHandler(this.Refresh);
             // 
@@ -164,11 +168,15 @@
             // btnExecute
             // 
             this.btnExecute.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnExecute.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnExecute.Image = global::EntityTools.Properties.Resources.Play;
+            this.btnExecute.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnExecute.Location = new System.Drawing.Point(558, 365);
             this.btnExecute.Name = "btnExecute";
             this.btnExecute.Size = new System.Drawing.Size(75, 23);
             this.btnExecute.TabIndex = 5;
             this.btnExecute.Text = "Execute";
+            this.btnExecute.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnExecute.UseVisualStyleBackColor = true;
             this.btnExecute.Click += new System.EventHandler(this.btnExecute_Click);
             // 
@@ -184,11 +192,15 @@
             // btnSelect
             // 
             this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelect.Location = new System.Drawing.Point(558, 404);
+            this.btnSelect.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSelect.Image = global::EntityTools.Properties.Resources.Valid;
+            this.btnSelect.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnSelect.Location = new System.Drawing.Point(491, 404);
             this.btnSelect.Name = "btnSelect";
-            this.btnSelect.Size = new System.Drawing.Size(75, 23);
+            this.btnSelect.Size = new System.Drawing.Size(68, 23);
             this.btnSelect.TabIndex = 9;
             this.btnSelect.Text = "Select";
+            this.btnSelect.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnSelect.UseVisualStyleBackColor = true;
             this.btnSelect.Click += new System.EventHandler(this.btnSelect_Click);
             // 
@@ -196,11 +208,15 @@
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(477, 404);
+            this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCancel.Image = global::EntityTools.Properties.Resources.Cancel;
+            this.btnCancel.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnCancel.Location = new System.Drawing.Point(565, 404);
             this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(75, 23);
+            this.btnCancel.Size = new System.Drawing.Size(68, 23);
             this.btnCancel.TabIndex = 9;
             this.btnCancel.Text = "Cancel";
+            this.btnCancel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 

@@ -44,7 +44,8 @@ namespace EntityTools.Tools.Entities
                         default:
                             throw new ArgumentException("Simple pattern is invalid");
                     }
-                else switch (pos)
+                else if (nameType == EntityNameType.NameUntranslated)
+                    switch (pos)
                     {
                         case SimplePatternPos.Full:
                             Check = CompareUntranslated2SimpleFull;
@@ -61,14 +62,16 @@ namespace EntityTools.Tools.Entities
                         default:
                             throw new ArgumentException("Simple pattern is invalid");
                     }
-
+                else Check = CompareEmpty;
             }
             else
             {
                 pattern = entPattern;
                 if (nameType == EntityNameType.InternalName)
                     Check = CompareInternal2Regex;
-                else Check = CompareUntranslated2Regex;
+                else if (nameType == EntityNameType.NameUntranslated)
+                    Check = CompareUntranslated2Regex;
+                else Check = CompareEmpty;
             }
 
         }
@@ -118,6 +121,10 @@ namespace EntityTools.Tools.Entities
             return Regex.IsMatch(e.NameUntranslated, pattern);
         }
 
+        private bool CompareEmpty(Entity e)
+        {
+            return string.IsNullOrEmpty(e.InternalName) && string.IsNullOrEmpty(e.NameUntranslated);
+        }
     }
     
 }

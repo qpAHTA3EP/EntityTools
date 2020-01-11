@@ -14,10 +14,12 @@ using Astral.Quester.FSM.States;
 using EntityTools;
 using EntityTools.Editors;
 using EntityTools.Enums;
+using EntityTools.Extensions;
 using EntityTools.Tools;
 using EntityTools.UCC.Conditions;
 using MyNW.Classes;
 using MyNW.Internals;
+using Unit = Astral.Logic.UCC.Ressources.Enums.Unit;
 
 namespace EntityTools.UCC
 {
@@ -69,22 +71,22 @@ namespace EntityTools.UCC
                                 {
                                     if (iCond.Loked)
                                     {
-                                        if (!iCond.IsOk(this))
+                                        if (!iCond.IsOK(ManagedAction))
                                             return false;
                                         lockedNum++;
                                     }
-                                    else if (c.IsOK(this))
+                                    else if (c.IsOK(ManagedAction))
                                         okUnlockedNum++;
                                 }
                                 else
                                 {
                                     if (c.Locked)
                                     {
-                                        if (!c.IsOK(this))
+                                        if (!c.IsOK(ManagedAction))
                                             return false;
                                         lockedNum++;
                                     }
-                                    else if (c.IsOK(this))
+                                    else if (c.IsOK(ManagedAction))
                                         okUnlockedNum++;
                                 }
                             }
@@ -99,10 +101,10 @@ namespace EntityTools.UCC
                             foreach (UCCCondition c in CustomConditions)
                                 if (c is ICustomUCCCondition iCond)
                                 {
-                                    if (!iCond.IsOk(this))
+                                    if (!iCond.IsOK(ManagedAction))
                                         return false;
                                 }
-                                else if (!c.IsOK(this))
+                                else if (!c.IsOK(ManagedAction))
                                     return false;
 
                             return true;
@@ -127,7 +129,7 @@ namespace EntityTools.UCC
 
         public SpecializedUCCAction()
         {
-            Target = Astral.Logic.UCC.Ressources.Enums.Unit.Player;
+            Target = Unit.Player;
         }
         public override UCCAction Clone()
         {
@@ -135,7 +137,7 @@ namespace EntityTools.UCC
             {
                 ManagedAction = CopyHelper.CreateDeepCopy(this.ManagedAction),
                 CustomConditionCheck = this.CustomConditionCheck,
-                CustomConditions = new List<UCCCondition>(this.CustomConditions)
+                CustomConditions = this.CustomConditions.Clone() ?? new List<UCCCondition>()
             });
         }
 
@@ -191,9 +193,9 @@ namespace EntityTools.UCC
         }
         [XmlIgnore]
         [Browsable(false)]
-        public new Astral.Logic.UCC.Ressources.Enums.Unit Target
+        public new Unit Target
         {
-            get => (ManagedAction == null) ? Astral.Logic.UCC.Ressources.Enums.Unit.Player : ManagedAction.Target;
+            get => (ManagedAction == null) ? Unit.Player : ManagedAction.Target;
             set
             {
                 if (ManagedAction != null)

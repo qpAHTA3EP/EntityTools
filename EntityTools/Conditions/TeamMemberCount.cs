@@ -21,7 +21,7 @@ namespace EntityTools.Conditions
         private List<CustomRegion> customRegions = null;
 
         [Description("CustomRegion names collection")]
-        [Editor(typeof(MultiCustomRegionSelectEditor), typeof(UITypeEditor))]
+        [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
         [Category("Location")]
         public List<string> CustomRegionNames
         {
@@ -87,6 +87,8 @@ namespace EntityTools.Conditions
                     {
                         membersCount = 0;
 
+                        if (customRegionNames != null && (customRegions == null || customRegions.Count != customRegionNames.Count))
+                            customRegions = CustomRegionTools.GetCustomRegions(customRegionNames); 
 
                         switch (DistanceSign)
                         {
@@ -173,6 +175,9 @@ namespace EntityTools.Conditions
                 if (EntityManager.LocalPlayer.PlayerTeam?.IsInTeam == true
                     && EntityManager.LocalPlayer.PlayerTeam?.Team?.MembersCount > 1)
                 {
+                    if (customRegionNames != null && (customRegions == null || customRegions.Count != customRegionNames.Count))
+                        customRegions = CustomRegionTools.GetCustomRegions(customRegionNames);
+
                     int memsCount = 0;
                     StringBuilder strBldr = new StringBuilder();
                     strBldr.AppendLine();

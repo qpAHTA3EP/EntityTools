@@ -5,6 +5,7 @@ using System.Xml.Serialization;
 using Astral.Quester.Classes;
 using EntityTools.Editors;
 using System.Drawing.Design;
+using System;
 
 namespace EntityTools.UCC.Conditions
 {
@@ -18,12 +19,19 @@ namespace EntityTools.UCC.Conditions
         public Condition Condition { get; set; } = null;
 
         #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOk(UCCAction refAction = null)
+        bool ICustomUCCCondition.IsOK(UCCAction refAction = null)
         {
             return Condition?.IsValid == true;
         }
 
         bool ICustomUCCCondition.Loked { get => base.Locked; set => base.Locked = value; }
+
+        string ICustomUCCCondition.TestInfos(UCCAction refAction)
+        {
+            if (Condition != null)
+                return Condition.TestInfos;
+            return "Condition doesn't set.";
+        }
         #endregion
 
         public override string ToString()

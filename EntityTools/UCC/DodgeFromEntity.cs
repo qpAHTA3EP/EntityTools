@@ -35,7 +35,7 @@ namespace EntityTools.UCC
         }
 
         [Description("Type of and EntityID:\n" +
-            "Simple: Simple test string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
+            "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
         public ItemFilterStringType EntityIdType
@@ -99,6 +99,11 @@ namespace EntityTools.UCC
         [Category("Optional")]
         public float ReactionRange { get; set; } = 30;
 
+        [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
+            "The default value is 0, which disables ZAxis checking")]
+        [Category("Optional")]
+        public float ReactionZRange { get; set; } = 0;
+
         [DisplayName("Moving time")]
         [Category("Required")]
         public int MovingTime { get => dodge.MovingTime; set => dodge.MovingTime = value; }
@@ -119,11 +124,14 @@ namespace EntityTools.UCC
             {
                 if (!string.IsNullOrEmpty(EntityID))
                 {
+                    if (Comparer == null && !string.IsNullOrEmpty(entityId))
+                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                    
                     //entity = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, 
                     //                                                HealthCheck, Range, RegionCheck);
 
                     entity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType.Complete, 
-                                                            HealthCheck, Range, RegionCheck);
+                                                            HealthCheck, ReactionRange, ReactionZRange, RegionCheck);
 
                     return Validate(entity) && entity.Location.Distance3DFromPlayer <= EntityRadius;
                 }
@@ -265,7 +273,7 @@ namespace EntityTools.UCC
                     if (!string.IsNullOrEmpty(EntityID))
                     {
                         entity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete,
-                                                                HealthCheck, Range, RegionCheck, null, Aura.Checker);
+                                                                HealthCheck, ReactionRange, ReactionZRange, RegionCheck, null, Aura.Checker);
                         return entity;
                     }
                 }

@@ -65,6 +65,7 @@ namespace EntityTools.Forms
             this.seSlideFilter = new DevExpress.XtraEditors.SpinEdit();
             this.lblSlideTimer = new System.Windows.Forms.Label();
             this.sbSettings = new System.Windows.Forms.BindingSource(this.components);
+            this.btnEntities = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.bteMissions.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bteAuras.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
@@ -87,7 +88,7 @@ namespace EntityTools.Forms
             this.btnUccEditor.Enabled = false;
             this.btnUccEditor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUccEditor.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnUccEditor.Location = new System.Drawing.Point(4, 297);
+            this.btnUccEditor.Location = new System.Drawing.Point(3, 251);
             this.btnUccEditor.Name = "btnUccEditor";
             this.btnUccEditor.Size = new System.Drawing.Size(355, 40);
             this.btnUccEditor.TabIndex = 0;
@@ -197,6 +198,7 @@ namespace EntityTools.Forms
             this.tabUtilities.Controls.Add(this.btnInterfaces);
             this.tabUtilities.Controls.Add(this.btnMissions);
             this.tabUtilities.Controls.Add(this.btnUiViewer);
+            this.tabUtilities.Controls.Add(this.btnEntities);
             this.tabUtilities.Controls.Add(this.btnUccEditor);
             this.tabUtilities.Controls.Add(this.bteStates);
             this.tabUtilities.Controls.Add(this.bteInterfaces);
@@ -213,7 +215,7 @@ namespace EntityTools.Forms
             // cbEnchantHelperActivator
             // 
             this.cbEnchantHelperActivator.AutoSize = true;
-            this.cbEnchantHelperActivator.Location = new System.Drawing.Point(6, 187);
+            this.cbEnchantHelperActivator.Location = new System.Drawing.Point(6, 171);
             this.cbEnchantHelperActivator.Name = "cbEnchantHelperActivator";
             this.cbEnchantHelperActivator.Size = new System.Drawing.Size(131, 17);
             this.cbEnchantHelperActivator.TabIndex = 10;
@@ -225,7 +227,7 @@ namespace EntityTools.Forms
             // 
             this.btnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnTest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnTest.Location = new System.Drawing.Point(309, 314);
+            this.btnTest.Location = new System.Drawing.Point(308, 222);
             this.btnTest.Name = "btnTest";
             this.btnTest.Size = new System.Drawing.Size(50, 23);
             this.btnTest.TabIndex = 2;
@@ -344,7 +346,6 @@ namespace EntityTools.Forms
             this.cbSlideMonitor.Text = "Enable SlideMonitor";
             this.cbSlideMonitor.UseVisualStyleBackColor = true;
             this.cbSlideMonitor.Visible = false;
-            this.cbSlideMonitor.CheckedChanged += new System.EventHandler(this.cbSlideMonitor_CheckedChanged);
             // 
             // ckbSpellStuckMonitor
             // 
@@ -410,7 +411,6 @@ namespace EntityTools.Forms
             this.seTimerSlide.Properties.Mask.EditMask = "N00";
             this.seTimerSlide.Size = new System.Drawing.Size(56, 20);
             this.seTimerSlide.TabIndex = 1;
-            this.seTimerSlide.EditValueChanged += new System.EventHandler(this.seTimerSlide_EditValueChanged);
             // 
             // lblTimerSlide
             // 
@@ -465,7 +465,6 @@ namespace EntityTools.Forms
             this.seTimerUnslide.Properties.Mask.EditMask = "N00";
             this.seTimerUnslide.Size = new System.Drawing.Size(56, 20);
             this.seTimerUnslide.TabIndex = 1;
-            this.seTimerUnslide.EditValueChanged += new System.EventHandler(this.seTimerUnslide_EditValueChanged);
             // 
             // seSlideFilter
             // 
@@ -489,7 +488,6 @@ namespace EntityTools.Forms
             0});
             this.seSlideFilter.Size = new System.Drawing.Size(56, 20);
             this.seSlideFilter.TabIndex = 0;
-            this.seSlideFilter.EditValueChanged += new System.EventHandler(this.seSlideFilter_EditValueChanged);
             // 
             // lblSlideTimer
             // 
@@ -499,6 +497,20 @@ namespace EntityTools.Forms
             this.lblSlideTimer.Size = new System.Drawing.Size(194, 13);
             this.lblSlideTimer.TabIndex = 2;
             this.lblSlideTimer.Text = "Time between aura check (millisecond):";
+            // 
+            // btnEntities
+            // 
+            this.btnEntities.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnEntities.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnEntities.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnEntities.Location = new System.Drawing.Point(4, 297);
+            this.btnEntities.Name = "btnEntities";
+            this.btnEntities.Size = new System.Drawing.Size(355, 40);
+            this.btnEntities.TabIndex = 0;
+            this.btnEntities.Text = "Entities";
+            this.btnEntities.UseVisualStyleBackColor = true;
+            this.btnEntities.Click += new System.EventHandler(this.btnEntities_Click);
             // 
             // MainPanel
             // 
@@ -563,5 +575,6 @@ namespace EntityTools.Forms
         private System.Windows.Forms.Label lblState;
         private System.Windows.Forms.CheckBox cbEnchantHelperActivator;
         private System.Windows.Forms.Button btnTest;
+        private System.Windows.Forms.Button btnEntities;
     }
 }

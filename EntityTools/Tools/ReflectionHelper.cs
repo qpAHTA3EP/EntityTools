@@ -119,8 +119,8 @@ namespace EntityTools.Tools
                 foreach (var assambly in AppDomain.CurrentDomain.GetAssemblies())
                 {
                     if (fullTypeName)
-                        return assambly.GetTypes().First(t => t.FullName == typeName);
-                    else return assambly.GetTypes().First(t => t.Name == typeName);
+                        return assambly.GetTypes().FirstOrDefault(t => t.FullName == typeName);
+                    else return assambly.GetTypes().FirstOrDefault(t => t.Name == typeName);
                 }
             }
             return null;
@@ -168,7 +168,7 @@ namespace EntityTools.Tools
                 return false;
 
             if (flags == BindingFlags.Default)
-                flags = DefaultFlags | BindingFlags.Instance;
+                flags = DefaultFlags | BindingFlags.Instance | BindingFlags.SetProperty;
 
             PropertyInfo pi = type.GetProperty(propName, flags | BindingFlags.Instance);//GetPrivateFieldInfo(type, fieldName, flags);
             if (pi == null)
@@ -203,7 +203,7 @@ namespace EntityTools.Tools
             //return ExecStaticMethod(type, "set_" + propName, ref arg, out object result, flags | BindingFlags.Static | BindingFlags.InvokeMethod, false);
 
             if (flags == BindingFlags.Default)
-                flags = DefaultFlags | BindingFlags.Static;
+                flags = DefaultFlags | BindingFlags.Static | BindingFlags.SetProperty;
 
             PropertyInfo pi = type.GetProperty(propName, flags | BindingFlags.Static);//GetPrivateFieldInfo(type, fieldName, flags);
             if (pi != null)

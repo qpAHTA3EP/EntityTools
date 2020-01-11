@@ -6,6 +6,7 @@ using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Tools;
 using MyNW.Classes;
+using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Text.RegularExpressions;
@@ -44,7 +45,7 @@ namespace EntityTools.UCC.Conditions
         public string UiGenPropertyValue { get; set; } = string.Empty;
 
         [Description("Type of and UiGenPropertyValue:\n" +
-                     "Simple: Simple test string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
+                     "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
                      "Regex: Regular expression\n" +
                      "Ignored if property 'Tested' is not equals to 'Property'")]
         [Category("GuiProperty")]
@@ -58,7 +59,7 @@ namespace EntityTools.UCC.Conditions
 
 
         #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOk(UCCAction refAction = null)
+        bool ICustomUCCCondition.IsOK(UCCAction refAction = null)
         {
             if (uiGen == null && !string.IsNullOrEmpty(uiGenID))
                 uiGen = MyNW.Internals.UIManager.AllUIGen.Find(x => x.Name == uiGenID);
@@ -89,6 +90,41 @@ namespace EntityTools.UCC.Conditions
         }
 
         bool ICustomUCCCondition.Loked { get => base.Locked; set => base.Locked = value; }
+
+        string ICustomUCCCondition.TestInfos(UCCAction refAction)
+        {
+            if (uiGen == null && !string.IsNullOrEmpty(uiGenID))
+                uiGen = MyNW.Internals.UIManager.AllUIGen.Find(x => x.Name == uiGenID);
+            if (uiGen != null && uiGen.IsValid)
+            {
+                switch (Check)
+                {
+                    case UiGenCheckType.IsVisible:
+                        if (uiGen.IsVisible)
+                            return $"GUI '{uiGenID}' is VISIBLE.";
+                        else return $"GUI '{uiGenID}' is HIDDEN.";
+                    case UiGenCheckType.IsHidden:
+                        if (uiGen.IsVisible)
+                            return $"GUI '{uiGenID}' is VISIBLE.";
+                        else return $"GUI '{uiGenID}' is HIDDEN.";
+                    case UiGenCheckType.Property:
+                        if (uiGen.IsVisible)
+                        {
+                            foreach (var uiVar in uiGen.Vars)
+                                if (uiVar.IsValid && uiVar.Name == UiGenProperty)
+                                {
+                                    if (CheckUiGenPropertyValue(uiVar))
+                                        return $"The Property '{uiGenID}.{UiGenProperty}' equals to '{uiVar.Value}'.";
+                                    else return $"The Property '{uiGenID}.{UiGenProperty}' equals to '{uiVar.Value}'.";
+                                }
+                            return $"The Property '{uiGenID}.{UiGenProperty}' does not founded.";
+                        }
+                        else return $"GUI '{uiGenID}' is HIDDEN. The Property '{UiGenProperty}' did not checked.";
+                }
+            }
+
+            return $"GUI '{uiGenID}' is not valid.";
+        }
         #endregion
 
 

@@ -42,6 +42,8 @@
             // 
             this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSelect.ImageOptions.Image = global::EntityTools.Properties.Resources.Valid;
+            this.btnSelect.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnSelect.Location = new System.Drawing.Point(12, 367);
             this.btnSelect.Name = "btnSelect";
             this.btnSelect.Size = new System.Drawing.Size(271, 23);
@@ -52,11 +54,12 @@
             // btnReload
             // 
             this.btnReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnReload.ImageOptions.Image = global::EntityTools.Properties.Resources.Refresh;
+            this.btnReload.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
             this.btnReload.Location = new System.Drawing.Point(289, 367);
             this.btnReload.Name = "btnReload";
             this.btnReload.Size = new System.Drawing.Size(23, 23);
             this.btnReload.TabIndex = 1;
-            this.btnReload.Text = "R";
             this.btnReload.ToolTip = "Reload";
             this.btnReload.Click += new System.EventHandler(this.btnReload_Click);
             // 

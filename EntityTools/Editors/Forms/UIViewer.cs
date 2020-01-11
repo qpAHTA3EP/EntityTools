@@ -15,7 +15,7 @@ using System.Windows.Forms;
 
 namespace EntityTools.Forms
 {
-    public partial class UIViewer :  XtraForm //*/Form
+    public partial class UIViewer : XtraForm //*/Form
     {
         //private static UIViewer uiViewer;
 

@@ -9,7 +9,18 @@ namespace EntityTools.Enums
     public enum EntityNameType
     {
         NameUntranslated,
-        InternalName
+        InternalName,
+        Empty
+    }
+
+    /// <summary>
+    /// Тип сопоставления
+    /// </summary>
+    [Serializable]
+    public enum MatchType
+    {
+        Match,
+        Mismatch
     }
 
     /// <summary>
