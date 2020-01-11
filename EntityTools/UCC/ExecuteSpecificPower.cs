@@ -3,25 +3,15 @@
 #endif
 #define REFLECTION_ACCESS
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Xml.Serialization;
-using Astral.Classes;
-using Astral.Classes.ItemFilter;
-using Astral.Controllers;
 using Astral.Logic.NW;
 using Astral.Logic.UCC;
-using Astral.Logic.UCC.Actions;
 using Astral.Logic.UCC.Classes;
-using Astral.Logic.UCC.Ressources;
-using Astral.Quester.FSM.States;
 using Astral.Quester.UIEditors;
-using EntityTools;
-using EntityTools.Editors;
 using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;

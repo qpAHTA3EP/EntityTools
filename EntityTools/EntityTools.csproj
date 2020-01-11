@@ -113,7 +113,7 @@
     <Compile Include="Actions\ChangePluginSettings.cs" />
     <Compile Include="Actions\MoveToLeader.cs" />
     <Compile Include="Actions\PickUpMissionExt.cs" />
-    <Compile Include="Conditions\CheckCampaignTask.cs" />
+    <Compile Include="Conditions\Deprecated\CheckCampaignTask.cs" />
     <Compile Include="Conditions\CheckGameGUICondition.cs" />
     <Compile Include="Conditions\CheckShard.cs" />
     <Compile Include="Conditions\EntityPropertyCachedTimeout.cs" />

@@ -61,7 +61,7 @@ namespace EntityTools.Conditions
         public override string ToString()
         {
             //return $"{GetType().Name}: {Tested} [{Task.GroupProject}] {Task.TaskName}";
-            return $"{GetType().Name}: Is [{Task.TaskName}] {Tested}?";
+            return $"[Deprecated] {GetType().Name}: Is [{Task.TaskName}] {Tested}?";
         }
 
         public override string TestInfos
