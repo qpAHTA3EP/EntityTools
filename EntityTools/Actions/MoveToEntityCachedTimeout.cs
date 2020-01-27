@@ -132,7 +132,7 @@ namespace EntityTools.Actions
         [Category("Interruptions")]
         public bool IgnoreCombat { get; set; } = true;
 
-        [Description("True: Complite an action when the object is closer than 'Distance'\n" +
+        [Description("True: Complete an action when the Entity is closer than 'Distance'\n" +
                      "False: Follow an Entity regardless of its distance")]
         [Category("Interruptions")]
         public bool StopOnApproached { get; set; } = false;
@@ -146,6 +146,10 @@ namespace EntityTools.Actions
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
         [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
         public string TestInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>";
+
+        [XmlIgnore]
+        [Browsable(false)]
+        public override string Category => "Basic";
 
         public override bool NeedToRun
         {
@@ -250,7 +254,7 @@ namespace EntityTools.Actions
 
             // Вариант реализации со сбросом флага IgnoreCombat в NeedToRun
             if (StopOnApproached)
-            return ActionResult.Completed;
+                return ActionResult.Completed;
             else return ActionResult.Running;
         }
 

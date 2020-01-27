@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Windows.Forms;
-using Astral.Controllers;
 using Astral.Logic.NW;
 using DevExpress.XtraEditors;
 using EntityTools.Forms;
@@ -166,12 +160,12 @@ namespace EntityTools.Editors.Forms
         private void Selector_SelectedIndexChanged(object sender, EventArgs e)
         {
             entity = null;
-            FillAuraList(UnitRef.Character);
+            FillAuraList(UnitRef?.Character);
         }
 
         private void btnReload_Click(object sender, EventArgs e)
         {
-            FillAuraList(UnitRef.Character);
+            FillAuraList(UnitRef?.Character);
         }
         #endregion
 

@@ -127,8 +127,9 @@ namespace EntityTools.UCC
                         Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
 
                     //entity = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, HealthCheck, Range, RegionCheck);
-                    entity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType.Complete, 
-                                                            HealthCheck, ReactionRange, ReactionZRange, RegionCheck, null, Aura.Checker);
+                    entity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete, 
+                                                            HealthCheck, ReactionRange, (ReactionZRange > 0) ? ReactionZRange : Settings.Get.MaxElevationDifference,
+                                                            RegionCheck, null, Aura.Checker);
                     return Validate(entity) && !(HealthCheck && entity.IsDead) && entity.CombatDistance > EntityRadius;
                 }
                 return false;
@@ -137,7 +138,9 @@ namespace EntityTools.UCC
 
         public override bool Run()
         {
-            return Approach.EntityByDistance(entity, EntityRadius);
+            if(entity.Location.Distance3DFromPlayer >= EntityRadius)
+                return Approach.EntityByDistance(entity, EntityRadius);
+            return true;
         }
 
         [XmlIgnore]
@@ -156,8 +159,10 @@ namespace EntityTools.UCC
                 {
                     if (!string.IsNullOrEmpty(EntityID))
                     {
-                        entity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType.Complete,
-                                                                HealthCheck, ReactionRange, ReactionRange, RegionCheck, null, Aura.Checker);
+                        entity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete,
+                                                                HealthCheck, ReactionRange, 
+                                                                (ReactionZRange > 0) ? ReactionZRange : Settings.Get.MaxElevationDifference,
+                                                                RegionCheck, null, Aura.Checker);
                         return entity;
                     }
                 }
@@ -190,6 +195,8 @@ namespace EntityTools.UCC
                 entityNameType = this.entityNameType,
                 RegionCheck = this.RegionCheck,
                 HealthCheck = this.HealthCheck,
+                ReactionRange = this.ReactionRange,
+                ReactionZRange = this.ReactionZRange,
                 EntityRadius = this.EntityRadius,
                 Aura = new AuraOption
                 {
@@ -211,6 +218,10 @@ namespace EntityTools.UCC
         protected Entity entity = new Entity(IntPtr.Zero);
 
         #region Hide Inherited Properties
+        [XmlIgnore]
+        [Browsable(false)]
+        public new int Range { get; set; } = 0;
+
         [XmlIgnore]
         [Browsable(false)]
         public new Astral.Logic.UCC.Ressources.Enums.Unit Target { get; set; }

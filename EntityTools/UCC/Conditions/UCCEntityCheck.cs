@@ -14,6 +14,7 @@ using System;
 using EntityTools.Tools.Entities;
 using EntityTools.Tools.UCCExtensions;
 using System.Text;
+using Astral.Controllers;
 
 namespace EntityTools.UCC.Conditions
 {
@@ -122,8 +123,10 @@ namespace EntityTools.UCC.Conditions
             {
                 //Entity closestEntity = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, HealthCheck, ReactionRange, RegionCheck, null);
                 if(!Validate(closestEntity))
-                    closestEntity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType.Complete, 
-                                                                   HealthCheck, ReactionRange, ReactionZRange, RegionCheck, null, Aura.Checker);
+                    closestEntity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete, 
+                                                                   HealthCheck, ReactionRange,
+                                                                   (ReactionZRange > 0) ? ReactionZRange : Settings.Get.MaxElevationDifference, 
+                                                                   RegionCheck, null, Aura.Checker);
 
                 bool result = false;
                 if (Validate(closestEntity))
@@ -192,7 +195,7 @@ namespace EntityTools.UCC.Conditions
             {
                 //Entity closestEntity = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, HealthCheck, ReactionRange, RegionCheck, null);
                 if (!Validate(closestEntity))
-                    closestEntity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType.Complete,
+                    closestEntity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete,
                                                                    HealthCheck, ReactionRange, ReactionZRange, RegionCheck, null, Aura.Checker);
 
                 if (Validate(closestEntity))

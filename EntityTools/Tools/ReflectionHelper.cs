@@ -522,7 +522,7 @@ namespace EntityTools.Tools
             {
                 type = type.BaseType;
             }
-
+            
             Type[] types;
             if (arguments != null && arguments.Length > 0)
             {

@@ -93,7 +93,14 @@ namespace EntityTools.UCC.Conditions
             if (Comparer == null && !string.IsNullOrEmpty(entityId))
                 Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
 
-            return Validate(target);
+            switch(Match)
+            {
+                case MatchType.Match:
+                    return Validate(target);
+                case MatchType.Mismatch:
+                    return !Validate(target);
+            }
+            return false;
         }
 
         bool ICustomUCCCondition.Loked { get => base.Locked; set => base.Locked = value; }
@@ -108,14 +115,18 @@ namespace EntityTools.UCC.Conditions
             if (Comparer != null)//(!string.IsNullOrEmpty(EntityID))
             {
                 StringBuilder sb = new StringBuilder("Target ");
-                if (EntityNameType == EntityNameType.InternalName)
-                    sb.Append(target.InternalName).Append(']');
-                else sb.Append(target.NameUntranslated).Append(']');
+                if (target != null)
+                {
+                    if (EntityNameType == EntityNameType.InternalName)
+                        sb.Append('[').Append(target.InternalName).Append(']');
+                    else sb.Append('[').Append(target.NameUntranslated).Append(']');
+                    if (Validate(target))
+                        sb.Append(" match");
+                    else sb.Append(" does not match");
+                    sb.Append("EntityID [").Append(entityId).Append(']');
+                }
+                else sb.Append("is NULL");
 
-                if (Validate(target))
-                    sb.Append(" match");
-                else sb.Append(" does not match");
-                sb.Append("EntityID [").Append(entityId).Append(']');
                 return sb.ToString();
             }
             return "Condition options is invalid!";
@@ -133,7 +144,7 @@ namespace EntityTools.UCC.Conditions
 
         public override string ToString()
         {
-            return $"EntityCheck [{EntityID}]";
+            return $"TargetMatchEntity [{EntityID}]";
         }
 
         public UCCTargetMatchEntity()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Threading;
+using System.Xml.Serialization;
 using Astral;
 using Astral.Logic.Classes.Map;
 using Astral.Logic.NW;
@@ -26,6 +27,8 @@ namespace EntityTools.Actions.Deprecated
 
         public int SkipTime { get; set; }
 
+        [XmlIgnore]
+        [Browsable(false)]
         public override string Category => Properties.Resources.CategoryDeprecated;
 
         public override void InternalReset(){ }

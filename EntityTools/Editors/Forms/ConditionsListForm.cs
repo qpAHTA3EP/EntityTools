@@ -73,19 +73,21 @@ namespace EntityTools.Forms
             string mess = string.Empty;
             if (Conditions.Items.Count > 0)
             {
-                UCCCondition c = Conditions.SelectedItem as UCCCondition;
-                if (c is ICustomUCCCondition iCond)
+                if (Conditions.SelectedItem is UCCCondition cond)
                 {
-                    result = iCond.IsOK();
-                    mess = iCond.TestInfos();
+                    if (cond is ICustomUCCCondition iCond)
+                    {
+                        result = iCond.IsOK();
+                        mess = iCond.TestInfos();
+                    }
+                    else
+                    {
+                        result = cond.IsOK(null);
+                        mess = $"{cond.Target} {cond.Tested} : {cond.Value}";
+                    }
+                    XtraMessageBox.Show($"{mess}\nResult: {result}");
                 }
-                else
-                {
-                    result = c.IsOK(null);
-                    mess = $"{c.Target} {c.Tested} : {c.Value}";
-                }
-
-                XtraMessageBox.Show($"{mess}\nResult: {result}");
+                else XtraMessageBox.Show("Can't test selected object!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

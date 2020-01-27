@@ -47,6 +47,7 @@ namespace EntityTools.Forms
             this.btnStates = new System.Windows.Forms.Button();
             this.btnInterfaces = new System.Windows.Forms.Button();
             this.btnUiViewer = new System.Windows.Forms.Button();
+            this.btnEntities = new System.Windows.Forms.Button();
             this.bteStates = new DevExpress.XtraEditors.ButtonEdit();
             this.bteInterfaces = new DevExpress.XtraEditors.ButtonEdit();
             this.lblState = new System.Windows.Forms.Label();
@@ -65,7 +66,12 @@ namespace EntityTools.Forms
             this.seSlideFilter = new DevExpress.XtraEditors.SpinEdit();
             this.lblSlideTimer = new System.Windows.Forms.Label();
             this.sbSettings = new System.Windows.Forms.BindingSource(this.components);
-            this.btnEntities = new System.Windows.Forms.Button();
+            this.tabRelogger = new DevExpress.XtraTab.XtraTabPage();
+            this.tbMashingId = new System.Windows.Forms.TextBox();
+            this.btnSet = new DevExpress.XtraEditors.SimpleButton();
+            this.btnGet = new DevExpress.XtraEditors.SimpleButton();
+            this.lblAccount = new System.Windows.Forms.Label();
+            this.lblMachinId = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.bteMissions.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bteAuras.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
@@ -79,6 +85,7 @@ namespace EntityTools.Forms
             ((System.ComponentModel.ISupportInitialize)(this.seTimerUnslide.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seSlideFilter.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.sbSettings)).BeginInit();
+            this.tabRelogger.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnUccEditor
@@ -187,7 +194,8 @@ namespace EntityTools.Forms
             this.tbclMain.TabIndex = 7;
             this.tbclMain.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.tabUtilities,
-            this.tabOptions});
+            this.tabOptions,
+            this.tabRelogger});
             // 
             // tabUtilities
             // 
@@ -273,6 +281,20 @@ namespace EntityTools.Forms
             this.btnUiViewer.Text = "UI Viewer";
             this.btnUiViewer.UseVisualStyleBackColor = true;
             this.btnUiViewer.Click += new System.EventHandler(this.btnUiViewer_Click);
+            // 
+            // btnEntities
+            // 
+            this.btnEntities.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnEntities.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnEntities.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnEntities.Location = new System.Drawing.Point(4, 297);
+            this.btnEntities.Name = "btnEntities";
+            this.btnEntities.Size = new System.Drawing.Size(355, 40);
+            this.btnEntities.TabIndex = 0;
+            this.btnEntities.Text = "Entities";
+            this.btnEntities.UseVisualStyleBackColor = true;
+            this.btnEntities.Click += new System.EventHandler(this.btnEntities_Click);
             // 
             // bteStates
             // 
@@ -498,19 +520,62 @@ namespace EntityTools.Forms
             this.lblSlideTimer.TabIndex = 2;
             this.lblSlideTimer.Text = "Time between aura check (millisecond):";
             // 
-            // btnEntities
+            // tabRelogger
             // 
-            this.btnEntities.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.tabRelogger.Controls.Add(this.lblMachinId);
+            this.tabRelogger.Controls.Add(this.lblAccount);
+            this.tabRelogger.Controls.Add(this.btnGet);
+            this.tabRelogger.Controls.Add(this.btnSet);
+            this.tabRelogger.Controls.Add(this.tbMashingId);
+            this.tabRelogger.Name = "tabRelogger";
+            this.tabRelogger.Padding = new System.Windows.Forms.Padding(5);
+            this.tabRelogger.Size = new System.Drawing.Size(364, 388);
+            this.tabRelogger.Text = "Relogger";
+            // 
+            // tbMashingId
+            // 
+            this.tbMashingId.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnEntities.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnEntities.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnEntities.Location = new System.Drawing.Point(4, 297);
-            this.btnEntities.Name = "btnEntities";
-            this.btnEntities.Size = new System.Drawing.Size(355, 40);
-            this.btnEntities.TabIndex = 0;
-            this.btnEntities.Text = "Entities";
-            this.btnEntities.UseVisualStyleBackColor = true;
-            this.btnEntities.Click += new System.EventHandler(this.btnEntities_Click);
+            this.tbMashingId.Location = new System.Drawing.Point(68, 40);
+            this.tbMashingId.Name = "tbMashingId";
+            this.tbMashingId.Size = new System.Drawing.Size(288, 21);
+            this.tbMashingId.TabIndex = 0;
+            // 
+            // btnSet
+            // 
+            this.btnSet.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSet.Location = new System.Drawing.Point(306, 67);
+            this.btnSet.Name = "btnSet";
+            this.btnSet.Size = new System.Drawing.Size(50, 23);
+            this.btnSet.TabIndex = 1;
+            this.btnSet.Text = "Set";
+            // 
+            // btnGet
+            // 
+            this.btnGet.Location = new System.Drawing.Point(250, 67);
+            this.btnGet.Name = "btnGet";
+            this.btnGet.Size = new System.Drawing.Size(50, 23);
+            this.btnGet.TabIndex = 1;
+            this.btnGet.Text = "Get";
+            this.btnGet.Click += new System.EventHandler(this.btnGet_Click);
+            // 
+            // lblAccount
+            // 
+            this.lblAccount.AutoSize = true;
+            this.lblAccount.Location = new System.Drawing.Point(8, 18);
+            this.lblAccount.Name = "lblAccount";
+            this.lblAccount.Size = new System.Drawing.Size(101, 13);
+            this.lblAccount.TabIndex = 2;
+            this.lblAccount.Text = "Account: @account";
+            // 
+            // lblMachinId
+            // 
+            this.lblMachinId.AutoSize = true;
+            this.lblMachinId.Location = new System.Drawing.Point(8, 43);
+            this.lblMachinId.Name = "lblMachinId";
+            this.lblMachinId.Size = new System.Drawing.Size(54, 13);
+            this.lblMachinId.TabIndex = 3;
+            this.lblMachinId.Text = "MachinId:";
             // 
             // MainPanel
             // 
@@ -536,6 +601,8 @@ namespace EntityTools.Forms
             ((System.ComponentModel.ISupportInitialize)(this.seTimerUnslide.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seSlideFilter.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.sbSettings)).EndInit();
+            this.tabRelogger.ResumeLayout(false);
+            this.tabRelogger.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -576,5 +643,11 @@ namespace EntityTools.Forms
         private System.Windows.Forms.CheckBox cbEnchantHelperActivator;
         private System.Windows.Forms.Button btnTest;
         private System.Windows.Forms.Button btnEntities;
+        private DevExpress.XtraTab.XtraTabPage tabRelogger;
+        private System.Windows.Forms.Label lblMachinId;
+        private System.Windows.Forms.Label lblAccount;
+        private DevExpress.XtraEditors.SimpleButton btnGet;
+        private DevExpress.XtraEditors.SimpleButton btnSet;
+        private System.Windows.Forms.TextBox tbMashingId;
     }
 }

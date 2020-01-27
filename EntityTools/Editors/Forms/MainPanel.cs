@@ -11,6 +11,7 @@ using EntityTools.Tools;
 using MyNW.Internals;
 using EntityTools.Tools.UCCExtensions;
 using System.Reflection;
+using MyNW;
 
 namespace EntityTools.Forms
 {
@@ -23,8 +24,6 @@ namespace EntityTools.Forms
             InitializeComponent();
 
             ckbSpellStuckMonitor.Checked = States.UnstuckSpellTask.Activate;//States.SpellStuckMonitor.Activate;
-            //cbSlideMonitor.Checked = States.SlideMonitor.Activate;
-            //gbSlideMonitor.Enabled = States.SlideMonitor.Activate;
         }
 
         private void btnTest_Click(object sender, EventArgs e)
@@ -314,26 +313,6 @@ namespace EntityTools.Forms
             UnstuckSpellTask.Activate = ckbSpellStuckMonitor.Checked;
         }
 
-        //private void seSlideFilter_EditValueChanged(object sender, EventArgs e)
-        //{
-        //    SlideMonitor.Filter = (float)seSlideFilter.Value;
-        //}
-
-        //private void seTimerUnslide_EditValueChanged(object sender, EventArgs e)
-        //{
-        //    SlideMonitor.CheckTimeNotSlide = (int)seTimerUnslide.Value;
-        //}
-
-        //private void seTimerSlide_EditValueChanged(object sender, EventArgs e)
-        //{
-        //    SlideMonitor.CheckTimeNotSlide = (int)seTimerUnslide.Value;
-        //}
-
-        //private void cbSlideMonitor_CheckedChanged(object sender, EventArgs e)
-        //{
-        //    SlideMonitor.Activate = cbSlideMonitor.Checked;
-        //    gbSlideMonitor.Enabled = cbSlideMonitor.Checked;
-        //}
 
         private void btnUiViewer_Click(object sender, EventArgs e)
         {
@@ -348,6 +327,13 @@ namespace EntityTools.Forms
         private void btnEntities_Click(object sender, EventArgs e)
         {
             EntitySelectForm.GetEntity();
+        }
+
+        private void btnGet_Click(object sender, EventArgs e)
+        {
+            var machineid = Memory.MMemory.ReadString(Memory.BaseAdress + 0x2640BD0, Encoding.UTF8, 64);
+            lblAccount.Text = $"Account:   @{EntityManager.LocalPlayer.AccountLoginUsername}";
+            tbMashingId.Text = machineid;
         }
     }
 

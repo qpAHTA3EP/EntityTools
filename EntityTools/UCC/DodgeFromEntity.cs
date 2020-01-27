@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
+using Astral.Controllers;
 using Astral.Logic.UCC.Actions;
 using Astral.Logic.UCC.Classes;
 using EntityTools.Editors;
@@ -130,7 +131,7 @@ namespace EntityTools.UCC
                     //entity = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, 
                     //                                                HealthCheck, Range, RegionCheck);
 
-                    entity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType.Complete, 
+                    entity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete, 
                                                             HealthCheck, ReactionRange, ReactionZRange, RegionCheck);
 
                     return Validate(entity) && entity.Location.Distance3DFromPlayer <= EntityRadius;
@@ -141,7 +142,9 @@ namespace EntityTools.UCC
 
         public override bool Run()
         {
-            return dodge.Run();
+            if (entity.Location.Distance3DFromPlayer < EntityRadius)
+                return dodge.Run();
+            return true; 
             //bool flag = false;
             //for (; ; )
             //{
@@ -273,7 +276,9 @@ namespace EntityTools.UCC
                     if (!string.IsNullOrEmpty(EntityID))
                     {
                         entity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete,
-                                                                HealthCheck, ReactionRange, ReactionZRange, RegionCheck, null, Aura.Checker);
+                                                                HealthCheck, ReactionRange,
+                                                                (ReactionZRange > 0) ? ReactionZRange : Settings.Get.MaxElevationDifference, 
+                                                                RegionCheck, null, Aura.Checker);
                         return entity;
                     }
                 }
@@ -316,6 +321,8 @@ namespace EntityTools.UCC
                 RegionCheck = this.RegionCheck,
                 HealthCheck = this.HealthCheck,
                 EntityRadius = this.EntityRadius,
+                ReactionRange = this.ReactionRange,
+                ReactionZRange = this.ReactionZRange,
                 dodge = this.dodge.Clone() as Dodge,
                 Aura = new AuraOption
                 {

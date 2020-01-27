@@ -187,6 +187,10 @@ namespace EntityTools.Actions
         public string TestInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>";
 
         [XmlIgnore]
+        [Browsable(false)]
+        public override string Category => "Basic";
+
+        [XmlIgnore]
         internal EntityComparerToPattern Comparer { get; private set; } = null;
 
         [NonSerialized]

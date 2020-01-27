@@ -95,7 +95,9 @@ namespace EntityTools.Conditions
                             case Relation.Inferior:
                                 {
                                     membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.FindAll((TeamMember member) =>
-                                                    (member.InternalName != EntityManager.LocalPlayer.InternalName
+                                                    (/* member.InternalName != EntityManager.LocalPlayer.InternalName
+                                                      * Эквивалентно строке: */
+                                                        member.Entity.ContainerId != EntityManager.LocalPlayer.ContainerId
                                                         && (!RegionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                                         && member.Entity.Location.Distance3DFromPlayer < Distance
                                                         && (customRegions == null || customRegions.Find((CustomRegion cr) => member.Entity.Within(cr)) != null))
@@ -106,7 +108,9 @@ namespace EntityTools.Conditions
                             case Relation.Superior:
                                 {
                                     membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.FindAll((TeamMember member) =>
-                                                    (member.InternalName != EntityManager.LocalPlayer.InternalName
+                                                    (/* member.InternalName != EntityManager.LocalPlayer.InternalName
+                                                      * Эквивалентно строке: */
+                                                        member.Entity.ContainerId != EntityManager.LocalPlayer.ContainerId
                                                         && (!RegionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                                         && member.Entity.Location.Distance3DFromPlayer > Distance
                                                         && (customRegions == null || customRegions.Find((CustomRegion cr) => member.Entity.Within(cr)) != null))
@@ -116,7 +120,9 @@ namespace EntityTools.Conditions
                             case Relation.Equal:
                                 {
                                     membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.FindAll((TeamMember member) =>
-                                                    (member.InternalName != EntityManager.LocalPlayer.InternalName
+                                                    (/* member.InternalName != EntityManager.LocalPlayer.InternalName
+                                                      * Эквивалентно строке: */
+                                                        member.Entity.ContainerId != EntityManager.LocalPlayer.ContainerId
                                                         && (!RegionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                                         && member.Entity.Location.Distance3DFromPlayer == Distance
                                                         && (customRegions == null || customRegions.Find((CustomRegion cr) => member.Entity.Within(cr)) != null))
@@ -126,7 +132,9 @@ namespace EntityTools.Conditions
                             case Relation.NotEqual:
                                 {
                                     membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.FindAll((TeamMember member) =>
-                                                    (member.InternalName != EntityManager.LocalPlayer.InternalName
+                                                    (/* member.InternalName != EntityManager.LocalPlayer.InternalName
+                                                      * Эквивалентно строке: */
+                                                        member.Entity.ContainerId != EntityManager.LocalPlayer.ContainerId
                                                         && (!RegionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                                         && member.Entity.Location.Distance3DFromPlayer != Distance
                                                         && (customRegions == null || customRegions.Find((CustomRegion cr) => member.Entity.Within(cr)) != null))
@@ -184,7 +192,9 @@ namespace EntityTools.Conditions
 
                     foreach (TeamMember member in EntityManager.LocalPlayer.PlayerTeam.Team.Members)
                     {
-                        if (member.InternalName != EntityManager.LocalPlayer.InternalName)
+                        /* if (member.InternalName != EntityManager.LocalPlayer.InternalName)
+                         * Эквивалентно следующей строке: */
+                        if (member.Entity.ContainerId != EntityManager.LocalPlayer.ContainerId)
                         {
                             strBldr.AppendLine(member.InternalName);
                             strBldr.AppendFormat("\tDistance: {0:0.##}", member.Entity.Location.Distance3DFromPlayer).AppendLine();

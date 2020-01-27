@@ -538,6 +538,8 @@ namespace EntityTools.Actions
             }
         }
 
+        [XmlIgnore]
+        [Browsable(false)]
         public override string Category => "Basic";
 
         public override string InternalDisplayName
