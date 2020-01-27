@@ -1,0 +1,356 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{DF7F797E-DB7E-44F9-A96A-020CFDB3C51E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>EntityTools</RootNamespace>
+    <AssemblyName>EntityTools</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <AssemblyVersion>0.20.0113.1435</AssemblyVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;X32</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE;X32</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.1</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>D:\Astral\Astral_RU_1\Plugins\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;X64</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Optimize>false</Optimize>
+    <DocumentationFile>
+    </DocumentationFile>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE;X64</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>
+    </ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AStar">
+      <HintPath>..\References\x64\AStar.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Astral_patched">
+      <HintPath>..\References\x64\Astral_patched.exe</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Data.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Printing.v18.1.Core, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Utils.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraEditors.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraGrid.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraLayout.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraPrinting.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MyMemory-x64">
+      <HintPath>..\..\QuesterAssistant\References\x64\MyMemory-x64.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MyNW, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\x64\MyNW.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Actions\ChangeInstanceToLeader.cs" />
+    <Compile Include="Actions\InsertInsignia.cs" />
+    <Compile Include="Actions\Deprecated\InteractEntity.cs" />
+    <Compile Include="Actions\InteractEntitiesCachedTimeout.cs" />
+    <Compile Include="Actions\ChangePluginSettings.cs" />
+    <Compile Include="Actions\MoveToLeader.cs" />
+    <Compile Include="Actions\PickUpMissionExt.cs" />
+    <Compile Include="Conditions\Deprecated\CheckCampaignTask.cs" />
+    <Compile Include="Conditions\CheckGameGUICondition.cs" />
+    <Compile Include="Conditions\CheckShard.cs" />
+    <Compile Include="Conditions\EntityPropertyCachedTimeout.cs" />
+    <Compile Include="Conditions\Deprecated\EntityDistance.cs" />
+    <Compile Include="Conditions\EntityCountCachedTimeout.cs" />
+    <Compile Include="Conditions\Deprecated\PartyCount.cs" />
+    <Compile Include="Conditions\TeamLeaderMapInstance.cs" />
+    <Compile Include="Conditions\TeamMemberCount.cs" />
+    <Compile Include="Editors\CampaignTaskEditor.cs" />
+    <Compile Include="Editors\CheckedListBoxCommonEditor.cs" />
+    <Compile Include="Editors\AddTypeCommonEditor.cs" />
+    <Compile Include="Editors\ConditionListEditor.cs" />
+    <Compile Include="Editors\EntityTestEditor.cs" />
+    <Compile Include="Editors\Forms\AuraSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\Forms\AuraSelectForm.Designer.cs">
+      <DependentUpon>AuraSelectForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\Forms\ConditionsListForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\Forms\ConditionsListForm.designer.cs">
+      <DependentUpon>ConditionsListForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\Forms\EntitySelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\Forms\EntitySelectForm.Designer.cs">
+      <DependentUpon>EntitySelectForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\Forms\InsigniaBonusSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\Forms\InsigniaBonusSelectForm.Designer.cs">
+      <DependentUpon>InsigniaBonusSelectForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\Forms\MainPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\Forms\MainPanel.Designer.cs">
+      <DependentUpon>MainPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\Forms\MountBonusPriorityListForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\Forms\MountBonusPriorityListForm.Designer.cs">
+      <DependentUpon>MountBonusPriorityListForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\Forms\UnoSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\Forms\UnoSelectForm.Designer.cs">
+      <DependentUpon>UnoSelectForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\Forms\MultiSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\Forms\MultiSelectForm.Designer.cs">
+      <DependentUpon>MultiSelectForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\Forms\TargetSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\Forms\TargetSelectForm.Designer.cs">
+      <DependentUpon>TargetSelectForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\Forms\UIViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\Forms\UIViewer.Designer.cs">
+      <DependentUpon>UIViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\NodePositionEditor.cs" />
+    <Compile Include="Editors\AuraIdEditor.cs" />
+    <Compile Include="Editors\UccGenericConditionEditor.cs" />
+    <Compile Include="Editors\UccActionEditor.cs" />
+    <Compile Include="Editors\UiIdEditor.cs" />
+    <Compile Include="Extensions\ListTExtentions.cs" />
+    <Compile Include="Patches\Patch.cs" />
+    <Compile Include="Patches\Patch_GraphicsNW.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="States\UnstuckSpellTask.cs" />
+    <Compile Include="Tools\AuraOption.cs" />
+    <Compile Include="Tools\CollectionTypeConverter.cs" />
+    <Compile Include="Tools\CopyHelper.cs" />
+    <Compile Include="Tools\CustomRegionTools.cs" />
+    <Compile Include="Tools\EnchantHelper.cs" />
+    <Compile Include="Tools\Entities\EntityCache.cs" />
+    <Compile Include="Tools\Entities\EntityComparerToPattern.cs" />
+    <Compile Include="Tools\Entities\Enums.cs" />
+    <Compile Include="Tools\Entities\SearchCached.cs" />
+    <Compile Include="Tools\Entities\SearchDirect.cs" />
+    <Compile Include="Tools\Enums.cs" />
+    <Compile Include="Tools\Export\FileTools.cs" />
+    <Compile Include="Tools\Export\Auras.cs" />
+    <Compile Include="Tools\CommonTools.cs" />
+    <Compile Include="Tools\EntitySelectionTools.cs" />
+    <Compile Include="EntityPlugin.cs" />
+    <Compile Include="Actions\MoveToEntityCachedTimeout.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\EntityIdEditor.cs" />
+    <Compile Include="Editors\CustomRegionListEditor.cs" />
+    <Compile Include="Editors\ShardEditor.cs" />
+    <Compile Include="Tools\Export\Missions.cs" />
+    <Compile Include="Tools\MountInsignias\Enums.cs" />
+    <Compile Include="Tools\MountInsignias\MountBonusesDef.cs" />
+    <Compile Include="Tools\MountInsignias\MountBonusPriorityDef.cs" />
+    <Compile Include="Tools\MountInsignias\ParagonMountBonusPriorityDef.cs" />
+    <Compile Include="Tools\ParagonTools.cs" />
+    <Compile Include="Tools\ReflectionHelper.cs" />
+    <Compile Include="Tools\SettingsTools.cs" />
+    <Compile Include="Tools\Struct.cs" />
+    <Compile Include="Tools\UCCExtensions\UCCActionExtention.cs" />
+    <Compile Include="Tools\UCCExtensions\UCCEditorExtensions.cs" />
+    <Compile Include="Tools\Export\GameUITools.cs" />
+    <Compile Include="UCC\Conditions\UCCConditionPack.cs" />
+    <Compile Include="UCC\Conditions\ICustomUCCCondition.cs" />
+    <Compile Include="UCC\Conditions\UCCTargetMatchEntity.cs" />
+    <Compile Include="UCC\Conditions\UCCQuesterCheck.cs" />
+    <Compile Include="UCC\DodgeFromEntity.cs" />
+    <Compile Include="UCC\ApproachEntity.cs" />
+    <Compile Include="UCC\Conditions\UCCEntityCheck.cs" />
+    <Compile Include="UCC\Conditions\UCCGameUICheck.cs" />
+    <Compile Include="UCC\ExecuteSpecificPower.cs" />
+    <Compile Include="UCC\SpecializedUCCAction.cs" />
+    <Compile Include="UCC\Conditions\UCCGenericCondition.cs" />
+    <Compile Include="UCC\UseItem.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Editors\Forms\AuraSelectForm.resx">
+      <DependentUpon>AuraSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\Forms\ConditionsListForm.resx">
+      <DependentUpon>ConditionsListForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\Forms\EntitySelectForm.resx">
+      <DependentUpon>EntitySelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\Forms\InsigniaBonusSelectForm.resx">
+      <DependentUpon>InsigniaBonusSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\Forms\MainPanel.resx">
+      <DependentUpon>MainPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\Forms\MountBonusPriorityListForm.resx">
+      <DependentUpon>MountBonusPriorityListForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\Forms\UnoSelectForm.resx">
+      <DependentUpon>UnoSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\Forms\MultiSelectForm.resx">
+      <DependentUpon>MultiSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\Forms\TargetSelectForm.resx">
+      <DependentUpon>TargetSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\Forms\UIViewer.resx">
+      <DependentUpon>UIViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Actions\Encripted\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Images\Entity_7_40х48.png" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Icons_Inventory_Enchantments_Insignia_Barbed.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Icons_Inventory_Enchantments_Insignia_Crescent.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Icons_Inventory_Enchantments_Insignia_Regal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Icons_Inventory_Enchantments_Insignia_Universal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Icons_Inventory_Enchantments_Insignia_Enlightened.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Icons_Inventory_Enchantments_Insignia_Illuminated.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\miniAdd" />
+    <None Include="Properties\DataSources\MountBonuses.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Astral\miniValid.png" />
+    <None Include="Images\Astral\miniSave.png" />
+    <None Include="Images\Astral\miniRemove.png" />
+    <None Include="Images\Astral\miniPlay.png" />
+    <None Include="Images\Astral\copy.png" />
+    <None Include="Images\Astral\paste.png" />
+    <None Include="Images\Astral\miniRefresh.png" />
+    <None Include="Images\Astral\miniDelete.png" />
+    <None Include="Images\Astral\miniAdd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Astral\miniTarget.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

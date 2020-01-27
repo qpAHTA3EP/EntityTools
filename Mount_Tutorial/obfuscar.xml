@@ -1,0 +1,12 @@
+<?xml version='1.0'?>
+<Obfuscator>
+  <Var name="InPath" value="." />
+  <Var name="OutPath" value=".\Obfuscator_Output" />
+  <Var name="HidePrivateApi" value="true" />
+
+  <Module file="$(InPath)\Mount_Tutorial.dll">
+    <SkipType name="Mount_Tutorial.MountTutorial" />
+    <SkipType name="Mount_Tutorial.MainPanel" />
+    <SkipType name="Mount_Tutorial.HorseEquipTutorialAction" />
+  </Module>
+</Obfuscator>
