@@ -14,14 +14,14 @@ using Astral.Logic.UCC.Classes;
 
 namespace EntityTools.Editors.Forms
 {
-    public partial class UnoSelectForm :XtraForm
+    public partial class ItemSelectForm :XtraForm
     {
         public delegate object ProcessingItems(ListBox itemList);
 
         internal ProcessingItems FillList;
         internal ProcessingItems GetSelectedItem;
 
-        public UnoSelectForm()
+        public ItemSelectForm()
         {
             InitializeComponent();
         }
@@ -33,14 +33,14 @@ namespace EntityTools.Editors.Forms
         /// <returns></returns>
         public static object GetAnItem<T>(bool includeBase = true)
         {
-            UnoSelectForm selectForm = 
+            ItemSelectForm selectForm = 
                 (includeBase) ? 
-                new UnoSelectForm()
+                new ItemSelectForm()
                 {
                     FillList =  FillItems<T>,
                     GetSelectedItem = GetItem
                 } :
-                new UnoSelectForm()
+                new ItemSelectForm()
                 {
                     FillList = FillDerivedItems<T>,
                     GetSelectedItem = GetItem
@@ -53,7 +53,7 @@ namespace EntityTools.Editors.Forms
 
         public static object GetAnItem(ProcessingItems fill, ProcessingItems get)
         {
-            UnoSelectForm selectForm = new UnoSelectForm()
+            ItemSelectForm selectForm = new ItemSelectForm()
                                             {
                                                 FillList = fill,
                                                 GetSelectedItem = get

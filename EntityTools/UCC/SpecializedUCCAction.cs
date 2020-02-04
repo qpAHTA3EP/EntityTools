@@ -51,6 +51,12 @@ namespace EntityTools.UCC
             "Disjunction: At least one of the Conditions have to be True (Logical OR)")]
         public LogicRule CustomConditionCheck { get; set; }
 
+        [Category("Timer")]
+        public string TimerName { get; set; } = string.Empty;
+
+        [Category("Timer")]
+        public int Timeout { get; set; } = 0;
+
         public override bool NeedToRun
         {
             get
@@ -117,7 +123,15 @@ namespace EntityTools.UCC
 
         public override bool Run()
         {
-            return ManagedAction?.Run() == true;
+            bool result = ManagedAction?.Run() == true;
+            if(result && !string.IsNullOrEmpty(TimerName) && Timeout > 0)
+            {
+                // Запуск таймера
+                if (UCCTools.SpecialTimers.ContainsKey(TimerName))
+                    UCCTools.SpecialTimers[TimerName] = new Pair<int, int>(Environment.TickCount, Environment.TickCount + Timeout);
+                else UCCTools.SpecialTimers.Add(TimerName, new Pair<int, int>(Environment.TickCount, Environment.TickCount + Timeout));
+            }
+            return result;
         }
 
         public override string ToString()

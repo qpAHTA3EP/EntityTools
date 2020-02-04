@@ -12,7 +12,7 @@ using Astral.Logic.UCC.Ressources;
 using EntityTools.Enums;
 using System;
 using EntityTools.Tools.Entities;
-using EntityTools.Tools.UCCExtensions;
+using EntityTools.UCC.Extensions;
 using System.Text;
 using Astral.Controllers;
 
@@ -125,7 +125,7 @@ namespace EntityTools.UCC.Conditions
                 if(!Validate(closestEntity))
                     closestEntity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete, 
                                                                    HealthCheck, ReactionRange,
-                                                                   (ReactionZRange > 0) ? ReactionZRange : Settings.Get.MaxElevationDifference, 
+                                                                   (ReactionZRange > 0) ? ReactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference, 
                                                                    RegionCheck, null, Aura.Checker);
 
                 bool result = false;

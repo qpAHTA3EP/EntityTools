@@ -152,7 +152,7 @@
         internal DevExpress.XtraEditors.SimpleButton btnReload;
         internal System.Windows.Forms.Label lbl;
         internal System.Windows.Forms.DataGridView dgvItems;
-        internal System.Windows.Forms.DataGridViewTextBoxColumn clmnItemsNames;
+        //internal System.Windows.Forms.DataGridViewTextBoxColumn clmnItemsNames;
         internal System.Windows.Forms.DataGridViewCheckBoxColumn clmnSelect;
         internal System.Windows.Forms.DataGridViewTextBoxColumn clmnItems;
     }

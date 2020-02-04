@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define DEBUG_INTERACTENTITIES
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -30,7 +31,7 @@ namespace EntityTools.Actions
     [Serializable]
     public class InteractEntities : Astral.Quester.Classes.Action
     {
-#if PROFILING
+#if DEBUG && PROFILING
         public static int RunCount = 0;
         public static void ResetWatch()
         {
@@ -242,7 +243,11 @@ namespace EntityTools.Actions
                 if (timeout.IsTimedOut/* || (target != null && (!Validate(target) || (HealthCheck && target.IsDead)))*/)
                 {
                     closestEntity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete,
-                                                                HealthCheck, ReactionRange, ReactionZRange, RegionCheck, customRegions);
+                                                                HealthCheck, ReactionRange, ReactionZRange, RegionCheck, customRegions, IsNotInBlackList);
+#if DEBUG_INTERACTENTITIES
+                    if(closestEntity!=null && closestEntity.IsValid)
+                        Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}::NeedToRun: Found Entity[{closestEntity.ContainerId.ToString("X8")}] (closest)");
+#endif
                     timeout.ChangeTime(SearchTimeInterval);
                 }
 
@@ -285,18 +290,18 @@ namespace EntityTools.Actions
         {
             try
             {
-#if PROFILING
+#if DEBUG && PROFILING
                 RunCount++;
 #endif
                 moved = false;
                 combat = false;
-#if DEBUG
-                Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}::Run: Approach Entity[{target.Pointer.ToString("X8")}] for interaction");
+#if DEBUG && DEBUG_INTERACTENTITIES
+                Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}::Run: Approach Entity[{target.ContainerId.ToString("X8")}] for interaction");
 #endif
                 if (Approach.EntityForInteraction(target, new Func<Approach.BreakInfos>(CheckCombat)))
                 {
-#if DEBUG
-                    Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}::Run: Interact Entity[{target.Pointer.ToString("X8")}]");
+#if DEBUG && DEBUG_INTERACTENTITIES
+                    Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}::Run: Interact Entity[{target.ContainerId.ToString("X8")}]");
 #endif
                     target.Interact();
                     Thread.Sleep(InteractTime);
@@ -331,7 +336,7 @@ namespace EntityTools.Actions
                 }
                 if (IgnoreCombat && target.Location.Distance3DFromPlayer <= CombatDistance)
                 {
-#if DEBUG
+#if DEBUG && DEBUG_INTERACTENTITIES
                     Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}::Run: Engage combat");
 #endif
                     Astral.Quester.API.IgnoreCombat = false;
@@ -339,32 +344,30 @@ namespace EntityTools.Actions
                 }
                 if (combat)
                 {
-#if DEBUG
+#if DEBUG && DEBUG_INTERACTENTITIES
                     Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}::Run: Player in combat...");
 #endif
                     return ActionResult.Running;
                 }
                 if (moved)
                 {
-#if DEBUG
-                    Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}::Run: Entity[{target.Pointer.ToString("X8")}] moved, skip...");
-#endif
+#if DEBUG && DEBUG_INTERACTENTITIES
+                    Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}::Run: Entity[{target.ContainerId.ToString("X8")}] moved, skip...");
+#else
                     Logger.WriteLine("Entity moved, skip...");
+#endif
                     return ActionResult.Fail;
                 }
                 return ActionResult.Fail;
             }
             finally
             {
-                if (InteractOnce)
+                if (InteractOnce || (SkipMoving && moved))
                 {
                     PushToBlackList(target);
-#if DEBUG
-                    Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}::Run: PushToBlackList Entity[{target.Pointer.ToString("X8")}]");
-#endif
-                }
 
-                target = new Entity(IntPtr.Zero);
+                    target = new Entity(IntPtr.Zero);
+                }
             }
         }
 
@@ -387,6 +390,9 @@ namespace EntityTools.Actions
         {
             /* 2 */
             blackList.Add(target.ContainerId, InteractingTimeout);
+#if DEBUG && DEBUG_INTERACTENTITIES
+            Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}::PushToBlackList: Entity[{target.ContainerId.ToString("X8")}]");
+#endif
         }
 
         private Approach.BreakInfos CheckCombat()
@@ -446,7 +452,8 @@ namespace EntityTools.Actions
         public override void GatherInfos()
         {
             //XtraMessageBox.Show("Target Entity and press ok.");
-            TargetSelectForm.TargetGuiRequest("Target Entity and press ok.", Application.OpenForms.Find<Astral.Quester.Forms.Editor>());
+            Form editor = Application.OpenForms.Find<Astral.Quester.Forms.Editor>();
+            TargetSelectForm.TargetGuiRequest("Target Entity and press ok.", editor);
             Entity betterEntityToInteract = Interact.GetBetterEntityToInteract();
             if (betterEntityToInteract.IsValid)
             {
@@ -458,7 +465,7 @@ namespace EntityTools.Actions
                     base.HotSpots.Add(betterEntityToInteract.Location.Clone());
                 }
             }
-            if (XtraMessageBox.Show("Add a dialog ? (open the dialog window before)", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            if (XtraMessageBox.Show(editor, "Add a dialog ? (open the dialog window before)", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 DialogEdit.Show(Dialogs);
             }

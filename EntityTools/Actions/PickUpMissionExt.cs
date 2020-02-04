@@ -18,6 +18,19 @@ using MyNW.Patchables.Enums;
 using EntityTools.Tools;
 using EntityTools.Enums;
 
+namespace EntityTools.Enums
+{
+    public enum MissionInteractResultExt
+    {
+        Error,
+        MissionNotFound,
+        MissionOffer,
+        MissionOfferAccepted,
+        Succeeed,
+        Succeeded,
+    }
+}
+
 namespace EntityTools.Actions
 {
     [Serializable]
@@ -37,6 +50,8 @@ namespace EntityTools.Actions
         public bool CloseContactDialog { get; set; } = false;
 
         public float InteractDistance { get; set; } = 0f;
+
+        public bool AutoAcceptOfferedMission { get; set; } = true;
 
         [Editor(typeof(RewardsEditor), typeof(UITypeEditor))]
         [Description("Item that is requered in rewards to PickUpMission\n" +
@@ -92,16 +107,23 @@ namespace EntityTools.Actions
                     && giverContactInfo.IsValid)
                 {
                     Entity entity = giverContactInfo.Entity;
-                    //if (entity.IsValid && entity.InternalName == this.GiverId && entity.Location.Distance3D(this.GiverPosition) < 1.0)
                     if (entity.IsValid && Giver.IsMatching(entity))
                     {
-                        Missions.MissionInteractResult missionInteractResult = /*Missions.*/PickUpMission(entity, MissionId);
-                        if (missionInteractResult == Missions.MissionInteractResult.Success)
+                        MissionInteractResultExt missionInteractResult = PickUpMission(entity, MissionId);
+                        if (missionInteractResult == MissionInteractResultExt.MissionOfferAccepted 
+                            || missionInteractResult == MissionInteractResultExt.MissionOffer)
+                        {
+                            if (!Missions.HaveMissionByPath(this.MissionId) && AutoAcceptOfferedMission)
+                                return ActionResult.Running;
+                        }
+                        else if (missionInteractResult == MissionInteractResultExt.Succeeed)
                         {
                             tries = 0;
+                            if (!Missions.HaveMissionByPath(this.MissionId) && AutoAcceptOfferedMission)
+                                return ActionResult.Running;
                             return ActionResult.Completed;
                         }
-                        else if (missionInteractResult == Missions.MissionInteractResult.MissionNotFound && SkipOnFail)
+                        else if (missionInteractResult == MissionInteractResultExt.MissionNotFound && SkipOnFail)
                         {
                             Logger.WriteLine("Mission not available...");
                             return ActionResult.Skip;
@@ -111,7 +133,7 @@ namespace EntityTools.Actions
                             EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
                             Thread.Sleep(2000);
                         }
-                        if (missionInteractResult == Missions.MissionInteractResult.MissionNotFound)
+                        if (missionInteractResult == MissionInteractResultExt.MissionNotFound)
                         {
                             tries++;
                         }
@@ -270,10 +292,11 @@ namespace EntityTools.Actions
         /// <param name="giver"></param>
         /// <param name="missionName"></param>
         /// <returns></returns>
-        private Missions.MissionInteractResult PickUpMission(Entity giver, string missionName)
+        private MissionInteractResultExt PickUpMission(Entity giver, string missionName)
         {
-            Missions.MissionInteractResult missionInteractResult = /*Missions.*/InteractForMission(giver, missionName);
-            if (missionInteractResult != Missions.MissionInteractResult.Success)
+            MissionInteractResultExt missionInteractResult = /*Missions.*/InteractForMission(giver, missionName);
+            if (missionInteractResult != MissionInteractResultExt.Succeeed
+                && missionInteractResult != MissionInteractResultExt.MissionOffer)
             {
                 return missionInteractResult;
             }
@@ -289,12 +312,16 @@ namespace EntityTools.Actions
                     {
                         if (timeout.IsTimedOut)
                         {
-                            return Missions.MissionInteractResult.Error;
+                            if (AutoAcceptOfferedMission &&
+                                (missionInteractResult == MissionInteractResultExt.MissionOffer
+                                || EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.ScreenType != ScreenType.MissionOffer))
+                                return MissionInteractResultExt.MissionOfferAccepted;
+                            return MissionInteractResultExt.Error;
                         }
                         Thread.Sleep(100);
                     }
                     Thread.Sleep(500);
-                    return Missions.MissionInteractResult.Success;
+                    return MissionInteractResultExt.Succeeed;
                 }
             }
             else
@@ -306,11 +333,11 @@ namespace EntityTools.Actions
                     Thread.Sleep(1000);
 
                     if(EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.ScreenType != ScreenType.List)
-                        return Missions.MissionInteractResult.Error;
-                    return Missions.MissionInteractResult.Success;
+                        return MissionInteractResultExt.Error;
+                    return MissionInteractResultExt.Succeeed;
                 }
             }
-            return Missions.MissionInteractResult.Error;
+            return MissionInteractResultExt.Error;
         }
 
         /// <summary>
@@ -320,11 +347,11 @@ namespace EntityTools.Actions
         /// <param name="entity"></param>
         /// <param name="missionName"></param>
         /// <returns></returns>
-        private Missions.MissionInteractResult InteractForMission(Entity entity, string missionName)
+        private MissionInteractResultExt InteractForMission(Entity entity, string missionName)
         {
             Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);
             // Попытка открыть экран принятия заданной миссии
-            ContactDialogOption missionOption = /*Missions.*/GetMissionOption(missionName);
+            ContactDialogOption missionOption = GetMissionOption(missionName);
             if (!missionOption.IsValid)
             {
                 // Диалоговое окно открытон, но экран заданной миссии открыть не удалось 
@@ -343,9 +370,9 @@ namespace EntityTools.Actions
                         Math.Max(7f, entity.InteractOption.InteractDistance) : Math.Max(InteractDistance, entity.InteractOption.InteractDistance))))
                         // Включение навигации с целью приближения к персонажу и вступления с ним во взаимодействие
                         if (!Approach.EntityForInteraction(entity, null))
-                            return Missions.MissionInteractResult.Error;
+                            return MissionInteractResultExt.Error;
                 }
-                else return Missions.MissionInteractResult.Error;
+                else return MissionInteractResultExt.Error;
 
                 // Взаимодействие с персонажем для открытия диалогового окна
                 entity.Interact();
@@ -354,20 +381,27 @@ namespace EntityTools.Actions
                 {
                     if (timeout.IsTimedOut)
                     {
-                        return Missions.MissionInteractResult.Error;
+                        return MissionInteractResultExt.Error;
                     }
                     Thread.Sleep(100);
                 }
                 Thread.Sleep(500);
                 // Попытка ищем пункт диалога, связанного с заданной миссией
-                missionOption = /*Missions.*/GetMissionOption(missionName);
+                missionOption = GetMissionOption(missionName);
             }
+
+            if(AutoAcceptOfferedMission &&
+                EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.ScreenType == ScreenType.MissionOffer)
+            {
+                return MissionInteractResultExt.MissionOffer;
+            }
+
             // Проверяем результаты поиска соответствующего миссии пункта диалога
             if (!missionOption.IsValid)
             {
                 // Соответствующий пункт диалога не найден
                 // Экран принятия миисии не обнаружен
-                return Missions.MissionInteractResult.MissionNotFound;
+                return MissionInteractResultExt.MissionNotFound;
             }
             // Активируем пункт диклога, связанный с нужной миссией
             missionOption.Select();
@@ -380,12 +414,12 @@ namespace EntityTools.Actions
                 }
                 if (timeout.IsTimedOut)
                 {
-                    return Missions.MissionInteractResult.Error;
+                    return MissionInteractResultExt.Error;
                 }
                 Thread.Sleep(100);
             }
             Thread.Sleep(750);
-            return Missions.MissionInteractResult.Success;
+            return MissionInteractResultExt.Succeeded;
         }
 
         /// <summary>
@@ -393,7 +427,7 @@ namespace EntityTools.Actions
         /// </summary>
         /// <param name="missionName"></param>
         /// <returns></returns>
-        private static ContactDialogOption GetMissionOption(string missionName)
+        private ContactDialogOption GetMissionOption(string missionName)
         {
             Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);
             while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.IsValid
@@ -405,6 +439,12 @@ namespace EntityTools.Actions
                 {
                     // Открыт экран принятия миссии
                     // На экране принятия миссии узнать из АПИ, к какой миссии он относится, - нельзя
+                    if (AutoAcceptOfferedMission)
+                    {
+                        // Активирована опция автопринятия предлагаемой миссии
+                        return new ContactDialogOption(IntPtr.Zero);
+                    }
+
                     // поэтому отказываемся принять миссию, чтобы вернуться к списку
                     if (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.HasOptionByKey("ViewOfferedMission.Back"))
                     {
@@ -511,7 +551,7 @@ namespace EntityTools.Actions
                     && Giver.RegionName == EntityManager.LocalPlayer.RegionInternalName;
             }
         }
-
+        
         public override void InternalReset()
         {
             tries = 0;

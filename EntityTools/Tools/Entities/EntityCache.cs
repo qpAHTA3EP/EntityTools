@@ -62,7 +62,7 @@ namespace EntityTools.Tools.Entities
     /// </summary>
     public class EntityCacheRecord
     {
-#if PROFILING
+#if DEBUG && PROFILING
         private static int RegenCount = 0;
         private static int EntitiesCount = 0;
         public static void ResetWatch()
@@ -107,7 +107,7 @@ namespace EntityTools.Tools.Entities
         /// </summary>
         public void Regen()
         {
-#if PROFILING
+#if DEBUG && PROFILING
             RegenCount++;
 #endif
             List<Entity> entts;
@@ -118,7 +118,7 @@ namespace EntityTools.Tools.Entities
             if (entts != null)
                 entities = entts;
             else entities.Clear();
-#if PROFILING
+#if DEBUG && PROFILING
             EntitiesCount += entities.Count;
 #endif
             if (EntityManager.LocalPlayer.InCombat
@@ -128,7 +128,7 @@ namespace EntityTools.Tools.Entities
         }
         public void Regen(Action<Entity> action)
         {
-#if PROFILING
+#if DEBUG && PROFILING
             RegenCount++;
 #endif
             List<Entity> entts;
@@ -139,7 +139,7 @@ namespace EntityTools.Tools.Entities
             if (entts != null)
                 entities = entts;
             else entities.Clear();
-#if PROFILING
+#if DEBUG && PROFILING
             EntitiesCount += entities.Count;
 #endif
             if (EntityManager.LocalPlayer.InCombat
@@ -188,7 +188,7 @@ namespace EntityTools.Tools.Entities
     /// </summary>
     public class EntityCache : KeyedCollection<CacheRecordKey, EntityCacheRecord>
     {
-#if PROFILING
+#if DEBUG && PROFILING
         private static int MatchCount = 0;
         private static int MismatchCount = 0;
 
@@ -225,7 +225,7 @@ namespace EntityTools.Tools.Entities
             CacheRecordKey key = new CacheRecordKey(pattern, matchType, nameType, setType);
             if (base.Contains(key))
             {
-#if PROFILING
+#if DEBUG && PROFILING
                 MatchCount++;
 #endif
                 record = this[key];
@@ -233,7 +233,7 @@ namespace EntityTools.Tools.Entities
             }
             else
             {
-#if PROFILING
+#if DEBUG && PROFILING
                 MismatchCount++;
 #endif
                 return false;

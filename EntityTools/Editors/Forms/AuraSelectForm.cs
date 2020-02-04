@@ -88,6 +88,16 @@ namespace EntityTools.Editors.Forms
             return string.Empty;
         }
 
+        static public void ShowFreeTool()
+        {
+            AuraSelectForm @this = new AuraSelectForm();
+
+            @this.NameFilter.Text = string.Empty;
+            @this.InternalNameFilter.Text = string.Empty;
+
+            @this.Show(Astral.Forms.Main.ActiveForm);
+        }
+
         private void FillAuraList(Character character)
         {
             Auras.Items.Clear();

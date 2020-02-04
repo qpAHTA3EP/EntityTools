@@ -18,6 +18,7 @@ using EntityTools.Enums;
 using System.Threading.Tasks;
 using EntityTools.Tools.Entities;
 using Astral.Quester.Classes;
+using System.Windows.Forms;
 
 namespace EntityTools.Editors
 {
@@ -194,7 +195,7 @@ namespace EntityTools.Editors
                 }
                 else sb.Append("Unable recognize test context!");
 
-                Task.Factory.StartNew(() => XtraMessageBox.Show(sb.ToString(), "Test of '" + context.Instance.ToString() + '\''));                
+                Task.Factory.StartNew(() => XtraMessageBox.Show(/*Form.ActiveForm, */sb.ToString(), "Test of '" + context.Instance.ToString() + '\''));                
             }
             return value;
         }

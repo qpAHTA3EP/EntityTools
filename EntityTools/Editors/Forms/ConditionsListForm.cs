@@ -27,7 +27,7 @@ namespace EntityTools.Forms
         private void bntAdd_Click(object sender, EventArgs e)
         {
             //if (AddAction.Show(typeof(UCCCondition)) is UCCCondition condition)
-            if(UnoSelectForm.GetAnItem<UCCCondition>(false) is UCCCondition condition)
+            if(ItemSelectForm.GetAnItem<UCCCondition>(false) is UCCCondition condition)
             {
                 Conditions.Items.Add(condition);
                 Conditions.SelectedItem = condition;  
@@ -38,7 +38,7 @@ namespace EntityTools.Forms
         {
 
             if (Conditions.SelectedIndex >= 0
-                && XtraMessageBox.Show("Are you sure to remove selected condition ?", "Remove Condition ?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                && XtraMessageBox.Show(/*Form.ActiveForm, */"Are you sure to remove selected condition ?", "Remove Condition ?", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 Conditions.Items.RemoveAt(Conditions.SelectedIndex);
             }
@@ -51,7 +51,7 @@ namespace EntityTools.Forms
             {
                 conditionCopy = CopyHelper.CreateDeepCopy(cond); // Этот метод быстрее
                 //conditionCopy = CopyHelper.CreateXmlCopy(cond); // Этот метод дольше
-                XtraMessageBox.Show($"Condition '{conditionCopy.ToString()}' copied");
+                XtraMessageBox.Show(/*Form.ActiveForm, */$"Condition '{conditionCopy.ToString()}' copied");
             }
         }
 
@@ -85,9 +85,9 @@ namespace EntityTools.Forms
                         result = cond.IsOK(null);
                         mess = $"{cond.Target} {cond.Tested} : {cond.Value}";
                     }
-                    XtraMessageBox.Show($"{mess}\nResult: {result}");
+                    XtraMessageBox.Show(/*Form.ActiveForm, */$"{mess}\nResult: {result}");
                 }
-                else XtraMessageBox.Show("Can't test selected object!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                else XtraMessageBox.Show(/*Form.ActiveForm, */"Can't test selected object!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

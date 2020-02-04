@@ -17,7 +17,7 @@ namespace EntityTools.Tools
     {
         public delegate bool SpecialCheckDelegate(Entity entity);
 
-#if PROFILING
+#if DEBUG && PROFILING
         private static readonly long interval = 10000;
 
         private static Stopwatch stopwatch = new Stopwatch();
@@ -120,7 +120,7 @@ namespace EntityTools.Tools
         /// <returns>Найденное Entity</returns>
         public static Entity FindClosestEntity(List<Entity> entities, string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, bool healthCheck = false, float range = 0, bool regionCheck = false, List<string> customRegionNames = null, SpecialCheckDelegate specialCheck = null, bool interactable = false)
         {
-#if PROFILING
+#if DEBUG && PROFILING
             Count++;
             TimeSpan StartTime = stopwatch.Elapsed;
             stopwatch.Start();
@@ -154,7 +154,7 @@ namespace EntityTools.Tools
                     }
                 }
                 return closestEntity;
-#if PROFILING
+#if DEBUG && PROFILING
             }
             finally
             {
@@ -190,7 +190,7 @@ namespace EntityTools.Tools
         public static Entity FindClosestContactEntity(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, bool healthCheck = false, float range = 0, bool regionCheck = false, List<string> customRegionNames = null, SpecialCheckDelegate specialCheck = null)
         {
 
-#if PROFILING
+#if DEBUG && PROFILING
             ContactCount++;
             TimeSpan StartTime = cntStopwatch.Elapsed;
             cntStopwatch.Start();
@@ -222,7 +222,7 @@ namespace EntityTools.Tools
 
                 return FindClosestEntity(entities, entPattern, strMatchType, nameType, healthCheck, range, regionCheck, customRegionNames, specialCheck, true);
 
-#if PROFILING
+#if DEBUG && PROFILING
             }
             finally
             {
@@ -244,19 +244,19 @@ namespace EntityTools.Tools
             }
 #endif        
         }
-    /// <summary>
-    /// Поиск ближайшего Entity из entities, 
-    /// у которого InternalName соответствует шаблону регулярного выражения
-    /// и соответствующего остальным условиям
-    /// </summary>
-    /// <param name="entities">Исходная коллекция Entity</param>
-    /// <param name="entPattern">Шаблон, соответсвие которому ищется</param>
-    /// <param name="healthCheck">>Флаг проверки очков HP у Entity</param>
-    /// <param name="range">Предельное расстояние поиска</param>
-    /// <param name="regionCheck">Флаг проверки соответствия региона Entity и региона игрока</param>
-    /// <param name="specialCheck">Функтор дополнительной проверки Entity, например наличия в черном списке</param>
-    /// <returns>Найденное Entity</returns>
-    private static Entity FindClosestEntityRegexNameInternal(List<Entity> entities, string entPattern, bool healthCheck = false, float range = 0, bool regionCheck = false, List<string> customRegionNames = null,SpecialCheckDelegate specialCheck = null, bool interactable = false)
+        /// <summary>
+        /// Поиск ближайшего Entity из entities, 
+        /// у которого InternalName соответствует шаблону регулярного выражения
+        /// и соответствующего остальным условиям
+        /// </summary>
+        /// <param name="entities">Исходная коллекция Entity</param>
+        /// <param name="entPattern">Шаблон, соответсвие которому ищется</param>
+        /// <param name="healthCheck">>Флаг проверки очков HP у Entity</param>
+        /// <param name="range">Предельное расстояние поиска</param>
+        /// <param name="regionCheck">Флаг проверки соответствия региона Entity и региона игрока</param>
+        /// <param name="specialCheck">Функтор дополнительной проверки Entity, например наличия в черном списке</param>
+        /// <returns>Найденное Entity</returns>
+        private static Entity FindClosestEntityRegexNameInternal(List<Entity> entities, string entPattern, bool healthCheck = false, float range = 0, bool regionCheck = false, List<string> customRegionNames = null,SpecialCheckDelegate specialCheck = null, bool interactable = false)
         {
             Entity closestEntity = new Entity(IntPtr.Zero);
 

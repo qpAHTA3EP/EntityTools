@@ -6,24 +6,45 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using EntityTools.States;
 using EntityTools.Tools;
 using MyNW.Internals;
-using EntityTools.Tools.UCCExtensions;
-using System.Reflection;
 using MyNW;
+using EntityTools.UCC.Extensions;
+using DevExpress.XtraEditors;
+using EntityTools.Tools.Reflection;
+using EntityTools.Enums;
 
 namespace EntityTools.Forms
 {
-    public partial class MainPanel : /* UserControl //*/ Astral.Forms.BasePanel
+    public partial class EntityToolsMainPanel : /* UserControl //*/ Astral.Forms.BasePanel
     {
         private EntitySelectForm.EntityDif entDif = new EntitySelectForm.EntityDif();
 
-        public MainPanel() : base("Entity Tools")
+        public EntityToolsMainPanel() : base("Entity Tools")
         {
             InitializeComponent();
 
-            ckbSpellStuckMonitor.Checked = States.UnstuckSpellTask.Activate;//States.SpellStuckMonitor.Activate;
+            cbbExportSelector.DataSource = Enum.GetValues(typeof(ExportTypes));
+
+            //ckbSpellStuckMonitor.Checked = EntityTools.PluginSettings.UnstuckSpells.Active;
+            ckbSpellStuckMonitor.DataBindings.Add(nameof(ckbSpellStuckMonitor.Checked),
+                                                  EntityTools.PluginSettings.UnstuckSpells,
+                                                  nameof(EntityTools.PluginSettings.UnstuckSpells.Active));
+
+            // Настройки Mapper'a
+            seMapperWaipointDistance.DataBindings.Add(nameof(seMapperWaipointDistance.Value),
+                                                EntityTools.PluginSettings.Mapper,
+                                                nameof(EntityTools.PluginSettings.Mapper.WaipointDistance));
+            seMapperMaxZDif.DataBindings.Add(nameof(seMapperMaxZDif.Value),
+                                                EntityTools.PluginSettings.Mapper,
+                                                nameof(EntityTools.PluginSettings.Mapper.MaxElevationDifference));
+            ckbMapperForceLinkingWaypoint.DataBindings.Add(nameof(ckbMapperForceLinkingWaypoint.Checked),
+                                                EntityTools.PluginSettings.Mapper,
+                                                nameof(EntityTools.PluginSettings.Mapper.ForceLinkingWaypoint));
+            ckbMapperLinearPath.DataBindings.Add(nameof(ckbMapperLinearPath.Checked),
+                                                EntityTools.PluginSettings.Mapper,
+                                                nameof(EntityTools.PluginSettings.Mapper.LinearPath));
+
         }
 
         private void btnTest_Click(object sender, EventArgs e)
@@ -147,6 +168,18 @@ namespace EntityTools.Forms
             #region Login
             //ReflectionHelper.ExecStaticMethodByArgs(typeof(MyNW.Internals.Injection), "\u0001", new object[] { "--", "--" }, out object res);
             #endregion
+
+            #region Mapper
+            ////var node = Astral.Quester.Core.GetNearesNodetPosition(EntityManager.LocalPlayer.Location, false);
+            ////var meshes = Astral.Quester.Core.Meshes;
+            //var meshes = typeof(Astral.Quester.Core).GetStaticPropertyAccessor<AStar.Graph>("Meshes");
+            //XtraMessageBox.Show(meshes.Value.ToString());
+
+
+            //var GetNearesNodes = typeof(Astral.Quester.Core).GetStaticMethodInvoker<MyNW.Classes.Vector3>("GetNearesNodetPosition", new Type[] { typeof(MyNW.Classes.Vector3), typeof(bool)});
+            //var pos = GetNearesNodes.Invoke(EntityManager.LocalPlayer.Location, false);
+            //XtraMessageBox.Show(pos.ToString());
+            #endregion
         }
 
         private void btnUccEditor_Click(object sender, EventArgs e)
@@ -159,164 +192,161 @@ namespace EntityTools.Forms
         }
 
 
-        private void MainPanel_Load(object sender, EventArgs e)
-        {
-            //bteMissions.Properties.NullValuePrompt = Path.Combine(FileTools.defaulExportFolderMissions, FileTools.defaulFileMissions);
-            //bteAuras.Properties.NullValuePrompt = Path.Combine(FileTools.defaulExportFolderAuras, FileTools.defaulFileAuras);
-        }
+        #region старый_экспорт
+        //private void MainPanel_Load(object sender, EventArgs e)
+        //{
+        //    //bteMissions.Properties.NullValuePrompt = Path.Combine(FileTools.defaulExportFolderMissions, FileTools.defaulFileMissions);
+        //    //bteAuras.Properties.NullValuePrompt = Path.Combine(FileTools.defaulExportFolderAuras, FileTools.defaulFileAuras);
+        //}
 
-        private void bte_ButtonClick(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
-        {
-            if (sender is DevExpress.XtraEditors.ButtonEdit bte)
-            {
-                string fileName = string.Empty;
+        //private void bte_ButtonClick(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
+        //{
+        //    if (sender is DevExpress.XtraEditors.ButtonEdit bte)
+        //    {
+        //        string fileName = string.Empty;
 
-                if (string.IsNullOrEmpty(bte.Text) || (bte.Text.IndexOfAny(Path.GetInvalidPathChars()) != -1))
-                {
+        //        if (string.IsNullOrEmpty(bte.Text) || (bte.Text.IndexOfAny(Path.GetInvalidPathChars()) != -1))
+        //        {
 
-                    if (bte.Name == bteAuras.Name) fldrBroserDlg.SelectedPath = FileTools.defaulExportFolderAuras;
-                    if (bte.Name == bteMissions.Name) fldrBroserDlg.SelectedPath = FileTools.defaulExportFolderMissions;
-                }
-                else
-                {
-                    fldrBroserDlg.SelectedPath = Path.GetDirectoryName(bte.Text);
-                    fileName = Path.GetFileName(bte.Text);
-                }
+        //            if (bte.Name == bteAuras.Name) fldrBroserDlg.SelectedPath = FileTools.defaultExportFolderAuras;
+        //            if (bte.Name == bteMissions.Name) fldrBroserDlg.SelectedPath = FileTools.defaultExportFolderMissions;
+        //        }
+        //        else
+        //        {
+        //            fldrBroserDlg.SelectedPath = Path.GetDirectoryName(bte.Text);
+        //            fileName = Path.GetFileName(bte.Text);
+        //        }
 
-                if (fldrBroserDlg.ShowDialog() == DialogResult.OK)
-                {
-                    if (string.IsNullOrEmpty(fileName))
-                    {
-                        if (bte.Name == bteAuras.Name) bte.Text = Path.Combine(fldrBroserDlg.SelectedPath, FileTools.defaulFileAuras);
-                        if (bte.Name == bteMissions.Name) bte.Text = Path.Combine(fldrBroserDlg.SelectedPath, FileTools.defaulFileMissions);
-                    }
-                    else bte.Text = Path.Combine(fldrBroserDlg.SelectedPath, fileName);
-                }
-            }
-        }
+        //        if (fldrBroserDlg.ShowDialog() == DialogResult.OK)
+        //        {
+        //            if (string.IsNullOrEmpty(fileName))
+        //            {
+        //                if (bte.Name == bteAuras.Name) bte.Text = Path.Combine(fldrBroserDlg.SelectedPath, FileTools.defaultFileAuras);
+        //                if (bte.Name == bteMissions.Name) bte.Text = Path.Combine(fldrBroserDlg.SelectedPath, FileTools.defaultFileMissions);
+        //            }
+        //            else bte.Text = Path.Combine(fldrBroserDlg.SelectedPath, fileName);
+        //        }
+        //    }
+        //}
 
-        private void btnAuras_Click(object sender, EventArgs e)
-        {
-            AurasWrapper auras = new AurasWrapper(EntityManager.LocalPlayer?.Character);
+        //private void btnAuras_Click(object sender, EventArgs e)
+        //{
+        //    AurasWrapper auras = new AurasWrapper(EntityManager.LocalPlayer?.Character);
 
-            string fullFileName = FileTools.ReplaceMask(bteAuras.Text);
+        //    string fullFileName = FileTools.ReplaceMask(bteAuras.Text);
 
-            if (string.IsNullOrEmpty(fullFileName) || fullFileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
-            {
-                fullFileName = Path.Combine(FileTools.defaulExportFolderAuras, FileTools.defaulFileAuras);
-                MessageBox.Show("The specified filename is invalid.\n" +
-                                "Auras will be saved in the file:\n" +
-                                fullFileName, "Caution!", MessageBoxButtons.OK);
-            }
+        //    if (string.IsNullOrEmpty(fullFileName) || fullFileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+        //    {
+        //        fullFileName = Path.Combine(FileTools.defaultExportFolderAuras, FileTools.defaultFileAuras);
+        //        MessageBox.Show("The specified filename is invalid.\n" +
+        //                        "Auras will be saved in the file:\n" +
+        //                        fullFileName, "Caution!", MessageBoxButtons.OK);
+        //    }
 
-            if (!Directory.Exists(Path.GetDirectoryName(fullFileName)))
-                Directory.CreateDirectory(Path.GetDirectoryName(fullFileName));
+        //    if (!Directory.Exists(Path.GetDirectoryName(fullFileName)))
+        //        Directory.CreateDirectory(Path.GetDirectoryName(fullFileName));
 
 
-            XmlSerializer serialiser = new XmlSerializer(typeof(AurasWrapper));
-            TextWriter FileStream = new StreamWriter(fullFileName);
-            serialiser.Serialize(FileStream, auras);
-            FileStream.Close();
+        //    XmlSerializer serialiser = new XmlSerializer(typeof(AurasWrapper));
+        //    TextWriter FileStream = new StreamWriter(fullFileName);
+        //    serialiser.Serialize(FileStream, auras);
+        //    FileStream.Close();
 
-            if (MessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?", $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                System.Diagnostics.Process.Start(fullFileName);
-        }
+        //    if (MessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?", $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+        //        System.Diagnostics.Process.Start(fullFileName);
+        //}
 
-        private void btnMissions_Click(object sender, EventArgs e)
-        {
-            MissionsWrapper missions = new MissionsWrapper(EntityManager.LocalPlayer);
+        //private void btnMissions_Click(object sender, EventArgs e)
+        //{
+        //    MissionsWrapper missions = new MissionsWrapper(EntityManager.LocalPlayer);
 
-            string fullFileName = FileTools.ReplaceMask(bteMissions.Text);
+        //    string fullFileName = FileTools.ReplaceMask(bteMissions.Text);
 
-            if (string.IsNullOrEmpty(fullFileName) || fullFileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
-            {
-                fullFileName = Path.Combine(FileTools.defaulExportFolderMissions, FileTools.defaulFileMissions);
-                MessageBox.Show("The specified filename is invalid.\n" +
-                    "Missions will be saved in the file:\n" +
-                    fullFileName, "Caution!", MessageBoxButtons.OK);
-            }
+        //    if (string.IsNullOrEmpty(fullFileName) || fullFileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+        //    {
+        //        fullFileName = Path.Combine(FileTools.defaultExportFolderMissions, FileTools.defaultFileMissions);
+        //        MessageBox.Show("The specified filename is invalid.\n" +
+        //            "Missions will be saved in the file:\n" +
+        //            fullFileName, "Caution!", MessageBoxButtons.OK);
+        //    }
 
-            if (!Directory.Exists(Path.GetDirectoryName(fullFileName)))
-                Directory.CreateDirectory(Path.GetDirectoryName(fullFileName));
+        //    if (!Directory.Exists(Path.GetDirectoryName(fullFileName)))
+        //        Directory.CreateDirectory(Path.GetDirectoryName(fullFileName));
 
-            XmlSerializer serialiser = new XmlSerializer(typeof(MissionsWrapper));
-            TextWriter FileStream = new StreamWriter(fullFileName);
-            serialiser.Serialize(FileStream, missions);
-            FileStream.Close();
+        //    XmlSerializer serialiser = new XmlSerializer(typeof(MissionsWrapper));
+        //    TextWriter FileStream = new StreamWriter(fullFileName);
+        //    serialiser.Serialize(FileStream, missions);
+        //    FileStream.Close();
 
-            if(MessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?", $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                System.Diagnostics.Process.Start(fullFileName);
-        }
+        //    if(MessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?", $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+        //        System.Diagnostics.Process.Start(fullFileName);
+        //}
 
-        private void btnInterfaces_Click(object sender, EventArgs e)
-        {
-            InterfaceWrapper Interfaces = new InterfaceWrapper();
+        //private void btnInterfaces_Click(object sender, EventArgs e)
+        //{
+        //    InterfaceWrapper Interfaces = new InterfaceWrapper();
 
-            string fullFileName = FileTools.ReplaceMask(bteInterfaces.Text);
+        //    string fullFileName = FileTools.ReplaceMask(bteInterfaces.Text);
 
-            if (string.IsNullOrEmpty(fullFileName) || fullFileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
-            {
-                fullFileName = Path.Combine(FileTools.defaultExportFolderInterfaces, FileTools.defaulFileInterfaces);
-                MessageBox.Show("The specified filename is invalid.\n" +
-                    "Interafaces will be saved in the file:\n" +
-                    fullFileName, "Caution!", MessageBoxButtons.OK);
-            }
+        //    if (string.IsNullOrEmpty(fullFileName) || fullFileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+        //    {
+        //        fullFileName = Path.Combine(FileTools.defaultExportFolderInterfaces, FileTools.defaultFileInterfaces);
+        //        MessageBox.Show("The specified filename is invalid.\n" +
+        //            "Interafaces will be saved in the file:\n" +
+        //            fullFileName, "Caution!", MessageBoxButtons.OK);
+        //    }
 
-            if (!Directory.Exists(Path.GetDirectoryName(fullFileName)))
-                Directory.CreateDirectory(Path.GetDirectoryName(fullFileName));
+        //    if (!Directory.Exists(Path.GetDirectoryName(fullFileName)))
+        //        Directory.CreateDirectory(Path.GetDirectoryName(fullFileName));
 
-            XmlSerializer serialiser = new XmlSerializer(typeof(InterfaceWrapper));
-            TextWriter FileStream = new StreamWriter(fullFileName);
-            serialiser.Serialize(FileStream, Interfaces);
-            FileStream.Close();
+        //    XmlSerializer serialiser = new XmlSerializer(typeof(InterfaceWrapper));
+        //    TextWriter FileStream = new StreamWriter(fullFileName);
+        //    serialiser.Serialize(FileStream, Interfaces);
+        //    FileStream.Close();
 
-            if (MessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?", $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                System.Diagnostics.Process.Start(fullFileName);
+        //    if (MessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?", $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+        //        System.Diagnostics.Process.Start(fullFileName);
 
-        }
+        //}
 
-        private void btnStates_Click(object sender, EventArgs e)
-        {
-            string fullFileName = FileTools.ReplaceMask(bteStates.Text);
+        //private void btnStates_Click(object sender, EventArgs e)
+        //{
+        //    string fullFileName = FileTools.ReplaceMask(bteStates.Text);
 
-            if (string.IsNullOrEmpty(fullFileName) || fullFileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
-            {
-                fullFileName = Path.Combine(FileTools.defaultExportFolderStates, FileTools.defaulFileStates);
-                MessageBox.Show("The specified filename is invalid.\n" +
-                    "Missions info will be saved in the file:\n" +
-                    fullFileName, "Caution!", MessageBoxButtons.OK);
-            }
+        //    if (string.IsNullOrEmpty(fullFileName) || fullFileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+        //    {
+        //        fullFileName = Path.Combine(FileTools.defaultExportFolderStates, FileTools.defaultFileStates);
+        //        MessageBox.Show("The specified filename is invalid.\n" +
+        //            "Missions info will be saved in the file:\n" +
+        //            fullFileName, "Caution!", MessageBoxButtons.OK);
+        //    }
 
-            if (!Directory.Exists(Path.GetDirectoryName(fullFileName)))
-                Directory.CreateDirectory(Path.GetDirectoryName(fullFileName));
+        //    if (!Directory.Exists(Path.GetDirectoryName(fullFileName)))
+        //        Directory.CreateDirectory(Path.GetDirectoryName(fullFileName));
 
-            using (StreamWriter sw = new StreamWriter(fullFileName, false, Encoding.Default))
-            {
-                sw.WriteLine($"Character: {EntityManager.LocalPlayer.InternalName}");
-                sw.WriteLine($"DateTime: {DateTime.Now.ToLongDateString()} {DateTime.Now.ToLongTimeString()}");
-                sw.WriteLine();
-                foreach (Astral.Logic.Classes.FSM.State state in Astral.Quester.API.Engine.States)
-                {
-                    sw.WriteLine($"{state.DisplayName} {state.Priority}");
-                    sw.WriteLine($"\t{state.GetType().FullName}");
-                }
-            }
+        //    using (StreamWriter sw = new StreamWriter(fullFileName, false, Encoding.Default))
+        //    {
+        //        sw.WriteLine($"Character: {EntityManager.LocalPlayer.InternalName}");
+        //        sw.WriteLine($"DateTime: {DateTime.Now.ToLongDateString()} {DateTime.Now.ToLongTimeString()}");
+        //        sw.WriteLine();
+        //        foreach (Astral.Logic.Classes.FSM.State state in Astral.Quester.API.Engine.States)
+        //        {
+        //            sw.WriteLine($"{state.DisplayName} {state.Priority}");
+        //            sw.WriteLine($"\t{state.GetType().FullName}");
+        //        }
+        //    }
 
-            if (MessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?", $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                System.Diagnostics.Process.Start(fullFileName);
+        //    if (MessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?", $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+        //        System.Diagnostics.Process.Start(fullFileName);
 
-        }
+        //}
+        #endregion
 
         private void cbSpellStuckMonitor_CheckedChanged(object sender, EventArgs e)
         {
             //SpellStuckMonitor.Activate = false;// ckbSpellStuckMonitor.Checked;
-            UnstuckSpellTask.Activate = ckbSpellStuckMonitor.Checked;
-        }
-
-
-        private void btnUiViewer_Click(object sender, EventArgs e)
-        {
-            UIViewer.GetUiGen();
+            //UnstuckSpellTask.Active = ckbSpellStuckMonitor.Checked;
+            EntityTools.PluginSettings.UnstuckSpells.Active = ckbSpellStuckMonitor.Checked;
         }
 
         private void cbEnchantHelperActivator_CheckedChanged(object sender, EventArgs e)
@@ -324,17 +354,134 @@ namespace EntityTools.Forms
             EnchantHelper.Enabled = cbEnchantHelperActivator.Checked;
         }
 
-        private void btnEntities_Click(object sender, EventArgs e)
+        private void btnUiViewer_Click(object sender, EventArgs e)
         {
-            EntitySelectForm.GetEntity();
+            UIViewer.ShowFreeTool();
         }
 
-        private void btnGet_Click(object sender, EventArgs e)
+        private void btnEntities_Click(object sender, EventArgs e)
+        {
+            EntitySelectForm.ShowFreeTool();
+        }
+
+        private void btnAuraViewer_Click(object sender, EventArgs e)
+        {
+            Editors.Forms.AuraSelectForm.ShowFreeTool();
+        }
+
+        private void btnGetMachineId_Click(object sender, EventArgs e)
         {
             var machineid = Memory.MMemory.ReadString(Memory.BaseAdress + 0x2640BD0, Encoding.UTF8, 64);
             lblAccount.Text = $"Account:   @{EntityManager.LocalPlayer.AccountLoginUsername}";
             tbMashingId.Text = machineid;
         }
-    }
 
+        private void btnExport_Click(object sender, EventArgs e)
+        {
+            if(cbbExportSelector.SelectedItem is ExportTypes expType)
+            {
+                string fullFileName = FileTools.ReplaceMask(tbExportFileSelector.Text);
+
+                if (string.IsNullOrEmpty(fullFileName) || fullFileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+                {
+                    fullFileName = Path.Combine(Astral.Controllers.Directories.LogsPath, expType.ToString(), FileTools.ReplaceMask(FileTools.defaultExportFileName));
+                    MessageBox.Show("The specified filename is incorrect.\n" +
+                                    $"{expType} will be saved in the file:\n" +
+                                    fullFileName, "Caution!", MessageBoxButtons.OK);
+                }
+
+                if (!Directory.Exists(Path.GetDirectoryName(fullFileName)))
+                    Directory.CreateDirectory(Path.GetDirectoryName(fullFileName));
+
+                switch (expType)
+                {
+                    case ExportTypes.Auras:
+                        {
+                            AurasWrapper auras = new AurasWrapper(EntityManager.LocalPlayer?.Character);
+
+                            XmlSerializer serialiser = new XmlSerializer(typeof(AurasWrapper));
+                            TextWriter FileStream = new StreamWriter(fullFileName);
+                            serialiser.Serialize(FileStream, auras);
+                            FileStream.Close();
+                            break;
+                        }
+                    case ExportTypes.Interfaces:
+                        {
+                            InterfaceWrapper Interfaces = new InterfaceWrapper();
+
+                            XmlSerializer serialiser = new XmlSerializer(typeof(InterfaceWrapper));
+                            TextWriter FileStream = new StreamWriter(fullFileName);
+                            serialiser.Serialize(FileStream, Interfaces);
+                            FileStream.Close();
+
+                            break;
+                        }
+                    case ExportTypes.Missions:
+                        {
+                            MissionsWrapper missions = new MissionsWrapper(EntityManager.LocalPlayer);
+
+                            XmlSerializer serialiser = new XmlSerializer(typeof(MissionsWrapper));
+                            TextWriter FileStream = new StreamWriter(fullFileName);
+                            serialiser.Serialize(FileStream, missions);
+                            FileStream.Close();
+                            break;
+                        }                        
+                    case ExportTypes.States:
+                        {
+                            using (StreamWriter sw = new StreamWriter(fullFileName, false, Encoding.Default))
+                            {
+                                sw.WriteLine($"Character: {EntityManager.LocalPlayer.InternalName}");
+                                sw.WriteLine($"DateTime: {DateTime.Now.ToLongDateString()} {DateTime.Now.ToLongTimeString()}");
+                                sw.WriteLine();
+                                foreach (Astral.Logic.Classes.FSM.State state in Astral.Quester.API.Engine.States)
+                                {
+                                    sw.WriteLine($"{state.DisplayName} {state.Priority}");
+                                    sw.WriteLine($"\t{state.GetType().FullName}");
+                                }
+                            }
+                            break;
+                        }
+                }
+
+                if (MessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?", $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    System.Diagnostics.Process.Start(fullFileName);
+            }
+        }
+
+        private void tbExportFileSelector_ButtonClick(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
+        {
+            if (cbbExportSelector.SelectedItem is ExportTypes expType)
+            {
+                string fileName;
+                if (string.IsNullOrEmpty(tbExportFileSelector.Text))
+                {
+                    fileName = Path.Combine(@".", Astral.Controllers.Directories.LogsPath.Substring(Astral.Controllers.Directories.AstralStartupPath.Length),
+                                            expType.ToString(), FileTools.defaultExportFileName);
+                    //fileName.Replace(Astral.Controllers.Directories.AstralStartupPath, @".\");
+                }
+                else fileName = tbExportFileSelector.Text;
+
+                string directory = Path.GetDirectoryName(fileName);
+                if (!Directory.Exists(fileName))
+                    Directory.CreateDirectory(directory);
+                dlgSaveFile.InitialDirectory = directory;
+
+                dlgSaveFile.FileName = fileName;
+                if (dlgSaveFile.ShowDialog() == DialogResult.OK)
+                    tbExportFileSelector.Text = dlgSaveFile.FileName;
+            }
+        }
+
+        private void cbbExportSelector_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbbExportSelector.SelectedItem is ExportTypes expType)
+            {
+                string fileName;
+                fileName = Path.Combine(@".", Astral.Controllers.Directories.LogsPath.Substring(Astral.Controllers.Directories.AstralStartupPath.Length), 
+                                        expType.ToString(), FileTools.defaultExportFileName);
+                //fileName.Replace(Astral.Controllers.Directories.AstralStartupPath, @".\");
+                tbExportFileSelector.Text = fileName;
+            }
+        }
+    }
 }

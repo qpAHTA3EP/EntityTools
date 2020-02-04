@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.0113.1435</AssemblyVersion>
+    <AssemblyVersion>0.20.0203.1713</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -38,7 +38,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>D:\Astral\Astral_RU_1\Plugins\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;X64</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -52,15 +52,17 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE;X64</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <DebugSymbols>true</DebugSymbols>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>
@@ -100,11 +102,10 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="MyMemory-x64">
-      <HintPath>..\..\QuesterAssistant\References\x64\MyMemory-x64.dll</HintPath>
+      <HintPath>..\References\x64\MyMemory-x64.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MyNW, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="MyNW">
       <HintPath>..\References\x64\MyNW.dll</HintPath>
       <Private>False</Private>
     </Reference>
@@ -179,11 +180,11 @@
     <Compile Include="Editors\Forms\MountBonusPriorityListForm.Designer.cs">
       <DependentUpon>MountBonusPriorityListForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editors\Forms\UnoSelectForm.cs">
+    <Compile Include="Editors\Forms\ItemSelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Editors\Forms\UnoSelectForm.Designer.cs">
-      <DependentUpon>UnoSelectForm.cs</DependentUpon>
+    <Compile Include="Editors\Forms\ItemSelectForm.Designer.cs">
+      <DependentUpon>ItemSelectForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Editors\Forms\MultiSelectForm.cs">
       <SubType>Form</SubType>
@@ -209,6 +210,11 @@
     <Compile Include="Editors\UccActionEditor.cs" />
     <Compile Include="Editors\UiIdEditor.cs" />
     <Compile Include="Extensions\ListTExtentions.cs" />
+    <Compile Include="Patches\Mapper\AddNavigationNodeTask.cs" />
+    <Compile Include="Patches\Mapper\AddNavigationNode.cs" />
+    <Compile Include="Patches\Mapper\MapperGraphCache.cs" />
+    <Compile Include="Patches\Patcher.cs" />
+    <Compile Include="Patches\Mapper\Patch_Mapper.cs" />
     <Compile Include="Patches\Patch.cs" />
     <Compile Include="Patches\Patch_GraphicsNW.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -216,7 +222,10 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="States\UnstuckSpellTask.cs" />
+    <Compile Include="Settings\MapperSettings.cs" />
+    <Compile Include="Settings\SettingsContainer.cs" />
+    <Compile Include="Daemons\UnstuckSpell\UnstuckSpellsDaemon.cs" />
+    <Compile Include="Daemons\UnstuckSpell\UnstuckSpellsDaemonSettings.cs" />
     <Compile Include="Tools\AuraOption.cs" />
     <Compile Include="Tools\CollectionTypeConverter.cs" />
     <Compile Include="Tools\CopyHelper.cs" />
@@ -228,10 +237,11 @@
     <Compile Include="Tools\Entities\SearchCached.cs" />
     <Compile Include="Tools\Entities\SearchDirect.cs" />
     <Compile Include="Tools\Enums.cs" />
-    <Compile Include="Tools\Export\FileTools.cs" />
+    <Compile Include="Tools\Export\Enums.cs" />
+    <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\Export\Auras.cs" />
     <Compile Include="Tools\CommonTools.cs" />
-    <Compile Include="Tools\EntitySelectionTools.cs" />
+    <Compile Include="Tools\Entities\EntitySelectionTools.cs" />
     <Compile Include="EntityPlugin.cs" />
     <Compile Include="Actions\MoveToEntityCachedTimeout.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -249,14 +259,17 @@
     <Compile Include="Tools\MountInsignias\MountBonusPriorityDef.cs" />
     <Compile Include="Tools\MountInsignias\ParagonMountBonusPriorityDef.cs" />
     <Compile Include="Tools\ParagonTools.cs" />
-    <Compile Include="Tools\ReflectionHelper.cs" />
-    <Compile Include="Tools\SettingsTools.cs" />
+    <Compile Include="Tools\Reflection\ReflectionHelper.cs" />
+    <Compile Include="Settings\PluginSettingsBase.cs" />
+    <Compile Include="Tools\Reflection\StaticMethodInvoker.cs" />
+    <Compile Include="Tools\Reflection\StaticPropertyAccessor.cs" />
     <Compile Include="Tools\Struct.cs" />
-    <Compile Include="Tools\UCCExtensions\UCCActionExtention.cs" />
-    <Compile Include="Tools\UCCExtensions\UCCEditorExtensions.cs" />
+    <Compile Include="UCC\Extensions\UCCActionExtention.cs" />
+    <Compile Include="UCC\Extensions\UCCEditorExtensions.cs" />
     <Compile Include="Tools\Export\GameUITools.cs" />
     <Compile Include="UCC\Conditions\UCCConditionPack.cs" />
     <Compile Include="UCC\Conditions\ICustomUCCCondition.cs" />
+    <Compile Include="UCC\Conditions\UCCCheckTimer.cs" />
     <Compile Include="UCC\Conditions\UCCTargetMatchEntity.cs" />
     <Compile Include="UCC\Conditions\UCCQuesterCheck.cs" />
     <Compile Include="UCC\DodgeFromEntity.cs" />
@@ -266,7 +279,8 @@
     <Compile Include="UCC\ExecuteSpecificPower.cs" />
     <Compile Include="UCC\SpecializedUCCAction.cs" />
     <Compile Include="UCC\Conditions\UCCGenericCondition.cs" />
-    <Compile Include="UCC\UseItem.cs" />
+    <Compile Include="UCC\UCCTools.cs" />
+    <Compile Include="UCC\UseItemSpecial.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Editors\Forms\AuraSelectForm.resx">
@@ -287,8 +301,8 @@
     <EmbeddedResource Include="Editors\Forms\MountBonusPriorityListForm.resx">
       <DependentUpon>MountBonusPriorityListForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Editors\Forms\UnoSelectForm.resx">
-      <DependentUpon>UnoSelectForm.cs</DependentUpon>
+    <EmbeddedResource Include="Editors\Forms\ItemSelectForm.resx">
+      <DependentUpon>ItemSelectForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editors\Forms\MultiSelectForm.resx">
       <DependentUpon>MultiSelectForm.cs</DependentUpon>
@@ -309,8 +323,8 @@
     <Folder Include="Actions\Encripted\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="Images\Entity_7_40х48.png" />
+    <None Include="Properties\DataSources\EntityTools.Properties.Settings.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

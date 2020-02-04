@@ -1,15 +1,10 @@
 ﻿using System.Windows.Forms;
 using Astral.Logic.NW;
-using Astral.Quester.Classes;
 using EntityTools.Enums;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace EntityTools.Tools
 {

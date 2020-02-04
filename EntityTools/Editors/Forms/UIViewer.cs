@@ -26,12 +26,8 @@ namespace EntityTools.Forms
             InitializeComponent();
         }
 
-        public static void GetUiGen(UIGen parentUiGen = null)
+        public static void ShowFreeTool()
         {
-            //if (uiViewer == null)
-            //    uiViewer = new UIViewer();
-            //uiViewer.Show();
-
             UIViewer uiViewer = new UIViewer();
             uiViewer.currentUiGenId = string.Empty;
             uiViewer.Show();

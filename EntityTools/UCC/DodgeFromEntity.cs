@@ -277,7 +277,7 @@ namespace EntityTools.UCC
                     {
                         entity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete,
                                                                 HealthCheck, ReactionRange,
-                                                                (ReactionZRange > 0) ? ReactionZRange : Settings.Get.MaxElevationDifference, 
+                                                                (ReactionZRange > 0) ? ReactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference, 
                                                                 RegionCheck, null, Aura.Checker);
                         return entity;
                     }

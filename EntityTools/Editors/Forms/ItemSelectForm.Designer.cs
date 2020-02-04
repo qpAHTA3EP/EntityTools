@@ -1,6 +1,6 @@
 ﻿namespace EntityTools.Editors.Forms
 {
-    partial class UnoSelectForm
+    partial class ItemSelectForm
     {
         /// <summary>
         /// Required designer variable.
@@ -110,7 +110,7 @@
         internal DevExpress.XtraEditors.SimpleButton btnSelect;
         internal DevExpress.XtraEditors.SimpleButton btnReload;
         internal System.Windows.Forms.Label lbl;
-        internal System.Windows.Forms.DataGridViewTextBoxColumn clmnItemsNames;
+        //internal System.Windows.Forms.DataGridViewTextBoxColumn clmnItemsNames;
         private System.Windows.Forms.ListBox ItemList;
     }
 }

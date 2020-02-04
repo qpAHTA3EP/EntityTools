@@ -22,6 +22,21 @@ namespace EntityTools.Enums
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+    public enum TestTimer
+    {
+        /// <summary>
+        /// Сколько времни осталось до истечения таймаута
+        /// </summary>
+        Left,
+        /// <summary>
+        /// Сколько времени прошло со старта таймера
+        /// </summary>
+        Passed
+    }
+
+    /// <summary>
     /// Перечисление 
     /// </summary>
     [Serializable]

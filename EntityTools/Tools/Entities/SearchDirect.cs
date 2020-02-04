@@ -13,7 +13,7 @@ namespace EntityTools.Tools.Entities
 {
     public static class SearchDirect
     {
-#if PROFILING
+#if DEBUG && PROFILING
         private static Stopwatch stopwatch = new Stopwatch();
         private static Stopwatch cntStopwatch = new Stopwatch();
         private static int Count = 0;
@@ -78,14 +78,14 @@ namespace EntityTools.Tools.Entities
         /// <returns></returns>
         public static List<Entity> GetEntities(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, Action<Entity> action = null)
         {
-#if PROFILING
+#if DEBUG && PROFILING
             Count++;
             TimeSpan StartTime = stopwatch.Elapsed;
             stopwatch.Start();
             try
             {
 #endif
-                EntityComparerToPattern comparer = new EntityComparerToPattern(entPattern, strMatchType, nameType);
+            EntityComparerToPattern comparer = new EntityComparerToPattern(entPattern, strMatchType, nameType);
 
                 if (action != null)
                     return EntityManager.GetEntities()?.FindAll((Entity e) =>
@@ -98,7 +98,7 @@ namespace EntityTools.Tools.Entities
                                 else return false;
                             });
                 else return EntityManager.GetEntities()?.FindAll(comparer.Check);
-#if PROFILING
+#if DEBUG && PROFILING
             }
             finally
             {
@@ -126,14 +126,14 @@ namespace EntityTools.Tools.Entities
         {
             if (key == null)
                 return null;
-#if PROFILING
+#if DEBUG && PROFILING
             Count++;
             TimeSpan StartTime = stopwatch.Elapsed;
             stopwatch.Start();
             try
             {
 #endif
-                if (action != null)
+            if (action != null)
                     return EntityManager.GetEntities()?.FindAll((Entity e) =>
                     {
                         if (key.Comparer.Check(e))
@@ -144,7 +144,7 @@ namespace EntityTools.Tools.Entities
                         else return false;
                     });
                 else return EntityManager.GetEntities()?.FindAll(key.Comparer.Check);
-#if PROFILING
+#if DEBUG && PROFILING
             }
             finally
             {
@@ -172,14 +172,14 @@ namespace EntityTools.Tools.Entities
         /// <returns></returns>
         public static List<Entity> GetContactEntities(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, Action<Entity> action = null)
         {
-#if PROFILING
+#if DEBUG && PROFILING
             ContactCount++;
             TimeSpan StartTime = cntStopwatch.Elapsed;
             cntStopwatch.Start();
             try
             {
 #endif
-                List<Entity> entities = new List<Entity>();
+            List<Entity> entities = new List<Entity>();
                 EntityComparerToPattern comparer = new EntityComparerToPattern(entPattern, strMatchType, nameType);
 
                 if (action != null)
@@ -215,7 +215,7 @@ namespace EntityTools.Tools.Entities
                     }
                 }
                 return entities;
-#if PROFILING
+#if DEBUG && PROFILING
             }
             finally
             {
@@ -242,14 +242,14 @@ namespace EntityTools.Tools.Entities
         {
             if (key == null)
                 return null;
-#if PROFILING
+#if DEBUG && PROFILING
             ContactCount++;
             TimeSpan StartTime = cntStopwatch.Elapsed;
             cntStopwatch.Start();
             try
             {
 #endif
-                List<Entity> entities = new List<Entity>();
+            List<Entity> entities = new List<Entity>();
 
                 if (action != null)
                 {
@@ -284,7 +284,7 @@ namespace EntityTools.Tools.Entities
                     }
                 }
                 return entities;
-#if PROFILING
+#if DEBUG && PROFILING
             }
             finally
             {

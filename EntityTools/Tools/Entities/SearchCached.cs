@@ -13,7 +13,7 @@ namespace EntityTools.Tools.Entities
 {
     public static class SearchCached
     {
-#if PROFILING
+#if DEBUG && PROFILING
         static readonly long interval = 10000;
 
         private static Stopwatch stopwatch = new Stopwatch();
@@ -87,15 +87,15 @@ namespace EntityTools.Tools.Entities
             bool healthCheck = false, float range = 0, float zRange = 0, bool regionCheck = false, List<CustomRegion> customRegions = null, 
             Predicate<Entity> specialCheck = null)
         {
-#if PROFILING
+#if DEBUG && PROFILING
             Count++;
             TimeSpan StartTime = stopwatch.Elapsed;
             stopwatch.Start();
             try
             {
 #endif
-                // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
-                float closestDistance = (range == 0) ? float.MaxValue : range;
+            // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
+            float closestDistance = (range == 0) ? float.MaxValue : range;
                 List<Entity> entities = new List<Entity>();
                 Action<Entity> evaluateAction;
 
@@ -161,7 +161,7 @@ namespace EntityTools.Tools.Entities
                 }
 
                 return entities;
-#if PROFILING
+#if DEBUG && PROFILING
             }
             finally
             {
@@ -201,15 +201,15 @@ namespace EntityTools.Tools.Entities
             bool healthCheck = false, float range = 0, float zRange = 0, bool regionCheck = false, List<CustomRegion> customRegions = null,
             Predicate<Entity> specialCheck = null)
         {
-#if PROFILING
+#if DEBUG && PROFILING
             Count++;
             TimeSpan StartTime = stopwatch.Elapsed;
             stopwatch.Start();
             try
             {
 #endif
-                // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
-                float closestDistance = (range == 0) ? float.MaxValue : range;
+            // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
+            float closestDistance = (range == 0) ? float.MaxValue : range;
                 Entity closestEntity = null;
                 Action<Entity> evaluateAction;
 
@@ -299,7 +299,7 @@ namespace EntityTools.Tools.Entities
                     cachedEntities.Processing(evaluateAction);
                 }
                 return closestEntity;
-#if PROFILING
+#if DEBUG && PROFILING
             }
             finally
             {

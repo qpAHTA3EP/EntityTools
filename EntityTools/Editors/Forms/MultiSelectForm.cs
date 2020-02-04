@@ -13,7 +13,7 @@ namespace EntityTools.Forms
     public partial class MultiSelectForm :XtraForm
     {
         internal int SelectColumnInd { get => clmnSelect.DisplayIndex; }
-        internal int ItemsNamesColumnInd { get => clmnItemsNames.DisplayIndex; }
+        //internal int ItemsNamesColumnInd { get => clmnItemsNames.DisplayIndex; }
 
         internal delegate void FillItems(DataGridView dgv);
 

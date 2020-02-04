@@ -11,6 +11,7 @@ using System.Drawing;
 using System.Drawing.Design;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace EntityTools.Actions
 {
@@ -126,7 +127,7 @@ namespace EntityTools.Actions
         }
         public override void GatherInfos()
         {
-            XtraMessageBox.Show("Place the character on the default waypoint and press OK");
+            XtraMessageBox.Show(/*Form.ActiveForm, */"Place the character on the default waypoint and press OK");
             Position = EntityManager.LocalPlayer.Location.Clone();
         }
     }

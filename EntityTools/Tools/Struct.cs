@@ -10,8 +10,9 @@ namespace EntityTools.Tools
     /// </summary>
     /// <typeparam name="A"></typeparam>
     /// <typeparam name="B"></typeparam>
-    public struct Pair<A, B>
+    public class Pair<A, B>
     {
+        public Pair() { }
         public Pair(A a, B b)
         {
             First = a;
@@ -22,7 +23,7 @@ namespace EntityTools.Tools
         public B Second;
     }
 
-    public struct ReadonlyPair<A, B>
+    public class ReadonlyPair<A, B>
     {
         public ReadonlyPair(A a, B b)
         {
@@ -52,10 +53,18 @@ namespace EntityTools.Tools
     /// <typeparam name="A"></typeparam>
     /// <typeparam name="B"></typeparam>
     /// <typeparam name="C"></typeparam>
-    public struct Triple<A, B, C>
+    public class Triple<A, B, C>
     {
         public A First;
         public B Second;
         public C Third;
+
+        public Triple() { }
+        public Triple(A a, B b, C c)
+        {
+            First = a;
+            Second = b;
+            Third = c;
+        }
     }
 }

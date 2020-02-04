@@ -2,23 +2,22 @@
 using Astral.Logic.UCC;
 using Astral.Logic.UCC.Forms;
 using EntityTools.Actions;
+using EntityTools.Patches;
 using EntityTools.Tools;
 using EntityTools.Tools.Entities;
+using MyNW.Internals;
 using System;
+using System.IO;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace EntityTools
 {
     public class EntityTools : Astral.Addons.Plugin
     {
-        //public EntityPluginSettings PluginSettings {get;} = new EntityPluginSettings();
-
-        public EntityTools() : base()
-        {
-            DebugInfoEnabled = false;
-        }
-        public static bool DebugInfoEnabled { get; set; }
         public override string Name => "Entity Tools";
         public override string Author => "MichaelProg";
         public override System.Drawing.Image Icon => Properties.Resources.EntityIcon;
@@ -28,14 +27,16 @@ namespace EntityTools
             get
             {
                 if (panel == null)
-                    panel = new Forms.MainPanel();
+                    panel = new Forms.EntityToolsMainPanel();
                 return panel;
             }
         }
 
+        public static SettingsContainer PluginSettings { get; set; } = new SettingsContainer();
+
         public override void OnBotStart()
         {
-#if PROFILING
+#if PROFILING && DEBUG
             InteractEntities.ResetWatch();
             //InteractEntitiesCached.ResetWatch();
             //InteractEntitiesCachedTimeout.ResetWatch();
@@ -49,7 +50,7 @@ namespace EntityTools
 
         public override void OnBotStop()
         {
-#if PROFILING
+#if PROFILING && DEBUG
             InteractEntities.LogWatch();
             //InteractEntitiesCached.LogWatch();
             //InteractEntitiesCachedTimeout.LogWatch();
@@ -63,12 +64,74 @@ namespace EntityTools
 
         public override void OnLoad()
         {
-            //States.SpellStuckMonitor.Activate = true;
-            //States.SlideMonitor.Activate = false;
-            States.UnstuckSpellTask.Activate = true;
+            LoadSettings();
+
+            Patcher.Apply();
         }
 
-        public override void OnUnload() { }
+        public override void OnUnload()
+        {
+            SaveSettings();
+        }
+
+        /// <summary>
+        /// Сохранение настроек в файл
+        /// </summary>
+        private void LoadSettings()
+        {
+            if (!Directory.Exists(Path.GetDirectoryName(FileTools.SettingsFile)))
+                Directory.CreateDirectory(Path.GetDirectoryName(FileTools.SettingsFile));
+
+            try
+            {
+                if (File.Exists(FileTools.SettingsFile))
+                {
+                    XmlSerializer serialiser = new XmlSerializer(PluginSettings.GetType());
+                    using (StreamReader fileStream = new StreamReader(FileTools.SettingsFile))
+                    {
+                        if (serialiser.Deserialize(fileStream) is SettingsContainer settings)
+                        {
+                            PluginSettings = settings;
+                            Astral.Logger.WriteLine($"{GetType().Name}: Load settings from {Path.GetFileName(FileTools.SettingsFile)}");
+                        }
+                        else
+                        {
+                            PluginSettings = new SettingsContainer();
+                            Astral.Logger.WriteLine($"{GetType().Name}: Settings file not found. Use default");
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                PluginSettings = new SettingsContainer();
+                Astral.Logger.WriteLine($"{GetType().Name}: Error load settings file {Path.GetFileName(FileTools.SettingsFile)}. Use default");
+            }
+        }
+
+        /// <summary>
+        /// Сохранение свойств
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void SaveSettings(object sender = null, EventArgs e = null)
+        {
+            try
+            {
+                if (!Directory.Exists(Path.GetDirectoryName(FileTools.SettingsFile)))
+                    Directory.CreateDirectory(Path.GetDirectoryName(FileTools.SettingsFile));
+
+                XmlSerializer serialiser = new XmlSerializer(/*typeof(SettingsContainer)*/PluginSettings.GetType());
+                using (TextWriter FileStream = new StreamWriter(FileTools.SettingsFile, false))
+                {
+                    serialiser.Serialize(FileStream, PluginSettings);
+                }
+            }
+            catch (Exception exp)
+            {
+                Astral.Logger.WriteLine($"{GetType().Name}: Error to save settings file {Path.GetFileName(FileTools.SettingsFile)}");
+            }
+        }
 
         #region Подмена обработчика кнопки "Combats"
         //// Старый обработчик из Astral.Forms.Panels.Main
@@ -154,7 +217,6 @@ namespace EntityTools
         //        while (mainPanel != null);
         //    }
         //}
-        #endregion
 
         #region Новый обработчика кнопки вызова редактора UCC
         private void ucc_Editor_Click(object sender, EventArgs e)
@@ -164,6 +226,7 @@ namespace EntityTools
             Editor uccEditor = new Editor(Core.Get.mProfil, false);
             uccEditor.ShowDialog();
         }
+        #endregion
         #endregion
     }
 }

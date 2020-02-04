@@ -2,6 +2,7 @@
 using Astral.Logic.UCC.Actions;
 using Astral.Logic.UCC.Classes;
 using Astral.Logic.UCC.Forms;
+using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
@@ -14,7 +15,7 @@ using System.Text;
 using System.Windows.Forms;
 using static Astral.Logic.UCC.Ressources.Enums;
 
-namespace EntityTools.Tools.UCCExtensions
+namespace EntityTools.UCC.Extensions
 {
     public static class UCCEditorExtensions
     {

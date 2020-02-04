@@ -12,7 +12,7 @@ using Astral.Logic.UCC.Ressources;
 using EntityTools.Enums;
 using System;
 using EntityTools.Tools.Entities;
-using EntityTools.Tools.UCCExtensions;
+using EntityTools.UCC.Extensions;
 using System.Text;
 
 namespace EntityTools.UCC.Conditions

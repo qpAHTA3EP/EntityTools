@@ -56,7 +56,7 @@ namespace VariableTools.Forms
         private void dntLoad_Click(object sender, EventArgs e)
         {
             if (!loadingVariables ||
-                XtraMessageBox.Show("Do you really want to load variables from file ?\n" +
+                XtraMessageBox.Show(/*Form.ActiveForm, */"Do you really want to load variables from file ?\n" +
                                     "All changes will be lost.",
                         "Warring", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
@@ -84,7 +84,7 @@ namespace VariableTools.Forms
         private void btnDelete_Click(object sender, EventArgs e)
         {
             if (dgvVariables.CurrentRow != null
-                && XtraMessageBox.Show($"Do you really want to delete variable {{{dgvVariables.CurrentRow.Cells[NameInd].Value.ToString()}}} ?",
+                && XtraMessageBox.Show(/*Form.ActiveForm, */$"Do you really want to delete variable {{{dgvVariables.CurrentRow.Cells[NameInd].Value.ToString()}}} ?",
                         "Warring", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
             {
                 VariableContainer newVar = dgvVariables.CurrentRow.Tag as VariableContainer;
@@ -109,7 +109,8 @@ namespace VariableTools.Forms
                         // проверка корректности имени переменной
                         if (Parser.CorrectForbiddenName(name, out string correctName))
                             // согласие на замену некорректного имени переменной
-                            if (XtraMessageBox.Show($"Задано недопустимое имя переменно '{name}'!\n" +
+                            if (XtraMessageBox.Show(/*Form.ActiveForm, */
+                                                    $"Задано недопустимое имя переменно '{name}'!\n" +
                                                     $"Хотите его исправить на '{correctName}'?\n" +
                                                     $"The name '{name}' is incorrect! \n" +
                                                     $"Whould you like to change it to '{correctName}'?",
@@ -127,7 +128,7 @@ namespace VariableTools.Forms
                     else
                     {
                         e.Cancel = true;
-                        XtraMessageBox.Show("Пустое имя переменной не допустимо!\n" +
+                        XtraMessageBox.Show(/*Form.ActiveForm, */"Пустое имя переменной не допустимо!\n" +
                                             "Empty variable name is not valid!", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
                         return;
                     }
@@ -140,7 +141,7 @@ namespace VariableTools.Forms
                     if (!Parser.TryParse(e.FormattedValue, out accScope))
                     {
                         e.Cancel = true;
-                        XtraMessageBox.Show("Поле 'Account' некорректно!\n" +
+                        XtraMessageBox.Show(/*Form.ActiveForm, */"Поле 'Account' некорректно!\n" +
                                             "Account scope is not valid!", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
                         return;
                     }
@@ -148,7 +149,7 @@ namespace VariableTools.Forms
                 else if (!Parser.TryParse(dgvVariables.Rows[e.RowIndex].Cells[AccScopeInd].Value, out accScope))
                 {
                     e.Cancel = true;
-                    XtraMessageBox.Show("Поле 'Account' некорректно!\n" +
+                    XtraMessageBox.Show(/*Form.ActiveForm, */"Поле 'Account' некорректно!\n" +
                                         "Account scope is not valid!", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
                     return;
                 }
@@ -159,7 +160,7 @@ namespace VariableTools.Forms
                     if (!Parser.TryParse(e.FormattedValue, out profScope))
                     {
                         e.Cancel = true;
-                        XtraMessageBox.Show("Поле 'Profile' некорректно!\n" +
+                        XtraMessageBox.Show(/*Form.ActiveForm, */"Поле 'Profile' некорректно!\n" +
                                             "Profile scope is not valid!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
@@ -167,7 +168,7 @@ namespace VariableTools.Forms
                 else if (!Parser.TryParse(dgvVariables.Rows[e.RowIndex].Cells[ProfScopeInd].Value, out profScope))
                 {
                     e.Cancel = true;
-                    XtraMessageBox.Show("Поле 'Profile' некорректно!\n" + 
+                    XtraMessageBox.Show(/*Form.ActiveForm, */"Поле 'Profile' некорректно!\n" + 
                                         "Profile scope is not valid!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
@@ -175,7 +176,7 @@ namespace VariableTools.Forms
                 if (!Parser.TryParse(dgvVariables.Rows[e.RowIndex].Cells[ValueInd].Value, out double value))
                 {
                     e.Cancel = true;
-                    XtraMessageBox.Show("Задано некорректное значение переменной!\n" + 
+                    XtraMessageBox.Show(/*Form.ActiveForm, */"Задано некорректное значение переменной!\n" + 
                                         "Value of the Variable is not valid!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
@@ -183,7 +184,7 @@ namespace VariableTools.Forms
                 if (!Parser.TryParse(dgvVariables.Rows[e.RowIndex].Cells[SaveInd].Value, out bool save))
                 {
                     e.Cancel = true;
-                    XtraMessageBox.Show("Флаг 'Save' имеет некорректное состояние!\n" +
+                    XtraMessageBox.Show(/*Form.ActiveForm, */"Флаг 'Save' имеет некорректное состояние!\n" +
                                         "Save flag of the Variable is not valid!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
@@ -198,7 +199,7 @@ namespace VariableTools.Forms
                     {
                         e.Cancel = true;
                         Logger.WriteLine(Logger.LogType.Debug, $"{nameof(VariableTools)}::{Name}: The combination of {{{name}, {accScope}, {profScope}}} parameters that identify the variable should not be repeated.\n");
-                        XtraMessageBox.Show($"Сочетание параметров {{{name}, {accScope}, {profScope}}} должно быть уникальным для каждой переменной.\n" +
+                        XtraMessageBox.Show(/*Form.ActiveForm, */$"Сочетание параметров {{{name}, {accScope}, {profScope}}} должно быть уникальным для каждой переменной.\n" +
                             $"Вам необходимо изменить '{dgvVariables.Columns[e.ColumnIndex].HeaderText}'.\n" +
                             $"The combination of {{{name}, {accScope}, {profScope}}} parameters that identify the variable should not be repeated.\n" +
                             $"You need to change '{dgvVariables.Columns[e.ColumnIndex].HeaderText}'", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -225,7 +226,7 @@ namespace VariableTools.Forms
                     else
                     {
                         Logger.WriteLine(Logger.LogType.Debug, $"FAILED to store variable from DataGridViewRow {e.RowIndex}");
-                        XtraMessageBox.Show($"Сочетание параметров {{{name}, {accScope}, {profScope}}} должно быть уникальным для каждой переменной.\n" +
+                        XtraMessageBox.Show(/*Form.ActiveForm, */$"Сочетание параметров {{{name}, {accScope}, {profScope}}} должно быть уникальным для каждой переменной.\n" +
                             $"Вам необходимо изменить '{dgvVariables.Columns[e.ColumnIndex].HeaderText}'.\n" +
                             $"The combination of {{{name}, {accScope}, {profScope}}} parameters that identify the variable should not be repeated.\n" +
                             $"You need to change '{dgvVariables.Columns[e.ColumnIndex].HeaderText}'.",
@@ -417,7 +418,8 @@ namespace VariableTools.Forms
                     string name = row.Cells[NameInd].Value.ToString();
                     string correctName = string.Empty;
                     bool nameOk = !string.IsNullOrEmpty(name) && !Parser.CorrectForbiddenName(name, out correctName);
-                    if (!nameOk && XtraMessageBox.Show($"The name '{name}' is incorrect! \n" +
+                    if (!nameOk && XtraMessageBox.Show(/*Form.ActiveForm, */
+                                                       $"The name '{name}' is incorrect! \n" +
                                                        $"Whould you like to change it to '{correctName}'?\n" +
                                                        $"If you select 'NO' the variable will not be stored.",
                         "Warring", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
@@ -442,7 +444,7 @@ namespace VariableTools.Forms
                             if (!VariableTools.Variables.TryAdd(newVar))
                             {
                                 Logger.WriteLine(Logger.LogType.Debug, $"{nameof(VariableTools)}::{GetType().Name}: Failed to store variable {{{name}}}[{accScope}, {profScope}] to the collection from row {row.Index}.");
-                                XtraMessageBox.Show($"Failed to store variable {{{name}}}({accScope}) to the collection from row {row.Index}.");
+                                XtraMessageBox.Show(/*Form.ActiveForm, */$"Failed to store variable {{{name}}}({accScope}) to the collection from row {row.Index}.");
                             }
                         }
                         else Logger.WriteLine(Logger.LogType.Debug, $"{nameof(VariableTools)}::{GetType().Name}: Failed to store variable {{{name}}} to the collection from row {row.Index}.");

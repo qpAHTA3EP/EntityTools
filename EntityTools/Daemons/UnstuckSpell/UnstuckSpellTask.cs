@@ -45,7 +45,7 @@ namespace EntityTools.States
         /// </summary>
         private static Task monitor = null;
         private static bool afterCallCombatSubcription = false;
-        public static bool Activate
+        public static bool Active
         {
             get
             {

@@ -7,8 +7,9 @@ using System.Linq;
 using System.Text;
 using EntityTools.UCC;
 using MyNW.Internals;
+using EntityTools.Tools;
 
-namespace EntityTools.Tools.UCCExtensions
+namespace EntityTools.UCC.Extensions
 {
     public static class UCCActionExtention
     {

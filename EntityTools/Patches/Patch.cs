@@ -17,17 +17,17 @@ namespace EntityTools.Patches
 
         public void Inject()
         {
-            throw new NotImplementedException();
-            //RuntimeHelpers.PrepareMethod(methodToReplace.MethodHandle);
-            //RuntimeHelpers.PrepareMethod(methodToInject.MethodHandle);
+            // throw new NotImplementedException();
+            RuntimeHelpers.PrepareMethod(methodToReplace.MethodHandle);
+            RuntimeHelpers.PrepareMethod(methodToInject.MethodHandle);
 
-            //unsafe
-            //{
-            //    long* inj = (long*)methodToInject.MethodHandle.Value.ToPointer() + 1;
-            //    long* tar = (long*)methodToReplace.MethodHandle.Value.ToPointer() + 1;
+            unsafe
+            {
+                long* inj = (long*)methodToInject.MethodHandle.Value.ToPointer() + 1;
+                long* tar = (long*)methodToReplace.MethodHandle.Value.ToPointer() + 1;
 
-            //    *tar = *inj;
-            //}
+                *tar = *inj;
+            }
         }
     }
 }

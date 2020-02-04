@@ -57,6 +57,7 @@ namespace ClassPatcher
                             }
                         }
                         break;
+                    #region Experiments
                     //case "-patch_ucc":
                     //    {
 
@@ -121,101 +122,73 @@ namespace ClassPatcher
                     //        }
                     //    }
                     //    break;
-                    case "-patch":
+                    #endregion
+                    default /*"-patch"*/:
                         {
 
                             string fileName;
                             if (args.Length > 1)
                                 fileName = args[1];
                             else fileName = "Astral.exe";
-
-                            if (File.Exists(fileName))
-                            {
-                                assembly = AssemblyDefinition.ReadAssembly(fileName);
-                                foreach (var tDef in assembly.MainModule.GetTypes())
-                                {
-                                    if (tDef.Name == "ItemIdFilterEditor" ||
-                                        tDef.Name == "ItemIdEditor" ||
-                                        tDef.Name == "GetMailItems" ||
-                                        tDef.Name == "Roles" ||
-                                        tDef.Name == "NPCVendorInfos" ||
-                                        tDef.Name == "BuyOptionsEditor" ||
-                                        tDef.Name == "DialogKeyEditor" ||
-                                        tDef.Name == "DialogEditor" ||
-                                        tDef.Name == "Core" ||
-                                        tDef.Name == "ProcessInfos" ||
-                                        tDef.Name == "RemoteContactEditor" ||
-                                        tDef.Name == "Movements" ||
-                                        tDef.Name == "MainMissionEditor" ||
-                                        tDef.Name == "AuraEditor" ||
-                                        tDef.Name == "PowerAllIdEditor" ||
-                                        tDef.Name == "AuraEditor" ||
-                                        tDef.Name == "NPCInfos" ||
-                                        tDef.FullName == "Astral.Controllers.Plugins")
-
-                                    {
-                                        tDef.IsPublic = true;
-                                        if (tDef.IsPublic) Console.WriteLine(tDef.ToString());
-                                    }
-                                    if(tDef.FullName == "Astral.Logic.UCC.Controllers.Movements")
-                                    {
-                                        foreach(var mDef in tDef.Methods)
-                                        {
-                                            mDef.IsPublic = true;
-                                            if (mDef.IsPublic) Console.WriteLine(mDef.FullName);
-                                        }
-                                    }
-                                }
-
-                                assembly.Write(Path.Combine(Path.GetDirectoryName(fileName), Path.GetFileNameWithoutExtension(fileName) + "_patched" + Path.GetExtension(fileName)));
-                                Console.ReadKey();
-                            }
+                            patch_astral(fileName);
                         }
                         break;
                 }
             }
+            else patch_astral("Astral.exe");            
+        }
 
-            //fileName = (args.Length == 0) ? "Astral.exe" : args[0];
-            //if (File.Exists(fileName))
-            //{
-            //    aDef = AssemblyDefinition.ReadAssembly(fileName);
-            //    if (aDef != null)
-            //    {
-            //        using (IEnumerator<TypeDefinition> tDefEnumer = aDef.MainModule.GetTypes().GetEnumerator())
-            //        {
-            //            while (tDefEnumer.MoveNext())
-            //            {
+        private static bool patch_astral(string fileName)
+        {
+            bool result = false;
+            if (File.Exists(fileName))
+            {
+                AssemblyDefinition assembly = AssemblyDefinition.ReadAssembly(fileName);
+                foreach (var tDef in assembly.MainModule.GetTypes())
+                {
+                    if (tDef.Name == "ItemIdFilterEditor" ||
+                        tDef.Name == "ItemIdEditor" ||
+                        tDef.Name == "GetMailItems" ||
+                        tDef.Name == "Roles" ||
+                        tDef.Name == "NPCVendorInfos" ||
+                        tDef.Name == "BuyOptionsEditor" ||
+                        tDef.Name == "DialogKeyEditor" ||
+                        tDef.Name == "DialogEditor" ||
+                        tDef.Name == "Core" ||
+                        tDef.Name == "ProcessInfos" ||
+                        tDef.Name == "RemoteContactEditor" ||
+                        tDef.Name == "Movements" ||
+                        tDef.Name == "MainMissionEditor" ||
+                        tDef.Name == "AuraEditor" ||
+                        tDef.Name == "PowerAllIdEditor" ||
+                        tDef.Name == "AuraEditor" ||
+                        tDef.Name == "NPCInfos" ||
+                        tDef.FullName == "Astral.Controllers.Plugins" ||
+                        tDef.FullName == "Astral.Logic.UCC.Controllers.Movements" ||
+                        tDef.FullName == "Astral.Controllers.Relogger")
 
-            //                //if (tDefEnumer.Current.FullName.StartsWith("Astral")
-            //                //&& !tDefEnumer.Current.IsAbstract
-            //                //&& !tDefEnumer.Current.IsNotPublic)
-            //                //{
-            //                //    tDefEnumer.Current.IsPublic = true;
-            //                //    Console.WriteLine(tDefEnumer.Current.FullName + " patched");
-            //                //}
+                    {
+                        tDef.IsPublic = true;
+                        if (tDef.IsPublic) Console.WriteLine(tDef.ToString());
+                        result = true;
+                    }
+                    if (tDef.FullName == "Astral.Logic.UCC.Controllers.Movements")
+                    {
+                        foreach (var mDef in tDef.Methods)
+                        {
+                            mDef.IsPublic = true;
+                            if (mDef.IsPublic) Console.WriteLine(mDef.FullName);
+                            result = true;
+                        }
+                    }
+                }
 
-            //                if(tDefEnumer.Current.FullName == "Astral.Logic.UCC.Forms.AddClass")
-            //                {
-            //                    foreach(MethodDefinition mDef in tDefEnumer.Current.Methods)
-            //                    {
-            //                        if(mDef.Name == tDefEnumer.Current.Name)
-            //                        {
+                assembly.Write(Path.Combine(Path.GetDirectoryName(fileName), Path.GetFileNameWithoutExtension(fileName) + "_patched" + Path.GetExtension(fileName)));
+                Console.ReadKey();
+                return result;
+            }
 
-            //                        }
-            //                    }                                
-            //                }
-            //            }
-            //        }
-
-            //        // (!) Файл занят, поэтому переименовать не удается 
-            //        //File.Move(fileName, Path.Combine( Path.GetFullPath(fileName), Path.GetFileNameWithoutExtension(fileName)+".bak"));
-
-            //        // Записываем измененную сборку 
-            //        aDef.Write("freeAstral.exe");
-
-            //        Console.ReadKey();
-            //    }
-            //}
+            return result;
         }
         //private static void PatchUCCAddClass(AssemblyDefinition assembly, TypeDefinition uccAddClassType, MethodDefinition ctorDef)
         //{
@@ -246,7 +219,7 @@ namespace ClassPatcher
         //    var dictMethodAddRef = assembly.MainModule.ImportReference(dictionaryType.GetMethod("Add"));
 
         //    // ссылка на типы переменных
-            
+
         //    var enumeratorListTypeType = Type.GetType("System.Collections.Generic.IEnumerator[System.Type]");
         //    var enumeratorListTypeRef = assembly.MainModule.ImportReference(enumeratorListTypeType);
         //    //var assemblyArrayType = Type.GetType("System.Reflection.Assembly[]");

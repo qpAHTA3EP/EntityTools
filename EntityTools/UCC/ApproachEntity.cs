@@ -128,7 +128,7 @@ namespace EntityTools.UCC
 
                     //entity = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), EntityID, EntityIdType, EntityNameType, HealthCheck, Range, RegionCheck);
                     entity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete, 
-                                                            HealthCheck, ReactionRange, (ReactionZRange > 0) ? ReactionZRange : Settings.Get.MaxElevationDifference,
+                                                            HealthCheck, ReactionRange, (ReactionZRange > 0) ? ReactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference,
                                                             RegionCheck, null, Aura.Checker);
                     return Validate(entity) && !(HealthCheck && entity.IsDead) && entity.CombatDistance > EntityRadius;
                 }
@@ -161,7 +161,7 @@ namespace EntityTools.UCC
                     {
                         entity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete,
                                                                 HealthCheck, ReactionRange, 
-                                                                (ReactionZRange > 0) ? ReactionZRange : Settings.Get.MaxElevationDifference,
+                                                                (ReactionZRange > 0) ? ReactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference,
                                                                 RegionCheck, null, Aura.Checker);
                         return entity;
                     }

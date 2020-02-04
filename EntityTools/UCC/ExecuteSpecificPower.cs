@@ -40,6 +40,7 @@ namespace EntityTools.UCC
         public bool CheckInTray { get; set; } = false;
 
         [Category("Optional")]
+        [DisplayName("CastingTime (ms)")]
         public int CastingTime { get; set; } = 0;
 
         [Category("Optional")]
@@ -483,7 +484,7 @@ namespace EntityTools.UCC
                         return entity;
                     else entity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete,
                                                                 HealthCheck, ReactionRange,
-                                                                (ReactionZRange > 0) ? ReactionZRange : Settings.Get.MaxElevationDifference,
+                                                                (ReactionZRange > 0) ? ReactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference,
                                                                 RegionCheck, null, Aura.Checker);
 
                     if (Validate(entity))

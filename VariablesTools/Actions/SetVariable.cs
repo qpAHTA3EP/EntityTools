@@ -63,7 +63,8 @@ namespace VariableTools.Actions
                     {
                         // Имя переменной некорректно
                         // Запрашиваем замену
-                        if (XtraMessageBox.Show($"Задано недопустимое имя переменно '{value}'!\n" +
+                        if (XtraMessageBox.Show(/*Form.ActiveForm, */
+                                                $"Задано недопустимое имя переменно '{value}'!\n" +
                                                 $"Хотите его исправить на '{corrected}'?\n" +
                                                 $"The name '{value}' is incorrect! \n" +
                                                 $"Whould you like to change it to '{corrected}'?",

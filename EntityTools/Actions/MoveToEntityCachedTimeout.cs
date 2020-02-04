@@ -183,31 +183,41 @@ namespace EntityTools.Actions
                 if (!HoldTargetEntity || !Validate(target) || (HealthCheck && target.IsDead))
                     target = closestEntity;
 
-                if (IgnoreCombat && Validate(target)
+                if (Validate(target)
                     && !(HealthCheck && target.IsDead)
                     && (target.Location.Distance3DFromPlayer <= Distance))
                 {
-                    Astral.Logic.NW.Attackers.List.Clear();
-                    if (AttackTargetEntity && target.RelationToPlayer == EntityRelation.Foe)
+                    if (AttackTargetEntity)
                     {
-                        Astral.Logic.NW.Attackers.List.Add(target);
-                        Astral.Quester.API.IgnoreCombat = false;
-                        Astral.Logic.NW.Combats.CombatUnit(target, null);
+                        Astral.Logic.NW.Attackers.List.Clear();
+                        if (AttackTargetEntity && target.RelationToPlayer == EntityRelation.Foe)
+                        {
+                            Astral.Logic.NW.Attackers.List.Add(target);
+                            if(IgnoreCombat)
+                                Astral.Quester.API.IgnoreCombat = false;
+                            Astral.Logic.NW.Combats.CombatUnit(target, null);
+                        }
                     }
-                    else Astral.Quester.API.IgnoreCombat = false;
+                    else if(IgnoreCombat)
+                        Astral.Quester.API.IgnoreCombat = false;
                 }
-                else if (IgnoreCombat && Validate(closestEntity)
+                else if (Validate(closestEntity)
                          && !(HealthCheck && closestEntity.IsDead)
                          && (closestEntity.Location.Distance3DFromPlayer <= Distance))
                 {
-                    Astral.Logic.NW.Attackers.List.Clear();
-                    if (AttackTargetEntity && closestEntity.RelationToPlayer != EntityRelation.Friend)
+                    if (AttackTargetEntity)
                     {
-                        Astral.Logic.NW.Attackers.List.Add(closestEntity);
-                        Astral.Quester.API.IgnoreCombat = false;
-                        Astral.Logic.NW.Combats.CombatUnit(closestEntity, null);
+                        Astral.Logic.NW.Attackers.List.Clear();
+                        if (AttackTargetEntity && closestEntity.RelationToPlayer != EntityRelation.Friend)
+                        {
+                            Astral.Logic.NW.Attackers.List.Add(closestEntity);
+                            if (IgnoreCombat)
+                                Astral.Quester.API.IgnoreCombat = false;
+                            Astral.Logic.NW.Combats.CombatUnit(closestEntity, null);
+                        }
                     }
-                    else Astral.Quester.API.IgnoreCombat = false;
+                    else if (IgnoreCombat)
+                        Astral.Quester.API.IgnoreCombat = false;
                 }
                 else if (IgnoreCombat)
                     Astral.Quester.API.IgnoreCombat = true;
@@ -218,41 +228,22 @@ namespace EntityTools.Actions
 
         public override ActionResult Run()
         {
-            //if (!Validate(target))
-            //{
-            //    Logger.WriteLine($"Entity [{EntityID}] not founded.");
-            //    return ActionResult.Fail;
-            //}
-
-            // Вариант реализации со сбросом флага IgnoreCombat в Run()
-            //if (target.Location.Distance3DFromPlayer < Distance)
-            //{
-            //    Astral.Quester.API.IgnoreCombat = false;
-
-            //    if (StopOnApproached)
-            //        return ActionResult.Completed;
-            //    else return ActionResult.Running;
-            //}
-            //else
-            //{
-            //    if (IgnoreCombat)
-            //        Astral.Quester.API.IgnoreCombat = IgnoreCombat;
-            //    return ActionResult.Running;
-            //}
-
-            if (IgnoreCombat)
+            if (AttackTargetEntity)
             {
                 Astral.Logic.NW.Attackers.List.Clear();
                 if (AttackTargetEntity)
                 {
                     Astral.Logic.NW.Attackers.List.Add(target);
-                    Astral.Quester.API.IgnoreCombat = false;
+                    if (IgnoreCombat)
+                        Astral.Quester.API.IgnoreCombat = false;
                     Astral.Logic.NW.Combats.CombatUnit(target, null);
                 }
                 else Astral.Quester.API.IgnoreCombat = false;
             }
 
-            // Вариант реализации со сбросом флага IgnoreCombat в NeedToRun
+            if (IgnoreCombat)
+                Astral.Quester.API.IgnoreCombat = false;
+
             if (StopOnApproached)
                 return ActionResult.Completed;
             else return ActionResult.Running;

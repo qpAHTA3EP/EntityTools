@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Drawing.Design;
 using Astral.Logic.UCC.Classes;
-using EntityTools.Tools.UCCExtensions;
+using EntityTools.UCC.Extensions;
 
 namespace EntityTools.Editors
 {

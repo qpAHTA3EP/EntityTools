@@ -69,8 +69,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Astral">
-      <HintPath>..\References\x64\Astral.exe</HintPath>
+    <Reference Include="Astral_patched">
+      <HintPath>..\References\x64\Astral_patched.exe</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.Data.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
