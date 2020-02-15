@@ -165,7 +165,8 @@ namespace ClassPatcher
                         tDef.Name == "NPCInfos" ||
                         tDef.FullName == "Astral.Controllers.Plugins" ||
                         tDef.FullName == "Astral.Logic.UCC.Controllers.Movements" ||
-                        tDef.FullName == "Astral.Controllers.Relogger")
+                        tDef.FullName == "Astral.Controllers.Relogger" ||
+                        tDef.FullName == "Astral.Controllers.CustomClasses")
 
                     {
                         tDef.IsPublic = true;

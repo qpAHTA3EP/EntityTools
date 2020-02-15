@@ -301,7 +301,7 @@ namespace EntityTools.UCC
                     while (Astral.Logic.UCC.Controllers.Movements.RangeIsOk)
 #endif
                     {
-                        if (Core.CurrentTarget.IsDead)
+                        if (Astral.Logic.UCC.Core.CurrentTarget.IsDead)
                         {
                             return true;
                         }
@@ -362,7 +362,7 @@ namespace EntityTools.UCC
 #endif
                 while (!castingTimeout.IsTimedOut && !AOECheck.PlayerIsInAOE)
                 {
-                    if (Core.CurrentTarget.IsDead)
+                    if (Astral.Logic.UCC.Core.CurrentTarget.IsDead)
                     {
                         return true;
                     }
@@ -501,7 +501,7 @@ namespace EntityTools.UCC
                     case Unit.StrongestTeamMember:
                         return ActionsPlayer.StrongestTeamMember;
                     default:
-                        return Core.CurrentTarget;
+                        return Astral.Logic.UCC.Core.CurrentTarget;
                 }
             }
         }

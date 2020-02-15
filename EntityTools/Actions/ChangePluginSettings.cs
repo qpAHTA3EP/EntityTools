@@ -3,7 +3,7 @@ using Astral.Classes;
 using Astral.Logic.Classes.Map;
 using Astral.Quester.UIEditors;
 using EntityTools.Enums;
-using EntityTools.Daemons;
+using EntityTools.Services;
 using EntityTools.Tools.Entities;
 using MyNW.Classes;
 using MyNW.Internals;
@@ -52,7 +52,7 @@ namespace EntityTools.Actions
                     case PluginSettingsCommand.DisableUnstuckSpell:
                         if (bool.TryParse(Value, out result))
                         {
-                            UnstuckSpells.Active = !result;
+                            EntityTools.PluginSettings.UnstuckSpells.Active = !result;
                             return ActionResult.Completed;
                         }
                         else return ActionResult.Fail;

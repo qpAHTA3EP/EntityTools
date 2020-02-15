@@ -72,7 +72,7 @@ namespace EntityTools.Editors.Forms
             // 
             // btnTarget
             // 
-            this.btnTarget.ImageOptions.Image = global::EntityTools.Properties.Resources.Target;
+            this.btnTarget.ImageOptions.Image = global::EntityTools.Properties.Resources.miniTarget;
             this.btnTarget.Location = new System.Drawing.Point(115, 31);
             this.btnTarget.Name = "btnTarget";
             this.btnTarget.Size = new System.Drawing.Size(89, 23);
@@ -106,7 +106,7 @@ namespace EntityTools.Editors.Forms
             // btnSelect
             // 
             this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelect.ImageOptions.Image = global::EntityTools.Properties.Resources.Valid;
+            this.btnSelect.ImageOptions.Image = global::EntityTools.Properties.Resources.miniValid;
             this.btnSelect.Location = new System.Drawing.Point(306, 391);
             this.btnSelect.Name = "btnSelect";
             this.btnSelect.Size = new System.Drawing.Size(74, 23);
@@ -116,7 +116,7 @@ namespace EntityTools.Editors.Forms
             // 
             // btnPlayer
             // 
-            this.btnPlayer.ImageOptions.Image = global::EntityTools.Properties.Resources.Target;
+            this.btnPlayer.ImageOptions.Image = global::EntityTools.Properties.Resources.miniTarget;
             this.btnPlayer.Location = new System.Drawing.Point(20, 31);
             this.btnPlayer.Name = "btnPlayer";
             this.btnPlayer.Size = new System.Drawing.Size(89, 23);
@@ -127,7 +127,7 @@ namespace EntityTools.Editors.Forms
             // 
             // btnEntity
             // 
-            this.btnEntity.ImageOptions.Image = global::EntityTools.Properties.Resources.Target;
+            this.btnEntity.ImageOptions.Image = global::EntityTools.Properties.Resources.miniTarget;
             this.btnEntity.Location = new System.Drawing.Point(210, 31);
             this.btnEntity.Name = "btnEntity";
             this.btnEntity.Size = new System.Drawing.Size(89, 23);
@@ -139,7 +139,7 @@ namespace EntityTools.Editors.Forms
             // btnReload
             // 
             this.btnReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnReload.ImageOptions.Image = global::EntityTools.Properties.Resources.Refresh;
+            this.btnReload.ImageOptions.Image = global::EntityTools.Properties.Resources.miniRefresh;
             this.btnReload.Location = new System.Drawing.Point(12, 391);
             this.btnReload.Name = "btnReload";
             this.btnReload.Size = new System.Drawing.Size(74, 23);

@@ -6,9 +6,9 @@ using System.Text;
 
 namespace EntityTools.Tools.Reflection
 {
-    public static class StaticPropertyAccessorMaker
+    public static class StaticPropertyAccessorFactory
     {
-        public static StaticPropertyAccessor<PropertyType> GetStaticPropertyAccessor<PropertyType>(this Type containerType, string propName, BindingFlags flags = BindingFlags.Default)
+        public static StaticPropertyAccessor<PropertyType> GetStaticProperty<PropertyType>(this Type containerType, string propName, BindingFlags flags = BindingFlags.Default)
         {
             return new StaticPropertyAccessor<PropertyType>(containerType, propName, flags);
         }
@@ -38,6 +38,7 @@ namespace EntityTools.Tools.Reflection
                 containerType = null;
                 propertyInfo = null;
                 getter = null;
+                setter = null;
             }
         }
 
@@ -108,5 +109,7 @@ namespace EntityTools.Tools.Reflection
                 }
             }
         }
+
+        public static implicit operator PropertyType(StaticPropertyAccessor<PropertyType> accessor) => accessor.Value;
     }
 }

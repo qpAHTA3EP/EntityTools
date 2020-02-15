@@ -27,7 +27,7 @@ namespace EntityTools.Tools
         public static readonly string defaultFileInterfaces = "Interfaces.xml";
         public static readonly string defaultFileAuras = "Auras.xml";
         public static readonly string defaultFileMissions = "Missions.xml";
-        public static readonly string defaultExportFileName = "%character%_%account%_%datetame%.xml";
+        public static readonly string defaultExportFileName = "%character%_%account%_%datetime%.xml";
 
         public static readonly string SettingsFile = Path.Combine(Astral.Controllers.Directories.SettingsPath, nameof(EntityTools), nameof(EntityTools) + ".xml");
         //public static bool ReplaceMask(ref string str)

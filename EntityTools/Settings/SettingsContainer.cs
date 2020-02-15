@@ -1,5 +1,5 @@
 ﻿using EntityTools.Settings;
-using EntityTools.Daemons;
+using EntityTools.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +13,7 @@ namespace EntityTools
         /// <summary>
         /// Настройки UnstuckSpellTask
         /// </summary>
-        public UnstuckSpellsDaemonSettings UnstuckSpells { get; set; } = new UnstuckSpellsDaemonSettings();
+        public UnstuckSpellsSettings UnstuckSpells { get; set; } = new UnstuckSpellsSettings();
 
         /// <summary>
         /// Настройки Mapper'a

@@ -89,7 +89,7 @@
             // 
             this.bntAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.bntAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.bntAdd.Image = global::EntityTools.Properties.Resources.Add;
+            this.bntAdd.Image = global::EntityTools.Properties.Resources.miniAdd;
             this.bntAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.bntAdd.Location = new System.Drawing.Point(13, 327);
             this.bntAdd.Name = "bntAdd";
@@ -104,7 +104,7 @@
             // 
             this.btnRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnRemove.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnRemove.Image = global::EntityTools.Properties.Resources.Delete;
+            this.btnRemove.Image = global::EntityTools.Properties.Resources.Deletemini;
             this.btnRemove.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnRemove.Location = new System.Drawing.Point(81, 327);
             this.btnRemove.Name = "btnRemove";
@@ -120,7 +120,7 @@
             this.bntCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.bntCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.bntCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.bntCancel.Image = global::EntityTools.Properties.Resources.Cancel;
+            this.bntCancel.Image = global::EntityTools.Properties.Resources.miniCancel;
             this.bntCancel.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.bntCancel.Location = new System.Drawing.Point(504, 327);
             this.bntCancel.Name = "bntCancel";
@@ -135,7 +135,7 @@
             // 
             this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSave.Image = global::EntityTools.Properties.Resources.Save;
+            this.btnSave.Image = global::EntityTools.Properties.Resources.miniSave;
             this.btnSave.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnSave.Location = new System.Drawing.Point(430, 327);
             this.btnSave.Name = "btnSave";
@@ -150,7 +150,7 @@
             // 
             this.btnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnTest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnTest.Image = global::EntityTools.Properties.Resources.Play;
+            this.btnTest.Image = global::EntityTools.Properties.Resources.miniPlay;
             this.btnTest.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnTest.Location = new System.Drawing.Point(303, 327);
             this.btnTest.Name = "btnTest";
@@ -165,7 +165,7 @@
             // 
             this.btnPaste.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnPaste.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnPaste.Image = global::EntityTools.Properties.Resources.Paste;
+            this.btnPaste.Image = global::EntityTools.Properties.Resources.miniPaste;
             this.btnPaste.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnPaste.Location = new System.Drawing.Point(233, 327);
             this.btnPaste.Name = "btnPaste";
@@ -180,7 +180,7 @@
             // 
             this.btnCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnCopy.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCopy.Image = global::EntityTools.Properties.Resources.Copy;
+            this.btnCopy.Image = global::EntityTools.Properties.Resources.miniCopy;
             this.btnCopy.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnCopy.Location = new System.Drawing.Point(165, 327);
             this.btnCopy.Name = "btnCopy";

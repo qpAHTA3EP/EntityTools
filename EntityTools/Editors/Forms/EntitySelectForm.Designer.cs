@@ -45,7 +45,7 @@
             this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSelect.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnSelect.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSelect.Image = global::EntityTools.Properties.Resources.Valid;
+            this.btnSelect.Image = global::EntityTools.Properties.Resources.miniValid;
             this.btnSelect.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnSelect.Location = new System.Drawing.Point(630, 427);
             this.btnSelect.Name = "btnSelect";
@@ -61,7 +61,7 @@
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCancel.Image = global::EntityTools.Properties.Resources.Cancel;
+            this.btnCancel.Image = global::EntityTools.Properties.Resources.miniCancel;
             this.btnCancel.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnCancel.Location = new System.Drawing.Point(704, 427);
             this.btnCancel.Name = "btnCancel";
@@ -141,7 +141,7 @@
             // 
             this.btnReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnReload.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnReload.Image = global::EntityTools.Properties.Resources.Refresh;
+            this.btnReload.Image = global::EntityTools.Properties.Resources.miniRefresh;
             this.btnReload.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnReload.Location = new System.Drawing.Point(13, 427);
             this.btnReload.Name = "btnReload";

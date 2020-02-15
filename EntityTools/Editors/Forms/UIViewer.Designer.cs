@@ -115,7 +115,7 @@
             // 
             this.btnFill.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnFill.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnFill.Image = global::EntityTools.Properties.Resources.Refresh;
+            this.btnFill.Image = global::EntityTools.Properties.Resources.miniRefresh;
             this.btnFill.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnFill.Location = new System.Drawing.Point(558, 11);
             this.btnFill.Name = "btnFill";
@@ -169,7 +169,7 @@
             // 
             this.btnExecute.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnExecute.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnExecute.Image = global::EntityTools.Properties.Resources.Play;
+            this.btnExecute.Image = global::EntityTools.Properties.Resources.miniPlay;
             this.btnExecute.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnExecute.Location = new System.Drawing.Point(558, 365);
             this.btnExecute.Name = "btnExecute";
@@ -193,7 +193,7 @@
             // 
             this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSelect.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSelect.Image = global::EntityTools.Properties.Resources.Valid;
+            this.btnSelect.Image = global::EntityTools.Properties.Resources.miniValid;
             this.btnSelect.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnSelect.Location = new System.Drawing.Point(491, 404);
             this.btnSelect.Name = "btnSelect";
@@ -209,7 +209,7 @@
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCancel.Image = global::EntityTools.Properties.Resources.Cancel;
+            this.btnCancel.Image = global::EntityTools.Properties.Resources.miniCancel;
             this.btnCancel.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnCancel.Location = new System.Drawing.Point(565, 404);
             this.btnCancel.Name = "btnCancel";

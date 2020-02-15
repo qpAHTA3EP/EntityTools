@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.0203.1713</AssemblyVersion>
+    <AssemblyVersion>0.20.0214.1552</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -81,24 +81,25 @@
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Printing.v18.1.Core, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
-      <Private>False</Private>
-    </Reference>
     <Reference Include="DevExpress.Utils.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraBars.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.XtraEditors.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraGrid.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
     <Reference Include="DevExpress.XtraLayout.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraPrinting.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+    <Reference Include="DevExpress.XtraNavBar.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\References\x64\ICSharpCode.SharpZipLib.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MyMemory-x64">
@@ -162,16 +163,22 @@
     <Compile Include="Editors\Forms\EntitySelectForm.Designer.cs">
       <DependentUpon>EntitySelectForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editors\Forms\InputBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\Forms\InputBox.Designer.cs">
+      <DependentUpon>InputBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editors\Forms\InsigniaBonusSelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Editors\Forms\InsigniaBonusSelectForm.Designer.cs">
       <DependentUpon>InsigniaBonusSelectForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editors\Forms\MainPanel.cs">
+    <Compile Include="Core\MainPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Editors\Forms\MainPanel.Designer.cs">
+    <Compile Include="Core\MainPanel.Designer.cs">
       <DependentUpon>MainPanel.cs</DependentUpon>
     </Compile>
     <Compile Include="Editors\Forms\MountBonusPriorityListForm.cs">
@@ -210,9 +217,18 @@
     <Compile Include="Editors\UccActionEditor.cs" />
     <Compile Include="Editors\UiIdEditor.cs" />
     <Compile Include="Extensions\ListTExtentions.cs" />
-    <Compile Include="Patches\Mapper\AddNavigationNodeTask.cs" />
-    <Compile Include="Patches\Mapper\AddNavigationNode.cs" />
+    <Compile Include="Patches\Mapper\AddNavigationNodeCached.cs" />
+    <Compile Include="Patches\Mapper\AddNavigationNodeStatic.cs" />
+    <Compile Include="Patches\Mapper\AddNavigationNodeDirect.cs" />
+    <Compile Include="Patches\Mapper\AstralMapperOriginals.cs" />
+    <Compile Include="Patches\Mapper\MapperFormExt.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Patches\Mapper\MapperFormExt.Designer.cs">
+      <DependentUpon>MapperFormExt.cs</DependentUpon>
+    </Compile>
     <Compile Include="Patches\Mapper\MapperGraphCache.cs" />
+    <Compile Include="Patches\Mapper\NodeDetail.cs" />
     <Compile Include="Patches\Patcher.cs" />
     <Compile Include="Patches\Mapper\Patch_Mapper.cs" />
     <Compile Include="Patches\Patch.cs" />
@@ -222,10 +238,10 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Settings\MapperSettings.cs" />
+    <Compile Include="Patches\Mapper\MapperSettings.cs" />
     <Compile Include="Settings\SettingsContainer.cs" />
-    <Compile Include="Daemons\UnstuckSpell\UnstuckSpellsDaemon.cs" />
-    <Compile Include="Daemons\UnstuckSpell\UnstuckSpellsDaemonSettings.cs" />
+    <Compile Include="Servises\UnstuckSpell\UnstuckSpells.cs" />
+    <Compile Include="Servises\UnstuckSpell\UnstuckSpellsSettings.cs" />
     <Compile Include="Tools\AuraOption.cs" />
     <Compile Include="Tools\CollectionTypeConverter.cs" />
     <Compile Include="Tools\CopyHelper.cs" />
@@ -242,7 +258,7 @@
     <Compile Include="Tools\Export\Auras.cs" />
     <Compile Include="Tools\CommonTools.cs" />
     <Compile Include="Tools\Entities\EntitySelectionTools.cs" />
-    <Compile Include="EntityPlugin.cs" />
+    <Compile Include="Core\EntityPlugin.cs" />
     <Compile Include="Actions\MoveToEntityCachedTimeout.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -259,10 +275,14 @@
     <Compile Include="Tools\MountInsignias\MountBonusPriorityDef.cs" />
     <Compile Include="Tools\MountInsignias\ParagonMountBonusPriorityDef.cs" />
     <Compile Include="Tools\ParagonTools.cs" />
+    <Compile Include="Tools\Reflection\NonStaticAction.cs" />
     <Compile Include="Tools\Reflection\ReflectionHelper.cs" />
     <Compile Include="Settings\PluginSettingsBase.cs" />
-    <Compile Include="Tools\Reflection\StaticMethodInvoker.cs" />
+    <Compile Include="Tools\Reflection\NonStaticFunction.cs" />
+    <Compile Include="Tools\Reflection\StaticFunction.cs" />
+    <Compile Include="Tools\Reflection\StaticFielsAccessor.cs" />
     <Compile Include="Tools\Reflection\StaticPropertyAccessor.cs" />
+    <Compile Include="Tools\Reflection\StaticAction.cs" />
     <Compile Include="Tools\Struct.cs" />
     <Compile Include="UCC\Extensions\UCCActionExtention.cs" />
     <Compile Include="UCC\Extensions\UCCEditorExtensions.cs" />
@@ -292,10 +312,13 @@
     <EmbeddedResource Include="Editors\Forms\EntitySelectForm.resx">
       <DependentUpon>EntitySelectForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Editors\Forms\InputBox.resx">
+      <DependentUpon>InputBox.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Editors\Forms\InsigniaBonusSelectForm.resx">
       <DependentUpon>InsigniaBonusSelectForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Editors\Forms\MainPanel.resx">
+    <EmbeddedResource Include="Core\MainPanel.resx">
       <DependentUpon>MainPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editors\Forms\MountBonusPriorityListForm.resx">
@@ -312,6 +335,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Editors\Forms\UIViewer.resx">
       <DependentUpon>UIViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Patches\Mapper\MapperFormExt.resx">
+      <DependentUpon>MapperFormExt.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -365,6 +391,51 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\Astral\miniTarget.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Astral\miniExport.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Astral\miniNew.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Astral\miniBiPath.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Astral\miniLinPath.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Astral\miniStop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Astral\miniUniPath.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Astral\miniEllipceCR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Astral\miniLink.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Astral\miniRectCR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Astral\miniZdiff.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Astral\miniImport.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Astral\miniClone.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Astral\miniDistance.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Astral\miniNodeDistance.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Astral\miniGear.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

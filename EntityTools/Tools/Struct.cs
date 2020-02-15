@@ -19,6 +19,15 @@ namespace EntityTools.Tools
             Second = b;
         }
 
+        public Pair<A, B> Clone()
+        {
+            return new Pair<A, B>()
+            {
+                First = this.First,
+                Second = this.Second
+            };
+        }
+
         public A First;
         public B Second;
     }
@@ -65,6 +74,15 @@ namespace EntityTools.Tools
             First = a;
             Second = b;
             Third = c;
+        }
+        public Triple<A, B, C> Clone()
+        {
+            return new Triple<A, B, C>()
+            {
+                First = this.First,
+               Second = this.Second,
+                Third = this.Third
+            };
         }
     }
 }
