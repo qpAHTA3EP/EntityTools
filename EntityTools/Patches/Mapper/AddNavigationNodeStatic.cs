@@ -63,35 +63,25 @@ namespace EntityTools.Patches.Mapper
 
                 try
                 {
-                    /*double distance;
-                    double zDifference;*/
                     // сканируем узлы графа, для определения ближайших к добавляемому узлу newNode
                     double minNodeDistance = double.MaxValue; // расстояние до ближайшего узла
                     int closestNodeInd = -1; // Индекс ближайшего узла в списке nearestNodeList
                     bool isEquivalent = false; // флаг, указывающий, что newNode был заменена на эквивалентный существующий узел
                     for (int i = 0; i < Graph.Nodes.Count; i++)
                     {
-                        Node currentNode = Graph.Nodes[i];
-                        if (lastNodeDetail != null
-                            && NodesEquals(lastNodeDetail.Node, currentNode))
+                        if (!(Graph.Nodes[i] is Node currentNode)
+                            || (lastNodeDetail != null
+                                && NodesEquals(lastNodeDetail.Node, currentNode)))
                             continue;
 
                         //Проверяем разницу высот
-                        /*zDifference = currentNode.Z - newNode.Z;
-                        zDifference *= Math.Sign(zDifference);*/
                         NodeDetail curNodeDet = new NodeDetail(currentNode, newNode);
                         if (curNodeDet.Vector.Z > - maxZDifference && curNodeDet.Vector.Z < maxZDifference)
                         {
                             // Разница высот в пределах допустимой величины,
                             // проверяем расстояние от добавляемой точки до текущей
-                            /* distance = Distance(currentNode, newNode); */
                             if (curNodeDet.Distance < equivalenceDistance)
                             {
-                                /*
-                                // В графе есть точка, расстояние до которой меньше equivalenceDistance
-                                // добавлять текущую точку нет смысла
-                                needAddNode = false;
-                                return null;*/
                                 // В графе есть точка, расстояние до которой меньше equivalenceDistance
                                 // подменяем newNode на currentNode
                                 newNode = currentNode;
@@ -143,9 +133,6 @@ namespace EntityTools.Patches.Mapper
                         if (uniDirection)
                             AddArcFunc = (n1, n2, w) => Graph.AddArc(n1, n2, w);
                         else AddArcFunc = (n1, n2, w) => Graph.Add2Arcs(n1, n2, w);
-
-                        /*/ Сортировка дорогостоящая операция, поэтому не выполняем
-                        nearestNodeList.Sort((n1, n2) => (int)(n1.Distance - n2.Distance)); //*/
 
                         try
                         {
@@ -349,29 +336,29 @@ namespace EntityTools.Patches.Mapper
                     for (int i = 0; i < Graph.Nodes.Count; i++)
                     {
                         //Проверяем разницу высот
-                        /*zDifference = currentNode.Z - newNode.Z;
-                        zDifference *= Math.Sign(zDifference);*/
-                        NodeDetail curNodeDet = new NodeDetail(Graph.Nodes[i], newNode);
-                        if (Math.Sign(curNodeDet.Vector.Z) * curNodeDet.Vector.Z < maxZDifference)
+                        if (Graph.Nodes[i] is Node iNode)
                         {
-                            // Разница высот в пределах допустимой величины,
-                            // проверяем расстояние от добавляемой точки до текущей
-                            /* distance = Distance(currentNode, newNode); */
-                            if (curNodeDet.Distance < equivalenceDistance)
+                            NodeDetail curNodeDet = new NodeDetail(iNode, newNode);
+                            if (Math.Sign(curNodeDet.Vector.Z) * curNodeDet.Vector.Z < maxZDifference)
                             {
-                                // В графе есть точка, расстояние до которой меньше equivalenceDistance
-                                // подменяем newNode на currentNode
-                                newNode = curNodeDet.Node;
-                                isEquivalent = true;
-                                if (nearestNodeDet != null)
-                                    nearestNodeDet.Rebase(newNode);
-                            }
-                            else if (nearestNodeDet == null || curNodeDet.Distance <= minNodeDistance)
-                            {
-                                // добавляет узел currentNode в список нодов
-                                if (nearestNodeDet == null || curNodeDet.Distance <= nearestNodeDet.Distance)
+                                // Разница высот в пределах допустимой величины,
+                                // проверяем расстояние от добавляемой точки до текущей
+                                if (curNodeDet.Distance < equivalenceDistance)
                                 {
-                                    nearestNodeDet = curNodeDet;
+                                    // В графе есть точка, расстояние до которой меньше equivalenceDistance
+                                    // подменяем newNode на currentNode
+                                    newNode = curNodeDet.Node;
+                                    isEquivalent = true;
+                                    if (nearestNodeDet != null)
+                                        nearestNodeDet.Rebase(newNode);
+                                }
+                                else if (nearestNodeDet == null || curNodeDet.Distance <= minNodeDistance)
+                                {
+                                    // добавляет узел currentNode в список нодов
+                                    if (nearestNodeDet == null || curNodeDet.Distance <= nearestNodeDet.Distance)
+                                    {
+                                        nearestNodeDet = curNodeDet;
+                                    }
                                 }
                             }
                         }
@@ -447,7 +434,6 @@ namespace EntityTools.Patches.Mapper
 
         private static bool NodesEquals(Node node1, Node node2)
         {
-            /*return node1.X == node2.X && node1.Y == node2.Y && node1.Z == node2.Z;*/
             return node1.Position == node2.Position;
         }
         private static bool NodesEquals(NodeDetail nodeDet1, NodeDetail nodeDet2)

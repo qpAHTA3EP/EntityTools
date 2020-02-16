@@ -11,10 +11,90 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Xml.Serialization;
 using EntityTools.Tools.Reflection;
+using System.Windows.Forms;
+using MyNW.Classes;
 
 namespace AstralMapperOriginals
-
 {
+    internal static class Class81
+    {
+        public static bool smethod_0(string string_0, Form form_0 = null)
+        {
+            Class81.Class82 @class = new Class81.Class82
+            {
+                form_0 = form_0,
+                string_0 = string_0,
+                dialogResult_0 = DialogResult.None
+            };
+            Astral.Controllers.Forms.InvokeOnMainThread(new Action(@class.method_0));
+            return @class.dialogResult_0 == DialogResult.Yes;
+        }
+
+        public static bool smethod_1<T>(int int_0, List<T> list_0)
+        {
+            if (int_0 - 1 >= 0)
+            {
+                list_0.Reverse(int_0 - 1, 2);
+                return true;
+            }
+            return false;
+        }
+
+        public static bool smethod_2<T>(int int_0, List<T> list_0)
+        {
+            if (int_0 + 1 < list_0.Count)
+            {
+                list_0.Reverse(int_0, 2);
+                return true;
+            }
+            return false;
+        }
+
+        public static bool smethod_3<T>(T gparam_0, List<T> list_0)
+        {
+            return Class81.smethod_1<T>(list_0.IndexOf(gparam_0), list_0);
+        }
+
+        public static bool smethod_4<T>(T gparam_0, List<T> list_0)
+        {
+            return Class81.smethod_2<T>(list_0.IndexOf(gparam_0), list_0);
+        }
+
+        public static int smethod_5(Vector3 vector3_0, float float_0, Vector3 vector3_1, Vector3 vector3_2)
+        {
+            float num = vector3_2.X - vector3_1.X;
+            float num2 = vector3_2.Y - vector3_1.Y;
+            float num3 = num * num + num2 * num2;
+            float num4 = 2f * (num * (vector3_1.X - vector3_0.X) + num2 * (vector3_1.Y - vector3_0.Y));
+            float num5 = (vector3_1.X - vector3_0.X) * (vector3_1.X - vector3_0.X) + (vector3_1.Y - vector3_0.Y) * (vector3_1.Y - vector3_0.Y) - float_0 * float_0;
+            float num6 = num4 * num4 - 4f * num3 * num5;
+            if ((double)num3 <= 1E-07 || num6 < 0f)
+            {
+                return 0;
+            }
+            if (num6 == 0f)
+            {
+                return 1;
+            }
+            return 2;
+        }
+        private sealed class Class82
+        {
+            internal void method_0()
+            {
+                if (this.form_0 == null)
+                {
+                    this.form_0 = Form.ActiveForm;
+                }
+                this.dialogResult_0 = XtraMessageBox.Show(this.form_0, this.string_0, "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            }
+
+            public Form form_0;
+            public DialogResult dialogResult_0;
+            public string string_0;
+        }
+    }
+
     internal static class Class88
     {
         private static readonly Func<Type[]> GetPluginsTypes = typeof(Astral.Controllers.Plugins).GetStaticFunction<Type[]>("GetTypes");
@@ -44,8 +124,7 @@ namespace AstralMapperOriginals
                 ZipFile zipFile = null;
                 try
                 {
-                    zipFile = new ZipFile(string_0);
-                    zipFile.UseZip64 = UseZip64.Off;
+                    zipFile = new ZipFile(string_0) { UseZip64 = UseZip64.Off };
                     foreach (object obj in zipFile)
                     {
                         ZipEntry zipEntry = obj as ZipEntry;
@@ -71,7 +150,7 @@ namespace AstralMapperOriginals
             return list;
         }
 
-        public static void smethod_2(string fileName, List<Class88.Class89> baseTypeList, bool bool_0 = false)
+        public static void SaveMeshes2Files(string fileName, List<Class88.Class89> baseTypeList, bool bool_0 = false)
         {
             ZipOutputStream zipOutputStream = null;
             ZipFile zipFile = null;
@@ -79,8 +158,7 @@ namespace AstralMapperOriginals
             {
                 if (bool_0 && File.Exists(fileName))
                 {
-                    zipFile = new ZipFile(File.Open(fileName, FileMode.Open));
-                    zipFile.UseZip64 = UseZip64.Off;
+                    zipFile = new ZipFile(File.Open(fileName, FileMode.Open)) { UseZip64 = UseZip64.Off };
                     zipFile.BeginUpdate();
                 }
                 else
@@ -174,8 +252,7 @@ namespace AstralMapperOriginals
             ZipFile zipFile = null;
             try
             {
-                zipFile = new ZipFile(File.OpenRead(string_0));
-                zipFile.UseZip64 = UseZip64.Off;
+                zipFile = new ZipFile(File.OpenRead(string_0)) { UseZip64 = UseZip64.Off };
                 foreach (Class88.Class89 @class in list_0)
                 {
                     ZipEntry entry = zipFile.GetEntry(@class.FileName);
@@ -259,11 +336,11 @@ namespace AstralMapperOriginals
                 }
             }
 
-            private object object_0;
-            private Class88.Class89.Enum2 enum2_0;
-            private string string_0;
-            private List<Type> list_0;
-            private bool bool_0;
+            private readonly object object_0;
+            private readonly Class88.Class89.Enum2 enum2_0;
+            private readonly string string_0;
+            private readonly List<Type> list_0;
+            private readonly bool bool_0;
             public enum Enum2
             {
                 const_0,

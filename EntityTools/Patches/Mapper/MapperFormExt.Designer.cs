@@ -66,6 +66,7 @@ namespace EntityTools.Patches.Mapper
             this.seEquivalenceDistance = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
             this.menuDeleteRadius = new DevExpress.XtraBars.BarEditItem();
             this.seDeleteRadius = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
+            this.menuCacheActive = new DevExpress.XtraBars.BarCheckItem();
             this.toolbarCustomRegion = new DevExpress.XtraBars.Bar();
             this.menuLableCR = new DevExpress.XtraBars.BarStaticItem();
             this.menuCRName = new DevExpress.XtraBars.BarEditItem();
@@ -137,8 +138,9 @@ namespace EntityTools.Patches.Mapper
             this.menuLableCR,
             this.menuCRName,
             this.menuCRAccept,
-            this.menuCRCancel});
-            this.barManager.MaxItemId = 81;
+            this.menuCRCancel,
+            this.menuCacheActive});
+            this.barManager.MaxItemId = 82;
             this.barManager.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.seDeleteRadius,
             this.seWaypointDistance,
@@ -262,7 +264,6 @@ namespace EntityTools.Patches.Mapper
             this.menuImportProfile.Id = 52;
             this.menuImportProfile.ImageOptions.Image = global::EntityTools.Properties.Resources.miniImport;
             this.menuImportProfile.Name = "menuImportProfile";
-            this.menuImportProfile.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
             this.menuImportProfile.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventImportNodesFromFile);
             // 
             // menuExportMesh
@@ -271,7 +272,6 @@ namespace EntityTools.Patches.Mapper
             this.menuExportMesh.Id = 55;
             this.menuExportMesh.ImageOptions.Image = global::EntityTools.Properties.Resources.miniExport;
             this.menuExportMesh.Name = "menuExportMesh";
-            this.menuExportMesh.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
             this.menuExportMesh.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventExportNodes2Mesh);
             // 
             // menuClear
@@ -299,7 +299,8 @@ namespace EntityTools.Patches.Mapper
             new DevExpress.XtraBars.LinkPersistInfo(this.menuWaypointDistance),
             new DevExpress.XtraBars.LinkPersistInfo(this.menuMaxZDifference),
             new DevExpress.XtraBars.LinkPersistInfo(this.menuEquivalenceDistance),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuDeleteRadius)});
+            new DevExpress.XtraBars.LinkPersistInfo(this.menuDeleteRadius),
+            new DevExpress.XtraBars.LinkPersistInfo(this.menuCacheActive)});
             this.popMenuOptions.Manager = this.barManager;
             this.popMenuOptions.Name = "popMenuOptions";
             // 
@@ -388,18 +389,24 @@ namespace EntityTools.Patches.Mapper
             0});
             this.seDeleteRadius.Name = "seDeleteRadius";
             // 
+            // menuCacheActive
+            // 
+            this.menuCacheActive.Caption = "Use Cache";
+            this.menuCacheActive.Id = 81;
+            this.menuCacheActive.Name = "menuCacheActive";
+            // 
             // toolbarCustomRegion
             // 
             this.toolbarCustomRegion.BarName = "CustomRegion";
             this.toolbarCustomRegion.DockCol = 0;
             this.toolbarCustomRegion.DockRow = 0;
-            this.toolbarCustomRegion.FloatLocation = new System.Drawing.Point(86, 193);
+            this.toolbarCustomRegion.FloatLocation = new System.Drawing.Point(66, 200);
             this.toolbarCustomRegion.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
             new DevExpress.XtraBars.LinkPersistInfo(this.menuLableCR, true),
             new DevExpress.XtraBars.LinkPersistInfo(DevExpress.XtraBars.BarLinkUserDefines.Width, this.menuCRName, "", false, true, true, 152),
             new DevExpress.XtraBars.LinkPersistInfo(this.menuCRAccept),
             new DevExpress.XtraBars.LinkPersistInfo(this.menuCRCancel)});
-            this.toolbarCustomRegion.Offset = 31;
+            this.toolbarCustomRegion.Offset = 10;
             this.toolbarCustomRegion.OptionsBar.DisableClose = true;
             this.toolbarCustomRegion.Text = "CustomRegion";
             this.toolbarCustomRegion.Visible = false;
@@ -444,7 +451,7 @@ namespace EntityTools.Patches.Mapper
             this.barDockControlTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.barDockControlTop.Location = new System.Drawing.Point(0, 0);
             this.barDockControlTop.Manager = this.barManager;
-            this.barDockControlTop.Size = new System.Drawing.Size(384, 28);
+            this.barDockControlTop.Size = new System.Drawing.Size(384, 31);
             // 
             // barDockControlBottom
             // 
@@ -458,17 +465,17 @@ namespace EntityTools.Patches.Mapper
             // 
             this.barDockControlLeft.CausesValidation = false;
             this.barDockControlLeft.Dock = System.Windows.Forms.DockStyle.Left;
-            this.barDockControlLeft.Location = new System.Drawing.Point(0, 28);
+            this.barDockControlLeft.Location = new System.Drawing.Point(0, 31);
             this.barDockControlLeft.Manager = this.barManager;
-            this.barDockControlLeft.Size = new System.Drawing.Size(0, 334);
+            this.barDockControlLeft.Size = new System.Drawing.Size(0, 331);
             // 
             // barDockControlRight
             // 
             this.barDockControlRight.CausesValidation = false;
             this.barDockControlRight.Dock = System.Windows.Forms.DockStyle.Right;
-            this.barDockControlRight.Location = new System.Drawing.Point(384, 28);
+            this.barDockControlRight.Location = new System.Drawing.Point(384, 31);
             this.barDockControlRight.Manager = this.barManager;
-            this.barDockControlRight.Size = new System.Drawing.Size(0, 334);
+            this.barDockControlRight.Size = new System.Drawing.Size(0, 331);
             // 
             // barMapper
             // 
@@ -619,5 +626,6 @@ namespace EntityTools.Patches.Mapper
         private RepositoryItemTextEdit teCRName;
         private BarButtonItem menuCRAccept;
         private BarButtonItem menuCRCancel;
+        private BarCheckItem menuCacheActive;
     }
 }

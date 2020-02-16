@@ -22,11 +22,31 @@ namespace EntityTools.Enums
 {
     public enum MissionInteractResultExt
     {
+        /// <summary>
+        /// Ошибка во время попытки взаимодействия с НПС при принятии миссии
+        /// </summary>
         Error,
+        /// <summary>
+        /// Целевая миссия не найдена
+        /// </summary>
         MissionNotFound,
+        /// <summary>
+        /// Награда за целевую мессию не содержит обязательного предмета
+        /// </summary>
+        RequiredRewardNotFound,
+        /// <summary>
+        /// НПС начинает диалог с автоматического предложения
+        /// </summary>
         MissionOffer,
+        /// <summary>
+        /// Принята миссия, предложенная НПС
+        /// </summary>
         MissionOfferAccepted,
+        /// <summary>
+        /// Ццелвая миссия принята
+        /// </summary>
         Succeeed,
+
         Succeeded,
     }
 }
@@ -110,6 +130,25 @@ namespace EntityTools.Actions
                     if (entity.IsValid && Giver.IsMatching(entity))
                     {
                         MissionInteractResultExt missionInteractResult = PickUpMission(entity, MissionId);
+                        /*switch(missionInteractResult)
+                        {
+                            case MissionInteractResultExt.Succeeed:
+                                tries = 0;
+                                if (!Missions.HaveMissionByPath(this.MissionId) && AutoAcceptOfferedMission)
+                                    return ActionResult.Running;
+                                return ActionResult.Completed;
+                            case MissionInteractResultExt.Succeeded:
+                                break;
+                            case MissionInteractResultExt.MissionOffer:
+                                if (!Missions.HaveMissionByPath(this.MissionId) && AutoAcceptOfferedMission)
+                                    return ActionResult.Running;
+                                break;
+                            case MissionInteractResultExt.MissionOfferAccepted:
+                                if (!Missions.HaveMissionByPath(this.MissionId) && AutoAcceptOfferedMission)
+                                    return ActionResult.Running;
+                                break;
+
+                        }*/
                         if (missionInteractResult == MissionInteractResultExt.MissionOfferAccepted 
                             || missionInteractResult == MissionInteractResultExt.MissionOffer)
                         {
@@ -123,6 +162,11 @@ namespace EntityTools.Actions
                                 return ActionResult.Running;
                             return ActionResult.Completed;
                         }
+                        else if(missionInteractResult == MissionInteractResultExt.RequiredRewardNotFound)
+                        {
+                            Logger.WriteLine("Required misstion reward not found...");
+                            return ActionResult.Skip;
+                        }
                         else if (missionInteractResult == MissionInteractResultExt.MissionNotFound && SkipOnFail)
                         {
                             Logger.WriteLine("Mission not available...");
@@ -133,7 +177,8 @@ namespace EntityTools.Actions
                             EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
                             Thread.Sleep(2000);
                         }
-                        if (missionInteractResult == MissionInteractResultExt.MissionNotFound)
+                        if (missionInteractResult == MissionInteractResultExt.MissionNotFound
+                            || missionInteractResult == MissionInteractResultExt.Error)
                         {
                             tries++;
                         }
@@ -334,7 +379,7 @@ namespace EntityTools.Actions
 
                     if(EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.ScreenType != ScreenType.List)
                         return MissionInteractResultExt.Error;
-                    return MissionInteractResultExt.Succeeed;
+                    return MissionInteractResultExt.RequiredRewardNotFound;
                 }
             }
             return MissionInteractResultExt.Error;

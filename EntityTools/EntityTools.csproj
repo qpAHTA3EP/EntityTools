@@ -217,9 +217,7 @@
     <Compile Include="Editors\UccActionEditor.cs" />
     <Compile Include="Editors\UiIdEditor.cs" />
     <Compile Include="Extensions\ListTExtentions.cs" />
-    <Compile Include="Patches\Mapper\AddNavigationNodeCached.cs" />
     <Compile Include="Patches\Mapper\AddNavigationNodeStatic.cs" />
-    <Compile Include="Patches\Mapper\AddNavigationNodeDirect.cs" />
     <Compile Include="Patches\Mapper\AstralMapperOriginals.cs" />
     <Compile Include="Patches\Mapper\MapperFormExt.cs">
       <SubType>Form</SubType>
@@ -230,7 +228,6 @@
     <Compile Include="Patches\Mapper\MapperGraphCache.cs" />
     <Compile Include="Patches\Mapper\NodeDetail.cs" />
     <Compile Include="Patches\Patcher.cs" />
-    <Compile Include="Patches\Mapper\Patch_Mapper.cs" />
     <Compile Include="Patches\Patch.cs" />
     <Compile Include="Patches\Patch_GraphicsNW.cs" />
     <Compile Include="Properties\Settings.Designer.cs">

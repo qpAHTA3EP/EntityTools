@@ -23,6 +23,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Reflection;
+using AstralMapperOriginals;
 using QuesterEditorForm = Astral.Quester.Forms.Editor;
 using QuesterMainForm = Astral.Quester.Forms.Main;
 
@@ -41,7 +42,21 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Функтор доступа к графу 
         /// </summary>
-        private static readonly StaticPropertyAccessor<AStar.Graph> coreMeshes = typeof(Astral.Quester.Core).GetStaticProperty<AStar.Graph>("Meshes");
+        private static readonly StaticPropertyAccessor<AStar.Graph> CoreCurrentMapMeshe = typeof(Astral.Quester.Core).GetStaticProperty<AStar.Graph>("Meshes");
+
+        /// <summary>
+        /// Функтор доступа к словарю Astral.Quester.Core.MapsMeshes
+        /// </summary>
+        private static readonly StaticPropertyAccessor<Dictionary<string, Graph>> CoreMapsMeshes = typeof(Astral.Quester.Core).GetStaticProperty<Dictionary<string, Graph>>("MapsMeshes");
+
+        /// <summary>
+        /// Функтор доступа к списку карт в файле профиля
+        /// Astral.Quester.Core.AvailableMeshesFromFile(openFileDialog.FileName)
+        /// </summary>
+        private static readonly Func<string, List<string>> CoreAvailableMeshesFromFile = typeof(Astral.Quester.Core).GetStaticFunction<string, List<string>>("AvailableMeshesFromFile");
+
+        //Astral.Quester.Core.LoadAllMeshes();
+        private static readonly Func<int> CoreLoadAllMeshes = typeof(Astral.Quester.Core).GetStaticFunction<int>("LoadAllMeshes");
 
         // PictureBox Astral.Forms.UserControls.Mapper.MapPicture;
         //private static readonly StaticFielsAccessor<PictureBox> mapperPicture = typeof(Astral.Forms.UserControls.Mapper).GetField<PictureBox>("MapPicture", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -54,14 +69,12 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Функтор запускающего фоновый поток отрисовки изображения Mapper'a
         /// </summary>
-        private static readonly Func<object, System.Action> StartMapperDrawing = typeof(Astral.Forms.UserControls.Mapper).GetAction("\u0002", BindingFlags.Instance | BindingFlags.NonPublic);
+        private static readonly Func<object, System.Action> MapperStartDrawing = typeof(Astral.Forms.UserControls.Mapper).GetAction("\u0002", BindingFlags.Instance | BindingFlags.NonPublic);
 
         /// <summary>
         /// Функтор запускающего фоновый поток отрисовки изображения Mapper'a
         /// </summary>
-        private static readonly Func<object, System.Action> StopMapperDrawing = typeof(Astral.Forms.UserControls.Mapper).GetAction("\u0003", BindingFlags.Instance | BindingFlags.Public);
-
-        private bool SubscribedMapperMouseDoubleClick = true;
+        private static readonly Func<object, System.Action> MapperStopDrawing = typeof(Astral.Forms.UserControls.Mapper).GetAction("\u0003", BindingFlags.Instance | BindingFlags.Public);
         #endregion
 
         /// <summary>
@@ -88,6 +101,9 @@ namespace EntityTools.Patches.Mapper
             BindingControls();
         }
 
+        /// <summary>
+        /// Привязка элементов управления к данным
+        /// </summary>
         public void BindingControls()
         {
             menuWaypointDistance.DataBindings.Add(nameof(menuWaypointDistance.EditValue),
@@ -102,15 +118,19 @@ namespace EntityTools.Patches.Mapper
                                                 EntityTools.PluginSettings.Mapper,
                                                 nameof(EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
+            menuCacheActive.DataBindings.Add(nameof(menuCacheActive.Checked),
+                                                EntityTools.PluginSettings.Mapper,
+                                                nameof(EntityTools.PluginSettings.Mapper.CacheActive),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
 
             /* Astral.API.CurrentSettings.DeleteNodeRadius не реализует INotifyPropertyChanged
              * поэтому привязка нижеуказанным методом невозможна
              * menuDeleteRadius.DataBindings.Add(new Binding(nameof(menuDeleteRadius.EditValue),
                                                 EntityTools.PluginSettings.Mapper,
                                                 nameof(Astral.API.CurrentSettings.DeleteNodeRadius))); //*/
+
             ((ISupportInitialize)bsrcAstralSettings).BeginInit();
             bsrcAstralSettings.DataSource = Astral.API.CurrentSettings;
-
             menuDeleteRadius.DataBindings.Add(nameof(menuDeleteRadius.EditValue), 
                                               bsrcAstralSettings, 
                                               nameof(Astral.API.CurrentSettings.DeleteNodeRadius), 
@@ -122,7 +142,6 @@ namespace EntityTools.Patches.Mapper
                                                 nameof(EntityTools.PluginSettings.Mapper.ForceLinkingWaypoint),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 
-
             /* Сохранение опции между сессиями не требуется
              * Отслеживание флага производится через свойство LinearPath
              * menuLinearPath.DataBindings.Add(nameof(menuLinearPath.Checked),
@@ -130,6 +149,9 @@ namespace EntityTools.Patches.Mapper
                                                 nameof(EntityTools.PluginSettings.Mapper.LinearPath)); */
         }
 
+        /// <summary>
+        /// Открытие формы
+        /// </summary>
         public static void Open()
         {
             if (EntityTools.PluginSettings.Mapper.Patch)
@@ -148,40 +170,50 @@ namespace EntityTools.Patches.Mapper
             else Astral.Quester.Forms.MapperForm.Open();
         }
 
+        /// <summary>
+        /// Событие при загрузке формы
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void eventLoadMapperForm(object sender, EventArgs e)
+        {
+            Binds.RemoveShiftAction(Keys.M);
+            //mapper.DoubleClick += eventMapperDoubleClick;
+            //mapper.CustomDraw += eventMapperDrawCache;
+            //ReflectionHelper.ExecMethod(mapper, "\u0002", new object[] { }, out object res, BindingFlags.Instance | BindingFlags.NonPublic);
+            
+            // PictureBox Astral.Forms.UserControls.Mapper.MapPicture;
+            //if (ReflectionHelper.GetFieldValue(mapper, "MapPicture", out object mapPictureObj, BindingFlags.Instance | BindingFlags.NonPublic)
+            //    && ReflectionHelper.SubscribeEvent(mapPictureObj, "MouseDoubleClick", this, "eventMapperDoubleClick", true))
+            //    SubscribedMapperMouseDoubleClick = true;
+
+            backgroundWorker.RunWorkerAsync();
+        }
+
+        /// <summary>
+        /// СОбытие при закрытие формы
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void eventClosingMapperForm(object sender, FormClosingEventArgs e)
         {
             MappingCanceler?.Cancel();
             backgroundWorker?.CancelAsync();
             if (mapper != null)
             {
-                StopMapperDrawing?.Invoke(mapper);
+                MapperStopDrawing?.Invoke(mapper);
                 //mapper.DoubleClick -= eventMapperDoubleClick;
-                mapper.CustomDraw -= eventMapperDrawCache;
+                //mapper.CustomDraw -= eventMapperDrawCache;
 
-                if (SubscribedMapperMouseDoubleClick
-                    && ReflectionHelper.GetFieldValue(mapper, "MapPicture", out object mapPictureObj, BindingFlags.Instance | BindingFlags.NonPublic)
-                    && ReflectionHelper.UnsubscribeEvent(mapPictureObj, "MouseDoubleClick", this, "eventMapperDoubleClick", true))
-                    SubscribedMapperMouseDoubleClick = false;
+                //if (SubscribedMapperMouseDoubleClick
+                //    && ReflectionHelper.GetFieldValue(mapper, "MapPicture", out object mapPictureObj, BindingFlags.Instance | BindingFlags.NonPublic)
+                //    && ReflectionHelper.UnsubscribeEvent(mapPictureObj, "MouseDoubleClick", this, "eventMapperDoubleClick", true))
+                //    SubscribedMapperMouseDoubleClick = false;
             }
             CustomRegionHelper.Reset();
 
             lastNodeDetail = null;
             Binds.RemoveShiftAction(Keys.M);
-        }
-
-        private void eventLoadMapperForm(object sender, EventArgs e)
-        {
-            Binds.RemoveShiftAction(Keys.M);
-            //mapper.DoubleClick += eventMapperDoubleClick;
-            mapper.CustomDraw += eventMapperDrawCache;
-            //ReflectionHelper.ExecMethod(mapper, "\u0002", new object[] { }, out object res, BindingFlags.Instance | BindingFlags.NonPublic);
-            
-            // PictureBox Astral.Forms.UserControls.Mapper.MapPicture;
-            if (ReflectionHelper.GetFieldValue(mapper, "MapPicture", out object mapPictureObj, BindingFlags.Instance | BindingFlags.NonPublic)
-                && ReflectionHelper.SubscribeEvent(mapPictureObj, "MouseDoubleClick", this, "eventMapperDoubleClick", true))
-                SubscribedMapperMouseDoubleClick = true;
-
-            backgroundWorker.RunWorkerAsync();
         }
 
         /// <summary>
@@ -258,17 +290,11 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         private string MapAndRegion = null;
 
-        private void eventStopMapping(object sender = null, ItemClickEventArgs e = null)
-        {
-            MappingCanceler.Cancel();
-            lastNodeDetail = null;
-            menuBidirectional.Checked = false;
-            menuBidirectional.Reset();
-            menuUnidirectional.Checked = false;
-            menuUnidirectional.Reset();
-            menuCheckStopMapping.Checked = true;
-        }
-
+        /// <summary>
+        /// Запуск потока прокладывания маршрута
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void eventStartMapping(object sender, ItemClickEventArgs e)
         {
             if (e.Item is BarCheckItem checkedItem
@@ -287,6 +313,23 @@ namespace EntityTools.Patches.Mapper
         }
 
         /// <summary>
+        /// Событие остановки прокладывания маршрута
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void eventStopMapping(object sender = null, ItemClickEventArgs e = null)
+        {
+            MappingCanceler.Cancel();
+            lastNodeDetail = null;
+            menuBidirectional.Checked = false;
+            menuBidirectional.Reset();
+            menuUnidirectional.Checked = false;
+            menuUnidirectional.Reset();
+            menuCheckStopMapping.Checked = true;
+            graphCache?.StopCache();
+        }
+
+        /// <summary>
         /// Прокладывание пути
         /// </summary>
         private void MappingWork(CancellationToken token)
@@ -294,14 +337,14 @@ namespace EntityTools.Patches.Mapper
             //NodeDetail nodeDetail = null;
             try
             {
-                if (graphCache == null || MapAndRegion != EntityManager.LocalPlayer.MapAndRegion)
-                    graphCache = new MapperGraphCache(coreMeshes);
-                else graphCache.RegenCache(EntityManager.LocalPlayer.Location.Clone(), true);
+                if (graphCache == null)
+                    graphCache = new MapperGraphCache(mapper);
+                else graphCache.StartCache(mapper);
 
 #if PROFILING && DEBUG
                 AddNavigationNodeChached.ResetWatch();
 #endif
-                if (graphCache.FullGraph.Nodes.Count != 0)
+                if (graphCache.Nodes.Count != 0)
                 {
                     if (LinearPath)
                         lastNodeDetail = AddNavigationNodeStatic.LinkNearest(EntityManager.LocalPlayer.Location.Clone(), graphCache);
@@ -365,154 +408,180 @@ namespace EntityTools.Patches.Mapper
         #endregion
 
         #region Mesh_Manipulation
+        /// <summary>
+        /// Импорт узлов из Игры
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void eventImportNodesFromGame(object sender, ItemClickEventArgs e)
         {
-            if (((Graph)coreMeshes).Nodes.Count == 0 || XtraMessageBox.Show(this, "Are you sure to import game nodes ? All actual nodes must be delete !", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            if (((Graph)CoreCurrentMapMeshe)?.Nodes.Count == 0 
+                || XtraMessageBox.Show(this, "Are you sure to import game nodes ? All actual nodes must be delete !", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                ((Graph)coreMeshes).Clear();
+                eventStopMapping();
+                MapperStopDrawing?.Invoke(mapper);
+                string locker = "eventImportNodesFromGame";
+                lock(locker)
+                {
+                    ((Graph)CoreCurrentMapMeshe).Clear();
+                    Astral.Logic.NW.GoldenPath.GetCurrentMapGraph(CoreCurrentMapMeshe);
+                    graphCache.RegenCache(null);
+                }
+                MapperStartDrawing?.Invoke(mapper);
             }
             //GoldenPath.GetCurrentMapGraph(coreMeshes);
             //GetCurrentMapGraph?.Invoke(coreMeshes);
-            Astral.Logic.NW.GoldenPath.GetCurrentMapGraph(coreMeshes);
         }
 
+        /// <summary>
+        /// Импорт узлов из файла
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void eventImportNodesFromFile(object sender, ItemClickEventArgs e)
         {
+            // Код перенесен из Astral'a
             string mapName = EntityManager.LocalPlayer.MapState.MapName;
             if (string.IsNullOrEmpty(mapName))
             {
                 XtraMessageBox.Show("Impossible to get current map name !");
                 return;
             }
-            //OpenFileDialog openFileDialog = new OpenFileDialog();
-            //openFileDialog.InitialDirectory = Directories.ProfilesPath;
-            //openFileDialog.DefaultExt = "amp.zip";
-            //openFileDialog.Filter = "Astral mission profil (*.amp.zip)|*.amp.zip|(*.mesh.zip)|*.mesh.zip";
-            //if (openFileDialog.ShowDialog() == DialogResult.OK)
-            //{
-            //    Dictionary<string, Graph> dictionary = new Dictionary<string, Graph>();
-            //    List<Class88.Class89> list = new List<Class88.Class89>();
-            //    List<Type> list2 = new List<Type>();
-            //    list2.Add(typeof(Astral.Quester.Classes.Action));
-            //    list2.Add(typeof(Condition));
-            //    Class88.Class89 @class = new Class88.Class89(dictionary, Class88.Class89.Enum2.const_1, "meshes.bin", null);
-            //    list.Add(@class);
-            //    Class88.smethod_4(openFileDialog.FileName, list);
-            //    if (@class.Success)
-            //    {
-            //        dictionary = (@class.Object as Dictionary<string, Graph>);
-            //    }
-            //    else
-            //    {
-            //        list.Clear();
-            //        dictionary = new Dictionary<string, Graph>();
-            //        foreach (string str in Core.AvailableMeshesFromFile(openFileDialog.FileName))
-            //        {
-            //            Class88.Class89 item = new Class88.Class89(new Graph(), Class88.Class89.Enum2.const_1, str + ".bin", null);
-            //            list.Add(item);
-            //        }
-            //        Class88.smethod_4(openFileDialog.FileName, list);
-            //        foreach (Class88.Class89 class2 in list)
-            //        {
-            //            Logger.WriteLine("found : " + class2.FileName + " : " + class2.Success.ToString());
-            //            if (class2.Success)
-            //            {
-            //                dictionary.Add(class2.FileName.Replace(".bin", ""), class2.Object as Graph);
-            //            }
-            //        }
-            //    }
-            //    DialogResult dialogResult = XtraMessageBox.Show("Import nodes for the current map only ? Else import all.", "Nodes import", MessageBoxButtons.YesNoCancel);
-            //    if (dialogResult == DialogResult.Yes)
-            //    {
-            //        if (dictionary.ContainsKey(mapName))
-            //        {
-            //            if (((AStar.Graph)coreMeshes).Nodes.Count == 0 || Class81.smethod_0("Are you sure, that will delete current map nodes ?", null))
-            //            {
-            //                Core.MapsMeshes[mapName] = dictionary[mapName];
-            //            }
-            //        }
-            //        else
-            //        {
-            //            XtraMessageBox.Show("This profile doesn't contain nodes for this map !");
-            //        }
-            //    }
-            //    if (dialogResult == DialogResult.No
-            //        && ((((AStar.Graph)coreMeshes).Nodes.Count == 0 && Core.MapsMeshes.Count <= 1)
-            //        || Class81.smethod_0("Are you sure, that will delete all maps nodes ?", null)))
-            //    {
-            //        Core.MapsMeshes = dictionary;
-            //    }
-            //}
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                InitialDirectory = Directories.ProfilesPath,
+                DefaultExt = "amp.zip",
+                Filter = "Astral mission profil (*.amp.zip)|*.amp.zip|(*.mesh.zip)|*.mesh.zip"
+            };
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                eventStopMapping();
+                Dictionary<string, Graph> profileMeshes = new Dictionary<string, Graph>();
+                List<Class88.Class89> list = new List<Class88.Class89>();
+                List<Type> baseTypeList = new List<Type>
+                {
+                    typeof(Astral.Quester.Classes.Action),
+                    typeof(Condition)
+                };
+                Class88.Class89 @class = new Class88.Class89(profileMeshes, Class88.Class89.Enum2.const_1, "meshes.bin", null);
+                list.Add(@class);
+                Class88.smethod_4(openFileDialog.FileName, list);
+                if (@class.Success)
+                {
+                    profileMeshes = (@class.Object as Dictionary<string, Graph>);
+                }
+                else
+                {
+                    list.Clear();
+                    profileMeshes = new Dictionary<string, Graph>();
+                    if(CoreAvailableMeshesFromFile != null)
+                        foreach (string str in CoreAvailableMeshesFromFile(openFileDialog.FileName))
+                        //foreach (string str in Astral.Quester.Core.AvailableMeshesFromFile(openFileDialog.FileName))
+                        {
+                            Class88.Class89 item = new Class88.Class89(new Graph(), Class88.Class89.Enum2.const_1, str + ".bin", null);
+                            list.Add(item);
+                        }
+                    Class88.smethod_4(openFileDialog.FileName, list);
+                    foreach (Class88.Class89 class2 in list)
+                    {
+                        Logger.WriteLine("found : " + class2.FileName + " : " + class2.Success.ToString());
+                        if (class2.Success)
+                        {
+                            profileMeshes.Add(class2.FileName.Replace(".bin", ""), class2.Object as Graph);
+                        }
+                    }
+                }
+                DialogResult dialogResult = XtraMessageBox.Show("Import nodes for the current map only ? Else import all.", "Nodes import", MessageBoxButtons.YesNoCancel);
+                if (dialogResult == DialogResult.Yes)
+                {
+                    if (profileMeshes.ContainsKey(mapName))
+                    {
+                        if (((AStar.Graph)CoreCurrentMapMeshe).Nodes.Count == 0 || Class81.smethod_0("Are you sure, that will delete current map nodes ?", null))
+                        {
+                            MapperStopDrawing?.Invoke(mapper);
+                            string locker = "eventImportNodesFromFile";
+                            lock (locker)
+                            {
+                                CoreMapsMeshes.Value[mapName] = profileMeshes[mapName];
+                                graphCache.RegenCache();
+                            }
+                            MapperStartDrawing?.Invoke(mapper);
+                        }
+                    }
+                    else
+                    {
+                        XtraMessageBox.Show("This profile doesn't contain nodes for this map !");
+                    }
+                }
+                if (dialogResult == DialogResult.No
+                    && ((((AStar.Graph)CoreCurrentMapMeshe).Nodes.Count == 0 && CoreMapsMeshes.Value.Count <= 1)
+                    || Class81.smethod_0("Are you sure, that will delete all maps nodes ?", null)))
+                {
+                    MapperStopDrawing?.Invoke(mapper);
+                    string locker = "eventImportNodesFromFile";
+                    lock (locker)
+                    {
+                        CoreMapsMeshes.Value = profileMeshes;
+                        graphCache.RegenCache();
+                    }
+                    MapperStartDrawing?.Invoke(mapper);
+                }
+            }
         }
 
+        /// <summary>
+        /// Экспорт узлов в файл 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void eventExportNodes2Mesh(object sender, ItemClickEventArgs e)
         {
-            //SaveFileDialog saveFileDialog = new SaveFileDialog();
-            //saveFileDialog.InitialDirectory = Directories.ProfilesPath;
-            //saveFileDialog.DefaultExt = "amp.zip";
-            //saveFileDialog.Filter = "Astral mesh file (*.mesh.zip)|*.mesh.zip";
-            //if (saveFileDialog.ShowDialog() == DialogResult.OK)
-            //{
-            //    Astral.Quester.Core.LoadAllMeshes();
-            //    List<Class88.Class89> list = new List<Class88.Class89>();
-            //    foreach (KeyValuePair<string, Graph> keyValuePair in Core.MapsMeshes)
-            //    {
-            //        Class88.Class89 item = new Class88.Class89(keyValuePair.Value, Class88.Class89.Enum2.const_1, keyValuePair.Key + ".bin", null);
-            //        list.Add(item);
-            //    }
-            //    Class88.smethod_2(saveFileDialog.FileName, list, false);
-            //}
+            // Код перенесен из Astral'a
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.InitialDirectory = Directories.ProfilesPath;
+            saveFileDialog.DefaultExt = "amp.zip";
+            saveFileDialog.Filter = "Astral mesh file (*.mesh.zip)|*.mesh.zip";
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                //Astral.Quester.Core.LoadAllMeshes();
+                eventStopMapping();
+                CoreLoadAllMeshes();
+                List<Class88.Class89> list = new List<Class88.Class89>();
+                foreach (KeyValuePair<string, Graph> keyValuePair in CoreMapsMeshes.Value)
+                {
+                    Class88.Class89 item = new Class88.Class89(keyValuePair.Value, Class88.Class89.Enum2.const_1, keyValuePair.Key + ".bin", null);
+                    list.Add(item);
+                }
+                Class88.SaveMeshes2Files(saveFileDialog.FileName, list, false);
+            }
         }
 
+        /// <summary>
+        /// Очистка графа мешей
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void eventClearNodes(object sender, ItemClickEventArgs e)
         {
             if (XtraMessageBox.Show(this, "Are you sure to delete all map nodes ?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                ((Graph)coreMeshes).Clear();
-                mapper.Refresh();
-            }
-        }
-        #endregion
-
-        #region Mapper_Event
-        /// <summary>
-        /// Обновление кэша при удалении вершин
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void eventMapperDoubleClick(object sender, EventArgs e)
-        {
-            // двойной клик означает удаление точек пути
-            // следовательно нужно обновить кэш
-            graphCache?.RegenCache();
-
-#if DEBUG
-            Logger.WriteLine(Logger.LogType.Debug, "MapperFormExt::eventMapperDoubleClick");
-#endif
-        }
-
-        /// <summary>
-        /// Отрисовка на Mapper'e кэшированных вершин
-        /// </summary>
-        /// <param name="g"></param>
-        private void eventMapperDrawCache(GraphicsNW g)
-        {
-            if(graphCache != null)
-            {
-                foreach(Node node in graphCache.Nodes)
+                eventStopMapping();
+                Graph g = ((Graph)CoreCurrentMapMeshe);
+                lock (g)
                 {
-                    g.drawFillEllipse(new Vector3((float)node.X, (float)node.Y, (float)node.Z), new Size(10, 10), Brushes.Gold);
+                    g.Clear();
                 }
-            }
-            if(lastNodeDetail != null && lastNodeDetail.Node != null)
-            {
-                //g.drawFillEllipse(new Vector3((float)lastNodeDetail.Node.X, (float)lastNodeDetail.Node.Y, (float)lastNodeDetail.Node.Z), new Size(9, 9), Brushes.Cyan);
-                CustomRegionHelper.DrawAnchor(g, new Vector3((float)lastNodeDetail.Node.X, (float)lastNodeDetail.Node.Y, (float)lastNodeDetail.Node.Z), Brushes.Orange);
+                graphCache.RegenCache(null);
             }
         }
         #endregion
 
         #region CustomRegion_Manipulation
+        /// <summary>
+        /// Запуск процедуры добавления прямоугольного региона
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void eventAddRectangularCR(object sender, ItemClickEventArgs e)
         {
             toolbarCustomRegion.FloatLocation = new Point(Location.X + 40, Location.Y + 60);
@@ -567,6 +636,11 @@ namespace EntityTools.Patches.Mapper
             };*/
         }
 
+        /// <summary>
+        /// Запуск процедуры добавления элиптического региона
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void eventAddElipticalCR(object sender, ItemClickEventArgs e)
         {
             toolbarCustomRegion.FloatLocation = new Point(Location.X + 40, Location.Y + 60);
@@ -574,6 +648,11 @@ namespace EntityTools.Patches.Mapper
             CustomRegionHelper.BeginAdd(mapper, true);
         }
 
+        /// <summary>
+        /// Завершение процедуры добавления региона
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void eventMenuCRAcceptClick(object sender, ItemClickEventArgs e)
         {
             string crName = menuCRName.EditValue.ToString()?.Trim();
@@ -591,6 +670,11 @@ namespace EntityTools.Patches.Mapper
             else XtraMessageBox.Show("Finish the edition of the CuatomRegion!");
         }
 
+        /// <summary>
+        /// Прерывание процедуры добавления региона
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void eventMenuCRCancelClick(object sender, ItemClickEventArgs e)
         {
             CustomRegionHelper.Reset();
@@ -674,7 +758,6 @@ namespace EntityTools.Patches.Mapper
         private static Vector3 anchorPoint = null;
         private static readonly float anchorSize = 4;
 
-
         #region Reflection
         /// <summary>
         /// Функтор доступа к экземпляру Квестер-редактора
@@ -695,9 +778,6 @@ namespace EntityTools.Patches.Mapper
         /// <param name="elliptical"></param>
         public static void BeginAdd(Astral.Forms.UserControls.Mapper m, bool elliptical = false)
         {
-            /* XtraMessageBox.Show("Right click on map to create the region.\n" +
-                "You should start by the left/top of desired area.\n" +
-                "Right click again to finish the creation.");//*/
             startPoint = null;
             endPoint = null;
             anchorPoint = null;
@@ -705,10 +785,12 @@ namespace EntityTools.Patches.Mapper
             isElliptical = elliptical;
             dragMode = DragMode.Disabled;
 
-
-            mapper = m;
-            mapper.OnClick += eventMapperClick;
-            mapper.CustomDraw += eventMapperDraw;
+            if (mapper != null && !mapper.IsDisposed)
+            {
+                mapper = m;
+                mapper.OnClick += eventMapperClick;
+                mapper.CustomDraw += eventMapperDraw;
+            }
         }
 
         internal static bool IsComplete
@@ -1100,7 +1182,7 @@ namespace EntityTools.Patches.Mapper
             customRegion = null;
             dragMode = DragMode.Disabled;
 
-            if (mapper != null)
+            if (mapper != null && !mapper.IsDisposed)
             {
                 mapper.OnClick -= eventMapperClick;
                 mapper.CustomDraw -= eventMapperDraw;

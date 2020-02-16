@@ -21,8 +21,8 @@ namespace EntityTools.Settings
             {
                 if (patch != value)
                 {
-                    base.NotifyPropertyChanged(nameof(Patch));
                     patch = value;
+                    base.NotifyPropertyChanged(nameof(Patch));
                 }
             }
         }
@@ -39,8 +39,9 @@ namespace EntityTools.Settings
             {
                 if (waypointDistance != value)
                 {
-                    base.NotifyPropertyChanged(nameof(WaypointDistance));
                     waypointDistance = Math.Max(5, value);
+                    base.NotifyPropertyChanged(nameof(WaypointDistance));
+                    WaypointEquivalenceDistance = Math.Min(waypointDistance/2, waypointEquivalenceDistance);
                 }
             }
         }
@@ -75,11 +76,45 @@ namespace EntityTools.Settings
             {
                 if (maxElevationDifference != value)
                 {
-                    base.NotifyPropertyChanged(nameof(MaxElevationDifference));
                     maxElevationDifference = Math.Max(2, value);
+                    base.NotifyPropertyChanged(nameof(MaxElevationDifference));
                 }
             }
         }
+
+        /// <summary>
+        /// Использование кэша при прокладывании пути
+        /// </summary>
+        [NonSerialized]
+        private bool cacheActive = true;
+        public bool CacheActive
+        {
+            get => cacheActive;
+            set
+            {
+                if (cacheActive != value)
+                {
+                    cacheActive = value;
+                    base.NotifyPropertyChanged(nameof(CacheActive));
+                }
+            }
+        }
+        /// <summary>
+        /// Время обновления кэша
+        /// </summary>
+        public int CacheRegenTimeout
+        {
+            get => cacheRegenTimeout;
+            set
+            {
+                if (value != cacheRegenTimeout)
+                {
+                    cacheRegenTimeout = Math.Max(1000, value);
+                    base.NotifyPropertyChanged(nameof(cacheRegenTimeout));
+                }
+            }
+        }
+        private int cacheRegenTimeout = 5000;
 
         /// <summary>
         /// Принудительное связывание новой точки пути с предыдущей точкой
@@ -95,8 +130,8 @@ namespace EntityTools.Settings
             {
                 if (forceLinkingWaypoint != value)
                 {
-                    base.NotifyPropertyChanged(nameof(ForceLinkingWaypoint));
                     forceLinkingWaypoint = value;
+                    base.NotifyPropertyChanged(nameof(ForceLinkingWaypoint));
                 }
             }
         }
@@ -113,8 +148,8 @@ namespace EntityTools.Settings
             {
                 if (linearPath != value)
                 {
-                    base.NotifyPropertyChanged(nameof(LinearPath));
                     linearPath = value;
+                    base.NotifyPropertyChanged(nameof(LinearPath));
                 }
             }
         }
