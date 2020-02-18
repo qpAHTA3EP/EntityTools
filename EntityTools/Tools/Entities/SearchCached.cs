@@ -83,7 +83,7 @@ namespace EntityTools.Tools.Entities
         /// <param name="specialCheck">Функтор дополнительной проверки Entity, например наличия в черном списке</param>
         /// <param name="interactable">Если True, искать только Entity с которыми можно взаимодействать</param>
         /// <returns>Найденное Entity</returns>
-        public static List<Entity> FindAllEntity(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete,
+        public static LinkedList<Entity> FindAllEntity(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete,
             bool healthCheck = false, float range = 0, float zRange = 0, bool regionCheck = false, List<CustomRegion> customRegions = null, 
             Predicate<Entity> specialCheck = null)
         {
@@ -96,7 +96,7 @@ namespace EntityTools.Tools.Entities
 #endif
             // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
             float closestDistance = (range == 0) ? float.MaxValue : range;
-                List<Entity> entities = new List<Entity>();
+                LinkedList<Entity> entities = new LinkedList<Entity>();
                 Action<Entity> evaluateAction;
 
                 // Конструируем функтор для поиска Entity в соответствии с доп. условиями
@@ -110,7 +110,7 @@ namespace EntityTools.Tools.Entities
                                 && (range == 0 || e.Location.Distance3DFromPlayer < range)
                                 && (zRange == 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < range)
                                 && customRegions.Find((CustomRegion cr) => e.Within(cr)) != null)
-                                entities.Add(e);
+                                entities.AddLast(e);
                         };
                     else evaluateAction = (Entity e) =>
                     {
@@ -120,7 +120,7 @@ namespace EntityTools.Tools.Entities
                             && (zRange == 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < range)
                             && customRegions.Find((CustomRegion cr) => e.Within(cr)) != null
                             && specialCheck(e))
-                            entities.Add(e);
+                            entities.AddLast(e);
                     };
                 }
                 else
@@ -132,7 +132,7 @@ namespace EntityTools.Tools.Entities
                                 && (!healthCheck || !e.IsDead)
                                 && (range == 0 || e.Location.Distance3DFromPlayer < range)
                                 && (zRange == 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < range))
-                                entities.Add(e);
+                                entities.AddLast(e);
                         };
                     else evaluateAction = (Entity e) =>
                     {
@@ -141,7 +141,7 @@ namespace EntityTools.Tools.Entities
                                 && (range == 0 || e.Location.Distance3DFromPlayer < range)
                                 && (zRange == 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < range)
                                 && specialCheck(e))
-                            entities.Add(e);
+                            entities.AddLast(e);
                     };
                 }
 

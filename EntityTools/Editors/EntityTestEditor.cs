@@ -50,7 +50,7 @@ namespace EntityTools.Editors
                     sb.Append("NeedToRun: ").AppendLine(mte.NeedToRun.ToString());
                     sb.AppendLine();
                     // список всех Entity, удовлетворяющих условиям
-                    List<Entity> entities = SearchCached.FindAllEntity(mte.EntityID, mte.EntityIdType, mte.EntityNameType, EntitySetType.Complete,
+                    LinkedList<Entity> entities = SearchCached.FindAllEntity(mte.EntityID, mte.EntityIdType, mte.EntityNameType, EntitySetType.Complete,
                         mte.HealthCheck, mte.ReactionRange, mte.ReactionZRange, mte.RegionCheck, CustomRegionTools.GetCustomRegions(mte.CustomRegionNames));
 
                     // Количество Entity, удовлетворяющих условиям
@@ -111,7 +111,7 @@ namespace EntityTools.Editors
                     sb.AppendLine();
 
                     // список всех Entity, удовлетворяющих условиям
-                    List <Entity> entities = SearchCached.FindAllEntity(ie.EntityID, ie.EntityIdType, ie.EntityNameType, ie.EntitySetType,
+                    LinkedList<Entity> entities = SearchCached.FindAllEntity(ie.EntityID, ie.EntityIdType, ie.EntityNameType, ie.EntitySetType,
                                                                         ie.HealthCheck, ie.ReactionRange, ie.ReactionZRange, ie.RegionCheck, CustomRegionTools.GetCustomRegions(ie.CustomRegionNames));
 
 
@@ -168,7 +168,7 @@ namespace EntityTools.Editors
                     sb.Append("Aura: ").AppendLine(auraOptionObj?.ToString() ?? "null");
 
                     sb.AppendLine();
-                    List<Entity> entities = SearchCached.FindAllEntity(entityId.ToString(), (ItemFilterStringType)entityIdType, (EntityNameType)entityNameType, entitySet,
+                    LinkedList<Entity> entities = SearchCached.FindAllEntity(entityId.ToString(), (ItemFilterStringType)entityIdType, (EntityNameType)entityNameType, entitySet,
                         healthCheck, reactionRange, reactionZRange, regionCheck, customRegions, auraOption.Checker);
 
                     // Количество Entity, удовлетворяющих условиям

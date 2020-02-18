@@ -91,8 +91,8 @@ namespace EntityTools.Tools.Entities
 
         public Timeout Timer { get; private set; } = new Timeout(0);
 
-        private List<Entity> entities = new List<Entity>();
-        public List<Entity> Entities
+        private LinkedList<Entity> entities = new LinkedList<Entity>();
+        public LinkedList<Entity> Entities
         {
             get
             {
@@ -110,7 +110,7 @@ namespace EntityTools.Tools.Entities
 #if DEBUG && PROFILING
             RegenCount++;
 #endif
-            List<Entity> entts;
+            LinkedList<Entity> entts;
             if (Key.EntitySetType == EntitySetType.Complete)
                 entts = SearchDirect.GetEntities(Key);
             else entts = SearchDirect.GetContactEntities(Key);
@@ -131,7 +131,7 @@ namespace EntityTools.Tools.Entities
 #if DEBUG && PROFILING
             RegenCount++;
 #endif
-            List<Entity> entts;
+            LinkedList<Entity> entts;
             if (Key.EntitySetType == EntitySetType.Complete)
                 entts = SearchDirect.GetEntities(Key, action);
             else entts = SearchDirect.GetContactEntities(Key, action);
@@ -160,15 +160,27 @@ namespace EntityTools.Tools.Entities
             {
                 // Если Entity валидна - оно передается для обработки в action
                 // в противном случае - удаляется из коллекции
-                entities.RemoveAll((Entity e) =>
-                                    {
-                                        if (Key.Comparer.Check(e))
-                                        {
-                                            action(e);
-                                            return false;
-                                        }
-                                        else return true;
-                                    });
+                LinkedList<Entity> newEntities = new LinkedList<Entity>();
+                
+                while(entities.Count > 0)
+                {
+                    LinkedListNode<Entity> eNode = entities.First;
+                    entities.RemoveFirst();
+                    if (Key.Comparer.Check(eNode.Value))
+                    {
+                        action(eNode.Value);
+                        newEntities.AddLast(eNode);
+                    }
+                }
+                //entities.RemoveAll((Entity e) =>
+                //                    {
+                //                        if (Key.Comparer.Check(e))
+                //                        {
+                //                            action(e);
+                //                            return false;
+                //                        }
+                //                        else return true;
+                //                    });
             }
         }
 

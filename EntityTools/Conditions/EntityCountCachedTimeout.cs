@@ -147,7 +147,7 @@ namespace EntityTools.Conditions
         }
 
         [NonSerialized]
-        List<Entity> entities = null;
+        LinkedList<Entity> entities = null;
         [NonSerialized]
         private EntityComparerToPattern Comparer = null;
         //[XmlIgnore]

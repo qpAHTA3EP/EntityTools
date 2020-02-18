@@ -76,7 +76,7 @@ namespace EntityTools.Tools.Entities
         /// <param name="nameType"></param>
         /// <param name="action">Функтор действия, которое нужно выполнить над Entity, удовлетворяющем условиям</param>
         /// <returns></returns>
-        public static List<Entity> GetEntities(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, Action<Entity> action = null)
+        public static LinkedList<Entity> GetEntities(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, Action<Entity> action = null)
         {
 #if DEBUG && PROFILING
             Count++;
@@ -85,19 +85,38 @@ namespace EntityTools.Tools.Entities
             try
             {
 #endif
+            LinkedList<Entity> entities = new LinkedList<Entity>();
             EntityComparerToPattern comparer = new EntityComparerToPattern(entPattern, strMatchType, nameType);
 
-                if (action != null)
-                    return EntityManager.GetEntities()?.FindAll((Entity e) =>
-                            {
-                                if (comparer.Check(e))
-                                {
-                                    action(e);
-                                    return true;
-                                }
-                                else return false;
-                            });
-                else return EntityManager.GetEntities()?.FindAll(comparer.Check);
+            if (action != null)
+            {
+                foreach (Entity e in EntityManager.GetEntities())
+                {
+                    if (comparer.Check(e))
+                    {
+                        action(e);
+                        entities.AddLast(e);
+                    }
+                }
+                //return EntityManager.GetEntities()?.FindAll((Entity e) =>
+                //        {
+                //            if (comparer.Check(e))
+                //            {
+                //                action(e);
+                //                return true;
+                //            }
+                //            else return false;
+                //        });
+            }
+            else
+            {
+                foreach (Entity e in EntityManager.GetEntities())
+                    if (comparer.Check(e))
+                        entities.AddLast(e);
+
+                //return EntityManager.GetEntities()?.FindAll(comparer.Check);
+            }
+            return entities;
 #if DEBUG && PROFILING
             }
             finally
@@ -122,7 +141,7 @@ namespace EntityTools.Tools.Entities
         /// <param name="key"></param>
         /// <param name="action">Функтор действия, которое нужно выполнить над Entity, удовлетворяющем условиям</param>
         /// <returns></returns>
-        public static List<Entity> GetEntities(CacheRecordKey key, Action<Entity> action = null)
+        public static LinkedList<Entity> GetEntities(CacheRecordKey key, Action<Entity> action = null)
         {
             if (key == null)
                 return null;
@@ -133,17 +152,35 @@ namespace EntityTools.Tools.Entities
             try
             {
 #endif
+            LinkedList<Entity> entities = new LinkedList<Entity>();
             if (action != null)
-                    return EntityManager.GetEntities()?.FindAll((Entity e) =>
+            {
+                foreach (Entity e in EntityManager.GetEntities())
+                {
+                    if (key.Comparer.Check(e))
                     {
-                        if (key.Comparer.Check(e))
-                        {
-                            action(e);
-                            return true;
-                        }
-                        else return false;
-                    });
-                else return EntityManager.GetEntities()?.FindAll(key.Comparer.Check);
+                        action(e);
+                        entities.AddLast(e);
+                    }
+                }
+                //return EntityManager.GetEntities()?.FindAll((Entity e) =>
+                //      {
+                //          if (key.Comparer.Check(e))
+                //          {
+                //              action(e);
+                //              return true;
+                //          }
+                //          else return false;
+                //      });
+            }
+            else
+            {
+                //return EntityManager.GetEntities()?.FindAll(key.Comparer.Check);
+                foreach (Entity e in EntityManager.GetEntities())
+                    if (key.Comparer.Check(e))
+                        entities.AddLast(e);
+            }
+            return entities;
 #if DEBUG && PROFILING
             }
             finally
@@ -170,7 +207,7 @@ namespace EntityTools.Tools.Entities
         /// <param name="nameType">Идентификатор (имя) Entity, с которым сопостовляется entPattern</param>
         /// <param name="action">Функтор действия, которое нужно выполнить над Entity, удовлетворяющем условиям</param>
         /// <returns></returns>
-        public static List<Entity> GetContactEntities(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, Action<Entity> action = null)
+        public static LinkedList<Entity> GetContactEntities(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, Action<Entity> action = null)
         {
 #if DEBUG && PROFILING
             ContactCount++;
@@ -179,7 +216,7 @@ namespace EntityTools.Tools.Entities
             try
             {
 #endif
-            List<Entity> entities = new List<Entity>();
+            LinkedList<Entity> entities = new LinkedList<Entity>();
                 EntityComparerToPattern comparer = new EntityComparerToPattern(entPattern, strMatchType, nameType);
 
                 if (action != null)
@@ -189,7 +226,7 @@ namespace EntityTools.Tools.Entities
                         if (contact.Entity.IsValid && comparer.Check(contact.Entity))
                         {
                             action(contact.Entity);
-                            entities.Add(contact.Entity);
+                            entities.AddLast(contact.Entity);
                         }
                     }
                     foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyInteractCritterEnts)
@@ -197,7 +234,7 @@ namespace EntityTools.Tools.Entities
                         if (contact.Entity.IsValid && comparer.Check(contact.Entity))
                         {
                             action(contact.Entity);
-                            entities.Add(contact.Entity);
+                            entities.AddLast(contact.Entity);
                         }
                     }
                 }
@@ -206,12 +243,12 @@ namespace EntityTools.Tools.Entities
                     foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts)
                     {
                         if (contact.Entity.IsValid && comparer.Check(contact.Entity))
-                            entities.Add(contact.Entity);
+                            entities.AddLast(contact.Entity);
                     }
                     foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyInteractCritterEnts)
                     {
                         if (contact.Entity.IsValid && comparer.Check(contact.Entity))
-                            entities.Add(contact.Entity);
+                            entities.AddLast(contact.Entity);
                     }
                 }
                 return entities;
@@ -238,7 +275,7 @@ namespace EntityTools.Tools.Entities
         /// <param name="key"></param>
         /// <param name="action">Функтор действия, которое нужно выполнить над Entity, удовлетворяющем условиям</param>
         /// <returns></returns>
-        public static List<Entity> GetContactEntities(CacheRecordKey key, Action<Entity> action = null)
+        public static LinkedList<Entity> GetContactEntities(CacheRecordKey key, Action<Entity> action = null)
         {
             if (key == null)
                 return null;
@@ -249,7 +286,7 @@ namespace EntityTools.Tools.Entities
             try
             {
 #endif
-            List<Entity> entities = new List<Entity>();
+            LinkedList<Entity> entities = new LinkedList<Entity>();
 
                 if (action != null)
                 {
@@ -258,7 +295,7 @@ namespace EntityTools.Tools.Entities
                         if (contact.Entity.IsValid && key.Comparer.Check(contact.Entity))
                         {
                             action(contact.Entity);
-                            entities.Add(contact.Entity);
+                            entities.AddFirst(contact.Entity);
                         }
                     }
                     foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyInteractCritterEnts)
@@ -266,7 +303,7 @@ namespace EntityTools.Tools.Entities
                         if (contact.Entity.IsValid && key.Comparer.Check(contact.Entity))
                         {
                             action(contact.Entity);
-                            entities.Add(contact.Entity);
+                            entities.AddFirst(contact.Entity);
                         }
                     }
                 }
@@ -275,12 +312,12 @@ namespace EntityTools.Tools.Entities
                     foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts)
                     {
                         if (contact.Entity.IsValid && key.Comparer.Check(contact.Entity))
-                            entities.Add(contact.Entity);
+                            entities.AddFirst(contact.Entity);
                     }
                     foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyInteractCritterEnts)
                     {
                         if (contact.Entity.IsValid && key.Comparer.Check(contact.Entity))
-                            entities.Add(contact.Entity);
+                            entities.AddFirst(contact.Entity);
                     }
                 }
                 return entities;
