@@ -319,7 +319,7 @@ namespace EntityTools.Patches.Mapper
         /// <param name="e"></param>
         private void eventStopMapping(object sender = null, ItemClickEventArgs e = null)
         {
-            MappingCanceler.Cancel();
+            MappingCanceler?.Cancel();
             lastNodeDetail = null;
             menuBidirectional.Checked = false;
             menuBidirectional.Reset();
@@ -785,9 +785,9 @@ namespace EntityTools.Patches.Mapper
             isElliptical = elliptical;
             dragMode = DragMode.Disabled;
 
+            mapper = m;
             if (mapper != null && !mapper.IsDisposed)
             {
-                mapper = m;
                 mapper.OnClick += eventMapperClick;
                 mapper.CustomDraw += eventMapperDraw;
             }

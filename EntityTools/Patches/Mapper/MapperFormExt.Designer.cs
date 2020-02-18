@@ -84,6 +84,12 @@ namespace EntityTools.Patches.Mapper
             this.barOptions = new DevExpress.XtraBars.BarSubItem();
             this.menuBtnStopMapping = new DevExpress.XtraBars.BarButtonItem();
             this.bsrcAstralSettings = new System.Windows.Forms.BindingSource(this.components);
+            this.statusBar = new DevExpress.XtraBars.Bar();
+            this.statMousePos = new DevExpress.XtraBars.BarStaticItem();
+            this.statZoom = new DevExpress.XtraBars.BarEditItem();
+            this.zoomer = new DevExpress.XtraEditors.Repository.RepositoryItemZoomTrackBar();
+            this.statCenterPlayerText = new DevExpress.XtraBars.BarStaticItem();
+            this.statCenterPlayer = new DevExpress.XtraBars.BarCheckItem();
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.popMenuOptions)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seWaypointDistance)).BeginInit();
@@ -92,6 +98,7 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.seDeleteRadius)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.teCRName)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bsrcAstralSettings)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.zoomer)).BeginInit();
             this.SuspendLayout();
             // 
             // backgroundWorker
@@ -103,7 +110,8 @@ namespace EntityTools.Patches.Mapper
             // 
             this.barManager.Bars.AddRange(new DevExpress.XtraBars.Bar[] {
             this.toolbarMainMapper,
-            this.toolbarCustomRegion});
+            this.toolbarCustomRegion,
+            this.statusBar});
             this.barManager.DockControls.Add(this.barDockControlTop);
             this.barManager.DockControls.Add(this.barDockControlBottom);
             this.barManager.DockControls.Add(this.barDockControlLeft);
@@ -139,14 +147,20 @@ namespace EntityTools.Patches.Mapper
             this.menuCRName,
             this.menuCRAccept,
             this.menuCRCancel,
-            this.menuCacheActive});
-            this.barManager.MaxItemId = 82;
+            this.menuCacheActive,
+            this.statMousePos,
+            this.statZoom,
+            this.statCenterPlayerText,
+            this.statCenterPlayer});
+            this.barManager.MaxItemId = 90;
             this.barManager.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.seDeleteRadius,
             this.seWaypointDistance,
             this.seMaxZDifference,
             this.seEquivalenceDistance,
-            this.teCRName});
+            this.teCRName,
+            this.zoomer});
+            this.barManager.StatusBar = this.statusBar;
             // 
             // toolbarMainMapper
             // 
@@ -394,6 +408,7 @@ namespace EntityTools.Patches.Mapper
             this.menuCacheActive.Caption = "Use Cache";
             this.menuCacheActive.Id = 81;
             this.menuCacheActive.Name = "menuCacheActive";
+            this.menuCacheActive.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
             // 
             // toolbarCustomRegion
             // 
@@ -451,15 +466,15 @@ namespace EntityTools.Patches.Mapper
             this.barDockControlTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.barDockControlTop.Location = new System.Drawing.Point(0, 0);
             this.barDockControlTop.Manager = this.barManager;
-            this.barDockControlTop.Size = new System.Drawing.Size(384, 31);
+            this.barDockControlTop.Size = new System.Drawing.Size(389, 31);
             // 
             // barDockControlBottom
             // 
             this.barDockControlBottom.CausesValidation = false;
             this.barDockControlBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.barDockControlBottom.Location = new System.Drawing.Point(0, 362);
+            this.barDockControlBottom.Location = new System.Drawing.Point(0, 335);
             this.barDockControlBottom.Manager = this.barManager;
-            this.barDockControlBottom.Size = new System.Drawing.Size(384, 0);
+            this.barDockControlBottom.Size = new System.Drawing.Size(389, 27);
             // 
             // barDockControlLeft
             // 
@@ -467,15 +482,15 @@ namespace EntityTools.Patches.Mapper
             this.barDockControlLeft.Dock = System.Windows.Forms.DockStyle.Left;
             this.barDockControlLeft.Location = new System.Drawing.Point(0, 31);
             this.barDockControlLeft.Manager = this.barManager;
-            this.barDockControlLeft.Size = new System.Drawing.Size(0, 331);
+            this.barDockControlLeft.Size = new System.Drawing.Size(0, 304);
             // 
             // barDockControlRight
             // 
             this.barDockControlRight.CausesValidation = false;
             this.barDockControlRight.Dock = System.Windows.Forms.DockStyle.Right;
-            this.barDockControlRight.Location = new System.Drawing.Point(384, 31);
+            this.barDockControlRight.Location = new System.Drawing.Point(389, 31);
             this.barDockControlRight.Manager = this.barManager;
-            this.barDockControlRight.Size = new System.Drawing.Size(0, 331);
+            this.barDockControlRight.Size = new System.Drawing.Size(0, 304);
             // 
             // barMapper
             // 
@@ -544,11 +559,56 @@ namespace EntityTools.Patches.Mapper
             this.menuBtnStopMapping.Name = "menuBtnStopMapping";
             this.menuBtnStopMapping.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventStopMapping);
             // 
+            // statusBar
+            // 
+            this.statusBar.BarName = "statusBar";
+            this.statusBar.CanDockStyle = DevExpress.XtraBars.BarCanDockStyle.Bottom;
+            this.statusBar.DockCol = 0;
+            this.statusBar.DockRow = 0;
+            this.statusBar.DockStyle = DevExpress.XtraBars.BarDockStyle.Bottom;
+            this.statusBar.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
+            new DevExpress.XtraBars.LinkPersistInfo(this.statCenterPlayer),
+            new DevExpress.XtraBars.LinkPersistInfo(this.statMousePos, true),
+            new DevExpress.XtraBars.LinkPersistInfo(DevExpress.XtraBars.BarLinkUserDefines.Width, this.statZoom, "", false, true, true, 196)});
+            this.statusBar.OptionsBar.AllowQuickCustomization = false;
+            this.statusBar.OptionsBar.DrawDragBorder = false;
+            this.statusBar.OptionsBar.UseWholeRow = true;
+            this.statusBar.Visible = false;
+            // 
+            // statMousePos
+            // 
+            this.statMousePos.Caption = "mousePos";
+            this.statMousePos.Id = 82;
+            this.statMousePos.Name = "statMousePos";
+            // 
+            // statZoom
+            // 
+            this.statZoom.Caption = "statZoom";
+            this.statZoom.Edit = this.zoomer;
+            this.statZoom.Id = 83;
+            this.statZoom.Name = "statZoom";
+            // 
+            // zoomer
+            // 
+            this.zoomer.Name = "zoomer";
+            // 
+            // statCenterPlayerText
+            // 
+            this.statCenterPlayerText.Caption = "Center Player";
+            this.statCenterPlayerText.Id = 88;
+            this.statCenterPlayerText.Name = "statCenterPlayerText";
+            // 
+            // statCenterPlayer
+            // 
+            this.statCenterPlayer.Id = 89;
+            this.statCenterPlayer.ImageOptions.Image = global::EntityTools.Properties.Resources.miniTarget;
+            this.statCenterPlayer.Name = "statCenterPlayer";
+            // 
             // MapperFormExt
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(384, 362);
+            this.ClientSize = new System.Drawing.Size(389, 362);
             this.Controls.Add(this.barDockControlLeft);
             this.Controls.Add(this.barDockControlRight);
             this.Controls.Add(this.barDockControlBottom);
@@ -568,6 +628,7 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.seDeleteRadius)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.teCRName)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bsrcAstralSettings)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.zoomer)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -627,5 +688,11 @@ namespace EntityTools.Patches.Mapper
         private BarButtonItem menuCRAccept;
         private BarButtonItem menuCRCancel;
         private BarCheckItem menuCacheActive;
+        private Bar statusBar;
+        private BarStaticItem statMousePos;
+        private BarEditItem statZoom;
+        private RepositoryItemZoomTrackBar zoomer;
+        private BarCheckItem statCenterPlayer;
+        private BarStaticItem statCenterPlayerText;
     }
 }

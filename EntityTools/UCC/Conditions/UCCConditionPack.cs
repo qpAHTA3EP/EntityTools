@@ -35,11 +35,13 @@ namespace EntityTools.Conditions
         #region ICustomUCCCondition
         bool ICustomUCCCondition.IsOK(UCCAction refAction = null)
         {
+            bool result = true;
             if (Conditions != null && Conditions.Count > 0)
                 if (TestRule == LogicRule.Disjunction)
                 {
                     int lockedNum = 0;
                     int okUnlockedNum = 0;
+                    bool lockedTrue = true;
                     foreach (UCCCondition c in Conditions)
                     {
                         if (c is ICustomUCCCondition iCond)
@@ -47,7 +49,10 @@ namespace EntityTools.Conditions
                             if (iCond.Loked)
                             {
                                 if (!iCond.IsOK(refAction))
-                                    return false;
+                                {
+                                    lockedTrue = false;
+                                    break;
+                                }
                                 lockedNum++;
                             }
                             else if (c.IsOK(refAction))
@@ -58,7 +63,10 @@ namespace EntityTools.Conditions
                             if (c.Locked)
                             {
                                 if (!c.IsOK(refAction))
-                                    return false;
+                                {
+                                    lockedTrue = false;
+                                    break;
+                                }
                                 lockedNum++;
                             }
                             else if (c.IsOK(refAction))
@@ -68,7 +76,8 @@ namespace EntityTools.Conditions
 
                     // Если множетство незалоченных условий пустое, тогда условие истино
                     // Если оно НЕ пустое, тогда должно встретиться хотя бы одно истиное
-                    return (Conditions.Count > lockedNum) ? okUnlockedNum > 0 : true;
+                    result = lockedTrue && (Conditions.Count == lockedNum || okUnlockedNum > 0);
+                    return (Not) ? !result : result;
                 }
                 else
                 {
@@ -77,14 +86,20 @@ namespace EntityTools.Conditions
                         if (c is ICustomUCCCondition iCond)
                         {
                             if (!iCond.IsOK(refAction))
-                                return false;
+                            {
+                                result = false;
+                                break;
+                            }
                         }
                         else if (!c.IsOK(refAction))
-                            return false;
+                        {
+                            result = false;
+                            break;
+                        }
 
-                    return true;
+                    return (Not) ? !result : result;
                 }
-            return false;
+            return (Not) ? !result : result;
         }
 
         bool ICustomUCCCondition.Loked { get => base.Locked; set => base.Locked = value; }

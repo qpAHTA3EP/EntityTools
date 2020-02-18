@@ -112,7 +112,7 @@ namespace EntityTools.Patches.Mapper
                 lastAddedNode = node;
                 return node;
             }
-            else return ((AStar.Graph)coreGraph).AddNode(x, y, z);
+            else return lastAddedNode = ((AStar.Graph)coreGraph).AddNode(x, y, z);
         }
 
         /// <summary>
@@ -558,9 +558,10 @@ namespace EntityTools.Patches.Mapper
         {
             if (LN != null)
             {
-                foreach (Node node in LN)
-                {
-                    g.drawFillEllipse(new Vector3((float)node.X, (float)node.Y, (float)node.Z), new Size(10, 10), Brushes.Gold);
+                lock(LN)
+                { 
+                    foreach (Node node in LN)
+                        g.drawFillEllipse(new Vector3((float)node.X, (float)node.Y, (float)node.Z), new Size(7, 7), Brushes.Gold);
                 }
             }
             if (lastAddedNode != null)

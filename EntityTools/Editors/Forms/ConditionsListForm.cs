@@ -152,5 +152,25 @@ namespace EntityTools.Forms
 
             return conditions;
         }
+
+        private void btnTestAll_Click(object sender, EventArgs e)
+        {
+            if (Conditions.Items?.Count > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (UCCCondition cond in Conditions.Items)
+                {
+                    if (cond.Locked)
+                        sb.Append("[L] ");
+                    else sb.Append("[U] ");
+                    if (cond is ICustomUCCCondition iCond)
+                        sb.Append(iCond.ToString()).Append(" | Result: ").Append(iCond.IsOK(null)).AppendLine();
+                    else sb.Append(cond.ToString()).Append(" | Result: ").Append(cond.IsOK(null)).AppendLine();
+                }
+                XtraMessageBox.Show(sb.ToString());
+            }
+            else XtraMessageBox.Show("The list 'Conditions' is empty");
+
+        }
     }
 }

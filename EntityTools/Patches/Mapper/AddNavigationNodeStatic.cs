@@ -1,4 +1,4 @@
-﻿#define PROFILING
+﻿//#define PROFILING
 //#define LOG
 using System;
 using System.Linq;
@@ -54,8 +54,8 @@ namespace EntityTools.Patches.Mapper
 #endif
                 Node newNode = new Node(pos.X, pos.Y, pos.Z);
 
-                double minDistance = EntityTools.PluginSettings.Mapper.WaypointDistance / 2;
-                double maxDistance = Math.Max(25, EntityTools.PluginSettings.Mapper.WaypointDistance * 1.25);
+                //double minDistance = (double)EntityTools.PluginSettings.Mapper.WaypointDistance / 2d;
+                double maxDistance = Math.Max(25d, (double)EntityTools.PluginSettings.Mapper.WaypointDistance * 1.25d);
                 double maxZDifference = EntityTools.PluginSettings.Mapper.MaxElevationDifference;
                 double equivalenceDistance = EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance;
                 // список узлов, ближайших к добавляемому узлу newNode
@@ -67,6 +67,7 @@ namespace EntityTools.Patches.Mapper
                     double minNodeDistance = double.MaxValue; // расстояние до ближайшего узла
                     int closestNodeInd = -1; // Индекс ближайшего узла в списке nearestNodeList
                     bool isEquivalent = false; // флаг, указывающий, что newNode был заменена на эквивалентный существующий узел
+                    NodeDetail equivalentNodeDetail = null;
                     for (int i = 0; i < Graph.Nodes.Count; i++)
                     {
                         if (!(Graph.Nodes[i] is Node currentNode)
@@ -76,12 +77,13 @@ namespace EntityTools.Patches.Mapper
 
                         //Проверяем разницу высот
                         NodeDetail curNodeDet = new NodeDetail(currentNode, newNode);
-                        if (curNodeDet.Vector.Z > - maxZDifference && curNodeDet.Vector.Z < maxZDifference)
+                        if (curNodeDet.Vector.Z * Math.Sign(curNodeDet.Vector.Z) < maxZDifference)
                         {
                             // Разница высот в пределах допустимой величины,
                             // проверяем расстояние от добавляемой точки до текущей
                             if (curNodeDet.Distance < equivalenceDistance)
                             {
+#if SWAP_NEW2EQUIVALENT
                                 // В графе есть точка, расстояние до которой меньше equivalenceDistance
                                 // подменяем newNode на currentNode
                                 newNode = currentNode;
@@ -90,7 +92,7 @@ namespace EntityTools.Patches.Mapper
                                 minNodeDistance = double.MaxValue;
                                 closestNodeInd = -1;
 
-#if !LINK_EQUIVALENT_ToALL
+#if LINK_EQUIVALENT_ToALL
                                 // Вариант, при котором эквивалентный узел связывается с другими "близкими" узлами
                                 // пересчитываем расстояния для узлов, добавленных в список nearestNodeList
                                 // одновременно с этим производит повторный поиск ближайшего узла к newNode = currentNode;
@@ -110,6 +112,11 @@ namespace EntityTools.Patches.Mapper
                                 // прерываем поиск
                                 break;
 #endif
+#else
+                                // Запоминаем существующий узел, эквивалентный "новому узлу"
+                                if(equivalentNodeDetail == null || curNodeDet.Distance < equivalentNodeDetail.Distance)
+                                    equivalentNodeDetail = curNodeDet;
+#endif
                             }
                             else if (curNodeDet.Distance <= maxDistance)
                             {
@@ -125,6 +132,35 @@ namespace EntityTools.Patches.Mapper
                         }
                     }
 
+#if !SWAP_NEW2EQUIVALENT
+                    if (equivalentNodeDetail != null)
+                    {
+                        // Формирование функтора добавление граней, в зависимости от типа пути (одно- или двунаправленный)
+                        Action<Node, Node, double> AddArcFunc;
+                        if (uniDirection)
+                            AddArcFunc = (n1, n2, w) => Graph.AddArc(n1, n2, w);
+                        else AddArcFunc = (n1, n2, w) => Graph.Add2Arcs(n1, n2, w);
+
+                        //int arcsNum = equivalentNodeDetail.Node.IncomingArcs.Count + equivalentNodeDetail.Node.IncomingArcs.Count;
+                        // Если задан узел lastNodeDetail - добавляем связь с ним
+                        if (lastNodeDetail != null)
+                        {
+                            lastNodeDetail.Rebase(equivalentNodeDetail.Node);
+                            AddArcFunc(lastNodeDetail.Node, equivalentNodeDetail.Node, lastNodeDetail.Distance);
+
+                            return equivalentNodeDetail;
+                        }
+
+                        // Добавляем связь между узлами newNode и CurrentNode
+                        for (int ind = 0; ind < nearestNodeList.Count; ind++)
+                        {
+                            NodeDetail curNodeDet = nearestNodeList[ind];
+                            curNodeDet.Rebase(equivalentNodeDetail.Node);
+                            AddArcFunc(curNodeDet.Node, equivalentNodeDetail.Node, curNodeDet.Distance);
+                        }
+
+                    }
+#endif
 
                     if (isEquivalent || Graph.AddNode(newNode))
                     {
@@ -146,13 +182,14 @@ namespace EntityTools.Patches.Mapper
                                     // Если угол между направлениями newNode на cosestNode и lastNode будет меньше 20 градусов, 
                                     // cos(10) == 0,9848
                                     // cos(20) == 0,9397
+                                    // cos(45) == 0,5
                                     // тогда можно будет соединить только currentNode и lastNode, 
                                     // а текущих узел newNode отбросить
 
                                     // вычисляем Cos угла между векторами из формулы скалярного произведения векторов
                                     // a * b = |a| * |b| * cos (alpha) = xa * xb + ya * yb
                                     double cos = Cosinus(closestNodeDetail, lastNodeDetail);
-                                    if (cos > 0 && cos < 0.9397)
+                                    if (cos >= 0.5)
                                     {
                                         // направление на closestNode и lastNode близко, поэтому
                                         // добавляем путь от lastNode до closestNode
