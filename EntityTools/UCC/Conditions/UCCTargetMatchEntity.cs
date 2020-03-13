@@ -1,17 +1,12 @@
 ﻿using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
 using EntityTools.Editors;
-using EntityTools.Tools;
 using MyNW.Classes;
-using MyNW.Internals;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Xml.Serialization;
-using static Astral.Quester.Classes.Condition;
-using Astral.Logic.UCC.Ressources;
 using EntityTools.Enums;
 using System;
-using EntityTools.Tools.Entities;
 using EntityTools.UCC.Extensions;
 using System.Text;
 
@@ -32,7 +27,7 @@ namespace EntityTools.UCC.Conditions
                 {
                     entityId = value;
                     if (!string.IsNullOrEmpty(entityId))
-                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                        Comparer = EntityToPatternComparer.Get(entityId, entityIdType, entityNameType);
                     else Comparer = null;
                 }
             }
@@ -51,7 +46,7 @@ namespace EntityTools.UCC.Conditions
                 {
                     entityIdType = value;
                     if (!string.IsNullOrEmpty(entityId))
-                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                        Comparer = EntityToPatternComparer.Get(entityId, entityIdType, entityNameType);
                     else Comparer = null;
                 }
             }
@@ -68,7 +63,7 @@ namespace EntityTools.UCC.Conditions
                 {
                     entityNameType = value;
                     if (!string.IsNullOrEmpty(entityId))
-                        Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                        Comparer = EntityToPatternComparer.Get(entityId, entityIdType, entityNameType);
                     else Comparer = null;
                 }
             }
@@ -86,12 +81,12 @@ namespace EntityTools.UCC.Conditions
         public MatchType Match { get; set; } = MatchType.Match;
 
         #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction = null)
+        bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
         {
             Entity target = refAction?.GetTarget();
 
             if (Comparer == null && !string.IsNullOrEmpty(entityId))
-                Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                Comparer = EntityToPatternComparer.Get(entityId, entityIdType, entityNameType);
 
             switch(Match)
             {
@@ -110,7 +105,7 @@ namespace EntityTools.UCC.Conditions
             Entity target = refAction?.GetTarget();
 
             if (Comparer == null && !string.IsNullOrEmpty(entityId))
-                Comparer = new EntityComparerToPattern(entityId, entityIdType, entityNameType);
+                Comparer = EntityToPatternComparer.Get(entityId, entityIdType, entityNameType);
 
             if (Comparer != null)//(!string.IsNullOrEmpty(EntityID))
             {
@@ -135,11 +130,11 @@ namespace EntityTools.UCC.Conditions
 
         [XmlIgnore]
         [Browsable(false)]
-        internal EntityComparerToPattern Comparer { get; private set; } = null;
+        internal Predicate<Entity> Comparer { get; private set; } = null;
 
         private bool Validate(Entity e)
         {
-            return e != null && e.IsValid && Comparer.Check(e);
+            return e != null && e.IsValid && Comparer?.Invoke(e) == true;
         }
 
         public override string ToString()

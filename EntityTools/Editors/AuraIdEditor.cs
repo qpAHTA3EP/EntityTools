@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using EntityTools.Editors.Forms;
 
 namespace EntityTools.Editors
 {

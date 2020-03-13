@@ -14,16 +14,17 @@
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <AssemblyVersion>1.20.0212.1557</AssemblyVersion>
+    <AssemblyVersion>1.20.0312.1651</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>..\References\x64\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -57,6 +58,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileStreamHelper.cs" />
+    <Compile Include="HorseEquipTutorialAction.cs" />
+    <Compile Include="IEntityToolsCore.cs" />
+    <Compile Include="InsertInsignia.cs" />
+    <Compile Include="IQuesterActionEngine.cs" />
     <Compile Include="MainPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -70,6 +76,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="QuesterActionInitializer.cs" />
+    <Compile Include="ReflectionHelper.cs" />
     <Compile Include="SysInformer.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -83,7 +91,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Mount_Tutorial.dll" />
+    <Folder Include="Resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

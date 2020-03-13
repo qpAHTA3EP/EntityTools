@@ -1,20 +1,14 @@
 ﻿using DevExpress.XtraEditors;
-using EntityTools.Tools.MountInsignias;
-using MyNW.Classes;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using System.Xml;
 using System.Xml.Serialization;
-using InsigniaSet = EntityTools.Tools.Triple<EntityTools.Tools.MountInsignias.InsigniaType, EntityTools.Tools.MountInsignias.InsigniaType, EntityTools.Tools.MountInsignias.InsigniaType>;
+using InsigniaSet = EntityTools.Tools.Triple<EntityCore.MountInsignias.InsigniaType, EntityCore.MountInsignias.InsigniaType, EntityCore.MountInsignias.InsigniaType>;
 
-namespace EntityTools.Forms
+namespace EntityCore.Forms
 {
     public partial class InsigniaBonusSelectForm : XtraForm //*/Form
     {

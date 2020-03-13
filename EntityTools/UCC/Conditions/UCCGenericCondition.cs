@@ -12,7 +12,7 @@ namespace EntityTools.UCC.Conditions
     public class UCCGenericCondition : UCCCondition, ICustomUCCCondition
     {
         #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction = null)
+        bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
         {
             return base.IsOK(refAction);
         }

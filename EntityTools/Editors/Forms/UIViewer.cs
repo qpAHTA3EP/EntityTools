@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace EntityTools.Forms
+namespace EntityTools.Editors.Forms
 {
     public partial class UIViewer : XtraForm //*/Form
     {

@@ -4,13 +4,13 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace EntityTools.Tools.Reflection
+namespace EntityTools.Reflection
 {
     /// <summary>
     /// Фабрика делегатов, осуществляющих через механизм рефлексии 
     /// доступ к методу объекта заданного типа, и не возвращающего значение
     /// </summary>
-    public static class NotStatiActionFactory
+    public static class NotStaticActionFactory
     {
         /// <summary>
         /// Конструирование делегата, осуществляющего через механизм рефлексии 

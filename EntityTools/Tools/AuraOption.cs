@@ -1,14 +1,13 @@
 ﻿using Astral.Classes.ItemFilter;
-using Astral.Quester.UIEditors;
+using EntityTools;
+using EntityTools.Extentions;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using MyNW.Classes;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using Sign = Astral.Logic.UCC.Ressources.Enums.Sign;
@@ -27,7 +26,7 @@ namespace EntityTools.Tools
             {
                 if(auraId != value)
                 {
-                    patternPos = CommonTools.GetSimplePatternPos(value, out auraPattern);
+                    patternPos = (SimplePatternPos)value.GetSimplePatternPosition(out auraPattern);
                     auraId = value;
                 }
             }
@@ -78,7 +77,7 @@ namespace EntityTools.Tools
             int num = 0;
             foreach(var mod in e.Character.Mods)
             {
-                if(CommonTools.SimpleMaskTextComparer(mod.PowerDef.InternalName, patternPos, auraPattern))
+                if(mod.PowerDef.InternalName.CompareToSimplePattern((coreSimplePatternPos)patternPos, auraPattern))
                 {
                     num++;
                     if (num > Stacks)
@@ -90,7 +89,7 @@ namespace EntityTools.Tools
 
         private bool AuraCheck_Simple(Entity e)
         {
-            int num = e.Character.Mods.Count(m => CommonTools.SimpleMaskTextComparer(m.PowerDef.InternalName, patternPos, auraPattern));
+            int num = e.Character.Mods.Count(m => m.PowerDef.InternalName.CompareToSimplePattern((coreSimplePatternPos)patternPos, auraPattern));
             switch (Sign)
             {
                 case Sign.Equal:

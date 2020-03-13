@@ -42,32 +42,32 @@ namespace EntityTools.Services
         /// и Astral.Logic.UCC.API.AfterCallCombat
         /// </summary>
         private static Task monitor = null;
-        //private static bool afterCallCombatSubcription = false;
-        //public static bool Active
-        //{
-        //    get
-        //    {
-        //        return monitor != null;
-        //    }
-        //    set
-        //    {
-        //        if (value)
-        //        {
-        //            if (!afterCallCombatSubcription)
-        //            {
-        //                Astral.Logic.UCC.API.AfterCallCombat += ArterCallCombat;
-        //                afterCallCombatSubcription = true;
-        //            }
-        //            Logger.WriteLine($"{nameof(UnstuckSpells)} activated");
-        //        }
-        //        else
-        //        {
-        //            Astral.Logic.UCC.API.AfterCallCombat -= ArterCallCombat;
-        //            afterCallCombatSubcription = false;
-        //            Logger.WriteLine($"{nameof(UnstuckSpells)} deactivated");
-        //        }
-        //    }
-        //}
+        private static bool afterCallCombatSubcription = false;
+        public static bool Active
+        {
+            get
+            {
+                return afterCallCombatSubcription;
+            }
+            set
+            {
+                if (value)
+                {
+                    if (!afterCallCombatSubcription)
+                    {
+                        Astral.Logic.UCC.API.AfterCallCombat += ArterCallCombat;
+                        afterCallCombatSubcription = true;
+                    }
+                    Logger.WriteLine($"{nameof(UnstuckSpells)} activated");
+                }
+                else
+                {
+                    Astral.Logic.UCC.API.AfterCallCombat -= ArterCallCombat;
+                    afterCallCombatSubcription = false;
+                    Logger.WriteLine($"{nameof(UnstuckSpells)} deactivated");
+                }
+            }
+        }
 
         /// <summary>
         /// Эвент активируется в момент активации UCC в боевом режиме
@@ -75,15 +75,17 @@ namespace EntityTools.Services
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="arg"></param>
-        public static void ArterCallCombat(object sender, Astral.Logic.UCC.API.AfterCallCombatEventArgs arg)
+        private static void ArterCallCombat(object sender, Astral.Logic.UCC.API.AfterCallCombatEventArgs arg)
         {
-            if (EntityTools.PluginSettings.UnstuckSpells.Active
-                && (monitor == null || (monitor.Status != TaskStatus.Running)))
+            if (EntityTools.PluginSettings.UnstuckSpells.Active)
             {
-                monitor = Task.Factory.StartNew(() => Work());
+                if (monitor == null || (monitor.Status != TaskStatus.Running))
+                {
+                    monitor = Task.Factory.StartNew(() => Work());
 #if DEBUG_SPELLSTUCKMONITOR
-                Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpells)}::ArterCallCombat: Start Task");
+                    Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpells)}::ArterCallCombat: Start Task");
 #endif
+                }
             }
             else Astral.Logic.UCC.API.AfterCallCombat -= ArterCallCombat;
         }
@@ -91,7 +93,7 @@ namespace EntityTools.Services
         /// <summary>
         /// Основной цикл
         /// </summary>
-        public static void Work()
+        private static void Work()
         {
 #if DEBUG_SPELLSTUCKMONITOR
             Logger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpells)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]::Run() starts");

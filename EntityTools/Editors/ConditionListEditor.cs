@@ -5,7 +5,6 @@ using System.Drawing.Design;
 using System.Windows.Forms;
 using Astral.Quester.Classes;
 using DevExpress.XtraEditors.Controls;
-using EntityTools.Forms;
 using MyNW.Classes;
 using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 
@@ -16,15 +15,13 @@ namespace EntityTools.Editors
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            ConditionListForm listEditor = new ConditionListForm();
+            ConditionList newConditions = EntityTools.Core.GUIRequest_UCCConditions(value as ConditionList);
 
-            ConditionList newConditions = listEditor.GetConditionList(value as ConditionList);
-
-            if (listEditor.DialogResult == DialogResult.OK)
+            if (newConditions != null)
             {
                 return newConditions;
             }            
-            return value;
+            else return value;
         }
 
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)

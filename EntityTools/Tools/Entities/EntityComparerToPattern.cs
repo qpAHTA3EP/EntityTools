@@ -1,5 +1,9 @@
 ﻿using Astral.Classes.ItemFilter;
+using EntityCore.Enums;
+using EntityCore.Extentions;
+using EntityCore.Tools;
 using EntityTools.Enums;
+using EntityTools.Tools;
 using MyNW.Classes;
 using System;
 using System.Collections.Generic;
@@ -7,24 +11,24 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace EntityTools.Tools.Entities
+namespace EntityCore.Entities
 {
 
     /// <summary>
     /// Класс, инкапсулирующие все базовые проверки Entity на соответствие шаблону
     /// 
     /// </summary>
-    public class EntityComparerToPattern
+    internal class EntityComparerToPattern
     {
         private string pattern = string.Empty;
 
-        public Predicate<Entity> Check { get; private set; }
+        internal Predicate<Entity> Check { get; private set; }
 
-        public EntityComparerToPattern(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated)
+        internal EntityComparerToPattern(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated)
         {
             if (strMatchType == ItemFilterStringType.Simple)
             {
-                SimplePatternPos pos = CommonTools.GetSimplePatternPos(entPattern, out pattern);
+                SimplePatternPos pos = entPattern.GetSimplePatternPosition(out pattern);
 
                 if (nameType == EntityNameType.InternalName)
                     switch (pos)

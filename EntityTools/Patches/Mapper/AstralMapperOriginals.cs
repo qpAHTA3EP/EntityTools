@@ -10,7 +10,7 @@ using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Xml.Serialization;
-using EntityTools.Tools.Reflection;
+using EntityTools.Reflection;
 using System.Windows.Forms;
 using MyNW.Classes;
 

@@ -5,9 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using EntityTools.UCC;
+using EntityTools.UCC.Actions;
 using MyNW.Internals;
 using EntityTools.Tools;
+using EntityTools.Reflection;
 
 namespace EntityTools.UCC.Extensions
 {

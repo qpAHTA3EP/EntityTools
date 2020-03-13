@@ -34,18 +34,6 @@ namespace EntityTools.Core
             this.btnUccEditor = new System.Windows.Forms.Button();
             this.fldrBroserDlg = new System.Windows.Forms.FolderBrowserDialog();
             this.tbclMain = new DevExpress.XtraTab.XtraTabControl();
-            this.tabMapper = new DevExpress.XtraTab.XtraTabPage();
-            this.gbxMapperSettings = new System.Windows.Forms.GroupBox();
-            this.seMapperWaipointDistance = new DevExpress.XtraEditors.SpinEdit();
-            this.btnMapperTest = new System.Windows.Forms.Button();
-            this.seWaypointEquivalenceDistance = new DevExpress.XtraEditors.SpinEdit();
-            this.lblWaypointEquivalenceDistance = new System.Windows.Forms.Label();
-            this.ckbMapperForceLinkingWaypoint = new System.Windows.Forms.CheckBox();
-            this.lblMapperMaxZDif = new System.Windows.Forms.Label();
-            this.lblNodeDistance = new System.Windows.Forms.Label();
-            this.seMapperMaxZDif = new DevExpress.XtraEditors.SpinEdit();
-            this.ckbMapperLinearPath = new System.Windows.Forms.CheckBox();
-            this.btnShowMapper = new System.Windows.Forms.Button();
             this.tabUtilities = new DevExpress.XtraTab.XtraTabPage();
             this.gpbExport = new System.Windows.Forms.GroupBox();
             this.cbbExportSelector = new System.Windows.Forms.ComboBox();
@@ -74,14 +62,21 @@ namespace EntityTools.Core
             this.btnGetMachineId = new DevExpress.XtraEditors.SimpleButton();
             this.btnSetMachineId = new DevExpress.XtraEditors.SimpleButton();
             this.tbMashingId = new System.Windows.Forms.TextBox();
+            this.tabMapper = new DevExpress.XtraTab.XtraTabPage();
+            this.gbxMapperSettings = new System.Windows.Forms.GroupBox();
+            this.seMapperWaipointDistance = new DevExpress.XtraEditors.SpinEdit();
+            this.btnMapperTest = new System.Windows.Forms.Button();
+            this.seWaypointEquivalenceDistance = new DevExpress.XtraEditors.SpinEdit();
+            this.lblWaypointEquivalenceDistance = new System.Windows.Forms.Label();
+            this.ckbMapperForceLinkingWaypoint = new System.Windows.Forms.CheckBox();
+            this.lblMapperMaxZDif = new System.Windows.Forms.Label();
+            this.lblNodeDistance = new System.Windows.Forms.Label();
+            this.seMapperMaxZDif = new DevExpress.XtraEditors.SpinEdit();
+            this.ckbMapperLinearPath = new System.Windows.Forms.CheckBox();
+            this.btnShowMapper = new System.Windows.Forms.Button();
             this.dlgSaveFile = new System.Windows.Forms.SaveFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
             this.tbclMain.SuspendLayout();
-            this.tabMapper.SuspendLayout();
-            this.gbxMapperSettings.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.seMapperWaipointDistance.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.seWaypointEquivalenceDistance.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.seMapperMaxZDif.Properties)).BeginInit();
             this.tabUtilities.SuspendLayout();
             this.gpbExport.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tbExportFileSelector.Properties)).BeginInit();
@@ -89,6 +84,11 @@ namespace EntityTools.Core
             this.gbSlideMonitor.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.seSlideFilter.Properties)).BeginInit();
             this.tabRelogger.SuspendLayout();
+            this.tabMapper.SuspendLayout();
+            this.gbxMapperSettings.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.seMapperWaipointDistance.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.seWaypointEquivalenceDistance.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.seMapperMaxZDif.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // btnUccEditor
@@ -120,190 +120,6 @@ namespace EntityTools.Core
             this.tabOptions,
             this.tabRelogger,
             this.tabMapper});
-            // 
-            // tabMapper
-            // 
-            this.tabMapper.Controls.Add(this.gbxMapperSettings);
-            this.tabMapper.Controls.Add(this.btnShowMapper);
-            this.tabMapper.Name = "tabMapper";
-            this.tabMapper.Padding = new System.Windows.Forms.Padding(6);
-            this.tabMapper.PageEnabled = false;
-            this.tabMapper.PageVisible = false;
-            this.tabMapper.Size = new System.Drawing.Size(364, 388);
-            this.tabMapper.Text = "Mapper Settings";
-            // 
-            // gbxMapperSettings
-            // 
-            this.gbxMapperSettings.Controls.Add(this.seMapperWaipointDistance);
-            this.gbxMapperSettings.Controls.Add(this.btnMapperTest);
-            this.gbxMapperSettings.Controls.Add(this.seWaypointEquivalenceDistance);
-            this.gbxMapperSettings.Controls.Add(this.lblWaypointEquivalenceDistance);
-            this.gbxMapperSettings.Controls.Add(this.ckbMapperForceLinkingWaypoint);
-            this.gbxMapperSettings.Controls.Add(this.lblMapperMaxZDif);
-            this.gbxMapperSettings.Controls.Add(this.lblNodeDistance);
-            this.gbxMapperSettings.Controls.Add(this.seMapperMaxZDif);
-            this.gbxMapperSettings.Controls.Add(this.ckbMapperLinearPath);
-            this.gbxMapperSettings.Location = new System.Drawing.Point(2, 9);
-            this.gbxMapperSettings.Name = "gbxMapperSettings";
-            this.gbxMapperSettings.Size = new System.Drawing.Size(359, 324);
-            this.gbxMapperSettings.TabIndex = 6;
-            this.gbxMapperSettings.TabStop = false;
-            this.gbxMapperSettings.Text = "Settings";
-            // 
-            // seMapperWaipointDistance
-            // 
-            this.seMapperWaipointDistance.EditValue = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            this.seMapperWaipointDistance.Location = new System.Drawing.Point(6, 20);
-            this.seMapperWaipointDistance.Name = "seMapperWaipointDistance";
-            this.seMapperWaipointDistance.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.seMapperWaipointDistance.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-            this.seMapperWaipointDistance.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
-            this.seMapperWaipointDistance.Properties.IsFloatValue = false;
-            this.seMapperWaipointDistance.Properties.Mask.EditMask = "N00";
-            this.seMapperWaipointDistance.Properties.MaxValue = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
-            this.seMapperWaipointDistance.Properties.MinValue = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            this.seMapperWaipointDistance.Size = new System.Drawing.Size(58, 20);
-            this.seMapperWaipointDistance.TabIndex = 1;
-            // 
-            // btnMapperTest
-            // 
-            this.btnMapperTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnMapperTest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMapperTest.Location = new System.Drawing.Point(303, 295);
-            this.btnMapperTest.Name = "btnMapperTest";
-            this.btnMapperTest.Size = new System.Drawing.Size(50, 23);
-            this.btnMapperTest.TabIndex = 5;
-            this.btnMapperTest.Text = "Test";
-            this.btnMapperTest.UseVisualStyleBackColor = true;
-            this.btnMapperTest.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // seWaypointEquivalenceDistance
-            // 
-            this.seWaypointEquivalenceDistance.EditValue = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            this.seWaypointEquivalenceDistance.Location = new System.Drawing.Point(6, 72);
-            this.seWaypointEquivalenceDistance.Name = "seWaypointEquivalenceDistance";
-            this.seWaypointEquivalenceDistance.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.seWaypointEquivalenceDistance.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-            this.seWaypointEquivalenceDistance.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
-            this.seWaypointEquivalenceDistance.Properties.IsFloatValue = false;
-            this.seWaypointEquivalenceDistance.Properties.Mask.EditMask = "N00";
-            this.seWaypointEquivalenceDistance.Properties.MaxValue = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
-            this.seWaypointEquivalenceDistance.Properties.MinValue = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            this.seWaypointEquivalenceDistance.Size = new System.Drawing.Size(58, 20);
-            this.seWaypointEquivalenceDistance.TabIndex = 1;
-            // 
-            // lblWaypointEquivalenceDistance
-            // 
-            this.lblWaypointEquivalenceDistance.AutoSize = true;
-            this.lblWaypointEquivalenceDistance.Location = new System.Drawing.Point(70, 75);
-            this.lblWaypointEquivalenceDistance.Name = "lblWaypointEquivalenceDistance";
-            this.lblWaypointEquivalenceDistance.Size = new System.Drawing.Size(156, 13);
-            this.lblWaypointEquivalenceDistance.TabIndex = 2;
-            this.lblWaypointEquivalenceDistance.Text = "Waypoint equivalence distance";
-            // 
-            // ckbMapperForceLinkingWaypoint
-            // 
-            this.ckbMapperForceLinkingWaypoint.AutoSize = true;
-            this.ckbMapperForceLinkingWaypoint.Location = new System.Drawing.Point(6, 121);
-            this.ckbMapperForceLinkingWaypoint.Name = "ckbMapperForceLinkingWaypoint";
-            this.ckbMapperForceLinkingWaypoint.Size = new System.Drawing.Size(343, 17);
-            this.ckbMapperForceLinkingWaypoint.TabIndex = 3;
-            this.ckbMapperForceLinkingWaypoint.Text = "The forced linking of the new waypoint and the previous waypoint";
-            this.ckbMapperForceLinkingWaypoint.UseVisualStyleBackColor = true;
-            // 
-            // lblMapperMaxZDif
-            // 
-            this.lblMapperMaxZDif.AutoSize = true;
-            this.lblMapperMaxZDif.Location = new System.Drawing.Point(70, 49);
-            this.lblMapperMaxZDif.Name = "lblMapperMaxZDif";
-            this.lblMapperMaxZDif.Size = new System.Drawing.Size(244, 13);
-            this.lblMapperMaxZDif.TabIndex = 2;
-            this.lblMapperMaxZDif.Text = "The max elevation difference between waypoints";
-            // 
-            // lblNodeDistance
-            // 
-            this.lblNodeDistance.AutoSize = true;
-            this.lblNodeDistance.Location = new System.Drawing.Point(70, 23);
-            this.lblNodeDistance.Name = "lblNodeDistance";
-            this.lblNodeDistance.Size = new System.Drawing.Size(226, 13);
-            this.lblNodeDistance.TabIndex = 2;
-            this.lblNodeDistance.Text = "The distance between waypoints in edit mode";
-            // 
-            // seMapperMaxZDif
-            // 
-            this.seMapperMaxZDif.EditValue = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.seMapperMaxZDif.Location = new System.Drawing.Point(6, 46);
-            this.seMapperMaxZDif.Name = "seMapperMaxZDif";
-            this.seMapperMaxZDif.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.seMapperMaxZDif.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-            this.seMapperMaxZDif.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
-            this.seMapperMaxZDif.Properties.IsFloatValue = false;
-            this.seMapperMaxZDif.Properties.Mask.EditMask = "N00";
-            this.seMapperMaxZDif.Properties.MaxValue = new decimal(new int[] {
-            50,
-            0,
-            0,
-            0});
-            this.seMapperMaxZDif.Properties.MinValue = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.seMapperMaxZDif.Size = new System.Drawing.Size(58, 20);
-            this.seMapperMaxZDif.TabIndex = 1;
-            // 
-            // ckbMapperLinearPath
-            // 
-            this.ckbMapperLinearPath.AutoSize = true;
-            this.ckbMapperLinearPath.Location = new System.Drawing.Point(6, 98);
-            this.ckbMapperLinearPath.Name = "ckbMapperLinearPath";
-            this.ckbMapperLinearPath.Size = new System.Drawing.Size(321, 17);
-            this.ckbMapperLinearPath.TabIndex = 3;
-            this.ckbMapperLinearPath.Text = "Linear path (Links new waypoint with only previous waypoint)";
-            this.ckbMapperLinearPath.UseVisualStyleBackColor = true;
-            // 
-            // btnShowMapper
-            // 
-            this.btnShowMapper.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnShowMapper.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold);
-            this.btnShowMapper.Location = new System.Drawing.Point(9, 339);
-            this.btnShowMapper.Name = "btnShowMapper";
-            this.btnShowMapper.Size = new System.Drawing.Size(346, 40);
-            this.btnShowMapper.TabIndex = 4;
-            this.btnShowMapper.Text = "Show Mapper";
-            this.btnShowMapper.UseVisualStyleBackColor = true;
-            this.btnShowMapper.Click += new System.EventHandler(this.btnShowMapper_Click);
             // 
             // tabUtilities
             // 
@@ -388,7 +204,7 @@ namespace EntityTools.Core
             // cbEnchantHelperActivator
             // 
             this.cbEnchantHelperActivator.AutoSize = true;
-            this.cbEnchantHelperActivator.Location = new System.Drawing.Point(9, 109);
+            this.cbEnchantHelperActivator.Location = new System.Drawing.Point(15, 108);
             this.cbEnchantHelperActivator.Name = "cbEnchantHelperActivator";
             this.cbEnchantHelperActivator.Size = new System.Drawing.Size(131, 17);
             this.cbEnchantHelperActivator.TabIndex = 10;
@@ -401,7 +217,7 @@ namespace EntityTools.Core
             this.btnTest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnTest.Location = new System.Drawing.Point(301, 264);
             this.btnTest.Name = "btnTest";
-            this.btnTest.Size = new System.Drawing.Size(50, 23);
+            this.btnTest.Size = new System.Drawing.Size(54, 23);
             this.btnTest.TabIndex = 2;
             this.btnTest.Text = "Test";
             this.btnTest.UseVisualStyleBackColor = true;
@@ -642,6 +458,188 @@ namespace EntityTools.Core
             this.tbMashingId.Size = new System.Drawing.Size(288, 21);
             this.tbMashingId.TabIndex = 0;
             // 
+            // tabMapper
+            // 
+            this.tabMapper.Controls.Add(this.gbxMapperSettings);
+            this.tabMapper.Controls.Add(this.btnShowMapper);
+            this.tabMapper.Name = "tabMapper";
+            this.tabMapper.Padding = new System.Windows.Forms.Padding(6);
+            this.tabMapper.Size = new System.Drawing.Size(364, 388);
+            this.tabMapper.Text = "Mapper Settings";
+            // 
+            // gbxMapperSettings
+            // 
+            this.gbxMapperSettings.Controls.Add(this.seMapperWaipointDistance);
+            this.gbxMapperSettings.Controls.Add(this.btnMapperTest);
+            this.gbxMapperSettings.Controls.Add(this.seWaypointEquivalenceDistance);
+            this.gbxMapperSettings.Controls.Add(this.lblWaypointEquivalenceDistance);
+            this.gbxMapperSettings.Controls.Add(this.ckbMapperForceLinkingWaypoint);
+            this.gbxMapperSettings.Controls.Add(this.lblMapperMaxZDif);
+            this.gbxMapperSettings.Controls.Add(this.lblNodeDistance);
+            this.gbxMapperSettings.Controls.Add(this.seMapperMaxZDif);
+            this.gbxMapperSettings.Controls.Add(this.ckbMapperLinearPath);
+            this.gbxMapperSettings.Location = new System.Drawing.Point(2, 9);
+            this.gbxMapperSettings.Name = "gbxMapperSettings";
+            this.gbxMapperSettings.Size = new System.Drawing.Size(359, 324);
+            this.gbxMapperSettings.TabIndex = 6;
+            this.gbxMapperSettings.TabStop = false;
+            this.gbxMapperSettings.Text = "Settings";
+            // 
+            // seMapperWaipointDistance
+            // 
+            this.seMapperWaipointDistance.EditValue = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.seMapperWaipointDistance.Location = new System.Drawing.Point(6, 20);
+            this.seMapperWaipointDistance.Name = "seMapperWaipointDistance";
+            this.seMapperWaipointDistance.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.seMapperWaipointDistance.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.seMapperWaipointDistance.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
+            this.seMapperWaipointDistance.Properties.IsFloatValue = false;
+            this.seMapperWaipointDistance.Properties.Mask.EditMask = "N00";
+            this.seMapperWaipointDistance.Properties.MaxValue = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            this.seMapperWaipointDistance.Properties.MinValue = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.seMapperWaipointDistance.Size = new System.Drawing.Size(58, 20);
+            this.seMapperWaipointDistance.TabIndex = 1;
+            // 
+            // btnMapperTest
+            // 
+            this.btnMapperTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnMapperTest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMapperTest.Location = new System.Drawing.Point(303, 295);
+            this.btnMapperTest.Name = "btnMapperTest";
+            this.btnMapperTest.Size = new System.Drawing.Size(50, 23);
+            this.btnMapperTest.TabIndex = 5;
+            this.btnMapperTest.Text = "Test";
+            this.btnMapperTest.UseVisualStyleBackColor = true;
+            this.btnMapperTest.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // seWaypointEquivalenceDistance
+            // 
+            this.seWaypointEquivalenceDistance.EditValue = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.seWaypointEquivalenceDistance.Location = new System.Drawing.Point(6, 72);
+            this.seWaypointEquivalenceDistance.Name = "seWaypointEquivalenceDistance";
+            this.seWaypointEquivalenceDistance.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.seWaypointEquivalenceDistance.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.seWaypointEquivalenceDistance.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
+            this.seWaypointEquivalenceDistance.Properties.IsFloatValue = false;
+            this.seWaypointEquivalenceDistance.Properties.Mask.EditMask = "N00";
+            this.seWaypointEquivalenceDistance.Properties.MaxValue = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            this.seWaypointEquivalenceDistance.Properties.MinValue = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.seWaypointEquivalenceDistance.Size = new System.Drawing.Size(58, 20);
+            this.seWaypointEquivalenceDistance.TabIndex = 1;
+            // 
+            // lblWaypointEquivalenceDistance
+            // 
+            this.lblWaypointEquivalenceDistance.AutoSize = true;
+            this.lblWaypointEquivalenceDistance.Location = new System.Drawing.Point(70, 75);
+            this.lblWaypointEquivalenceDistance.Name = "lblWaypointEquivalenceDistance";
+            this.lblWaypointEquivalenceDistance.Size = new System.Drawing.Size(156, 13);
+            this.lblWaypointEquivalenceDistance.TabIndex = 2;
+            this.lblWaypointEquivalenceDistance.Text = "Waypoint equivalence distance";
+            // 
+            // ckbMapperForceLinkingWaypoint
+            // 
+            this.ckbMapperForceLinkingWaypoint.AutoSize = true;
+            this.ckbMapperForceLinkingWaypoint.Location = new System.Drawing.Point(6, 121);
+            this.ckbMapperForceLinkingWaypoint.Name = "ckbMapperForceLinkingWaypoint";
+            this.ckbMapperForceLinkingWaypoint.Size = new System.Drawing.Size(343, 17);
+            this.ckbMapperForceLinkingWaypoint.TabIndex = 3;
+            this.ckbMapperForceLinkingWaypoint.Text = "The forced linking of the new waypoint and the previous waypoint";
+            this.ckbMapperForceLinkingWaypoint.UseVisualStyleBackColor = true;
+            // 
+            // lblMapperMaxZDif
+            // 
+            this.lblMapperMaxZDif.AutoSize = true;
+            this.lblMapperMaxZDif.Location = new System.Drawing.Point(70, 49);
+            this.lblMapperMaxZDif.Name = "lblMapperMaxZDif";
+            this.lblMapperMaxZDif.Size = new System.Drawing.Size(244, 13);
+            this.lblMapperMaxZDif.TabIndex = 2;
+            this.lblMapperMaxZDif.Text = "The max elevation difference between waypoints";
+            // 
+            // lblNodeDistance
+            // 
+            this.lblNodeDistance.AutoSize = true;
+            this.lblNodeDistance.Location = new System.Drawing.Point(70, 23);
+            this.lblNodeDistance.Name = "lblNodeDistance";
+            this.lblNodeDistance.Size = new System.Drawing.Size(226, 13);
+            this.lblNodeDistance.TabIndex = 2;
+            this.lblNodeDistance.Text = "The distance between waypoints in edit mode";
+            // 
+            // seMapperMaxZDif
+            // 
+            this.seMapperMaxZDif.EditValue = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.seMapperMaxZDif.Location = new System.Drawing.Point(6, 46);
+            this.seMapperMaxZDif.Name = "seMapperMaxZDif";
+            this.seMapperMaxZDif.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.seMapperMaxZDif.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.seMapperMaxZDif.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
+            this.seMapperMaxZDif.Properties.IsFloatValue = false;
+            this.seMapperMaxZDif.Properties.Mask.EditMask = "N00";
+            this.seMapperMaxZDif.Properties.MaxValue = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            this.seMapperMaxZDif.Properties.MinValue = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.seMapperMaxZDif.Size = new System.Drawing.Size(58, 20);
+            this.seMapperMaxZDif.TabIndex = 1;
+            // 
+            // ckbMapperLinearPath
+            // 
+            this.ckbMapperLinearPath.AutoSize = true;
+            this.ckbMapperLinearPath.Location = new System.Drawing.Point(6, 98);
+            this.ckbMapperLinearPath.Name = "ckbMapperLinearPath";
+            this.ckbMapperLinearPath.Size = new System.Drawing.Size(321, 17);
+            this.ckbMapperLinearPath.TabIndex = 3;
+            this.ckbMapperLinearPath.Text = "Linear path (Links new waypoint with only previous waypoint)";
+            this.ckbMapperLinearPath.UseVisualStyleBackColor = true;
+            // 
+            // btnShowMapper
+            // 
+            this.btnShowMapper.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnShowMapper.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold);
+            this.btnShowMapper.Location = new System.Drawing.Point(9, 339);
+            this.btnShowMapper.Name = "btnShowMapper";
+            this.btnShowMapper.Size = new System.Drawing.Size(346, 40);
+            this.btnShowMapper.TabIndex = 4;
+            this.btnShowMapper.Text = "Show Mapper";
+            this.btnShowMapper.UseVisualStyleBackColor = true;
+            this.btnShowMapper.Click += new System.EventHandler(this.btnShowMapper_Click);
+            // 
             // dlgSaveFile
             // 
             this.dlgSaveFile.CheckPathExists = false;
@@ -657,12 +655,6 @@ namespace EntityTools.Core
             this.Size = new System.Drawing.Size(370, 416);
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).EndInit();
             this.tbclMain.ResumeLayout(false);
-            this.tabMapper.ResumeLayout(false);
-            this.gbxMapperSettings.ResumeLayout(false);
-            this.gbxMapperSettings.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.seMapperWaipointDistance.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.seWaypointEquivalenceDistance.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.seMapperMaxZDif.Properties)).EndInit();
             this.tabUtilities.ResumeLayout(false);
             this.tabUtilities.PerformLayout();
             this.gpbExport.ResumeLayout(false);
@@ -674,6 +666,12 @@ namespace EntityTools.Core
             ((System.ComponentModel.ISupportInitialize)(this.seSlideFilter.Properties)).EndInit();
             this.tabRelogger.ResumeLayout(false);
             this.tabRelogger.PerformLayout();
+            this.tabMapper.ResumeLayout(false);
+            this.gbxMapperSettings.ResumeLayout(false);
+            this.gbxMapperSettings.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.seMapperWaipointDistance.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.seWaypointEquivalenceDistance.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.seMapperMaxZDif.Properties)).EndInit();
             this.ResumeLayout(false);
 
         }

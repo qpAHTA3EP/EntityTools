@@ -2,6 +2,7 @@
 using Astral.Logic.UCC.Actions;
 using Astral.Logic.UCC.Classes;
 using Astral.Logic.UCC.Forms;
+using EntityTools.Reflection;
 using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;

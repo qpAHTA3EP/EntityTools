@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace EntityTools.Tools.Reflection
+namespace EntityTools.Reflection
 {
     public static class StaticPropertyAccessorFactory
     {

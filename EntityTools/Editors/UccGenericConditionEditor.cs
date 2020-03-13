@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using Astral.Quester.Forms;
 using EntityTools.UCC.Conditions;
-using EntityTools.Editors.Forms;
 using ActionCond = Astral.Logic.UCC.Ressources.Enums.ActionCond;
 
 namespace EntityTools.Editors
@@ -17,9 +16,8 @@ namespace EntityTools.Editors
                 if(condition.Tested == ActionCond.HasAura
                     || condition.Tested == ActionCond.AuraStacks)
                 {
-                    string newVal = AuraSelectForm.GetAuraId();
-
-                    if (!string.IsNullOrEmpty(newVal))
+                    string newVal = string.Empty;
+                    if (EntityTools.Core.GUIRequest_AuraId(ref newVal))
                     {
                         if (condition.Tested == ActionCond.AuraStacks)
                         {

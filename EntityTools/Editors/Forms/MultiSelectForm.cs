@@ -8,7 +8,7 @@ using System.Linq;
 using System.Windows.Forms;
 using DevExpress.XtraEditors;
 
-namespace EntityTools.Forms
+namespace EntityTools.Editors.Forms
 {
     public partial class MultiSelectForm :XtraForm
     {

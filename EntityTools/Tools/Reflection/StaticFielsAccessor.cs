@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace EntityTools.Tools.Reflection
+namespace EntityTools.Reflection
 {
     public static class StaticFielsAccessorFactory
     {
@@ -20,7 +20,7 @@ namespace EntityTools.Tools.Reflection
     /// <typeparam name="FieldType"></typeparam>
     public class StaticFielsAccessor<FieldType>
     {
-        private Type containerType;
+        private readonly Type containerType;
         private FieldInfo fieldInfo;
 
         public StaticFielsAccessor(Type t, string fieldName, BindingFlags flags = BindingFlags.Default)

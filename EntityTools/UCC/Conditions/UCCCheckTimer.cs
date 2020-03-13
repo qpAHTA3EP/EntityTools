@@ -9,6 +9,7 @@ using System;
 using Sign = Astral.Logic.UCC.Ressources.Enums.Sign;
 using EntityTools.Enums;
 using EntityTools.Tools;
+using EntityTools;
 
 namespace EntityTools.UCC.Conditions
 {
@@ -33,7 +34,7 @@ namespace EntityTools.UCC.Conditions
 
 
         #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction = null)
+        bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
         {
             if(!string.IsNullOrEmpty(TimerName) && UCCTools.SpecialTimers.ContainsKey(TimerName))
             {

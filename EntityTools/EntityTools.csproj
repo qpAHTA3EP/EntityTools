@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.0217.0641</AssemblyVersion>
+    <AssemblyVersion>0.20.0310.1621</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -124,101 +124,49 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Actions\ChangeInstanceToLeader.cs" />
-    <Compile Include="Actions\InsertInsignia.cs" />
-    <Compile Include="Actions\Deprecated\InteractEntity.cs" />
-    <Compile Include="Actions\InteractEntitiesCachedTimeout.cs" />
-    <Compile Include="Actions\ChangePluginSettings.cs" />
-    <Compile Include="Actions\MoveToLeader.cs" />
-    <Compile Include="Actions\PickUpMissionExt.cs" />
-    <Compile Include="Conditions\Deprecated\CheckCampaignTask.cs" />
-    <Compile Include="Conditions\CheckGameGUICondition.cs" />
-    <Compile Include="Conditions\CheckShard.cs" />
-    <Compile Include="Conditions\EntityPropertyCachedTimeout.cs" />
-    <Compile Include="Conditions\Deprecated\EntityDistance.cs" />
-    <Compile Include="Conditions\EntityCountCachedTimeout.cs" />
-    <Compile Include="Conditions\Deprecated\PartyCount.cs" />
-    <Compile Include="Conditions\TeamLeaderMapInstance.cs" />
-    <Compile Include="Conditions\TeamMemberCount.cs" />
+    <Compile Include="Core\EntityToolsInitializer.cs" />
+    <Compile Include="Core\Facades\QuesterActionInitializer.cs" />
+    <Compile Include="Core\Interfaces\IEntityToolsCore.cs" />
+    <Compile Include="Core\Interfaces\IQuesterActionEngine.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Quester\Actions\ChangeInstanceToLeader.cs" />
+    <Compile Include="Quester\Actions\InsertInsignia.cs" />
+    <Compile Include="Quester\Actions\Deprecated\InteractEntity.cs" />
+    <Compile Include="Quester\Actions\InteractEntities.cs" />
+    <Compile Include="Quester\Actions\ChangePluginSettings.cs" />
+    <Compile Include="Quester\Actions\MoveToLeader.cs" />
+    <Compile Include="Quester\Actions\PickUpMissionExt.cs" />
+    <Compile Include="Quester\Conditions\Deprecated\CheckCampaignTask.cs" />
+    <Compile Include="Quester\Conditions\CheckGameGUICondition.cs" />
+    <Compile Include="Quester\Conditions\CheckShard.cs" />
+    <Compile Include="Quester\Conditions\EntityProperty.cs" />
+    <Compile Include="Quester\Conditions\EntityCount.cs" />
+    <Compile Include="Quester\Conditions\TeamLeaderMapInstance.cs" />
+    <Compile Include="Quester\Conditions\TeamMemberCount.cs" />
     <Compile Include="Editors\CampaignTaskEditor.cs" />
     <Compile Include="Editors\CheckedListBoxCommonEditor.cs" />
     <Compile Include="Editors\AddTypeCommonEditor.cs" />
     <Compile Include="Editors\ConditionListEditor.cs" />
     <Compile Include="Editors\EntityTestEditor.cs" />
-    <Compile Include="Editors\Forms\AuraSelectForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Editors\Forms\AuraSelectForm.Designer.cs">
-      <DependentUpon>AuraSelectForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Editors\Forms\ConditionsListForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Editors\Forms\ConditionsListForm.designer.cs">
-      <DependentUpon>ConditionsListForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Editors\Forms\EntitySelectForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Editors\Forms\EntitySelectForm.Designer.cs">
-      <DependentUpon>EntitySelectForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Editors\Forms\InputBox.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Editors\Forms\InputBox.Designer.cs">
-      <DependentUpon>InputBox.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Editors\Forms\InsigniaBonusSelectForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Editors\Forms\InsigniaBonusSelectForm.Designer.cs">
-      <DependentUpon>InsigniaBonusSelectForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Core\MainPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Core\MainPanel.Designer.cs">
       <DependentUpon>MainPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editors\Forms\MountBonusPriorityListForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Editors\Forms\MountBonusPriorityListForm.Designer.cs">
-      <DependentUpon>MountBonusPriorityListForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Editors\Forms\ItemSelectForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Editors\Forms\ItemSelectForm.Designer.cs">
-      <DependentUpon>ItemSelectForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Editors\Forms\MultiSelectForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Editors\Forms\MultiSelectForm.Designer.cs">
-      <DependentUpon>MultiSelectForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Editors\Forms\TargetSelectForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Editors\Forms\TargetSelectForm.Designer.cs">
-      <DependentUpon>TargetSelectForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Editors\Forms\UIViewer.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Editors\Forms\UIViewer.Designer.cs">
-      <DependentUpon>UIViewer.cs</DependentUpon>
-    </Compile>
     <Compile Include="Editors\NodePositionEditor.cs" />
     <Compile Include="Editors\AuraIdEditor.cs" />
     <Compile Include="Editors\UccGenericConditionEditor.cs" />
     <Compile Include="Editors\UccActionEditor.cs" />
     <Compile Include="Editors\UiIdEditor.cs" />
-    <Compile Include="Extensions\ListTExtentions.cs" />
-    <Compile Include="Patches\Mapper\AddNavigationNodeStatic.cs" />
+    <Compile Include="Patches\Mapper\AddNavigationNodeAdvanced.cs" />
     <Compile Include="Patches\Mapper\AstralMapperOriginals.cs" />
+    <Compile Include="Patches\Mapper\CustomRegionHelper.cs" />
+    <Compile Include="Patches\Mapper\Enums.cs" />
     <Compile Include="Patches\Mapper\MapperFormExt.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -226,10 +174,15 @@
       <DependentUpon>MapperFormExt.cs</DependentUpon>
     </Compile>
     <Compile Include="Patches\Mapper\MapperGraphCache.cs" />
+    <Compile Include="Patches\Mapper\NewDrawings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Patches\Mapper\NewDrawings.Designer.cs">
+      <DependentUpon>NewDrawings.cs</DependentUpon>
+    </Compile>
     <Compile Include="Patches\Mapper\NodeDetail.cs" />
     <Compile Include="Patches\Patcher.cs" />
     <Compile Include="Patches\Patch.cs" />
-    <Compile Include="Patches\Patch_GraphicsNW.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -241,46 +194,34 @@
     <Compile Include="Servises\UnstuckSpell\UnstuckSpellsSettings.cs" />
     <Compile Include="Tools\AuraOption.cs" />
     <Compile Include="Tools\CollectionTypeConverter.cs" />
-    <Compile Include="Tools\CopyHelper.cs" />
-    <Compile Include="Tools\CustomRegionTools.cs" />
-    <Compile Include="Tools\EnchantHelper.cs" />
-    <Compile Include="Tools\Entities\EntityCache.cs" />
-    <Compile Include="Tools\Entities\EntityComparerToPattern.cs" />
-    <Compile Include="Tools\Entities\Enums.cs" />
-    <Compile Include="Tools\Entities\SearchCached.cs" />
-    <Compile Include="Tools\Entities\SearchDirect.cs" />
+    <Compile Include="Servises\EnchantHelper.cs" />
+    <Compile Include="Tools\EntityDef.cs" />
     <Compile Include="Tools\Enums.cs" />
     <Compile Include="Tools\Export\Enums.cs" />
+    <Compile Include="Tools\Extensions\FormCollectionExtentions.cs" />
+    <Compile Include="Tools\Extensions\ListTExtentions.cs" />
+    <Compile Include="Tools\FileStreamHelper.cs" />
     <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\Export\Auras.cs" />
     <Compile Include="Tools\CommonTools.cs" />
-    <Compile Include="Tools\Entities\EntitySelectionTools.cs" />
     <Compile Include="Core\EntityPlugin.cs" />
-    <Compile Include="Actions\MoveToEntityCachedTimeout.cs" />
+    <Compile Include="Quester\Actions\MoveToEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Editors\EntityIdEditor.cs" />
     <Compile Include="Editors\CustomRegionListEditor.cs" />
     <Compile Include="Editors\ShardEditor.cs" />
     <Compile Include="Tools\Export\Missions.cs" />
-    <Compile Include="Tools\MountInsignias\Enums.cs" />
-    <Compile Include="Tools\MountInsignias\MountBonusesDef.cs" />
-    <Compile Include="Tools\MountInsignias\MountBonusPriorityDef.cs" />
-    <Compile Include="Tools\MountInsignias\ParagonMountBonusPriorityDef.cs" />
     <Compile Include="Tools\ParagonTools.cs" />
-    <Compile Include="Tools\Reflection\NonStaticAction.cs" />
-    <Compile Include="Tools\Reflection\ReflectionHelper.cs" />
     <Compile Include="Settings\PluginSettingsBase.cs" />
+    <Compile Include="Tools\Classes.cs" />
+    <Compile Include="Tools\Reflection\CopyHelper.cs" />
+    <Compile Include="Tools\Reflection\NonStaticAction.cs" />
     <Compile Include="Tools\Reflection\NonStaticFunction.cs" />
-    <Compile Include="Tools\Reflection\StaticFunction.cs" />
-    <Compile Include="Tools\Reflection\StaticFielsAccessor.cs" />
-    <Compile Include="Tools\Reflection\StaticPropertyAccessor.cs" />
+    <Compile Include="Tools\Reflection\ReflectionHelper.cs" />
     <Compile Include="Tools\Reflection\StaticAction.cs" />
-    <Compile Include="Tools\Struct.cs" />
+    <Compile Include="Tools\Reflection\StaticFielsAccessor.cs" />
+    <Compile Include="Tools\Reflection\StaticFunction.cs" />
+    <Compile Include="Tools\Reflection\StaticPropertyAccessor.cs" />
     <Compile Include="UCC\Extensions\UCCActionExtention.cs" />
     <Compile Include="UCC\Extensions\UCCEditorExtensions.cs" />
     <Compile Include="Tools\Export\GameUITools.cs" />
@@ -289,61 +230,32 @@
     <Compile Include="UCC\Conditions\UCCCheckTimer.cs" />
     <Compile Include="UCC\Conditions\UCCTargetMatchEntity.cs" />
     <Compile Include="UCC\Conditions\UCCQuesterCheck.cs" />
-    <Compile Include="UCC\DodgeFromEntity.cs" />
-    <Compile Include="UCC\ApproachEntity.cs" />
+    <Compile Include="UCC\Actions\DodgeFromEntity.cs" />
+    <Compile Include="UCC\Actions\ApproachEntity.cs" />
     <Compile Include="UCC\Conditions\UCCEntityCheck.cs" />
     <Compile Include="UCC\Conditions\UCCGameUICheck.cs" />
-    <Compile Include="UCC\ExecuteSpecificPower.cs" />
-    <Compile Include="UCC\SpecializedUCCAction.cs" />
+    <Compile Include="UCC\Actions\ExecuteSpecificPower.cs" />
+    <Compile Include="UCC\Actions\SpecializedUCCAction.cs" />
     <Compile Include="UCC\Conditions\UCCGenericCondition.cs" />
     <Compile Include="UCC\UCCTools.cs" />
-    <Compile Include="UCC\UseItemSpecial.cs" />
+    <Compile Include="UCC\Actions\UseItemSpecial.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Editors\Forms\AuraSelectForm.resx">
-      <DependentUpon>AuraSelectForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Editors\Forms\ConditionsListForm.resx">
-      <DependentUpon>ConditionsListForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Editors\Forms\EntitySelectForm.resx">
-      <DependentUpon>EntitySelectForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Editors\Forms\InputBox.resx">
-      <DependentUpon>InputBox.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Editors\Forms\InsigniaBonusSelectForm.resx">
-      <DependentUpon>InsigniaBonusSelectForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Core\MainPanel.resx">
       <DependentUpon>MainPanel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Editors\Forms\MountBonusPriorityListForm.resx">
-      <DependentUpon>MountBonusPriorityListForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Editors\Forms\ItemSelectForm.resx">
-      <DependentUpon>ItemSelectForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Editors\Forms\MultiSelectForm.resx">
-      <DependentUpon>MultiSelectForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Editors\Forms\TargetSelectForm.resx">
-      <DependentUpon>TargetSelectForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Editors\Forms\UIViewer.resx">
-      <DependentUpon>UIViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Patches\Mapper\MapperFormExt.resx">
       <DependentUpon>MapperFormExt.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Patches\Mapper\NewDrawings.resx">
+      <DependentUpon>NewDrawings.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Actions\Encripted\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\Entity_7_40х48.png" />
@@ -372,67 +284,83 @@
     <None Include="Images\Icons_Inventory_Enchantments_Insignia_Illuminated.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\miniAdd" />
     <None Include="Properties\DataSources\MountBonuses.xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Astral\miniValid.png" />
-    <None Include="Images\Astral\miniSave.png" />
-    <None Include="Images\Astral\miniRemove.png" />
-    <None Include="Images\Astral\miniPlay.png" />
-    <None Include="Images\Astral\copy.png" />
-    <None Include="Images\Astral\paste.png" />
-    <None Include="Images\Astral\miniRefresh.png" />
-    <None Include="Images\Astral\miniDelete.png" />
-    <None Include="Images\Astral\miniAdd.png" />
+    <None Include="Images\Icons\miniValid.png" />
+    <None Include="Images\Icons\miniSave.png" />
+    <None Include="Images\Icons\miniPlay.png" />
+    <None Include="Images\Icons\paste.png" />
+    <None Include="Images\Icons\miniRefresh.png" />
+    <None Include="Images\Icons\miniDelete.png" />
+    <None Include="Images\Icons\miniAdd.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Astral\miniTarget.png" />
+    <None Include="Images\Icons\miniTarget.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Astral\miniExport.png" />
+    <None Include="Images\Icons\miniExport.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Astral\miniNew.png" />
+    <None Include="Images\Icons\miniNew.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Astral\miniBiPath.png" />
+    <None Include="Images\Icons\miniBiPath.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Astral\miniLinPath.png" />
+    <None Include="Images\Icons\miniLinPath.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Astral\miniStop.png" />
+    <None Include="Images\Icons\miniStop.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Astral\miniUniPath.png" />
+    <None Include="Images\Icons\miniUniPath.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Astral\miniEllipceCR.png" />
+    <None Include="Images\Icons\miniEllipceCR.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Astral\miniLink.png" />
+    <None Include="Images\Icons\miniLink.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Astral\miniRectCR.png" />
+    <None Include="Images\Icons\miniRectCR.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Astral\miniZdiff.png" />
+    <None Include="Images\Icons\miniZdiff.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Astral\miniImport.png" />
+    <None Include="Images\Icons\miniImport.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Astral\miniClone.png" />
+    <None Include="Images\Icons\miniClone.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Astral\miniDistance.png" />
+    <None Include="Images\Icons\miniDistance.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Astral\miniNodeDistance.png" />
+    <None Include="Images\Icons\miniNodeDistance.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Astral\miniGear.png" />
+    <None Include="Images\Icons\miniGear.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Icons\charArrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Icons\miniCancel.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Icons\miniCopy.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Icons\miniPlayAll.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="EntitySelectForm\" />
+    <Folder Include="EntityToolsCore\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Entity_7_40х48.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

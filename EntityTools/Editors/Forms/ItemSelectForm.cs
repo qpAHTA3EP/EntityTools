@@ -9,13 +9,15 @@ using System.Windows.Forms;
 using DevExpress.XtraEditors;
 using Astral.Controllers;
 using System.Reflection;
-using EntityTools.Tools;
+using EntityTools.Reflection;
 using Astral.Logic.UCC.Classes;
 
 namespace EntityTools.Editors.Forms
 {
     public partial class ItemSelectForm :XtraForm
     {
+        private static readonly Func<List<Type>> PluginsGetTypes = typeof(Astral.Controllers.Plugins).GetStaticFunction<List<Type>>("GetTypes");
+
         public delegate object ProcessingItems(ListBox itemList);
 
         internal ProcessingItems FillList;
@@ -92,8 +94,8 @@ namespace EntityTools.Editors.Forms
             itemList.Items.Clear();
             itemList.DisplayMember = string.Empty;
             Type baseType = typeof(T);
-            if (ReflectionHelper.ExecStaticMethod(typeof(Plugins), "GetTypes", new object[0], out object typeListObj, BindingFlags.Default)
-                && typeListObj is List<Type> typeList)
+            List<Type> typeList = PluginsGetTypes();
+            if (typeList != null)
             {
                 foreach (Type t in typeList)
                 {

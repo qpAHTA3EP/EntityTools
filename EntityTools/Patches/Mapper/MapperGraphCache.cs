@@ -2,18 +2,14 @@
 using Astral;
 using Astral.Classes;
 using Astral.Logic.Classes.Map;
-using EntityTools.Tools;
-using EntityTools.Tools.Reflection;
+using EntityTools.Reflection;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Windows.Forms;
 
 namespace EntityTools.Patches.Mapper
 {
@@ -366,7 +362,8 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Последняя добавленный узел
         /// </summary>
-        internal Node lastAddedNode = null;
+        internal Node LastAddedNode { get => lastAddedNode; set => lastAddedNode = value; }
+        private Node lastAddedNode = null;
 
         /// <summary>
         /// Расстояние от cacheInitialPos в плоскости oXY, в пределах которого кэшируются узлы графа
@@ -559,9 +556,12 @@ namespace EntityTools.Patches.Mapper
             if (LN != null)
             {
                 lock(LN)
-                { 
-                    foreach (Node node in LN)
+                {
+                    for (int i = 0; i < LN.Count; i++)
+                    {
+                        Node node = LN[i];
                         g.drawFillEllipse(new Vector3((float)node.X, (float)node.Y, (float)node.Z), new Size(7, 7), Brushes.Gold);
+                    }
                 }
             }
             if (lastAddedNode != null)

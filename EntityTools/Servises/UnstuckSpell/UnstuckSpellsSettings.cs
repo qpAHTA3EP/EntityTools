@@ -1,5 +1,6 @@
 ﻿using EntityTools.Services;
 using System;
+using System.ComponentModel;
 
 namespace EntityTools.Settings
 {
@@ -13,6 +14,7 @@ namespace EntityTools.Settings
         /// <summary>
         /// Активация или деактивация умения
         /// </summary>
+        [Bindable(true)]
         public bool Active
         {
             get => active;
@@ -25,12 +27,13 @@ namespace EntityTools.Settings
                 }
             }
         }
-        [NonSerialized]
+        //[NonSerialized]
         private bool active = true;
 
         /// <summary>
         /// Интервал проверки залипания умений (милисекунд)
         /// </summary>
+        [Bindable(true)]
         public int CheckInterval
         {
             get => checkInterval;
@@ -43,7 +46,7 @@ namespace EntityTools.Settings
                 }
             }
         }
-        [NonSerialized]
+        //[NonSerialized]
         private int checkInterval = 500;
     }
 }

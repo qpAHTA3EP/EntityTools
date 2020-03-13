@@ -2,11 +2,11 @@
 using System.Windows.Forms;
 using Astral.Logic.NW;
 using DevExpress.XtraEditors;
-using EntityTools.Forms;
+using EntityTools.Editors.Forms;
 using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
-using static EntityTools.Forms.EntitySelectForm;
+using static EntityTools.Editors.Forms.EntitySelectForm;
 
 namespace EntityTools.Editors.Forms
 {

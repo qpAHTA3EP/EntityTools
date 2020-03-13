@@ -11,16 +11,14 @@ using MyNW.Internals;
 using MyNW;
 using EntityTools.UCC.Extensions;
 using DevExpress.XtraEditors;
-using EntityTools.Tools.Reflection;
 using EntityTools.Enums;
-using EntityTools.Forms;
-using EntityTools.Patches.Mapper;
+using EntityTools.Servises;
 
 namespace EntityTools.Core
 {
     public partial class EntityToolsMainPanel : /* UserControl //*/ Astral.Forms.BasePanel
     {
-        private EntitySelectForm.EntityDif entDif = new EntitySelectForm.EntityDif();
+        private EntityDef entDif = new EntityDef();
 
         public EntityToolsMainPanel() : base("Entity Tools")
         {
@@ -189,6 +187,102 @@ namespace EntityTools.Core
             //var GetNearesNodes = typeof(Astral.Quester.Core).GetStaticMethodInvoker<MyNW.Classes.Vector3>("GetNearesNodetPosition", new Type[] { typeof(MyNW.Classes.Vector3), typeof(bool)});
             //var pos = GetNearesNodes.Invoke(EntityManager.LocalPlayer.Location, false);
             //XtraMessageBox.Show(pos.ToString());
+            #endregion
+
+            #region Test_LinkedList
+
+            //Dictionary<int, Pair<WatchPair, WatchPair>> listWatches = new Dictionary<int, Pair<WatchPair, WatchPair>>();
+            //Dictionary<int, Pair<WatchPair, WatchPair>> linkedListWatches = new Dictionary<int, Pair<WatchPair, WatchPair>>();
+            //Pair<WatchPair, WatchPair> listTotal = new Pair<WatchPair, WatchPair>(new WatchPair(), new WatchPair());
+            //Pair<WatchPair, WatchPair> LinkListTotal = new Pair<WatchPair, WatchPair>(new WatchPair(), new WatchPair());
+
+            //Stopwatch sw = new Stopwatch();
+            //Random rnd = new Random();
+            //for (int i = 0; i< 1000;  i++)
+            //{
+            //    double dist = 100 + rnd.Next(700);
+            //    Pair<WatchPair, WatchPair> watch = new Pair<WatchPair, WatchPair>(new WatchPair(), new WatchPair());
+            //    sw.Restart();
+            //    List<Entity> list = new List<Entity>();
+            //    foreach(Entity ent in EntityManager.GetEntities())
+            //    {
+            //        list.Add(ent);
+            //    }
+            //    sw.Stop();
+            //    watch.First.Ticks = sw.ElapsedTicks;
+            //    listTotal.First.Ticks += sw.ElapsedTicks;
+            //    watch.First.Millisecond = sw.ElapsedMilliseconds;
+            //    listTotal.First.Millisecond += sw.ElapsedMilliseconds;
+            //    sw.Restart();
+            //    list.RemoveAll((o) => o.Location.Distance3DFromPlayer > dist);
+            //    sw.Stop();
+            //    watch.Second.Ticks = sw.ElapsedTicks;
+            //    listTotal.Second.Ticks += sw.ElapsedTicks;
+            //    watch.Second.Millisecond = sw.ElapsedMilliseconds;
+            //    listTotal.Second.Millisecond += sw.ElapsedMilliseconds;
+            //    listWatches.Add(i, watch);
+
+            //    watch = new Pair<WatchPair, WatchPair>(new WatchPair(), new WatchPair());
+            //    sw.Restart();
+            //    LinkedList<Entity> linkList = new LinkedList<Entity>();
+            //    foreach (Entity ent in EntityManager.GetEntities())
+            //    {
+            //        linkList.AddLast(ent);
+            //    }
+            //    sw.Stop();
+            //    watch.First.Ticks = sw.ElapsedTicks;
+            //    LinkListTotal.First.Ticks += sw.ElapsedTicks;
+            //    watch.First.Millisecond = sw.ElapsedMilliseconds;
+            //    LinkListTotal.First.Millisecond += sw.ElapsedMilliseconds;
+            //    sw.Restart();
+            //    //list.RemoveAll((o) => o.Location.Distance3DFromPlayer > 500);
+            //    LinkedList<Entity> newlinkList = new LinkedList<Entity>();
+            //    while(linkList.Count > 0)
+            //    {
+            //        LinkedListNode<Entity> node = linkList.First;
+            //        linkList.RemoveFirst();
+            //        if (node.Value.Location.Distance3DFromPlayer > dist)
+            //            newlinkList.AddLast(node);
+            //    }
+
+            //    sw.Stop();
+            //    watch.Second.Ticks = sw.ElapsedTicks;
+            //    LinkListTotal.Second.Ticks += sw.ElapsedTicks;
+            //    watch.Second.Millisecond = sw.ElapsedMilliseconds;
+            //    LinkListTotal.Second.Millisecond += sw.ElapsedMilliseconds;
+            //    linkedListWatches.Add(i, watch);
+            //}
+
+            //Logger.WriteLine("List<Entity> Test:");
+            //Logger.WriteLine($"\tCreate Total (t):\t {listTotal.First.Ticks.ToString()}");
+            //Logger.WriteLine($"\tCreate Total (ms):\t {listTotal.First.Millisecond}");
+            //Logger.WriteLine($"\tRemote Total (t):\t {listTotal.Second.Ticks.ToString()}");
+            //Logger.WriteLine($"\tRemote Total (ms):\t {listTotal.Second.Millisecond}");
+            //Logger.WriteLine("--------------------------------------------------------");
+            //foreach (var w in listWatches)
+            //{
+            //    Logger.WriteLine($"\t{w.Value.First.Millisecond.ToString("")}\t{w.Value.First.Ticks}\t\t{w.Value.Second.Millisecond}\t{w.Value.Second.Ticks}\t");
+            //}
+            //Logger.WriteLine("========================================================");
+            //Logger.WriteLine(string.Empty);
+            //Logger.WriteLine("LinkedList<Entity> Test:");
+            //Logger.WriteLine($"\tCreate Total (t):\t {LinkListTotal.First.Ticks.ToString("N3")}");
+            //Logger.WriteLine($"\tCreate Total (ms):\t {LinkListTotal.First.Millisecond}");
+            //Logger.WriteLine($"\tRemote Total (t):\t {LinkListTotal.Second.Ticks.ToString("N3")}");
+            //Logger.WriteLine($"\tRemote Total (ms):\t {LinkListTotal.Second.Millisecond}");
+            //Logger.WriteLine("--------------------------------------------------------");
+            //foreach (var w in linkedListWatches)
+            //{
+            //    Logger.WriteLine($"\t{w.Value.First.Millisecond}\t{w.Value.First.Ticks}\t\t{w.Value.Second.Millisecond}\t{w.Value.Second.Ticks}\t");
+            //}
+            //Logger.WriteLine("========================================================");
+            #endregion
+
+            #region AStarDiagnostic
+            string filename = AStar.SearchStatistics.SaveLog();
+            if (!string.IsNullOrEmpty(filename)
+                || MessageBox.Show(this, $"Would you like to open {Path.GetFileName(filename)}?", $"Open {Path.GetFileName(filename)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                System.Diagnostics.Process.Start(filename);
             #endregion
         }
 

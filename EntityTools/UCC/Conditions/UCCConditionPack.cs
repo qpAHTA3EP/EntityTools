@@ -10,8 +10,9 @@ using EntityTools.Enums;
 using EntityTools.UCC.Conditions;
 using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 using System.Xml.Serialization;
+using EntityTools;
 
-namespace EntityTools.Conditions
+namespace EntityTools.UCC.Conditions
 {
     [Serializable]
     public class UCCConditionPack : Astral.Logic.UCC.Classes.UCCCondition, ICustomUCCCondition
@@ -33,7 +34,7 @@ namespace EntityTools.Conditions
         public ConditionList Conditions { get; set; } = new ConditionList();
 
         #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction = null)
+        bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
         {
             bool result = true;
             if (Conditions != null && Conditions.Count > 0)
@@ -55,7 +56,7 @@ namespace EntityTools.Conditions
                                 }
                                 lockedNum++;
                             }
-                            else if (c.IsOK(refAction))
+                            else if (iCond.IsOK(refAction))
                                 okUnlockedNum++;
                         }
                         else
@@ -104,7 +105,7 @@ namespace EntityTools.Conditions
 
         bool ICustomUCCCondition.Loked { get => base.Locked; set => base.Locked = value; }
 
-        string ICustomUCCCondition.TestInfos(UCCAction refAction = null)
+        string ICustomUCCCondition.TestInfos(UCCAction refAction/* = null*/)
         {
             if (Conditions.Count > 0)
             {

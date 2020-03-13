@@ -24,14 +24,16 @@ namespace EntityTools.Patches
 
         public static void Apply()
         {
-            foreach(var field in typeof(Patcher).GetFields(BindingFlags.NonPublic | BindingFlags.Static))
-            {
-                if (field.GetValue(null) is Patch patch
-                    && patch != null)
-                {
-                    patch.Inject();
-                }
-            }
+            //foreach(var field in typeof(Patcher).GetFields(BindingFlags.NonPublic | BindingFlags.Static))
+            //{
+            //    if (field.GetValue(null) is Patch patch
+            //        && patch != null)
+            //    {
+            //        patch.Inject();
+            //    }
+            //}
+
+            Patch_Mapper?.Inject();
         }
     }
 }

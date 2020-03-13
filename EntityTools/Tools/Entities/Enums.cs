@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EntityTools.Enums
+namespace EntityCore.Enums
 {
     /// <summary>
     /// Перечисление полей Entity, по которым производится поиск

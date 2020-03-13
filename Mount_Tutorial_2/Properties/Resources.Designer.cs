@@ -59,15 +59,5 @@ namespace Mount_Tutorial.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] Mount_Tutorial {
-            get {
-                object obj = ResourceManager.GetObject("Mount_Tutorial", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
@@ -12,8 +13,7 @@ namespace EntityTools.Settings
         /// <summary>
         /// Активация и деактивация патча
         /// </summary>
-        [NonSerialized]
-        private bool patch = true;
+        [Bindable(true)]
         public bool Patch
         {
             get => patch;
@@ -26,12 +26,13 @@ namespace EntityTools.Settings
                 }
             }
         }
+        //[NonSerialized]
+        private bool patch = true;
 
         /// <summary>
         /// Расстояние между соединяемыми точками пути, в режиме добавления
         /// </summary>
-        [NonSerialized]
-        private int waypointDistance = 20;
+        [Bindable(true)]
         public int WaypointDistance
         {
             get => waypointDistance;
@@ -45,12 +46,13 @@ namespace EntityTools.Settings
                 }
             }
         }
+        //[NonSerialized]
+        private int waypointDistance = 20;
 
         /// <summary>
         /// Расстояние между точками пути, меньше которого они считаются совпадающими
         /// </summary>
-        [NonSerialized]
-        private int waypointEquivalenceDistance = 5;
+        [Bindable(true)]
         public int WaypointEquivalenceDistance
         {
             get => waypointEquivalenceDistance;
@@ -63,12 +65,13 @@ namespace EntityTools.Settings
                 }
             }
         }
+        //[NonSerialized]
+        private int waypointEquivalenceDistance = 5;
 
         /// <summary>
         /// Максимальная допустимая разница высот между точками пути, соединяемыми в режиме добавления
         /// </summary>
-        [NonSerialized]
-        private int maxElevationDifference = 10;
+        [Bindable(true)]
         public int MaxElevationDifference
         {
             get => maxElevationDifference;
@@ -81,12 +84,13 @@ namespace EntityTools.Settings
                 }
             }
         }
+        //[NonSerialized]
+        private int maxElevationDifference = 10;
 
         /// <summary>
         /// Использование кэша при прокладывании пути
         /// </summary>
-        [NonSerialized]
-        private bool cacheActive = true;
+        [Bindable(true)]
         public bool CacheActive
         {
             get => cacheActive;
@@ -99,9 +103,13 @@ namespace EntityTools.Settings
                 }
             }
         }
+        //[NonSerialized]
+        private bool cacheActive = true;
+
         /// <summary>
         /// Время обновления кэша
         /// </summary>
+        [Bindable(true)]
         public int CacheRegenTimeout
         {
             get => cacheRegenTimeout;
@@ -114,15 +122,15 @@ namespace EntityTools.Settings
                 }
             }
         }
+        //[NonSerialized]
         private int cacheRegenTimeout = 5000;
 
         /// <summary>
         /// Принудительное связывание новой точки пути с предыдущей точкой
         /// Сохранять состояние данного флага между сессиями астрала нет смысла - установлен атрибут XmlIgnore
         /// </summary>
-        [NonSerialized]
-        private bool forceLinkingWaypoint = true;
         [XmlIgnore]
+        [Bindable(true)]
         public bool ForceLinkingWaypoint
         {
             get => forceLinkingWaypoint;
@@ -135,12 +143,14 @@ namespace EntityTools.Settings
                 }
             }
         }
+        //[NonSerialized]
+        private bool forceLinkingWaypoint = true;
 
         /// <summary>
         /// Принудительное связывание новой точки пути с предыдущей точкой
         /// </summary>
-        [NonSerialized]
-        private bool linearPath = true;
+        [XmlIgnore]
+        [Bindable(true)]
         public bool LinearPath
         {
             get => linearPath;
@@ -153,5 +163,7 @@ namespace EntityTools.Settings
                 }
             }
         }
+        //[NonSerialized]
+        private bool linearPath = true;
     }
 }

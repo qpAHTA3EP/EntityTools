@@ -10,12 +10,15 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using Astral;
+using EntityCore.Enums;
+using EntityCore.Tools;
+using EntityCore.Extentions;
 
-namespace EntityTools.Tools
+namespace EntityCore.Entities
 {
-    public static class EntitySelectionTools
+    internal static class EntitySelectionTools
     {
-        public delegate bool SpecialCheckDelegate(Entity entity);
+        internal delegate bool SpecialCheckDelegate(Entity entity);
 
 #if DEBUG && PROFILING
         private static readonly long interval = 10000;
@@ -35,7 +38,7 @@ namespace EntityTools.Tools
         private static Dictionary<long, long> frequencyDistribution = new Dictionary<long, long>();
         private static Dictionary<long, long> contactFrequencyDistribution = new Dictionary<long, long>();
 
-        public static void ResetWatch()
+        internal static void ResetWatch()
         {
             ContactCount = 0;
             ContactWorseTryNumber = 0;
@@ -52,7 +55,7 @@ namespace EntityTools.Tools
             Logger.WriteLine(Logger.LogType.Debug, $"UncachedSearch::ResetWatch()");
         }
 
-        public static void LogWatch()
+        internal static void LogWatch()
         {
             if (Count > 0)
             {
@@ -118,7 +121,7 @@ namespace EntityTools.Tools
         /// <param name="specialCheck">Функтор дополнительной проверки Entity, например наличия в черном списке</param>
         /// <param name="interactable">Если True, искать только Entity с которыми можно взаимодействать</param>
         /// <returns>Найденное Entity</returns>
-        public static Entity FindClosestEntity(List<Entity> entities, string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, bool healthCheck = false, float range = 0, bool regionCheck = false, List<string> customRegionNames = null, SpecialCheckDelegate specialCheck = null, bool interactable = false)
+        internal static Entity FindClosestEntity(List<Entity> entities, string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, bool healthCheck = false, float range = 0, bool regionCheck = false, List<string> customRegionNames = null, SpecialCheckDelegate specialCheck = null, bool interactable = false)
         {
 #if DEBUG && PROFILING
             Count++;
@@ -187,7 +190,7 @@ namespace EntityTools.Tools
         /// <param name="customRegionNames">Список CustomRegion'ов, в которых нужно искать Entity</param>
         /// <param name="specialCheck">Функтор дополнительной проверки Entity, например наличия в черном списке</param>
         /// <returns>Найденное Entity</returns>
-        public static Entity FindClosestContactEntity(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, bool healthCheck = false, float range = 0, bool regionCheck = false, List<string> customRegionNames = null, SpecialCheckDelegate specialCheck = null)
+        internal static Entity FindClosestContactEntity(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, bool healthCheck = false, float range = 0, bool regionCheck = false, List<string> customRegionNames = null, SpecialCheckDelegate specialCheck = null)
         {
 
 #if DEBUG && PROFILING
@@ -485,7 +488,7 @@ namespace EntityTools.Tools
         /// <param name="specialCheck">Функтор дополнительной проверки Entity, например наличия в черном списке</param>
         /// <param name="interactable">Если True, искать только Entity с которыми можно взаимодействать</param>
         /// <returns>Список найденных Entity</returns>
-        public static List<Entity> FindAllEntities(List<Entity> entities, string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, 
+        internal static List<Entity> FindAllEntities(List<Entity> entities, string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, 
             bool healthCheck = false, bool regionCheck = false, List<string> customRegionNames = null,SpecialCheckDelegate specialCheck = null)
         {
             List<Entity> resultList = null;
@@ -527,7 +530,7 @@ namespace EntityTools.Tools
         /// <param name="customRegionNames">Список CustomRegion'ов, в которых нужно искать Entity</param>
         /// <param name="specialCheck">Функтор дополнительной проверки Entity, например наличия в черном списке</param>
         /// <returns>Список всех найденных Entity</returns>
-        public static List<Entity> FindAllContactEntities(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, 
+        internal static List<Entity> FindAllContactEntities(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, 
             bool healthCheck = false, bool regionCheck = false, List<string> customRegionNames = null,SpecialCheckDelegate specialCheck = null)
         {
             List<Entity> entities = new List<Entity>();

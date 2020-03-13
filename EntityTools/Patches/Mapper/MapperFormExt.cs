@@ -1,48 +1,33 @@
-﻿using AStar;
+﻿#define LOG
+
+using AStar;
 using Astral;
 using Astral.Controllers;
-using Astral.Forms;
-using Astral.Logic;
-using Astral.Logic.Classes.Map;
 using Astral.Quester.Classes;
 using DevExpress.XtraBars;
 using DevExpress.XtraEditors;
-using EntityTools.Editors.Forms;
-using EntityTools.Tools;
-using EntityTools.Tools.Reflection;
-using MyNW.Classes;
+using EntityTools.Reflection;
 using MyNW.Internals;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Reflection;
 using AstralMapperOriginals;
-using QuesterEditorForm = Astral.Quester.Forms.Editor;
-using QuesterMainForm = Astral.Quester.Forms.Main;
+using MappingType = EntityTools.Enums.MappingType;
 
 namespace EntityTools.Patches.Mapper
 {
-    public enum MappingType
-    {
-        Bidirectional,
-        Unidirectional,
-        Stoped
-    }
-
     public partial class MapperFormExt : XtraForm //*/Form
     {
         #region Reflection helpers
         /// <summary>
         /// Функтор доступа к графу 
         /// </summary>
-        private static readonly StaticPropertyAccessor<AStar.Graph> CoreCurrentMapMeshe = typeof(Astral.Quester.Core).GetStaticProperty<AStar.Graph>("Meshes");
+        private static readonly StaticPropertyAccessor<AStar.Graph> CoreCurrentMapMeshes = typeof(Astral.Quester.Core).GetStaticProperty<AStar.Graph>("Meshes");
 
         /// <summary>
         /// Функтор доступа к словарю Astral.Quester.Core.MapsMeshes
@@ -87,16 +72,19 @@ namespace EntityTools.Patches.Mapper
         {
             InitializeComponent();
 
-            //mapper = new Astral.Forms.UserControls.Mapper(); // Создание экземпляра при объявлении
-            mapper.Anchor = (AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right);
-            mapper.Dock = DockStyle.Fill;
-            mapper.CustomDraw = null;
-            mapper.Location = new Point(6, 26);
-            mapper.Name = "mapper";
-            mapper.OnClick = null;
-            mapper.Size = new Size(372, 275);
-            mapper.TabIndex = 0;
+            mapper = new Astral.Forms.UserControls.Mapper {
+                Anchor = (AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right),
+                Dock = DockStyle.Fill,
+                CustomDraw = null,
+                Location = new Point(6, 26),
+                Name = "mapper",
+                OnClick = null,
+                Size = new Size(372, 275),
+                TabIndex = 0
+            };
             Controls.Add(mapper);
+
+            //graphics = new GraphicsNW(Math.Max(mapBox.ClientSize.Width*2, 600), Math.Max(mapBox.ClientSize.Height*2, 600));
 
             BindingControls();
         }
@@ -110,6 +98,9 @@ namespace EntityTools.Patches.Mapper
                                                 EntityTools.PluginSettings.Mapper,
                                                 nameof(EntityTools.PluginSettings.Mapper.WaypointDistance),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
+            menuWaypointDistance.Edit.EditValueChanged += eventWaypointDistanceChanged;
+            menuWaypointDistance.Edit.Leave += eventWaypointDistanceChanged;
+
             menuMaxZDifference.DataBindings.Add(nameof(menuMaxZDifference.EditValue),
                                                 EntityTools.PluginSettings.Mapper,
                                                 nameof(EntityTools.PluginSettings.Mapper.MaxElevationDifference),
@@ -136,6 +127,8 @@ namespace EntityTools.Patches.Mapper
                                               nameof(Astral.API.CurrentSettings.DeleteNodeRadius), 
                                               false, DataSourceUpdateMode.OnPropertyChanged);
             ((ISupportInitialize)bsrcAstralSettings).EndInit();
+            menuDeleteRadius.Edit.EditValueChanged += eventDeleteRadiusChanged;
+            menuDeleteRadius.Edit.Leave += eventDeleteRadiusChanged;
 
             menuForceLinkLast.DataBindings.Add(nameof(menuForceLinkLast.Checked),
                                                 EntityTools.PluginSettings.Mapper,
@@ -347,8 +340,8 @@ namespace EntityTools.Patches.Mapper
                 if (graphCache.Nodes.Count != 0)
                 {
                     if (LinearPath)
-                        lastNodeDetail = AddNavigationNodeStatic.LinkNearest(EntityManager.LocalPlayer.Location.Clone(), graphCache);
-                    else lastNodeDetail = AddNavigationNodeStatic.LinkComplex(EntityManager.LocalPlayer.Location.Clone(), graphCache);
+                        lastNodeDetail = AddNavigationNodeAdvanced.LinkNearest1(EntityManager.LocalPlayer.Location.Clone(), graphCache);
+                    else lastNodeDetail = AddNavigationNodeAdvanced.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), graphCache);
                 }
                 while (MappingType != MappingType.Stoped
                        && !token.IsCancellationRequested)
@@ -365,23 +358,24 @@ namespace EntityTools.Patches.Mapper
                                 if (LinearPath)
                                 {
                                     if (ForceLinkLastWaypoint)
-                                        lastNodeDetail = AddNavigationNodeStatic.LinkLast(EntityManager.LocalPlayer.Location.Clone(), graphCache, lastNodeDetail, false) ?? lastNodeDetail;
-                                    else lastNodeDetail = AddNavigationNodeStatic.LinkLast(EntityManager.LocalPlayer.Location.Clone(), graphCache, null, false) ?? lastNodeDetail;
+                                        lastNodeDetail = AddNavigationNodeAdvanced.LinkLast(EntityManager.LocalPlayer.Location.Clone(), graphCache, lastNodeDetail, false) ?? lastNodeDetail;
+                                    else lastNodeDetail = AddNavigationNodeAdvanced.LinkLast(EntityManager.LocalPlayer.Location.Clone(), graphCache, null, false) ?? lastNodeDetail;
                                 }
                                 else
                                 {
                                     // Строим комплексный (многосвязный путь)
                                     if (ForceLinkLastWaypoint)
-                                        lastNodeDetail = AddNavigationNodeStatic.LinkComplex(EntityManager.LocalPlayer.Location.Clone(), graphCache, lastNodeDetail, false) ?? lastNodeDetail;
-                                    else lastNodeDetail = AddNavigationNodeStatic.LinkComplex(EntityManager.LocalPlayer.Location.Clone(), graphCache, null, false) ?? lastNodeDetail;
+                                        lastNodeDetail = AddNavigationNodeAdvanced.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), graphCache, lastNodeDetail, false) ?? lastNodeDetail;
+                                    else lastNodeDetail = AddNavigationNodeAdvanced.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), graphCache, null, false) ?? lastNodeDetail;
                                 }
                                 break;
                             case MappingType.Unidirectional:
                                 {
-                                    lastNodeDetail = AddNavigationNodeStatic.LinkLast(EntityManager.LocalPlayer.Location.Clone(), graphCache, lastNodeDetail, true) ?? lastNodeDetail;
+                                    lastNodeDetail = AddNavigationNodeAdvanced.LinkLast(EntityManager.LocalPlayer.Location.Clone(), graphCache, lastNodeDetail, true) ?? lastNodeDetail;
                                 }
                                 break;
                         }
+                        graphCache.LastAddedNode = lastNodeDetail?.Node;
                     }
                     Thread.Sleep(100);
                 }
@@ -390,8 +384,8 @@ namespace EntityTools.Patches.Mapper
                     // Инициировано прерывание 
                     // Связываем текущее местоположение с графом
                     if (LinearPath)
-                        AddNavigationNodeStatic.LinkNearest(EntityManager.LocalPlayer.Location.Clone(), graphCache, lastNodeDetail, MappingType == MappingType.Unidirectional);
-                    else AddNavigationNodeStatic.LinkComplex(EntityManager.LocalPlayer.Location.Clone(), graphCache, lastNodeDetail, MappingType == MappingType.Unidirectional);
+                        AddNavigationNodeAdvanced.LinkNearest1(EntityManager.LocalPlayer.Location.Clone(), graphCache, lastNodeDetail, MappingType == MappingType.Unidirectional);
+                    else AddNavigationNodeAdvanced.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), graphCache, lastNodeDetail, MappingType == MappingType.Unidirectional);
                     lastNodeDetail = null;
                     //token.ThrowIfCancellationRequested();
                 }
@@ -400,7 +394,9 @@ namespace EntityTools.Patches.Mapper
             {
 #if PROFILING && DEBUG
                 AddNavigationNodeStatic.LogWatch();
-                Logger.WriteLine(Logger.LogType.Debug, $"MapperExtWithCache:: Graph Nodes: {Meshes.Value.Nodes.Count}");
+#endif
+#if LOG && DEBUG
+                Logger.WriteLine(Logger.LogType.Debug, $"MapperExtWithCache:: Graph Nodes: {graphCache.FullGraph.Nodes.Count}");
 #endif
                 Logger.WriteLine(ex.ToString());
             }
@@ -415,17 +411,18 @@ namespace EntityTools.Patches.Mapper
         /// <param name="e"></param>
         private void eventImportNodesFromGame(object sender, ItemClickEventArgs e)
         {
-            if (((Graph)CoreCurrentMapMeshe)?.Nodes.Count == 0 
+            if (((Graph)CoreCurrentMapMeshes)?.Nodes.Count == 0 
                 || XtraMessageBox.Show(this, "Are you sure to import game nodes ? All actual nodes must be delete !", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 eventStopMapping();
                 MapperStopDrawing?.Invoke(mapper);
-                string locker = "eventImportNodesFromGame";
-                lock(locker)
+                //string locker = "eventImportNodesFromGame";
+                Graph graph = (Graph)CoreCurrentMapMeshes;
+                lock (graph)
                 {
-                    ((Graph)CoreCurrentMapMeshe).Clear();
-                    Astral.Logic.NW.GoldenPath.GetCurrentMapGraph(CoreCurrentMapMeshe);
-                    graphCache.RegenCache(null);
+                    graph.Clear();
+                    Astral.Logic.NW.GoldenPath.GetCurrentMapGraph(graph);
+                    //graphCache?.RegenCache(null);
                 }
                 MapperStartDrawing?.Invoke(mapper);
             }
@@ -496,14 +493,15 @@ namespace EntityTools.Patches.Mapper
                 {
                     if (profileMeshes.ContainsKey(mapName))
                     {
-                        if (((AStar.Graph)CoreCurrentMapMeshe).Nodes.Count == 0 || Class81.smethod_0("Are you sure, that will delete current map nodes ?", null))
+                        if (((AStar.Graph)CoreCurrentMapMeshes).Nodes.Count == 0 || Class81.smethod_0("Are you sure, that will delete current map nodes ?", null))
                         {
+                            eventStopMapping();
                             MapperStopDrawing?.Invoke(mapper);
-                            string locker = "eventImportNodesFromFile";
-                            lock (locker)
+                            //string locker = "eventImportNodesFromFile";
+                            var coreMeshes = CoreMapsMeshes.Value;
+                            lock (coreMeshes)
                             {
-                                CoreMapsMeshes.Value[mapName] = profileMeshes[mapName];
-                                graphCache.RegenCache();
+                                coreMeshes[mapName] = profileMeshes[mapName];
                             }
                             MapperStartDrawing?.Invoke(mapper);
                         }
@@ -514,15 +512,15 @@ namespace EntityTools.Patches.Mapper
                     }
                 }
                 if (dialogResult == DialogResult.No
-                    && ((((AStar.Graph)CoreCurrentMapMeshe).Nodes.Count == 0 && CoreMapsMeshes.Value.Count <= 1)
+                    && ((((AStar.Graph)CoreCurrentMapMeshes).Nodes.Count == 0 && CoreMapsMeshes.Value.Count <= 1)
                     || Class81.smethod_0("Are you sure, that will delete all maps nodes ?", null)))
                 {
+                    eventStopMapping();
                     MapperStopDrawing?.Invoke(mapper);
-                    string locker = "eventImportNodesFromFile";
+                    object locker = new object();//"eventImportNodesFromFile";
                     lock (locker)
                     {
                         CoreMapsMeshes.Value = profileMeshes;
-                        graphCache.RegenCache();
                     }
                     MapperStartDrawing?.Invoke(mapper);
                 }
@@ -537,10 +535,11 @@ namespace EntityTools.Patches.Mapper
         private void eventExportNodes2Mesh(object sender, ItemClickEventArgs e)
         {
             // Код перенесен из Astral'a
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.InitialDirectory = Directories.ProfilesPath;
-            saveFileDialog.DefaultExt = "amp.zip";
-            saveFileDialog.Filter = "Astral mesh file (*.mesh.zip)|*.mesh.zip";
+            SaveFileDialog saveFileDialog = new SaveFileDialog {
+                InitialDirectory = Directories.ProfilesPath,
+                DefaultExt = "amp.zip",
+                Filter = "Astral mesh file (*.mesh.zip)|*.mesh.zip"
+            };
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 //Astral.Quester.Core.LoadAllMeshes();
@@ -566,12 +565,13 @@ namespace EntityTools.Patches.Mapper
             if (XtraMessageBox.Show(this, "Are you sure to delete all map nodes ?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 eventStopMapping();
-                Graph g = ((Graph)CoreCurrentMapMeshe);
-                lock (g)
+                MapperStopDrawing?.Invoke(mapper);
+                Graph graph = CoreCurrentMapMeshes;
+                lock (graph)
                 {
-                    g.Clear();
+                    graph.Clear();
                 }
-                graphCache.RegenCache(null);
+                MapperStartDrawing?.Invoke(mapper);
             }
         }
         #endregion
@@ -587,53 +587,6 @@ namespace EntityTools.Patches.Mapper
             toolbarCustomRegion.FloatLocation = new Point(Location.X + 40, Location.Y + 60);
             toolbarCustomRegion.Visible = true;
             CustomRegionHelper.BeginAdd(mapper, false);
-            /*newRegion = new CustomRegion();
-            XtraMessageBox.Show("Right click on map to create the region.\n" +
-                "You should start by the left/top of desired area.\n" +
-                "Right click again to finish the creation.");
-
-            mapper.OnClick = delegate (MouseEventArgs me, GraphicsNW g)
-            {
-                if (me.Button == MouseButtons.Right)
-                {
-                    if (!newRegion.Position.IsValid)
-                    {
-                        Vector3 worldPos = g.getWorldPos(me.Location);
-                        newRegion.Position = new Vector3((float)((int)worldPos.X), (float)((int)worldPos.Y), 0f);
-                        return;
-                    }
-                    Vector3 worldPos2 = g.getWorldPos(me.Location);
-                    worldPos2.X = (float)((int)worldPos2.X);
-                    worldPos2.Y = (float)((int)worldPos2.Y);
-                    newRegion.Width = Convert.ToInt32(worldPos2.X - newRegion.Position.X);
-                    newRegion.Height = Convert.ToInt32(worldPos2.Y - newRegion.Position.Y);
-                    newRegion.Name = InputBox.GetValue("Set region name");
-                    if (newRegion.Name.Length > 0)
-                    {
-                        Astral.Quester.API.CurrentProfile.CustomRegions.Add(newRegion);
-                        CustomRegionHelper.RefreshQuesterEditorForm();
-                    }
-                    mapper.OnClick = null;
-                    mapper.CustomDraw = null;
-                }
-            };
-            mapper.CustomDraw = delegate (GraphicsNW g)
-            {
-                if (newRegion.Position.IsValid)
-                {
-                    Vector3 worldPos = g.getWorldPos(mapper.RelativeMousePosition);
-                    worldPos.X = (float)((int)worldPos.X);
-                    worldPos.Y = (float)((int)worldPos.Y);
-                    int num = newRegion.Width;
-                    int num2 = newRegion.Height;
-                    if (num == 0)
-                    {
-                        num = Convert.ToInt32(worldPos.X - newRegion.Position.X);
-                        num2 = Convert.ToInt32(worldPos.Y - newRegion.Position.Y);
-                    }
-                    g.drawRectangle(newRegion.Position, new Vector3((float)num, (float)num2, 0f), Pens.Green);
-                }
-            };*/
         }
 
         /// <summary>
@@ -681,513 +634,14 @@ namespace EntityTools.Patches.Mapper
             toolbarCustomRegion.Visible = false;
         }
         #endregion
-    }
 
-    /// <summary>
-    /// Помощник для добавления CustomRegion
-    /// </summary>
-    internal static class CustomRegionHelper
-    {
-        public static CustomRegion Clone(this CustomRegion @this)
+        private void eventDeleteRadiusChanged(object sender, EventArgs e)
         {
-            if (@this != null)
-                return new CustomRegion()
-                {
-                    Position = @this.Position.Clone(),
-                    Height = @this.Height,
-                    Width = @this.Width,
-                    Eliptic = @this.Eliptic,
-                    Name = @this.Name
-                };
-            return null;
+            Astral.API.CurrentSettings.DeleteNodeRadius = Convert.ToInt32(menuDeleteRadius.EditValue);
         }
-
-        /// <summary>
-        /// Режим перетаскивания якорей CustomRegion'a
-        /// </summary>
-        public enum DragMode
+        private void eventWaypointDistanceChanged(object sender, EventArgs e)
         {
-            None, // перетаскивание якорей разрешено, но не производится
-            TopLeft,
-            TopCenter,
-            TopRight,
-            Left,
-            Center,
-            Right,
-            DownLeft,
-            DownCenter,
-            DownRight,
-            Disabled // перетаскивание якорей запрещено
-        }
-
-        private static Vector3 startPoint = null;
-        private static Vector3 endPoint = null;
-        private static bool isElliptical = false;
-        private static Astral.Forms.UserControls.Mapper mapper;
-        
-        private static CustomRegion customRegion = null;
-
-        internal static CustomRegion GetCustomRegion()
-        {
-            if (customRegion != null
-                && customRegion.Position.IsValid
-                && customRegion.Height != 0
-                && customRegion.Width != 0)
-                return customRegion;
-            else
-            {
-                if (startPoint != null && startPoint.IsValid
-                    && endPoint != null && endPoint.IsValid)
-                {
-                    Vector3 topLeft = new Vector3(Math.Min(startPoint.X, endPoint.X), Math.Max(startPoint.Y, endPoint.Y), 0f);
-                    Vector3 downRight = new Vector3(Math.Max(startPoint.X, endPoint.X), Math.Min(startPoint.Y, endPoint.Y), 0f);
-                    return customRegion = new CustomRegion()
-                    {
-                        Position = topLeft,
-                        Eliptic = isElliptical,
-                        Height = (int)(downRight.Y - topLeft.Y),
-                        Width = (int)(downRight.X - topLeft.X),
-                        Name = string.Empty
-                    };
-                }
-            }
-            return null;
-        }
-
-        private static DragMode dragMode = DragMode.Disabled;
-        private static Vector3 anchorPoint = null;
-        private static readonly float anchorSize = 4;
-
-        #region Reflection
-        /// <summary>
-        /// Функтор доступа к экземпляру Квестер-редактора
-        /// Astral.Quester.Forms.Main.editorForm
-        /// </summary>
-        private static readonly StaticFielsAccessor<QuesterEditorForm> QuesterEditor = typeof(QuesterMainForm).GetStaticField<QuesterEditorForm>("editorForm");
-
-        /// <summary>
-        /// Функтор обновления списка CustomRegion'ов в окне Квестер-редактора
-        /// </summary>
-        private static Func<Object, System.Action> QuesterEditorRefreshRegions = null; 
-        #endregion
-
-        /// <summary>
-        /// Начала процедуры добавления CustomRegion'a
-        /// </summary>
-        /// <param name="m"></param>
-        /// <param name="elliptical"></param>
-        public static void BeginAdd(Astral.Forms.UserControls.Mapper m, bool elliptical = false)
-        {
-            startPoint = null;
-            endPoint = null;
-            anchorPoint = null;
-            customRegion = null;
-            isElliptical = elliptical;
-            dragMode = DragMode.Disabled;
-
-            mapper = m;
-            if (mapper != null && !mapper.IsDisposed)
-            {
-                mapper.OnClick += eventMapperClick;
-                mapper.CustomDraw += eventMapperDraw;
-            }
-        }
-
-        internal static bool IsComplete
-        {
-            get
-            {
-                return dragMode == DragMode.None
-                       && ((customRegion != null
-                                && customRegion.Position.IsValid
-                                && customRegion.Height != 0
-                                && customRegion.Width != 0)
-                            || (startPoint != null && endPoint != null
-                                && startPoint.IsValid
-                                && startPoint != endPoint));
-            }
-        }
-
-        private static void eventMapperClick(MouseEventArgs me, GraphicsNW g)
-        {
-            if (me.Button == MouseButtons.Right)
-            {
-                Vector3 worldPos = g.getWorldPos(me.Location);
-                if (startPoint == null)
-                {
-                    startPoint = new Vector3((float)Math.Round(worldPos.X), (float)Math.Round(worldPos.Y), 0f);
-                    return;
-                }
-                if(endPoint == null)
-                {
-                    endPoint = new Vector3((float)Math.Round(worldPos.X), (float)Math.Round(worldPos.Y), 0f);
-                    dragMode = DragMode.None;
-                }
-
-                if (customRegion == null
-                    || !customRegion.Position.IsValid)
-                {
-                    Vector3 topLeft = new Vector3(Math.Min(startPoint.X, endPoint.X), Math.Max(startPoint.Y, endPoint.Y), 0f);
-                    Vector3 downRight = new Vector3(Math.Max(startPoint.X, endPoint.X), Math.Min(startPoint.Y, endPoint.Y), 0f);
-                    customRegion = new CustomRegion()
-                    {
-                        Position = topLeft,
-                        Eliptic = isElliptical,
-                        Height = (int)(downRight.Y - topLeft.Y),
-                        Width = (int)(downRight.X - topLeft.X),
-                    };
-                    dragMode = DragMode.None;
-                    return;
-                }
-
-                if (dragMode != DragMode.Disabled)
-                {
-                    if(anchorPoint == null)
-                        // вычисление якоря
-                        SelectAnchor(customRegion, worldPos, out anchorPoint, out dragMode);
-                    else
-                    {
-                        // вычисление изменений/смещений региона
-                        CustomRegion cr = TransformCustomRegion(customRegion, anchorPoint, worldPos, dragMode);
-                        if(cr != null)
-                        {
-                            customRegion = cr;
-                            dragMode = DragMode.None;
-                            anchorPoint = null;
-                        }
-                    }
-                }
-            }
-        }
-
-        private static bool SelectAnchor(CustomRegion cr, Vector3 pos, out Vector3 anchor, out DragMode mode)
-        {
-            if (cr != null
-                && cr.Position.IsValid)
-            {
-                Vector3 topLeft = cr.Position.Clone();
-                // TopLeft
-                if (CheckAnchorSelection(topLeft, pos))
-                {
-                    anchor = topLeft;
-                    mode = DragMode.TopLeft;
-                    return true;
-                }
-
-                // TopCenter
-                Vector3 topCenter = new Vector3(topLeft.X + (float)cr.Width / 2f, topLeft.Y, 0f);
-                if (CheckAnchorSelection(topCenter, pos))
-                {
-                    anchor = topCenter;
-                    mode = DragMode.TopCenter;
-                    return true;
-                }
-
-                // TopRight
-                Vector3 topRight = new Vector3(topLeft.X + (float)cr.Width, topLeft.Y, 0f);
-                if (CheckAnchorSelection(topRight, pos))
-                {
-                    anchor = topRight;
-                    mode = DragMode.TopRight;
-                    return true;
-                }
-
-                // Left
-                Vector3 left = new Vector3(topLeft.X, topLeft.Y + (float)cr.Height / 2f, 0f);
-                if (CheckAnchorSelection(left, pos))
-                {
-                    anchor = left;
-                    mode = DragMode.Left;
-                    return true;
-                }
-
-                // Center
-                Vector3 center = new Vector3(topLeft.X + (float)cr.Width / 2f, topLeft.Y + (float)cr.Height / 2f, 0f);
-                if (CheckAnchorSelection(center, pos))
-                {
-                    anchor = center;
-                    mode = DragMode.Center;
-                    return true;
-                }
-
-                // Right
-                Vector3 right = new Vector3(topLeft.X + (float)cr.Width, topLeft.Y + (float)cr.Height / 2f, 0f);
-                if (CheckAnchorSelection(right, pos))
-                {
-                    anchor = right;
-                    mode = DragMode.Right;
-                    return true;
-                }
-
-                // DownLeft
-                Vector3 downLeft = new Vector3(topLeft.X, topLeft.Y + (float)cr.Height, 0f);
-                if (CheckAnchorSelection(downLeft, pos))
-                {
-                    anchor = downLeft;
-                    mode = DragMode.DownLeft;
-                    return true;
-                }
-
-                // DownCenter
-                Vector3 downCenter = new Vector3(topLeft.X + (float)cr.Width / 2f, topLeft.Y + (float)cr.Height, 0f);
-                if (CheckAnchorSelection(downCenter, pos))
-                {
-                    anchor = downCenter;
-                    mode = DragMode.DownCenter;
-                    return true;
-                }
-
-                // DownRight
-                Vector3 downRight = new Vector3(cr.Position.X + (float)cr.Width,
-                                                cr.Position.Y + (float)cr.Height, 0f);
-                if (CheckAnchorSelection(downRight, pos))
-                {
-                    anchor = downRight;
-                    mode = DragMode.DownRight;
-                    return true;
-                }
-            }
-            anchor = null;
-            mode = DragMode.None;
-            return false;
-        }
-
-        private static bool CheckAnchorSelection(Vector3 anchor, Vector3 pos)
-        {
-            float dx = anchor.X - pos.X;
-            float dy = anchor.Y - pos.Y;
-            return Math.Sign(dx) * dx <= anchorSize
-                && Math.Sign(dy) * dy <= anchorSize;
-        }
-
-        public static CustomRegion TransformCustomRegion(CustomRegion cr, Vector3 anchorPoint, Vector3 worldPos, DragMode mode)
-        {
-            if (cr != null
-                && cr.Position.IsValid)
-            {
-                int dx = (int)Math.Round(worldPos.X - anchorPoint.X);
-                int dy = (int)Math.Round(worldPos.Y - anchorPoint.Y);
-
-                switch (mode)
-                {
-                    case DragMode.TopLeft:
-                        cr.Position.X += dx;
-                        cr.Position.Y += dy;
-                        cr.Width -= dx;
-                        cr.Height -= dy;
-                        return cr;
-                    case DragMode.TopCenter:
-                        cr.Position.Y += dy;
-                        cr.Height -= dy;
-                        return cr;
-                    case DragMode.TopRight:
-                        cr.Position.Y += dy;
-                        cr.Width += dx;
-                        cr.Height -= dy;
-                        return cr;
-                    case DragMode.Left:
-                        cr.Position.X += dx;
-                        cr.Width -= dx;
-                        return cr;
-                    case DragMode.Center:
-                        cr.Position.X += dx;
-                        cr.Position.Y += dy;
-                        return cr;
-                    case DragMode.Right:
-                        cr.Width += dx;
-                        return cr;
-                    case DragMode.DownLeft:
-                        cr.Position.X += dx;
-                        cr.Width -= dx;
-                        cr.Height += dy;
-                        return cr;
-                    case DragMode.DownCenter:
-                        cr.Height += dy;
-                        return cr;
-                    case DragMode.DownRight:
-                        cr.Width += dx;
-                        cr.Height += dy;
-                        return cr;
-                }
-            }
-            return null;
-        }
-
-        private static void eventMapperDraw(GraphicsNW g)
-        {
-            Vector3 topLeft, top, topRight, left, center, right, downLeft, down, downRight;
-            float width, height;
-            
-            if (customRegion == null)
-            {
-                if (startPoint != null)
-                {
-                    if (endPoint != null)
-                    {
-                        topLeft = new Vector3(Math.Min(startPoint.X, endPoint.X),
-                                              Math.Max(startPoint.Y, endPoint.Y), 0f);
-                        downRight = new Vector3(Math.Max(startPoint.X, endPoint.X),
-                                                Math.Min(startPoint.Y, endPoint.Y), 0f);
-
-                        height = (float)Math.Round(downRight.Y - topLeft.Y); // Math.Max(startPoint.Y, endPoint.Y) - Math.Min(startPoint.Y, endPoint.Y)
-                        width = (float)Math.Round(downRight.X - topLeft.X);  // Math.Max(startPoint.X, endPoint.X) - Math.Min(startPoint.X, endPoint.X)
-
-                        customRegion = new CustomRegion()
-                        {
-                            Position = topLeft.Clone(),
-                            Height = (int)height,
-                            Width = (int)width,
-                            Eliptic = isElliptical
-                        };
-                    }
-                    else
-                    {
-                        Vector3 worldPos = g.getWorldPos(mapper.RelativeMousePosition);
-                        topLeft = new Vector3((float)Math.Round(Math.Min(startPoint.X, worldPos.X)),
-                                              (float)Math.Round(Math.Max(startPoint.Y, worldPos.Y)), 0f);
-                        downRight = new Vector3((float)Math.Round(Math.Max(startPoint.X, worldPos.X)),
-                                                (float)Math.Round(Math.Min(startPoint.Y, worldPos.Y)), 0f);//*/
-
-                        height = (float)Math.Round(downRight.Y - topLeft.Y); // Math.Max(startPoint.Y, endPoint.Y) - Math.Min(startPoint.Y, endPoint.Y)
-                        width = (float)Math.Round(downRight.X - topLeft.X);  // Math.Max(startPoint.X, endPoint.X) - Math.Min(startPoint.X, endPoint.X)
-                    }
-                }
-                else return;
-            }
-            else
-            {
-                CustomRegion cr;
-                if (dragMode == DragMode.None)
-                    cr = customRegion;
-                else
-                    cr = TransformCustomRegion(customRegion.Clone(), anchorPoint, g.getWorldPos(mapper.RelativeMousePosition), dragMode);
-
-                if (cr == null)
-                    return;
-
-                topLeft = cr.Position;
-                downRight = new Vector3(cr.Position.X + cr.Width,
-                                        cr.Position.Y + cr.Height, 0);
-
-                height = cr.Height; // Math.Max(startPoint.Y, endPoint.Y) - Math.Min(startPoint.Y, endPoint.Y)
-                width = cr.Width;  // Math.Max(startPoint.X, endPoint.X) - Math.Min(startPoint.X, endPoint.X)
-            }
-            Pen penRect = (isElliptical) ? Pens.DarkOliveGreen : Pens.LimeGreen;
-            Pen penCR = Pens.LimeGreen;
-            Brush brushRect = (isElliptical) ? Brushes.DarkOliveGreen : Brushes.LimeGreen;
-            Brush brushCR = Brushes.LimeGreen;
-
-            // Отрисовака опорного прямоугольника якоря topLeft
-            g.drawRectangle(topLeft, new Vector3(width, height, 0), penRect);
-            top = new Vector3(topLeft.X + width / 2, topLeft.Y, 0f);
-            down = new Vector3(topLeft.X + width / 2, topLeft.Y + height, 0f);//*/
-            g.drawLine(top, down, penRect);
-            right = new Vector3(topLeft.X + width, topLeft.Y + height / 2, 0f);
-            left = new Vector3(topLeft.X, topLeft.Y + height / 2, 0f);
-            g.drawLine(left, right, penRect);
-            DrawAnchor(g, topLeft, brushRect);
-            DrawAnchor(g, downRight, brushRect);
-            topRight = new Vector3(topLeft.X+ width, topLeft.Y, 0f);
-            DrawAnchor(g, topRight, brushRect);
-            downLeft = new Vector3(topLeft.X, topLeft.Y + height, 0f);
-            DrawAnchor(g, downLeft, brushRect);
-            center = new Vector3(topLeft.X + width / 2, topLeft.Y + height / 2, 0f);
-            DrawAnchor(g, center, brushRect);
-
-            // Отрисовка Эллипса
-            if(isElliptical)
-                g.drawComplexeEllipse(topLeft, new Vector3(width, height, 0), penCR);
-
-            // Отрисовака якоря top
-            DrawAnchor(g, top, brushCR);
-            // Отрисовака якоря left
-            DrawAnchor(g, left, brushCR);
-            // Отрисовака якоря right
-            DrawAnchor(g, right, brushCR);
-            // Отрисовака якоря down
-            DrawAnchor(g, down, brushCR);
-        }
-
-        public static void DrawAnchor(GraphicsNW g, Vector3 anchor, Brush brush = null)
-        {
-            if (brush == null)
-                brush = Brushes.Green;
-            g.drawFillPolygon(new List<Vector3>() { new Vector3(anchor.X - anchorSize, anchor.Y - anchorSize, 0),
-                                                    new Vector3(anchor.X + anchorSize, anchor.Y - anchorSize, 0),
-                                                    new Vector3(anchor.X + anchorSize, anchor.Y + anchorSize, 0),
-                                                    new Vector3(anchor.X - anchorSize, anchor.Y + anchorSize, 0),
-                                                  }, brush);
-        }
-
-        internal static void RefreshQuesterEditorForm()
-        {
-            if (QuesterEditor.Value is QuesterEditorForm editor
-                && editor?.IsDisposed == false)
-            {
-                if (QuesterEditorRefreshRegions == null)
-                {
-                    if ((QuesterEditorRefreshRegions = typeof(QuesterEditorForm).GetAction("RefreshRegions")) != null)
-                        QuesterEditorRefreshRegions(editor)();
-                }
-                else QuesterEditorRefreshRegions(editor)();
-            }
-        }
-
-        /// <summary>
-        /// Завершение процедуры добавления CustomRegion'a
-        /// </summary>
-        internal static bool Finish(string crName)
-        {
-            if (dragMode == DragMode.None)
-            {
-                CustomRegion cr = GetCustomRegion();
-                if (cr != null
-                    && !string.IsNullOrEmpty(crName))
-                {
-                    if (customRegion == null
-                        || !customRegion.Position.IsValid)
-                    {
-                        Vector3 topLeft = new Vector3(Math.Min(startPoint.X, endPoint.X), Math.Max(startPoint.Y, endPoint.Y), 0f);
-                        Vector3 downRight = new Vector3(Math.Max(startPoint.X, endPoint.X), Math.Min(startPoint.Y, endPoint.Y), 0f);
-                        customRegion = new CustomRegion()
-                        {
-                            Position = topLeft,
-                            Eliptic = isElliptical,
-                            Height = (int)(downRight.Y - topLeft.Y),
-                            Width = (int)(downRight.X - topLeft.X),
-                            Name = crName
-                        };
-
-                    }
-                    else customRegion.Name = crName;
-
-                    Astral.Quester.API.CurrentProfile.CustomRegions.Add(customRegion);
-                    RefreshQuesterEditorForm();
-                    Reset();
-
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Сброс всех сохраненных значений
-        /// </summary>
-        internal static void Reset()
-        {
-            startPoint = null;
-            endPoint = null;
-            anchorPoint = null;
-            customRegion = null;
-            dragMode = DragMode.Disabled;
-
-            if (mapper != null && !mapper.IsDisposed)
-            {
-                mapper.OnClick -= eventMapperClick;
-                mapper.CustomDraw -= eventMapperDraw;
-                mapper = null;
-            }
+            EntityTools.PluginSettings.Mapper.WaypointDistance = Convert.ToInt32(menuWaypointDistance.EditValue);
         }
     }
 }

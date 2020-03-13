@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace EntityTools.Forms
+namespace EntityTools.Editors.Forms
 {
     public partial class EntitySelectForm : XtraForm //*/ Form
     {

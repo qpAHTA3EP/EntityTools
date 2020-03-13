@@ -253,7 +253,6 @@ namespace EntityTools.Editors.Forms
         private Thread thread_0;
         private Entity entity_0 = new Entity(IntPtr.Zero);
         private bool bool_0;
-        private IContainer icontainer_0;
         private LabelControl lblEntitySelector;
         private SimpleButton btnTarget;
         private LabelControl unitRefName;

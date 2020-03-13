@@ -8,10 +8,10 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Mount_Tutorial")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("MichaelProg")]
 [assembly: AssemblyProduct("Mount_Tutorial")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCopyright("MichaelProg ©  2019")]
+[assembly: AssemblyTrademark("MichaelProg ©  2019")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.20.0212.1557")]
-[assembly: AssemblyFileVersion("1.20.0212.1557")]
+[assembly: AssemblyVersion("0.20.0312.2006")]
+[assembly: AssemblyFileVersion("0.20.0312.2006")]

@@ -1,23 +1,21 @@
 ﻿using Astral.Forms;
-using Astral.Logic.UCC;
 using Astral.Logic.UCC.Forms;
-using EntityTools.Actions;
 using EntityTools.Patches;
 using EntityTools.Tools;
-using EntityTools.Tools.Entities;
-using MyNW.Internals;
 using System;
 using System.IO;
-using System.Text;
-using System.Threading;
 using System.Windows.Forms;
-using System.Xml;
 using System.Xml.Serialization;
+using System.Reflection;
+using EntityTools.Core;
+using EntityTools.Core.Interfaces;
 
 namespace EntityTools
 {
     public class EntityTools : Astral.Addons.Plugin
     {
+        public static IEntityToolsCore Core { get; }
+
         public override string Name => "Entity Tools";
         public override string Author => "MichaelProg";
         public override System.Drawing.Image Icon => Properties.Resources.EntityIcon;
@@ -36,8 +34,7 @@ namespace EntityTools
 
         public override void OnBotStart()
         {
-            if(EntityTools.PluginSettings.UnstuckSpells.Active)
-                Astral.Logic.UCC.API.AfterCallCombat += Services.UnstuckSpells.ArterCallCombat;
+            Services.UnstuckSpells.Active = EntityTools.PluginSettings.UnstuckSpells.Active;
 
 #if PROFILING && DEBUG
             InteractEntities.ResetWatch();
@@ -67,9 +64,27 @@ namespace EntityTools
 
         public override void OnLoad()
         {
+            Assembly.Load(Properties.Resources.EntityCore);
             LoadSettings();
+            //if (!File.Exists(@".\Logs\Assemplies.log"))
+            //    File.Create(@".\Logs\Assemplies.log");
 
-            Patcher.Apply();
+            using (StreamWriter file = new StreamWriter(@".\Logs\Assemblies.log", false))
+            {
+                foreach(Assembly a in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    file.WriteLine("=================================================================");
+                    file.WriteLine(a.FullName);
+                    file.WriteLine("-----------------------------------------------------------------");
+                    foreach(Type t in a.GetTypes())
+                    {
+                        file.Write('\t');
+                        file.WriteLine(t.FullName);
+                    }
+                }
+            }
+
+            //Patcher.Apply();
         }
 
         public override void OnUnload()

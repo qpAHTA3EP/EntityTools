@@ -1,6 +1,7 @@
 ﻿using Astral;
 using Astral.Classes;
 using Astral.Classes.ItemFilter;
+using EntityCore.Enums;
 using EntityTools.Enums;
 using MyNW.Classes;
 using MyNW.Internals;
@@ -9,9 +10,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
-namespace EntityTools.Tools.Entities
+namespace EntityCore.Entities
 {
-    public static class SearchDirect
+    internal static class SearchDirect
     {
 #if DEBUG && PROFILING
         private static Stopwatch stopwatch = new Stopwatch();
@@ -26,7 +27,7 @@ namespace EntityTools.Tools.Entities
         private static TimeSpan ContactMinTime = TimeSpan.MaxValue;
         private static TimeSpan ContactMaxTime = TimeSpan.MinValue;
 
-        public static void ResetWatch()
+        internal static void ResetWatch()
         {
             ContactCount = 0;
             Count = 0;
@@ -41,7 +42,7 @@ namespace EntityTools.Tools.Entities
             Logger.WriteLine(Logger.LogType.Debug, $"UncachedSearch::ResetWatch()");
         }
 
-        public static void LogWatch()
+        internal static void LogWatch()
         {
             if (Count > 0)
             {
@@ -76,7 +77,7 @@ namespace EntityTools.Tools.Entities
         /// <param name="nameType"></param>
         /// <param name="action">Функтор действия, которое нужно выполнить над Entity, удовлетворяющем условиям</param>
         /// <returns></returns>
-        public static LinkedList<Entity> GetEntities(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, Action<Entity> action = null)
+        internal static LinkedList<Entity> GetEntities(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, Action<Entity> action = null)
         {
 #if DEBUG && PROFILING
             Count++;
@@ -141,7 +142,7 @@ namespace EntityTools.Tools.Entities
         /// <param name="key"></param>
         /// <param name="action">Функтор действия, которое нужно выполнить над Entity, удовлетворяющем условиям</param>
         /// <returns></returns>
-        public static LinkedList<Entity> GetEntities(CacheRecordKey key, Action<Entity> action = null)
+        internal static LinkedList<Entity> GetEntities(CacheRecordKey key, Action<Entity> action = null)
         {
             if (key == null)
                 return null;
@@ -207,7 +208,7 @@ namespace EntityTools.Tools.Entities
         /// <param name="nameType">Идентификатор (имя) Entity, с которым сопостовляется entPattern</param>
         /// <param name="action">Функтор действия, которое нужно выполнить над Entity, удовлетворяющем условиям</param>
         /// <returns></returns>
-        public static LinkedList<Entity> GetContactEntities(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, Action<Entity> action = null)
+        internal static LinkedList<Entity> GetContactEntities(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, Action<Entity> action = null)
         {
 #if DEBUG && PROFILING
             ContactCount++;
@@ -275,7 +276,7 @@ namespace EntityTools.Tools.Entities
         /// <param name="key"></param>
         /// <param name="action">Функтор действия, которое нужно выполнить над Entity, удовлетворяющем условиям</param>
         /// <returns></returns>
-        public static LinkedList<Entity> GetContactEntities(CacheRecordKey key, Action<Entity> action = null)
+        internal static LinkedList<Entity> GetContactEntities(CacheRecordKey key, Action<Entity> action = null)
         {
             if (key == null)
                 return null;

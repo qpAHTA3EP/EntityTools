@@ -1,4 +1,4 @@
-﻿namespace EntityTools.Forms
+﻿namespace EntityTools.Editors.Forms
 {
     partial class MountBonusPriorityListForm
     {

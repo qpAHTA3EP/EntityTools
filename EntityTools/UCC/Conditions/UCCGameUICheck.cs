@@ -2,6 +2,8 @@
 using Astral.Logic.UCC.Classes;
 using Astral.Logic.UCC.Ressources;
 using Astral.Quester.Classes;
+using EntityTools;
+using EntityTools.Extentions;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Tools;
@@ -59,7 +61,7 @@ namespace EntityTools.UCC.Conditions
 
 
         #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction = null)
+        bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
         {
             if (!Validate(uiGen) && !string.IsNullOrEmpty(uiGenID))
             {

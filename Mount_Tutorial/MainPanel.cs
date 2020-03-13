@@ -11,6 +11,8 @@ namespace Mount_Tutorial
 {
     public partial class MainPanel : /* UserControl //*/ Astral.Forms.BasePanel
     {
+        private static readonly string Buyer = "GoldenTide";
+
         public MainPanel() : base("MountTutorial")
         {
             InitializeComponent();

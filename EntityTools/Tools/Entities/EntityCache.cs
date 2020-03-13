@@ -1,6 +1,7 @@
 ﻿using Astral;
 using Astral.Classes;
 using Astral.Classes.ItemFilter;
+using EntityCore.Enums;
 using EntityTools.Enums;
 using MyNW.Classes;
 using MyNW.Internals;
@@ -9,15 +10,15 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
-namespace EntityTools.Tools.Entities
+namespace EntityCore.Entities
 {
-    public class CacheRecordKey
+    internal class CacheRecordKey
     {
-        public CacheRecordKey()
+        internal CacheRecordKey()
         {
             Comparer = new EntityComparerToPattern(Pattern, MatchType, NameType);
         }
-        public CacheRecordKey(string p, ItemFilterStringType mp = ItemFilterStringType.Simple, EntityNameType nt = EntityNameType.NameUntranslated, EntitySetType est = EntitySetType.Complete)
+        internal CacheRecordKey(string p, ItemFilterStringType mp = ItemFilterStringType.Simple, EntityNameType nt = EntityNameType.NameUntranslated, EntitySetType est = EntitySetType.Complete)
         {
             Pattern = p;
             MatchType = mp;
@@ -27,11 +28,11 @@ namespace EntityTools.Tools.Entities
         }
 
 
-        public readonly string Pattern = string.Empty;
-        public readonly ItemFilterStringType MatchType = ItemFilterStringType.Simple;
-        public readonly EntityNameType NameType = EntityNameType.NameUntranslated;
-        public readonly EntitySetType EntitySetType = EntitySetType.Complete;
-        public readonly EntityComparerToPattern Comparer = null;
+        internal readonly string Pattern = string.Empty;
+        internal readonly ItemFilterStringType MatchType = ItemFilterStringType.Simple;
+        internal readonly EntityNameType NameType = EntityNameType.NameUntranslated;
+        internal readonly EntitySetType EntitySetType = EntitySetType.Complete;
+        internal readonly EntityComparerToPattern Comparer = null;
 
         public override bool Equals(object otherObj)
         {
@@ -42,7 +43,7 @@ namespace EntityTools.Tools.Entities
             return false;
         }
 
-        public bool Equals(CacheRecordKey other)
+        internal bool Equals(CacheRecordKey other)
         {
             return ReferenceEquals(this, other)
                 || (Pattern == other.Pattern
@@ -60,25 +61,25 @@ namespace EntityTools.Tools.Entities
     /// <summary>
     /// Запись Кэша
     /// </summary>
-    public class EntityCacheRecord
+    internal class EntityCacheRecord
     {
 #if DEBUG && PROFILING
         private static int RegenCount = 0;
         private static int EntitiesCount = 0;
-        public static void ResetWatch()
+        internal static void ResetWatch()
         {
             RegenCount = 0;
             EntitiesCount = 0;
             Logger.WriteLine(Logger.LogType.Debug, $"EntityCacheRecord::ResetWatch()");
         }
 
-        public static void LogWatch()
+        internal static void LogWatch()
         {
             Logger.WriteLine(Logger.LogType.Debug, $"EntityCacheRecord: RegenCount: {RegenCount}");
         }
 #endif
-        public EntityCacheRecord() { }
-        public EntityCacheRecord(string p, ItemFilterStringType mp = ItemFilterStringType.Simple, EntityNameType nt = EntityNameType.NameUntranslated, EntitySetType est = EntitySetType.Complete)
+        internal EntityCacheRecord() { }
+        internal EntityCacheRecord(string p, ItemFilterStringType mp = ItemFilterStringType.Simple, EntityNameType nt = EntityNameType.NameUntranslated, EntitySetType est = EntitySetType.Complete)
         {
             Key = new CacheRecordKey(p, mp, nt, est);
             //if (EntityManager.LocalPlayer.InCombat
@@ -87,12 +88,12 @@ namespace EntityTools.Tools.Entities
             //else Timer = new Timeout(EntityCache.ChacheTime);
         }
 
-        public CacheRecordKey Key { get; }
+        internal CacheRecordKey Key { get; }
 
-        public Timeout Timer { get; private set; } = new Timeout(0);
+        internal Timeout Timer { get; private set; } = new Timeout(0);
 
         private LinkedList<Entity> entities = new LinkedList<Entity>();
-        public LinkedList<Entity> Entities
+        internal LinkedList<Entity> Entities
         {
             get
             {
@@ -105,7 +106,7 @@ namespace EntityTools.Tools.Entities
         /// <summary>
         /// Обновление кэша
         /// </summary>
-        public void Regen()
+        internal void Regen()
         {
 #if DEBUG && PROFILING
             RegenCount++;
@@ -126,7 +127,7 @@ namespace EntityTools.Tools.Entities
                     Timer = new Timeout(EntityCache.ChacheTime);
             else Timer = new Timeout(EntityCache.CombatChacheTime);
         }
-        public void Regen(Action<Entity> action)
+        internal void Regen(Action<Entity> action)
         {
 #if DEBUG && PROFILING
             RegenCount++;
@@ -152,7 +153,7 @@ namespace EntityTools.Tools.Entities
         /// Обработка (сканирование) Entities
         /// </summary>
         /// <param name="action"></param>
-        public void Processing(Action<Entity> action)
+        internal void Processing(Action<Entity> action)
         {
             if (Timer.IsTimedOut)
                 Regen(action);
@@ -184,7 +185,7 @@ namespace EntityTools.Tools.Entities
             }
         }
 
-        public bool Equals(EntityCacheRecord other)
+        internal bool Equals(EntityCacheRecord other)
         {
             return ReferenceEquals(this, other) || Key.Equals(other.Key);
         }
@@ -198,13 +199,13 @@ namespace EntityTools.Tools.Entities
     /// <summary>
     /// Колекция кэшированных Entity
     /// </summary>
-    public class EntityCache : KeyedCollection<CacheRecordKey, EntityCacheRecord>
+    internal class EntityCache : KeyedCollection<CacheRecordKey, EntityCacheRecord>
     {
 #if DEBUG && PROFILING
         private static int MatchCount = 0;
         private static int MismatchCount = 0;
 
-        public static void ResetWatch()
+        internal static void ResetWatch()
         {
             MatchCount = 0;
             MismatchCount = 0;
@@ -219,19 +220,19 @@ namespace EntityTools.Tools.Entities
         /// <summary>
         /// Интервал времени между обновлениями кэша
         /// </summary>
-        public static int ChacheTime { get; set; } = 500;
+        internal static int ChacheTime { get; set; } = 500;
 
         /// <summary>
         /// Интервал времени между обновлениями кэша во время боя
         /// </summary>
-        public static int CombatChacheTime { get; set; } = 200;
+        internal static int CombatChacheTime { get; set; } = 200;
 
         protected override CacheRecordKey GetKeyForItem(EntityCacheRecord item)
         {
             return item.Key;
         }
 
-        public bool TryGetValue(out EntityCacheRecord record, string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete)
+        internal bool TryGetValue(out EntityCacheRecord record, string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete)
         {
             record = null;
             CacheRecordKey key = new CacheRecordKey(pattern, matchType, nameType, setType);
@@ -252,14 +253,14 @@ namespace EntityTools.Tools.Entities
             }
         }
 
-        public EntityCacheRecord MakeCache(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete)
+        internal EntityCacheRecord MakeCache(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete)
         {
             EntityCacheRecord record = new EntityCacheRecord(pattern, matchType, nameType, setType);
             base.Add(record);
             return record;
         }
 
-        public bool Contains(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete)
+        internal bool Contains(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete)
         {
             CacheRecordKey key = new CacheRecordKey(pattern, matchType, nameType, setType);
             return base.Contains(key);

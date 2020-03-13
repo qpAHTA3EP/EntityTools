@@ -57,7 +57,7 @@ namespace EntityTools.Tools
                 {
                     string result = str.Replace(MaskAccount, EntityManager.LocalPlayer?.AccountLoginUsername);
                     result = result.Replace(MaskCharacter, EntityManager.LocalPlayer?.Name);
-                    result = result.Replace(MaskDateTime, DateTime.Now.ToString());
+                    result = result.Replace(MaskDateTime, $"{DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day}_{DateTime.Now.Hour}-{DateTime.Now.Minute}-{DateTime.Now.Second}");
                     result = result.Replace(MaskAD, EntityManager.LocalPlayer.Inventory.AstralDiamonds.ToString());
                     result = result.Replace(MaskRAD, EntityManager.LocalPlayer.Inventory.AstralDiamondsRough.ToString());
 

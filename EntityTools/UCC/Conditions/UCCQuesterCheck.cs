@@ -19,7 +19,7 @@ namespace EntityTools.UCC.Conditions
         public Condition Condition { get; set; } = null;
 
         #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction = null)
+        bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
         {
             return Condition?.IsValid == true;
         }

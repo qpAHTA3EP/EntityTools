@@ -12,12 +12,16 @@ using Astral.Logic.UCC.Classes;
 using Astral.Controllers;
 using System.Collections.Generic;
 using EntityTools.Editors.Forms;
+using EntityTools.Reflection;
 
-namespace EntityTools.Forms
+namespace EntityTools.Editors.Forms
 {
     public partial class ConditionListForm : XtraForm //*/Form
     {
         private static UCCCondition conditionCopy;
+        // Индекс элемента списка условий Conditions.Items
+        // в котором допускается изменение состояния "Checked"
+        private int AllowConditionsItemChechedChangeInd = -1;
 
         public ConditionListForm()
         {
@@ -105,21 +109,40 @@ namespace EntityTools.Forms
 
         private void Conditions_SelectedIndexChanged(object sender, EventArgs e)
         {
+            //if(Conditions.SelectedIndex >= 0  && Conditions.SelectedIndex < Conditions.Items.Count )
+            //    Properties.SelectedObject = Conditions.Items[Conditions.SelectedIndex];
             Properties.SelectedObject = Conditions.SelectedItem;
         }
 
         private void Conditions_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            if (Conditions.SelectedItem is UCCCondition condition)
+            // изменение состояния Checked у элемента разрешено, 
+            // если его индекс совпадает с AllowConditionsItemChechedChangeInd
+            if (e.Index != AllowConditionsItemChechedChangeInd
+                || AllowConditionsItemChechedChangeInd < 0)
             {
-                condition.Locked = (e.NewValue == CheckState.Checked);
+                // запрет изменения состояния Чекбокса
+                e.NewValue = e.CurrentValue;
             }
+            AllowConditionsItemChechedChangeInd = -1;
+
+            //if (Conditions.SelectedItem is UCCCondition condition)
+            //{
+
+            //    condition.Locked = (e.NewValue == CheckState.Checked);
+            //}
         }
 
         private void Properties_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
             if (e.ChangedItem.Label == "Locked")
+            {
+                AllowConditionsItemChechedChangeInd = Conditions.SelectedIndex;
+                //Conditions.ItemCheck -= Conditions_ItemCheck;
                 Conditions.SetItemChecked(Conditions.SelectedIndex, e.ChangedItem.Value.Equals(true));
+                //Conditions.ItemCheck += Conditions_ItemCheck;
+            }
+            Conditions.Refresh();
         }
 
         public ConditionList GetConditionList(ConditionList conditions = null)
@@ -131,7 +154,7 @@ namespace EntityTools.Forms
                 foreach (UCCCondition condition in conditions)
                 {
                     int ind = Conditions.Items.Add(CopyHelper.CreateDeepCopy(condition));
-                    Conditions.SetItemChecked(ind, condition.Locked);
+                    //Conditions.SetItemChecked(ind, condition.Locked);
                 }
             }
 
