@@ -75,7 +75,7 @@ namespace EntityTools.Quester.Actions.Deprecated
                     list.Add(entity);
                 }
             }
-            Logger.WriteLine(list.Count + " items");
+            Astral.Logger.WriteLine(list.Count + " items");
             for (; ; )
             {
                 bool flag2 = !base.ConditionsAreOK && base.PlayWhileConditionsAreOk;

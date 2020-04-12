@@ -118,6 +118,7 @@ namespace VariableTools.Classes
             public string Qualifier { get; protected set; } = string.Empty;
 
             [XmlIgnore]
+            [Browsable(false)]
             public bool IsValid
             {
                 get => valid;

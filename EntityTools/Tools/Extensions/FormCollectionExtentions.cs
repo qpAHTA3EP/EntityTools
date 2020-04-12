@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace EntityTools.Extentions
+namespace EntityTools.Extensions
 {
     public static class FormCollectionExtentions
     {

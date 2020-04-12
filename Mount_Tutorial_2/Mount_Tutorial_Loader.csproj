@@ -14,7 +14,7 @@
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <AssemblyVersion>1.20.0312.1651</AssemblyVersion>
+    <AssemblyVersion>0.20.0313.1134</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -58,10 +58,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FileStreamHelper.cs" />
-    <Compile Include="HorseEquipTutorialAction.cs" />
+    <Compile Include="Helpers\FileStreamHelper.cs" />
+    <Compile Include="Actions\HorseEquipTutorialAction.cs" />
     <Compile Include="IEntityToolsCore.cs" />
-    <Compile Include="InsertInsignia.cs" />
     <Compile Include="IQuesterActionEngine.cs" />
     <Compile Include="MainPanel.cs">
       <SubType>UserControl</SubType>
@@ -76,9 +75,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="QuesterActionInitializer.cs" />
-    <Compile Include="ReflectionHelper.cs" />
-    <Compile Include="SysInformer.cs" />
+    <Compile Include="Proxies\EntityCoreInitializer.cs" />
+    <Compile Include="Proxies\QuesterActionProxy.cs" />
+    <Compile Include="Helpers\ReflectionHelper.cs" />
+    <Compile Include="Helpers\SysInformer.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="MainPanel.resx">

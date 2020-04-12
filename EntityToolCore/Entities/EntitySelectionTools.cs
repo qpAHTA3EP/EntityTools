@@ -5,7 +5,7 @@ using MyNW.Internals;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using EntityTools.Extentions;
+using EntityCore.Extensions;
 using EntityTools.Enums;
 
 namespace EntityCore.Entities
@@ -46,7 +46,7 @@ namespace EntityCore.Entities
             cntStopwatch.Reset();
             frequencyDistribution.Clear();
             contactFrequencyDistribution.Clear();
-            Logger.WriteLine(Logger.LogType.Debug, $"UncachedSearch::ResetWatch()");
+            EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"UncachedSearch::ResetWatch()");
         }
 
         public static void LogWatch()
@@ -55,48 +55,48 @@ namespace EntityCore.Entities
             {
                 double avrgTime = (double)stopwatch.ElapsedMilliseconds / (double)Count;
                 double avrgTicks = (double)stopwatch.ElapsedTicks / (double)Count;
-                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tCount: {Count}");
-                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tWorseTryNumber: {WorseTryNumber}");
-                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tTotalTime: {stopwatch.Elapsed}({stopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
-                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tMinTime: {MinTime.TotalMilliseconds.ToString("N3")} ms ({MinTime.Ticks.ToString("N0")} ticks)");
-                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tMaxTime: {MaxTime.TotalMilliseconds.ToString("N3")} ms ({MaxTime.Ticks.ToString("N0")} ticks)");
-                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tAverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tCount: {Count}");
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tWorseTryNumber: {WorseTryNumber}");
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tTotalTime: {stopwatch.Elapsed}({stopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tMinTime: {MinTime.TotalMilliseconds.ToString("N3")} ms ({MinTime.Ticks.ToString("N0")} ticks)");
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tMaxTime: {MaxTime.TotalMilliseconds.ToString("N3")} ms ({MaxTime.Ticks.ToString("N0")} ticks)");
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity():\tAverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
                 if (frequencyDistribution.Count > 0)
                 {
-                    Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FrequencyDistribution:");
+                    EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FrequencyDistribution:");
                     var list = frequencyDistribution.ToList();
                     list.Sort((KeyValuePair<long, long> l, KeyValuePair<long, long> r) => { return (int)l.Key - (int)r.Key; });
                     foreach (var i in list)
-                        Logger.WriteLine(Logger.LogType.Debug, $"\t\t{((double)i.Key * (double)interval / 10000d).ToString("N3")} := {i.Value.ToString("N0")}");
+                        EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"\t\t{((double)i.Key * (double)interval / 10000d).ToString("N3")} := {i.Value.ToString("N0")}");
                 }
-                //Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity(): Count: {Count}, TotalTime: {stopwatch.Elapsed}({stopwatch.ElapsedMilliseconds.ToString("N3")} ms), MinTime: {MinTime.TotalMilliseconds.ToString("N3")} ms ({MinTime.Ticks.ToString("N0")} ticks), MaxTime: {MaxTime.TotalMilliseconds.ToString("N3")} ms ({MaxTime.Ticks.ToString("N0")} ticks) , AverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
+                //EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity(): Count: {Count}, TotalTime: {stopwatch.Elapsed}({stopwatch.ElapsedMilliseconds.ToString("N3")} ms), MinTime: {MinTime.TotalMilliseconds.ToString("N3")} ms ({MinTime.Ticks.ToString("N0")} ticks), MaxTime: {MaxTime.TotalMilliseconds.ToString("N3")} ms ({MaxTime.Ticks.ToString("N0")} ticks) , AverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
                 //foreach (var i in frequencyDistribution)
-                //    Logger.WriteLine(Logger.LogType.Debug, $"FrequencyDistribution[{((double)i.Key * (double)interval / 10000d).ToString("N3")}] := {i.Value.ToString("N0")}");
+                //    EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"FrequencyDistribution[{((double)i.Key * (double)interval / 10000d).ToString("N3")}] := {i.Value.ToString("N0")}");
             }
-            else Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity(): Count: 0");
+            else EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestEntity(): Count: 0");
             if (ContactCount > 0)
             {
                 double avrgTime = (double)cntStopwatch.ElapsedMilliseconds / (double)ContactCount;
                 double avrgTicks = (double)cntStopwatch.ElapsedTicks / (double)ContactCount;
-                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tCount: {ContactCount}");
-                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tWorseTryNumber: {ContactWorseTryNumber}");
-                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tTotalTime: {cntStopwatch.Elapsed}({cntStopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
-                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tMinTime: {ContactMinTime.TotalMilliseconds.ToString("N3")} ms ({ContactMinTime.Ticks.ToString("N0")} ticks)");
-                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tMaxTime: {ContactMaxTime.TotalMilliseconds.ToString("N3")} ms ({ContactMaxTime.Ticks.ToString("N0")} ticks)");
-                Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tAverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tCount: {ContactCount}");
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tWorseTryNumber: {ContactWorseTryNumber}");
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tTotalTime: {cntStopwatch.Elapsed}({cntStopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tMinTime: {ContactMinTime.TotalMilliseconds.ToString("N3")} ms ({ContactMinTime.Ticks.ToString("N0")} ticks)");
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tMaxTime: {ContactMaxTime.TotalMilliseconds.ToString("N3")} ms ({ContactMaxTime.Ticks.ToString("N0")} ticks)");
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity():\tAverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
                 if (contactFrequencyDistribution.Count > 0)
                 {
-                    Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::ContactFrequencyDistribution:");
+                    EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::ContactFrequencyDistribution:");
                     var list = contactFrequencyDistribution.ToList();
                     list.Sort((KeyValuePair<long, long> l, KeyValuePair<long, long> r) => { return (int)l.Key - (int)r.Key; });
                     foreach (var i in list)
-                        Logger.WriteLine(Logger.LogType.Debug, $"\t\t{((double)i.Key * (double)interval / 10000d).ToString("N3")} := {i.Value.ToString("N0")}");
+                        EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"\t\t{((double)i.Key * (double)interval / 10000d).ToString("N3")} := {i.Value.ToString("N0")}");
                 }
-                //Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity(): Count: {ContactCount}, TotalTime: {cntStopwatch.Elapsed}({cntStopwatch.ElapsedMilliseconds.ToString("N3")} ms), MinTime: {ContactMinTime.TotalMilliseconds.ToString("N3")} ms ({ContactMinTime.Ticks.ToString("N0")} ticks), MaxTime: {ContactMaxTime.TotalMilliseconds.ToString("N3")} ms ({ContactMaxTime.Ticks.ToString("N0")} ticks) , AverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
+                //EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity(): Count: {ContactCount}, TotalTime: {cntStopwatch.Elapsed}({cntStopwatch.ElapsedMilliseconds.ToString("N3")} ms), MinTime: {ContactMinTime.TotalMilliseconds.ToString("N3")} ms ({ContactMinTime.Ticks.ToString("N0")} ticks), MaxTime: {ContactMaxTime.TotalMilliseconds.ToString("N3")} ms ({ContactMaxTime.Ticks.ToString("N0")} ticks) , AverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
                 //foreach (var i in contactFrequencyDistribution)
-                //    Logger.WriteLine(Logger.LogType.Debug, $"ContactFrequencyDistribution[{((double)i.Key * (double)interval / 10000d).ToString("N3")}] := {i.Value.ToString("N0")}");
+                //    EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"ContactFrequencyDistribution[{((double)i.Key * (double)interval / 10000d).ToString("N3")}] := {i.Value.ToString("N0")}");
             }
-            else Logger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity(): Count: 0");
+            else EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"EntitySelectionTools::FindClosestContactEntity(): Count: 0");
         }
 #endif
 

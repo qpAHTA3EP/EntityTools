@@ -7,6 +7,7 @@ using ActionCond = Astral.Logic.UCC.Ressources.Enums.ActionCond;
 
 namespace EntityTools.Editors
 {
+#if DEVELOPER
     public class UccGenericConditionEditor : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
@@ -45,4 +46,5 @@ namespace EntityTools.Editors
             return UITypeEditorEditStyle.Modal;
         }
     }
+#endif
 }

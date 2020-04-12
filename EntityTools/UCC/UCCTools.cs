@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace EntityTools.UCC
 {
-    public class UCCTools
+    public static class UCCTools
     {
         internal static Dictionary<string, Pair<int, int>> SpecialTimers = new Dictionary<string, Pair<int, int>>();        
     }

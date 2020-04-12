@@ -1,21 +1,23 @@
 ﻿using Astral;
 using Astral.Logic.NW;
 using Astral.Quester.Forms;
-using EntityTools.Extentions;
+using EntityTools.Extensions;
 using EntityCore.Forms;
 using EntityTools.Enums;
 using EntityTools.Quester.Actions;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
-using EntityTools.Enums;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Forms;
-using static Astral.Quester.Classes.Action;
 using EntityCore.Enums;
-using Astral.Quester.Classes;
+using EntityTools.Core.Interfaces;
+using Astral.Logic.Classes.Map;
+using System.Drawing;
+using static Astral.Quester.Classes.Action;
+using EntityTools;
+using EntityTools.Logger;
 
 namespace EntityCore.Enums
 {
@@ -70,25 +72,35 @@ namespace EntityCore.Enums
 
 namespace EntityCore.Quester.Action
 {
-    public class PickUpMissionEngine : IQuesterActionEngine
+    public class PickUpMissionEngine
+#if CORE_INTERFACES
+        : IQuesterActionEngine
+#endif
     {
-        PickUpMissionExt @this;
-        ContactInfo giverContactInfo = null;
+        private PickUpMissionExt @this;
+
+        #region данные ядра
+        private ContactInfo giverContactInfo = null;
         private int tries = 0;
         private SimplePatternPos patternPos = SimplePatternPos.None;
         private string rewardItemPattern = string.Empty;
-        private string label = string.Empty;
+        private string label = string.Empty; 
+        #endregion
 
         public PickUpMissionEngine(PickUpMissionExt pum) 
         {
             @this = pum;
+#if CORE_DELEGATES
             @this.coreNeedToRun = NeedToRun;
             @this.coreRun = Run;
             @this.coreValidate = Validate;
             @this.coreReset = Reset;
             @this.coreGatherInfos = GatherInfos;
             @this.coreString = Label;
-
+#endif
+#if CORE_INTERFACES
+            @this.ActionEngine = this;
+#endif
             @this.PropertyChanged += PropertyChanged;
         }
 
@@ -101,11 +113,12 @@ namespace EntityCore.Quester.Action
                         patternPos = @this.RequiredRewardItem.GetSimplePatternPosition(out rewardItemPattern);
                         break;
                     case "MissionId":
-                        label = $"{@this.GetType().Name}: [{@this.MissionId}]";
+                        label = string.Empty;
                         break;
                 }
         }
 
+#if CORE_DELEGATES
         public bool NeedToRun()
         {
             if (@this.Giver.MapName == EntityManager.LocalPlayer.MapState.MapName
@@ -169,13 +182,13 @@ namespace EntityCore.Quester.Action
                             case MissionPickUpResult.MissionNotFound:
                                 if (@this.SkipOnFail)
                                 {
-                                    Logger.WriteLine("Mission not available...");
+                                    EntityToolsLogger.WriteLine("Mission not available...");
                                     return ActionResult.Skip;
                                 }
                                 tries++;
                                 break;
                             case MissionPickUpResult.MissionRequiredRewardNotFound:
-                                Logger.WriteLine("Required misstion reward not found...");
+                                EntityToolsLogger.WriteLine("Required mission reward not found...");
                                 if (@this.CloseContactDialog)
                                 {
                                     EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
@@ -183,7 +196,7 @@ namespace EntityCore.Quester.Action
                                 }
                                 return ActionResult.Skip;
                             case MissionPickUpResult.OfferMissionRequiredRewardNotFound:
-                                Logger.WriteLine("Required misstion reward not found...");
+                                EntityToolsLogger.WriteLine("Required mission reward not found...");
                                 if (@this.CloseContactDialog)
                                 {
                                     EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
@@ -197,7 +210,7 @@ namespace EntityCore.Quester.Action
 
                         if (tries > 2)
                         {
-                            Logger.WriteLine("Mission not available...");
+                            EntityToolsLogger.WriteLine("Mission not available...");
                             return ActionResult.Fail;
                         }
                     }
@@ -318,6 +331,309 @@ namespace EntityCore.Quester.Action
                 }
             }
         }
+
+        public bool Validate()
+        {
+            return !Missions.MissionIsCompletedByPath(@this.MissionId)
+                && !Missions.HaveMissionByPath(@this.MissionId)
+                && @this.Giver.MapName == EntityManager.LocalPlayer.MapState.MapName
+                && @this.Giver.RegionName == EntityManager.LocalPlayer.RegionInternalName;
+        }
+
+        public void Reset()
+        {
+            /*patternPos = SimplePatternPos.None;
+            rewardItemPattern = string.Empty;*/
+            tries = 0;
+        }
+
+        public string Label()
+        {
+            if (string.IsNullOrEmpty(label))
+                label = $"{@this.GetType().Name}: [{@this.MissionId}]";
+            return label;
+        }
+#endif
+#if CORE_INTERFACES
+        public bool NeedToRun
+        {
+            get
+            {
+                if (@this._giver.MapName == EntityManager.LocalPlayer.MapState.MapName
+                    && @this._giver.RegionName == EntityManager.LocalPlayer.RegionInternalName
+                    && @this._giver.Position.Distance3DFromPlayer < Math.Max(@this._interactDistance, 20f))
+                {
+                    foreach (ContactInfo contactInfo in EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts)
+                    {
+                        if (@this._giver.IsMatching(contactInfo.Entity)
+                            && ((contactInfo.Entity.Location.Distance3DFromPlayer < Math.Max(@this._interactDistance, 20f)
+                                    && Astral.Logic.General.ZAxisDiffFromPlayer(contactInfo.Entity.Location) < 10.0)
+                                || contactInfo.Entity.CanInteract))
+                        {
+                            giverContactInfo = contactInfo;
+                            return true;
+                        }
+                    }
+                }
+                giverContactInfo = null;
+                return false;
+            }
+        }
+
+        public ActionResult Run()
+        {
+            if (InternalConditions)
+            {
+                if (giverContactInfo == null
+                    || !giverContactInfo.IsValid)
+                {
+                    // giverContactInfo недействительный, поэтому производим повторный поиск
+                    foreach (ContactInfo contactInfo in EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts)
+                    {
+                        if (contactInfo.Entity.IsValid && @this._giver.IsMatching(contactInfo.Entity))
+                        {
+                            giverContactInfo = contactInfo;
+                            break;
+                        }
+                    }
+                }
+
+                if (giverContactInfo != null
+                    && giverContactInfo.IsValid)
+                {
+                    Entity entity = giverContactInfo.Entity;
+                    if (entity.IsValid && @this._giver.IsMatching(entity))
+                    {
+                        MissionPickUpResult pickUpResult = PickUpMission(entity, @this._missionId);
+                        switch (pickUpResult)
+                        {
+                            case MissionPickUpResult.MissionAccepted:
+                                tries = 0;
+                                if (@this._closeContactDialog)
+                                {
+                                    EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
+                                    Thread.Sleep(2000);
+                                }
+                                return ActionResult.Completed;
+                            case MissionPickUpResult.MissionOfferAccepted:
+                                tries++;
+                                break;
+                            case MissionPickUpResult.MissionNotFound:
+                                if (@this.SkipOnFail)
+                                {
+                                    EntityToolsLogger.WriteLine("Mission not available...");
+                                    return ActionResult.Skip;
+                                }
+                                tries++;
+                                break;
+                            case MissionPickUpResult.MissionRequiredRewardNotFound:
+                                EntityToolsLogger.WriteLine("Required mission reward not found...");
+                                if (@this.CloseContactDialog)
+                                {
+                                    EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
+                                    Thread.Sleep(2000);
+                                }
+                                return ActionResult.Skip;
+                            case MissionPickUpResult.OfferMissionRequiredRewardNotFound:
+                                EntityToolsLogger.WriteLine("Required mission reward not found...");
+                                if (@this.CloseContactDialog)
+                                {
+                                    EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
+                                    Thread.Sleep(2000);
+                                }
+                                return ActionResult.Skip;
+                            case MissionPickUpResult.Error:
+                                tries++;
+                                break;
+                        }
+
+                        if (tries > 2)
+                        {
+                            EntityToolsLogger.WriteLine("Mission not available...");
+                            return ActionResult.Fail;
+                        }
+                    }
+                }
+                return ActionResult.Running;
+            }
+            else return ActionResult.Fail;
+        }
+
+        public string ActionLabel
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(label))
+                    label = $"{@this.GetType().Name}: [{@this._missionId}]";
+                return label;
+            }
+        }
+
+        public bool InternalConditions
+        {
+            get
+            {
+                return !Missions.MissionIsCompletedByPath(@this.MissionId)
+                    && !Missions.HaveMissionByPath(@this.MissionId)
+                    && @this.Giver.MapName == EntityManager.LocalPlayer.MapState.MapName
+                    && @this.Giver.RegionName == EntityManager.LocalPlayer.RegionInternalName;
+            }
+        }
+
+        public ActionValidity InternalValidity
+        {
+            get
+            {
+                if (@this._giver == null)
+                    return new ActionValidity("Giver is invalid.");
+                if (!@this._giver.Position.IsValid)
+                    return new ActionValidity("Giver position invalid.");
+                if (@this._missionId.Length == 0)
+                    return new ActionValidity("Invalid mission id.");
+                return new ActionValidity();
+            }
+        }
+
+        public bool UseHotSpots => false;
+
+        public Vector3 InternalDestination
+        {
+            get
+            {
+                if (@this._giver != null && @this._giver.Position.IsValid)
+                    return @this._giver.Position.Clone();
+                else return new Vector3();
+            }
+        }
+
+        public void InternalReset()
+        {
+            /*patternPos = SimplePatternPos.None;
+            rewardItemPattern = string.Empty;*/
+            tries = 0;
+            label = String.Empty;
+        }
+
+        public void GatherInfos()
+        {
+            if (TargetSelectForm.GUIRequest("Target mission giver and press ok."/*, Application.OpenForms.Find<Astral.Quester.Forms.Editor>()*/) == DialogResult.OK)
+            {
+                Entity betterEntityToInteract = Interact.GetBetterEntityToInteract();
+                if (betterEntityToInteract.IsValid)
+                {
+                    @this.Giver = new Astral.Quester.Classes.NPCInfos()
+                    {
+                        CostumeName = betterEntityToInteract.CostumeRef.CostumeName,
+                        DisplayName = betterEntityToInteract.Name,
+                        Position = betterEntityToInteract.Location.Clone(),
+                        MapName = EntityManager.LocalPlayer.MapState.MapName,
+                        RegionName = EntityManager.LocalPlayer.RegionInternalName
+                    };
+
+                    // Взаимодействие с betterEntityToInteract, чтобы открыть диалоговое окно
+                    if (betterEntityToInteract.CombatDistance3 <= ((@this.InteractDistance <= 0) ?
+                        Math.Max(7f, betterEntityToInteract.InteractOption.InteractDistance) : Math.Max(@this.InteractDistance, betterEntityToInteract.InteractOption.InteractDistance))
+                        || Approach.EntityForInteraction(betterEntityToInteract, null))
+                    {
+                        betterEntityToInteract.Interact();
+                        Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(3000);
+                        while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count == 0)
+                        {
+                            if (timeout.IsTimedOut)
+                            {
+                                break;
+                            }
+                            Thread.Sleep(100);
+                        }
+
+                        //CommonTools.FocusForm(typeof(Editor));
+
+                        string mission_id = string.Empty;
+                        if (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count != 0)
+                        {
+                            // выбор пункта меню, соответствующего миссии
+                            string adialogKey = GetAnId.GetADialogKey();
+                            if (adialogKey.Length > 0)
+                            {
+                                // Вычисляем идентификатор миссии из строки диалога
+                                // "OptionsList.MissionOffer.Az_Ee_Ed_No_Crevice_Untouched_0"
+
+                                // Индекс начала "текстового идентификатора миссии"
+                                int startInd = adialogKey.IndexOf("MissionOffer.", 0, StringComparison.OrdinalIgnoreCase);
+
+                                // Индекс окончания "текстового идентификатора миссии"
+                                // Если последний символ - цифра, значит нужно удалить суффикс
+                                int lastInd = char.IsDigit(adialogKey[adialogKey.Length - 1]) ?
+                                                    adialogKey.LastIndexOf('_') : adialogKey.Length - 1;
+
+                                if (startInd >= 0 && startInd + 13 < adialogKey.Length)
+                                {
+                                    mission_id = adialogKey.Substring(startInd + 13, lastInd - startInd - 13);
+
+                                    if (!string.IsNullOrEmpty(mission_id))
+                                    {
+                                        // Принимаем миссию
+                                        EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.SelectOptionByKey(adialogKey, "");
+                                        Thread.Sleep(1000);
+
+
+                                        if (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.ScreenType == ScreenType.MissionOffer)
+                                        {
+                                            // Выбираем обязательную награду
+                                            GetAnItem.ListItem rewardItem = GetAnItem.Show(4);
+                                            if (rewardItem != null && !string.IsNullOrEmpty(rewardItem.ItemId))
+                                            {
+                                                @this.RequiredRewardItem = rewardItem.ItemId;
+                                                //patternPos = PUM.RequiredRewardItem.GetSimplePatternPosition(out rewardItemPattern);
+                                            }
+
+                                            // Принимаем миссию
+                                            EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.SelectOptionByKey("ViewOfferedMission.Accept");
+
+                                            // Проверяем корректность определения "идентификатора миссии"
+                                            timeout.Reset();
+                                            while (!Missions.HaveMissionByPath(mission_id))
+                                            {
+                                                if (timeout.IsTimedOut)
+                                                {
+                                                    // Миссия была "принята", однако, по найденному идентификатору она "не определяется"
+                                                    //XtraMessageBox.Show("Select MissionId\n" +
+                                                    //    "Автоматическое определение идентификатора миссии не удалось.\n" +
+                                                    //    "Укажите миссию вручную");
+                                                    mission_id = GetMissionId.Show(true, mission_id, false, false);
+                                                    if (!string.IsNullOrEmpty(mission_id))
+                                                        @this.MissionId = mission_id;
+
+                                                    return;
+                                                }
+                                                Thread.Sleep(100);
+                                            }
+
+                                            @this.MissionId = mission_id;
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Ручной выбор идентификатора миссии
+                        mission_id = GetMissionId.Show(true, "", false, false);
+                        if (!string.IsNullOrEmpty(mission_id))
+                            @this.MissionId = mission_id;
+                    }
+                }
+            }
+        }
+
+        public void OnMapDraw(GraphicsNW graph)
+        {
+            if (@this._giver != null && @this._giver.Position.IsValid)
+            {
+                graph.drawFillEllipse(@this._giver.Position, new Size(10, 10), Brushes.Beige);
+            }
+        }
+#endif
 
         #region Аналоги функций из Astral.Logic.NW.Missions
         /// <summary>
@@ -609,28 +925,6 @@ namespace EntityCore.Quester.Action
 
             return false;
         }
-        #endregion
-
-        public bool Validate()
-        {
-            return !Missions.MissionIsCompletedByPath(@this.MissionId)
-                && !Missions.HaveMissionByPath(@this.MissionId)
-                && @this.Giver.MapName == EntityManager.LocalPlayer.MapState.MapName
-                && @this.Giver.RegionName == EntityManager.LocalPlayer.RegionInternalName;
-        }
-
-        public void Reset()
-        {
-            /*patternPos = SimplePatternPos.None;
-            rewardItemPattern = string.Empty;*/
-            tries = 0;
-        }
-
-        public string Label()
-        {
-            if (string.IsNullOrEmpty(label))
-                label = $"{@this.GetType().Name}: [{@this.MissionId}]";
-            return label;
-        }
+#endregion
     }
 }

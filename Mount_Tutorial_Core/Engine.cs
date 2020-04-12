@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using static Astral.Quester.Classes.Action;
-using EntityCore.Quester.Action;
 //using EntityTools.Quester.Conditions;
 //using UCCConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 //using EntityTools.Tools;
@@ -73,13 +72,13 @@ namespace Mount_Tutorial_Core
                 //    return true;
                 //}
                 //else 
-                if (action is InsertInsignia ii)
+                /*if (action is InsertInsignia ii)
                 {
                     //list.AddLast(new InsertInsigniaEngine(ii));
                     dictionary.Add(ii, new InsertInsigniaEngine(ii));
                     return true;
                 }
-                else if (action is HorseEquipTutorialAction horseEquip)
+                else */if (action is HorseEquipTutorialAction horseEquip)
                 {
                     dictionary.Add(horseEquip, new HorseEquipTutorialEngine(horseEquip));
                     return true;

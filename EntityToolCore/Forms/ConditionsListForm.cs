@@ -21,7 +21,7 @@ namespace EntityCore.Forms
             InitializeComponent();
         }
 
-        public static ConditionList Processing(ConditionList conditions = null)
+        public static ConditionList GUIRequest(ConditionList conditions = null)
         {
             ConditionListForm @this = new ConditionListForm();
 

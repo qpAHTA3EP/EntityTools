@@ -11,15 +11,17 @@ using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.U
 
 namespace EntityTools.Editors
 {
+#if DEVELOPER
     class UCCConditionListEditor : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            ConditionList newConditions = EntityTools.Core.GUIRequest_UCCConditions(value as ConditionList);
 
-            if (newConditions != null)
+            ConditionList conditions = value as ConditionList;
+
+            if (EntityTools.Core.GUIRequest_UCCConditions(ref conditions))
             {
-                return newConditions;
+                return conditions;
             }            
             else return value;
         }
@@ -29,4 +31,5 @@ namespace EntityTools.Editors
             return UITypeEditorEditStyle.Modal;
         }
     }
+#endif
 }

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace EntityTools.Extentions
+namespace EntityCore.Extensions
 {
     public static class FormCollectionExtentions
     {

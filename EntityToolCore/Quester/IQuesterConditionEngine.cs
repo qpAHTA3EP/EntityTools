@@ -5,6 +5,7 @@ using System.Text;
 
 namespace EntityCore.Quester
 {
+#if CORE_DELEGATES
     public interface IQuesterConditionEngine
     {
         bool NeedToRun();
@@ -12,4 +13,5 @@ namespace EntityCore.Quester
         void GatherInfos();
         void Reset();
     }
+#endif
 }

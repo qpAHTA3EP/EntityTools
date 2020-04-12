@@ -1,26 +1,47 @@
-﻿using Astral.Classes;
-using Astral.Classes.ItemFilter;
+﻿using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
+using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
-using MyNW.Classes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Text;
 
 namespace EntityTools.Quester.Conditions
 {
     [Serializable]
-    public class EntityProperty : Condition
+    public class EntityProperty : Condition, INotifyPropertyChanged
     {
-        public EntityProperty() { }
+        #region Взаимодействие с ядром EntityTools
+        public event PropertyChangedEventHandler PropertyChanged;
+#if CORE_DELEGATES
+        public Func<bool> doValidate = null;
+        public Func<string> getString = null;
+        public Func<string> getTestInfos = null;
+        public System.Action doReset = null;
+#endif
+#if CORE_INTERFACES
+        internal IQuesterConditionEngine Engine = null;
+#endif
+        #endregion
+
+        public EntityProperty()
+        {
+#if CORE_INTERFACES
+            Engine = new QuesterConditionProxy(this);
+#endif
+            // EntityTools.Core.Initialize(this);
+        }
 
         #region Опции команды
+#if DEVELOPER
         [Description("ID of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
+#else
+        [Browsable(false)]
+#endif
         public string EntityID
         {
             get => _entityId;
@@ -33,28 +54,36 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        private string _entityId = string.Empty;
+        internal string _entityId = string.Empty;
 
+#if DEVELOPER
         [Description("The switcher of the Entity filed which compared to the property EntityID")]
         [Category("Entity")]
+#else
+        [Browsable(false)]
+#endif
         public EntityNameType EntityNameType
         {
-            get => entityNameType;
+            get => _entityNameType;
             set
             {
-                if (entityNameType != value)
+                if (_entityNameType != value)
                 {
-                    entityNameType = value;
-                    //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityNameType)));
+                    _entityNameType = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityNameType)));
                 }
             }
         }
-        private EntityNameType entityNameType = EntityNameType.NameUntranslated;
+        internal EntityNameType _entityNameType = EntityNameType.NameUntranslated;
 
+#if DEVELOPER
         [Description("Type of and EntityID:\n" +
             "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
+#else
+        [Browsable(false)]
+#endif
         public ItemFilterStringType EntityIdType
         {
             get => _entityIdType;
@@ -67,12 +96,16 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        private ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
+        internal ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
 
+#if DEVELOPER
         [Description("Check Entity's Region:\n" +
             "True: Search an Entity only if it located in the same Region as Player\n" +
             "False: Does not consider the region when searching Entities")]
         [Category("Optional")]
+#else
+        [Browsable(false)]
+#endif
         public bool RegionCheck
         {
             get => _regionCheck; set
@@ -84,12 +117,16 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        private bool _regionCheck = false;
+        internal bool _regionCheck = false;
 
+#if DEVELOPER
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
         [Category("Optional")]
+#else
+        [Browsable(false)]
+#endif
         public bool HealthCheck
         {
             get => _healthCheck; set
@@ -101,17 +138,22 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        private bool _healthCheck = true;
+        internal bool _healthCheck = true;
 
 
+#if DEVELOPER
         [Description("A subset of entities that are searched for a target\n" +
             "Contacts: Only interactable Entities\n" +
             "Complete: All possible Entities")]
         [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
         [Category("Optional")]
+#else
+        [Browsable(false)]
+#endif
         public EntitySetType EntitySetType
         {
-            get => _entitySetType; set
+            get => _entitySetType;
+            set
             {
                 if (_entitySetType != value)
                 {
@@ -120,14 +162,19 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        private EntitySetType _entitySetType = EntitySetType.Complete;
+        internal EntitySetType _entitySetType = EntitySetType.Complete;
 
+#if DEVELOPER
         [Description("The maximum distance from the character within which the Entity is searched\n" +
             "The default value is 0, which disables distance checking")]
         [Category("Entity optional checks")]
+#else
+        [Browsable(false)]
+#endif
         public float ReactionRange
         {
-            get => _reactionRange; set
+            get => _reactionRange;
+            set
             {
                 if (_reactionRange != value)
                 {
@@ -136,14 +183,19 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        private float _reactionRange = 0;
+        internal float _reactionRange = 0;
 
+#if DEVELOPER
         [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
             "The default value is 0, which disables ZAxis checking")]
         [Category("Optional")]
+#else
+        [Browsable(false)]
+#endif
         public float ReactionZRange
         {
-            get => _reactionZRange; set
+            get => _reactionZRange;
+            set
             {
                 if (_reactionZRange != value)
                 {
@@ -152,11 +204,15 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        private float _reactionZRange = 0;
+        internal float _reactionZRange = 0;
 
+#if DEVELOPER
         [Description("CustomRegion names collection")]
         [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
         [Category("Optional")]
+#else
+        [Browsable(false)]
+#endif
         public List<string> CustomRegionNames
         {
             get => _customRegionNames;
@@ -169,9 +225,13 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        private List<string> _customRegionNames = new List<string>();
+        internal List<string> _customRegionNames = new List<string>();
 
+#if DEVELOPER
         [Category("Tested")]
+#else
+        [Browsable(false)]
+#endif
         public EntityPropertyType PropertyType
         {
             get => _propertyType; set
@@ -183,12 +243,17 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        private EntityPropertyType _propertyType = EntityPropertyType.Distance;
+        internal EntityPropertyType _propertyType = EntityPropertyType.Distance;
 
+#if DEVELOPER
         [Category("Tested")]
+#else
+        [Browsable(false)]
+#endif
         public float Value
         {
-            get => _value; set
+            get => _value;
+            set
             {
                 if (_value != value)
                 {
@@ -197,13 +262,18 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        private float _value = 0;
+        internal float _value = 0;
 
+#if DEVELOPER
         [Description("Value comparison type to the closest Entity")]
         [Category("Tested")]
+#else
+        [Browsable(false)]
+#endif
         public Relation Sign
         {
-            get => _sign; set
+            get => _sign;
+            set
             {
                 if (_sign != value)
                 {
@@ -212,13 +282,18 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        private Relation _sign = Relation.Superior;
+        internal Relation _sign = Relation.Superior;
 
+#if DEVELOPER
         [Description("Time between searches of the Entity (ms)")]
         [Category("Optional")]
+#else
+        [Browsable(false)]
+#endif
         public int SearchTimeInterval
         {
-            get => _searchTimeInterval; set
+            get => _searchTimeInterval;
+            set
             {
                 if (_searchTimeInterval != value)
                 {
@@ -227,18 +302,11 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        private int _searchTimeInterval = 100;
+        internal int _searchTimeInterval = 200;
         #endregion
 
-        #region Взаимодействие с ядром EntityTools
-        public event PropertyChangedEventHandler PropertyChanged;
-        public Func<bool> doValidate = null;
-        public Func<string> getString = null;
-        public Func<string> getTestInfos = null;
-        public System.Action doReset = null;
-        #endregion
-
-        public override string ToString()
+#if CORE_DELEGATES
+       public override string ToString()
         {
             if (getString == null)
                 EntityTools.Core.Initialize(this);
@@ -271,5 +339,12 @@ namespace EntityTools.Quester.Conditions
                 EntityTools.Core.Initialize(this);
             doReset();
         }
+#endif
+#if CORE_INTERFACES
+        public override bool IsValid => Engine.IsValid;
+        public override void Reset() => Engine.Reset();
+        public override string TestInfos => Engine.TestInfos;
+        public override string ToString() => Engine.Label();
+#endif
     }
 }

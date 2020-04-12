@@ -4,12 +4,14 @@ using System.Drawing.Design;
 
 namespace EntityTools.Editors
 {
+#if DEVELOPER
     public class AuraIdEditor : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            string auraId = AuraSelectForm.GetAuraId();
-            if (!string.IsNullOrEmpty(auraId))
+            string auraId = value.ToString();
+            if (EntityTools.Core.GUIRequest_AuraId(ref auraId) &&
+                !string.IsNullOrEmpty(auraId))
                 return auraId;
 
             return value;
@@ -20,4 +22,5 @@ namespace EntityTools.Editors
             return UITypeEditorEditStyle.Modal;
         }
     }
+#endif
 }

@@ -5,6 +5,7 @@ using System.Drawing.Design;
 
 namespace EntityTools.Editors
 {
+#if DEVELOPER
     class NodePositionEditor : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
@@ -22,4 +23,5 @@ namespace EntityTools.Editors
             return UITypeEditorEditStyle.Modal;
         }
     }
+#endif
 }

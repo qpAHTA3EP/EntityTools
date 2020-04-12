@@ -21,6 +21,7 @@ using EntityCore;
 using System.Windows.Forms;
 using EntityCore.Forms;
 using DevExpress.XtraEditors;
+using EntityTools.Core.Interfaces;
 
 namespace EntityCore.Quester.Action
 {

@@ -5,7 +5,7 @@ using Astral;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.Classes.Map;
 using Astral.Quester.UIEditors;
-using EntityTools.Core.Facades;
+using EntityTools.Core.Proxies;
 using EntityTools.Core.Interfaces;
 using EntityTools.Editors;
 using EntityTools.Enums;
@@ -31,20 +31,24 @@ namespace EntityTools.Quester.Actions
         public static void ResetWatch()
         {
             RunCount = 0;
-            Logger.WriteLine(Logger.LogType.Debug, $"InteractEntities::ResetWatch()");
+            EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntities::ResetWatch()");
         }
 
         public static void LogWatch()
         {
             if (RunCount > 0)
-                Logger.WriteLine(Logger.LogType.Debug, $"InteractEntities: RunCount: {RunCount}");
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntities: RunCount: {RunCount}");
         }
 #endif
 
         #region Опции команды
+#if DEVELOPER
         [Description("ID of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
+#else
+        [Browsable(false)]
+#endif
         public string EntityID
         {
             get => _entityId;
@@ -57,13 +61,16 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        [NonSerialized]
         internal string _entityId = string.Empty;
 
+#if DEVELOPER
         [Description("Type of the EntityID:\n" +
             "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
+#else
+        [Browsable(false)]
+#endif
         public ItemFilterStringType EntityIdType
         {
             get => _entityIdType;
@@ -76,11 +83,14 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        [NonSerialized]
         internal ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
 
+#if DEVELOPER
         [Description("The switcher of the Entity filed which compared to the property EntityID")]
         [Category("Entity")]
+#else
+        [Browsable(false)]
+#endif
         public EntityNameType EntityNameType
         {
             get => _entityNameType;
@@ -93,13 +103,16 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        [NonSerialized]
         internal EntityNameType _entityNameType = EntityNameType.InternalName;
 
+#if DEVELOPER
         [Description("Check Entity's Ingame Region (Not CustomRegion):\n" +
             "True: Only Entities located in the same Region as Player are detected\n" +
             "False: Entity's Region does not checked during search")]
         [Category("Optional")]
+#else
+        [Browsable(false)]
+#endif
         public bool RegionCheck
         {
             get => _regionCheck; set
@@ -113,10 +126,14 @@ namespace EntityTools.Quester.Actions
         }
         internal bool _regionCheck = false;
 
+#if DEVELOPER
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
         [Category("Optional")]
+#else
+        [Browsable(false)]
+#endif
         public bool HealthCheck
         {
             get => _healthCheck; set
@@ -130,9 +147,13 @@ namespace EntityTools.Quester.Actions
         }
         internal bool _healthCheck = true;
 
+#if DEVELOPER
         [Description("True: Do not change the target Entity while it is alive or until the Bot within Distance of it\n" +
                     "False: Constantly scan an area and target the nearest Entity")]
         [Category("Optional")]
+#else
+        [Browsable(false)]
+#endif
         public bool HoldTargetEntity
         {
             get => _holdTargetEntity; set
@@ -146,10 +167,14 @@ namespace EntityTools.Quester.Actions
         }
         internal bool _holdTargetEntity = true;
 
+#if DEVELOPER
         [Description("Check if Entity is moving:\n" +
             "True: Only standing Entities are detected\n" +
             "False: Both moving and stationary Entities are detected")]
         [Category("Optional")]
+#else
+        [Browsable(false)]
+#endif
         public bool SkipMoving
         {
             get => _skipMoving; set
@@ -163,9 +188,13 @@ namespace EntityTools.Quester.Actions
         }
         internal bool _skipMoving = false;
 
+#if DEVELOPER
         [Description("The maximum distance from the character within which the Entity is searched\n" +
             "The value equals 0(zero) disables distance checking")]
         [Category("Optional")]
+#else
+        [Browsable(false)]
+#endif
         public float ReactionRange
         {
             get => _reactionRange; set
@@ -179,9 +208,13 @@ namespace EntityTools.Quester.Actions
         }
         internal float _reactionRange = 150;
 
+#if DEVELOPER
         [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
             "The default value is 0, which disables ZAxis checking")]
         [Category("Optional")]
+#else
+        [Browsable(false)]
+#endif
         public float ReactionZRange
         {
             get => _reactionZRange; set
@@ -195,9 +228,13 @@ namespace EntityTools.Quester.Actions
         }
         internal float _reactionZRange = 0;
 
+#if DEVELOPER
         [Description("CustomRegion names collection")]
         [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
         [Category("Optional")]
+#else
+        [Browsable(false)]
+#endif
         public List<string> CustomRegionNames
         {
             get => _customRegionNames;
@@ -210,14 +247,17 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        [NonSerialized]
         internal List<string> _customRegionNames = new List<string>();
 
+#if DEVELOPER
         [Description("A subset of entities that are searched for a target\n" +
             "Contacts: Only interactable Entities\n" +
             "Complete: All possible Entities")]
         [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
         [Category("Optional")]
+#else
+        [Browsable(false)]
+#endif
         public EntitySetType EntitySetType
         {
             get => _entitySetType; set
@@ -231,8 +271,12 @@ namespace EntityTools.Quester.Actions
         }
         internal EntitySetType _entitySetType = EntitySetType.Contacts;
 
+/*#if DEVELOPER
         [Description("Time between searches of the Entity (ms)")]
         [Category("Optional")]
+#else
+        [Browsable(false)]
+#endif
         public int SearchTimeInterval
         {
             get => _searchTimeInterval; set
@@ -244,11 +288,15 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal int _searchTimeInterval = 100;
+        internal int _searchTimeInterval = 100;*/
 
+#if DEVELOPER
         [Description("Distance to the Entity by which it is necessary to approach to disable 'IgnoreCombat' mode\n" +
             "Ignored if 'IgnoreCombat' does not True")]
         [Category("Interruptions")]
+#else
+        [Browsable(false)]
+#endif
         public float CombatDistance
         {
             get => _combatDistance; set
@@ -262,8 +310,12 @@ namespace EntityTools.Quester.Actions
         }
         internal float _combatDistance = 30;
 
+#if DEVELOPER
         [Description("Enable IgnoreCombat mode while distance to the closest Entity greater then 'CombatDistance'")]
         [Category("Interruptions")]
+#else
+        [Browsable(false)]
+#endif
         public bool IgnoreCombat
         {
             get => _ignoreCombat; set
@@ -277,8 +329,12 @@ namespace EntityTools.Quester.Actions
         }
         internal bool _ignoreCombat = true;
 
+#if DEVELOPER
         [Category("Interaction")]
         [Description("Only one interaction with Entity is possible in 'InteractitTimeout' period")]
+#else
+        [Browsable(false)]
+#endif
         public bool InteractOnce
         {
             get => _interactOnce; set
@@ -292,8 +348,12 @@ namespace EntityTools.Quester.Actions
         }
         internal bool _interactOnce = false;
 
+#if DEVELOPER
         [Category("Interaction")]
         [Description("Interaction timeout (sec) if InteractitOnce flag is set")]
+#else
+        [Browsable(false)]
+#endif
         public int InteractingTimeout
         {
             get => _interactingTimeout; set
@@ -307,8 +367,12 @@ namespace EntityTools.Quester.Actions
         }
         internal int _interactingTimeout = 60;
 
+#if DEVELOPER
         [Description("Time to interact (ms)")]
         [Category("Interaction")]
+#else
+        [Browsable(false)]
+#endif
         public int InteractTime
         {
             get => _interactTime;
@@ -323,9 +387,13 @@ namespace EntityTools.Quester.Actions
         }
         internal int _interactTime = 2000;
 
+#if DEVELOPER
         [Description("Answers in dialog while interact with Entity")]
         [Editor(typeof(DialogEditor), typeof(UITypeEditor))]
         [Category("Interaction")]
+#else
+        [Browsable(false)]
+#endif
         public List<string> Dialogs
         {
             get => _dialogs; set
@@ -339,10 +407,13 @@ namespace EntityTools.Quester.Actions
         }
         internal List<string> _dialogs = new List<string>();
 
+#if DEVELOPER
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
         [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
         public string TestInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>";
+#endif
+
 
         [XmlIgnore]
         [Browsable(false)]
@@ -352,34 +423,35 @@ namespace EntityTools.Quester.Actions
         #region Взаимодействие с EntityToolsCore
         public event PropertyChangedEventHandler PropertyChanged;
 
+#if CORE_INTERFACES
         [NonSerialized]
-        internal IQuesterActionEngine ActionEngine;
+        internal IQuesterActionEngine Engine;
+#endif
 
-        #region Реализация через делегаты
-        //[NonSerialized]
-        //internal Func<ActionResult> coreRun = null;
-        //[NonSerialized]
-        //internal Func<bool> coreNeedToRun = null;
-        //[NonSerialized]
-        //internal Func<bool> coreInternalConditions = null;
-        //[NonSerialized]
-        //internal Func<ActionValidity> coreActionValidity = null;
-        //[NonSerialized]
-        //internal System.Action coreReset = null;
-        //[NonSerialized]
-        //internal System.Action coreGatherInfos = null;
-        //[NonSerialized]
-        //internal Func<string> coreLabel = null;
-        //[NonSerialized]
-        //internal Func<Entity> coreTarget = null;
-        //[NonSerialized]
-        //internal Func<bool> coreTargetValidate = null; 
-        #endregion
+#if CORE_DELEGATES
+        [NonSerialized]
+        internal Func<ActionResult> coreRun = null;
+        [NonSerialized]
+        internal Func<bool> coreNeedToRun = null;
+        [NonSerialized]
+        internal Func<bool> coreInternalConditions = null;
+        [NonSerialized]
+        internal Func<ActionValidity> coreActionValidity = null;
+        [NonSerialized]
+        internal System.Action coreReset = null;
+        [NonSerialized]
+        internal System.Action coreGatherInfos = null;
+        [NonSerialized]
+        internal Func<string> coreLabel = null;
+        [NonSerialized]
+        internal Func<Entity> coreTarget = null;
+        [NonSerialized]
+        internal Func<bool> coreTargetValidate = null;
+#endif
 
         public InteractEntities()
         {
-            ActionEngine = new QuesterActionInitializer(this);
-
+#if CORE_DELEGATES
             //coreRun = () => Core.Initializer.Initialize(ref coreRun);
             //coreNeedToRun = () => Core.Initializer.Initialize(ref coreNeedToRun);
             //coreInternalConditions = () => Core.Initializer.Initialize(ref coreInternalConditions);
@@ -389,62 +461,62 @@ namespace EntityTools.Quester.Actions
             //coreLabel = () => Core.Initializer.Initialize(ref coreLabel);
             //coreTarget = () => Core.Initializer.Initialize(ref coreTarget);
             //coreTargetValidate = () => Core.Initializer.Initialize(ref coreTargetValidate);
+#endif
+#if CORE_INTERFACES
+            Engine = new QuesterActionProxy(this);
+#endif
+            // EntityTools.Core.Initialize(this);
         }
         #endregion
 
-        #region Интерфейс Quester.Action через делегаты
-        //public override bool NeedToRun => coreNeedToRun();
-        //public override ActionResult Run() => coreRun();
+#if CORE_DELEGATES
+        // Интерфейс Quester.Action через делегаты
+        public override bool NeedToRun => coreNeedToRun();
+        public override ActionResult Run() => coreRun();
 
-        //public override string ActionLabel => coreLabel();
-        //public override string InternalDisplayName => string.Empty;
-        //public override bool UseHotSpots => true;
-        //protected override Vector3 InternalDestination
-        //{
-        //    get
-        //    {
-        //        if (coreTargetValidate())
-        //        {
-        //            Entity target = coreTarget();
-        //            if (_ignoreCombat && (target.Location.Distance3DFromPlayer > _combatDistance))
-        //                return target.Location.Clone();
-        //        }
-        //        return new Vector3();
-        //    }
-        //}
-
-        //protected override bool IntenalConditions => coreInternalConditions();
-        //protected override ActionValidity InternalValidity => coreActionValidity();
-
-        //public override void InternalReset() => coreReset();
-        //public override void GatherInfos() => coreGatherInfos();
-        //public override void OnMapDraw(GraphicsNW graph)
-        //{
-        //    if (coreTargetValidate())
-        //    {
-        //        graph.drawFillEllipse(coreTarget().Location, new Size(10, 10), Brushes.Beige);
-        //    }
-        //}
-        #endregion
-
-        #region Интерфейс Quester.Action через IQuesterActionEngine
-        public override bool NeedToRun => ActionEngine.NeedToRun;
-        public override ActionResult Run() => ActionEngine.Run();
-
-        public override string ActionLabel => ActionEngine.ActionLabel;
+        public override string ActionLabel => coreLabel();
         public override string InternalDisplayName => string.Empty;
+        public override bool UseHotSpots => true;
+        protected override Vector3 InternalDestination
+        {
+            get
+            {
+                if (coreTargetValidate())
+                {
+                    Entity target = coreTarget();
+                    if (_ignoreCombat && (target.Location.Distance3DFromPlayer > _combatDistance))
+                        return target.Location.Clone();
+                }
+                return new Vector3();
+            }
+        }
 
-        public override bool UseHotSpots => ActionEngine.UseHotSpots;
-        protected override Vector3 InternalDestination => ActionEngine.InternalDestination;
+        protected override bool IntenalConditions => coreInternalConditions();
+        protected override ActionValidity InternalValidity => coreActionValidity();
 
-        protected override bool IntenalConditions => ActionEngine.InternalConditions;
-        protected override ActionValidity InternalValidity => ActionEngine.InternalValidity;
-
-        public override void InternalReset() => ActionEngine.InternalReset();
-
-        public override void GatherInfos() => ActionEngine.GatherInfos();
-
-        public override void OnMapDraw(GraphicsNW graph) => ActionEngine.OnMapDraw(graph);
-        #endregion
+        public override void InternalReset() => coreReset();
+        public override void GatherInfos() => coreGatherInfos();
+        public override void OnMapDraw(GraphicsNW graph)
+        {
+            if (coreTargetValidate())
+            {
+                graph.drawFillEllipse(coreTarget().Location, new Size(10, 10), Brushes.Beige);
+            }
+        }
+#endif
+#if CORE_INTERFACES
+        // Интерфейс Quester.Action через IQuesterActionEngine
+        public override bool NeedToRun => Engine.NeedToRun;
+        public override ActionResult Run() => Engine.Run();
+        public override string ActionLabel => Engine.ActionLabel;
+        public override string InternalDisplayName => string.Empty;
+        public override bool UseHotSpots => Engine.UseHotSpots;
+        protected override Vector3 InternalDestination => Engine.InternalDestination;
+        protected override bool IntenalConditions => Engine.InternalConditions;
+        protected override ActionValidity InternalValidity => Engine.InternalValidity;
+        public override void InternalReset() => Engine.InternalReset();
+        public override void GatherInfos() => Engine.GatherInfos();
+        public override void OnMapDraw(GraphicsNW graph) => Engine.OnMapDraw(graph);
+#endif
     }
 }

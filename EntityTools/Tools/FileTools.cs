@@ -1,9 +1,8 @@
-﻿using MyNW.Internals;
+﻿using Microsoft.Win32.SafeHandles;
+using MyNW.Internals;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
+using System.Runtime.InteropServices;
 
 namespace EntityTools.Tools
 {

@@ -27,7 +27,7 @@ namespace EntityTools.Quester.Actions
                         if (bool.TryParse(Value, out bool result))
                         {
                             //SlideMonitor.Activate = !result;
-                            Logger.WriteLine(Logger.LogType.Debug, "SlideMonitor was removed. This command is deprecated");
+                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, "SlideMonitor was removed. This command is deprecated");
                             return ActionResult.Skip;
                         }
                         else return ActionResult.Fail;
@@ -46,19 +46,21 @@ namespace EntityTools.Quester.Actions
                         }
                         else return ActionResult.Fail;
                     case PluginSettingsCommand.EntityCacheTime:
-                        if (int.TryParse(Value, out int timer))
-                        {
-                            if(timer >= 1)
-                                EntityCache.ChacheTime = timer;
-                        }
-                        return ActionResult.Fail;
+                        //if (int.TryParse(Value, out int timer))
+                        //{
+                        //    if(timer >= 1)
+                        //        EntityCache.ChacheTime = timer;
+                        //}
+                        //return ActionResult.Fail;
+                        throw new NotImplementedException("PluginSettingsCommand.EntityCacheTime");                        
                     case PluginSettingsCommand.EntityCacheCombatTime:
-                        if (int.TryParse(Value, out timer))
-                        {
-                            if (timer >= 1)
-                                EntityCache.CombatChacheTime = timer;
-                        }
-                        return ActionResult.Fail;
+                        //if (int.TryParse(Value, out timer))
+                        //{
+                        //    if (timer >= 1)
+                        //        EntityCache.CombatChacheTime = timer;
+                        //}
+                        //return ActionResult.Fail;
+                        throw new NotImplementedException("PluginSettingsCommand.EntityCacheCombatTime");
                 }
             }
             return ActionResult.Skip;

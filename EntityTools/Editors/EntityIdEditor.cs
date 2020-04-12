@@ -12,11 +12,12 @@ using Astral.Classes.ItemFilter;
 
 namespace EntityTools.Editors
 {
+#if DEVELOPER
     public class EntityIdEditor : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            string oldVal = string.Empty;
+            string strPattern = string.Empty;
             EntityNameType nameType = EntityNameType.NameUntranslated;
             ItemFilterStringType strFilterType = ItemFilterStringType.Simple;
 
@@ -54,33 +55,71 @@ namespace EntityTools.Editors
                     nameType = uccConditionEntityCheck.EntityNameType;
                     strFilterType = uccConditionEntityCheck.EntityIdType;
                 }
-                else 
-                if (ReflectionHelper.GetPropertyValue(context.Instance, "EntityNameType", out object entityNameTypeObj)
-                    && entityNameTypeObj is EntityNameType entityNameType)
+                else
                 {
-                    nameType = entityNameType;
-                }
-                if (ReflectionHelper.GetPropertyValue(context.Instance, "EntityIdType", out object itemFilterStringTypeObj)
-                    && itemFilterStringTypeObj is ItemFilterStringType itemFilterStringType)
-                {
-                    strFilterType = itemFilterStringType;
+                    if (ReflectionHelper.GetPropertyValue(context.Instance, "EntityNameType", out object entityNameTypeObj)
+                        && entityNameTypeObj is EntityNameType entityNameType)
+                    {
+                        nameType = entityNameType;
+                    }
+                    if (ReflectionHelper.GetPropertyValue(context.Instance, "EntityIdType", out object itemFilterStringTypeObj)
+                        && itemFilterStringTypeObj is ItemFilterStringType itemFilterStringType)
+                    {
+                        strFilterType = itemFilterStringType;
+                    }
                 }
             }
 
             if (value != null)
-                oldVal = value.ToString();
+                strPattern = value.ToString();
 
-            EntityDef selectedEntityDef = EntityTools.Core.GUIRequest_EntityId(oldVal, strFilterType, nameType);
-
-            if (selectedEntityDef != null && selectedEntityDef.IsValid)
+            if (EntityTools.Core.GUIRequest_EntityId(ref strPattern, ref strFilterType, ref nameType))
             {
-                switch(nameType)
+                // сохраняем новые значени опций команды
+                if (context.Instance is MoveToEntity moveToEntity)
                 {
-                    case EntityNameType.InternalName:
-                        return selectedEntityDef.InternalName;
-                    case EntityNameType.NameUntranslated:
-                        return selectedEntityDef.NameUntranslated;
-                }                
+                    if(nameType != moveToEntity.EntityNameType)
+                        moveToEntity.EntityNameType = nameType;
+                    if(strFilterType != moveToEntity.EntityIdType)
+                        moveToEntity.EntityIdType = strFilterType;
+                }
+                else if (context.Instance is InteractEntities interactEntities)
+                {
+                    if(nameType != interactEntities.EntityNameType)
+                        interactEntities.EntityNameType = nameType;
+                    if (strFilterType != interactEntities.EntityIdType)
+                        interactEntities.EntityIdType = strFilterType;
+                }
+                else if (context.Instance is EntityProperty entityProperty)
+                {
+                    if(nameType != entityProperty.EntityNameType)
+                        entityProperty.EntityNameType = nameType;
+                    if(strFilterType != entityProperty.EntityIdType)
+                        entityProperty.EntityIdType = strFilterType;
+                }
+                else if (context.Instance is EntityCount entityCountInCustomRegions)
+                {
+                    if(nameType != entityCountInCustomRegions.EntityNameType)
+                        entityCountInCustomRegions.EntityNameType = nameType;
+                    if(strFilterType != entityCountInCustomRegions.EntityIdType)
+                        entityCountInCustomRegions.EntityIdType = strFilterType;
+                }
+                else if (context.Instance is DodgeFromEntity dodgeFromEntity)
+                {
+                    if(nameType != dodgeFromEntity.EntityNameType)
+                        dodgeFromEntity.EntityNameType = nameType;
+                    if(strFilterType != dodgeFromEntity.EntityIdType)
+                        dodgeFromEntity.EntityIdType = strFilterType;
+                }
+                else if (context.Instance is UCCEntityCheck uccConditionEntityCheck)
+                {
+                    if(nameType != uccConditionEntityCheck.EntityNameType)
+                        uccConditionEntityCheck.EntityNameType = nameType;
+                    if(strFilterType != uccConditionEntityCheck.EntityIdType)
+                        uccConditionEntityCheck.EntityIdType = strFilterType;
+                }
+
+                return strPattern;
             }
             return value;
         }
@@ -90,4 +129,5 @@ namespace EntityTools.Editors
             return UITypeEditorEditStyle.Modal;
         }
     }
+#endif
 }

@@ -12,13 +12,14 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <AssemblyVersion>0.20.0408.1523</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <OutputPath>..\References\x64\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;DEVELOPER, CORE_INTERFACES</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
@@ -27,7 +28,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;CORE_INTERFACES</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
@@ -72,8 +73,8 @@
     <Compile Include="Entities\SearchDirect.cs" />
     <Compile Include="Extensions\CustomRegionExtentions.cs" />
     <Compile Include="Extensions\FormCollectionExtentions.cs" />
+    <Compile Include="Extensions\ListBoxItemCollectionExtension.cs" />
     <Compile Include="Extensions\ListTExtentions.cs" />
-    <Compile Include="Extensions\StringExtentions.cs" />
     <Compile Include="Forms\AuraSelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -135,9 +136,10 @@
       <DependentUpon>UIViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="IEntityInfos.cs" />
-    <Compile Include="Quester\Action\InteractEntitiesEngine_delegates.cs" />
+    <Compile Include="Quester\Conditions\CheckGameGUIEngine.cs" />
+    <Compile Include="Quester\Conditions\EntityDistanceEngine.cs" />
+    <Compile Include="Quester\Conditions\TeamMembersCountEngine.cs" />
     <Compile Include="Quester\IQuesterConditionEngine.cs" />
-    <Compile Include="UCC\IUCCActionEngine.cs" />
     <Compile Include="MountInsignias\Enums.cs" />
     <Compile Include="MountInsignias\MountBonusesDef.cs" />
     <Compile Include="MountInsignias\MountBonusPriorityDef.cs" />
@@ -154,8 +156,17 @@
     <Compile Include="Quester\Action\PickUpMissionEngine.cs" />
     <Compile Include="Quester\Conditions\EntityPropertyEngine.cs" />
     <Compile Include="Quester\Conditions\EntityCountEngine.cs" />
+    <Compile Include="UCC\Actions\ApproachEntityEngine.cs" />
+    <Compile Include="UCC\Actions\DodgeFromEntityEngine.cs" />
+    <Compile Include="UCC\Actions\ExecuteSpecificPowerEngine.cs" />
+    <Compile Include="UCC\Actions\UseItemSpecialEngine.cs" />
+    <Compile Include="UCC\Conditions\UCCGameUICheckEngine.cs" />
+    <Compile Include="UCC\Conditions\UCCTargetMatchEntityEngine.cs" />
+    <Compile Include="UCC\Conditions\UCCEntityCheckEngine.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="EntityTools\" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EntityTools\EntityTools.csproj">
       <Project>{df7f797e-db7e-44f9-a96a-020cfdb3c51e}</Project>
@@ -200,91 +211,94 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniAdd.png" />
+    <EmbeddedResource Include="Resources\miniAdd.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniCancel.png" />
+    <EmbeddedResource Include="Resources\miniCancel.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniCopy.png" />
+    <EmbeddedResource Include="Resources\miniCopy.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniDelete.png" />
+    <EmbeddedResource Include="Resources\miniDelete.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniEdit.png" />
+    <EmbeddedResource Include="Resources\miniEdit.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniExport.png" />
+    <EmbeddedResource Include="Resources\miniExport.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniGear.png" />
+    <EmbeddedResource Include="Resources\miniGear.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniImport.png" />
+    <EmbeddedResource Include="Resources\miniImport.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniLoad.png" />
+    <EmbeddedResource Include="Resources\miniLoad.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniNew.png" />
+    <EmbeddedResource Include="Resources\miniNew.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniPaste.png" />
+    <EmbeddedResource Include="Resources\miniPaste.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniPlay.png" />
+    <EmbeddedResource Include="Resources\miniPlay.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniPlayAll.png" />
+    <EmbeddedResource Include="Resources\miniPlayAll.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniRectCR.png" />
+    <EmbeddedResource Include="Resources\miniRectCR.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniRefresh.png" />
+    <EmbeddedResource Include="Resources\miniRefresh.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniSave.png" />
+    <EmbeddedResource Include="Resources\miniSave.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniSaveAll.png" />
+    <EmbeddedResource Include="Resources\miniSaveAll.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniSkip.png" />
+    <EmbeddedResource Include="Resources\miniSkip.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniStats.png" />
+    <EmbeddedResource Include="Resources\miniStats.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniStop.png" />
+    <EmbeddedResource Include="Resources\miniStop.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniTarget.png" />
+    <EmbeddedResource Include="Resources\miniTarget.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniValid.png" />
+    <EmbeddedResource Include="Resources\miniValid.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\paste.png" />
+    <EmbeddedResource Include="Resources\paste.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Icons_Inventory_Enchantments_Insignia_Barbed.png" />
+    <EmbeddedResource Include="Resources\Icons_Inventory_Enchantments_Insignia_Barbed.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Icons_Inventory_Enchantments_Insignia_Crescent.png" />
+    <EmbeddedResource Include="Resources\Icons_Inventory_Enchantments_Insignia_Crescent.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Icons_Inventory_Enchantments_Insignia_Enlightened.png" />
+    <EmbeddedResource Include="Resources\Icons_Inventory_Enchantments_Insignia_Enlightened.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Icons_Inventory_Enchantments_Insignia_Illuminated.png" />
+    <EmbeddedResource Include="Resources\Icons_Inventory_Enchantments_Insignia_Illuminated.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Icons_Inventory_Enchantments_Insignia_Regal.png" />
+    <EmbeddedResource Include="Resources\Icons_Inventory_Enchantments_Insignia_Regal.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Icons_Inventory_Enchantments_Insignia_Universal.png" />
+    <EmbeddedResource Include="Resources\Icons_Inventory_Enchantments_Insignia_Universal.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>type "$(TargetPath)"&gt;"$(TargetDir)EntityTools.dll:Core"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

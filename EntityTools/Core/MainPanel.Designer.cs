@@ -31,31 +31,38 @@ namespace EntityTools.Core
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.btnUccEditor = new System.Windows.Forms.Button();
             this.fldrBroserDlg = new System.Windows.Forms.FolderBrowserDialog();
             this.tbclMain = new DevExpress.XtraTab.XtraTabControl();
             this.tabUtilities = new DevExpress.XtraTab.XtraTabPage();
-            this.gpbExport = new System.Windows.Forms.GroupBox();
-            this.cbbExportSelector = new System.Windows.Forms.ComboBox();
-            this.tbExportFileSelector = new DevExpress.XtraEditors.ButtonEdit();
-            this.btnExport = new System.Windows.Forms.Button();
-            this.btnDefault = new System.Windows.Forms.Button();
             this.cbEnchantHelperActivator = new System.Windows.Forms.CheckBox();
             this.btnTest = new System.Windows.Forms.Button();
             this.btnUiViewer = new System.Windows.Forms.Button();
             this.btnAuraViewer = new System.Windows.Forms.Button();
             this.btnEntities = new System.Windows.Forms.Button();
+            this.ckbSpellStuckMonitor = new System.Windows.Forms.CheckBox();
+            this.gbxExport = new System.Windows.Forms.GroupBox();
+            this.cbbxExportSelector = new System.Windows.Forms.ComboBox();
+            this.tbExportFileSelector = new DevExpress.XtraEditors.ButtonEdit();
+            this.btnExport = new System.Windows.Forms.Button();
+            this.btnDefault = new System.Windows.Forms.Button();
             this.tabOptions = new DevExpress.XtraTab.XtraTabPage();
             this.cbSlideMonitor = new System.Windows.Forms.CheckBox();
-            this.ckbSpellStuckMonitor = new System.Windows.Forms.CheckBox();
-            this.gbSlideMonitor = new System.Windows.Forms.GroupBox();
+            this.gbxSlideMonitor = new System.Windows.Forms.GroupBox();
             this.tbSlidingAuras = new System.Windows.Forms.TextBox();
             this.lblSlideFilter = new System.Windows.Forms.Label();
             this.lblSlidingAuras = new System.Windows.Forms.Label();
             this.lblTimerUnslide = new System.Windows.Forms.Label();
             this.seSlideFilter = new DevExpress.XtraEditors.SpinEdit();
             this.lblSlideTimer = new System.Windows.Forms.Label();
-            this.ckbMapperPatch = new System.Windows.Forms.CheckBox();
+            this.gbxEntityCache = new System.Windows.Forms.GroupBox();
+            this.seCombatCacheTime = new DevExpress.XtraEditors.SpinEdit();
+            this.lblCombatCacheTime = new System.Windows.Forms.Label();
+            this.seLocalCacheTime = new DevExpress.XtraEditors.SpinEdit();
+            this.lblLocalCacheTime = new System.Windows.Forms.Label();
+            this.seGlobalCacheTime = new DevExpress.XtraEditors.SpinEdit();
+            this.lblGlobalCacheTime = new System.Windows.Forms.Label();
             this.tabRelogger = new DevExpress.XtraTab.XtraTabPage();
             this.lblMachinId = new System.Windows.Forms.Label();
             this.lblAccount = new System.Windows.Forms.Label();
@@ -63,6 +70,7 @@ namespace EntityTools.Core
             this.btnSetMachineId = new DevExpress.XtraEditors.SimpleButton();
             this.tbMashingId = new System.Windows.Forms.TextBox();
             this.tabMapper = new DevExpress.XtraTab.XtraTabPage();
+            this.ckbMapperPatch = new System.Windows.Forms.CheckBox();
             this.gbxMapperSettings = new System.Windows.Forms.GroupBox();
             this.seMapperWaipointDistance = new DevExpress.XtraEditors.SpinEdit();
             this.btnMapperTest = new System.Windows.Forms.Button();
@@ -74,21 +82,33 @@ namespace EntityTools.Core
             this.seMapperMaxZDif = new DevExpress.XtraEditors.SpinEdit();
             this.ckbMapperLinearPath = new System.Windows.Forms.CheckBox();
             this.btnShowMapper = new System.Windows.Forms.Button();
+            this.tabLogger = new DevExpress.XtraTab.XtraTabPage();
+            this.ckbEnableLogger = new System.Windows.Forms.CheckBox();
+            this.gbxLogger = new System.Windows.Forms.GroupBox();
+            this.ckbExtendedActionDebugInfo = new System.Windows.Forms.CheckBox();
+            this.btnOpenLog = new System.Windows.Forms.Button();
             this.dlgSaveFile = new System.Windows.Forms.SaveFileDialog();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
             this.tbclMain.SuspendLayout();
             this.tabUtilities.SuspendLayout();
-            this.gpbExport.SuspendLayout();
+            this.gbxExport.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tbExportFileSelector.Properties)).BeginInit();
             this.tabOptions.SuspendLayout();
-            this.gbSlideMonitor.SuspendLayout();
+            this.gbxSlideMonitor.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.seSlideFilter.Properties)).BeginInit();
+            this.gbxEntityCache.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.seCombatCacheTime.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.seLocalCacheTime.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.seGlobalCacheTime.Properties)).BeginInit();
             this.tabRelogger.SuspendLayout();
             this.tabMapper.SuspendLayout();
             this.gbxMapperSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.seMapperWaipointDistance.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seWaypointEquivalenceDistance.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seMapperMaxZDif.Properties)).BeginInit();
+            this.tabLogger.SuspendLayout();
+            this.gbxLogger.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnUccEditor
@@ -119,97 +139,34 @@ namespace EntityTools.Core
             this.tabUtilities,
             this.tabOptions,
             this.tabRelogger,
-            this.tabMapper});
+            this.tabMapper,
+            this.tabLogger});
             // 
             // tabUtilities
             // 
-            this.tabUtilities.Controls.Add(this.gpbExport);
             this.tabUtilities.Controls.Add(this.cbEnchantHelperActivator);
             this.tabUtilities.Controls.Add(this.btnTest);
             this.tabUtilities.Controls.Add(this.btnUiViewer);
             this.tabUtilities.Controls.Add(this.btnAuraViewer);
             this.tabUtilities.Controls.Add(this.btnEntities);
             this.tabUtilities.Controls.Add(this.btnUccEditor);
+            this.tabUtilities.Controls.Add(this.ckbSpellStuckMonitor);
+            this.tabUtilities.Controls.Add(this.gbxExport);
             this.tabUtilities.Name = "tabUtilities";
             this.tabUtilities.Padding = new System.Windows.Forms.Padding(6);
             this.tabUtilities.Size = new System.Drawing.Size(364, 388);
             this.tabUtilities.Text = "Utilities";
             // 
-            // gpbExport
-            // 
-            this.gpbExport.Controls.Add(this.cbbExportSelector);
-            this.gpbExport.Controls.Add(this.tbExportFileSelector);
-            this.gpbExport.Controls.Add(this.btnExport);
-            this.gpbExport.Controls.Add(this.btnDefault);
-            this.gpbExport.Location = new System.Drawing.Point(9, 9);
-            this.gpbExport.Name = "gpbExport";
-            this.gpbExport.Size = new System.Drawing.Size(346, 82);
-            this.gpbExport.TabIndex = 12;
-            this.gpbExport.TabStop = false;
-            this.gpbExport.Text = "Export";
-            // 
-            // cbbExportSelector
-            // 
-            this.cbbExportSelector.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbbExportSelector.Location = new System.Drawing.Point(6, 20);
-            this.cbbExportSelector.Name = "cbbExportSelector";
-            this.cbbExportSelector.Size = new System.Drawing.Size(219, 21);
-            this.cbbExportSelector.Sorted = true;
-            this.cbbExportSelector.TabIndex = 11;
-            this.cbbExportSelector.SelectedIndexChanged += new System.EventHandler(this.cbbExportSelector_SelectedIndexChanged);
-            // 
-            // tbExportFileSelector
-            // 
-            this.tbExportFileSelector.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbExportFileSelector.EditValue = "";
-            this.tbExportFileSelector.Location = new System.Drawing.Point(6, 51);
-            this.tbExportFileSelector.Name = "tbExportFileSelector";
-            this.tbExportFileSelector.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton()});
-            this.tbExportFileSelector.Properties.HideSelection = false;
-            this.tbExportFileSelector.Properties.NullText = "Enter the Filename";
-            this.tbExportFileSelector.Properties.NullValuePromptShowForEmptyValue = true;
-            this.tbExportFileSelector.Size = new System.Drawing.Size(334, 20);
-            this.tbExportFileSelector.TabIndex = 6;
-            this.tbExportFileSelector.ToolTip = "File name to store selected data. \r\nAllow mask %character%, %account%, %dateTime%" +
-    ".";
-            this.tbExportFileSelector.ButtonClick += new DevExpress.XtraEditors.Controls.ButtonPressedEventHandler(this.tbExportFileSelector_ButtonClick);
-            // 
-            // btnExport
-            // 
-            this.btnExport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnExport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnExport.Location = new System.Drawing.Point(290, 20);
-            this.btnExport.Name = "btnExport";
-            this.btnExport.Size = new System.Drawing.Size(50, 23);
-            this.btnExport.TabIndex = 2;
-            this.btnExport.Text = "Export";
-            this.btnExport.UseVisualStyleBackColor = true;
-            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
-            // 
-            // btnDefault
-            // 
-            this.btnDefault.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDefault.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnDefault.Location = new System.Drawing.Point(231, 20);
-            this.btnDefault.Name = "btnDefault";
-            this.btnDefault.Size = new System.Drawing.Size(53, 23);
-            this.btnDefault.TabIndex = 2;
-            this.btnDefault.Text = "Default";
-            this.btnDefault.UseVisualStyleBackColor = true;
-            this.btnDefault.Click += new System.EventHandler(this.btnExport_Click);
-            // 
             // cbEnchantHelperActivator
             // 
             this.cbEnchantHelperActivator.AutoSize = true;
-            this.cbEnchantHelperActivator.Location = new System.Drawing.Point(15, 108);
+            this.cbEnchantHelperActivator.Location = new System.Drawing.Point(15, 114);
             this.cbEnchantHelperActivator.Name = "cbEnchantHelperActivator";
             this.cbEnchantHelperActivator.Size = new System.Drawing.Size(131, 17);
             this.cbEnchantHelperActivator.TabIndex = 10;
             this.cbEnchantHelperActivator.Text = "Enable EnchantHelper";
             this.cbEnchantHelperActivator.UseVisualStyleBackColor = true;
+            this.cbEnchantHelperActivator.CheckedChanged += new System.EventHandler(this.cbEnchantHelperActivator_CheckedChanged);
             // 
             // btnTest
             // 
@@ -265,19 +222,100 @@ namespace EntityTools.Core
             this.btnEntities.UseVisualStyleBackColor = true;
             this.btnEntities.Click += new System.EventHandler(this.btnEntities_Click);
             // 
+            // ckbSpellStuckMonitor
+            // 
+            this.ckbSpellStuckMonitor.AutoSize = true;
+            this.ckbSpellStuckMonitor.Checked = true;
+            this.ckbSpellStuckMonitor.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ckbSpellStuckMonitor.Location = new System.Drawing.Point(15, 91);
+            this.ckbSpellStuckMonitor.Name = "ckbSpellStuckMonitor";
+            this.ckbSpellStuckMonitor.Size = new System.Drawing.Size(145, 17);
+            this.ckbSpellStuckMonitor.TabIndex = 1;
+            this.ckbSpellStuckMonitor.Text = "Enable SpellStuckMonitor";
+            this.ckbSpellStuckMonitor.UseVisualStyleBackColor = true;
+            this.ckbSpellStuckMonitor.CheckedChanged += new System.EventHandler(this.cbSpellStuckMonitor_CheckedChanged);
+            // 
+            // gbxExport
+            // 
+            this.gbxExport.Controls.Add(this.cbbxExportSelector);
+            this.gbxExport.Controls.Add(this.tbExportFileSelector);
+            this.gbxExport.Controls.Add(this.btnExport);
+            this.gbxExport.Controls.Add(this.btnDefault);
+            this.gbxExport.Location = new System.Drawing.Point(9, 3);
+            this.gbxExport.Name = "gbxExport";
+            this.gbxExport.Size = new System.Drawing.Size(346, 82);
+            this.gbxExport.TabIndex = 12;
+            this.gbxExport.TabStop = false;
+            this.gbxExport.Text = "Export";
+            // 
+            // cbbxExportSelector
+            // 
+            this.cbbxExportSelector.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbbxExportSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbbxExportSelector.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbbxExportSelector.Location = new System.Drawing.Point(6, 20);
+            this.cbbxExportSelector.Name = "cbbxExportSelector";
+            this.cbbxExportSelector.Size = new System.Drawing.Size(219, 21);
+            this.cbbxExportSelector.Sorted = true;
+            this.cbbxExportSelector.TabIndex = 11;
+            this.cbbxExportSelector.SelectedIndexChanged += new System.EventHandler(this.cbbExportSelector_SelectedIndexChanged);
+            // 
+            // tbExportFileSelector
+            // 
+            this.tbExportFileSelector.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbExportFileSelector.EditValue = "";
+            this.tbExportFileSelector.Location = new System.Drawing.Point(6, 51);
+            this.tbExportFileSelector.Name = "tbExportFileSelector";
+            this.tbExportFileSelector.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton()});
+            this.tbExportFileSelector.Properties.HideSelection = false;
+            this.tbExportFileSelector.Properties.NullText = "Enter the Filename";
+            this.tbExportFileSelector.Properties.NullValuePromptShowForEmptyValue = true;
+            this.tbExportFileSelector.Size = new System.Drawing.Size(334, 20);
+            this.tbExportFileSelector.TabIndex = 6;
+            this.tbExportFileSelector.ToolTip = "File name to store selected data. \r\nAllow mask %character%, %account%, %dateTime%" +
+    ".";
+            this.tbExportFileSelector.ButtonClick += new DevExpress.XtraEditors.Controls.ButtonPressedEventHandler(this.tbExportFileSelector_ButtonClick);
+            // 
+            // btnExport
+            // 
+            this.btnExport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnExport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnExport.Location = new System.Drawing.Point(290, 20);
+            this.btnExport.Name = "btnExport";
+            this.btnExport.Size = new System.Drawing.Size(50, 23);
+            this.btnExport.TabIndex = 2;
+            this.btnExport.Text = "Export";
+            this.btnExport.UseVisualStyleBackColor = true;
+            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
+            // 
+            // btnDefault
+            // 
+            this.btnDefault.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDefault.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnDefault.Location = new System.Drawing.Point(231, 20);
+            this.btnDefault.Name = "btnDefault";
+            this.btnDefault.Size = new System.Drawing.Size(53, 23);
+            this.btnDefault.TabIndex = 2;
+            this.btnDefault.Text = "Default";
+            this.btnDefault.UseVisualStyleBackColor = true;
+            this.btnDefault.Click += new System.EventHandler(this.btnDefault_Click);
+            // 
             // tabOptions
             // 
             this.tabOptions.Controls.Add(this.cbSlideMonitor);
-            this.tabOptions.Controls.Add(this.ckbSpellStuckMonitor);
-            this.tabOptions.Controls.Add(this.gbSlideMonitor);
-            this.tabOptions.Controls.Add(this.ckbMapperPatch);
+            this.tabOptions.Controls.Add(this.gbxSlideMonitor);
+            this.tabOptions.Controls.Add(this.gbxEntityCache);
             this.tabOptions.Name = "tabOptions";
+            this.tabOptions.Padding = new System.Windows.Forms.Padding(6);
             this.tabOptions.Size = new System.Drawing.Size(364, 388);
             this.tabOptions.Text = "Options";
             // 
             // cbSlideMonitor
             // 
-            this.cbSlideMonitor.Location = new System.Drawing.Point(13, 223);
+            this.cbSlideMonitor.Location = new System.Drawing.Point(18, 220);
             this.cbSlideMonitor.Name = "cbSlideMonitor";
             this.cbSlideMonitor.Size = new System.Drawing.Size(119, 17);
             this.cbSlideMonitor.TabIndex = 3;
@@ -285,34 +323,22 @@ namespace EntityTools.Core
             this.cbSlideMonitor.UseVisualStyleBackColor = true;
             this.cbSlideMonitor.Visible = false;
             // 
-            // ckbSpellStuckMonitor
+            // gbxSlideMonitor
             // 
-            this.ckbSpellStuckMonitor.AutoSize = true;
-            this.ckbSpellStuckMonitor.Checked = true;
-            this.ckbSpellStuckMonitor.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ckbSpellStuckMonitor.Location = new System.Drawing.Point(12, 15);
-            this.ckbSpellStuckMonitor.Name = "ckbSpellStuckMonitor";
-            this.ckbSpellStuckMonitor.Size = new System.Drawing.Size(145, 17);
-            this.ckbSpellStuckMonitor.TabIndex = 1;
-            this.ckbSpellStuckMonitor.Text = "Enable SpellStuckMonitor";
-            this.ckbSpellStuckMonitor.UseVisualStyleBackColor = true;
-            // 
-            // gbSlideMonitor
-            // 
-            this.gbSlideMonitor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.gbxSlideMonitor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.gbSlideMonitor.Controls.Add(this.tbSlidingAuras);
-            this.gbSlideMonitor.Controls.Add(this.lblSlideFilter);
-            this.gbSlideMonitor.Controls.Add(this.lblSlidingAuras);
-            this.gbSlideMonitor.Controls.Add(this.lblTimerUnslide);
-            this.gbSlideMonitor.Controls.Add(this.seSlideFilter);
-            this.gbSlideMonitor.Controls.Add(this.lblSlideTimer);
-            this.gbSlideMonitor.Location = new System.Drawing.Point(3, 225);
-            this.gbSlideMonitor.Name = "gbSlideMonitor";
-            this.gbSlideMonitor.Size = new System.Drawing.Size(359, 160);
-            this.gbSlideMonitor.TabIndex = 4;
-            this.gbSlideMonitor.TabStop = false;
-            this.gbSlideMonitor.Visible = false;
+            this.gbxSlideMonitor.Controls.Add(this.tbSlidingAuras);
+            this.gbxSlideMonitor.Controls.Add(this.lblSlideFilter);
+            this.gbxSlideMonitor.Controls.Add(this.lblSlidingAuras);
+            this.gbxSlideMonitor.Controls.Add(this.lblTimerUnslide);
+            this.gbxSlideMonitor.Controls.Add(this.seSlideFilter);
+            this.gbxSlideMonitor.Controls.Add(this.lblSlideTimer);
+            this.gbxSlideMonitor.Location = new System.Drawing.Point(9, 219);
+            this.gbxSlideMonitor.Name = "gbxSlideMonitor";
+            this.gbxSlideMonitor.Size = new System.Drawing.Size(347, 160);
+            this.gbxSlideMonitor.TabIndex = 4;
+            this.gbxSlideMonitor.TabStop = false;
+            this.gbxSlideMonitor.Visible = false;
             // 
             // tbSlidingAuras
             // 
@@ -324,7 +350,7 @@ namespace EntityTools.Core
             this.tbSlidingAuras.Location = new System.Drawing.Point(6, 94);
             this.tbSlidingAuras.Multiline = true;
             this.tbSlidingAuras.Name = "tbSlidingAuras";
-            this.tbSlidingAuras.Size = new System.Drawing.Size(347, 60);
+            this.tbSlidingAuras.Size = new System.Drawing.Size(335, 60);
             this.tbSlidingAuras.TabIndex = 3;
             this.tbSlidingAuras.Text = "M10_Becritter_Boat_Costume\r\nVolume_Ground_Slippery\r\nVolume_Ground_Slippery_Player" +
     "only";
@@ -389,15 +415,106 @@ namespace EntityTools.Core
             this.lblSlideTimer.TabIndex = 2;
             this.lblSlideTimer.Text = "Time between aura check (millisecond):";
             // 
-            // ckbMapperPatch
+            // gbxEntityCache
             // 
-            this.ckbMapperPatch.AutoSize = true;
-            this.ckbMapperPatch.Location = new System.Drawing.Point(12, 38);
-            this.ckbMapperPatch.Name = "ckbMapperPatch";
-            this.ckbMapperPatch.Size = new System.Drawing.Size(157, 17);
-            this.ckbMapperPatch.TabIndex = 3;
-            this.ckbMapperPatch.Text = "Mapper Patch (need Relog)";
-            this.ckbMapperPatch.UseVisualStyleBackColor = true;
+            this.gbxEntityCache.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbxEntityCache.Controls.Add(this.seCombatCacheTime);
+            this.gbxEntityCache.Controls.Add(this.lblCombatCacheTime);
+            this.gbxEntityCache.Controls.Add(this.seLocalCacheTime);
+            this.gbxEntityCache.Controls.Add(this.lblLocalCacheTime);
+            this.gbxEntityCache.Controls.Add(this.seGlobalCacheTime);
+            this.gbxEntityCache.Controls.Add(this.lblGlobalCacheTime);
+            this.gbxEntityCache.Location = new System.Drawing.Point(9, 9);
+            this.gbxEntityCache.Name = "gbxEntityCache";
+            this.gbxEntityCache.Size = new System.Drawing.Size(346, 102);
+            this.gbxEntityCache.TabIndex = 5;
+            this.gbxEntityCache.TabStop = false;
+            this.gbxEntityCache.Text = "EntityCache settings";
+            // 
+            // seCombatCacheTime
+            // 
+            this.seCombatCacheTime.EditValue = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.seCombatCacheTime.Location = new System.Drawing.Point(9, 72);
+            this.seCombatCacheTime.Name = "seCombatCacheTime";
+            this.seCombatCacheTime.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.seCombatCacheTime.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.seCombatCacheTime.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
+            this.seCombatCacheTime.Properties.IsFloatValue = false;
+            this.seCombatCacheTime.Properties.Mask.EditMask = "N00";
+            this.seCombatCacheTime.Size = new System.Drawing.Size(58, 20);
+            this.seCombatCacheTime.TabIndex = 3;
+            // 
+            // lblCombatCacheTime
+            // 
+            this.lblCombatCacheTime.AutoSize = true;
+            this.lblCombatCacheTime.Location = new System.Drawing.Point(73, 75);
+            this.lblCombatCacheTime.Name = "lblCombatCacheTime";
+            this.lblCombatCacheTime.Size = new System.Drawing.Size(199, 13);
+            this.lblCombatCacheTime.TabIndex = 4;
+            this.lblCombatCacheTime.Text = "Combat entity cache refresh time (UCC)";
+            // 
+            // seLocalCacheTime
+            // 
+            this.seLocalCacheTime.EditValue = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.seLocalCacheTime.Location = new System.Drawing.Point(9, 46);
+            this.seLocalCacheTime.Name = "seLocalCacheTime";
+            this.seLocalCacheTime.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.seLocalCacheTime.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.seLocalCacheTime.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
+            this.seLocalCacheTime.Properties.IsFloatValue = false;
+            this.seLocalCacheTime.Properties.Mask.EditMask = "N00";
+            this.seLocalCacheTime.Size = new System.Drawing.Size(58, 20);
+            this.seLocalCacheTime.TabIndex = 3;
+            this.seLocalCacheTime.ToolTip = "Time between the refresh of the local Entities cache of the actions and condition" +
+    "s";
+            // 
+            // lblLocalCacheTime
+            // 
+            this.lblLocalCacheTime.AutoSize = true;
+            this.lblLocalCacheTime.Location = new System.Drawing.Point(73, 49);
+            this.lblLocalCacheTime.Name = "lblLocalCacheTime";
+            this.lblLocalCacheTime.Size = new System.Drawing.Size(204, 13);
+            this.lblLocalCacheTime.TabIndex = 4;
+            this.lblLocalCacheTime.Text = "Local entity cache refresh time (Quester)";
+            // 
+            // seGlobalCacheTime
+            // 
+            this.seGlobalCacheTime.EditValue = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.seGlobalCacheTime.Location = new System.Drawing.Point(9, 20);
+            this.seGlobalCacheTime.Name = "seGlobalCacheTime";
+            this.seGlobalCacheTime.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.seGlobalCacheTime.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.seGlobalCacheTime.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
+            this.seGlobalCacheTime.Properties.IsFloatValue = false;
+            this.seGlobalCacheTime.Properties.Mask.EditMask = "N00";
+            this.seGlobalCacheTime.Size = new System.Drawing.Size(58, 20);
+            this.seGlobalCacheTime.TabIndex = 3;
+            this.seGlobalCacheTime.ToolTip = "Time between the refresh of the global entity cache";
+            // 
+            // lblGlobalCacheTime
+            // 
+            this.lblGlobalCacheTime.AutoSize = true;
+            this.lblGlobalCacheTime.Location = new System.Drawing.Point(73, 23);
+            this.lblGlobalCacheTime.Name = "lblGlobalCacheTime";
+            this.lblGlobalCacheTime.Size = new System.Drawing.Size(209, 13);
+            this.lblGlobalCacheTime.TabIndex = 4;
+            this.lblGlobalCacheTime.Text = "Global entity cache refresh time (Quester)";
             // 
             // tabRelogger
             // 
@@ -460,6 +577,7 @@ namespace EntityTools.Core
             // 
             // tabMapper
             // 
+            this.tabMapper.Controls.Add(this.ckbMapperPatch);
             this.tabMapper.Controls.Add(this.gbxMapperSettings);
             this.tabMapper.Controls.Add(this.btnShowMapper);
             this.tabMapper.Name = "tabMapper";
@@ -467,8 +585,21 @@ namespace EntityTools.Core
             this.tabMapper.Size = new System.Drawing.Size(364, 388);
             this.tabMapper.Text = "Mapper Settings";
             // 
+            // ckbMapperPatch
+            // 
+            this.ckbMapperPatch.AutoSize = true;
+            this.ckbMapperPatch.Location = new System.Drawing.Point(15, 9);
+            this.ckbMapperPatch.Name = "ckbMapperPatch";
+            this.ckbMapperPatch.Size = new System.Drawing.Size(157, 17);
+            this.ckbMapperPatch.TabIndex = 3;
+            this.ckbMapperPatch.Text = "Mapper Patch (need Relog)";
+            this.ckbMapperPatch.UseVisualStyleBackColor = true;
+            // 
             // gbxMapperSettings
             // 
+            this.gbxMapperSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.gbxMapperSettings.Controls.Add(this.seMapperWaipointDistance);
             this.gbxMapperSettings.Controls.Add(this.btnMapperTest);
             this.gbxMapperSettings.Controls.Add(this.seWaypointEquivalenceDistance);
@@ -478,9 +609,9 @@ namespace EntityTools.Core
             this.gbxMapperSettings.Controls.Add(this.lblNodeDistance);
             this.gbxMapperSettings.Controls.Add(this.seMapperMaxZDif);
             this.gbxMapperSettings.Controls.Add(this.ckbMapperLinearPath);
-            this.gbxMapperSettings.Location = new System.Drawing.Point(2, 9);
+            this.gbxMapperSettings.Location = new System.Drawing.Point(9, 32);
             this.gbxMapperSettings.Name = "gbxMapperSettings";
-            this.gbxMapperSettings.Size = new System.Drawing.Size(359, 324);
+            this.gbxMapperSettings.Size = new System.Drawing.Size(346, 301);
             this.gbxMapperSettings.TabIndex = 6;
             this.gbxMapperSettings.TabStop = false;
             this.gbxMapperSettings.Text = "Settings";
@@ -517,13 +648,12 @@ namespace EntityTools.Core
             // 
             this.btnMapperTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnMapperTest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMapperTest.Location = new System.Drawing.Point(303, 295);
+            this.btnMapperTest.Location = new System.Drawing.Point(290, 272);
             this.btnMapperTest.Name = "btnMapperTest";
             this.btnMapperTest.Size = new System.Drawing.Size(50, 23);
             this.btnMapperTest.TabIndex = 5;
             this.btnMapperTest.Text = "Test";
             this.btnMapperTest.UseVisualStyleBackColor = true;
-            this.btnMapperTest.Click += new System.EventHandler(this.button1_Click);
             // 
             // seWaypointEquivalenceDistance
             // 
@@ -630,6 +760,8 @@ namespace EntityTools.Core
             // 
             // btnShowMapper
             // 
+            this.btnShowMapper.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.btnShowMapper.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnShowMapper.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold);
             this.btnShowMapper.Location = new System.Drawing.Point(9, 339);
@@ -639,6 +771,64 @@ namespace EntityTools.Core
             this.btnShowMapper.Text = "Show Mapper";
             this.btnShowMapper.UseVisualStyleBackColor = true;
             this.btnShowMapper.Click += new System.EventHandler(this.btnShowMapper_Click);
+            // 
+            // tabLogger
+            // 
+            this.tabLogger.Controls.Add(this.ckbEnableLogger);
+            this.tabLogger.Controls.Add(this.gbxLogger);
+            this.tabLogger.Name = "tabLogger";
+            this.tabLogger.Padding = new System.Windows.Forms.Padding(6);
+            this.tabLogger.Size = new System.Drawing.Size(364, 388);
+            this.tabLogger.Text = "Logger";
+            // 
+            // ckbEnableLogger
+            // 
+            this.ckbEnableLogger.AutoSize = true;
+            this.ckbEnableLogger.Location = new System.Drawing.Point(18, 9);
+            this.ckbEnableLogger.Name = "ckbEnableLogger";
+            this.ckbEnableLogger.Size = new System.Drawing.Size(150, 17);
+            this.ckbEnableLogger.TabIndex = 6;
+            this.ckbEnableLogger.Text = "Enable EntityTools Logger";
+            this.ckbEnableLogger.UseVisualStyleBackColor = true;
+            this.ckbEnableLogger.CheckedChanged += new System.EventHandler(this.ckbEnableLogger_CheckedChanged);
+            // 
+            // gbxLogger
+            // 
+            this.gbxLogger.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbxLogger.Controls.Add(this.ckbExtendedActionDebugInfo);
+            this.gbxLogger.Controls.Add(this.btnOpenLog);
+            this.gbxLogger.Location = new System.Drawing.Point(9, 9);
+            this.gbxLogger.Name = "gbxLogger";
+            this.gbxLogger.Size = new System.Drawing.Size(346, 370);
+            this.gbxLogger.TabIndex = 7;
+            this.gbxLogger.TabStop = false;
+            // 
+            // ckbExtendedActionDebugInfo
+            // 
+            this.ckbExtendedActionDebugInfo.AutoSize = true;
+            this.ckbExtendedActionDebugInfo.Location = new System.Drawing.Point(9, 23);
+            this.ckbExtendedActionDebugInfo.Name = "ckbExtendedActionDebugInfo";
+            this.ckbExtendedActionDebugInfo.Size = new System.Drawing.Size(296, 17);
+            this.ckbExtendedActionDebugInfo.TabIndex = 6;
+            this.ckbExtendedActionDebugInfo.Text = "Enable the Extended debug info for the Quester-actions";
+            this.ckbExtendedActionDebugInfo.UseVisualStyleBackColor = true;
+            this.ckbExtendedActionDebugInfo.CheckedChanged += new System.EventHandler(this.ckbEnableLogger_CheckedChanged);
+            // 
+            // btnOpenLog
+            // 
+            this.btnOpenLog.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnOpenLog.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnOpenLog.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold);
+            this.btnOpenLog.Location = new System.Drawing.Point(6, 324);
+            this.btnOpenLog.Name = "btnOpenLog";
+            this.btnOpenLog.Size = new System.Drawing.Size(334, 40);
+            this.btnOpenLog.TabIndex = 5;
+            this.btnOpenLog.Text = "Open EntityTools log file";
+            this.btnOpenLog.UseVisualStyleBackColor = true;
+            this.btnOpenLog.Click += new System.EventHandler(this.btnOpenLog_Click);
             // 
             // dlgSaveFile
             // 
@@ -657,21 +847,30 @@ namespace EntityTools.Core
             this.tbclMain.ResumeLayout(false);
             this.tabUtilities.ResumeLayout(false);
             this.tabUtilities.PerformLayout();
-            this.gpbExport.ResumeLayout(false);
+            this.gbxExport.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.tbExportFileSelector.Properties)).EndInit();
             this.tabOptions.ResumeLayout(false);
-            this.tabOptions.PerformLayout();
-            this.gbSlideMonitor.ResumeLayout(false);
-            this.gbSlideMonitor.PerformLayout();
+            this.gbxSlideMonitor.ResumeLayout(false);
+            this.gbxSlideMonitor.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.seSlideFilter.Properties)).EndInit();
+            this.gbxEntityCache.ResumeLayout(false);
+            this.gbxEntityCache.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.seCombatCacheTime.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.seLocalCacheTime.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.seGlobalCacheTime.Properties)).EndInit();
             this.tabRelogger.ResumeLayout(false);
             this.tabRelogger.PerformLayout();
             this.tabMapper.ResumeLayout(false);
+            this.tabMapper.PerformLayout();
             this.gbxMapperSettings.ResumeLayout(false);
             this.gbxMapperSettings.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.seMapperWaipointDistance.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seWaypointEquivalenceDistance.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seMapperMaxZDif.Properties)).EndInit();
+            this.tabLogger.ResumeLayout(false);
+            this.tabLogger.PerformLayout();
+            this.gbxLogger.ResumeLayout(false);
+            this.gbxLogger.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -691,7 +890,7 @@ namespace EntityTools.Core
         private DevExpress.XtraEditors.SpinEdit seMapperWaipointDistance;
         private DevExpress.XtraEditors.SpinEdit seSlideFilter;
         private System.Windows.Forms.CheckBox cbSlideMonitor;
-        private System.Windows.Forms.GroupBox gbSlideMonitor;
+        private System.Windows.Forms.GroupBox gbxSlideMonitor;
         private System.Windows.Forms.TextBox tbSlidingAuras;
         private System.Windows.Forms.Label lblSlidingAuras;
         private System.Windows.Forms.Button btnUiViewer;
@@ -705,11 +904,11 @@ namespace EntityTools.Core
         private DevExpress.XtraEditors.SimpleButton btnSetMachineId;
         private System.Windows.Forms.TextBox tbMashingId;
         private System.Windows.Forms.Button btnAuraViewer;
-        private System.Windows.Forms.ComboBox cbbExportSelector;
+        private System.Windows.Forms.ComboBox cbbxExportSelector;
         private DevExpress.XtraEditors.ButtonEdit tbExportFileSelector;
         private System.Windows.Forms.SaveFileDialog dlgSaveFile;
         private System.Windows.Forms.Button btnExport;
-        private System.Windows.Forms.GroupBox gpbExport;
+        private System.Windows.Forms.GroupBox gbxExport;
         private System.Windows.Forms.Button btnDefault;
         private DevExpress.XtraEditors.SpinEdit seMapperMaxZDif;
         private System.Windows.Forms.Label lblMapperMaxZDif;
@@ -722,5 +921,18 @@ namespace EntityTools.Core
         private System.Windows.Forms.Button btnMapperTest;
         private System.Windows.Forms.GroupBox gbxMapperSettings;
         private System.Windows.Forms.CheckBox ckbMapperPatch;
+        private DevExpress.XtraTab.XtraTabPage tabLogger;
+        private System.Windows.Forms.CheckBox ckbEnableLogger;
+        private System.Windows.Forms.Button btnOpenLog;
+        private System.Windows.Forms.GroupBox gbxLogger;
+        private System.Windows.Forms.GroupBox gbxEntityCache;
+        private DevExpress.XtraEditors.SpinEdit seGlobalCacheTime;
+        private System.Windows.Forms.Label lblGlobalCacheTime;
+        private DevExpress.XtraEditors.SpinEdit seCombatCacheTime;
+        private System.Windows.Forms.Label lblCombatCacheTime;
+        private DevExpress.XtraEditors.SpinEdit seLocalCacheTime;
+        private System.Windows.Forms.Label lblLocalCacheTime;
+        private System.Windows.Forms.ToolTip toolTip;
+        private System.Windows.Forms.CheckBox ckbExtendedActionDebugInfo;
     }
 }

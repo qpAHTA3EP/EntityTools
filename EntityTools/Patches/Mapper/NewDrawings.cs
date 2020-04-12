@@ -1,6 +1,7 @@
 ﻿using AStar;
 using Astral;
 using Astral.Logic.Classes.Map;
+using EntityTools.Logger;
 using EntityTools.Reflection;
 using MyNW.Classes;
 using MyNW.Internals;
@@ -211,7 +212,7 @@ namespace EntityTools.Patches.Mapper
             }*/
             catch (Exception ex)
             {
-                Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex.ToString());
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex.ToString());
             }
             /*finally
             {

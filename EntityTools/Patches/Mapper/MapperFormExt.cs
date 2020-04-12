@@ -18,6 +18,7 @@ using System.Windows.Forms;
 using System.Reflection;
 using AstralMapperOriginals;
 using MappingType = EntityTools.Enums.MappingType;
+using EntityTools.Logger;
 
 namespace EntityTools.Patches.Mapper
 {
@@ -396,9 +397,9 @@ namespace EntityTools.Patches.Mapper
                 AddNavigationNodeStatic.LogWatch();
 #endif
 #if LOG && DEBUG
-                Logger.WriteLine(Logger.LogType.Debug, $"MapperExtWithCache:: Graph Nodes: {graphCache.FullGraph.Nodes.Count}");
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"MapperExtWithCache:: Graph Nodes: {graphCache.FullGraph.Nodes.Count}");
 #endif
-                Logger.WriteLine(ex.ToString());
+                EntityToolsLogger.WriteLine(ex.ToString());
             }
         }
         #endregion
@@ -481,7 +482,7 @@ namespace EntityTools.Patches.Mapper
                     Class88.smethod_4(openFileDialog.FileName, list);
                     foreach (Class88.Class89 class2 in list)
                     {
-                        Logger.WriteLine("found : " + class2.FileName + " : " + class2.Success.ToString());
+                        EntityToolsLogger.WriteLine("found : " + class2.FileName + " : " + class2.Success.ToString());
                         if (class2.Success)
                         {
                             profileMeshes.Add(class2.FileName.Replace(".bin", ""), class2.Object as Graph);

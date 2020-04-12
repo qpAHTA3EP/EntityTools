@@ -10,9 +10,12 @@ using EntityTools.Tools;
 using MyNW.Internals;
 using MyNW;
 using EntityTools.UCC.Extensions;
-using DevExpress.XtraEditors;
 using EntityTools.Enums;
-using EntityTools.Servises;
+using EntityTools.Services;
+using Astral.Classes.ItemFilter;
+using EntityTools.Logger;
+using System.Collections.Generic;
+using MyNW.Classes;
 
 namespace EntityTools.Core
 {
@@ -24,35 +27,76 @@ namespace EntityTools.Core
         {
             InitializeComponent();
 
-            cbbExportSelector.DataSource = Enum.GetValues(typeof(ExportTypes));
+            cbbxExportSelector.DataSource = Enum.GetValues(typeof(ExportTypes));
 
             //ckbSpellStuckMonitor.Checked = EntityTools.PluginSettings.UnstuckSpells.Active;
             ckbSpellStuckMonitor.DataBindings.Add(nameof(ckbSpellStuckMonitor.Checked),
-                                                  EntityTools.PluginSettings.UnstuckSpells,
-                                                  nameof(EntityTools.PluginSettings.UnstuckSpells.Active));
+                                                EntityTools.PluginSettings.UnstuckSpells,
+                                                nameof(EntityTools.PluginSettings.UnstuckSpells.Active),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
 
+#if DEVELOPER
             // Настройки Mapper'a
             ckbMapperPatch.DataBindings.Add(nameof(ckbMapperPatch.Checked),
-                                               EntityTools.PluginSettings.Mapper,
-                                               nameof(EntityTools.PluginSettings.Mapper.Patch),
-                                               false, DataSourceUpdateMode.OnPropertyChanged);
+                                                EntityTools.PluginSettings.Mapper,
+                                                nameof(EntityTools.PluginSettings.Mapper.Patch),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
 
             seMapperWaipointDistance.DataBindings.Add(nameof(seMapperWaipointDistance.Value),
                                                 EntityTools.PluginSettings.Mapper,
-                                                nameof(EntityTools.PluginSettings.Mapper.WaypointDistance));
+                                                nameof(EntityTools.PluginSettings.Mapper.WaypointDistance),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
             seMapperMaxZDif.DataBindings.Add(nameof(seMapperMaxZDif.Value),
                                                 EntityTools.PluginSettings.Mapper,
-                                                nameof(EntityTools.PluginSettings.Mapper.MaxElevationDifference));
+                                                nameof(EntityTools.PluginSettings.Mapper.MaxElevationDifference),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
             seWaypointEquivalenceDistance.DataBindings.Add(nameof(seWaypointEquivalenceDistance.Value),
                                                 EntityTools.PluginSettings.Mapper,
-                                                nameof(EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance));
+                                                nameof(EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
 
             ckbMapperForceLinkingWaypoint.DataBindings.Add(nameof(ckbMapperForceLinkingWaypoint.Checked),
                                                 EntityTools.PluginSettings.Mapper,
-                                                nameof(EntityTools.PluginSettings.Mapper.ForceLinkingWaypoint));
+                                                nameof(EntityTools.PluginSettings.Mapper.ForceLinkingWaypoint),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
             ckbMapperLinearPath.DataBindings.Add(nameof(ckbMapperLinearPath.Checked),
                                                 EntityTools.PluginSettings.Mapper,
-                                                nameof(EntityTools.PluginSettings.Mapper.LinearPath));
+                                                nameof(EntityTools.PluginSettings.Mapper.LinearPath),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
+
+            // Настройки EntityToolsLogger
+            ckbEnableLogger.DataBindings.Add(nameof(ckbEnableLogger.Checked),
+                                                EntityTools.PluginSettings.Logger,
+                                                nameof(EntityTools.PluginSettings.Logger.Active),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
+            ckbExtendedActionDebugInfo.DataBindings.Add(nameof(ckbExtendedActionDebugInfo.Checked),
+                                                EntityTools.PluginSettings.Logger,
+                                                nameof(EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
+            
+
+            // Настройки EntityCache
+            seGlobalCacheTime.DataBindings.Add( nameof(seGlobalCacheTime.Value),
+                                                EntityTools.PluginSettings.EntityCache,
+                                                nameof(EntityTools.PluginSettings.EntityCache.GlobalCacheTime),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
+            seLocalCacheTime.DataBindings.Add(nameof(seLocalCacheTime.Value),
+                                                EntityTools.PluginSettings.EntityCache,
+                                                nameof(EntityTools.PluginSettings.EntityCache.LocalCacheTime),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
+            seCombatCacheTime.DataBindings.Add(nameof(seCombatCacheTime.Value),
+                                                EntityTools.PluginSettings.EntityCache,
+                                                nameof(EntityTools.PluginSettings.EntityCache.CombatCacheTime),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
+
+#else
+            btnEntities.Visible = false;
+            btnAuraViewer.Visible = false;
+            btnUiViewer.Visible = false;
+            tabOptions.PageVisible = false;
+            tabRelogger.PageVisible = false;
+            tabMapper.PageVisible = false;
+#endif
         }
 
         private void btnTest_Click(object sender, EventArgs e)
@@ -253,37 +297,53 @@ namespace EntityTools.Core
             //    linkedListWatches.Add(i, watch);
             //}
 
-            //Logger.WriteLine("List<Entity> Test:");
-            //Logger.WriteLine($"\tCreate Total (t):\t {listTotal.First.Ticks.ToString()}");
-            //Logger.WriteLine($"\tCreate Total (ms):\t {listTotal.First.Millisecond}");
-            //Logger.WriteLine($"\tRemote Total (t):\t {listTotal.Second.Ticks.ToString()}");
-            //Logger.WriteLine($"\tRemote Total (ms):\t {listTotal.Second.Millisecond}");
-            //Logger.WriteLine("--------------------------------------------------------");
+            //EntityToolsLogger.WriteLine("List<Entity> Test:");
+            //EntityToolsLogger.WriteLine($"\tCreate Total (t):\t {listTotal.First.Ticks.ToString()}");
+            //EntityToolsLogger.WriteLine($"\tCreate Total (ms):\t {listTotal.First.Millisecond}");
+            //EntityToolsLogger.WriteLine($"\tRemote Total (t):\t {listTotal.Second.Ticks.ToString()}");
+            //EntityToolsLogger.WriteLine($"\tRemote Total (ms):\t {listTotal.Second.Millisecond}");
+            //EntityToolsLogger.WriteLine("--------------------------------------------------------");
             //foreach (var w in listWatches)
             //{
             //    Logger.WriteLine($"\t{w.Value.First.Millisecond.ToString("")}\t{w.Value.First.Ticks}\t\t{w.Value.Second.Millisecond}\t{w.Value.Second.Ticks}\t");
             //}
-            //Logger.WriteLine("========================================================");
-            //Logger.WriteLine(string.Empty);
-            //Logger.WriteLine("LinkedList<Entity> Test:");
-            //Logger.WriteLine($"\tCreate Total (t):\t {LinkListTotal.First.Ticks.ToString("N3")}");
-            //Logger.WriteLine($"\tCreate Total (ms):\t {LinkListTotal.First.Millisecond}");
-            //Logger.WriteLine($"\tRemote Total (t):\t {LinkListTotal.Second.Ticks.ToString("N3")}");
-            //Logger.WriteLine($"\tRemote Total (ms):\t {LinkListTotal.Second.Millisecond}");
-            //Logger.WriteLine("--------------------------------------------------------");
+            //EntityToolsLogger.WriteLine("========================================================");
+            //EntityToolsLogger.WriteLine(string.Empty);
+            //EntityToolsLogger.WriteLine("LinkedList<Entity> Test:");
+            //EntityToolsLogger.WriteLine($"\tCreate Total (t):\t {LinkListTotal.First.Ticks.ToString("N3")}");
+            //EntityToolsLogger.WriteLine($"\tCreate Total (ms):\t {LinkListTotal.First.Millisecond}");
+            //EntityToolsLogger.WriteLine($"\tRemote Total (t):\t {LinkListTotal.Second.Ticks.ToString("N3")}");
+            //EntityToolsLogger.WriteLine($"\tRemote Total (ms):\t {LinkListTotal.Second.Millisecond}");
+            //EntityToolsLogger.WriteLine("--------------------------------------------------------");
             //foreach (var w in linkedListWatches)
             //{
-            //    Logger.WriteLine($"\t{w.Value.First.Millisecond}\t{w.Value.First.Ticks}\t\t{w.Value.Second.Millisecond}\t{w.Value.Second.Ticks}\t");
+            //    EntityToolsLogger.WriteLine($"\t{w.Value.First.Millisecond}\t{w.Value.First.Ticks}\t\t{w.Value.Second.Millisecond}\t{w.Value.Second.Ticks}\t");
             //}
-            //Logger.WriteLine("========================================================");
+            //EntityToolsLogger.WriteLine("========================================================");
             #endregion
 
             #region AStarDiagnostic
+#if false
             string filename = AStar.SearchStatistics.SaveLog();
             if (!string.IsNullOrEmpty(filename)
                 || MessageBox.Show(this, $"Would you like to open {Path.GetFileName(filename)}?", $"Open {Path.GetFileName(filename)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 System.Diagnostics.Process.Start(filename);
+
+#endif
             #endregion
+
+            #region Test_FindAllEntity
+            LinkedList<Entity> entities = EntityTools.Core.FindAllEntity(@"^M12_(Batiri_Elite_Raptorrider|Dinosaur_Raptor_Standard_Enervoraptor)",
+                                                            ItemFilterStringType.Regex, EntityNameType.InternalName, EntitySetType.Complete,
+                                                            true, 0, 30, false, null, null);
+            StringBuilder sb = new StringBuilder(1024);
+            foreach(Entity ett in entities)
+            {
+                sb.AppendLine($"{ett.InternalName}: Distance({ett.Location.Distance3DFromPlayer})");
+            }
+            MessageBox.Show(sb.ToString());
+            #endregion
+
         }
 
         private void btnUccEditor_Click(object sender, EventArgs e)
@@ -294,7 +354,6 @@ namespace EntityTools.Core
                 uccEditor.Show();
             }
         }
-
 
         #region старый_экспорт
         //private void MainPanel_Load(object sender, EventArgs e)
@@ -448,29 +507,40 @@ namespace EntityTools.Core
 
         private void cbSpellStuckMonitor_CheckedChanged(object sender, EventArgs e)
         {
-            //SpellStuckMonitor.Activate = false;// ckbSpellStuckMonitor.Checked;
-            //UnstuckSpellTask.Active = ckbSpellStuckMonitor.Checked;
             EntityTools.PluginSettings.UnstuckSpells.Active = ckbSpellStuckMonitor.Checked;
         }
 
         private void cbEnchantHelperActivator_CheckedChanged(object sender, EventArgs e)
         {
-            EnchantHelper.Enabled = cbEnchantHelperActivator.Checked;
+            if(cbEnchantHelperActivator.Checked)
+                EnchantHelper.Start();
+            else EnchantHelper.Stop();
         }
 
         private void btnUiViewer_Click(object sender, EventArgs e)
         {
-            UIViewer.ShowFreeTool();
+            string uiGenId = string.Empty;
+#if DEVELOPER
+        EntityTools.Core.GUIRequest_UIGenId(ref uiGenId);
+#endif
         }
 
         private void btnEntities_Click(object sender, EventArgs e)
         {
-            EntitySelectForm.ShowFreeTool();
+            string pattern = string.Empty;
+            EntityNameType nameType = EntityNameType.InternalName;
+            ItemFilterStringType strMatch = ItemFilterStringType.Simple;
+#if DEVELOPER
+        EntityTools.Core.GUIRequest_EntityId(ref pattern, ref strMatch, ref nameType);
+#endif
         }
 
         private void btnAuraViewer_Click(object sender, EventArgs e)
         {
-            Editors.Forms.AuraSelectForm.ShowFreeTool();
+            string auraId = string.Empty;
+#if DEVELOPER
+        EntityTools.Core.GUIRequest_AuraId(ref auraId);
+#endif
         }
 
         private void btnGetMachineId_Click(object sender, EventArgs e)
@@ -480,9 +550,54 @@ namespace EntityTools.Core
             tbMashingId.Text = machineid;
         }
 
+        private void tbExportFileSelector_ButtonClick(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
+        {
+            if (cbbxExportSelector.SelectedItem is ExportTypes expType)
+            {
+                string fileName;
+                if (string.IsNullOrEmpty(tbExportFileSelector.Text))
+                {
+                    fileName = Path.Combine(Astral.Controllers.Directories.LogsPath, expType.ToString(), FileTools.defaultExportFileName);
+                    fileName.Replace(Astral.Controllers.Directories.AstralStartupPath, @".\");
+                }
+                else fileName = tbExportFileSelector.Text;
+
+                string directory = Path.GetDirectoryName(fileName);
+                if (!Directory.Exists(fileName))
+                    Directory.CreateDirectory(directory);
+                dlgSaveFile.InitialDirectory = directory;
+
+                dlgSaveFile.FileName = fileName;
+                if (dlgSaveFile.ShowDialog() == DialogResult.OK)
+                    tbExportFileSelector.Text = dlgSaveFile.FileName;
+            }
+        }
+
+        private void cbbExportSelector_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbbxExportSelector.SelectedItem is ExportTypes expType)
+            {
+                string fileName;
+                fileName = Path.Combine(Astral.Controllers.Directories.LogsPath, expType.ToString(), FileTools.defaultExportFileName);
+                fileName.Replace(Astral.Controllers.Directories.AstralStartupPath, @".\");
+                tbExportFileSelector.Text = fileName;
+            }
+        }
+
+        private void btnDefault_Click(object sender, EventArgs e)
+        {
+            if (cbbxExportSelector.SelectedItem is ExportTypes expType)
+            {
+
+                string fileName = Path.Combine(Astral.Controllers.Directories.LogsPath, expType.ToString(), FileTools.defaultExportFileName);
+                fileName.Replace(Astral.Controllers.Directories.AstralStartupPath, @".\");
+                tbExportFileSelector.Text = fileName;
+            }
+        }
+
         private void btnExport_Click(object sender, EventArgs e)
         {
-            if(cbbExportSelector.SelectedItem is ExportTypes expType)
+            if (cbbxExportSelector.SelectedItem is ExportTypes expType)
             {
                 string fullFileName = FileTools.ReplaceMask(tbExportFileSelector.Text);
 
@@ -529,7 +644,7 @@ namespace EntityTools.Core
                             serialiser.Serialize(FileStream, missions);
                             FileStream.Close();
                             break;
-                        }                        
+                        }
                     case ExportTypes.States:
                         {
                             using (StreamWriter sw = new StreamWriter(fullFileName, false, Encoding.Default))
@@ -552,49 +667,22 @@ namespace EntityTools.Core
             }
         }
 
-        private void tbExportFileSelector_ButtonClick(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
-        {
-            if (cbbExportSelector.SelectedItem is ExportTypes expType)
-            {
-                string fileName;
-                if (string.IsNullOrEmpty(tbExportFileSelector.Text))
-                {
-                    fileName = Path.Combine(Astral.Controllers.Directories.LogsPath, expType.ToString(), FileTools.defaultExportFileName);
-                    fileName.Replace(Astral.Controllers.Directories.AstralStartupPath, @".\");
-                }
-                else fileName = tbExportFileSelector.Text;
-
-                string directory = Path.GetDirectoryName(fileName);
-                if (!Directory.Exists(fileName))
-                    Directory.CreateDirectory(directory);
-                dlgSaveFile.InitialDirectory = directory;
-
-                dlgSaveFile.FileName = fileName;
-                if (dlgSaveFile.ShowDialog() == DialogResult.OK)
-                    tbExportFileSelector.Text = dlgSaveFile.FileName;
-            }
-        }
-
-        private void cbbExportSelector_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cbbExportSelector.SelectedItem is ExportTypes expType)
-            {
-                string fileName;
-                fileName = Path.Combine(Astral.Controllers.Directories.LogsPath, expType.ToString(), FileTools.defaultExportFileName);
-                fileName.Replace(Astral.Controllers.Directories.AstralStartupPath, @".\");
-                tbExportFileSelector.Text = fileName;
-            }
-        }
-
         private void btnShowMapper_Click(object sender, EventArgs e)
         {
             Astral.Quester.Forms.MapperForm.Open();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void ckbEnableLogger_CheckedChanged(object sender, EventArgs e)
         {
-            //MapperFormExt.Open();
-            XtraMessageBox.Show(EntityTools.PluginSettings.Mapper.WaypointDistance.ToString());
+            gbxLogger.Enabled = ckbEnableLogger.Checked;
+            if (ckbEnableLogger.Checked)
+                EntityToolsLogger.Start();
+        }
+
+        private void btnOpenLog_Click(object sender, EventArgs e)
+        {
+            if(File.Exists(EntityToolsLogger.LogFilePath))
+                System.Diagnostics.Process.Start(EntityToolsLogger.LogFilePath);
         }
     }
 }

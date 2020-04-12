@@ -17,23 +17,39 @@ namespace EntityTools.UCC.Conditions
     [Serializable]
     public class UCCConditionPack : Astral.Logic.UCC.Classes.UCCCondition, ICustomUCCCondition
     {
+#if DEVELOPER
         [Description("Displayed name of the ConditionPack")]
+#else
+        [Browsable(false)]
+#endif
         public string Name { get; set; }
 
+#if DEVELOPER
         [Description("The negation of the result of the ConditionPack")]
+#else
+        [Browsable(false)]
+#endif
         public bool Not { get; set; }
 
+#if DEVELOPER
         [Description("Logical rule of the Conditions checks\n" +
             "Conjunction: All Conditions have to be True (Logical AND)\n" +
             "Disjunction: At least one of the Conditions have to be True (Logical OR)")]
+#else
+        [Browsable(false)]
+#endif
         public LogicRule TestRule { get; set; }
 
+#if DEVELOPER
         [Description("The list of the Conditions")]
         [TypeConverter(typeof(CollectionTypeConverter))]
         [Editor(typeof(UCCConditionListEditor), typeof(UITypeEditor))]
+#else
+        [Browsable(false)]
+#endif
         public ConditionList Conditions { get; set; } = new ConditionList();
 
-        #region ICustomUCCCondition
+#region ICustomUCCCondition
         bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
         {
             bool result = true;
@@ -130,57 +146,7 @@ namespace EntityTools.UCC.Conditions
             }
             else return "The list 'Conditions' is empty";
         }
-        #endregion
-        //public override bool IsValid
-        //{
-        //    get
-        //    {
-        //        if (Conditions.Count == 0)
-        //            return false;
-
-        //        bool result = (Tested == LogicRule.Conjunction);
-
-        //        if (Tested == LogicRule.Conjunction)
-        //        {
-        //            foreach (UCCCondition cond in Conditions)
-        //                if (!cond.IsValid)
-        //                {
-        //                    result = false;
-        //                    break;
-        //                }
-        //        }
-        //        else
-        //        {
-        //            int trueNumUnlock = 0,
-        //                trueNumLock = 0;
-        //            bool lockTrue = true;
-
-        //            foreach (UCCCondition cond in Conditions)
-        //            {
-        //                if (cond.IsValid)
-        //                {
-        //                    if (cond.Locked)
-        //                    { trueNumLock++;}
-        //                    else trueNumUnlock++;
-        //                }
-        //                else
-        //                {
-        //                    if (cond.Locked)
-        //                    {
-        //                        lockTrue = false;
-        //                        break;
-        //                    }
-        //                }
-        //            }
-
-        //            result = lockTrue && (Conditions.Count == trueNumLock || trueNumUnlock > 0);
-        //        }
-                
-        //        return (Not)? !result : result;
-        //    }
-        //}
-
-        //public override void Reset() { }
+#endregion
 
         public override string ToString()
         {

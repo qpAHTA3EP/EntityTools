@@ -1,8 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using Astral.Classes.ItemFilter;
 using Astral.Logic.NW;
 using DevExpress.XtraEditors;
+using EntityCore.Entities;
 using EntityCore.Forms;
+using EntityTools.Enums;
 using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
@@ -17,12 +23,16 @@ namespace EntityCore.Forms
         Entity
     };
 
-    public partial class AuraSelectForm : XtraForm
+    public partial class AuraSelectForm : XtraForm //*/ Form
     {
         private static AuraSelectForm @this = null;
 
-        internal Entity entity = null;
-        internal Entity UnitRef
+        private CancellationTokenSource tokenSource = new CancellationTokenSource();
+        private CancellationToken cancellationToken;
+        private Task backgroundTaskFillAuraList;
+
+        private Entity entity = null;
+        private Entity UnitRef
         {
             get
             {
@@ -38,14 +48,13 @@ namespace EntityCore.Forms
                             return entity = EntityManager.LocalPlayer;
                         case SelectedAuraSource.Target:
                             if(entity == null || !entity.IsValid)
-                                while (TargetSelectForm.TargetGuiRequest("Target NPC and press ok.", this) == DialogResult.OK)
+                                while (TargetSelectForm.GUIRequest("Target NPC and press ok.", this) == DialogResult.OK)
                                 {
                                     Entity betterEntityToInteract = Interact.GetBetterEntityToInteract();
                                     if (betterEntityToInteract != null && betterEntityToInteract.IsValid)
                                     {
                                         entity = betterEntityToInteract;
                                         unitRefName.Text = $"{entity.Name} [{entity.InternalName}]";
-                                            ;
                                         break;
                                     }
                                 }
@@ -53,12 +62,21 @@ namespace EntityCore.Forms
                         case SelectedAuraSource.Entity:
                             if (entity == null || !entity.IsValid)
                             {
-                                entity = EntitySelectForm.GetEntity()?.entity;
-                                if (!string.IsNullOrEmpty(entity.InternalName))
-                                    unitRefName.Text = entity.InternalName;
-                                else if (!string.IsNullOrEmpty(entity.Name))
-                                    unitRefName.Text = entity.Name;
-                                else unitRefName.Text = entity.NameUntranslated;
+                                string pattern = string.Empty;
+                                ItemFilterStringType strMatch = ItemFilterStringType.Simple;
+                                EntityNameType nameType = EntityNameType.InternalName;
+                                entity = EntitySelectForm.GUIRequest(ref pattern, ref strMatch, ref nameType);
+
+                                if (entity != null)
+                                {
+                                    if(!string.IsNullOrEmpty(pattern))
+                                        unitRefName.Text = pattern;
+                                    else if (!string.IsNullOrEmpty(entity.InternalName))
+                                        unitRefName.Text = entity.InternalName;
+                                    else if (!string.IsNullOrEmpty(entity.Name))
+                                        unitRefName.Text = entity.Name;
+                                    else unitRefName.Text = entity.NameUntranslated;
+                                }
                             }
                             return entity;
                     }
@@ -73,7 +91,7 @@ namespace EntityCore.Forms
             InitializeComponent();
         }
 
-        public static string Processing()
+        public static string GUIRequest()
         {
             if(@this == null || @this.IsDisposed)
                 @this = new AuraSelectForm();
@@ -88,15 +106,15 @@ namespace EntityCore.Forms
             return string.Empty;
         }
 
-        static public void ShowFreeTool()
-        {
-            AuraSelectForm @this = new AuraSelectForm();
+        //static public void ShowFreeTool()
+        //{
+        //    AuraSelectForm @this = new AuraSelectForm();
 
-            @this.NameFilter.Text = string.Empty;
-            @this.InternalNameFilter.Text = string.Empty;
+        //    @this.NameFilter.Text = string.Empty;
+        //    @this.InternalNameFilter.Text = string.Empty;
 
-            @this.Show(Astral.Forms.Main.ActiveForm);
-        }
+        //    @this.Show(Astral.Forms.Main.ActiveForm);
+        //}
 
         private void FillAuraList(Character character)
         {
@@ -105,56 +123,100 @@ namespace EntityCore.Forms
             if (character != null && character.IsValid)
             {
                 // Конструирование предиката
-                Predicate<AttribModNet> predicate;
-                if (string.IsNullOrEmpty(NameFilter.Text))
-                    if (string.IsNullOrEmpty(InternalNameFilter.Text))
-                        predicate = (AttribModNet mDef) => mDef.PowerDef.IsValid;
-                    else predicate = (AttribModNet mDef) => mDef.PowerDef.IsValid
-                                                            && mDef.PowerDef.InternalName.IndexOf(InternalNameFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0;
-                else if (string.IsNullOrEmpty(InternalNameFilter.Text))
-                    predicate = (AttribModNet mDef) => mDef.PowerDef.IsValid
-                                                       && mDef.PowerDef.DisplayName.IndexOf(NameFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0;
-                else predicate = (AttribModNet mDef) => mDef.PowerDef.IsValid
-                                                        && mDef.PowerDef.DisplayName.IndexOf(NameFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0 
-                                                        && mDef.PowerDef.InternalName.IndexOf(InternalNameFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0;
+                Predicate<AttribModNet> predicate = GetAuraPredicate();
 
                 foreach (AttribModNet def in character.Mods)
                     if (predicate(def))
-                        //auraList.Add(new AuraDef(def.PowerDef));
                         Auras.Items.Add(new AuraDef(def.PowerDef));
             }
         }
 
+        private void BackgroundFillAuraList(Character character, CancellationToken token)
+        {
+            if (character != null && character.IsValid)
+            {
+                Astral.Controllers.Forms.InvokeOnMainThread(() => Auras.Items.Clear());
+
+
+                // Список обработанных аур
+                List<AuraDef> auraList = new List<AuraDef>();
+
+                foreach(AttribModNet def in character.Mods)
+                    auraList.Add(new AuraDef(def.PowerDef));
+
+                while(!token.IsCancellationRequested)
+                {
+                    // Конструирование предиката
+                    Predicate<AttribModNet> predicate = GetAuraPredicate();
+
+                    foreach (AttribModNet def in character.Mods)
+                    {
+                        AuraDef auraDef = new AuraDef(def.PowerDef);
+                        if (!auraList.Contains(auraDef))
+                        {
+                            auraList.Add(auraDef);
+                            if(predicate(def))
+                                Astral.Controllers.Forms.InvokeOnMainThread(() => Auras.Items.Add(auraDef));
+                        }
+                    }
+
+                    Thread.Sleep(100);
+                }
+            }
+        }
+
+        private Predicate<AttribModNet> GetAuraPredicate()
+        {
+            Predicate<AttribModNet> predicate;
+            if (string.IsNullOrEmpty(NameFilter.Text))
+                if (string.IsNullOrEmpty(InternalNameFilter.Text))
+                    predicate = (AttribModNet mDef) => mDef.PowerDef.IsValid && !Auras.Items.Contains(mDef);
+                else predicate = (AttribModNet mDef) => mDef.PowerDef.IsValid
+                                                        && mDef.PowerDef.InternalName.IndexOf(InternalNameFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0
+                                                        && !Auras.Items.Contains(mDef);
+            else if (string.IsNullOrEmpty(InternalNameFilter.Text))
+                predicate = (AttribModNet mDef) => mDef.PowerDef.IsValid
+                                                   && mDef.PowerDef.DisplayName.IndexOf(NameFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0
+                                                   && !Auras.Items.Contains(mDef);
+            else predicate = (AttribModNet mDef) => mDef.PowerDef.IsValid
+                                                    && mDef.PowerDef.DisplayName.IndexOf(NameFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0
+                                                    && mDef.PowerDef.InternalName.IndexOf(InternalNameFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0
+                                                    && !Auras.Items.Contains(mDef);
+            return predicate;
+        }
+
         #region Обработчики
-        private void btnPlayer_Click(object sender, EventArgs e)
-        {
-            //selectedAuraSource = SelectedAuraSource.Player;
-            Selector.SelectedItem = SelectedAuraSource.Player;
-            unitRefName.Text = EntityManager.LocalPlayer.InternalName;
-            FillAuraList(EntityManager.LocalPlayer.Character);
-        }
+        //private void btnPlayer_Click(object sender, EventArgs e)
+        //{
+        //    //selectedAuraSource = SelectedAuraSource.Player;
+        //    Selector.SelectedItem = SelectedAuraSource.Player;
+        //    unitRefName.Text = EntityManager.LocalPlayer.InternalName;
+        //    FillAuraList(EntityManager.LocalPlayer.Character);
+        //}
 
-        private void btnTarget_Click(object sender, EventArgs e)
-        {
-            //selectedAuraSource = SelectedAuraSource.Target;
-            Selector.SelectedItem = SelectedAuraSource.Target;
-            unitRefName.Text = EntityManager.LocalPlayer.Character.CurrentTarget.InternalName;
-            FillAuraList(EntityManager.LocalPlayer.Character.CurrentTarget.Character);
-        }
+        //private void btnTarget_Click(object sender, EventArgs e)
+        //{
+        //    //selectedAuraSource = SelectedAuraSource.Target;
+        //    Selector.SelectedItem = SelectedAuraSource.Target;
+        //    unitRefName.Text = EntityManager.LocalPlayer.Character.CurrentTarget.InternalName;
+        //    FillAuraList(EntityManager.LocalPlayer.Character.CurrentTarget.Character);
+        //}
 
-        private void btnEntity_Click(object sender, EventArgs e)
-        {
-            //selectedAuraSource = SelectedAuraSource.Entity;
-            Selector.SelectedItem = SelectedAuraSource.Entity;
-            EntityDef entity = EntitySelectForm.GetEntity();
-            if (!string.IsNullOrEmpty(entity.InternalName))
-                unitRefName.Text = entity.InternalName;
-            else if (!string.IsNullOrEmpty(entity.Name))
-                unitRefName.Text = entity.Name;
-            else unitRefName.Text = entity.NameUntranslated;
-            if (entity != null && entity.entity != null)
-                FillAuraList(entity.entity.Character.CurrentTarget.Character);
-        }
+        //private void btnEntity_Click(object sender, EventArgs e)
+        //{
+        //    //selectedAuraSource = SelectedAuraSource.Entity;
+        //    Selector.SelectedItem = SelectedAuraSource.Entity;
+        //    Entity entity = EntitySelectForm.GUIRequest();
+        //    if (entity != null)
+        //    {
+        //        if (!string.IsNullOrEmpty(entity.InternalName))
+        //            unitRefName.Text = entity.InternalName;
+        //        else if (!string.IsNullOrEmpty(entity.Name))
+        //            unitRefName.Text = entity.Name;
+        //        else unitRefName.Text = entity.NameUntranslated;
+        //        FillAuraList(entity.Character.CurrentTarget.Character);
+        //    }
+        //}
 
         private void btnSelect_Click(object sender, EventArgs e)
         {
@@ -169,15 +231,17 @@ namespace EntityCore.Forms
 
         private void Selector_SelectedIndexChanged(object sender, EventArgs e)
         {
+            ckbNewAuras.Checked = false;
             entity = null;
             FillAuraList(UnitRef?.Character);
         }
 
         private void btnReload_Click(object sender, EventArgs e)
         {
-            FillAuraList(UnitRef?.Character);
+            if (ckbNewAuras.Checked)
+                ckbNewAuras_CheckedChanged(sender, e);
+            else FillAuraList(UnitRef?.Character);
         }
-        #endregion
 
         private void lbAuras_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -186,5 +250,19 @@ namespace EntityCore.Forms
                 Description.Text = aura.Description;
             }
         }
+
+        private void ckbNewAuras_CheckedChanged(object sender, EventArgs e)
+        {
+            if (backgroundTaskFillAuraList?.Status == TaskStatus.Running)
+                tokenSource?.Cancel();
+
+            if (ckbNewAuras.Checked)
+            {
+                tokenSource = new CancellationTokenSource();
+                cancellationToken = tokenSource.Token;
+                backgroundTaskFillAuraList = Task.Factory.StartNew(() => BackgroundFillAuraList(UnitRef?.Character, tokenSource.Token), tokenSource.Token);
+            }
+        }
+        #endregion
     }
 }

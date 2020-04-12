@@ -1,7 +1,7 @@
 ﻿using EntityTools.Reflection;
 using System.Collections.Generic;
 
-namespace EntityTools.Extensions
+namespace EntityCore.Extensions
 {
     public static class ListTExtentions
     {

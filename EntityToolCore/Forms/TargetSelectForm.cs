@@ -23,7 +23,7 @@ namespace EntityCore.Forms
             InitializeComponent();
         }
 
-        public static DialogResult TargetGuiRequest(string caption, Form parent = null)
+        public static DialogResult GUIRequest(string caption, Form parent = null)
         {
             if (@this == null)
                 @this = new TargetSelectForm();

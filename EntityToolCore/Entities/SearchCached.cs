@@ -6,10 +6,12 @@ using MyNW.Classes;
 using MyNW.Internals;
 using System;
 using System.Collections.Generic;
-using EntityTools.Extentions;
+using EntityCore.Extensions;
 using System.Linq;
 using EntityTools.Enums;
 using System.Diagnostics;
+using EntityTools;
+using EntityTools.Logger;
 
 namespace EntityCore.Entities
 {
@@ -34,7 +36,7 @@ namespace EntityCore.Entities
             MaxTime = TimeSpan.MinValue;
             stopwatch.Reset();
             frequencyDistribution.Clear();
-            Logger.WriteLine(Logger.LogType.Debug, $"SearchCached::ResetWatch()");
+            EntityToolsLogger.WriteLine(LogType.Debug, $"SearchCached::ResetWatch()");
         }
 
         public static void LogWatch()
@@ -43,20 +45,20 @@ namespace EntityCore.Entities
             {
                 double avrgTime = (double)stopwatch.ElapsedMilliseconds / (double)Count;
                 double avrgTicks = (double)stopwatch.ElapsedTicks / (double)Count;
-                Logger.WriteLine(Logger.LogType.Debug, $"SearchCached:\tCount: {Count}, TotalTime: {stopwatch.Elapsed}({stopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
-                Logger.WriteLine(Logger.LogType.Debug, $"SearchCached:\tMinTime: {MinTime.TotalMilliseconds.ToString("N3")} ms ({MinTime.Ticks.ToString("N0")} ticks)");
-                Logger.WriteLine(Logger.LogType.Debug, $"SearchCached:\tMaxTime: {MaxTime.TotalMilliseconds.ToString("N3")} ms ({MaxTime.Ticks.ToString("N0")} ticks)");
-                Logger.WriteLine(Logger.LogType.Debug, $"SearchCached:\tAverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
+                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchCached:\tCount: {Count}, TotalTime: {stopwatch.Elapsed}({stopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
+                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchCached:\tMinTime: {MinTime.TotalMilliseconds.ToString("N3")} ms ({MinTime.Ticks.ToString("N0")} ticks)");
+                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchCached:\tMaxTime: {MaxTime.TotalMilliseconds.ToString("N3")} ms ({MaxTime.Ticks.ToString("N0")} ticks)");
+                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchCached:\tAverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
                 if (frequencyDistribution.Count > 0)
                 {
-                    Logger.WriteLine(Logger.LogType.Debug, $"SearchCached::FrequencyDistribution:");
+                    EntityToolsLogger.WriteLine(LogType.Debug, $"SearchCached::FrequencyDistribution:");
                     var list = frequencyDistribution.ToList();
                     list.Sort((KeyValuePair<long, long> l, KeyValuePair<long, long> r) => { return (int)l.Key - (int)r.Key; } );
                     foreach (var i in list)
-                        Logger.WriteLine(Logger.LogType.Debug, $"\t\t{((double)i.Key * (double)interval / 10000d).ToString("N3")} := {i.Value.ToString("N0")}");
+                        EntityToolsLogger.WriteLine(LogType.Debug, $"\t\t{((double)i.Key * (double)interval / 10000d).ToString("N3")} := {i.Value.ToString("N0")}");
                 }
             }
-            else Logger.WriteLine(Logger.LogType.Debug, $"SearchCached: Count: 0");
+            else EntityToolsLogger.WriteLine(LogType.Debug, $"SearchCached: Count: 0");
         }
 #endif
 
@@ -96,8 +98,11 @@ namespace EntityCore.Entities
             try
             {
 #endif
-            // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
-            float closestDistance = (range == 0) ? float.MaxValue : range;
+                if (zRange < 1)
+                    zRange = Astral.Controllers.Settings.Get.MaxElevationDifference;
+
+                // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
+                float closestDistance = (range == 0) ? float.MaxValue : range;
                 LinkedList<Entity> entities = new LinkedList<Entity>();
                 Action<Entity> evaluateAction;
 
@@ -109,8 +114,8 @@ namespace EntityCore.Entities
                         {
                             if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                 && (!healthCheck || !e.IsDead)
-                                && (range == 0 || e.Location.Distance3DFromPlayer < range)
-                                && (zRange == 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < range)
+                                && (range <= 0 || e.Location.Distance3DFromPlayer < range)
+                                && (zRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
                                 && customRegions.Find((CustomRegion cr) => e.Within(cr)) != null)
                                 entities.AddLast(e);
                         };
@@ -118,8 +123,8 @@ namespace EntityCore.Entities
                     {
                         if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                             && (!healthCheck || !e.IsDead)
-                            && (range == 0 || e.Location.Distance3DFromPlayer < range)
-                            && (zRange == 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < range)
+                            && (range <= 0 || e.Location.Distance3DFromPlayer < range)
+                            && (zRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
                             && customRegions.Find((CustomRegion cr) => e.Within(cr)) != null
                             && specialCheck(e))
                             entities.AddLast(e);
@@ -128,20 +133,243 @@ namespace EntityCore.Entities
                 else
                 {
                     if (specialCheck == null)
+#if DEBUG
+#if false
+                        if (regionCheck)
+                        {
+                            if (healthCheck)
+                            {
+                                if (range > 0)
+                                {
+                                    if (zRange > 0)
+                                    {
+                                        evaluateAction = (Entity e) =>
+                                        {
+                                            if (!e.IsDead && e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName
+                                                && e.Location.Distance3DFromPlayer < range
+                                                && Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
+
+                                                entities.AddLast(e);
+                                        };
+
+                                    }
+                                    else
+                                    {
+                                        evaluateAction = (Entity e) =>
+                                        {
+                                            if (!e.IsDead && e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName
+                                                && e.Location.Distance3DFromPlayer < range)
+
+                                                entities.AddLast(e);
+                                        };
+                                    }
+                                }
+                                else
+                                {
+                                    if (zRange > 0)
+                                    {
+                                        evaluateAction = (Entity e) =>
+                                        {
+                                            if (!e.IsDead && e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName
+                                                && Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
+
+                                                entities.AddLast(e);
+                                        };
+
+                                    }
+                                    else
+                                    {
+                                        evaluateAction = (Entity e) =>
+                                        {
+                                            if (!e.IsDead && e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+
+                                                entities.AddLast(e);
+                                        };
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (range > 0)
+                                {
+                                    if (zRange > 0)
+                                    {
+                                        evaluateAction = (Entity e) =>
+                                        {
+                                            if (e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName
+                                                && e.Location.Distance3DFromPlayer < range
+                                                && Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
+
+                                                entities.AddLast(e);
+                                        };
+
+                                    }
+                                    else
+                                    {
+                                        evaluateAction = (Entity e) =>
+                                        {
+                                            if (e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName
+                                                && e.Location.Distance3DFromPlayer < range)
+
+                                                entities.AddLast(e);
+                                        };
+                                    }
+                                }
+                                else
+                                {
+                                    if (zRange > 0)
+                                    {
+                                        evaluateAction = (Entity e) =>
+                                        {
+                                            if (e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName
+                                                && Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
+
+                                                entities.AddLast(e);
+                                        };
+
+                                    }
+                                    else
+                                    {
+                                        evaluateAction = (Entity e) =>
+                                        {
+                                            if (e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+
+                                                entities.AddLast(e);
+                                        };
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (healthCheck)
+                            {
+                                if (range > 0)
+                                {
+                                    if (zRange > 0)
+                                    {
+                                        evaluateAction = (Entity e) =>
+                                        {
+                                            if (!e.IsDead
+                                                && e.Location.Distance3DFromPlayer < range
+                                                && Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
+
+                                                entities.AddLast(e);
+                                        };
+
+                                    }
+                                    else
+                                    {
+                                        evaluateAction = (Entity e) =>
+                                        {
+                                            if (!e.IsDead
+                                                && e.Location.Distance3DFromPlayer < range)
+
+                                                entities.AddLast(e);
+                                        };
+                                    }
+                                }
+                                else
+                                {
+                                    if (zRange > 0)
+                                    {
+                                        evaluateAction = (Entity e) =>
+                                        {
+                                            if (!e.IsDead
+                                                && Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
+
+                                                entities.AddLast(e);
+                                        };
+
+                                    }
+                                    else
+                                    {
+                                        evaluateAction = (Entity e) =>
+                                        {
+                                            if (!e.IsDead)
+
+                                                entities.AddLast(e);
+                                        };
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (range > 0)
+                                {
+                                    if (zRange > 0)
+                                    {
+                                        evaluateAction = (Entity e) =>
+                                        {
+                                            if (e.Location.Distance3DFromPlayer < range
+                                                && Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
+
+                                                entities.AddLast(e);
+                                        };
+
+                                    }
+                                    else
+                                    {
+                                        evaluateAction = (Entity e) =>
+                                        {
+                                            if (e.Location.Distance3DFromPlayer < range)
+
+                                                entities.AddLast(e);
+                                        };
+                                    }
+                                }
+                                else
+                                {
+                                    if (zRange > 0)
+                                    {
+                                        evaluateAction = (Entity e) =>
+                                        {
+                                            if (Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
+
+                                                entities.AddLast(e);
+                                        };
+
+                                    }
+                                    else
+                                    {
+                                        evaluateAction = (Entity e) => entities.AddLast(e);
+                                    }
+                                }
+                            }
+                        } 
+#endif
+                        evaluateAction = (Entity e) =>
+                        {
+                            bool regionFlag = (!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName);
+                            bool healthFlag = (!healthCheck || !e.IsDead);
+                            bool rangeFlag = (range <= 0 || e.Location.Distance3DFromPlayer < range);
+                            bool zRangeFlag = (zRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange);
+
+
+                            if (regionFlag
+                                && healthFlag
+                                && rangeFlag
+                                && zRangeFlag)
+
+                                entities.AddLast(e);
+                        };
+#else
                         evaluateAction = (Entity e) =>
                         {
                             if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                 && (!healthCheck || !e.IsDead)
-                                && (range == 0 || e.Location.Distance3DFromPlayer < range)
-                                && (zRange == 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < range))
+                                && (range <= 0 || e.Location.Distance3DFromPlayer < range)
+                                && (zRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange))
                                 entities.AddLast(e);
                         };
+
+#endif
                     else evaluateAction = (Entity e) =>
                     {
                         if((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                 && (!healthCheck || !e.IsDead)
-                                && (range == 0 || e.Location.Distance3DFromPlayer < range)
-                                && (zRange == 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < range)
+                                && (range <= 0 || e.Location.Distance3DFromPlayer < range)
+                                && (zRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
                                 && specialCheck(e))
                             entities.AddLast(e);
                     };
@@ -210,8 +438,11 @@ namespace EntityCore.Entities
             try
             {
 #endif
-            // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
-            float closestDistance = (range == 0) ? float.MaxValue : range;
+                if (zRange < 1)
+                    zRange = Astral.Controllers.Settings.Get.MaxElevationDifference;
+
+                // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
+                float closestDistance = (range == 0) ? float.MaxValue : range;
                 Entity closestEntity = null;
                 Action<Entity> evaluateAction;
 
@@ -224,7 +455,7 @@ namespace EntityCore.Entities
                             if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                 && (!healthCheck || !e.IsDead)
                                 && (range == 0 || e.Location.Distance3DFromPlayer < range)
-                                && (zRange == 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < range)
+                                && (zRange == 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
                                 && customRegions.Find((CustomRegion cr) => e.Within(cr)) != null)
                             {
                                 float eDistance = e.CombatDistance3;
@@ -240,7 +471,7 @@ namespace EntityCore.Entities
                         if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                             && (!healthCheck || !e.IsDead)
                             && (range == 0 || e.Location.Distance3DFromPlayer < range)
-                            && (zRange == 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < range)
+                            && (zRange == 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
                             && customRegions.Find((CustomRegion cr) => e.Within(cr)) != null
                             && specialCheck(e))
                         {

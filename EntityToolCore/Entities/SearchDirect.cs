@@ -1,7 +1,7 @@
 ﻿#define PROFILING
-using Astral;
 using Astral.Classes.ItemFilter;
 using EntityTools.Enums;
+using EntityTools.Logger;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
@@ -37,7 +37,7 @@ namespace EntityCore.Entities
             ContactMaxTime = TimeSpan.MinValue;
             stopwatch.Reset();
             cntStopwatch.Reset();
-            Logger.WriteLine(Logger.LogType.Debug, $"UncachedSearch::ResetWatch()");
+            EntityToolsLogger.WriteLine(LogType.Debug, $"UncachedSearch::ResetWatch()");
         }
 
         public static void LogWatch()
@@ -46,24 +46,24 @@ namespace EntityCore.Entities
             {
                 double avrgTime = (double)stopwatch.ElapsedMilliseconds / (double)Count;
                 double avrgTicks = (double)stopwatch.ElapsedTicks / (double)Count;
-                //Logger.WriteLine(Logger.LogType.Debug, $"SearchDirect::GetEntities(): Count: {Count}, TotalTime: {stopwatch.Elapsed}({stopwatch.ElapsedMilliseconds.ToString("N3")} ms), MinTime: {MinTime.TotalMilliseconds.ToString("N3")} ms ({MinTime.Ticks.ToString("N0")} ticks), MaxTime: {MaxTime.TotalMilliseconds.ToString("N3")} ms ({MaxTime.Ticks.ToString("N0")} ticks) , AverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
-                Logger.WriteLine(Logger.LogType.Debug, $"SearchDirect::GetEntities():\tCount: {Count}, TotalTime: {stopwatch.Elapsed}({stopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
-                Logger.WriteLine(Logger.LogType.Debug, $"SearchDirect::GetEntities():\tMinTime: {MinTime.TotalMilliseconds.ToString("N3")} ms ({MinTime.Ticks.ToString("N0")} ticks)");
-                Logger.WriteLine(Logger.LogType.Debug, $"SearchDirect::GetEntities():\tMaxTime: {MaxTime.TotalMilliseconds.ToString("N3")} ms ({MaxTime.Ticks.ToString("N0")} ticks)");
-                Logger.WriteLine(Logger.LogType.Debug, $"SearchDirect::GetEntities():\tAverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
+                //EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetEntities(): Count: {Count}, TotalTime: {stopwatch.Elapsed}({stopwatch.ElapsedMilliseconds.ToString("N3")} ms), MinTime: {MinTime.TotalMilliseconds.ToString("N3")} ms ({MinTime.Ticks.ToString("N0")} ticks), MaxTime: {MaxTime.TotalMilliseconds.ToString("N3")} ms ({MaxTime.Ticks.ToString("N0")} ticks) , AverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
+                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetEntities():\tCount: {Count}, TotalTime: {stopwatch.Elapsed}({stopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
+                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetEntities():\tMinTime: {MinTime.TotalMilliseconds.ToString("N3")} ms ({MinTime.Ticks.ToString("N0")} ticks)");
+                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetEntities():\tMaxTime: {MaxTime.TotalMilliseconds.ToString("N3")} ms ({MaxTime.Ticks.ToString("N0")} ticks)");
+                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetEntities():\tAverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
             }
-            else Logger.WriteLine(Logger.LogType.Debug, $"SearchDirect::GetEntities(): Count: 0");
+            else EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetEntities(): Count: 0");
             if (ContactCount > 0)
             {
                 double avrgTime = (double)cntStopwatch.ElapsedMilliseconds / (double)ContactCount;
                 double avrgTicks = (double)cntStopwatch.ElapsedTicks / (double)ContactCount;
-                //Logger.WriteLine(Logger.LogType.Debug, $"SearchDirect::GetContactEntities(): Count: {ContactCount}, TotalTime: {cntStopwatch.Elapsed}({cntStopwatch.ElapsedMilliseconds.ToString("N3")} ms), MinTime: {ContactMinTime.TotalMilliseconds.ToString("N3")} ms ({ContactMinTime.Ticks.ToString("N0")} ticks), MaxTime: {ContactMaxTime.TotalMilliseconds.ToString("N3")} ms ({ContactMaxTime.Ticks.ToString("N0")} ticks) , AverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
-                Logger.WriteLine(Logger.LogType.Debug, $"SearchDirect::GetContactEntities():\tCount: {ContactCount}, TotalTime: {cntStopwatch.Elapsed}({cntStopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
-                Logger.WriteLine(Logger.LogType.Debug, $"SearchDirect::GetContactEntities():\tMinTime: {ContactMinTime.TotalMilliseconds.ToString("N3")} ms ({ContactMinTime.Ticks.ToString("N0")} ticks)");
-                Logger.WriteLine(Logger.LogType.Debug, $"SearchDirect::GetContactEntities():\tMaxTime: {ContactMaxTime.TotalMilliseconds.ToString("N3")} ms ({ContactMaxTime.Ticks.ToString("N0")} ticks)");
-                Logger.WriteLine(Logger.LogType.Debug, $"SearchDirect::GetContactEntities():\tAverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
+                //EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetContactEntities(): Count: {ContactCount}, TotalTime: {cntStopwatch.Elapsed}({cntStopwatch.ElapsedMilliseconds.ToString("N3")} ms), MinTime: {ContactMinTime.TotalMilliseconds.ToString("N3")} ms ({ContactMinTime.Ticks.ToString("N0")} ticks), MaxTime: {ContactMaxTime.TotalMilliseconds.ToString("N3")} ms ({ContactMaxTime.Ticks.ToString("N0")} ticks) , AverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
+                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetContactEntities():\tCount: {ContactCount}, TotalTime: {cntStopwatch.Elapsed}({cntStopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
+                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetContactEntities():\tMinTime: {ContactMinTime.TotalMilliseconds.ToString("N3")} ms ({ContactMinTime.Ticks.ToString("N0")} ticks)");
+                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetContactEntities():\tMaxTime: {ContactMaxTime.TotalMilliseconds.ToString("N3")} ms ({ContactMaxTime.Ticks.ToString("N0")} ticks)");
+                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetContactEntities():\tAverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
             }
-            else Logger.WriteLine(Logger.LogType.Debug, $"SearchDirect::GetContactEntities(): Count: 0");
+            else EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetContactEntities(): Count: 0");
         }
 #endif
 
@@ -84,38 +84,38 @@ namespace EntityCore.Entities
             try
             {
 #endif
-            LinkedList<Entity> entities = new LinkedList<Entity>();
-            Predicate<Entity> comparer = EntityToPatternComparer.Get(entPattern, strMatchType, nameType);
+                LinkedList<Entity> entities = new LinkedList<Entity>();
+                Predicate<Entity> comparer = EntityToPatternComparer.Get(entPattern, strMatchType, nameType);
 
-            if (action != null)
-            {
-                foreach (Entity e in EntityManager.GetEntities())
+                if (action != null)
                 {
-                    if (comparer(e))
+                    foreach (Entity e in EntityManager.GetEntities())
                     {
-                        action(e);
-                        entities.AddLast(e);
+                        if (comparer(e))
+                        {
+                            action(e);
+                            entities.AddLast(e);
+                        }
                     }
+                    //return EntityManager.GetEntities()?.FindAll((Entity e) =>
+                    //        {
+                    //            if (comparer.Check(e))
+                    //            {
+                    //                action(e);
+                    //                return true;
+                    //            }
+                    //            else return false;
+                    //        });
                 }
-                //return EntityManager.GetEntities()?.FindAll((Entity e) =>
-                //        {
-                //            if (comparer.Check(e))
-                //            {
-                //                action(e);
-                //                return true;
-                //            }
-                //            else return false;
-                //        });
-            }
-            else
-            {
-                foreach (Entity e in EntityManager.GetEntities())
-                    if (comparer(e))
-                        entities.AddLast(e);
+                else
+                {
+                    foreach (Entity e in EntityManager.GetEntities())
+                        if (comparer(e))
+                            entities.AddLast(e);
 
-                //return EntityManager.GetEntities()?.FindAll(comparer.Check);
-            }
-            return entities;
+                    //return EntityManager.GetEntities()?.FindAll(comparer.Check);
+                }
+                return entities;
 #if DEBUG && PROFILING
             }
             finally

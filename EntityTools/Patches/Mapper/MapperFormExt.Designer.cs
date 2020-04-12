@@ -197,7 +197,7 @@ namespace EntityTools.Patches.Mapper
             this.menuCheckStopMapping.Checked = true;
             this.menuCheckStopMapping.GroupIndex = 1;
             this.menuCheckStopMapping.Id = 67;
-            this.menuCheckStopMapping.ImageOptions.Image = global::EntityTools.Properties.Resources.miniStopSimple;
+            this.menuCheckStopMapping.ImageOptions.Image = global::EntityTools.Properties.Resources.miniStop;
             this.menuCheckStopMapping.Name = "menuCheckStopMapping";
             this.menuCheckStopMapping.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventStopMapping);
             // 
@@ -295,7 +295,7 @@ namespace EntityTools.Patches.Mapper
             // 
             this.menuClear.Caption = "Clear";
             this.menuClear.Id = 63;
-            this.menuClear.ImageOptions.Image = global::EntityTools.Properties.Resources.Deletemini;
+            this.menuClear.ImageOptions.Image = global::EntityTools.Properties.Resources.miniDelete;
             this.menuClear.Name = "menuClear";
             this.menuClear.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventClearNodes);
             // 
@@ -597,7 +597,7 @@ namespace EntityTools.Patches.Mapper
             this.menuBtnStopMapping.Caption = "Stop Mapping";
             this.menuBtnStopMapping.GroupIndex = 1;
             this.menuBtnStopMapping.Id = 68;
-            this.menuBtnStopMapping.ImageOptions.Image = global::EntityTools.Properties.Resources.miniStopSimple;
+            this.menuBtnStopMapping.ImageOptions.Image = global::EntityTools.Properties.Resources.miniStop;
             this.menuBtnStopMapping.Name = "menuBtnStopMapping";
             this.menuBtnStopMapping.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventStopMapping);
             // 

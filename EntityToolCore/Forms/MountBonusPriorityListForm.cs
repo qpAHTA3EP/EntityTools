@@ -1,7 +1,6 @@
 ﻿using DevExpress.XtraEditors;
 using EntityCore.MountInsignias;
 using EntityTools.Tools;
-using EntityCore.MountInsignias;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;

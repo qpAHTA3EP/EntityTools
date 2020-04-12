@@ -8,8 +8,8 @@ namespace EntityCore
 {
     public interface IEntityInfos
     {
-        Entity Target();
-        bool TargetValidate();
+        //Entity Target();
+        //bool TargetValidate();
         bool EntityDiagnosticString(out string infoString);
     }
 }

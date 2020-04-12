@@ -11,14 +11,18 @@ namespace EntityTools.UCC.Conditions
 {
     public class UCCQuesterCheck : UCCCondition, ICustomUCCCondition
     {
+#if DEVELOPER
         internal class QuesterConditionEditor : AddTypeCommonEditor<Condition>
         { }
 
         [Editor(typeof(QuesterConditionEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(ExpandableObjectConverter))]
+#else
+        [Browsable(false)]
+#endif
         public Condition Condition { get; set; } = null;
 
-        #region ICustomUCCCondition
+#region ICustomUCCCondition
         bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
         {
             return Condition?.IsValid == true;
@@ -32,14 +36,14 @@ namespace EntityTools.UCC.Conditions
                 return Condition.TestInfos;
             return "Condition doesn't set.";
         }
-        #endregion
+#endregion
 
         public override string ToString()
         {
             return GetType().Name;
         }
 
-        #region Hide Inherited Properties
+#region Hide Inherited Properties
         [XmlIgnore]
         [Browsable(false)]
         public new Astral.Logic.UCC.Ressources.Enums.Sign Sign { get; set; }
@@ -55,6 +59,6 @@ namespace EntityTools.UCC.Conditions
         [XmlIgnore]
         [Browsable(false)]
         public new Astral.Logic.UCC.Ressources.Enums.ActionCond Tested { get; set; }
-        #endregion
+#endregion
     }
 }

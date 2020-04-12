@@ -1,5 +1,7 @@
 ﻿using Astral;
 using Astral.Forms;
+using Astral.Logic.UCC.Classes;
+using Astral.Professions.Classes;
 using EntityTools.Core.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -18,8 +20,8 @@ namespace Mount_Tutorial
 {
     public class MountTutorialLoaderPlugin : Astral.Addons.Plugin
     {
-        internal static IEntityToolsCore Core
-        {
+        internal static IEntityToolsCore Core { get; private set; }  = new CoreProxy();
+        /*{
             get
             {
                 if(_core == null)
@@ -46,7 +48,7 @@ namespace Mount_Tutorial
                 return _core;
             }
         }
-        internal static IEntityToolsCore _core = null;
+        internal static IEntityToolsCore _core = null;*/
 
         public override string Name => GetType().Name;
         public override string Author => "MichaelProg";
@@ -58,6 +60,7 @@ namespace Mount_Tutorial
         {
             //System.AppDomain.CurrentDomain.AssemblyLoad += CurrentDomain_AssemblyLoad;
             System.AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+            assemblyResolve_Deletage_Binded = true;
         }
 
         public override void OnUnload() { }
@@ -115,14 +118,16 @@ namespace Mount_Tutorial
         //{
         //    LoadAssembly();
         //}
-private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
-{
-    //LoadAssembly();
-    //return args.Name.Contains($"{Category}.resources") ? typeof(Astral.Forms.Main).Assembly : typeof(MountTutorialLoaderPlugin).Assembly;
-    if (Regex.IsMatch(args.Name, $"^{Assembly.GetExecutingAssembly().GetName().Name}\\W"))
-            return typeof(MountTutorialLoaderPlugin).Assembly;
-    return null;
-}
+        private static bool assemblyResolve_Deletage_Binded = false;
+
+        private static readonly string assemblyResolve_Name = $"^{Assembly.GetExecutingAssembly().GetName().Name}\\W";
+
+        private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            if (Regex.IsMatch(args.Name, assemblyResolve_Name))
+                    return typeof(MountTutorialLoaderPlugin).Assembly;
+            return null;
+        }
 
         //internal static bool MountTutorialLoaded = false;
         //static MountTutorialLoaderPlugin()
@@ -155,5 +160,99 @@ private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs a
         //        Logger.WriteLine("Fail to load the MountTutorial Assembly");
         //    }
         //}
+        internal class CoreProxy : IEntityToolsCore
+        {
+            static Func<bool> InternalInitialize = LoadCore;
+            public string EntityDiagnosticInfos(object obj)
+            {
+                if (InternalInitialize())
+                    return MountTutorialLoaderPlugin.Core.EntityDiagnosticInfos(obj);
+                return string.Empty;
+            }
+
+            public bool Initialize(object obj)
+            {
+                if (InternalInitialize())
+                    return MountTutorialLoaderPlugin.Core.Initialize(obj);
+                return false;
+            }
+
+            public bool Initialize(Astral.Quester.Classes.Action action)
+            {
+                if (InternalInitialize())
+                    return MountTutorialLoaderPlugin.Core.Initialize(action);
+                return false;
+            }
+
+            public bool Initialize(Astral.Quester.Classes.Condition condition)
+            {
+                if (InternalInitialize())
+                    return MountTutorialLoaderPlugin.Core.Initialize(condition);
+                return false;
+            }
+
+            public bool Initialize(UCCAction action)
+            {
+                if (InternalInitialize())
+                    return MountTutorialLoaderPlugin.Core.Initialize(action);
+                return false;
+            }
+
+            public bool Initialize(UCCCondition condition)
+            {
+                if (InternalInitialize())
+                    return MountTutorialLoaderPlugin.Core.Initialize(condition);
+                return false;
+            }
+
+            private static bool LoadCore()
+            {
+                if (assemblyResolve_Deletage_Binded)
+                {
+                    // Попытка загрузки ядра производится только после привязки делегата
+
+                    try
+                    {
+                        using (FileStream file = FileStreamHelper.OpenWithStream(Assembly.GetExecutingAssembly().Location, "Core", System.IO.FileMode.Open, System.IO.FileAccess.Read))
+                        {
+                            byte[] buffer = new byte[file.Length];
+                            if (file.Read(buffer, 0, (int)file.Length) > 0)
+                            {
+                                Assembly assembly = Assembly.Load(buffer);
+
+                                if (assembly != null)
+                                    foreach (Type type in assembly.GetTypes())
+                                    {
+                                        if (type.GetInterfaces().Contains(typeof(IEntityToolsCore)))
+                                        {
+                                            IEntityToolsCore core = Activator.CreateInstance(type) as IEntityToolsCore;
+                                            if (core != null)
+                                            {
+                                                MountTutorialLoaderPlugin.Core = core;
+                                                return true;
+                                            }
+                                        }
+                                    }
+                                //if(assembly.CreateInstance("Mount_Tutorial_Core.Engine") is IEntityToolsCore core)
+                                //{
+                                //    MountTutorialLoaderPlugin.Core = core;
+                                //    return true;
+                                //}
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Astral.Logger.WriteLine(Logger.LogType.Debug, e.ToString());
+                    }
+                    finally
+                    {
+                        InternalInitialize = DoNothing;
+                    }
+                }
+                return false;
+            }
+            private static bool DoNothing() => false;
+        }
     }
 }

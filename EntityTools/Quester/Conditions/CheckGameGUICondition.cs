@@ -1,31 +1,41 @@
 ﻿using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
-using EntityTools;
-using EntityTools.Extentions;
+using EntityTools.Extensions;
 using EntityTools.Editors;
 using EntityTools.Enums;
-using EntityTools.Tools;
 using MyNW.Classes;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
+using EntityTools.Core.Proxies;
 
 namespace EntityTools.Quester.Conditions
 {
     public class CheckGameGUI : Astral.Quester.Classes.Condition
     {
-        private UIGen uiGen;
+        #region Взаимодействие с ядром EntityTools
+        public event PropertyChangedEventHandler PropertyChanged;
+#if CORE_INTERFACES
+        internal IQuesterConditionEngine ConditionEngine = null;
+#endif
 
-        public CheckGameGUI() { }
+        public CheckGameGUI()
+        {
+#if CORE_INTERFACES
+            ConditionEngine = new QuesterConditionProxy(this);
+#endif
+            // EntityTools.Core.Initialize(this);
+        }
+        #endregion
 
 
+        #region Опции команды
+#if DEVELOPER
         [Description("The Identifier of the Ingame user interface element")]
         [Editor(typeof(UiIdEditor), typeof(UITypeEditor))]
+#else
+        [Browsable(false)]
+#endif
         public string UiGenID
         {
             get { return _uiGenID; }
@@ -33,136 +43,118 @@ namespace EntityTools.Quester.Conditions
             {
                 if (_uiGenID != value)
                 {
-                    uiGen = MyNW.Internals.UIManager.AllUIGen.Find(x => x.Name == value);
-                    if(uiGen != null)
-                        _uiGenID = value;
-                }                
+                    _uiGenID = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UiGenID)));
+                }
             }
         }
-        private string _uiGenID;
+        internal string _uiGenID;
 
-        public UiGenCheckType Tested { get; set; } = UiGenCheckType.IsVisible;
+#if !DEVELOPER
+        [Browsable(false)]
+#endif
+        public UiGenCheckType Tested
+        {
+            get => _tested; set
+            {
+                _tested = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Tested)));
+            }
+        }
+        internal UiGenCheckType _tested = UiGenCheckType.IsVisible;
 
+#if DEVELOPER
         [Description("The Name of the GUI element's property which is checked\n" +
                      "Ignored if property 'Tested' is not equals to 'Property'")]
         [Category("GuiProperty")]
-        public string UiGenProperty { get; set; }
+#else
+        [Browsable(false)]
+#endif
+        public string UiGenProperty
+        {
+            get => _uiGenProperty;
+            set
+            {
+                if (_uiGenProperty != value)
+                {
+                    _uiGenProperty = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UiGenProperty)));
+                }
+            }
+        }
+        internal string _uiGenProperty;
 
+#if DEVELOPER
         [Description("The Value of the GUI element's property which is checked\n" +
                      "Ignored if property 'Tested' is not equals to 'Property'")]
         [Category("GuiProperty")]
-        public string UiGenPropertyValue { get; set; } = string.Empty;
+#else
+        [Browsable(false)]
+#endif
+        public string UiGenPropertyValue
+        {
+            get => _uiGenPropertyValue;
+            set
+            {
+                if (_uiGenPropertyValue != value)
+                {
+                    _uiGenPropertyValue = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UiGenProperty)));
+                }
+            }
+        }
+        internal string _uiGenPropertyValue = string.Empty;
 
+#if DEVELOPER
         [Description("Type of and UiGenPropertyValue:\n" +
                      "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
                      "Regex: Regular expression\n" +
                      "Ignored if property 'Tested' is not equals to 'Property'")]
         [Category("GuiProperty")]
-        public ItemFilterStringType UiGenPropertyValueType { get; set; } = ItemFilterStringType.Simple;
+#else
+        [Browsable(false)]
+#endif
+        public ItemFilterStringType UiGenPropertyValueType
+        {
+            get => _uiGenPropertyValueType;
+            set
+            {
+                if (_uiGenPropertyValueType != value)
+                {
+                    _uiGenPropertyValueType = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UiGenPropertyValueType)));
+                }
+            }
+        }
+        internal ItemFilterStringType _uiGenPropertyValueType = ItemFilterStringType.Simple;
 
+#if DEVELOPER
         [Category("GuiProperty")]
-        public Condition.Presence PropertySign { get; set; } = Presence.Equal;
-
-        public override bool IsValid
+#else
+        [Browsable(false)]
+#endif
+        public Condition.Presence PropertySign
         {
-            get
+            get => _propertySign;
+            set
             {
-                if(uiGen == null && !string.IsNullOrEmpty(_uiGenID))
-                    uiGen = MyNW.Internals.UIManager.AllUIGen.Find(x => x.Name == _uiGenID);
-                if (uiGen != null && uiGen.IsValid)
+                if (_propertySign != value)
                 {
-                    switch (Tested)
-                    {
-                        case UiGenCheckType.IsVisible:
-                            return uiGen.IsVisible;
-                        case UiGenCheckType.IsHidden:
-                            return !uiGen.IsVisible;
-                        case UiGenCheckType.Property:
-                            if(uiGen.IsVisible)
-                            {
-                                bool result = false;
-                                foreach(var uiVar in uiGen.Vars)
-                                    if (uiVar.Name == UiGenProperty)
-                                    {
-                                        result = CheckUiGenPropertyValue(uiVar);
-                                        break;
-                                    }
-                                return result;
-                            }
-                            break;
-                    }
+                    _propertySign = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PropertySign)));
                 }
-                return false;
             }
         }
+        internal Presence _propertySign = Presence.Equal;
+        #endregion
 
 
-        public override void Reset() { }
+        public override bool IsValid => ConditionEngine.IsValid;
 
-        public override string ToString()
-        {
-            return $"{GetType().Name} [{UiGenID}]";
-        }
+        public override void Reset() => ConditionEngine.Reset();
 
-        public override string TestInfos
-        {
-            get
-            {
-                if (uiGen == null && !string.IsNullOrEmpty(_uiGenID))
-                    uiGen = MyNW.Internals.UIManager.AllUIGen.Find(x => x.Name == _uiGenID);
-                if (uiGen != null && uiGen.IsValid)
-                {
-                    switch (Tested)
-                    {
-                        case UiGenCheckType.IsVisible:
-                            if(uiGen.IsVisible)
-                                return $"GUI '{_uiGenID}' is VISIBLE.";
-                            else return $"GUI '{_uiGenID}' is HIDDEN.";
-                        case UiGenCheckType.IsHidden:
-                            if (uiGen.IsVisible)
-                                return $"GUI '{_uiGenID}' is VISIBLE.";
-                            else return $"GUI '{_uiGenID}' is HIDDEN.";
-                        case UiGenCheckType.Property:
-                            if (uiGen.IsVisible)
-                            {
-                                foreach (var uiVar in uiGen.Vars)
-                                    if (uiVar.IsValid && uiVar.Name == UiGenProperty)
-                                    {
-                                        if(CheckUiGenPropertyValue(uiVar))
-                                            return $"The Property '{_uiGenID}.{UiGenProperty}' equals to '{uiVar.Value}'.";
-                                        else return $"The Property '{_uiGenID}.{UiGenProperty}' equals to '{uiVar.Value}'.";
-                                    }
-                                return $"The Property '{_uiGenID}.{UiGenProperty}' does not founded.";
-                            }
-                            else return $"GUI '{_uiGenID}' is HIDDEN. The Property '{UiGenProperty}' did not checked.";
-                    }
-                }
+        public override string ToString() => ConditionEngine.Label();
 
-                return $"GUI '{_uiGenID}' is not valid.";
-            }
-        }
-
-        private bool CheckUiGenPropertyValue(UIVar uiVar)
-        {
-            if (uiVar == null || !uiVar.IsValid)
-                return false;
-
-            bool result = false;
-            if (string.IsNullOrEmpty(uiVar.Value) && string.IsNullOrEmpty(UiGenPropertyValue))
-                result = true;
-            else switch (UiGenPropertyValueType)
-            {
-                case ItemFilterStringType.Simple:
-                    result = uiVar.Value.CompareToSimplePattern(UiGenPropertyValue);                            
-                    break;
-                case ItemFilterStringType.Regex:
-                    result = Regex.IsMatch(uiVar.Value, UiGenPropertyValue);
-                    break;
-            }
-
-            if (PropertySign == Presence.Equal)
-                return result;
-            else return !result;
-        }
+        public override string TestInfos => ConditionEngine.TestInfos;
     }
 }

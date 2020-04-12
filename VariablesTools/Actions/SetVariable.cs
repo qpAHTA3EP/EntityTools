@@ -16,25 +16,10 @@ namespace VariableTools.Actions
     [Serializable]
     public class SetVariable : Astral.Quester.Classes.Action
     {
-        //[XmlIgnore]
-        //private bool variableNameOk = false;
-        ////[XmlIgnore]
-        //private string variableName = string.Empty;
-        //[XmlIgnore]
-        //internal VariableContainer variableContainer = new VariableContainer();
-
-        //[Category("Variable")]
-        //[DisplayName("Variable")]
-        //[TypeConverter(typeof(ExpandableObjectConverter))]
-        //public VariableScopeIdentifier VarContainer { get => variableContainer; set => variableContainer = value; }
-
-
-        [XmlIgnore]
-        private VariableKey key = new VariableKey();
-
+#region Опции команды
         [Description("Идентификатор (имя) переменной.\n" +
-            "В имени переменной допускается использовние букв, цифр и символа \'_\'\n" +
-            "The Name of the {Variable}.")]
+                     "В имени переменной допускается использовние букв, цифр и символа \'_\'\n" +
+                     "The Name of the {Variable}.")]
         [Category("Variable")]
         [DisplayName("Variable")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
@@ -44,12 +29,14 @@ namespace VariableTools.Actions
             get => key;
             set
             {
-                if(!ReferenceEquals(key, value))
+                if (!ReferenceEquals(key, value))
                 {
                     key = value;
-                }                
+                    lable = string.Empty;
+                }
             }
         }
+        private VariableKey key = new VariableKey();
 
         [Browsable(false)]
         public string Variable
@@ -96,62 +83,51 @@ namespace VariableTools.Actions
             }
         }
 
-        //[Category("Variable")]
-        //public AccountScopeType AccountScope { get; set; }
-
-        //[Category("Variable")]
-        //public ProfileScopeType ProfileScope { get; set; }
-
-        //[Category("Variable")]
-        //[XmlIgnore]
-        //[ReadOnly(true)]
-        //public bool Save { get; protected set; }
-
-        //[Category("Variable")]
-        //[XmlIgnore]
-        //[ReadOnly(true)]
-        //public double StoredValue { get; protected set; }
+        [Category("Variable")]
+        [XmlIgnore]
+        [Editor(typeof(StoreVariableEditor), typeof(UITypeEditor))]
+        [Description("Нажми на кнопку '...' чтобы сохранить переменную в коллекцию\n" +
+                     "Press button '...' to store the variable to the collection")]
+        public string VariableToCollection { get; } = "Нажми на кнопку '...' =>";
 
         private NumberExpression equation = new NumberExpression();
 
         [Editor(typeof(EquationUiEditor), typeof(UITypeEditor))]
-        [Description("An expression whose result is assigned to the {Variable}.\r\n" +
-                     "Выражение, результат которого присваивается переменной {Variable}.")]
-        [Category("Value that assigns to the Variable")]
+        [Description("Выражение, результат которого присваивается переменной {Variable}.\n" +
+                     "An expression whose result is assigned to the {Variable}.")]
+        [Category("What will assign to the Variable")]
         public NumberExpression Equation
         {
             get => equation;
             set
             {
                 if (value.Text != equation.Text)
+                {
                     equation = value;
+                    lable = string.Empty;
+                }
             }
         }
+
+        #endregion
 
         public override bool NeedToRun => true;
 
         public override ActionResult Run()
         {
-            if (/*variableNameOk*/ Key.IsValid && equation.IsValid)
+            if (Key.IsValid && equation.IsValid)
             {
                 if (equation.Calcucate(out double result))
                 {
-                    // Реализация через Dictionary<string, double>
-                    //if (VariableTools.Variables.ContainsKey(variableName))
-                    //    VariableTools.Variables[variableName] = result;
-                    //else VariableTools.Variables.Add(variableName, result);
 #if DEBUG
                     if (VariableTools.DebugMessage)
                         Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}::{GetType().Name}[{ActionID}]: Equation '{equation.Text}' result is {result}.");
 #endif
 
                     // Реализация через VariableCollection
-                    //if (VariableTools.Variables.TryGetValue(out VariableContainer variable, variableName, AccountScope, ProfileScope))
                     if (VariableTools.Variables.TryGetValue(out VariableContainer variable, Key))
                     {
                         variable.Value = result;
-                        //Save = variable.Save;
-                        //StoredValue = variable.Value;
 #if DEBUG
                         if (VariableTools.DebugMessage)
                             Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}::{GetType().Name}[{ActionID}]: Variable {{{variable.Name}}}[{variable.AccountScope}, {variable.ProfileScope}] set to '{variable.Value}' (Equation = {equation.Text})");
@@ -160,13 +136,11 @@ namespace VariableTools.Actions
                     }
                     else
                     {
-                        //variable = VariableTools.Variables.Add(result, variableName, AccountScope, ProfileScope);
                         variable = VariableTools.Variables.Add(result, Key.Name, Key.AccountScope, Key.ProfileScope);
                         if (variable != null)
                         {
 #if DEBUG
                             if (VariableTools.DebugMessage)
-                                //Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}::{GetType().Name}[{ActionID}]: Add variable {{{variable.Name}}}[{variable.AccountScope}, {variable.ProfileScope}] with the value '{variable.Value}' (Equation = {equation.Text})");
                                 Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}::{GetType().Name}[{ActionID}]: Add variable {{{variable.ToString()}}} with the value '{variable.Value}' (Equation = {equation.Text})");
 #endif
                             return ActionResult.Completed;
@@ -175,7 +149,6 @@ namespace VariableTools.Actions
                         {
 #if DEBUG
                             if(VariableTools.DebugMessage)
-                                //Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}::{GetType().Name}[{ActionID}]: FAILED to set the value to the Variable {{{variableName}}}[{AccountScope}, {ProfileScope}]");
                                 Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}::{GetType().Name}[{ActionID}]: FAILED to set the value to the Variable {{{Key.ToString()}}}");
 #endif
                             return ActionResult.Fail;
@@ -189,21 +162,25 @@ namespace VariableTools.Actions
             return ActionResult.Fail;
         }
 
-
+        #region Интерфейс Quester.Action
         public override string ActionLabel
         {
             get
             {
-                if (Key != null)
-                    //return $"{GetType().Name}: {variableName}[{AccountScope}, {ProfileScope}] := {equation.Text}";
-                    return $"{GetType().Name}: {Key.ToString()} := {equation.Text}";
-                else return GetType().Name;
+                if (string.IsNullOrEmpty(lable))
+                {
+                    if (Key != null)
+                        lable = $"{GetType().Name}: {Key.ToString()} := {equation.Text}";
+                    else lable = GetType().Name;
+                }
+                return lable;
             }
         }
+        private string lable = string.Empty;
 
         public override string InternalDisplayName => string.Empty;
         public override bool UseHotSpots => false;
-        protected override bool IntenalConditions => /*variableNameOk*/ Key != null && Key.IsValid && equation.IsValid;
+        protected override bool IntenalConditions => Key != null && Key.IsValid && equation.IsValid;
         protected override Vector3 InternalDestination => new Vector3();
         protected override ActionValidity InternalValidity
         {
@@ -226,6 +203,7 @@ namespace VariableTools.Actions
         }
         public override void GatherInfos() { }
         public override void InternalReset() { }
-        public override void OnMapDraw(GraphicsNW graph) { }
+        public override void OnMapDraw(GraphicsNW graph) { } 
+        #endregion
     }
 }

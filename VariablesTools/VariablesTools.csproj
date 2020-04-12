@@ -52,7 +52,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>D:\ASTRAL\Astral_RU_1\Plugins\</OutputPath>
     <DefineConstants>TRACE;DEBUG;X64, ASTRAL</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
@@ -110,6 +110,7 @@
   <ItemGroup>
     <Compile Include="Classes\VariableCollection.cs" />
     <Compile Include="Classes\VariableContainer.cs" />
+    <Compile Include="Editors\StoreVariableEditor.cs" />
     <Compile Include="Editors\EquationUiEditor.cs" />
     <Compile Include="Editors\VariableSelectUiEditor.cs" />
     <Compile Include="Expressions\AstBase.cs" />

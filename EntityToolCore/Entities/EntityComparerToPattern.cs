@@ -1,8 +1,10 @@
 ﻿using Astral.Classes.ItemFilter;
 using EntityTools.Enums;
-using EntityTools.Extentions;
+using EntityTools.Extensions;
+using EntityTools.Logger;
 using MyNW.Classes;
 using System;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
@@ -31,7 +33,10 @@ namespace EntityCore.Entities
                         case SimplePatternPos.End:
                             return (Entity e) => CompareInternal2SimpleEnd(e, pattern);
                         default:
-                            throw new ArgumentException("Simple pattern is invalid");
+#if DEBUG
+                            EntityToolsLogger.WriteLine(LogType.Error, $"{nameof(EntityToPatternComparer)}::{MethodBase.GetCurrentMethod().Name}: Simple pattern is invalid {{{entPattern}, {strMatchType}, {nameType}}}");
+#endif
+                            return null;
                     }
                 else if (nameType == EntityNameType.NameUntranslated)
                     switch (pos)
@@ -45,7 +50,10 @@ namespace EntityCore.Entities
                         case SimplePatternPos.End:
                             return (Entity e) => CompareUntranslated2SimpleEnd(e, pattern);
                         default:
-                            throw new ArgumentException("Simple pattern is invalid");
+#if DEBUG
+                            EntityToolsLogger.WriteLine(LogType.Error, $"{nameof(EntityToPatternComparer)}::{MethodBase.GetCurrentMethod().Name}: Simple pattern is invalid {{{entPattern}, {strMatchType}, {nameType}}}");
+#endif
+                            return null;
                     }
                 else return CompareEmpty;
             }

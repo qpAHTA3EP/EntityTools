@@ -112,8 +112,18 @@ namespace VariableTools
             // Подстрока с относительным путем к профилю
             if (psq == ProfileScopeType.Profile)
             {
+                bool hasExtention = Astral.API.CurrentSettings.LastQuesterProfile.EndsWith(@".amp.zip");
+
                 if (Astral.API.CurrentSettings.LastQuesterProfile.StartsWith(Astral.Controllers.Directories.ProfilesPath))
-                        sb.Append(Astral.API.CurrentSettings.LastQuesterProfile.Substring(Astral.Controllers.Directories.ProfilesPath.Length));
+                {
+                    // Length + 1 нужно чтобы удалить символ '\' перед именем профиля
+                    sb.Append(Astral.API.CurrentSettings.LastQuesterProfile.Substring(Astral.Controllers.Directories.ProfilesPath.Length + 1,
+                        Astral.API.CurrentSettings.LastQuesterProfile.Length - Astral.Controllers.Directories.ProfilesPath.Length - (hasExtention ? 9 : 1)));
+                }
+                else if (Astral.API.CurrentSettings.LastQuesterProfile.StartsWith(@".\Profiles\", StringComparison.OrdinalIgnoreCase))
+                    sb.Append(Astral.API.CurrentSettings.LastQuesterProfile.Substring(11, Astral.API.CurrentSettings.LastQuesterProfile.Length - Astral.Controllers.Directories.ProfilesPath.Length - (hasExtention ? 9 : 1)));
+                //if (Astral.API.CurrentSettings.LastQuesterProfile.StartsWith(Astral.Controllers.Directories.AstralStartupPath))
+                //    sb.Append(Astral.API.CurrentSettings.LastQuesterProfile.Replace(Astral.Controllers.Directories.AstralStartupPath, @"."));
                 else sb.Append(Astral.API.CurrentSettings.LastQuesterProfile);
                 if (asq != AccountScopeType.Global)
                     sb.Append("&&");

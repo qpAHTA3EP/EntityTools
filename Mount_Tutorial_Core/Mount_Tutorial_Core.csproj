@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>1.20.0312.1626</AssemblyVersion>
+    <AssemblyVersion>1.20.0313.1134</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -53,7 +53,6 @@
     <Compile Include="Enums.cs" />
     <Compile Include="HorseEquipTutorialEngine.cs" />
     <Compile Include="Engine.cs" />
-    <Compile Include="InsertInsigniaEngine.cs" />
     <Compile Include="Instruments.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

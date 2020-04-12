@@ -1,12 +1,16 @@
-﻿using System;
+﻿#define TEST
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Management;
 using System.Security.Cryptography;
+using MyConverter;
 using System.Text;
 using System.Windows.Forms;
 
@@ -14,29 +18,75 @@ namespace MachineKeyGenerator
 {
     public partial class KeyGeneratorForm : Form
     {
+        private string machineId = string.Empty;
+        private string encrMachineId = string.Empty;
+        private string decrMachineId = string.Empty;
+#if TEST
+        private byte[] machineIdByte = null;
+        private byte[] encrMachineIdByte = null;
+        private byte[] decrMachineIdByte = null;
+#endif
         public KeyGeneratorForm()
         {
             InitializeComponent();
         }
 
-        private void btnClose_Click(object sender, EventArgs e)
+        private void KeyGeneratorForm_Load(object sender, EventArgs e)
+        {
+            tbId.Text = SysInfo.SysInformer.GetMashineID(true);
+        }
+
+        private void btnCopy_Click(object sender, EventArgs e)
         {
             Close();
             if(!string.IsNullOrEmpty(tbId.Text))
                 Clipboard.SetText(tbId.Text);
         }
 
+#if TEST
         private void btnGenerate_Click(object sender, EventArgs e)
         {
-            tbId.Text = SysInfo.Helper.GetMashineID();
+            machineId = SysInfo.SysInformer.GetMashineID(false);
+            tbId.Text = machineId;
+            machineIdByte = Encoding.UTF8.GetBytes(machineId);
+            encrMachineIdByte = SysInfo.SysInformer.Encrypt(machineIdByte, SysInfo.SysInformer.publicKey);
+            if (encrMachineIdByte != null)
+            {
+                encrMachineId = encrMachineIdByte.ToHexString();
+                tbId.Text += string.Concat("\r\n=================================\r\n", encrMachineId);
+            }
         }
 
-        private void KeyGeneratorForm_Load(object sender, EventArgs e)
+        private void btnDecrypt_Click(object sender, EventArgs e)
         {
-            tbId.Text = SysInfo.Helper.GetMashineID();
+            if (!string.IsNullOrEmpty(encrMachineId))
+            {
+                decrMachineIdByte = SysInfo.SysInformer.Decrypt(encrMachineId.ToBytes(), SysInfo.SysInformer.publicKey);
+                if (decrMachineIdByte != null)
+                {
+                    decrMachineId = Encoding.UTF8.GetString(decrMachineIdByte);
+                    tbId.Text += string.Concat("\r\n=================================\r\n", decrMachineId);
+                }
+            }
+        }
+#endif
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveDialog = new SaveFileDialog();
+            saveDialog.AddExtension = true;
+            saveDialog.DefaultExt = "key";
+            saveDialog.Filter = "Key files (*.key)|*.key";
+            saveDialog.InitialDirectory = Environment.CurrentDirectory;
+            if (saveDialog.ShowDialog() == DialogResult.OK)
+            {
+                File.WriteAllText(saveDialog.FileName, tbId.Text);
+                //System.Diagnostics.Process.Start(saveDialog.FileName);
+            }
+            Close();
         }
     }
 }
+#if false
 namespace SysInfo
 {
     internal static class Helper
@@ -93,7 +143,7 @@ namespace SysInfo
             foreach (ManagementObject babeBoard in mc.GetInstances())
             {
                 string val = babeBoard.GetPropertyValue("SerialNumber")?.ToString();
-                if(!string.IsNullOrEmpty(val))
+                if (!string.IsNullOrEmpty(val))
                     idBuilder.Append('_').Append(val);
             }
 
@@ -106,12 +156,12 @@ namespace SysInfo
             }
 
             mc = new ManagementClass("Win32_DiskDrive");
-            foreach(ManagementObject disk in mc.GetInstances())
+            foreach (ManagementObject disk in mc.GetInstances())
             {
                 string diskInfo = string.Empty;
                 string val = disk.GetPropertyValue("Model")?.ToString();
                 if (!string.IsNullOrEmpty(val))
-                    diskInfo = '_'+ val;
+                    diskInfo = '_' + val;
                 val = disk.GetPropertyValue("FirmwareRevision")?.ToString();
                 if (!string.IsNullOrEmpty(val))
                     diskInfo += '_' + val;
@@ -123,10 +173,10 @@ namespace SysInfo
             foreach (ManagementObject networkAdaptr in mc.GetInstances())
             {
                 string val = networkAdaptr.GetPropertyValue("MACAddress")?.ToString();
-                if(!string.IsNullOrEmpty(val))
+                if (!string.IsNullOrEmpty(val))
                     idBuilder.Append('_').Append(val);
             }
-           
+
             return Encrypt(idBuilder.ToString(), "fs5er4z6#'f1dsg3regjuty6k@(");
         }
         /*public static string MD5_Bytes2String(byte[] bytes)
@@ -206,4 +256,5 @@ namespace SysInfo
             return result;
         }*/
     }
-}
+} 
+#endif

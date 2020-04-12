@@ -9,17 +9,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using static Astral.Quester.Classes.Action;
+using Mount_Tutorial;
 
-namespace EntityTools.Core.Facades
+namespace EntityTools.Core.Proxy
 {
     /// <summary>
     /// Класс-заглушка, инициирующий ядро команды Quester.Action 
     /// </summary>
-    internal class QuesterActionInitializer : IQuesterActionEngine
+    internal sealed class QuesterActionProxy : IQuesterActionEngine
     {
         private Astral.Quester.Classes.Action action;
 
-        internal QuesterActionInitializer(Astral.Quester.Classes.Action a)
+        private QuesterActionProxy() { }
+
+        internal QuesterActionProxy(Astral.Quester.Classes.Action a)
         {
             action = a ?? throw new ArgumentNullException();
         }
@@ -28,7 +31,7 @@ namespace EntityTools.Core.Facades
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
+                if (MountTutorialLoaderPlugin.Core.Initialize(action))
                     return action.NeedToRun;
                 else return false;
             }
@@ -38,7 +41,7 @@ namespace EntityTools.Core.Facades
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
+                if (MountTutorialLoaderPlugin.Core.Initialize(action))
                     return action.ActionLabel;
                 else return action.GetType().Name;
             }
@@ -48,7 +51,7 @@ namespace EntityTools.Core.Facades
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
+                if (MountTutorialLoaderPlugin.Core.Initialize(action))
                     if(ReflectionHelper.GetPropertyValue(action, "InternalConditions", out object result, BindingFlags.Instance | BindingFlags.NonPublic)
                         && result != null)
                         return result.Equals(true);
@@ -60,7 +63,7 @@ namespace EntityTools.Core.Facades
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
+                if (MountTutorialLoaderPlugin.Core.Initialize(action))
                     if (ReflectionHelper.GetPropertyValue(action, "InternalValidity", out object result, BindingFlags.Instance | BindingFlags.NonPublic)
                         && result != null)
                         return result as ActionValidity;
@@ -72,7 +75,7 @@ namespace EntityTools.Core.Facades
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
+                if (MountTutorialLoaderPlugin.Core.Initialize(action))
                     if (ReflectionHelper.GetPropertyValue(action, "InternalDestination", out object result, BindingFlags.Instance | BindingFlags.NonPublic)
                         && result != null)
                         return result as Vector3;
@@ -83,7 +86,7 @@ namespace EntityTools.Core.Facades
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
+                if (MountTutorialLoaderPlugin.Core.Initialize(action))
                     return action.UseHotSpots;
                 else return false;
             }
@@ -91,25 +94,25 @@ namespace EntityTools.Core.Facades
 
         public void GatherInfos()
         {
-            if (EntityTools.Core.Initialize(action))
+            if (MountTutorialLoaderPlugin.Core.Initialize(action))
                 action.GatherInfos();
         }
 
         public void InternalReset()
         {
-            if (EntityTools.Core.Initialize(action))
+            if (MountTutorialLoaderPlugin.Core.Initialize(action))
                 action.InternalReset();
         }
 
         public void OnMapDraw(GraphicsNW graph)
         {
-            if (EntityTools.Core.Initialize(action))
+            if (MountTutorialLoaderPlugin.Core.Initialize(action))
                 action.OnMapDraw(graph);
         }
 
         public ActionResult Run()
         {
-            if (EntityTools.Core.Initialize(action))
+            if (MountTutorialLoaderPlugin.Core.Initialize(action))
                 return action.Run();
             else return ActionResult.Fail;
         }

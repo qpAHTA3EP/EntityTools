@@ -29,7 +29,8 @@
         private void InitializeComponent()
         {
             this.tbId = new System.Windows.Forms.TextBox();
-            this.btnClose = new System.Windows.Forms.Button();
+            this.btnCopy = new System.Windows.Forms.Button();
+            this.btnSave = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // tbId
@@ -40,32 +41,44 @@
             this.tbId.Location = new System.Drawing.Point(12, 12);
             this.tbId.Multiline = true;
             this.tbId.Name = "tbId";
-            this.tbId.Size = new System.Drawing.Size(378, 74);
+            this.tbId.Size = new System.Drawing.Size(378, 118);
             this.tbId.TabIndex = 0;
             // 
-            // btnClose
+            // btnCopy
             // 
-            this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClose.Location = new System.Drawing.Point(301, 99);
-            this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(89, 23);
-            this.btnClose.TabIndex = 1;
-            this.btnClose.Text = "Copy && Close";
-            this.btnClose.UseVisualStyleBackColor = true;
-            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            this.btnCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCopy.Location = new System.Drawing.Point(301, 143);
+            this.btnCopy.Name = "btnCopy";
+            this.btnCopy.Size = new System.Drawing.Size(89, 23);
+            this.btnCopy.TabIndex = 1;
+            this.btnCopy.Text = "Copy && Close";
+            this.btnCopy.UseVisualStyleBackColor = true;
+            this.btnCopy.Click += new System.EventHandler(this.btnCopy_Click);
+            // 
+            // btnSave
+            // 
+            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnSave.Location = new System.Drawing.Point(12, 143);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(89, 23);
+            this.btnSave.TabIndex = 1;
+            this.btnSave.Text = "Save && Close";
+            this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // KeyGeneratorForm
             // 
-            this.AcceptButton = this.btnClose;
+            this.AcceptButton = this.btnSave;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(402, 134);
-            this.Controls.Add(this.btnClose);
+            this.ClientSize = new System.Drawing.Size(402, 178);
+            this.Controls.Add(this.btnSave);
+            this.Controls.Add(this.btnCopy);
             this.Controls.Add(this.tbId);
             this.Name = "KeyGeneratorForm";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "MachineId";
+            this.Text = "KeyGenerator";
             this.Load += new System.EventHandler(this.KeyGeneratorForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -75,7 +88,8 @@
         #endregion
 
         private System.Windows.Forms.TextBox tbId;
-        private System.Windows.Forms.Button btnClose;
+        private System.Windows.Forms.Button btnCopy;
+        private System.Windows.Forms.Button btnSave;
     }
 }
 

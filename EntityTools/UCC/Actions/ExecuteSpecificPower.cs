@@ -1,7 +1,8 @@
 ﻿#if DEBUG
-#define DEBUT_ExecuteSpecificPower
+#define DEBUG_ExecuteSpecificPower
 #endif
 #define REFLECTION_ACCESS
+
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
@@ -13,6 +14,8 @@ using Astral.Controllers;
 using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
 using Astral.Quester.UIEditors;
+using EntityTools.Core.Interfaces;
+using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Reflection;
@@ -27,497 +30,341 @@ namespace EntityTools.UCC.Actions
     [Serializable]
     public class ExecuteSpecificPower : UCCAction
     {
+        #region Взаимодействие с EntityToolsCore
+#if CORE_INTERFACES
+        [NonSerialized]
+        internal IUCCActionEngine Engine;
+#endif
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public ExecuteSpecificPower()
+        {
+            Target = Unit.Target;
+#if CORE_INTERFACES
+            Engine = new UCCActionProxy(this);
+#endif
+            // EntityTools.Core.Initialize(this);
+        }
+        #endregion
+
+        #region Опции команды
+#if DEVELOPER
         [Editor(typeof(PowerAllIdEditor), typeof(UITypeEditor))]
         [Category("Required")]
-        public string PowerId { get; set; } = string.Empty;
+#else
+        [Browsable(false)]
+#endif
+        public string PowerId
+        {
+            get => _powerId;
+            set
+            {
+                if (_powerId != value)
+                {
+                    _powerId = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PowerId)));
+                }
+            }
+        }
+        internal string _powerId = string.Empty;
 
+#if DEVELOPER
         [Category("Optional")]
-        public bool CheckPowerCooldown { get; set; } = false;
+#else
+        [Browsable(false)]
+#endif
+        public bool CheckPowerCooldown
+        {
+            get => _checkPowerCooldown;
+            set
+            {
+                if (_checkPowerCooldown != value)
+                {
+                    _checkPowerCooldown = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CheckPowerCooldown)));
+                }
+            }
+        }
+        internal bool _checkPowerCooldown = false;
 
+#if DEVELOPER
         [Category("Optional")]
-        public bool CheckInTray { get; set; } = false;
+#else
+        [Browsable(false)]
+#endif
+        public bool CheckInTray
+        {
+            get => _checkInTray;
+            set
+            {
+                if (_checkInTray != value)
+                {
+                    _checkInTray = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CheckInTray)));
+                }
+            }
+        }
+        internal bool _checkInTray = false;
 
+#if DEVELOPER
         [Category("Optional")]
         [DisplayName("CastingTime (ms)")]
-        public int CastingTime { get; set; } = 0;
+#else
+        [Browsable(false)]
+#endif
+        public int CastingTime
+        {
+            get => _castingTime;
+            set
+            {
+                if (_castingTime != value)
+                {
+                    _castingTime = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CastingTime)));
+                }
+            }
+        }
+        internal int _castingTime = 0;
 
+#if DEVELOPER
         [Category("Optional")]
-        public bool ForceMaintain { get; set; } = false;
+#else
+        [Browsable(false)]
+#endif
+        public bool ForceMaintain
+        {
+            get => _forceMaintain;
+            set
+            {
+                if (_forceMaintain != value)
+                {
+                    _forceMaintain = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ForceMaintain)));
+                }
+            }
+        }
+        internal bool _forceMaintain = false;
 
+#if DEVELOPER
         [Description("ID of the Entity that is preferred to attack\n" +
             "If Entity does not exist or EntityID is empty then the Target option is used")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("TargetEntity")]
+#else
+        [Browsable(false)]
+#endif
         public string EntityID
         {
-            get => entityId;
+            get => _entityId;
             set
             {
-                if (entityId != value)
+                if (_entityId != value)
                 {
-                    entityId = value;
-                    if (!string.IsNullOrEmpty(entityId))
-                        Comparer = EntityToPatternComparer.Get(entityId, entityIdType, entityNameType);
-                    else Comparer = null;
+                    _entityId = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityID)));
                 }
             }
         }
+        internal string _entityId = string.Empty;
 
+#if DEVELOPER
         [Description("Type of and EntityID:\n" +
             "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("TargetEntity")]
+#else
+        [Browsable(false)]
+#endif
         public ItemFilterStringType EntityIdType
         {
-            get => entityIdType;
+            get => _entityIdType;
             set
             {
-                if (entityIdType != value)
+                if (_entityIdType != value)
                 {
-                    entityIdType = value;
-                    if (!string.IsNullOrEmpty(entityId))
-                        Comparer = EntityToPatternComparer.Get(entityId, entityIdType, entityNameType);
-                    else Comparer = null;
+                    _entityIdType = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityIdType)));
                 }
             }
         }
+        internal ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
 
+#if DEVELOPER
         [Description("The switcher of the Entity filed which compared to the property EntityID")]
         [Category("TargetEntity")]
+#else
+        [Browsable(false)]
+#endif
         public EntityNameType EntityNameType
         {
-            get => entityNameType;
+            get => _entityNameType;
             set
             {
-                if (entityNameType != value)
+                if (_entityNameType != value)
                 {
-                    entityNameType = value;
-                    if (!string.IsNullOrEmpty(entityId))
-                        Comparer = EntityToPatternComparer.Get(entityId, entityIdType, entityNameType);
-                    else Comparer = null;
+                    _entityNameType = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityNameType)));
                 }
             }
         }
+        internal EntityNameType _entityNameType = EntityNameType.NameUntranslated;
 
+#if DEVELOPER
         [Description("Check Entity's Ingame Region (Not CustomRegion):\n" +
             "True: Only Entities located in the same Region as Player are detected\n" +
             "False: Entity's Region does not checked during search")]
         [Category("TargetEntity (Optional)")]
-        public bool RegionCheck { get; set; } = true;
+#else
+        [Browsable(false)]
+#endif
+        public bool RegionCheck
+        {
+            get => _regionCheck;
+            set
+            {
+                if (_regionCheck != value)
+                {
+                    _regionCheck = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RegionCheck)));
+                }
+            }
+        }
+        internal bool _regionCheck = true;
 
+#if DEVELOPER
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
         [Category("TargetEntity (Optional)")]
-        public bool HealthCheck { get; set; } = true;
+#else
+        [Browsable(false)]
+#endif
+        public bool HealthCheck
+        {
+            get => _healthCheck;
+            set
+            {
+                if (_healthCheck != value)
+                {
+                    _healthCheck = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HealthCheck)));
+                }
+            }
+        }
+        internal bool _healthCheck = true;
 
+#if DEVELOPER
         [Description("Aura which checked on the Entity")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         [Category("TargetEntity (Optional)")]
-        public AuraOption Aura { get; set; } = new AuraOption();
+#else
+        [Browsable(false)]
+#endif
+        public AuraOption Aura
+        {
+            get => _aura;
+            set
+            {
+                if (_aura != value)
+                {
+                    _aura = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Aura)));
+                }
+            }
+        }
+        internal AuraOption _aura = new AuraOption();
 
+#if DEVELOPER
         [Description("The maximum distance from the character within which the Entity is searched\n" +
             "The default value is 0, which disables distance checking")]
         [Category("TargetEntity (Optional)")]
-        public float ReactionRange { get; set; } = 60;
+#else
+        [Browsable(false)]
+#endif
+        public float ReactionRange
+        {
+            get => _reactionRange;
+            set
+            {
+                if (_reactionRange != value)
+                {
+                    _reactionRange = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionRange)));
+                }
+            }
+        }
+        internal float _reactionRange = 60;
 
+#if DEVELOPER
         [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
             "The default value is 0, which disables ZAxis checking")]
         [Category("TargetEntity (Optional)")]
-        public float ReactionZRange { get; set; } = 0;
+#else
+        [Browsable(false)]
+#endif
+        public float ReactionZRange
+        {
+            get => _reactionZRange;
+            set
+            {
+                if (_reactionZRange != value)
+                {
+                    _reactionZRange = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionZRange)));
+                }
+            }
+        }
+        internal float _reactionZRange = 0;
 
+#if DEVELOPER
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
         [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
         //[Category("Entity")]
         public string TestInfo { get; } = "Нажми '...' =>";
+#endif
 
+        #region Hide Inherited Properties
+        [XmlIgnore]
+        [Browsable(false)]
+        public new string ActionName { get; set; }
+        #endregion
+        #endregion
 
         [XmlIgnore]
         [Browsable(false)]
-        public bool Slotted
-        {
-            get
-            {
-                if (!Validate(power))
-                {
-                    attachedGameProcessId = Astral.API.AttachedGameProcess.Id;
-                    power = Powers.GetPowerByInternalName(PowerId);
-                }
-                return power?.IsInTray == true;
-            }
-        }
+        public override bool NeedToRun => Engine.NeedToRun;
 
-        //[XmlIgnore]
-        //[Browsable(false)]
-        //private Entity TargetEntity
-        //{
-        //    get
-        //    {
-        //        if (!string.IsNullOrEmpty(entityId))
-        //        {
-        //            if (Validate(entity))
-        //                return entity;
-        //            else entity = SearchCached.FindClosestEntity(EntityID, EntityIdType, EntityNameType, EntitySetType.Complete,
-        //                                                        HealthCheck, ReactionRange, ReactionRange, RegionCheck, null, Aura.Checker);
-        //            if (Validate(entity))
-        //                return entity;
-        //        }
-        //        switch (Target)
-        //        {
-        //            case Unit.Player:
-        //                return EntityManager.LocalPlayer;
-        //            case Unit.MostInjuredAlly:
-        //                return ActionsPlayer.MostInjuredAlly;
-        //            case Unit.StrongestAdd:
-        //                return ActionsPlayer.AnAdd;
-        //            case Unit.StrongestTeamMember:
-        //                return ActionsPlayer.StrongestTeamMember;
-        //            default:
-        //                return Core.CurrentTarget;
-        //        }
-        //    }
-        //}
-
-        [XmlIgnore]
-        [Browsable(false)]
-        public override bool NeedToRun
-        {
-            get
-            {
-                Power p = GetCurrentPower();
-
-                return Validate(p)
-                        && (!CheckPowerCooldown || !p.IsOnCooldown())
-                        && (!CheckInTray || p.IsInTray);
-            }
-        }
-
-        public override bool Run()
-        {
-#if DEBUT_ExecuteSpecificPower
-            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower::Run() starts");
-#endif
-#if REFLECTION_ACCESS
-            if (movementsType == null)
-                movementsType = typeof(Astral.Logic.UCC.Controllers.Movements);
-#endif
-
-            Power currentPower = GetCurrentPower();
-
-            if (!Validate(currentPower))
-            {
-#if DEBUT_ExecuteSpecificPower
-                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to get Power '{PowerId}' by 'PowerId'");
-#endif
-                return false;
-            }
-            Power entActivatedPower = currentPower.EntGetActivatedPower();
-            PowerDef powerDef = entActivatedPower.EntGetActivatedPower().EffectivePowerDef();
-            if (base.Target != Unit.Player)
-            {
-                switch (Target)
-                {
-                    case Unit.MostInjuredAlly:
-#if REFLECTION_ACCESS
-                        if (!ReflectionHelper.SetStaticPropertyValue(movementsType, "SpecificTarget", ActionsPlayer.MostInjuredAlly/*, BindingFlags.Static | BindingFlags.NonPublic*/))
-                        {
-#if DEBUT_ExecuteSpecificPower
-                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to set UCC.Controllers.Movements.SpecificTarget to 'MostInjuredAlly'");
-#endif
-                            return false;
-                        }
-#else
-                        Astral.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.MostInjuredAlly;
-#endif
-                        break;
-                    case Unit.StrongestAdd:
-#if REFLECTION_ACCESS
-                        if (!ReflectionHelper.SetStaticPropertyValue(movementsType, "SpecificTarget", ActionsPlayer.AnAdd/*, BindingFlags.Static | BindingFlags.NonPublic*/))
-                        {
-#if DEBUT_ExecuteSpecificPower
-                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to set UCC.Controllers.Movements.SpecificTarget to 'AnAdd'");
-#endif
-                            return false;
-                        }
-#else
-                        Astral.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.AnAdd;
-#endif
-                        break;
-                    case Unit.StrongestTeamMember:
-#if REFLECTION_ACCESS
-                        if (!ReflectionHelper.SetStaticPropertyValue(movementsType, "SpecificTarget", ActionsPlayer.StrongestTeamMember/*, BindingFlags.Static | BindingFlags.NonPublic*/))
-                        {
-#if DEBUG
-                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to set UCC.Controllers.Movements.SpecificTarget to 'StrongestTeamMember'");
-#endif
-                            return false;
-                        }
-#else
-                        Astral.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.StrongestTeamMember;
-#endif
-                        break;
-                    default:
-#if REFLECTION_ACCESS
-                        if (!ReflectionHelper.SetStaticPropertyValue(movementsType, "SpecificTarget", null/*, BindingFlags.Static | BindingFlags.NonPublic*/))
-                        {
-#if DEBUT_ExecuteSpecificPower
-                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to set UCC.Controllers.Movements.SpecificTarget to 'null'");
-#endif
-                            return false;
-                        }
-#else
-                        Astral.Logic.UCC.Controllers.Movements.SpecificTarget = null;
-#endif
-                        break;
-                }
-                int effectiveRange = Powers.getEffectiveRange(powerDef);
-
-                if (Range > 0)
-                    effectiveRange = Range;
-
-                if (effectiveRange > 1)
-                {
-                    if (effectiveRange < 7)
-                    {
-                        effectiveRange = 7;
-                    }
-#if REFLECTION_ACCESS
-                    if (!ReflectionHelper.SetStaticPropertyValue(movementsType, "RequireRange", effectiveRange - 2/*, BindingFlags.Static | BindingFlags.SetProperty*/))
-                    {
-#if DEBUT_ExecuteSpecificPower
-                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to set UCC.Controllers.Movements.RequireRange to '{effectiveRange - 2}'");
-#endif
-                        return false;
-                    }
-#else
-                    Astral.Logic.UCC.Controllers.Movements.RequireRange = range - 2;
-#endif
-#if REFLECTION_ACCESS
-                    while (ReflectionHelper.GetPropertyValue(movementsType, "RangeIsOk", out object RangeIsOk) && RangeIsOk.Equals(true))
-#else
-                    while (Astral.Logic.UCC.Controllers.Movements.RangeIsOk)
-#endif
-                    {
-                        if (Astral.Logic.UCC.Core.CurrentTarget.IsDead)
-                        {
-                            return true;
-                        }
-                        Thread.Sleep(100);
-                        //if (Spell.stopMoveDodgeTO.IsTimedOut && AOECheck.PlayerIsInAOE)
-                        //{
-                        //    Spell.stopMoveDodgeTO.ChangeTime(3500);
-                        //    return true;
-                        //}
-                    }
-                }
-            }
-            int castingTime;
-            if (this.CastingTime > 0)
-            {
-                castingTime = this.CastingTime;
-            }
-            else
-            {
-                castingTime = Powers.getEffectiveTimeCharge(powerDef);
-            }
-            Entity target = new Entity(UnitRef.Pointer);//new Entity(TargetEntity.Pointer);
-            if (target.ContainerId != EntityManager.LocalPlayer.ContainerId && !target.Location.IsInYawFace)
-            {
-                target.Location.Face();
-                Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(750);
-                while (!target.Location.IsInYawFace && !timeout.IsTimedOut)
-                {
-                    Thread.Sleep(20);
-                }
-                Thread.Sleep(100);
-            }
-            double effectiveTimeActivate = (double)Powers.getEffectiveTimeActivate(powerDef) * 1.5;
-            Astral.Classes.Timeout castingTimeout = new Astral.Classes.Timeout(castingTime);
-
-            try
-            {
-                if (!powerDef.GroundTargeted && !powerDef.Categories.Contains(PowerCategory.IgnorePitch))
-                {
-                    target.Location.Face();
-#if DEBUT_ExecuteSpecificPower
-                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Activate ExecPower '{currentPower.PowerDef.InternalName}' on target {target.Name}[{target.InternalName}]");
-#endif
-                    Powers.ExecPower(currentPower, target, true);
-                }
-                else
-                {
-                    Vector3 location = target.Location;
-                    location.Z += 3f;
-                    location.Face();
-#if DEBUT_ExecuteSpecificPower
-                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Activate ExecPower '{currentPower.PowerDef.InternalName}' on location <{location.X.ToString("0,4:N2")}, {location.Y.ToString("0,4:N2")}, {location.Z.ToString("0,4:N2")}>");
-#endif
-                    Powers.ExecPower(currentPower, location, true);
-                }
-#if DEBUT_ExecuteSpecificPower
-                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Wait casting time ({castingTime} ms)");
-#endif
-                while (!castingTimeout.IsTimedOut && !AOECheck.PlayerIsInAOE)
-                {
-                    if (Astral.Logic.UCC.Core.CurrentTarget.IsDead)
-                    {
-                        return true;
-                    }
-                    if (!this.ForceMaintain && ((currentPower.UseCharges() && !currentPower.ChargeAvailable()) || currentPower.IsActive))
-                    {
-                        break;
-                    }
-                    Thread.Sleep(20);
-                }
-            }
-            catch { }
-            finally
-            {
-#if DEBUT_ExecuteSpecificPower
-                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Deactivate ExecPower '{currentPower.PowerDef.InternalName}' on target {target.Name}[{target.InternalName}]");
-#endif
-                Powers.ExecPower(currentPower, target, false);
-            }
-            if (!this.ForceMaintain)
-            {
-                Powers.WaitPowerActivation(currentPower, (int)effectiveTimeActivate);
-            }
-            return true;
-        }
-
-        public ExecuteSpecificPower()
-        {
-            Target = Unit.Target;
-            movementsType = typeof(Astral.Logic.UCC.Controllers.Movements);
-        }
+        public override bool Run() => Engine.Run();
 
         public override UCCAction Clone()
         {
             return base.BaseClone(new ExecuteSpecificPower
             {
-                PowerId = this.PowerId,
-                CheckPowerCooldown = this.CheckPowerCooldown,
-                CheckInTray = this.CheckInTray,
-                CastingTime = this.CastingTime,
-                ForceMaintain = this.ForceMaintain,
-                entityId = this.entityId,
-                entityIdType = this.entityIdType,
-                entityNameType = this.entityNameType,
-                RegionCheck = this.RegionCheck,
-                HealthCheck = this.HealthCheck,
-                Aura = new AuraOption
+                _powerId = this._powerId,
+                _checkPowerCooldown = this._checkPowerCooldown,
+                _checkInTray = this._checkInTray,
+                _castingTime = this._castingTime,
+                _forceMaintain = this._forceMaintain,
+                _entityId = this._entityId,
+                _entityIdType = this._entityIdType,
+                _entityNameType = this._entityNameType,
+                _regionCheck = this._regionCheck,
+                _healthCheck = this._healthCheck,
+                _aura = new AuraOption
                 {
-                    AuraName = this.Aura.AuraName,
-                    AuraNameType = this.Aura.AuraNameType,
-                    Sign = this.Aura.Sign,
-                    Stacks = this.Aura.Stacks
+                    AuraName = this._aura.AuraName,
+                    AuraNameType = this._aura.AuraNameType,
+                    Sign = this._aura.Sign,
+                    Stacks = this._aura.Stacks
                 }
             });
         }
-        public override string ToString()
-        {
-            Power currentPower = GetCurrentPower();
 
-            if (Validate(currentPower))
-            {
-                StringBuilder str = new StringBuilder();
-                if (CheckInTray && Slotted)
-                    str.Append("[Slotted] ");
-                if (currentPower.EffectivePowerDef().DisplayName.Length > 0)
-                    str.Append(currentPower.EffectivePowerDef().DisplayName);
-                else str.Append(currentPower.EffectivePowerDef().InternalName);
-
-                return str.ToString();
-            }
-
-            return "Unknow Power";
-        }
-
-        private bool Validate(Power p)
-        {
-            return attachedGameProcessId == Astral.API.AttachedGameProcess.Id
-                && p != null && p.IsValid && p.PowerDef.InternalName == PowerId;
-        }
-        private bool Validate(Entity e)
-        {
-            return e != null && e.IsValid && Comparer?.Invoke(e) == true;
-        }
-
-        private Power GetCurrentPower()
-        {
-            if (!Validate(power))
-            {
-                attachedGameProcessId = Astral.API.AttachedGameProcess.Id;
-                power = Powers.GetPowerByInternalName(PowerId);
-            }
-            return power;
-        }
-
-        [NonSerialized]
-        int attachedGameProcessId = 0;
-
-        [NonSerialized]
-        private Power power = null;
-#if REFLECTION_ACCESS
-        [NonSerialized]
-        private static Type movementsType = null;
-#endif
+        public override string ToString() => Engine.Label();
 
         [XmlIgnore]
         [Browsable(false)]
-        internal Predicate<Entity> Comparer { get; private set; } = null;
-
-        [XmlIgnore]
-        [Browsable(false)]
-        public Entity UnitRef
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(entityId))
-                {
-                    if (Comparer == null)
-                        Comparer = EntityToPatternComparer.Get(entityId, entityIdType, entityNameType);
-                    if (Validate(entity))
-                        return entity;
-                    else entity = SearchCached.FindClosestEntity(entityId, entityIdType, entityNameType, EntitySetType.Complete,
-                                                                HealthCheck, ReactionRange,
-                                                                (ReactionZRange > 0) ? ReactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference,
-                                                                RegionCheck, null, Aura.Checker);
-
-                    if (Validate(entity))
-                        return entity;
-                }
-                switch (Target)
-                {
-                    case Unit.Player:
-                        return EntityManager.LocalPlayer;
-                    case Unit.MostInjuredAlly:
-                        return ActionsPlayer.MostInjuredAlly;
-                    case Unit.StrongestAdd:
-                        return ActionsPlayer.AnAdd;
-                    case Unit.StrongestTeamMember:
-                        return ActionsPlayer.StrongestTeamMember;
-                    default:
-                        return Astral.Logic.UCC.Core.CurrentTarget;
-                }
-            }
-        }
-
-        [NonSerialized]
-        private string entityId = string.Empty;
-        [NonSerialized]
-        private ItemFilterStringType entityIdType = ItemFilterStringType.Simple;
-        [NonSerialized]
-        private EntityNameType entityNameType = EntityNameType.NameUntranslated;
-        [NonSerialized]
-        protected Entity entity = new Entity(IntPtr.Zero);
-
-
-#region Hide Inherited Properties
-        [XmlIgnore]
-        [Browsable(false)]
-        public new string ActionName { get; set; }
-#endregion
+        public Entity UnitRef => Engine.UnitRef;
     }
 }

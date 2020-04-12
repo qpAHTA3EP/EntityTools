@@ -64,7 +64,8 @@ namespace EntityCore.Forms
                 // Файл списка бонусов ОТСУТСТВУЕТ
                 // Создаем копию файла списка бонусов из ресурса
                 Directory.CreateDirectory(fileName);
-                File.WriteAllText(fileName, Properties.Resources.MountBonuses);
+                throw new NotImplementedException();
+                //File.WriteAllText(fileName, Properties.Resources.MountBonuses);
             }
 
             if (File.Exists(fileName))

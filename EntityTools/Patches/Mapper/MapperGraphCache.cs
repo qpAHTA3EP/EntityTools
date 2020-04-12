@@ -2,6 +2,7 @@
 using Astral;
 using Astral.Classes;
 using Astral.Logic.Classes.Map;
+using EntityTools.Logger;
 using EntityTools.Reflection;
 using MyNW.Classes;
 using MyNW.Internals;
@@ -543,7 +544,7 @@ namespace EntityTools.Patches.Mapper
             RegenCache();
 
 #if DEBUG
-            Logger.WriteLine(Logger.LogType.Debug, "MapperFormExt::eventMapperDoubleClick");
+            EntityToolsLogger.WriteLine(Logger.LogType.Debug, "MapperFormExt::eventMapperDoubleClick");
 #endif
         }
 

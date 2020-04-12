@@ -9,32 +9,49 @@ using System.Xml.Serialization;
 using System.Reflection;
 using EntityTools.Core;
 using EntityTools.Core.Interfaces;
+using Astral.Logic.UCC.Classes;
+using Astral.Classes.ItemFilter;
+using EntityTools.Enums;
+using MyNW.Classes;
+using System.Collections.Generic;
+using Astral;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Runtime.CompilerServices;
+using EntityTools.Logger;
+using Astral.Quester.Classes;
+
+[assembly: InternalsVisibleTo("EntityCore")]
 
 namespace EntityTools
 {
     public class EntityTools : Astral.Addons.Plugin
     {
-        public static IEntityToolsCore Core { get; }
+        internal static IEntityToolsCore Core { get; private set; } = new EntityCoreProxy();
+
+        private static bool assemblyResolve_Deletage_Binded = false;
+        private static readonly string assemblyResolve_Name = $"^{Assembly.GetExecutingAssembly().GetName().Name},";
 
         public override string Name => "Entity Tools";
         public override string Author => "MichaelProg";
         public override System.Drawing.Image Icon => Properties.Resources.EntityIcon;
-        private BasePanel panel = null;
         public override BasePanel Settings
         {
             get
             {
-                if (panel == null)
-                    panel = new Core.EntityToolsMainPanel();
-                return panel;
+                if (_panel == null)
+                    _panel = new Core.EntityToolsMainPanel();
+                return _panel;
             }
         }
+        private BasePanel _panel = null;
 
-        public static SettingsContainer PluginSettings { get; set; } = new SettingsContainer();
+        public static EntityToolsSettings PluginSettings { get; set; } = new EntityToolsSettings();
 
         public override void OnBotStart()
         {
-            Services.UnstuckSpells.Active = EntityTools.PluginSettings.UnstuckSpells.Active;
+            if(PluginSettings.UnstuckSpells.Active)
+                Services.UnstuckSpells.Start();
 
 #if PROFILING && DEBUG
             InteractEntities.ResetWatch();
@@ -64,27 +81,36 @@ namespace EntityTools
 
         public override void OnLoad()
         {
-            Assembly.Load(Properties.Resources.EntityCore);
-            LoadSettings();
-            //if (!File.Exists(@".\Logs\Assemplies.log"))
-            //    File.Create(@".\Logs\Assemplies.log");
-
-            using (StreamWriter file = new StreamWriter(@".\Logs\Assemblies.log", false))
+            if (!assemblyResolve_Deletage_Binded)
             {
-                foreach(Assembly a in AppDomain.CurrentDomain.GetAssemblies())
-                {
-                    file.WriteLine("=================================================================");
-                    file.WriteLine(a.FullName);
-                    file.WriteLine("-----------------------------------------------------------------");
-                    foreach(Type t in a.GetTypes())
-                    {
-                        file.Write('\t');
-                        file.WriteLine(t.FullName);
-                    }
-                }
+                System.AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+                assemblyResolve_Deletage_Binded = true;
             }
+            if (PluginSettings.Logger.Active)
+                EntityToolsLogger.Start();
+            // Загрузка ядрая из ресурса
+            //Assembly.Load(Properties.Resources.EntityCore);
+            ////if (!File.Exists(@".\Logs\Assemplies.log"))
+            ////    File.Create(@".\Logs\Assemplies.log");
 
-            //Patcher.Apply();
+            //using (StreamWriter file = new StreamWriter(@".\Logs\Assemblies.log", false))
+            //{
+            //    foreach(Assembly a in AppDomain.CurrentDomain.GetAssemblies())
+            //    {
+            //        file.WriteLine("=================================================================");
+            //        file.WriteLine(a.FullName);
+            //        file.WriteLine("-----------------------------------------------------------------");
+            //        foreach(Type t in a.GetTypes())
+            //        {
+            //            file.Write('\t');
+            //            file.WriteLine(t.FullName);
+            //        }
+            //    }
+            //}
+
+            LoadSettings();
+
+            Patcher.Apply();
         }
 
         public override void OnUnload()
@@ -93,13 +119,10 @@ namespace EntityTools
         }
 
         /// <summary>
-        /// Сохранение настроек в файл
+        /// Загрузка настроек из файла
         /// </summary>
         private void LoadSettings()
         {
-            if (!Directory.Exists(Path.GetDirectoryName(FileTools.SettingsFile)))
-                Directory.CreateDirectory(Path.GetDirectoryName(FileTools.SettingsFile));
-
             try
             {
                 if (File.Exists(FileTools.SettingsFile))
@@ -107,23 +130,26 @@ namespace EntityTools
                     XmlSerializer serialiser = new XmlSerializer(PluginSettings.GetType());
                     using (StreamReader fileStream = new StreamReader(FileTools.SettingsFile))
                     {
-                        if (serialiser.Deserialize(fileStream) is SettingsContainer settings)
+                        if (serialiser.Deserialize(fileStream) is EntityToolsSettings settings)
                         {
                             PluginSettings = settings;
                             Astral.Logger.WriteLine($"{GetType().Name}: Load settings from {Path.GetFileName(FileTools.SettingsFile)}");
+                            EntityToolsLogger.WriteLine($"{GetType().Name}: Load settings from {Path.GetFileName(FileTools.SettingsFile)}");
                         }
                         else
                         {
-                            PluginSettings = new SettingsContainer();
+                            PluginSettings = new EntityToolsSettings();
                             Astral.Logger.WriteLine($"{GetType().Name}: Settings file not found. Use default");
+                            EntityToolsLogger.WriteLine($"{GetType().Name}: Settings file not found. Use default");
                         }
                     }
                 }
             }
             catch
             {
-                PluginSettings = new SettingsContainer();
+                PluginSettings = new EntityToolsSettings();
                 Astral.Logger.WriteLine($"{GetType().Name}: Error load settings file {Path.GetFileName(FileTools.SettingsFile)}. Use default");
+                EntityToolsLogger.WriteLine($"{GetType().Name}: Error load settings file {Path.GetFileName(FileTools.SettingsFile)}. Use default");
             }
         }
 
@@ -148,7 +174,8 @@ namespace EntityTools
             catch (Exception exp)
             {
                 Astral.Logger.WriteLine($"{GetType().Name}: Error to save settings file {Path.GetFileName(FileTools.SettingsFile)}");
-                Astral.Logger.WriteLine(exp.ToString());
+                EntityToolsLogger.WriteLine($"{GetType().Name}: Error to save settings file {Path.GetFileName(FileTools.SettingsFile)}");
+                EntityToolsLogger.WriteLine(exp.ToString());
             }
         }
 
@@ -247,5 +274,167 @@ namespace EntityTools
         }
         #endregion
         #endregion
+
+
+        private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            if (Regex.IsMatch(args.Name, assemblyResolve_Name))
+                return typeof(EntityTools).Assembly;
+            return null;
+        }
+
+        /// <summary>
+        /// Класс-заместитель, инициализирующий ядро
+        /// </summary>
+        internal class EntityCoreProxy : IEntityToolsCore
+        {
+            static Func<bool> InternalInitialize = internal_LoadCore;
+#if DEVELOPER
+            public string EntityDiagnosticInfos(object obj)
+            {
+                if (InternalInitialize())
+                    return Core.EntityDiagnosticInfos(obj);
+                return string.Empty;
+            }
+#endif
+            public bool Initialize(object obj)
+            {
+                if (InternalInitialize())
+                    return Core.Initialize(obj);
+                return false;
+            }
+
+            public bool Initialize(Astral.Quester.Classes.Action action)
+            {
+                if (InternalInitialize())
+                    return Core.Initialize(action);
+                return false;
+            }
+
+            public bool Initialize(Astral.Quester.Classes.Condition condition)
+            {
+                if (InternalInitialize())
+                    return Core.Initialize(condition);
+                return false;
+            }
+
+            public bool Initialize(UCCAction action)
+            {
+                if (InternalInitialize())
+                    return Core.Initialize(action);
+                return false;
+            }
+
+            public bool Initialize(UCCCondition condition)
+            {
+                if (InternalInitialize())
+                    return Core.Initialize(condition);
+                return false;
+            }
+#if DEVELOPER
+            public bool GUIRequest_AuraId(ref string id)
+            {
+                if (InternalInitialize())
+                    return Core.GUIRequest_AuraId(ref id);
+                return false;
+            }
+
+            public bool GUIRequest_UIGenId(ref string id)
+            {
+                if (InternalInitialize())
+                    return Core.GUIRequest_UIGenId(ref id);
+                return false;
+            }
+
+            public bool GUIRequest_EntityId(ref string entPattern, ref ItemFilterStringType strMatchType, ref EntityNameType nameType)
+            {
+                if (InternalInitialize())
+                    return Core.GUIRequest_EntityId(ref entPattern, ref strMatchType, ref nameType);
+                return false;
+            }
+
+            public bool GUIRequest_UCCConditions(ref List<UCCCondition> list)
+            {
+                if (InternalInitialize())
+                    return Core.GUIRequest_UCCConditions(ref list);
+                return false;
+            }
+
+            public bool GUIRequest_CustomRegions(ref List<string> crList)
+            {
+                if (InternalInitialize())
+                    return Core.GUIRequest_CustomRegions(ref crList);
+                return false;
+            }
+
+            public bool GUIRequest_NodeLocation(ref Vector3 pos, string caption)
+            {
+                if (InternalInitialize())
+                    return Core.GUIRequest_NodeLocation(ref pos, caption);
+                return false;
+            }
+#endif
+#if DEBUG
+            public LinkedList<Entity> FindAllEntity(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete, bool healthCheck = false, float range = 0, float zRange = 0, bool regionCheck = false, List<CustomRegion> customRegions = null, Predicate<Entity> specialCheck = null)
+            {
+                if (InternalInitialize())
+                    return Core.FindAllEntity(pattern, matchType, nameType, setType, healthCheck, range, zRange, regionCheck, customRegions, specialCheck);
+                return null;
+            }
+#endif
+
+            /// <summary>
+            /// Загрузка сборки, содержащей реализацию ядра из альтернативного файлового потока
+            /// </summary>
+            /// <returns></returns>
+            private static bool internal_LoadCore()
+            {
+                if (!assemblyResolve_Deletage_Binded)
+                {
+                    System.AppDomain.CurrentDomain.AssemblyResolve += EntityTools.CurrentDomain_AssemblyResolve;
+                    assemblyResolve_Deletage_Binded = true;
+                }
+                if (assemblyResolve_Deletage_Binded)
+                {
+                    // Попытка загрузки ядра производится только после привязки делегата
+                    try
+                    {
+                        using (FileStream file = FileStreamHelper.OpenWithStream(Assembly.GetExecutingAssembly().Location, "Core", System.IO.FileMode.Open, System.IO.FileAccess.Read))
+                        {
+                            byte[] buffer = new byte[file.Length];
+                            if (file.Read(buffer, 0, (int)file.Length) > 0)
+                            {
+
+                                Assembly assembly = Assembly.Load(buffer);
+
+                                if (assembly != null)
+                                    foreach (Type type in assembly.GetTypes())
+                                    {
+                                        if (type.GetInterfaces().Contains(typeof(IEntityToolsCore)))
+                                        {
+                                            IEntityToolsCore core = Activator.CreateInstance(type) as IEntityToolsCore;
+                                            if (core != null)
+                                            {
+                                                Core = core;
+                                                return true;
+                                            }
+                                        }
+                                    }
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        EntityToolsLogger.WriteLine(LogType.Debug, e.ToString());
+                    }
+                    finally
+                    {
+                        InternalInitialize = internal_DoNothing;
+                    }
+                }
+                return false;
+            }
+            private static bool internal_DoNothing() => false;
+        }
     }
 }

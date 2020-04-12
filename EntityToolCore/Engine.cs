@@ -1,16 +1,11 @@
 ﻿using Astral.Logic.UCC.Classes;
 using Astral.Quester.Classes;
-using EntityTools.Core;
-using EntityTools.Quester.Action;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using EntityTools.Quester.Actions;
-using static Astral.Quester.Classes.Action;
 using EntityCore.Quester.Action;
 using EntityTools.Quester.Conditions;
-using UCCConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 using EntityTools.Tools;
 using Astral.Classes.ItemFilter;
 using EntityTools.Enums;
@@ -18,13 +13,21 @@ using System.Threading.Tasks;
 using DevExpress.XtraEditors;
 using MyNW.Classes;
 using EntityCore.Entities;
-using EntityTools.Extentions;
+using EntityCore.Extensions;
 using EntityCore.Forms;
 using System.Windows.Forms;
 using MyNW.Internals;
 using EntityTools.Reflection;
+using EntityCore.Quester.Conditions;
+using EntityTools.Core.Interfaces;
+using EntityTools.UCC.Conditions;
+using EntityTools.UCC.Actions;
+using EntityCore.UCC.Actions;
+using EntityCore.UCC.Conditions;
+using UCCConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
+using EntityTools.Logger;
 
 namespace EntityCore
 {
@@ -33,6 +36,12 @@ namespace EntityCore
         internal static LinkedList<object> list = new LinkedList<object>();
         internal static Dictionary<object, object> dictionary = new Dictionary<object, object>();
 
+        public Engine()
+        {
+            EntityToolsLogger.WriteLine("EntityToolsCore loaded");
+        }
+
+        #region Инициализация элементов
         public bool Initialize(object obj)
         {
             try
@@ -87,8 +96,27 @@ namespace EntityCore
             {
                 if (condition is EntityCount ettCount)
                 {
-                    //list.AddLast(new EntityCountEngine(ettCount));
                     dictionary.Add(ettCount, new EntityCountEngine(ettCount));
+                    return true;
+                }
+                else if(condition is EntityProperty ettProperty)
+                {
+                    dictionary.Add(ettProperty, new EntityPropertyEngine(ettProperty));
+                    return true;
+                }
+                else if (condition is TeamMembersCount teamCount)
+                {
+                    dictionary.Add(teamCount, new TeamMembersCountEngine(teamCount));
+                    return true;
+                }
+                else if (condition is CheckGameGUI guiCheck)
+                {
+                    dictionary.Add(guiCheck, new CheckGameGUIEngine(guiCheck));
+                    return true;
+                }
+                else if (condition is EntityDistance ettDist)
+                {
+                    dictionary.Add(ettDist, new EntityDistanceEngine(ettDist));
                     return true;
                 }
             }
@@ -97,17 +125,63 @@ namespace EntityCore
         }
         public bool Initialize(UCCAction action)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (action is ApproachEntity ettApproach)
+                {
+                    dictionary.Add(ettApproach, new ApproachEntityEngine(ettApproach));
+                    return true;
+                }
+                else if(action is DodgeFromEntity ettDodge)
+                {
+                    dictionary.Add(ettDodge, new DodgeFromEntityEngine(ettDodge));
+                    return true;
+                }
+                else if (action is ExecuteSpecificPower execPower)
+                {
+                    dictionary.Add(execPower, new ExecuteSpecificPowerEngine(execPower));
+                    return true;
+                }
+                else if (action is UseItemSpecial useItem)
+                {
+                    dictionary.Add(useItem, new UseItemSpecialEngine(useItem));
+                    return true;
+                }
+            }
+            catch { }
+            return false;
         }
         public bool Initialize(UCCCondition condition)
         {
-            throw new NotImplementedException();
+            try
+            { 
+                if (condition is UCCEntityCheck ettCheck)
+                {
+                    dictionary.Add(ettCheck, new UCCEntityCheckEngine(ettCheck));
+                    return true;
+                }
+                else if (condition is UCCTargetMatchEntity targMatch)
+                {
+                    dictionary.Add(targMatch, new UCCTargetMatchEntityEngine(targMatch));
+                    return true;
+                }
+                else if (condition is UCCGameUICheck uiCheck)
+                {
+                    dictionary.Add(uiCheck, new UCCGameUICheckEngine(uiCheck));
+                    return true;
+                }
+            }
+            catch { }
+            return false;
         }
+        #endregion
 
+#if DEVELOPER
+        #region Запрос к пользователю
         public bool GUIRequest_AuraId(ref string id)
         {
-            string newId = Forms.AuraSelectForm.Processing();
-            if(!string.IsNullOrEmpty(newId))
+            string newId = Forms.AuraSelectForm.GUIRequest();
+            if (!string.IsNullOrEmpty(newId))
             {
                 id = newId;
                 return true;
@@ -117,7 +191,7 @@ namespace EntityCore
 
         public bool GUIRequest_UIGenId(ref string id)
         {
-            string newId = Forms.UIViewer.Procesing(id);
+            string newId = Forms.UIViewer.GUIRequest(id);
             if (!string.IsNullOrEmpty(newId))
             {
                 id = newId;
@@ -126,23 +200,30 @@ namespace EntityCore
             return false;
         }
 
-        public UCCConditionList GUIRequest_UCCConditions(UCCConditionList list)
+        public bool GUIRequest_UCCConditions(ref UCCConditionList list)
         {
-            return Forms.ConditionListForm.Processing(list);
+            UCCConditionList newList = Forms.ConditionListForm.GUIRequest(list);
+            if (newList != null)
+            {
+                if (!ReferenceEquals(list, newList))
+                    list = newList;
+                return true;
+            }
+            return false;
         }
 
-        public EntityDef GUIRequest_EntityId(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated)
+        public bool GUIRequest_EntityId(ref string entPattern, ref ItemFilterStringType strMatchType, ref EntityNameType nameType)
         {
-            return Forms.EntitySelectForm.Processing(entPattern, strMatchType, nameType);
+            return Forms.EntitySelectForm.GUIRequest(ref entPattern, ref strMatchType, ref nameType) != null;
         }
 
         public bool GUIRequest_CustomRegions(ref List<string> crList)
         {
             List<string> list = crList ?? new List<string>();
 
-            if (MultiSelectForm.Processing("Select CustomRegions:", 
-                                            (DataGridView dgv) => CustomRegionExtentions.CustomRegionList2DataGridView(list, dgv), 
-                                            (DataGridView dgv) => CustomRegionExtentions.DataGridView2CustomRegionList(dgv, ref list)))
+            if (MultiSelectForm.GUIRequest("Select CustomRegions:",
+                    (DataGridView dgv) => CustomRegionExtentions.CustomRegionList2DataGridView(list, dgv),
+                    (DataGridView dgv) => CustomRegionExtentions.DataGridView2CustomRegionList(dgv, ref list)))
             {
                 crList = list;
                 return true;
@@ -152,12 +233,12 @@ namespace EntityCore
 
         public bool GUIRequest_NodeLocation(ref Vector3 pos, string caption)
         {
-            while (TargetSelectForm.TargetGuiRequest(caption) == DialogResult.OK)
+            while (TargetSelectForm.GUIRequest(caption) == DialogResult.OK)
             {
                 if (EntityManager.LocalPlayer.Player.InteractStatus.pMouseOverNode != IntPtr.Zero)
                 {
                     var node = EntityManager.LocalPlayer.Player.InteractStatus.PreferredTargetNode;
-                    if(node != null && node.IsMouseOver)
+                    if (node != null && node.IsMouseOver)
                     {
                         pos = node.Location.Clone();
                         return true;
@@ -173,7 +254,8 @@ namespace EntityCore
                 }
             }
             return false;
-        }
+        } 
+        #endregion
 
         public string EntityDiagnosticInfos(object obj)
         {
@@ -181,15 +263,12 @@ namespace EntityCore
             {
                 StringBuilder sb = new StringBuilder();
 
-                if (obj is MoveToEntity mte)
+                object engine = dictionary.ContainsKey(obj) ? dictionary[obj] : null;
+                if (engine is IEntityInfos ettInfos)
                 {
-                    
-
-                    //XtraMessageBox.Show(sb.ToString(), "Test of '" + mte.ToString() + '\'');
-                }
-                else if (obj is InteractEntities ie)
-                {
-                    
+                    if (ettInfos.EntityDiagnosticString(out string infos))
+                        sb.Append(infos);
+                    else sb.Append("DiagnosticString formating error");
                 }
                 else if (ReflectionHelper.GetPropertyValue(obj, "EntityID", out object entityId)
                         && ReflectionHelper.GetPropertyValue(obj, "EntityNameType", out object entityNameType)
@@ -222,7 +301,7 @@ namespace EntityCore
                     sb.Append("Aura: ").AppendLine(auraOptionObj?.ToString() ?? "null");
 
                     sb.AppendLine();
-                    LinkedList<Entity> entities = SearchCached.FindAllEntity(entityId.ToString(), entityIdType, entityNameType, entitySet,
+                    LinkedList<Entity> entities = SearchCached.FindAllEntity(entityId.ToString(), (ItemFilterStringType)entityIdType, (EntityNameType)entityNameType, entitySet,
                         healthCheck, reactionRange, reactionZRange, regionCheck, customRegions, auraOption.Checker);
 
                     // Количество Entity, удовлетворяющих условиям
@@ -232,8 +311,8 @@ namespace EntityCore
                     sb.AppendLine();
 
                     // Ближайшее Entity
-                    Entity target = SearchCached.FindClosestEntity(entityId.ToString(), entityIdType,
-                                            entityNameType, entitySet, healthCheck, reactionRange, reactionZRange, regionCheck, customRegions);
+                    Entity target = SearchCached.FindClosestEntity(entityId.ToString(), (ItemFilterStringType)entityIdType,
+                                            (EntityNameType)entityNameType, entitySet, healthCheck, reactionRange, reactionZRange, regionCheck, customRegions);
                     if (target != null && target.IsValid)
                     {
                         sb.Append("ClosectEntity: ").AppendLine(target.ToString());
@@ -254,5 +333,14 @@ namespace EntityCore
 
             return string.Empty;
         }
+#endif
+#if DEBUG
+        public LinkedList<Entity> FindAllEntity(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete,
+                                         bool healthCheck = false, float range = 0, float zRange = 0, bool regionCheck = false, List<CustomRegion> customRegions = null,
+                                         Predicate<Entity> specialCheck = null)
+        {
+            return Entities.SearchCached.FindAllEntity(pattern, matchType, nameType, setType, healthCheck, range, zRange, regionCheck, customRegions, specialCheck);
+        }
+#endif
     }
 }

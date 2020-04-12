@@ -24,7 +24,7 @@ namespace EntityCore.Forms
             InitializeComponent();
         }
 
-        internal static bool Processing(string caption, Action<DataGridView> fill, Action<DataGridView> select)
+        internal static bool GUIRequest(string caption, Action<DataGridView> fill, Action<DataGridView> select)
         {
             bool result = false;
             if(fill != null && select != null)

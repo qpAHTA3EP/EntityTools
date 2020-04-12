@@ -1,4 +1,5 @@
 ﻿using Astral.Classes;
+using EntityTools.Logger;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
@@ -8,11 +9,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace EntityTools.Servises
+namespace EntityTools.Services
 {
     public static class EnchantHelper
     {
         //private Timeout timeout = new Timeout(1000);
+        private static CancellationTokenSource tokenSource;
         private static Task task = null;
 
         public static int CheckingTime { get; set; } = 150;
@@ -34,31 +36,25 @@ namespace EntityTools.Servises
         private static UIGen Modaldialog_Ok = null;
 
 
-        private static bool enabled;
-        public static bool Enabled
+        public static void Start()
         {
-            get
+            if (task?.Status != TaskStatus.Running)
             {
-                return enabled;
-            }
-            set
-            {
-                if (enabled == false)
-                {
-                    enabled = value;
-                    if (enabled && (task == null || task.Status != TaskStatus.Running))
-                    {
-                        task = Task.Factory.StartNew(Run);
-                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"EnchantHelper: Start new background Task");
-                    }
-                }
-                else enabled = value;
+                tokenSource = new CancellationTokenSource();
+                task = Task.Factory.StartNew(() => Run(tokenSource.Token), tokenSource.Token);
+                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"EnchantHelper: Start new background Task");
+                EntityToolsLogger.WriteLine(LogType.Debug, $"EnchantHelper: Start new background Task");
             }
         }
-
-        private static void Run()
+        public static void Stop()
         {
-            while (enabled)
+            tokenSource.Cancel();
+        }
+
+
+        private static void Run(CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
             {
                 // Активация пункта контекстного меню "Зачаровать предмет" на вкладке "Персонажа" в окне "Листок персонажа"
                 if (Equippeditemmenu_Enchant == null || !Equippeditemmenu_Enchant.IsValid)
@@ -101,7 +97,7 @@ namespace EntityTools.Servises
                     if (Enchantitem_Unslotdialog_Resources != null && Enchantitem_Unslotdialog_Resources.IsValid && Enchantitem_Unslotdialog_Resources.IsVisible)
                     {
                         GameCommands.Execute("GenButtonClick Enchantitem_Unslotdialog_Resources");
-                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"EnchantHelper: Enchant unsloted");
+                        EntityToolsLogger.WriteLine(LogType.Debug, $"EnchantHelper: Enchant unsloted");
                     }
                 }
 
@@ -120,7 +116,7 @@ namespace EntityTools.Servises
                     if (Modaldialog_Ok != null && Modaldialog_Ok.IsValid && Modaldialog_Ok.IsVisible)
                     {
                         GameCommands.Execute("GenButtonClick Modaldialog_Ok");
-                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"EnchantHelper: Enchant sloted");
+                        EntityToolsLogger.WriteLine(LogType.Debug, $"EnchantHelper: Enchant sloted");
                     }
 
                 }
@@ -129,6 +125,7 @@ namespace EntityTools.Servises
             }
 
             Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"EnchantHelper: Background Task stoped");
+            EntityToolsLogger.WriteLine(LogType.Debug, $"EnchantHelper: Background Task stoped");
 
             Equippeditemmenu_Enchant = null;
             Enchantmenu_Itemremoveintact = null;

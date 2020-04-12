@@ -26,7 +26,7 @@ namespace EntityCore.Forms
             InitializeComponent();
         }
 
-        public static string Procesing(string uiGenId)
+        public static string GUIRequest(string uiGenId)
         {
             UIViewer @this = new UIViewer();
 
@@ -167,8 +167,8 @@ namespace EntityCore.Forms
                     int removeNam = 0;
 
                     if ((removeNam = uiGenList.RemoveAll(ui => ui.Pointer == uiGen.Pointer)) > 0)
-                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: '{uiGen.Name}' was removed from 'uiGenList' {removeNam} times");
-                    else Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: '{uiGen.Name}' was not removed from 'uiGenList'");
+                        EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: '{uiGen.Name}' was removed from 'uiGenList' {removeNam} times");
+                    else EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: '{uiGen.Name}' was not removed from 'uiGenList'");
 #else
                     uiGenList.RemoveAll(ui => ui.Pointer == uiGen.Pointer);
 #endif
@@ -178,14 +178,14 @@ namespace EntityCore.Forms
 
 #if DEBUG_TREEBUILDER
             stopwatch.Stop();
-            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: The TreeNodes of interfaces was generated in {stopwatch.ElapsedMilliseconds} ms");
+            EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: The TreeNodes of interfaces was generated in {stopwatch.ElapsedMilliseconds} ms");
             stopwatch.Stop();
 #endif
             if (cbSort.Checked)
                 tvInterfaces.Sort();
 #if DEBUG_TREEBUILDER
             stopwatch.Stop();
-            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: Total time to generated and sort The TreeNodes of interfaces is {stopwatch.ElapsedMilliseconds} ms");
+            EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: Total time to generated and sort The TreeNodes of interfaces is {stopwatch.ElapsedMilliseconds} ms");
             lblGenTime.Text = $"Generation time is {stopwatch.ElapsedMilliseconds} ms";
 #endif
         }
@@ -216,8 +216,8 @@ namespace EntityCore.Forms
 #if DEBUG_TREEBUILDER
                     int removeNam = 0;
                     if ((removeNam = uiGenList.RemoveAll(ui => ui.Pointer == uiGen.Pointer)) > 0)
-                         Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: '{uiGen.Name}' was removed from 'uiGenList' {removeNam} times");
-                    else Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: '{uiGen.Name}' was not removed from 'uiGenList'");
+                         EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: '{uiGen.Name}' was removed from 'uiGenList' {removeNam} times");
+                    else EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: '{uiGen.Name}' was not removed from 'uiGenList'");
 #else
                     uiGenList.RemoveAll(ui => ui.Pointer == uiGen.Pointer);
 #endif
@@ -266,8 +266,8 @@ namespace EntityCore.Forms
 #if DEBUG_TREEBUILDER
                         int removeNam = 0;
                         if ((removeNam = uiGenList.RemoveAll(ui => ui.Pointer == uiGen.Pointer)) > 0)
-                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: '{uiGen.Name}' was removed from 'uiGenList' {removeNam} times");
-                        else Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: '{uiGen.Name}' was not removed from 'uiGenList'");
+                            EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: '{uiGen.Name}' was removed from 'uiGenList' {removeNam} times");
+                        else EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: '{uiGen.Name}' was not removed from 'uiGenList'");
 #else
                         uiGenList.RemoveAll(ui => ui.Pointer == uiGen.Pointer);
 #endif
@@ -291,8 +291,8 @@ namespace EntityCore.Forms
 #if DEBUG_TREEBUILDER
                 int removeNam = 0;
                 if ((removeNam = uiGenList.RemoveAll(ui => ui.Pointer == uiGen.Pointer)) > 0)
-                    Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: '{uiGen.Name}' was removed from 'uiGenList' {removeNam} times");
-                else Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: '{uiGen.Name}' was not removed from 'uiGenList'");
+                    EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: '{uiGen.Name}' was removed from 'uiGenList' {removeNam} times");
+                else EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: '{uiGen.Name}' was not removed from 'uiGenList'");
 #else
                 uiGenList.RemoveAll(ui => ui.Pointer == uiGen.Pointer);
 #endif

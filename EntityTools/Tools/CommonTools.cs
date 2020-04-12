@@ -5,6 +5,7 @@ using MyNW.Classes;
 using MyNW.Internals;
 using System;
 using System.Threading;
+using EntityTools.Logger;
 
 namespace EntityTools.Tools
 {
@@ -54,6 +55,7 @@ namespace EntityTools.Tools
                 if (!EntityManager.LocalPlayer.InCombat)
                 {
                     Astral.Logger.WriteLine($"Change to instance {mapInstance.InstanceIndex} ...");
+                    EntityToolsLogger.WriteLine($"Change to instance {mapInstance.InstanceIndex} ...");
                     mapInstance.Transfer();
                     Thread.Sleep(7500);
                     while (EntityManager.LocalPlayer.IsLoading)

@@ -15,6 +15,7 @@ namespace EntityTools.UCC.Conditions
 {
     public class UCCCheckTimer : UCCCondition, ICustomUCCCondition
     {
+        #region Опции
         [Category("Timer")]
         public string TimerName { get; set; } = string.Empty;
 
@@ -31,7 +32,7 @@ namespace EntityTools.UCC.Conditions
         [Category("Timer")]
         [Description("Comparison type for Time")]
         public new Sign Sign { get; set; }
-
+        #endregion
 
         #region ICustomUCCCondition
         bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)

@@ -21,32 +21,58 @@ namespace EntityTools.UCC.Actions
     
     public class SpecializedUCCAction : UCCAction
     {
+        #region Опции команды
+#if DEVELOPER
         [Category("Managed Action")]
         [Editor(typeof(UccActionEditor), typeof(UITypeEditor))]
         [Description("Основная ucc-команда, которой транслируется вызов")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
+#else
+        [Browsable(false)]
+#endif
         public UCCAction ManagedAction { get; set; }
 
+#if DEVELOPER
         [Category("Custom Conditions")]
         [Description("Список нестандартных условий, реализованных в плагинах")]
         [Editor(typeof(UCCConditionListEditor), typeof(UITypeEditor))]
+#else
+        [Browsable(false)]
+#endif
         public List<UCCCondition> CustomConditions { get; set; }
 
+#if DEVELOPER
         [Category("Custom Conditions")]
         [Description("The negation of the result of the ConditionPack")]
+#else
+        [Browsable(false)]
+#endif
         public bool Not { get; set; }
 
+#if DEVELOPER
         [Category("Custom Conditions")]
         [Description("Logical rule of the Conditions checks\n" +
             "Conjunction: All Conditions have to be True (Logical AND)\n" +
             "Disjunction: At least one of the Conditions have to be True (Logical OR)")]
+#else
+        [Browsable(false)]
+#endif
         public LogicRule CustomConditionCheck { get; set; }
 
+#if DEVELOPER
         [Category("Timer")]
+#else
+        [Browsable(false)]
+#endif
         public string TimerName { get; set; } = string.Empty;
 
+#if DEVELOPER
         [Category("Timer")]
-        public int Timeout { get; set; } = 0;
+#else
+        [Browsable(false)]
+#endif
+        public int Timeout { get; set; } = 0; 
+        #endregion
 
         public override bool NeedToRun
         {

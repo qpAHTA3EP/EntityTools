@@ -9,6 +9,7 @@ using System.Windows.Forms;
 
 namespace EntityTools.Editors
 {
+#if DEVELOPER
     public class UiIdEditor : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
@@ -22,5 +23,6 @@ namespace EntityTools.Editors
             return UITypeEditorEditStyle.Modal;
         }
     }
+#endif
 }
 

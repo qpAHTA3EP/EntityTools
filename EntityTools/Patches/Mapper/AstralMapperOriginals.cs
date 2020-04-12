@@ -136,7 +136,7 @@ namespace AstralMapperOriginals
                 }
                 catch (Exception ex)
                 {
-                    Logger.WriteLine(ex.ToString());
+                    Astral.Logger.WriteLine(ex.ToString());
                 }
                 finally
                 {

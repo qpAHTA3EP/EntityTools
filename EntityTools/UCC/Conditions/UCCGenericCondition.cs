@@ -19,6 +19,9 @@ namespace EntityTools.UCC.Conditions
 
         bool ICustomUCCCondition.Loked { get => base.Locked; set => base.Locked = value; }
 
+#if !DEVELOPER
+        [Browsable(false)]
+#endif
         string ICustomUCCCondition.TestInfos(UCCAction refAction)
         {
             return $"{base.Target} {base.Tested} : {base.getRefValue(refAction, out ConditionType t).ToString()}";
@@ -30,7 +33,11 @@ namespace EntityTools.UCC.Conditions
             return $"{GetType().Name}: {base.Target} {base.Tested} {base.Value}";
         }
 
+#if DEVELOPER
         [Editor(typeof(UccGenericConditionEditor), typeof(UITypeEditor))]
+#else
+        [Browsable(false)]
+#endif
         public new string Value { get => base.Value; set => base.Value = value; }
     }
 }

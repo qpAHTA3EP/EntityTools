@@ -1,4 +1,5 @@
 ﻿using Astral;
+using EntityTools.Logger;
 using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -35,13 +36,13 @@ namespace EntityTools.Patches
             else
             {
 
-                Logger.WriteLine("Fail to inject:");
+                EntityToolsLogger.WriteLine("Fail to inject:");
                 if(methodToReplace == null)
-                    Logger.WriteLine($"MethodToReplace: NULL");
-                else Logger.WriteLine($"MethodToReplace: {methodToReplace.Name}");
+                    EntityToolsLogger.WriteLine($"MethodToReplace: NULL");
+                else EntityToolsLogger.WriteLine($"MethodToReplace: {methodToReplace.Name}");
                 if (methodToInject== null)
-                    Logger.WriteLine($"MethodToInject: NULL");
-                else Logger.WriteLine($"MethodToInject: {methodToInject.Name}");
+                    EntityToolsLogger.WriteLine($"MethodToInject: NULL");
+                else EntityToolsLogger.WriteLine($"MethodToInject: {methodToInject.Name}");
             }
         }
     }

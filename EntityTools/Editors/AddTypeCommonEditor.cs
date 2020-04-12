@@ -5,6 +5,7 @@ using Astral.Quester.Forms;
 
 namespace EntityTools.Editors
 {
+#if DEVELOPER
     class AddTypeCommonEditor<T> : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
@@ -23,4 +24,5 @@ namespace EntityTools.Editors
             return UITypeEditorEditStyle.Modal;
         }
     }
+#endif
 }

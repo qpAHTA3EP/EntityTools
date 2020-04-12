@@ -7,7 +7,7 @@ using System.Text;
 namespace EntityTools.Tools
 {
     [Serializable]
-    public class AuraDef
+    public class AuraDef : IComparable, IEquatable<AuraDef>
     {
         public string InternalName;
         public string DisplayName;
@@ -39,6 +39,38 @@ namespace EntityTools.Tools
         public override string ToString()
         {
             return $"{DisplayName} [{InternalName}]";
+        }
+
+        public bool Equals(AuraDef aura)
+        {
+            return InternalName == aura.InternalName;
+        }
+        public bool Equals(AttribModNet mod)
+        {
+            return InternalName == mod.PowerDef.InternalName;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is AuraDef aura)
+                return Equals(aura);
+            else if (obj is AttribModNet mod)
+                return Equals(mod);
+            return false;
+        }
+
+        public int CompareTo(object obj)
+        {
+            if(obj is AuraDef aura)
+            {
+                return InternalName.CompareTo(aura.InternalName);
+            }
+            return -1;
+        }
+
+        public override int GetHashCode()
+        {
+            return -676643589 + EqualityComparer<string>.Default.GetHashCode(InternalName);
         }
     }
 

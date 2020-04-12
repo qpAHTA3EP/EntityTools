@@ -6,7 +6,7 @@ using Microsoft.Win32.SafeHandles;
 /// <summary>
 /// https://www.cyberforum.ru/post9373739.html
 /// </summary>
-namespace Mount_Tutorial
+namespace EntityTools.Tools
 {
     public static class FileStreamHelper
     {

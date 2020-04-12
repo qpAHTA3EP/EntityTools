@@ -2,49 +2,59 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Xml.Serialization;
 using Astral;
 using Astral.Classes;
 using Astral.Logic.NW;
 using Astral.Quester.Classes;
 using EntityCore.Entities;
-using EntityTools.Extentions;
+using EntityCore.Extensions;
 using EntityTools.Enums;
 using EntityTools.Quester.Actions;
 using MyNW.Classes;
 using MyNW.Internals;
-using static Astral.Quester.Classes.Action;
-using EntityCore;
-using System.Windows.Forms;
-using EntityCore.Forms;
-using DevExpress.XtraEditors;
 using EntityTools.Core.Interfaces;
 using Astral.Logic.Classes.Map;
+using System.Drawing;
+using static Astral.Quester.Classes.Action;
+using EntityTools;
+using EntityTools.Logger;
+using System.Reflection;
 
 namespace EntityCore.Quester.Action
 {
-    public class InteractEntitiesEngine : IQuesterActionEngine, IEntityInfos
+    public class InteractEntitiesEngine : IEntityInfos
+#if CORE_INTERFACES
+        , IQuesterActionEngine
+#endif
     {
         InteractEntities @this = null;
+
+        #region Данные ядра
+        private Func<List<CustomRegion>> getCustomRegions = null;
+        private Predicate<Entity> checkEntity = null;
+
         private TempBlackList<uint> blackList = new TempBlackList<uint>();
         private bool combat;
         private bool moved;
-        private Entity target = new Entity(IntPtr.Zero);
+        private Entity target = null;
         private Vector3 initialPos = new Vector3();
         private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
-        private Predicate<Entity> Comparer { get; set; } = null;
-        private List<CustomRegion> customRegions = new List<CustomRegion>();
-        private string label = string.Empty;
+        private List<CustomRegion> customRegions = null;
+        private string label = string.Empty; 
+        #endregion
 
         public InteractEntitiesEngine(InteractEntities ie)
         {
             @this = ie;
-            @this.ActionEngine = this;
-
+#if CORE_INTERFACES
+            @this.Engine = this;
+#endif
             @this.PropertyChanged += PropertyChanged;
+
+            checkEntity = internal_CheckEntity_Initializer;
+            getCustomRegions = internal_GetCustomRegion_Initializer;
         }
 
         public void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -54,22 +64,26 @@ namespace EntityCore.Quester.Action
                 switch (e.PropertyName)
                 {
                     case "EntityID":
-                        Comparer = EntityToPatternComparer.Get(@this.EntityID, @this.EntityIdType, @this.EntityNameType);
+                        checkEntity = internal_CheckEntity_Initializer;//EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
                         label = string.Empty;
                         break;
                     case "EntityIdType":
-                        Comparer = EntityToPatternComparer.Get(@this.EntityID, @this.EntityIdType, @this.EntityNameType);
+                        checkEntity = internal_CheckEntity_Initializer; //EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
                         break;
                     case "EntityNameType":
-                        Comparer = EntityToPatternComparer.Get(@this.EntityID, @this.EntityIdType, @this.EntityNameType);
+                        checkEntity = internal_CheckEntity_Initializer; //EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
                         break;
                     case "CustomRegionNames":
-                        customRegions = CustomRegionExtentions.GetCustomRegions(@this.CustomRegionNames);
+                        getCustomRegions = internal_GetCustomRegion_Initializer; //CustomRegionExtentions.GetCustomRegions(@this._customRegionNames);
                         break;
                 }
+
+                target = null;
+                timeout.ChangeTime(0);
             }
         }
 
+#if CORE_DELEGATES
         #region IQuesterActionEngine
         public bool NeedToRun
         {
@@ -78,12 +92,12 @@ namespace EntityCore.Quester.Action
                 if (@this.CustomRegionNames != null && (customRegions == null || customRegions.Count != @this.CustomRegionNames.Count))
                     customRegions = CustomRegionExtentions.GetCustomRegions(@this.CustomRegionNames);
 
-                if (Comparer == null && !string.IsNullOrEmpty(@this.EntityID))
+                if (checkEntity == null && !string.IsNullOrEmpty(@this.EntityID))
                 {
 #if DEBUG
-                    Logger.WriteLine(Logger.LogType.Debug, "InteractEntitiesEngine::NeedToRun: Comparer is null. Initialize.");
+                    EntityToolsLogger.WriteLine(Logger.LogType.Debug, "InteractEntitiesEngine::NeedToRun: Comparer is null. Initialize.");
 #endif
-                    Comparer = EntityToPatternComparer.Get(@this.EntityID, @this.EntityIdType, @this.EntityNameType);
+                    checkEntity = EntityToPatternComparer.Get(@this.EntityID, @this.EntityIdType, @this.EntityNameType);
                 }
 
                 Entity closestEntity = null;
@@ -93,7 +107,7 @@ namespace EntityCore.Quester.Action
                                                                    @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, customRegions, IsNotInBlackList);
 #if DEBUG_INTERACTENTITIES
                     if (closestEntity != null && closestEntity.IsValid)
-                        Logger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::NeedToRun: Found Entity[{closestEntity.ContainerId.ToString("X8")}] (closest)");
+                        EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::NeedToRun: Found Entity[{closestEntity.ContainerId.ToString("X8")}] (closest)");
 #endif
                     timeout.ChangeTime(@this.SearchTimeInterval);
                 }
@@ -142,12 +156,12 @@ namespace EntityCore.Quester.Action
                 moved = false;
                 combat = false;
 #if DEBUG && DEBUG_INTERACTENTITIES
-                Logger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Approach Entity[{target.ContainerId.ToString("X8")}] for interaction");
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Approach Entity[{target.ContainerId.ToString("X8")}] for interaction");
 #endif
                 if (Approach.EntityForInteraction(target, CheckCombat/*new Func<Approach.BreakInfos>(CheckCombat)*/))
                 {
 #if DEBUG && DEBUG_INTERACTENTITIES
-                    Logger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Interact Entity[{target.ContainerId.ToString("X8")}]");
+                    EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Interact Entity[{target.ContainerId.ToString("X8")}]");
 #endif
                     target.Interact();
                     Thread.Sleep(@this._interactTime);
@@ -176,7 +190,7 @@ namespace EntityCore.Quester.Action
                 if (@this._ignoreCombat && target.Location.Distance3DFromPlayer <= @this._combatDistance)
                 {
 #if DEBUG && DEBUG_INTERACTENTITIES
-                    Logger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Engage combat");
+                    EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Engage combat");
 #endif
                     Astral.Quester.API.IgnoreCombat = false;
                     return ActionResult.Running;
@@ -184,16 +198,16 @@ namespace EntityCore.Quester.Action
                 if (combat)
                 {
 #if DEBUG && DEBUG_INTERACTENTITIES
-                    Logger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Player in combat...");
+                    EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Player in combat...");
 #endif
                     return ActionResult.Running;
                 }
                 if (moved)
                 {
 #if DEBUG && DEBUG_INTERACTENTITIES
-                    Logger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Entity[{target.ContainerId.ToString("X8")}] moved, skip...");
+                    EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Entity[{target.ContainerId.ToString("X8")}] moved, skip...");
 #else
-                    Logger.WriteLine("Entity moved, skip...");
+                    EntityToolsLogger.WriteLine("Entity moved, skip...");
 #endif
                     return ActionResult.Fail;
                 }
@@ -248,8 +262,6 @@ namespace EntityCore.Quester.Action
             }
         }
 
-
-
         public Entity Target()
         {
             return target;
@@ -261,7 +273,7 @@ namespace EntityCore.Quester.Action
         }
         public bool ValidateEntity(Entity e)
         {
-            return e != null && e.IsValid && Comparer?.Invoke(e) == true;
+            return e != null && e.IsValid && checkEntity?.Invoke(e) == true;
         }
 
         public void Reset()
@@ -301,12 +313,199 @@ namespace EntityCore.Quester.Action
             throw new NotImplementedException();
         }
         #endregion
+#endif
+#if CORE_INTERFACES
+        public bool NeedToRun
+        {
+            get
+            {
+                Entity closestEntity = null;
+                if (timeout.IsTimedOut/* || (target != null && (!Validate(target) || (HealthCheck && target.IsDead)))*/)
+                {
+                    closestEntity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
+                                                                   @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, getCustomRegions(), IsNotInBlackList);
+#if DEBUG_INTERACTENTITIES
+                    if (closestEntity != null && closestEntity.IsValid)
+                        EntityToolsLogger.WriteLine(LogType.Debug, $"{GetType().Name}::{MethodBase.GetCurrentMethod().Name}: Found Entity[{closestEntity.ContainerId.ToString("X8")}] (closest)");
+                    
+#endif
+                    timeout.ChangeTime(EntityTools.EntityTools.PluginSettings.EntityCache.LocalCacheTime);
+                }
+
+                if (!@this._holdTargetEntity || !ValidateEntity(target) || (@this._healthCheck && target.IsDead))
+                    target = closestEntity;
+
+                if (ValidateEntity(target) && !(@this._healthCheck && target.IsDead))
+                {
+                    if (@this._ignoreCombat)
+                    {
+                        if (target.Location.Distance3DFromPlayer > @this._combatDistance)
+                        {
+                            Astral.Quester.API.IgnoreCombat = true;
+                            return false;
+                        }
+                        else
+                        {
+                            Astral.Logic.NW.Attackers.List.Clear();
+                            Astral.Quester.API.IgnoreCombat = false;
+                        }
+                    }
+                    initialPos = target.Location/*.Clone()*/;
+                    return true;
+                }
+                else if (@this._ignoreCombat && ValidateEntity(closestEntity)
+                         && !(@this._healthCheck && closestEntity.IsDead)
+                         && (closestEntity.Location.Distance3DFromPlayer <= @this._combatDistance))
+                {
+                    Astral.Logic.NW.Attackers.List.Clear();
+                    Astral.Quester.API.IgnoreCombat = false;
+                }
+                else if (@this._ignoreCombat)
+                    Astral.Quester.API.IgnoreCombat = true;
+
+                return false;
+            }
+        }
+
+        public ActionResult Run()
+        {
+            try
+            {
+#if DEBUG && PROFILING
+                RunCount++;
+#endif
+                moved = false;
+                combat = false;
+#if DEBUG && DEBUG_INTERACTENTITIES
+                EntityToolsLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Approach Entity[{target.ContainerId.ToString("X8")}] for interaction");
+#endif
+                if (Approach.EntityForInteraction(target, CheckCombat/*new Func<Approach.BreakInfos>(CheckCombat)*/))
+                {
+#if DEBUG && DEBUG_INTERACTENTITIES
+                    EntityToolsLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Interact Entity[{target.ContainerId.ToString("X8")}]");
+#endif
+                    target.Interact();
+                    Thread.Sleep(@this._interactTime);
+                    Interact.WaitForInteraction();
+                    if (@this.Dialogs.Count > 0)
+                    {
+                        Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);
+                        while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count == 0)
+                        {
+                            if (timeout.IsTimedOut)
+                            {
+                                return ActionResult.Fail;
+                            }
+                            Thread.Sleep(100);
+                        }
+                        Thread.Sleep(500);
+                        foreach (string key in @this.Dialogs)
+                        {
+                            EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.SelectOptionByKey(key, "");
+                            Thread.Sleep(1000);
+                        }
+                    }
+                    EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
+                    return ActionResult.Completed;
+                }
+                if (@this._ignoreCombat && target.Location.Distance3DFromPlayer <= @this._combatDistance)
+                {
+#if DEBUG && DEBUG_INTERACTENTITIES
+                    EntityToolsLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Engage combat");
+#endif
+                    Astral.Quester.API.IgnoreCombat = false;
+                    return ActionResult.Running;
+                }
+                if (combat)
+                {
+#if DEBUG && DEBUG_INTERACTENTITIES
+                    EntityToolsLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Player in combat...");
+#endif
+                    return ActionResult.Running;
+                }
+                if (moved)
+                {
+#if DEBUG && DEBUG_INTERACTENTITIES
+                    EntityToolsLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Entity[{target.ContainerId.ToString("X8")}] moved, skip...");
+#else
+                    EntityToolsLogger.WriteLine("Entity moved, skip...");
+#endif
+                    return ActionResult.Fail;
+                }
+                return ActionResult.Fail;
+            }
+            finally
+            {
+                if (@this._interactOnce || (@this._skipMoving && moved))
+                {
+                    PushToBlackList(target);
+
+                    target = new Entity(IntPtr.Zero);
+                }
+            }
+
+        }
+
+        public string ActionLabel
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(label))
+                    label = $"{@this.GetType().Name} [{@this._entityId}]";
+                return label;
+            }
+        }
+
+        public bool InternalConditions
+        {
+            get
+            {
+                return !string.IsNullOrEmpty(@this._entityId) || @this._entityNameType == EntityNameType.Empty;
+            }
+        }
+        public ActionValidity InternalValidity
+        {
+            get
+            {
+                if (!InternalConditions)
+                    return new ActionValidity($"{nameof(@this.EntityID)} property is not valid.");
+                return new ActionValidity();
+            }
+        }
+
+        public bool UseHotSpots => true;
+        public Vector3 InternalDestination
+        {
+            get
+            {
+                if (ValidateEntity(target))
+                {
+                    if (target.Location.Distance3DFromPlayer > @this._combatDistance)
+                        return target.Location.Clone();
+                    else return EntityManager.LocalPlayer.Location.Clone();
+                }
+                return new Vector3();
+            }
+        }
+
+        public void InternalReset()
+        {
+            checkEntity = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+            label = String.Empty;
+        }
+        public void GatherInfos() { }
+        public void OnMapDraw(GraphicsNW graph)
+        {
+            if (checkEntity(target))
+                graph.drawFillEllipse(target.Location, new Size(10, 10), Brushes.Beige);
+        }
+#endif
 
         public bool EntityDiagnosticString(out string infoString)
         {
             StringBuilder sb = new StringBuilder();
 
-            Reset();
+            InternalReset();
             sb.Append("EntityID: ").AppendLine(@this._entityId);
             sb.Append("EntityIdType: ").AppendLine(@this._entityIdType.ToString());
             sb.Append("EntityNameType: ").AppendLine(@this._entityNameType.ToString());
@@ -324,11 +523,11 @@ namespace EntityCore.Quester.Action
             }
             sb.AppendLine();
             //sb.Append("NeedToRun: ").AppendLine(NeedToRun.ToString());
-            sb.AppendLine();
+            //sb.AppendLine();
 
             // список всех Entity, удовлетворяющих условиям
             LinkedList<Entity> entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
-                                                                     @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, customRegions);
+                                                                     @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, getCustomRegions(), IsNotInBlackList);
 
 
             // Количество Entity, удовлетворяющих условиям
@@ -339,7 +538,7 @@ namespace EntityCore.Quester.Action
 
             // Ближайшее Entity (найдено при вызове ie.NeedToRun, поэтому строка ниже закомментирована)
             target = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
-                                                    @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, customRegions, IsNotInBlackList);
+                                                    @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, getCustomRegions(), IsNotInBlackList);
             if (target != null && target.IsValid)
             {
                 sb.Append("Target: ").AppendLine(target.ToString());
@@ -358,31 +557,53 @@ namespace EntityCore.Quester.Action
             return true;
         }
 
-
-
-        #region Вспомогательный функции
-        private bool IsNotInBlackList(Entity ent)
+#region Вспомогательный функции
+        public bool ValidateEntity(Entity e)
         {
-            /* 2 */
-            return !blackList.Contains(ent.ContainerId);
-
-            /* 4
-            BlackEntityDef def = blackList.Find(x => x.Equals(ent));
-            if (def != null && def.IsTimedOut)
-            {
-                blackList.Remove(def);
-                return true;
-            }
-            return def == null; */
+            return e != null && e.IsValid && checkEntity(e);
         }
+
+
+        private bool internal_CheckEntity_Initializer(Entity e)
+        {
+            Predicate<Entity> predicate = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+            if (predicate != null)
+            {
+#if DEBUG
+                EntityToolsLogger.WriteLine(LogType.Debug, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Comparer does not defined. Initialize.");
+#endif
+                checkEntity = predicate;
+                return checkEntity(e);
+            }
+#if DEBUG
+            else EntityToolsLogger.WriteLine(LogType.Error, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Fail to initialize the Comparer.");
+#endif
+            return false;
+        }
+
+
+        private bool IsNotInBlackList(Entity ent)
+            {
+                /* 2 */
+                return !blackList.Contains(ent.ContainerId);
+
+                /* 4
+                BlackEntityDef def = blackList.Find(x => x.Equals(ent));
+                if (def != null && def.IsTimedOut)
+                {
+                    blackList.Remove(def);
+                    return true;
+                }
+                return def == null; */
+            }
 
         private void PushToBlackList(Entity ent)
         {
             /* 2 */
             blackList.Add(target.ContainerId, @this._interactingTimeout);
-#if DEBUG && DEBUG_INTERACTENTITIES
-            Logger.WriteLine(Logger.LogType.Debug, $"{GetType().Name}::PushToBlackList: Entity[{target.ContainerId.ToString("X8")}]");
-#endif
+    #if DEBUG && DEBUG_INTERACTENTITIES
+            EntityToolsLogger.WriteLine(LogType.Debug, $"{GetType().Name}::PushToBlackList: Entity[{target.ContainerId.ToString("X8")}]");
+    #endif
         }
 
         private Approach.BreakInfos CheckCombat()
@@ -398,6 +619,22 @@ namespace EntityCore.Quester.Action
                 return Approach.BreakInfos.ApproachFail;
             }
             return Approach.BreakInfos.Continue;
+        }
+
+        internal List<CustomRegion> internal_GetCustomRegion_Initializer()
+        {
+            if (customRegions == null && @this._customRegionNames != null)
+            {
+                getCustomRegions = internal_GetCustomRegion_Getter;
+                customRegions = CustomRegionExtentions.GetCustomRegions(@this._customRegionNames);
+                return customRegions;
+            }
+            return null;
+        }
+
+        internal List<CustomRegion> internal_GetCustomRegion_Getter()
+        {
+            return customRegions;
         }
         #endregion
     }

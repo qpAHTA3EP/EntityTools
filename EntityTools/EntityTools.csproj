@@ -12,18 +12,19 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.0310.1621</AssemblyVersion>
+    <AssemblyVersion>0.20.0408.1523</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;X32</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEVELOPER, CORE_INTERFACES, X64</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <LangVersion>7.1</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,8 +38,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>D:\Astral\Astral_RU_1\Plugins\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <OutputPath>..\References\x64\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;DEVELOPER, CORE_INTERFACES</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -52,7 +53,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;CORE_INTERFACES</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
@@ -116,6 +117,7 @@
     <Reference Include="System.Data.Linq" />
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -124,10 +126,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\EntityToolsInitializer.cs" />
-    <Compile Include="Core\Facades\QuesterActionInitializer.cs" />
+    <Compile Include="Logger\EntityToolLogger.cs" />
+    <Compile Include="Core\Interfaces\IUCCConditionEngine.cs" />
+    <Compile Include="Core\Interfaces\IUCCActionEngine.cs" />
+    <Compile Include="Core\Proxies\EntityCoreProxy.cs" />
+    <Compile Include="Core\Proxies\QuesterActionProxy.cs" />
     <Compile Include="Core\Interfaces\IEntityToolsCore.cs" />
     <Compile Include="Core\Interfaces\IQuesterActionEngine.cs" />
+    <Compile Include="Core\Proxies\QuesterConditionProxy.cs" />
+    <Compile Include="Core\Proxies\UCCActionProxy.cs" />
+    <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -140,9 +148,11 @@
     <Compile Include="Quester\Actions\ChangePluginSettings.cs" />
     <Compile Include="Quester\Actions\MoveToLeader.cs" />
     <Compile Include="Quester\Actions\PickUpMissionExt.cs" />
+    <Compile Include="Core\Interfaces\IQuesterConditionEngine.cs" />
     <Compile Include="Quester\Conditions\Deprecated\CheckCampaignTask.cs" />
     <Compile Include="Quester\Conditions\CheckGameGUICondition.cs" />
     <Compile Include="Quester\Conditions\CheckShard.cs" />
+    <Compile Include="Quester\Conditions\Deprecated\EntityDistance.cs" />
     <Compile Include="Quester\Conditions\EntityProperty.cs" />
     <Compile Include="Quester\Conditions\EntityCount.cs" />
     <Compile Include="Quester\Conditions\TeamLeaderMapInstance.cs" />
@@ -189,9 +199,11 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Patches\Mapper\MapperSettings.cs" />
-    <Compile Include="Settings\SettingsContainer.cs" />
+    <Compile Include="Settings\EntityCacheSettings.cs" />
+    <Compile Include="Settings\EntityToolsSettings.cs" />
     <Compile Include="Servises\UnstuckSpell\UnstuckSpells.cs" />
     <Compile Include="Servises\UnstuckSpell\UnstuckSpellsSettings.cs" />
+    <Compile Include="Logger\EntityToolLoggerSettings.cs" />
     <Compile Include="Tools\AuraOption.cs" />
     <Compile Include="Tools\CollectionTypeConverter.cs" />
     <Compile Include="Servises\EnchantHelper.cs" />
@@ -200,6 +212,7 @@
     <Compile Include="Tools\Export\Enums.cs" />
     <Compile Include="Tools\Extensions\FormCollectionExtentions.cs" />
     <Compile Include="Tools\Extensions\ListTExtentions.cs" />
+    <Compile Include="Tools\Extensions\StringExtentions.cs" />
     <Compile Include="Tools\FileStreamHelper.cs" />
     <Compile Include="Tools\FileTools.cs" />
     <Compile Include="Tools\Export\Auras.cs" />
@@ -221,7 +234,9 @@
     <Compile Include="Tools\Reflection\StaticAction.cs" />
     <Compile Include="Tools\Reflection\StaticFielsAccessor.cs" />
     <Compile Include="Tools\Reflection\StaticFunction.cs" />
+    <Compile Include="Tools\Reflection\InstancePropertyAccessor.cs" />
     <Compile Include="Tools\Reflection\StaticPropertyAccessor.cs" />
+    <Compile Include="Tools\SysInformer.cs" />
     <Compile Include="UCC\Extensions\UCCActionExtention.cs" />
     <Compile Include="UCC\Extensions\UCCEditorExtensions.cs" />
     <Compile Include="Tools\Export\GameUITools.cs" />
@@ -258,106 +273,76 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Entity_7_40х48.png" />
-    <None Include="Properties\DataSources\EntityTools.Properties.Settings.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons_Inventory_Enchantments_Insignia_Barbed.png" />
+    <None Include="Resources\charArrow.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons_Inventory_Enchantments_Insignia_Crescent.png" />
+    <None Include="Resources\miniAdd.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons_Inventory_Enchantments_Insignia_Regal.png" />
+    <None Include="Resources\miniBiPath.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons_Inventory_Enchantments_Insignia_Universal.png" />
+    <None Include="Resources\miniCancel.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons_Inventory_Enchantments_Insignia_Enlightened.png" />
+    <None Include="Resources\miniClone.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons_Inventory_Enchantments_Insignia_Illuminated.png" />
+    <None Include="Resources\miniCopy.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Properties\DataSources\MountBonuses.xml" />
+    <None Include="Resources\miniDelete.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\miniValid.png" />
-    <None Include="Images\Icons\miniSave.png" />
-    <None Include="Images\Icons\miniPlay.png" />
-    <None Include="Images\Icons\paste.png" />
-    <None Include="Images\Icons\miniRefresh.png" />
-    <None Include="Images\Icons\miniDelete.png" />
-    <None Include="Images\Icons\miniAdd.png" />
+    <None Include="Resources\miniDistance.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\miniTarget.png" />
+    <None Include="Resources\miniEllipceCR.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\miniExport.png" />
+    <None Include="Resources\miniExport.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\miniNew.png" />
+    <None Include="Resources\miniGear.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\miniBiPath.png" />
+    <None Include="Resources\miniLink.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\miniLinPath.png" />
+    <None Include="Resources\miniLinPath.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\miniStop.png" />
+    <None Include="Resources\miniNodeDistance.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\miniUniPath.png" />
+    <None Include="Resources\miniRectCR.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\miniEllipceCR.png" />
+    <None Include="Resources\miniImport.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\miniLink.png" />
+    <None Include="Resources\miniStop.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\miniRectCR.png" />
+    <None Include="Resources\miniTarget.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\miniZdiff.png" />
+    <None Include="Resources\miniUniPath.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\miniImport.png" />
+    <None Include="Resources\miniValid.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\miniClone.png" />
+    <None Include="Resources\miniZdiff.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons\miniDistance.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Images\Icons\miniNodeDistance.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Images\Icons\miniGear.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Images\Icons\charArrow.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Images\Icons\miniCancel.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Images\Icons\miniCopy.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Images\Icons\miniPlayAll.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="EntitySelectForm\" />
-    <Folder Include="EntityToolsCore\" />
+    <None Include="Resources\miniRefresh.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Entity_7_40х48.png" />

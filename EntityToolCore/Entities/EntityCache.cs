@@ -1,9 +1,10 @@
-﻿//#define PROFILING
+﻿#define PROFILING
 
 using Astral;
 using Astral.Classes;
 using Astral.Classes.ItemFilter;
 using EntityTools.Enums;
+using EntityTools.Logger;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
@@ -71,12 +72,12 @@ namespace EntityCore.Entities
         {
             RegenCount = 0;
             EntitiesCount = 0;
-            Logger.WriteLine(Logger.LogType.Debug, $"EntityCacheRecord::ResetWatch()");
+            EntityToolsLogger.WriteLine(LogType.Debug, $"EntityCacheRecord::ResetWatch()");
         }
 
         public static void LogWatch()
         {
-            Logger.WriteLine(Logger.LogType.Debug, $"EntityCacheRecord: RegenCount: {RegenCount}");
+            EntityToolsLogger.WriteLine(LogType.Debug, $"EntityCacheRecord: RegenCount: {RegenCount}");
         }
 #endif
         public EntityCacheRecord() { }
@@ -121,7 +122,7 @@ namespace EntityCore.Entities
 #endif
             if (EntityManager.LocalPlayer.InCombat
                 && !Astral.Quester.API.IgnoreCombat)
-                    Timer = new Timeout(EntityCache.ChacheTime);
+                    Timer = new Timeout(EntityTools.EntityTools.PluginSettings.EntityCache.GlobalCacheTime);
             else Timer = new Timeout(EntityCache.CombatChacheTime);
         }
         public void Regen(Action<Entity> action)
@@ -142,7 +143,7 @@ namespace EntityCore.Entities
 #endif
             if (EntityManager.LocalPlayer.InCombat
                 && !Astral.Quester.API.IgnoreCombat)
-                    Timer = new Timeout(EntityCache.ChacheTime);
+                    Timer = new Timeout(EntityTools.EntityTools.PluginSettings.EntityCache.GlobalCacheTime);
             else Timer = new Timeout(EntityCache.CombatChacheTime);
         }
 
@@ -170,15 +171,6 @@ namespace EntityCore.Entities
                         newEntities.AddLast(eNode);
                     }
                 }
-                //entities.RemoveAll((Entity e) =>
-                //                    {
-                //                        if (Key.Comparer.Check(e))
-                //                        {
-                //                            action(e);
-                //                            return false;
-                //                        }
-                //                        else return true;
-                //                    });
             }
         }
 
@@ -206,18 +198,18 @@ namespace EntityCore.Entities
         {
             MatchCount = 0;
             MismatchCount = 0;
-            Logger.WriteLine(Logger.LogType.Debug, $"EntityCache::ResetWatch()");
+            EntityToolsLogger.WriteLine(LogType.Debug, $"EntityCache::ResetWatch()");
         }
 
         public static void LogWatch()
         {
-            Logger.WriteLine(Logger.LogType.Debug, $"EntityCache: MatchCount: {MatchCount}, MismatchCount: {MismatchCount}");
+            EntityToolsLogger.WriteLine(LogType.Debug, $"EntityCache: MatchCount: {MatchCount}, MismatchCount: {MismatchCount}");
         }
 #endif
         /// <summary>
         /// Интервал времени между обновлениями кэша
         /// </summary>
-        public static int ChacheTime { get; set; } = 500;
+        //public static int ChacheTime { get; set; } = 500;
 
         /// <summary>
         /// Интервал времени между обновлениями кэша во время боя

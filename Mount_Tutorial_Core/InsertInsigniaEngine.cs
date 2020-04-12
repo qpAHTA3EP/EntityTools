@@ -1,4 +1,5 @@
 ﻿#define DEBUG_INSERTINSIGNIA
+//#define DELEGATE_REALIZATION
 
 using System;
 using System.Collections.Generic;
@@ -23,16 +24,26 @@ namespace EntityCore.Quester.Action
         internal InsertInsigniaEngine(InsertInsignia ii)
         {
             @this = ii;
+#if DELEGATE_REALIZATION
+            @this.coreNeedToRun = () => NeedToRun;
+            @this.coreRun = Run;
+
+            @this.coreActionLabel = () => ActionLabel;
+
+            @this.coreInternalConditions = () => InternalConditions;
+            @this.coreInternalValidity = () => InternalValidity;
+
+            @this.coreUseHotSpots = () => UseHotSpots;
+            @this.coreInternalDestination = () => InternalDestination;
+
+            @this.coreReset = InternalReset;
+            @this.coreGatherInfos = GatherInfos;
+
+            @this.coreMapDraw = OnMapDraw;
+#else
             @this.ActionEngine = this;
-
-            //@this.coreNeedToRun = NeedToRun;
-            //@this.coreRun = Run;
-            //@this.coreValidate = Validate;
-            //@this.coreReset = Reset;
-            //@this.coreGatherInfos = GatherInfos;
-            //@this.coreLabel = Label;
-
-            //@this.PropertyChanged += PropertyChanged;
+#endif
+            @this.PropertyChanged += PropertyChanged;
         }
 
         public bool NeedToRun => true;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EntityTools.Logger;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -101,7 +102,7 @@ namespace EntityTools.Reflection
             finally
             {
                 stopwatch.Stop();
-                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"CreateDeepCopy() worktime is {stopwatch.ElapsedMilliseconds} ms");
+                EntityToolsLogger.WriteLine(LogType.Debug, $"CreateDeepCopy() worktime is {stopwatch.ElapsedMilliseconds} ms");
             }
 #endif
         }
@@ -144,7 +145,7 @@ namespace EntityTools.Reflection
             finally
             {
                 stopwatch.Stop();
-                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"CreateXmlCopy() worktime is {stopwatch.ElapsedMilliseconds} ms");
+                EntityToolsLogger.WriteLine(LogType.Debug, $"CreateXmlCopy() worktime is {stopwatch.ElapsedMilliseconds} ms");
             }
 #endif
         }

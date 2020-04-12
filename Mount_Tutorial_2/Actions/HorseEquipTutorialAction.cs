@@ -1,5 +1,5 @@
 ﻿using Astral.Logic.Classes.Map;
-using EntityTools.Core.Facades;
+using EntityTools.Core.Proxy;
 using EntityTools.Core.Interfaces;
 using MyNW.Classes;
 using System;
@@ -13,7 +13,8 @@ namespace Mount_Tutorial
 
         public HorseEquipTutorialAction()
         {
-            ActionEngine = new QuesterActionInitializer(this);
+            ActionEngine = new QuesterActionProxy(this);
+            MountTutorialLoaderPlugin.Core.Initialize(this);
         }
 
         public override string ActionLabel => ActionEngine.ActionLabel;

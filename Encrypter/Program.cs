@@ -14,6 +14,7 @@ namespace Encrypter
             None,
             Encrypt,
             Decrypt,
+            Hash,
             GenerateKey
         }
 
@@ -89,15 +90,31 @@ namespace Encrypter
                     }
                     mode = Mode.GenerateKey;
                 }
+                else if(arg1 == "-md5")
+                {
+                    if (args.Length > 1)
+                    {
+                        dataFile = args[1];
+                        if (!File.Exists(dataFile))
+                        {
+                            Console.WriteLine($"Not found source File: {dataFile}");
+                            Console.ReadKey();
+                            return;
+                        }
+                        else keyFile = "EntityToolKey.key";
+                    }
+                    mode = Mode.Hash;
+                }
                 else if(arg1 == "-h" || arg1 == "-help")
                 {
-                    Console.WriteLine(@"encrypter [-e <DataFile> <KeyFile>] | [-d <DataFile> <KeyFile>] ");
+                    Console.WriteLine(@"encrypter [-e <DataFile> <KeyFile>] | [-d <DataFile> <KeyFile>] | -h");
                     Console.WriteLine(@"encrypter <DataFile> <KeyFile>");
                     Console.WriteLine(@"encrypter [-k] [<KeyFile>]");
                     Console.WriteLine("\t-e\tEncrypt <DataFile> with the key information from the <KeyFile>");
                     Console.WriteLine("\t\tEncrypt mode is used if flag was skipped and specified only <DataFile> and <KeyFile> ");
                     Console.WriteLine("\t-d\tDecrypt encrypted <DataFile> with file <KeyFile>");
                     Console.WriteLine("\t-k\tGenerage <KeyFile>");
+                    Console.WriteLine("\t-h\tThis help message");
                     Console.ReadKey();
                     return;
                 }
@@ -138,9 +155,28 @@ namespace Encrypter
                 case Mode.GenerateKey:
                     if (string.IsNullOrEmpty(keyFile))
                         keyFile = "EntityToolKey.key";
-                    using (TextWriter file = new StreamWriter(keyFile))
+                    string keyCode = SysInfo.SysInformer.GetMashineID(true);
+                    File.WriteAllText(keyFile, keyCode);
+
+                    //using (TextWriter file = new StreamWriter(keyFile))
+                    //{
+                    //    file.Write(SysInfo.SysInformer.GetMashineID(true));
+                    //}
+                    Console.WriteLine("KeyCode: ");
+                    Console.WriteLine(keyCode);
+                    Console.ReadKey();
+                    return;
+                case Mode.Hash:
+                    byte[] bytes = File.ReadAllBytes(dataFile);
+                    if(bytes != null && bytes.Length > 0)
                     {
-                        file.Write(SysInfo.Helper.GetMashineID());
+                        string hashFile = string.Concat(Path.GetDirectoryName(dataFile), Path.PathSeparator, Path.GetFileNameWithoutExtension(dataFile), ".hash");
+                        string hashCode = SysInfo.SysInformer.MD5_Bytes2String(bytes);
+                        File.WriteAllText(hashFile, hashCode);
+                        Console.WriteLine("HashCode of the file: ");
+                        Console.Write(dataFile);
+                        Console.WriteLine(hashCode);
+                        Console.ReadKey();
                     }
                     return;
                 case Mode.Encrypt:
@@ -148,16 +184,18 @@ namespace Encrypter
                     {
                         if (File.Exists(keyFile))
                         {
-                            byte[] key = System.IO.File.ReadAllBytes(keyFile);
-                            if (key.Length > 0)
+                            byte[] encryptedKeyData = File.ReadAllBytes(keyFile);
+                            if (encryptedKeyData != null && encryptedKeyData.Length > 0)
                             {
-                                byte[] inData = System.IO.File.ReadAllBytes(keyFile);
+                                byte[] keyData = SysInfo.SysInformer.Decrypt(encryptedKeyData, );
+                                byte[] key = SHA256.Create().ComputeHash(encryptedKeyData);
+
+                                byte[] inData = File.ReadAllBytes(dataFile);
                                 if (inData.Length > 0)
                                 {
                                     string encryptedFile = Path.Combine(Path.GetDirectoryName(dataFile), Path.GetFileNameWithoutExtension(dataFile) + ".etcrypt");
                                     try
                                     {
-                                        //Create a network stream from the TCP connection.   
                                         using (FileStream outDataStream = new FileStream(encryptedFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
                                         {
                                             //Create a new instance of the RijndaelManaged class  
@@ -170,8 +208,8 @@ namespace Encrypter
                                             //Create a CryptoStream, pass it the NetworkStream, and encrypt   
                                             //it with the Rijndael class.  
                                             CryptoStream cryptStream = new CryptoStream(outDataStream,
-                                            rmCrypto.CreateEncryptor(key, iv),
-                                            CryptoStreamMode.Write);
+                                                                                        rmCrypto.CreateEncryptor(key, iv),
+                                                                                        CryptoStreamMode.Write);
 
                                             //Create a StreamWriter for easy writing to the   
                                             //network stream.  
