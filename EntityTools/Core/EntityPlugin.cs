@@ -1,25 +1,24 @@
 ﻿using Astral.Forms;
 using Astral.Logic.UCC.Forms;
 using EntityTools.Patches;
-using EntityTools.Tools;
 using System;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using System.Reflection;
-using EntityTools.Core;
 using EntityTools.Core.Interfaces;
 using Astral.Logic.UCC.Classes;
 using Astral.Classes.ItemFilter;
 using EntityTools.Enums;
 using MyNW.Classes;
 using System.Collections.Generic;
-using Astral;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Runtime.CompilerServices;
 using EntityTools.Logger;
 using Astral.Quester.Classes;
+using EntityTools.Extensions;
+using EntityTools.Tools;
 
 [assembly: InternalsVisibleTo("EntityCore")]
 
@@ -396,30 +395,63 @@ namespace EntityTools
                 }
                 if (assemblyResolve_Deletage_Binded)
                 {
-                    // Попытка загрузки ядра производится только после привязки делегата
+                    // Попытка загрузки ядра производится только после привязки делегата CurrentDomain_AssemblyResolve
                     try
                     {
-                        using (FileStream file = FileStreamHelper.OpenWithStream(Assembly.GetExecutingAssembly().Location, "Core", System.IO.FileMode.Open, System.IO.FileAccess.Read))
+                        using (FileStream file = FileStreamHelper.OpenWithStream(Assembly.GetExecutingAssembly().Location, "Tony", FileMode.Open, FileAccess.Read))
                         {
-                            byte[] buffer = new byte[file.Length];
-                            if (file.Read(buffer, 0, (int)file.Length) > 0)
+                            byte[] coreBytes = new byte[file.Length];
+                            if (file.Read(coreBytes, 0, (int)file.Length) > 0)
                             {
-
-                                Assembly assembly = Assembly.Load(buffer);
-
-                                if (assembly != null)
-                                    foreach (Type type in assembly.GetTypes())
+#if ENCRYPTED_CORE
+                                byte[] key = SysInfo.SysInformer.GetMashineID(false).TextToBytes();
+                                if (CryptoHelper.DecryptFile_Rijndael(coreBytes, key, out byte[] decryptedCoreBytes))
+                                {
+#if !DEBUG
+                                    File.WriteAllText("EntityCore_key", key.ToHexString());
+                                    File.WriteAllBytes("EntityCore_encrypt", coreBytes);
+                                    File.WriteAllBytes("EntityCore_decrypt", decryptedCoreBytes);
+                                    File.WriteAllText("EntityCore_decrypt.md5", CryptoHelper.MD5_HashString(decryptedCoreBytes));
+#endif
+                                    try
                                     {
-                                        if (type.GetInterfaces().Contains(typeof(IEntityToolsCore)))
-                                        {
-                                            IEntityToolsCore core = Activator.CreateInstance(type) as IEntityToolsCore;
-                                            if (core != null)
+                                        Assembly assembly = Assembly.Load(decryptedCoreBytes);
+#else
+                                    try
+                                    {
+                                        Assembly assembly = Assembly.Load(coreBytes);
+#endif
+                                        if (assembly != null)
+                                            foreach (Type type in assembly.GetTypes())
                                             {
-                                                Core = core;
-                                                return true;
+                                                if (type.GetInterfaces().Contains(typeof(IEntityToolsCore)))
+                                                {
+                                                    IEntityToolsCore core = Activator.CreateInstance(type) as IEntityToolsCore;
+                                                    if (core != null)
+                                                    {
+                                                        Core = core;
+                                                        return true;
+                                                    }
+                                                }
                                             }
-                                        }
                                     }
+#if !ENCRYPTED_CORE
+                                    catch { }
+#else
+                                    catch (Exception e)
+                                    {
+                                        string msg = "Fail to load decrypted EntityToolCore ";
+                                        EntityToolsLogger.WriteLine(LogType.Error, msg);
+                                        Astral.Logger.WriteLine(msg);
+                                    }
+                                }
+                                else
+                                {
+                                    string msg = "Fail to decrypt EntityToolCore";
+                                    EntityToolsLogger.WriteLine(LogType.Error, msg);
+                                    Astral.Logger.WriteLine(msg);
+                                }
+#endif
                             }
                         }
                     }

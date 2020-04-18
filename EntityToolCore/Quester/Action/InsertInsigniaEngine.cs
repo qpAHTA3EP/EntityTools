@@ -40,6 +40,8 @@ namespace EntityCore.Quester.Action
             @this.ActionEngine = this;
 #endif
             @this.PropertyChanged += PropertyChanged;
+
+            EntityToolsLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized");
         }
 
         private void PropertyChanged(object sender, PropertyChangedEventArgs e) { }

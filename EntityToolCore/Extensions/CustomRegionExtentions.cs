@@ -113,14 +113,12 @@ namespace EntityCore.Extensions
         /// <param name="dgv"></param>
         internal static void DataGridView2CustomRegionList(DataGridView dgv, ref List<string> regions)
         {
-            if (regions != null)
-                regions.Clear();
-            else regions = new List<string>();
-
             int indSelect = dgv.Columns.Contains("clmnSelect") ? dgv.Columns["clmnSelect"].DisplayIndex : -1;
             int indItems = dgv.Columns.Contains("clmnItems") ? dgv.Columns["clmnItems"].DisplayIndex : -1;
             if (indSelect == -1 || indItems == -1)
                 return;
+
+            regions = new List<string>(dgv.Rows.Count);
 
             foreach (DataGridViewRow row in dgv.Rows)
             {

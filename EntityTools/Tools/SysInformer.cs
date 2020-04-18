@@ -1,16 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿#if ENCRYPTOR
+using Extensions;
+using Encrypter;
+#else
+using EntityTools.Extensions;
+using EntityTools.Tools;
+#endif
 using System.Management;
-using System.Security.Cryptography;
 using System.Text;
+
+using System.IO;
 
 namespace SysInfo
 {
     internal static class SysInformer
     {
-        internal static string GetMashineID()
+        public static readonly string publicKey = "fs5er4z6#'f1dsg3regjuty6k@(";
+
+        internal static string GetMashineID(bool encrypt)
         {
+
             StringBuilder idBuilder = new StringBuilder();
             ManagementClass mc = new ManagementClass("Win32_Processor");
             foreach (ManagementObject processor in mc.GetInstances())
@@ -96,83 +104,54 @@ namespace SysInfo
                     idBuilder.Append('_').Append(val);
             }
 
-            return Encrypt(idBuilder.ToString(), "fs5er4z6#'f1dsg3regjuty6k@(");
-        }
-        public static string MD5_Bytes2String(byte[] bytes)
-        {
-            byte[] array = MD5.Create().ComputeHash(bytes);
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < array.Length; i++)
+            if (idBuilder.Length > 0)
             {
-                stringBuilder.Append(array[i].ToString("X2"));
-            }
-            return stringBuilder.ToString();
-        }
-
-        public static string SHA1_Bytes2String(byte[] byte_0)
-        {
-            byte[] array = new SHA1CryptoServiceProvider().ComputeHash(byte_0);
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < array.Length; i++)
-            {
-                stringBuilder.Append(array[i].ToString("X2"));
-            }
-            return stringBuilder.ToString();
-        }
-
-        internal static string Encrypt(string data, string cryptKey)
-        {
-            UTF8Encoding utf8Encoding = new UTF8Encoding();
-            MD5CryptoServiceProvider md5CryptoServiceProvider = new MD5CryptoServiceProvider();
-            byte[] key = md5CryptoServiceProvider.ComputeHash(utf8Encoding.GetBytes(cryptKey));
-            TripleDESCryptoServiceProvider tripleDESCryptoServiceProvider = new TripleDESCryptoServiceProvider();
-            tripleDESCryptoServiceProvider.Key = key;
-            tripleDESCryptoServiceProvider.Mode = CipherMode.ECB;
-            tripleDESCryptoServiceProvider.Padding = PaddingMode.PKCS7;
-            byte[] bytes = utf8Encoding.GetBytes(data);
-            byte[] inArray;
-            try
-            {
-                inArray = tripleDESCryptoServiceProvider.CreateEncryptor().TransformFinalBlock(bytes, 0, bytes.Length);
-            }
-            finally
-            {
-                tripleDESCryptoServiceProvider.Clear();
-                md5CryptoServiceProvider.Clear();
-            }
-            return Convert.ToBase64String(inArray);
-        }
-
-        internal static string Decrypt(string data, string cryptKey)
-        {
-            string result;
-            try
-            {
-                UTF8Encoding utf8Encoding = new UTF8Encoding();
-                MD5CryptoServiceProvider md5CryptoServiceProvider = new MD5CryptoServiceProvider();
-                byte[] key = md5CryptoServiceProvider.ComputeHash(utf8Encoding.GetBytes(cryptKey));
-                TripleDESCryptoServiceProvider tripleDESCryptoServiceProvider = new TripleDESCryptoServiceProvider();
-                tripleDESCryptoServiceProvider.Key = key;
-                tripleDESCryptoServiceProvider.Mode = CipherMode.ECB;
-                tripleDESCryptoServiceProvider.Padding = PaddingMode.PKCS7;
-                byte[] array = Convert.FromBase64String(data);
-                byte[] bytes;
-                try
+                if (encrypt)
                 {
-                    bytes = tripleDESCryptoServiceProvider.CreateDecryptor().TransformFinalBlock(array, 0, array.Length);
+                    if (CryptoHelper.Encrypt_Astral(idBuilder.ToString().TextToBytes(), publicKey, out byte[] bytes))
+                    {
+                        return bytes.ToHexString();
+                    }
                 }
-                finally
-                {
-                    tripleDESCryptoServiceProvider.Clear();
-                    md5CryptoServiceProvider.Clear();
-                }
-                result = utf8Encoding.GetString(bytes);
+                else return idBuilder.ToString();
             }
-            catch
-            {
-                result = string.Empty;
-            }
-            return result;
+            return string.Empty;
         }
+
+#if ENCRIPTOR
+        internal static bool MashineIDFromKey(string hexStr, out byte[] decrMachineIdByte, out string decrMachineIdstr)
+        {
+            if (!string.IsNullOrEmpty(hexStr))
+            {
+                if (CryptoHelper.Decrypt_Astral(hexStr.HexToBytes(), publicKey, out decrMachineIdByte))
+                {
+                    decrMachineIdstr = decrMachineIdByte.ToNormalString();
+                    return true;
+                }
+            }
+            decrMachineIdByte = null;
+            decrMachineIdstr = string.Empty;
+            return false;
+        }
+
+        internal static bool MashineIDFromFile(string keyFile, out byte[] decrMachineIdByte, out string decrMachineIdstr)
+        {
+            if (File.Exists(keyFile))
+            {
+                string hexStr = File.ReadAllText(keyFile);
+                if (!string.IsNullOrEmpty(hexStr))
+                {
+                    if (CryptoHelper.Decrypt_Astral(hexStr.HexToBytes(), publicKey, out decrMachineIdByte))
+                    {
+                        decrMachineIdstr = decrMachineIdByte.ToNormalString();
+                        return true;
+                    }
+                }
+            }
+            decrMachineIdByte = null;
+            decrMachineIdstr = string.Empty;
+            return false;
+        } 
+#endif
     }
 }

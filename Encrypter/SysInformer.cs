@@ -1,10 +1,12 @@
-﻿using MachineKeyGenerator;
+﻿using Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management;
 using System.Security.Cryptography;
 using System.Text;
+using Encrypter;
+using System.IO;
 
 namespace SysInfo
 {
@@ -104,8 +106,7 @@ namespace SysInfo
             {
                 if (encrypt)
                 {
-                    byte[] bytes = Encrypt(Encoding.UTF8.GetBytes(idBuilder.ToString()), publicKey);
-                    if (bytes != null)
+                    if (CryptoHelper.Encrypt_Astral(idBuilder.ToString().TextToBytes(), publicKey, out byte[] bytes))
                     {
                         return bytes.ToHexString();
                     }
@@ -115,86 +116,38 @@ namespace SysInfo
             return string.Empty;
         }
 
-        public static string MD5_Bytes2String(byte[] bytes)
+        internal static bool MashineIDFromKey(string hexStr, out byte[] decrMachineIdByte, out string decrMachineIdstr)
         {
-            byte[] array = MD5.Create().ComputeHash(bytes);
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < array.Length; i++)
+            if(!string.IsNullOrEmpty(hexStr))
             {
-                stringBuilder.Append(array[i].ToString("X2"));
-            }
-            return stringBuilder.ToString();
-        }
-
-        public static string SHA1_Bytes2String(byte[] bytes)
-        {
-            if (bytes == null || bytes.Length == 0)
-                return string.Empty;
-
-            byte[] array = new SHA1CryptoServiceProvider().ComputeHash(bytes);
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < array.Length; i++)
-            {
-                stringBuilder.Append(array[i].ToString("X2"));
-            }
-            return stringBuilder.ToString();
-        }
-
-        internal static byte[] Encrypt(byte[] data, string cryptKey)
-        {
-            if (data == null || data.Length == 0)
-                return null;
-
-            MD5CryptoServiceProvider md5CryptoServiceProvider = new MD5CryptoServiceProvider();
-            byte[] key = md5CryptoServiceProvider.ComputeHash(Encoding.UTF8.GetBytes(cryptKey));
-            TripleDESCryptoServiceProvider tripleDESCryptoServiceProvider = new TripleDESCryptoServiceProvider {
-                    Key = key,
-                    Mode = CipherMode.ECB,
-                    Padding = PaddingMode.PKCS7
-                };
-            byte[] inArray = null;
-            try
-            {
-                inArray = tripleDESCryptoServiceProvider.CreateEncryptor().TransformFinalBlock(data, 0, data.Length);
-            }
-            finally
-            {
-                tripleDESCryptoServiceProvider.Clear();
-                md5CryptoServiceProvider.Clear();
-            }
-            return inArray;
-        }
-
-        internal static byte[] Decrypt(byte[] data, string cryptKey)
-        {
-            byte[] result = null;
-            try
-            {
-                MD5CryptoServiceProvider md5CryptoServiceProvider = new MD5CryptoServiceProvider();
-                byte[] key = md5CryptoServiceProvider.ComputeHash(Encoding.UTF8.GetBytes(cryptKey));
-                TripleDESCryptoServiceProvider tripleDESCryptoServiceProvider = new TripleDESCryptoServiceProvider
+                if (CryptoHelper.Decrypt_Astral(hexStr.HexToBytes(), publicKey, out decrMachineIdByte))
                 {
-                    Key = key,
-                    Mode = CipherMode.ECB,
-                    Padding = PaddingMode.PKCS7
-                };
-                byte[] bytes;
-                try
-                {
-                    bytes = tripleDESCryptoServiceProvider.CreateDecryptor().TransformFinalBlock(data, 0, data.Length);
+                    decrMachineIdstr = decrMachineIdByte.ToNormalString();
+                    return true;
                 }
-                finally
-                {
-                    tripleDESCryptoServiceProvider.Clear();
-                    md5CryptoServiceProvider.Clear();
-                }
-                result = bytes;
             }
-            catch
+            decrMachineIdByte = null;
+            decrMachineIdstr = string.Empty;
+            return false;
+        }
+
+        internal static bool MashineIDFromFile(string keyFile, out byte[] decrMachineIdByte, out string decrMachineIdstr)
+        {
+            if(File.Exists(keyFile))
             {
-                result = null;
+                string hexStr = File.ReadAllText(keyFile);
+                if (!string.IsNullOrEmpty(hexStr))
+                {
+                    if (Encrypter.CryptoHelper.Decrypt_Astral(hexStr.HexToBytes(), publicKey, out decrMachineIdByte))
+                    {
+                        decrMachineIdstr=  decrMachineIdByte.ToNormalString();
+                        return true;
+                    }
+                }
             }
-            return result;
+            decrMachineIdByte = null;
+            decrMachineIdstr = string.Empty;
+            return false;
         }
     }
 }

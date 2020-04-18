@@ -1,6 +1,4 @@
-﻿#define TEST
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -10,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Management;
 using System.Security.Cryptography;
-using MyConverter;
+using Extensions;
 using System.Text;
 using System.Windows.Forms;
 
@@ -18,10 +16,10 @@ namespace MachineKeyGenerator
 {
     public partial class KeyGeneratorForm : Form
     {
+#if TEST
         private string machineId = string.Empty;
         private string encrMachineId = string.Empty;
         private string decrMachineId = string.Empty;
-#if TEST
         private byte[] machineIdByte = null;
         private byte[] encrMachineIdByte = null;
         private byte[] decrMachineIdByte = null;
@@ -29,11 +27,22 @@ namespace MachineKeyGenerator
         public KeyGeneratorForm()
         {
             InitializeComponent();
+#if TEST
+            btnCopy.Text = "Generate";
+            btnCopy.Click -= btnCopy_Click;
+            btnCopy.Click += btnGenerate_Click;
+
+            btnSave.Text = "Decrypt";
+            btnSave.Click -= btnSave_Click;
+            btnSave.Click += btnDecrypt_Click;
+#endif
         }
 
         private void KeyGeneratorForm_Load(object sender, EventArgs e)
         {
+#if !TEST
             tbId.Text = SysInfo.SysInformer.GetMashineID(true);
+#endif
         }
 
         private void btnCopy_Click(object sender, EventArgs e)
@@ -43,33 +52,6 @@ namespace MachineKeyGenerator
                 Clipboard.SetText(tbId.Text);
         }
 
-#if TEST
-        private void btnGenerate_Click(object sender, EventArgs e)
-        {
-            machineId = SysInfo.SysInformer.GetMashineID(false);
-            tbId.Text = machineId;
-            machineIdByte = Encoding.UTF8.GetBytes(machineId);
-            encrMachineIdByte = SysInfo.SysInformer.Encrypt(machineIdByte, SysInfo.SysInformer.publicKey);
-            if (encrMachineIdByte != null)
-            {
-                encrMachineId = encrMachineIdByte.ToHexString();
-                tbId.Text += string.Concat("\r\n=================================\r\n", encrMachineId);
-            }
-        }
-
-        private void btnDecrypt_Click(object sender, EventArgs e)
-        {
-            if (!string.IsNullOrEmpty(encrMachineId))
-            {
-                decrMachineIdByte = SysInfo.SysInformer.Decrypt(encrMachineId.ToBytes(), SysInfo.SysInformer.publicKey);
-                if (decrMachineIdByte != null)
-                {
-                    decrMachineId = Encoding.UTF8.GetString(decrMachineIdByte);
-                    tbId.Text += string.Concat("\r\n=================================\r\n", decrMachineId);
-                }
-            }
-        }
-#endif
         private void btnSave_Click(object sender, EventArgs e)
         {
             SaveFileDialog saveDialog = new SaveFileDialog();
@@ -84,6 +66,33 @@ namespace MachineKeyGenerator
             }
             Close();
         }
+#if TEST
+        private void btnGenerate_Click(object sender, EventArgs e)
+        {
+            machineId = SysInfo.SysInformer.GetMashineID(false);
+            tbId.Text = machineId;
+            machineIdByte = machineId.TextToBytes();
+            encrMachineIdByte = Encrypter.CryptoHelper.Encrypt_Astral(machineIdByte, SysInfo.SysInformer.publicKey);
+            if (encrMachineIdByte != null)
+            {
+                encrMachineId = encrMachineIdByte.ToHexString();
+                tbId.Text += string.Concat("\r\n=================================\r\n", encrMachineId);
+            }
+        }
+
+        private void btnDecrypt_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(encrMachineId))
+            {
+                decrMachineIdByte = Encrypter.CryptoHelper.Decrypt_Astral(encrMachineId.HexToBytes(), SysInfo.SysInformer.publicKey);
+                if (decrMachineIdByte != null)
+                {
+                    decrMachineId = decrMachineIdByte.ToNormalString();
+                    tbId.Text += string.Concat("\r\n=================================\r\n", decrMachineId);
+                }
+            }
+        }
+#endif
     }
 }
 #if false

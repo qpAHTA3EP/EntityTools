@@ -27,7 +27,7 @@ namespace VariableTools.Expressions.Functions
         public override bool Calculate(out double result)
         {
             result = 0;
-#if ASTRAL
+#if !TEST
             foreach (InventorySlot slot in EntityManager.LocalPlayer.AllItems)
             {
                 if (slot.Item?.ItemDef?.InternalName == ItemId)
@@ -63,7 +63,7 @@ namespace VariableTools.Expressions.Functions
 
         public override bool Calculate(out double result)
         {
-#if ASTRAL
+#if !TEST
             int? res = EntityManager.LocalPlayer?.Inventory?.GetNumericCount(NumericId);
             if (res != null)
                 result = (double)res;

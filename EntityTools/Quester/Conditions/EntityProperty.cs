@@ -284,6 +284,7 @@ namespace EntityTools.Quester.Conditions
         }
         internal Relation _sign = Relation.Superior;
 
+#if false
 #if DEVELOPER
         [Description("Time between searches of the Entity (ms)")]
         [Category("Optional")]
@@ -302,7 +303,8 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal int _searchTimeInterval = 200;
+        internal int _searchTimeInterval = 200; 
+#endif
         #endregion
 
 #if CORE_DELEGATES

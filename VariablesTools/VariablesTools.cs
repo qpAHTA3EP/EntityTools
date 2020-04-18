@@ -112,19 +112,26 @@ namespace VariableTools
             // Подстрока с относительным путем к профилю
             if (psq == ProfileScopeType.Profile)
             {
-                bool hasExtention = Astral.API.CurrentSettings.LastQuesterProfile.EndsWith(@".amp.zip");
+                string lastQuesterProfileName = Path.GetFullPath(Astral.API.CurrentSettings.LastQuesterProfile);
+
+                bool hasExtention = lastQuesterProfileName.EndsWith(@".amp.zip");
 
                 if (Astral.API.CurrentSettings.LastQuesterProfile.StartsWith(Astral.Controllers.Directories.ProfilesPath))
                 {
                     // Length + 1 нужно чтобы удалить символ '\' перед именем профиля
-                    sb.Append(Astral.API.CurrentSettings.LastQuesterProfile.Substring(Astral.Controllers.Directories.ProfilesPath.Length + 1,
-                        Astral.API.CurrentSettings.LastQuesterProfile.Length - Astral.Controllers.Directories.ProfilesPath.Length - (hasExtention ? 9 : 1)));
+                    sb.Append(lastQuesterProfileName.Substring(Astral.Controllers.Directories.ProfilesPath.Length + 1,
+                        lastQuesterProfileName.Length - Astral.Controllers.Directories.ProfilesPath.Length - 1 - (hasExtention ? @".amp.zip".Length : 0)));
                 }
+#if false
                 else if (Astral.API.CurrentSettings.LastQuesterProfile.StartsWith(@".\Profiles\", StringComparison.OrdinalIgnoreCase))
-                    sb.Append(Astral.API.CurrentSettings.LastQuesterProfile.Substring(11, Astral.API.CurrentSettings.LastQuesterProfile.Length - Astral.Controllers.Directories.ProfilesPath.Length - (hasExtention ? 9 : 1)));
+                    sb.Append(Astral.API.CurrentSettings.LastQuesterProfile.Substring(11, Astral.API.CurrentSettings.LastQuesterProfile.Length - Astral.Controllers.Directories.ProfilesPath.Length - (hasExtention ? @".amp.zip".Length : 1)));
                 //if (Astral.API.CurrentSettings.LastQuesterProfile.StartsWith(Astral.Controllers.Directories.AstralStartupPath))
                 //    sb.Append(Astral.API.CurrentSettings.LastQuesterProfile.Replace(Astral.Controllers.Directories.AstralStartupPath, @"."));
-                else sb.Append(Astral.API.CurrentSettings.LastQuesterProfile);
+#endif
+                else if (hasExtention)
+                    sb.Append(lastQuesterProfileName.Substring(0, lastQuesterProfileName.Length - @".amp.zip".Length));
+                else sb.Append(lastQuesterProfileName); 
+
                 if (asq != AccountScopeType.Global)
                     sb.Append("&&");
             }
@@ -167,7 +174,7 @@ namespace VariableTools
             return sb.ToString();
         }
 
-        #region Accesse to Relogger
+        #region Доступ к полям Astral.Controllers.Relogger
         internal static FieldInfo charFiledInfo;
         internal static FieldInfo accFieldInfo;
         /// <summary>

@@ -7,6 +7,7 @@ using MyNW.Classes;
 using System.Text.RegularExpressions;
 using EntityTools.Extensions;
 using static Astral.Quester.Classes.Condition;
+using EntityTools.Logger;
 
 namespace EntityCore.UCC.Conditions
 {
@@ -26,6 +27,8 @@ namespace EntityCore.UCC.Conditions
             @this.Engine = this;
 #endif
             @this.PropertyChanged += PropertyChanged;
+
+            EntityToolsLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized");
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

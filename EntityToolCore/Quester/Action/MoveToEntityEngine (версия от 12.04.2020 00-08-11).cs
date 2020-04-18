@@ -36,6 +36,8 @@ namespace EntityCore.Quester.Action
         private Predicate<Entity> checkEntity = null;
         private Func<List<CustomRegion>> getCustomRegions = null;
 
+        private readonly InstancePropertyAccessor<MoveToEntity, ActionDebug> actionDebug = null;
+
         private List<CustomRegion> customRegions = null;
         private string label = string.Empty;
         private Entity target = null;
@@ -58,11 +60,11 @@ namespace EntityCore.Quester.Action
 #endif
 #if CORE_INTERFACES
             @this.Engine = this;
-#endif 
+#endif
+            actionDebug = @this.GetInstanceProperty<MoveToEntity, ActionDebug>("Debug", BindingFlags.NonPublic);
+ 
             checkEntity = internal_CheckEntity_Initializer;
             getCustomRegions = internal_GetCustomRegion_Initializer;
-
-            EntityToolsLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized");
         }
 
         internal void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

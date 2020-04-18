@@ -44,6 +44,8 @@ namespace EntityCore.Quester.Conditions
 
             checkEntity = internal_CheckEntity_Initializer;
             getCustomRegions = internal_GetCustomRegion_Initializer;
+
+            EntityToolsLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized");
         }
 
         internal void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

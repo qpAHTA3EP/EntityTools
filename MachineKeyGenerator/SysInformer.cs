@@ -1,14 +1,11 @@
-﻿using MachineKeyGenerator;
+﻿using Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MyConverter;
 using System.Management;
 using System.Security.Cryptography;
 using System.Text;
-using System.Reflection;
-using System.IO;
-using System.Windows.Forms;
+using Encrypter;
 
 namespace SysInfo
 {
@@ -16,14 +13,9 @@ namespace SysInfo
     {
         public static readonly string publicKey = "fs5er4z6#'f1dsg3regjuty6k@(";
 
-        /*static SysInformer()
+        internal static string GetMashineID(bool encrypt)
         {
-            byte[] bytes = File.ReadAllBytes(Application.ExecutablePath);
-            publicKey = MD5_Bytes2String(bytes);
-        }*/
 
-    internal static string GetMashineID(bool encrypt)
-        {
             StringBuilder idBuilder = new StringBuilder();
             ManagementClass mc = new ManagementClass("Win32_Processor");
             foreach (ManagementObject processor in mc.GetInstances())
@@ -113,7 +105,7 @@ namespace SysInfo
             {
                 if (encrypt)
                 {
-                    byte[] bytes = Encrypt(Encoding.UTF8.GetBytes(idBuilder.ToString()), publicKey);
+                    byte[] bytes = CryptoHelper.Encrypt_Astral(idBuilder.ToString().TextToBytes(), publicKey);
                     if (bytes != null)
                     {
                         return bytes.ToHexString();
@@ -122,88 +114,6 @@ namespace SysInfo
                 else return idBuilder.ToString();
             }
             return string.Empty;
-        }
-
-        public static string MD5_Bytes2String(byte[] bytes)
-        {
-            byte[] array = MD5.Create().ComputeHash(bytes);
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < array.Length; i++)
-            {
-                stringBuilder.Append(array[i].ToString("X2"));
-            }
-            return stringBuilder.ToString();
-        }
-
-        public static string SHA1_Bytes2String(byte[] bytes)
-        {
-            if (bytes == null || bytes.Length == 0)
-                return string.Empty;
-
-            byte[] array = new SHA1CryptoServiceProvider().ComputeHash(bytes);
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < array.Length; i++)
-            {
-                stringBuilder.Append(array[i].ToString("X2"));
-            }
-            return stringBuilder.ToString();
-        }
-
-        internal static byte[] Encrypt(byte[] data, string cryptKey)
-        {
-            if (data == null || data.Length == 0)
-                return null;
-
-            MD5CryptoServiceProvider md5CryptoServiceProvider = new MD5CryptoServiceProvider();
-            byte[] key = md5CryptoServiceProvider.ComputeHash(Encoding.UTF8.GetBytes(cryptKey));
-            TripleDESCryptoServiceProvider tripleDESCryptoServiceProvider = new TripleDESCryptoServiceProvider {
-                    Key = key,
-                    Mode = CipherMode.ECB,
-                    Padding = PaddingMode.PKCS7
-                };
-            byte[] inArray = null;
-            try
-            {
-                inArray = tripleDESCryptoServiceProvider.CreateEncryptor().TransformFinalBlock(data, 0, data.Length);
-            }
-            finally
-            {
-                tripleDESCryptoServiceProvider.Clear();
-                md5CryptoServiceProvider.Clear();
-            }
-            return inArray;
-        }
-
-        internal static byte[] Decrypt(byte[] data, string cryptKey)
-        {
-            byte[] result = null;
-            try
-            {
-                MD5CryptoServiceProvider md5CryptoServiceProvider = new MD5CryptoServiceProvider();
-                byte[] key = md5CryptoServiceProvider.ComputeHash(Encoding.UTF8.GetBytes(cryptKey));
-                TripleDESCryptoServiceProvider tripleDESCryptoServiceProvider = new TripleDESCryptoServiceProvider
-                {
-                    Key = key,
-                    Mode = CipherMode.ECB,
-                    Padding = PaddingMode.PKCS7
-                };
-                byte[] bytes;
-                try
-                {
-                    bytes = tripleDESCryptoServiceProvider.CreateDecryptor().TransformFinalBlock(data, 0, data.Length);
-                }
-                finally
-                {
-                    tripleDESCryptoServiceProvider.Clear();
-                    md5CryptoServiceProvider.Clear();
-                }
-                result = bytes;
-            }
-            catch
-            {
-                result = null;
-            }
-            return result;
         }
     }
 }

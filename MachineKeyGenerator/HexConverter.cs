@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace MyConverter
+namespace Extensions
 {
     public static class HexConverter
     {
@@ -24,7 +24,16 @@ namespace MyConverter
             return string.Empty;
         }
 
-        public static byte[] ToBytes(this string hex)
+        public static byte[] TextToBytes(this string str)
+        {
+            if (string.IsNullOrEmpty(str))
+                return new byte[0];
+            else return Encoding.UTF8.GetBytes(str);
+        }
+
+#if ENCRYPTOR || TEST
+
+        public static byte[] HexToBytes(this string hex)
         {
             if (hex.Length % 2 == 1)
                 throw new Exception("The binary key cannot have an odd number of digits");
@@ -37,8 +46,7 @@ namespace MyConverter
             }
 
             return arr;
-        }
-
+        } 
         private static int GetHexVal(char hex)
         {
             int val = (int)hex;
@@ -49,5 +57,6 @@ namespace MyConverter
             //Or the two combined, but a bit slower:
             //return val - (val < 58 ? 48 : (val < 97 ? 55 : 87));
         }
+#endif
     }
 }
