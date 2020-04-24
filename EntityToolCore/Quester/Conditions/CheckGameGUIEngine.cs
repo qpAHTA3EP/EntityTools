@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using static Astral.Quester.Classes.Condition;
-using EntityTools.Logger;
+using EntityTools;
 
 namespace EntityCore.Quester.Conditions
 {
@@ -29,7 +29,7 @@ namespace EntityCore.Quester.Conditions
 #endif
             @this.PropertyChanged += PropertyChanged;
 
-            EntityToolsLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized");
+            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
         }
 
         internal void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

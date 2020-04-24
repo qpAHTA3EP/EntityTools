@@ -13,7 +13,6 @@ using Astral.Quester.Classes;
 using System.ComponentModel;
 using EntityTools.Core.Interfaces;
 using EntityTools;
-using EntityTools.Logger;
 
 namespace EntityCore.Quester.Action
 {
@@ -41,7 +40,7 @@ namespace EntityCore.Quester.Action
 #endif
             @this.PropertyChanged += PropertyChanged;
 
-            EntityToolsLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized");
+            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {ActionLabel}");
         }
 
         private void PropertyChanged(object sender, PropertyChangedEventArgs e) { }
@@ -157,7 +156,7 @@ namespace EntityCore.Quester.Action
 #if DEBUG_INSERTINSIGNIA
                 int insertedNum = 0;
 
-                EntityToolsLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}: Check mount '{mount.Item.ItemDef.InternalName}'");
+                ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}: Check mount '{mount.Item.ItemDef.InternalName}'");
 #endif
                 // Проверяем наличие свободного места для знака
                 foreach (ItemGemSlotDef insgnSlotDef in mount.Item.ItemDef.EffectiveItemGemSlots)
@@ -170,7 +169,7 @@ namespace EntityCore.Quester.Action
                     {
                         // обнаружен "пустой слот" знака скакуна
 #if DEBUG_INSERTINSIGNIA
-                        EntityToolsLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}: Mount [{mount.Item.ItemDef.InternalName}] has free slot {insgnSlotDef.Index}");
+                        ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}: Mount [{mount.Item.ItemDef.InternalName}] has free slot {insgnSlotDef.Index}");
 #endif
                         // ищем в сумке подходящие инсигнии (знаки скакуна)
                         if (freeInsignias == null || freeInsignias.Count == 0)
@@ -191,7 +190,7 @@ namespace EntityCore.Quester.Action
                             {
                                 // в инвентаре отсутствуют инсигнии
 #if DEBUG_INSERTINSIGNIA
-                                EntityToolsLogger.WriteLine(LogType.Debug, $"{GetType().Name}: No one insignia found in the Bags");
+                                ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}: No one insignia found in the Bags");
 #endif
                                 return ActionResult.Skip;
                             }
@@ -208,7 +207,7 @@ namespace EntityCore.Quester.Action
                         if (insigniaBagSlot != null && insigniaBagSlot.IsValid)
                         {
                             mount.Item.GemThisItem(insigniaBagSlot.Item, insgnSlotDef.Index);
-                            EntityToolsLogger.WriteLine(LogType.Debug, $"{GetType().Name}: Insert '{insigniaBagSlot.Item.ItemDef.InternalName}' at the slot {insgnSlotDef.Index} of [{mount.Item.ItemDef.InternalName}]");
+                            ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}: Insert '{insigniaBagSlot.Item.ItemDef.InternalName}' at the slot {insgnSlotDef.Index} of [{mount.Item.ItemDef.InternalName}]");
 #if DEBUG_INSERTINSIGNIA
                             insertedNum++;
 #endif
@@ -238,7 +237,7 @@ namespace EntityCore.Quester.Action
 
         public ActionValidity InternalValidity => new ActionValidity();
 
-        public bool UseHotSpots => true;
+        public bool UseHotSpots => false;
 
         public Vector3 InternalDestination => new Vector3();
 

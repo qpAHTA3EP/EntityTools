@@ -4,13 +4,13 @@ using System;
 using System.ComponentModel;
 using System.IO;
 
-namespace EntityTools.Logger
+namespace EntityTools.Settings
 {
     /// <summary>
     /// Настройки службы EntityToolsLogger
     /// </summary>
     [Serializable]
-    public class EntityToolLoggerSettings : PluginSettingsBase
+    public class ETLoggerSettings : PluginSettingsBase
     {
         /// <summary>
         /// Активация или деактивация логгирования

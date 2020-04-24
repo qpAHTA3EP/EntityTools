@@ -33,7 +33,7 @@ namespace Encrypter
     {
         static readonly string DefaultKeyFile = "EntityTools.key";
 
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
             //Console.WriteLine(Constants.CompileTime != null ? Constants.CompileTime.ToString() : "Empty");
 
@@ -65,7 +65,7 @@ namespace Encrypter
                         {
                             Console.WriteLine($"Not found DataFile: {dataFile}");
                             Console.Read();
-                            return;
+                            return 1;
                         }
                     }
                     if (args.Length > 2)
@@ -75,7 +75,7 @@ namespace Encrypter
                         {
                             Console.WriteLine($"Not found KeyFile: {keyFile}");
                             Console.Read();
-                            return;
+                            return 2;
                         }
                     }
                     if (args.Length > 4)
@@ -97,7 +97,7 @@ namespace Encrypter
                         {
                             Console.WriteLine($"Not found DataFile: {dataFile}");
                             Console.Read();
-                            return;
+                            return 1;
                         }
                     }
                     if (args.Length > 2)
@@ -107,7 +107,7 @@ namespace Encrypter
                         {
                             Console.WriteLine($"Not found KeyFile: {keyFile}");
                             Console.Read();
-                            return;
+                            return 2;
                         }
                     }
                     if (args.Length > 4)
@@ -185,7 +185,7 @@ namespace Encrypter
                     Console.WriteLine("\tThis help message");
                     Console.WriteLine();
                     Console.Read();
-                    return;
+                    return 0;
                 }
 #if false
                 else if (arg1 == "-md5")
@@ -236,6 +236,7 @@ namespace Encrypter
 #endif
             }
             Console.Read();
+            return 0;
         }
 
         private static bool GenerateKey(string keyFile)
@@ -293,12 +294,9 @@ namespace Encrypter
                 {
                     byte[] data = File.ReadAllBytes(dataFile);
 
-#if DEBUG
                     string fullDataFile = Path.GetFullPath(dataFile);
-                    string md5File = string.Concat(Path.GetDirectoryName(fullDataFile), Path.DirectorySeparatorChar, Path.GetFileNameWithoutExtension(fullDataFile), ".md5");
+                    string md5File = string.Concat(Path.GetDirectoryName(fullDataFile), Path.DirectorySeparatorChar, Path.GetFileNameWithoutExtension(fullDataFile), '_', Path.GetFileNameWithoutExtension(keyFile), '_', DateTime.Now.ToString("yyy-MM-dd_hh-mm"), ".md5");
                     File.WriteAllText(md5File, CryptoHelper.MD5_HashString(data));
-#endif
-
 
                     string hexKeyStr = File.ReadAllText(keyFile);
                     if (SysInfo.SysInformer.MashineIDFromKey(hexKeyStr, out byte[] mashineIdBytes, out string mashinIdStr))
@@ -332,7 +330,8 @@ namespace Encrypter
                                 {
                                     // Сохранение в обычный файл
                                     string fileName = (targetFile != string.Empty) ? targetFile :
-                                                                Path.Combine(Path.GetDirectoryName(dataFile), Path.GetFileNameWithoutExtension(dataFile) + ".encrypted");
+                                                                Path.Combine(Path.GetDirectoryName(dataFile), Path.GetFileNameWithoutExtension(dataFile)+".encrypted");
+                                                                             //string.Concat(Path.GetFileNameWithoutExtension(dataFile),'_',Path.GetFileNameWithoutExtension(keyFile), '_', DateTime.Now.ToString("yyy-MM-dd_hh-mm") , ".encrypted"));
                                     File.WriteAllBytes(fileName, encryptedData);
                                     Console.WriteLine($"Succeeded! EncryptedFile: {fileName}");
                                 }

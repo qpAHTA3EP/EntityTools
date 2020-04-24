@@ -1,4 +1,7 @@
-﻿using System;
+﻿#define DEBUG_LOG
+
+using System;
+using System.Reflection;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
@@ -11,6 +14,7 @@ using EntityTools.Extensions;
 using EntityTools.Tools;
 using EntityTools.UCC.Conditions;
 using Unit = Astral.Logic.UCC.Ressources.Enums.Unit;
+using System.Text;
 
 namespace EntityTools.UCC.Actions
 {
@@ -21,6 +25,10 @@ namespace EntityTools.UCC.Actions
     
     public class SpecializedUCCAction : UCCAction
     {
+#if DEBUG && DEBUG_LOG
+        static StringBuilder debugStr = new StringBuilder(1000);
+#endif
+
         #region Опции команды
 #if DEVELOPER
         [Category("Managed Action")]
@@ -84,62 +92,182 @@ namespace EntityTools.UCC.Actions
                         return false;
 
                     if (CustomConditions != null && CustomConditions.Count > 0)
+                    {
+                        bool result = true;
+#if DEBUG && DEBUG_LOG
+                        debugStr.Clear();
+                        debugStr.Append(GetType().Name).Append('[').Append(GetHashCode().ToString("X2")).Append(']').Append(MethodBase.GetCurrentMethod().Name).Append(":: ").Append(CustomConditionCheck).Append(" of the Conditions is %RES%");
+                        if(Not)
+                            debugStr.Append(" => Not [");
+                        else debugStr.Append(" => [");
+#endif
                         if (CustomConditionCheck == LogicRule.Disjunction)
                         {
                             int lockedNum = 0;
                             int okUnlockedNum = 0;
                             bool lockedTrue = true;
-                            foreach (UCCCondition c in Conditions)
+                            foreach (UCCCondition c in CustomConditions)
                             {
                                 if (c is ICustomUCCCondition iCond)
                                 {
+#if DEBUG && DEBUG_LOG
+                                    if (okUnlockedNum > 0 || lockedNum > 0)
+                                        debugStr.Append("; ");
+                                    debugStr.Append(iCond.GetType().Name);
+#endif
                                     if (iCond.Loked)
                                     {
+#if DEBUG && DEBUG_LOG
+                                        debugStr.Append("(L) ");
+#endif
                                         if (!iCond.IsOK(ManagedAction))
                                         {
+#if DEBUG && DEBUG_LOG
+                                            debugStr.Append("False");
+#endif
                                             lockedTrue = false;
                                             break;
                                         }
+#if DEBUG && DEBUG_LOG
+                                        else debugStr.Append("True");
+#endif
                                         lockedNum++;
                                     }
-                                    else if (iCond.IsOK(ManagedAction))
-                                        okUnlockedNum++;
+                                    else
+                                    {
+#if DEBUG && DEBUG_LOG
+                                        debugStr.Append("(U) ");
+#endif
+                                        if (iCond.IsOK(ManagedAction))
+                                        {
+#if DEBUG && DEBUG_LOG
+                                            debugStr.Append("True");
+#endif
+                                            okUnlockedNum++;
+                                        }
+#if DEBUG && DEBUG_LOG
+                                        else debugStr.Append("False");
+#endif
+                                    }
                                 }
                                 else
                                 {
+#if DEBUG && DEBUG_LOG
+                                    if (okUnlockedNum > 0 || lockedNum > 0)
+                                        debugStr.Append(" ;");
+                                    debugStr.Append(c.Tested);
+#endif
                                     if (c.Locked)
                                     {
+#if DEBUG && DEBUG_LOG
+                                        debugStr.Append("(L) ");
+#endif
                                         if (!c.IsOK(ManagedAction))
                                         {
+#if DEBUG && DEBUG_LOG
+                                            debugStr.Append("False");
+#endif
                                             lockedTrue = false;
                                             break;
                                         }
+#if DEBUG && DEBUG_LOG
+                                        else debugStr.Append("True");
+#endif
                                         lockedNum++;
                                     }
-                                    else if (c.IsOK(ManagedAction))
-                                        okUnlockedNum++;
+                                    else
+                                    {
+#if DEBUG && DEBUG_LOG
+                                        debugStr.Append("(U) ");
+#endif
+                                        if (c.IsOK(ManagedAction))
+                                        {
+#if DEBUG && DEBUG_LOG
+                                            debugStr.Append("True");
+#endif
+                                            okUnlockedNum++;
+                                        }
+#if DEBUG && DEBUG_LOG
+                                        else debugStr.Append("False");
+#endif
+                                    }
                                 }
                             }
+#if DEBUG && DEBUG_LOG
+                            debugStr.Append(']');
+#endif
 
                             // Если множетство незалоченных условий пустое, тогда условие истино
-                            // Если оно НЕ пустое, тогда должно встретиться хотя бы одно истиное
-                            bool result = lockedTrue && (Conditions.Count == lockedNum || okUnlockedNum > 0);
-                            return (Not) ? !result : result;
+                            // Если оно НЕ пустое, тогда должно встретиться хотя бы одно истиное 
+                            result = lockedTrue && (Conditions.Count == lockedNum || okUnlockedNum > 0);
+                            // отрицание результата, если задан флаг
+                            if (Not)
+                                result = !result;
+#if DEBUG && DEBUG_LOG
+                            debugStr.Replace("%RES%", (result) ? "True " : "False");
+#endif
                         }
                         else
                         {
                             // Проверка всех условий
+#if DEBUG && DEBUG_LOG
+                            int num = 0;
+#endif
                             foreach (UCCCondition c in CustomConditions)
+                            {
+#if DEBUG && DEBUG_LOG
+                                if (num > 0)
+                                    debugStr.Append("; ");
+#endif
                                 if (c is ICustomUCCCondition iCond)
                                 {
+#if DEBUG && DEBUG_LOG
+                                    debugStr.Append(iCond.GetType().Name);
+#endif
                                     if (!iCond.IsOK(ManagedAction))
-                                        return false;
+                                    {
+#if DEBUG && DEBUG_LOG
+                                        debugStr.Append(" False");
+#endif
+                                        result = false;
+                                        break;
+                                    }
+#if DEBUG && DEBUG_LOG
+                                    else debugStr.Append(" True");
+#endif
                                 }
-                                else if (!c.IsOK(ManagedAction))
-                                    return false;
+                                else
+                                {
+#if DEBUG && DEBUG_LOG
+                                    debugStr.Append(c.Tested);
+#endif
+                                    if (!c.IsOK(ManagedAction))
+                                    {
+#if DEBUG && DEBUG_LOG
+                                        debugStr.Append(" False");
+#endif
+                                        result = false;
+                                        break;
+                                    }
+#if DEBUG && DEBUG_LOG
+                                    else debugStr.Append(" True");
+#endif
 
-                            return true;
+                                }
+                            }
+
+                            if(Not)
+                                result = !result;
+
+#if DEBUG && DEBUG_LOG
+                            debugStr.Replace("%RES%", (result) ? "True " : "False");
+#endif
                         }
+#if DEBUG && DEBUG_LOG
+                        ETLogger.WriteLine(LogType.Debug, debugStr.ToString());
+#endif
+                        return result;
+                    }
                 }
 
                 return false;
@@ -155,6 +283,9 @@ namespace EntityTools.UCC.Actions
                 if (UCCTools.SpecialTimers.ContainsKey(TimerName))
                     UCCTools.SpecialTimers[TimerName] = new Pair<int, int>(Environment.TickCount, Environment.TickCount + Timeout);
                 else UCCTools.SpecialTimers.Add(TimerName, new Pair<int, int>(Environment.TickCount, Environment.TickCount + Timeout));
+#if DEBUG && DEBUG_LOG
+                debugStr.Append("False");
+#endif
             }
             return result;
         }

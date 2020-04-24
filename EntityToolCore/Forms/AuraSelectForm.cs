@@ -248,6 +248,8 @@ namespace EntityCore.Forms
             if(Auras.SelectedItem is AuraDef aura)
             {
                 Description.Text = aura.Description;
+                //webDescription.Document.OpenNew(true);
+                //webDescription.Document.Write(aura.Description);
             }
         }
 

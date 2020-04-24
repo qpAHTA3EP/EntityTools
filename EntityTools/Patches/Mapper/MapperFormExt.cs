@@ -1,5 +1,9 @@
 ﻿#define LOG
 
+#if DEVELOPER
+using MappingType = EntityTools.Enums.MappingType; 
+#endif
+
 using AStar;
 using Astral;
 using Astral.Controllers;
@@ -17,14 +21,13 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Reflection;
 using AstralMapperOriginals;
-using MappingType = EntityTools.Enums.MappingType;
-using EntityTools.Logger;
 
 namespace EntityTools.Patches.Mapper
 {
+#if DEVELOPER
     public partial class MapperFormExt : XtraForm //*/Form
     {
-        #region Reflection helpers
+    #region Reflection helpers
         /// <summary>
         /// Функтор доступа к графу 
         /// </summary>
@@ -61,19 +64,20 @@ namespace EntityTools.Patches.Mapper
         /// Функтор запускающего фоновый поток отрисовки изображения Mapper'a
         /// </summary>
         private static readonly Func<object, System.Action> MapperStopDrawing = typeof(Astral.Forms.UserControls.Mapper).GetAction("\u0003", BindingFlags.Instance | BindingFlags.Public);
-        #endregion
+    #endregion
 
         /// <summary>
         /// Кэш вершин графа путей
         /// </summary>
         private MapperGraphCache graphCache;
 
-        #region Инициализация формы
+    #region Инициализация формы
         private MapperFormExt()
         {
             InitializeComponent();
 
-            mapper = new Astral.Forms.UserControls.Mapper {
+            mapper = new Astral.Forms.UserControls.Mapper
+            {
                 Anchor = (AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right),
                 Dock = DockStyle.Fill,
                 CustomDraw = null,
@@ -123,9 +127,9 @@ namespace EntityTools.Patches.Mapper
 
             ((ISupportInitialize)bsrcAstralSettings).BeginInit();
             bsrcAstralSettings.DataSource = Astral.API.CurrentSettings;
-            menuDeleteRadius.DataBindings.Add(nameof(menuDeleteRadius.EditValue), 
-                                              bsrcAstralSettings, 
-                                              nameof(Astral.API.CurrentSettings.DeleteNodeRadius), 
+            menuDeleteRadius.DataBindings.Add(nameof(menuDeleteRadius.EditValue),
+                                              bsrcAstralSettings,
+                                              nameof(Astral.API.CurrentSettings.DeleteNodeRadius),
                                               false, DataSourceUpdateMode.OnPropertyChanged);
             ((ISupportInitialize)bsrcAstralSettings).EndInit();
             menuDeleteRadius.Edit.EditValueChanged += eventDeleteRadiusChanged;
@@ -175,7 +179,7 @@ namespace EntityTools.Patches.Mapper
             //mapper.DoubleClick += eventMapperDoubleClick;
             //mapper.CustomDraw += eventMapperDrawCache;
             //ReflectionHelper.ExecMethod(mapper, "\u0002", new object[] { }, out object res, BindingFlags.Instance | BindingFlags.NonPublic);
-            
+
             // PictureBox Astral.Forms.UserControls.Mapper.MapPicture;
             //if (ReflectionHelper.GetFieldValue(mapper, "MapPicture", out object mapPictureObj, BindingFlags.Instance | BindingFlags.NonPublic)
             //    && ReflectionHelper.SubscribeEvent(mapPictureObj, "MouseDoubleClick", this, "eventMapperDoubleClick", true))
@@ -230,9 +234,9 @@ namespace EntityTools.Patches.Mapper
                 Thread.Sleep(1000);
             }
         }
-        #endregion
+    #endregion
 
-        #region Mapping
+    #region Mapping
         /// <summary>
         /// Task, прокладывающий путь
         /// </summary>
@@ -294,7 +298,7 @@ namespace EntityTools.Patches.Mapper
             if (e.Item is BarCheckItem checkedItem
                 && checkedItem.Checked)
             {
-                if (MappingTask == null 
+                if (MappingTask == null
                     || MappingTask.IsCanceled || MappingTask.IsCompleted || MappingTask.IsFaulted)
                 {
                     MapAndRegion = EntityManager.LocalPlayer.MapAndRegion;
@@ -353,7 +357,7 @@ namespace EntityTools.Patches.Mapper
 
                     if (lastNodeDetail == null || lastNodeDetail.Distance > EntityTools.PluginSettings.Mapper.WaypointDistance)
                     {
-                        switch(MappingType)
+                        switch (MappingType)
                         {
                             case MappingType.Bidirectional:
                                 if (LinearPath)
@@ -397,14 +401,14 @@ namespace EntityTools.Patches.Mapper
                 AddNavigationNodeStatic.LogWatch();
 #endif
 #if LOG && DEBUG
-                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"MapperExtWithCache:: Graph Nodes: {graphCache.FullGraph.Nodes.Count}");
+                ETLogger.WriteLine(Logger.LogType.Debug, $"MapperExtWithCache:: Graph Nodes: {graphCache.FullGraph.Nodes.Count}");
 #endif
-                EntityToolsLogger.WriteLine(ex.ToString());
+                ETLogger.WriteLine(ex.ToString());
             }
         }
-        #endregion
+    #endregion
 
-        #region Mesh_Manipulation
+    #region Mesh_Manipulation
         /// <summary>
         /// Импорт узлов из Игры
         /// </summary>
@@ -412,7 +416,7 @@ namespace EntityTools.Patches.Mapper
         /// <param name="e"></param>
         private void eventImportNodesFromGame(object sender, ItemClickEventArgs e)
         {
-            if (((Graph)CoreCurrentMapMeshes)?.Nodes.Count == 0 
+            if (((Graph)CoreCurrentMapMeshes)?.Nodes.Count == 0
                 || XtraMessageBox.Show(this, "Are you sure to import game nodes ? All actual nodes must be delete !", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 eventStopMapping();
@@ -472,7 +476,7 @@ namespace EntityTools.Patches.Mapper
                 {
                     list.Clear();
                     profileMeshes = new Dictionary<string, Graph>();
-                    if(CoreAvailableMeshesFromFile != null)
+                    if (CoreAvailableMeshesFromFile != null)
                         foreach (string str in CoreAvailableMeshesFromFile(openFileDialog.FileName))
                         //foreach (string str in Astral.Quester.Core.AvailableMeshesFromFile(openFileDialog.FileName))
                         {
@@ -482,7 +486,7 @@ namespace EntityTools.Patches.Mapper
                     Class88.smethod_4(openFileDialog.FileName, list);
                     foreach (Class88.Class89 class2 in list)
                     {
-                        EntityToolsLogger.WriteLine("found : " + class2.FileName + " : " + class2.Success.ToString());
+                        ETLogger.WriteLine("found : " + class2.FileName + " : " + class2.Success.ToString());
                         if (class2.Success)
                         {
                             profileMeshes.Add(class2.FileName.Replace(".bin", ""), class2.Object as Graph);
@@ -536,7 +540,8 @@ namespace EntityTools.Patches.Mapper
         private void eventExportNodes2Mesh(object sender, ItemClickEventArgs e)
         {
             // Код перенесен из Astral'a
-            SaveFileDialog saveFileDialog = new SaveFileDialog {
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
                 InitialDirectory = Directories.ProfilesPath,
                 DefaultExt = "amp.zip",
                 Filter = "Astral mesh file (*.mesh.zip)|*.mesh.zip"
@@ -575,9 +580,9 @@ namespace EntityTools.Patches.Mapper
                 MapperStartDrawing?.Invoke(mapper);
             }
         }
-        #endregion
+    #endregion
 
-        #region CustomRegion_Manipulation
+    #region CustomRegion_Manipulation
         /// <summary>
         /// Запуск процедуры добавления прямоугольного региона
         /// </summary>
@@ -634,7 +639,7 @@ namespace EntityTools.Patches.Mapper
             CustomRegionHelper.Reset();
             toolbarCustomRegion.Visible = false;
         }
-        #endregion
+    #endregion
 
         private void eventDeleteRadiusChanged(object sender, EventArgs e)
         {
@@ -644,5 +649,6 @@ namespace EntityTools.Patches.Mapper
         {
             EntityTools.PluginSettings.Mapper.WaypointDistance = Convert.ToInt32(menuWaypointDistance.EditValue);
         }
-    }
+    } 
+#endif
 }

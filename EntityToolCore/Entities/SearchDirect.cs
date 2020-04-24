@@ -1,7 +1,6 @@
 ﻿#define PROFILING
 using Astral.Classes.ItemFilter;
 using EntityTools.Enums;
-using EntityTools.Logger;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
@@ -37,7 +36,7 @@ namespace EntityCore.Entities
             ContactMaxTime = TimeSpan.MinValue;
             stopwatch.Reset();
             cntStopwatch.Reset();
-            EntityToolsLogger.WriteLine(LogType.Debug, $"UncachedSearch::ResetWatch()");
+            ETLogger.WriteLine(LogType.Debug, $"UncachedSearch::ResetWatch()");
         }
 
         public static void LogWatch()
@@ -47,23 +46,23 @@ namespace EntityCore.Entities
                 double avrgTime = (double)stopwatch.ElapsedMilliseconds / (double)Count;
                 double avrgTicks = (double)stopwatch.ElapsedTicks / (double)Count;
                 //EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetEntities(): Count: {Count}, TotalTime: {stopwatch.Elapsed}({stopwatch.ElapsedMilliseconds.ToString("N3")} ms), MinTime: {MinTime.TotalMilliseconds.ToString("N3")} ms ({MinTime.Ticks.ToString("N0")} ticks), MaxTime: {MaxTime.TotalMilliseconds.ToString("N3")} ms ({MaxTime.Ticks.ToString("N0")} ticks) , AverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
-                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetEntities():\tCount: {Count}, TotalTime: {stopwatch.Elapsed}({stopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
-                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetEntities():\tMinTime: {MinTime.TotalMilliseconds.ToString("N3")} ms ({MinTime.Ticks.ToString("N0")} ticks)");
-                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetEntities():\tMaxTime: {MaxTime.TotalMilliseconds.ToString("N3")} ms ({MaxTime.Ticks.ToString("N0")} ticks)");
-                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetEntities():\tAverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
+                ETLogger.WriteLine(LogType.Debug, $"SearchDirect::GetEntities():\tCount: {Count}, TotalTime: {stopwatch.Elapsed}({stopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
+                ETLogger.WriteLine(LogType.Debug, $"SearchDirect::GetEntities():\tMinTime: {MinTime.TotalMilliseconds.ToString("N3")} ms ({MinTime.Ticks.ToString("N0")} ticks)");
+                ETLogger.WriteLine(LogType.Debug, $"SearchDirect::GetEntities():\tMaxTime: {MaxTime.TotalMilliseconds.ToString("N3")} ms ({MaxTime.Ticks.ToString("N0")} ticks)");
+                ETLogger.WriteLine(LogType.Debug, $"SearchDirect::GetEntities():\tAverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
             }
-            else EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetEntities(): Count: 0");
+            else ETLogger.WriteLine(LogType.Debug, $"SearchDirect::GetEntities(): Count: 0");
             if (ContactCount > 0)
             {
                 double avrgTime = (double)cntStopwatch.ElapsedMilliseconds / (double)ContactCount;
                 double avrgTicks = (double)cntStopwatch.ElapsedTicks / (double)ContactCount;
                 //EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetContactEntities(): Count: {ContactCount}, TotalTime: {cntStopwatch.Elapsed}({cntStopwatch.ElapsedMilliseconds.ToString("N3")} ms), MinTime: {ContactMinTime.TotalMilliseconds.ToString("N3")} ms ({ContactMinTime.Ticks.ToString("N0")} ticks), MaxTime: {ContactMaxTime.TotalMilliseconds.ToString("N3")} ms ({ContactMaxTime.Ticks.ToString("N0")} ticks) , AverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
-                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetContactEntities():\tCount: {ContactCount}, TotalTime: {cntStopwatch.Elapsed}({cntStopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
-                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetContactEntities():\tMinTime: {ContactMinTime.TotalMilliseconds.ToString("N3")} ms ({ContactMinTime.Ticks.ToString("N0")} ticks)");
-                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetContactEntities():\tMaxTime: {ContactMaxTime.TotalMilliseconds.ToString("N3")} ms ({ContactMaxTime.Ticks.ToString("N0")} ticks)");
-                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetContactEntities():\tAverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
+                ETLogger.WriteLine(LogType.Debug, $"SearchDirect::GetContactEntities():\tCount: {ContactCount}, TotalTime: {cntStopwatch.Elapsed}({cntStopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
+                ETLogger.WriteLine(LogType.Debug, $"SearchDirect::GetContactEntities():\tMinTime: {ContactMinTime.TotalMilliseconds.ToString("N3")} ms ({ContactMinTime.Ticks.ToString("N0")} ticks)");
+                ETLogger.WriteLine(LogType.Debug, $"SearchDirect::GetContactEntities():\tMaxTime: {ContactMaxTime.TotalMilliseconds.ToString("N3")} ms ({ContactMaxTime.Ticks.ToString("N0")} ticks)");
+                ETLogger.WriteLine(LogType.Debug, $"SearchDirect::GetContactEntities():\tAverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
             }
-            else EntityToolsLogger.WriteLine(LogType.Debug, $"SearchDirect::GetContactEntities(): Count: 0");
+            else ETLogger.WriteLine(LogType.Debug, $"SearchDirect::GetContactEntities(): Count: 0");
         }
 #endif
 

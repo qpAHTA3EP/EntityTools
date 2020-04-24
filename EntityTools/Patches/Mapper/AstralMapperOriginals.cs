@@ -16,6 +16,7 @@ using MyNW.Classes;
 
 namespace AstralMapperOriginals
 {
+#if DEVELOPER
     internal static class Class81
     {
         public static bool smethod_0(string string_0, Form form_0 = null)
@@ -176,7 +177,7 @@ namespace AstralMapperOriginals
                         foreach (Type baseType in @class.ExtraBaseTypes)
                         {
                             List<Type> typeList = Assembly.GetExecutingAssembly().GetTypes().ToList<Type>();
-                            if(GetPluginsTypes != null)
+                            if (GetPluginsTypes != null)
                                 typeList.AddRange(GetPluginsTypes.Invoke());
                             foreach (Type type in typeList)
                             {
@@ -363,5 +364,6 @@ namespace AstralMapperOriginals
 
             private Stream stream_0;
         }
-    }
+    } 
+#endif
 }

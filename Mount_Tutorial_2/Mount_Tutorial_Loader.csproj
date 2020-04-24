@@ -43,6 +43,15 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Release|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Encrypted_Release\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Astral_patched">
       <HintPath>..\References\x64\Astral_patched.exe</HintPath>
@@ -70,7 +79,9 @@
     <Compile Include="Helpers\FileStreamHelper.cs" />
     <Compile Include="Actions\HorseEquipTutorialAction.cs" />
     <Compile Include="IEntityToolsCore.cs" />
+    <Compile Include="IMessage.cs" />
     <Compile Include="IQuesterActionEngine.cs" />
+    <Compile Include="IQuesterActionRequest.cs" />
     <Compile Include="MainPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>

@@ -1,6 +1,6 @@
 ﻿using Astral.Quester.Classes;
 using EntityCore.Extensions;
-using EntityTools.Logger;
+using EntityTools;
 using EntityTools.Quester.Conditions;
 using MyNW.Classes;
 using MyNW.Internals;
@@ -42,7 +42,7 @@ namespace EntityCore.Quester.Conditions
 
             getCustomRegions = internal_GetCustomRegion_Initializer;
 
-            EntityToolsLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized");
+            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

@@ -89,6 +89,7 @@ namespace EntityTools.Core
             this.btnOpenLog = new System.Windows.Forms.Button();
             this.dlgSaveFile = new System.Windows.Forms.SaveFileDialog();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.btnCheckCore = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
             this.tbclMain.SuspendLayout();
             this.tabUtilities.SuspendLayout();
@@ -113,12 +114,12 @@ namespace EntityTools.Core
             // 
             // btnUccEditor
             // 
-            this.btnUccEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.btnUccEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.btnUccEditor.Enabled = false;
             this.btnUccEditor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUccEditor.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnUccEditor.Location = new System.Drawing.Point(9, 247);
+            this.btnUccEditor.Location = new System.Drawing.Point(9, 201);
             this.btnUccEditor.Name = "btnUccEditor";
             this.btnUccEditor.Size = new System.Drawing.Size(287, 40);
             this.btnUccEditor.TabIndex = 0;
@@ -146,6 +147,7 @@ namespace EntityTools.Core
             // 
             this.tabUtilities.Controls.Add(this.cbEnchantHelperActivator);
             this.tabUtilities.Controls.Add(this.btnTest);
+            this.tabUtilities.Controls.Add(this.btnCheckCore);
             this.tabUtilities.Controls.Add(this.btnUiViewer);
             this.tabUtilities.Controls.Add(this.btnAuraViewer);
             this.tabUtilities.Controls.Add(this.btnEntities);
@@ -170,23 +172,24 @@ namespace EntityTools.Core
             // 
             // btnTest
             // 
-            this.btnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnTest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnTest.Location = new System.Drawing.Point(301, 264);
+            this.btnTest.Location = new System.Drawing.Point(301, 218);
             this.btnTest.Name = "btnTest";
             this.btnTest.Size = new System.Drawing.Size(54, 23);
             this.btnTest.TabIndex = 2;
             this.btnTest.Text = "Test";
             this.btnTest.UseVisualStyleBackColor = true;
+            this.btnTest.Visible = false;
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
             // btnUiViewer
             // 
-            this.btnUiViewer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.btnUiViewer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.btnUiViewer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUiViewer.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnUiViewer.Location = new System.Drawing.Point(9, 339);
+            this.btnUiViewer.Location = new System.Drawing.Point(9, 293);
             this.btnUiViewer.Name = "btnUiViewer";
             this.btnUiViewer.Size = new System.Drawing.Size(346, 40);
             this.btnUiViewer.TabIndex = 0;
@@ -196,11 +199,10 @@ namespace EntityTools.Core
             // 
             // btnAuraViewer
             // 
-            this.btnAuraViewer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAuraViewer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnAuraViewer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAuraViewer.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnAuraViewer.Location = new System.Drawing.Point(185, 293);
+            this.btnAuraViewer.Location = new System.Drawing.Point(185, 247);
             this.btnAuraViewer.Name = "btnAuraViewer";
             this.btnAuraViewer.Size = new System.Drawing.Size(170, 40);
             this.btnAuraViewer.TabIndex = 0;
@@ -210,11 +212,10 @@ namespace EntityTools.Core
             // 
             // btnEntities
             // 
-            this.btnEntities.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnEntities.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnEntities.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnEntities.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnEntities.Location = new System.Drawing.Point(9, 293);
+            this.btnEntities.Location = new System.Drawing.Point(9, 247);
             this.btnEntities.Name = "btnEntities";
             this.btnEntities.Size = new System.Drawing.Size(170, 40);
             this.btnEntities.TabIndex = 0;
@@ -814,7 +815,6 @@ namespace EntityTools.Core
             this.ckbExtendedActionDebugInfo.TabIndex = 6;
             this.ckbExtendedActionDebugInfo.Text = "Enable the Extended debug info for the Quester-actions";
             this.ckbExtendedActionDebugInfo.UseVisualStyleBackColor = true;
-            this.ckbExtendedActionDebugInfo.CheckedChanged += new System.EventHandler(this.ckbEnableLogger_CheckedChanged);
             // 
             // btnOpenLog
             // 
@@ -835,6 +835,20 @@ namespace EntityTools.Core
             this.dlgSaveFile.CheckPathExists = false;
             this.dlgSaveFile.Filter = "XML|*.xml";
             this.dlgSaveFile.ValidateNames = false;
+            // 
+            // btnCheckCore
+            // 
+            this.btnCheckCore.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCheckCore.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCheckCore.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnCheckCore.Location = new System.Drawing.Point(9, 339);
+            this.btnCheckCore.Name = "btnCheckCore";
+            this.btnCheckCore.Size = new System.Drawing.Size(346, 40);
+            this.btnCheckCore.TabIndex = 0;
+            this.btnCheckCore.Text = "Check EntityTools";
+            this.btnCheckCore.UseVisualStyleBackColor = true;
+            this.btnCheckCore.Click += new System.EventHandler(this.btnCheckCore_Click);
             // 
             // EntityToolsMainPanel
             // 
@@ -934,5 +948,6 @@ namespace EntityTools.Core
         private System.Windows.Forms.Label lblLocalCacheTime;
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.CheckBox ckbExtendedActionDebugInfo;
+        private System.Windows.Forms.Button btnCheckCore;
     }
 }

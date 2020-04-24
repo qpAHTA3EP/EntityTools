@@ -1,5 +1,4 @@
 ﻿using Astral.Classes;
-using EntityTools.Logger;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
@@ -43,7 +42,7 @@ namespace EntityTools.Services
                 tokenSource = new CancellationTokenSource();
                 task = Task.Factory.StartNew(() => Run(tokenSource.Token), tokenSource.Token);
                 Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"EnchantHelper: Start new background Task");
-                EntityToolsLogger.WriteLine(LogType.Debug, $"EnchantHelper: Start new background Task");
+                ETLogger.WriteLine(LogType.Debug, $"EnchantHelper: Start new background Task");
             }
         }
         public static void Stop()
@@ -97,7 +96,7 @@ namespace EntityTools.Services
                     if (Enchantitem_Unslotdialog_Resources != null && Enchantitem_Unslotdialog_Resources.IsValid && Enchantitem_Unslotdialog_Resources.IsVisible)
                     {
                         GameCommands.Execute("GenButtonClick Enchantitem_Unslotdialog_Resources");
-                        EntityToolsLogger.WriteLine(LogType.Debug, $"EnchantHelper: Enchant unsloted");
+                        ETLogger.WriteLine(LogType.Debug, $"EnchantHelper: Enchant unsloted");
                     }
                 }
 
@@ -116,7 +115,7 @@ namespace EntityTools.Services
                     if (Modaldialog_Ok != null && Modaldialog_Ok.IsValid && Modaldialog_Ok.IsVisible)
                     {
                         GameCommands.Execute("GenButtonClick Modaldialog_Ok");
-                        EntityToolsLogger.WriteLine(LogType.Debug, $"EnchantHelper: Enchant sloted");
+                        ETLogger.WriteLine(LogType.Debug, $"EnchantHelper: Enchant sloted");
                     }
 
                 }
@@ -125,7 +124,7 @@ namespace EntityTools.Services
             }
 
             Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"EnchantHelper: Background Task stoped");
-            EntityToolsLogger.WriteLine(LogType.Debug, $"EnchantHelper: Background Task stoped");
+            ETLogger.WriteLine(LogType.Debug, $"EnchantHelper: Background Task stoped");
 
             Equippeditemmenu_Enchant = null;
             Enchantmenu_Itemremoveintact = null;

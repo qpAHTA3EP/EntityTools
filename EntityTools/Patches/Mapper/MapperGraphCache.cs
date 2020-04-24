@@ -2,7 +2,6 @@
 using Astral;
 using Astral.Classes;
 using Astral.Logic.Classes.Map;
-using EntityTools.Logger;
 using EntityTools.Reflection;
 using MyNW.Classes;
 using MyNW.Internals;
@@ -14,6 +13,7 @@ using System.Reflection;
 
 namespace EntityTools.Patches.Mapper
 {
+#if DEVELOPER
     public class MapperGraphCache
     {
         public MapperGraphCache() { }
@@ -23,7 +23,7 @@ namespace EntityTools.Patches.Mapper
             RegenCache();
         }
 
-        #region Дублирование интерфейса AStar.Graph
+    #region Дублирование интерфейса AStar.Graph
         /// <summary>
         /// Список кэшированных узлов
         /// </summary>
@@ -358,7 +358,7 @@ namespace EntityTools.Patches.Mapper
         /// Кэшированные ребра
         /// </summary>
         private List<Arc> LA = new List<Arc>();
-        #endregion
+    #endregion
 
         /// <summary>
         /// Последняя добавленный узел
@@ -403,7 +403,7 @@ namespace EntityTools.Patches.Mapper
             get
             {
                 double z;
-                return EntityManager.LocalPlayer.IsValid 
+                return EntityManager.LocalPlayer.IsValid
                         && (cacheTimeout.IsTimedOut
                             || EntityManager.LocalPlayer.MapAndRegion != cachedMapAndRegion
                             || (EntityManager.LocalPlayer.Location.Distance2D(cacheInitialPos) > cacheXY * 0.75d
@@ -489,7 +489,7 @@ namespace EntityTools.Patches.Mapper
                 mapper.CustomDraw += eventMapperDrawCache;
                 object mapPictureObj = null;
                 if (ReflectionHelper.GetFieldValue(mapper, "\u000E", out mapPictureObj, BindingFlags.Instance | BindingFlags.NonPublic)
-                    && ReflectionHelper.SubscribeEvent(mapPictureObj, "MouseDoubleClick", this, "eventMapperDoubleClick", true, BindingFlags.Instance| BindingFlags.Public, BindingFlags.Instance | BindingFlags.NonPublic))
+                    && ReflectionHelper.SubscribeEvent(mapPictureObj, "MouseDoubleClick", this, "eventMapperDoubleClick", true, BindingFlags.Instance | BindingFlags.Public, BindingFlags.Instance | BindingFlags.NonPublic))
                     SubscribedMapperMouseDoubleClick = true;
 
                 if (mapPictureObj != null
@@ -529,7 +529,7 @@ namespace EntityTools.Patches.Mapper
         }
         private static readonly StaticPropertyAccessor<AStar.Graph> coreGraph = typeof(Astral.Quester.Core).GetStaticProperty<AStar.Graph>("Meshes");
 
-        #region Mapper
+    #region Mapper
         private Astral.Forms.UserControls.Mapper mapper = null;
 
         /// <summary>
@@ -544,7 +544,7 @@ namespace EntityTools.Patches.Mapper
             RegenCache();
 
 #if DEBUG
-            EntityToolsLogger.WriteLine(Logger.LogType.Debug, "MapperFormExt::eventMapperDoubleClick");
+            ETLogger.WriteLine(Logger.LogType.Debug, "MapperFormExt::eventMapperDoubleClick");
 #endif
         }
 
@@ -556,7 +556,7 @@ namespace EntityTools.Patches.Mapper
         {
             if (LN != null)
             {
-                lock(LN)
+                lock (LN)
                 {
                     for (int i = 0; i < LN.Count; i++)
                     {
@@ -573,13 +573,14 @@ namespace EntityTools.Patches.Mapper
         }
         private bool SubscribedMapperMouseDoubleClick = false;
         private bool SubscribedMapperDoubleClick = false;
-        #endregion
+    #endregion
 
         /// <summary>
         /// Центр кэшируемой области
         /// </summary>
-        private Vector3 cacheInitialPos = new Vector3(0,0,0);
+        private Vector3 cacheInitialPos = new Vector3(0, 0, 0);
 
         private Timeout cacheTimeout = new Timeout(0);
-    }
+    } 
+#endif
 }

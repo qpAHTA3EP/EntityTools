@@ -12,14 +12,14 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.0413.1032</AssemblyVersion>
+    <AssemblyVersion>0.20.0424.0832</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;ENTITYTOOLS, DEVELOPER, CORE_INTERFACES</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
@@ -30,7 +30,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>TRACE;ENTITYTOOLS</DefineConstants>
+    <DefineConstants>TRACE;NOT_DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
@@ -39,7 +39,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;ENTITYTOOLS, ENCRYPTED_CORE, DEVELOPER, CORE_INTERFACES</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -52,8 +52,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE;CORE_INTERFACES</DefineConstants>
+    <OutputPath>..\References\x64\</OutputPath>
+    <DefineConstants>TRACE;NOT_DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
@@ -71,11 +71,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Encrypted_Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;ENTITYTOOLS, DEVELOPER, CORE_INTERFACES</DefineConstants>
+    <OutputPath>..\References\Encrypted\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;DEVELOPER, ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>7.1</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -83,7 +83,30 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\References\Encrypted\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;ENTITYTOOLS, ENCRYPTED_CORE, DEVELOPER, CORE_INTERFACES</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEVELOPER, ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Release|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\References\Encrypted\</OutputPath>
+    <DefineConstants>NOT_DEVELOPER, ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>7.1</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Release|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\References\Encrypted\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NOT_DEVELOPER, ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
@@ -158,6 +181,7 @@
     <Compile Include="Core\Proxies\QuesterConditionProxy.cs" />
     <Compile Include="Core\Proxies\UCCActionProxy.cs" />
     <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
+    <Compile Include="Patches\XmlSerializer\AstralXmlSerializerPatch.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -199,16 +223,12 @@
     <Compile Include="Patches\Mapper\AstralMapperOriginals.cs" />
     <Compile Include="Patches\Mapper\CustomRegionHelper.cs" />
     <Compile Include="Patches\Mapper\Enums.cs" />
-    <Compile Include="Patches\Mapper\MapperFormExt.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Patches\Mapper\MapperFormExt.cs" />
     <Compile Include="Patches\Mapper\MapperFormExt.Designer.cs">
       <DependentUpon>MapperFormExt.cs</DependentUpon>
     </Compile>
     <Compile Include="Patches\Mapper\MapperGraphCache.cs" />
-    <Compile Include="Patches\Mapper\NewDrawings.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Patches\Mapper\NewDrawings.cs" />
     <Compile Include="Patches\Mapper\NewDrawings.Designer.cs">
       <DependentUpon>NewDrawings.cs</DependentUpon>
     </Compile>
@@ -371,5 +391,6 @@
   <ItemGroup>
     <None Include="Resources\Entity_7_40х48.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

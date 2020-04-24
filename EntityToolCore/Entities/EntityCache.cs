@@ -4,7 +4,6 @@ using Astral;
 using Astral.Classes;
 using Astral.Classes.ItemFilter;
 using EntityTools.Enums;
-using EntityTools.Logger;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
@@ -72,12 +71,12 @@ namespace EntityCore.Entities
         {
             RegenCount = 0;
             EntitiesCount = 0;
-            EntityToolsLogger.WriteLine(LogType.Debug, $"EntityCacheRecord::ResetWatch()");
+            ETLogger.WriteLine(LogType.Debug, $"EntityCacheRecord::ResetWatch()");
         }
 
         public static void LogWatch()
         {
-            EntityToolsLogger.WriteLine(LogType.Debug, $"EntityCacheRecord: RegenCount: {RegenCount}");
+            ETLogger.WriteLine(LogType.Debug, $"EntityCacheRecord: RegenCount: {RegenCount}");
         }
 #endif
         public EntityCacheRecord() { }
@@ -198,12 +197,12 @@ namespace EntityCore.Entities
         {
             MatchCount = 0;
             MismatchCount = 0;
-            EntityToolsLogger.WriteLine(LogType.Debug, $"EntityCache::ResetWatch()");
+            ETLogger.WriteLine(LogType.Debug, $"EntityCache::ResetWatch()");
         }
 
         public static void LogWatch()
         {
-            EntityToolsLogger.WriteLine(LogType.Debug, $"EntityCache: MatchCount: {MatchCount}, MismatchCount: {MismatchCount}");
+            ETLogger.WriteLine(LogType.Debug, $"EntityCache: MatchCount: {MatchCount}, MismatchCount: {MismatchCount}");
         }
 #endif
         /// <summary>

@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using EntityTools.Logger;
 using System.Reflection;
 using System.IO;
 using System.Xml;
@@ -19,15 +18,17 @@ namespace EntityTools
         /// </summary>
         public UnstuckSpellsSettings UnstuckSpells { get; set; } = new UnstuckSpellsSettings();
 
+#if DEVELOPER
         /// <summary>
         /// Настройки Mapper'a
         /// </summary>
         public MapperSettings Mapper { get; set; } = new MapperSettings();
 
+#endif
         /// <summary>
         /// Настройки EntityToolsLogger
         /// </summary>
-        public EntityToolLoggerSettings Logger { get; set; } = new EntityToolLoggerSettings();
+        public ETLoggerSettings Logger { get; set; } = new ETLoggerSettings();
 
         /// <summary>
         /// Настройки EntityCache

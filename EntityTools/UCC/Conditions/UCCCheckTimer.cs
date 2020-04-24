@@ -20,17 +20,21 @@ namespace EntityTools.UCC.Conditions
         public string TimerName { get; set; } = string.Empty;
 
         [Category("Timer")]
-        [Description("Time (ms) compared to Timer starts time\n" +
-            "Left: Check the amount of time remaining before the timer expiration\n" +
-            "Passed: Check the time passed from the timer starts")]
+        [Description("Переключатель периода времени, сопоставляемого с параметром 'Time'\r\n" +
+            "Switch for the time period compared to the 'Time'\n\r" +
+            "Left:\tПарамет Time сравнивается со временем, сотавшимся до окончания таймера\n\r" +
+            "\t\tCheck the amount of time remaining before the timer expiration\n" +
+            "Passed:\tПарамет Time сравнивается со временем, прошедшим с момента старта таймера\n\r" +
+            "\t\tCheck the time passed from the timer starts")]
         public TestTimer TestTimer { get; set; } = TestTimer.Left;
 
         [Category("Timer")]
-        [Description("Time (ms) compared to Timer starts time")]
+        [Description("Значение (мс), сопоставляемое с периодом времени, заданным 'TestTimer'\n\r" +
+            "The value (ms) compared to the period of time setted with 'TestTimer'")]
         public uint Time { get; set; } = 0;
 
         [Category("Timer")]
-        [Description("Comparison type for Time")]
+        [Description("Тип сопоставления 'Time' со периодом времени, заданным 'TestTimer'\n\rComparison type for Time")]
         public new Sign Sign { get; set; }
         #endregion
 
@@ -58,7 +62,7 @@ namespace EntityTools.UCC.Conditions
                         }
                         break;
                     case TestTimer.Passed:
-                        int passed = UCCTools.SpecialTimers[TimerName].First - Environment.TickCount;
+                        int passed = Environment.TickCount - UCCTools.SpecialTimers[TimerName].First;
 
                         switch (Sign)
                         {
@@ -77,7 +81,7 @@ namespace EntityTools.UCC.Conditions
             else
             {
                 // Поскольку таймер на задан, принимаем, что таймаут истек (до окончания 0 мс), а
-                // время с момента старта таймера 0 мс
+                // время с момента старта таймера также 0 мс
                 switch (Sign)
                 {
                     case Sign.Equal:
@@ -87,9 +91,9 @@ namespace EntityTools.UCC.Conditions
                     case Sign.Inferior:
                         return false;
                     case Sign.Superior:
-                        return true;
+                        return false;
                 }
-            }
+            } 
             return false;
         }
 
@@ -101,7 +105,7 @@ namespace EntityTools.UCC.Conditions
             {
                 Pair<int, int> p = UCCTools.SpecialTimers[TimerName];
                 int left = (p.Second > Environment.TickCount) ? p.Second - Environment.TickCount : 0;
-                int passed = p.First - Environment.TickCount;
+                int passed = Environment.TickCount - p.First;
 
                 return $"Timer '{TimerName}' started at {DateTime.Now.Subtract(new TimeSpan(left)).ToLongTimeString()}\n" +
                     $"\tLeft: {left} ms\n" +

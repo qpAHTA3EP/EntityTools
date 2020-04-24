@@ -27,7 +27,7 @@ using EntityCore.UCC.Conditions;
 using UCCConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
-using EntityTools.Logger;
+using EntityTools;
 
 namespace EntityCore
 {
@@ -38,7 +38,12 @@ namespace EntityCore
 
         public Engine()
         {
-            EntityToolsLogger.WriteLine("EntityToolsCore loaded");
+            ETLogger.WriteLine("EntityToolsCore loaded");
+        }
+
+        public bool CheckCore()
+        {
+            return true;
         }
 
         #region Инициализация элементов
@@ -332,6 +337,11 @@ namespace EntityCore
             }
 
             return string.Empty;
+        }
+
+        public bool CheckCore()
+        {
+            return true;
         }
 #endif
 #if DEBUG

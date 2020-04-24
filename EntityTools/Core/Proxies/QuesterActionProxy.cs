@@ -28,7 +28,13 @@ namespace EntityTools.Core.Proxies
             {
                 if (EntityTools.Core.Initialize(action))
                     return action.NeedToRun;
-                else return false;
+
+                EntityTools.StopBot();
+
+                Astral.Logger.WriteLine($"EntityToolsCore is invalid. Stop bot");
+                ETLogger.WriteLine($"EntityToolsCore is invalid. Stop bot");
+
+                return false;
             }
         }
 
@@ -50,6 +56,12 @@ namespace EntityTools.Core.Proxies
                     if (ReflectionHelper.GetPropertyValue(action, "InternalConditions", out object result, BindingFlags.Instance | BindingFlags.NonPublic)
                         && result != null)
                         return result.Equals(true);
+
+                EntityTools.StopBot();
+
+                Astral.Logger.WriteLine($"EntityToolsCore is invalid. Stop bot");
+                ETLogger.WriteLine($"EntityToolsCore is invalid. Stop bot");
+
                 return false;
             }
         }
@@ -74,6 +86,12 @@ namespace EntityTools.Core.Proxies
                     if (ReflectionHelper.GetPropertyValue(action, "InternalDestination", out object result, BindingFlags.Instance | BindingFlags.NonPublic)
                         && result != null)
                         return result as Vector3;
+
+                EntityTools.StopBot();
+
+                Astral.Logger.WriteLine($"EntityToolsCore is invalid. Stop bot");
+                ETLogger.WriteLine($"EntityToolsCore is invalid. Stop bot");
+
                 return new Vector3();
             }
         }
@@ -109,7 +127,13 @@ namespace EntityTools.Core.Proxies
         {
             if (EntityTools.Core.Initialize(action))
                 return action.Run();
-            else return ActionResult.Fail;
+
+            EntityTools.StopBot();
+
+            Astral.Logger.WriteLine($"EntityToolsCore is invalid. Stop bot");
+            ETLogger.WriteLine($"EntityToolsCore is invalid. Stop bot");
+
+            return ActionResult.Fail;
         }
     }
 }

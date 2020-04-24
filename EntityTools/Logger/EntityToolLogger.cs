@@ -8,9 +8,9 @@ using System.Threading;
 using DevExpress.XtraBars.Alerter;
 using System.Threading.Tasks;
 
-namespace EntityTools.Logger
+namespace EntityTools
 {
-    internal class EntityToolsLogger
+    internal class ETLogger
     {
         private static StringBuilder LogCache = new StringBuilder(1024);
         internal static string LogFilePath = string.Empty;
@@ -21,7 +21,8 @@ namespace EntityTools.Logger
 
         internal static void Start()
         {
-            if(backgroundLoggerTask?.Status != TaskStatus.Running)
+            if (backgroundLoggerTask?.Status != TaskStatus.Running
+                && EntityTools.PluginSettings.Logger.Active)
             {
                 LogFilePath = string.Concat(EntityTools.PluginSettings.Logger.LogsPath, DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"),
                                             //DateTime.Now.Year.ToString("00"), "-", DateTime.Now.Month.ToString("00"), "-", DateTime.Now.Day.ToString("00"), "_", 
@@ -41,13 +42,13 @@ namespace EntityTools.Logger
             cancellationTokenSource.Cancel();
         }
 
-        public static void WriteLine(string Text)
+        public static void WriteLine(string Text, bool toAstral = false)
         {
             if(EntityTools.PluginSettings.Logger.Active)
-                WriteLine(LogType.Log, Text);
+                WriteLine(LogType.Log, Text, toAstral);
         }
 
-        public static void WriteLine(LogType logType, string Text)
+        public static void WriteLine(LogType logType, string Text, bool toAstral = false)
         {
             if (EntityTools.PluginSettings.Logger.Active)
             {
@@ -60,15 +61,22 @@ namespace EntityTools.Logger
                     {
                         case LogType.Log:
                             LogCache.Append(" LOG] ");
+                            if (toAstral)
+                                Logger.WriteLine(Logger.LogType.Log, Text);
                             break;
                         case LogType.Debug:
                             LogCache.Append(" DBG] ");
+                            if (toAstral)
+                                Logger.WriteLine(Logger.LogType.Debug, Text);
                             break;
                         case LogType.Error:
                             LogCache.Append(" ERR] ");
+                            if (toAstral)
+                                Logger.WriteLine(Logger.LogType.Debug, Text);
                             break;
                     }
                     LogCache.AppendLine(Text);
+
                 }
                 catch { }
             }

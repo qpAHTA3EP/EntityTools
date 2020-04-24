@@ -1,7 +1,6 @@
 ﻿using AStar;
 using Astral;
 using Astral.Logic.Classes.Map;
-using EntityTools.Logger;
 using EntityTools.Reflection;
 using MyNW.Classes;
 using MyNW.Internals;
@@ -11,6 +10,7 @@ using System.Windows.Forms;
 
 namespace EntityTools.Patches.Mapper
 {
+#if DEVELOPER
     public partial class NewDrawings : Form
     {
         /// <summary>
@@ -30,7 +30,7 @@ namespace EntityTools.Patches.Mapper
             drawMap();
         }
 
-        #region Drawings
+    #region Drawings
         private GraphicsNW graphicsNW = null;
 
         public double Zoom
@@ -200,7 +200,7 @@ namespace EntityTools.Patches.Mapper
                     //this.graphicsNW.drawEllipse(Navigator.GetDestination, new Size(10, 10), Pens.Red);
                 }
                 mapBox.BackgroundImage = graphicsNW.getImage();
-                
+
             }
             /*catch (ObjectDisposedException)
             {
@@ -212,7 +212,7 @@ namespace EntityTools.Patches.Mapper
             }*/
             catch (Exception ex)
             {
-                EntityToolsLogger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex.ToString());
+                ETLogger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex.ToString());
             }
             /*finally
             {
@@ -337,6 +337,7 @@ namespace EntityTools.Patches.Mapper
             }
             return bitmap;
         }
-        #endregion
-    }
+    #endregion
+    } 
+#endif
 }

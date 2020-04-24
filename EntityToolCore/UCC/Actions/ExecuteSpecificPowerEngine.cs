@@ -10,7 +10,6 @@ using EntityCore.Entities;
 using EntityTools;
 using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
-using EntityTools.Logger;
 using EntityTools.Reflection;
 using EntityTools.UCC.Actions;
 using MyNW.Classes;
@@ -19,7 +18,6 @@ using MyNW.Patchables.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Xml.Serialization;
@@ -45,9 +43,9 @@ namespace EntityCore.UCC.Actions
 #if REFLECTION_ACCESS
         private static Type movementsType = null;
 #elif SMART_REFLECTION_ACCESS
-        private static StaticPropertyAccessor<Entity> movementSpecificTarget = typeof(Astral.Logic.UCC.Controllers.Movements).GetStaticProperty<Entity>("SpecificTarget");
-        private static StaticPropertyAccessor<int> movementRequireRange = typeof(Astral.Logic.UCC.Controllers.Movements).GetStaticProperty<int>("RequireRange");
-        private static StaticPropertyAccessor<bool> movementRangeIsOk = typeof(Astral.Logic.UCC.Controllers.Movements).GetStaticProperty<bool>("RangeIsOk");
+        private static readonly StaticPropertyAccessor<Entity> movementSpecificTarget = typeof(Astral.Logic.UCC.Controllers.Movements).GetStaticProperty<Entity>("SpecificTarget");
+        private static readonly StaticPropertyAccessor<int> movementRequireRange = typeof(Astral.Logic.UCC.Controllers.Movements).GetStaticProperty<int>("RequireRange");
+        private static readonly StaticPropertyAccessor<bool> movementRangeIsOk = typeof(Astral.Logic.UCC.Controllers.Movements).GetStaticProperty<bool>("RangeIsOk");
         #endif
 
         #endregion
@@ -60,7 +58,7 @@ namespace EntityCore.UCC.Actions
 #endif
             @this.PropertyChanged += PropertyChanged;
 
-            EntityToolsLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized");
+            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -111,7 +109,7 @@ namespace EntityCore.UCC.Actions
         public bool Run()
         {
 #if DEBUG_ExecuteSpecificPower
-            EntityToolsLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower::Run() starts");
+            ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower::Run() starts");
 #endif
 #if REFLECTION_ACCESS
             if (movementsType == null)
@@ -123,7 +121,7 @@ namespace EntityCore.UCC.Actions
             if (!ValidatePower(currentPower))
             {
 #if DEBUG_ExecuteSpecificPower
-                EntityToolsLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Fail to get Power '{@this._powerId}' by 'PowerId'");
+                ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Fail to get Power '{@this._powerId}' by 'PowerId'");
 #endif
                 return false;
             }
@@ -268,7 +266,7 @@ namespace EntityCore.UCC.Actions
                 {
                     target.Location.Face();
 #if DEBUG_ExecuteSpecificPower
-                    EntityToolsLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Activate ExecPower '{currentPower.PowerDef.InternalName}' on target {target.Name}[{target.InternalName}]");
+                    ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Activate ExecPower '{currentPower.PowerDef.InternalName}' on target {target.Name}[{target.InternalName}]");
 #endif
                     Powers.ExecPower(currentPower, target, true);
                 }
@@ -278,12 +276,12 @@ namespace EntityCore.UCC.Actions
                     location.Z += 3f;
                     location.Face();
 #if DEBUG_ExecuteSpecificPower
-                    EntityToolsLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Activate ExecPower '{currentPower.PowerDef.InternalName}' on location <{location.X.ToString("0,4:N2")}, {location.Y.ToString("0,4:N2")}, {location.Z.ToString("0,4:N2")}>");
+                    ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Activate ExecPower '{currentPower.PowerDef.InternalName}' on location <{location.X.ToString("0,4:N2")}, {location.Y.ToString("0,4:N2")}, {location.Z.ToString("0,4:N2")}>");
 #endif
                     Powers.ExecPower(currentPower, location, true);
                 }
 #if DEBUG_ExecuteSpecificPower
-                EntityToolsLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Wait casting time ({castingTime} ms)");
+                ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Wait casting time ({castingTime} ms)");
 #endif
                 while (!castingTimeout.IsTimedOut && !Astral.Controllers.AOECheck.PlayerIsInAOE)
                 {
@@ -302,7 +300,7 @@ namespace EntityCore.UCC.Actions
             finally
             {
 #if DEBUG_ExecuteSpecificPower
-                EntityToolsLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Deactivate ExecPower '{currentPower.PowerDef.InternalName}' on target {target.Name}[{target.InternalName}]");
+                ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Deactivate ExecPower '{currentPower.PowerDef.InternalName}' on target {target.Name}[{target.InternalName}]");
 #endif
                 Powers.ExecPower(currentPower, target, false);
             }

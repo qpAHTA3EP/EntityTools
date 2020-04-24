@@ -4,6 +4,7 @@ using Astral.Logic.UCC.Classes;
 using Astral.Professions.Classes;
 using EntityTools.Core.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -21,34 +22,14 @@ namespace Mount_Tutorial
     public class MountTutorialLoaderPlugin : Astral.Addons.Plugin
     {
         internal static IEntityToolsCore Core { get; private set; }  = new CoreProxy();
-        /*{
-            get
-            {
-                if(_core == null)
-                {
-                    using (FileStream file = FileStreamHelper.OpenWithStream(Assembly.GetExecutingAssembly().Location, "Core", System.IO.FileMode.Open, System.IO.FileAccess.Read))
-                    {
-                        byte[] buffer = new byte[file.Length];
-                        if (file.Read(buffer, 0, (int)file.Length) > 0)
-                        {
-                            Assembly assembly = Assembly.Load(buffer);
+        internal static ConcurrentBag<IQuesterActionRequest> Requests_QuesterActions { get; } = new ConcurrentBag<IQuesterActionRequest>();
 
-                            _core = assembly.CreateInstance("Mount_Tutorial_Core.Engine") as IEntityToolsCore;
-                        }
-                    }
-                    //Assembly assembly = Assembly.Load(Properties.Resources.Mount_Tutorial_Core);
-                    //foreach(Type type in assembly.GetTypes())
-                    //{
-                    //    if(type.GetInterfaces().Contains(typeof(IEntityToolsCore)))
-                    //    {
-                    //        _core = Activator.CreateInstance(type) as IEntityToolsCore;
-                    //    }
-                    //}
-                }
-                return _core;
-            }
+        async static internal TResult RequestCore<TResult>(IQuesterActionRequest request)
+        {
+            Requests_QuesterActions.Add(request);
+
+            while(request.Ready != )
         }
-        internal static IEntityToolsCore _core = null;*/
 
         public override string Name => GetType().Name;
         public override string Author => "MichaelProg";

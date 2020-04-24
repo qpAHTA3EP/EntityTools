@@ -17,14 +17,11 @@ namespace EntityTools.Core
     {
         internal static Return Initialize<Return>(ref Func<Return> method)
         {
-            if (EntityTools.Core.Initialize(method.Target))
-                return method();
-            else return default(Return);
+            throw new NotImplementedException();
         }
         internal static void Initialize(ref System.Action method)
         {
-            if (EntityTools.Core.Initialize(method.Target))
-                    method();
+            throw new NotImplementedException(); 
         }
 
         public bool Initialize(object obj)
@@ -95,5 +92,9 @@ namespace EntityTools.Core
             throw new NotImplementedException();
         } 
 #endif
+        public bool CheckCore()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

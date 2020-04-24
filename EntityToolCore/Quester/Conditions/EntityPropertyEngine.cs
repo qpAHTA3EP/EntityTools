@@ -9,7 +9,7 @@ using EntityCore.Extensions;
 using EntityTools.Quester.Conditions;
 using MyNW.Classes;
 using static Astral.Quester.Classes.Condition;
-using EntityTools.Logger;
+using EntityTools;
 
 namespace EntityCore.Quester.Conditions
 {
@@ -50,7 +50,7 @@ namespace EntityCore.Quester.Conditions
             checkEntity = internal_CheckEntity_Initializer;
             getCustomRegions = internal_GetCustomRegion_Initializer;
 
-            EntityToolsLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized");
+            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -374,13 +374,13 @@ namespace EntityCore.Quester.Conditions
             if (predicate != null)
             {
 #if DEBUG
-                EntityToolsLogger.WriteLine(LogType.Debug, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Comparer does not defined. Initialize.");
+                ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Comparer does not defined. Initialize.");
 #endif
                 checkEntity = predicate;
                 return checkEntity(e);
             }
 #if DEBUG
-            else EntityToolsLogger.WriteLine(LogType.Error, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Fail to initialize the Comparer.");
+            else ETLogger.WriteLine(LogType.Error, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Fail to initialize the Comparer.");
 #endif
             return false;
         }

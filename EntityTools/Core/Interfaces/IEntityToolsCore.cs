@@ -32,5 +32,7 @@ namespace EntityTools.Core.Interfaces
                                          bool healthCheck = false, float range = 0, float zRange = 0, bool regionCheck = false, List<CustomRegion> customRegions = null,
                                          Predicate<Entity> specialCheck = null);
 #endif
+
+        bool CheckCore();
     }
 }

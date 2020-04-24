@@ -7,6 +7,7 @@ using System.Text;
 
 namespace EntityTools.Patches.Mapper
 {
+#if DEVELOPER
     internal class NodeDetail
     {
         public NodeDetail()
@@ -49,4 +50,5 @@ namespace EntityTools.Patches.Mapper
         public Point3D Vector { get; private set; }
         public double Distance { get; private set; }
     }
+#endif
 }

@@ -1,5 +1,6 @@
 ﻿namespace EntityTools.Patches.Mapper
 {
+#if DEVELOPER
     partial class NewDrawings
     {
         /// <summary>
@@ -20,7 +21,7 @@
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
+    #region Windows Form Designer generated code
 
         /// <summary>
         /// Required method for Designer support - do not modify
@@ -168,7 +169,7 @@
 
         }
 
-        #endregion
+    #endregion
 
         private System.Windows.Forms.PictureBox mapBox;
         private DevExpress.XtraBars.BarManager barManager;
@@ -181,5 +182,6 @@
         private DevExpress.XtraBars.BarEditItem menuZoom;
         private DevExpress.XtraEditors.Repository.RepositoryItemZoomTrackBar itemZoom;
         private DevExpress.XtraBars.BarButtonItem menuRefresh;
-    }
+    } 
+#endif
 }

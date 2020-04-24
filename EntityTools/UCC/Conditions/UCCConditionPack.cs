@@ -94,7 +94,6 @@ namespace EntityTools.UCC.Conditions
                     // Если множетство незалоченных условий пустое, тогда условие истино
                     // Если оно НЕ пустое, тогда должно встретиться хотя бы одно истиное
                     result = lockedTrue && (Conditions.Count == lockedNum || okUnlockedNum > 0);
-                    return (Not) ? !result : result;
                 }
                 else
                 {
@@ -113,8 +112,6 @@ namespace EntityTools.UCC.Conditions
                             result = false;
                             break;
                         }
-
-                    return (Not) ? !result : result;
                 }
             return (Not) ? !result : result;
         }

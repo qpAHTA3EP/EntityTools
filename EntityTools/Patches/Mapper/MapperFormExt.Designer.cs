@@ -11,6 +11,7 @@ using System.Windows.Forms;
 
 namespace EntityTools.Patches.Mapper
 {
+#if DEVELOPER
     partial class MapperFormExt
     {
         /// <summary>
@@ -31,7 +32,7 @@ namespace EntityTools.Patches.Mapper
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
+    #region Windows Form Designer generated code
 
         /// <summary>
         /// Required method for Designer support - do not modify
@@ -649,7 +650,7 @@ namespace EntityTools.Patches.Mapper
 
         }
 
-        #endregion
+    #endregion
 
         private static MapperFormExt @this;
 
@@ -708,5 +709,6 @@ namespace EntityTools.Patches.Mapper
         private BarCheckItem statCenterPlayer;
         private BarStaticItem statCenterPlayerText;
         private PictureBox mapBox;
-    }
+    } 
+#endif
 }

@@ -1,11 +1,11 @@
 ﻿using Astral;
-using EntityTools.Logger;
 using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace EntityTools.Patches
 {
+#if DEVELOPER
     internal class Patch
     {
         private readonly MethodInfo methodToReplace;
@@ -36,14 +36,15 @@ namespace EntityTools.Patches
             else
             {
 
-                EntityToolsLogger.WriteLine("Fail to inject:");
-                if(methodToReplace == null)
-                    EntityToolsLogger.WriteLine($"MethodToReplace: NULL");
-                else EntityToolsLogger.WriteLine($"MethodToReplace: {methodToReplace.Name}");
-                if (methodToInject== null)
-                    EntityToolsLogger.WriteLine($"MethodToInject: NULL");
-                else EntityToolsLogger.WriteLine($"MethodToInject: {methodToInject.Name}");
+                ETLogger.WriteLine("Fail to inject:");
+                if (methodToReplace == null)
+                    ETLogger.WriteLine($"MethodToReplace: NULL");
+                else ETLogger.WriteLine($"MethodToReplace: {methodToReplace.Name}");
+                if (methodToInject == null)
+                    ETLogger.WriteLine($"MethodToInject: NULL");
+                else ETLogger.WriteLine($"MethodToInject: {methodToInject.Name}");
             }
         }
-    }
+    } 
+#endif
 }

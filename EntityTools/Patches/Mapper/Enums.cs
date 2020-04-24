@@ -1,5 +1,6 @@
 ﻿namespace EntityTools.Enums
 {
+#if DEVELOPER
     public enum MappingType
     {
         Bidirectional,
@@ -23,5 +24,6 @@
         DownCenter,
         DownRight,
         Disabled // перетаскивание якорей запрещено
-    }
+    } 
+#endif
 }

@@ -15,10 +15,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Runtime.CompilerServices;
-using EntityTools.Logger;
 using Astral.Quester.Classes;
 using EntityTools.Extensions;
 using EntityTools.Tools;
+using EntityTools.Reflection;
+using DevExpress.XtraEditors;
+using System.Threading.Tasks;
 
 [assembly: InternalsVisibleTo("EntityCore")]
 
@@ -26,10 +28,20 @@ namespace EntityTools
 {
     public class EntityTools : Astral.Addons.Plugin
     {
+        internal static string CoreHash;
         internal static IEntityToolsCore Core { get; private set; } = new EntityCoreProxy();
 
         private static bool assemblyResolve_Deletage_Binded = false;
         private static readonly string assemblyResolve_Name = $"^{Assembly.GetExecutingAssembly().GetName().Name},";
+
+        /// <summary>
+        /// Управление выбранной ролью (запуск/остановка)
+        /// </summary>
+        private static readonly Action<bool> ToggleRole = typeof(Astral.Controllers.Roles).GetStaticAction<bool>("ToggleRole", BindingFlags.Public);
+        public static void StopBot()
+        {
+            ToggleRole(false);
+        }
 
         public override string Name => "Entity Tools";
         public override string Author => "MichaelProg";
@@ -86,30 +98,36 @@ namespace EntityTools
                 assemblyResolve_Deletage_Binded = true;
             }
             if (PluginSettings.Logger.Active)
-                EntityToolsLogger.Start();
-            // Загрузка ядрая из ресурса
-            //Assembly.Load(Properties.Resources.EntityCore);
-            ////if (!File.Exists(@".\Logs\Assemplies.log"))
-            ////    File.Create(@".\Logs\Assemplies.log");
+                ETLogger.Start();
 
-            //using (StreamWriter file = new StreamWriter(@".\Logs\Assemblies.log", false))
-            //{
-            //    foreach(Assembly a in AppDomain.CurrentDomain.GetAssemblies())
-            //    {
-            //        file.WriteLine("=================================================================");
-            //        file.WriteLine(a.FullName);
-            //        file.WriteLine("-----------------------------------------------------------------");
-            //        foreach(Type t in a.GetTypes())
-            //        {
-            //            file.Write('\t');
-            //            file.WriteLine(t.FullName);
-            //        }
-            //    }
-            //}
+            // Загрузка ядрая из ресурса
+#if false
+            Assembly.Load(Properties.Resources.EntityCore);
+            //if (!File.Exists(@".\Logs\Assemplies.log"))
+            //    File.Create(@".\Logs\Assemplies.log");
+
+            using (StreamWriter file = new StreamWriter(@".\Logs\Assemblies.log", false))
+            {
+                foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    file.WriteLine("=================================================================");
+                    file.WriteLine(a.FullName);
+                    file.WriteLine("-----------------------------------------------------------------");
+                    foreach (Type t in a.GetTypes())
+                    {
+                        file.Write('\t');
+                        file.WriteLine(t.FullName);
+                    }
+                }
+            } 
+#endif
 
             LoadSettings();
 
+#if DEVELOPER
             Patcher.Apply();
+
+#endif
         }
 
         public override void OnUnload()
@@ -133,13 +151,13 @@ namespace EntityTools
                         {
                             PluginSettings = settings;
                             Astral.Logger.WriteLine($"{GetType().Name}: Load settings from {Path.GetFileName(FileTools.SettingsFile)}");
-                            EntityToolsLogger.WriteLine($"{GetType().Name}: Load settings from {Path.GetFileName(FileTools.SettingsFile)}");
+                            ETLogger.WriteLine($"{GetType().Name}: Load settings from {Path.GetFileName(FileTools.SettingsFile)}");
                         }
                         else
                         {
                             PluginSettings = new EntityToolsSettings();
                             Astral.Logger.WriteLine($"{GetType().Name}: Settings file not found. Use default");
-                            EntityToolsLogger.WriteLine($"{GetType().Name}: Settings file not found. Use default");
+                            ETLogger.WriteLine($"{GetType().Name}: Settings file not found. Use default");
                         }
                     }
                 }
@@ -148,7 +166,7 @@ namespace EntityTools
             {
                 PluginSettings = new EntityToolsSettings();
                 Astral.Logger.WriteLine($"{GetType().Name}: Error load settings file {Path.GetFileName(FileTools.SettingsFile)}. Use default");
-                EntityToolsLogger.WriteLine($"{GetType().Name}: Error load settings file {Path.GetFileName(FileTools.SettingsFile)}. Use default");
+                ETLogger.WriteLine($"{GetType().Name}: Error load settings file {Path.GetFileName(FileTools.SettingsFile)}. Use default");
             }
         }
 
@@ -173,8 +191,8 @@ namespace EntityTools
             catch (Exception exp)
             {
                 Astral.Logger.WriteLine($"{GetType().Name}: Error to save settings file {Path.GetFileName(FileTools.SettingsFile)}");
-                EntityToolsLogger.WriteLine($"{GetType().Name}: Error to save settings file {Path.GetFileName(FileTools.SettingsFile)}");
-                EntityToolsLogger.WriteLine(exp.ToString());
+                ETLogger.WriteLine($"{GetType().Name}: Error to save settings file {Path.GetFileName(FileTools.SettingsFile)}");
+                ETLogger.WriteLine(exp.ToString());
             }
         }
 
@@ -288,6 +306,8 @@ namespace EntityTools
         internal class EntityCoreProxy : IEntityToolsCore
         {
             static Func<bool> InternalInitialize = internal_LoadCore;
+
+
 #if DEVELOPER
             public string EntityDiagnosticInfos(object obj)
             {
@@ -335,6 +355,12 @@ namespace EntityTools
             {
                 if (InternalInitialize())
                     return Core.GUIRequest_AuraId(ref id);
+
+                XtraMessageBox.Show("EntityToolsCore is invalid!\n\rAura request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                Astral.Logger.WriteLine("EntityToolsCore is invalid! Aura request denied.");
+                ETLogger.WriteLine("EntityToolsCore is invalid! Aura request denied.");
+
                 return false;
             }
 
@@ -342,6 +368,12 @@ namespace EntityTools
             {
                 if (InternalInitialize())
                     return Core.GUIRequest_UIGenId(ref id);
+
+                XtraMessageBox.Show("EntityToolsCore is invalid!\n\rUIGen request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                Astral.Logger.WriteLine("EntityToolsCore is invalid! UIGen request denied.");
+                ETLogger.WriteLine("EntityToolsCore is invalid! UIGen request denied.");
+
                 return false;
             }
 
@@ -349,6 +381,12 @@ namespace EntityTools
             {
                 if (InternalInitialize())
                     return Core.GUIRequest_EntityId(ref entPattern, ref strMatchType, ref nameType);
+
+                XtraMessageBox.Show("EntityToolsCore is invalid!\n\rEntityId request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                Astral.Logger.WriteLine("EntityToolsCore is invalid! EntityId request denied.");
+                ETLogger.WriteLine("EntityToolsCore is invalid! EntityId request denied.");
+
                 return false;
             }
 
@@ -356,6 +394,12 @@ namespace EntityTools
             {
                 if (InternalInitialize())
                     return Core.GUIRequest_UCCConditions(ref list);
+
+                XtraMessageBox.Show("EntityToolsCore is invalid!\n\rUCC conditions request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                Astral.Logger.WriteLine("EntityToolsCore is invalid! UCC conditions request denied.");
+                ETLogger.WriteLine("EntityToolsCore is invalid! UCC conditions request denied.");
+
                 return false;
             }
 
@@ -363,6 +407,12 @@ namespace EntityTools
             {
                 if (InternalInitialize())
                     return Core.GUIRequest_CustomRegions(ref crList);
+
+                XtraMessageBox.Show("EntityToolsCore is invalid!\n\rCustomRegions request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                Astral.Logger.WriteLine("EntityToolsCore is invalid! CustomRegions request denied.");
+                ETLogger.WriteLine("EntityToolsCore is invalid! CustomRegions request denied.");
+
                 return false;
             }
 
@@ -370,6 +420,12 @@ namespace EntityTools
             {
                 if (InternalInitialize())
                     return Core.GUIRequest_NodeLocation(ref pos, caption);
+
+                XtraMessageBox.Show("EntityToolsCore is invalid!\n\rNodeLocation request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                Astral.Logger.WriteLine("EntityToolsCore is invalid! Node Location request denied.");
+                ETLogger.WriteLine("EntityToolsCore is invalid! Node Location request denied.");
+
                 return false;
             }
 #endif
@@ -378,9 +434,22 @@ namespace EntityTools
             {
                 if (InternalInitialize())
                     return Core.FindAllEntity(pattern, matchType, nameType, setType, healthCheck, range, zRange, regionCheck, customRegions, specialCheck);
+
+                //Astral.Controllers.Roles.ToggleRole(false);
+                ToggleRole(false);
+
+                Astral.Logger.WriteLine("EntityToolsCore is invalid! Entities search aborted. Stop bot.");
+                ETLogger.WriteLine("EntityToolsCore is invalid! Entities search aborted. Stop bot.");
+
                 return null;
             }
 #endif
+            public bool CheckCore()
+            {
+                if (InternalInitialize())
+                    return Core.CheckCore();
+                else return false;
+            }
 
             /// <summary>
             /// Загрузка сборки, содержащей реализацию ядра из альтернативного файлового потока
@@ -398,7 +467,7 @@ namespace EntityTools
                     // Попытка загрузки ядра производится только после привязки делегата CurrentDomain_AssemblyResolve
                     try
                     {
-                        using (FileStream file = FileStreamHelper.OpenWithStream(Assembly.GetExecutingAssembly().Location, "Tony", FileMode.Open, FileAccess.Read))
+                        using (FileStream file = FileStreamHelper.OpenWithStream(Assembly.GetExecutingAssembly().Location, "Core", FileMode.Open, FileAccess.Read))
                         {
                             byte[] coreBytes = new byte[file.Length];
                             if (file.Read(coreBytes, 0, (int)file.Length) > 0)
@@ -407,7 +476,7 @@ namespace EntityTools
                                 byte[] key = SysInfo.SysInformer.GetMashineID(false).TextToBytes();
                                 if (CryptoHelper.DecryptFile_Rijndael(coreBytes, key, out byte[] decryptedCoreBytes))
                                 {
-#if !DEBUG
+#if DEBUG
                                     File.WriteAllText("EntityCore_key", key.ToHexString());
                                     File.WriteAllBytes("EntityCore_encrypt", coreBytes);
                                     File.WriteAllBytes("EntityCore_decrypt", decryptedCoreBytes);
@@ -416,18 +485,19 @@ namespace EntityTools
                                     try
                                     {
                                         Assembly assembly = Assembly.Load(decryptedCoreBytes);
+                                        CoreHash = CryptoHelper.MD5_HashString(decryptedCoreBytes);
 #else
                                     try
                                     {
                                         Assembly assembly = Assembly.Load(coreBytes);
+                                        CoreHash = CryptoHelper.MD5_HashString(coreBytes);
 #endif
                                         if (assembly != null)
                                             foreach (Type type in assembly.GetTypes())
                                             {
                                                 if (type.GetInterfaces().Contains(typeof(IEntityToolsCore)))
                                                 {
-                                                    IEntityToolsCore core = Activator.CreateInstance(type) as IEntityToolsCore;
-                                                    if (core != null)
+                                                    if (Activator.CreateInstance(type) is IEntityToolsCore core)
                                                     {
                                                         Core = core;
                                                         return true;
@@ -440,15 +510,15 @@ namespace EntityTools
 #else
                                     catch (Exception e)
                                     {
-                                        string msg = "Fail to load decrypted EntityToolCore ";
-                                        EntityToolsLogger.WriteLine(LogType.Error, msg);
+                                        string msg = "Fail to load decrypted EntityToolCore\r\n" + e.Message;
+                                        ETLogger.WriteLine(LogType.Error, msg);
                                         Astral.Logger.WriteLine(msg);
                                     }
                                 }
                                 else
                                 {
                                     string msg = "Fail to decrypt EntityToolCore";
-                                    EntityToolsLogger.WriteLine(LogType.Error, msg);
+                                    ETLogger.WriteLine(LogType.Error, msg);
                                     Astral.Logger.WriteLine(msg);
                                 }
 #endif
@@ -457,7 +527,8 @@ namespace EntityTools
                     }
                     catch (Exception e)
                     {
-                        EntityToolsLogger.WriteLine(LogType.Debug, e.ToString());
+                        ETLogger.WriteLine(LogType.Debug, e.ToString());
+                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, e.ToString());
                     }
                     finally
                     {
@@ -466,7 +537,15 @@ namespace EntityTools
                 }
                 return false;
             }
-            private static bool internal_DoNothing() => false;
+            private static bool internal_DoNothing()
+            {
+                //Astral.Controllers.Roles.ToggleRole(false);
+
+                //Astral.Logger.WriteLine($"EntityToolsCore is invalid. Stop bot");
+                //ETLogger.WriteLine($"EntityToolsCore is invalid. Stop bot");
+
+                return false;
+            }
         }
     }
 }

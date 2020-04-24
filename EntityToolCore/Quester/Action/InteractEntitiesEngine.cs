@@ -19,7 +19,6 @@ using Astral.Logic.Classes.Map;
 using System.Drawing;
 using static Astral.Quester.Classes.Action;
 using EntityTools;
-using EntityTools.Logger;
 using System.Reflection;
 
 namespace EntityCore.Quester.Action
@@ -56,7 +55,7 @@ namespace EntityCore.Quester.Action
             checkEntity = internal_CheckEntity_Initializer;
             getCustomRegions = internal_GetCustomRegion_Initializer;
 
-            EntityToolsLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized");
+            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {ActionLabel}");
         }
 
         public void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -328,7 +327,7 @@ namespace EntityCore.Quester.Action
                                                                    @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, getCustomRegions(), IsNotInBlackList);
 #if DEBUG_INTERACTENTITIES
                     if (closestEntity != null && closestEntity.IsValid)
-                        EntityToolsLogger.WriteLine(LogType.Debug, $"{GetType().Name}::{MethodBase.GetCurrentMethod().Name}: Found Entity[{closestEntity.ContainerId.ToString("X8")}] (closest)");
+                        ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}::{MethodBase.GetCurrentMethod().Name}: Found Entity[{closestEntity.ContainerId.ToString("X8")}] (closest)");
                     
 #endif
                     timeout.ChangeTime(EntityTools.EntityTools.PluginSettings.EntityCache.LocalCacheTime);
@@ -379,12 +378,12 @@ namespace EntityCore.Quester.Action
                 moved = false;
                 combat = false;
 #if DEBUG && DEBUG_INTERACTENTITIES
-                EntityToolsLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Approach Entity[{target.ContainerId.ToString("X8")}] for interaction");
+                ETLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Approach Entity[{target.ContainerId.ToString("X8")}] for interaction");
 #endif
                 if (Approach.EntityForInteraction(target, CheckCombat/*new Func<Approach.BreakInfos>(CheckCombat)*/))
                 {
 #if DEBUG && DEBUG_INTERACTENTITIES
-                    EntityToolsLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Interact Entity[{target.ContainerId.ToString("X8")}]");
+                    ETLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Interact Entity[{target.ContainerId.ToString("X8")}]");
 #endif
                     target.Interact();
                     Thread.Sleep(@this._interactTime);
@@ -413,7 +412,7 @@ namespace EntityCore.Quester.Action
                 if (@this._ignoreCombat && target.Location.Distance3DFromPlayer <= @this._combatDistance)
                 {
 #if DEBUG && DEBUG_INTERACTENTITIES
-                    EntityToolsLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Engage combat");
+                    ETLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Engage combat");
 #endif
                     Astral.Quester.API.IgnoreCombat = false;
                     return ActionResult.Running;
@@ -421,16 +420,16 @@ namespace EntityCore.Quester.Action
                 if (combat)
                 {
 #if DEBUG && DEBUG_INTERACTENTITIES
-                    EntityToolsLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Player in combat...");
+                    ETLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Player in combat...");
 #endif
                     return ActionResult.Running;
                 }
                 if (moved)
                 {
 #if DEBUG && DEBUG_INTERACTENTITIES
-                    EntityToolsLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Entity[{target.ContainerId.ToString("X8")}] moved, skip...");
+                    ETLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Entity[{target.ContainerId.ToString("X8")}] moved, skip...");
 #else
-                    EntityToolsLogger.WriteLine("Entity moved, skip...");
+                    ETLogger.WriteLine("Entity moved, skip...", true);
 #endif
                     return ActionResult.Fail;
                 }
@@ -572,13 +571,13 @@ namespace EntityCore.Quester.Action
             if (predicate != null)
             {
 #if DEBUG
-                EntityToolsLogger.WriteLine(LogType.Debug, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Comparer does not defined. Initialize.");
+                ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Comparer does not defined. Initialize.");
 #endif
                 checkEntity = predicate;
                 return checkEntity(e);
             }
 #if DEBUG
-            else EntityToolsLogger.WriteLine(LogType.Error, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Fail to initialize the Comparer.");
+            else ETLogger.WriteLine(LogType.Error, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Fail to initialize the Comparer.");
 #endif
             return false;
         }
@@ -604,7 +603,7 @@ namespace EntityCore.Quester.Action
             /* 2 */
             blackList.Add(target.ContainerId, @this._interactingTimeout);
     #if DEBUG && DEBUG_INTERACTENTITIES
-            EntityToolsLogger.WriteLine(LogType.Debug, $"{GetType().Name}::PushToBlackList: Entity[{target.ContainerId.ToString("X8")}]");
+            ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}::PushToBlackList: Entity[{target.ContainerId.ToString("X8")}]");
     #endif
         }
 

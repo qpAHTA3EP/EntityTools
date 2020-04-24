@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace EntityTools.Tools
 {
@@ -26,7 +27,7 @@ namespace EntityTools.Tools
             {
                 InternalName = def.InternalName;
                 DisplayName = def.DisplayName;
-                Description = def.Description;
+                Description = Regex.Replace(def.Description, "<[^>]+>", string.Empty);
             }
             else
             {

@@ -17,7 +17,6 @@ using Astral.Logic.Classes.Map;
 using System.Drawing;
 using static Astral.Quester.Classes.Action;
 using EntityTools;
-using EntityTools.Logger;
 
 namespace EntityCore.Enums
 {
@@ -103,7 +102,7 @@ namespace EntityCore.Quester.Action
 #endif
             @this.PropertyChanged += PropertyChanged;
 
-            EntityToolsLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized");
+            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {ActionLabel}");
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -423,13 +422,13 @@ namespace EntityCore.Quester.Action
                             case MissionPickUpResult.MissionNotFound:
                                 if (@this.SkipOnFail)
                                 {
-                                    EntityToolsLogger.WriteLine("Mission not available...");
+                                    ETLogger.WriteLine($"{@this.GetType().Name}: Mission not available...", true);
                                     return ActionResult.Skip;
                                 }
                                 tries++;
                                 break;
                             case MissionPickUpResult.MissionRequiredRewardNotFound:
-                                EntityToolsLogger.WriteLine("Required mission reward not found...");
+                                ETLogger.WriteLine($"{@this.GetType().Name}: Required mission reward not found...", true);
                                 if (@this.CloseContactDialog)
                                 {
                                     EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
@@ -437,7 +436,7 @@ namespace EntityCore.Quester.Action
                                 }
                                 return ActionResult.Skip;
                             case MissionPickUpResult.OfferMissionRequiredRewardNotFound:
-                                EntityToolsLogger.WriteLine("Required mission reward not found...");
+                                ETLogger.WriteLine($"{@this.GetType().Name}: Required mission reward not found...", true);
                                 if (@this.CloseContactDialog)
                                 {
                                     EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
@@ -451,7 +450,7 @@ namespace EntityCore.Quester.Action
 
                         if (tries > 2)
                         {
-                            EntityToolsLogger.WriteLine("Mission not available...");
+                            ETLogger.WriteLine($"{@this.GetType().Name}: Mission not available...");
                             return ActionResult.Fail;
                         }
                     }

@@ -11,8 +11,6 @@ using System.Linq;
 using EntityTools.Enums;
 using System.Diagnostics;
 using EntityTools;
-using EntityTools.Logger;
-
 namespace EntityCore.Entities
 {
     public static class SearchCached
@@ -36,7 +34,7 @@ namespace EntityCore.Entities
             MaxTime = TimeSpan.MinValue;
             stopwatch.Reset();
             frequencyDistribution.Clear();
-            EntityToolsLogger.WriteLine(LogType.Debug, $"SearchCached::ResetWatch()");
+            ETLogger.WriteLine(LogType.Debug, $"SearchCached::ResetWatch()");
         }
 
         public static void LogWatch()
@@ -45,20 +43,20 @@ namespace EntityCore.Entities
             {
                 double avrgTime = (double)stopwatch.ElapsedMilliseconds / (double)Count;
                 double avrgTicks = (double)stopwatch.ElapsedTicks / (double)Count;
-                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchCached:\tCount: {Count}, TotalTime: {stopwatch.Elapsed}({stopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
-                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchCached:\tMinTime: {MinTime.TotalMilliseconds.ToString("N3")} ms ({MinTime.Ticks.ToString("N0")} ticks)");
-                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchCached:\tMaxTime: {MaxTime.TotalMilliseconds.ToString("N3")} ms ({MaxTime.Ticks.ToString("N0")} ticks)");
-                EntityToolsLogger.WriteLine(LogType.Debug, $"SearchCached:\tAverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
+                ETLogger.WriteLine(LogType.Debug, $"SearchCached:\tCount: {Count}, TotalTime: {stopwatch.Elapsed}({stopwatch.ElapsedMilliseconds.ToString("N0")} ms)");
+                ETLogger.WriteLine(LogType.Debug, $"SearchCached:\tMinTime: {MinTime.TotalMilliseconds.ToString("N3")} ms ({MinTime.Ticks.ToString("N0")} ticks)");
+                ETLogger.WriteLine(LogType.Debug, $"SearchCached:\tMaxTime: {MaxTime.TotalMilliseconds.ToString("N3")} ms ({MaxTime.Ticks.ToString("N0")} ticks)");
+                ETLogger.WriteLine(LogType.Debug, $"SearchCached:\tAverageTime: {avrgTime.ToString("N3")} ms ({avrgTicks.ToString("N0")} ticks)");
                 if (frequencyDistribution.Count > 0)
                 {
-                    EntityToolsLogger.WriteLine(LogType.Debug, $"SearchCached::FrequencyDistribution:");
+                    ETLogger.WriteLine(LogType.Debug, $"SearchCached::FrequencyDistribution:");
                     var list = frequencyDistribution.ToList();
                     list.Sort((KeyValuePair<long, long> l, KeyValuePair<long, long> r) => { return (int)l.Key - (int)r.Key; } );
                     foreach (var i in list)
-                        EntityToolsLogger.WriteLine(LogType.Debug, $"\t\t{((double)i.Key * (double)interval / 10000d).ToString("N3")} := {i.Value.ToString("N0")}");
+                        ETLogger.WriteLine(LogType.Debug, $"\t\t{((double)i.Key * (double)interval / 10000d).ToString("N3")} := {i.Value.ToString("N0")}");
                 }
             }
-            else EntityToolsLogger.WriteLine(LogType.Debug, $"SearchCached: Count: 0");
+            else ETLogger.WriteLine(LogType.Debug, $"SearchCached: Count: 0");
         }
 #endif
 

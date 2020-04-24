@@ -6,6 +6,7 @@ using System.Text;
 
 namespace EntityTools.Patches
 {
+#if DEVELOPER
     /// <summary>
     /// Патчер, содержащий список всех патчей
     /// </summary>
@@ -18,10 +19,22 @@ namespace EntityTools.Patches
             new Patch(
                 typeof(Astral.Quester.Forms.MapperForm).GetMethod("Open",
                     BindingFlags.Static | BindingFlags.Public),
-                typeof(Patches.Mapper.MapperFormExt).GetMethod(nameof(Patches.Mapper.MapperFormExt.Open),
-                    BindingFlags.Static | BindingFlags.Public)) 
+                typeof(Mapper.MapperFormExt).GetMethod(nameof(Mapper.MapperFormExt.Open),
+                    BindingFlags.Static | BindingFlags.Public))
             : null;
 
+#if Patch_AstralXmlSerializer
+        /// <summary>
+        /// Подмена метода, формирующего список типов для сериализации профилей
+        /// </summary>
+        private static Patch Patch_AstralXmlSerializer = new Patch(
+                    typeof(Astral.Functions.XmlSerializer).GetMethod("GetExtraTypes",
+                        BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic/*, 
+                        null, new Type[] { typeof(int) }, null*/),
+                    typeof(XmlSerializer.AstralXmlSerializerPatch).GetMethod(nameof(XmlSerializer.AstralXmlSerializerPatch.GetExtraTypes),
+                        BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic));
+
+#endif
         public static void Apply()
         {
             //foreach(var field in typeof(Patcher).GetFields(BindingFlags.NonPublic | BindingFlags.Static))
@@ -34,6 +47,11 @@ namespace EntityTools.Patches
             //}
 
             Patch_Mapper?.Inject();
+
+#if Patch_AstralXmlSerializer
+            Patch_AstralXmlSerializer?.Inject();
+#endif
         }
     }
+#endif
 }

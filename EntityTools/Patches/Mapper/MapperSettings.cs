@@ -7,6 +7,7 @@ using System.Xml.Serialization;
 
 namespace EntityTools.Settings
 {
+#if DEVELOPER
     [Serializable]
     public class MapperSettings : PluginSettingsBase
     {
@@ -42,7 +43,7 @@ namespace EntityTools.Settings
                 {
                     waypointDistance = Math.Max(5, value);
                     base.NotifyPropertyChanged(nameof(WaypointDistance));
-                    WaypointEquivalenceDistance = Math.Min(waypointDistance/2, waypointEquivalenceDistance);
+                    WaypointEquivalenceDistance = Math.Min(waypointDistance / 2, waypointEquivalenceDistance);
                 }
             }
         }
@@ -60,7 +61,7 @@ namespace EntityTools.Settings
             {
                 if (waypointEquivalenceDistance != value)
                 {
-                    waypointEquivalenceDistance = Math.Max(2, Math.Min(value, WaypointDistance/2)); ;
+                    waypointEquivalenceDistance = Math.Max(2, Math.Min(value, WaypointDistance / 2)); ;
                     base.NotifyPropertyChanged(nameof(WaypointEquivalenceDistance));
                 }
             }
@@ -165,5 +166,6 @@ namespace EntityTools.Settings
         }
         //[NonSerialized]
         private bool linearPath = true;
-    }
+    } 
+#endif
 }

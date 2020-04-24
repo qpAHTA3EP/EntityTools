@@ -1,7 +1,6 @@
 ﻿using Astral.Classes.ItemFilter;
 using EntityTools.Enums;
 using EntityTools.Extensions;
-using EntityTools.Logger;
 using MyNW.Classes;
 using System;
 using System.Reflection;
@@ -34,7 +33,7 @@ namespace EntityCore.Entities
                             return (Entity e) => CompareInternal2SimpleEnd(e, pattern);
                         default:
 #if DEBUG
-                            EntityToolsLogger.WriteLine(LogType.Error, $"{nameof(EntityToPatternComparer)}::{MethodBase.GetCurrentMethod().Name}: Simple pattern is invalid {{{entPattern}, {strMatchType}, {nameType}}}");
+                            ETLogger.WriteLine(LogType.Error, $"{nameof(EntityToPatternComparer)}::{MethodBase.GetCurrentMethod().Name}: Simple pattern is invalid {{{entPattern}, {strMatchType}, {nameType}}}");
 #endif
                             return null;
                     }
@@ -51,7 +50,7 @@ namespace EntityCore.Entities
                             return (Entity e) => CompareUntranslated2SimpleEnd(e, pattern);
                         default:
 #if DEBUG
-                            EntityToolsLogger.WriteLine(LogType.Error, $"{nameof(EntityToPatternComparer)}::{MethodBase.GetCurrentMethod().Name}: Simple pattern is invalid {{{entPattern}, {strMatchType}, {nameType}}}");
+                            ETLogger.WriteLine(LogType.Error, $"{nameof(EntityToPatternComparer)}::{MethodBase.GetCurrentMethod().Name}: Simple pattern is invalid {{{entPattern}, {strMatchType}, {nameType}}}");
 #endif
                             return null;
                     }

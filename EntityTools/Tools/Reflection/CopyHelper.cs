@@ -1,4 +1,4 @@
-﻿using EntityTools.Logger;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -27,7 +27,7 @@ namespace EntityTools.Reflection
             while (indices[rank] <= upper_bound)
             {
                 object value = array.GetValue(indices);
-                if (!ReferenceEquals(value, null))
+                if (!(value is null))
                     array.SetValue(CreateDeepCopyInternal(state, value), indices);
 
                 if (next_rank < array.Rank)
@@ -51,8 +51,7 @@ namespace EntityTools.Reflection
         private static object CreateDeepCopyInternal(Dictionary<object, object> state,
             object o)
         {
-            object exist_object;
-            if (state.TryGetValue(o, out exist_object))
+            if (state.TryGetValue(o, out object exist_object))
                 return exist_object;
 
             if (o is Array)
@@ -78,7 +77,7 @@ namespace EntityTools.Reflection
                     BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
                 {
                     object original = f.GetValue(o);
-                    if (!ReferenceEquals(original, null))
+                    if (!(original is null))
                         f.SetValue(copy, CreateDeepCopyInternal(state, original));
                 }
                 return copy;
@@ -87,22 +86,21 @@ namespace EntityTools.Reflection
 
         public static T CreateDeepCopy<T>(T o)
         {
-#if DEBUG
+#if PROFILING
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             try
             {
 #endif
-                object input = o;
                 if (ReferenceEquals(o, null))
                     return o;
-                return (T)CreateDeepCopyInternal(new Dictionary<object, object>(), input);
-#if DEBUG
+                return (T)CreateDeepCopyInternal(new Dictionary<object, object>(), o);
+#if PROFILING
             }
             finally
             {
                 stopwatch.Stop();
-                EntityToolsLogger.WriteLine(LogType.Debug, $"CreateDeepCopy() worktime is {stopwatch.ElapsedMilliseconds} ms");
+                ETLogger.WriteLine(LogType.Debug, $"CreateDeepCopy() worktime is {stopwatch.ElapsedMilliseconds} ms");
             }
 #endif
         }
@@ -115,19 +113,19 @@ namespace EntityTools.Reflection
         /// <returns>The copied object.</returns>
         public static T CreateXmlCopy<T>(T source)
         {
-#if DEBUG
+#if PROFILING
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             try
             {
 #endif
-                if (!typeof(T).IsSerializable)
+            if (!typeof(T).IsSerializable)
                 {
                     throw new ArgumentException("The type must be serializable.", "source");
                 }
 
                 // Don't serialize a null object, simply return the default for that object
-                if (Object.ReferenceEquals(source, null))
+                if (ReferenceEquals(source, null))
                 {
                     return default(T);
                 }
@@ -140,12 +138,12 @@ namespace EntityTools.Reflection
                     stream.Seek(0, SeekOrigin.Begin);
                     return (T)formatter.Deserialize(stream);
                 }
-#if DEBUG
+#if PROFILING
             }
             finally
             {
                 stopwatch.Stop();
-                EntityToolsLogger.WriteLine(LogType.Debug, $"CreateXmlCopy() worktime is {stopwatch.ElapsedMilliseconds} ms");
+                ETLogger.WriteLine(LogType.Debug, $"CreateXmlCopy() worktime is {stopwatch.ElapsedMilliseconds} ms");
             }
 #endif
         }

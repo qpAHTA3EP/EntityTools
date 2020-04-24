@@ -3,7 +3,7 @@ using Astral.Logic.UCC.Classes;
 using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
 using EntityTools.Extensions;
-using EntityTools.Logger;
+using EntityTools;
 using EntityTools.UCC.Actions;
 using MyNW.Classes;
 using MyNW.Internals;
@@ -33,7 +33,7 @@ namespace EntityCore.UCC.Actions
 #endif
             @this.PropertyChanged += PropertyChanged;
 
-            EntityToolsLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized");
+            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

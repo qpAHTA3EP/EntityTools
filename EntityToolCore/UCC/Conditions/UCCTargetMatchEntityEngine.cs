@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 using EntityTools.UCC.Extensions;
-using EntityTools.Logger;
+using EntityTools;
 
 namespace EntityCore.UCC.Conditions
 {
@@ -35,7 +35,7 @@ namespace EntityCore.UCC.Conditions
 
             checkEntity = internal_CheckEntity_Initializer;
 
-            EntityToolsLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized");
+            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -91,8 +91,6 @@ namespace EntityCore.UCC.Conditions
             else sb.Append("is NULL");
 
             return sb.ToString();
-
-            return "Condition options is invalid!";
         }
 
         public string Label()
@@ -116,13 +114,13 @@ namespace EntityCore.UCC.Conditions
             if (predicate != null)
             {
 #if DEBUG
-                EntityToolsLogger.WriteLine(LogType.Debug, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Comparer does not defined. Initialize.");
+                ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Comparer does not defined. Initialize.");
 #endif
                 checkEntity = predicate;
                 return checkEntity(e);
             }
 #if DEBUG
-            else EntityToolsLogger.WriteLine(LogType.Error, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Fail to initialize the Comparer.");
+            else ETLogger.WriteLine(LogType.Error, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Fail to initialize the Comparer.");
 #endif
             return false;
         }

@@ -13,9 +13,9 @@ using EntityTools.UCC.Extensions;
 using EntityTools.Enums;
 using EntityTools.Services;
 using Astral.Classes.ItemFilter;
-using EntityTools.Logger;
 using System.Collections.Generic;
 using MyNW.Classes;
+using DevExpress.XtraEditors;
 
 namespace EntityTools.Core
 {
@@ -144,9 +144,9 @@ namespace EntityTools.Core
                 MessageBox.Show(strBldr.ToString());
             }
 #endif
-            #endregion
+#endregion
 
-            #region Test_EntitySelectForm
+#region Test_EntitySelectForm
 #if Test_EntitySelectForm
             entDif = EntitySelectForm.GetEntity(entDif.NameUntranslated);
             if (entDif != null)
@@ -157,172 +157,172 @@ namespace EntityTools.Core
             else MessageBox.Show("No Entity was selected");
 
 #endif
-            #endregion
+#endregion
 
-            #region Test_InsertInsignia
-            //// Ищем все неэкипированные инсигнии (впервый раз)
-            //List<InventorySlot> freeInsignias = EntityManager.LocalPlayer.BagsItems.FindAll(slot => slot.Item.ItemDef.InternalName.StartsWith("Insignia"));
-            //// сортировка списка "инсигний";
-            //freeInsignias.Sort(Actions.InsertInsignia.InsigniaQualityDescendingComparison);
+#region Test_InsertInsignia
+//// Ищем все неэкипированные инсигнии (впервый раз)
+//List<InventorySlot> freeInsignias = EntityManager.LocalPlayer.BagsItems.FindAll(slot => slot.Item.ItemDef.InternalName.StartsWith("Insignia"));
+//// сортировка списка "инсигний";
+//freeInsignias.Sort(Actions.InsertInsignia.InsigniaQualityDescendingComparison);
 
-            //StringBuilder sb = new StringBuilder();
-            //foreach(InventorySlot slot in freeInsignias)
-            //{
-            //    sb./*Append(slot.Item.ItemDef.DisplayName).*/Append('[').Append(slot.Item.ItemDef.InternalName).Append("] number is ").Append(slot.Item.Count).AppendLine();
-            //}
-            //MessageBox.Show(sb.ToString());
+//StringBuilder sb = new StringBuilder();
+//foreach(InventorySlot slot in freeInsignias)
+//{
+//    sb./*Append(slot.Item.ItemDef.DisplayName).*/Append('[').Append(slot.Item.ItemDef.InternalName).Append("] number is ").Append(slot.Item.Count).AppendLine();
+//}
+//MessageBox.Show(sb.ToString());
 
-            //InventorySlot insigniaSlot = InsertInsignia(freeInsignias);
+//InventorySlot insigniaSlot = InsertInsignia(freeInsignias);
 
-            //if (insigniaSlot != null)
-            //{
-            //    sb.Clear();
-            //    sb.Append("InsigniaSlot.IsValid=").Append(insigniaSlot.IsValid).AppendLine();
-            //    sb.Append("InsigniaSlot.Filled=").Append(insigniaSlot.Filled).AppendLine();
-            //    sb.Append("InsigniaSlot.Item.IsValid=").Append(insigniaSlot.Item.IsValid).AppendLine();
-            //    sb.Append("InsigniaSlot.Item.ItemDef.IsValid=").Append(insigniaSlot.Item.ItemDef.IsValid).AppendLine();
-            //    sb.Append("InsigniaSlot.Item.ItemDef.InternalName=").Append(insigniaSlot.Item.ItemDef.InternalName).AppendLine();
+//if (insigniaSlot != null)
+//{
+//    sb.Clear();
+//    sb.Append("InsigniaSlot.IsValid=").Append(insigniaSlot.IsValid).AppendLine();
+//    sb.Append("InsigniaSlot.Filled=").Append(insigniaSlot.Filled).AppendLine();
+//    sb.Append("InsigniaSlot.Item.IsValid=").Append(insigniaSlot.Item.IsValid).AppendLine();
+//    sb.Append("InsigniaSlot.Item.ItemDef.IsValid=").Append(insigniaSlot.Item.ItemDef.IsValid).AppendLine();
+//    sb.Append("InsigniaSlot.Item.ItemDef.InternalName=").Append(insigniaSlot.Item.ItemDef.InternalName).AppendLine();
 
-            //    MessageBox.Show(sb.ToString());
-            //}
-            #endregion
+//    MessageBox.Show(sb.ToString());
+//}
+#endregion
 
-            #region Test_MountBonusPriority
-            //MountBonusPriorityListForm.GetBonusList();
-            //InsigniaBonusSelectForm.GetMountBonuses();
-            #endregion
+#region Test_MountBonusPriority
+//MountBonusPriorityListForm.GetBonusList();
+//InsigniaBonusSelectForm.GetMountBonuses();
+#endregion
 
-            #region Test_ComplexCondition
-            //ConditionListForm listEditor = new ConditionListForm();
-            //var condList = listEditor.GetConditionList();
-            //if (condList != null)
-            //{
-            //    StringBuilder sb = new StringBuilder();
-            //    foreach (var cond in condList)
-            //    {
-            //        sb.AppendLine(cond.ToString());
-            //    }
-            //    MessageBox.Show(sb.ToString());
-            //}
-            //else MessageBox.Show("Conditions is empty");
+#region Test_ComplexCondition
+//ConditionListForm listEditor = new ConditionListForm();
+//var condList = listEditor.GetConditionList();
+//if (condList != null)
+//{
+//    StringBuilder sb = new StringBuilder();
+//    foreach (var cond in condList)
+//    {
+//        sb.AppendLine(cond.ToString());
+//    }
+//    MessageBox.Show(sb.ToString());
+//}
+//else MessageBox.Show("Conditions is empty");
 
 
-            #endregion
+#endregion
 
-            #region DUMP_TEST
+#region DUMP_TEST
 #if DUMP_TEST
             ReflectionHelper.DumpClassMethod(typeof(Astral.Logic.UCC.Forms.AddClass), "AddClass");
 
             ReflectionHelper.DumpClassMethod(typeof(TestClass), "TestClass");
 #endif
-            #endregion
+#endregion
 
-            #region Login
-            //ReflectionHelper.ExecStaticMethodByArgs(typeof(MyNW.Internals.Injection), "\u0001", new object[] { "--", "--" }, out object res);
-            #endregion
+#region Login
+//ReflectionHelper.ExecStaticMethodByArgs(typeof(MyNW.Internals.Injection), "\u0001", new object[] { "--", "--" }, out object res);
+#endregion
 
-            #region Mapper
-            ////var node = Astral.Quester.Core.GetNearesNodetPosition(EntityManager.LocalPlayer.Location, false);
-            ////var meshes = Astral.Quester.Core.Meshes;
-            //var meshes = typeof(Astral.Quester.Core).GetStaticPropertyAccessor<AStar.Graph>("Meshes");
-            //XtraMessageBox.Show(meshes.Value.ToString());
+#region Mapper
+////var node = Astral.Quester.Core.GetNearesNodetPosition(EntityManager.LocalPlayer.Location, false);
+////var meshes = Astral.Quester.Core.Meshes;
+//var meshes = typeof(Astral.Quester.Core).GetStaticPropertyAccessor<AStar.Graph>("Meshes");
+//XtraMessageBox.Show(meshes.Value.ToString());
 
 
-            //var GetNearesNodes = typeof(Astral.Quester.Core).GetStaticMethodInvoker<MyNW.Classes.Vector3>("GetNearesNodetPosition", new Type[] { typeof(MyNW.Classes.Vector3), typeof(bool)});
-            //var pos = GetNearesNodes.Invoke(EntityManager.LocalPlayer.Location, false);
-            //XtraMessageBox.Show(pos.ToString());
-            #endregion
+//var GetNearesNodes = typeof(Astral.Quester.Core).GetStaticMethodInvoker<MyNW.Classes.Vector3>("GetNearesNodetPosition", new Type[] { typeof(MyNW.Classes.Vector3), typeof(bool)});
+//var pos = GetNearesNodes.Invoke(EntityManager.LocalPlayer.Location, false);
+//XtraMessageBox.Show(pos.ToString());
+#endregion
 
-            #region Test_LinkedList
+#region Test_LinkedList
 
-            //Dictionary<int, Pair<WatchPair, WatchPair>> listWatches = new Dictionary<int, Pair<WatchPair, WatchPair>>();
-            //Dictionary<int, Pair<WatchPair, WatchPair>> linkedListWatches = new Dictionary<int, Pair<WatchPair, WatchPair>>();
-            //Pair<WatchPair, WatchPair> listTotal = new Pair<WatchPair, WatchPair>(new WatchPair(), new WatchPair());
-            //Pair<WatchPair, WatchPair> LinkListTotal = new Pair<WatchPair, WatchPair>(new WatchPair(), new WatchPair());
+//Dictionary<int, Pair<WatchPair, WatchPair>> listWatches = new Dictionary<int, Pair<WatchPair, WatchPair>>();
+//Dictionary<int, Pair<WatchPair, WatchPair>> linkedListWatches = new Dictionary<int, Pair<WatchPair, WatchPair>>();
+//Pair<WatchPair, WatchPair> listTotal = new Pair<WatchPair, WatchPair>(new WatchPair(), new WatchPair());
+//Pair<WatchPair, WatchPair> LinkListTotal = new Pair<WatchPair, WatchPair>(new WatchPair(), new WatchPair());
 
-            //Stopwatch sw = new Stopwatch();
-            //Random rnd = new Random();
-            //for (int i = 0; i< 1000;  i++)
-            //{
-            //    double dist = 100 + rnd.Next(700);
-            //    Pair<WatchPair, WatchPair> watch = new Pair<WatchPair, WatchPair>(new WatchPair(), new WatchPair());
-            //    sw.Restart();
-            //    List<Entity> list = new List<Entity>();
-            //    foreach(Entity ent in EntityManager.GetEntities())
-            //    {
-            //        list.Add(ent);
-            //    }
-            //    sw.Stop();
-            //    watch.First.Ticks = sw.ElapsedTicks;
-            //    listTotal.First.Ticks += sw.ElapsedTicks;
-            //    watch.First.Millisecond = sw.ElapsedMilliseconds;
-            //    listTotal.First.Millisecond += sw.ElapsedMilliseconds;
-            //    sw.Restart();
-            //    list.RemoveAll((o) => o.Location.Distance3DFromPlayer > dist);
-            //    sw.Stop();
-            //    watch.Second.Ticks = sw.ElapsedTicks;
-            //    listTotal.Second.Ticks += sw.ElapsedTicks;
-            //    watch.Second.Millisecond = sw.ElapsedMilliseconds;
-            //    listTotal.Second.Millisecond += sw.ElapsedMilliseconds;
-            //    listWatches.Add(i, watch);
+//Stopwatch sw = new Stopwatch();
+//Random rnd = new Random();
+//for (int i = 0; i< 1000;  i++)
+//{
+//    double dist = 100 + rnd.Next(700);
+//    Pair<WatchPair, WatchPair> watch = new Pair<WatchPair, WatchPair>(new WatchPair(), new WatchPair());
+//    sw.Restart();
+//    List<Entity> list = new List<Entity>();
+//    foreach(Entity ent in EntityManager.GetEntities())
+//    {
+//        list.Add(ent);
+//    }
+//    sw.Stop();
+//    watch.First.Ticks = sw.ElapsedTicks;
+//    listTotal.First.Ticks += sw.ElapsedTicks;
+//    watch.First.Millisecond = sw.ElapsedMilliseconds;
+//    listTotal.First.Millisecond += sw.ElapsedMilliseconds;
+//    sw.Restart();
+//    list.RemoveAll((o) => o.Location.Distance3DFromPlayer > dist);
+//    sw.Stop();
+//    watch.Second.Ticks = sw.ElapsedTicks;
+//    listTotal.Second.Ticks += sw.ElapsedTicks;
+//    watch.Second.Millisecond = sw.ElapsedMilliseconds;
+//    listTotal.Second.Millisecond += sw.ElapsedMilliseconds;
+//    listWatches.Add(i, watch);
 
-            //    watch = new Pair<WatchPair, WatchPair>(new WatchPair(), new WatchPair());
-            //    sw.Restart();
-            //    LinkedList<Entity> linkList = new LinkedList<Entity>();
-            //    foreach (Entity ent in EntityManager.GetEntities())
-            //    {
-            //        linkList.AddLast(ent);
-            //    }
-            //    sw.Stop();
-            //    watch.First.Ticks = sw.ElapsedTicks;
-            //    LinkListTotal.First.Ticks += sw.ElapsedTicks;
-            //    watch.First.Millisecond = sw.ElapsedMilliseconds;
-            //    LinkListTotal.First.Millisecond += sw.ElapsedMilliseconds;
-            //    sw.Restart();
-            //    //list.RemoveAll((o) => o.Location.Distance3DFromPlayer > 500);
-            //    LinkedList<Entity> newlinkList = new LinkedList<Entity>();
-            //    while(linkList.Count > 0)
-            //    {
-            //        LinkedListNode<Entity> node = linkList.First;
-            //        linkList.RemoveFirst();
-            //        if (node.Value.Location.Distance3DFromPlayer > dist)
-            //            newlinkList.AddLast(node);
-            //    }
+//    watch = new Pair<WatchPair, WatchPair>(new WatchPair(), new WatchPair());
+//    sw.Restart();
+//    LinkedList<Entity> linkList = new LinkedList<Entity>();
+//    foreach (Entity ent in EntityManager.GetEntities())
+//    {
+//        linkList.AddLast(ent);
+//    }
+//    sw.Stop();
+//    watch.First.Ticks = sw.ElapsedTicks;
+//    LinkListTotal.First.Ticks += sw.ElapsedTicks;
+//    watch.First.Millisecond = sw.ElapsedMilliseconds;
+//    LinkListTotal.First.Millisecond += sw.ElapsedMilliseconds;
+//    sw.Restart();
+//    //list.RemoveAll((o) => o.Location.Distance3DFromPlayer > 500);
+//    LinkedList<Entity> newlinkList = new LinkedList<Entity>();
+//    while(linkList.Count > 0)
+//    {
+//        LinkedListNode<Entity> node = linkList.First;
+//        linkList.RemoveFirst();
+//        if (node.Value.Location.Distance3DFromPlayer > dist)
+//            newlinkList.AddLast(node);
+//    }
 
-            //    sw.Stop();
-            //    watch.Second.Ticks = sw.ElapsedTicks;
-            //    LinkListTotal.Second.Ticks += sw.ElapsedTicks;
-            //    watch.Second.Millisecond = sw.ElapsedMilliseconds;
-            //    LinkListTotal.Second.Millisecond += sw.ElapsedMilliseconds;
-            //    linkedListWatches.Add(i, watch);
-            //}
+//    sw.Stop();
+//    watch.Second.Ticks = sw.ElapsedTicks;
+//    LinkListTotal.Second.Ticks += sw.ElapsedTicks;
+//    watch.Second.Millisecond = sw.ElapsedMilliseconds;
+//    LinkListTotal.Second.Millisecond += sw.ElapsedMilliseconds;
+//    linkedListWatches.Add(i, watch);
+//}
 
-            //EntityToolsLogger.WriteLine("List<Entity> Test:");
-            //EntityToolsLogger.WriteLine($"\tCreate Total (t):\t {listTotal.First.Ticks.ToString()}");
-            //EntityToolsLogger.WriteLine($"\tCreate Total (ms):\t {listTotal.First.Millisecond}");
-            //EntityToolsLogger.WriteLine($"\tRemote Total (t):\t {listTotal.Second.Ticks.ToString()}");
-            //EntityToolsLogger.WriteLine($"\tRemote Total (ms):\t {listTotal.Second.Millisecond}");
-            //EntityToolsLogger.WriteLine("--------------------------------------------------------");
-            //foreach (var w in listWatches)
-            //{
-            //    Logger.WriteLine($"\t{w.Value.First.Millisecond.ToString("")}\t{w.Value.First.Ticks}\t\t{w.Value.Second.Millisecond}\t{w.Value.Second.Ticks}\t");
-            //}
-            //EntityToolsLogger.WriteLine("========================================================");
-            //EntityToolsLogger.WriteLine(string.Empty);
-            //EntityToolsLogger.WriteLine("LinkedList<Entity> Test:");
-            //EntityToolsLogger.WriteLine($"\tCreate Total (t):\t {LinkListTotal.First.Ticks.ToString("N3")}");
-            //EntityToolsLogger.WriteLine($"\tCreate Total (ms):\t {LinkListTotal.First.Millisecond}");
-            //EntityToolsLogger.WriteLine($"\tRemote Total (t):\t {LinkListTotal.Second.Ticks.ToString("N3")}");
-            //EntityToolsLogger.WriteLine($"\tRemote Total (ms):\t {LinkListTotal.Second.Millisecond}");
-            //EntityToolsLogger.WriteLine("--------------------------------------------------------");
-            //foreach (var w in linkedListWatches)
-            //{
-            //    EntityToolsLogger.WriteLine($"\t{w.Value.First.Millisecond}\t{w.Value.First.Ticks}\t\t{w.Value.Second.Millisecond}\t{w.Value.Second.Ticks}\t");
-            //}
-            //EntityToolsLogger.WriteLine("========================================================");
-            #endregion
+//EntityToolsLogger.WriteLine("List<Entity> Test:");
+//EntityToolsLogger.WriteLine($"\tCreate Total (t):\t {listTotal.First.Ticks.ToString()}");
+//EntityToolsLogger.WriteLine($"\tCreate Total (ms):\t {listTotal.First.Millisecond}");
+//EntityToolsLogger.WriteLine($"\tRemote Total (t):\t {listTotal.Second.Ticks.ToString()}");
+//EntityToolsLogger.WriteLine($"\tRemote Total (ms):\t {listTotal.Second.Millisecond}");
+//EntityToolsLogger.WriteLine("--------------------------------------------------------");
+//foreach (var w in listWatches)
+//{
+//    Logger.WriteLine($"\t{w.Value.First.Millisecond.ToString("")}\t{w.Value.First.Ticks}\t\t{w.Value.Second.Millisecond}\t{w.Value.Second.Ticks}\t");
+//}
+//EntityToolsLogger.WriteLine("========================================================");
+//EntityToolsLogger.WriteLine(string.Empty);
+//EntityToolsLogger.WriteLine("LinkedList<Entity> Test:");
+//EntityToolsLogger.WriteLine($"\tCreate Total (t):\t {LinkListTotal.First.Ticks.ToString("N3")}");
+//EntityToolsLogger.WriteLine($"\tCreate Total (ms):\t {LinkListTotal.First.Millisecond}");
+//EntityToolsLogger.WriteLine($"\tRemote Total (t):\t {LinkListTotal.Second.Ticks.ToString("N3")}");
+//EntityToolsLogger.WriteLine($"\tRemote Total (ms):\t {LinkListTotal.Second.Millisecond}");
+//EntityToolsLogger.WriteLine("--------------------------------------------------------");
+//foreach (var w in linkedListWatches)
+//{
+//    EntityToolsLogger.WriteLine($"\t{w.Value.First.Millisecond}\t{w.Value.First.Ticks}\t\t{w.Value.Second.Millisecond}\t{w.Value.Second.Ticks}\t");
+//}
+//EntityToolsLogger.WriteLine("========================================================");
+#endregion
 
-            #region AStarDiagnostic
+#region AStarDiagnostic
 #if false
             string filename = AStar.SearchStatistics.SaveLog();
             if (!string.IsNullOrEmpty(filename)
@@ -330,9 +330,10 @@ namespace EntityTools.Core
                 System.Diagnostics.Process.Start(filename);
 
 #endif
-            #endregion
+#endregion
 
-            #region Test_FindAllEntity
+#region Test_FindAllEntity
+#if DEBUG
             LinkedList<Entity> entities = EntityTools.Core.FindAllEntity(@"^M12_(Batiri_Elite_Raptorrider|Dinosaur_Raptor_Standard_Enervoraptor)",
                                                             ItemFilterStringType.Regex, EntityNameType.InternalName, EntitySetType.Complete,
                                                             true, 0, 30, false, null, null);
@@ -342,7 +343,8 @@ namespace EntityTools.Core
                 sb.AppendLine($"{ett.InternalName}: Distance({ett.Location.Distance3DFromPlayer})");
             }
             MessageBox.Show(sb.ToString());
-            #endregion
+#endif
+#endregion
 
         }
 
@@ -355,7 +357,7 @@ namespace EntityTools.Core
             }
         }
 
-        #region старый_экспорт
+#region старый_экспорт
         //private void MainPanel_Load(object sender, EventArgs e)
         //{
         //    //bteMissions.Properties.NullValuePrompt = Path.Combine(FileTools.defaulExportFolderMissions, FileTools.defaulFileMissions);
@@ -503,7 +505,7 @@ namespace EntityTools.Core
         //        System.Diagnostics.Process.Start(fullFileName);
 
         //}
-        #endregion
+#endregion
 
         private void cbSpellStuckMonitor_CheckedChanged(object sender, EventArgs e)
         {
@@ -519,27 +521,27 @@ namespace EntityTools.Core
 
         private void btnUiViewer_Click(object sender, EventArgs e)
         {
-            string uiGenId = string.Empty;
 #if DEVELOPER
+            string uiGenId = string.Empty;
         EntityTools.Core.GUIRequest_UIGenId(ref uiGenId);
 #endif
         }
 
         private void btnEntities_Click(object sender, EventArgs e)
         {
+#if DEVELOPER
             string pattern = string.Empty;
             EntityNameType nameType = EntityNameType.InternalName;
             ItemFilterStringType strMatch = ItemFilterStringType.Simple;
-#if DEVELOPER
         EntityTools.Core.GUIRequest_EntityId(ref pattern, ref strMatch, ref nameType);
 #endif
         }
 
         private void btnAuraViewer_Click(object sender, EventArgs e)
         {
-            string auraId = string.Empty;
 #if DEVELOPER
-        EntityTools.Core.GUIRequest_AuraId(ref auraId);
+            string auraId = string.Empty;
+            EntityTools.Core.GUIRequest_AuraId(ref auraId);
 #endif
         }
 
@@ -676,13 +678,29 @@ namespace EntityTools.Core
         {
             gbxLogger.Enabled = ckbEnableLogger.Checked;
             if (ckbEnableLogger.Checked)
-                EntityToolsLogger.Start();
+                ETLogger.Start();
+            else ETLogger.Stop();
         }
 
         private void btnOpenLog_Click(object sender, EventArgs e)
         {
-            if(File.Exists(EntityToolsLogger.LogFilePath))
-                System.Diagnostics.Process.Start(EntityToolsLogger.LogFilePath);
+            if(File.Exists(ETLogger.LogFilePath))
+                System.Diagnostics.Process.Start(ETLogger.LogFilePath);
+        }
+
+        private void btnCheckCore_Click(object sender, EventArgs e)
+        {
+            if (EntityTools.Core.CheckCore())
+            {
+
+                XtraMessageBox.Show($"EntityToolsCore is VALID!\n\rCore hash: {EntityTools.CoreHash}");
+                Astral.Logger.WriteLine($"EntityToolsCore is VALID! Core hash: {EntityTools.CoreHash}");
+            }
+            else
+            {
+                XtraMessageBox.Show($"EntityToolsCore is INVALID!\n\rCore hash: {EntityTools.CoreHash}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                Astral.Logger.WriteLine($"EntityToolsCore is INVALID!\n\rCore hash: {EntityTools.CoreHash}");
+            }
         }
     }
 }

@@ -14,6 +14,7 @@ using System.Drawing;
 
 namespace EntityTools.Patches.Mapper
 {
+#if DEVELOPER
     /// <summary>
     /// Помощник для добавления CustomRegion
     /// </summary>
@@ -73,7 +74,7 @@ namespace EntityTools.Patches.Mapper
         private static Vector3 anchorPoint = null;
         private static readonly float anchorSize = 4;
 
-        #region Reflection
+    #region Reflection
         /// <summary>
         /// Функтор доступа к экземпляру Квестер-редактора
         /// Astral.Quester.Forms.Main.editorForm
@@ -84,7 +85,7 @@ namespace EntityTools.Patches.Mapper
         /// Функтор обновления списка CustomRegion'ов в окне Квестер-редактора
         /// </summary>
         private static Func<Object, System.Action> QuesterEditorRefreshRegions = null;
-        #endregion
+    #endregion
 
         /// <summary>
         /// Начала процедуры добавления CustomRegion'a
@@ -504,5 +505,6 @@ namespace EntityTools.Patches.Mapper
                 mapper = null;
             }
         }
-    }
+    } 
+#endif
 }
