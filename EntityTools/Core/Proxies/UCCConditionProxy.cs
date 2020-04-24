@@ -22,10 +22,9 @@ namespace EntityTools.Core.Proxies
             if (EntityTools.Core.Initialize(condition))
                 return condition.IsOK(refAction);
 
-            EntityTools.StopBot();
+            ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
 
-            Astral.Logger.WriteLine($"EntityToolsCore is invalid. Stop bot");
-            ETLogger.WriteLine($"EntityToolsCore is invalid. Stop bot");
+            EntityTools.StopBot();
 
             return false;
         }

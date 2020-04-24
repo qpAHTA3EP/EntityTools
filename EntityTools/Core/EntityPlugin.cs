@@ -125,7 +125,7 @@ namespace EntityTools
             LoadSettings();
 
 #if DEVELOPER
-            Patcher.Apply();
+            ETPatcher.Apply();
 
 #endif
         }
@@ -527,8 +527,7 @@ namespace EntityTools
                     }
                     catch (Exception e)
                     {
-                        ETLogger.WriteLine(LogType.Debug, e.ToString());
-                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, e.ToString());
+                        ETLogger.WriteLine(LogType.Debug, e.ToString(), true);
                     }
                     finally
                     {

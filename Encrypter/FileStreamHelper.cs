@@ -6,7 +6,7 @@ using Microsoft.Win32.SafeHandles;
 /// <summary>
 /// https://www.cyberforum.ru/post9373739.html
 /// </summary>
-namespace Encrypter
+namespace Encryptor
 {
     public static class FileStreamHelper
     {

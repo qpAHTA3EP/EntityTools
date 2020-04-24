@@ -544,7 +544,7 @@ namespace EntityTools.Patches.Mapper
             RegenCache();
 
 #if DEBUG
-            ETLogger.WriteLine(Logger.LogType.Debug, "MapperFormExt::eventMapperDoubleClick");
+            ETLogger.WriteLine(LogType.Debug, "MapperFormExt::eventMapperDoubleClick");
 #endif
         }
 

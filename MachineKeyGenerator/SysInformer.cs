@@ -5,7 +5,7 @@ using System.Linq;
 using System.Management;
 using System.Security.Cryptography;
 using System.Text;
-using Encrypter;
+using Encryptor;
 
 namespace SysInfo
 {

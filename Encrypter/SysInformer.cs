@@ -5,7 +5,7 @@ using System.Linq;
 using System.Management;
 using System.Security.Cryptography;
 using System.Text;
-using Encrypter;
+using Encryptor;
 using System.IO;
 
 namespace SysInfo
@@ -138,7 +138,7 @@ namespace SysInfo
                 string hexStr = File.ReadAllText(keyFile);
                 if (!string.IsNullOrEmpty(hexStr))
                 {
-                    if (Encrypter.CryptoHelper.Decrypt_Astral(hexStr.HexToBytes(), publicKey, out decrMachineIdByte))
+                    if (Encryptor.CryptoHelper.Decrypt_Astral(hexStr.HexToBytes(), publicKey, out decrMachineIdByte))
                     {
                         decrMachineIdstr=  decrMachineIdByte.ToNormalString();
                         return true;

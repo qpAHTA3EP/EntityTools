@@ -338,11 +338,6 @@ namespace EntityCore
 
             return string.Empty;
         }
-
-        public bool CheckCore()
-        {
-            return true;
-        }
 #endif
 #if DEBUG
         public LinkedList<Entity> FindAllEntity(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete,

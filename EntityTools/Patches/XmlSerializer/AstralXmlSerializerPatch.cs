@@ -7,12 +7,18 @@ using Astral.Classes.SkillTrain;
 using Astral.Logic.UCC.Classes;
 using Astral.MultiTasks.Classes;
 using EntityTools.Reflection;
+#if HARMONY
+using HarmonyLib; 
+#endif
 
 namespace EntityTools.Patches.XmlSerializer
 {
     /// <summary>
     /// Патч класса Astral.Functions.XmlSerializer
     /// </summary>
+#if HARMONY
+    [HarmonyPatch(typeof(Astral.Functions.XmlSerializer), "GetExtraTypes")] 
+#endif
     internal static class AstralXmlSerializerPatch
     {
         static Func<List<Type>> GetPluginTypes = typeof(Astral.Controllers.Plugins).GetStaticFunction<List<Type>>("GetTypes");
@@ -21,7 +27,9 @@ namespace EntityTools.Patches.XmlSerializer
         static List<Type> MultitaskTypes = new List<Type>(10);
         static List<Type> SkillTrainTypes = new List<Type>(50);
 
-        internal static List<Type> GetExtraTypes(int typeNum)
+#if HARMONY
+        [HarmonyPrefix] 
+        internal static bool GetExtraTypes(out List<Type> __result, int typeNum)
         {
             if (UCCTypes.Count == 0 || QuesterTypes.Count == 0 || MultitaskTypes.Count == 0 || SkillTrainTypes.Count == 0)
             {
@@ -40,19 +48,59 @@ namespace EntityTools.Patches.XmlSerializer
             }
 
             switch (typeNum)
-                {
-                    case 1: // UCC types
-                        return UCCTypes;
-                    case 2: // Quester types
-                        return QuesterTypes;
-                    case 3: // SkillTrain types
-                        return MultitaskTypes;
-                    case 4: // Multitask types
-                        return SkillTrainTypes;
-                    default:
-                        return new List<Type>();
-                }
+            {
+                case 1: // UCC types
+                    __result = UCCTypes;
+                    break;
+                case 2: // Quester types
+                    __result = QuesterTypes;
+                    break;
+                case 3: // SkillTrain types
+                    __result = MultitaskTypes;
+                    break;
+                case 4: // Multitask types
+                    __result = SkillTrainTypes;
+                    break;
+                default:
+                    __result = new List<Type>();
+                break;
+            }
+            return false;
         }
+#else
+        internal static List<Type> GetExtraTypes(int typeNum)
+        {
+            if (UCCTypes.Count == 0 || QuesterTypes.Count == 0 || MultitaskTypes.Count == 0 || SkillTrainTypes.Count == 0)
+            {
+                UCCTypes.Clear();
+                QuesterTypes.Clear();
+                MultitaskTypes.Clear();
+                SkillTrainTypes.Clear();
+                // Заполняем все списки одновременно
+
+                // Проверяем типы, объявленные в Астрале
+                FillTypeLists(Assembly.GetEntryAssembly().GetTypes());
+
+                // Проверяем типы, объявленные в плагинах
+                if (GetPluginTypes != null)
+                    FillTypeLists(GetPluginTypes());
+            }
+
+            switch (typeNum)
+            {
+                case 1: // UCC types
+                    return UCCTypes;
+                case 2: // Quester types
+                    return QuesterTypes;
+                case 3: // SkillTrain types
+                    return MultitaskTypes;
+                case 4: // Multitask types
+                    return SkillTrainTypes;
+                default:
+                    return new List<Type>();
+            }
+        }
+#endif
 
         internal static void FillTypeLists(IEnumerable<Type> types)
         {

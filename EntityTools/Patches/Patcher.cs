@@ -1,4 +1,10 @@
-﻿using System;
+﻿#if HARMONY
+using HarmonyLib; 
+#else
+//#define Patch_AstralXmlSerializer
+#endif
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -10,7 +16,7 @@ namespace EntityTools.Patches
     /// <summary>
     /// Патчер, содержащий список всех патчей
     /// </summary>
-    internal static class Patcher
+    internal static class ETPatcher
     {
         /// <summary>
         /// Подмена штатного окна Mapper'a
@@ -35,22 +41,32 @@ namespace EntityTools.Patches
                         BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic));
 
 #endif
+        static bool Applied = false;
         public static void Apply()
         {
-            //foreach(var field in typeof(Patcher).GetFields(BindingFlags.NonPublic | BindingFlags.Static))
-            //{
-            //    if (field.GetValue(null) is Patch patch
-            //        && patch != null)
-            //    {
-            //        patch.Inject();
-            //    }
-            //}
+            if (!Applied)
+            {
+                //foreach(var field in typeof(Patcher).GetFields(BindingFlags.NonPublic | BindingFlags.Static))
+                //{
+                //    if (field.GetValue(null) is Patch patch
+                //        && patch != null)
+                //    {
+                //        patch.Inject();
+                //    }
+                //}
 
-            Patch_Mapper?.Inject();
+                Patch_Mapper?.Inject();
 
 #if Patch_AstralXmlSerializer
-            Patch_AstralXmlSerializer?.Inject();
+                Patch_AstralXmlSerializer?.Inject();
 #endif
+#if HARMONY
+                var harmony = new Harmony(nameof(EntityToolsPatcher));
+                harmony.PatchAll(); 
+#endif
+                Applied = true;
+            }
+
         }
     }
 #endif

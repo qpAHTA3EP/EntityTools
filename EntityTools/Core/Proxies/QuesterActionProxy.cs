@@ -29,10 +29,9 @@ namespace EntityTools.Core.Proxies
                 if (EntityTools.Core.Initialize(action))
                     return action.NeedToRun;
 
-                EntityTools.StopBot();
+                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
 
-                Astral.Logger.WriteLine($"EntityToolsCore is invalid. Stop bot");
-                ETLogger.WriteLine($"EntityToolsCore is invalid. Stop bot");
+                EntityTools.StopBot();
 
                 return false;
             }
@@ -57,10 +56,9 @@ namespace EntityTools.Core.Proxies
                         && result != null)
                         return result.Equals(true);
 
-                EntityTools.StopBot();
+                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
 
-                Astral.Logger.WriteLine($"EntityToolsCore is invalid. Stop bot");
-                ETLogger.WriteLine($"EntityToolsCore is invalid. Stop bot");
+                EntityTools.StopBot();
 
                 return false;
             }
@@ -87,10 +85,9 @@ namespace EntityTools.Core.Proxies
                         && result != null)
                         return result as Vector3;
 
-                EntityTools.StopBot();
+                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
 
-                Astral.Logger.WriteLine($"EntityToolsCore is invalid. Stop bot");
-                ETLogger.WriteLine($"EntityToolsCore is invalid. Stop bot");
+                EntityTools.StopBot();
 
                 return new Vector3();
             }
@@ -128,10 +125,9 @@ namespace EntityTools.Core.Proxies
             if (EntityTools.Core.Initialize(action))
                 return action.Run();
 
-            EntityTools.StopBot();
+            ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
 
-            Astral.Logger.WriteLine($"EntityToolsCore is invalid. Stop bot");
-            ETLogger.WriteLine($"EntityToolsCore is invalid. Stop bot");
+            EntityTools.StopBot();
 
             return ActionResult.Fail;
         }

@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.0424.0832</AssemblyVersion>
+    <AssemblyVersion>0.20.0424.1415</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -223,12 +223,16 @@
     <Compile Include="Patches\Mapper\AstralMapperOriginals.cs" />
     <Compile Include="Patches\Mapper\CustomRegionHelper.cs" />
     <Compile Include="Patches\Mapper\Enums.cs" />
-    <Compile Include="Patches\Mapper\MapperFormExt.cs" />
+    <Compile Include="Patches\Mapper\MapperFormExt.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Patches\Mapper\MapperFormExt.Designer.cs">
       <DependentUpon>MapperFormExt.cs</DependentUpon>
     </Compile>
     <Compile Include="Patches\Mapper\MapperGraphCache.cs" />
-    <Compile Include="Patches\Mapper\NewDrawings.cs" />
+    <Compile Include="Patches\Mapper\NewDrawings.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Patches\Mapper\NewDrawings.Designer.cs">
       <DependentUpon>NewDrawings.cs</DependentUpon>
     </Compile>
@@ -391,6 +395,10 @@
   <ItemGroup>
     <None Include="Resources\Entity_7_40х48.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <PackageReference Include="Lib.Harmony">
+      <Version>2.0.0.10</Version>
+    </PackageReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

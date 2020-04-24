@@ -212,7 +212,7 @@ namespace EntityTools.Patches.Mapper
             }*/
             catch (Exception ex)
             {
-                ETLogger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex.ToString());
+                ETLogger.WriteLine(LogType.Debug, "Error in map thread :\r\n" + ex.ToString());
             }
             /*finally
             {

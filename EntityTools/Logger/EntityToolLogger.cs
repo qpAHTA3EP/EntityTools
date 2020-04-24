@@ -76,7 +76,6 @@ namespace EntityTools
                             break;
                     }
                     LogCache.AppendLine(Text);
-
                 }
                 catch { }
             }

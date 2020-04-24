@@ -1,5 +1,6 @@
 ﻿#define PROFILING
 using Astral.Classes.ItemFilter;
+using EntityTools;
 using EntityTools.Enums;
 using MyNW.Classes;
 using MyNW.Internals;

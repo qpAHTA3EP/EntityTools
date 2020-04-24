@@ -6,13 +6,13 @@ using System.Security.Cryptography;
 using System.Text;
 #if ENCRYPTOR
 using Extensions;
-using Encrypter;
+using Encryptor;
 #else
 using EntityTools.Extensions;
 using EntityTools.Tools;
 #endif
 
-namespace Encrypter
+namespace Encryptor
 {
     public static class CryptoHelper
     {
@@ -28,7 +28,7 @@ namespace Encrypter
                     // Если длина ключа не соответствует требованиям
                     // в качестве ключа используется 256 битный хэш ключа
                     byte[] keyHash = (key.Length % 8 == 0 && key.Length <= 32) ? key : sha256.ComputeHash(key);
-#if DEBUG
+#if DEBUG_OUTFILES
                     File.WriteAllText("keyHash_decrypt", keyHash.ToHexString());
 #endif
 
@@ -44,7 +44,7 @@ namespace Encrypter
                         offset += IV.Length;
                         // *2*
                         //byte[] iv = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16 };
-#if DEBUG
+#if DEBUG_OUTFILES
                         File.WriteAllText("ir_decrypt", IV.ToHexString());
                         File.WriteAllText("encrDataFull_decrypt", data.ToHexString());
 #endif
@@ -54,7 +54,7 @@ namespace Encrypter
                         Array.Copy(data, encryptedData, encryptedData.LongLength);
                         //Array.Resize(ref data, data.Length - 16);
                         //data.CopyTo(out byte[] encryptedData, data.Length - 16);
-#if DEBUG
+#if DEBUG_OUTFILES
                         File.WriteAllText("encrData_decrypt", encryptedData.ToHexString());
 #endif  
 #endif
@@ -237,7 +237,7 @@ namespace Encrypter
                     // Если длина ключа не соответствует требованиям
                     // в качестве ключа используется 256 битный хэш ключа
                     byte[] keyHash = (key.Length % 8 == 0 && key.Length <= 32) ? key : sha256.ComputeHash(key);
-#if DEBUG
+#if DEBUG_OUTFILES
                     File.WriteAllText("keyHash_encrypt", keyHash.ToHexString());
 #endif
 
@@ -269,7 +269,7 @@ namespace Encrypter
                         memStream.Write(lenIVbytes, 0, lenIVbytes.Length);
                         memStream.Write(IV, 0, IV.Length);
 
-#if DEBUG
+#if DEBUG_OUTFILES
                         File.WriteAllText("ir_encrypt", IV.ToHexString());
 #endif
                         //Create a CryptoStream, and encrypt MemoryStream with the Rijndael class.  
@@ -279,7 +279,7 @@ namespace Encrypter
 
                         cryptoStream.Write(data, 0, data.Length);
                         cryptoStream.FlushFinalBlock();
-#if DEBUG
+#if DEBUG_OUTFILES
                         File.WriteAllText("encrData_encrypt", memStream.ToArray().ToHexString());
 #endif
                         // добавляем соль и выводим результат

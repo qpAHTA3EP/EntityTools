@@ -24,9 +24,10 @@ namespace EntityTools.Core.Proxies
                 if (EntityTools.Core.Initialize(action))
                     return action.NeedToRun;
 
-                ETLogger.WriteLine($"EntityToolsCore is invalid. Stop bot", true);
+                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
 
                 EntityTools.StopBot();
+
                 return false;
             }
         }
@@ -55,9 +56,9 @@ namespace EntityTools.Core.Proxies
             if (EntityTools.Core.Initialize(action))
                 return action.Run();
 
-            EntityTools.StopBot();
+            ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
 
-            ETLogger.WriteLine($"EntityToolsCore is invalid. Stop bot", true);
+            EntityTools.StopBot();
 
             return false;
         }

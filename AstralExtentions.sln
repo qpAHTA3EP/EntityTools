@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetHardwareInfo", "GetHardw
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MachineKeyGenerator", "MachineKeyGenerator\MachineKeyGenerator.csproj", "{F5A6654B-864D-4B4D-B421-819BBD57584C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Encrypter", "Encrypter\Encrypter.csproj", "{F557CCF3-CFC5-4A2E-92FF-B029B266ED6D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Encryptor", "Encrypter\Encryptor.csproj", "{F557CCF3-CFC5-4A2E-92FF-B029B266ED6D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityCore", "EntityToolCore\EntityCore.csproj", "{BD4ED31E-FDA2-4B75-A5FF-AC385A9B20DF}"
 EndProject

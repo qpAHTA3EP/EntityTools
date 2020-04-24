@@ -401,7 +401,7 @@ namespace EntityTools.Patches.Mapper
                 AddNavigationNodeStatic.LogWatch();
 #endif
 #if LOG && DEBUG
-                ETLogger.WriteLine(Logger.LogType.Debug, $"MapperExtWithCache:: Graph Nodes: {graphCache.FullGraph.Nodes.Count}");
+                ETLogger.WriteLine(LogType.Debug, $"MapperExtWithCache:: Graph Nodes: {graphCache.FullGraph.Nodes.Count}");
 #endif
                 ETLogger.WriteLine(ex.ToString());
             }

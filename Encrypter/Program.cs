@@ -7,7 +7,7 @@ using Extensions;
 using System.Text;
 using System.Reflection;
 
-namespace Encrypter
+namespace Encryptor
 {
     internal static partial class Constants
     {
@@ -44,7 +44,7 @@ namespace Encrypter
             if (args.Length > 0)
             {
                 string arg1 = args[0];
-#if DEBUG
+#if DEBUG_OUTFILES
                 if(arg1 == "-test")
                 {
                     string testKeyFile = "Test.key";
@@ -123,15 +123,7 @@ namespace Encrypter
                 else if (arg1 == "-k")
                 {
                     if (args.Length > 1)
-                    {
                         keyFile = args[1];
-                        if (!File.Exists(keyFile))
-                        {
-                            Console.WriteLine($"Not found KeyFile: {keyFile}");
-                            keyFile = DefaultKeyFile;
-                            Console.WriteLine($"Generate default: {keyFile}");
-                        }
-                    }
                     else
                     {
                         keyFile = DefaultKeyFile;
@@ -247,12 +239,10 @@ namespace Encrypter
             string keyCode = SysInfo.SysInformer.GetMashineID(true);
             File.WriteAllText(keyFile, keyCode);
 
-            //using (TextWriter file = new StreamWriter(keyFile))
-            //{
-            //    file.Write(SysInfo.SysInformer.GetMashineID(true));
-            //}
-            Console.WriteLine("KeyCode: ");
+#if DEBUG_OUTFILES
+            Console.Write("KeyCode: ");
             Console.WriteLine(keyCode);
+#endif
             return true;
         }
 
@@ -294,9 +284,11 @@ namespace Encrypter
                 {
                     byte[] data = File.ReadAllBytes(dataFile);
 
+#if false
                     string fullDataFile = Path.GetFullPath(dataFile);
                     string md5File = string.Concat(Path.GetDirectoryName(fullDataFile), Path.DirectorySeparatorChar, Path.GetFileNameWithoutExtension(fullDataFile), '_', Path.GetFileNameWithoutExtension(keyFile), '_', DateTime.Now.ToString("yyy-MM-dd_hh-mm"), ".md5");
-                    File.WriteAllText(md5File, CryptoHelper.MD5_HashString(data));
+                    File.WriteAllText(md5File, CryptoHelper.MD5_HashString(data)); 
+#endif
 
                     string hexKeyStr = File.ReadAllText(keyFile);
                     if (SysInfo.SysInformer.MashineIDFromKey(hexKeyStr, out byte[] mashineIdBytes, out string mashinIdStr))

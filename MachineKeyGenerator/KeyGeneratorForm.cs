@@ -72,7 +72,7 @@ namespace MachineKeyGenerator
             machineId = SysInfo.SysInformer.GetMashineID(false);
             tbId.Text = machineId;
             machineIdByte = machineId.TextToBytes();
-            encrMachineIdByte = Encrypter.CryptoHelper.Encrypt_Astral(machineIdByte, SysInfo.SysInformer.publicKey);
+            encrMachineIdByte = Encryptor.CryptoHelper.Encrypt_Astral(machineIdByte, SysInfo.SysInformer.publicKey);
             if (encrMachineIdByte != null)
             {
                 encrMachineId = encrMachineIdByte.ToHexString();
@@ -84,7 +84,7 @@ namespace MachineKeyGenerator
         {
             if (!string.IsNullOrEmpty(encrMachineId))
             {
-                decrMachineIdByte = Encrypter.CryptoHelper.Decrypt_Astral(encrMachineId.HexToBytes(), SysInfo.SysInformer.publicKey);
+                decrMachineIdByte = Encryptor.CryptoHelper.Decrypt_Astral(encrMachineId.HexToBytes(), SysInfo.SysInformer.publicKey);
                 if (decrMachineIdByte != null)
                 {
                     decrMachineId = decrMachineIdByte.ToNormalString();
