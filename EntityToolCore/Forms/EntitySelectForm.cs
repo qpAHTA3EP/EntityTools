@@ -62,17 +62,6 @@ namespace EntityCore.Forms
                 && @this.dgvEntities.CurrentRow != null 
                 || !string.IsNullOrEmpty(@this.tbPattern.Text)))
             {
-                /*if (!@this.dgvEntities.CurrentRow.IsNewRow)
-                {
-                    return new EntityDef
-                    {
-                        entity = @this.dgvEntities.CurrentRow.Tag as Entity,
-                        Name = @this.dgvEntities.CurrentRow.Cells[@this.clmnNameInd].Value.ToString(),
-                        NameUntranslated = @this.dgvEntities.CurrentRow.Cells[@this.clmnNameUntranslatedInd].Value.ToString(),
-                        InternalName = @this.dgvEntities.CurrentRow.Cells[@this.clmnInternalNameInd].Value.ToString(),
-                        Distance = (double)@this.dgvEntities.CurrentRow.Cells[@this.clmnDistanceInd].Value
-                    };
-                }*/
                 if (string.IsNullOrEmpty(@this.tbPattern.Text))
                 {
                     switch (@this.cbNameType.SelectedItem)
@@ -107,11 +96,13 @@ namespace EntityCore.Forms
             if (check == null)
                 check = (Entity e) => false;
 
+#if false
             dgvEntities.DataSource = null;
 
             clmnName.DataPropertyName = string.Empty;
             clmnInternalName.DataPropertyName = string.Empty;
-            clmnNameUntranslated.DataPropertyName = string.Empty;
+            clmnNameUntranslated.DataPropertyName = string.Empty; 
+#endif
 
             dgvEntities.Rows.Clear();
 
@@ -150,12 +141,20 @@ namespace EntityCore.Forms
 
         private void btnReload_Click(object sender, EventArgs e)
         {
-            string entityUntrName = dgvEntities?.CurrentRow.Cells[clmnNameUntranslatedInd].Value?.ToString() ?? string.Empty;
+            //string entityUntrName = dgvEntities?.CurrentRow.Cells[clmnNameUntranslatedInd].Value?.ToString() ?? string.Empty;
+
+            // Запоминаем текущую позицию
+            Predicate<object> predicate = null;
+            if (!(dgvEntities.CurrentRow?.Tag is null))
+            {
+                object entt = dgvEntities.CurrentRow.Tag;
+                predicate = (object tag) => ReferenceEquals(tag, entt);
+            }
 
             DataGridViewColumn sortedColumn = dgvEntities.SortedColumn;
             SortOrder sortOrder = dgvEntities.SortOrder;
 
-            FillEntitiesDgv(EntityToPatternComparer.Get(entityUntrName, (ItemFilterStringType)cbStrMatch.SelectedItem, (EntityNameType)cbNameType.SelectedItem));
+            FillEntitiesDgv(predicate);//EntityToPatternComparer.Get(entityUntrName, (ItemFilterStringType)cbStrMatch.SelectedItem, (EntityNameType)cbNameType.SelectedItem));
 
             if (sortedColumn != null)
             {
@@ -168,12 +167,86 @@ namespace EntityCore.Forms
                         dgvEntities.Sort(dgvEntities.SortedColumn, System.ComponentModel.ListSortDirection.Descending);
                         break;
                 }
+
+                // устанавливаем фокус на ранее выбранную строку после сортировки
+                // если сортировка не производилась, то фокус нужной строке передается в FillEntitiesDgv(predicate);
+                if (predicate != null)
+                {
+                    foreach (DataGridViewRow row in dgvEntities.Rows)
+                    {
+                        if (predicate(row.Tag))
+                        {
+                            row.Cells[0].Selected = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void dgvEntities_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (System.Windows.Forms.Control.ModifierKeys == Keys.Control
+                && !(dgvEntities.CurrentRow is null))
+            {
+                string text = (cbStrMatch.SelectedItem.Equals(ItemFilterStringType.Regex)
+                               && !string.IsNullOrEmpty(tbPattern.Text)) ? "|" : string.Empty;
+                switch (cbNameType.SelectedItem)
+                {
+                    case EntityNameType.InternalName:
+                        text += dgvEntities.CurrentRow.Cells[clmnInternalNameInd].Value.ToString();
+                        break;
+                    case EntityNameType.NameUntranslated:
+                        text += dgvEntities.CurrentRow.Cells[clmnNameUntranslatedInd].Value.ToString();
+                        break;
+                }
+                tbPattern.Text += text;
+            }
+        }
+
+        private void dgvEntities_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            // Запоминаем текущую позицию
+            Predicate<object> predicate = null;
+            if (!(dgvEntities.CurrentRow?.Tag is null))
+            {
+                object entt = dgvEntities.CurrentRow.Tag;
+                predicate = (object tag) => ReferenceEquals(tag, entt);
+            }
+
+            if (dgvEntities.SortedColumn?.DisplayIndex == e.ColumnIndex)
+            {
+                System.ComponentModel.ListSortDirection sortDirection;
+                // переключаем режим сортировки текущего столбца
+                if (dgvEntities.SortOrder != SortOrder.Ascending)
+                    sortDirection = System.ComponentModel.ListSortDirection.Ascending;
+                else sortDirection = System.ComponentModel.ListSortDirection.Descending;
+                dgvEntities.Sort(dgvEntities.SortedColumn, sortDirection);
+            }
+            else
+            {
+                // переключаемся на сортировку другого столбца
+                dgvEntities.Sort(dgvEntities.Columns[e.ColumnIndex], System.ComponentModel.ListSortDirection.Ascending);
+            }
+
+            // устанавливаем фокус на ранее выбранную строку
+            if (!(predicate is null))
+            {
+                foreach (DataGridViewRow row in dgvEntities.Rows)
+                {
+                    if (predicate(row.Tag))
+                    {
+                        row.Cells[0].Selected = true;
+                        break;
+                    }
+                }
             }
         }
 
         private void dgvEntities_MouseDown(object sender, MouseEventArgs e)
         {
-            if (dgvEntities.CurrentRow != null)
+            if (!(dgvEntities.CurrentRow is null)
+                && System.Windows.Forms.Control.ModifierKeys == Keys.Control)
             {
                 switch (cbNameType.SelectedItem)
                 {
@@ -221,26 +294,6 @@ namespace EntityCore.Forms
                         tbPattern.Text += e.Data.GetData(DataFormats.Text).ToString();
                         break;
                 }
-            }
-        }
-
-        private void dgvEntities_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (System.Windows.Forms.Control.ModifierKeys == Keys.Control
-                && dgvEntities.CurrentRow != null)
-            {
-                string text = (cbStrMatch.SelectedItem.Equals(ItemFilterStringType.Regex)
-                               && !string.IsNullOrEmpty(tbPattern.Text)) ? "|" : string.Empty;
-                switch (cbNameType.SelectedItem)
-                {
-                    case EntityNameType.InternalName:
-                        text += dgvEntities.CurrentRow.Cells[clmnInternalNameInd].Value.ToString();
-                        break;
-                    case EntityNameType.NameUntranslated:
-                        text += dgvEntities.CurrentRow.Cells[clmnNameUntranslatedInd].Value.ToString();
-                        break;
-                }
-                tbPattern.Text += text;
             }
         }
 

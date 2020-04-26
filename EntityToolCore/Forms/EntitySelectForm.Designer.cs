@@ -89,33 +89,33 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dgvEntities.BackgroundColor = System.Drawing.SystemColors.Control;
-            this.dgvEntities.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.dgvEntities.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.Disable;
+            this.dgvEntities.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.dgvEntities.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+            this.dgvEntities.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
+            this.dgvEntities.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.dgvEntities.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.clmnName,
             this.clmnInternalName,
             this.clmnNameUntranslated,
             this.clmnDistance});
-            this.dgvEntities.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dgvEntities.Location = new System.Drawing.Point(13, 13);
             this.dgvEntities.MultiSelect = false;
             this.dgvEntities.Name = "dgvEntities";
             this.dgvEntities.ReadOnly = true;
-            this.dgvEntities.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             this.dgvEntities.RowHeadersVisible = false;
             this.dgvEntities.RowHeadersWidth = 20;
+            this.dgvEntities.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.dgvEntities.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.dgvEntities.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
+            this.dgvEntities.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvEntities.ShowEditingIcon = false;
             this.dgvEntities.ShowRowErrors = false;
             this.dgvEntities.Size = new System.Drawing.Size(758, 375);
             this.dgvEntities.TabIndex = 1;
-            this.dgvEntities.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgvEntities_MouseClick);
             this.dgvEntities.MouseDown += new System.Windows.Forms.MouseEventHandler(this.dgvEntities_MouseDown);
             // 
             // btnReload
             // 
-            this.btnReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnReload.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnReload.Image = global::EntityCore.Properties.Resources.miniRefresh;
             this.btnReload.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -146,7 +146,8 @@
             // 
             this.cbNameType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cbNameType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbNameType.FormattingEnabled = true;
+            this.cbNameType.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbNameType.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.cbNameType.Items.AddRange(new object[] {
             "NameUntranslated"});
             this.cbNameType.Location = new System.Drawing.Point(13, 399);
@@ -158,6 +159,7 @@
             // 
             this.cbStrMatch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cbStrMatch.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbStrMatch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cbStrMatch.Location = new System.Drawing.Point(13, 428);
             this.cbStrMatch.Name = "cbStrMatch";
             this.cbStrMatch.Size = new System.Drawing.Size(130, 21);
@@ -207,7 +209,6 @@
             this.clmnDistance.HeaderText = "Distance";
             this.clmnDistance.Name = "clmnDistance";
             this.clmnDistance.ReadOnly = true;
-            this.clmnDistance.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             this.clmnDistance.Width = 74;
             // 
             // EntitySelectForm

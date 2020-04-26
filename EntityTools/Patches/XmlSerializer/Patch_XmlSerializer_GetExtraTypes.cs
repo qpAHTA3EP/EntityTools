@@ -1,4 +1,8 @@
-﻿using System;
+﻿#if HARMONY
+using HarmonyLib; 
+#endif
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -7,25 +11,26 @@ using Astral.Classes.SkillTrain;
 using Astral.Logic.UCC.Classes;
 using Astral.MultiTasks.Classes;
 using EntityTools.Reflection;
-#if HARMONY
-using HarmonyLib; 
-#endif
 
-namespace EntityTools.Patches.XmlSerializer
+namespace EntityTools.Patches
 {
+#if DEVELOPER
     /// <summary>
-    /// Патч класса Astral.Functions.XmlSerializer
+    /// Патч метода Astral.Functions.XmlSerializer.GetExtraTypes()
     /// </summary>
 #if HARMONY
     [HarmonyPatch(typeof(Astral.Functions.XmlSerializer), "GetExtraTypes")] 
 #endif
-    internal static class AstralXmlSerializerPatch
+    internal class Patch_XmlSerializer_GetExtraTypes : Patch
     {
         static Func<List<Type>> GetPluginTypes = typeof(Astral.Controllers.Plugins).GetStaticFunction<List<Type>>("GetTypes");
         static List<Type> UCCTypes = new List<Type>(20);
         static List<Type> QuesterTypes = new List<Type>(100);
         static List<Type> MultitaskTypes = new List<Type>(10);
         static List<Type> SkillTrainTypes = new List<Type>(50);
+
+        internal Patch_XmlSerializer_GetExtraTypes() : base(typeof(Astral.Functions.XmlSerializer).GetMethod("GetExtraTypes", ReflectionHelper.DefaultFlags), typeof(Patch_XmlSerializer_GetExtraTypes).GetMethod(nameof(GetExtraTypes), ReflectionHelper.DefaultFlags))
+        { }
 
 #if HARMONY
         [HarmonyPrefix] 
@@ -56,10 +61,10 @@ namespace EntityTools.Patches.XmlSerializer
                     __result = QuesterTypes;
                     break;
                 case 3: // SkillTrain types
-                    __result = MultitaskTypes;
+                    __result = SkillTrainTypes;
                     break;
                 case 4: // Multitask types
-                    __result = SkillTrainTypes;
+                    __result = MultitaskTypes;
                     break;
                 default:
                     __result = new List<Type>();
@@ -105,7 +110,7 @@ namespace EntityTools.Patches.XmlSerializer
         internal static void FillTypeLists(IEnumerable<Type> types)
         {
             // перебираем типы, объявленные в Астрале
-            foreach(Type type in types)
+            foreach (Type type in types)
             {
                 if (type.BaseType == typeof(UCCAction))
                 {
@@ -142,11 +147,12 @@ namespace EntityTools.Patches.XmlSerializer
                 {
                     SkillTrainTypes.Add(type);
                 }
-                if (type.BaseType == typeof(MTAction))
+                else if (type.BaseType == typeof(MTAction))
                 {
                     MultitaskTypes.Add(type);
                 }
             }
         }
-    }
+    } 
+#endif
 }
