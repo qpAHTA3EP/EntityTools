@@ -106,12 +106,15 @@ namespace EntityTools.UCC.Actions
                             int lockedNum = 0;
                             int okUnlockedNum = 0;
                             bool lockedTrue = true;
+#if DEBUG && DEBUG_LOG
+                            int num = 0;
+#endif
                             foreach (UCCCondition c in CustomConditions)
                             {
                                 if (c is ICustomUCCCondition iCond)
                                 {
 #if DEBUG && DEBUG_LOG
-                                    if (okUnlockedNum > 0 || lockedNum > 0)
+                                    if (num > 0)
                                         debugStr.Append("; ");
                                     debugStr.Append(iCond.GetType().Name);
 #endif
@@ -153,7 +156,7 @@ namespace EntityTools.UCC.Actions
                                 else
                                 {
 #if DEBUG && DEBUG_LOG
-                                    if (okUnlockedNum > 0 || lockedNum > 0)
+                                    if (num > 0)
                                         debugStr.Append(" ;");
                                     debugStr.Append(c.Tested);
 #endif
@@ -192,6 +195,7 @@ namespace EntityTools.UCC.Actions
 #endif
                                     }
                                 }
+                                num++;
                             }
 #if DEBUG && DEBUG_LOG
                             debugStr.Append(']');
@@ -199,7 +203,8 @@ namespace EntityTools.UCC.Actions
 
                             // Если множетство незалоченных условий пустое, тогда условие истино
                             // Если оно НЕ пустое, тогда должно встретиться хотя бы одно истиное 
-                            result = lockedTrue && (Conditions.Count == lockedNum || okUnlockedNum > 0);
+                            result = lockedTrue && (CustomConditions.Count == lockedNum || okUnlockedNum > 0);
+
                             // отрицание результата, если задан флаг
                             if (Not)
                                 result = !result;
@@ -254,6 +259,7 @@ namespace EntityTools.UCC.Actions
 #endif
 
                                 }
+                                num++;
                             }
 
                             if(Not)

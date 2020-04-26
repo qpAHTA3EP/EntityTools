@@ -168,6 +168,7 @@
     <Compile Include="Editors\EquationUiEditor.cs" />
     <Compile Include="Editors\VariableSelectUiEditor.cs" />
     <Compile Include="Expressions\AstBase.cs" />
+    <Compile Include="Expressions\DateFunctors.cs" />
     <Compile Include="Expressions\Expression.cs" />
     <Compile Include="Expressions\NumberExpression.cs" />
     <Compile Include="Expressions\NumberFunctors.cs" />

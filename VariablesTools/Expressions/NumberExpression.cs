@@ -10,6 +10,7 @@ using VariableTools.Expressions.Operators;
 using System.Diagnostics;
 using System.Xml.Serialization;
 using VariableTools.Classes;
+using static VariableTools.Expressions.DateFunctors;
 
 namespace VariableTools.Expressions
 {
@@ -1489,6 +1490,82 @@ namespace VariableTools.Expressions
 						// Открывающая скобка '(' не найдена
 						throw new FatalParseError($"ParseRandom: Symbol '{Parser.Symbols.openGroupBrace}' does not found after {{{Parser.Predicates.Random}}} predicate", expr);
 					}
+                }
+                else throw new ParseError($"ParseRandom: Predicate {{{Parser.Predicates.Random}}} does not found at the beginning of the expression", expr);
+            }
+            catch (Exception e)
+            {
+                expr = exprBackup;
+                throw e;
+            }
+        }
+
+        /// <summary>
+        /// Извлечение функции 'Now' из входной строки expression
+        /// В случае успеха соответствующая функции подстрока удаляется из expression
+        /// В противном случае генерируется исключение ParseError
+        /// </summary>
+        /// <param name="expr"></param>
+        /// <returns>Узел синтаксического дерева RandomNumber</returns>
+        protected static DateTimeNow ParseNow(ref string expr)
+        {
+            string exprBackup = expr;
+            ErrorList subErrors = new ErrorList();
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
+                {
+                    throw new FatalParseError("ParseNow: Expression string is empty");
+                }
+
+                expr = expr.TrimStart();
+
+                if (expr.StartsWith(Parser.Predicates.Random, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Обнаружен предикативный литерал 'Random'
+                    expr = expr.Substring(Parser.Predicates.Random.Length);
+
+                    // Ищем открывающую скобку '('
+                    if (Parser.Symbols.TrimOpenGroupBracesAndWhiteSpace(ref expr))
+                    {
+                        // Найдена открывающая скобка '('
+
+                        // Ищем выражение вида Addition
+                        NumberAstNode operand = null;
+                        try
+                        {
+                            operand = ParseAddition(ref expr);
+                        }
+                        catch (ParseError opErr)
+                        {
+                            // Операнд не найден, значит максимум случайного числа не определен
+                            subErrors.Add(opErr);
+
+                        }
+
+                        // Ищем закрывающую скобку ')'
+                        if (Parser.Symbols.TrimCloseGroupBracesAndWhiteSpace(ref expr))
+                        {
+                            // Найдена закрывающая скобка ')'
+
+                            // Конструируем функтор Random
+                            return new RandomNumber(operand);
+                        }
+                        else
+                        {
+                            // Закрывающая скобка ')' не найдена
+                            // следовательно входная строка не соответствует правилу Random
+                            // Восстанавливаем входную строку
+                            throw new FatalParseError(subErrors, $"ParseRandom: Symbol '{Parser.Symbols.closeGroupBrace}' does not found", expr);
+
+                        }
+                    }
+                    else
+                    {
+                        // Открывающая скобка '(' не найдена
+                        throw new FatalParseError($"ParseRandom: Symbol '{Parser.Symbols.openGroupBrace}' does not found after {{{Parser.Predicates.Random}}} predicate", expr);
+                    }
                 }
                 else throw new ParseError($"ParseRandom: Predicate {{{Parser.Predicates.Random}}} does not found at the beginning of the expression", expr);
             }

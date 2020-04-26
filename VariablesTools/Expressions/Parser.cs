@@ -636,6 +636,37 @@ namespace VariableTools.Expressions
             /// Генератор случайных чисел
             /// </summary>
             public static readonly string Random = "Random";
+
+            /// <summary>
+            /// Текущее время и дата
+            /// </summary>
+            public static readonly string Now = "Now";
+
+            /// <summary>
+            /// Количество дней
+            /// </summary>
+            public static readonly string Days = "Days";
+            /// <summary>
+            /// Количество месяцев
+            /// </summary>
+            public static readonly string Months = "Months";
+            /// <summary>
+            /// Количество лет
+            /// </summary>
+            public static readonly string Years = "Years";
+
+            /// <summary>
+            /// Количество часов
+            /// </summary>
+            public static readonly string Hours = "Hours";
+            /// <summary>
+            /// Количество минут
+            /// </summary>
+            public static readonly string Minutes = "Minutes";
+            /// <summary>
+            /// Количество секунд
+            /// </summary>
+            public static readonly string Seconds = "Seconds";
         }//class Predicates
 
 

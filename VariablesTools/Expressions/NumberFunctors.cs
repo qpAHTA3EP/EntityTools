@@ -120,5 +120,4 @@ namespace VariableTools.Expressions.Functions
             //return $"{GetType().Name} {{Max='{Operand.ToString()}'}}";
         }
     }
-
 }
