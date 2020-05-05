@@ -27,7 +27,7 @@ namespace EntityTools.Reflection
             while (indices[rank] <= upper_bound)
             {
                 object value = array.GetValue(indices);
-                if (!(value is null))
+                if (value != null)
                     array.SetValue(CreateDeepCopyInternal(state, value), indices);
 
                 if (next_rank < array.Rank)
@@ -77,7 +77,7 @@ namespace EntityTools.Reflection
                     BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
                 {
                     object original = f.GetValue(o);
-                    if (!(original is null))
+                    if (original != null)
                         f.SetValue(copy, CreateDeepCopyInternal(state, original));
                 }
                 return copy;

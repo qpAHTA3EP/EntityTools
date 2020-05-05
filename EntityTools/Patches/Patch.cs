@@ -32,17 +32,14 @@ namespace EntityTools.Patches
 
                     *tar = *inj;
                 }
+                ETLogger.WriteLine($"Patch of the '{methodToReplace.ReflectedType.Name}.{methodToReplace.Name}' succeeded!", true);
             }
             else
             {
-
-                ETLogger.WriteLine("Fail to inject:");
-                if (methodToReplace == null)
-                    ETLogger.WriteLine($"MethodToReplace: NULL");
-                else ETLogger.WriteLine($"MethodToReplace: {methodToReplace.Name}");
-                if (methodToInject == null)
-                    ETLogger.WriteLine($"MethodToInject: NULL");
-                else ETLogger.WriteLine($"MethodToInject: {methodToInject.Name}");
+                string msg = string.Concat("Fail to inject:", Environment.NewLine,
+                                            (methodToReplace == null) ? $"MethodToReplace: NULL" : $"MethodToReplace: {methodToReplace.Name}", Environment.NewLine,
+                                            (methodToInject == null) ? $"MethodToInject: NULL" : $"MethodToInject: {methodToInject.Name}");
+                ETLogger.WriteLine(LogType.Error, msg, true);
             }
         }
     } 

@@ -56,7 +56,7 @@ namespace QuesterAssistant.Actions
             if (XtraMessageBox.Show("Add a dialog ? (open the dialog window before)", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 DialogEdit.Show(Dialogs);
-            }            
+            }
         }
         public override void InternalReset() { }
         public override void OnMapDraw(GraphicsNW graph) { }

@@ -7,7 +7,6 @@ using EntityTools.UCC.Actions;
 using EntityTools.UCC.Conditions;
 using EntityTools.Enums;
 using EntityTools.Reflection;
-using EntityTools.Tools;
 using Astral.Classes.ItemFilter;
 
 namespace EntityTools.Editors

@@ -54,14 +54,27 @@ namespace VariableTools.Classes
     [Serializable]
     public class VariableContainer : ISerializable, IXmlSerializable
     {
-        public VariableContainer() { }
-        public VariableContainer(double v, string n, AccountScopeType asq = AccountScopeType.Global, ProfileScopeType psq = ProfileScopeType.Common)
+        private VariableContainer()
+        {
+#if false
+            LastOperation = //$"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}] {EntityManager.LocalPlayer.InternalName} initialized with the value {val}";
+                    string.Concat('[', DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), "] ",
+                                (EntityManager.LocalPlayer.InternalName is null || string.IsNullOrEmpty(EntityManager.LocalPlayer.InternalName)) ? "Offline" : EntityManager.LocalPlayer.InternalName,
+                                " initialized with the value ", val); 
+#endif
+        }
+        private VariableContainer(double v, string n, AccountScopeType asq = AccountScopeType.Global, ProfileScopeType psq = ProfileScopeType.Common, bool s = false)
         {
             name = n;
             val = v;
             accountScope = asq;
             profileScope = psq;
             qualifier = VariableTools.GetScopeQualifier(accountScope, profileScope);
+            Save = s;
+            LastOperation = //$"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}] {EntityManager.LocalPlayer.InternalName} initialized with the value {val}";
+                            string.Concat('[', DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), "] ",
+                                        (EntityManager.LocalPlayer.InternalName is null || string.IsNullOrEmpty(EntityManager.LocalPlayer.InternalName)) ? "Offline" : EntityManager.LocalPlayer.InternalName,
+                                        " initialized with the value ", val);
         }
 
         /// <summary>
@@ -84,9 +97,13 @@ namespace VariableTools.Classes
             {
                 if(name != value)
                 {
+                    string opDescription = string.Concat('[', DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),"] ",
+                                            (EntityManager.LocalPlayer.InternalName is null || string.IsNullOrEmpty(EntityManager.LocalPlayer.InternalName)) ? "Offline" : EntityManager.LocalPlayer.InternalName,
+                                            " changed '",nameof(Name),"' from '",name,"' to '",value,"'. The value is ",val);
                     if (VariableTools.Variables.ContainsKey(Key))
                         VariableTools.Variables.ChangeItemKey(this, new VariableKey(value, accountScope, profileScope));
                     name = value;
+                    LastOperation = opDescription;
                 }
             }
         }
@@ -104,7 +121,18 @@ namespace VariableTools.Classes
                     return val;
                 return 0;
             }
-            set => val = value;
+            set
+            {
+                if (val != value)
+                {
+                    val = value;
+                    LastOperation = //$"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}] {EntityManager.LocalPlayer.InternalName} assigned the value {val}";
+                                    string.Concat('[', DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), "] ",
+                                        (EntityManager.LocalPlayer.InternalName is null || string.IsNullOrEmpty(EntityManager.LocalPlayer.InternalName)) ? "Offline" : EntityManager.LocalPlayer.InternalName,
+                                        " assigned the value ", val);
+
+                }
+            }
         }
 
         [XmlIgnore]
@@ -119,12 +147,16 @@ namespace VariableTools.Classes
             {
                 if (accountScope != value)
                 {
-                    //string newQualifier = VariableTools.GetScopeQualifier(value, profileScope);
+                    string opDescription = string.Concat('[', DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), "] ",
+                                            (EntityManager.LocalPlayer.InternalName is null || string.IsNullOrEmpty(EntityManager.LocalPlayer.InternalName)) ? "Offline" : EntityManager.LocalPlayer.InternalName,
+                                            " changed '", nameof(AccountScope), "' from '", accountScope, "' to '", value, "'. The value is ", val);
+
                     VariableKey newKey = new VariableKey(name, value, profileScope);
                     if (VariableTools.Variables.ContainsKey(Key))
                         VariableTools.Variables.ChangeItemKey(this, newKey);
                     qualifier = newKey.Qualifier;
                     accountScope = value;
+                    LastOperation = opDescription;
                 }
             }
         }
@@ -141,12 +173,15 @@ namespace VariableTools.Classes
             {
                 if(profileScope != value)
                 {
-                    //string newQualifier = VariableTools.GetScopeQualifier(accountScope, value);
-                    VariableKey newKey = new VariableKey(name, accountScope, value);
+                    string opDescription =  string.Concat('[', DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), "] ",
+                                            (EntityManager.LocalPlayer.InternalName is null || string.IsNullOrEmpty(EntityManager.LocalPlayer.InternalName)) ? "Offline" : EntityManager.LocalPlayer.InternalName,
+                                            " changed '", nameof(ProfileScope), "' from '", profileScope, "' to '", value, "'. The value is ", val);
+                        VariableKey newKey = new VariableKey(name, accountScope, value);
                     if (VariableTools.Variables.ContainsKey(Key))
                         VariableTools.Variables.ChangeItemKey(this, newKey);
                     qualifier = newKey.Qualifier;
                     profileScope = value;
+                    LastOperation = opDescription;
                 }
             }
         }
@@ -163,6 +198,12 @@ namespace VariableTools.Classes
         /// Флаг сохранения в файл при закрытии Астрала
         /// </summary>
         public bool Save { get; set; }
+
+        /// <summary>
+        /// Запись о последней операции присваивания
+        /// </summary>
+        [Browsable(false)]
+        public string LastOperation { get; private set; }
 
         /// <summary>
         /// Проверка видимости переменной в данной области видимости
@@ -194,8 +235,12 @@ namespace VariableTools.Classes
 
         internal void ChangeScopeImplementation(VariableContainer item, VariableKey newKey)
         {
-            if(!Object.ReferenceEquals(this, item))
+            if(ReferenceEquals(this, item))
             {
+                LastOperation =  string.Concat('[', DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), "] ",
+                                                (EntityManager.LocalPlayer.InternalName is null || string.IsNullOrEmpty(EntityManager.LocalPlayer.InternalName)) ? "Offline" : EntityManager.LocalPlayer.InternalName,
+                                                " changed scope from [", name, ", ", accountScope, ", ", profileScope, 
+                                                "] to [", newKey.Name, ", ", newKey.AccountScope,", ", newKey.ProfileScope, "]. The value is ", val);
                 name = newKey.Name;
                 accountScope = newKey.AccountScope;
                 profileScope = newKey.ProfileScope;
@@ -228,7 +273,9 @@ namespace VariableTools.Classes
                 ProfileScope = p;
             else ProfileScope = ProfileScopeType.Common;
 
-            qualifier = info.GetString(nameof(ScopeQualifier));
+            qualifier = VariableTools.NormalizeScopeQualifier(info.GetString(nameof(ScopeQualifier)));
+
+            LastOperation = info.GetString(nameof(LastOperation));
         }
 
         /// <summary>
@@ -243,7 +290,8 @@ namespace VariableTools.Classes
             info.AddValue(nameof(Save), Save);
             info.AddValue(nameof(AccountScope), accountScope);
             info.AddValue(nameof(ProfileScope), profileScope);
-            info.AddValue(nameof(ScopeQualifier), qualifier);
+            info.AddValue(nameof(ScopeQualifier), qualifier.ToLower());
+            info.AddValue(nameof(LastOperation), LastOperation);
         }
         #endregion
 
@@ -293,7 +341,10 @@ namespace VariableTools.Classes
                             else profileScope = ProfileScopeType.Common;
                             break;
                         case "ScopeQualifier":
-                            qualifier = reader.ReadElementContentAsString(nameof(ScopeQualifier), "");
+                            qualifier = VariableTools.NormalizeScopeQualifier(reader.ReadElementContentAsString(nameof(ScopeQualifier), ""));
+                            break;
+                        case "LastOperation":
+                            LastOperation = reader.ReadElementContentAsString(nameof(LastOperation), "");
                             break;
                         case "VariableContainer":
                             if (reader.NodeType == XmlNodeType.EndElement)
@@ -317,7 +368,8 @@ namespace VariableTools.Classes
             writer.WriteElementString(nameof(Save), Save.ToString());
             writer.WriteElementString(nameof(AccountScope), accountScope.ToString());
             writer.WriteElementString(nameof(ProfileScope), profileScope.ToString());
-            writer.WriteElementString(nameof(ScopeQualifier), qualifier);
+            writer.WriteElementString(nameof(ScopeQualifier), qualifier.ToLower());
+            writer.WriteElementString(nameof(LastOperation), LastOperation);
         }
         #endregion
     }

@@ -23,10 +23,9 @@ namespace VariableTools.Expressions.Operand
 
         public override string Description(int indent = 0)
         {
-            StringBuilder sb = new StringBuilder();
+            sb.Clear();
             sb.Insert(sb.Length, Parser.Indent, indent).Append(GetType().Name).Append(" {").Append(val).Append('}');
             return sb.ToString();
-            //return $"{GetType().Name} {{{val}}}";
         }
     }
 
@@ -35,29 +34,20 @@ namespace VariableTools.Expressions.Operand
     /// </summary>
     public class NumberVariable : AstNode<double>
     {
-        //protected NumVar val;
-        //protected string variableName;
         VariableCollection.VariableKey varKey;
 
-        public NumberVariable()
-        {
-            //val = new NumVar();
-        }
+        public NumberVariable() { }
         public NumberVariable(string name, AccountScopeType accScope, ProfileScopeType profScope)
         {
             varKey = new VariableCollection.VariableKey(name, accScope, profScope);
         }
         public NumberVariable(VariableCollection.VariableKey vKey)
         {
-            //val = new NumVar(var_name);
-            //variableName = var_name;
             varKey = vKey;
         }
 
         public override bool Calculate(out double result)
         {
-            //result = val.ReadValue;
-
             if(VariableTools.Variables.TryGetValue(out result, varKey))
                 return true;
             else
@@ -69,7 +59,7 @@ namespace VariableTools.Expressions.Operand
 
         public override string Description(int indent = 0)
         {
-            StringBuilder sb = new StringBuilder();
+            sb.Clear();
             sb.Insert(sb.Length, Parser.Indent, indent).Append(GetType().Name).Append(" {").Append(varKey.ToString()).Append(", Value=").Append(Result).Append('}');
             return sb.ToString();            
         }

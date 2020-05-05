@@ -28,6 +28,7 @@ using UCCConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classe
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 using EntityTools;
+using Astral.Logic.NW;
 
 namespace EntityCore
 {
@@ -259,7 +260,29 @@ namespace EntityCore
                 }
             }
             return false;
-        } 
+        }
+
+        public bool GUIRequest_NPCInfos(ref NPCInfos npc)
+        {
+            npc = null;
+            while (TargetSelectForm.GUIRequest("Target the Traider and press ok.") == DialogResult.OK)
+            {
+                Entity betterEntityToInteract = Interact.GetBetterEntityToInteract();
+                if (betterEntityToInteract.IsValid)
+                {
+                    npc = new NPCInfos()
+                    {
+                        CostumeName = betterEntityToInteract.CostumeRef.CostumeName,
+                        DisplayName = betterEntityToInteract.Name,
+                        Position = betterEntityToInteract.Location.Clone(),
+                        MapName = EntityManager.LocalPlayer.MapState.MapName,
+                        RegionName = EntityManager.LocalPlayer.RegionInternalName
+                    };
+                    return true;
+                }
+            }
+            return false;
+        }
         #endregion
 
         public string EntityDiagnosticInfos(object obj)

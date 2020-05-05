@@ -230,7 +230,7 @@ namespace EntityCore.Forms
             }
 
             // устанавливаем фокус на ранее выбранную строку
-            if (!(predicate is null))
+            if (predicate != null)
             {
                 foreach (DataGridViewRow row in dgvEntities.Rows)
                 {

@@ -10,6 +10,7 @@ using VariableTools.Classes;
 using DevExpress.XtraEditors;
 using System.Windows.Forms;
 using static VariableTools.Classes.VariableCollection;
+using MyNW.Internals;
 
 namespace VariableTools.Actions
 {
@@ -130,7 +131,10 @@ namespace VariableTools.Actions
                         variable.Value = result;
 #if DEBUG
                         if (VariableTools.DebugMessage)
-                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}::{GetType().Name}[{ActionID}]: Variable {{{variable.Name}}}[{variable.AccountScope}, {variable.ProfileScope}] set to '{variable.Value}' (Equation = {equation.Text})");
+                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, string.Concat(nameof(VariableTools), "::", GetType().Name, '[', ActionID,
+                                "]: Character '", (EntityManager.LocalPlayer?.InternalName is null || string.IsNullOrEmpty(EntityManager.LocalPlayer.InternalName)) ? "Offline" : EntityManager.LocalPlayer.InternalName,
+                                "' assign the value '", variable.Value, "' to the Variable {", variable.Name, "}[", variable.AccountScope, ", ", variable.ProfileScope, 
+                                "] (as the result of the Equation = ", equation.Text,')'));
 #endif
                         return ActionResult.Completed;
                     }
@@ -141,7 +145,11 @@ namespace VariableTools.Actions
                         {
 #if DEBUG
                             if (VariableTools.DebugMessage)
-                                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}::{GetType().Name}[{ActionID}]: Add variable {{{variable.ToString()}}} with the value '{variable.Value}' (Equation = {equation.Text})");
+                                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, string.Concat(nameof(VariableTools), "::", GetType().Name, '[', ActionID,
+                                    "]: Character '", (EntityManager.LocalPlayer?.InternalName is null || string.IsNullOrEmpty(EntityManager.LocalPlayer.InternalName)) ? "Offline" : EntityManager.LocalPlayer.InternalName,
+                                    "' initialize the Variable {", variable.ToString(), "} with the value '", variable.Value, 
+                                    "' (as the result of the Equation = ", equation.Text, ')'));
+
 #endif
                             return ActionResult.Completed;
                         }
@@ -149,7 +157,9 @@ namespace VariableTools.Actions
                         {
 #if DEBUG
                             if(VariableTools.DebugMessage)
-                                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"{nameof(VariableTools)}::{GetType().Name}[{ActionID}]: FAILED to set the value to the Variable {{{Key.ToString()}}}");
+                                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, string.Concat(nameof(VariableTools), "::", GetType().Name, '[', ActionID,
+                                    "]: Character '", (EntityManager.LocalPlayer?.InternalName is null || string.IsNullOrEmpty(EntityManager.LocalPlayer.InternalName)) ? "Offline" : EntityManager.LocalPlayer.InternalName, 
+                                    "' FAILED to initialize the Variable {", Key.ToString(), '}'));
 #endif
                             return ActionResult.Fail;
                         }
@@ -180,7 +190,7 @@ namespace VariableTools.Actions
 
         public override string InternalDisplayName => string.Empty;
         public override bool UseHotSpots => false;
-        protected override bool IntenalConditions => Key != null && Key.IsValid && equation.IsValid;
+        protected override bool IntenalConditions => key.IsValid && equation.IsValid;
         protected override Vector3 InternalDestination => new Vector3();
         protected override ActionValidity InternalValidity
         {

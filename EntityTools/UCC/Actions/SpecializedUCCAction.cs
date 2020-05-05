@@ -261,8 +261,11 @@ namespace EntityTools.UCC.Actions
                                 }
                                 num++;
                             }
+#if DEBUG && DEBUG_LOG
+                            debugStr.Append(']');
+#endif
 
-                            if(Not)
+                            if (Not)
                                 result = !result;
 
 #if DEBUG && DEBUG_LOG
@@ -298,9 +301,9 @@ namespace EntityTools.UCC.Actions
 
         public override string ToString()
         {
-            if (ManagedAction != null)
-                return "(SP) " + ManagedAction.ToString();
-            else return "Property 'CurrentAction' does not set !";
+            if (ManagedAction is null)
+                return $"Property '{nameof(ManagedAction)}' does not set !";
+            else return "(SP) " + ManagedAction.ToString();
         }
 
         public SpecializedUCCAction()

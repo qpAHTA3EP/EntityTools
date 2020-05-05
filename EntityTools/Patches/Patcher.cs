@@ -72,8 +72,15 @@ namespace EntityTools.Patches
                 patchXmlSerializerGetExtraTypes.Inject();
 #endif
 #if HARMONY
-                var harmony = new Harmony(nameof(ETPatcher));
-                harmony.PatchAll(); 
+                try
+                {
+                    var harmony = new Harmony(nameof(ETPatcher));
+                    harmony.PatchAll();
+                }
+                catch
+                {
+                    ETLogger.WriteLine(LogType.Error, "Harmonies patches are faild!",true);
+                }
 #endif
                 Applied = true;
             }

@@ -79,7 +79,7 @@ namespace EntityTools.Patches.Mapper
         /// Функтор доступа к экземпляру Квестер-редактора
         /// Astral.Quester.Forms.Main.editorForm
         /// </summary>
-        private static readonly StaticFielsAccessor<QuesterEditorForm> QuesterEditor = typeof(QuesterMainForm).GetStaticField<QuesterEditorForm>("editorForm");
+        private static readonly StaticFieldAccessor<QuesterEditorForm> QuesterEditor = typeof(QuesterMainForm).GetStaticField<QuesterEditorForm>("editorForm");
 
         /// <summary>
         /// Функтор обновления списка CustomRegion'ов в окне Квестер-редактора

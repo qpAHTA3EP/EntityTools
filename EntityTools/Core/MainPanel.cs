@@ -698,9 +698,31 @@ namespace EntityTools.Core
             }
             else
             {
-                XtraMessageBox.Show($"EntityToolsCore is INVALID!\n\rCore hash: {EntityTools.CoreHash}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                XtraMessageBox.Show($"EntityToolsCore is INVALID!",//\n\rCore hash: {EntityTools.CoreHash}", 
+                                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 Astral.Logger.WriteLine($"EntityToolsCore is INVALID!\n\rCore hash: {EntityTools.CoreHash}");
             }
+        }
+
+        private void ckbDebugMonitor_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ckbDebugMonitor.Checked)
+                Patches.Patch_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = ShowMonitor;
+            else Patches.Patch_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = null;
+        }
+
+        private void ShowMonitor(Entity entity)
+        {
+            string info = string.Empty;
+            if(entity != null)
+            {
+                info = string.Concat("MostInjuredAlly: ", entity.DebugName, Environment.NewLine, 
+                    "--------------------------------------", Environment.NewLine,
+                    '\t', nameof(entity.IsPlayer), '=', entity.IsPlayer, Environment.NewLine,
+                    '\t', nameof(entity.CombatDistance3), '=', entity.CombatDistance3, Environment.NewLine,
+                    '\t', nameof(entity.Character.AttribsBasic.HealthPercent), '=', entity.Character.AttribsBasic.HealthPercent);
+            }
+            tbDebugMonitorInfo.Text = info;
         }
     }
 }

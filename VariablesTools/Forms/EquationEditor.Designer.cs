@@ -39,12 +39,20 @@
             this.btnInsItmCnt = new DevExpress.XtraBars.BarButtonItem();
             this.btnInsNumCnt = new DevExpress.XtraBars.BarButtonItem();
             this.btnInsRnd = new DevExpress.XtraBars.BarButtonItem();
+            this.btnInsDateTime = new DevExpress.XtraBars.BarButtonItem();
+            this.popDateTime = new DevExpress.XtraBars.PopupMenu(this.components);
+            this.btnInsNow = new DevExpress.XtraBars.BarButtonItem();
+            this.btnInsDays = new DevExpress.XtraBars.BarButtonItem();
+            this.btnInsHours = new DevExpress.XtraBars.BarButtonItem();
+            this.btnInsMinutes = new DevExpress.XtraBars.BarButtonItem();
+            this.btnInsSeconds = new DevExpress.XtraBars.BarButtonItem();
             this.barManager = new DevExpress.XtraBars.BarManager(this.components);
             this.barDockControlTop = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlBottom = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlLeft = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlRight = new DevExpress.XtraBars.BarDockControl();
             ((System.ComponentModel.ISupportInitialize)(this.popInsert)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.popDateTime)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).BeginInit();
             this.SuspendLayout();
             // 
@@ -52,6 +60,7 @@
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnCancel.Location = new System.Drawing.Point(360, 217);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(60, 23);
@@ -62,11 +71,13 @@
             // btnSave
             // 
             this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnSave.Location = new System.Drawing.Point(294, 217);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(60, 23);
             this.btnSave.TabIndex = 3;
             this.btnSave.Text = "Save";
+            this.btnSave.UseCompatibleTextRendering = true;
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
@@ -85,6 +96,7 @@
             // btnValidate
             // 
             this.btnValidate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnValidate.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnValidate.Location = new System.Drawing.Point(153, 217);
             this.btnValidate.Name = "btnValidate";
             this.btnValidate.Size = new System.Drawing.Size(60, 23);
@@ -104,7 +116,7 @@
             this.dtnInsert.AppearanceDropDown.BackColor = System.Drawing.SystemColors.Control;
             this.dtnInsert.AppearanceDropDown.BackColor2 = System.Drawing.SystemColors.Control;
             this.dtnInsert.AppearanceDropDown.Options.UseBackColor = true;
-            this.dtnInsert.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Style3D;
+            this.dtnInsert.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Flat;
             this.dtnInsert.DropDownControl = this.popInsert;
             this.dtnInsert.Location = new System.Drawing.Point(12, 217);
             this.dtnInsert.LookAndFeel.SkinMaskColor = System.Drawing.SystemColors.Control;
@@ -122,9 +134,10 @@
             // 
             this.popInsert.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
             new DevExpress.XtraBars.LinkPersistInfo(this.btnInsVarible),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnInsItmCnt),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnInsItmCnt, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnInsNumCnt),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnInsRnd)});
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnInsRnd),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnInsDateTime, true)});
             this.popInsert.Manager = this.barManager;
             this.popInsert.MenuAppearance.AppearanceMenu.Normal.BackColor = System.Drawing.SystemColors.Control;
             this.popInsert.MenuAppearance.AppearanceMenu.Normal.BackColor2 = System.Drawing.SystemColors.Control;
@@ -199,6 +212,66 @@
             this.btnInsRnd.RememberLastCommand = true;
             this.btnInsRnd.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnInsRnd_ItemClick);
             // 
+            // btnInsDateTime
+            // 
+            this.btnInsDateTime.ButtonStyle = DevExpress.XtraBars.BarButtonStyle.DropDown;
+            this.btnInsDateTime.Caption = "DateTime(...)";
+            this.btnInsDateTime.DropDownControl = this.popDateTime;
+            this.btnInsDateTime.GroupIndex = 1;
+            this.btnInsDateTime.Id = 4;
+            this.btnInsDateTime.Name = "btnInsDateTime";
+            // 
+            // popDateTime
+            // 
+            this.popDateTime.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnInsNow),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnInsDays, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnInsHours, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnInsMinutes),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnInsSeconds)});
+            this.popDateTime.Manager = this.barManager;
+            this.popDateTime.Name = "popDateTime";
+            // 
+            // btnInsNow
+            // 
+            this.btnInsNow.Caption = "Now()";
+            this.btnInsNow.GroupIndex = 2;
+            this.btnInsNow.Id = 5;
+            this.btnInsNow.Name = "btnInsNow";
+            this.btnInsNow.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnInsNow_ItemClick);
+            // 
+            // btnInsDays
+            // 
+            this.btnInsDays.Caption = "Days(...)";
+            this.btnInsDays.GroupIndex = 3;
+            this.btnInsDays.Id = 6;
+            this.btnInsDays.Name = "btnInsDays";
+            this.btnInsDays.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnInsDays_ItemClick);
+            // 
+            // btnInsHours
+            // 
+            this.btnInsHours.Caption = "Hours(...)";
+            this.btnInsHours.GroupIndex = 3;
+            this.btnInsHours.Id = 7;
+            this.btnInsHours.Name = "btnInsHours";
+            this.btnInsHours.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnInsHours_ItemClick);
+            // 
+            // btnInsMinutes
+            // 
+            this.btnInsMinutes.Caption = "Minutes(...)";
+            this.btnInsMinutes.GroupIndex = 3;
+            this.btnInsMinutes.Id = 8;
+            this.btnInsMinutes.Name = "btnInsMinutes";
+            this.btnInsMinutes.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnInsMinutes_ItemClick);
+            // 
+            // btnInsSeconds
+            // 
+            this.btnInsSeconds.Caption = "Seconds(...)";
+            this.btnInsSeconds.GroupIndex = 3;
+            this.btnInsSeconds.Id = 9;
+            this.btnInsSeconds.Name = "btnInsSeconds";
+            this.btnInsSeconds.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnInsSeconds_ItemClick);
+            // 
             // barManager
             // 
             this.barManager.DockControls.Add(this.barDockControlTop);
@@ -210,8 +283,14 @@
             this.btnInsVarible,
             this.btnInsItmCnt,
             this.btnInsNumCnt,
-            this.btnInsRnd});
-            this.barManager.MaxItemId = 4;
+            this.btnInsRnd,
+            this.btnInsDateTime,
+            this.btnInsNow,
+            this.btnInsDays,
+            this.btnInsHours,
+            this.btnInsMinutes,
+            this.btnInsSeconds});
+            this.barManager.MaxItemId = 12;
             // 
             // barDockControlTop
             // 
@@ -268,6 +347,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "EquationEditor";
             ((System.ComponentModel.ISupportInitialize)(this.popInsert)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.popDateTime)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -291,5 +371,12 @@
         private DevExpress.XtraBars.BarDockControl barDockControlBottom;
         private DevExpress.XtraBars.BarDockControl barDockControlLeft;
         private DevExpress.XtraBars.BarDockControl barDockControlRight;
+        private DevExpress.XtraBars.BarButtonItem btnInsDateTime;
+        private DevExpress.XtraBars.PopupMenu popDateTime;
+        private DevExpress.XtraBars.BarButtonItem btnInsNow;
+        private DevExpress.XtraBars.BarButtonItem btnInsDays;
+        private DevExpress.XtraBars.BarButtonItem btnInsHours;
+        private DevExpress.XtraBars.BarButtonItem btnInsMinutes;
+        private DevExpress.XtraBars.BarButtonItem btnInsSeconds;
     }
 }

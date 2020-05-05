@@ -112,11 +112,11 @@ namespace VariableTools
             // Подстрока с относительным путем к профилю
             if (psq == ProfileScopeType.Profile)
             {
-                string lastQuesterProfileName = Path.GetFullPath(Astral.API.CurrentSettings.LastQuesterProfile);
+                string lastQuesterProfileName = Path.GetFullPath(Astral.API.CurrentSettings.LastQuesterProfile).ToLower();
 
-                bool hasExtention = lastQuesterProfileName.EndsWith(@".amp.zip");
+                bool hasExtention = lastQuesterProfileName.EndsWith(@".amp.zip", StringComparison.OrdinalIgnoreCase);
 
-                if (Astral.API.CurrentSettings.LastQuesterProfile.StartsWith(Astral.Controllers.Directories.ProfilesPath))
+                if (lastQuesterProfileName.StartsWith(Astral.Controllers.Directories.ProfilesPath, StringComparison.OrdinalIgnoreCase))
                 {
                     // Length + 1 нужно чтобы удалить символ '\' перед именем профиля
                     sb.Append(lastQuesterProfileName.Substring(Astral.Controllers.Directories.ProfilesPath.Length + 1,
@@ -141,11 +141,11 @@ namespace VariableTools
             {
                 //if (EntityManager.LocalPlayer.IsValid)
                 if(!string.IsNullOrEmpty(EntityManager.LocalPlayer.InternalName))
-                    sb.Append(EntityManager.LocalPlayer.InternalName);
+                    sb.Append(EntityManager.LocalPlayer.InternalName.ToLower());
                 else if (GetLastLoggedCharacter(out string charName)
                          && GetLastLoggedAccount(out string accName))
                 {
-                    sb.Append(charName).Append(accName);
+                    sb.Append(charName.ToLower()).Append(accName.ToLower());
                     Logger.WriteLine(Logger.LogType.Debug, "ScopeQualifier constracted with LastPlayedCharacter because of character is not in the Game!");
                 }
                 else
@@ -158,10 +158,10 @@ namespace VariableTools
             else if (asq == AccountScopeType.Account)
             { 
                 if (!string.IsNullOrEmpty(EntityManager.LocalPlayer.AccountLoginUsername))
-                    sb.Append(EntityManager.LocalPlayer.AccountLoginUsername);
+                    sb.Append(EntityManager.LocalPlayer.AccountLoginUsername.ToLower());
                 else if (GetLastLoggedAccount(out string account))
                 {
-                    sb.Append(account);
+                    sb.Append(account.ToLower());
                     Logger.WriteLine(Logger.LogType.Debug, "ScopeQualifier constracted with LastPlayedAccount because the Game is not logged in!");
                 }
                 else
@@ -173,7 +173,21 @@ namespace VariableTools
             }
             return sb.ToString();
         }
-
+        public static string NormalizeScopeQualifier(string qualifier)
+        {
+            if (!string.IsNullOrEmpty(qualifier))
+            {
+                if (qualifier.StartsWith(Astral.Controllers.Directories.ProfilesPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Length + 1 нужно чтобы удалить символ '\' перед именем профиля
+                    qualifier = qualifier.Substring(Astral.Controllers.Directories.ProfilesPath.Length + 1,
+                        qualifier.Length - Astral.Controllers.Directories.ProfilesPath.Length - 1).Replace(@".amp.zip", null).ToLower();
+                }
+                else qualifier = qualifier.Replace(@".amp.zip", null).ToLower();
+                return qualifier;
+            }
+            return string.Empty;
+        }
         #region Доступ к полям Astral.Controllers.Relogger
         internal static FieldInfo charFiledInfo;
         internal static FieldInfo accFieldInfo;

@@ -6,13 +6,14 @@ using Astral.Quester.Classes;
 using EntityTools.Editors;
 using System.Drawing.Design;
 using System;
+using QuesterCondition = Astral.Quester.Classes.Condition;
 
 namespace EntityTools.UCC.Conditions
 {
     public class UCCQuesterCheck : UCCCondition, ICustomUCCCondition
     {
 #if DEVELOPER
-        internal class QuesterConditionEditor : AddTypeCommonEditor<Condition>
+        internal class QuesterConditionEditor : AddTypeCommonEditor<QuesterCondition>
         { }
 
         [Editor(typeof(QuesterConditionEditor), typeof(UITypeEditor))]
@@ -20,7 +21,7 @@ namespace EntityTools.UCC.Conditions
 #else
         [Browsable(false)]
 #endif
-        public Condition Condition { get; set; } = null;
+        public QuesterCondition Condition { get; set; } = null;
 
 #region ICustomUCCCondition
         bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
@@ -34,7 +35,7 @@ namespace EntityTools.UCC.Conditions
         {
             if (Condition != null)
                 return Condition.TestInfos;
-            return "Condition doesn't set.";
+            return $"{nameof(Condition)} does not set.";
         }
 #endregion
 

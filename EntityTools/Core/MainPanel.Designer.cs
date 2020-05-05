@@ -38,6 +38,7 @@ namespace EntityTools.Core
             this.tabUtilities = new DevExpress.XtraTab.XtraTabPage();
             this.cbEnchantHelperActivator = new System.Windows.Forms.CheckBox();
             this.btnTest = new System.Windows.Forms.Button();
+            this.btnCheckCore = new System.Windows.Forms.Button();
             this.btnUiViewer = new System.Windows.Forms.Button();
             this.btnAuraViewer = new System.Windows.Forms.Button();
             this.btnEntities = new System.Windows.Forms.Button();
@@ -89,7 +90,9 @@ namespace EntityTools.Core
             this.btnOpenLog = new System.Windows.Forms.Button();
             this.dlgSaveFile = new System.Windows.Forms.SaveFileDialog();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.btnCheckCore = new System.Windows.Forms.Button();
+            this.tabDebug = new DevExpress.XtraTab.XtraTabPage();
+            this.tbDebugMonitorInfo = new System.Windows.Forms.TextBox();
+            this.ckbDebugMonitor = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
             this.tbclMain.SuspendLayout();
             this.tabUtilities.SuspendLayout();
@@ -110,6 +113,7 @@ namespace EntityTools.Core
             ((System.ComponentModel.ISupportInitialize)(this.seMapperMaxZDif.Properties)).BeginInit();
             this.tabLogger.SuspendLayout();
             this.gbxLogger.SuspendLayout();
+            this.tabDebug.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnUccEditor
@@ -141,7 +145,8 @@ namespace EntityTools.Core
             this.tabOptions,
             this.tabRelogger,
             this.tabMapper,
-            this.tabLogger});
+            this.tabLogger,
+            this.tabDebug});
             // 
             // tabUtilities
             // 
@@ -182,6 +187,20 @@ namespace EntityTools.Core
             this.btnTest.UseVisualStyleBackColor = true;
             this.btnTest.Visible = false;
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
+            // 
+            // btnCheckCore
+            // 
+            this.btnCheckCore.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCheckCore.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCheckCore.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnCheckCore.Location = new System.Drawing.Point(9, 339);
+            this.btnCheckCore.Name = "btnCheckCore";
+            this.btnCheckCore.Size = new System.Drawing.Size(346, 40);
+            this.btnCheckCore.TabIndex = 0;
+            this.btnCheckCore.Text = "Check EntityTools";
+            this.btnCheckCore.UseVisualStyleBackColor = true;
+            this.btnCheckCore.Click += new System.EventHandler(this.btnCheckCore_Click);
             // 
             // btnUiViewer
             // 
@@ -836,19 +855,37 @@ namespace EntityTools.Core
             this.dlgSaveFile.Filter = "XML|*.xml";
             this.dlgSaveFile.ValidateNames = false;
             // 
-            // btnCheckCore
+            // tabDebug
             // 
-            this.btnCheckCore.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.tabDebug.Controls.Add(this.tbDebugMonitorInfo);
+            this.tabDebug.Controls.Add(this.ckbDebugMonitor);
+            this.tabDebug.Name = "tabDebug";
+            this.tabDebug.Padding = new System.Windows.Forms.Padding(6);
+            this.tabDebug.Size = new System.Drawing.Size(364, 388);
+            this.tabDebug.Text = "Debug";
+            // 
+            // tbDebugMonitorInfo
+            // 
+            this.tbDebugMonitorInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCheckCore.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCheckCore.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnCheckCore.Location = new System.Drawing.Point(9, 339);
-            this.btnCheckCore.Name = "btnCheckCore";
-            this.btnCheckCore.Size = new System.Drawing.Size(346, 40);
-            this.btnCheckCore.TabIndex = 0;
-            this.btnCheckCore.Text = "Check EntityTools";
-            this.btnCheckCore.UseVisualStyleBackColor = true;
-            this.btnCheckCore.Click += new System.EventHandler(this.btnCheckCore_Click);
+            this.tbDebugMonitorInfo.Location = new System.Drawing.Point(9, 32);
+            this.tbDebugMonitorInfo.Multiline = true;
+            this.tbDebugMonitorInfo.Name = "tbDebugMonitorInfo";
+            this.tbDebugMonitorInfo.ReadOnly = true;
+            this.tbDebugMonitorInfo.Size = new System.Drawing.Size(346, 347);
+            this.tbDebugMonitorInfo.TabIndex = 9;
+            // 
+            // ckbDebugMonitor
+            // 
+            this.ckbDebugMonitor.AutoSize = true;
+            this.ckbDebugMonitor.Location = new System.Drawing.Point(9, 9);
+            this.ckbDebugMonitor.Name = "ckbDebugMonitor";
+            this.ckbDebugMonitor.Size = new System.Drawing.Size(93, 17);
+            this.ckbDebugMonitor.TabIndex = 8;
+            this.ckbDebugMonitor.Text = "DebugMonitor";
+            this.ckbDebugMonitor.UseVisualStyleBackColor = true;
+            this.ckbDebugMonitor.CheckedChanged += new System.EventHandler(this.ckbDebugMonitor_CheckedChanged);
             // 
             // EntityToolsMainPanel
             // 
@@ -885,6 +922,8 @@ namespace EntityTools.Core
             this.tabLogger.PerformLayout();
             this.gbxLogger.ResumeLayout(false);
             this.gbxLogger.PerformLayout();
+            this.tabDebug.ResumeLayout(false);
+            this.tabDebug.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -949,5 +988,8 @@ namespace EntityTools.Core
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.CheckBox ckbExtendedActionDebugInfo;
         private System.Windows.Forms.Button btnCheckCore;
+        private DevExpress.XtraTab.XtraTabPage tabDebug;
+        private System.Windows.Forms.TextBox tbDebugMonitorInfo;
+        private System.Windows.Forms.CheckBox ckbDebugMonitor;
     }
 }

@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.splitContainer = new System.Windows.Forms.SplitContainer();
-            this.Conditions = new System.Windows.Forms.CheckedListBox();
+            this.lsbxConditions = new System.Windows.Forms.CheckedListBox();
             this.Properties = new System.Windows.Forms.PropertyGrid();
             this.bntAdd = new System.Windows.Forms.Button();
             this.btnRemove = new System.Windows.Forms.Button();
@@ -55,7 +55,7 @@
             // 
             // splitContainer.Panel1
             // 
-            this.splitContainer.Panel1.Controls.Add(this.Conditions);
+            this.splitContainer.Panel1.Controls.Add(this.lsbxConditions);
             // 
             // splitContainer.Panel2
             // 
@@ -66,13 +66,13 @@
             // 
             // Conditions
             // 
-            this.Conditions.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Conditions.Location = new System.Drawing.Point(0, 0);
-            this.Conditions.Name = "Conditions";
-            this.Conditions.Size = new System.Drawing.Size(290, 302);
-            this.Conditions.TabIndex = 0;
-            this.Conditions.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.Conditions_ItemCheck);
-            this.Conditions.SelectedIndexChanged += new System.EventHandler(this.Conditions_SelectedIndexChanged);
+            this.lsbxConditions.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lsbxConditions.Location = new System.Drawing.Point(0, 0);
+            this.lsbxConditions.Name = "Conditions";
+            this.lsbxConditions.Size = new System.Drawing.Size(290, 302);
+            this.lsbxConditions.TabIndex = 0;
+            this.lsbxConditions.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.Conditions_ItemCheck);
+            this.lsbxConditions.SelectedIndexChanged += new System.EventHandler(this.Conditions_SelectedIndexChanged);
             // 
             // Properties
             // 
@@ -238,7 +238,7 @@
 
         private System.Windows.Forms.SplitContainer splitContainer;
         private System.Windows.Forms.PropertyGrid Properties;
-        private System.Windows.Forms.CheckedListBox Conditions;
+        private System.Windows.Forms.CheckedListBox lsbxConditions;
         private System.Windows.Forms.Button bntAdd;
         private System.Windows.Forms.Button btnRemove;
         private System.Windows.Forms.Button bntCancel;

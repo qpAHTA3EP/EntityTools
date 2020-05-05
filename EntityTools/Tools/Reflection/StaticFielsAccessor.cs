@@ -8,9 +8,9 @@ namespace EntityTools.Reflection
 {
     public static class StaticFielsAccessorFactory
     {
-        public static StaticFielsAccessor<FieldType> GetStaticField<FieldType>(this Type containerType, string fieldName, BindingFlags flags = BindingFlags.Default)
+        public static StaticFieldAccessor<FieldType> GetStaticField<FieldType>(this Type containerType, string fieldName, BindingFlags flags = BindingFlags.Default)
         {
-            return new StaticFielsAccessor<FieldType>(containerType, fieldName, flags);
+            return new StaticFieldAccessor<FieldType>(containerType, fieldName, flags);
         }
     }
 
@@ -18,12 +18,12 @@ namespace EntityTools.Reflection
     /// Класс доступа к статическому полю
     /// </summary>
     /// <typeparam name="FieldType"></typeparam>
-    public class StaticFielsAccessor<FieldType>
+    public class StaticFieldAccessor<FieldType>
     {
         private readonly Type containerType;
         private FieldInfo fieldInfo;
 
-        public StaticFielsAccessor(Type t, string fieldName, BindingFlags flags = BindingFlags.Default)
+        public StaticFieldAccessor(Type t, string fieldName, BindingFlags flags = BindingFlags.Default)
         {
             if (string.IsNullOrEmpty(fieldName))
                 throw new ArgumentException("Field name is invalid");
@@ -83,6 +83,6 @@ namespace EntityTools.Reflection
             }
         }
 
-        public static implicit operator FieldType(StaticFielsAccessor<FieldType> accessor) => accessor.Value;
+        public static implicit operator FieldType(StaticFieldAccessor<FieldType> accessor) => accessor.Value;
     }
 }

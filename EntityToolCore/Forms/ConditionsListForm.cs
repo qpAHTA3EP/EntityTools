@@ -8,6 +8,7 @@ using Astral.Logic.UCC.Classes;
 using EntityTools.Extensions;
 using EntityTools.Reflection;
 using UCCEditor = Astral.Logic.UCC.Forms.Editor;
+using EntityTools.UCC.Actions;
 
 namespace EntityCore.Forms
 {
@@ -40,22 +41,22 @@ namespace EntityCore.Forms
         {
             ConditionListForm @this = new ConditionListForm();
 
-            @this.Conditions.Items.Clear();
+            @this.lsbxConditions.Items.Clear();
             if (conditions != null)
             {
                 // Отображаем список условий
                 foreach (UCCCondition condition in conditions)
                 {
-                    @this.AllowConditionsItemChechedChangeInd = @this.Conditions.Items.Add(CopyHelper.CreateDeepCopy(condition));
-                    @this.Conditions.SetItemChecked(@this.AllowConditionsItemChechedChangeInd, condition.Locked);
+                    @this.AllowConditionsItemChechedChangeInd = @this.lsbxConditions.Items.Add(CopyHelper.CreateDeepCopy(condition));
+                    @this.lsbxConditions.SetItemChecked(@this.AllowConditionsItemChechedChangeInd, condition.Locked);
                 }
             }
 
             if (@this.ShowDialog() == DialogResult.OK)
             {
                 // Формируем новый список условий
-                ConditionList newConditions = new ConditionList(@this.Conditions.Items.Count);
-                foreach (object item in @this.Conditions.Items)
+                ConditionList newConditions = new ConditionList(@this.lsbxConditions.Items.Count);
+                foreach (object item in @this.lsbxConditions.Items)
                 {
                     if (item is UCCCondition condition)
                         newConditions.Add(condition);
@@ -73,25 +74,25 @@ namespace EntityCore.Forms
             //if (AddAction.Show(typeof(UCCCondition)) is UCCCondition condition)
             if (ItemSelectForm.GetAnItem<UCCCondition>(false) is UCCCondition condition)
             {
-                Conditions.Items.Add(condition);
-                Conditions.SelectedItem = condition;
+                lsbxConditions.Items.Add(condition);
+                lsbxConditions.SelectedItem = condition;
             }
         }
 
         private void btnRemove_Click(object sender, EventArgs e)
         {
 
-            if (Conditions.SelectedIndex >= 0
+            if (lsbxConditions.SelectedIndex >= 0
                 && XtraMessageBox.Show(/*Form.ActiveForm, */"Are you sure to remove selected condition ?", "Remove Condition ?", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                Conditions.Items.RemoveAt(Conditions.SelectedIndex);
+                lsbxConditions.Items.RemoveAt(lsbxConditions.SelectedIndex);
             }
         }
 
         private void btnCopy_Click(object sender, EventArgs e)
         {
             conditionCopy = null;
-            if (Conditions.SelectedItem is UCCCondition cond)
+            if (lsbxConditions.SelectedItem is UCCCondition cond)
             {
                 conditionCopy = CopyHelper.CreateDeepCopy(cond); // Этот метод быстрее
                 //conditionCopy = CopyHelper.CreateXmlCopy(cond); // Этот метод дольше
@@ -105,9 +106,9 @@ namespace EntityCore.Forms
             {
                 UCCCondition cond = CopyHelper.CreateDeepCopy(conditionCopy);
                 //CustomUCCCondition cond = CopyHelper.CreateXmlCopy(conditionCopy); // Этот метод дольше
-                Conditions.Items.Add(cond); // Этот метод быстрее
+                lsbxConditions.Items.Add(cond); // Этот метод быстрее
 
-                Conditions.SelectedItem = cond;
+                lsbxConditions.SelectedItem = cond;
             }
         }
 
@@ -115,18 +116,22 @@ namespace EntityCore.Forms
         {
             bool result = false;
             string mess = string.Empty;
-            if (currentUccAction != null && Conditions.Items.Count > 0)
+            if (currentUccAction != null && lsbxConditions.Items.Count > 0)
             {
-                if (Conditions.SelectedItem is UCCCondition cond)
+                UCCAction action = currentUccAction;
+                if (action is SpecializedUCCAction specializedUCCAction)
+                    action = specializedUCCAction.ManagedAction;
+
+                if (lsbxConditions.SelectedItem is UCCCondition cond)
                 {
                     if (cond is ICustomUCCCondition iCond)
                     {
-                        result = iCond.IsOK(currentUccAction);
-                        mess = iCond.TestInfos(currentUccAction);
+                        result = iCond.IsOK(action);
+                        mess = iCond.TestInfos(action);
                     }
                     else
                     {
-                        result = cond.IsOK(currentUccAction);
+                        result = cond.IsOK(action);
                         mess = $"{cond.Target} {cond.Tested} : {cond.Value}";
                     }
                     XtraMessageBox.Show(/*Form.ActiveForm, */$"{mess}\nResult: {result}");
@@ -137,17 +142,21 @@ namespace EntityCore.Forms
 
         private void btnTestAll_Click(object sender, EventArgs e)
         {
-            if (currentUccAction != null && Conditions.Items?.Count > 0)
+            if (currentUccAction != null && lsbxConditions.Items?.Count > 0)
             {
+                UCCAction action = currentUccAction;
+                if (action is SpecializedUCCAction specializedUCCAction)
+                    action = specializedUCCAction.ManagedAction;
+
                 StringBuilder sb = new StringBuilder();
-                foreach (UCCCondition cond in Conditions.Items)
+                foreach (UCCCondition cond in lsbxConditions.Items)
                 {
                     if (cond.Locked)
                         sb.Append("[L] ");
                     else sb.Append("[U] ");
                     if (cond is ICustomUCCCondition iCond)
-                        sb.Append(iCond.ToString()).Append(" | Result: ").Append(iCond.IsOK(currentUccAction)).AppendLine();
-                    else sb.Append(cond.ToString()).Append(" | Result: ").Append(cond.IsOK(currentUccAction)).AppendLine();
+                        sb.Append(iCond.ToString()).Append(" | Result: ").Append(iCond.IsOK(action)).AppendLine();
+                    else sb.Append(cond.ToString()).Append(" | Result: ").Append(cond.IsOK(action)).AppendLine();
                 }
                 XtraMessageBox.Show(sb.ToString());
             }
@@ -171,7 +180,7 @@ namespace EntityCore.Forms
         {
             //if(Conditions.SelectedIndex >= 0  && Conditions.SelectedIndex < Conditions.Items.Count )
             //    Properties.SelectedObject = Conditions.Items[Conditions.SelectedIndex];
-            Properties.SelectedObject = Conditions.SelectedItem;
+            Properties.SelectedObject = lsbxConditions.SelectedItem;
         }
 
         private void Conditions_ItemCheck(object sender, ItemCheckEventArgs e)
@@ -191,12 +200,12 @@ namespace EntityCore.Forms
         {
             if (e.ChangedItem.Label == "Locked")
             {
-                AllowConditionsItemChechedChangeInd = Conditions.SelectedIndex;
+                AllowConditionsItemChechedChangeInd = lsbxConditions.SelectedIndex;
                 //Conditions.ItemCheck -= Conditions_ItemCheck;
-                Conditions.SetItemChecked(Conditions.SelectedIndex, e.ChangedItem.Value.Equals(true));
+                lsbxConditions.SetItemChecked(lsbxConditions.SelectedIndex, e.ChangedItem.Value.Equals(true));
                 //Conditions.ItemCheck += Conditions_ItemCheck;
             }
-            Conditions.Refresh();
+            lsbxConditions.Refresh();
         }
         #endregion
     }

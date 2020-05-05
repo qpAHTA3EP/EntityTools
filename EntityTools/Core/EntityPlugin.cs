@@ -126,7 +126,6 @@ namespace EntityTools
 
 #if DEVELOPER
             ETPatcher.Apply();
-
 #endif
         }
 
@@ -295,6 +294,10 @@ namespace EntityTools
 
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
+#if DEVELOPER
+            ETPatcher.Apply();
+#endif
+
             if (Regex.IsMatch(args.Name, assemblyResolve_Name))
                 return typeof(EntityTools).Assembly;
             return null;
@@ -425,6 +428,18 @@ namespace EntityTools
 
                 Astral.Logger.WriteLine("EntityToolsCore is invalid! Node Location request denied.");
                 ETLogger.WriteLine("EntityToolsCore is invalid! Node Location request denied.");
+
+                return false;
+            }
+
+            public bool GUIRequest_NPCInfos(ref NPCInfos npc)
+            {
+                if (InternalInitialize())
+                    return Core.GUIRequest_NPCInfos(ref npc);
+
+                XtraMessageBox.Show("EntityToolsCore is invalid!\n\rNPCInfos request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                ETLogger.WriteLine("EntityToolsCore is invalid! NPCInfos request denied.", true);
 
                 return false;
             }

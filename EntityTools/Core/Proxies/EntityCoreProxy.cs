@@ -84,6 +84,11 @@ namespace EntityTools.Core
         {
             throw new NotImplementedException();
         }
+
+        public bool GUIRequest_NPCInfos(ref NPCInfos npc)
+        {
+            throw new NotImplementedException();
+        }
 #endif
 
 #if DEBUG

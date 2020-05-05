@@ -39,7 +39,7 @@ namespace VariableTools.Expressions.Functions
 
         public override string Description(int indent = 0)
         {
-            StringBuilder sb = new StringBuilder();
+            sb.Clear();
             sb.Insert(sb.Length, Parser.Indent, indent).Append(GetType().Name).Append(" {Id='").Append(ItemId).Append("' Value=").Append(Result).Append("}");
             return sb.ToString();
             //return $"{GetType().Name} {{Id='{ItemId}'}}";
@@ -76,10 +76,9 @@ namespace VariableTools.Expressions.Functions
 
         public override string Description(int indent = 0)
         {
-            StringBuilder sb = new StringBuilder();
+            sb.Clear();
             sb.Insert(sb.Length, Parser.Indent, indent).Append(GetType().Name).Append(" {Id='").Append(NumericId).Append("' Value=").Append(Result).Append('}');
             return sb.ToString();
-            //return $"{GetType().Name} {{Id='{NumericId}'}}";
         }
     }
 
@@ -108,7 +107,7 @@ namespace VariableTools.Expressions.Functions
 
         public override string Description(int indent = 0)
         {
-            StringBuilder sb = new StringBuilder();
+            sb.Clear();
             sb.Insert(sb.Length, Parser.Indent, indent).Append(GetType().Name).Append(" { Max = ");
             if(Operand != null)
             {
@@ -117,7 +116,6 @@ namespace VariableTools.Expressions.Functions
             }
             else sb.Append(int.MaxValue).Append(" }");
             return sb.ToString();
-            //return $"{GetType().Name} {{Max='{Operand.ToString()}'}}";
         }
     }
 }

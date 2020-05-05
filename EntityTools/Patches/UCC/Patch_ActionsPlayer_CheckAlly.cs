@@ -14,11 +14,13 @@ namespace EntityTools.Patches
     ///
     internal class Patch_ActionsPlayer_CheckAlly : Patch
     {
+        internal static Action<Entity> MostInjuredAllyChanged = null;
+
         //mostInjuredAlly;
         /// <summary>
         /// Доступ к полю Astral.Logic.UCC.Classes.ActionsPlayer.mostInjuredAlly
         /// </summary>
-        static readonly StaticFielsAccessor<Entity> mostInjuredAlly = typeof(Astral.Logic.UCC.Classes.ActionsPlayer).GetStaticField<Entity>("mostInjuredAlly");
+        static readonly StaticFieldAccessor<Entity> mostInjuredAlly = typeof(Astral.Logic.UCC.Classes.ActionsPlayer).GetStaticField<Entity>("mostInjuredAlly");
 
         internal Patch_ActionsPlayer_CheckAlly() : 
             base(typeof(Astral.Logic.UCC.Classes.ActionsPlayer).GetMethod("CheckAlly", ReflectionHelper.DefaultFlags), typeof(Patch_ActionsPlayer_CheckAlly).GetMethod(nameof(CheckAlly), ReflectionHelper.DefaultFlags))
@@ -31,7 +33,8 @@ namespace EntityTools.Patches
         private static void CheckAlly(List<Entity> entities)
         {
             Entity mostInjured = null;
-
+            float minHP = 100;
+            float currentHP = 100;
             //  игнорируем петов 
 #if false
             if (EntityManager.LocalPlayer.PlayerTeam.IsInTeam
@@ -42,9 +45,11 @@ namespace EntityTools.Patches
                 {
                     if (entity.IsPlayer && !entity.IsDead && !entity.Character.IsNearDeath
                         && entity.RelationToPlayer == EntityRelation.Friend
-                        && entity.Location.Distance3DFromPlayer < 70.0)
+                        && entity.Location.Distance3DFromPlayer < 70.0
+                        && (currentHP = entity.Character.AttribsBasic.HealthPercent) < minHP)
                     {
                         mostInjured = entity;
+                        minHP = currentHP;
                     }
                 }
             }
@@ -64,8 +69,12 @@ namespace EntityTools.Patches
             }
             mostInjuredAlly.Value.Pointer = IntPtr.Zero; 
 #endif
-            if (mostInjured is null)
+            MostInjuredAllyChanged?.Invoke(mostInjured);
+
+            if (mostInjured != null)
+            {
                 mostInjuredAlly.Value.Pointer = mostInjured.Pointer;
+            }
         }
     } 
 #endif

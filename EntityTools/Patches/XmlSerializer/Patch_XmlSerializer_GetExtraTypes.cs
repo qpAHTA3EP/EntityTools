@@ -55,7 +55,8 @@ namespace EntityTools.Patches
             switch (typeNum)
             {
                 case 1: // UCC types
-                    __result = UCCTypes;
+                    //__result = UCCTypes;
+                    __result = QuesterTypes;
                     break;
                 case 2: // Quester types
                     __result = QuesterTypes;
@@ -133,14 +134,6 @@ namespace EntityTools.Patches
                 else if (type.BaseType == typeof(Astral.Quester.Classes.Condition))
                 {
                     UCCTypes.Add(type);
-                    QuesterTypes.Add(type);
-                }
-                else if (type.BaseType == typeof(UCCAction))
-                {
-                    QuesterTypes.Add(type);
-                }
-                else if (type.BaseType == typeof(UCCCondition))
-                {
                     QuesterTypes.Add(type);
                 }
                 else if (type.BaseType == typeof(SkillTrainAction))

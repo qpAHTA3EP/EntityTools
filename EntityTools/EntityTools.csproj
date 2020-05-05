@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.0425.0801</AssemblyVersion>
+    <AssemblyVersion>0.20.0506.0758</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -175,6 +175,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Editors\NPCVendorInfosExt.cs" />
     <Compile Include="Logger\EntityToolLogger.cs" />
     <Compile Include="Core\Interfaces\IUCCConditionEngine.cs" />
     <Compile Include="Core\Interfaces\IUCCActionEngine.cs" />
@@ -212,7 +213,6 @@
     <Compile Include="Editors\CheckedListBoxCommonEditor.cs" />
     <Compile Include="Editors\AddTypeCommonEditor.cs" />
     <Compile Include="Editors\ConditionListEditor.cs" />
-    <Compile Include="Editors\EntityTestEditor.cs" />
     <Compile Include="Core\MainPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -256,13 +256,16 @@
     <Compile Include="Servises\UnstuckSpell\UnstuckSpellsSettings.cs" />
     <Compile Include="Logger\EntityToolLoggerSettings.cs" />
     <Compile Include="Tools\AuraOption.cs" />
+    <Compile Include="Tools\BuyItems\BuyItemEntry.cs" />
+    <Compile Include="Tools\BuyItems\Enums.cs" />
     <Compile Include="Tools\CollectionTypeConverter.cs" />
     <Compile Include="Servises\EnchantHelper.cs" />
     <Compile Include="Tools\CryptoHelper.cs" />
     <Compile Include="Tools\EntityDef.cs" />
     <Compile Include="Tools\Enums.cs" />
     <Compile Include="Tools\Export\Enums.cs" />
-    <Compile Include="Tools\Extensions\Extensions.cs" />
+    <Compile Include="Tools\Extensions\ArrayExtensions.cs" />
+    <Compile Include="Tools\Extensions\HexConverter.cs" />
     <Compile Include="Tools\Extensions\FormCollectionExtentions.cs" />
     <Compile Include="Tools\Extensions\ListTExtentions.cs" />
     <Compile Include="Tools\Extensions\StringExtentions.cs" />
@@ -281,8 +284,10 @@
     <Compile Include="Settings\PluginSettingsBase.cs" />
     <Compile Include="Tools\Classes.cs" />
     <Compile Include="Tools\Reflection\CopyHelper.cs" />
+    <Compile Include="Tools\Reflection\InstanceFieldAccessor.cs" />
     <Compile Include="Tools\Reflection\NonStaticAction.cs" />
     <Compile Include="Tools\Reflection\NonStaticFunction.cs" />
+    <Compile Include="Tools\Reflection\PrivateConsructor.cs" />
     <Compile Include="Tools\Reflection\ReflectionHelper.cs" />
     <Compile Include="Tools\Reflection\StaticAction.cs" />
     <Compile Include="Tools\Reflection\StaticFielsAccessor.cs" />
@@ -404,6 +409,9 @@
     <PackageReference Include="Lib.Harmony">
       <Version>2.0.0.10</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Editors\Forms\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

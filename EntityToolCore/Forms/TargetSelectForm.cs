@@ -38,9 +38,6 @@ namespace EntityCore.Forms
             finally
             {
                 Binds.RemoveAction(Keys.F12);
-                /*if (parent != null)
-                    parent.Focus();
-                else CommonTools.FocusForm(typeof(Astral.Forms.Main));*/
             }
         }
 
