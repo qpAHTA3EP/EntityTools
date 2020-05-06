@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.0506.0758</AssemblyVersion>
+    <AssemblyVersion>0.20.0506.0807</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -175,6 +175,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Editors\EntityTestEditor.cs" />
     <Compile Include="Editors\NPCVendorInfosExt.cs" />
     <Compile Include="Logger\EntityToolLogger.cs" />
     <Compile Include="Core\Interfaces\IUCCConditionEngine.cs" />
