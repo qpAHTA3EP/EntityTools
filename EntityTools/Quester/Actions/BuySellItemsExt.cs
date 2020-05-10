@@ -17,7 +17,7 @@ using Astral.Quester.UIEditors;
 using Astral.Quester.UIEditors.Forms;
 using DevExpress.XtraEditors;
 using EntityTools.Enums;
-using EntityTools.Tools.BuyItems;
+using EntityTools.Tools.BuySellItems;
 using EntityTools.UIEditors;
 using MyNW.Classes;
 using MyNW.Internals;
@@ -28,52 +28,88 @@ namespace EntityTools.Quester.Actions
 {
     public class BuySellItemsExt : Astral.Quester.Classes.Action
     {
+        BuySellItemsExt @this => this;
+
         #region Опции команды
+#if DEVELOPER
         [Editor(typeof(NPCVendorInfosExtEditor), typeof(UITypeEditor))]
         [Category("Vendor")]
-        public Astral.Quester.Classes.NPCInfos Vendor { get; set; } = new Astral.Quester.Classes.NPCInfos();
+#else
+        [Browsable(false)]
+#endif
+        public NPCInfos Vendor { get => _vendor; set => _vendor = value; }
+        private NPCInfos _vendor = new NPCInfos();
 
+#if DEVELOPER
         [Editor(typeof(DialogEditor), typeof(UITypeEditor))]
         [Description("Specific dialogs before reaching item list.")]
         [Category("Vendor")]
-        public List<string> BuyMenus { get; set; } = new List<string>();
+#else
+        [Browsable(false)]
+#endif
+        public List<string> BuyMenus { get => _buyMenus; set => _buyMenus = value; }
+        private List<string> _buyMenus = new List<string>();
 
+#if DEVELOPER
         //[Editor(typeof(BuyOptionsEditor), typeof(UITypeEditor))]
         [Category("Purchase")]
-        public List<ItemEntry> BuyOptions { get; set; } = new List<ItemEntry>();
+#else
+        [Browsable(false)]
+#endif
+        public List<ItemFilterEntryExt> BuyOptions { get => _buyOptions; set => _buyOptions = value; }
+        private List<ItemFilterEntryExt> _buyOptions = new List<ItemFilterEntryExt>();
 
+#if DEVELOPER
         [Editor(typeof(ItemIdFilterEditor), typeof(UITypeEditor))]
-        public ItemFilterCore SellOptions { get; set; }
+#else
+        [Browsable(false)]
+#endif
+        public ItemFilterCore SellOptions { get => _sellOptions; set => _sellOptions = value; }
+        private ItemFilterCore _sellOptions;
 
+#if DEVELOPER
         [Description("Use options set in general settings to sell")]
         [Category("Purchase")]
-        public bool UseGeneralSettingsToSell { get; set; } = true;
+#else
+        [Browsable(false)]
+#endif
+        public bool UseGeneralSettingsToSell { get => _useGeneralSettingsToSell; set => _useGeneralSettingsToSell = value; }
+        private bool _useGeneralSettingsToSell = true;
 
+#if DEVELOPER
         [Description("Use options set in general settings to buy")]
         [Category("Purchase")]
-        public bool UseGeneralSettingsToBuy { get; set; } = false;
+#else
+        [Browsable(false)]
+#endif
+        public bool UseGeneralSettingsToBuy { get => _useGeneralSettingsToBuy; set => _useGeneralSettingsToBuy = value; }
+        private bool _useGeneralSettingsToBuy = false;
 
+#if DEVELOPER
         [Category("Restriction")]
-        [Description("Покупать экипировку, уроверь которой выше соответствующей экипировки персонажа")]
-        public bool CheckEquipmentLevel { get; set; } = true;
+        [Description("Проверять наличие свободных слотов сумки")]
+#else
+        [Browsable(false)]
+#endif
+        public bool CheckFreeBags { get => _checkFreeBags; set => _checkFreeBags = value; }
+        private bool _checkFreeBags = true;
 
-        [Category("Restriction")]
-        [Description("Покупать экипировку, подходящую персонажу по уровню")]
-        public bool CheckPlayerLevel { get; set; } = true;
-
-        [Category("Restriction")]
-        [Description("Проверять свободных слотов сумки")]
-        public bool CheckFreeBags { get; set; } = true;
-
-        [Description("Экипировать покупки")]
-        public bool PutOnEquipment { get; set; } = true;
-
+#if DEVELOPER
         [Description("True: Закрывать диалоговое окно после покупки\n\r" +
             "False: Оставлять диалоговое окно открытым (значение по умолчанию)")]
-        public bool CloseContactDialog { get; set; } = false;
+#else
+        [Browsable(false)]
+#endif
+        public bool CloseContactDialog { get => _closeContactDialog; set => _closeContactDialog = value; }
+        private bool _closeContactDialog = false;
 
+#if DEVELOPER
         [Description("Продолжительно торговой сессии")]
-        public uint Timer { get; set; } = 10000;
+#else
+        [Browsable(false)]
+#endif
+        public uint Timer { get => _timer; set => _timer = value; }
+        private uint _timer = 10000;
         #endregion
 
         public BuySellItemsExt() { }
@@ -86,6 +122,7 @@ namespace EntityTools.Quester.Actions
         protected override Vector3 InternalDestination => Vendor.Position;
         public override void GatherInfos()
         {
+#if DEVELOPER
             if (NPCVendorInfosExtEditor.SetInfos(out NPCInfos npcInfos))
             {
                 Vendor = npcInfos;
@@ -93,7 +130,8 @@ namespace EntityTools.Quester.Actions
                 {
                     DialogEdit.Show(BuyMenus);
                 }
-            }
+            } 
+#endif
         }
         public override void InternalReset() { tries = 3; }
         public override void OnMapDraw(GraphicsNW graph) { }
@@ -104,7 +142,7 @@ namespace EntityTools.Quester.Actions
                 if (!Validate(Vendor))
                     return new ActionValidity("Vendor does not set");
 
-                if (!UseGeneralSettingsToBuy || BuyOptions == null || BuyOptions.Count == 0)
+                if (!UseGeneralSettingsToBuy && (BuyOptions == null || BuyOptions.Count == 0))
                     return new ActionValidity("Items to buy are not specified");
 
                 return new ActionValidity();
@@ -112,14 +150,14 @@ namespace EntityTools.Quester.Actions
         }
         #endregion
 
-        public override bool NeedToRun => tries > 0 && Validate(Vendor) && (!Vendor.Position.IsValid || Vendor.Position.Distance3DFromPlayer < 25);
+        public override bool NeedToRun => tries > 0 && Validate(@this._vendor) && (!@this._vendor.Position.IsValid || @this._vendor.Position.Distance3DFromPlayer < 25);
 
         private uint tries = 3;
 
         public override ActionResult Run()
         {
             tries--;
-            switch (Vendor.CostumeName)
+            switch (@this._vendor.CostumeName)
             {
                 case "None":
                     return ActionResult.Fail;
@@ -177,7 +215,7 @@ namespace EntityTools.Quester.Actions
                     }
                 }
 
-                foreach (ItemEntry item2buy in BuyOptions)
+                foreach (ItemFilterEntryExt item2buy in BuyOptions)
                 {
                     foreach (StoreItemInfo storeItemInfo in EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.StoreItems)
                     {
@@ -206,13 +244,13 @@ namespace EntityTools.Quester.Actions
                 if (vendorEntity is null)
                     return ActionResult.Running;
 
-                if (Interact.VendorWithDialogs(vendorEntity, BuyMenus))
+                if (Interact.VendorWithDialogs(vendorEntity, @this._buyMenus))
                 {
                     SellItems();
 
                     BuyItems();
 
-                    if (CloseContactDialog)
+                    if (@this._closeContactDialog)
                         EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
 
                     return ActionResult.Completed;
@@ -238,7 +276,7 @@ namespace EntityTools.Quester.Actions
                         Interact.RestockBetterInjuryKit(Astral.Controllers.Settings.Get.QuesterOptions.RestockInjuryKitsCount);
                     }
                 }
-                foreach (ItemEntry item2Buy in BuyOptions)
+                foreach (ItemFilterEntryExt item2Buy in @this._buyOptions)
                 {
                     BuyAnItem(item2Buy);
 
@@ -252,16 +290,11 @@ namespace EntityTools.Quester.Actions
         }
 
         /// <summary>
-        /// Проверка наличия в сумке свободных слотов.
+        /// Обработка одной позиции списка покупок
         /// </summary>
+        /// <param name="item2buy"></param>
         /// <returns></returns>
-        private static bool CheckFreeSlots()
-        {
-            return EntityManager.LocalPlayer.BagsFreeSlots > 0
-                && EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.Overflow).FilledSlots == 0;
-        }
-
-        private BuyItemResult BuyAnItem(ItemEntry item2buy)
+        private BuyItemResult BuyAnItem(ItemFilterEntryExt item2buy)
         {
             foreach (StoreItemInfo storeItemInfo in EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.StoreItems)
             {
@@ -269,7 +302,7 @@ namespace EntityTools.Quester.Actions
                 {
                     if (item2buy.IsMatch(storeItemInfo.Item))
                     {
-                        Astral.Classes.Timeout timeout = new Astral.Classes.Timeout((int)Timer);
+                        Astral.Classes.Timeout timeout = new Astral.Classes.Timeout((int)@this._timer);
 
                         //Вычисляем количество предметов, которые необходимо докупить
                         uint toBuyNum = 0;
@@ -299,13 +332,17 @@ namespace EntityTools.Quester.Actions
             return BuyItemResult.Completed;
         }
 
+        /// <summary>
+        /// Продажа всех предметов
+        /// </summary>
         private void SellItems()
         {
+#if false
             if (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.SellEnabled)
             {
-                if (UseGeneralSettingsToSell)
+                if (@this._useGeneralSettingsToSell)
                     Interact.SellItems();
-                if (SellOptions.Entries.Count > 0)
+                if (@this._sellOptions.Entries.Count > 0)
                 {
                     EntityManager.LocalPlayer.BagsItems.AddRange(Professions2.CraftingBags);
 
@@ -319,9 +356,17 @@ namespace EntityTools.Quester.Actions
                 }
             }
             else Logger.WriteLine("Can't sell to this vendor !");
+#else
+            throw new NotImplementedException(System.Reflection.MethodBase.GetCurrentMethod().Name);
+#endif
         }
 
-        public uint NumberOfItem2By(ItemEntry item2buy)
+        /// <summary>
+        /// Подсчет количества предметов, заданных данной позицией списка покупок, которые необходимо (до)купить
+        /// </summary>
+        /// <param name="item2buy"></param>
+        /// <returns></returns>
+        public uint NumberOfItem2By(ItemFilterEntryExt item2buy)
         {
             uint toBuyNum = item2buy.Count;
             if (item2buy.OverallNumber)
@@ -334,10 +379,36 @@ namespace EntityTools.Quester.Actions
             return toBuyNum;
         }
 
+        /// <summary>
+        /// Проверка корректности вендора и возможности взаимодействия с ним в текущей локации
+        /// </summary>
+        /// <param name="npcInfos"></param>
+        /// <returns></returns>
         private bool Validate(NPCInfos npcInfos)
         {
             return npcInfos != null && !string.IsNullOrEmpty(npcInfos.CostumeName)
                 && (npcInfos.MapName == "All" || (npcInfos.MapName == EntityManager.LocalPlayer.MapState.MapName && npcInfos.RegionName == EntityManager.LocalPlayer.RegionInternalName));
+        }
+
+        /// <summary>
+        /// Проверка наличия в сумке свободных слотов.
+        /// </summary>
+        /// <returns></returns>
+        private static bool CheckFreeSlots()
+        {
+            return EntityManager.LocalPlayer.BagsFreeSlots > 0
+                && EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.Overflow).FilledSlots == 0;
+        }
+
+        private static bool Check_PlayerLevel(Item item)
+        {
+#if false
+            item.ItemDef.UsageRestriction.MinLevel; // Минимальный требуемый уровень персонажа
+            item.ItemDef.UsageRestriction.AllowedClasses; // Список допустимых классов
+            item.ItemDef.Level; // Уроверь предмета  
+#endif
+
+            return false;
         }
     }
 }

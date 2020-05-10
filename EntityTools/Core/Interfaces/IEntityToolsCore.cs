@@ -17,6 +17,7 @@ namespace EntityTools.Core.Interfaces
         bool Initialize(Astral.Logic.UCC.Classes.UCCAction action);
         bool Initialize(Astral.Logic.UCC.Classes.UCCCondition condition);
 #if DEVELOPER
+        bool GUIRequest_Item<T>(Func<IEnumerable<T>> source, ref T selectedValue);
         bool GUIRequest_AuraId(ref string id);
         bool GUIRequest_UIGenId(ref string id);
         bool GUIRequest_EntityId(ref string entPattern, ref ItemFilterStringType strMatchType, ref EntityNameType nameType);

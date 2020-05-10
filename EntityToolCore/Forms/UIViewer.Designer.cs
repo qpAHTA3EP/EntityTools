@@ -239,6 +239,7 @@
             this.Controls.Add(this.cbSort);
             this.Controls.Add(this.filterVisibleOnly);
             this.Controls.Add(this.splitContainer);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "UIViewer";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "UIViewer";

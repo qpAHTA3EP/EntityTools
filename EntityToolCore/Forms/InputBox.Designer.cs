@@ -76,6 +76,8 @@ namespace EntityCore.Forms
             this.Controls.Add(this.value);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "InputBox";
+            this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.Text = "InputBox";
             this.TopMost = true;
             this.Load += new System.EventHandler(this.InputBox_Load);

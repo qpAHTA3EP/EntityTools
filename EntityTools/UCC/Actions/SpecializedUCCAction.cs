@@ -195,15 +195,17 @@ namespace EntityTools.UCC.Actions
 #endif
                                     }
                                 }
+#if DEBUG && DEBUG_LOG
                                 num++;
+#endif
                             }
 #if DEBUG && DEBUG_LOG
                             debugStr.Append(']');
 #endif
 
-                            // Если множетство незалоченных условий пустое, тогда условие истино
-                            // Если оно НЕ пустое, тогда должно встретиться хотя бы одно истиное 
-                            result = lockedTrue && (CustomConditions.Count == lockedNum || okUnlockedNum > 0);
+                                // Если множетство незалоченных условий пустое, тогда условие истино
+                                // Если оно НЕ пустое, тогда должно встретиться хотя бы одно истиное 
+                                result = lockedTrue && (CustomConditions.Count == lockedNum || okUnlockedNum > 0);
 
                             // отрицание результата, если задан флаг
                             if (Not)
@@ -259,7 +261,9 @@ namespace EntityTools.UCC.Actions
 #endif
 
                                 }
+#if DEBUG && DEBUG_LOG
                                 num++;
+#endif
                             }
 #if DEBUG && DEBUG_LOG
                             debugStr.Append(']');

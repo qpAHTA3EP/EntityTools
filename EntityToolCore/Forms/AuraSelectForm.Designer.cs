@@ -93,6 +93,7 @@ namespace EntityCore.Forms
             // btnSelect
             // 
             this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSelect.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.btnSelect.ImageOptions.Image = global::EntityCore.Properties.Resources.miniValid;
             this.btnSelect.Location = new System.Drawing.Point(298, 391);
             this.btnSelect.Name = "btnSelect";
@@ -104,6 +105,7 @@ namespace EntityCore.Forms
             // btnReload
             // 
             this.btnReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnReload.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.btnReload.ImageOptions.Image = global::EntityCore.Properties.Resources.miniRefresh;
             this.btnReload.Location = new System.Drawing.Point(12, 391);
             this.btnReload.Name = "btnReload";
@@ -209,6 +211,8 @@ namespace EntityCore.Forms
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.MaximumSize = new System.Drawing.Size(400, 700);
             this.Name = "AuraSelectForm";
+            this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Select Aura";
             this.Load += new System.EventHandler(this.AuraSelectForm_Load);

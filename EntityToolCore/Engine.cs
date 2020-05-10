@@ -29,6 +29,7 @@ using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 using EntityTools;
 using Astral.Logic.NW;
+using System.Linq;
 
 namespace EntityCore
 {
@@ -184,6 +185,17 @@ namespace EntityCore
 
 #if DEVELOPER
         #region Запрос к пользователю
+        public bool GUIRequest_Item<T>(Func<IEnumerable<T>> source, ref T selectedValue)
+        {
+            T value = selectedValue;
+            if(ItemSelectForm.GetAnItem(source, ref value))
+            {
+                selectedValue = value;
+                return true;
+            }
+            return false;
+        }
+
         public bool GUIRequest_AuraId(ref string id)
         {
             string newId = Forms.AuraSelectForm.GUIRequest();
@@ -227,14 +239,24 @@ namespace EntityCore
         {
             List<string> list = crList ?? new List<string>();
 
-            if (MultiSelectForm.GUIRequest("Select CustomRegions:",
-                    (DataGridView dgv) => CustomRegionExtentions.CustomRegionList2DataGridView(list, dgv),
-                    (DataGridView dgv) => CustomRegionExtentions.DataGridView2CustomRegionList(dgv, ref list)))
+#if disabled_20200510_0025
+            if (MultiItemSelectForm.GUIRequest("Select CustomRegions:",
+            (DataGridView dgv) => CustomRegionExtentions.CustomRegionList2DataGridView(list, dgv),
+            (DataGridView dgv) => CustomRegionExtentions.DataGridView2CustomRegionList(dgv, ref list)))
+            {
+                crList = list;
+                return true;
+            }
+            return false; 
+#else
+            if(MultiItemSelectForm.GUIRequest("Select CustomRegions:",
+                () => Astral.Quester.API.CurrentProfile.CustomRegions.Select(cr => cr.Name), ref list))
             {
                 crList = list;
                 return true;
             }
             return false;
+#endif
         }
 
         public bool GUIRequest_NodeLocation(ref Vector3 pos, string caption)

@@ -173,6 +173,16 @@ namespace EntityTools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap miniExpand {
+            get {
+                object obj = ResourceManager.GetObject("miniExpand", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap miniExport {
             get {
                 object obj = ResourceManager.GetObject("miniExport", resourceCulture);
@@ -233,9 +243,29 @@ namespace EntityTools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap miniPlayAll {
+            get {
+                object obj = ResourceManager.GetObject("miniPlayAll", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap miniRefresh {
             get {
                 object obj = ResourceManager.GetObject("miniRefresh", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap miniReverse {
+            get {
+                object obj = ResourceManager.GetObject("miniReverse", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -72,7 +72,7 @@ namespace EntityCore.Forms
         private void bntAdd_Click(object sender, EventArgs e)
         {
             //if (AddAction.Show(typeof(UCCCondition)) is UCCCondition condition)
-            if (ItemSelectForm.GetAnItem<UCCCondition>(false) is UCCCondition condition)
+            if (ItemSelectForm.GetAnInstanceOfType(out UCCCondition condition, false))
             {
                 lsbxConditions.Items.Add(condition);
                 lsbxConditions.SelectedItem = condition;

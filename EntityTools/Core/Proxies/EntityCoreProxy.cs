@@ -50,6 +50,11 @@ namespace EntityTools.Core
         }
 
 #if DEVELOPER
+        public bool GUIRequest_Item<T>(Func<IEnumerable<T>> source, ref T selectedValue)
+        {
+            throw new NotImplementedException();
+        }
+
         public string EntityDiagnosticInfos(object obj)
         {
             throw new NotImplementedException();

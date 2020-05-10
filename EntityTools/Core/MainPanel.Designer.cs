@@ -88,11 +88,11 @@ namespace EntityTools.Core
             this.gbxLogger = new System.Windows.Forms.GroupBox();
             this.ckbExtendedActionDebugInfo = new System.Windows.Forms.CheckBox();
             this.btnOpenLog = new System.Windows.Forms.Button();
-            this.dlgSaveFile = new System.Windows.Forms.SaveFileDialog();
-            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.tabDebug = new DevExpress.XtraTab.XtraTabPage();
             this.tbDebugMonitorInfo = new System.Windows.Forms.TextBox();
             this.ckbDebugMonitor = new System.Windows.Forms.CheckBox();
+            this.dlgSaveFile = new System.Windows.Forms.SaveFileDialog();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
             this.tbclMain.SuspendLayout();
             this.tabUtilities.SuspendLayout();
@@ -185,7 +185,6 @@ namespace EntityTools.Core
             this.btnTest.TabIndex = 2;
             this.btnTest.Text = "Test";
             this.btnTest.UseVisualStyleBackColor = true;
-            this.btnTest.Visible = false;
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
             // btnCheckCore
@@ -849,12 +848,6 @@ namespace EntityTools.Core
             this.btnOpenLog.UseVisualStyleBackColor = true;
             this.btnOpenLog.Click += new System.EventHandler(this.btnOpenLog_Click);
             // 
-            // dlgSaveFile
-            // 
-            this.dlgSaveFile.CheckPathExists = false;
-            this.dlgSaveFile.Filter = "XML|*.xml";
-            this.dlgSaveFile.ValidateNames = false;
-            // 
             // tabDebug
             // 
             this.tabDebug.Controls.Add(this.tbDebugMonitorInfo);
@@ -886,6 +879,12 @@ namespace EntityTools.Core
             this.ckbDebugMonitor.Text = "DebugMonitor";
             this.ckbDebugMonitor.UseVisualStyleBackColor = true;
             this.ckbDebugMonitor.CheckedChanged += new System.EventHandler(this.ckbDebugMonitor_CheckedChanged);
+            // 
+            // dlgSaveFile
+            // 
+            this.dlgSaveFile.CheckPathExists = false;
+            this.dlgSaveFile.Filter = "XML|*.xml";
+            this.dlgSaveFile.ValidateNames = false;
             // 
             // EntityToolsMainPanel
             // 

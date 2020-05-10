@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.0506.0807</AssemblyVersion>
+    <AssemblyVersion>0.20.0507.1129</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,7 +22,7 @@
     <DefineConstants>TRACE;DEBUG;DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, HARMONY, ENTITYTOOLS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>7.1</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
@@ -115,10 +115,6 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.0.0.10, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\x64\0Harmony.dll</HintPath>
-    </Reference>
     <Reference Include="AStar">
       <HintPath>..\References\x64\AStar.dll</HintPath>
       <Private>False</Private>
@@ -140,6 +136,9 @@
     </Reference>
     <Reference Include="DevExpress.XtraEditors.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraGrid.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.XtraLayout.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
@@ -176,6 +175,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Editors\EntityTestEditor.cs" />
+    <Compile Include="Editors\Forms\ItemFilterEditorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\Forms\ItemFilterEditorForm.Designer.cs">
+      <DependentUpon>ItemFilterEditorForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editors\NPCVendorInfosExt.cs" />
     <Compile Include="Logger\EntityToolLogger.cs" />
     <Compile Include="Core\Interfaces\IUCCConditionEngine.cs" />
@@ -257,8 +262,9 @@
     <Compile Include="Servises\UnstuckSpell\UnstuckSpellsSettings.cs" />
     <Compile Include="Logger\EntityToolLoggerSettings.cs" />
     <Compile Include="Tools\AuraOption.cs" />
-    <Compile Include="Tools\BuyItems\BuyItemEntry.cs" />
-    <Compile Include="Tools\BuyItems\Enums.cs" />
+    <Compile Include="Tools\BuySellItems\BuyItemEntry.cs" />
+    <Compile Include="Tools\BuySellItems\Enums.cs" />
+    <Compile Include="Tools\BuySellItems\IndexedBags.cs" />
     <Compile Include="Tools\CollectionTypeConverter.cs" />
     <Compile Include="Servises\EnchantHelper.cs" />
     <Compile Include="Tools\CryptoHelper.cs" />
@@ -317,6 +323,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Core\MainPanel.resx">
       <DependentUpon>MainPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\Forms\ItemFilterEditorForm.resx">
+      <DependentUpon>ItemFilterEditorForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Patches\Mapper\MapperFormExt.resx">
       <DependentUpon>MapperFormExt.cs</DependentUpon>
@@ -412,7 +421,13 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Editors\Forms\" />
+    <None Include="Resources\miniExpand.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniReverse.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniPlayAll.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

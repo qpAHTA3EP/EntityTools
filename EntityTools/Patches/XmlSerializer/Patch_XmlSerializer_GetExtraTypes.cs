@@ -11,6 +11,7 @@ using Astral.Classes.SkillTrain;
 using Astral.Logic.UCC.Classes;
 using Astral.MultiTasks.Classes;
 using EntityTools.Reflection;
+using System.Windows.Forms;
 
 namespace EntityTools.Patches
 {
@@ -29,8 +30,7 @@ namespace EntityTools.Patches
         static List<Type> MultitaskTypes = new List<Type>(10);
         static List<Type> SkillTrainTypes = new List<Type>(50);
 
-        internal Patch_XmlSerializer_GetExtraTypes() : base(typeof(Astral.Functions.XmlSerializer).GetMethod("GetExtraTypes", ReflectionHelper.DefaultFlags), typeof(Patch_XmlSerializer_GetExtraTypes).GetMethod(nameof(GetExtraTypes), ReflectionHelper.DefaultFlags))
-        { }
+        internal Patch_XmlSerializer_GetExtraTypes() : base(typeof(Astral.Functions.XmlSerializer).GetMethod("GetExtraTypes", ReflectionHelper.DefaultFlags), typeof(Patch_XmlSerializer_GetExtraTypes).GetMethod(nameof(GetExtraTypes), ReflectionHelper.DefaultFlags)){ }
 
 #if HARMONY
         [HarmonyPrefix] 
@@ -43,20 +43,23 @@ namespace EntityTools.Patches
                 MultitaskTypes.Clear();
                 SkillTrainTypes.Clear();
                 // Заполняем все списки одновременно
-                
+
+#if true
                 // Проверяем типы, объявленные в Астрале
                 FillTypeLists(Assembly.GetEntryAssembly().GetTypes());
-                
+
                 // Проверяем типы, объявленные в плагинах
                 if (GetPluginTypes != null)
-                    FillTypeLists(GetPluginTypes());
+                    FillTypeLists(GetPluginTypes()); 
+#else
+                FillTypeLists();
+#endif
             }
 
             switch (typeNum)
             {
                 case 1: // UCC types
-                    //__result = UCCTypes;
-                    __result = QuesterTypes;
+                    __result = UCCTypes;
                     break;
                 case 2: // Quester types
                     __result = QuesterTypes;
@@ -143,6 +146,46 @@ namespace EntityTools.Patches
                 else if (type.BaseType == typeof(MTAction))
                 {
                     MultitaskTypes.Add(type);
+                }
+            }
+        }
+        internal static void FillTypeLists()
+        {
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {// перебираем типы, объявленные в Астрале
+                foreach (Type type in assembly.GetTypes())
+                {
+                    if (type.BaseType == typeof(UCCAction))
+                    {
+                        UCCTypes.Add(type);
+                        QuesterTypes.Add(type);
+                    }
+                    else if (type.BaseType == typeof(UCCCondition))
+                    {
+                        UCCTypes.Add(type);
+                        QuesterTypes.Add(type);
+                    }
+                    else if (type.BaseType == typeof(TargetPriorityEntry))
+                    {
+                        UCCTypes.Add(type);
+                    }
+                    else if (type.BaseType == typeof(Astral.Quester.Classes.Action))
+                    {
+                        QuesterTypes.Add(type);
+                    }
+                    else if (type.BaseType == typeof(Astral.Quester.Classes.Condition))
+                    {
+                        UCCTypes.Add(type);
+                        QuesterTypes.Add(type);
+                    }
+                    else if (type.BaseType == typeof(SkillTrainAction))
+                    {
+                        SkillTrainTypes.Add(type);
+                    }
+                    else if (type.BaseType == typeof(MTAction))
+                    {
+                        MultitaskTypes.Add(type);
+                    }
                 }
             }
         }

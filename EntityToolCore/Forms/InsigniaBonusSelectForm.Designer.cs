@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.lbFilter = new System.Windows.Forms.Label();
             this.tbBarbed = new System.Windows.Forms.TextBox();
             this.tbCrescent = new System.Windows.Forms.TextBox();
@@ -39,7 +38,7 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnSelect = new System.Windows.Forms.Button();
             this.BonusList = new System.Windows.Forms.ListBox();
-            this.bindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.bindingSource = new System.Windows.Forms.BindingSource();
             this.Description = new System.Windows.Forms.TextBox();
             this.pbBarbed = new System.Windows.Forms.PictureBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
@@ -272,8 +271,11 @@
             this.Controls.Add(this.tbCrescent);
             this.Controls.Add(this.tbBarbed);
             this.Controls.Add(this.lbFilter);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.MinimumSize = new System.Drawing.Size(555, 385);
             this.Name = "InsigniaBonusSelectForm";
+            this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "InsigniaBonuses";
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource)).EndInit();

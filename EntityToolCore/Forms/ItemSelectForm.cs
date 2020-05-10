@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define DELEGATES_FILL
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -18,28 +20,34 @@ namespace EntityCore.Forms
     {
         private static readonly Func<List<Type>> PluginsGetTypes = typeof(Astral.Controllers.Plugins).GetStaticFunction<List<Type>>("GetTypes");
 
+#if DELEGATES_FILL
         public delegate object ProcessingItems(ListBox itemList);
 
-        internal ProcessingItems FillList;
-        internal ProcessingItems GetSelectedItem;
+        private ProcessingItems FillList;
+        private ProcessingItems GetSelectedItem;
+
+#endif
+        private Action fillListAction;
 
         public ItemSelectForm()
         {
             InitializeComponent();
         }
 
+        #region GetAnInstanceOfType
         /// <summary>
         /// Выбор типа и конструирование обекта выбранного типа
         /// </summary>
         /// <typeparam name="T">базовый тип</typeparam>
         /// <returns></returns>
-        public static T GetAnItem<T>(bool includeBase = true) where T: class
+        public static bool GetAnInstanceOfType<T>(out T selectedValue, bool includeBase = true) where T : class
+#if DELEGATES_FILL
         {
-            ItemSelectForm selectForm = 
-                (includeBase) ? 
+            ItemSelectForm selectForm =
+                (includeBase) ?
                 new ItemSelectForm()
                 {
-                    FillList =  FillItems<T>,
+                    FillList = FillItems<T>,
                     GetSelectedItem = GetItem
                 } :
                 new ItemSelectForm()
@@ -52,44 +60,32 @@ namespace EntityCore.Forms
                 return selectForm.GetSelectedItem?.Invoke(selectForm.ItemList) as T;
             else return null;
         }
-
-        public static object GetAnItem(ProcessingItems fill, ProcessingItems get)
+#else
         {
-            ItemSelectForm selectForm = new ItemSelectForm()
-                                            {
-                                                FillList = fill,
-                                                GetSelectedItem = get
-                                            };
-            if (selectForm.ShowDialog() == DialogResult.OK)
-                return selectForm.GetSelectedItem?.Invoke(selectForm.ItemList);
-            else return null;
-        }
+            ItemSelectForm selectForm = new ItemSelectForm();
+            if (includeBase)
+                selectForm.fillListAction = () => FillItems<T>(selectForm.ItemList);
+            else selectForm.fillListAction = () => FillDerivedItems<T>(selectForm.ItemList);
 
-        #region Обработчики
-        private void btnSelect_Click(object sender, EventArgs e)
-        {
-            this.DialogResult = DialogResult.OK;
-            Close();
+            if (selectForm.ShowDialog() == DialogResult.OK
+                && selectForm.ItemList.SelectedIndex >= 0)
+            {
+                selectedValue = selectForm.ItemList.SelectedItem as T;
+                return selectedValue != null;
+            }
+            else
+            {
+                selectedValue = default(T);
+                return false;
+            }
         }
-
-        private void btnReload_Click(object sender, EventArgs e)
-        {
-            FillList?.Invoke(ItemList);
-        }
-
-        private void Form_Shown(object sender, EventArgs e)
-        {
-            FillList?.Invoke(ItemList);
-        }
-        #endregion
-
         /// <summary>
         /// Добавление производных типов в список
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="itemList"></param>
         /// <returns></returns>
-        internal static object FillDerivedItems<T>(ListBox itemList)
+        private static object FillDerivedItems<T>(ListBox itemList)
         {
             itemList.Items.Clear();
             itemList.DisplayMember = string.Empty;
@@ -105,7 +101,7 @@ namespace EntityCore.Forms
                     }
                 }
             }
-            if(itemList.Items.Count > 0)
+            if (itemList.Items.Count > 0)
                 itemList.DisplayMember = "Name";
             return itemList.Items.Count;
         }
@@ -115,24 +111,102 @@ namespace EntityCore.Forms
         /// <typeparam name="T"></typeparam>
         /// <param name="itemList"></param>
         /// <returns></returns>
-        internal static object FillItems<T>(ListBox itemList)
+        private static object FillItems<T>(ListBox itemList)
         {
             FillDerivedItems<T>(itemList);
             itemList.Items.Add(typeof(T));
-            if(itemList.Items.Count > 0)
+            if (itemList.Items.Count > 0)
                 itemList.DisplayMember = "Name";
             return itemList.Items.Count;
         }
+
         /// <summary>
         /// конструирование объекта выбранного типа
         /// </summary>
         /// <param name="itemList"></param>
         /// <returns></returns>
-        internal static object GetItem(ListBox itemList)
+        private static object GetItem(ListBox itemList)
         {
             if (itemList.SelectedItem is Type t)
                 return Activator.CreateInstance(t);
             return null;
         }
+#endif
+        #endregion
+
+#if DELEGATES_FILL
+        public static object GetAnItem(ProcessingItems fill, ProcessingItems get)
+        {
+            ItemSelectForm selectForm = new ItemSelectForm()
+            {
+                FillList = fill,
+                GetSelectedItem = get
+            };
+            if (selectForm.ShowDialog() == DialogResult.OK)
+                return selectForm.GetSelectedItem?.Invoke(selectForm.ItemList);
+            else return null;
+        } 
+#endif
+
+        #region GetAnItem
+        /// <summary>
+        /// Выбор элемента из списка, формируемого функтором source
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="selectedValue"></param>
+        /// <returns></returns>
+        public static bool GetAnItem<T>(Func<IEnumerable<T>> source, ref T selectedValue)
+        {
+            ItemSelectForm selectForm = new ItemSelectForm();
+            T value = selectedValue;
+            selectForm.fillListAction = () => {
+                    selectForm.ItemList.DataSource = source();
+                    if (value != null) selectForm.ItemList.SelectedItem = value;
+                };
+#if DELEGATES_FILL
+            selectForm.FillList = null;
+            selectForm.GetSelectedItem = null; 
+#endif
+
+            if (selectForm.ShowDialog() == DialogResult.OK
+                && selectForm.ItemList.SelectedIndex >= 0)
+            {
+                selectedValue = (T)selectForm.ItemList.SelectedItem;
+                return true;
+            }
+            else
+            {
+                //selectedValue = default(T);
+                return false;
+            }
+        } 
+        #endregion
+
+        #region Обработчики
+        private void btnSelect_Click(object sender, EventArgs e)
+        {
+            this.DialogResult = DialogResult.OK;
+            Close();
+        }
+
+        private void btnReload_Click(object sender, EventArgs e)
+        {
+#if DELEGATES_FILL
+            FillList?.Invoke(ItemList);
+#else
+            fillListAction?.Invoke();
+#endif
+        }
+
+            private void Form_Shown(object sender, EventArgs e)
+        {
+#if DELEGATES_FILL
+            FillList?.Invoke(ItemList);
+#else
+            fillListAction?.Invoke();
+#endif
+        }
+        #endregion
     }
 }

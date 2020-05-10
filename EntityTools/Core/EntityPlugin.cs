@@ -149,14 +149,12 @@ namespace EntityTools
                         if (serialiser.Deserialize(fileStream) is EntityToolsSettings settings)
                         {
                             PluginSettings = settings;
-                            Astral.Logger.WriteLine($"{GetType().Name}: Load settings from {Path.GetFileName(FileTools.SettingsFile)}");
-                            ETLogger.WriteLine($"{GetType().Name}: Load settings from {Path.GetFileName(FileTools.SettingsFile)}");
+                            ETLogger.WriteLine($"{GetType().Name}: Load settings from {Path.GetFileName(FileTools.SettingsFile)}", true);
                         }
                         else
                         {
                             PluginSettings = new EntityToolsSettings();
-                            Astral.Logger.WriteLine($"{GetType().Name}: Settings file not found. Use default");
-                            ETLogger.WriteLine($"{GetType().Name}: Settings file not found. Use default");
+                            ETLogger.WriteLine($"{GetType().Name}: Settings file not found. Use default", true);
                         }
                     }
                 }
@@ -164,8 +162,7 @@ namespace EntityTools
             catch
             {
                 PluginSettings = new EntityToolsSettings();
-                Astral.Logger.WriteLine($"{GetType().Name}: Error load settings file {Path.GetFileName(FileTools.SettingsFile)}. Use default");
-                ETLogger.WriteLine($"{GetType().Name}: Error load settings file {Path.GetFileName(FileTools.SettingsFile)}. Use default");
+                ETLogger.WriteLine(LogType.Error, $"{GetType().Name}: Error load settings file {Path.GetFileName(FileTools.SettingsFile)}. Use default", true);
             }
         }
 
@@ -189,9 +186,8 @@ namespace EntityTools
             }
             catch (Exception exp)
             {
-                Astral.Logger.WriteLine($"{GetType().Name}: Error to save settings file {Path.GetFileName(FileTools.SettingsFile)}");
-                ETLogger.WriteLine($"{GetType().Name}: Error to save settings file {Path.GetFileName(FileTools.SettingsFile)}");
-                ETLogger.WriteLine(exp.ToString());
+                ETLogger.WriteLine(LogType.Error, $"{GetType().Name}: Error to save settings file {Path.GetFileName(FileTools.SettingsFile)}", true);
+                ETLogger.WriteLine(LogType.Error, exp.ToString(), true);
             }
         }
 
@@ -294,10 +290,6 @@ namespace EntityTools
 
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
-#if DEVELOPER
-            ETPatcher.Apply();
-#endif
-
             if (Regex.IsMatch(args.Name, assemblyResolve_Name))
                 return typeof(EntityTools).Assembly;
             return null;
@@ -354,6 +346,18 @@ namespace EntityTools
                 return false;
             }
 #if DEVELOPER
+            public bool GUIRequest_Item<T>(Func<IEnumerable<T>> source, ref T selectedValue)
+            {
+                if (InternalInitialize())
+                    return Core.GUIRequest_Item(source, ref selectedValue);
+
+                XtraMessageBox.Show("EntityToolsCore is invalid!\n\rItem request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! UIGen request denied.", true);
+
+                return false;
+            }
+
             public bool GUIRequest_AuraId(ref string id)
             {
                 if (InternalInitialize())
@@ -361,8 +365,7 @@ namespace EntityTools
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rAura request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                Astral.Logger.WriteLine("EntityToolsCore is invalid! Aura request denied.");
-                ETLogger.WriteLine("EntityToolsCore is invalid! Aura request denied.");
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! Aura request denied.", true);
 
                 return false;
             }
@@ -374,8 +377,7 @@ namespace EntityTools
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rUIGen request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                Astral.Logger.WriteLine("EntityToolsCore is invalid! UIGen request denied.");
-                ETLogger.WriteLine("EntityToolsCore is invalid! UIGen request denied.");
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! UIGen request denied.", true);
 
                 return false;
             }
@@ -387,8 +389,7 @@ namespace EntityTools
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rEntityId request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                Astral.Logger.WriteLine("EntityToolsCore is invalid! EntityId request denied.");
-                ETLogger.WriteLine("EntityToolsCore is invalid! EntityId request denied.");
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! EntityId request denied.", true);
 
                 return false;
             }
@@ -400,8 +401,7 @@ namespace EntityTools
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rUCC conditions request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                Astral.Logger.WriteLine("EntityToolsCore is invalid! UCC conditions request denied.");
-                ETLogger.WriteLine("EntityToolsCore is invalid! UCC conditions request denied.");
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! UCC conditions request denied.", true);
 
                 return false;
             }
@@ -413,8 +413,7 @@ namespace EntityTools
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rCustomRegions request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                Astral.Logger.WriteLine("EntityToolsCore is invalid! CustomRegions request denied.");
-                ETLogger.WriteLine("EntityToolsCore is invalid! CustomRegions request denied.");
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! CustomRegions request denied.", true);
 
                 return false;
             }
@@ -426,8 +425,7 @@ namespace EntityTools
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rNodeLocation request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                Astral.Logger.WriteLine("EntityToolsCore is invalid! Node Location request denied.");
-                ETLogger.WriteLine("EntityToolsCore is invalid! Node Location request denied.");
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! Node Location request denied.", true);
 
                 return false;
             }
@@ -439,7 +437,7 @@ namespace EntityTools
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rNPCInfos request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                ETLogger.WriteLine("EntityToolsCore is invalid! NPCInfos request denied.", true);
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! NPCInfos request denied.", true);
 
                 return false;
             }
@@ -453,8 +451,7 @@ namespace EntityTools
                 //Astral.Controllers.Roles.ToggleRole(false);
                 ToggleRole(false);
 
-                Astral.Logger.WriteLine("EntityToolsCore is invalid! Entities search aborted. Stop bot.");
-                ETLogger.WriteLine("EntityToolsCore is invalid! Entities search aborted. Stop bot.");
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! Entities search aborted. Stop bot.", true);
 
                 return null;
             }
