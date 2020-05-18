@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Text.RegularExpressions;
@@ -15,13 +16,14 @@ using MyNW.Internals;
 using MyNW.Patchables.Enums;
 using EntityTools.Core.Proxies;
 using EntityTools.Core.Interfaces;
+using EntityTools.Tools.BuySellItems;
 
 namespace EntityTools.UCC.Actions
 {
     [Serializable]
     public class UseItemSpecial : UCCAction
     {
-#if DEVELOPER
+#if DEVELOPER && CheckedListBoxCommonSelector_InvBagIDs
         internal class InventoryBagsCheckedListBoxEditor : CheckedListBoxCommonEditor<InvBagIDs> { }
 #endif
 
@@ -39,7 +41,7 @@ namespace EntityTools.UCC.Actions
 #endif
             // EntityTools.Core.Initialize(this);
             Target = Astral.Logic.UCC.Ressources.Enums.Unit.Player;
-            CoolDown = 1000;
+            CoolDown = 18000;
         }
         #endregion
 
@@ -108,13 +110,14 @@ namespace EntityTools.UCC.Actions
 #if DEVELOPER
         [Category("Item")]
         [Description("Identificator of the bag where Item would be searched\n" +
-            "When selected value is 'None' then item is rearched in the all inventories")]
+            "When selected value is 'None' then item is searched in the all inventories")]
         [Browsable(false)]
 #else
         [Browsable(false)]
 #endif
         public InvBagIDs BagId
         {
+#if CheckedListBoxCommonSelector_InvBagIDs
             get
             {
                 if (Bags != null && Bags.Items.Count > 0)
@@ -133,9 +136,30 @@ namespace EntityTools.UCC.Actions
                     if (!Bags.Items.Contains(value))
                         Bags.Items.Add(value);
                 }
+            } 
+#else
+            get
+            {
+                if (Bags != null)
+                    return Bags.FirstOrDefault();
+                return InvBagIDs.None;
             }
+            set
+            {
+                if (Bags == null)
+                {
+                    Bags = new BagsList();
+                    Bags.Add(value);
+                }
+                else
+                {
+                    Bags.Add(value);
+                }
+            }
+#endif
         }
 
+#if CheckedListBoxCommonSelector_InvBagIDs
 #if DEVELOPER
         [Category("Item")]
         [Description("Identificator of the bags where Item would be searched\n")]
@@ -155,6 +179,27 @@ namespace EntityTools.UCC.Actions
             }
         }
         internal CheckedListBoxCommonSelector<InvBagIDs> _bags = new CheckedListBoxCommonSelector<InvBagIDs>();
+#else 
+#if DEVELOPER
+        [Category("Item")]
+        [Description("Identificator of the bags where Item would be searched\n")]
+        [Editor(typeof(BagsListEditor), typeof(UITypeEditor))]
+#else
+        [Browsable(false)]
+#endif
+        public BagsList Bags
+        {
+            get => _bags; set
+            {
+                if (_bags != value)
+                {
+                    _bags = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Bags)));
+                }
+            }
+        }
+        internal BagsList _bags = new BagsList();
+#endif
 
         #region Hide Inherited Properties
         [XmlIgnore]

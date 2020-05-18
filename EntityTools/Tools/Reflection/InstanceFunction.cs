@@ -8,19 +8,20 @@ namespace EntityTools.Reflection
 {
     /// <summary>
     /// Фабрика делегатов, осуществляющих через механизм рефлексии 
-    /// доступ к методу объекта заданного типа, и не возвращающего значение
+    /// доступ к методу объекта заданного типа, и возвращающего значение типа ReturnT
     /// </summary>
-    public static class NotStaticActionFactory
+    public static class InstanceFunctionFactory
     {
         /// <summary>
         /// Конструирование делегата, осуществляющего через механизм рефлексии 
         /// доступ к методу объекта заданного типа, и возвращающего значение типа ReturnT
         /// </summary>
+        /// <typeparam name="ReturnT">Тип возвращаемого значения</typeparam>
         /// <param name="type">Тип, декларирующий искомый методв</param>
         /// <param name="methodName">Имя метода</param>
         /// <param name="flags"></param>
         /// <returns>Сконструированный делегат</returns>
-        public static Func<object, Action> GetAction(this Type type, string methodName = "", BindingFlags flags = BindingFlags.Default)
+        public static Func<object, Func<ReturnT>> GetFunction<ReturnT>(this Type type, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
             if (Equals(type, null))
                 return null;
@@ -32,25 +33,28 @@ namespace EntityTools.Reflection
             if (string.IsNullOrEmpty(methodName))
             {
                 // Поиск метода по сигнатуре (без имени)
-                if (!FindBySignature(type,argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
+                if (!FindBySignature(type, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
                     return null;
             }
             else
             {
                 // Поиск метода по имени и сигнатуре
-                if (!FindByNameAndSignature(type, methodName, argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
+                if (!FindByNameAndSignature(type, methodName, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
                     return null;
             }
             if (method!=null)
             {
-                return new Func<object, Action>((object o) =>
+                return new Func<object, Func<ReturnT>>((object o) =>
                                 {
                                     if (o != null
                                         && Equals(o.GetType(), type))
                                     {
-                                        return new Action(() =>
+                                        return new Func<ReturnT>(() =>
                                             {
-                                                method.Invoke(o, new object[] { });
+                                                object result = method.Invoke(o, new object[] { });
+                                                if (Equals(result, null))
+                                                    return default(ReturnT);
+                                                else return (ReturnT)result;
                                             });
                                     }
                                     return null;
@@ -61,16 +65,15 @@ namespace EntityTools.Reflection
 
         /// <summary>
         /// Конструирование делегата, осуществляющего через механизм рефлексии 
-        /// доступ к методу объекта заданного типа, принимающего аргумент тип ArgumentT1
-        /// и возвращающего значение типа ReturnT
+        /// доступ к методу объекта заданного типа, и возвращающего значение типа ReturnT
         /// </summary>
         /// <typeparam name="ReturnT">Тип возвращаемого значения</typeparam>
         /// <param name="type">Тип, декларирующий искомый методв</param>
         /// <param name="methodName">Имя метода</param>
         /// <param name="flags"></param>
         /// <returns>Сконструированный делегат</returns>
-        public static Func<Object, Action<ArgumentT1>>
-                                      GetFunction<ArgumentT1>(this Type type, string methodName = "", BindingFlags flags = BindingFlags.Default)
+        public static Func<Object, Func<ArgumentT1, ReturnT>>
+                                      GetFunction<ArgumentT1, ReturnT>(this Type type, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
             if (Equals(type, null))
                 return null;
@@ -82,25 +85,28 @@ namespace EntityTools.Reflection
             if (string.IsNullOrEmpty(methodName))
             {
                 // Поиск метода по сигнатуре (без имени)
-                if (!FindBySignature(type, argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
+                if (!FindBySignature(type, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
                     return null;
             }
             else
             {
                 // Поиск метода по имени и сигнатуре
-                if (!FindByNameAndSignature(type, methodName, argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
+                if (!FindByNameAndSignature(type, methodName, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
                     return null;
             }
             if (method != null)
             {
-                return new Func<object, Action<ArgumentT1>>((object o) =>
+                return new Func<object, Func<ArgumentT1, ReturnT>>((object o) =>
                 {
                     if (o != null
                         && Equals(o.GetType(), type))
                     {
-                        return new Action<ArgumentT1>((ArgumentT1 a1) =>
+                        return new Func<ArgumentT1, ReturnT>((ArgumentT1 a1) =>
                         {
-                            method.Invoke(o, new object[] { a1 });
+                            object result = method.Invoke(o, new object[] { a1 });
+                            if (Equals(result, null))
+                                return default(ReturnT);
+                            else return (ReturnT)result;
                         });
                     }
                     return null;
@@ -118,8 +124,8 @@ namespace EntityTools.Reflection
         /// <param name="methodName">Имя метода</param>
         /// <param name="flags"></param>
         /// <returns>Сконструированный делегат</returns>
-        public static Func<Object, Action<ArgumentT1, ArgumentT2>>
-                                      GetFunction<ArgumentT1, ArgumentT2>(this Type type, string methodName = "", BindingFlags flags = BindingFlags.Default)
+        public static Func<Object, Func<ArgumentT1, ArgumentT2, ReturnT>>
+                                      GetFunction<ArgumentT1, ArgumentT2, ReturnT>(this Type type, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
             if (Equals(type, null))
                 return null;
@@ -131,25 +137,28 @@ namespace EntityTools.Reflection
             if (string.IsNullOrEmpty(methodName))
             {
                 // Поиск метода по сигнатуре (без имени)
-                if (!FindBySignature(type, argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
+                if (!FindBySignature(type, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
                     return null;
             }
             else
             {
                 // Поиск метода по имени и сигнатуре
-                if (!FindByNameAndSignature(type, methodName, argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
+                if (!FindByNameAndSignature(type, methodName, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
                     return null;
             }
             if (method != null)
             {
-                return new Func<object, Action<ArgumentT1, ArgumentT2>>((object o) =>
+                return new Func<object, Func<ArgumentT1, ArgumentT2, ReturnT>>((object o) =>
                 {
                     if (o != null
                         && Equals(o.GetType(), type))
                     {
-                        return new Action<ArgumentT1, ArgumentT2>((ArgumentT1 a1, ArgumentT2 a2) =>
+                        return new Func<ArgumentT1, ArgumentT2, ReturnT>((ArgumentT1 a1, ArgumentT2 a2) =>
                         {
-                            method.Invoke(o, new object[] { a1, a2 });
+                            object result = method.Invoke(o, new object[] { a1, a2 });
+                            if (Equals(result, null))
+                                return default(ReturnT);
+                            else return (ReturnT)result;
                         });
                     }
                     return null;
@@ -167,8 +176,8 @@ namespace EntityTools.Reflection
         /// <param name="methodName">Имя метода</param>
         /// <param name="flags"></param>
         /// <returns>Сконструированный делегат</returns>
-        public static Func<Object, Action<ArgumentT1, ArgumentT2, ArgumentT3>>
-                                      GetFunction<ArgumentT1, ArgumentT2, ArgumentT3>(this Type type, string methodName = "", BindingFlags flags = BindingFlags.Default)
+        public static Func<Object, Func<ArgumentT1, ArgumentT2, ArgumentT3, ReturnT>>
+                                      GetFunction<ArgumentT1, ArgumentT2, ArgumentT3, ReturnT>(this Type type, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
             if (Equals(type, null))
                 return null;
@@ -180,25 +189,28 @@ namespace EntityTools.Reflection
             if (string.IsNullOrEmpty(methodName))
             {
                 // Поиск метода по сигнатуре (без имени)
-                if (!FindBySignature(type, argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
+                if (!FindBySignature(type, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
                     return null;
             }
             else
             {
                 // Поиск метода по имени и сигнатуре
-                if (!FindByNameAndSignature(type, methodName, argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
+                if (!FindByNameAndSignature(type, methodName, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
                     return null;
             }
             if (method != null)
             {
-                return new Func<object, Action<ArgumentT1, ArgumentT2, ArgumentT3>>((object o) =>
+                return new Func<object, Func<ArgumentT1, ArgumentT2, ArgumentT3, ReturnT>>((object o) =>
                 {
                     if (o != null
                         && Equals(o.GetType(), type))
                     {
-                        return new Action<ArgumentT1, ArgumentT2, ArgumentT3>((ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3) =>
+                        return new Func<ArgumentT1, ArgumentT2, ArgumentT3, ReturnT>((ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3) =>
                         {
-                            method.Invoke(o, new object[] { a1, a2, a3 });
+                            object result = method.Invoke(o, new object[] { a1, a2, a3 });
+                            if (Equals(result, null))
+                                return default(ReturnT);
+                            else return (ReturnT)result;
                         });
                     }
                     return null;
@@ -216,8 +228,8 @@ namespace EntityTools.Reflection
         /// <param name="methodName">Имя метода</param>
         /// <param name="flags"></param>
         /// <returns>Сконструированный делегат</returns>
-        public static Func<Object, Action<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4>>
-                                      GetFunction<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4>(this Type type, string methodName = "", BindingFlags flags = BindingFlags.Default)
+        public static Func<Object, Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ReturnT>>
+                                      GetFunction<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ReturnT>(this Type type, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
             if (Equals(type, null))
                 return null;
@@ -229,25 +241,28 @@ namespace EntityTools.Reflection
             if (string.IsNullOrEmpty(methodName))
             {
                 // Поиск метода по сигнатуре (без имени)
-                if (!FindBySignature(type, argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
+                if (!FindBySignature(type, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
                     return null;
             }
             else
             {
                 // Поиск метода по имени и сигнатуре
-                if (!FindByNameAndSignature(type, methodName, argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
+                if (!FindByNameAndSignature(type, methodName, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
                     return null;
             }
             if (method != null)
             {
-                return new Func<object, Action<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4>>((object o) =>
+                return new Func<object, Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ReturnT>>((object o) =>
                 {
                     if (o != null
                         && Equals(o.GetType(), type))
                     {
-                        return new Action<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4>((ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3, ArgumentT4 a4) =>
+                        return new Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ReturnT>((ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3, ArgumentT4 a4) =>
                         {
-                            method.Invoke(o, new object[] { a1, a2, a3, a4 });
+                            object result = method.Invoke(o, new object[] { a1, a2, a3, a4 });
+                            if (Equals(result, null))
+                                return default(ReturnT);
+                            else return (ReturnT)result;
                         });
                     }
                     return null;
@@ -265,8 +280,8 @@ namespace EntityTools.Reflection
         /// <param name="methodName">Имя метода</param>
         /// <param name="flags"></param>
         /// <returns>Сконструированный делегат</returns>
-        public static Func<Object, Action<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5>>
-                                      GetFunction<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5>(this Type type, string methodName, BindingFlags flags = BindingFlags.Default)
+        public static Func<Object, Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5, ReturnT>>
+                                      GetFunction<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5, ReturnT>(this Type type, string methodName, BindingFlags flags = BindingFlags.Default)
         {
             if (Equals(type, null))
                 return null;
@@ -278,25 +293,28 @@ namespace EntityTools.Reflection
             if (string.IsNullOrEmpty(methodName))
             {
                 // Поиск метода по сигнатуре (без имени)
-                if (!FindBySignature(type, argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
+                if (!FindBySignature(type, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
                     return null;
             }
             else
             {
                 // Поиск метода по имени и сигнатуре
-                if (!FindByNameAndSignature(type, methodName, argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
+                if (!FindByNameAndSignature(type, methodName, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method))
                     return null;
             }
             if (method != null)
             {
-                return new Func<object, Action<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5>>((object o) =>
+                return new Func<object, Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5, ReturnT>>((object o) =>
                 {
                     if (o != null
                         && Equals(o.GetType(), type))
                     {
-                        return new Action<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5>((ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3, ArgumentT4 a4, ArgumentT5 a5) =>
+                        return new Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5, ReturnT>((ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3, ArgumentT4 a4, ArgumentT5 a5) =>
                         {
-                            method.Invoke(o, new object[] { a1, a2, a3, a4, a5 });
+                            object result = method.Invoke(o, new object[] { a1, a2, a3, a4, a5 });
+                            if (Equals(result, null))
+                                return default(ReturnT);
+                            else return (ReturnT)result;
                         });
                     }
                     return null;
@@ -310,20 +328,27 @@ namespace EntityTools.Reflection
         /// </summary>
         /// <param name="type"></param>
         /// <param name="methodName"></param>
+        /// <param name="returnType"></param>
         /// <param name="inputTypes"></param>
         /// <param name="flags"></param>
         /// <param name="method"></param>
         /// <returns></returns>
-        private static bool FindByNameAndSignature(Type type, string methodName, Type[] inputTypes, BindingFlags flags, out MethodInfo method)
+        private static bool FindByNameAndSignature(Type type, string methodName, Type returnType, Type[] inputTypes, BindingFlags flags, out MethodInfo method)
         {
-            if (type != null)
+            if (!Equals(type, null))
             {
                 method = type.GetMethod(methodName, flags, null, inputTypes, null);
                 if (method != null)
                 {
-                    return true;
+                    if (method.ReturnType.Equals(returnType))
+                        return true;
+                    else
+                    {
+                        method = null;
+                        return false;
+                    }
                 }
-                return FindByNameAndSignature(type.BaseType, methodName, inputTypes, flags, out method);
+                return FindByNameAndSignature(type.BaseType, methodName, returnType, inputTypes, flags, out method);
             }
             method = null;
             return false;
@@ -333,17 +358,18 @@ namespace EntityTools.Reflection
         /// Поиск метода только сигнатуре (без имени)
         /// </summary>
         /// <param name="type"></param>
+        /// <param name="returnType"></param>
         /// <param name="inputTypes"></param>
         /// <param name="flags"></param>
         /// <param name="method"></param>
         /// <returns></returns>
-        private static bool FindBySignature(Type type, Type[] inputTypes, BindingFlags flags, out MethodInfo method)
+        private static bool FindBySignature(Type type, Type returnType, Type[] inputTypes, BindingFlags flags, out MethodInfo method)
         {
-            if (type != null)
+            if (!Equals(type, null))
             {
                 foreach (MethodInfo methodInfo in type.GetMethods(flags | BindingFlags.Static))
                 {
-                    if (methodInfo.GetParameters().Length == inputTypes.Length)
+                    if (methodInfo.ReturnType.Equals(returnType) && methodInfo.GetParameters().Length == inputTypes.Length)
                     {
                         var arguments = methodInfo.GetParameters();
                         bool flag = true;
@@ -362,7 +388,7 @@ namespace EntityTools.Reflection
                         }
                     }
                 }
-                return FindBySignature(type.BaseType, inputTypes, flags, out method);
+                return FindBySignature(type.BaseType, returnType, inputTypes, flags, out method);
             }
             method = null;
             return false;

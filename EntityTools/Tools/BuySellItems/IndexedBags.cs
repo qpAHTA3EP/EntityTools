@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using Astral.Classes.ItemFilter;
 using EntityTools.Enums;
+using System.Collections;
 
 namespace EntityTools.Tools.BuySellItems
 {
@@ -19,7 +20,17 @@ namespace EntityTools.Tools.BuySellItems
         public IndexedBags() { }
         public IndexedBags(IEnumerable<ItemFilterEntryExt> filters)
         {
-            FilterProcessing(filters);
+            AnalizeFilters(filters);
+        }
+        public IndexedBags(IEnumerable<ItemFilterEntryExt> filters, BagsList bags)
+        {
+            AnalizeFilters(filters);
+            _bags = Reflection.CopyHelper.CreateDeepCopy(bags);
+        }
+        public IndexedBags(IEnumerable<ItemFilterEntryExt> filters, InvBagIDs[] bagsIds)
+        {
+            AnalizeFilters(filters);
+            _bags = new BagsList(bagsIds);
         }
 
         /// <summary>
@@ -53,7 +64,7 @@ namespace EntityTools.Tools.BuySellItems
                 if (value != null && value.Count > 0)
                 {
                     // Разделение include-фильтра и формирование запрещающего предиката
-                    FilterProcessing(value);
+                    AnalizeFilters(value);
                 }
                 else 
                 {
@@ -70,7 +81,7 @@ namespace EntityTools.Tools.BuySellItems
         /// Выделение include-фильтра и формирование запрещающего предиката
         /// </summary>
         /// <param name="filters"></param>
-        private void FilterProcessing(IEnumerable<ItemFilterEntryExt> filters)
+        private void AnalizeFilters(IEnumerable<ItemFilterEntryExt> filters)
         {
             _filters = new List<ItemFilterEntryExt>();
             _exclude = null;
@@ -82,20 +93,29 @@ namespace EntityTools.Tools.BuySellItems
             }
         }
 
-        
+#if BagsOnly_flag
         public bool BagsOnly
         {
             get => _bagsOnly;
             set
             {
-                if(_bagsOnly != value)
+                if (_bagsOnly != value)
                 {
                     _bagsOnly = value;
                     Clear();
                 }
             }
         }
-        bool _bagsOnly = false;
+        bool _bagsOnly = false; 
+#else
+        BagsList Bags
+        {
+            get => _bags;
+        }
+        BagsList _bags = new BagsList();
+#endif
+
+
 
         public IList<InventorySlot> this[ItemCategory cat]
         {
@@ -141,13 +161,13 @@ namespace EntityTools.Tools.BuySellItems
         /// <param name="type"></param>
         /// <param name="slots"></param>
         /// <returns></returns>
-        public string Description(IList<InventorySlot> slots = null)
+        public string Description()
         {
             StringBuilder sb = new StringBuilder();
             if (_filters == null || _filters.Count == 0)
             {
                 if (categorizedSlots == null || categorizedSlots.Count == 0)
-                    Indexing(slots);
+                    Indexing();
 
                 if (categorizedSlots != null && categorizedSlots.Count > 0)
                 {
@@ -176,7 +196,7 @@ namespace EntityTools.Tools.BuySellItems
             else
             {
                 if (filteredSlots == null || filteredSlots.Count == 0)
-                    Indexing(slots);
+                    Indexing();
 
                 if (filteredSlots != null && filteredSlots.Count > 0)
                 {
@@ -207,45 +227,30 @@ namespace EntityTools.Tools.BuySellItems
 
         #region Индексирование сумки
         /// <summary>
-        /// Анализ slot и добавление к индексу.
-        /// Если slots не задан, тогда индексируется сумка персонажа и экипировка (в зависимости от флага BagsOnly)
+        /// Анализ сумок, заданных в Bags и индексирование их содержимого.
         /// </summary>
         /// <param name="slots"></param>
-        private void Indexing(IEnumerable<InventorySlot> slots = null)
+        private void Indexing()
         {
-            if (slots is null)
-            {
-                if (_filters != null && _filters.Count > 0)
-                    if (_exclude != null)
-                    {
-                        Indexing_IncludeExcludeFilter(EntityManager.LocalPlayer.BagsItems);
-                        if (!_bagsOnly) Indexing_IncludeExcludeFilter(EntityManager.LocalPlayer.EquippedItem);
-                    }
-                    else
-                    {
-                        Indexing_IncludeFilter(EntityManager.LocalPlayer.BagsItems);
-                        if (!_bagsOnly) Indexing_IncludeFilter(EntityManager.LocalPlayer.EquippedItem);
-                    }
-                else if (_exclude != null)
-                {
-                    Indexing_ExcludeFilter(EntityManager.LocalPlayer.BagsItems);
-                    if (!_bagsOnly) Indexing_ExcludeFilter(EntityManager.LocalPlayer.EquippedItem);
-                }
+            Action<IEnumerable<InventorySlot>> indexer = null;
+            if (_filters != null && _filters.Count > 0)
+                if (_exclude != null)
+                    indexer = Indexing_IncludeExcludeFilter;
                 else
-                {
-                    Indexing_NoFilter(EntityManager.LocalPlayer.BagsItems);
-                    if (!_bagsOnly) Indexing_NoFilter(EntityManager.LocalPlayer.EquippedItem);
-                }
-            }
+                    indexer = Indexing_IncludeFilter;
+            else if (_exclude != null)
+                indexer = Indexing_ExcludeFilter;
             else
+                indexer = Indexing_NoFilter;
+
+            int bagsNum = 0;
+            if(indexer != null)
             {
-                if (_filters != null && _filters.Count > 0)
-                    if (_exclude != null)
-                        Indexing_IncludeExcludeFilter(slots);
-                    else Indexing_IncludeFilter(slots);
-                else if (_exclude != null)
-                    Indexing_ExcludeFilter(slots);
-                else Indexing_NoFilter(slots);
+                foreach(var bag in _bags.GetSelectedBags())
+                {
+                    indexer(bag.GetItems);
+                    bagsNum++;
+                }
             }
         }
 

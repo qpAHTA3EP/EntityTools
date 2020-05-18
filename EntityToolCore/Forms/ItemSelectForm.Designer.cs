@@ -38,7 +38,7 @@
             // 
             this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelect.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Flat;
+            this.btnSelect.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.btnSelect.ImageOptions.Image = global::EntityCore.Properties.Resources.miniValid;
             this.btnSelect.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnSelect.Location = new System.Drawing.Point(12, 367);
@@ -51,7 +51,7 @@
             // btnReload
             // 
             this.btnReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnReload.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Flat;
+            this.btnReload.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.btnReload.ImageOptions.Image = global::EntityCore.Properties.Resources.miniRefresh;
             this.btnReload.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
             this.btnReload.Location = new System.Drawing.Point(289, 367);
@@ -80,6 +80,7 @@
             this.ItemList.Location = new System.Drawing.Point(12, 37);
             this.ItemList.Name = "ItemList";
             this.ItemList.Size = new System.Drawing.Size(300, 314);
+            this.ItemList.Sorted = true;
             this.ItemList.TabIndex = 3;
             // 
             // ItemSelectForm

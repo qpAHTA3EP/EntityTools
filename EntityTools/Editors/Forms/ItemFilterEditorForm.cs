@@ -34,7 +34,7 @@ namespace EntityTools.Forms
         static readonly IEnumerable<ItemCategory> categories = Enum.GetValues(typeof(ItemCategory)).Cast<ItemCategory>().ToList();
 
         /// <summary>
-        /// Списко-фильтр
+        /// Список-фильтров
         /// </summary>
         BindingList<ItemFilterEntryExt> filter = new BindingList<ItemFilterEntryExt>();
 
@@ -46,7 +46,6 @@ namespace EntityTools.Forms
         private ItemFilterEditorForm()
         {
             InitializeComponent();
-
 #if false
             RepositoryItemComboBox repositoryItemComboBox = new RepositoryItemComboBox();
             repositoryItemComboBox.QueryPopUp += this.method_0;
@@ -112,7 +111,14 @@ namespace EntityTools.Forms
             }
             XtraMessageBox.Show(text);  
 #endif
-            IndexedBags bag = new IndexedBags(filter);
+#if disabled_20200513_1311
+            var slots = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.StoreItems;
+            if (slots.Count > 0)
+                if (XtraMessageBox.Show("Would you like to search the matches in the Store (Yes) or in the player bags (No)?\n\r" +
+                                       "Искать соответствующие предметы у торговца (Yes) или в сумке персонажа (No)?", "", MessageBoxButtons.YesNo) == DialogResult.No)
+                    slots =  
+#endif
+            IndexedBags bag = new IndexedBags(filter, BagsList.GetFullPlayerInventory());
             string bagDskr = bag.Description();
             if (string.IsNullOrEmpty(bagDskr))
                 bagDskr = "No item matches";
@@ -212,7 +218,7 @@ namespace EntityTools.Forms
                 {
                     if (filter.Count > 0)
                     {
-                        switch (XtraMessageBox.Show("Add to current list ? (Else, clear it before)", "Import filters", MessageBoxButtons.YesNoCancel))
+                        switch (XtraMessageBox.Show("Add an entries to the filter (Yes) or replace current filter (No) ?", "Import filters", MessageBoxButtons.YesNoCancel))
                         {
                             case DialogResult.Yes: // Добавление к существующему списку
                                 foreach (var item in newFilter)
@@ -233,7 +239,33 @@ namespace EntityTools.Forms
                             filter.Add(item);
                     }
                 }
-                else XtraMessageBox.Show("Empty or file opening error.");
+                else
+                {
+                    ItemFilterCore newFilterCore = Astral.Functions.XmlSerializer.Deserialize<ItemFilterCore>(openFileDialog.FileName);
+
+                    if (newFilterCore != null && newFilterCore.Entries.Count > 0)
+                    {
+                        switch (XtraMessageBox.Show("There are ItemFilter at the Astral's format in the File.\n\r" +
+                            "You can import only ItemId and Category entry from it.\n\r" +
+                            "Add an entries to the filter (Yes) or replace current filter (No) ?", "Import filters", MessageBoxButtons.YesNoCancel))
+                        {
+                            case DialogResult.Yes: // Добавление к существующему списку
+                                foreach (var item in newFilterCore.Entries)
+                                    if(item.Type == ItemFilterType.ItemID || item.Type == ItemFilterType.ItemCatergory)
+                                        filter.Add(new ItemFilterEntryExt(item));
+                                return;
+                            case DialogResult.No: // Замена существующего списка
+                                filter.Clear();
+                                foreach (var item in newFilterCore.Entries)
+                                    if (item.Type == ItemFilterType.ItemID || item.Type == ItemFilterType.ItemCatergory)
+                                        filter.Add(new ItemFilterEntryExt(item));
+                                return;
+                            default:
+                                return;
+                        }
+                    }
+                    else XtraMessageBox.Show("Empty or file opening error.");
+                }
             }
         }
 

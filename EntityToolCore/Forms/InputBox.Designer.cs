@@ -47,6 +47,7 @@ namespace EntityCore.Forms
             // 
             // btnOk
             // 
+            this.btnOk.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.btnOk.Location = new System.Drawing.Point(233, 44);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(28, 19);

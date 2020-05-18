@@ -19,6 +19,8 @@ using DevExpress.XtraEditors;
 using EntityTools.Tools.BuySellItems;
 using MyNW.Patchables.Enums;
 using EntityTools.Forms;
+using System.Diagnostics;
+using EntityTools.UCC.Conditions;
 
 namespace EntityTools.Core
 {
@@ -106,6 +108,7 @@ namespace EntityTools.Core
 
         private void btnTest_Click(object sender, EventArgs e)
         {
+            #region Старые тесты
 #if Test_MultiSelectCustomRegion
             //Entity entity = new Entity(IntPtr.Zero);
 
@@ -390,7 +393,7 @@ namespace EntityTools.Core
             Astral.Logger.WriteLine(sb.ToString());
 #endif
 
-#if !Test_ItemListEditor
+#if Test_ItemListEditor
             List<ItemFilterEntryExt> filter = new List<ItemFilterEntryExt>()
             {
                 new ItemFilterEntryExt(){ StringType = ItemFilterStringType.Simple, EntryType = ItemFilterEntryType.Category, Identifier = "*Artifact*"},
@@ -426,6 +429,88 @@ namespace EntityTools.Core
                 Astral.Logger.WriteLine(sb.ToString());
             }
 #endif
+
+#if Test_BagsAccess
+            Stopwatch stopwatch = new Stopwatch();
+            StringBuilder sb = new StringBuilder();
+            stopwatch.Start();
+            var AllItems = EntityManager.LocalPlayer.AllItems;
+            stopwatch.Stop();
+            sb.AppendLine("Allitem (direct): ");
+            sb.Append("\tcount = ").AppendLine(AllItems.Count.ToString());
+            sb.Append("\taccessTime = ").Append(stopwatch.ElapsedMilliseconds).Append(" ms (").Append(stopwatch.ElapsedTicks).AppendLine(")");
+
+            stopwatch.Restart();
+            var BagsItems = EntityManager.LocalPlayer.BagsItems;
+            stopwatch.Stop();
+            sb.AppendLine("BagsItems (direct): ");
+            sb.Append("\tcount = ").AppendLine(BagsItems.Count.ToString());
+            sb.Append("\taccessTime = ").Append(stopwatch.ElapsedMilliseconds).Append(" ms (").Append(stopwatch.ElapsedTicks).AppendLine(")");
+
+            stopwatch.Restart();
+            var CraftingResources = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.CraftingResources).GetItems;
+            stopwatch.Stop();
+            sb.AppendLine("CraftingResources (direct): ");
+            sb.Append("\tcount = ").AppendLine(CraftingResources.Count.ToString());
+            sb.Append("\taccessTime = ").Append(stopwatch.ElapsedMilliseconds).Append(" ms (").Append(stopwatch.ElapsedTicks).AppendLine(")");
+
+            XtraMessageBox.Show(sb.ToString());
+#endif
+
+#if Test_UCCQuesterCheck_ConditionXml
+#if false
+            UCCQuesterCheck c = new UCCQuesterCheck();
+            c.Condition = new Astral.Quester.Classes.Conditions.PartyStatus() { Type = Astral.Quester.Classes.Conditions.PartyStatus.PartyStatusType.IsInAParty };
+            string xml = c.ConditionXml;
+            bool test = ((ICustomUCCCondition)c).IsOK(null);
+            XtraMessageBox.Show(xml + Environment.NewLine + test);
+
+            Astral.Functions.XmlSerializer.Serialize("UCCQuesterCheck.xml", c, 2);
+#else
+            UCCQuesterCheck c = Astral.Functions.XmlSerializer.Deserialize<UCCQuesterCheck>("UCCQuesterCheck.xml", true, 2);
+            string xml = c.ConditionXml;
+            bool test = ((ICustomUCCCondition)c).IsOK(null);
+            XtraMessageBox.Show(xml + Environment.NewLine + test);
+#endif
+#endif
+            #endregion
+
+#if UCCQuesterCheck_Serialization
+            UCCQuesterCheck c = new UCCQuesterCheck() { Condition = new Astral.Quester.Classes.Conditions.PartyStatus() { Type = Astral.Quester.Classes.Conditions.PartyStatus.PartyStatusType.IsNotInAParty } };
+            bool result = c.Condition.IsValid;
+            XtraMessageBox.Show(result.ToString());
+            Astral.Functions.XmlSerializer.Serialize("UCCQuesterCheck.xml", c, 1);
+#endif
+
+#if !BagsList_IXmlSerializable
+#if Serialization
+            BagsList bags = new BagsList(BagsList.FullInventory);
+            //XtraMessageBox.Show(bags.ToString());
+
+            XmlSerializer serializer = new XmlSerializer(bags.GetType());
+            using (StringWriter writer = new StringWriter())
+            {
+                serializer.Serialize(writer, bags);
+                XtraMessageBox.Show(writer.ToString());
+            }
+
+            Astral.Functions.XmlSerializer.Serialize("BagsList.xml", bags, 0); 
+#endif
+#if !Deserialization
+
+#endif
+            BagsList bags = Astral.Functions.XmlSerializer.Deserialize<BagsList>("BagsList.xml");
+            if (bags != null)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (InvBagIDs id in bags)
+                {
+                    sb.AppendLine(id.ToString());
+                }
+                XtraMessageBox.Show(sb.ToString());
+            }
+            else XtraMessageBox.Show("Bags is null");
+#endif
         }
 
         private void btnUccEditor_Click(object sender, EventArgs e)
@@ -437,8 +522,7 @@ namespace EntityTools.Core
             }
         }
 
-        #region старый_экспорт
-#if false
+#if старый_экспорт
         private void MainPanel_Load(object sender, EventArgs e)
         {
             //bteMissions.Properties.NullValuePrompt = Path.Combine(FileTools.defaulExportFolderMissions, FileTools.defaulFileMissions);
@@ -587,7 +671,6 @@ namespace EntityTools.Core
 
         } 
 #endif
-        #endregion
 
         private void cbSpellStuckMonitor_CheckedChanged(object sender, EventArgs e)
         {

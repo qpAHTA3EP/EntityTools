@@ -70,14 +70,14 @@ namespace EntityCore.Forms
             if (selectForm.ShowDialog() == DialogResult.OK
                 && selectForm.ItemList.SelectedIndex >= 0)
             {
-                selectedValue = selectForm.ItemList.SelectedItem as T;
-                return selectedValue != null;
+                if (selectForm.ItemList.SelectedItem is Type type)
+                {
+                    selectedValue = Activator.CreateInstance(type) as T;
+                    return selectedValue != null;
+                }
             }
-            else
-            {
-                selectedValue = default(T);
-                return false;
-            }
+            selectedValue = default(T);
+            return false;
         }
         /// <summary>
         /// Добавление производных типов в список

@@ -38,7 +38,7 @@ namespace EntityCore.Forms
             // 
             // btnOK
             // 
-            this.btnOK.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Flat;
+            this.btnOK.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnOK.Location = new System.Drawing.Point(105, 56);
             this.btnOK.Name = "btnOK";

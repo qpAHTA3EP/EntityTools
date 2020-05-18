@@ -94,9 +94,10 @@
             this.filterVisibleOnly.AutoSize = true;
             this.filterVisibleOnly.Checked = true;
             this.filterVisibleOnly.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.filterVisibleOnly.Location = new System.Drawing.Point(329, 15);
+            this.filterVisibleOnly.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.filterVisibleOnly.Location = new System.Drawing.Point(332, 15);
             this.filterVisibleOnly.Name = "filterVisibleOnly";
-            this.filterVisibleOnly.Size = new System.Drawing.Size(78, 17);
+            this.filterVisibleOnly.Size = new System.Drawing.Size(75, 17);
             this.filterVisibleOnly.TabIndex = 3;
             this.filterVisibleOnly.Text = "Visible only";
             this.filterVisibleOnly.UseVisualStyleBackColor = true;
@@ -105,6 +106,7 @@
             // 
             this.filterName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.filterName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.filterName.Location = new System.Drawing.Point(114, 13);
             this.filterName.Name = "filterName";
             this.filterName.Size = new System.Drawing.Size(209, 21);
@@ -141,9 +143,10 @@
             this.cbSort.AutoSize = true;
             this.cbSort.Checked = true;
             this.cbSort.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbSort.Location = new System.Drawing.Point(412, 17);
+            this.cbSort.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbSort.Location = new System.Drawing.Point(415, 15);
             this.cbSort.Name = "cbSort";
-            this.cbSort.Size = new System.Drawing.Size(46, 17);
+            this.cbSort.Size = new System.Drawing.Size(43, 17);
             this.cbSort.TabIndex = 3;
             this.cbSort.Text = "Sort";
             this.cbSort.UseVisualStyleBackColor = true;
@@ -160,6 +163,7 @@
             // 
             this.tbCommand.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbCommand.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tbCommand.Location = new System.Drawing.Point(114, 367);
             this.tbCommand.Name = "tbCommand";
             this.tbCommand.Size = new System.Drawing.Size(438, 21);

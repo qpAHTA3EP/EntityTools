@@ -54,7 +54,6 @@ namespace EntityTools.Forms
             this.colCheckPlayerLevel = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colKeepNumber = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colPutOnItem = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.bindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.barManager = new DevExpress.XtraBars.BarManager(this.components);
             this.barDockControl_0 = new DevExpress.XtraBars.BarDockControl();
             this.barDockControl_1 = new DevExpress.XtraBars.BarDockControl();
@@ -73,10 +72,10 @@ namespace EntityTools.Forms
             this.btnCancel = new DevExpress.XtraEditors.SimpleButton();
             this.bntSave = new DevExpress.XtraEditors.SimpleButton();
             this.btnReload = new DevExpress.XtraEditors.SimpleButton();
+            this.colBuyByOne = new DevExpress.XtraGrid.Columns.GridColumn();
             ((System.ComponentModel.ISupportInitialize)(this.purchaseOptions)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnEditItemFilterEntry)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fastAddItemCombo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.addEntryMenu)).BeginInit();
@@ -107,6 +106,7 @@ namespace EntityTools.Forms
             this.colMode,
             this.colIdentifier,
             this.colCount,
+            this.colBuyByOne,
             this.colCheckEquipmentLevel,
             this.colCheckPlayerLevel,
             this.colKeepNumber,
@@ -123,6 +123,7 @@ namespace EntityTools.Forms
             this.colStringType.Name = "colStringType";
             this.colStringType.Visible = true;
             this.colStringType.VisibleIndex = 0;
+            this.colStringType.Width = 50;
             // 
             // colEntryType
             // 
@@ -131,6 +132,7 @@ namespace EntityTools.Forms
             this.colEntryType.Name = "colEntryType";
             this.colEntryType.Visible = true;
             this.colEntryType.VisibleIndex = 1;
+            this.colEntryType.Width = 61;
             // 
             // colMode
             // 
@@ -139,16 +141,18 @@ namespace EntityTools.Forms
             this.colMode.Name = "colMode";
             this.colMode.Visible = true;
             this.colMode.VisibleIndex = 2;
+            this.colMode.Width = 47;
             // 
             // colIdentifier
             // 
+            this.colIdentifier.Caption = "Identifier";
             this.colIdentifier.ColumnEdit = this.btnEditItemFilterEntry;
             this.colIdentifier.FieldName = "Identifier";
             this.colIdentifier.Name = "colIdentifier";
             this.colIdentifier.ShowButtonMode = DevExpress.XtraGrid.Views.Base.ShowButtonModeEnum.ShowOnlyInEditor;
             this.colIdentifier.Visible = true;
             this.colIdentifier.VisibleIndex = 3;
-            this.colIdentifier.Width = 355;
+            this.colIdentifier.Width = 237;
             // 
             // btnEditItemFilterEntry
             // 
@@ -167,7 +171,7 @@ namespace EntityTools.Forms
             this.colCount.UnboundType = DevExpress.Data.UnboundColumnType.Integer;
             this.colCount.Visible = true;
             this.colCount.VisibleIndex = 4;
-            this.colCount.Width = 65;
+            this.colCount.Width = 42;
             // 
             // colCheckEquipmentLevel
             // 
@@ -180,8 +184,8 @@ namespace EntityTools.Forms
             this.colCheckEquipmentLevel.ToolTip = "Check Equipment Level";
             this.colCheckEquipmentLevel.UnboundType = DevExpress.Data.UnboundColumnType.Boolean;
             this.colCheckEquipmentLevel.Visible = true;
-            this.colCheckEquipmentLevel.VisibleIndex = 6;
-            this.colCheckEquipmentLevel.Width = 39;
+            this.colCheckEquipmentLevel.VisibleIndex = 7;
+            this.colCheckEquipmentLevel.Width = 40;
             // 
             // colCheckPlayerLevel
             // 
@@ -194,8 +198,8 @@ namespace EntityTools.Forms
             this.colCheckPlayerLevel.ToolTip = "Check Player Level";
             this.colCheckPlayerLevel.UnboundType = DevExpress.Data.UnboundColumnType.Boolean;
             this.colCheckPlayerLevel.Visible = true;
-            this.colCheckPlayerLevel.VisibleIndex = 7;
-            this.colCheckPlayerLevel.Width = 38;
+            this.colCheckPlayerLevel.VisibleIndex = 8;
+            this.colCheckPlayerLevel.Width = 40;
             // 
             // colKeepNumber
             // 
@@ -209,7 +213,7 @@ namespace EntityTools.Forms
             this.colKeepNumber.ToolTip = "Keep number of item equals to Count";
             this.colKeepNumber.UnboundType = DevExpress.Data.UnboundColumnType.Boolean;
             this.colKeepNumber.Visible = true;
-            this.colKeepNumber.VisibleIndex = 5;
+            this.colKeepNumber.VisibleIndex = 6;
             this.colKeepNumber.Width = 40;
             // 
             // colPutOnItem
@@ -222,8 +226,8 @@ namespace EntityTools.Forms
             this.colPutOnItem.ToolTip = "Equip item arter buying";
             this.colPutOnItem.UnboundType = DevExpress.Data.UnboundColumnType.Boolean;
             this.colPutOnItem.Visible = true;
-            this.colPutOnItem.VisibleIndex = 8;
-            this.colPutOnItem.Width = 42;
+            this.colPutOnItem.VisibleIndex = 9;
+            this.colPutOnItem.Width = 40;
             // 
             // barManager
             // 
@@ -413,6 +417,19 @@ namespace EntityTools.Forms
             this.btnReload.ToolTip = "Clear list";
             this.btnReload.Click += new System.EventHandler(this.btnReload_Click);
             // 
+            // colBuyByOne
+            // 
+            this.colBuyByOne.Caption = "Buy1";
+            this.colBuyByOne.FieldName = "BuyByOne";
+            this.colBuyByOne.Name = "colBuyByOne";
+            this.colBuyByOne.OptionsColumn.AllowSize = false;
+            this.colBuyByOne.OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
+            this.colBuyByOne.OptionsColumn.FixedWidth = true;
+            this.colBuyByOne.UnboundType = DevExpress.Data.UnboundColumnType.Boolean;
+            this.colBuyByOne.Visible = true;
+            this.colBuyByOne.VisibleIndex = 5;
+            this.colBuyByOne.Width = 40;
+            // 
             // ItemFilterEditorForm
             // 
             this.AcceptButton = this.bntSave;
@@ -443,7 +460,6 @@ namespace EntityTools.Forms
             ((System.ComponentModel.ISupportInitialize)(this.purchaseOptions)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnEditItemFilterEntry)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.bindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.fastAddItemCombo)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.addEntryMenu)).EndInit();
@@ -455,7 +471,6 @@ namespace EntityTools.Forms
 
         private GridControl purchaseOptions;
         private GridView gridView;
-        private BindingSource bindingSource;
         private GridColumn colStringType;
         private GridColumn colEntryType;
         private GridColumn colMode;
@@ -484,5 +499,6 @@ namespace EntityTools.Forms
         private SimpleButton bntSave;
         private SimpleButton btnCancel;
         private SimpleButton btnReload;
+        private GridColumn colBuyByOne;
     }
 }

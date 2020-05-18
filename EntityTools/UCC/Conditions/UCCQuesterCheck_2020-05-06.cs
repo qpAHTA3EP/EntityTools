@@ -18,7 +18,6 @@ namespace EntityTools.UCC.Conditions
 
         [Editor(typeof(QuesterConditionEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        [XmlElement("QuesterCondition", typeof(QuesterCondition))]
 #else
         [Browsable(false)]
 #endif

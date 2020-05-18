@@ -1,5 +1,6 @@
 ﻿using EntityTools.Reflection;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace EntityTools.Extensions
 {
@@ -18,6 +19,21 @@ namespace EntityTools.Extensions
                 return listCopy;
             }
             return null;
+        }
+
+        /// <summary>
+        /// Проверка содержет ли список хотя бы один list элемент из elements
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <param name="items"></param>
+        /// <returns></returns>
+        public static bool ContainsAny<T>(this IEnumerable<T> list, IEnumerable<T> elements)
+        {
+            var elem = list.First((t) => elements.Contains(t));
+            if (elem != null)
+                return true;
+            return false;
         }
     }
 }

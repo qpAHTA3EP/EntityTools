@@ -86,6 +86,11 @@ namespace EntityTools.Tools.BuySellItems
         internal bool _keepNumber = false;
 
         [Category("Optional")]
+        [Description("Приобретать предмет по 1 ед. (выбор количества не предусмотрен)")]
+        public bool BuyByOne { get => _buyBy1; set => _buyBy1 = value; }
+        internal bool _buyBy1 = false;
+
+        [Category("Optional")]
         [Description("Покупать экипировку, уроверь которой выше соответствующей экипировки персонажа")]
         public bool CheckEquipmentLevel { get => _checkEquipmentLevel; set => _checkEquipmentLevel = value; }
         internal bool _checkEquipmentLevel = false;
@@ -104,6 +109,22 @@ namespace EntityTools.Tools.BuySellItems
 
         public ItemFilterEntryExt()
         {
+            isMatchPredicate = IsMatch_Selector;
+            //categories = new BitArray(Enum.GetValues(typeof(ItemCategory)).Length);
+        }
+
+        public ItemFilterEntryExt(ItemFilterEntry fEntry)
+        {
+            if (fEntry.Type == ItemFilterType.ItemCatergory)
+                _entryType = ItemFilterEntryType.Category;
+            else if (fEntry.Type == ItemFilterType.ItemID)
+                _entryType = ItemFilterEntryType.Identifier;
+            else throw new ArgumentException($"Item type of '{fEntry.Type}' is not supported in {nameof(ItemFilterEntryExt)}");
+
+            _stringType = fEntry.StringType;
+            _identifier = fEntry.Text;
+            _mode = fEntry.Mode;
+
             isMatchPredicate = IsMatch_Selector;
             //categories = new BitArray(Enum.GetValues(typeof(ItemCategory)).Length);
         }
@@ -144,7 +165,7 @@ namespace EntityTools.Tools.BuySellItems
                 _count, "; ",
                 '\'', _identifier, '\'',
                 (_keepNumber)?"; Keep":string.Empty,
-                (_checkEquipmentLevel)? "; PlLvl": string.Empty,
+                (_checkPlayerLevel)? "; PlLvl": string.Empty,
                 (_checkEquipmentLevel)? "; EqLvl": string.Empty, '}');
         }
 

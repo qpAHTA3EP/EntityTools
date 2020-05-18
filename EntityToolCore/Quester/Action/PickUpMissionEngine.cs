@@ -354,8 +354,7 @@ namespace EntityCore.Quester.Action
                 label = $"{@this.GetType().Name}: [{@this.MissionId}]";
             return label;
         }
-#endif
-#if CORE_INTERFACES
+#elif CORE_INTERFACES
         public bool NeedToRun
         {
             get
@@ -729,7 +728,8 @@ namespace EntityCore.Quester.Action
 
         /// <summary>
         /// Функция взаимодействия с квестодателем
-        /// в случа необходимости задействуется навигационная система для перемещения персонажа к месту нахождения квестодателя
+        /// в случае необходимости задействуется навигационная система 
+        /// для перемещения персонажа к месту нахождения квестодателя
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="missionName"></param>
@@ -749,8 +749,8 @@ namespace EntityCore.Quester.Action
                 //}
 
                 // Проверяем карту и регион
-                if (@this.Giver.MapName == EntityManager.LocalPlayer.MapState.MapName
-                    && @this.Giver.RegionName == EntityManager.LocalPlayer.RegionInternalName)
+                if (@this._giver.MapName == EntityManager.LocalPlayer.MapState.MapName
+                    && @this._giver.RegionName == EntityManager.LocalPlayer.RegionInternalName)
                 {
                     // Проверяем расстояние до цели и возможность взаимодействия в квестодателем
                     if (/*!entity.CanInteract || */(entity.CombatDistance3 > ((@this.InteractDistance == 0) ?

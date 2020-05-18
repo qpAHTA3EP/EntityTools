@@ -77,7 +77,7 @@ namespace EntityCore.UCC.Actions
                     if (timeout.IsTimedOut)
                     {
                         entity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                                @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck);
+                                                                @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, null, @this._aura.Checker);
                         timeout.ChangeTime(EntityTools.EntityTools.PluginSettings.EntityCache.CombatCacheTime);
                     }
 
@@ -89,114 +89,114 @@ namespace EntityCore.UCC.Actions
 
         public bool Run()
         {
-            if (entity.Location.Distance3DFromPlayer < @this._entityRadius)
-                return dodge.Run();
+            return dodge.Run();
+#if false
+            bool flag = false;
+            for (; ; )
+            {
+                IL_326:
+                if (flag)
+                {
+                    if (base.CoolDown > 0)
+                    {
+                        break;
+                    }
+                }
+
+                // Выключаем все системы навигации
+                //Astral.Logic.UCC.Controllers.Movements.Stop();
+                ReflectionHelper.ExecStaticMethod(typeof(Astral.Logic.UCC.Controllers.Movements), "Stop", new object[0], out object res);
+                //Astral.Logic.UCC.Controllers.Movements.RequireRange = 0;
+                Astral.Quester.API.Engine.Navigation.Stop();
+                MyNW.Internals.Movements.StopNavTo();
+
+                bool flag2 = false;
+                int num = 0;
+                Vector3 location = EntityManager.LocalPlayer.Location;
+                while (!flag2)
+                {
+                    num++;
+                    if (num > 2)
+                    {
+                        goto IL_32E;
+                    }
+                    flag = true;
+                    Astral.Logic.NW.Movements.Dodge(this.Direction, this.MovingTime);
+                    Thread.Sleep(250);
+                    flag2 = (EntityManager.LocalPlayer.Location.Distance3D(location) > 5.0);
+                }
+                Astral.Logic.UCC.Core.CurrentTarget.Location.Face();
+                Thread.Sleep(250);
+                if (!Combats.ShouldDodge(true))
+                {
+                    Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(2000);
+                    Astral.Classes.Timeout timeout2 = new Astral.Classes.Timeout(5000);
+                    if (Combats.IsMeleeChar && this.pathtToLocIsInAOE(EntityManager.LocalPlayer.Location, Astral.Logic.UCC.Core.CurrentTarget.Location))
+                    {
+                        while (this.pathtToLocIsInAOE(EntityManager.LocalPlayer.Location, Astral.Logic.UCC.Core.CurrentTarget.Location))
+                        {
+                            Vector3 location2 = EntityManager.LocalPlayer.Location;
+                            Vector3 vector = new Vector3();
+                            Thread.Sleep(150);
+                            if (Combats.ShouldDodge(true))
+                            {
+                                goto IL_326;
+                            }
+                            if (timeout2.IsTimedOut)
+                            {
+                                break;
+                            }
+                            foreach (Entity entity in from a in Attackers.List
+                                                      orderby a.CombatDistance
+                                                      select a)
+                            {
+                                if (entity.CombatDistance < 10f)
+                                {
+                                    Astral.Logic.UCC.Core.Get.queryTargetChange(entity, "near while aoe", 4000);
+                                    goto IL_32E;
+                                }
+                                if (entity.CombatDistance < 60f && !this.pathtToLocIsInAOE(location2, entity.Location))
+                                {
+                                    if (!timeout.IsTimedOut)
+                                    {
+                                        if (EntityManager.CurrentSettings.UsePathfinding3 && PathFinding.CheckDirection(location2, entity.Location, ref vector))
+                                        {
+                                            continue;
+                                        }
+                                    }
+                                    else if (EntityManager.CurrentSettings.UsePathfinding3)
+                                    {
+                                        float num2 = 0f;
+                                        while ((double)num2 < 6.2831853071795862)
+                                        {
+                                            float num3 = (float)Math.Cos((double)num2) * 30f;
+                                            float num4 = (float)Math.Sin((double)num2) * 30f;
+                                            Vector3 vector2 = new Vector3(location2.X + num3, location2.Y + num4, location2.Z + 2f);
+                                            if (!vector2.IsInBackByRange(1.5f, 3.40282347E+38f) && !this.pathtToLocIsInAOE(location2, vector2) && !PathFinding.CheckDirection(location2, vector2, ref vector) && !this.pathtToLocIsInAOE(vector2, Astral.Logic.UCC.Core.CurrentTarget.Location) && !PathFinding.CheckDirection(vector2, Astral.Logic.UCC.Core.CurrentTarget.Location, ref vector))
+                                            {
+                                                vector2.Face();
+                                                flag = true;
+                                                Astral.Logic.NW.Movements.Dodge(Enums.DodgeDirection.DodgeFront, this.MovingTime);
+                                                Thread.Sleep(250);
+                                                goto IL_32E;
+                                            }
+                                            num2 += 0.314159274f;
+                                        }
+                                    }
+                                    Astral.Logic.UCC.Core.Get.queryTargetChange(entity, "outside aoe", 6000);
+                                    goto IL_32E;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    break;
+                }
+            }
+            IL_32E:
+            base.CurrentTimeout = new Astral.Classes.Timeout(base.CoolDown);
             return true;
-            //bool flag = false;
-            //for (; ; )
-            //{
-            //    IL_326:
-            //    if (flag)
-            //    {
-            //        if (base.CoolDown > 0)
-            //        {
-            //            break;
-            //        }
-            //    }
-
-            //    // Выключаем все системы навигации
-            //    //Astral.Logic.UCC.Controllers.Movements.Stop();
-            //    ReflectionHelper.ExecStaticMethod(typeof(Astral.Logic.UCC.Controllers.Movements), "Stop", new object[0], out object res);
-            //    //Astral.Logic.UCC.Controllers.Movements.RequireRange = 0;
-            //    Astral.Quester.API.Engine.Navigation.Stop();
-            //    MyNW.Internals.Movements.StopNavTo();
-
-            //    bool flag2 = false;
-            //    int num = 0;
-            //    Vector3 location = EntityManager.LocalPlayer.Location;
-            //    while (!flag2)
-            //    {
-            //        num++;
-            //        if (num > 2)
-            //        {
-            //            goto IL_32E;
-            //        }
-            //        flag = true;
-            //        Astral.Logic.NW.Movements.Dodge(this.Direction, this.MovingTime);
-            //        Thread.Sleep(250);
-            //        flag2 = (EntityManager.LocalPlayer.Location.Distance3D(location) > 5.0);
-            //    }
-            //    Astral.Logic.UCC.Core.CurrentTarget.Location.Face();
-            //    Thread.Sleep(250);
-            //    if (!Combats.ShouldDodge(true))
-            //    {
-            //        Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(2000);
-            //        Astral.Classes.Timeout timeout2 = new Astral.Classes.Timeout(5000);
-            //        if (Combats.IsMeleeChar && this.pathtToLocIsInAOE(EntityManager.LocalPlayer.Location, Astral.Logic.UCC.Core.CurrentTarget.Location))
-            //        {
-            //            while (this.pathtToLocIsInAOE(EntityManager.LocalPlayer.Location, Astral.Logic.UCC.Core.CurrentTarget.Location))
-            //            {
-            //                Vector3 location2 = EntityManager.LocalPlayer.Location;
-            //                Vector3 vector = new Vector3();
-            //                Thread.Sleep(150);
-            //                if (Combats.ShouldDodge(true))
-            //                {
-            //                    goto IL_326;
-            //                }
-            //                if (timeout2.IsTimedOut)
-            //                {
-            //                    break;
-            //                }
-            //                foreach (Entity entity in from a in Attackers.List
-            //                                          orderby a.CombatDistance
-            //                                          select a)
-            //                {
-            //                    if (entity.CombatDistance < 10f)
-            //                    {
-            //                        Astral.Logic.UCC.Core.Get.queryTargetChange(entity, "near while aoe", 4000);
-            //                        goto IL_32E;
-            //                    }
-            //                    if (entity.CombatDistance < 60f && !this.pathtToLocIsInAOE(location2, entity.Location))
-            //                    {
-            //                        if (!timeout.IsTimedOut)
-            //                        {
-            //                            if (EntityManager.CurrentSettings.UsePathfinding3 && PathFinding.CheckDirection(location2, entity.Location, ref vector))
-            //                            {
-            //                                continue;
-            //                            }
-            //                        }
-            //                        else if (EntityManager.CurrentSettings.UsePathfinding3)
-            //                        {
-            //                            float num2 = 0f;
-            //                            while ((double)num2 < 6.2831853071795862)
-            //                            {
-            //                                float num3 = (float)Math.Cos((double)num2) * 30f;
-            //                                float num4 = (float)Math.Sin((double)num2) * 30f;
-            //                                Vector3 vector2 = new Vector3(location2.X + num3, location2.Y + num4, location2.Z + 2f);
-            //                                if (!vector2.IsInBackByRange(1.5f, 3.40282347E+38f) && !this.pathtToLocIsInAOE(location2, vector2) && !PathFinding.CheckDirection(location2, vector2, ref vector) && !this.pathtToLocIsInAOE(vector2, Astral.Logic.UCC.Core.CurrentTarget.Location) && !PathFinding.CheckDirection(vector2, Astral.Logic.UCC.Core.CurrentTarget.Location, ref vector))
-            //                                {
-            //                                    vector2.Face();
-            //                                    flag = true;
-            //                                    Astral.Logic.NW.Movements.Dodge(Enums.DodgeDirection.DodgeFront, this.MovingTime);
-            //                                    Thread.Sleep(250);
-            //                                    goto IL_32E;
-            //                                }
-            //                                num2 += 0.314159274f;
-            //                            }
-            //                        }
-            //                        Astral.Logic.UCC.Core.Get.queryTargetChange(entity, "outside aoe", 6000);
-            //                        goto IL_32E;
-            //                    }
-            //                }
-            //            }
-            //            break;
-            //        }
-            //        break;
-            //    }
-            //}
-            //IL_32E:
-            //base.CurrentTimeout = new Astral.Classes.Timeout(base.CoolDown);
-            //return true;
+#endif
         }
 
         public Entity UnitRef
@@ -454,7 +454,9 @@ namespace EntityCore.UCC.Actions
 
             // список всех Entity, удовлетворяющих условиям
             LinkedList<Entity> entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                                     @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck);
+                                                                     @this._healthCheck, @this._reactionRange, 
+                                                                     (@this._reactionZRange > 0) ? @this._reactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference,
+                                                                     @this._regionCheck, null, @this._aura.Checker);
 
 
             // Количество Entity, удовлетворяющих условиям
@@ -465,7 +467,9 @@ namespace EntityCore.UCC.Actions
 
             // Ближайшее Entity (найдено при вызове ie.NeedToRun, поэтому строка ниже закомментирована)
             entity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                    @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck);
+                                                    @this._healthCheck, @this._reactionRange,
+                                                    (@this._reactionZRange > 0) ? @this._reactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference, 
+                                                    @this._regionCheck, null, @this._aura.Checker);
             if (entity != null)
             {
                 sb.Append("Target: ").AppendLine(entity.ToString());

@@ -15,7 +15,7 @@ using System.Windows.Forms;
 
 namespace EntityTools.Patches
 {
-#if DEVELOPER
+#if DEVELOPER && HARMONY
     /// <summary>
     /// Патч метода Astral.Functions.XmlSerializer.GetExtraTypes()
     /// </summary>
@@ -25,10 +25,10 @@ namespace EntityTools.Patches
     internal class Patch_XmlSerializer_GetExtraTypes : Patch
     {
         static Func<List<Type>> GetPluginTypes = typeof(Astral.Controllers.Plugins).GetStaticFunction<List<Type>>("GetTypes");
-        static List<Type> UCCTypes = new List<Type>(20);
-        static List<Type> QuesterTypes = new List<Type>(100);
-        static List<Type> MultitaskTypes = new List<Type>(10);
-        static List<Type> SkillTrainTypes = new List<Type>(50);
+        internal static List<Type> UCCTypes = new List<Type>(20);
+        internal static List<Type> QuesterTypes = new List<Type>(100);
+        internal static List<Type> MultitaskTypes = new List<Type>(10);
+        internal static List<Type> SkillTrainTypes = new List<Type>(50);
 
         internal Patch_XmlSerializer_GetExtraTypes() : base(typeof(Astral.Functions.XmlSerializer).GetMethod("GetExtraTypes", ReflectionHelper.DefaultFlags), typeof(Patch_XmlSerializer_GetExtraTypes).GetMethod(nameof(GetExtraTypes), ReflectionHelper.DefaultFlags)){ }
 

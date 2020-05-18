@@ -47,7 +47,7 @@ namespace EntityTools.Enums
     }
 
     /// <summary>
-    /// Результаты торговли
+    /// Результат торговой операции
     /// </summary>
     public enum BuyItemResult
     {

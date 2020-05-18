@@ -10,7 +10,7 @@ using EntityTools.Reflection;
 
 namespace EntityTools.Patches
 {
-#if DEVELOPER && HARMONY
+#if DEVELOPER
     ///
     internal class Patch_ActionsPlayer_CheckAlly : Patch
     {

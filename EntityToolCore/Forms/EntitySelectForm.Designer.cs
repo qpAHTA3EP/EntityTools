@@ -89,7 +89,6 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dgvEntities.BackgroundColor = System.Drawing.SystemColors.Control;
-            this.dgvEntities.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.dgvEntities.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
             this.dgvEntities.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
             this.dgvEntities.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
@@ -164,6 +163,7 @@
             this.tbPattern.AllowDrop = true;
             this.tbPattern.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbPattern.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tbPattern.Location = new System.Drawing.Point(149, 399);
             this.tbPattern.Multiline = true;
             this.tbPattern.Name = "tbPattern";

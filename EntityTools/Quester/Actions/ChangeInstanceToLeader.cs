@@ -28,7 +28,8 @@ namespace EntityTools.Quester.Actions
         {
             get
             {
-                return true;//EntityManager.LocalPlayer.PlayerTeam.IsInTeam &&
+                return true;
+                //return EntityManager.LocalPlayer.PlayerTeam.IsInTeam &&
                         //!EntityManager.LocalPlayer.PlayerTeam.IsLeader;// &&
                         //EntityManager.LocalPlayer.PlayerTeam.Team.Leader.MapName == EntityManager.LocalPlayer.MapState.MapName &&
                         //EntityManager.LocalPlayer.PlayerTeam.Team.Leader.MapInstanceNumber != ;

@@ -318,18 +318,41 @@ namespace EntityCore.Forms
 
         private void btnTest_Click(object sender, EventArgs e)
         {
-            Predicate<Entity> test = EntityToPatternComparer.Get(tbPattern.Text, (ItemFilterStringType)cbStrMatch.SelectedItem, (EntityNameType)cbNameType.SelectedItem);
-
-            foreach (DataGridViewRow row in dgvEntities.Rows)
-            {
-                if ((row.Tag is Entity entity) && test(entity))
+            Predicate<Entity> test = null;
+            if (string.IsNullOrEmpty(tbPattern.Text))
+                if (dgvEntities.CurrentRow != null)
+                    switch ((EntityNameType)cbNameType.SelectedItem)
+                    {
+                        case EntityNameType.InternalName:
+                            test = EntityToPatternComparer.Get(dgvEntities.CurrentRow.Cells[clmnInternalNameInd].Value.ToString(), (ItemFilterStringType)cbStrMatch.SelectedItem, (EntityNameType)cbNameType.SelectedItem);
+                            break;
+                        case EntityNameType.NameUntranslated:
+                            test = EntityToPatternComparer.Get(dgvEntities.CurrentRow.Cells[clmnNameUntranslatedInd].Value.ToString(), (ItemFilterStringType)cbStrMatch.SelectedItem, (EntityNameType)cbNameType.SelectedItem);
+                            break;
+                        case EntityNameType.Empty:
+                            test = EntityToPatternComparer.Get(string.Empty, (ItemFilterStringType)cbStrMatch.SelectedItem, (EntityNameType)cbNameType.SelectedItem);
+                            break;
+                    }
+                else
                 {
-                    row.Cells[0].Selected = true;
+                    XtraMessageBox.Show("Select Entity first!");
                     return;
                 }
-            }
+            else test = EntityToPatternComparer.Get(tbPattern.Text, (ItemFilterStringType)cbStrMatch.SelectedItem, (EntityNameType)cbNameType.SelectedItem);
 
-            XtraMessageBox.Show("No Entity match to the pattern","", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            if (test != null)
+            {
+                foreach (DataGridViewRow row in dgvEntities.Rows)
+                {
+                    if ((row.Tag is Entity entity) && test(entity))
+                    {
+                        row.Cells[0].Selected = true;
+                        return;
+                    }
+                }
+
+                XtraMessageBox.Show("No Entity match to the pattern", "", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
         #endregion
     }

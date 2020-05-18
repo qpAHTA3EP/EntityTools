@@ -98,9 +98,12 @@ namespace EntityCore.UCC.Actions
 
         public string Label()
         {
-            if (string.IsNullOrEmpty(label) || string.IsNullOrEmpty(@this._itemId))
-                label = $"{@this.GetType().Name} [{@this._itemId}]";
-            else label = @this.GetType().Name;
+            if (string.IsNullOrEmpty(label))
+            {
+                if (string.IsNullOrEmpty(@this._itemId))
+                    label = @this.GetType().Name;
+                else label = $"{@this.GetType().Name} [{@this._itemId}]";
+            }
             return label;
         }
 
@@ -123,18 +126,19 @@ namespace EntityCore.UCC.Actions
                 return itemSlotChache;
             else itemSlotChache = null;
 
-            if (@this._bags != null && @this._bags.Items.Count > 0)
+            if (@this._bags != null)
             {
                 if(patternPos == SimplePatternPos.None)
                     patternPos = @this._itemId.GetSimplePatternPosition(out itemIdPattern);
 
-                foreach (InvBagIDs bagId in @this._bags.Items)
+                foreach (InvBagIDs bagId in @this._bags)
                 {
                     if (bagId != InvBagIDs.None)
                     {
                         InventorySlot iSlot = EntityManager.LocalPlayer.GetInventoryBagById(bagId).GetItems.Find(checkSlot);
 
-                        if (iSlot != null && iSlot.IsValid && iSlot.Item.Count > 0)
+                        if (iSlot != null && iSlot.IsValid && iSlot.Item.Count > 0
+                            && (iSlot.BagId == InvBagIDs.Potions || iSlot.Item.ItemDef.CanUseUnequipped))
                             return itemSlotChache = iSlot;
                     }
                 }
