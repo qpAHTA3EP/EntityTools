@@ -53,14 +53,12 @@ namespace EntityTools.Tools.BuySellItems
             bags._bags[(int)InvBagIDs.Overflow] = true;
             return bags;
         }
-
         /// <summary>
-        /// Сумки и экипированные предметы (без предметов профессий и ценностей)
+        /// Только сумки персонажа (без экипированных предметов)
         /// </summary>
-        public static BagsList GetFullPlayerInventory()
+        public static BagsList GetPlayerBagsAndPotions()
         {
-            //new InvBagIDs[] { InvBagIDs.Inventory, InvBagIDs.PlayerBag1, InvBagIDs.PlayerBag2, InvBagIDs.PlayerBag3, InvBagIDs.PlayerBag4, InvBagIDs.PlayerBag5, InvBagIDs.PlayerBag6, InvBagIDs.PlayerBag7, InvBagIDs.PlayerBag8, InvBagIDs.PlayerBag9, InvBagIDs.Overflow,
-            //                  InvBagIDs.AdventuringHead, InvBagIDs.AdventuringNeck, InvBagIDs.AdventuringArmor, InvBagIDs.AdventuringArms, InvBagIDs.AdventuringWaist, InvBagIDs.AdventuringFeet, InvBagIDs.AdventuringHands, InvBagIDs.AdventuringShirt, InvBagIDs.AdventuringTrousers, InvBagIDs.AdventuringRanged, InvBagIDs.AdventuringRings, InvBagIDs.AdventuringSurges, InvBagIDs.ArtifactPrimary, InvBagIDs.ArtifactSecondary };
+            //new InvBagIDs[] { InvBagIDs.Inventory, InvBagIDs.PlayerBag1, InvBagIDs.PlayerBag2, InvBagIDs.PlayerBag3, InvBagIDs.PlayerBag4, InvBagIDs.PlayerBag5, InvBagIDs.PlayerBag6, InvBagIDs.PlayerBag7, InvBagIDs.PlayerBag8, InvBagIDs.PlayerBag9, InvBagIDs.Overflow };
             BagsList bags = new BagsList();
             bags._bags[(int)InvBagIDs.Inventory] = true;
             bags._bags[(int)InvBagIDs.PlayerBag1] = true;
@@ -73,6 +71,17 @@ namespace EntityTools.Tools.BuySellItems
             bags._bags[(int)InvBagIDs.PlayerBag8] = true;
             bags._bags[(int)InvBagIDs.PlayerBag9] = true;
             bags._bags[(int)InvBagIDs.Overflow] = true;
+            bags._bags[(int)InvBagIDs.Potions] = true;
+            return bags;
+        }
+        /// <summary>
+        /// Сумки и экипированные предметы (без предметов профессий и ценностей)
+        /// </summary>
+        public static BagsList GetFullPlayerInventory()
+        {
+            //new InvBagIDs[] { InvBagIDs.Inventory, InvBagIDs.PlayerBag1, InvBagIDs.PlayerBag2, InvBagIDs.PlayerBag3, InvBagIDs.PlayerBag4, InvBagIDs.PlayerBag5, InvBagIDs.PlayerBag6, InvBagIDs.PlayerBag7, InvBagIDs.PlayerBag8, InvBagIDs.PlayerBag9, InvBagIDs.Overflow,
+            //                  InvBagIDs.AdventuringHead, InvBagIDs.AdventuringNeck, InvBagIDs.AdventuringArmor, InvBagIDs.AdventuringArms, InvBagIDs.AdventuringWaist, InvBagIDs.AdventuringFeet, InvBagIDs.AdventuringHands, InvBagIDs.AdventuringShirt, InvBagIDs.AdventuringTrousers, InvBagIDs.AdventuringRanged, InvBagIDs.AdventuringRings, InvBagIDs.AdventuringSurges, InvBagIDs.ArtifactPrimary, InvBagIDs.ArtifactSecondary };
+            BagsList bags = new BagsList();
             bags._bags[(int)InvBagIDs.AdventuringHead] = true;
             bags._bags[(int)InvBagIDs.AdventuringNeck] = true;
             bags._bags[(int)InvBagIDs.AdventuringArmor] = true;
@@ -87,6 +96,17 @@ namespace EntityTools.Tools.BuySellItems
             bags._bags[(int)InvBagIDs.AdventuringSurges] = true;
             bags._bags[(int)InvBagIDs.ArtifactPrimary] = true;
             bags._bags[(int)InvBagIDs.ArtifactSecondary] = true;
+            bags._bags[(int)InvBagIDs.Inventory] = true;
+            bags._bags[(int)InvBagIDs.PlayerBag1] = true;
+            bags._bags[(int)InvBagIDs.PlayerBag2] = true;
+            bags._bags[(int)InvBagIDs.PlayerBag3] = true;
+            bags._bags[(int)InvBagIDs.PlayerBag4] = true;
+            bags._bags[(int)InvBagIDs.PlayerBag5] = true;
+            bags._bags[(int)InvBagIDs.PlayerBag6] = true;
+            bags._bags[(int)InvBagIDs.PlayerBag7] = true;
+            bags._bags[(int)InvBagIDs.PlayerBag8] = true;
+            bags._bags[(int)InvBagIDs.PlayerBag9] = true;
+            bags._bags[(int)InvBagIDs.Overflow] = true;
             bags._bags[(int)InvBagIDs.Potions] = true;
             return bags;
         }
@@ -232,6 +252,20 @@ namespace EntityTools.Tools.BuySellItems
         }
 
         /// <summary>
+        /// Перечисление слотов в выбранных сумках
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<InventorySlot> GetItems()
+        {
+            for (int i = 0; i < _bags.Count; i++)
+            {
+                if (_bags[i])
+                    foreach(var item in EntityManager.LocalPlayer.GetInventoryBagById((InvBagIDs)i).GetItems)
+                        yield return item;
+            }
+        }
+
+        /// <summary>
         /// Сброс всех сумок
         /// </summary>
         public void Clear()
@@ -363,9 +397,16 @@ namespace EntityTools.Tools.BuySellItems
             || name == "Bags") 
 #endif
                 {
-                    reader.ReadStartElement(name);
-                    ReadInnerXml(reader, name);
-                    reader.ReadEndElement();
+                    if (reader.IsEmptyElement)
+                    {
+                        reader.ReadStartElement(name);
+                    }
+                    else
+                    {
+                        reader.ReadStartElement(name);
+                        ReadInnerXml(reader, name);
+                        reader.ReadEndElement();
+                    }
                 }
 #if false
                 while (reader.ReadState == ReadState.Interactive)
@@ -432,9 +473,14 @@ namespace EntityTools.Tools.BuySellItems
                 {
                     if (reader.IsStartElement())
                     {
-                        reader.ReadStartElement(name);
-                        ReadInnerXml(reader, name);
-                        reader.ReadEndElement();
+                        if (reader.IsEmptyElement)
+                            reader.ReadStartElement(name);
+                        else
+                        {
+                            reader.ReadStartElement(name);
+                            ReadInnerXml(reader, name);
+                            reader.ReadEndElement();
+                        }
                     }
                     else throw new XmlException($"{MethodBase.GetCurrentMethod().Name}: Unexpected XmlStartElement '{name}' while there are should be the XmlEndElement '{xmlEndElement}'");
                 }

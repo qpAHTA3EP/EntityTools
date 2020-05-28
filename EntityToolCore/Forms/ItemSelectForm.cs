@@ -208,5 +208,74 @@ namespace EntityCore.Forms
 #endif
         }
         #endregion
+
+        #region Переход к элементу начинающемуся с itemNameBuf (по нажатию клавиш) 
+        string itemNameBuf = string.Empty;
+        private void ItemList_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Escape)
+            {
+                // Сброс буфера
+                itemNameBuf = string.Empty;
+                e.SuppressKeyPress = true;
+            }
+            if (ItemList.DataSource is null && e.Control && e.KeyCode == Keys.S)
+            {
+                // сортировка списка невозможна, если задан DataSource
+                ItemList.Sorted = !ItemList.Sorted;
+                e.SuppressKeyPress = true;
+            }
+        }
+
+        /// <summary>
+        /// Поиск элементов, начинающихся с нажатой буквы
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ItemList_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (char.IsLetter(e.KeyChar))
+            {
+                char startChar = e.KeyChar;
+                int startInd = 0;
+                string itemStr = string.Empty;
+                // Определяем стартовую позицию для поиска
+                if (ItemList.SelectedIndex >= 0)
+                {
+                    itemStr = ItemList.SelectedItem.ToString();
+                    if (!string.IsNullOrEmpty(itemStr) && itemStr[0] == startChar)
+                        startInd = ItemList.SelectedIndex + 1;
+                }
+                // Ищем следующий элемент, начинающийся с данной буквы
+                // в диапазоне [startInd, Count)
+                for (int ind = startInd; ind < ItemList.Items.Count; ind++)
+                {
+                    itemStr = ItemList.Items[ind].ToString();
+                    if (!string.IsNullOrEmpty(itemStr) && itemStr[0] == startChar)
+                    {
+                        // Устанавливаем фокус на первый попавшийся элемент, начинающийся со startChar
+                        ItemList.SelectedIndex = ind;
+                        return;
+                    }
+                }
+                if (startInd > 0)
+                {
+                    // В диапазоне [startInd, Count) не удалось найти подходящий элемент
+                    // Ищем следующий элемент, начинающийся с данной буквы
+                    // в диапазоне [0, startInd)
+                    for (int ind = 0; ind < startInd; ind++)
+                    {
+                        itemStr = ItemList.Items[ind].ToString();
+                        if (!string.IsNullOrEmpty(itemStr) && itemStr[0] == startChar)
+                        {
+                            // Устанавливаем фокус на первый попавшийся элемент, начинающийся со startChar
+                            ItemList.SelectedIndex = ind;
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
     }
 }

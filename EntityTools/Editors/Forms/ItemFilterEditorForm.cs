@@ -32,6 +32,10 @@ namespace EntityTools.Forms
         /// Список категорий предметов
         /// </summary>
         static readonly IEnumerable<ItemCategory> categories = Enum.GetValues(typeof(ItemCategory)).Cast<ItemCategory>().ToList();
+        /// <summary>
+        /// Список типов предметов
+        /// </summary>
+        static readonly IEnumerable<ItemType> itemTypes = Enum.GetValues(typeof(ItemType)).Cast<ItemType>().ToList();
 
         /// <summary>
         /// Список-фильтров
@@ -301,7 +305,16 @@ namespace EntityTools.Forms
                             gridView.SetFocusedValue(cat.ToString());
                         }
                     }
-                    else
+                    else if(fType == ItemFilterEntryType.ItemType)
+                    {
+                        //Выбор типа предмета
+                        ItemType type = ItemType.None;
+                        if (EntityTools.Core.GUIRequest_Item(() => itemTypes, ref type))
+                        {
+                            gridView.SetFocusedValue(type.ToString());
+                        }
+                    }
+                    else if(fType == ItemFilterEntryType.Identifier)
                     {
                         //Выбор предмета
                         GetAnItem.ListItem rewardItem = null;

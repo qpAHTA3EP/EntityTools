@@ -1,4 +1,5 @@
-﻿#define PROFILING
+﻿//#define PROFILING
+
 using Astral;
 using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
@@ -96,11 +97,12 @@ namespace EntityCore.Entities
             try
             {
 #endif
-                if (zRange < 1)
-                    zRange = Astral.Controllers.Settings.Get.MaxElevationDifference;
+#if disabled_20200526_1659
+                if (zRange > 0 && zRange < 1)
+                    zRange = Astral.Controllers.Settings.Get.MaxElevationDifference; 
+#endif
 
                 // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
-                float closestDistance = (range == 0) ? float.MaxValue : range;
                 LinkedList<Entity> entities = new LinkedList<Entity>();
                 Action<Entity> evaluateAction;
 
@@ -436,8 +438,10 @@ namespace EntityCore.Entities
             try
             {
 #endif
-                if (zRange < 1)
-                    zRange = Astral.Controllers.Settings.Get.MaxElevationDifference;
+#if disabled_20200526_1659
+                if (zRange > 0 && zRange < 1)
+                    zRange = Astral.Controllers.Settings.Get.MaxElevationDifference; 
+#endif
 
                 // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
                 float closestDistance = (range == 0) ? float.MaxValue : range;
@@ -452,8 +456,8 @@ namespace EntityCore.Entities
                         {
                             if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                 && (!healthCheck || !e.IsDead)
-                                && (range == 0 || e.Location.Distance3DFromPlayer < range)
-                                && (zRange == 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
+                                && (range <= 0 || e.Location.Distance3DFromPlayer < range)
+                                && (zRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
                                 && customRegions.Find((CustomRegion cr) => e.Within(cr)) != null)
                             {
                                 float eDistance = e.CombatDistance3;
@@ -468,8 +472,8 @@ namespace EntityCore.Entities
                     {
                         if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                             && (!healthCheck || !e.IsDead)
-                            && (range == 0 || e.Location.Distance3DFromPlayer < range)
-                            && (zRange == 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
+                            && (range <= 0 || e.Location.Distance3DFromPlayer < range)
+                            && (zRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
                             && customRegions.Find((CustomRegion cr) => e.Within(cr)) != null
                             && specialCheck(e))
                         {
@@ -489,7 +493,8 @@ namespace EntityCore.Entities
                         {
                             if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                 && (!healthCheck || !e.IsDead)
-                                && (range == 0 || e.Location.Distance3DFromPlayer < range))
+                                && (zRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
+                                && (range <= 0 || e.Location.Distance3DFromPlayer < range))
                             {
                                 float eDistance = e.CombatDistance3;
                                 if (eDistance < closestDistance)
@@ -503,7 +508,8 @@ namespace EntityCore.Entities
                     {
                         if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                 && (!healthCheck || !e.IsDead)
-                                && (range == 0 || e.Location.Distance3DFromPlayer < range)
+                                && (zRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
+                                && (range <= 0 || e.Location.Distance3DFromPlayer < range)
                                 && specialCheck(e))
                         {
                             float eDistance = e.CombatDistance3;

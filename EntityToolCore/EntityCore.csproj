@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.0518.0904</AssemblyVersion>
+    <AssemblyVersion>0.20.0527.1637</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -99,6 +99,12 @@
     </Compile>
     <Compile Include="Forms\AuraSelectForm.Designer.cs">
       <DependentUpon>AuraSelectForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\AddUccActionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AddUccActionForm.designer.cs">
+      <DependentUpon>AddUccActionForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\ConditionsListForm.cs">
       <SubType>Form</SubType>
@@ -196,6 +202,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Forms\AuraSelectForm.resx">
       <DependentUpon>AuraSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\AddUccActionForm.resx">
+      <DependentUpon>AddUccActionForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ConditionsListForm.resx">
       <DependentUpon>ConditionsListForm.cs</DependentUpon>

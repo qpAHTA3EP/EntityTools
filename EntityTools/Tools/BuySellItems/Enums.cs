@@ -12,6 +12,10 @@ namespace EntityTools.Enums
         /// </summary>
         Identifier,
         /// <summary>
+        /// Тип предмета
+        /// </summary>
+        ItemType,
+        /// <summary>
         /// Предмет задан категорией
         /// </summary>
         Category
@@ -67,6 +71,11 @@ namespace EntityTools.Enums
         /// Полная сумка, поэтому покупка не состоялась
         /// </summary>
         FullBag,
+        /// <summary>
+        /// Такой же или лучший предмет имеется в сумке
+        /// Поэтому предмет не подлежит покупке
+        /// </summary>
+        Exists,
         /// <summary>
         /// Предмет не подлежит покупке
         /// </summary>

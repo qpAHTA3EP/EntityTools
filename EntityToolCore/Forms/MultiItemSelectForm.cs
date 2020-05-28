@@ -62,24 +62,36 @@ namespace EntityCore.Forms
                 {
                     List<T> values = selecteValues;
                     @this.fillAction = () => {
-                            @this.Items.DataSource = source();
-                            for (int i = 0; i < @this.Items.ItemCount; i++)
+#if disabled_20200527_1229
+                        // Когда selecteValues не пустой, возникает ошибка
+
+                        @this.Items.DataSource = source(); 
+                        for (int i = 0; i < @this.ItemList.ItemCount; i++)
                             {
-                                if (values.Contains((T)@this.Items.Items[i].Value))
-                                    @this.Items.Items[i].CheckState = CheckState.Checked;
-                                else @this.Items.Items[i].CheckState = CheckState.Unchecked;
+                                if (values.Contains((T)@this.ItemList.Items[i].Value))
+                                    @this.ItemList.Items[i].CheckState = CheckState.Checked;
+                                else @this.ItemList.Items[i].CheckState = CheckState.Unchecked;
                             }
-                        };
+                        
+#else
+                        @this.ItemList.Items.Clear();
+                        foreach(var item in source())
+                        {
+                            bool cheched = values.Contains(item);
+                            @this.ItemList.Items.Add(item, cheched);
+                        }
+#endif
+                    };
                 }
                 else
                 {
-                    @this.fillAction = () => @this.Items.DataSource = source();
+                    @this.fillAction = () => @this.ItemList.DataSource = source();
                 }
 
                 if (@this.ShowDialog() == DialogResult.OK
-                    && @this.Items.SelectedItem is T)
+                    && @this.ItemList.SelectedItem is T)
                 {
-                    var checkList = @this.Items.CheckedItems;
+                    var checkList = @this.ItemList.CheckedItems;
                     if (checkList.Count > 0)
                     {
                         if (selecteValues is null)

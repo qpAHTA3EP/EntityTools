@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.0518.0904</AssemblyVersion>
+    <AssemblyVersion>0.20.0527.1632</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -115,6 +115,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Harmony, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\x64\0Harmony.dll</HintPath>
+    </Reference>
     <Reference Include="AStar">
       <HintPath>..\References\x64\AStar.dll</HintPath>
       <Private>False</Private>
@@ -195,6 +199,7 @@
     <Compile Include="Core\Proxies\UCCActionProxy.cs" />
     <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
     <Compile Include="Patches\UCC\Patch_ActionsPlayer_CheckAlly.cs" />
+    <Compile Include="Patches\UCC\Patch_AddClass_Show.cs" />
     <Compile Include="Patches\XmlSerializer\Patch_XmlSerializer_GetExtraTypes.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -270,6 +275,8 @@
     <Compile Include="Tools\BuySellItems\Enums.cs" />
     <Compile Include="Tools\BuySellItems\Extensions.cs" />
     <Compile Include="Tools\BuySellItems\IndexedBags.cs" />
+    <Compile Include="Tools\BuySellItems\ItemStats.cs" />
+    <Compile Include="Tools\BuySellItems\SlotCache.cs" />
     <Compile Include="Tools\CollectionTypeConverter.cs" />
     <Compile Include="Servises\EnchantHelper.cs" />
     <Compile Include="Tools\CryptoHelper.cs" />

@@ -333,7 +333,7 @@ namespace EntityCore.Quester.Action
                     timeout.ChangeTime(EntityTools.EntityTools.PluginSettings.EntityCache.LocalCacheTime);
                 }
 
-                if (!@this._holdTargetEntity || !ValidateEntity(target) || (@this._healthCheck && target.IsDead))
+                if (closestEntity != null && (!@this._holdTargetEntity || !ValidateEntity(target) || (@this._healthCheck && target.IsDead)))
                     target = closestEntity;
 
                 if (ValidateEntity(target) && !(@this._healthCheck && target.IsDead))

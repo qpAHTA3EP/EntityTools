@@ -249,11 +249,19 @@ namespace EntityCore
             }
             return false; 
 #else
-            if(MultiItemSelectForm.GUIRequest("Select CustomRegions:",
-                () => Astral.Quester.API.CurrentProfile.CustomRegions.Select(cr => cr.Name), ref list))
+            //Нужно разобраться с селектором.
+            //Не работает когда list не пустой.
+
+            if (Astral.Quester.API.CurrentProfile.CustomRegions.Count > 0)
             {
-                crList = list;
-                return true;
+                IEnumerable<string> allCRNames = Astral.Quester.API.CurrentProfile.CustomRegions.Select(cr => cr.Name);
+
+                if (MultiItemSelectForm.GUIRequest("Select CustomRegions:",
+                    () => allCRNames, ref list))
+                {
+                    crList = list;
+                    return true;
+                }
             }
             return false;
 #endif
@@ -304,6 +312,12 @@ namespace EntityCore
                 }
             }
             return false;
+        }
+
+        
+        public bool GUIRequest_UCCAction(out UCCAction action)
+        {
+            return Forms.AddUccActionForm.GUIRequest(out action);
         }
         #endregion
 
@@ -362,9 +376,10 @@ namespace EntityCore
 
                     // Ближайшее Entity
                     Entity target = SearchCached.FindClosestEntity(entityId.ToString(), (ItemFilterStringType)entityIdType,
-                                            (EntityNameType)entityNameType, entitySet, healthCheck, reactionRange, reactionZRange, regionCheck, customRegions);
+                                            (EntityNameType)entityNameType, entitySet, false /*healthCheck*/, 0 /*reactionRange*/, 0/*reactionZRange*/, regionCheck, customRegions);
                     if (target != null && target.IsValid)
                     {
+#if false
                         sb.Append("ClosectEntity: ").AppendLine(target.ToString());
                         sb.Append("\tName: ").AppendLine(target.Name);
                         sb.Append("\tInternalName: ").AppendLine(target.InternalName);
@@ -372,7 +387,33 @@ namespace EntityCore
                         sb.Append("\tIsDead: ").AppendLine(target.IsDead.ToString());
                         sb.Append("\tRegion: '").Append(target.RegionInternalName).AppendLine("'");
                         sb.Append("\tLocation: ").AppendLine(target.Location.ToString());
-                        sb.Append("\tDistance: ").AppendLine(target.Location.Distance3DFromPlayer.ToString());
+                        sb.Append("\tDistance: ").AppendLine(target.Location.Distance3DFromPlayer.ToString()); 
+#else
+                        bool distOk = reactionRange <= 0 || target.Location.Distance3DFromPlayer < reactionRange;
+                        bool zOk = reactionZRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(target.Location) < reactionZRange;
+                        bool alive = !healthCheck || !target.IsDead;
+                        sb.Append("ClosestEntity: ").Append(target.ToString());
+                        if (distOk && zOk && alive)
+                            sb.AppendLine(" [MATCH]");
+                        else sb.AppendLine(" [MISMATCH]");
+                        sb.Append("\tName: ").AppendLine(target.Name);
+                        sb.Append("\tInternalName: ").AppendLine(target.InternalName);
+                        sb.Append("\tNameUntranslated: ").AppendLine(target.NameUntranslated);
+                        sb.Append("\tIsDead: ").Append(target.IsDead.ToString());
+                        if (alive)
+                            sb.AppendLine(" [OK]");
+                        else sb.AppendLine(" [FAIL]");
+                        sb.Append("\tRegion: '").Append(target.RegionInternalName).AppendLine("'");
+                        sb.Append("\tLocation: ").AppendLine(target.Location.ToString());
+                        sb.Append("\tDistance: ").Append(target.Location.Distance3DFromPlayer.ToString());
+                        if (distOk)
+                            sb.AppendLine(" [OK]");
+                        else sb.AppendLine(" [FAIL]");
+                        sb.Append("\tZAxisDiff: ").Append(Astral.Logic.General.ZAxisDiffFromPlayer(target.Location).ToString());
+                        if (zOk)
+                            sb.AppendLine(" [OK]");
+                        else sb.AppendLine(" [FAIL]");
+#endif
                     }
                     else sb.AppendLine("Closest Entity not found!");
                 }

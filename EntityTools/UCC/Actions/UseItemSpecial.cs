@@ -107,6 +107,8 @@ namespace EntityTools.UCC.Actions
         }
         internal bool _checkItemCooldown = false;
 
+
+#if disabled_20200527_1854
 #if DEVELOPER
         [Category("Item")]
         [Description("Identificator of the bag where Item would be searched\n" +
@@ -114,7 +116,7 @@ namespace EntityTools.UCC.Actions
         [Browsable(false)]
 #else
         [Browsable(false)]
-#endif
+#endif        
         public InvBagIDs BagId
         {
 #if CheckedListBoxCommonSelector_InvBagIDs
@@ -140,24 +142,28 @@ namespace EntityTools.UCC.Actions
 #else
             get
             {
-                if (Bags != null)
-                    return Bags.FirstOrDefault();
+#if disabled_20200527_1847
+                if (_bags != null)
+                    return _bags.FirstOrDefault();
+
+#endif
                 return InvBagIDs.None;
             }
             set
             {
-                if (Bags == null)
+                if (_bags == null)
                 {
-                    Bags = new BagsList();
-                    Bags.Add(value);
+                    _bags = new BagsList();
+                    _bags.Add(value);
                 }
                 else
                 {
-                    Bags.Add(value);
+                    _bags.Add(value);
                 }
             }
 #endif
-        }
+        } 
+#endif
 
 #if CheckedListBoxCommonSelector_InvBagIDs
 #if DEVELOPER
@@ -179,7 +185,7 @@ namespace EntityTools.UCC.Actions
             }
         }
         internal CheckedListBoxCommonSelector<InvBagIDs> _bags = new CheckedListBoxCommonSelector<InvBagIDs>();
-#else 
+#else
 #if DEVELOPER
         [Category("Item")]
         [Description("Identificator of the bags where Item would be searched\n")]
@@ -198,7 +204,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal BagsList _bags = new BagsList();
+        internal BagsList _bags = BagsList.GetPlayerBagsAndPotions();
 #endif
 
         #region Hide Inherited Properties

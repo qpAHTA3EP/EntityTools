@@ -25,11 +25,14 @@ using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
 using NPCInfos = Astral.Quester.Classes.NPCInfos;
-using static EntityTools.Tools.BuySellItems.ItemFilterEntryExt;
-using System.Collections.ObjectModel;
 
 namespace EntityTools.Quester.Actions
 {
+	/*
+	 * Используется прямой поиск в сумках при каждой покупке предмета
+	 * В проверке уновня предмета некорректно определяется ситуация с возможностью 
+	 * экипировать предмет в несколько слотов (например кольца или оружие)
+	 */
     [Serializable]
     public class BuySellItemsExt : Astral.Quester.Classes.Action
     {
@@ -162,11 +165,8 @@ namespace EntityTools.Quester.Actions
         /// <summary>
         /// Кэшированный список слотов, которые подлежат продаже
         /// </summary>
-        private List<InventorySlot> slots2sellCache = null;
+        private List<InventorySlot> slots2sell = null;
 
-        /// <summary>
-        /// Функтор доступа к методу сопоставления предмета с ItemFilterCore
-        /// </summary>
         private Func<object, Func<Item, bool>> ItemFilterCore_SellItems = typeof(ItemFilterCore).GetFunction<Item, bool>("\u0001");
 
         #region Интерфейс Quester.Action
@@ -183,18 +183,18 @@ namespace EntityTools.Quester.Actions
                 if (@this._useGeneralSettingsToSell)
                 {
                     if (_bags.GetItems(Astral.Controllers.Settings.Get.SellFilter, out List<InventorySlot> slots))
-                        slots2sellCache = slots;
+                        slots2sell = slots;
                 }
 
                 if (@this._sellOptions != null && @this._sellOptions.Entries.Count > 0)
                 {
                     if (_bags.GetItems(@this._sellOptions, out List<InventorySlot> slots))
-                        if (slots2sellCache != null)
-                            slots2sellCache.AddRange(slots);
-                        else slots2sellCache = slots;
+                        if (slots2sell != null)
+                            slots2sell.AddRange(slots);
+                        else slots2sell = slots;
                 }
 
-                return slots2sellCache?.Count > 0 
+                return slots2sell?.Count > 0 
                     || @this._useGeneralSettingsToBuy && Astral.Controllers.Settings.Get.SellFilter.Entries.Count > 0 
                     || @this._buyOptions.Count > 0;
             }
@@ -482,67 +482,25 @@ namespace EntityTools.Quester.Actions
                     }
                 }
 
-#if direct_item_search_in_bags
-                if (_buyOptions.Count > 0)
+                foreach (ItemFilterEntryExt item2buy in @this._buyOptions)
                 {
-                    foreach (ItemFilterEntryExt item2buy in @this._buyOptions)
-                    {
 #if false
-                        // Подсчет общего количества предметов
-                        int totalNum = playerBag[item2buy].Sum((slot) => (int)slot.Item.Count);
-                        // Вычисляем количество предметов, которые нужно купить
-                        int buyNum = 0;
-                        if (item2buy.KeepNumber)
-                        {
-                            if (item2buy.Count > totalNum)
-                                buyNum = (int)item2buy.Count - totalNum;
-                        }
-                        else buyNum = (int)item2buy.Count;
-
-                        if (buyNum > 0) 
-#endif
-                        {
-                            List<ItemDef> boughtItems = null;
-                            BuyItemResult buyItemResult = BuyAnItem(item2buy, ref boughtItems);
-                            // Обработка результата покупки
-                            // Если результат не позволяет продолжать покупку - прерываем выполнение команды
-                            switch (buyItemResult)
-                            {
-                                case BuyItemResult.Succeeded:
-                                    {
-                                        // Предмет необходимо экипировать после покупки
-                                        if (item2buy.PutOnItem && boughtItems != null && boughtItems.Count > 0)
-                                        {
-                                            foreach (ItemDef item in boughtItems)
-                                            {
-                                                // Здесь не учитывается возможно приобретения и экипировки нескольких вещений (колец)
-
-                                                InventorySlot slot = _bags.Find(item);
-                                                if (slot != null)
-                                                    slot.Equip();
-                                            }
-                                        }
-                                        break;
-                                    }
-                                case BuyItemResult.FullBag:
-                                    return ActionResult.Skip;
-                                case BuyItemResult.Error:
-                                    return ActionResult.Fail;
-                            }
-                        }
-                    } 
-                }
-#else
-                if (_buyOptions.Count > 0)
-                {
-                    // Анализируем содержимое сумок
-                    IndexedBags indexedBags = new IndexedBags(@this._buyOptions, @this._bags);
-
-                    foreach (var filterEntry in indexedBags.Filters)
+                    // Подсчет общего количества предметов
+                    int totalNum = playerBag[item2buy].Sum((slot) => (int)slot.Item.Count);
+                    // Вычисляем количество предметов, которые нужно купить
+                    int buyNum = 0;
+                    if (item2buy.KeepNumber)
                     {
-                        var slotCache = indexedBags[filterEntry];
+                        if (item2buy.Count > totalNum)
+                            buyNum = (int)item2buy.Count - totalNum;
+                    }
+                    else buyNum = (int)item2buy.Count;
+
+                    if (buyNum > 0) 
+#endif
+                    {
                         List<ItemDef> boughtItems = null;
-                        BuyItemResult buyItemResult = (slotCache is null) ? BuyAnItem(filterEntry, ref boughtItems) : BuyAnItem(filterEntry, slotCache, ref boughtItems);
+                        BuyItemResult buyItemResult = BuyAnItem(item2buy, ref boughtItems);
                         // Обработка результата покупки
                         // Если результат не позволяет продолжать покупку - прерываем выполнение команды
                         switch (buyItemResult)
@@ -550,12 +508,12 @@ namespace EntityTools.Quester.Actions
                             case BuyItemResult.Succeeded:
                                 {
                                     // Предмет необходимо экипировать после покупки
-                                    if (filterEntry.PutOnItem && boughtItems != null && boughtItems.Count > 0)
+                                    if(item2buy.PutOnItem && boughtItems != null && boughtItems.Count > 0)
                                     {
                                         foreach (ItemDef item in boughtItems)
                                         {
-                                            // Здесь не учитывается возможно приобретения и экипировки нескольких вещений (например, колец)
-
+                                            // Здесь не учитывается возможно приобретения и экипировки нескольких вещений (колец)
+                                            
                                             InventorySlot slot = _bags.Find(item);
                                             if (slot != null)
                                                 slot.Equip();
@@ -570,7 +528,6 @@ namespace EntityTools.Quester.Actions
                         }
                     }
                 }
-#endif
 
                 return ActionResult.Completed;
             }
@@ -606,7 +563,7 @@ namespace EntityTools.Quester.Actions
                                 if (!_checkFreeBags || Check_FreeSlots())
                                 {
                                     //Вычисляем количество предметов, которые необходимо докупить
-                                    uint toBuyNum = storeItemInfo.NumberOfItem2Buy(_bags, item2buy);
+                                    uint toBuyNum = _bags.NumberOfItem2Buy(item2buy);
                                     if (toBuyNum > 0)
                                     {
                                         // Проверка наличия валюты заложена в storeItemInfo.CanBuyError
@@ -668,111 +625,6 @@ namespace EntityTools.Quester.Actions
             }
             return result;
         }
-#if ReadOnlyItemFilterEntryExt
-        private BuyItemResult BuyAnItem(KeyValuePair<ReadOnlyItemFilterEntryExt, SlotCache> filterEntryCache, ref List<ItemDef> boughtItems)
-#else
-        private BuyItemResult BuyAnItem(ItemFilterEntryExt filterEntry, SlotCache slotCache, ref List<ItemDef> boughtItems)
-#endif
-        {
-            BuyItemResult result = BuyItemResult.Completed;
-            if (boughtItems == null)
-                boughtItems = new List<ItemDef>();
-            else boughtItems.Clear();
-
-            foreach (StoreItemInfo storeItemInfo in EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.StoreItems)
-            {
-                if (storeItemInfo.CanBuyError == 0u)
-                {
-                    // Проверка наличия валюты заложена в storeItemInfo.CanBuyError
-                    // Код ошибки (нет валюты) = 6
-
-                    if (filterEntry.IsMatch(storeItemInfo.Item))
-                    {
-                        // Проверка соответствия уровню персонажа
-                        if (!filterEntry.CheckPlayerLevel || storeItemInfo.FitsPlayerLevel())
-                        {
-                            // Проверка уровня предмета
-                            if (!filterEntry.CheckEquipmentLevel 
-                                //|| filterEntryCache.Value.MaxItemLevel <= storeItemInfo.Item.ItemDef.Level)
-                                || slotCache.HasWorseThen(storeItemInfo))
-                            {
-                                bool succeeded = false;
-                                Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(@this._timer > 0 ? (int)@this._timer : int.MaxValue);
-
-                                if (!_checkFreeBags || Check_FreeSlots())
-                                {
-                                    //Вычисляем количество предметов, которые необходимо докупить
-                                    uint toBuyNum = storeItemInfo.NumberOfItem2Buy(slotCache, filterEntry);
-                                    if (toBuyNum > 0)
-                                    {
-                                        uint mayBuyInBulk = storeItemInfo.Item.ItemDef.MayBuyInBulk;
-
-                                        //if (!filterEntryCache.Key.BuyByOne)
-                                        if (mayBuyInBulk > toBuyNum)
-                                        {
-                                            // Покупка предмета в необходимом количество за один раз
-                                            Logger.WriteLine($"Buy {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] ...");
-                                            storeItemInfo.BuyItem(toBuyNum);
-                                            Thread.Sleep(250);
-
-                                            succeeded = true;
-                                            result = BuyItemResult.Succeeded;
-                                        }
-                                        else
-                                        {
-                                            // Невозможна единовременная покупка необходимого количества предметов, 
-                                            // производим покупку в цикле
-                                            Logger.WriteLine($"Buy total {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] by one item...");
-                                            uint totalPurchasedNum = 0;
-                                            for (totalPurchasedNum = 0; totalPurchasedNum < toBuyNum; totalPurchasedNum++)
-                                            {
-                                                storeItemInfo.BuyItem(1);
-                                                Thread.Sleep(250);
-                                                if (timeout.IsTimedOut)
-                                                {
-                                                    Logger.WriteLine($"Buying time is out. Bought only {totalPurchasedNum} of {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] was bought ...");
-                                                    break;
-                                                }
-                                                if(storeItemInfo.CanBuyError != 0u)
-                                                {
-                                                    boughtItems.Add(storeItemInfo.Item.ItemDef);
-
-                                                    Logger.WriteLine($"Buying is impossible now. Error code '{storeItemInfo.CanBuyError}'. Bought only {totalPurchasedNum} of {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] ...");
-                                                    return result = BuyItemResult.NotEnoughCurrency;
-                                                }
-                                                if (_checkFreeBags && !Check_FreeSlots())
-                                                {
-                                                    boughtItems.Add(storeItemInfo.Item.ItemDef);
-
-                                                    Logger.WriteLine($"Bags are full. Bought only {totalPurchasedNum} of {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] ...");
-                                                    return result = BuyItemResult.FullBag;
-                                                }
-                                            }
-
-                                            succeeded = totalPurchasedNum >= toBuyNum;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    Logger.WriteLine("Bags are full, skip ...");
-                                    return result = BuyItemResult.FullBag;
-                                }
-
-                                if (succeeded)
-                                {
-                                    result = BuyItemResult.Succeeded;
-                                    boughtItems.Add(storeItemInfo.Item.ItemDef);
-                                }
-                            }
-                        }
-                    }
-                    //else return BuyItemResult.Skiped;
-                }
-                //else return BuyItemResult.Error;
-            }
-            return result;
-        }
 
         /// <summary>
         /// Продажа всех предметов
@@ -796,9 +648,9 @@ namespace EntityTools.Quester.Actions
                             Thread.Sleep(250);
                         } 
 #else
-                    if(slots2sellCache?.Count > 0)
+                    if(slots2sell?.Count > 0)
                     {
-                        foreach (InventorySlot slot in slots2sellCache)
+                        foreach (InventorySlot slot in slots2sell)
                             if (Astral.Logic.NW.Inventory.CanSell(slot.Item))
                             {
                                 Logger.WriteLine(string.Concat("Sell : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));

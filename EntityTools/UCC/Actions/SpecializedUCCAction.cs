@@ -68,19 +68,24 @@ namespace EntityTools.UCC.Actions
         public LogicRule CustomConditionCheck { get; set; }
 
 #if DEVELOPER
-        [Category("Timer")]
+        [Category("SpecificTimer")]
 #else
         [Browsable(false)]
 #endif
         public string TimerName { get; set; } = string.Empty;
 
 #if DEVELOPER
-        [Category("Timer")]
+        [Category("SpecificTimer")]
 #else
         [Browsable(false)]
 #endif
         public int Timeout { get; set; } = 0; 
         #endregion
+
+        public SpecializedUCCAction()
+        {
+            Target = Unit.Player;
+        }
 
         public override bool NeedToRun
         {
@@ -310,10 +315,6 @@ namespace EntityTools.UCC.Actions
             else return "(SP) " + ManagedAction.ToString();
         }
 
-        public SpecializedUCCAction()
-        {
-            Target = Unit.Player;
-        }
         public override UCCAction Clone()
         {
             return base.BaseClone(new SpecializedUCCAction()

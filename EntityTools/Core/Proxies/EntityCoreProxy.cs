@@ -94,6 +94,11 @@ namespace EntityTools.Core
         {
             throw new NotImplementedException();
         }
+
+        public bool GUIRequest_UCCAction(out UCCAction action)
+        {
+            throw new NotImplementedException();
+        }
 #endif
 
 #if DEBUG
@@ -106,5 +111,6 @@ namespace EntityTools.Core
         {
             throw new NotImplementedException();
         }
+
     }
 }

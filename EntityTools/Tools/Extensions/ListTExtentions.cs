@@ -30,10 +30,7 @@ namespace EntityTools.Extensions
         /// <returns></returns>
         public static bool ContainsAny<T>(this IEnumerable<T> list, IEnumerable<T> elements)
         {
-            var elem = list.First((t) => elements.Contains(t));
-            if (elem != null)
-                return true;
-            return false;
+            return list.Any((t) => elements.Contains(t));
         }
     }
 }

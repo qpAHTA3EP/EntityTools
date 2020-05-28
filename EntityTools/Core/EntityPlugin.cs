@@ -441,6 +441,20 @@ namespace EntityTools
 
                 return false;
             }
+
+            public bool GUIRequest_UCCAction(out UCCAction action)
+            {
+                if (InternalInitialize())
+                    return Core.GUIRequest_UCCAction(out action);
+                else action = null;
+
+                XtraMessageBox.Show("EntityToolsCore is invalid!\n\rUCCAction request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! UCCAction request denied.", true);
+
+                return false;
+            }
+
 #endif
 #if DEBUG
             public LinkedList<Entity> FindAllEntity(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete, bool healthCheck = false, float range = 0, float zRange = 0, bool regionCheck = false, List<CustomRegion> customRegions = null, Predicate<Entity> specialCheck = null)

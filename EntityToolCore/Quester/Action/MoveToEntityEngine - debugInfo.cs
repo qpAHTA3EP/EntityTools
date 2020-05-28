@@ -36,9 +36,11 @@ namespace EntityCore.Quester.Action
         private Predicate<Entity> checkEntity = null;
         private Func<List<CustomRegion>> getCustomRegions = null;
 
+#if false
         // Запись отладочной информации в поле MoveToEntity.Debug
         // приводит к критической ошибке и аварийному завершению Astral'a
-        //private readonly InstancePropertyAccessor<MoveToEntity, ActionDebug> debug = null;
+        private readonly InstancePropertyAccessor<MoveToEntity, ActionDebug> debug = null; 
+#endif
 
         private List<CustomRegion> customRegions = null;
         private string label = string.Empty;
@@ -242,13 +244,25 @@ namespace EntityCore.Quester.Action
                     timeout.ChangeTime(EntityTools.EntityTools.PluginSettings.EntityCache.LocalCacheTime);
                 }
 
-                if (!@this._holdTargetEntity || !ValidateEntity(target) || (@this._healthCheck && target.IsDead))
-                    target = closestEntity;
+                bool closestValidationResult = closestEntity != null;
 
                 bool targetValidationResult = ValidateEntity(target);
                 bool targetHealthResult = targetValidationResult ? !(@this._healthCheck && target.IsDead) : false;
                 double targetDistance = targetValidationResult ? target.Location.Distance3DFromPlayer : double.MaxValue;
                 bool targetDistanceResult = targetDistance <= @this._distance;
+
+                if (closestValidationResult && !(@this._holdTargetEntity && targetValidationResult && targetHealthResult))
+                {
+                    // closestEntity - Валидно, а target - Не валидно, Мертво или Не стоит флаг удержания HoldTargetEntity
+                    // Заменяем 
+                    target = closestEntity;
+
+                    targetValidationResult = closestValidationResult;
+                    targetHealthResult = targetValidationResult ? !(@this._healthCheck && target.IsDead) : false;
+                    targetDistance = targetValidationResult ? target.Location.Distance3DFromPlayer : double.MaxValue;
+                    targetDistanceResult = targetDistance <= @this._distance;
+                }
+
 
                 if (targetValidationResult
                     && targetHealthResult
@@ -269,7 +283,7 @@ namespace EntityCore.Quester.Action
                     if (@this._attackTargetEntity)
                     {
                         Astral.Logic.NW.Attackers.List.Clear();
-                        if (@this._attackTargetEntity && target.RelationToPlayer == EntityRelation.Foe)
+                        if (@this._attackTargetEntity && target.RelationToPlayer != EntityRelation.Friend)
                         {
                             Astral.Logic.NW.Attackers.List.Add(target);
                             if (@this._ignoreCombat)
@@ -303,7 +317,6 @@ namespace EntityCore.Quester.Action
                 }
                 else
                 {
-                    bool closestValidationResult = ValidateEntity(closestEntity);
                     bool closetHealthResult = closestValidationResult ? !(@this._healthCheck && closestEntity.IsDead) : false;
                     double closetDistance = closestValidationResult ? closestEntity.Location.Distance3DFromPlayer : double.MaxValue;
                     bool closestDisnceResult = closetDistance <= @this._distance;
@@ -574,7 +587,25 @@ namespace EntityCore.Quester.Action
         #region Вспомогательные методы
         internal bool ValidateEntity(Entity e)
         {
-            return e != null && e.IsValid && checkEntity(e);
+            bool isNull = e is null;
+            bool isValid = isNull ? false : e.IsValid;
+            bool checkOk = isNull ? false : checkEntity(e);
+
+            bool result = !isNull && isValid && checkOk;
+            if (!result && EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+            {
+                string debugMsg = string.Concat(MethodBase.GetCurrentMethod().Name, '[', hashCode, "]: FAIL => ",
+                                                                isNull ? "NULL" : string.Empty,
+                                                                isNull || isValid ? string.Empty : "Invalid ",
+                                                                isNull || checkOk ? string.Empty : (@this._entityNameType == EntityNameType.InternalName ? e.InternalName : e.NameUntranslated));
+                // 2
+                //Astral.Controllers.Forms.InvokeOnMainThread(() => debug.Value.AddInfo(debugMsg));
+                // 3
+                ETLogger.WriteLine(LogType.Debug, debugMsg);
+            }
+                
+            return  result;
+
         }
 
         private bool internal_CheckEntity_Initializer(Entity e)

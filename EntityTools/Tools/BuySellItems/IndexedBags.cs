@@ -8,6 +8,8 @@ using System.Text;
 using Astral.Classes.ItemFilter;
 using EntityTools.Enums;
 using System.Collections;
+using System.Collections.ObjectModel;
+using static EntityTools.Tools.BuySellItems.ItemFilterEntryExt;
 
 namespace EntityTools.Tools.BuySellItems
 {
@@ -36,17 +38,102 @@ namespace EntityTools.Tools.BuySellItems
         /// <summary>
         /// Индекс слотов сумки по категориям
         /// </summary>
-        Dictionary<ItemCategory, List<InventorySlot>> categorizedSlots = new Dictionary<ItemCategory, List<InventorySlot>>();
+        public IEnumerable<KeyValuePair<ItemCategory, SlotCache>> CategorizedSlots
+        {
+            get
+            {
+                if (_categorizedSlots.Count == 0)
+                    Indexing();
+
+                foreach (var d in _categorizedSlots)
+                    yield return new KeyValuePair<ItemCategory, SlotCache>(d.Key, new SlotCache(d.Value, true));
+            }
+        }
+        Dictionary<ItemCategory, SlotCache> _categorizedSlots = new Dictionary<ItemCategory, SlotCache>();
+
+        /// <summary>
+        /// Индекс слотов сумки по типам
+        /// </summary>
+        public IEnumerable<KeyValuePair<ItemType, SlotCache>> TypedSlots
+        {
+            get
+            {
+                if (_typedSlots.Count == 0)
+                    Indexing();
+
+                foreach (var d in _typedSlots)
+                    yield return new KeyValuePair<ItemType, SlotCache>(d.Key, new SlotCache(d.Value, true));
+            }
+        }
+        Dictionary<ItemType, SlotCache> _typedSlots = new Dictionary<ItemType, SlotCache>();
 
         /// <summary>
         /// Индекс слотов сумки по фильтру
         /// </summary>
-        Dictionary<ItemFilterEntryExt, List<InventorySlot>> filteredSlots = new Dictionary<ItemFilterEntryExt, List<InventorySlot>>();
+#if ReadOnlyItemFilterEntryExt
+        public IEnumerable<KeyValuePair<ReadOnlyItemFilterEntryExt, SlotCache>> FilteredSlots
+        {
+            get
+            {
+                if (_filteredSlots.Count == 0)
+                    Indexing();
+
+                foreach (var d in _filteredSlots)
+                    yield return new KeyValuePair<ReadOnlyItemFilterEntryExt, SlotCache>(d.Key.AsReadOnly(), new SlotCache(d.Value, true));
+            }
+        } 
+#else
+        public IEnumerable<KeyValuePair<ItemFilterEntryExt, SlotCache>> FilteredSlots
+        {
+            get
+            {
+                if (_filteredSlots.Count == 0)
+                    Indexing();
+
+                foreach (var d in _filteredSlots)
+                    yield return new KeyValuePair<ItemFilterEntryExt, SlotCache>(d.Key.AsReadOnly(), new SlotCache(d.Value, true));
+            }
+        }
+#endif
+        Dictionary<ItemFilterEntryExt, SlotCache> _filteredSlots = new Dictionary<ItemFilterEntryExt, SlotCache>();
+
+#if ItemStats
+        /// <summary>
+        /// Получение статистики по предметам, имеющимся в сумке
+        /// соответствуеющей заданному фильтру
+        /// </summary>
+        public ItemStats GetItemStats(ItemFilterEntryExt fEntry)
+        {
+            if (_filteredItemStats.Count == 0 && _filters.Count > 0)
+                Indexing();
+
+            if (_filteredItemStats.ContainsKey(fEntry))
+                return _filteredItemStats[fEntry].Clone();
+            return new ItemStats();
+        }
+        Dictionary<ItemFilterEntryExt, ItemStats> _filteredItemStats = new Dictionary<ItemFilterEntryExt, ItemStats>();
+
+        /// <summary>
+        /// Получение статистики по предметам, имеющимся в сумке
+        /// соответствуеющей заданной категории
+        /// </summary>
+        public ItemStats GetItemStats(ItemCategory iCat)
+        {
+            if (_categorizedItemStats.Count == 0)
+                Indexing();
+
+            if (_categorizedItemStats.ContainsKey(iCat))
+                return _categorizedItemStats[iCat].Clone();
+            return new ItemStats();
+        }
+        Dictionary<ItemCategory, ItemStats> _categorizedItemStats = new Dictionary<ItemCategory, ItemStats>(); 
+#endif
 
         /// <summary>
         /// Список-заглушка, возвращаемые при отсутствии содержимого в сумке
         /// </summary>
-        static readonly List<InventorySlot> emptyList = new List<InventorySlot>();
+        static readonly ReadOnlyCollection<InventorySlot> emptyList = new ReadOnlyCollection<InventorySlot>(new List<InventorySlot>());
+        static readonly SlotCache emptySlotCache = new SlotCache(true);
 
         /// <summary>
         /// Запрещающий предикат, исключающий из анализа
@@ -83,8 +170,12 @@ namespace EntityTools.Tools.BuySellItems
         /// <param name="filters"></param>
         private void AnalizeFilters(IEnumerable<ItemFilterEntryExt> filters)
         {
-            _filters = new List<ItemFilterEntryExt>();
+            if (_filters is null)
+                _filters = new List<ItemFilterEntryExt>();
+            else _filters.Clear();
+
             _exclude = null;
+
             foreach (var f in filters)
             {
                 if (f.Mode == ItemFilterMode.Include)
@@ -115,44 +206,57 @@ namespace EntityTools.Tools.BuySellItems
         BagsList _bags = new BagsList();
 #endif
 
-
-
-        public IList<InventorySlot> this[ItemCategory cat]
+        public SlotCache this[ItemCategory cat]
         {
             get
             {
-                if (categorizedSlots.Count == 0)
+                if (_categorizedSlots.Count == 0)
                     Indexing();
 
+                if (_categorizedSlots.ContainsKey(cat))
+                    return _categorizedSlots[cat].AsReadOnly();
 
-                if (categorizedSlots.ContainsKey(cat))
-                    return categorizedSlots[cat].AsReadOnly();
-                emptyList.Clear();
-                return emptyList.AsReadOnly();
+                return emptySlotCache;
             }
         }
 
-        public IList<InventorySlot> this[ItemFilterEntryExt fItem]
+        public SlotCache this[ItemFilterEntryExt fItem]
         {
             get
             {
-                if (filteredSlots.Count == 0)
+                if (_filteredSlots.Count == 0 && _filters.Count > 0)
                     Indexing();
 
-                if (filteredSlots.ContainsKey(fItem))
-                    return filteredSlots[fItem].AsReadOnly();
-                emptyList.Clear();
-                return emptyList.AsReadOnly();
+                if (_filteredSlots.ContainsKey(fItem))
+                    return _filteredSlots[fItem].AsReadOnly();
+
+                return emptySlotCache;
             }
         }
 
+        public SlotCache this[ItemType type]
+        {
+            get
+            {
+                if (_typedSlots.Count == 0)
+                    Indexing();
+
+                if (_typedSlots.ContainsKey(type))
+                    return _typedSlots[type].AsReadOnly();
+
+                return emptySlotCache;
+            }
+        }
         /// <summary>
         ///  Очистка индекса
         /// </summary>
         public void Clear()
         {
-            categorizedSlots.Clear();
-            filteredSlots.Clear();
+            _categorizedSlots.Clear();
+            _filteredSlots.Clear();
+#if ItemStats
+            _filteredItemStats.Clear(); 
+#endif
         }
 
         /// <summary>
@@ -166,12 +270,12 @@ namespace EntityTools.Tools.BuySellItems
             StringBuilder sb = new StringBuilder();
             if (_filters == null || _filters.Count == 0)
             {
-                if (categorizedSlots == null || categorizedSlots.Count == 0)
+                if (_categorizedSlots == null || _categorizedSlots.Count == 0)
                     Indexing();
 
-                if (categorizedSlots != null && categorizedSlots.Count > 0)
+                if (_categorizedSlots != null && _categorizedSlots.Count > 0)
                 {
-                    foreach (var catSlots in categorizedSlots)
+                    foreach (var catSlots in _categorizedSlots)
                     {
                         if (catSlots.Value != null && catSlots.Value.Count > 0)
                         {
@@ -187,6 +291,8 @@ namespace EntityTools.Tools.BuySellItems
                                     catNum++;
                                 }
                                 sb.AppendLine("}");
+                                sb.Append("\tMaxItemLevel: ").AppendLine(catSlots.Value.MaxItemLevel.ToString());
+                                sb.Append("\tTotalItemsCount: ").AppendLine(catSlots.Value.TotalItemsCount.ToString());
                             }
                         }
                     }
@@ -195,12 +301,12 @@ namespace EntityTools.Tools.BuySellItems
             }
             else
             {
-                if (filteredSlots == null || filteredSlots.Count == 0)
+                if (_filteredSlots == null || _filteredSlots.Count == 0)
                     Indexing();
 
-                if (filteredSlots != null && filteredSlots.Count > 0)
+                if (_filteredSlots != null && _filteredSlots.Count > 0)
                 {
-                    foreach (var fltrSlots in filteredSlots)
+                    foreach (var fltrSlots in _filteredSlots)
                     {
                         if (fltrSlots.Value != null && fltrSlots.Value.Count > 0)
                         {
@@ -216,6 +322,8 @@ namespace EntityTools.Tools.BuySellItems
                                     catNum++;
                                 }
                                 sb.AppendLine("}");
+                                sb.Append("\tMaxItemLevel: ").AppendLine(fltrSlots.Value.MaxItemLevel.ToString());
+                                sb.Append("\tTotalItemsCount: ").AppendLine(fltrSlots.Value.TotalItemsCount.ToString());
                             }
                         }
                     }
@@ -225,7 +333,7 @@ namespace EntityTools.Tools.BuySellItems
             return sb.ToString();
         }
 
-        #region Индексирование сумки
+        #region Индексирование сумкок
         /// <summary>
         /// Анализ сумок, заданных в Bags и индексирование их содержимого.
         /// </summary>
@@ -268,18 +376,50 @@ namespace EntityTools.Tools.BuySellItems
                     if (!_exclude(slot.Item) && f.IsMatch(slot.Item))
                     {
                         // Добавляе слот в список, соответствующий фильтру
-                        if (filteredSlots.ContainsKey(f))
-                            filteredSlots[f].Add(slot);
-                        else filteredSlots.Add(f, new List<InventorySlot>() { slot });
+                        if (_filteredSlots.ContainsKey(f))
+                            _filteredSlots[f].Add(slot);
+                        else _filteredSlots.Add(f, new SlotCache(slot));
+
+                        // Добавляе слот в список, соответствующий типу
+                        ItemType itemType = slot.Item.ItemDef.Type;
+                        if (_typedSlots.ContainsKey(itemType))
+                            _typedSlots[itemType].Add(slot);
+                        else _typedSlots.Add(itemType, new SlotCache(slot));
 
                         //Сканируем все категории предмета
                         foreach (ItemCategory cat in slot.Item.ItemDef.Categories)
                         {
                             // Добавляем слот в список, соответствующий категории
-                            if (categorizedSlots.ContainsKey(cat))
-                                categorizedSlots[cat].Add(slot);
-                            else categorizedSlots.Add(cat, new List<InventorySlot>() { slot });
+                            if (_categorizedSlots.ContainsKey(cat))
+                                _categorizedSlots[cat].Add(slot);
+                            else _categorizedSlots.Add(cat, new SlotCache(slot));
+
+#if ItemStats
+                            //обновляем статистику по категориям
+                            if (_categorizedItemStats.ContainsKey(cat))
+                            {
+                                var stats = _categorizedItemStats[cat];
+                                if (stats.MaxItemLevel < slot.Item.ItemDef.Level)
+                                    stats.MaxItemLevel = slot.Item.ItemDef.Level;
+                                stats.TotalItemsCount += slot.Item.Count;
+                            }
+                            else _categorizedItemStats.Add(cat, new ItemStats(slot.Item.ItemDef.Level, slot.Item.Count));
+
+#endif
                         }
+
+#if ItemStats
+                        //обновляем статистику по фильтрам
+                        if (_filteredItemStats.ContainsKey(f))
+                        {
+                            var stats = _filteredItemStats[f];
+                            if (stats.MaxItemLevel < slot.Item.ItemDef.Level)
+                                stats.MaxItemLevel = slot.Item.ItemDef.Level;
+
+                            stats.TotalItemsCount += slot.Item.Count;
+                        }
+                        else _filteredItemStats.Add(f, new ItemStats(slot.Item.ItemDef.Level, slot.Item.Count)); 
+#endif
                     }
                 }
             }
@@ -299,18 +439,49 @@ namespace EntityTools.Tools.BuySellItems
                     if (f.IsMatch(slot.Item))
                     {
                         // Добавляе слот в список, соответствующий фильтру
-                        if (filteredSlots.ContainsKey(f))
-                            filteredSlots[f].Add(slot);
-                        else filteredSlots.Add(f, new List<InventorySlot>() { slot });
+                        if (_filteredSlots.ContainsKey(f))
+                            _filteredSlots[f].Add(slot);
+                        else _filteredSlots.Add(f, new SlotCache(slot));
+
+                        // Добавляе слот в список, соответствующий типу
+                        ItemType itemType = slot.Item.ItemDef.Type;
+                        if (_typedSlots.ContainsKey(itemType))
+                            _typedSlots[itemType].Add(slot);
+                        else _typedSlots.Add(itemType, new SlotCache(slot));
 
                         //Сканируем все категории предмета
                         foreach (ItemCategory cat in slot.Item.ItemDef.Categories)
                         {
                             // Добавляем слот в список, соответствующий категории
-                            if (categorizedSlots.ContainsKey(cat))
-                                categorizedSlots[cat].Add(slot);
-                            else categorizedSlots.Add(cat, new List<InventorySlot>() { slot });
+                            if (_categorizedSlots.ContainsKey(cat))
+                                _categorizedSlots[cat].Add(slot);
+                            else _categorizedSlots.Add(cat, new SlotCache(slot));
+
+#if ItemStats
+                            //обновляем статистику по категориям
+                            if (_categorizedItemStats.ContainsKey(cat))
+                            {
+                                var stats = _categorizedItemStats[cat];
+                                if (stats.MaxItemLevel < slot.Item.ItemDef.Level)
+                                    stats.MaxItemLevel = slot.Item.ItemDef.Level;
+                                stats.TotalItemsCount += slot.Item.Count;
+                            }
+                            else _categorizedItemStats.Add(cat, new ItemStats(slot.Item.ItemDef.Level, slot.Item.Count)); 
+#endif
                         }
+
+#if ItemStats
+                        //обновляем статистику по фильтрам
+                        if (_filteredItemStats.ContainsKey(f))
+                        {
+                            var stats = _filteredItemStats[f];
+                            if (stats.MaxItemLevel < slot.Item.ItemDef.Level)
+                                stats.MaxItemLevel = slot.Item.ItemDef.Level;
+
+                            stats.TotalItemsCount += slot.Item.Count;
+                        }
+                        else _filteredItemStats.Add(f, new ItemStats(slot.Item.ItemDef.Level, slot.Item.Count)); 
+#endif
                     }
                 }
             }
@@ -324,11 +495,31 @@ namespace EntityTools.Tools.BuySellItems
             {
                 if (!_exclude(slot.Item))
                 {
+                    // Добавляе слот в список, соответствующий типу
+                    ItemType itemType = slot.Item.ItemDef.Type;
+                    if (_typedSlots.ContainsKey(itemType))
+                        _typedSlots[itemType].Add(slot);
+                    else _typedSlots.Add(itemType, new SlotCache(slot));
+
+                    //Сканируем все категории предмета
                     foreach (ItemCategory cat in slot.Item.ItemDef.Categories)
                     {
-                        if (categorizedSlots.ContainsKey(cat))
-                            categorizedSlots[cat].Add(slot);
-                        else categorizedSlots.Add(cat, new List<InventorySlot>() { slot });
+                        // Добавляем слот в список, соответствующий категории
+                        if (_categorizedSlots.ContainsKey(cat))
+                            _categorizedSlots[cat].Add(slot);
+                        else _categorizedSlots.Add(cat, new SlotCache(slot));
+
+#if ItemStats
+                        //обновляем статистику по категориям
+                        if (_categorizedItemStats.ContainsKey(cat))
+                        {
+                            var stats = _categorizedItemStats[cat];
+                            if (stats.MaxItemLevel < slot.Item.ItemDef.Level)
+                                stats.MaxItemLevel = slot.Item.ItemDef.Level;
+                            stats.TotalItemsCount += slot.Item.Count;
+                        }
+                        else _categorizedItemStats.Add(cat, new ItemStats(slot.Item.ItemDef.Level, slot.Item.Count)); 
+#endif
                     }
                 }
             }
@@ -340,11 +531,31 @@ namespace EntityTools.Tools.BuySellItems
         {
             foreach (InventorySlot slot in slots)
             {
+                // Добавляе слот в список, соответствующий типу
+                ItemType itemType = slot.Item.ItemDef.Type;
+                if (_typedSlots.ContainsKey(itemType))
+                    _typedSlots[itemType].Add(slot);
+                else _typedSlots.Add(itemType, new SlotCache(slot));
+
+                //Сканируем все категории предмета
                 foreach (ItemCategory cat in slot.Item.ItemDef.Categories)
                 {
-                    if (categorizedSlots.ContainsKey(cat))
-                        categorizedSlots[cat].Add(slot);
-                    else categorizedSlots.Add(cat, new List<InventorySlot>() { slot });
+                    // Добавляем слот в список, соответствующий категории
+                    if (_categorizedSlots.ContainsKey(cat))
+                        _categorizedSlots[cat].Add(slot);
+                    else _categorizedSlots.Add(cat, new SlotCache( slot ));
+
+#if ItemStats
+                    //обновляем статистику по категориям
+                    if (_categorizedItemStats.ContainsKey(cat))
+                    {
+                        var stats = _categorizedItemStats[cat];
+                        if (stats.MaxItemLevel < slot.Item.ItemDef.Level)
+                            stats.MaxItemLevel = slot.Item.ItemDef.Level;
+                        stats.TotalItemsCount += slot.Item.Count;
+                    }
+                    else _categorizedItemStats.Add(cat, new ItemStats(slot.Item.ItemDef.Level, slot.Item.Count)); 
+#endif
                 }
             }
         } 

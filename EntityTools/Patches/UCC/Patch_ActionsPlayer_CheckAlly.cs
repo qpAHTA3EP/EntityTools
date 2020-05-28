@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using EntityTools.Reflection;
 
-namespace EntityTools.Patches
+namespace EntityTools.Patches.UCC
 {
 #if DEVELOPER
     ///

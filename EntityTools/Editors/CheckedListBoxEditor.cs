@@ -98,6 +98,8 @@ namespace EntityTools.Editors
                 bags = new BagsList(null);
                 foreach (InvBagIDs id in cbx.CheckedItems)
                     bags[id] = true;
+
+                return bags;
             }
             return value;
         }

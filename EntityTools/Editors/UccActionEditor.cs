@@ -11,8 +11,13 @@ namespace EntityTools.Editors
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
+#if false
             if (UCCEditorExtensions.GetUccAction(out UCCAction uccAction))
-                return uccAction;
+                return uccAction; 
+#else
+            if (EntityTools.Core.GUIRequest_UCCAction(out UCCAction action))
+                return action;
+#endif
 
             return value;
         }

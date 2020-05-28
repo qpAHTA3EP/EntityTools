@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using EntityTools.Patches.UCC;
 
 namespace EntityTools.Patches
 {
@@ -46,27 +47,40 @@ namespace EntityTools.Patches
 
 #endif
         /// <summary>
-        /// Подмена 
+        /// Подмена ActionsPlayer.CheckAlly(..)
         /// </summary>
         private static Patch_ActionsPlayer_CheckAlly patchActionsPlayerCheckAlly = new Patch_ActionsPlayer_CheckAlly();
+
+        private static Patch_AddClass_Show patchAddClassShow = new Patch_AddClass_Show();
 
         static bool Applied = false;
         public static void Apply()
         {
             if (!Applied)
             {
-                //foreach(var field in typeof(Patcher).GetFields(BindingFlags.NonPublic | BindingFlags.Static))
-                //{
-                //    if (field.GetValue(null) is Patch patch
-                //        && patch != null)
-                //    {
-                //        patch.Inject();
-                //    }
-                //}
+#if true
+                foreach (var field in typeof(ETPatcher).GetFields(BindingFlags.NonPublic | BindingFlags.Static))
+                {
+                    if (field.GetValue(null) is Patch patch
+                        && patch != null)
+                    {
+                        patch.Inject();
+                    }
+#if false
+                    else
+                    {
+                        ETLogger.WriteLine($"Faild to apply patch '{field.FieldType.Name}' named '{field.Name}'");
+                    } 
+#endif
+                }
+#else
 
                 patchMapper?.Inject();
 
                 patchActionsPlayerCheckAlly.Inject();
+
+                PatchAddClassShow.Inject();
+#endif
 
 #if Patch_AstralXmlSerializer
                 patchXmlSerializerGetExtraTypes.Inject();

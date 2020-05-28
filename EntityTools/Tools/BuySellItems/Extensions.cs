@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using static EntityTools.Tools.BuySellItems.ItemFilterEntryExt;
 
 namespace EntityTools.Extensions
 {
@@ -47,6 +48,7 @@ namespace EntityTools.Extensions
             return num;
         }
 
+#if false
         /// <summary>
         /// Подсчет количества предметов, заданных данной позицией списка покупок, которые необходимо (до)купить
         /// </summary>
@@ -54,6 +56,7 @@ namespace EntityTools.Extensions
         /// <returns></returns>
         public static uint NumberOfItem2Buy(this IndexedBags bags, ItemFilterEntryExt item2buy)
         {
+            неправильно.если заданы опции 'CheckEquipmentLevel' или 'CheckEquipmentLevel' при расчете должен учитываться предмет, который покупается.
             uint toBuyNum = item2buy.Count;
             if (item2buy.KeepNumber)
             {
@@ -72,6 +75,7 @@ namespace EntityTools.Extensions
         /// <returns></returns>
         public static uint NumberOfItem2Buy(this BagsList bags, ItemFilterEntryExt item2buy)
         {
+            неправильно.если заданы опции 'CheckEquipmentLevel' или 'CheckEquipmentLevel' при расчете должен учитываться предмет, который покупается.
             uint toBuyNum = item2buy.Count;
             if (item2buy.KeepNumber)
             {
@@ -82,6 +86,178 @@ namespace EntityTools.Extensions
             }
             return toBuyNum;
         }
+#if ReadOnlyItemFilterEntryExt
+        public static uint NumberOfItem2Buy(this KeyValuePair<ReadOnlyItemFilterEntryExt, SlotCache> filterEntryCache)
+#else
+        public static uint NumberOfItem2Buy(this KeyValuePair<ItemFilterEntryExt, SlotCache> filterEntryCache)
+#endif
+        {
+            неправильно.если заданы опции 'CheckEquipmentLevel' или 'CheckEquipmentLevel' при расчете должен учитываться предмет, который покупается.
+            uint toBuyNum = filterEntryCache.Key.Count;
+            if (filterEntryCache.Key.KeepNumber)
+            {
+#if false
+                uint haveItemNum = bags.CountItems(item2buy);
+                if (haveItemNum < toBuyNum)
+                    toBuyNum -= haveItemNum;
+                else toBuyNum = 0; 
+#else
+                if (filterEntryCache.Value.TotalItemsCount < toBuyNum)
+                    toBuyNum -= filterEntryCache.Value.TotalItemsCount;
+                else toBuyNum = 0;
+#endif
+            }
+            return toBuyNum;
+        }
+        public static uint NumberOfItem2Buy(this SlotCache slotCache, ItemFilterEntryExt filterEntry)
+        {
+            неправильно.если заданы опции 'CheckEquipmentLevel' или 'CheckEquipmentLevel' при расчете должен учитываться предмет, который покупается.
+            uint toBuyNum = filterEntry.Count;
+            if (filterEntry.KeepNumber)
+            {
+#if false
+                uint haveItemNum = bags.CountItems(item2buy);
+                if (haveItemNum < toBuyNum)
+                    toBuyNum -= haveItemNum;
+                else toBuyNum = 0; 
+#else
+                if (slotCache.TotalItemsCount < toBuyNum)
+                    toBuyNum -= slotCache.TotalItemsCount;
+                else toBuyNum = 0;
+#endif
+            }
+            return toBuyNum;
+        } 
+#endif
+        /// <summary>
+        /// Подсчет в сумках bags количества предметов, соответствующих фильтру filterEntry,
+        /// и вычисление количества предметов storeItem, которые необходимо (до)купить
+        /// </summary>
+        /// <param name="storeItem"></param>
+        /// <param name="slotCache"></param>
+        /// <param name="filterEntry"></param>
+        /// <returns></returns>
+        public static uint NumberOfItem2Buy(this StoreItemInfo storeItem, BagsList bags, ItemFilterEntryExt filterEntry)
+        {
+            uint toBuyNum = filterEntry.Count;
+
+            if (filterEntry.KeepNumber)
+            {
+                if (filterEntry.CheckEquipmentLevel)
+                {
+                    //если заданы опциz 'CheckEquipmentLevel',
+                    //тогда при подсчете должео производиться сравнение с предметом, который покупается.
+
+                    // Подсчитываем количество предметов, соответствующих filterEntry
+                    uint hasNum = 0;
+                    if (storeItem.Item.ItemDef.ProgressionDef.IsValid)
+                    {
+                        // Предмет может быть "обработан" (апгрейжен), поэтому сравнивать по уровню предмета нет смысла
+                        foreach (var slot in bags.GetItems())
+                        {
+                            if (filterEntry.IsMatch(slot))
+                            {
+                                if (storeItem.Item.IsRecommended(slot.Item))
+                                    hasNum += slot.Item.Count;
+                                else if (!slot.Item.IsRecommended(storeItem.Item))
+                                {
+                                    // Если storeItem НЕ лучше чем slot.Item
+                                    // и при этом slot.Item НЕ лучше чем storeItem
+                                    // значит они одинаковые
+                                    hasNum += slot.Item.Count;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Предмет не может быть "обработан" (апгрейжен)
+                        // сравниваем по уровню предмета
+                        foreach (var slot in bags.GetItems())
+                        {
+                            if (filterEntry.IsMatch(slot)
+                                && storeItem.Item.ItemDef.Level >= slot.Item.ItemDef.Level)
+                                hasNum += slot.Item.Count;
+                        }
+                        if (hasNum < toBuyNum)
+                            toBuyNum -= hasNum;
+                        else toBuyNum = 0;
+                    }
+                }
+                else
+                {
+                    uint hasItems = bags.CountItems(filterEntry);
+                    if (hasItems < toBuyNum)
+                        toBuyNum -= hasItems;
+                    else toBuyNum = 0;
+                }
+            }
+            return toBuyNum;
+        }
+
+        /// <summary>
+        /// Подсчет в slotCache количества предметов, соответствующих фильтру filterEntry
+        /// и вычисление количества предметов storeItem, которые необходимо (до)купить
+        /// </summary>
+        /// <param name="storeItem"></param>
+        /// <param name="slotCache"></param>
+        /// <param name="filterEntry"></param>
+        /// <returns></returns>
+        public static uint NumberOfItem2Buy(this StoreItemInfo storeItem,  SlotCache slotCache, ItemFilterEntryExt filterEntry)
+        {
+            uint toBuyNum = filterEntry.Count;
+
+            if (filterEntry.KeepNumber && slotCache.Slots.Count > 0)
+            {
+                if (filterEntry.CheckEquipmentLevel)
+                {
+                    //если заданы опциz 'CheckEquipmentLevel',
+                    //тогда при подсчете должео производиться сравнение с предметом, который покупается.
+
+                    // Подсчитываем количество предметов, соответствующих filterEntry
+                    uint hasNum = 0;
+                    if (storeItem.Item.ItemDef.ProgressionDef.IsValid)
+                    {
+                        // Предмет может быть "обработан" (апгрейжен), поэтому сравнивать по уровню предмета нет смысла
+                        foreach (var slot in slotCache.Slots)
+                        {
+                            if (filterEntry.IsMatch(slot))
+                            {
+                                if (storeItem.Item.IsRecommended(slot.Item))
+                                    hasNum += slot.Item.Count;
+                                else if (!slot.Item.IsRecommended(storeItem.Item))
+                                {
+                                    // Если storeItem НЕ лучше чем slot.Item
+                                    // и при этом slot.Item НЕ лучше чем storeItem
+                                    // значит они одинаковые
+                                    hasNum += slot.Item.Count;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Предмет не может быть "обработан" (апгрейжен)
+                        // сравниваем по уровню предмета
+                        foreach (var slot in slotCache.Slots)
+                            if (filterEntry.IsMatch(slot)
+                                && storeItem.Item.ItemDef.Level >= slot.Item.ItemDef.Level)
+                                    hasNum += slot.Item.Count;
+                    }
+                    if (hasNum < toBuyNum)
+                        toBuyNum -= hasNum;
+                    else toBuyNum = 0;
+                }
+                else
+                {
+                    if (slotCache.TotalItemsCount < toBuyNum)
+                        toBuyNum -= slotCache.TotalItemsCount;
+                    else toBuyNum = 0;
+                }
+            }
+            return toBuyNum;
+        }
+
 
         /// <summary>
         /// Проверка соответствия уровню персонажа
@@ -107,7 +283,7 @@ namespace EntityTools.Extensions
         /// <param name="bags"></param>
         /// <param name="storeItem"></param>
         /// <returns></returns>
-        public static bool IsBetterEquipmentLevel(this BagsList bags, StoreItemInfo storeItem)
+        public static bool ContainsBetterItemEquipmentLevel(this BagsList bags, StoreItemInfo storeItem)
         {
             var restrictBags = storeItem.Item.ItemDef.RestrictBagIDs;
             if (restrictBags.Count > 0)
@@ -124,10 +300,11 @@ namespace EntityTools.Extensions
                         //restrictBagsList[bagId] = true;
                     } 
 #else
-                isEquitable = storeItem.Item.ItemDef.RestrictBagIDs.FindIndex((bagId) => BagsList.IsEquipmentsBag(bagId)) >= 0;
+                var equipBags = storeItem.Item.ItemDef.RestrictBagIDs.FindAll((bagId) => BagsList.IsEquipmentsBag(bagId));
+                isEquitable = equipBags.Count > 0;
 #endif
 
-                uint maxItemLevel = storeItem.Item.ItemDef.Level;
+                uint maxItemLevel = 0;
                 if (isEquitable)
                 {
                     // Предмет может быть экипирован
@@ -138,7 +315,8 @@ namespace EntityTools.Extensions
                         {
                             uint bagItemLvl = bagSlot.Item.ItemDef.Level;
                             if (bagItemLvl > maxItemLevel
-                                && bagSlot.Item.ItemDef.RestrictBagIDs.ContainsAny(restrictBags))
+                                // && bagSlot.Item.ItemDef.RestrictBagIDs.Count > 0
+                                && bagSlot.Item.ItemDef.RestrictBagIDs.ContainsAny(equipBags))//Any((bagId) => equipBags.Contains(bagId)))
                                 maxItemLevel = bagItemLvl;
                         }
                     }
@@ -146,6 +324,62 @@ namespace EntityTools.Extensions
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Сопоставление предмета в магазине со всеми предметами в сумке.
+        /// Покупаемый предмет должен быть лучше всех предметов в сумке, соответствующих фильтру
+        /// </summary>
+        /// <param name="filterEntryCache"></param>
+        /// <param name="storeItem"></param>
+        /// <returns></returns>
+        public static bool HasWorseThen<KeyType>(this KeyValuePair<KeyType, SlotCache> filterEntryCache, StoreItemInfo storeItem)
+        {
+            if(storeItem.Item.ItemDef.ProgressionDef.IsValid)
+            {
+                // Предмет может быть "обработан" (апгрейжен), поэтому сравнивать по уровню предмета нет смысла
+                if(filterEntryCache.Value.Slots.Count > 0)
+                {
+                    foreach (var slot in filterEntryCache.Value.Slots)
+                        if (!storeItem.Item.IsRecommended(slot.Item))
+                            return false;
+                }
+            }
+            else
+            {
+                // Предмет не быть "обработан" (апгрейжен)
+                // сравниваем по уровню предмета
+                return filterEntryCache.Value.MaxItemLevel <= storeItem.Item.ItemDef.Level;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Сопоставление предмета в магазине с предметами в сумке
+        /// Покупаемый предмет должен быть лучше всех предметов в сумке, соответствующих фильтру
+        /// </summary>
+        /// <param name="slotCache"></param>
+        /// <param name="storeItem"></param>
+        /// <returns></returns>
+        public static bool HasWorseThen(this SlotCache slotCache, StoreItemInfo storeItem)
+        {
+            if (storeItem.Item.ItemDef.ProgressionDef.IsValid)
+            {
+                // Предмет может быть "обработан" (апгрейжен), поэтому сравнивать по уровню предмета нет смысла
+                if (slotCache.Slots.Count > 0)
+                {
+                    foreach (var slot in slotCache.Slots)
+                        if (!storeItem.Item.IsRecommended(slot.Item))
+                            return false;
+                }
+            }
+            else
+            {
+                // Предмет не может быть "обработан" (апгрейжен)
+                // сравниваем по уровню предмета
+                return slotCache.MaxItemLevel <= storeItem.Item.ItemDef.Level;
+            }
+            return true;
         }
 
         /// <summary>

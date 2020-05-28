@@ -31,8 +31,8 @@
             this.btnSelect = new DevExpress.XtraEditors.SimpleButton();
             this.btnReload = new DevExpress.XtraEditors.SimpleButton();
             this.lbl = new System.Windows.Forms.Label();
-            this.Items = new DevExpress.XtraEditors.CheckedListBoxControl();
-            ((System.ComponentModel.ISupportInitialize)(this.Items)).BeginInit();
+            this.ItemList = new DevExpress.XtraEditors.CheckedListBoxControl();
+            ((System.ComponentModel.ISupportInitialize)(this.ItemList)).BeginInit();
             this.SuspendLayout();
             // 
             // btnSelect
@@ -73,15 +73,15 @@
             // 
             // Items
             // 
-            this.Items.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.ItemList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.Items.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
-            this.Items.CheckOnClick = true;
-            this.Items.Location = new System.Drawing.Point(12, 36);
-            this.Items.Name = "Items";
-            this.Items.Size = new System.Drawing.Size(300, 315);
-            this.Items.SortOrder = System.Windows.Forms.SortOrder.Ascending;
-            this.Items.TabIndex = 5;
+            this.ItemList.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
+            this.ItemList.CheckOnClick = true;
+            this.ItemList.Location = new System.Drawing.Point(12, 36);
+            this.ItemList.Name = "Items";
+            this.ItemList.Size = new System.Drawing.Size(300, 315);
+            this.ItemList.SortOrder = System.Windows.Forms.SortOrder.Ascending;
+            this.ItemList.TabIndex = 5;
             // 
             // MultiItemSelectForm
             // 
@@ -89,7 +89,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(324, 402);
-            this.Controls.Add(this.Items);
+            this.Controls.Add(this.ItemList);
             this.Controls.Add(this.lbl);
             this.Controls.Add(this.btnReload);
             this.Controls.Add(this.btnSelect);
@@ -103,7 +103,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "MultiSelectForm";
             this.Shown += new System.EventHandler(this.MultiSelectForm_Shown);
-            ((System.ComponentModel.ISupportInitialize)(this.Items)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ItemList)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -113,6 +113,6 @@
         internal DevExpress.XtraEditors.SimpleButton btnSelect;
         internal DevExpress.XtraEditors.SimpleButton btnReload;
         internal System.Windows.Forms.Label lbl;
-        private DevExpress.XtraEditors.CheckedListBoxControl Items;
+        private DevExpress.XtraEditors.CheckedListBoxControl ItemList;
     }
 }

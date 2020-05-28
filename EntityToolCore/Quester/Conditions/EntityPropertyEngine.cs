@@ -57,15 +57,18 @@ namespace EntityCore.Quester.Conditions
         {
             if (object.ReferenceEquals(sender, @this))
             {
-                if (e.PropertyName == nameof(@this.EntityID) 
-                    || e.PropertyName == nameof(@this.PropertyType) 
-                    || e.PropertyName == nameof(@this.Sign) 
+                if (e.PropertyName == nameof(@this.EntityID)
+                    || e.PropertyName == nameof(@this.PropertyType)
+                    || e.PropertyName == nameof(@this.Sign)
                     || e.PropertyName == nameof(@this.Value))
                     label = string.Empty;
                 else if (e.PropertyName == nameof(@this.EntityID)
                         || e.PropertyName == nameof(@this.EntityIdType)
                         || e.PropertyName == nameof(@this.EntityNameType))
+                {
+                    label = string.Empty;
                     checkEntity = internal_CheckEntity_Initializer;
+                }
                 else if (e.PropertyName == nameof(@this.CustomRegionNames))
                     getCustomRegions = internal_GetCustomRegion_Initializer;
 
@@ -262,44 +265,44 @@ namespace EntityCore.Quester.Conditions
                             switch (@this.Sign)
                             {
                                 case Relation.Equal:
-                                    return result = (entity.Location.Distance3DFromPlayer == @this.Value);
+                                    return result = (entity.Location.Distance3DFromPlayer == @this._value);
                                 case Relation.NotEqual:
-                                    return result = (entity.Location.Distance3DFromPlayer != @this.Value);
+                                    return result = (entity.Location.Distance3DFromPlayer != @this._value);
                                 case Relation.Inferior:
-                                    return result = (entity.Location.Distance3DFromPlayer < @this.Value);
+                                    return result = (entity.Location.Distance3DFromPlayer < @this._value);
                                 case Relation.Superior:
-                                    return result = (entity.Location.Distance3DFromPlayer > @this.Value);
+                                    return result = (entity.Location.Distance3DFromPlayer > @this._value);
                             }
                             break;
                         case EntityPropertyType.HealthPercent:
                             switch (@this.Sign)
                             {
                                 case Relation.Equal:
-                                    return result = (entity.Character?.AttribsBasic?.HealthPercent == @this.Value);
+                                    return result = (entity.Character?.AttribsBasic?.HealthPercent == @this._value);
                                 case Relation.NotEqual:
-                                    return result = (entity.Character?.AttribsBasic?.HealthPercent != @this.Value);
+                                    return result = (entity.Character?.AttribsBasic?.HealthPercent != @this._value);
                                 case Relation.Inferior:
-                                    return result = (entity.Character?.AttribsBasic?.HealthPercent < @this.Value);
+                                    return result = (entity.Character?.AttribsBasic?.HealthPercent < @this._value);
                                 case Relation.Superior:
-                                    return result = (entity.Character?.AttribsBasic?.HealthPercent > @this.Value);
+                                    return result = (entity.Character?.AttribsBasic?.HealthPercent > @this._value);
                             }
                             break;
                         case EntityPropertyType.ZAxis:
                             switch (@this.Sign)
                             {
                                 case Relation.Equal:
-                                    return result = (entity.Location.Z == @this.Value);
+                                    return result = (entity.Location.Z == @this._value);
                                 case Relation.NotEqual:
-                                    return result = (entity.Location.Z != @this.Value);
+                                    return result = (entity.Location.Z != @this._value);
                                 case Relation.Inferior:
-                                    return result = (entity.Location.Z < @this.Value);
+                                    return result = (entity.Location.Z < @this._value);
                                 case Relation.Superior:
-                                    return result = (entity.Location.Z > @this.Value);
+                                    return result = (entity.Location.Z > @this._value);
                             }
                             break;
                     }
                 }
-                else return (@this.PropertyType == EntityPropertyType.Distance && @this.Sign == Relation.Superior);
+                else return (@this._propertyType == EntityPropertyType.Distance && @this._sign == Relation.Superior);
 
                 return false;
             }

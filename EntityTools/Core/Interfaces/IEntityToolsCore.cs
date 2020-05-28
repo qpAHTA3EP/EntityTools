@@ -27,6 +27,8 @@ namespace EntityTools.Core.Interfaces
         bool GUIRequest_NodeLocation(ref Vector3 pos, string caption);
         bool GUIRequest_NPCInfos(ref NPCInfos npc);
 
+        bool GUIRequest_UCCAction(out Astral.Logic.UCC.Classes.UCCAction action);
+
         string EntityDiagnosticInfos(object obj);
 #endif
 #if DEBUG

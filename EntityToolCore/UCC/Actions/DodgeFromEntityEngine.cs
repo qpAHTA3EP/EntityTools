@@ -454,8 +454,7 @@ namespace EntityCore.UCC.Actions
 
             // список всех Entity, удовлетворяющих условиям
             LinkedList<Entity> entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                                     @this._healthCheck, @this._reactionRange, 
-                                                                     (@this._reactionZRange > 0) ? @this._reactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference,
+                                                                     @this._healthCheck, 0, 0,
                                                                      @this._regionCheck, null, @this._aura.Checker);
 
 
@@ -467,20 +466,30 @@ namespace EntityCore.UCC.Actions
 
             // Ближайшее Entity (найдено при вызове ie.NeedToRun, поэтому строка ниже закомментирована)
             entity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                    @this._healthCheck, @this._reactionRange,
-                                                    (@this._reactionZRange > 0) ? @this._reactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference, 
+                                                    @this._healthCheck, 0, 0, 
                                                     @this._regionCheck, null, @this._aura.Checker);
             if (entity != null)
             {
-                sb.Append("Target: ").AppendLine(entity.ToString());
+                bool distOk = entity.Location.Distance3DFromPlayer < @this._reactionRange;
+                bool zOk = Astral.Logic.General.ZAxisDiffFromPlayer(entity.Location) < @this._reactionZRange;
+                sb.Append("ClosestEntity: ").Append(entity.ToString());
+                if (distOk && zOk)
+                    sb.AppendLine(" [MATCH]");
+                else sb.AppendLine(" [MISMATCH]");
                 sb.Append("\tName: ").AppendLine(entity.Name);
                 sb.Append("\tInternalName: ").AppendLine(entity.InternalName);
                 sb.Append("\tNameUntranslated: ").AppendLine(entity.NameUntranslated);
                 sb.Append("\tIsDead: ").AppendLine(entity.IsDead.ToString());
                 sb.Append("\tRegion: '").Append(entity.RegionInternalName).AppendLine("'");
                 sb.Append("\tLocation: ").AppendLine(entity.Location.ToString());
-                sb.Append("\tDistance: ").AppendLine(entity.Location.Distance3DFromPlayer.ToString());
-                sb.Append("\tZAxisDiff: ").AppendLine(Astral.Logic.General.ZAxisDiffFromPlayer(entity.Location).ToString());
+                sb.Append("\tDistance: ").Append(entity.Location.Distance3DFromPlayer.ToString());
+                if (distOk)
+                    sb.AppendLine(" [OK]");
+                else sb.AppendLine(" [too FAR]");
+                sb.Append("\tZAxisDiff: ").Append(Astral.Logic.General.ZAxisDiffFromPlayer(entity.Location).ToString());
+                if (zOk)
+                    sb.AppendLine(" [OK]");
+                else sb.AppendLine(" [too FAR]");
             }
             else sb.AppendLine("Closest Entity not found!");
 

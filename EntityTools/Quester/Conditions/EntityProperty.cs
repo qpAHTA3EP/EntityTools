@@ -167,7 +167,7 @@ namespace EntityTools.Quester.Conditions
 #if DEVELOPER
         [Description("The maximum distance from the character within which the Entity is searched\n" +
             "The default value is 0, which disables distance checking")]
-        [Category("Entity optional checks")]
+        [Category("Optional")]
 #else
         [Browsable(false)]
 #endif

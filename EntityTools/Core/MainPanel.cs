@@ -873,8 +873,8 @@ namespace EntityTools.Core
         {
 #if DEVELOPER
             if (ckbDebugMonitor.Checked)
-                Patches.Patch_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = ShowMonitor;
-            else Patches.Patch_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = null; 
+                Patches.UCC.Patch_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = ShowMonitor;
+            else Patches.UCC.Patch_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = null; 
 #endif
         }
 

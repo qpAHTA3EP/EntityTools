@@ -14,6 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using EntityTools.Tools.BuySellItems;
 
 namespace EntityCore.UCC.Actions
 {
@@ -131,15 +132,34 @@ namespace EntityCore.UCC.Actions
                 if(patternPos == SimplePatternPos.None)
                     patternPos = @this._itemId.GetSimplePatternPosition(out itemIdPattern);
 
+                int bagsNum = 0;
                 foreach (InvBagIDs bagId in @this._bags)
                 {
                     if (bagId != InvBagIDs.None)
                     {
+                        bagsNum++;
                         InventorySlot iSlot = EntityManager.LocalPlayer.GetInventoryBagById(bagId).GetItems.Find(checkSlot);
 
                         if (iSlot != null && iSlot.IsValid && iSlot.Item.Count > 0
                             && (iSlot.BagId == InvBagIDs.Potions || iSlot.Item.ItemDef.CanUseUnequipped))
                             return itemSlotChache = iSlot;
+                    }
+                }
+
+                if(bagsNum == 0)
+                {
+                    // Не задано ни одной сумки - ищем в сумках персонажа и в Potions
+                    foreach (InvBagIDs bagId in BagsList.GetPlayerBagsAndPotions())
+                    {
+                        if (bagId != InvBagIDs.None)
+                        {
+                            bagsNum++;
+                            InventorySlot iSlot = EntityManager.LocalPlayer.GetInventoryBagById(bagId).GetItems.Find(checkSlot);
+
+                            if (iSlot != null && iSlot.IsValid && iSlot.Item.Count > 0
+                                && (iSlot.BagId == InvBagIDs.Potions || iSlot.Item.ItemDef.CanUseUnequipped))
+                                return itemSlotChache = iSlot;
+                        }
                     }
                 }
             }

@@ -66,9 +66,9 @@
             this.lbl.AutoSize = true;
             this.lbl.Location = new System.Drawing.Point(9, 9);
             this.lbl.Name = "lbl";
-            this.lbl.Size = new System.Drawing.Size(166, 13);
+            this.lbl.Size = new System.Drawing.Size(138, 13);
             this.lbl.TabIndex = 2;
-            this.lbl.Text = "Select several items from the list:";
+            this.lbl.Text = "Select an item from the list:";
             // 
             // ItemList
             // 
@@ -76,12 +76,12 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ItemList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.ItemList.FormattingEnabled = true;
             this.ItemList.Location = new System.Drawing.Point(12, 37);
             this.ItemList.Name = "ItemList";
             this.ItemList.Size = new System.Drawing.Size(300, 314);
-            this.ItemList.Sorted = true;
             this.ItemList.TabIndex = 3;
+            this.ItemList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ItemList_KeyDown);
+            this.ItemList.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ItemList_KeyPress);
             // 
             // ItemSelectForm
             // 
