@@ -471,25 +471,28 @@ namespace EntityCore.UCC.Actions
             if (entity != null)
             {
                 bool distOk = entity.Location.Distance3DFromPlayer < @this._reactionRange;
-                bool zOk = Astral.Logic.General.ZAxisDiffFromPlayer(entity.Location) < @this._reactionZRange;
+                bool zOk = @this._reactionZRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(entity.Location) < @this._reactionZRange;
+                bool alive = !@this._healthCheck || !entity.IsDead;
                 sb.Append("ClosestEntity: ").Append(entity.ToString());
-                if (distOk && zOk)
+                if (distOk && zOk && alive)
                     sb.AppendLine(" [MATCH]");
                 else sb.AppendLine(" [MISMATCH]");
                 sb.Append("\tName: ").AppendLine(entity.Name);
                 sb.Append("\tInternalName: ").AppendLine(entity.InternalName);
                 sb.Append("\tNameUntranslated: ").AppendLine(entity.NameUntranslated);
-                sb.Append("\tIsDead: ").AppendLine(entity.IsDead.ToString());
-                sb.Append("\tRegion: '").Append(entity.RegionInternalName).AppendLine("'");
+                sb.Append("\tIsDead: ").Append(entity.IsDead.ToString());
+                if (alive)
+                    sb.AppendLine(" [OK]");
+                else sb.AppendLine(" [FAIL]"); sb.Append("\tRegion: '").Append(entity.RegionInternalName).AppendLine("'");
                 sb.Append("\tLocation: ").AppendLine(entity.Location.ToString());
                 sb.Append("\tDistance: ").Append(entity.Location.Distance3DFromPlayer.ToString());
                 if (distOk)
                     sb.AppendLine(" [OK]");
-                else sb.AppendLine(" [too FAR]");
+                else sb.AppendLine(" [FAIL]");
                 sb.Append("\tZAxisDiff: ").Append(Astral.Logic.General.ZAxisDiffFromPlayer(entity.Location).ToString());
                 if (zOk)
                     sb.AppendLine(" [OK]");
-                else sb.AppendLine(" [too FAR]");
+                else sb.AppendLine(" [FAIL]");
             }
             else sb.AppendLine("Closest Entity not found!");
 

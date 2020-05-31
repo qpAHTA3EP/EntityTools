@@ -35,7 +35,7 @@ namespace EntityCore
 {
     public class Engine : IEntityToolsCore
     {
-        internal static LinkedList<object> list = new LinkedList<object>();
+        //internal static LinkedList<object> list = new LinkedList<object>();
         internal static Dictionary<object, object> dictionary = new Dictionary<object, object>();
 
         public Engine()

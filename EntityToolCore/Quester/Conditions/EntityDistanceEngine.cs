@@ -76,20 +76,27 @@ namespace EntityCore.Quester.Conditions
 
             sb.AppendLine();
 
+#if false
             List<Entity> entities = /*SearchCached.FindAllEntity(@this.EntityID, @this.EntityIdType, EntityNameType.co, @this.EntitySetType,
                 @this.HealthCheck, @this.ReactionRange, @this.ReactionZRange, @this.RegionCheck, customRegions);*/
-                                        EntitySelectionTools.FindAllEntities(EntityManager.GetEntities(), @this._entityID, @this._entityIdType, EntityNameType.NameUntranslated, false, @this._regionCheck);
-
+                                EntitySelectionTools.FindAllEntities(EntityManager.GetEntities(), @this._entityID, @this._entityIdType, EntityNameType.NameUntranslated, false, @this._regionCheck);
+#else
+            LinkedList<Entity> entities = SearchCached.FindAllEntity(@this._entityID, @this._entityIdType, EntityNameType.NameUntranslated, EntitySetType.Complete, false, 0, 0, @this._regionCheck);
+#endif
             // Количество Entity, удовлетворяющих условиям
-            if (entities != null)
+            if (entities != null && entities.Count > 0)
                 sb.Append("Founded Entities: ").AppendLine(entities.Count.ToString());
             else sb.Append("Founded Entities: 0");
             sb.AppendLine();
 
+#if false
             // Ближайшее Entity
             Entity closestEntity = /*SearchCached.FindClosestEntity(@this.EntityID, @this.EntityIdType,
                                     @this.EntityNameType, @this.EntitySetType, @this.HealthCheck, @this.ReactionRange, @this.ReactionZRange, @this.RegionCheck, customRegions);*/
                                     EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), @this._entityID, @this._entityIdType, EntityNameType.NameUntranslated, false, 0, @this._regionCheck);
+#else
+            Entity closestEntity = SearchCached.FindClosestEntity(@this._entityID, @this._entityIdType, EntityNameType.NameUntranslated, EntitySetType.Complete, false, 0, 0, @this._regionCheck);
+#endif
             if (closestEntity != null && closestEntity.IsValid)
             {
                 sb.Append("ClosectEntity: ").AppendLine(closestEntity.ToString());
@@ -114,8 +121,11 @@ namespace EntityCore.Quester.Conditions
             {
                 if (!string.IsNullOrEmpty(@this._entityID))
                 {
+#if false
                     Entity closestEntity = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), @this._entityID, @this._entityIdType, EntityNameType.NameUntranslated, false, 0, @this._regionCheck);
-
+#else
+                    Entity closestEntity = SearchCached.FindClosestEntity(@this._entityID, @this._entityIdType, EntityNameType.NameUntranslated, EntitySetType.Complete, false, 0, 0, @this._regionCheck);
+#endif
                     bool result = false;
                     switch (@this._sign)
                     {
@@ -140,8 +150,11 @@ namespace EntityCore.Quester.Conditions
         {
             get
             {
+#if false
                 Entity closestEntity = EntitySelectionTools.FindClosestEntity(EntityManager.GetEntities(), @this._entityID, @this._entityIdType, EntityNameType.NameUntranslated, false, 0, @this._regionCheck);
-
+#else
+                Entity closestEntity = SearchCached.FindClosestEntity(@this._entityID, @this._entityIdType, EntityNameType.NameUntranslated, EntitySetType.Complete, false, 0, 0, @this._regionCheck);
+#endif
                 if (closestEntity.IsValid)
                      return $"Found closect Entity [{closestEntity.NameUntranslated}] at the {nameof(@this.Distance)} = {closestEntity.Location.Distance3DFromPlayer}";
                 else return $"No one Entity matched to [{@this._entityID}]";

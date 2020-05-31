@@ -223,18 +223,39 @@ namespace EntityCore.Quester.Conditions
             sb.AppendLine();
 
             // Ближайшее Entity
+#if false
             Entity closestEntity = SearchCached.FindClosestEntity(@this.EntityID, @this.EntityIdType,
-                                    @this.EntityNameType, @this.EntitySetType, @this.HealthCheck, @this.ReactionRange, @this.ReactionZRange, @this.RegionCheck, getCustomRegions());
+                            @this.EntityNameType, @this.EntitySetType, @this.HealthCheck, @this.ReactionRange, @this.ReactionZRange, @this.RegionCheck, getCustomRegions());
+#else
+            Entity closestEntity = SearchCached.FindClosestEntity(@this.EntityID, @this.EntityIdType,
+                @this.EntityNameType, @this.EntitySetType, false, 0, 0, @this.RegionCheck, getCustomRegions());
+
+#endif
             if (closestEntity != null && closestEntity.IsValid)
             {
-                sb.Append("ClosectEntity: ").AppendLine(closestEntity.ToString());
+                bool distOk = closestEntity.Location.Distance3DFromPlayer < @this._reactionRange;
+                bool zOk = @this._reactionZRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(closestEntity.Location) < @this._reactionZRange;
+                bool alive = !@this._healthCheck || !closestEntity.IsDead;
+                sb.Append("ClosestEntity: ").Append(closestEntity.ToString());
+                if (distOk && zOk && alive)
+                    sb.AppendLine(" [MATCH]");
+                else sb.AppendLine(" [MISMATCH]");
                 sb.Append("\tName: ").AppendLine(closestEntity.Name);
                 sb.Append("\tInternalName: ").AppendLine(closestEntity.InternalName);
                 sb.Append("\tNameUntranslated: ").AppendLine(closestEntity.NameUntranslated);
-                sb.Append("\tIsDead: ").AppendLine(closestEntity.IsDead.ToString());
-                sb.Append("\tRegion: '").Append(closestEntity.RegionInternalName).AppendLine("'");
+                sb.Append("\tIsDead: ").Append(closestEntity.IsDead.ToString());
+                if (alive)
+                    sb.AppendLine(" [OK]");
+                else sb.AppendLine(" [FAIL]"); sb.Append("\tRegion: '").Append(closestEntity.RegionInternalName).AppendLine("'");
                 sb.Append("\tLocation: ").AppendLine(closestEntity.Location.ToString());
-                sb.Append("\tDistance: ").AppendLine(closestEntity.Location.Distance3DFromPlayer.ToString());
+                sb.Append("\tDistance: ").Append(closestEntity.Location.Distance3DFromPlayer.ToString());
+                if (distOk)
+                    sb.AppendLine(" [OK]");
+                else sb.AppendLine(" [FAIL]");
+                sb.Append("\tZAxisDiff: ").Append(Astral.Logic.General.ZAxisDiffFromPlayer(closestEntity.Location).ToString());
+                if (zOk)
+                    sb.AppendLine(" [OK]");
+                else sb.AppendLine(" [FAIL]");
             }
             else sb.AppendLine("Closest Entity not found!");
 
