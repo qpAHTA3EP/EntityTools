@@ -1,6 +1,6 @@
 ﻿#define LOG
 
-#if DEVELOPER
+#if PATCH_ASTRAL
 using MappingType = EntityTools.Enums.MappingType; 
 #endif
 
@@ -24,7 +24,7 @@ using AstralMapperOriginals;
 
 namespace EntityTools.Patches.Mapper
 {
-#if DEVELOPER
+#if PATCH_ASTRAL
     public partial class MapperFormExt : XtraForm //*/Form
     {
     #region Reflection helpers

@@ -482,7 +482,7 @@ namespace EntityTools.Core
             Astral.Functions.XmlSerializer.Serialize("UCCQuesterCheck.xml", c, 1);
 #endif
 
-#if !BagsList_IXmlSerializable
+#if BagsList_IXmlSerializable
 #if Serialization
             BagsList bags = new BagsList(BagsList.FullInventory);
             //XtraMessageBox.Show(bags.ToString());
@@ -510,6 +510,11 @@ namespace EntityTools.Core
                 XtraMessageBox.Show(sb.ToString());
             }
             else XtraMessageBox.Show("Bags is null");
+#endif
+#if true
+            if (Tools.Reflection.AstralAccessors.ItemFilter.IsMatch != null)
+                XtraMessageBox.Show("AstralAccessors.ItemFilter.IsMatch is OK!");
+            else XtraMessageBox.Show("AstralAccessors.ItemFilter.IsMatch is NULL!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
 #endif
         }
 

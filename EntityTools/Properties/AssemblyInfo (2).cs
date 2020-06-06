@@ -1,17 +1,18 @@
-﻿using System.Reflection;
+﻿using System.Resources;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("EntityToolCore")]
+[assembly: AssemblyTitle("EntityTools")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("EntityToolCore")]
-[assembly: AssemblyCopyright("Copyright ©  2020")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyProduct("EntityTools")]
+[assembly: AssemblyCopyright("MichaelProg ©  2019")]
+[assembly: AssemblyTrademark("MichaelProg")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -20,7 +21,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("bd4ed31e-fda2-4b75-a5ff-ac385a9b20df")]
+[assembly: Guid("df7f797e-db7e-44f9-a96a-020cfdb3c51e")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -31,6 +32,10 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.20.0603.1834")]
-[assembly: AssemblyFileVersion("0.20.0603.1834")]
+//[assembly: AssemblyVersion("0.1.*")]
+[assembly: AssemblyVersion("0.20.0601.1745")]
+#pragma warning disable CS7035 // The specified version string does not conform to the recommended format - major.minor.build.revision
+[assembly: AssemblyFileVersion("0.20.0601.1745")]
+#pragma warning restore CS7035 // The specified version string does not conform to the recommended format - major.minor.build.revision
+[assembly: NeutralResourcesLanguage("")]
+

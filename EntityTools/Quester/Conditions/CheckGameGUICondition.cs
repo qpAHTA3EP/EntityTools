@@ -28,6 +28,13 @@ namespace EntityTools.Quester.Conditions
         }
         #endregion
 
+#if PATCH_ASTRAL
+        static CheckGameGUI()
+        {
+            // Пременение патча на этапе десериализации (до инициализации плагина)
+            Patches.ETPatcher.Apply();
+        }
+#endif
 
         #region Опции команды
 #if DEVELOPER

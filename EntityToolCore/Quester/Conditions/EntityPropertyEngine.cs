@@ -233,7 +233,7 @@ namespace EntityCore.Quester.Conditions
 #endif
             if (closestEntity != null && closestEntity.IsValid)
             {
-                bool distOk = closestEntity.Location.Distance3DFromPlayer < @this._reactionRange;
+                bool distOk = @this._reactionRange <= 0 || closestEntity.Location.Distance3DFromPlayer < @this._reactionRange;
                 bool zOk = @this._reactionZRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(closestEntity.Location) < @this._reactionZRange;
                 bool alive = !@this._healthCheck || !closestEntity.IsDead;
                 sb.Append("ClosestEntity: ").Append(closestEntity.ToString());
@@ -401,7 +401,7 @@ namespace EntityCore.Quester.Conditions
                 ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Comparer does not defined. Initialize.");
 #endif
                 checkEntity = predicate;
-                return checkEntity(e);
+                return e != null && checkEntity(e);
             }
 #if DEBUG
             else ETLogger.WriteLine(LogType.Error, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Fail to initialize the Comparer.");

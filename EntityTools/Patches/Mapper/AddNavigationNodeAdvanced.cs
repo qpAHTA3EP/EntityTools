@@ -1,5 +1,6 @@
 ﻿//#define PROFILING
 #define LOG
+
 using System;
 using System.Linq;
 using System.Collections;
@@ -15,7 +16,7 @@ using System.Diagnostics;
 
 namespace EntityTools.Patches.Mapper
 {
-#if DEVELOPER
+#if PATCH_ASTRAL
     internal static class AddNavigationNodeAdvanced
     {
 #if PROFILING && DEBUG

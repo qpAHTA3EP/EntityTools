@@ -14,7 +14,7 @@ using System.Drawing;
 
 namespace EntityTools.Patches.Mapper
 {
-#if DEVELOPER
+#if PATCH_ASTRAL
     /// <summary>
     /// Помощник для добавления CustomRegion
     /// </summary>

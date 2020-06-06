@@ -16,6 +16,13 @@ namespace EntityTools.Quester.Conditions
                 Name = Game.CharacterSelectionData.CharacterChoices.LastPlayedCharacter.ShardName;
             }
         }
+#if PATCH_ASTRAL
+        static CheckShard()
+        {
+            // Пременение патча на этапе десериализации (до инициализации плагина)
+            Patches.ETPatcher.Apply();
+        }
+#endif
 
         [Description("A name of the Shard (GameServer)")]
         [Editor(typeof(CurrentShardEditor), typeof(UITypeEditor))]

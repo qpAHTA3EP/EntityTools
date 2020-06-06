@@ -1,6 +1,6 @@
 ﻿namespace EntityTools.Patches.Mapper
 {
-#if DEVELOPER
+#if PATCH_ASTRAL
     partial class NewDrawings
     {
         /// <summary>

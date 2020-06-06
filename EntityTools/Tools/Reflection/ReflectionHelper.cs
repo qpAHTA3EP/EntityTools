@@ -297,17 +297,6 @@ namespace EntityTools.Reflection
         /// <returns>The value of the property boxed as an object.</returns>
         public static bool GetStaticPropertyValue(Type type, string propName, out object result, BindingFlags flags = BindingFlags.Default, bool searchBaseRecursive = false)
         {
-            //result = null;
-            //if (flags == BindingFlags.Default)
-            //    flags = DefaultFlags;
-            //if (BaseType)
-            //{
-            //    type = type.BaseType;
-            //}
-            //object[] arg = new object[] { };
-
-            //return ExecStaticMethod(type, "get_" + propName, ref arg, out result, flags | BindingFlags.Static | BindingFlags.InvokeMethod, false);
-
             result = null;
 
             if (flags == BindingFlags.Default)

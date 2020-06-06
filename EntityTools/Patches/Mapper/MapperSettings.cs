@@ -7,7 +7,7 @@ using System.Xml.Serialization;
 
 namespace EntityTools.Settings
 {
-#if DEVELOPER
+#if PATCH_ASTRAL
     [Serializable]
     public class MapperSettings : PluginSettingsBase
     {

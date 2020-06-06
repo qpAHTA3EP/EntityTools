@@ -1,5 +1,5 @@
 ﻿//#define HARMONY
-#if HARMONY
+#if PATCH_ASTRAL && HARMONY 
 using HarmonyLib; 
 #else
 //#define Patch_AstralXmlSerializer
@@ -15,7 +15,7 @@ using EntityTools.Patches.UCC;
 
 namespace EntityTools.Patches
 {
-#if DEVELOPER
+#if PATCH_ASTRAL
     /// <summary>
     /// Патчер, содержащий список всех патчей
     /// </summary>
@@ -24,7 +24,7 @@ namespace EntityTools.Patches
         /// <summary>
         /// Подмена штатного окна Mapper'a
         /// </summary>
-        private static Patch patchMapper = (EntityTools.PluginSettings.Mapper.Patch) ?
+        private static readonly Patch patchMapper = (EntityTools.PluginSettings.Mapper.Patch) ?
             new Patch(
                 typeof(Astral.Quester.Forms.MapperForm).GetMethod("Open", ReflectionHelper.DefaultFlags),
                 typeof(Mapper.MapperFormExt).GetMethod(nameof(Mapper.MapperFormExt.Open), ReflectionHelper.DefaultFlags))
@@ -49,9 +49,13 @@ namespace EntityTools.Patches
         /// <summary>
         /// Подмена ActionsPlayer.CheckAlly(..)
         /// </summary>
-        private static Patch_ActionsPlayer_CheckAlly patchActionsPlayerCheckAlly = new Patch_ActionsPlayer_CheckAlly();
+        private static readonly Patch_ActionsPlayer_CheckAlly patchActionsPlayerCheckAlly = new Patch_ActionsPlayer_CheckAlly();
 
-        private static Patch_AddClass_Show patchAddClassShow = new Patch_AddClass_Show();
+        private static readonly Patch_AddClass_Show patchAddClassShow = new Patch_AddClass_Show();
+
+        private static readonly Patch_VIP_SealTraderEntity patchVIPSealTraderEntity = new Patch_VIP_SealTraderEntity();
+
+        private static readonly Patch_VIP_ProfessionVendorEntity patchVIPProfessionVendorEntity = new Patch_VIP_ProfessionVendorEntity();
 
         static bool Applied = false;
         public static void Apply()
@@ -69,7 +73,7 @@ namespace EntityTools.Patches
 #if false
                     else
                     {
-                        ETLogger.WriteLine($"Faild to apply patch '{field.FieldType.Name}' named '{field.Name}'");
+                        ETLogger.WriteLine($"Failed to apply patch '{field.FieldType.Name}' named '{field.Name}'");
                     } 
 #endif
                 }
@@ -93,7 +97,7 @@ namespace EntityTools.Patches
                 }
                 catch
                 {
-                    ETLogger.WriteLine(LogType.Error, "Harmonies patches are faild!",true);
+                    ETLogger.WriteLine(LogType.Error, "Harmonies patches are failed!",true);
                 }
 #endif
                 Applied = true;

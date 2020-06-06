@@ -124,8 +124,21 @@ namespace EntityTools
 
             LoadSettings();
 
-#if DEVELOPER
+#if PATCH_ASTRAL
+            // Применение патчей
             ETPatcher.Apply();
+
+            // Проверка и перезагрузка UCC-профиля (при необходимости)
+            string lastCustomClass = Astral.Controllers.Settings.Get.LastCustomClass;
+
+            if (lastCustomClass == "UCC" 
+                && Astral.Logic.UCC.API.CurrentProfile.ActionsCombat.Count == 0
+                && File.Exists(Astral.Controllers.Settings.Get.LastUCCProfile))
+            {
+                // Повторная попытка загрузить последний использовавшийся UCC-профиль
+                ETLogger.WriteLine($"{GetType().Name}: Second try to load ucc-profile '{Astral.Controllers.Settings.Get.LastUCCProfile}'", true);
+                Astral.Logic.UCC.API.LoadProfile(Astral.Controllers.Settings.Get.LastUCCProfile);
+            }
 #endif
         }
 

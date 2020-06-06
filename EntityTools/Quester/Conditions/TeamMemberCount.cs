@@ -24,7 +24,6 @@ namespace EntityTools.Quester.Conditions
             // EntityTools.Core.Initialize(this);
         }
         #endregion
-
         #region Опции команды
 #if DEVELOPER
         [Description("CustomRegion names collection")]

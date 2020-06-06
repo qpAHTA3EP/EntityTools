@@ -7,7 +7,7 @@ using System.Text;
 
 namespace EntityTools.Patches.Mapper
 {
-#if DEVELOPER
+#if PATCH_ASTRAL
     internal class NodeDetail
     {
         public NodeDetail()

@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace EntityTools.Patches.Mapper
 {
-#if DEVELOPER
+#if PATCH_ASTRAL
     partial class MapperFormExt
     {
         /// <summary>

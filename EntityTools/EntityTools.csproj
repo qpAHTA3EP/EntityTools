@@ -12,14 +12,14 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.0529.0713</AssemblyVersion>
+    <AssemblyVersion>0.20.0604.0553</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, HARMONY, ENTITYTOOLS</DefineConstants>
+    <OutputPath>D:\ASTRAL\Astral_RU_1\Plugins\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, PATCH_ASTRAL, HARMONY, ENTITYTOOLS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
@@ -118,6 +118,7 @@
     <Reference Include="0Harmony, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\x64\0Harmony.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="AStar">
       <HintPath>..\References\x64\AStar.dll</HintPath>
@@ -187,7 +188,7 @@
     <Compile Include="Editors\Forms\ItemFilterEditorForm.Designer.cs">
       <DependentUpon>ItemFilterEditorForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editors\NPCVendorInfosExt.cs" />
+    <Compile Include="Editors\VendorInfoEditor.cs" />
     <Compile Include="Logger\EntityToolLogger.cs" />
     <Compile Include="Core\Interfaces\IUCCConditionEngine.cs" />
     <Compile Include="Core\Interfaces\IUCCActionEngine.cs" />
@@ -198,6 +199,9 @@
     <Compile Include="Core\Proxies\QuesterConditionProxy.cs" />
     <Compile Include="Core\Proxies\UCCActionProxy.cs" />
     <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
+    <Compile Include="Patches\Mapper\GraphicsNW\Patch_GraphicsNW.cs" />
+    <Compile Include="Patches\Patch_VIP_SealTraderEntity.cs" />
+    <Compile Include="Patches\Patch_VIP_ProfessionVendorEntity.cs" />
     <Compile Include="Patches\UCC\Patch_ActionsPlayer_CheckAlly.cs" />
     <Compile Include="Patches\UCC\Patch_AddClass_Show.cs" />
     <Compile Include="Patches\XmlSerializer\Patch_XmlSerializer_GetExtraTypes.cs" />
@@ -277,6 +281,7 @@
     <Compile Include="Tools\BuySellItems\IndexedBags.cs" />
     <Compile Include="Tools\BuySellItems\ItemStats.cs" />
     <Compile Include="Tools\BuySellItems\SlotCache.cs" />
+    <Compile Include="Tools\BuySellItems\VendorInfo.cs" />
     <Compile Include="Tools\CollectionTypeConverter.cs" />
     <Compile Include="Servises\EnchantHelper.cs" />
     <Compile Include="Tools\CryptoHelper.cs" />
@@ -302,6 +307,7 @@
     <Compile Include="Tools\ParagonTools.cs" />
     <Compile Include="Settings\PluginSettingsBase.cs" />
     <Compile Include="Tools\Classes.cs" />
+    <Compile Include="Tools\Reflection\AstralAccessors.cs" />
     <Compile Include="Tools\Reflection\CopyHelper.cs" />
     <Compile Include="Tools\Reflection\InstanceFieldAccessor.cs" />
     <Compile Include="Tools\Reflection\InstanceAction.cs" />
@@ -442,4 +448,7 @@
     <None Include="Resources\miniPlayAll.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>type EntityCore.bin&gt;"EntityTools.dll:Core"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

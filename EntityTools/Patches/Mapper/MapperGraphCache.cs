@@ -13,7 +13,7 @@ using System.Reflection;
 
 namespace EntityTools.Patches.Mapper
 {
-#if DEVELOPER
+#if PATCH_ASTRAL
     public class MapperGraphCache
     {
         public MapperGraphCache() { }

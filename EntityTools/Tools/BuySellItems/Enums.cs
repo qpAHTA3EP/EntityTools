@@ -39,11 +39,11 @@ namespace EntityTools.Enums
         /// <summary>
         /// Игровой магазин кампаний
         /// </summary>
-        RemouteVendor,
+        RemoteVendor,
         /// <summary>
         /// ВИП-магазин печатей
         /// </summary>
-        VIPSummonSealTrader,
+        VIPSealTrader,
         /// <summary>
         /// ВИП-магазин магазина профессий
         /// </summary>

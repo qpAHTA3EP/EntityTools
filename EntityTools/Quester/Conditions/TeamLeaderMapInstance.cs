@@ -12,6 +12,14 @@ namespace EntityTools.Quester.Conditions
     [Serializable]
     public class TeamLeaderMapInstance : Condition
     {
+        public TeamLeaderMapInstance() { }
+#if PATCH_ASTRAL
+        static TeamLeaderMapInstance()
+        {
+            // Пременение патча на этапе десериализации (до инициализации плагина)
+            Patches.ETPatcher.Apply();
+        }
+#endif
         [Description("There is a bug: the bot does not detect correctly the current number of the map's instance \n" +
             "if the player changed the map's instance while it is in the party, \n" +
             "Therefore this condition has the false result in this case.")]
@@ -41,9 +49,7 @@ namespace EntityTools.Quester.Conditions
             }
         }
 
-        public override void Reset()
-        {
-        }
+        public override void Reset() { }
 
         public override string ToString()
         {
@@ -54,8 +60,8 @@ namespace EntityTools.Quester.Conditions
         {
             get
             {
-                if (EntityManager.LocalPlayer.PlayerTeam?.IsInTeam == true
-                    && EntityManager.LocalPlayer.PlayerTeam?.Team?.MembersCount > 1)
+                if (EntityManager.LocalPlayer.PlayerTeam.IsInTeam == true
+                    && EntityManager.LocalPlayer.PlayerTeam.Team.MembersCount > 1)
                 {
                     if (EntityManager.LocalPlayer.PlayerTeam.IsLeader)
                         return "Player is TeamLeader";

@@ -5,12 +5,17 @@ using System.Runtime.CompilerServices;
 
 namespace EntityTools.Patches
 {
-#if DEVELOPER
+#if PATCH_ASTRAL
     internal class Patch
     {
-        private readonly MethodInfo methodToReplace;
-        private readonly MethodInfo methodToInject;
+        protected MethodInfo methodToReplace;
+        protected MethodInfo methodToInject;
 
+        public Patch()
+        {
+            methodToReplace = null;
+            methodToInject = null;
+        }
         public Patch(MethodInfo methodToReplace, MethodInfo methodToInject)
         {
             this.methodToReplace = methodToReplace;

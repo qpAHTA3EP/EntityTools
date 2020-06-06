@@ -491,13 +491,15 @@ namespace EntityCore.Quester.Action
 
         public void InternalReset()
         {
+            target = null;
             checkEntity = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+            getCustomRegions = internal_GetCustomRegion_Initializer;
             label = String.Empty;
         }
         public void GatherInfos() { }
         public void OnMapDraw(GraphicsNW graph)
         {
-            if (checkEntity(target))
+            if (ValidateEntity(target))
                 graph.drawFillEllipse(target.Location, new Size(10, 10), Brushes.Beige);
         }
 #endif
@@ -546,7 +548,7 @@ namespace EntityCore.Quester.Action
                                                     @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, getCustomRegions(), IsNotInBlackList);
             if (target != null && target.IsValid)
             {
-                bool distOk = target.Location.Distance3DFromPlayer < @this._reactionRange;
+                bool distOk = @this._reactionRange <= 0 || target.Location.Distance3DFromPlayer < @this._reactionRange;
                 bool zOk = @this._reactionZRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(target.Location) < @this._reactionZRange;
                 bool alive = !@this._healthCheck || !target.IsDead;
                 sb.Append("ClosestEntity: ").Append(target.ToString());
@@ -592,7 +594,7 @@ namespace EntityCore.Quester.Action
                 ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Comparer does not defined. Initialize.");
 #endif
                 checkEntity = predicate;
-                return checkEntity(e);
+                return e!= null && checkEntity(e);
             }
 #if DEBUG
             else ETLogger.WriteLine(LogType.Error, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Fail to initialize the Comparer.");

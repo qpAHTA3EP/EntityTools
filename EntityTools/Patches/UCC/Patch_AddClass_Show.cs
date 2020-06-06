@@ -8,7 +8,7 @@ using System.Text;
 
 namespace EntityTools.Patches.UCC
 {
-#if DEVELOPER
+#if PATCH_ASTRAL
     internal class Patch_AddClass_Show : Patch                
     {
         internal Patch_AddClass_Show() : base(typeof(Astral.Logic.UCC.Forms.AddClass).GetMethod(nameof(Astral.Logic.UCC.Forms.AddClass.Show), ReflectionHelper.DefaultFlags, null, new Type[] { typeof(Type) }, null),

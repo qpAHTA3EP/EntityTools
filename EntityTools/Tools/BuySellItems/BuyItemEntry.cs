@@ -87,6 +87,25 @@ namespace EntityTools.Tools.BuySellItems
         }
         internal string _identifier = string.Empty;
 
+        /// <summary>
+        /// Приоритет (0 - максимальный)
+        /// Покупка предметов с меньшим приоритетом запрещена (например 1), 
+        /// если не удалось приобрести хотя бы один предмет с более высоким приоритетом (например 0).
+        /// Покупка предметов с меньшим приоритетом производится, 
+        /// если предметы с большим приоритетом не требуется покупать (например, они есть в наличии в нужном количестве)
+        /// </summary>
+        [Description("Приоритет покупки (0 - максимальный)")]
+        public uint Priority
+        {
+            get => _priority;
+            set
+            {
+                if (!_readOnly)
+                    _priority = value;
+            }
+        }
+        internal uint _priority = 0;
+
         public uint Count
         {
             get => _count;
@@ -109,16 +128,21 @@ namespace EntityTools.Tools.BuySellItems
         }
         internal bool _keepNumber = false;
 
+#if false
+        // Максимальное количество предметов, которые можно купить за одну транзакцию (стак)
+        // задано в поле StoreItemInfo.Item.ItemDef.MayBuyInBulk
+        // 0 - одна штука
         [Category("Optional")]
         [Description("Приобретать предмет по 1 ед. (выбор количества не предусмотрен)")]
         public bool BuyByOne
         {
             get => _buyBy1; set
             {
-                if(!_readOnly) _buyBy1 = value;
+                if (!_readOnly) _buyBy1 = value;
             }
         }
-        internal bool _buyBy1 = false;
+        internal bool _buyBy1 = false; 
+#endif
 
         [Category("Optional")]
         [Description("Покупать экипировку, уроверь которой выше соответствующей экипировки персонажа")]

@@ -62,6 +62,7 @@ namespace EntityCore.Forms
                     && uccActions.TryGetValue(actionType, out UCCAction newAction))
                 {
                     action = newAction.Clone();
+                    action.Target = newAction.Target;
                     return action != null;
                 }
             }

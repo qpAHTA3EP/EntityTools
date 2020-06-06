@@ -18,6 +18,7 @@ namespace EntityTools.Quester.Actions
     [Serializable]
     public class MoveToLeader : Astral.Quester.Classes.Action
     {
+        #region Опции команды
         [Description("Distance to the Team Leader by which it is necessary to approach")]
         [Category("Interruptions")]
         public float Distance { get; set; } = 30;
@@ -38,7 +39,8 @@ namespace EntityTools.Quester.Actions
         //public bool PartyCheck { get; set; }
 
         [Editor(typeof(PositionEditor), typeof(UITypeEditor))]
-        public Vector3 Position { get; set; } = new Vector3();
+        public Vector3 Position { get; set; } = new Vector3(); 
+        #endregion
 
         public MoveToLeader() { }
 

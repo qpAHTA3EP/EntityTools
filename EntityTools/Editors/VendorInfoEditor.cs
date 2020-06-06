@@ -10,6 +10,7 @@ using Astral.Quester.UIEditors.Forms;
 using DevExpress.XtraEditors;
 using EntityTools.Enums;
 using EntityTools.Reflection;
+using EntityTools.Tools.BuySellItems;
 using MyNW.Classes;
 using MyNW.Internals;
 //using static EntityTools.Reflection.PrivateConsructor;
@@ -18,7 +19,7 @@ using NPCInfos = Astral.Quester.Classes.NPCInfos;
 namespace EntityTools.Editors
 {
 #if DEVELOPER
-    internal class NPCVendorInfosExtEditor : UITypeEditor
+    internal class VendorInfoEditor : UITypeEditor
     {
 #if Using_GetAnId_Form
         static readonly GetAnId vendorTypeSelectForm = null;
@@ -28,13 +29,13 @@ namespace EntityTools.Editors
         private static readonly VendorType[] displayedVendors = new VendorType[] { //VendorType.Auto,
                                                                           VendorType.Normal,
                                                                           VendorType.ArtifactVendor,
-                                                                          VendorType.RemouteVendor,
-                                                                          VendorType.VIPSummonSealTrader,
+                                                                          VendorType.RemoteVendor,
+                                                                          VendorType.VIPSealTrader,
                                                                           VendorType.VIPProfessionVendor
                                                                         };
 #endif
 
-        static NPCVendorInfosExtEditor()
+        static VendorInfoEditor()
         {
 #if Using_GetAnId_Form
             vendorTypeSelectForm = Activator<GetAnId>.CreateInstance("Select vendor", ReflectionHelper.DefaultFlags);
@@ -52,9 +53,9 @@ namespace EntityTools.Editors
 
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            if (SetInfos(out NPCInfos npc))
+            if (SetInfos(out VendorInfo vendor))
             {
-                return npc;
+                return vendor;
             }
             return value;
         }
@@ -64,20 +65,22 @@ namespace EntityTools.Editors
             return UITypeEditorEditStyle.Modal;
         }
 
-        public static bool SetInfos(out NPCInfos npc)
+        public static bool SetInfos(out VendorInfo vendor)
         {
-            npc = null;
+            vendor = null;
 #if Using_GetAnId_Form
             VendorType vendor = GetVendor();
 #else
-            VendorType vendor = VendorType.None;
+            VendorType vndType = VendorType.None;
 #endif
 
-            if (EntityTools.Core.GUIRequest_Item(() => displayedVendors, ref vendor))
+            if (EntityTools.Core.GUIRequest_Item(() => displayedVendors, ref vndType))
             {
-                switch (vendor)
+                switch (vndType)
                 {
                     case VendorType.None:
+                        return false;
+                    case VendorType.Auto:
                         return false;
                     case VendorType.Normal:
                         NPCInfos giver = null;
@@ -86,8 +89,9 @@ namespace EntityTools.Editors
                             Entity betterEntityToInteract = Interact.GetBetterEntityToInteract();
                             if (betterEntityToInteract.IsValid)
                             {
-                                npc = new NPCInfos()
+                                vendor = new VendorInfo()
                                 {
+                                    VendorType = vndType,
                                     CostumeName = betterEntityToInteract.CostumeRef.CostumeName,
                                     DisplayName = betterEntityToInteract.Name,
                                     Position = betterEntityToInteract.Location.Clone(),
@@ -98,24 +102,23 @@ namespace EntityTools.Editors
                             }
                         }
                         return false;
-                    case VendorType.RemouteVendor:
+                    case VendorType.RemoteVendor:
                         string contactName = GetAnId.GetARemoteContact();
                         if (!string.IsNullOrEmpty(contactName))
                         {
-                            npc = new NPCInfos()
+                            vendor = new VendorInfo()
                             {
+                                VendorType = vndType,
                                 CostumeName = contactName,
                                 DisplayName = contactName,
-                                MapName = "All"
                             };
                             if ((XtraMessageBox.Show("Call it now ?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes))
                             {
-                                //RemoteContact remoteContact = EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts.Find((rc) => rc.ContactDef == contactName);
                                 foreach (RemoteContact remoteContact in EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts)
                                 {
                                     if (remoteContact.ContactDef == contactName)
                                     {
-                                        npc.DisplayName = remoteContact.DisplayName;
+                                        vendor.DisplayName = remoteContact.DisplayName;
                                         remoteContact.Start();
                                         break;
                                     }
@@ -124,11 +127,11 @@ namespace EntityTools.Editors
                         }
                         return !string.IsNullOrEmpty(contactName);
                     default:
-                        npc = new NPCInfos()
+                        vendor = new VendorInfo()
                         {
-                            CostumeName = vendor.ToString(),
-                            DisplayName = vendor.ToString(),
-                            MapName = "All"
+                            VendorType = vndType,
+                            CostumeName = vndType.ToString(),
+                            DisplayName = vndType.ToString(),
                         };
                         return true;
                 }
@@ -156,7 +159,7 @@ namespace EntityTools.Editors
 #if false
                 vendorTypeSelectForm_List.Value.Items.Add("Normal");
                 vendorTypeSelectForm_List.Value.Items.Add("ArtifactVendor");
-                vendorTypeSelectForm_List.Value.Items.Add("RemouteVendor");
+                vendorTypeSelectForm_List.Value.Items.Add("RemoteVendor");
                 vendorTypeSelectForm_List.Value.Items.Add("VIPSummonSealTrader");
                 vendorTypeSelectForm_List.Value.Items.Add("VIPProfessionVendor"); 
 #endif

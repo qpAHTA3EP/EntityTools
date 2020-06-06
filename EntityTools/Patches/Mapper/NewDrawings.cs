@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace EntityTools.Patches.Mapper
 {
-#if DEVELOPER
+#if PATCH_ASTRAL
     public partial class NewDrawings : Form
     {
         /// <summary>

@@ -10,6 +10,7 @@ using EntityTools.Enums;
 using System.Collections;
 using System.Collections.ObjectModel;
 using static EntityTools.Tools.BuySellItems.ItemFilterEntryExt;
+using EntityTools.Reflection;
 
 namespace EntityTools.Tools.BuySellItems
 {
@@ -27,7 +28,7 @@ namespace EntityTools.Tools.BuySellItems
         public IndexedBags(IEnumerable<ItemFilterEntryExt> filters, BagsList bags)
         {
             AnalizeFilters(filters);
-            _bags = Reflection.CopyHelper.CreateDeepCopy(bags);
+            _bags = CopyHelper.CreateDeepCopy(bags);
         }
         public IndexedBags(IEnumerable<ItemFilterEntryExt> filters, InvBagIDs[] bagsIds)
         {

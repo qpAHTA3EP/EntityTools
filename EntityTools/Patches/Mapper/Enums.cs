@@ -1,6 +1,6 @@
 ﻿namespace EntityTools.Enums
 {
-#if DEVELOPER
+#if PATCH_ASTRAL
     public enum MappingType
     {
         Bidirectional,

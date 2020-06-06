@@ -135,7 +135,7 @@ namespace EntityCore.UCC.Actions
                 ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Comparer does not defined. Initialize.");
 #endif
                 checkEntity = predicate;
-                return checkEntity(e);
+                return e != null && checkEntity(e);
             }
 #if DEBUG
             else ETLogger.WriteLine(LogType.Error, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Fail to initialize the Comparer.");
@@ -183,7 +183,7 @@ namespace EntityCore.UCC.Actions
                                                     @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck);
             if (entity != null)
             {
-                bool distOk = entity.Location.Distance3DFromPlayer < @this._reactionRange;
+                bool distOk = @this._reactionRange <= 0 || entity.Location.Distance3DFromPlayer < @this._reactionRange;
                 bool zOk = @this._reactionZRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(entity.Location) < @this._reactionZRange;
                 bool alive = !@this._healthCheck || !entity.IsDead;
                 sb.Append("ClosestEntity: ").Append(entity.ToString());

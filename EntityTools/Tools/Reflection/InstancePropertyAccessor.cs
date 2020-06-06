@@ -8,7 +8,7 @@ namespace EntityTools.Reflection
 {
     public static class InstancePropertyAccessorFactory
     {
-        public static InstancePropertyAccessor<ContainerType, PropertyType> GetInstanceProperty<ContainerType, PropertyType>(this ContainerType instance, string propName, BindingFlags flags = BindingFlags.Default)
+        public static InstancePropertyAccessor<ContainerType, PropertyType> GetInstanceProperty<ContainerType, PropertyType>(this ContainerType instance, string propName, BindingFlags flags = BindingFlags.Default) where ContainerType : class
         {
             return new InstancePropertyAccessor<ContainerType, PropertyType>(instance, propName, flags);
         }

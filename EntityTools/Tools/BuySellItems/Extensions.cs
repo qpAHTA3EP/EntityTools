@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using EntityTools.Tools.Reflection;
 using static EntityTools.Tools.BuySellItems.ItemFilterEntryExt;
 
 namespace EntityTools.Extensions
@@ -241,7 +242,7 @@ namespace EntityTools.Extensions
                         // сравниваем по уровню предмета
                         foreach (var slot in slotCache.Slots)
                             if (filterEntry.IsMatch(slot)
-                                && storeItem.Item.ItemDef.Level >= slot.Item.ItemDef.Level)
+                                && slot.Item.ItemDef.Level >= storeItem.Item.ItemDef.Level)
                                     hasNum += slot.Item.Count;
                     }
                     if (hasNum < toBuyNum)
@@ -414,90 +415,152 @@ namespace EntityTools.Extensions
         /// <param name="filter"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        public static bool GetBagsItems(this ItemFilterCore filter, out List<InventorySlot> list)
+        public static bool GetBagsItems(this ItemFilterCore filter, out List<InventorySlot> list, bool checkSellable = false)
         {
             list = new List<InventorySlot>();
 
+#if false
             var predicate = typeof(ItemFilterCore).GetFunction<Item, bool>("\u0001");
 
             if (predicate != null)
             {
                 List<InventorySlot> slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.Inventory).GetItems;
                 if (slots != null && slots.Count > 0)
-                    foreach (var filterEntry in filter.Entries)
-                        list.AddRange(slots.FindAll(s => predicate(filterEntry)(s.Item)));
+                    list.AddRange(slots.FindAll(s => predicate(filter)(s.Item)));
                 slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag1).GetItems;
                 if (slots != null && slots.Count > 0)
-                    foreach (var filterEntry in filter.Entries)
-                        list.AddRange(slots.FindAll(s => predicate(filterEntry)(s.Item)));
+                    list.AddRange(slots.FindAll(s => predicate(filter)(s.Item)));
                 slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag2).GetItems;
                 if (slots != null && slots.Count > 0)
-                    foreach (var filterEntry in filter.Entries)
-                        list.AddRange(slots.FindAll(s => predicate(filterEntry)(s.Item)));
+                    list.AddRange(slots.FindAll(s => predicate(filter)(s.Item)));
                 slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag3).GetItems;
                 if (slots != null && slots.Count > 0)
-                    foreach (var filterEntry in filter.Entries)
-                        list.AddRange(slots.FindAll(s => predicate(filterEntry)(s.Item)));
+                    list.AddRange(slots.FindAll(s => predicate(filter)(s.Item)));
                 slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag4).GetItems;
                 if (slots != null && slots.Count > 0)
-                    foreach (var filterEntry in filter.Entries)
-                        list.AddRange(slots.FindAll(s => predicate(filterEntry)(s.Item)));
+                    list.AddRange(slots.FindAll(s => predicate(filter)(s.Item)));
                 slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag5).GetItems;
                 if (slots != null && slots.Count > 0)
-                    foreach (var filterEntry in filter.Entries)
-                        list.AddRange(slots.FindAll(s => predicate(filterEntry)(s.Item)));
+                    list.AddRange(slots.FindAll(s => predicate(filter)(s.Item)));
                 slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag6).GetItems;
                 if (slots != null && slots.Count > 0)
-                    foreach (var filterEntry in filter.Entries)
-                        list.AddRange(slots.FindAll(s => predicate(filterEntry)(s.Item)));
+                    list.AddRange(slots.FindAll(s => predicate(filter)(s.Item)));
                 slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag7).GetItems;
                 if (slots != null && slots.Count > 0)
-                    foreach (var filterEntry in filter.Entries)
-                        list.AddRange(slots.FindAll(s => predicate(filterEntry)(s.Item)));
+                    list.AddRange(slots.FindAll(s => predicate(filter)(s.Item)));
                 slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag8).GetItems;
                 if (slots != null && slots.Count > 0)
-                    foreach (var filterEntry in filter.Entries)
-                        list.AddRange(slots.FindAll(s => predicate(filterEntry)(s.Item)));
+                    list.AddRange(slots.FindAll(s => predicate(filter)(s.Item)));
                 slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag9).GetItems;
                 if (slots != null && slots.Count > 0)
-                    foreach (var filterEntry in filter.Entries)
-                        list.AddRange(slots.FindAll(s => predicate(filterEntry)(s.Item)));
+                    list.AddRange(slots.FindAll(s => predicate(filter)(s.Item)));
                 slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.Overflow).GetItems;
                 if (slots != null && slots.Count > 0)
-                    foreach (var filterEntry in filter.Entries)
-                        list.AddRange(slots.FindAll(s => predicate(filterEntry)(s.Item)));
+                    list.AddRange(slots.FindAll(s => predicate(filter)(s.Item)));
 
                 slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.CraftingResources).GetItems;
                 if (slots != null && slots.Count > 0)
-                    foreach (var filterEntry in filter.Entries)
-                        list.AddRange(slots.FindAll(s => predicate(filterEntry)(s.Item)));
+                    list.AddRange(slots.FindAll(s => predicate(filter)(s.Item)));
                 slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.CraftingInventory).GetItems;
                 if (slots != null && slots.Count > 0)
-                    foreach (var filterEntry in filter.Entries)
-                        list.AddRange(slots.FindAll(s => predicate(filterEntry)(s.Item)));
+                    list.AddRange(slots.FindAll(s => predicate(filter)(s.Item)));
                 slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.FashionItems).GetItems;
                 if (slots != null && slots.Count > 0)
-                    foreach (var filterEntry in filter.Entries)
-                        list.AddRange(slots.FindAll(s => predicate(filterEntry)(s.Item)));
+                    list.AddRange(slots.FindAll(s => predicate(filter)(s.Item)));
             }
+#else
+
+            if (AstralAccessors.ItemFilter.IsMatch != null)
+            {
+                // Формируем предикат для проверки предметов на соответствие
+                Predicate<Item> predicate;
+                if (checkSellable)
+                {
+                    predicate = (Item item) => {
+                        return Astral.Logic.NW.Inventory.CanSell(item)
+                               && AstralAccessors.ItemFilter.IsMatch(filter)(item);
+                    };
+                }
+                else predicate = (Item item) => AstralAccessors.ItemFilter.IsMatch(filter)(item);
+
+                List<InventorySlot> slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.Inventory).GetItems;
+                if (slots != null && slots.Count > 0)
+                    list.AddRange(slots.FindAll(s => predicate(s.Item)));
+                slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag1).GetItems;
+                if (slots != null && slots.Count > 0)
+                    list.AddRange(slots.FindAll(s => predicate(s.Item)));
+                slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag2).GetItems;
+                if (slots != null && slots.Count > 0)
+                    list.AddRange(slots.FindAll(s => predicate(s.Item)));
+                slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag3).GetItems;
+                if (slots != null && slots.Count > 0)
+                    list.AddRange(slots.FindAll(s => predicate(s.Item)));
+                slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag4).GetItems;
+                if (slots != null && slots.Count > 0)
+                    list.AddRange(slots.FindAll(s => predicate(s.Item)));
+                slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag5).GetItems;
+                if (slots != null && slots.Count > 0)
+                    list.AddRange(slots.FindAll(s => predicate(s.Item)));
+                slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag6).GetItems;
+                if (slots != null && slots.Count > 0)
+                    list.AddRange(slots.FindAll(s => predicate(s.Item)));
+                slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag7).GetItems;
+                if (slots != null && slots.Count > 0)
+                    list.AddRange(slots.FindAll(s => predicate(s.Item)));
+                slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag8).GetItems;
+                if (slots != null && slots.Count > 0)
+                    list.AddRange(slots.FindAll(s => predicate(s.Item)));
+                slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag9).GetItems;
+                if (slots != null && slots.Count > 0)
+                    list.AddRange(slots.FindAll(s => predicate(s.Item)));
+                slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.Overflow).GetItems;
+                if (slots != null && slots.Count > 0)
+                    list.AddRange(slots.FindAll(s => predicate(s.Item)));
+
+                slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.CraftingResources).GetItems;
+                if (slots != null && slots.Count > 0)
+                    list.AddRange(slots.FindAll(s => predicate(s.Item)));
+                slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.CraftingInventory).GetItems;
+                if (slots != null && slots.Count > 0)
+                    list.AddRange(slots.FindAll(s => predicate(s.Item)));
+                slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.FashionItems).GetItems;
+                if (slots != null && slots.Count > 0)
+                    list.AddRange(slots.FindAll(s => predicate(s.Item)));
+            }
+#endif
+
 
             return list.Count > 0;
         }
 
-        public static bool GetItems(this BagsList bags, ItemFilterCore filter, out List<InventorySlot> list)
+        public static bool GetItems(this BagsList bags, ItemFilterCore filter, out List<InventorySlot> list, bool checkSellable = false)
         {
             list = new List<InventorySlot>();
-
+#if false
             var predicate = typeof(ItemFilterCore).GetFunction<Item, bool>("\u0001");
 
             if (predicate != null)
+#else
+            if (AstralAccessors.ItemFilter.IsMatch != null)
             {
+                // Формируем предикат для проверки предметов на соответствие
+                Predicate<Item> predicate;
+                if(checkSellable)
+                {
+                    predicate = (Item item) => {
+                        return Astral.Logic.NW.Inventory.CanSell(item)
+                               && AstralAccessors.ItemFilter.IsMatch(filter)(item);
+                    };
+                }
+                else predicate = (Item item) => AstralAccessors.ItemFilter.IsMatch(filter)(item);
+#endif
+
+                // Сканируем все выбранные сумки и добавляем подходящие предметы в список
                 foreach (var bag in bags.GetSelectedBags())
                 {
                     List<InventorySlot> slots = bag.GetItems;
                     if (slots != null && slots.Count > 0)
-                        foreach (var filterEntry in filter.Entries)
-                            list.AddRange(slots.FindAll(s => predicate(filterEntry)(s.Item)));
+                        list.AddRange(slots.FindAll(s => predicate(s.Item)));
                 }
             }
 

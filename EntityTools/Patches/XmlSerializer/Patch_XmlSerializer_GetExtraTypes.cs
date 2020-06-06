@@ -1,4 +1,4 @@
-﻿#if HARMONY
+﻿#if PATCH_ASTRAL && HARMONY
 using HarmonyLib; 
 #endif
 
@@ -15,7 +15,7 @@ using System.Windows.Forms;
 
 namespace EntityTools.Patches
 {
-#if DEVELOPER && HARMONY
+#if PATCH_ASTRAL && HARMONY
     /// <summary>
     /// Патч метода Astral.Functions.XmlSerializer.GetExtraTypes()
     /// </summary>

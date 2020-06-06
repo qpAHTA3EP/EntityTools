@@ -26,6 +26,9 @@ namespace EntityTools.Reflection
             if (Equals(type, null))
                 return null;
 
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
+
             Type[] argumentTypes = new Type[] { };
 
             MethodInfo method = null;
@@ -67,6 +70,7 @@ namespace EntityTools.Reflection
         /// Конструирование делегата, осуществляющего через механизм рефлексии 
         /// доступ к методу объекта заданного типа, и возвращающего значение типа ReturnT
         /// </summary>
+        /// <typeparam name="ArgumentT1">Тип аргумента метода</typeparam>
         /// <typeparam name="ReturnT">Тип возвращаемого значения</typeparam>
         /// <param name="type">Тип, декларирующий искомый методв</param>
         /// <param name="methodName">Имя метода</param>
@@ -77,6 +81,9 @@ namespace EntityTools.Reflection
         {
             if (Equals(type, null))
                 return null;
+
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
 
             Type[] argumentTypes = new Type[] { typeof(ArgumentT1) };
 
@@ -130,6 +137,9 @@ namespace EntityTools.Reflection
             if (Equals(type, null))
                 return null;
 
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
+
             Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT2) };
 
             MethodInfo method = null;
@@ -171,6 +181,9 @@ namespace EntityTools.Reflection
         /// Конструирование делегата, осуществляющего через механизм рефлексии 
         /// доступ к методу объекта заданного типа, и возвращающего значение типа ReturnT
         /// </summary>
+        /// <typeparam name="ArgumentT1">Тип аргумента метода</typeparam>
+        /// <typeparam name="ArgumentT2">Тип аргумента метода</typeparam>
+        /// <typeparam name="ArgumentT3">Тип аргумента метода</typeparam>
         /// <typeparam name="ReturnT">Тип возвращаемого значения</typeparam>
         /// <param name="type">Тип, декларирующий искомый методв</param>
         /// <param name="methodName">Имя метода</param>
@@ -181,6 +194,9 @@ namespace EntityTools.Reflection
         {
             if (Equals(type, null))
                 return null;
+
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
 
             Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3) };
 
@@ -223,6 +239,10 @@ namespace EntityTools.Reflection
         /// Конструирование делегата, осуществляющего через механизм рефлексии 
         /// доступ к методу объекта заданного типа, и возвращающего значение типа ReturnT
         /// </summary>
+        /// <typeparam name="ArgumentT1">Тип аргумента метода</typeparam>
+        /// <typeparam name="ArgumentT2">Тип аргумента метода</typeparam>
+        /// <typeparam name="ArgumentT3">Тип аргумента метода</typeparam>
+        /// <typeparam name="ArgumentT4">Тип аргумента метода</typeparam>
         /// <typeparam name="ReturnT">Тип возвращаемого значения</typeparam>
         /// <param name="type">Тип, декларирующий искомый методв</param>
         /// <param name="methodName">Имя метода</param>
@@ -233,6 +253,9 @@ namespace EntityTools.Reflection
         {
             if (Equals(type, null))
                 return null;
+
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
 
             Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4) };
 
@@ -275,6 +298,11 @@ namespace EntityTools.Reflection
         /// Конструирование делегата, осуществляющего через механизм рефлексии 
         /// доступ к методу объекта заданного типа, и возвращающего значение типа ReturnT
         /// </summary>
+        /// <typeparam name="ArgumentT1">Тип аргумента метода</typeparam>
+        /// <typeparam name="ArgumentT2">Тип аргумента метода</typeparam>
+        /// <typeparam name="ArgumentT3">Тип аргумента метода</typeparam>
+        /// <typeparam name="ArgumentT4">Тип аргумента метода</typeparam>
+        /// <typeparam name="ArgumentT5">Тип аргумента метода</typeparam>
         /// <typeparam name="ReturnT">Тип возвращаемого значения</typeparam>
         /// <param name="type">Тип, декларирующий искомый методв</param>
         /// <param name="methodName">Имя метода</param>
@@ -285,6 +313,9 @@ namespace EntityTools.Reflection
         {
             if (Equals(type, null))
                 return null;
+
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
 
             Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4), typeof(ArgumentT5) };
 
@@ -333,7 +364,7 @@ namespace EntityTools.Reflection
         /// <param name="flags"></param>
         /// <param name="method"></param>
         /// <returns></returns>
-        private static bool FindByNameAndSignature(Type type, string methodName, Type returnType, Type[] inputTypes, BindingFlags flags, out MethodInfo method)
+        internal static bool FindByNameAndSignature(Type type, string methodName, Type returnType, Type[] inputTypes, BindingFlags flags, out MethodInfo method)
         {
             if (!Equals(type, null))
             {
@@ -363,7 +394,7 @@ namespace EntityTools.Reflection
         /// <param name="flags"></param>
         /// <param name="method"></param>
         /// <returns></returns>
-        private static bool FindBySignature(Type type, Type returnType, Type[] inputTypes, BindingFlags flags, out MethodInfo method)
+        internal static bool FindBySignature(Type type, Type returnType, Type[] inputTypes, BindingFlags flags, out MethodInfo method)
         {
             if (!Equals(type, null))
             {
@@ -393,5 +424,373 @@ namespace EntityTools.Reflection
             method = null;
             return false;
         }
+    }
+
+    public class InstanceAccessor<ContainerType> where ContainerType : class
+    {
+        /// <summary>
+        /// Конструирование делегата, осуществляющего через механизм рефлексии 
+        /// доступ к методу объекта заданного типа, и возвращающего значение типа ReturnT
+        /// </summary>
+        /// <typeparam name="ContainerType">Тип объекта, содержащего нужный метод</typeparam>
+        /// <typeparam name="ReturnT">Тип возвращаемого значения</typeparam>
+        /// <param name="methodName">Имя метода</param>
+        /// <param name="flags"></param>
+        /// <returns>Сконструированный делегат</returns>
+        public static Func<ContainerType, Func<ReturnT>>
+                                      GetFunction<ReturnT>(string methodName = "", BindingFlags flags = BindingFlags.Default)
+        {
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
+
+            Type type = typeof(ContainerType);
+
+            Type[] argumentTypes = new Type[] { };
+
+            MethodInfo method = null;
+
+            if (string.IsNullOrEmpty(methodName))
+            {
+                // Поиск метода по сигнатуре (без имени)
+                InstanceFunctionFactory.FindBySignature(type, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method);
+            }
+            else
+            {
+                // Поиск метода по имени и сигнатуре
+                InstanceFunctionFactory.FindByNameAndSignature(type, methodName, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method);
+            }
+            if (method != null)
+            {
+                return new Func<ContainerType, Func<ReturnT>>((ContainerType o) =>
+                {
+                    return new Func<ReturnT>(() =>
+                    {
+                        object result = method.Invoke(o, new object[] { });
+                        if (Equals(result, null))
+                            return default(ReturnT);
+                        else return (ReturnT)result;
+                    });
+                });
+            }
+
+            return new Dummy<ReturnT>(methodName).DummyMethod; 
+        }
+
+        /// <summary>
+        /// Конструирование делегата, осуществляющего через механизм рефлексии 
+        /// доступ к методу объекта заданного типа, и возвращающего значение типа ReturnT
+        /// </summary>
+        /// <typeparam name="ArgumentT1">Тип аргумента метода</typeparam>
+        /// <typeparam name="ReturnT">Тип возвращаемого значения</typeparam>
+        /// <param name="methodName">Имя метода</param>
+        /// <param name="flags"></param>
+        /// <returns>Сконструированный делегат</returns>
+        public static Func<ContainerType, Func<ArgumentT1, ReturnT>>
+                                      GetFunction<ArgumentT1, ReturnT>(string methodName = "", BindingFlags flags = BindingFlags.Default)
+        {
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
+
+            Type type = typeof(ContainerType);
+
+            Type[] argumentTypes = new Type[] { typeof(ArgumentT1) };
+
+            MethodInfo method = null;
+
+            if (string.IsNullOrEmpty(methodName))
+            {
+                // Поиск метода по сигнатуре (без имени)
+                InstanceFunctionFactory.FindBySignature(type, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method);
+            }
+            else
+            {
+                // Поиск метода по имени и сигнатуре
+                InstanceFunctionFactory.FindByNameAndSignature(type, methodName, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method);
+            }
+            if (method != null)
+            {
+                return new Func<ContainerType, Func<ArgumentT1, ReturnT>>((ContainerType o) =>
+                {
+                    return new Func<ArgumentT1, ReturnT>((ArgumentT1 a1) =>
+                    {
+                        object result = method.Invoke(o, new object[] { a1 });
+                        if (Equals(result, null))
+                            return default(ReturnT);
+                        else return (ReturnT)result;
+                    });
+                });
+            }
+            return new Dummy<ReturnT>(methodName).DummyMethod<ArgumentT1>;
+        }
+
+        /// <summary>
+        /// Конструирование делегата, осуществляющего через механизм рефлексии 
+        /// доступ к методу объекта заданного типа, и возвращающего значение типа ReturnT
+        /// </summary>
+        /// <typeparam name="ArgumentT1">Тип аргумента метода</typeparam>
+        /// <typeparam name="ArgumentT2">Тип аргумента метода</typeparam>
+        /// <typeparam name="ReturnT">Тип возвращаемого значения</typeparam>
+        /// <param name="type">Тип, декларирующий искомый методв</param>
+        /// <param name="methodName">Имя метода</param>
+        /// <param name="flags"></param>
+        /// <returns>Сконструированный делегат</returns>
+        public static Func<ContainerType, Func<ArgumentT1, ArgumentT2, ReturnT>>
+                                      GetFunction<ArgumentT1, ArgumentT2, ReturnT>(string methodName = "", BindingFlags flags = BindingFlags.Default)
+        {
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
+
+            Type type = typeof(ContainerType);
+
+            Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT2) };
+
+            MethodInfo method = null;
+
+            if (string.IsNullOrEmpty(methodName))
+            {
+                // Поиск метода по сигнатуре (без имени)
+                InstanceFunctionFactory.FindBySignature(type, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method);
+            }
+            else
+            {
+                // Поиск метода по имени и сигнатуре
+                InstanceFunctionFactory.FindByNameAndSignature(type, methodName, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method);
+            }
+            if (method != null)
+            {
+                return new Func<ContainerType, Func<ArgumentT1, ArgumentT2, ReturnT>>((ContainerType o) =>
+                {
+                    return new Func<ArgumentT1, ArgumentT2, ReturnT>((ArgumentT1 a1, ArgumentT2 a2) =>
+                    {
+                        object result = method.Invoke(o, new object[] { a1, a2 });
+                        if (Equals(result, null))
+                            return default(ReturnT);
+                        else return (ReturnT)result;
+                    });
+                });
+            }
+            return new Dummy<ReturnT>(methodName).DummyMethod<ArgumentT1, ArgumentT2>;
+        }
+
+        /// <summary>
+        /// Конструирование делегата, осуществляющего через механизм рефлексии 
+        /// доступ к методу объекта заданного типа, и возвращающего значение типа ReturnT
+        /// </summary>
+        /// <typeparam name="ArgumentT1">Тип аргумента метода</typeparam>
+        /// <typeparam name="ArgumentT2">Тип аргумента метода</typeparam>
+        /// <typeparam name="ArgumentT3">Тип аргумента метода</typeparam>
+        /// <typeparam name="ReturnT">Тип возвращаемого значения</typeparam>
+        /// <param name="type">Тип, декларирующий искомый методв</param>
+        /// <param name="methodName">Имя метода</param>
+        /// <param name="flags"></param>
+        /// <returns>Сконструированный делегат</returns>
+        public static Func<ContainerType, Func<ArgumentT1, ArgumentT2, ArgumentT3, ReturnT>>
+                                      GetFunction<ArgumentT1, ArgumentT2, ArgumentT3, ReturnT>(string methodName = "", BindingFlags flags = BindingFlags.Default)
+        {
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
+
+            Type type = typeof(ContainerType);
+
+            Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3) };
+
+            MethodInfo method = null;
+
+            if (string.IsNullOrEmpty(methodName))
+            {
+                // Поиск метода по сигнатуре (без имени)
+                InstanceFunctionFactory.FindBySignature(type, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method);
+            }
+            else
+            {
+                // Поиск метода по имени и сигнатуре
+                InstanceFunctionFactory.FindByNameAndSignature(type, methodName, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method);
+            }
+            if (method != null)
+            {
+                return new Func<ContainerType, Func<ArgumentT1, ArgumentT2, ArgumentT3, ReturnT>>((ContainerType o) =>
+                {
+                    return new Func<ArgumentT1, ArgumentT2, ArgumentT3, ReturnT>((ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3) =>
+                    {
+                        object result = method.Invoke(o, new object[] { a1, a2, a3 });
+                        if (Equals(result, null))
+                            return default(ReturnT);
+                        else return (ReturnT)result;
+                    });
+                });
+            }
+            return new Dummy<ReturnT>(methodName).DummyMethod<ArgumentT1, ArgumentT2, ArgumentT3>;
+        }
+
+        /// <summary>
+        /// Конструирование делегата, осуществляющего через механизм рефлексии 
+        /// доступ к методу объекта заданного типа, и возвращающего значение типа ReturnT
+        /// </summary>
+        /// <typeparam name="ArgumentT1">Тип аргумента метода</typeparam>
+        /// <typeparam name="ArgumentT2">Тип аргумента метода</typeparam>
+        /// <typeparam name="ArgumentT3">Тип аргумента метода</typeparam>
+        /// <typeparam name="ArgumentT4">Тип аргумента метода</typeparam>
+        /// <typeparam name="ReturnT">Тип возвращаемого значения</typeparam>
+        /// <param name="type">Тип, декларирующий искомый методв</param>
+        /// <param name="methodName">Имя метода</param>
+        /// <param name="flags"></param>
+        /// <returns>Сконструированный делегат</returns>
+        public static Func<ContainerType, Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ReturnT>>
+                                      GetFunction<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ReturnT>(string methodName = "", BindingFlags flags = BindingFlags.Default)
+        {
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
+
+            Type type = typeof(ContainerType);
+
+            Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4) };
+
+            MethodInfo method = null;
+
+            if (string.IsNullOrEmpty(methodName))
+            {
+                // Поиск метода по сигнатуре (без имени)
+                InstanceFunctionFactory.FindBySignature(type, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method);
+            }
+            else
+            {
+                // Поиск метода по имени и сигнатуре
+                InstanceFunctionFactory.FindByNameAndSignature(type, methodName, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method);
+            }
+            if (method != null)
+            {
+                return new Func<ContainerType, Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ReturnT>>((ContainerType o) =>
+                {
+                    return new Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ReturnT>((ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3, ArgumentT4 a4) =>
+                    {
+                        object result = method.Invoke(o, new object[] { a1, a2, a3, a4 });
+                        if (Equals(result, null))
+                            return default(ReturnT);
+                        else return (ReturnT)result;
+                    });
+                });
+            }
+            return new Dummy<ReturnT>(methodName).DummyMethod<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4>;
+        }
+
+        /// <summary>
+        /// Конструирование делегата, осуществляющего через механизм рефлексии 
+        /// доступ к методу объекта заданного типа, и возвращающего значение типа ReturnT
+        /// </summary>
+        /// <typeparam name="ArgumentT1">Тип аргумента метода</typeparam>
+        /// <typeparam name="ArgumentT2">Тип аргумента метода</typeparam>
+        /// <typeparam name="ArgumentT3">Тип аргумента метода</typeparam>
+        /// <typeparam name="ArgumentT4">Тип аргумента метода</typeparam>
+        /// <typeparam name="ArgumentT5">Тип аргумента метода</typeparam>
+        /// <typeparam name="ReturnT">Тип возвращаемого значения</typeparam>
+        /// <param name="type">Тип, декларирующий искомый методв</param>
+        /// <param name="methodName">Имя метода</param>
+        /// <param name="flags"></param>
+        /// <returns>Сконструированный делегат</returns>
+        public static Func<ContainerType, Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5, ReturnT>>
+                                      GetFunction<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5, ReturnT>(string methodName, BindingFlags flags = BindingFlags.Default)
+        {
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
+
+            Type type = typeof(ContainerType);
+
+            Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4), typeof(ArgumentT5) };
+
+            MethodInfo method = null;
+
+            if (string.IsNullOrEmpty(methodName))
+            {
+                // Поиск метода по сигнатуре (без имени)
+                InstanceFunctionFactory.FindBySignature(type, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method);
+            }
+            else
+            {
+                // Поиск метода по имени и сигнатуре
+                InstanceFunctionFactory.FindByNameAndSignature(type, methodName, typeof(ReturnT), argumentTypes, flags | BindingFlags.Static | BindingFlags.NonPublic, out method);
+            }
+            if (method != null)
+            {
+                return new Func<ContainerType, Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5, ReturnT>>((ContainerType o) =>
+                {
+                    return new Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5, ReturnT>((ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3, ArgumentT4 a4, ArgumentT5 a5) =>
+                    {
+                        object result = method.Invoke(o, new object[] { a1, a2, a3, a4, a5 });
+                        if (Equals(result, null))
+                            return default;
+                        else return (ReturnT)result;
+                    });
+                });
+            }
+            return new Dummy<ReturnT>(methodName).DummyMethod<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5>;
+        }
+
+        /// <summary>
+        /// Методы заглушки, вызываемый в случае неудачи при получении доступа к члену или методу
+        /// </summary>
+        /// <typeparam name="ReturnT"></typeparam>
+        /// <param name="methodName"></param>
+        /// <returns></returns>
+        private class Dummy<ReturnT>
+        {
+            string message = string.Empty;
+
+            public Dummy(string methodName)
+            {
+                message = $"Fail to access to method '{typeof(ContainerType).Name}.{methodName}'";
+            }
+
+            public Func<ReturnT> DummyMethod(ContainerType c)
+            {
+                return internalDummyMethod;
+            }
+            public Func<ArgumentT1, ReturnT> DummyMethod<ArgumentT1>(ContainerType c)
+            {
+                return internalDummyMethod;
+            }
+            public Func<ArgumentT1, ArgumentT2, ReturnT> DummyMethod<ArgumentT1, ArgumentT2>(ContainerType c)
+            {
+                return internalDummyMethod;
+            }
+            public Func<ArgumentT1, ArgumentT2, ArgumentT3, ReturnT> DummyMethod<ArgumentT1, ArgumentT2, ArgumentT3>(ContainerType c)
+            {
+                return internalDummyMethod;
+            }
+            public Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ReturnT> DummyMethod<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4>(ContainerType c)
+            {
+                return internalDummyMethod;
+            }
+            public Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5, ReturnT> DummyMethod<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5>(ContainerType c)
+            {
+                return internalDummyMethod;
+            }
+
+            private ReturnT internalDummyMethod()
+            {
+                ETLogger.WriteLine(LogType.Error, message, true);
+                return default;
+            }
+            private ReturnT internalDummyMethod<ArgumentT1>(ArgumentT1 a1)
+            {
+                return internalDummyMethod();
+            }
+            private ReturnT internalDummyMethod<ArgumentT1, ArgumentT2>(ArgumentT1 a1, ArgumentT2 a2)
+            {
+                return internalDummyMethod();
+            }
+            private ReturnT internalDummyMethod<ArgumentT1, ArgumentT2, ArgumentT3>(ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3)
+            {
+                return internalDummyMethod();
+            }
+            private ReturnT internalDummyMethod<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4>(ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3, ArgumentT4 a4)
+            {
+                return internalDummyMethod();
+            }
+            private ReturnT internalDummyMethod<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5>(ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3, ArgumentT4 a4, ArgumentT5 a5)
+            {
+                return internalDummyMethod();
+            }
+        }
+
     }
 }

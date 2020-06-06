@@ -433,82 +433,14 @@ namespace EntityTools.Quester.Actions
         internal IQuesterActionEngine Engine;
 #endif
 
-#if CORE_DELEGATES
-        [NonSerialized]
-        internal Func<ActionResult> coreRun = null;
-        [NonSerialized]
-        internal Func<bool> coreNeedToRun = null;
-        [NonSerialized]
-        internal Func<bool> coreInternalConditions = null;
-        [NonSerialized]
-        internal Func<ActionValidity> coreActionValidity = null;
-        [NonSerialized]
-        internal System.Action coreReset = null;
-        [NonSerialized]
-        internal System.Action coreGatherInfos = null;
-        [NonSerialized]
-        internal Func<string> coreLabel = null;
-        [NonSerialized]
-        internal Func<Entity> coreTarget = null;
-        [NonSerialized]
-        internal Func<bool> coreTargetValidate = null;
-#endif
-
         public InteractEntities()
         {
-#if CORE_DELEGATES
-            //coreRun = () => Core.Initializer.Initialize(ref coreRun);
-            //coreNeedToRun = () => Core.Initializer.Initialize(ref coreNeedToRun);
-            //coreInternalConditions = () => Core.Initializer.Initialize(ref coreInternalConditions);
-            //coreActionValidity = () => Core.Initializer.Initialize(ref coreActionValidity);
-            //coreReset = () => Core.Initializer.Initialize(ref coreReset);
-            //coreGatherInfos = () => Core.Initializer.Initialize(ref coreGatherInfos);
-            //coreLabel = () => Core.Initializer.Initialize(ref coreLabel);
-            //coreTarget = () => Core.Initializer.Initialize(ref coreTarget);
-            //coreTargetValidate = () => Core.Initializer.Initialize(ref coreTargetValidate);
-#endif
 #if CORE_INTERFACES
             Engine = new QuesterActionProxy(this);
 #endif
-            // EntityTools.Core.Initialize(this);
         }
         #endregion
 
-#if CORE_DELEGATES
-        // Интерфейс Quester.Action через делегаты
-        public override bool NeedToRun => coreNeedToRun();
-        public override ActionResult Run() => coreRun();
-
-        public override string ActionLabel => coreLabel();
-        public override string InternalDisplayName => string.Empty;
-        public override bool UseHotSpots => true;
-        protected override Vector3 InternalDestination
-        {
-            get
-            {
-                if (coreTargetValidate())
-                {
-                    Entity target = coreTarget();
-                    if (_ignoreCombat && (target.Location.Distance3DFromPlayer > _combatDistance))
-                        return target.Location.Clone();
-                }
-                return new Vector3();
-            }
-        }
-
-        protected override bool IntenalConditions => coreInternalConditions();
-        protected override ActionValidity InternalValidity => coreActionValidity();
-
-        public override void InternalReset() => coreReset();
-        public override void GatherInfos() => coreGatherInfos();
-        public override void OnMapDraw(GraphicsNW graph)
-        {
-            if (coreTargetValidate())
-            {
-                graph.drawFillEllipse(coreTarget().Location, new Size(10, 10), Brushes.Beige);
-            }
-        }
-#endif
 #if CORE_INTERFACES
         // Интерфейс Quester.Action через IQuesterActionEngine
         public override bool NeedToRun => Engine.NeedToRun;

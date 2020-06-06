@@ -10,7 +10,7 @@ using EntityTools.Reflection;
 
 namespace EntityTools.Patches.UCC
 {
-#if DEVELOPER
+#if PATCH_ASTRAL
     ///
     internal class Patch_ActionsPlayer_CheckAlly : Patch
     {

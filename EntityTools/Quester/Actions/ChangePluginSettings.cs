@@ -13,7 +13,7 @@ namespace EntityTools.Quester.Actions
 
         public string Value { get; set; }
 
-        public override string ActionLabel=> $"{GetType().Name} : {Command} => {Value}";
+        public ChangePluginSetting() { }
 
         public override bool NeedToRun => true;
 
@@ -66,8 +66,7 @@ namespace EntityTools.Quester.Actions
             return ActionResult.Skip;
         }
 
-        public ChangePluginSetting() { }
-
+        public override string ActionLabel=> string.Empty;
         protected override bool IntenalConditions => true;
         public override void OnMapDraw(GraphicsNW graph){}
         public override void InternalReset() { }
@@ -114,5 +113,10 @@ namespace EntityTools.Quester.Actions
             }
         }
         public override void GatherInfos() { }
+
+        public override string ToString()
+        {
+            return $"{GetType().Name} : {Command} => {Value}";
+        }
     }
 }

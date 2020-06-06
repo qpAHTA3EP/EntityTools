@@ -55,16 +55,6 @@ namespace EntityCore.Quester.Action
             hashCode = @this.GetHashCode().ToString("X2");
 
             @this.PropertyChanged += PropertyChanged;
-
-#if CORE_DELEGATES
-            @this.coreNeedToRun = NeedToRun;
-            @this.coreRun = Run;
-            @this.coreValidate = Validate;
-            @this.coreReset = Reset;
-            @this.coreGatherInfos = GatherInfos;
-            @this.getString = GetString;
-            @this.getTarget = Target; 
-#endif
 #if CORE_INTERFACES
             @this.Engine = this;
 #endif
@@ -102,117 +92,6 @@ namespace EntityCore.Quester.Action
             }
         }
 
-#if CORE_DELEGATES
-        internal bool NeedToRun()
-        {
-            //Команда работает с 2 - мя целями:
-            //1 - я цель (target) определяет навигацию. Если она зафиксированная(HoldTargetEntity), то не сбрасывается пока жива и не достигнута
-            //2 - я ближайшая цель (closest) управляет флагом IgnoreCombat
-            //Если HoldTargetEntity ВЫКЛЮЧЕН, то обе цели совпадают - это ближайшая цель 
-
-            if (customRegions == null)
-                customRegions = CustomRegionExtentions.GetCustomRegions(@this.CustomRegionNames);
-
-            if (Comparer == null && !string.IsNullOrEmpty(@this.EntityID))
-            {
-#if DEBUG
-                EntityToolsLogger.WriteLine(Logger.LogType.Debug, "MoveToEntityEngine::NeedToRun: Comparer is null. Initialize.");
-#endif
-                Comparer = EntityToPatternComparer.Get(@this.EntityID, @this.EntityIdType, @this.EntityNameType);
-            }
-
-
-            Entity closestEntity = null;
-            if (timeout.IsTimedOut/* || (target != null && (!Validate(target) || (HealthCheck && target.IsDead)))*/)
-            {
-                closestEntity = SearchCached.FindClosestEntity(@this.EntityID, @this.EntityIdType, @this.EntityNameType, EntitySetType.Complete,
-                                                            @this.HealthCheck, @this.ReactionRange, @this.ReactionZRange, @this.RegionCheck, customRegions);
-                timeout.ChangeTime(@this.SearchTimeInterval);
-            }
-
-            if (!@this.HoldTargetEntity || !Validate(target) || (@this.HealthCheck && target.IsDead))
-                target = closestEntity;
-
-            if (Validate(target)
-                && !(@this.HealthCheck && target.IsDead)
-                && (target.Location.Distance3DFromPlayer <= @this.Distance))
-            {
-                if (@this.AttackTargetEntity)
-                {
-                    Astral.Logic.NW.Attackers.List.Clear();
-                    if (@this.AttackTargetEntity && target.RelationToPlayer == EntityRelation.Foe)
-                    {
-                        Astral.Logic.NW.Attackers.List.Add(target);
-                        if (@this.IgnoreCombat)
-                            Astral.Quester.API.IgnoreCombat = false;
-                        Astral.Logic.NW.Combats.CombatUnit(target, null);
-                    }
-                }
-                else if (@this.IgnoreCombat)
-                    Astral.Quester.API.IgnoreCombat = false;
-            }
-            else if (Validate(closestEntity)
-                     && !(@this.HealthCheck && closestEntity.IsDead)
-                     && (closestEntity.Location.Distance3DFromPlayer <= @this.Distance))
-            {
-                if (@this.AttackTargetEntity)
-                {
-                    Astral.Logic.NW.Attackers.List.Clear();
-                    if (@this.AttackTargetEntity && closestEntity.RelationToPlayer != EntityRelation.Friend)
-                    {
-                        Astral.Logic.NW.Attackers.List.Add(closestEntity);
-                        if (@this.IgnoreCombat)
-                            Astral.Quester.API.IgnoreCombat = false;
-                        Astral.Logic.NW.Combats.CombatUnit(closestEntity, null);
-                    }
-                }
-                else if (@this.IgnoreCombat)
-                    Astral.Quester.API.IgnoreCombat = false;
-            }
-            else if (@this.IgnoreCombat)
-                Astral.Quester.API.IgnoreCombat = true;
-
-            return (Validate(target) && (target.Location.Distance3DFromPlayer < @this.Distance));
-        }
-
-        internal ActionResult Run()
-        {
-            if (@this.AttackTargetEntity)
-            {
-                Astral.Logic.NW.Attackers.List.Clear();
-                if (@this.AttackTargetEntity)
-                {
-                    Astral.Logic.NW.Attackers.List.Add(target);
-                    if (@this.IgnoreCombat)
-                        Astral.Quester.API.IgnoreCombat = false;
-                    Astral.Logic.NW.Combats.CombatUnit(target, null);
-                }
-                else Astral.Quester.API.IgnoreCombat = false;
-            }
-
-            if (@this.IgnoreCombat)
-                Astral.Quester.API.IgnoreCombat = false;
-
-            if (@this.StopOnApproached)
-                return ActionResult.Completed;
-            else return ActionResult.Running;
-        }
-
-        internal Entity Target()
-        {
-            return target;
-        }
-
-        internal bool Validate()
-        {
-            return ValidateEntity(target);
-        }
-
-        internal bool ValidateEntity(Entity e)
-        {
-            return e != null && e.IsValid && (Comparer?.Invoke(e) == true);
-        }
-#endif
 #if CORE_INTERFACES
         public bool NeedToRun
         {
@@ -518,6 +397,7 @@ namespace EntityCore.Quester.Action
 
         public void InternalReset()
         {
+            target = null;
             checkEntity = internal_CheckEntity_Initializer;
             getCustomRegions = internal_GetCustomRegion_Initializer;
             label = String.Empty;
@@ -527,7 +407,7 @@ namespace EntityCore.Quester.Action
 
         public void OnMapDraw(GraphicsNW graph)
         {
-            if (checkEntity(target))
+            if (ValidateEntity(target))
                 graph.drawFillEllipse(target.Location, new Size(10, 10), Brushes.Beige);
         }
 #endif
@@ -574,7 +454,7 @@ namespace EntityCore.Quester.Action
 #endif
             if (ValidateEntity(target))
             {
-                bool distOk = target.Location.Distance3DFromPlayer < @this._reactionRange;
+                bool distOk = @this._reactionRange<= 0 || target.Location.Distance3DFromPlayer < @this._reactionRange;
                 bool zOk = @this._reactionZRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(target.Location) < @this._reactionZRange;
                 bool alive = !@this._healthCheck || !target.IsDead;
                 sb.Append("ClosestEntity: ").Append(target.ToString());
@@ -646,7 +526,7 @@ namespace EntityCore.Quester.Action
                 }
 
                 checkEntity = predicate;
-                return checkEntity(e);
+                return e != null && checkEntity(e);
             }
 #if DEBUG
             else ETLogger.WriteLine(LogType.Error, $"{GetType().Name}[{hashCode}]: Fail to initialize the Comparer.");

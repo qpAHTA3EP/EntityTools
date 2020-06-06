@@ -19,14 +19,6 @@ namespace EntityTools.Quester.Actions
         #region Взаимодействие с ядром EntityToolsCore
         public event PropertyChangedEventHandler PropertyChanged;
 
-#if CORE_DELEGATES
-        internal Func<ActionResult> coreRun = null;
-        internal Func<bool> coreNeedToRun = null;
-        internal Func<bool> coreValidate = null;
-        internal System.Action coreReset = null;
-        internal System.Action coreGatherInfos = null;
-        internal Func<string> coreString = null;
-#endif
 #if CORE_INTERFACES
         [NonSerialized]
         internal IQuesterActionEngine Engine;
@@ -337,63 +329,6 @@ namespace EntityTools.Quester.Actions
         public override string Category => "Basic";
         #endregion
 
-
-#if CORE_DELEGATES
-        // Интерфейс Quester.Action через делегаты
-        public override string ActionLabel => $"{GetType().Name} [{_entityId}]";
-        protected override bool IntenalConditions => !string.IsNullOrEmpty(_entityId);//Comparer != null;
-        public override string InternalDisplayName => string.Empty;
-        public override bool UseHotSpots => true;
-        protected override Vector3 InternalDestination
-        {
-            get
-            {
-                if (coreValidate())
-                {
-                    Entity target = coreTarget();
-                    if (target.Location.Distance3DFromPlayer > Distance)
-                        return target.Location.Clone();
-                    else return EntityManager.LocalPlayer.Location.Clone();
-                }
-                return new Vector3();
-            }
-        }
-        protected override ActionValidity InternalValidity
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(_entityId))
-                {
-                    return new ActionValidity($"EntityID property not set.");
-                }
-                return new ActionValidity();
-            }
-        }
-        public override bool NeedToRun
-        {
-            get
-            {
-                if (coreNeedToRun == null)
-                    EntityTools.Core.Initialize(this);
-                return coreNeedToRun();
-            }
-        }
-        public override ActionResult Run()
-        {
-            if (coreRun == null)
-                EntityTools.Core.Initialize(this);
-            return coreRun();
-        }
-        public override void OnMapDraw(GraphicsNW graph)
-        {
-            if (coreValidate())
-            {
-                graph.drawFillEllipse(getTarget().Location, new Size(10, 10), Brushes.Beige);
-            }
-        }
-        public override void InternalReset() { }
-        public override void GatherInfos() { }        
-#endif
 #if CORE_INTERFACES
         // Интерфес Quester.Action, реализованный через ActionEngine
         public override bool NeedToRun => Engine.NeedToRun;

@@ -16,7 +16,7 @@ using MyNW.Classes;
 
 namespace AstralMapperOriginals
 {
-#if DEVELOPER
+#if PATCH_ASTRAL
     internal static class Class81
     {
         public static bool smethod_0(string string_0, Form form_0 = null)
