@@ -144,9 +144,9 @@ namespace EntityTools.Tools.BuySellItems
         /// <summary>
         /// Фильтр слотов сумки
         /// </summary>
-        public List<ItemFilterEntryExt> Filters
+        public IList<ItemFilterEntryExt> Filters
         {
-            get => _filters;
+            get => _filters.AsReadOnly();
             set
             {
                 if (value != null && value.Count > 0)
@@ -177,11 +177,14 @@ namespace EntityTools.Tools.BuySellItems
 
             _exclude = null;
 
-            foreach (var f in filters)
+            // вставка с одновременной сортировкой по возрастанию ЫPriority
+            foreach (var f in filters.OrderBy(fe => fe.Priority))
             {
                 if (f.Mode == ItemFilterMode.Include)
-                    _filters.Add(f);
-                else _exclude += f.IsMatch;
+                {
+                    _filters.Add(CopyHelper.CreateDeepCopy(f));
+                }
+                else _exclude += CopyHelper.CreateDeepCopy(f).IsMatch;
             }
         }
 

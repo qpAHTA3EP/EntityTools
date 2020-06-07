@@ -86,6 +86,33 @@ namespace EntityTools.Enums
         Error
     }
 
+    /// <summary>
+    /// Тип ограничения привязки предмета
+    /// </summary>
+    public enum BoundingRestrictionType
+    {
+        /// <summary>
+        /// Никаких ограничений - любый предметы с привязкой и без
+        /// </summary>
+        None = 0,
+        /// <summary>
+        /// Привязанные к персонажу предметы
+        /// </summary>
+        CharacterBounded = 1,
+        /// <summary>
+        /// Привязанные к аккаунту предметы
+        /// </summary>
+        AccountBounded = 8,
+        /// <summary>
+        /// Привязанные к персонажу или к аккаунту предметы
+        /// </summary>
+        Bounded = 9, 
+        /// <summary>
+        /// Только непривязанные предметы
+        /// </summary>
+        Unbounded
+    }
+
     public enum EquipmentCategory
     {
         None = 0,

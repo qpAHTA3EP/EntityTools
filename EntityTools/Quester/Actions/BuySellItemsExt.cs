@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define grouping_filterEntry_by_priority
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
@@ -127,7 +129,27 @@ namespace EntityTools.Quester.Actions
         [Browsable(false)]
 #endif
         public List<ItemFilterEntryExt> BuyOptions { get => _buyOptions; set => _buyOptions = value; }
-        private List<ItemFilterEntryExt> _buyOptions = new List<ItemFilterEntryExt>();
+        internal List<ItemFilterEntryExt> _buyOptions = new List<ItemFilterEntryExt>();
+
+#if DEVELOPER
+        [Description("")]
+        [Category("Setting of buying")]
+#else
+        [Browsable(false)]
+#endif
+        public BoundingRestrictionType BoundingRestriction
+        {
+            get => _boundingRestriction;
+            set
+            {
+                if(_boundingRestriction != value)
+                {
+                    _boundingRestriction = value;
+                }
+            }
+
+        }
+        internal BoundingRestrictionType _boundingRestriction = BoundingRestrictionType.None;
 
 #if DEVELOPER
         [Description("Use options set in general settings to buy")]
@@ -790,6 +812,68 @@ namespace EntityTools.Quester.Actions
                     // Анализируем содержимое сумок
                     IndexedBags indexedBags = new IndexedBags(@this._buyOptions, @this._buyBags);
 
+#if grouping_filterEntry_by_priority
+                    uint allowBuyPriority = uint.MaxValue;
+                    foreach(var group in indexedBags.Filters.GroupBy((f) => f.Priority))
+                    {
+                        if (allowBuyPriority >= group.Key)
+                        {
+                            foreach (var filterEntry in indexedBags.Filters)
+                            {
+                                if (extendedActionDebugInfo)
+                                    debug.Value.AddInfo(string.Concat(methodName, ": Processing FilterEntry: ", filterEntry.ToString()));
+
+                                var slotCache = indexedBags[filterEntry];
+                                List<ItemDef> boughtItems = null;
+                                BuyItemResult buyItemResult = (slotCache is null) ? BuyAnItem(filterEntry, ref boughtItems) : BuyAnItem(filterEntry, slotCache, ref boughtItems);
+
+                                if (extendedActionDebugInfo)
+                                    debug.Value.AddInfo(string.Concat(methodName, ": Result: ", buyItemResult));
+                                
+                                // Обработка результата покупки
+                                // Если результат не позволяет продолжать покупку - прерываем выполнение команды
+                                switch (buyItemResult)
+                                {
+                                    case BuyItemResult.Succeeded:
+                                        {
+                                            // Предмет необходимо экипировать после покупки
+                                            if (filterEntry.PutOnItem && boughtItems != null && boughtItems.Count > 0)
+                                            {
+                                                foreach (ItemDef item in boughtItems)
+                                                {
+                                                    Thread.Sleep(1000);
+                                                    
+                                                    // Здесь не учитывается возможно приобретения и экипировки нескольких вещений (например, колец)
+                                                    InventorySlot slot = _buyBags.Find(item);
+                                                    if (slot != null)
+                                                        slot.Equip();
+                                                }
+                                            }
+                                            // можно продолжать покупки
+                                            break;
+                                        }
+                                    case BuyItemResult.Exists:
+                                        // можно продолжать покупки
+                                        break;
+                                    case BuyItemResult.Completed:
+                                        // можно продолжать покупки
+                                        break;
+                                    case BuyItemResult.FullBag:
+                                        return ActionResult.Skip;
+                                    case BuyItemResult.Error:
+                                        return ActionResult.Fail;
+                                    case BuyItemResult.NotEnoughCurrency:
+                                        // можно продолжать покупки с приоритетом не выше allowBuyPriority
+                                        allowBuyPriority = group.Key;
+                                        break;
+                                    default:
+                                        allowBuyPriority = group.Key;
+                                        break;
+                                }
+                            }
+                        }
+                    }
+#else
                     foreach (var filterEntry in indexedBags.Filters)
                     {
                         if (extendedActionDebugInfo)
@@ -827,10 +911,11 @@ namespace EntityTools.Quester.Actions
                                 return ActionResult.Fail;
                         }
                     }
+#endif
                 }
 #endif
 
-                return ActionResult.Completed;
+                    return ActionResult.Completed;
             }
             else
             {
@@ -990,7 +1075,7 @@ namespace EntityTools.Quester.Actions
                                 || slotCache.HasWorseThen(storeItemInfo))
                             {
                                 bool succeeded = false;
-                                Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(@this._timer > 0 ? (int)@this._timer : int.MaxValue);
+                                Astral.Classes.Timeout timeout = new Astral.Classes.Timeout((int)@this._timer);
 
                                 if (!_checkFreeBags || Check_FreeSlots(_buyBags))
                                 {
@@ -1029,7 +1114,7 @@ namespace EntityTools.Quester.Actions
                                             {
                                                 storeItemInfo.BuyItem(1);
                                                 Thread.Sleep(250);
-                                                if (timeout.IsTimedOut)
+                                                if (@this._timer > 0 && timeout.IsTimedOut)
                                                 {
                                                     str = $"Buying time is out. Bought only {totalPurchasedNum} of {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] was bought ...";
                                                     if (extendedActionDebugInfo)
@@ -1120,29 +1205,66 @@ namespace EntityTools.Quester.Actions
                 if (@this._sellOptions.Entries.Count > 0)
                 {
                     // Задан локальный фильтр продажи
-                    if(slots2sellCache?.Count > 0)
+                    if (slots2sellCache?.Count > 0)
                     {
                         // lots2sellCache сформирован, дополнительный происк производить не нужно
                         foreach (InventorySlot slot in slots2sellCache)
-                            if (Astral.Logic.NW.Inventory.CanSell(slot.Item))
-                            {
-                                Logger.WriteLine(string.Concat("Sell : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
-                                slot.StoreSellItem();
-                                Thread.Sleep(250);
-                            }
+                            TrySellAnItem(slot);
                     }
-                    else if(_sellBags.GetItems(@this._sellOptions, out List<InventorySlot> slots2sell, true))
-                        foreach(InventorySlot slot in slots2sell)
-                            if (Astral.Logic.NW.Inventory.CanSell(slot.Item))
-                            {
-                                Logger.WriteLine(string.Concat("Sell : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
-                                slot.StoreSellItem();
-                                Thread.Sleep(250);
-                            }
+                    else if (_sellBags.GetItems(@this._sellOptions, out List<InventorySlot> slots2sell, true))
+                    {
+                        foreach (InventorySlot slot in slots2sell)
+                            TrySellAnItem(slot);
+                    }
                     else Logger.WriteLine("Nothing to sell !");
                 }
             }
             else Logger.WriteLine("Can't sell to this vendor !");
+        }
+
+        private void TrySellAnItem(InventorySlot slot)
+        {
+            if (Astral.Logic.NW.Inventory.CanSell(slot.Item))
+                switch (_boundingRestriction)
+                {
+                    case BoundingRestrictionType.None:
+                        Logger.WriteLine(string.Concat("Sell : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
+                        slot.StoreSellItem();
+                        Thread.Sleep(250);
+                        break;
+                    case BoundingRestrictionType.Unbounded:
+                        if ((slot.Item.Flags & (uint)BoundingRestrictionType.Bounded) == 0u)
+                        {
+                            Logger.WriteLine(string.Concat("Sell unbounded items : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
+                            slot.StoreSellItem();
+                            Thread.Sleep(250);
+                        }
+                        break;
+                    case BoundingRestrictionType.Bounded:
+                        if ((slot.Item.Flags & (uint)BoundingRestrictionType.Bounded) > 0u)
+                        {
+                            Logger.WriteLine(string.Concat("Sell bounded items : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
+                            slot.StoreSellItem();
+                            Thread.Sleep(250);
+                        }
+                        break;
+                    case BoundingRestrictionType.CharacterBounded:
+                        if ((slot.Item.Flags & (uint)BoundingRestrictionType.CharacterBounded) > 0u)
+                        {
+                            Logger.WriteLine(string.Concat("Sell bounded to character items : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
+                            slot.StoreSellItem();
+                            Thread.Sleep(250);
+                        }
+                        break;
+                    case BoundingRestrictionType.AccountBounded:
+                        if ((slot.Item.Flags & (uint)BoundingRestrictionType.AccountBounded) > 0u)
+                        {
+                            Logger.WriteLine(string.Concat("Sell bounded to account items : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
+                            slot.StoreSellItem();
+                            Thread.Sleep(250);
+                        }
+                        break;
+                }
         }
 
 #if false
