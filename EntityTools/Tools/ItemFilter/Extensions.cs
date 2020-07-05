@@ -1,6 +1,6 @@
 ﻿using Astral.Classes.ItemFilter;
 using EntityTools.Reflection;
-using EntityTools.Tools.BuySellItems;
+using EntityTools.Tools.ItemFilter;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
@@ -9,29 +9,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using EntityTools.Tools.Reflection;
-using static EntityTools.Tools.BuySellItems.ItemFilterEntryExt;
+using static EntityTools.Tools.ItemFilter.BuyFilterEntry;
+using System.Xml.Serialization;
+using System.ComponentModel;
 
 namespace EntityTools.Extensions
 {
     /// <summary>
     /// Методы-расширения для индексированной сумки
     /// </summary>
-    public static class BagsExtension
+    public static class ItemFilterExtension
     {
+#if disable_20200704_1111
         /// <summary>
         /// Подсчет числа предметов, соответствующих item2buy
         /// </summary>
         /// <param name="bags"></param>
         /// <param name="item2buy"></param>
         /// <returns></returns>
-        public static uint CountItems(this IndexedBags bags, ItemFilterEntryExt item2buy)
+        public static uint CountItems<TFilterEntry>(this IndexedBags<TFilterEntry> bags, TFilterEntry item2buy) where TFilterEntry : IFilterEntry
         {
             var slots = bags[item2buy];
             uint num = 0;
             if (slots != null && slots.Count > 0)
                 num = (uint)slots.Sum((s) => s.Item.Count);
             return num;
-        }
+        } 
+#endif
 
         /// <summary>
         /// Подсчет числа предметов, соответствующих item2buy
@@ -39,7 +43,7 @@ namespace EntityTools.Extensions
         /// <param name="bags"></param>
         /// <param name="item2buy"></param>
         /// <returns></returns>
-        public static uint CountItems(this BagsList bags, ItemFilterEntryExt item2buy)
+        public static uint CountItems<TFilterEntry>(this BagsList bags, TFilterEntry item2buy) where TFilterEntry : IFilterEntry
         {
             uint num = 0;
             foreach (var bag in bags.GetSelectedBags())
@@ -48,6 +52,23 @@ namespace EntityTools.Extensions
             }
             return num;
         }
+
+        /// <summary>
+        /// Подсчет числа предметов, соответствующих <paramref name="item"/>
+        /// </summary>
+        /// <param name="bags"></param>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public static uint CountItems<TFilterEntry>(this BagsList bags, Item item) where TFilterEntry : IFilterEntry
+        {
+            uint num = 0;
+            foreach (var bag in bags.GetSelectedBags())
+            {
+                num += (uint)bag.GetItems.Sum(s => item.ItemDef.InternalName == s.Item.ItemDef.InternalName ? s.Item.Count : 0);
+            }
+            return num;
+        }
+
 
 #if false
         /// <summary>
@@ -138,8 +159,11 @@ namespace EntityTools.Extensions
         /// <param name="slotCache"></param>
         /// <param name="filterEntry"></param>
         /// <returns></returns>
-        public static uint NumberOfItem2Buy(this StoreItemInfo storeItem, BagsList bags, ItemFilterEntryExt filterEntry)
+        public static uint NumberOfItem2Buy(this StoreItemInfo storeItem, BagsList bags, BuyFilterEntry filterEntry)
         {
+            if (filterEntry.CheckPlayerLevel && !storeItem.FitsPlayerLevel())
+                return 0;
+
             uint toBuyNum = filterEntry.Count;
 
             if (filterEntry.KeepNumber)
@@ -196,6 +220,7 @@ namespace EntityTools.Extensions
             return toBuyNum;
         }
 
+#if disabled_20200705_1109
         /// <summary>
         /// Подсчет в slotCache количества предметов, соответствующих фильтру filterEntry
         /// и вычисление количества предметов storeItem, которые необходимо (до)купить
@@ -204,13 +229,13 @@ namespace EntityTools.Extensions
         /// <param name="slotCache"></param>
         /// <param name="filterEntry"></param>
         /// <returns></returns>
-        public static uint NumberOfItem2Buy(this StoreItemInfo storeItem,  SlotCache slotCache, ItemFilterEntryExt filterEntry)
+        public static uint NumberOfItem2Buy(this StoreItemInfo storeItem, SlotCache<BuyFilterEntry> slotCache)
         {
-            uint toBuyNum = filterEntry.Count;
+            uint toBuyNum = slotCache.Filter.Count;
 
-            if (filterEntry.KeepNumber && slotCache.Slots.Count > 0)
+            if (slotCache.Filter.KeepNumber && slotCache.Slots.Count > 0)
             {
-                if (filterEntry.CheckEquipmentLevel)
+                if (slotCache.Filter.CheckEquipmentLevel)
                 {
                     //если заданы опциz 'CheckEquipmentLevel',
                     //тогда при подсчете должео производиться сравнение с предметом, который покупается.
@@ -222,7 +247,7 @@ namespace EntityTools.Extensions
                         // Предмет может быть "обработан" (апгрейжен), поэтому сравнивать по уровню предмета нет смысла
                         foreach (var slot in slotCache.Slots)
                         {
-                            if (filterEntry.IsMatch(slot))
+                            if (slotCache.Filter.IsMatch(slot))
                             {
                                 if (storeItem.Item.IsRecommended(slot.Item))
                                     hasNum += slot.Item.Count;
@@ -241,9 +266,9 @@ namespace EntityTools.Extensions
                         // Предмет не может быть "обработан" (апгрейжен)
                         // сравниваем по уровню предмета
                         foreach (var slot in slotCache.Slots)
-                            if (filterEntry.IsMatch(slot)
+                            if (slotCache.Filter.IsMatch(slot)
                                 && slot.Item.ItemDef.Level >= storeItem.Item.ItemDef.Level)
-                                    hasNum += slot.Item.Count;
+                                hasNum += slot.Item.Count;
                     }
                     if (hasNum < toBuyNum)
                         toBuyNum -= hasNum;
@@ -257,7 +282,8 @@ namespace EntityTools.Extensions
                 }
             }
             return toBuyNum;
-        }
+        } 
+#endif
 
 
         /// <summary>
@@ -331,17 +357,17 @@ namespace EntityTools.Extensions
         /// Сопоставление предмета в магазине со всеми предметами в сумке.
         /// Покупаемый предмет должен быть лучше всех предметов в сумке, соответствующих фильтру
         /// </summary>
-        /// <param name="filterEntryCache"></param>
+        /// <param name="slotCache"></param>
         /// <param name="storeItem"></param>
         /// <returns></returns>
-        public static bool HasWorseThen<KeyType>(this KeyValuePair<KeyType, SlotCache> filterEntryCache, StoreItemInfo storeItem)
+        public static bool HasWorseThen(this SlotCache<BuyFilterEntry> slotCache, StoreItemInfo storeItem)
         {
             if(storeItem.Item.ItemDef.ProgressionDef.IsValid)
             {
                 // Предмет может быть "обработан" (апгрейжен), поэтому сравнивать по уровню предмета нет смысла
-                if(filterEntryCache.Value.Slots.Count > 0)
+                if(slotCache.Slots.Count > 0)
                 {
-                    foreach (var slot in filterEntryCache.Value.Slots)
+                    foreach (var slot in slotCache.Slots)
                         if (!storeItem.Item.IsRecommended(slot.Item))
                             return false;
                 }
@@ -350,7 +376,7 @@ namespace EntityTools.Extensions
             {
                 // Предмет не быть "обработан" (апгрейжен)
                 // сравниваем по уровню предмета
-                return filterEntryCache.Value.MaxItemLevel <= storeItem.Item.ItemDef.Level;
+                return slotCache.MaxItemLevel <= storeItem.Item.ItemDef.Level;
             }
             return true;
         }
@@ -362,7 +388,7 @@ namespace EntityTools.Extensions
         /// <param name="slotCache"></param>
         /// <param name="storeItem"></param>
         /// <returns></returns>
-        public static bool HasWorseThen(this SlotCache slotCache, StoreItemInfo storeItem)
+        public static bool HasWorseThen<TFilterEntry>(this SlotCache<TFilterEntry> slotCache, StoreItemInfo storeItem) where TFilterEntry : IFilterEntry
         {
             if (storeItem.Item.ItemDef.ProgressionDef.IsValid)
             {
@@ -532,6 +558,56 @@ namespace EntityTools.Extensions
 
             return list.Count > 0;
         }
+        public static bool GetBagsItems<TFilterEntry>(this ItemFilterCoreExt<TFilterEntry> filter, out List<InventorySlot> list, bool checkSellable = false) where TFilterEntry : IFilterEntry
+        {
+            list = new List<InventorySlot>();
+
+            List<InventorySlot> slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.Inventory).GetItems;
+            if (slots != null && slots.Count > 0)
+                list.AddRange(slots.FindAll(s => filter.IsMatch(s)));
+            slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag1).GetItems;
+            if (slots != null && slots.Count > 0)
+                list.AddRange(slots.FindAll(s => filter.IsMatch(s)));
+            slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag2).GetItems;
+            if (slots != null && slots.Count > 0)
+                list.AddRange(slots.FindAll(s => filter.IsMatch(s)));
+            slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag3).GetItems;
+            if (slots != null && slots.Count > 0)
+                list.AddRange(slots.FindAll(s => filter.IsMatch(s)));
+            slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag4).GetItems;
+            if (slots != null && slots.Count > 0)
+                list.AddRange(slots.FindAll(s => filter.IsMatch(s)));
+            slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag5).GetItems;
+            if (slots != null && slots.Count > 0)
+                list.AddRange(slots.FindAll(s => filter.IsMatch(s)));
+            slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag6).GetItems;
+            if (slots != null && slots.Count > 0)
+                list.AddRange(slots.FindAll(s => filter.IsMatch(s)));
+            slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag7).GetItems;
+            if (slots != null && slots.Count > 0)
+                list.AddRange(slots.FindAll(s => filter.IsMatch(s)));
+            slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag8).GetItems;
+            if (slots != null && slots.Count > 0)
+                list.AddRange(slots.FindAll(s => filter.IsMatch(s)));
+            slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.PlayerBag9).GetItems;
+            if (slots != null && slots.Count > 0)
+                list.AddRange(slots.FindAll(s => filter.IsMatch(s)));
+            slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.Overflow).GetItems;
+            if (slots != null && slots.Count > 0)
+                list.AddRange(slots.FindAll(s => filter.IsMatch(s)));
+
+            slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.CraftingResources).GetItems;
+            if (slots != null && slots.Count > 0)
+                list.AddRange(slots.FindAll(s => filter.IsMatch(s)));
+            slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.CraftingInventory).GetItems;
+            if (slots != null && slots.Count > 0)
+                list.AddRange(slots.FindAll(s => filter.IsMatch(s)));
+            slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.FashionItems).GetItems;
+            if (slots != null && slots.Count > 0)
+                list.AddRange(slots.FindAll(s => filter.IsMatch(s)));
+
+            return list.Count > 0;
+        }
 
         public static bool GetItems(this BagsList bags, ItemFilterCore filter, out List<InventorySlot> list, bool checkSellable = false)
         {
@@ -563,6 +639,21 @@ namespace EntityTools.Extensions
                         list.AddRange(slots.FindAll(s => predicate(s.Item)));
                 }
             }
+
+            return list.Count > 0;
+        }
+        public static bool GetItems<TFilterEntry>(this BagsList bags, ItemFilterCoreExt<TFilterEntry> filter, out List<InventorySlot> list, bool checkSellable = false) where TFilterEntry : IFilterEntry
+        {
+            list = new List<InventorySlot>();
+
+            // Сканируем все выбранные сумки и добавляем подходящие предметы в список
+            foreach (var bag in bags.GetSelectedBags())
+            {
+                List<InventorySlot> slots = bag.GetItems;
+                if (slots != null && slots.Count > 0)
+                    list.AddRange(slots.FindAll(s => filter.IsMatch(s)));
+            }
+            
 
             return list.Count > 0;
         }

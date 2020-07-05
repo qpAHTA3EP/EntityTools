@@ -69,8 +69,8 @@ namespace EntityTools.Reflection
         /// <param name="methodName">Имя метода</param>
         /// <param name="flags"></param>
         /// <returns>Сконструированный делегат</returns>
-        public static Func<Object, Action<ArgumentT1>>
-                                      GetFunction<ArgumentT1>(this Type type, string methodName = "", BindingFlags flags = BindingFlags.Default)
+        public static Func<object, Action<ArgumentT1>>
+                                      GetAction<ArgumentT1>(this Type type, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
             if (Equals(type, null))
                 return null;
@@ -118,7 +118,7 @@ namespace EntityTools.Reflection
         /// <param name="methodName">Имя метода</param>
         /// <param name="flags"></param>
         /// <returns>Сконструированный делегат</returns>
-        public static Func<Object, Action<ArgumentT1, ArgumentT2>>
+        public static Func<object, Action<ArgumentT1, ArgumentT2>>
                                       GetAction<ArgumentT1, ArgumentT2>(this Type type, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
             if (Equals(type, null))
@@ -167,7 +167,7 @@ namespace EntityTools.Reflection
         /// <param name="methodName">Имя метода</param>
         /// <param name="flags"></param>
         /// <returns>Сконструированный делегат</returns>
-        public static Func<Object, Action<ArgumentT1, ArgumentT2, ArgumentT3>>
+        public static Func<object, Action<ArgumentT1, ArgumentT2, ArgumentT3>>
                                       GetAction<ArgumentT1, ArgumentT2, ArgumentT3>(this Type type, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
             if (Equals(type, null))
@@ -216,7 +216,7 @@ namespace EntityTools.Reflection
         /// <param name="methodName">Имя метода</param>
         /// <param name="flags"></param>
         /// <returns>Сконструированный делегат</returns>
-        public static Func<Object, Action<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4>>
+        public static Func<object, Action<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4>>
                                       GetAction<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4>(this Type type, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
             if (Equals(type, null))
@@ -265,7 +265,7 @@ namespace EntityTools.Reflection
         /// <param name="methodName">Имя метода</param>
         /// <param name="flags"></param>
         /// <returns>Сконструированный делегат</returns>
-        public static Func<Object, Action<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5>>
+        public static Func<object, Action<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5>>
                                       GetAction<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5>(this Type type, string methodName, BindingFlags flags = BindingFlags.Default)
         {
             if (Equals(type, null))

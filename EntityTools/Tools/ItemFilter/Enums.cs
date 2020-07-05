@@ -5,21 +5,51 @@ using System.Text;
 
 namespace EntityTools.Enums
 {
+
+    /// <summary>
+    /// Перечисление типов фильтров предметов
+    /// </summary>
     public enum ItemFilterEntryType
     {
         /// <summary>
+        /// Отображаемое имя предмета
+        /// </summary>
+        Name = 0,
+        /// <summary>
         /// Предмет задан идентификатором
         /// </summary>
-        Identifier,
-        /// <summary>
-        /// Тип предмета
+        Identifier = 1,
+        /// <summary> 
+        /// Тип предмета <see cref="ItemType"/>
         /// </summary>
-        ItemType,
+        Category = 2,
         /// <summary>
-        /// Предмет задан категорией
+        /// Флаги предмета <see cref="ItemFlags"/>
         /// </summary>
-        Category
+        Type = 3,
+        /// <summary>
+        /// Предмет задан категорией <see cref="ItemCategory"/>
+        /// </summary>
+        Flag = 4,
+        /// <summary>
+        /// Качество предмета <see cref="ItemQuality"/>
+        /// </summary>
+        Quality = 6
+
     }
+#if false
+    ///
+    public enum ItemFilterType
+    {
+        ItemName = 0,
+        ItemID = 1,
+        ItemCatergory = 2,
+        ItemType = 3,
+        ItemFlag = 4,
+        Loot = 5,
+        ItemQuality = 6
+    }
+# endif
 
     public enum VendorType
     {
@@ -112,6 +142,33 @@ namespace EntityTools.Enums
         /// </summary>
         Unbounded
     }
+
+    public enum ItemFlagsExt
+    {
+        Unidentified = 2,
+        Unbound = 0,
+        CharacterBound = 1,
+        AccountBound = 8,
+        AnyBounds = 9,
+        Full = 4,
+        TrainingFromItem = 16,
+        SlottedOnAssignment = 32,
+        Algo = 64,
+        ProtectedItem = 128
+    }
+#if false
+    public enum ItemFlags : uint
+    {
+        Bound = 1,
+        Unidentified = 2,
+        Full = 4,
+        BoundToAccount = 8,
+        TrainingFromItem = 16,
+        SlottedOnAssignment = 32,
+        Algo = 64,
+        ProtectedItem = 128
+    } 
+#endif
 
     public enum EquipmentCategory
     {

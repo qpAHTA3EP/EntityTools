@@ -334,6 +334,11 @@ namespace EntityTools.Quester.Actions
         }
         internal bool _ignoreCombat = true;
 
+
+        //TODO: Добавить опцию, которая автоматически прерывать бой при удалении от заданного Entity.
+        // - автоматическая вставлка/удаление (при завершении команды) AbortCombat
+        // - фоновый процесс
+
 #if DEVELOPER
         [Category("Interaction")]
         [Description("Only one interaction with Entity is possible in 'InteractitTimeout' period")]

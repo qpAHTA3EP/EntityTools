@@ -1,21 +1,24 @@
 ﻿using EntityTools.Forms;
-using EntityTools.Tools.BuySellItems;
+using EntityTools.Tools.ItemFilter;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Xml.Serialization;
 
 namespace EntityTools.Editors
 {
 #if DEVELOPER
-    public class ItemFilterEntryListEditor : UITypeEditor
+    public partial class ItemFilterCoreExtEditor<TFilterEntry> where TFilterEntry : IFilterEntry
+    { }
+    public partial class ItemFilterCoreExtEditor<TFilterEntry> : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            if (value is List<ItemFilterEntryExt> list)
+            if (value is ItemFilterCoreExt<TFilterEntry> filterCore)
             {
-                if (ItemFilterEditorForm.GUIRequiest(ref list))
-                    return new List<ItemFilterEntryExt>(list);
+                if (ItemFilterEditorForm<TFilterEntry>.GUIRequiest(ref filterCore))
+                    return filterCore;
             }
             return value;
         }

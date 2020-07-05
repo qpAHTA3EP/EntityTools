@@ -37,6 +37,8 @@ namespace EntityTools.Core
             this.tbclMain = new DevExpress.XtraTab.XtraTabControl();
             this.tabUtilities = new DevExpress.XtraTab.XtraTabPage();
             this.cbEnchantHelperActivator = new System.Windows.Forms.CheckBox();
+            this.button2 = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.btnTest = new System.Windows.Forms.Button();
             this.btnCheckCore = new System.Windows.Forms.Button();
             this.btnUiViewer = new System.Windows.Forms.Button();
@@ -130,7 +132,7 @@ namespace EntityTools.Core
             this.btnUccEditor.Text = "Extended UCC Editor";
             this.btnUccEditor.UseVisualStyleBackColor = true;
             this.btnUccEditor.Visible = false;
-            this.btnUccEditor.Click += new System.EventHandler(this.btnUccEditor_Click);
+            this.btnUccEditor.Click += new System.EventHandler(this.event_OpenUccEditor);
             // 
             // tbclMain
             // 
@@ -151,6 +153,8 @@ namespace EntityTools.Core
             // tabUtilities
             // 
             this.tabUtilities.Controls.Add(this.cbEnchantHelperActivator);
+            this.tabUtilities.Controls.Add(this.button2);
+            this.tabUtilities.Controls.Add(this.button1);
             this.tabUtilities.Controls.Add(this.btnTest);
             this.tabUtilities.Controls.Add(this.btnCheckCore);
             this.tabUtilities.Controls.Add(this.btnUiViewer);
@@ -173,7 +177,31 @@ namespace EntityTools.Core
             this.cbEnchantHelperActivator.TabIndex = 10;
             this.cbEnchantHelperActivator.Text = "Enable EnchantHelper";
             this.cbEnchantHelperActivator.UseVisualStyleBackColor = true;
-            this.cbEnchantHelperActivator.CheckedChanged += new System.EventHandler(this.cbEnchantHelperActivator_CheckedChanged);
+            this.cbEnchantHelperActivator.CheckedChanged += new System.EventHandler(this.event_EnchantHelperActivation);
+            // 
+            // button2
+            // 
+            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button2.Location = new System.Drawing.Point(301, 160);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(54, 23);
+            this.button2.TabIndex = 2;
+            this.button2.Text = "Test 1";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.event_Test_1);
+            // 
+            // button1
+            // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button1.Location = new System.Drawing.Point(301, 189);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(54, 23);
+            this.button1.TabIndex = 2;
+            this.button1.Text = "Test 2";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.event_Test_2);
             // 
             // btnTest
             // 
@@ -183,9 +211,9 @@ namespace EntityTools.Core
             this.btnTest.Name = "btnTest";
             this.btnTest.Size = new System.Drawing.Size(54, 23);
             this.btnTest.TabIndex = 2;
-            this.btnTest.Text = "Test";
+            this.btnTest.Text = "Test 3";
             this.btnTest.UseVisualStyleBackColor = true;
-            this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
+            this.btnTest.Click += new System.EventHandler(this.event_Test_3);
             // 
             // btnCheckCore
             // 
@@ -199,7 +227,7 @@ namespace EntityTools.Core
             this.btnCheckCore.TabIndex = 0;
             this.btnCheckCore.Text = "Check EntityTools";
             this.btnCheckCore.UseVisualStyleBackColor = true;
-            this.btnCheckCore.Click += new System.EventHandler(this.btnCheckCore_Click);
+            this.btnCheckCore.Click += new System.EventHandler(this.event_CheckCore);
             // 
             // btnUiViewer
             // 
@@ -207,13 +235,13 @@ namespace EntityTools.Core
             | System.Windows.Forms.AnchorStyles.Right)));
             this.btnUiViewer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUiViewer.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnUiViewer.Location = new System.Drawing.Point(9, 293);
+            this.btnUiViewer.Location = new System.Drawing.Point(185, 293);
             this.btnUiViewer.Name = "btnUiViewer";
-            this.btnUiViewer.Size = new System.Drawing.Size(346, 40);
+            this.btnUiViewer.Size = new System.Drawing.Size(170, 40);
             this.btnUiViewer.TabIndex = 0;
             this.btnUiViewer.Text = "UI Viewer";
             this.btnUiViewer.UseVisualStyleBackColor = true;
-            this.btnUiViewer.Click += new System.EventHandler(this.btnUiViewer_Click);
+            this.btnUiViewer.Click += new System.EventHandler(this.event_OpenUiViewer);
             // 
             // btnAuraViewer
             // 
@@ -226,20 +254,20 @@ namespace EntityTools.Core
             this.btnAuraViewer.TabIndex = 0;
             this.btnAuraViewer.Text = "Auras";
             this.btnAuraViewer.UseVisualStyleBackColor = true;
-            this.btnAuraViewer.Click += new System.EventHandler(this.btnAuraViewer_Click);
+            this.btnAuraViewer.Click += new System.EventHandler(this.event_OpenAuraViewer);
             // 
             // btnEntities
             // 
             this.btnEntities.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnEntities.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnEntities.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnEntities.Location = new System.Drawing.Point(9, 247);
+            this.btnEntities.Location = new System.Drawing.Point(9, 293);
             this.btnEntities.Name = "btnEntities";
             this.btnEntities.Size = new System.Drawing.Size(170, 40);
             this.btnEntities.TabIndex = 0;
             this.btnEntities.Text = "Entities";
             this.btnEntities.UseVisualStyleBackColor = true;
-            this.btnEntities.Click += new System.EventHandler(this.btnEntities_Click);
+            this.btnEntities.Click += new System.EventHandler(this.event_OpenEntitiesViewer);
             // 
             // ckbSpellStuckMonitor
             // 
@@ -252,7 +280,7 @@ namespace EntityTools.Core
             this.ckbSpellStuckMonitor.TabIndex = 1;
             this.ckbSpellStuckMonitor.Text = "Enable SpellStuckMonitor";
             this.ckbSpellStuckMonitor.UseVisualStyleBackColor = true;
-            this.ckbSpellStuckMonitor.CheckedChanged += new System.EventHandler(this.cbSpellStuckMonitor_CheckedChanged);
+            this.ckbSpellStuckMonitor.CheckedChanged += new System.EventHandler(this.event_SpellStuckMonitorActivation);
             // 
             // gbxExport
             // 
@@ -278,7 +306,7 @@ namespace EntityTools.Core
             this.cbbxExportSelector.Size = new System.Drawing.Size(219, 21);
             this.cbbxExportSelector.Sorted = true;
             this.cbbxExportSelector.TabIndex = 11;
-            this.cbbxExportSelector.SelectedIndexChanged += new System.EventHandler(this.cbbExportSelector_SelectedIndexChanged);
+            this.cbbxExportSelector.SelectedIndexChanged += new System.EventHandler(this.event_ChangeExportingData);
             // 
             // tbExportFileSelector
             // 
@@ -296,7 +324,7 @@ namespace EntityTools.Core
             this.tbExportFileSelector.TabIndex = 6;
             this.tbExportFileSelector.ToolTip = "File name to store selected data. \r\nAllow mask %character%, %account%, %dateTime%" +
     ".";
-            this.tbExportFileSelector.ButtonClick += new DevExpress.XtraEditors.Controls.ButtonPressedEventHandler(this.tbExportFileSelector_ButtonClick);
+            this.tbExportFileSelector.ButtonClick += new DevExpress.XtraEditors.Controls.ButtonPressedEventHandler(this.event_ChangeExportingFileName);
             // 
             // btnExport
             // 
@@ -308,7 +336,7 @@ namespace EntityTools.Core
             this.btnExport.TabIndex = 2;
             this.btnExport.Text = "Export";
             this.btnExport.UseVisualStyleBackColor = true;
-            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
+            this.btnExport.Click += new System.EventHandler(this.event_Export);
             // 
             // btnDefault
             // 
@@ -320,7 +348,7 @@ namespace EntityTools.Core
             this.btnDefault.TabIndex = 2;
             this.btnDefault.Text = "Default";
             this.btnDefault.UseVisualStyleBackColor = true;
-            this.btnDefault.Click += new System.EventHandler(this.btnDefault_Click);
+            this.btnDefault.Click += new System.EventHandler(this.event_ResetExportSettings);
             // 
             // tabOptions
             // 
@@ -574,7 +602,7 @@ namespace EntityTools.Core
             this.btnGetMachineId.Size = new System.Drawing.Size(50, 23);
             this.btnGetMachineId.TabIndex = 1;
             this.btnGetMachineId.Text = "Get";
-            this.btnGetMachineId.Click += new System.EventHandler(this.btnGetMachineId_Click);
+            this.btnGetMachineId.Click += new System.EventHandler(this.event_GetMachineId);
             // 
             // btnSetMachineId
             // 
@@ -789,7 +817,7 @@ namespace EntityTools.Core
             this.btnShowMapper.TabIndex = 4;
             this.btnShowMapper.Text = "Show Mapper";
             this.btnShowMapper.UseVisualStyleBackColor = true;
-            this.btnShowMapper.Click += new System.EventHandler(this.btnShowMapper_Click);
+            this.btnShowMapper.Click += new System.EventHandler(this.event_ShowMapper);
             // 
             // tabLogger
             // 
@@ -846,7 +874,7 @@ namespace EntityTools.Core
             this.btnOpenLog.TabIndex = 5;
             this.btnOpenLog.Text = "Open EntityTools log file";
             this.btnOpenLog.UseVisualStyleBackColor = true;
-            this.btnOpenLog.Click += new System.EventHandler(this.btnOpenLog_Click);
+            this.btnOpenLog.Click += new System.EventHandler(this.event_OpenLogFile);
             // 
             // tabDebug
             // 
@@ -878,7 +906,7 @@ namespace EntityTools.Core
             this.ckbDebugMonitor.TabIndex = 8;
             this.ckbDebugMonitor.Text = "DebugMonitor";
             this.ckbDebugMonitor.UseVisualStyleBackColor = true;
-            this.ckbDebugMonitor.CheckedChanged += new System.EventHandler(this.ckbDebugMonitor_CheckedChanged);
+            this.ckbDebugMonitor.CheckedChanged += new System.EventHandler(this.event_DebugMonitorActivation);
             // 
             // dlgSaveFile
             // 
@@ -990,5 +1018,7 @@ namespace EntityTools.Core
         private DevExpress.XtraTab.XtraTabPage tabDebug;
         private System.Windows.Forms.TextBox tbDebugMonitorInfo;
         private System.Windows.Forms.CheckBox ckbDebugMonitor;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button1;
     }
 }

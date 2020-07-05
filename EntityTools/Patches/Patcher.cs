@@ -60,6 +60,10 @@ namespace EntityTools.Patches
         static bool Applied = false;
         public static void Apply()
         {
+            //TODO: Реализовать механизм отключения патчей (всех)
+            // В первую очерещь эта касается патчей Patch_VIP_SealTraderEntity и Patch_VIP_ProfessionVendorEntity
+
+
             if (!Applied)
             {
 #if true

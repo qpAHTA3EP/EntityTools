@@ -35,13 +35,6 @@ namespace EntityCore.Quester.Conditions
         internal EntityPropertyEngine(EntityProperty ettPr)
         {
             @this = ettPr;
-#if CORE_DELEGATES
-            @this.doValidate = Validate;
-            @this.doReset = Reset;
-            @this.getString = GetString;
-            @this.getTestInfos = TestInfos;
-            @this.PropertyChanged += PropertyChanged;
-#endif
 #if CORE_INTERFACES
             @this.Engine = this;
 #endif
@@ -76,121 +69,6 @@ namespace EntityCore.Quester.Conditions
                 timeout.ChangeTime(0);
             }
         }
-
-#if CORE_DELEGATES
-        internal bool Validate()
-        {
-            if (timeout.IsTimedOut || (closestEntity != null && !ValidateEntity(closestEntity)))
-            {
-                if (@this.CustomRegionNames != null && (customRegions == null || customRegions.Count != @this.CustomRegionNames.Count))
-                    customRegions = CustomRegionExtentions.GetCustomRegions(@this.CustomRegionNames);
-
-                if (Comparer == null && !string.IsNullOrEmpty(@this.EntityID))
-                    Comparer = EntityToPatternComparer.Get(@this.EntityID, @this.EntityIdType, @this.EntityNameType);
-
-                if (!string.IsNullOrEmpty(@this.EntityID))
-                    closestEntity = SearchCached.FindClosestEntity(@this.EntityID, @this.EntityIdType, @this.EntityNameType, @this.EntitySetType,
-                                                            @this.HealthCheck, @this.ReactionRange, @this.ReactionZRange, @this.RegionCheck, customRegions);
-
-                timeout.ChangeTime(@this.SearchTimeInterval);
-            }
-
-            if (ValidateEntity(closestEntity))
-            {
-                bool result = false;
-                switch (@this.PropertyType)
-                {
-                    case EntityPropertyType.Distance:
-                        switch (@this.Sign)
-                        {
-                            case Relation.Equal:
-                                return result = (closestEntity.Location.Distance3DFromPlayer == @this.Value);
-                            case Relation.NotEqual:
-                                return result = (closestEntity.Location.Distance3DFromPlayer != @this.Value);
-                            case Relation.Inferior:
-                                return result = (closestEntity.Location.Distance3DFromPlayer < @this.Value);
-                            case Relation.Superior:
-                                return result = (closestEntity.Location.Distance3DFromPlayer > @this.Value);
-                        }
-                        break;
-                    case EntityPropertyType.HealthPercent:
-                        switch (@this.Sign)
-                        {
-                            case Relation.Equal:
-                                return result = (closestEntity.Character?.AttribsBasic?.HealthPercent == @this.Value);
-                            case Relation.NotEqual:
-                                return result = (closestEntity.Character?.AttribsBasic?.HealthPercent != @this.Value);
-                            case Relation.Inferior:
-                                return result = (closestEntity.Character?.AttribsBasic?.HealthPercent < @this.Value);
-                            case Relation.Superior:
-                                return result = (closestEntity.Character?.AttribsBasic?.HealthPercent > @this.Value);
-                        }
-                        break;
-                    case EntityPropertyType.ZAxis:
-                        switch (@this.Sign)
-                        {
-                            case Relation.Equal:
-                                return result = (closestEntity.Location.Z == @this.Value);
-                            case Relation.NotEqual:
-                                return result = (closestEntity.Location.Z != @this.Value);
-                            case Relation.Inferior:
-                                return result = (closestEntity.Location.Z < @this.Value);
-                            case Relation.Superior:
-                                return result = (closestEntity.Location.Z > @this.Value);
-                        }
-                        break;
-                }
-            }
-            else return (@this.PropertyType == EntityPropertyType.Distance && @this.Sign == Relation.Superior);
-
-            return false;
-        }
-
-        internal string GetString()
-        {
-            if (string.IsNullOrEmpty(label))
-                label = $"Entity [{@this.EntityID}] {@this.PropertyType} {@this.Sign} to {@this.Value}"; ;
-            return label;
-        }
-
-        internal string TestInfos()
-        {
-            if (@this.CustomRegionNames != null && (customRegions == null || customRegions.Count != @this.CustomRegionNames.Count))
-                customRegions = CustomRegionExtentions.GetCustomRegions(@this.CustomRegionNames);
-
-            closestEntity = SearchCached.FindClosestEntity(@this.EntityID, @this.EntityIdType, @this.EntityNameType, @this.EntitySetType,
-                                                    @this.HealthCheck, @this.ReactionRange, @this.ReactionZRange, @this.RegionCheck, customRegions);
-
-            if (ValidateEntity(closestEntity))
-            {
-                StringBuilder sb = new StringBuilder("Found closect Entity");
-                sb.Append(" [").Append(closestEntity.NameUntranslated).Append(']').Append(" which ").Append(@this.PropertyType).Append(" = ");
-                switch (@this.PropertyType)
-                {
-                    case EntityPropertyType.Distance:
-                        sb.Append(closestEntity.Location.Distance3DFromPlayer);
-                        break;
-                    case EntityPropertyType.ZAxis:
-                        sb.Append(closestEntity.Location.Z);
-                        break;
-                    case EntityPropertyType.HealthPercent:
-                        sb.Append(closestEntity.Character?.AttribsBasic?.HealthPercent);
-                        break;
-                }
-                return sb.ToString();
-            }
-            else
-            {
-                StringBuilder sb = new StringBuilder("No one Entity matched to");
-                sb.Append(" [").Append(@this.EntityID).Append(']').AppendLine();
-                if (@this.PropertyType == EntityPropertyType.Distance)
-                    sb.AppendLine("The distance to the missing Entity is considered equal to infinity.");
-                return sb.ToString();
-            }
-        }
-
-        internal void Reset() { } 
-#endif
 
         public bool EntityDiagnosticString(out string infoString)
         {

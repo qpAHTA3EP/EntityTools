@@ -44,6 +44,7 @@ namespace EntityCore.Forms
         }
 
         #region Интерфейс
+        #region изменение TreeNode
         /// <summary>
         /// Функция построения простого дерева с группировкой по первой части имени (до символа '_')
         /// </summary>
@@ -317,17 +318,19 @@ namespace EntityCore.Forms
             }
             return null;
         }
+        #endregion
 
-        private void Refresh(object sender, EventArgs e)
+        #region Обработчики
+        private void event_Refresh(object sender, EventArgs e)
         {
             string selectedKey = (string.IsNullOrEmpty(currentUiGenId)) ? tvInterfaces.SelectedNode?.Text : currentUiGenId;
             //FillTreeView();
             RecurciveTreeBuilder();
             TreeNode selectedNode = (string.IsNullOrEmpty(selectedKey)) ? null : tvInterfaces.Nodes.Find(selectedKey, true).FirstOrDefault();
-            tvInterfaces_AfterSelect(tvInterfaces, new TreeViewEventArgs(selectedNode));
+            event_AfterSelectNode(tvInterfaces, new TreeViewEventArgs(selectedNode));
         }
 
-        private void tvInterfaces_AfterSelect(object sender, TreeViewEventArgs e)
+        private void event_AfterSelectNode(object sender, TreeViewEventArgs e)
         {
             UIGen uiGen = e.Node?.Tag as UIGen;
             if (uiGen != null && uiGen.IsValid)
@@ -337,30 +340,31 @@ namespace EntityCore.Forms
             else pgProperties.SelectedObject = null;
         }
 
-        private void filterName_KeyPress(object sender, KeyPressEventArgs e)
+        private void event_filterName_KeyPress(object sender, KeyPressEventArgs e)
         {
             // запрет на ввод любых символов отличных от алфавитно-цифровых
             if (!char.IsLetterOrDigit(e.KeyChar))
                 e.Handled = true;
         }
 
-        private void btnExecute_Click(object sender, EventArgs e)
+        private void event_Execute(object sender, EventArgs e)
         {
             if (!string.IsNullOrEmpty(tbCommand.Text))
                 GameCommands.Execute(tbCommand.Text);
         }
 
-        private void btnSelect_Click(object sender, EventArgs e)
+        private void event_Select(object sender, EventArgs e)
         {
             DialogResult = DialogResult.OK;
             Close();
         }
 
-        private void btnCancel_Click(object sender, EventArgs e)
+        private void event_Cancel(object sender, EventArgs e)
         {
             DialogResult = DialogResult.Cancel;
             Close();
-        } 
+        }  
+        #endregion
         #endregion
     }
 }

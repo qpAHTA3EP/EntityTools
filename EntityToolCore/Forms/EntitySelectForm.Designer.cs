@@ -37,10 +37,10 @@
             this.clmnNameUntranslated = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.clmnDistance = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnReload = new System.Windows.Forms.Button();
-            this.tbPattern = new System.Windows.Forms.TextBox();
             this.cbNameType = new System.Windows.Forms.ComboBox();
             this.cbStrMatch = new System.Windows.Forms.ComboBox();
             this.btnTest = new System.Windows.Forms.Button();
+            this.tbPattern = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEntities)).BeginInit();
             this.SuspendLayout();
             // 
@@ -158,21 +158,6 @@
             this.btnReload.UseVisualStyleBackColor = true;
             this.btnReload.Click += new System.EventHandler(this.btnReload_Click);
             // 
-            // tbPattern
-            // 
-            this.tbPattern.AllowDrop = true;
-            this.tbPattern.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbPattern.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tbPattern.Location = new System.Drawing.Point(149, 399);
-            this.tbPattern.Multiline = true;
-            this.tbPattern.Name = "tbPattern";
-            this.tbPattern.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.tbPattern.Size = new System.Drawing.Size(474, 50);
-            this.tbPattern.TabIndex = 3;
-            this.tbPattern.DragDrop += new System.Windows.Forms.DragEventHandler(this.tbPattern_DragDrop);
-            this.tbPattern.DragEnter += new System.Windows.Forms.DragEventHandler(this.tbPattern_DragEnter);
-            // 
             // cbNameType
             // 
             this.cbNameType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -211,6 +196,21 @@
             this.btnTest.UseVisualStyleBackColor = true;
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
+            // tbPattern
+            // 
+            this.tbPattern.AllowDrop = true;
+            this.tbPattern.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbPattern.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tbPattern.Location = new System.Drawing.Point(149, 399);
+            this.tbPattern.Multiline = true;
+            this.tbPattern.Name = "tbPattern";
+            this.tbPattern.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.tbPattern.Size = new System.Drawing.Size(474, 50);
+            this.tbPattern.TabIndex = 3;
+            this.tbPattern.DragDrop += new System.Windows.Forms.DragEventHandler(this.tbPattern_DragDrop);
+            this.tbPattern.DragEnter += new System.Windows.Forms.DragEventHandler(this.tbPattern_DragEnter);
+            // 
             // EntitySelectForm
             // 
             this.AcceptButton = this.btnSelect;
@@ -247,7 +247,6 @@
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.DataGridView dgvEntities;
         private System.Windows.Forms.Button btnReload;
-        private System.Windows.Forms.TextBox tbPattern;
         private System.Windows.Forms.ComboBox cbNameType;
         private System.Windows.Forms.ComboBox cbStrMatch;
         private System.Windows.Forms.Button btnTest;
@@ -255,5 +254,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn clmnInternalName;
         private System.Windows.Forms.DataGridViewTextBoxColumn clmnNameUntranslated;
         private System.Windows.Forms.DataGridViewTextBoxColumn clmnDistance;
+        private System.Windows.Forms.TextBox tbPattern;
     }
 }

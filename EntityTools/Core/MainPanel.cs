@@ -16,7 +16,7 @@ using Astral.Classes.ItemFilter;
 using System.Collections.Generic;
 using MyNW.Classes;
 using DevExpress.XtraEditors;
-using EntityTools.Tools.BuySellItems;
+using EntityTools.Tools.ItemFilter;
 using MyNW.Patchables.Enums;
 using EntityTools.Forms;
 using System.Diagnostics;
@@ -106,7 +106,11 @@ namespace EntityTools.Core
 #endif
         }
 
-        private void btnTest_Click(object sender, EventArgs e)
+#if Test_Null_SystemAction
+        Action<string> action { get; set; } 
+#endif
+
+        private void event_Test_1(object sender, EventArgs e)
         {
             #region Старые тесты
 #if Test_MultiSelectCustomRegion
@@ -473,7 +477,6 @@ namespace EntityTools.Core
             XtraMessageBox.Show(xml + Environment.NewLine + test);
 #endif
 #endif
-            #endregion
 
 #if UCCQuesterCheck_Serialization
             UCCQuesterCheck c = new UCCQuesterCheck() { Condition = new Astral.Quester.Classes.Conditions.PartyStatus() { Type = Astral.Quester.Classes.Conditions.PartyStatus.PartyStatusType.IsNotInAParty } };
@@ -511,14 +514,108 @@ namespace EntityTools.Core
             }
             else XtraMessageBox.Show("Bags is null");
 #endif
-#if true
+            #endregion
+
+#if AstralAccessors
             if (Tools.Reflection.AstralAccessors.ItemFilter.IsMatch != null)
                 XtraMessageBox.Show("AstralAccessors.ItemFilter.IsMatch is OK!");
             else XtraMessageBox.Show("AstralAccessors.ItemFilter.IsMatch is NULL!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
 #endif
+#if Test_Null_SystemAction
+            //action = null;
+            try { action += (string str) => XtraMessageBox.Show(str); }
+            catch (Exception ex)
+            {
+                XtraMessageBox.Show(ex.Message);
+            }
+            action?.Invoke("It's OK");
+#endif
+#if Test_CommonFilterEntry_NotifyPropertyChanged
+            IFilterEntry cfe1 = new CommonFilterEntry() { Pattern = "Armor"};
+            IFilterEntry cfe2 = new CommonFilterEntry() { Pattern = "Armor" };
+
+            if (cfe1 == cfe2)
+                XtraMessageBox.Show("CommonFilterEntries are equal: True");
+            else XtraMessageBox.Show("CommonFilterEntries are not equal: False");
+
+            ItemFilterCoreExt<CommonFilterEntry> filterCore = new ItemFilterCoreExt<CommonFilterEntry>();
+            filterCore.Filters.Add((CommonFilterEntry)cfe1);
+            filterCore.Filters.Add((CommonFilterEntry)cfe2);
+            cfe2.Pattern = "Feet";
+#endif
+#if Test_BuyFilterEntry
+            BuyFilterEntry bfe = new BuyFilterEntry() { Pattern = "Arms" };
+
+            bfe.PropertyChanged += (object s, System.ComponentModel.PropertyChangedEventArgs ev) =>
+            {
+                XtraMessageBox.Show($"{ev.PropertyName} was changed in {s}");
+            };
+
+            bfe.EntryType = ItemFilterEntryType.Category;
+
+            CommonFilterEntry cfe3 = new BuyFilterEntry() { Pattern = "Head"};
+            cfe3.PropertyChanged += (object s, System.ComponentModel.PropertyChangedEventArgs ev) =>
+            {
+                XtraMessageBox.Show($"{ev.PropertyName} was changed in {s}");
+            };
+
+            ((BuyFilterEntry)cfe3).Priority = 1;
+
+#endif
+#if Test_CommonFilterEntry_GetItemFlags
+            var values = Enum.GetValues(typeof(ItemFlagsExt));
+            Random random = new Random();
+            ItemFlagsExt f = (ItemFlagsExt)values.GetValue(random.Next(values.Length - 1));
+            int num = CommonFilterEntry.GetItemFlags("*ound*", ItemFilterStringType.Simple, out ItemFlagsExt flags);
+
+            bool bUnbound = (flags & f) == ItemFlagsExt.Unbound;
+            bool bAccountBound = (flags & f) == ItemFlagsExt.AccountBound;
+            bool bCharacterBound = (flags & f) == ItemFlagsExt.CharacterBound;
+            bool bAnyBounds = (flags & f) == ItemFlagsExt.AnyBounds;
+            bool bFull = (flags & f) == ItemFlagsExt.Full;
+            bool bProtectedItem = (flags & f) == ItemFlagsExt.ProtectedItem;
+            bool bSlottedOnAssignment = (flags & f) == ItemFlagsExt.SlottedOnAssignment;
+            bool bTrainingFromItem = (flags & f) == ItemFlagsExt.TrainingFromItem;
+            bool bUnidentified = (flags & f) ==  ItemFlagsExt.Unidentified;
+            bool bAlgo = (flags & f) == ItemFlagsExt.Algo;
+
+            unchecked
+            {
+                flags = (ItemFlagsExt)random.Next(int.MaxValue); 
+            }
+            f = (ItemFlagsExt)values.GetValue(random.Next(values.Length - 1));
+
+            bool isMatch = f == ItemFlagsExt.Unbound || (flags & f) > 0;
+
+            bUnbound = (flags & f) == ItemFlagsExt.Unbound;
+            bAccountBound = (flags & f) == ItemFlagsExt.AccountBound;
+            bCharacterBound = (flags & f) == ItemFlagsExt.CharacterBound;
+            bAnyBounds = (flags & f) == ItemFlagsExt.AnyBounds;
+            bFull = (flags & f) == ItemFlagsExt.Full;
+            bProtectedItem = (flags & f) == ItemFlagsExt.ProtectedItem;
+            bSlottedOnAssignment = (flags & f) == ItemFlagsExt.SlottedOnAssignment;
+            bTrainingFromItem = (flags & f) == ItemFlagsExt.TrainingFromItem;
+            bUnidentified = (flags & f) == ItemFlagsExt.Unidentified;
+            bAlgo = (flags & f) == ItemFlagsExt.Algo;
+#endif
+
+#if false
+            ItemFilterCoreExt<CommonFilterEntry> filter = new ItemFilterCoreExt<CommonFilterEntry>();
+            ItemFilterEditorForm<CommonFilterEntry>.GUIRequiest(ref filter);
+#else
+            ItemFilterCoreExt<BuyFilterEntry> filter = new ItemFilterCoreExt<BuyFilterEntry>();
+            ItemFilterEditorForm<BuyFilterEntry>.GUIRequiest(ref filter);
+#endif
+
+        }
+        private void event_Test_2(object sender, EventArgs e)
+        {
+        }
+        private void event_Test_3(object sender, EventArgs e)
+        {
         }
 
-        private void btnUccEditor_Click(object sender, EventArgs e)
+        private void event_OpenUccEditor(object sender, EventArgs e)
         {
             Astral.Logic.UCC.Forms.Editor uccEditor = null;
             if (UCCEditorExtensions.GetUccEditor(ref uccEditor))
@@ -677,19 +774,19 @@ namespace EntityTools.Core
         } 
 #endif
 
-        private void cbSpellStuckMonitor_CheckedChanged(object sender, EventArgs e)
+        private void event_SpellStuckMonitorActivation(object sender, EventArgs e)
         {
             EntityTools.PluginSettings.UnstuckSpells.Active = ckbSpellStuckMonitor.Checked;
         }
 
-        private void cbEnchantHelperActivator_CheckedChanged(object sender, EventArgs e)
+        private void event_EnchantHelperActivation(object sender, EventArgs e)
         {
             if(cbEnchantHelperActivator.Checked)
                 EnchantHelper.Start();
             else EnchantHelper.Stop();
         }
 
-        private void btnUiViewer_Click(object sender, EventArgs e)
+        private void event_OpenUiViewer(object sender, EventArgs e)
         {
 #if DEVELOPER
             string uiGenId = string.Empty;
@@ -697,7 +794,7 @@ namespace EntityTools.Core
 #endif
         }
 
-        private void btnEntities_Click(object sender, EventArgs e)
+        private void event_OpenEntitiesViewer(object sender, EventArgs e)
         {
 #if DEVELOPER
             string pattern = string.Empty;
@@ -707,7 +804,7 @@ namespace EntityTools.Core
 #endif
         }
 
-        private void btnAuraViewer_Click(object sender, EventArgs e)
+        private void event_OpenAuraViewer(object sender, EventArgs e)
         {
 #if DEVELOPER
             string auraId = string.Empty;
@@ -715,14 +812,14 @@ namespace EntityTools.Core
 #endif
         }
 
-        private void btnGetMachineId_Click(object sender, EventArgs e)
+        private void event_GetMachineId(object sender, EventArgs e)
         {
             var machineid = Memory.MMemory.ReadString(Memory.BaseAdress + 0x2640BD0, Encoding.UTF8, 64);
             lblAccount.Text = $"Account:   @{EntityManager.LocalPlayer.AccountLoginUsername}";
             tbMashingId.Text = machineid;
         }
 
-        private void tbExportFileSelector_ButtonClick(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
+        private void event_ChangeExportingFileName(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
         {
             if (cbbxExportSelector.SelectedItem is ExportTypes expType)
             {
@@ -745,7 +842,7 @@ namespace EntityTools.Core
             }
         }
 
-        private void cbbExportSelector_SelectedIndexChanged(object sender, EventArgs e)
+        private void event_ChangeExportingData(object sender, EventArgs e)
         {
             if (cbbxExportSelector.SelectedItem is ExportTypes expType)
             {
@@ -756,7 +853,7 @@ namespace EntityTools.Core
             }
         }
 
-        private void btnDefault_Click(object sender, EventArgs e)
+        private void event_ResetExportSettings(object sender, EventArgs e)
         {
             if (cbbxExportSelector.SelectedItem is ExportTypes expType)
             {
@@ -767,7 +864,7 @@ namespace EntityTools.Core
             }
         }
 
-        private void btnExport_Click(object sender, EventArgs e)
+        private void event_Export(object sender, EventArgs e)
         {
             if (cbbxExportSelector.SelectedItem is ExportTypes expType)
             {
@@ -839,7 +936,7 @@ namespace EntityTools.Core
             }
         }
 
-        private void btnShowMapper_Click(object sender, EventArgs e)
+        private void event_ShowMapper(object sender, EventArgs e)
         {
             Astral.Quester.Forms.MapperForm.Open();
         }
@@ -852,13 +949,13 @@ namespace EntityTools.Core
             else ETLogger.Stop();
         }
 
-        private void btnOpenLog_Click(object sender, EventArgs e)
+        private void event_OpenLogFile(object sender, EventArgs e)
         {
             if(File.Exists(ETLogger.LogFilePath))
                 System.Diagnostics.Process.Start(ETLogger.LogFilePath);
         }
 
-        private void btnCheckCore_Click(object sender, EventArgs e)
+        private void event_CheckCore(object sender, EventArgs e)
         {
             if (EntityTools.Core.CheckCore())
             {
@@ -874,7 +971,7 @@ namespace EntityTools.Core
             }
         }
 
-        private void ckbDebugMonitor_CheckedChanged(object sender, EventArgs e)
+        private void event_DebugMonitorActivation(object sender, EventArgs e)
         {
 #if DEVELOPER
             if (ckbDebugMonitor.Checked)

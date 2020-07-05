@@ -19,6 +19,9 @@ namespace EntityCore.Entities
         {
             if (strMatchType == ItemFilterStringType.Simple)
             {
+                if (entPattern == "*" || entPattern == "**")
+                    return CompareSimpleAny;
+
                 SimplePatternPos pos = entPattern.GetSimplePatternPosition(out string pattern);
 
                 if (nameType == EntityNameType.InternalName)
@@ -102,6 +105,7 @@ namespace EntityCore.Entities
         {
             return e.NameUntranslated.EndsWith(pattern);
         }
+        private static bool CompareSimpleAny(Entity e) => true;
 
         private static bool CompareInternal2Regex(Entity e, string pattern)
         {
@@ -116,5 +120,6 @@ namespace EntityCore.Entities
         {
             return string.IsNullOrEmpty(e.InternalName) && string.IsNullOrEmpty(e.NameUntranslated);
         }
+
     }
 }

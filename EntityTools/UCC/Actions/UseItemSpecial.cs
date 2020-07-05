@@ -16,7 +16,7 @@ using MyNW.Internals;
 using MyNW.Patchables.Enums;
 using EntityTools.Core.Proxies;
 using EntityTools.Core.Interfaces;
-using EntityTools.Tools.BuySellItems;
+using EntityTools.Tools.ItemFilter;
 
 namespace EntityTools.UCC.Actions
 {

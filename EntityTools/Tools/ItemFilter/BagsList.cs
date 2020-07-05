@@ -17,15 +17,15 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
-namespace EntityTools.Tools.BuySellItems
+namespace EntityTools.Tools.ItemFilter
 {
     /// <summary>
     /// Список сумок
     /// </summary>
     [Serializable]
-    public class BagsList
+    public class BagsList : INotifyPropertyChanged
 #if BagsList_Enumerable
-                        : IEnumerable<InvBagIDs>
+                        , IEnumerable<InvBagIDs>
 #if BagsList_IXmlSerializable
                         , IXmlSerializable
 #endif
@@ -177,9 +177,12 @@ namespace EntityTools.Tools.BuySellItems
         }
         public BagsList(InvBagIDs[] bagsList)
         {
-            if(bagsList != null)
+            if (bagsList != null)
                 foreach (var id in bagsList)
+                {
                     _bags[(int)id] = true;
+                    _count++;
+                }
         }
 
         /// <summary>
@@ -187,6 +190,8 @@ namespace EntityTools.Tools.BuySellItems
         /// </summary>
         [XmlIgnore]
         BitArray _bags = new BitArray(Enum.GetValues(typeof(InvBagIDs)).Length, false);
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
         /// Флаги сумок
@@ -201,7 +206,15 @@ namespace EntityTools.Tools.BuySellItems
             }
             set
             {
-                _bags[(int)bagId] = value;
+                if (_bags[(int)bagId] != value)
+                {
+                    if (_bags[(int)bagId])
+                        _count--;
+                    else _count++;
+
+                    _bags[(int)bagId] = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(bagId.ToString()));
+                }
             }
         }
 
@@ -266,11 +279,18 @@ namespace EntityTools.Tools.BuySellItems
         }
 
         /// <summary>
+        /// Количество выбранных сумок
+        /// </summary>
+        public uint Count { get => _count; }
+        uint _count = 0;
+
+        /// <summary>
         /// Сброс всех сумок
         /// </summary>
         public void Clear()
         {
             _bags.SetAll(false);
+            _count = 0;
         }
 
         //создание копии списка
@@ -290,7 +310,10 @@ namespace EntityTools.Tools.BuySellItems
         {
             if(obj is InvBagIDs id)
             {
+                if (!_bags[(int)id])
+                    _count++;
                 _bags[(int)id] = true;
+                
             }
         }
 
@@ -300,6 +323,8 @@ namespace EntityTools.Tools.BuySellItems
         /// <param name="obj"></param>
         public void Add(InvBagIDs id)
         {
+            if (!_bags[(int)id])
+                _count++;
             _bags[(int)id] = true;
         }
 
@@ -315,7 +340,7 @@ namespace EntityTools.Tools.BuySellItems
 
         public override string ToString()
         {
-            return string.Concat(nameof(BagsList), " (", GetSelectedBagsId().Count(), ')');
+            return string.Concat(nameof(BagsList), " (", _count, ')');
         }
 
         /// <summary>
@@ -324,7 +349,7 @@ namespace EntityTools.Tools.BuySellItems
         public class BagsListEnumerator : IEnumerator<InvBagIDs>
         {
             BagsList _bags;
-            int ind = 0;
+            int ind = -1;
 
             public BagsListEnumerator(BagsList bags)
             {
@@ -334,7 +359,7 @@ namespace EntityTools.Tools.BuySellItems
             {
                 get
                 {
-                    if (ind < _bags._bags.Count)
+                    if (ind >= 0 && ind < _bags._bags.Count)
                     {
                         return (InvBagIDs)ind;
                     }
@@ -346,7 +371,7 @@ namespace EntityTools.Tools.BuySellItems
             {
                 get
                 {
-                    if (ind < _bags._bags.Count)
+                    if (ind >= 0 && ind < _bags._bags.Count)
                     {
                         return (InvBagIDs)ind;
                     }
@@ -361,6 +386,7 @@ namespace EntityTools.Tools.BuySellItems
 
             public bool MoveNext()
             {
+                //TODO: Проверить корректность состояния "до первого вызова MoveNext()", чтобы не получилось пропуска нулевой сумки
                 while (ind < _bags._bags.Count)
                 {
                     ind++;
@@ -372,11 +398,11 @@ namespace EntityTools.Tools.BuySellItems
 
             public void Reset()
             {
-                ind = 0;
+                ind = -1;
             }
         }
 #endif
-        #region ISerializable
+        #region IXmlSerializable
 #if BagsList_IXmlSerializable
         public XmlSchema GetSchema()
         {

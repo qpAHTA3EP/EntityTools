@@ -31,12 +31,6 @@ namespace EntityCore.Quester.Conditions
         {
             @this = ettc;
 
-#if CORE_DELEGATES
-            @this.doValidate = Validate;
-            @this.doReset = Reset;
-            @this.getString = GetString;
-            @this.getTestInfos = TestInfos;
-#endif
 #if CORE_INTERFACES
             @this.Engine = this;
 #endif
@@ -53,7 +47,7 @@ namespace EntityCore.Quester.Conditions
             if (object.ReferenceEquals(sender, @this))
             {
                 if (e.PropertyName == nameof(@this.Sign) || e.PropertyName == nameof(@this.Value))
-                    label = string.Empty;//$"{nameof(EntityCount)} {@this.Sign} {@this.Value}";
+                    label = string.Empty;
                 else if(e.PropertyName == nameof(@this.EntityID)
                         || e.PropertyName == nameof(@this.EntityIdType)
                         || e.PropertyName == nameof(@this.EntityNameType))
@@ -64,131 +58,6 @@ namespace EntityCore.Quester.Conditions
                 entities?.Clear();
             }
         }
-
-#if CORE_DELEGATES
-        internal bool Validate()
-        {
-            if (!string.IsNullOrEmpty(@this.EntityID))
-            {
-                if (@this.CustomRegionNames != null && (customRegions == null || customRegions.Count != @this.CustomRegionNames.Count))
-                    customRegions = CustomRegionExtentions.GetCustomRegions(@this.CustomRegionNames);
-
-                if (Comparer == null)
-                    Comparer = EntityToPatternComparer.Get(@this.EntityID, @this.EntityIdType, @this.EntityNameType);
-
-
-                //if (timeout.IsTimedOut)
-                {
-                    entities = SearchCached.FindAllEntity(@this.EntityID, @this.EntityIdType, @this.EntityNameType, @this.EntitySetType,
-                       @this.HealthCheck, @this.ReactionRange, @this.ReactionZRange, @this.RegionCheck, customRegions);
-                    //timeout.ChangeTime(SearchTimeInterval);
-                }
-
-                uint entCount = 0;
-
-                if (entities != null)
-                {
-                    if (customRegions != null && customRegions.Count > 0)
-                        foreach (Entity entity in entities)
-                        {
-                            bool match = false;
-                            foreach (CustomRegion cr in customRegions)
-                            {
-                                if (entity.Within(cr))
-                                {
-                                    match = true;
-                                    break;
-                                }
-                            }
-
-                            if (@this.Tested == Presence.Equal && match)
-                                entCount++;
-                            if (@this.Tested == Presence.NotEquel && !match)
-                                entCount++;
-                        }
-                    else entCount = (uint)entities.Count;
-                }
-
-                switch (@this.Sign)
-                {
-                    case Relation.Equal:
-                        return entCount == @this.Value;
-                    case Relation.NotEqual:
-                        return entCount != @this.Value;
-                    case Relation.Inferior:
-                        return entCount < @this.Value;
-                    case Relation.Superior:
-                        return entCount > @this.Value;
-                }
-            }
-            return false;
-        }
-
-        internal string GetString()
-        {
-            if (string.IsNullOrEmpty(cachedString))
-                lable = $"{nameof(EntityCount)} {@this.Sign} {@this.Value}";
-            return lable;
-        }
-
-        internal string TestInfos()
-        {
-            if (!string.IsNullOrEmpty(@this.EntityID))
-            {
-                if (@this.CustomRegionNames != null && (customRegions == null || customRegions.Count != @this.CustomRegionNames.Count))
-                    customRegions = CustomRegionExtentions.GetCustomRegions(@this.CustomRegionNames);
-
-                entities = SearchCached.FindAllEntity(@this.EntityID, @this.EntityIdType, @this.EntityNameType, @this.EntitySetType,
-                       @this.HealthCheck, @this.ReactionRange, @this.ReactionZRange, @this.RegionCheck, customRegions);
-
-                StringBuilder strBldr = new StringBuilder();
-                uint entCount = 0;
-
-                if (entities != null)
-                {
-                    if (customRegions != null && customRegions.Count > 0)
-                    {
-                        strBldr.AppendLine();
-                        foreach (Entity entity in entities)
-                        {
-                            StringBuilder strBldr2 = new StringBuilder();
-                            bool match = false;
-
-                            foreach (CustomRegion customRegion in Astral.Quester.API.CurrentProfile.CustomRegions)
-                            {
-                                if (entity.Within(customRegion))
-                                {
-                                    match = true;
-                                    if (strBldr2.Length > 0)
-                                        strBldr2.Append(", ");
-                                    strBldr2.Append($"[{customRegion.Name}]");
-                                }
-                            }
-
-                            if (@this.Tested == Presence.Equal && match)
-                                entCount++;
-                            if (@this.Tested == Presence.NotEquel && !match)
-                                entCount++;
-
-                            strBldr.Append($"[{entity.InternalName}] is in CustomRegions: ").Append(strBldr2).AppendLine();
-                        }
-
-                        if (@this.Tested == Presence.Equal)
-                            strBldr.Insert(0, $"Total {entCount} Entities [{@this.EntityID}] are detected in {customRegions.Count} CustomRegion:");
-                        if (@this.Tested == Presence.NotEquel)
-                            strBldr.Insert(0, $"Total {entCount} Entities [{@this.EntityID}] are detected out of {customRegions.Count} CustomRegion:");
-                    }
-                    else strBldr.Append($"Total {entities.Count} Entities [{@this.EntityID}] are detected");
-                }
-                else strBldr.Append($"No Entity [{@this.EntityID}] was found.");
-
-                return strBldr.ToString();
-            }
-            return $"Property '{nameof(@this.EntityID)}' does not set !";
-        }
-
-        internal void Reset() { }
-#endif
 
 #if CORE_INTERFACES
         public bool IsValid

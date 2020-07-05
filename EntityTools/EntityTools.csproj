@@ -9,10 +9,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>EntityTools</RootNamespace>
     <AssemblyName>EntityTools</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.0604.0553</AssemblyVersion>
+    <AssemblyVersion>0.20.0619.0816</AssemblyVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,8 +24,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.1</LangVersion>
+    <LangVersion>7.3</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -34,7 +36,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.1</LangVersion>
+    <LangVersion>7.3</LangVersion>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -50,6 +53,7 @@
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>..\References\x64\</OutputPath>
@@ -61,6 +65,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <DebugSymbols>true</DebugSymbols>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
@@ -76,9 +81,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.1</LangVersion>
+    <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -90,6 +96,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Release|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -98,10 +105,11 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.1</LangVersion>
+    <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Optimize>true</Optimize>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Release|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -113,6 +121,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
@@ -180,7 +189,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Editors\CheckedListBoxEditor.cs" />
-    <Compile Include="Editors\ItemFilterEntryListEditor.cs" />
+    <Compile Include="Editors\ItemFilterCoreExtEditor.cs" />
     <Compile Include="Editors\EntityTestEditor.cs" />
     <Compile Include="Editors\Forms\ItemFilterEditorForm.cs">
       <SubType>Form</SubType>
@@ -210,7 +219,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Quester\Actions\BuySellItemsExt.cs" />
     <Compile Include="Quester\Actions\ChangeInstanceToLeader.cs" />
     <Compile Include="Quester\Actions\InsertInsignia.cs" />
     <Compile Include="Quester\Actions\Deprecated\InteractEntity.cs" />
@@ -274,17 +282,22 @@
     <Compile Include="Servises\UnstuckSpell\UnstuckSpellsSettings.cs" />
     <Compile Include="Logger\EntityToolLoggerSettings.cs" />
     <Compile Include="Tools\AuraOption.cs" />
-    <Compile Include="Tools\BuySellItems\BagsList.cs" />
-    <Compile Include="Tools\BuySellItems\BuyItemEntry.cs" />
-    <Compile Include="Tools\BuySellItems\Enums.cs" />
-    <Compile Include="Tools\BuySellItems\Extensions.cs" />
-    <Compile Include="Tools\BuySellItems\IndexedBags.cs" />
-    <Compile Include="Tools\BuySellItems\ItemStats.cs" />
-    <Compile Include="Tools\BuySellItems\SlotCache.cs" />
-    <Compile Include="Tools\BuySellItems\VendorInfo.cs" />
+    <Compile Include="Tools\ItemFilter\BagsList.cs" />
+    <Compile Include="Tools\ItemFilter\BuyFilterEntry.cs" />
+    <Compile Include="Tools\ItemFilter\CommonFilterEntry.cs" />
+    <Compile Include="Tools\ItemFilter\Enums.cs" />
+    <Compile Include="Tools\ItemFilter\Extensions.cs" />
+    <Compile Include="Tools\ItemFilter\IFilterEntry.cs" />
+    <Compile Include="Tools\ItemFilter\IItemMatch.cs" />
+    <Compile Include="Tools\ItemFilter\ItemFilterEntryCoreExt.cs" />
+    <Compile Include="Tools\ItemFilter\ItemFilterGroup.cs" />
+    <Compile Include="Tools\ItemFilter\VendorInfo.cs" />
     <Compile Include="Tools\CollectionTypeConverter.cs" />
     <Compile Include="Servises\EnchantHelper.cs" />
     <Compile Include="Tools\CryptoHelper.cs" />
+    <Compile Include="Tools\ItemFilter\IndexedBags.cs" />
+    <Compile Include="Tools\ItemFilter\SlotCache.cs" />
+    <Compile Include="Tools\StringToPattern.cs" />
     <Compile Include="Tools\EntityDef.cs" />
     <Compile Include="Tools\Enums.cs" />
     <Compile Include="Tools\Export\Enums.cs" />

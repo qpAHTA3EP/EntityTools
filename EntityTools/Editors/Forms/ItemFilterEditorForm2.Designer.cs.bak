@@ -7,7 +7,7 @@ using DevExpress.XtraGrid;
 using DevExpress.XtraGrid.Columns;
 using DevExpress.XtraGrid.Views.Base;
 using DevExpress.XtraGrid.Views.Grid;
-using EntityTools.Tools.ItemFilter;
+using EntityTools.Tools.BuySellItems;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -15,7 +15,7 @@ using System.Xml.Serialization;
 
 namespace EntityTools.Forms
 {
-    partial class ItemFilterEditorForm<TFilterEntry> where TFilterEntry : IFilterEntry
+    partial class ItemFilterEditorForm2<TFilterEntry> where TFilterEntry : IFilterEntry
     {
         /// <summary>
         /// Required designer variable.
@@ -44,20 +44,14 @@ namespace EntityTools.Forms
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            DevExpress.XtraGrid.GridLevelNode gridLevelNode1 = new DevExpress.XtraGrid.GridLevelNode();
             this.purchaseOptions = new DevExpress.XtraGrid.GridControl();
-            this.gridView = new DevExpress.XtraGrid.Views.Grid.GridView();
+            this.GroupGridView = new DevExpress.XtraGrid.Views.Grid.GridView();
             this.colGroup = new DevExpress.XtraGrid.Columns.GridColumn();
             this.editorNumber = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
-            this.colStringType = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colEntryType = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colMode = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colPattern = new DevExpress.XtraGrid.Columns.GridColumn();
             this.editorItemFilterEntry = new DevExpress.XtraEditors.Repository.RepositoryItemButtonEdit();
             this.colCount = new DevExpress.XtraGrid.Columns.GridColumn();
             this.colCheckEquipmentLevel = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colCheckPlayerLevel = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colKeepNumber = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colWear = new DevExpress.XtraGrid.Columns.GridColumn();
             this.barManager = new DevExpress.XtraBars.BarManager(this.components);
             this.barDockControl_0 = new DevExpress.XtraBars.BarDockControl();
             this.barDockControl_1 = new DevExpress.XtraBars.BarDockControl();
@@ -78,13 +72,15 @@ namespace EntityTools.Forms
             this.btnReload = new DevExpress.XtraEditors.SimpleButton();
             this.btnDelete = new DevExpress.XtraEditors.SimpleButton();
             this.btnAdd = new DevExpress.XtraEditors.SimpleButton();
+            this.FilterEntryGridView = new DevExpress.XtraGrid.Views.Grid.GridView();
             ((System.ComponentModel.ISupportInitialize)(this.purchaseOptions)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.gridView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.GroupGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.editorNumber)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.editorItemFilterEntry)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fastAddItemCombo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.addEntryMenu)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.FilterEntryGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // purchaseOptions
@@ -93,8 +89,12 @@ namespace EntityTools.Forms
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.purchaseOptions.Cursor = System.Windows.Forms.Cursors.Default;
+            gridLevelNode1.LevelTemplate = this.FilterEntryGridView;
+            gridLevelNode1.RelationName = "Level1";
+            this.purchaseOptions.LevelTree.Nodes.AddRange(new DevExpress.XtraGrid.GridLevelNode[] {
+            gridLevelNode1});
             this.purchaseOptions.Location = new System.Drawing.Point(12, 12);
-            this.purchaseOptions.MainView = this.gridView;
+            this.purchaseOptions.MainView = this.GroupGridView;
             this.purchaseOptions.Name = "purchaseOptions";
             this.purchaseOptions.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.editorItemFilterEntry,
@@ -103,41 +103,36 @@ namespace EntityTools.Forms
             this.purchaseOptions.TabIndex = 6;
             this.purchaseOptions.UseEmbeddedNavigator = true;
             this.purchaseOptions.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
-            this.gridView});
+            this.GroupGridView,
+            this.FilterEntryGridView});
             // 
-            // gridView
+            // GroupGridView
             // 
-            this.gridView.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
+            this.GroupGridView.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
             this.colGroup,
-            this.colStringType,
-            this.colEntryType,
-            this.colMode,
-            this.colPattern,
             this.colCount,
-            this.colCheckEquipmentLevel,
-            this.colCheckPlayerLevel,
-            this.colKeepNumber,
-            this.colWear});
-            this.gridView.GridControl = this.purchaseOptions;
-            this.gridView.Name = "gridView";
-            this.gridView.OptionsView.ShowGroupPanel = false;
-            this.gridView.OptionsView.ShowIndicator = false;
-            this.gridView.SortInfo.AddRange(new DevExpress.XtraGrid.Columns.GridColumnSortInfo[] {
+            this.colCheckEquipmentLevel});
+            this.GroupGridView.GridControl = this.purchaseOptions;
+            this.GroupGridView.Name = "GroupGridView";
+            this.GroupGridView.OptionsView.ShowGroupPanel = false;
+            this.GroupGridView.OptionsView.ShowIndicator = false;
+            this.GroupGridView.SortInfo.AddRange(new DevExpress.XtraGrid.Columns.GridColumnSortInfo[] {
             new DevExpress.XtraGrid.Columns.GridColumnSortInfo(this.colGroup, DevExpress.Data.ColumnSortOrder.Ascending)});
             // 
             // colGroup
             // 
-            this.colGroup.Caption = "Group";
+            this.colGroup.Caption = "Grp";
             this.colGroup.ColumnEdit = this.editorNumber;
-            this.colGroup.DisplayFormat.FormatString = "N00";
+            this.colGroup.DisplayFormat.FormatString = "N0";
             this.colGroup.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
             this.colGroup.FieldName = "Group";
-            this.colGroup.MinWidth = 60;
+            this.colGroup.MaxWidth = 40;
+            this.colGroup.MinWidth = 40;
             this.colGroup.Name = "colGroup";
             this.colGroup.ToolTip = "Index of the Group. All filter in the Group checks at conjunction rule";
             this.colGroup.Visible = true;
             this.colGroup.VisibleIndex = 0;
-            this.colGroup.Width = 60;
+            this.colGroup.Width = 40;
             // 
             // editorNumber
             // 
@@ -146,53 +141,7 @@ namespace EntityTools.Forms
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.editorNumber.DisplayFormat.FormatString = "N0";
             this.editorNumber.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-            this.editorNumber.IsFloatValue = false;
-            this.editorNumber.Mask.EditMask = "N00";
             this.editorNumber.Name = "editorNumber";
-            // 
-            // colStringType
-            // 
-            this.colStringType.Caption = "TextType";
-            this.colStringType.FieldName = "StringType";
-            this.colStringType.MaxWidth = 60;
-            this.colStringType.MinWidth = 60;
-            this.colStringType.Name = "colStringType";
-            this.colStringType.Visible = true;
-            this.colStringType.VisibleIndex = 1;
-            this.colStringType.Width = 60;
-            // 
-            // colEntryType
-            // 
-            this.colEntryType.Caption = "FilterType";
-            this.colEntryType.FieldName = "EntryType";
-            this.colEntryType.MaxWidth = 60;
-            this.colEntryType.MinWidth = 60;
-            this.colEntryType.Name = "colEntryType";
-            this.colEntryType.Visible = true;
-            this.colEntryType.VisibleIndex = 2;
-            this.colEntryType.Width = 60;
-            // 
-            // colMode
-            // 
-            this.colMode.Caption = "Inclusion";
-            this.colMode.FieldName = "Mode";
-            this.colMode.MaxWidth = 50;
-            this.colMode.MinWidth = 50;
-            this.colMode.Name = "colMode";
-            this.colMode.Visible = true;
-            this.colMode.VisibleIndex = 3;
-            this.colMode.Width = 50;
-            // 
-            // colPattern
-            // 
-            this.colPattern.Caption = "Pattern";
-            this.colPattern.ColumnEdit = this.editorItemFilterEntry;
-            this.colPattern.FieldName = "Pattern";
-            this.colPattern.Name = "colPattern";
-            this.colPattern.ShowButtonMode = DevExpress.XtraGrid.Views.Base.ShowButtonModeEnum.ShowOnlyInEditor;
-            this.colPattern.Visible = true;
-            this.colPattern.VisibleIndex = 4;
-            this.colPattern.Width = 180;
             // 
             // editorItemFilterEntry
             // 
@@ -213,7 +162,7 @@ namespace EntityTools.Forms
             this.colCount.Name = "colCount";
             this.colCount.UnboundType = DevExpress.Data.UnboundColumnType.Integer;
             this.colCount.Visible = true;
-            this.colCount.VisibleIndex = 5;
+            this.colCount.VisibleIndex = 1;
             this.colCount.Width = 48;
             // 
             // colCheckEquipmentLevel
@@ -229,56 +178,8 @@ namespace EntityTools.Forms
             this.colCheckEquipmentLevel.ToolTip = "Check Equipment Level";
             this.colCheckEquipmentLevel.UnboundType = DevExpress.Data.UnboundColumnType.Boolean;
             this.colCheckEquipmentLevel.Visible = true;
-            this.colCheckEquipmentLevel.VisibleIndex = 7;
+            this.colCheckEquipmentLevel.VisibleIndex = 2;
             this.colCheckEquipmentLevel.Width = 40;
-            // 
-            // colCheckPlayerLevel
-            // 
-            this.colCheckPlayerLevel.Caption = "PlLvl";
-            this.colCheckPlayerLevel.FieldName = "CheckPlayerLevel";
-            this.colCheckPlayerLevel.MaxWidth = 40;
-            this.colCheckPlayerLevel.MinWidth = 40;
-            this.colCheckPlayerLevel.Name = "colCheckPlayerLevel";
-            this.colCheckPlayerLevel.OptionsColumn.AllowSize = false;
-            this.colCheckPlayerLevel.OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
-            this.colCheckPlayerLevel.OptionsColumn.FixedWidth = true;
-            this.colCheckPlayerLevel.ToolTip = "Check Player Level";
-            this.colCheckPlayerLevel.UnboundType = DevExpress.Data.UnboundColumnType.Boolean;
-            this.colCheckPlayerLevel.Visible = true;
-            this.colCheckPlayerLevel.VisibleIndex = 8;
-            this.colCheckPlayerLevel.Width = 40;
-            // 
-            // colKeepNumber
-            // 
-            this.colKeepNumber.Caption = "Keep";
-            this.colKeepNumber.FieldName = "KeepNumber";
-            this.colKeepNumber.MaxWidth = 40;
-            this.colKeepNumber.MinWidth = 40;
-            this.colKeepNumber.Name = "colKeepNumber";
-            this.colKeepNumber.OptionsColumn.AllowShowHide = false;
-            this.colKeepNumber.OptionsColumn.AllowSize = false;
-            this.colKeepNumber.OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
-            this.colKeepNumber.OptionsColumn.FixedWidth = true;
-            this.colKeepNumber.ToolTip = "Keep number of item equals to Count";
-            this.colKeepNumber.UnboundType = DevExpress.Data.UnboundColumnType.Boolean;
-            this.colKeepNumber.Visible = true;
-            this.colKeepNumber.VisibleIndex = 6;
-            this.colKeepNumber.Width = 40;
-            // 
-            // colWear
-            // 
-            this.colWear.Caption = "Wear";
-            this.colWear.FieldName = "Wear";
-            this.colWear.MaxWidth = 40;
-            this.colWear.MinWidth = 40;
-            this.colWear.Name = "colWear";
-            this.colWear.OptionsColumn.AllowSize = false;
-            this.colWear.OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
-            this.colWear.ToolTip = "Equip item arter buying";
-            this.colWear.UnboundType = DevExpress.Data.UnboundColumnType.Boolean;
-            this.colWear.Visible = true;
-            this.colWear.VisibleIndex = 9;
-            this.colWear.Width = 40;
             // 
             // barManager
             // 
@@ -504,7 +405,12 @@ namespace EntityTools.Forms
             this.btnAdd.ToolTip = "Import Filter list from the File";
             this.btnAdd.Click += new System.EventHandler(this.event_AddFilterEntry);
             // 
-            // ItemFilterEditorForm
+            // FilterEntryGridView
+            // 
+            this.FilterEntryGridView.GridControl = this.purchaseOptions;
+            this.FilterEntryGridView.Name = "FilterEntryGridView";
+            // 
+            // ItemFilterEditorForm2
             // 
             this.AcceptButton = this.bntSave;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -527,19 +433,20 @@ namespace EntityTools.Forms
             this.Controls.Add(this.barDockControl_0);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.MinimumSize = new System.Drawing.Size(660, 200);
-            this.Name = "ItemFilterEditorForm";
+            this.Name = "ItemFilterEditorForm2";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "ItemFilterEditor";
             this.Shown += new System.EventHandler(this.event_FormShown);
             ((System.ComponentModel.ISupportInitialize)(this.purchaseOptions)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.gridView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.GroupGridView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.editorNumber)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.editorItemFilterEntry)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.fastAddItemCombo)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.addEntryMenu)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.FilterEntryGridView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -547,16 +454,9 @@ namespace EntityTools.Forms
         #endregion
 
         private GridControl purchaseOptions;
-        private GridView gridView;
-        private GridColumn colStringType;
-        private GridColumn colEntryType;
-        private GridColumn colMode;
-        private GridColumn colPattern;
+        private GridView GroupGridView;
         private GridColumn colCount;
         private GridColumn colCheckEquipmentLevel;
-        private GridColumn colCheckPlayerLevel;
-        private GridColumn colKeepNumber;
-        private GridColumn colWear;
         private PopupMenu addEntryMenu;
         private BarButtonItem barButtonItem1;
         private BarManager barManager;
@@ -580,5 +480,6 @@ namespace EntityTools.Forms
         private SimpleButton btnAdd;
         private SimpleButton btnDelete;
         private RepositoryItemSpinEdit editorNumber;
+        private GridView FilterEntryGridView;
     }
 }

@@ -1,5 +1,4 @@
-﻿//#define grouping_filterEntry_by_priority
-#define ItemFilterGroup_for_buying
+﻿#define grouping_filterEntry_by_priority
 
 using System;
 using System.Collections.Generic;
@@ -877,8 +876,6 @@ namespace EntityTools.Quester.Actions
                             }
                         }
                     }
-#elif ItemFilterGroup_for_buying
-                    foreach(var filterGroup in indexedBags.)
 #else
                     foreach (var filterEntry in indexedBags.Filters)
                     {
@@ -921,7 +918,7 @@ namespace EntityTools.Quester.Actions
                 }
 #endif
 
-                return ActionResult.Completed;
+                    return ActionResult.Completed;
             }
             else
             {

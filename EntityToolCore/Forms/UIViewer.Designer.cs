@@ -56,7 +56,7 @@
             this.tvInterfaces.Name = "tvInterfaces";
             this.tvInterfaces.Size = new System.Drawing.Size(310, 301);
             this.tvInterfaces.TabIndex = 0;
-            this.tvInterfaces.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvInterfaces_AfterSelect);
+            this.tvInterfaces.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.event_AfterSelectNode);
             // 
             // pgProperties
             // 
@@ -111,7 +111,7 @@
             this.filterName.Name = "filterName";
             this.filterName.Size = new System.Drawing.Size(209, 21);
             this.filterName.TabIndex = 4;
-            this.filterName.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.filterName_KeyPress);
+            this.filterName.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.event_filterName_KeyPress);
             // 
             // btnFill
             // 
@@ -126,7 +126,7 @@
             this.btnFill.Text = "Refresh";
             this.btnFill.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnFill.UseVisualStyleBackColor = true;
-            this.btnFill.Click += new System.EventHandler(this.Refresh);
+            this.btnFill.Click += new System.EventHandler(this.event_Refresh);
             // 
             // lblFilterName
             // 
@@ -182,7 +182,7 @@
             this.btnExecute.Text = "Execute";
             this.btnExecute.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnExecute.UseVisualStyleBackColor = true;
-            this.btnExecute.Click += new System.EventHandler(this.btnExecute_Click);
+            this.btnExecute.Click += new System.EventHandler(this.event_Execute);
             // 
             // lblCommand
             // 
@@ -206,7 +206,7 @@
             this.btnSelect.Text = "Select";
             this.btnSelect.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnSelect.UseVisualStyleBackColor = true;
-            this.btnSelect.Click += new System.EventHandler(this.btnSelect_Click);
+            this.btnSelect.Click += new System.EventHandler(this.event_Select);
             // 
             // btnCancel
             // 
@@ -222,7 +222,7 @@
             this.btnCancel.Text = "Cancel";
             this.btnCancel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            this.btnCancel.Click += new System.EventHandler(this.event_Cancel);
             // 
             // UIViewer
             // 
@@ -247,7 +247,7 @@
             this.Name = "UIViewer";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "UIViewer";
-            this.Load += new System.EventHandler(this.Refresh);
+            this.Load += new System.EventHandler(this.event_Refresh);
             this.splitContainer.Panel1.ResumeLayout(false);
             this.splitContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).EndInit();

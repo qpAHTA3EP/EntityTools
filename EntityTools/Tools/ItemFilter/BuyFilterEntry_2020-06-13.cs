@@ -9,8 +9,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml;
+using System.Xml.Schema;
 using System.Xml.Serialization;
 
 namespace EntityTools.Tools.BuySellItems
@@ -19,7 +22,7 @@ namespace EntityTools.Tools.BuySellItems
     /// Элемент фильтра предметов
     /// </summary>
     [Serializable]
-    public class ItemFilterEntryExt
+    public class BuyFilterEntry : IFilterEntry, IXmlSerializable, INotifyPropertyChanged
     {
         #region Данные
         [Description("Тип идентификатора предмета")]
@@ -32,6 +35,7 @@ namespace EntityTools.Tools.BuySellItems
                 {
                     _entryType = value;
                     isMatchPredicate = IsMatch_Selector;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntryType)));
                 }
             }
         }
@@ -49,6 +53,7 @@ namespace EntityTools.Tools.BuySellItems
                 {
                     _stringType = value;
                     isMatchPredicate = IsMatch_Selector;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StringType)));
                 }
             }
         }
@@ -64,28 +69,33 @@ namespace EntityTools.Tools.BuySellItems
             "Exclude: предмет, попадающий под фильтр, НЕ подлежит обработке")]
         public ItemFilterMode Mode
         {
-            get => _mode; set
+            get => _mode;
+            set
             {
-                if(!_readOnly)
+                if (!_readOnly)
+                {
                     _mode = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Mode)));
+                }
             }
         }
         internal ItemFilterMode _mode = ItemFilterMode.Include;
 
-        [Description("Идентификатор предмета или категории")]
-        public string Identifier
+        [Description("Шаблон с которым производится сопоставление выбранного признака предмета")]
+        public string Pattern
         {
-            get => _identifier;
+            get => _pattern;
             set
             {
-                if (!_readOnly && _identifier != value)
+                if (!_readOnly && _pattern != value)
                 {
-                    _identifier = value;
+                    _pattern = value;
                     isMatchPredicate = IsMatch_Selector;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Pattern)));
                 }
             }
         }
-        internal string _identifier = string.Empty;
+        internal string _pattern = string.Empty;
 
         /// <summary>
         /// Приоритет (0 - максимальный)
@@ -94,14 +104,19 @@ namespace EntityTools.Tools.BuySellItems
         /// Покупка предметов с меньшим приоритетом производится, 
         /// если предметы с большим приоритетом не требуется покупать (например, они есть в наличии в нужном количестве)
         /// </summary>
-        [Description("Приоритет покупки (0 - максимальный)")]
+        [Description("Приоритет покупки (0 - максимальный)\n\r" +
+            "Если не удалось приобрести хотя бы один предмет с более высоким приоритетом (например 0),\n\r" +
+            "тогда покупка предметов с меньшим приоритетом не производится (например 1)")]
         public uint Priority
         {
             get => _priority;
             set
             {
                 if (!_readOnly)
+                {
                     _priority = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Priority)));
+                }
             }
         }
         internal uint _priority = 0;
@@ -111,8 +126,11 @@ namespace EntityTools.Tools.BuySellItems
             get => _count;
             set
             {
-                if(!_readOnly)
+                if (!_readOnly)
+                {
                     _count = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
+                }
             }
         }
         internal uint _count = 1;
@@ -122,35 +140,27 @@ namespace EntityTools.Tools.BuySellItems
         {
             get => _keepNumber; set
             {
-                if(!_readOnly)
+                if (!_readOnly)
+                {
                     _keepNumber = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeepNumber)));
+                }
             }
         }
         internal bool _keepNumber = false;
-
-#if false
-        // Максимальное количество предметов, которые можно купить за одну транзакцию (стак)
-        // задано в поле StoreItemInfo.Item.ItemDef.MayBuyInBulk
-        // 0 - одна штука
-        [Category("Optional")]
-        [Description("Приобретать предмет по 1 ед. (выбор количества не предусмотрен)")]
-        public bool BuyByOne
-        {
-            get => _buyBy1; set
-            {
-                if (!_readOnly) _buyBy1 = value;
-            }
-        }
-        internal bool _buyBy1 = false; 
-#endif
 
         [Category("Optional")]
         [Description("Покупать экипировку, уроверь которой выше соответствующей экипировки персонажа")]
         public bool CheckEquipmentLevel
         {
-            get => _checkEquipmentLevel; set
+            get => _checkEquipmentLevel;
+            set
             {
-                if(!_readOnly) _checkEquipmentLevel = value;
+                if (!_readOnly)
+                {
+                    _checkEquipmentLevel = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CheckEquipmentLevel)));
+                }
             }
         }
         internal bool _checkEquipmentLevel = false;
@@ -159,9 +169,14 @@ namespace EntityTools.Tools.BuySellItems
         [Description("Покупать экипировку, подходящую персонажу по уровню")]
         public bool CheckPlayerLevel
         {
-            get => _checkPlayerLevel; set
+            get => _checkPlayerLevel;
+            set
             {
-                if(!_readOnly) _checkPlayerLevel = value;
+                if (!_readOnly)
+                {
+                    _checkPlayerLevel = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CheckPlayerLevel)));
+                }
             }
         }
         internal bool _checkPlayerLevel = false;
@@ -173,7 +188,11 @@ namespace EntityTools.Tools.BuySellItems
             get => _putOnItem;
             set
             {
-                if (!_readOnly) _putOnItem = value;
+                if (!_readOnly)
+                {
+                    _putOnItem = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PutOnItem)));
+                }
             }
         }
         internal bool _putOnItem = false;
@@ -183,59 +202,50 @@ namespace EntityTools.Tools.BuySellItems
         public bool IsReadOnly => _readOnly;
         private bool _readOnly = false;
 
-        public ItemFilterEntryExt()
+        public BuyFilterEntry()
         {
             isMatchPredicate = IsMatch_Selector;
             //categories = new BitArray(Enum.GetValues(typeof(ItemCategory)).Length);
-#if ReadOnlyItemFilterEntryExt
-            readOnlyClone = new ReadOnlyItemFilterEntryExt(this);
-#endif
         }
         /// <summary>
         /// Конструктор копирования
         /// </summary>
         /// <param name="source"></param>
         /// <param name="readOnly"></param>
-        public ItemFilterEntryExt(ItemFilterEntryExt source, bool readOnly = false)
+        public BuyFilterEntry(BuyFilterEntry source, bool readOnly = false)
         {
             _entryType = source._entryType;
             _stringType = source.StringType;
-            _identifier = source._identifier;
+            _pattern = source._pattern;
             _mode = source._mode;
             _putOnItem = source._putOnItem;
             _keepNumber = source._keepNumber;
             _count = source._count;
             _checkEquipmentLevel = source._checkEquipmentLevel;
             _checkPlayerLevel = source._checkPlayerLevel;
+            _priority = source._priority;
 
             _readOnly = readOnly;
 
             isMatchPredicate = IsMatch_Selector;
-            //categories = new BitArray(Enum.GetValues(typeof(ItemCategory)).Length);
-
-#if ReadOnlyItemFilterEntryExt
-            readOnlyClone = new ReadOnlyItemFilterEntryExt(this); 
-#endif
         }
-        public ItemFilterEntryExt(ItemFilterEntry fEntry, bool readOnly = false)
+        public BuyFilterEntry(ItemFilterEntry fEntry, bool readOnly = false)
         {
+#if changed_20200607_2022
             if (fEntry.Type == ItemFilterType.ItemCatergory)
                 _entryType = ItemFilterEntryType.Category;
             else if (fEntry.Type == ItemFilterType.ItemID)
                 _entryType = ItemFilterEntryType.Identifier;
-            else throw new ArgumentException($"Item type of '{fEntry.Type}' is not supported in {nameof(ItemFilterEntryExt)}");
-
+            else throw new ArgumentException($"Item type of '{fEntry.Type}' is not supported in {nameof(BuyFilterEntry)}");
+#else
+            _entryType = (ItemFilterEntryType)fEntry.Type;
+#endif
             _stringType = fEntry.StringType;
-            _identifier = fEntry.Text;
+            _pattern = fEntry.Text;
             _mode = fEntry.Mode;
             _readOnly = readOnly;
 
             isMatchPredicate = IsMatch_Selector;
-            //categories = new BitArray(Enum.GetValues(typeof(ItemCategory)).Length);
-
-#if ReadOnlyItemFilterEntryExt
-            readOnlyClone = new ReadOnlyItemFilterEntryExt(this); 
-#endif
         }
 
         public bool IsMatch(InventorySlot slot)
@@ -247,49 +257,26 @@ namespace EntityTools.Tools.BuySellItems
             return isMatchPredicate(item);
         }
 
-#if ReadOnlyItemFilterEntryExt
-        public ReadOnlyItemFilterEntryExt AsReadOnly()
+        public IFilterEntry AsReadOnly()
         {
-            return readOnlyClone;
+            return new BuyFilterEntry(this, true);
         }
-        ReadOnlyItemFilterEntryExt readOnlyClone; 
-#else
-        public ItemFilterEntryExt AsReadOnly()
-        {
-            return new ItemFilterEntryExt(this, true);
-        }
-#endif
-
-#if moved_to_IndexedBags
-        Функционал перемещен в 
-        public uint CountItemInBag(List<InventorySlot> slots = null/*, bool bagsItemsOnly = true*/)
-        {
-            if (slots is null)
-                slots = EntityManager.LocalPlayer.BagsItems;
-            uint count = 0;
-            //List<InventorySlot> slots = bagsItemsOnly ? localPlayer.BagsItems : localPlayer.AllItems;
-            foreach (InventorySlot slot in slots)
-            {
-                if (isMatchPredicate(slot.Item))
-                    count += slot.Item.Count;
-            }
-            return count;
-        } 
-#endif
 
         public override string ToString()
         {
-            //return $"{GetType().Name}{{{_mode}; {_entryType}; {_stringType}; {_count}; '{_identifier}'}}";
             return string.Concat(GetType().Name, " {",
+                "Pr:", _priority, "; ",
                 _mode, "; ",
                 _entryType, "; ",
                 _stringType, "; ",
                 _count, "; ",
-                '\'', _identifier, '\'',
+                '\'', _pattern, '\'',
                 (_keepNumber)?"; Keep":string.Empty,
                 (_checkPlayerLevel)? "; PlLvl": string.Empty,
                 (_checkEquipmentLevel)? "; EqLvl": string.Empty, '}');
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         #region Сопоставления
         /// <summary>
@@ -303,17 +290,6 @@ namespace EntityTools.Tools.BuySellItems
         [NonSerialized]
         string pattern;
 
-#if false
-        // Массив флагов сопоставленных категории
-        // Флаг взведен, если категория 
-        [NonSerialized]
-        BitArray categories;
-        // Массив флагов сопоставленных типам предметов
-        // Флаг взведен, если категория 
-        [NonSerialized]
-        BitArray itemTypes; 
-#endif
-
         /// <summary>
         /// Предикат-прокладка, выполняющий предварительную обработку условий сопоставления
         /// и выбирающий предикат, фактически выполняющий проверку соответствия предмета item текущему ItemFilterExt
@@ -322,6 +298,7 @@ namespace EntityTools.Tools.BuySellItems
         /// <returns></returns>
         private bool IsMatch_Selector(Item item)
         {
+            //TODO: нужно переработать в связи с усложнением типов списка
             isMatchPredicate = null;
             if (CheckPlayerLevel)
                 isMatchPredicate += IsMatch_PlayerLevel;
@@ -330,33 +307,33 @@ namespace EntityTools.Tools.BuySellItems
                 if (StringType == ItemFilterStringType.Simple)
                 {
                     // Simple
-                    if (Identifier[0] == '*')
+                    if (Pattern[0] == '*')
                     {
-                        if (Identifier[Identifier.Length - 1] == '*')
+                        if (Pattern[Pattern.Length - 1] == '*')
                         {
                             // SimplePatternPos.Middle;
-                            pattern = Identifier.Trim('*');
+                            pattern = Pattern.Trim('*');
                             isMatchPredicate = IsMatch_Simple_Id_Middle;
                         }
                         else
                         {
                             //SimplePatternPos.End;
-                            pattern = Identifier.TrimStart('*');
+                            pattern = Pattern.TrimStart('*');
                             isMatchPredicate = IsMatch_Simple_Id_End;
                         }
                     }
                     else
                     {
-                        if (Identifier[Identifier.Length - 1] == '*')
+                        if (Pattern[Pattern.Length - 1] == '*')
                         {
                             // SimplePatternPos.Start;
-                            pattern = Identifier.TrimEnd('*');
+                            pattern = Pattern.TrimEnd('*');
                             isMatchPredicate = IsMatch_Simple_Id_Start;
                         }
                         else
                         {
                             // SimplePatternPos.Full;
-                            pattern = Identifier;
+                            pattern = Pattern;
                             isMatchPredicate = IsMatch_Simple_Id_Full;
                         }
                     }
@@ -365,7 +342,7 @@ namespace EntityTools.Tools.BuySellItems
                 {
                     // Regex
                     isMatchPredicate = IsMatch_Regex_Id;
-                    pattern = Identifier;
+                    pattern = Pattern;
                 }
                 return IsMatch_Regex_Id(item);
             }
@@ -377,12 +354,12 @@ namespace EntityTools.Tools.BuySellItems
                 if (StringType == ItemFilterStringType.Simple)
                 {
                     // Simple
-                    if (_identifier[0] == '*')
+                    if (_pattern[0] == '*')
                     {
-                        if (_identifier[_identifier.Length - 1] == '*')
+                        if (_pattern[_pattern.Length - 1] == '*')
                         {
                             // SimplePatternPos.Middle;
-                            pattern = _identifier.Trim('*');
+                            pattern = _pattern.Trim('*');
                             foreach (var ctg in Enum.GetValues(typeof(ItemCategory)))
                             {
                                 if (ctg.ToString().Contains(pattern))
@@ -393,7 +370,7 @@ namespace EntityTools.Tools.BuySellItems
                         else
                         {
                             //SimplePatternPos.End;
-                            pattern = _identifier.TrimStart('*');
+                            pattern = _pattern.TrimStart('*');
                             foreach (var ctg in Enum.GetValues(typeof(ItemCategory)))
                             {
                                 if (ctg.ToString().EndsWith(pattern))
@@ -404,10 +381,10 @@ namespace EntityTools.Tools.BuySellItems
                     }
                     else
                     {
-                        if (Identifier[Identifier.Length - 1] == '*')
+                        if (Pattern[Pattern.Length - 1] == '*')
                         {
                             // SimplePatternPos.Start;
-                            pattern = _identifier.TrimEnd('*');
+                            pattern = _pattern.TrimEnd('*');
                             foreach (var ctg in Enum.GetValues(typeof(ItemCategory)))
                             {
                                 if (ctg.ToString().StartsWith(pattern))
@@ -418,7 +395,7 @@ namespace EntityTools.Tools.BuySellItems
                         else
                         {
                             // SimplePatternPos.Full;
-                            pattern = Identifier;
+                            pattern = Pattern;
                             if (Enum.TryParse(pattern, out ItemCategory ctg))
                             {
                                 categories.SetAll(false);
@@ -433,7 +410,7 @@ namespace EntityTools.Tools.BuySellItems
                     // Regex
                     foreach (var ctg in Enum.GetValues(typeof(ItemCategory)))
                     {
-                        if (Regex.IsMatch(ctg.ToString(), Identifier))
+                        if (Regex.IsMatch(ctg.ToString(), Pattern))
                             categories[(int)ctg] = true;
                         else categories[(int)ctg] = false;
                     }
@@ -443,7 +420,7 @@ namespace EntityTools.Tools.BuySellItems
 
                 return IsMatch_Regex_Id(item);
             }
-            else if(_entryType == ItemFilterEntryType.ItemType)
+            else if(_entryType == ItemFilterEntryType.Type)
             {
                 pattern = string.Empty;
                 BitArray itemTypes = new BitArray(Enum.GetValues(typeof(ItemType)).Length, false);
@@ -451,12 +428,12 @@ namespace EntityTools.Tools.BuySellItems
                 if (StringType == ItemFilterStringType.Simple)
                 {
                     // Simple
-                    if (_identifier[0] == '*')
+                    if (_pattern[0] == '*')
                     {
-                        if (_identifier[_identifier.Length - 1] == '*')
+                        if (_pattern[_pattern.Length - 1] == '*')
                         {
                             // SimplePatternPos.Middle;
-                            pattern = _identifier.Trim('*');
+                            pattern = _pattern.Trim('*');
                             foreach (var type in Enum.GetValues(typeof(ItemType)))
                             {
                                 if (type.ToString().Contains(pattern))
@@ -467,7 +444,7 @@ namespace EntityTools.Tools.BuySellItems
                         else
                         {
                             //SimplePatternPos.End;
-                            pattern = _identifier.TrimStart('*');
+                            pattern = _pattern.TrimStart('*');
                             foreach (var type in Enum.GetValues(typeof(ItemType)))
                             {
                                 if (type.ToString().EndsWith(pattern))
@@ -478,10 +455,10 @@ namespace EntityTools.Tools.BuySellItems
                     }
                     else
                     {
-                        if (Identifier[Identifier.Length - 1] == '*')
+                        if (Pattern[Pattern.Length - 1] == '*')
                         {
                             // SimplePatternPos.Start;
-                            pattern = _identifier.TrimEnd('*');
+                            pattern = _pattern.TrimEnd('*');
                             foreach (var type in Enum.GetValues(typeof(ItemType)))
                             {
                                 if (type.ToString().StartsWith(pattern))
@@ -492,7 +469,7 @@ namespace EntityTools.Tools.BuySellItems
                         else
                         {
                             // SimplePatternPos.Full;
-                            pattern = Identifier;
+                            pattern = Pattern;
                             if (Enum.TryParse(pattern, out ItemType ctg))
                             {
                                 itemTypes.SetAll(false);
@@ -507,7 +484,7 @@ namespace EntityTools.Tools.BuySellItems
                     // Regex
                     foreach (var type in Enum.GetValues(typeof(ItemType)))
                     {
-                        if (Regex.IsMatch(type.ToString(), Identifier))
+                        if (Regex.IsMatch(type.ToString(), Pattern))
                             itemTypes[(int)type] = true;
                         else itemTypes[(int)type] = false;
                     }
@@ -517,7 +494,7 @@ namespace EntityTools.Tools.BuySellItems
 
                 return IsMatch_Regex_Id(item);
             }
-            throw new InvalidEnumArgumentException($"{nameof(ItemFilterEntryExt)}: Не удалось вычислить предикат сопоставления для типа '{_entryType}'");
+            throw new InvalidEnumArgumentException($"{nameof(BuyFilterEntry)}: Не удалось вычислить предикат сопоставления для типа '{_entryType}'");
         }
 
         #region IsMatch_Id
@@ -597,84 +574,113 @@ namespace EntityTools.Tools.BuySellItems
                 && lvl <= item.ItemDef.UsageRestriction.MaxLevel;
 
         }
-#if false
-        static bool IsMatch_EquipmentLevel(Item item)
+        #endregion
+        #endregion
+
+
+        #region IXmlSerializable
+        public XmlSchema GetSchema()
         {
-            uint equipLvl = 0;
-            foreach (ItemCategory cat in item.ItemDef.Categories)
-            {
-                if (cat)
-            }
-
-            return item.ItemDef.Level > equipLvl;
-        } 
-#endif
-        #endregion
-        #endregion
-
-#if ReadOnlyItemFilterEntryExt
-        /// <summary>
-        /// Обертка для ItemFilterEntryExt, предоставляющая доступ только для чтения
-        /// </summary>
-        public class ReadOnlyItemFilterEntryExt
-        {
-            ItemFilterEntryExt itemFilterEntry = null;
-
-        #region Данные
-            [Description("Тип идентификатора предмета")]
-            public ItemFilterEntryType EntryType => itemFilterEntry._entryType;
-
-            [Description("Способ интерпретации строки, задающей идентификатор предмета:\n\r" +
-                "Simple:\tПростой текст, допускающий подстановочный символ '*' в начале и в конце\n\r" +
-                "Regex:\tРегулярное выражение")]
-            public ItemFilterStringType StringType => itemFilterEntry._stringType;
-
-            /// <summary>
-            /// Тип фильтра - разрешающий или запрещающий
-            /// Include: предмет, попадающий под фильтр, подлежит обработке
-            /// Exclude: предмет, попадающий под фильтр, НЕ подлежит обработке
-            /// </summary>
-            [Description("Тип фильтра:\n\r" +
-                "Include: предмет, попадающий под фильтр, подлежит обработке\n\r" +
-                "Exclude: предмет, попадающий под фильтр, НЕ подлежит обработке")]
-            public ItemFilterMode Mode => itemFilterEntry._mode;
-
-            [Description("Идентификатор предмета или категории")]
-            public string Identifier => itemFilterEntry._identifier;
-
-            public uint Count => itemFilterEntry._count;
-
-            [Description("Докупать предметы, чтобы общее количество равнялось 'Count'")]
-            public bool KeepNumber => itemFilterEntry._keepNumber;
-
-            [Category("Optional")]
-            [Description("Приобретать предмет по 1 ед. (выбор количества не предусмотрен)")]
-            public bool BuyByOne => itemFilterEntry._buyBy1;
-
-            [Category("Optional")]
-            [Description("Покупать экипировку, уроверь которой выше соответствующей экипировки персонажа")]
-            public bool CheckEquipmentLevel => itemFilterEntry._checkEquipmentLevel;
-
-            [Category("Optional")]
-            [Description("Покупать экипировку, подходящую персонажу по уровню")]
-            public bool CheckPlayerLevel => itemFilterEntry._checkPlayerLevel;
-
-            [Category("Optional")]
-            [Description("Экипировать предмет после покупки")]
-            public bool PutOnItem => itemFilterEntry._putOnItem;
-        #endregion
-
-            public ReadOnlyItemFilterEntryExt(ItemFilterEntryExt fEntry)
-            {
-                if (fEntry is null)
-                    throw new ArgumentNullException();
-
-                itemFilterEntry = fEntry;
-            }
-
-            public bool IsMatch(InventorySlot slot) => itemFilterEntry.isMatchPredicate(slot.Item);
-            public bool IsMatch(Item item) => itemFilterEntry.isMatchPredicate(item);
+            return null;
         }
-#endif
-    } 
+
+        public void ReadXml(XmlReader reader)
+        {
+            if (reader.IsStartElement())
+            {
+                //TODO: Распарсить все элементы
+                string elementName = reader.Name;
+                reader.ReadStartElement(elementName);
+                while (reader.ReadState == ReadState.Interactive)
+                {
+                    if (reader.Name == nameof(EntryType) || reader.Name == nameof(ItemFilterEntry.Type))
+                    {
+                        string entryType_str = reader.ReadElementContentAsString(nameof(EntryType), "");
+                        if (!Enum.TryParse(entryType_str, out ItemFilterEntryType eType))
+                            _entryType = eType;
+                        else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parce '{nameof(EntryType)}'", true);
+                    }
+                    else if (reader.Name == nameof(StringType))
+                    {
+                        string strType_str = reader.ReadElementContentAsString(nameof(StringType), "");
+                        if (!Enum.TryParse(strType_str, out ItemFilterStringType strType))
+                            _stringType = strType;
+                        else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parce '{nameof(StringType)}'", true);
+                    }
+                    else if (reader.Name == nameof(Mode))
+                    {
+                        string mode_str = reader.ReadElementContentAsString(nameof(Mode), "");
+                        if (!Enum.TryParse(mode_str, out ItemFilterMode mode))
+                            _mode = mode;
+                        else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parce '{nameof(Mode)}'", true);
+                    }
+                    else if (reader.Name == nameof(Pattern) || reader.Name == nameof(ItemFilterEntry.Text) || reader.Name == "Identifier")
+                        _pattern = reader.ReadElementContentAsString(nameof(Pattern), "");
+                    else if (reader.Name == nameof(Priority))
+                    {
+                        string priority_str = reader.ReadElementContentAsString(nameof(Priority), "");
+                        if (!uint.TryParse(priority_str, out uint prt))
+                            _priority = prt;
+                        else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parce '{nameof(Priority)}'", true);
+                    }
+                    else if (reader.Name == nameof(Count))
+                    {
+                        string cnt_str = reader.ReadElementContentAsString(nameof(Count), "");
+                        if (!uint.TryParse(cnt_str, out uint cnt))
+                            _count = cnt;
+                        else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parce '{nameof(Count)}'", true);
+                    }
+                    else if (reader.Name == nameof(KeepNumber))
+                    {
+                        string keep_str = reader.ReadElementContentAsString(nameof(KeepNumber), "");
+                        if (!bool.TryParse(keep_str, out bool keep))
+                            _keepNumber = keep;
+                        else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parce '{nameof(KeepNumber)}'", true);
+                    }
+                    else if (reader.Name == nameof(CheckEquipmentLevel))
+                    {
+                        string keep_str = reader.ReadElementContentAsString(nameof(CheckEquipmentLevel), "");
+                        if (!bool.TryParse(keep_str, out bool keep))
+                            _keepNumber = keep;
+                        else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parce '{nameof(CheckEquipmentLevel)}'", true);
+                    }
+                    else if (reader.Name == nameof(CheckPlayerLevel))
+                    {
+                        string keep_str = reader.ReadElementContentAsString(nameof(CheckPlayerLevel), "");
+                        if (!bool.TryParse(keep_str, out bool keep))
+                            _keepNumber = keep;
+                        else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parce '{nameof(CheckPlayerLevel)}'", true);
+                    }
+                    else if (reader.Name == nameof(PutOnItem))
+                    {
+                        string keep_str = reader.ReadElementContentAsString(nameof(PutOnItem), "");
+                        if (!bool.TryParse(keep_str, out bool keep))
+                            _keepNumber = keep;
+                        else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parce '{nameof(PutOnItem)}'", true);
+                    }
+                    else if (reader.Name == elementName && reader.NodeType == XmlNodeType.EndElement)
+                    {
+                        reader.ReadEndElement();
+                        break;
+                    }
+                    else reader.Skip();
+                }
+            }
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            writer.WriteElementString(nameof(EntryType), _entryType.ToString());
+            writer.WriteElementString(nameof(StringType), _stringType.ToString());
+            writer.WriteElementString(nameof(Mode), _mode.ToString());
+            writer.WriteElementString(nameof(Pattern), _pattern);
+            writer.WriteElementString(nameof(Priority), _priority.ToString());
+            writer.WriteElementString(nameof(Count), _count.ToString());
+            writer.WriteElementString(nameof(KeepNumber), _keepNumber.ToString());
+            writer.WriteElementString(nameof(CheckEquipmentLevel), _checkEquipmentLevel.ToString());
+            writer.WriteElementString(nameof(CheckPlayerLevel), _checkPlayerLevel.ToString());
+            writer.WriteElementString(nameof(PutOnItem), _putOnItem.ToString());
+        }
+        #endregion
+    }
 }

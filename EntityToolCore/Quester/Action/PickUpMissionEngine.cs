@@ -380,6 +380,8 @@ namespace EntityCore.Quester.Action
             }
         }
 
+        //TODO: Упростить замысловатую логику взятия миссии
+        //TODO: Добавить возможность взятия миссии дистанционно (RemoteDialog)
         public ActionResult Run()
         {
             if (InternalConditions)

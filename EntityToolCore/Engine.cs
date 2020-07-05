@@ -35,7 +35,8 @@ namespace EntityCore
 {
     public class Engine : IEntityToolsCore
     {
-        //internal static LinkedList<object> list = new LinkedList<object>();
+        //TODO: Исправить ошибку восстановления статуса после PullProfileFromStack, которая проявилась в Lliiras_Night_DartKotik.amp.zip
+
         internal static Dictionary<object, object> dictionary = new Dictionary<object, object>();
 
         public Engine()
@@ -71,26 +72,26 @@ namespace EntityCore
             {
                 if (action is MoveToEntity m2e)
                 {
-                    //list.AddLast(new MoveToEntityEngine(m2e));
-                    dictionary.Add(m2e, new MoveToEntityEngine(m2e));
+                    if (!dictionary.ContainsKey(m2e))
+                        dictionary.Add(m2e, new MoveToEntityEngine(m2e));
                     return true;
                 }
                 else if (action is InteractEntities ie)
                 {
-                    //list.AddLast(new InteractEntitiesEngine(ie));
-                    dictionary.Add(ie, new InteractEntitiesEngine(ie));
+                    if(!dictionary.ContainsKey(ie))
+                        dictionary.Add(ie, new InteractEntitiesEngine(ie));
                     return true;
                 }
                 else if (action is PickUpMissionExt pum)
                 {
-                    //list.AddLast(new PickUpMissionEngine(pum));
-                    dictionary.Add(pum, new PickUpMissionEngine(pum));
+                    if (!dictionary.ContainsKey(pum))
+                        dictionary.Add(pum, new PickUpMissionEngine(pum));
                     return true;
                 }
                 else if (action is InsertInsignia ii)
                 {
-                    //list.AddLast(new InsertInsigniaEngine(ii));
-                    dictionary.Add(ii, new InsertInsigniaEngine(ii));
+                    if (!dictionary.ContainsKey(ii))
+                        dictionary.Add(ii, new InsertInsigniaEngine(ii));
                     return true;
                 }
             }
@@ -103,27 +104,32 @@ namespace EntityCore
             {
                 if (condition is EntityCount ettCount)
                 {
-                    dictionary.Add(ettCount, new EntityCountEngine(ettCount));
+                    if (!dictionary.ContainsKey(ettCount))
+                        dictionary.Add(ettCount, new EntityCountEngine(ettCount));
                     return true;
                 }
                 else if(condition is EntityProperty ettProperty)
                 {
-                    dictionary.Add(ettProperty, new EntityPropertyEngine(ettProperty));
+                    if (!dictionary.ContainsKey(ettProperty))
+                        dictionary.Add(ettProperty, new EntityPropertyEngine(ettProperty));
                     return true;
                 }
                 else if (condition is TeamMembersCount teamCount)
                 {
-                    dictionary.Add(teamCount, new TeamMembersCountEngine(teamCount));
+                    if (!dictionary.ContainsKey(teamCount))
+                        dictionary.Add(teamCount, new TeamMembersCountEngine(teamCount));
                     return true;
                 }
                 else if (condition is CheckGameGUI guiCheck)
                 {
-                    dictionary.Add(guiCheck, new CheckGameGUIEngine(guiCheck));
+                    if (!dictionary.ContainsKey(guiCheck))
+                        dictionary.Add(guiCheck, new CheckGameGUIEngine(guiCheck));
                     return true;
                 }
                 else if (condition is EntityDistance ettDist)
                 {
-                    dictionary.Add(ettDist, new EntityDistanceEngine(ettDist));
+                    if (!dictionary.ContainsKey(ettDist))
+                        dictionary.Add(ettDist, new EntityDistanceEngine(ettDist));
                     return true;
                 }
             }
@@ -136,22 +142,26 @@ namespace EntityCore
             {
                 if (action is ApproachEntity ettApproach)
                 {
-                    dictionary.Add(ettApproach, new ApproachEntityEngine(ettApproach));
+                    if (!dictionary.ContainsKey(ettApproach))
+                        dictionary.Add(ettApproach, new ApproachEntityEngine(ettApproach));
                     return true;
                 }
                 else if(action is DodgeFromEntity ettDodge)
                 {
-                    dictionary.Add(ettDodge, new DodgeFromEntityEngine(ettDodge));
+                    if (!dictionary.ContainsKey(ettDodge))
+                        dictionary.Add(ettDodge, new DodgeFromEntityEngine(ettDodge));
                     return true;
                 }
                 else if (action is ExecuteSpecificPower execPower)
                 {
-                    dictionary.Add(execPower, new ExecuteSpecificPowerEngine(execPower));
+                    if (!dictionary.ContainsKey(execPower))
+                        dictionary.Add(execPower, new ExecuteSpecificPowerEngine(execPower));
                     return true;
                 }
                 else if (action is UseItemSpecial useItem)
                 {
-                    dictionary.Add(useItem, new UseItemSpecialEngine(useItem));
+                    if (!dictionary.ContainsKey(useItem))
+                        dictionary.Add(useItem, new UseItemSpecialEngine(useItem));
                     return true;
                 }
             }
@@ -164,17 +174,20 @@ namespace EntityCore
             { 
                 if (condition is UCCEntityCheck ettCheck)
                 {
-                    dictionary.Add(ettCheck, new UCCEntityCheckEngine(ettCheck));
+                    if (!dictionary.ContainsKey(ettCheck))
+                        dictionary.Add(ettCheck, new UCCEntityCheckEngine(ettCheck));
                     return true;
                 }
                 else if (condition is UCCTargetMatchEntity targMatch)
                 {
-                    dictionary.Add(targMatch, new UCCTargetMatchEntityEngine(targMatch));
+                    if (!dictionary.ContainsKey(targMatch))
+                        dictionary.Add(targMatch, new UCCTargetMatchEntityEngine(targMatch));
                     return true;
                 }
                 else if (condition is UCCGameUICheck uiCheck)
                 {
-                    dictionary.Add(uiCheck, new UCCGameUICheckEngine(uiCheck));
+                    if (!dictionary.ContainsKey(uiCheck))
+                        dictionary.Add(uiCheck, new UCCGameUICheckEngine(uiCheck));
                     return true;
                 }
             }

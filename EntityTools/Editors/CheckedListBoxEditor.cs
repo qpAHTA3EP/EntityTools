@@ -1,4 +1,4 @@
-﻿using EntityTools.Tools.BuySellItems;
+﻿using EntityTools.Tools.ItemFilter;
 using MyNW.Patchables.Enums;
 using System;
 using System.Collections;

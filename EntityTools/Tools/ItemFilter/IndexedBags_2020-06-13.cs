@@ -9,7 +9,7 @@ using Astral.Classes.ItemFilter;
 using EntityTools.Enums;
 using System.Collections;
 using System.Collections.ObjectModel;
-using static EntityTools.Tools.BuySellItems.ItemFilterEntryExt;
+using static EntityTools.Tools.BuySellItems.BuyFilterEntry;
 using EntityTools.Reflection;
 
 namespace EntityTools.Tools.BuySellItems
@@ -18,21 +18,21 @@ namespace EntityTools.Tools.BuySellItems
     /// Индексированная сумка
     /// </summary>
     [Serializable]
-    public class IndexedBags
+    public class IndexedBags<TFilterEntry> where TFilterEntry : IFilterEntry
     {
         public IndexedBags() { }
-        public IndexedBags(IEnumerable<ItemFilterEntryExt> filters)
+        public IndexedBags(IEnumerable<TFilterEntry> filters)
         {
-            AnalizeFilters(filters);
+            AnalizeFilters(filters, out _filters, out _exclude);
         }
-        public IndexedBags(IEnumerable<ItemFilterEntryExt> filters, BagsList bags)
+        public IndexedBags(IEnumerable<TFilterEntry> filters, BagsList bags)
         {
-            AnalizeFilters(filters);
+            AnalizeFilters(filters, out _filters, out _exclude);
             _bags = CopyHelper.CreateDeepCopy(bags);
         }
-        public IndexedBags(IEnumerable<ItemFilterEntryExt> filters, InvBagIDs[] bagsIds)
+        public IndexedBags(IEnumerable<TFilterEntry> filters, InvBagIDs[] bagsIds)
         {
-            AnalizeFilters(filters);
+            AnalizeFilters(filters, out _filters, out _exclude);
             _bags = new BagsList(bagsIds);
         }
 
@@ -84,7 +84,7 @@ namespace EntityTools.Tools.BuySellItems
             }
         } 
 #else
-        public IEnumerable<KeyValuePair<ItemFilterEntryExt, SlotCache>> FilteredSlots
+        public IEnumerable<KeyValuePair<IFilterEntry, SlotCache>> FilteredSlots
         {
             get
             {
@@ -92,11 +92,11 @@ namespace EntityTools.Tools.BuySellItems
                     Indexing();
 
                 foreach (var d in _filteredSlots)
-                    yield return new KeyValuePair<ItemFilterEntryExt, SlotCache>(d.Key.AsReadOnly(), new SlotCache(d.Value, true));
+                    yield return new KeyValuePair<IFilterEntry, SlotCache>(d.Key.AsReadOnly(), new SlotCache(d.Value, true));
             }
         }
 #endif
-        Dictionary<ItemFilterEntryExt, SlotCache> _filteredSlots = new Dictionary<ItemFilterEntryExt, SlotCache>();
+        Dictionary<IFilterEntry, SlotCache> _filteredSlots = new Dictionary<IFilterEntry, SlotCache>();
 
 #if ItemStats
         /// <summary>
@@ -144,7 +144,7 @@ namespace EntityTools.Tools.BuySellItems
         /// <summary>
         /// Фильтр слотов сумки
         /// </summary>
-        public IList<ItemFilterEntryExt> Filters
+        public IList<TFilterEntry> Filters
         {
             get => _filters.AsReadOnly();
             set
@@ -152,7 +152,7 @@ namespace EntityTools.Tools.BuySellItems
                 if (value != null && value.Count > 0)
                 {
                     // Разделение include-фильтра и формирование запрещающего предиката
-                    AnalizeFilters(value);
+                    AnalizeFilters(value, out _filters, out _exclude);
                 }
                 else 
                 {
@@ -163,30 +163,7 @@ namespace EntityTools.Tools.BuySellItems
                 Clear();
             }
         }
-        List<ItemFilterEntryExt> _filters = new List<ItemFilterEntryExt>();
-
-        /// <summary>
-        /// Выделение include-фильтра и формирование запрещающего предиката
-        /// </summary>
-        /// <param name="filters"></param>
-        private void AnalizeFilters(IEnumerable<ItemFilterEntryExt> filters)
-        {
-            if (_filters is null)
-                _filters = new List<ItemFilterEntryExt>();
-            else _filters.Clear();
-
-            _exclude = null;
-
-            // вставка с одновременной сортировкой по возрастанию ЫPriority
-            foreach (var f in filters.OrderBy(fe => fe.Priority))
-            {
-                if (f.Mode == ItemFilterMode.Include)
-                {
-                    _filters.Add(CopyHelper.CreateDeepCopy(f));
-                }
-                else _exclude += CopyHelper.CreateDeepCopy(f).IsMatch;
-            }
-        }
+        List<TFilterEntry> _filters = new List<TFilterEntry>();
 
 #if BagsOnly_flag
         public bool BagsOnly
@@ -224,7 +201,7 @@ namespace EntityTools.Tools.BuySellItems
             }
         }
 
-        public SlotCache this[ItemFilterEntryExt fItem]
+        public SlotCache this[TFilterEntry fItem]
         {
             get
             {
@@ -337,6 +314,70 @@ namespace EntityTools.Tools.BuySellItems
             return sb.ToString();
         }
 
+#if disabled_20200613_106
+        /// <summary>
+        /// Выделение include-фильтра и формирование запрещающего предиката
+        /// </summary>
+        /// <param name="inFilters"></param>
+        /// <param name="outFilters"></param>
+        /// <param name="exclude"></param>
+        private static bool AnalizeFilters(IEnumerable<TFilterEntry> inFilters, out List<TFilterEntry> outFilters, out Predicate<Item> exclude)
+        {
+            if (inFilters != null)
+            {
+                outFilters = new List<TFilterEntry>();
+
+                exclude = null;
+
+                // вставка с одновременной сортировкой по возрастанию Priority
+                foreach (var f in inFilters)
+                {
+                    if (f.Mode == ItemFilterMode.Include)
+                    {
+                        outFilters.Add(CopyHelper.CreateDeepCopy(f));
+                    }
+                    else if (exclude is null) exclude = CopyHelper.CreateDeepCopy(f).IsMatch;
+                    else exclude += CopyHelper.CreateDeepCopy(f).IsMatch;
+                }
+                return true;
+            }
+            outFilters = null;
+            exclude = null;
+            return false;
+        }
+        /// <summary>
+        /// Выделение include-фильтра и формирование запрещающего предиката
+        /// </summary>
+        /// <param name="inFilters"></param>
+        /// <param name="outFilters"></param>
+        /// <param name="exclude"></param>
+        private static bool AnalizeFilters(IEnumerable<BuyFilterEntry> inFilters, out List<BuyFilterEntry> outFilters, out Predicate<Item> exclude)
+        {
+            if (inFilters != null)
+            {
+                outFilters = new List<BuyFilterEntry>();
+
+                exclude = null;
+
+                // вставка с одновременной сортировкой по возрастанию Priority
+                foreach (BuyFilterEntry f in inFilters.OrderBy(fe => fe.Priority))
+                {
+                    if (f.Mode == ItemFilterMode.Include)
+                    {
+                        outFilters.Add(CopyHelper.CreateDeepCopy(f));
+                    }
+                    else if (exclude is null) exclude = CopyHelper.CreateDeepCopy(f).IsMatch;
+                    else exclude += CopyHelper.CreateDeepCopy(f).IsMatch;
+                }
+                return true;
+            }
+            outFilters = null;
+            exclude = null;
+            return false;
+        }
+
+
+#endif        
         #region Индексирование сумкок
         /// <summary>
         /// Анализ сумок, заданных в Bags и индексирование их содержимого.
@@ -375,7 +416,7 @@ namespace EntityTools.Tools.BuySellItems
             foreach (InventorySlot slot in slots)
             {
                 // Сопоставляем все слоты с фильтрами
-                foreach (ItemFilterEntryExt f in _filters)
+                foreach (IFilterEntry f in _filters)
                 {
                     if (!_exclude(slot.Item) && f.IsMatch(slot.Item))
                     {
@@ -397,7 +438,6 @@ namespace EntityTools.Tools.BuySellItems
                             if (_categorizedSlots.ContainsKey(cat))
                                 _categorizedSlots[cat].Add(slot);
                             else _categorizedSlots.Add(cat, new SlotCache(slot));
-
 #if ItemStats
                             //обновляем статистику по категориям
                             if (_categorizedItemStats.ContainsKey(cat))
@@ -411,7 +451,6 @@ namespace EntityTools.Tools.BuySellItems
 
 #endif
                         }
-
 #if ItemStats
                         //обновляем статистику по фильтрам
                         if (_filteredItemStats.ContainsKey(f))
@@ -438,7 +477,7 @@ namespace EntityTools.Tools.BuySellItems
             foreach (InventorySlot slot in slots)
             {
                 // Сопоставляем все слоты с фильтрами
-                foreach (ItemFilterEntryExt f in _filters)
+                foreach (IFilterEntry f in _filters)
                 {
                     if (f.IsMatch(slot.Item))
                     {
@@ -460,7 +499,6 @@ namespace EntityTools.Tools.BuySellItems
                             if (_categorizedSlots.ContainsKey(cat))
                                 _categorizedSlots[cat].Add(slot);
                             else _categorizedSlots.Add(cat, new SlotCache(slot));
-
 #if ItemStats
                             //обновляем статистику по категориям
                             if (_categorizedItemStats.ContainsKey(cat))
@@ -473,7 +511,6 @@ namespace EntityTools.Tools.BuySellItems
                             else _categorizedItemStats.Add(cat, new ItemStats(slot.Item.ItemDef.Level, slot.Item.Count)); 
 #endif
                         }
-
 #if ItemStats
                         //обновляем статистику по фильтрам
                         if (_filteredItemStats.ContainsKey(f))
@@ -512,7 +549,6 @@ namespace EntityTools.Tools.BuySellItems
                         if (_categorizedSlots.ContainsKey(cat))
                             _categorizedSlots[cat].Add(slot);
                         else _categorizedSlots.Add(cat, new SlotCache(slot));
-
 #if ItemStats
                         //обновляем статистику по категориям
                         if (_categorizedItemStats.ContainsKey(cat))

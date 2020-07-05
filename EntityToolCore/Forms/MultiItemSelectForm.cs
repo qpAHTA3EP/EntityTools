@@ -88,8 +88,7 @@ namespace EntityCore.Forms
                     @this.fillAction = () => @this.ItemList.DataSource = source();
                 }
 
-                if (@this.ShowDialog() == DialogResult.OK
-                    && @this.ItemList.SelectedItem is T)
+                if (@this.ShowDialog() == DialogResult.OK)
                 {
                     var checkList = @this.ItemList.CheckedItems;
                     if (checkList.Count > 0)
