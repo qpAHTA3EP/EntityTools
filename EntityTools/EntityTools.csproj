@@ -219,6 +219,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Quester\Actions\BuySellItems_Dummy.cs" />
     <Compile Include="Quester\Actions\ChangeInstanceToLeader.cs" />
     <Compile Include="Quester\Actions\InsertInsignia.cs" />
     <Compile Include="Quester\Actions\Deprecated\InteractEntity.cs" />
@@ -286,7 +287,6 @@
     <Compile Include="Tools\ItemFilter\BuyFilterEntry.cs" />
     <Compile Include="Tools\ItemFilter\CommonFilterEntry.cs" />
     <Compile Include="Tools\ItemFilter\Enums.cs" />
-    <Compile Include="Tools\ItemFilter\Extensions.cs" />
     <Compile Include="Tools\ItemFilter\IFilterEntry.cs" />
     <Compile Include="Tools\ItemFilter\IItemMatch.cs" />
     <Compile Include="Tools\ItemFilter\ItemFilterEntryCoreExt.cs" />
@@ -295,8 +295,6 @@
     <Compile Include="Tools\CollectionTypeConverter.cs" />
     <Compile Include="Servises\EnchantHelper.cs" />
     <Compile Include="Tools\CryptoHelper.cs" />
-    <Compile Include="Tools\ItemFilter\IndexedBags.cs" />
-    <Compile Include="Tools\ItemFilter\SlotCache.cs" />
     <Compile Include="Tools\StringToPattern.cs" />
     <Compile Include="Tools\EntityDef.cs" />
     <Compile Include="Tools\Enums.cs" />

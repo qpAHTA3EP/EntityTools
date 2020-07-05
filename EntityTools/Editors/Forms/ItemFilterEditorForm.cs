@@ -133,12 +133,14 @@ namespace EntityTools.Forms
         /// <param name="e"></param>
         private void event_TestFilters(object sender, EventArgs e)
         {
+#if disabled_20200705_2323
             IndexedBags<TFilterEntry> bag = new IndexedBags<TFilterEntry>(filterCore, BagsList.GetFullPlayerInventory());
             string bagDskr = bag.Description();
             if (string.IsNullOrEmpty(bagDskr))
                 bagDskr = "No item matches";
             ETLogger.WriteLine(bagDskr, true);
-            XtraMessageBox.Show(bagDskr); 
+            XtraMessageBox.Show(bagDskr);  
+#endif
         }
 
         /// <summary>
