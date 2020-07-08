@@ -376,13 +376,17 @@ namespace EntityTools.Tools.ItemFilter
         {
             if (reader.ReadState == ReadState.Initial)
                 reader.Read(); 
-            while (reader.ReadState == ReadState.Interactive)
+            if (reader.ReadState == ReadState.Interactive)
             {
                 if (reader.NodeType == XmlNodeType.Element)
                 {
                     string elemName = reader.Name;
                     if (reader.IsEmptyElement)
-                        throw new XmlException($"{MethodBase.GetCurrentMethod().Name}: does not expect empty element <{elemName} />");
+#if disabled_20200708_1352
+                        throw new XmlException($"{MethodBase.GetCurrentMethod().Name}: does not expect empty element <{elemName} />"); 
+#else
+                        reader.ReadStartElement();
+#endif
                     else
                     {
                         List<TFilterEntry> deprecatedFilters = new List<TFilterEntry>();
@@ -406,7 +410,7 @@ namespace EntityTools.Tools.ItemFilter
                                     if (deprFilter.Mode == ItemFilterMode.Include)
                                     {
                                         // Ищем "свободный" инденкc
-                                        while (_fullFilters.First((TFilterEntry f) => f.Group == groupInd) != null && groupInd < uint.MaxValue)
+                                        while (_fullFilters.FirstOrDefault((TFilterEntry f) => f.Group == groupInd) != null && groupInd < uint.MaxValue)
                                             groupInd++;
 
                                         deprFilter.Group = groupInd;
