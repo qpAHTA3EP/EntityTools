@@ -1,4 +1,5 @@
-﻿#define CORE_INTERFACES
+﻿#define ActionID_Identifier
+
 using Astral;
 using Astral.Classes;
 using Astral.Quester.Classes;
@@ -31,15 +32,21 @@ namespace EntityCore.Quester.Action
         /// ссылка на команду, для которой предоставляется функционал ядра
         /// </summary>
         private MoveToEntity @this;
-        private readonly string hashCode = string.Empty;
 #region Данные 
         private Predicate<Entity> checkEntity = null;
         private Func<List<CustomRegion>> getCustomRegions = null;
 
-#if false
+
         // Запись отладочной информации в поле MoveToEntity.Debug
         // приводит к критической ошибке и аварийному завершению Astral'a
-        private readonly InstancePropertyAccessor<MoveToEntity, ActionDebug> debug = null; 
+        //private readonly InstancePropertyAccessor<MoveToEntity, ActionDebug> debug = null; 
+        internal readonly InstancePropertyAccessor<MoveToEntity, ActionDebug> debug = null;
+
+#if ActionID_Identifier
+        private readonly string actionIDstr = string.Empty; 
+#endif
+#if HashCode_Identifier
+        private readonly string hashCode = string.Empty; 
 #endif
 
         private List<CustomRegion> customRegions = null;
@@ -52,18 +59,29 @@ namespace EntityCore.Quester.Action
         {
             @this = m2e;
 
-            hashCode = @this.GetHashCode().ToString("X2");
+#if HashCode_Identifier
+            hashCode = @this.GetHashCode().ToString("X2"); 
+#endif
+#if ActionID_Identifier
+            actionIDstr = string.Concat(@this.GetType().Name, '[', @this.ActionID, ']'); 
+#endif
 
             @this.PropertyChanged += PropertyChanged;
 #if CORE_INTERFACES
             @this.Engine = this;
 #endif
-            //debug = @this.GetInstanceProperty<MoveToEntity, ActionDebug>("Debug");
+            debug = @this.GetInstanceProperty<MoveToEntity, ActionDebug>("Debug");
+            debug.Value.AddInfo($"{actionIDstr} initialized");
 
             checkEntity = internal_CheckEntity_Initializer;
             getCustomRegions = internal_GetCustomRegion_Initializer;
 
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{hashCode}] initialized: {ActionLabel}");
+#if HashCode_Identifier
+            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{hashCode}] initialized: {ActionLabel}"); 
+#endif
+#if ActionID_Identifier
+            ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} initialized");
+#endif
         }
 
         internal void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -97,22 +115,157 @@ namespace EntityCore.Quester.Action
         {
             get
             {
+                string currentMethodName = MethodBase.GetCurrentMethod().Name;
+                if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                {
+                    string debugMsg = string.Concat(currentMethodName, ": Begins");
+
+                    debug.Value.AddInfo(debugMsg);
+                    ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
+                }
                 //Команда работает с 2 - мя целями:
                 //1 - я цель (target) определяет навигацию. Если она зафиксированная(HoldTargetEntity), то не сбрасывается пока жива и не достигнута
                 //2 - я ближайшая цель (closest) управляет флагом IgnoreCombat
-                //Если HoldTargetEntity ВЫКЛЮЧЕН, то обе цели совпадают - это ближайшая цель 
+                //Если HoldTargetEntity ВЫКЛЮЧЕН и обе цели совпадают - это ближайшая цель 
+                EntityPreprocessingResult entityPreprocessingResult = EntityPreprocessing(target);
+                if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                {
+                    string debugMsg = string.Empty;
+                    if (target is null)
+                        debugMsg = string.Concat(currentMethodName, ": Target[NULL] processing result: '", entityPreprocessingResult, '\'');
+                    else debugMsg = string.Concat(currentMethodName, ": Target[", (@this._entityNameType == EntityNameType.InternalName) ? target.InternalName : target.NameUntranslated, "] processing result: '", entityPreprocessingResult, '\'');
+
+                    debug.Value.AddInfo(debugMsg);
+                    ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
+                }
 
                 Entity closestEntity = null;
+                //if (entityPreprocessingResult == EntityPreprocessingResult.Completed)
+                //{
+                //    // target является ближайшим и был обработан
+                //    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                //    {
+                //        string debugMsg = string.Concat(currentMethodName, ": Result 'True'");
+
+                //        debug.Value.AddInfo(debugMsg);
+                //        ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
+                //    }
+                //    return true;
+                //}
+                //else 
+                if (entityPreprocessingResult != EntityPreprocessingResult.Completed
+                    && timeout.IsTimedOut)
+                {
+                    // target не был обработан
+                    // перерыв между поисками ближайшей сущности истек
+                    closestEntity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
+                                                                   @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, getCustomRegions());
+
+                    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                    {
+                        string debugMsg = string.Empty;
+                        if (closestEntity is null)
+                            debugMsg = string.Concat(currentMethodName, ": ClosestEntity not found");
+                        else debugMsg = string.Concat(currentMethodName, ": Found ClosestEntity[", (@this._entityNameType == EntityNameType.InternalName) ? closestEntity.InternalName : closestEntity.NameUntranslated, ']');
+
+                        debug.Value.AddInfo(debugMsg);
+                        ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
+                    }
+
+                    timeout.ChangeTime(EntityTools.EntityTools.PluginSettings.EntityCache.LocalCacheTime);
+                }
+
+                if (closestEntity != null)
+                {
+                    if (entityPreprocessingResult == EntityPreprocessingResult.Failed)
+                    {
+                        // сохраняем ближайшую сущность в target
+                        if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                        {
+                            string debugMsg = string.Concat(currentMethodName, ": Change Target[INVALID] to the ClosestEntity[", (@this._entityNameType == EntityNameType.InternalName) ? closestEntity.InternalName : closestEntity.NameUntranslated, ']');
+
+                            debug.Value.AddInfo(debugMsg);
+                            ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
+                        }
+                        target = closestEntity;
+                    }
+                    else if (target != closestEntity)
+                    {
+                        // target не является ближайшей сущностью
+                        if (!@this._holdTargetEntity)
+                        {
+                            // Фиксация на target не требуется
+                            // ближайшую цель можно сохранить в target
+                            if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                            {
+                                string debugMsg = string.Empty;
+                                if(target is null)
+                                    string.Concat(currentMethodName, ": Change Target[NULL] to the ClosestEntity[", (@this._entityNameType == EntityNameType.InternalName) ? closestEntity.InternalName : closestEntity.NameUntranslated, ']');
+                                else string.Concat(currentMethodName, ": Change Target[", (@this._entityNameType == EntityNameType.InternalName) ? target.InternalName : target.NameUntranslated, 
+                                    "] to the ClosestEntity[", (@this._entityNameType == EntityNameType.InternalName) ? closestEntity.InternalName : closestEntity.NameUntranslated, ']');
+
+                                debug.Value.AddInfo(debugMsg);
+                                ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
+                            }
+                            target = closestEntity;
+                        }
+
+                        // обрабатываем ближайшую сущность closestEntity
+                        entityPreprocessingResult = EntityPreprocessing(closestEntity);
+                        if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                        {
+                            string debugMsg = string.Concat(currentMethodName, ": ClosestEntity[", (@this._entityNameType == EntityNameType.InternalName) ? closestEntity.InternalName : closestEntity.NameUntranslated, "] processing result: '", entityPreprocessingResult, '\'');
+
+                            debug.Value.AddInfo(debugMsg);
+                            ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
+                        }
+                    }
+                    //if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                    //{
+                    //    string debugMsg = string.Concat(currentMethodName, ": Result '", entityPreprocessingResult == EntityPreprocessingResult.Completed, '\'');
+
+                    //    debug.Value.AddInfo(debugMsg);
+                    //    ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
+                    //}
+                    //entityPreprocessingResult == EntityPreprocessingResult.Completed;
+                }
+                if (@this._ignoreCombat && entityPreprocessingResult != EntityPreprocessingResult.Completed)
+                {
+                    Astral.Quester.API.IgnoreCombat = true;
+                    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                    {
+                        string debugMsg = string.Concat(currentMethodName, ": Disable combat");
+
+                        debug.Value.AddInfo(debugMsg);
+                        ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
+                    }
+                }
+
+                if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                {
+                    string debugMsg = string.Concat(currentMethodName, ": Result '", entityPreprocessingResult == EntityPreprocessingResult.Completed, '\'');
+
+                    debug.Value.AddInfo(debugMsg);
+                    ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
+                }
+                return entityPreprocessingResult == EntityPreprocessingResult.Completed;
+            }
+#if disabled_20200707
+            get
+            {
+                Entity closestEntity = null;
+                bool closestValidationResult = false;
                 if (timeout.IsTimedOut/* || (target != null && (!Validate(target) || (HealthCheck && target.IsDead)))*/)
                 {
-                    closestEntity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                                @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, getCustomRegions());
+
+                    closestValidationResult = closestEntity != null;
+
                     if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
                     {
                         // 1
                         //debug.Value.AddInfo(string.Concat(MethodBase.GetCurrentMethod().Name, ": Found closest Entity[", closestEntity?.GetHashCode().ToString("X2")?? "NULL", "]"));
                         string debugMsg = string.Empty;
-                        if (closestEntity != null)
+                        if (closestValidationResult)
                             debugMsg = string.Concat(MethodBase.GetCurrentMethod().Name, '[', hashCode, "]: Found closest Entity[", (@this._entityNameType == EntityNameType.InternalName) ? closestEntity.InternalName : closestEntity.NameUntranslated, ']');
                         else debugMsg = string.Concat(MethodBase.GetCurrentMethod().Name, '[', hashCode, "]: No entity found");
                         // 2
@@ -122,8 +275,6 @@ namespace EntityCore.Quester.Action
                     }
                     timeout.ChangeTime(EntityTools.EntityTools.PluginSettings.EntityCache.LocalCacheTime);
                 }
-
-                bool closestValidationResult = closestEntity != null;
 
                 bool targetValidationResult = ValidateEntity(target);
                 bool targetHealthResult = targetValidationResult ? !(@this._healthCheck && target.IsDead) : false;
@@ -136,9 +287,16 @@ namespace EntityCore.Quester.Action
                     // Заменяем 
                     target = closestEntity;
 
-                    targetValidationResult = closestValidationResult;
-                    targetHealthResult = targetValidationResult ? !(@this._healthCheck && target.IsDead) : false;
-                    targetDistance = targetValidationResult ? target.Location.Distance3DFromPlayer : double.MaxValue;
+                    if (targetValidationResult = closestValidationResult)
+                    {
+                        targetHealthResult = !(@this._healthCheck && target.IsDead);
+                        targetDistance = target.Location.Distance3DFromPlayer;
+                    }
+                    else
+                    {
+                        targetHealthResult = false;
+                        targetDistance = double.MaxValue;
+                    }
                     targetDistanceResult = targetDistance <= @this._distance;
                 }
 
@@ -198,11 +356,11 @@ namespace EntityCore.Quester.Action
                 {
                     bool closetHealthResult = closestValidationResult ? !(@this._healthCheck && closestEntity.IsDead) : false;
                     double closetDistance = closestValidationResult ? closestEntity.Location.Distance3DFromPlayer : double.MaxValue;
-                    bool closestDisnceResult = closetDistance <= @this._distance;
+                    bool closestDistanceResult = closetDistance <= @this._distance;
 
                     if (closestValidationResult
                          && closetHealthResult
-                         && closestDisnceResult)
+                         && closestDistanceResult)
                     {
                         if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
                         {
@@ -210,7 +368,7 @@ namespace EntityCore.Quester.Action
                                                               @this._entityNameType == EntityNameType.InternalName ? closestEntity.InternalName : closestEntity.NameUntranslated, "] => {",
                                                               closestValidationResult ? "Valid; " : "Invalid; ",
                                                               closetHealthResult ? "Alive; " : "Dead; ",
-                                                              closestDisnceResult ? $"Distance({closetDistance})" : "Out_of_Distance", '}');
+                                                              closestDistanceResult ? $"Distance({closetDistance})" : "Out_of_Distance", '}');
                             // 2
                             //Astral.Controllers.Forms.InvokeOnMainThread(() => debug.Value.AddInfo(debugMsg));
                             // 3
@@ -269,7 +427,7 @@ namespace EntityCore.Quester.Action
                 if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
                 {
                     string debugMsg = string.Empty;
-                    if(target != null)
+                    if (target != null)
                         debugMsg = string.Concat(MethodBase.GetCurrentMethod().Name, '[', hashCode, "]: NeedToRun =>", result, "; Entity[", //target.GetHashCode().ToString("X2"), "] => {",
                                                         @this._entityNameType == EntityNameType.InternalName ? target.InternalName : target.NameUntranslated, "] => {",
                                                         targetValidationResult ? "Valid; " : "Invalid; ",
@@ -281,58 +439,135 @@ namespace EntityCore.Quester.Action
                     // 3
                     ETLogger.WriteLine(LogType.Debug, debugMsg);
                 }
-                return result;
+                return result; 
+            }
+#endif
+        }
+
+        enum EntityPreprocessingResult
+        {
+            /// <summary>
+            /// Некорректная сущность, обработка провалена
+            /// </summary>
+            Failed,
+            /// <summary>
+            /// Сущность в пределах заданной дистации и "обработана" в соответствии с настройками
+            /// </summary>
+            Completed,
+            /// <summary>
+            /// Суoнщсть не достигнута (находится за пределами заданой дистанции)
+            /// </summary>
+            Faraway
+        }
+
+        /// <summary>
+        /// Анализ <paramref name="entity"/> на предмет возможности вступления в бой
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        private EntityPreprocessingResult EntityPreprocessing(Entity entity)
+        {
+            string currentMethodName = MethodBase.GetCurrentMethod().Name;
+
+            EntityPreprocessingResult result = EntityPreprocessingResult.Failed;
+
+            bool validationResult = ValidateEntity(entity);
+            bool healthResult = false;
+            double distance = double.MaxValue;
+            bool distanceResult = false;
+
+            if (validationResult)
+            {
+                // entity валидно
+                healthResult = @this._healthCheck || !entity.IsDead;
+                distance = entity.Location.Distance3DFromPlayer;
+                distanceResult = distance <= @this._distance;
+
+                if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                {
+                    string debugMsg = string.Concat(currentMethodName, ": Results=", healthResult && distanceResult, " {Validation=", validationResult,
+                                                    "; HealthCheck=", (@this._healthCheck) ? healthResult.ToString() : "Skip",
+                                                    "; DistanceCheck=", distanceResult, '(', distance.ToString("N2"), ")}");
+
+                    debug.Value.AddInfo(debugMsg);
+                    ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
+                }
+
+                if (healthResult && distanceResult)
+                {
+                    // entity в пределах заданного расстояния
+                    // производим попытку активировать бой и атаковать entity
+                    EntityConditionalAttack(entity);
+
+                    result = EntityPreprocessingResult.Completed;
+                }
+                else result = EntityPreprocessingResult.Faraway;
+            }
+            else if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+            {
+                string debugMsg = string.Concat(currentMethodName, ": Results=False {Validation=False}");
+
+                debug.Value.AddInfo(debugMsg);
+                ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Нападение на сущность в зависимости от настроек команды
+        /// </summary>
+        /// <param name="entity"></param>
+        private void EntityConditionalAttack(Entity entity)
+        {
+            string currentMethodName = MethodBase.GetCurrentMethod().Name;
+
+            if (entity != null && @this._attackTargetEntity)
+            {
+                // entity нужно атаковать
+                Astral.Logic.NW.Attackers.List.Clear();
+                if (entity.RelationToPlayer != EntityRelation.Friend)
+                {
+                    // entity враждебно и должно быть атаковано
+                    Astral.Logic.NW.Attackers.List.Add(entity);
+                    if (@this._ignoreCombat)
+                        Astral.Quester.API.IgnoreCombat = false;
+                    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                    {
+                        string debugMsg = string.Concat(currentMethodName, ": Attack Entity[", @this._entityNameType == EntityNameType.InternalName ? entity.InternalName : entity.NameUntranslated, "; ", entity.RelationToPlayer,']');
+
+                        debug.Value.AddInfo(debugMsg);
+                        ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
+                    } 
+                    // атака entity
+                    Astral.Logic.NW.Combats.CombatUnit(entity, null);
+                    return;
+                }
+            }
+            if (@this._ignoreCombat)
+            {
+                // entity в пределах досягаемости, но не может быть атакована (entity.RelationToPlayer == EntityRelation.Friend) или не должна быть атакована принудительно (!@this._attackTargetEntity)
+                if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                {
+                    string debugMsg = $"{currentMethodName}: Engage combat";
+                    ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
+                } 
+                Astral.Quester.API.IgnoreCombat = false;
             }
         }
 
         public ActionResult Run()
         {
-            if (@this._attackTargetEntity)
+            string currentMethodName = MethodBase.GetCurrentMethod().Name;
+            if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
             {
-                Astral.Logic.NW.Attackers.List.Clear();
-                if (@this._attackTargetEntity)
-                {
-                    Astral.Logic.NW.Attackers.List.Add(target);
-                    if (@this._ignoreCombat)
-                        Astral.Quester.API.IgnoreCombat = false;
-                    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
-                    {
-                        // 1
-                        //debug.Value.AddInfo($"{MethodBase.GetCurrentMethod().Name}: Attack target Entity[{target.GetHashCode().ToString("X2")}]");
-                        string debugMsg = string.Concat(MethodBase.GetCurrentMethod().Name, '[', hashCode, "]: Attack target Entity[", @this._entityNameType == EntityNameType.InternalName ? target.InternalName : target.NameUntranslated, ']');
-                        // 2
-                        //Astral.Controllers.Forms.InvokeOnMainThread(() => debug.Value.AddInfo(debugMsg));
-                        // 3
-                        ETLogger.WriteLine(LogType.Debug, debugMsg);
-                    }
-                    Astral.Logic.NW.Combats.CombatUnit(target, null);
-                }
-                else
-                {
-                    Astral.Quester.API.IgnoreCombat = false;
-                    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
-                    {
-                        string debugMsg = $"{MethodBase.GetCurrentMethod().Name}[{hashCode}]: Enable combat";
-                        // 2
-                        //Astral.Controllers.Forms.InvokeOnMainThread(() => debug.Value.AddInfo(debugMsg));
-                        // 3
-                        ETLogger.WriteLine(LogType.Debug, debugMsg);
-                    }
-                }
+                string debugMsg = string.Concat(currentMethodName, ": Begins");
+
+                debug.Value.AddInfo(debugMsg);
+                ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
             }
 
-            if (@this._ignoreCombat)
-            {
-                Astral.Quester.API.IgnoreCombat = false;
-                if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
-                {
-                    string debugMsg = $"{MethodBase.GetCurrentMethod().Name}[{hashCode}]: Enable combat";
-                    // 2
-                    //Astral.Controllers.Forms.InvokeOnMainThread(() => debug.Value.AddInfo(debugMsg));
-                    // 3
-                    ETLogger.WriteLine(LogType.Debug, debugMsg);
-                }
-            }
+            EntityConditionalAttack(target);
 
             ActionResult actionResult;
             if (@this._stopOnApproached)
@@ -341,12 +576,11 @@ namespace EntityCore.Quester.Action
 
             if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
             {
-                string debugMsg = $"{MethodBase.GetCurrentMethod().Name}[{hashCode}]: ActionResult => {actionResult}";
-                // 2
-                //Astral.Controllers.Forms.InvokeOnMainThread(() => debug.Value.AddInfo(debugMsg));
-                // 3
-                ETLogger.WriteLine(LogType.Debug, debugMsg);
-            }
+                string debugMsg = string.Concat(currentMethodName, ": ActionResult=", actionResult);
+
+                debug.Value.AddInfo(debugMsg);
+                ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
+            } 
 
             return actionResult;
         }
@@ -374,7 +608,8 @@ namespace EntityCore.Quester.Action
             get
             {
                 if (!InternalConditions)
-                    return new ActionValidity($"{nameof(@this.EntityID)} property is not valid.");
+                    return new ActionValidity($"The combination of the main Entity identifier attribute is not valid.\n\r" +
+                        $"Check {nameof(@this.EntityID)} and {nameof(@this.EntityNameType)} properties.");
                 return new ActionValidity();
             }
         }
@@ -484,9 +719,10 @@ namespace EntityCore.Quester.Action
             return true;
         }
 
-        #region Вспомогательные методы
+#region Вспомогательные методы
         internal bool ValidateEntity(Entity e)
         {
+#if ExtendedActionDebugInfo
             bool isNull = e is null;
             bool isValid = isNull ? false : e.IsValid;
             bool checkOk = isNull ? false : checkEntity(e);
@@ -502,10 +738,12 @@ namespace EntityCore.Quester.Action
                 //Astral.Controllers.Forms.InvokeOnMainThread(() => debug.Value.AddInfo(debugMsg));
                 // 3
                 ETLogger.WriteLine(LogType.Debug, debugMsg);
-            }
-                
-            return  result;
+            } 
 
+            return result;
+#else
+            return e != null && checkEntity(e);
+#endif
         }
 
         private bool internal_CheckEntity_Initializer(Entity e)
@@ -514,22 +752,28 @@ namespace EntityCore.Quester.Action
             if (predicate != null)
             {
 #if DEBUG
-                ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}[{hashCode}]: Initialize the Comparer.");
+#if HashCode_Identifier
+                string debugMsg = $"{GetType().Name}[{hashCode}]: Initialize the Comparer."; 
+#elif ActionID_Identifier
+                string debugMsg = string.Concat(actionIDstr,": Initialize the Comparer.");
 #endif
-                if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
-                {
-                    string debugMsg = $"{MethodBase.GetCurrentMethod().Name}[{hashCode}]: Initialize Comparer";
-                    // 2
-                    //Astral.Controllers.Forms.InvokeOnMainThread(() => debug.Value.AddInfo(debugMsg));
-                    // 3
-                    ETLogger.WriteLine(LogType.Debug, debugMsg);
-                }
-
+                debug.Value.AddInfo(debugMsg);
+                ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg)); 
+#endif
                 checkEntity = predicate;
                 return e != null && checkEntity(e);
             }
-#if DEBUG
-            else ETLogger.WriteLine(LogType.Error, $"{GetType().Name}[{hashCode}]: Fail to initialize the Comparer.");
+#if DEBUG 
+            else
+            {
+#if HashCode_Identifier
+            string debugMsg = $"{GetType().Name}[{hashCode}]: Fail to initialize the Comparer.";
+#elif ActionID_Identifier
+                string debugMsg = string.Concat(actionIDstr, "Fail to initialize the Comparer.");
+#endif
+                debug.Value.AddInfo(debugMsg);
+                ETLogger.WriteLine(LogType.Error, string.Concat(actionIDstr, '.', debugMsg));
+            }
 #endif
             return false;
         }
@@ -547,7 +791,7 @@ namespace EntityCore.Quester.Action
         private List<CustomRegion> internal_GetCustomRegion_Getter()
         {
             return customRegions;
-        } 
-        #endregion
+        }
+#endregion
     }
 }

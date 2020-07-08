@@ -22,7 +22,7 @@ namespace Mount_Tutorial
         OnMapDraw// in (GraphicsNW graph), out void
     }
 
-    interface IQuesterActionRequest : IMessage, IQuesterActionEngine
+    interface IQuesterActionRequest : IMessage//, IQuesterActionEngine
     {
         QuesterQctionRequestType QuesterQctionRequestType { get; }
     }

@@ -22,7 +22,7 @@ namespace Mount_Tutorial
     public class MountTutorialLoaderPlugin : Astral.Addons.Plugin
     {
         internal static IEntityToolsCore Core { get; private set; }  = new CoreProxy();
-        internal static ConcurrentBag<IQuesterActionRequest> Requests_QuesterActions { get; } = new ConcurrentBag<IQuesterActionRequest>();
+        internal static ConcurrentQueue<IQuesterActionRequest> Requests_QuesterActions { get; } = new ConcurrentQueue<IQuesterActionRequest>();
 
         async static internal TResult RequestCore<TResult>(IQuesterActionRequest request)
         {

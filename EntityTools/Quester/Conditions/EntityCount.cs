@@ -81,7 +81,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal EntityNameType _entityNameType = EntityNameType.NameUntranslated;
+        internal EntityNameType _entityNameType = EntityNameType.InternalName;
 
 #if DEVELOPER
         [Description("Type of and EntityID:\n" +

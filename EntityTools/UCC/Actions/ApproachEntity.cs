@@ -95,7 +95,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal EntityNameType _entityNameType = EntityNameType.NameUntranslated;
+        internal EntityNameType _entityNameType = EntityNameType.InternalName;
 
 #if DEVELOPER
         [Category("Entity")]

@@ -96,7 +96,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal EntityNameType _entityNameType = EntityNameType.NameUntranslated;
+        internal EntityNameType _entityNameType = EntityNameType.InternalName;
 
 #if DEVELOPER
         [Description("Check Entity's Region:\n" +

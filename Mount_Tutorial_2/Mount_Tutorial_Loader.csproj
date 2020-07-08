@@ -76,6 +76,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\AuesterActionRequest.cs" />
     <Compile Include="Helpers\FileStreamHelper.cs" />
     <Compile Include="Actions\HorseEquipTutorialAction.cs" />
     <Compile Include="IEntityToolsCore.cs" />
