@@ -13,7 +13,7 @@ namespace EntityTools.Editors
             Vector3 pos = new Vector3();
             if (EntityTools.Core.GUIRequest_NodeLocation(ref pos, "Target the node and press ok."))
             {
-                return pos;
+                return pos.Clone();
             }
             else return value;
         }

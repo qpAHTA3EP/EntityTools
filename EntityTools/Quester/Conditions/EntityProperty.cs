@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Xml.Serialization;
 
 namespace EntityTools.Quester.Conditions
 {
@@ -304,6 +305,13 @@ namespace EntityTools.Quester.Conditions
             }
         }
         internal int _searchTimeInterval = 200; 
+#endif
+
+#if DEVELOPER
+        [XmlIgnore]
+        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
+        [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
+        public string TestInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>";
 #endif
         #endregion
 

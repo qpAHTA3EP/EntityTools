@@ -250,7 +250,9 @@ namespace EntityCore
 
         public bool GUIRequest_CustomRegions(ref List<string> crList)
         {
-            List<string> list = crList ?? new List<string>();
+            //TODO: Исправить ошибку отображения списка CustomRegion (отображается предыдущий списко), а также ошибку приведения ListBoxItem к System.String
+            if(crList is null)
+                crList = new List<string>();
 
 #if disabled_20200510_0025
             if (MultiItemSelectForm.GUIRequest("Select CustomRegions:",
@@ -269,13 +271,9 @@ namespace EntityCore
             {
                 IEnumerable<string> allCRNames = Astral.Quester.API.CurrentProfile.CustomRegions.Select(cr => cr.Name);
 
-                if (MultiItemSelectForm.GUIRequest("Select CustomRegions:",
-                    () => allCRNames, ref list))
-                {
-                    crList = list;
-                    return true;
-                }
+                return MultiItemSelectForm.GUIRequest("Select CustomRegions:", () => allCRNames, ref crList);
             }
+            else XtraMessageBox.Show($"List of the {nameof(Astral.Quester.API.CurrentProfile.CustomRegions)} is empty", string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Information);
             return false;
 #endif
         }

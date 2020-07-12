@@ -21,11 +21,19 @@ namespace EntityCore.Quester.Conditions
 
         private Predicate<Entity> checkEntity = null;
         private Func<List<CustomRegion>> getCustomRegions = null;
+        private Predicate<Entity> customRegionCheck = null;
 
         private List<CustomRegion> customRegions = null;
         private LinkedList<Entity> entities = null;
-        private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
+#if timeout
+        private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0); 
+#endif
         private string label = string.Empty;
+
+        /// <summary>
+        /// Префикс, идентифицирующий принадлежность отладочной информации, выводимой в Лог
+        /// </summary>
+        private string conditionIDstr = string.Empty;
 
         internal EntityCountEngine(EntityCount ettc)
         {
@@ -38,8 +46,11 @@ namespace EntityCore.Quester.Conditions
 
             checkEntity = internal_CheckEntity_Initializer;
             getCustomRegions = internal_GetCustomRegion_Initializer;
+            customRegionCheck = internal_CustomRegionCheck_Initializer;
 
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
+            conditionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+
+            ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} initialized: {Label()}");
         }
 
         internal void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -48,12 +59,19 @@ namespace EntityCore.Quester.Conditions
             {
                 if (e.PropertyName == nameof(@this.Sign) || e.PropertyName == nameof(@this.Value))
                     label = string.Empty;
-                else if(e.PropertyName == nameof(@this.EntityID)
+                else if (e.PropertyName == nameof(@this.EntityID)
                         || e.PropertyName == nameof(@this.EntityIdType)
                         || e.PropertyName == nameof(@this.EntityNameType))
                     checkEntity = internal_CheckEntity_Initializer;
-                else if(e.PropertyName == nameof(@this.CustomRegionNames))
+                else if (e.PropertyName == nameof(@this.CustomRegionNames))
+                {
                     getCustomRegions = internal_GetCustomRegion_Initializer;
+                    customRegionCheck = internal_CustomRegionCheck_Initializer;
+                }
+                else if (e.PropertyName == nameof(@this.Tested))
+                {
+                    customRegionCheck = internal_CustomRegionCheck_Initializer;
+                }
 
                 entities?.Clear();
             }
@@ -64,18 +82,117 @@ namespace EntityCore.Quester.Conditions
         {
             get
             {
-                if (!string.IsNullOrEmpty(@this._entityId))
+                bool result = false;
+                if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
                 {
+#if timeout
+                    string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Begins. Timeout left:", timeout.Left);
+#else
+                    string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Begins");
+#endif
+                    ETLogger.WriteLine(LogType.Debug, debugMsg);
+                }
+
+                if (!string.IsNullOrEmpty(@this._entityId) || @this._entityNameType == EntityNameType.Empty)
+                {
+#if timeout
                     if (timeout.IsTimedOut)
+                    { 
+#endif
+                    entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
+                       @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, null/*getCustomRegions()*/, customRegionCheck);
+
+                    uint entCount = (entities is null) ? 0u: (uint)entities.Count;
+
+                    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
                     {
-                        entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
-                           @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, getCustomRegions());
-                        timeout.ChangeTime(EntityTools.EntityTools.PluginSettings.EntityCache.LocalCacheTime);
+                        string debugMsg;
+                        if (entities?.Count > 0)
+                            debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Search Entities (irrespectively CustomRegion). Total found: ", entCount);
+                        else debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Search Entities (irrespectively CustomRegion). Nothing found");
+
+                        ETLogger.WriteLine(LogType.Debug, debugMsg);
                     }
+#if timeout
+                    timeout.ChangeTime(EntityTools.EntityTools.PluginSettings.EntityCache.LocalCacheTime);
+                }
+                else if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                {
+                    string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Total entities cached (irrespectively CustomRegion): ", entities.Count);
+
+                    ETLogger.WriteLine(LogType.Debug, debugMsg);
+                } 
+#endif
+
+                    switch (@this._sign)
+                    {
+                        case Relation.Equal:
+                            result = entCount == @this._value;
+                            break;
+                        case Relation.NotEqual:
+                            result = entCount != @this._value;
+                            break;
+                        case Relation.Inferior:
+                            result = entCount < @this._value;
+                            break;
+                        case Relation.Superior:
+                            result = entCount > @this._value;
+                            break;
+                    }
+
+                    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                    {
+                        string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Result=", result, " (", entCount, " entities mutched)");
+
+                        ETLogger.WriteLine(LogType.Debug, debugMsg);
+                    }
+                }
+                return result;
+            }
+#if disabled_20200709_1325
+            get
+            {
+                if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                {
+#if timeout
+                    string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Begins. Timeout left:", timeout.Left);
+#else
+                    string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Begins");
+#endif
+                    ETLogger.WriteLine(LogType.Debug, debugMsg);
+                }
+
+                if (!string.IsNullOrEmpty(@this._entityId) || @this._entityNameType == EntityNameType.Empty)
+                {
+#if timeout
+                    if (timeout.IsTimedOut)
+                    { 
+#endif
+                    entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
+                       @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck/*, getCustomRegions()*/);
+                    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                    {
+                        string debugMsg;
+                        if (entities is null || entities.Count == 0)
+                            debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Search Entities (irrespectively CustomRegion). Total found: ", entities.Count);
+                        else debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Search Entities (irrespectively CustomRegion). Nothing found");
+
+                        ETLogger.WriteLine(LogType.Debug, debugMsg);
+                    }
+#if timeout
+                    timeout.ChangeTime(EntityTools.EntityTools.PluginSettings.EntityCache.LocalCacheTime);
+                }
+                else if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                {
+                    string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Total entities cached (irrespectively CustomRegion): ", entities.Count);
+
+                    ETLogger.WriteLine(LogType.Debug, debugMsg);
+                } 
+#endif
 
                     uint entCount = 0;
 
-                    if (entities != null)
+                    if (entities != null && entities.Count > 0)
                     {
                         List<CustomRegion> crList = getCustomRegions();
                         if (crList != null && crList.Count > 0)
@@ -99,20 +216,33 @@ namespace EntityCore.Quester.Conditions
                         else entCount = (uint)entities.Count;
                     }
 
+                    bool result = false;
                     switch (@this._sign)
                     {
                         case Relation.Equal:
-                            return entCount == @this._value;
+                            result = entCount == @this._value;
+                            break;
                         case Relation.NotEqual:
-                            return entCount != @this._value;
+                            result = entCount != @this._value;
+                            break;
                         case Relation.Inferior:
-                            return entCount < @this._value;
+                            result = entCount < @this._value;
+                            break;
                         case Relation.Superior:
-                            return entCount > @this._value;
+                            result = entCount > @this._value;
+                            break;
+                    }
+
+                    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                    {
+                        string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Result=", result, " (", entCount, " entities mutched)");
+
+                        ETLogger.WriteLine(LogType.Debug, debugMsg);
                     }
                 }
                 return false;
-            }
+            } 
+#endif
         }
 
         public void Reset() => entities?.Clear();
@@ -121,15 +251,22 @@ namespace EntityCore.Quester.Conditions
         {
             get
             {
-                if (!string.IsNullOrEmpty(@this._entityId))
+                if (!string.IsNullOrEmpty(@this._entityId) || @this._entityNameType == EntityNameType.Empty)
                 {
-                    entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
-                           @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, getCustomRegions());
+#if false
+                    if (entities is null || entities.Count == 0)
+#elif timeout
+                    if (timeout.IsTimedOut)
+#endif
+                    {
+                        entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
+                                           @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, null /*getCustomRegions()*/, customRegionCheck);
+                    }
 
                     StringBuilder strBldr = new StringBuilder();
                     uint entCount = 0;
 
-                    if (entities != null)
+                    if (entities != null && entities.Count > 0)
                     {
                         List<CustomRegion> crList = getCustomRegions();
                         if (crList != null && crList.Count > 0)
@@ -176,10 +313,19 @@ namespace EntityCore.Quester.Conditions
                             if (@this.Tested == Presence.NotEquel)
                                 strBldr.Insert(0, $"Total {entCount} Entities [{@this._entityId}] are detected out of {crList.Count} CustomRegion:");
                         }
-                        else strBldr.Append($"Total {entities.Count} Entities [{@this._entityId}] are detected");
+                        else strBldr.AppendLine($"Total {entities.Count} Entities [{@this._entityId}] are detected");
                     }
-                    else strBldr.Append($"No Entity [{@this._entityId}] was found.");
+                    else strBldr.AppendLine($"No Entity [{@this._entityId}] was found.");
+#if timeout
+                    strBldr.Append($"Timeout left: {timeout.Left}"); 
+#endif
 
+                    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                    {
+                        string debugMsg = string.Concat(conditionIDstr, '.', nameof(TestInfos), ':', strBldr.ToString());
+
+                        ETLogger.WriteLine(LogType.Debug, debugMsg);
+                    }
                     return strBldr.ToString();
                 }
                 return $"Property '{nameof(@this._entityId)}' does not set !";
@@ -214,13 +360,9 @@ namespace EntityCore.Quester.Conditions
             }
 
             sb.AppendLine();
-#if false
+
             LinkedList<Entity> entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
-                                                                     @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, getCustomRegions()); 
-#else
-            LinkedList<Entity> entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
-                                                         false, 0, 0, @this._regionCheck, getCustomRegions());
-#endif
+                                                         false, 0, 0, @this._regionCheck, null/*getCustomRegions()*/, customRegionCheck);
 
             // Количество Entity, удовлетворяющих условиям
             if (entities != null)
@@ -229,20 +371,17 @@ namespace EntityCore.Quester.Conditions
             sb.AppendLine();
 
             // Ближайшее Entity
-#if false
             Entity closestEntity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType,
-                            @this._entityNameType, @this._entitySetType, @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, getCustomRegions());
-#else
-            Entity closestEntity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType,
-                            @this._entityNameType, @this._entitySetType, false, 0, 0, @this._regionCheck, getCustomRegions());
-#endif
-            if (closestEntity != null && closestEntity.IsValid)
+                            @this._entityNameType, @this._entitySetType, false, 0, 0, @this._regionCheck);//, null/*getCustomRegions()*/, customRegionCheck);
+
+            if (closestEntity != null)
             {
                 bool distOk = @this._reactionRange <= 0 || closestEntity.Location.Distance3DFromPlayer < @this._reactionRange;
                 bool zOk = @this._reactionZRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(closestEntity.Location) < @this._reactionZRange;
                 bool alive = !@this._healthCheck || !closestEntity.IsDead;
+                bool crOK = customRegionCheck(closestEntity);
                 sb.Append("ClosestEntity: ").Append(closestEntity.ToString());
-                if (distOk && zOk && alive)
+                if (distOk && zOk && alive && crOK)
                     sb.AppendLine(" [MATCH]");
                 else sb.AppendLine(" [MISMATCH]");
                 sb.Append("\tName: ").AppendLine(closestEntity.Name);
@@ -261,6 +400,25 @@ namespace EntityCore.Quester.Conditions
                 if (zOk)
                     sb.AppendLine(" [OK]");
                 else sb.AppendLine(" [FAIL]");
+                //TODO: Добавить отображение CustomRegion'ов в другие классы, связанные с проверкой CustomRegion 
+                var crList = getCustomRegions();
+                if(crList?.Count > 0)
+                {
+                    int crNum = 0;
+                    sb.Append("\tRegionCheck: {");
+                    foreach (var cr in crList)
+                        if(cr.Within(closestEntity))
+                        {
+                            if (crNum > 0)
+                                sb.Append(", ");
+                            sb.Append(cr.Name);
+                        }
+                    sb.Append("}");
+                    if (crOK)
+                        sb.AppendLine(" [OK]");
+                    else sb.AppendLine(" [FAIL]");
+                }
+
             }
             else sb.AppendLine("Closest Entity not found!");
 
@@ -280,31 +438,74 @@ namespace EntityCore.Quester.Conditions
             if (predicate != null)
             {
 #if DEBUG
-                ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Comparer does not defined. Initialize.");
+                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}: Comparer does not defined. Initialize.");
 #endif
                 checkEntity = predicate;
                 return e != null && checkEntity(e);
             }
 #if DEBUG
-            else ETLogger.WriteLine(LogType.Error, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Fail to initialize the Comparer.");
+            else ETLogger.WriteLine(LogType.Error, $"{conditionIDstr}: Fail to initialize the Comparer.");
 #endif
             return false;
         }
 
         private List<CustomRegion> internal_GetCustomRegion_Initializer()
         {
-            if (customRegions == null && @this._customRegionNames != null)
+            //TODO: Исправить internal_GetCustomRegion_Initializer в других класах, связанных с проверкой CustomRegion
+            if (@this._customRegionNames?.Count > 0)
             {
-                getCustomRegions = internal_GetCustomRegion_Getter;
                 customRegions = CustomRegionExtentions.GetCustomRegions(@this._customRegionNames);
-                return customRegions;
+#if DEBUG
+                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(internal_GetCustomRegion_Initializer)}: Select List of {customRegions?.Count} CustomRegions");
+#endif
             }
-            return null;
+            else
+            {
+                customRegions = null;
+#if DEBUG
+                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(internal_GetCustomRegion_Initializer)}: Set {nameof(customRegions)} to NULL");
+#endif
+            }
+
+            getCustomRegions = internal_GetCustomRegion_Getter;
+            return customRegions;
         }
 
         private List<CustomRegion> internal_GetCustomRegion_Getter()
         {
             return customRegions;
+        }
+
+        private bool internal_CustomRegionCheck_Initializer(Entity e)
+        {
+            if (getCustomRegions()?.Count > 0)
+            {
+                if (@this.Tested == Presence.Equal)
+                {
+                    customRegionCheck = internal_CustomRegionCheckWithing;
+#if DEBUG
+                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(internal_CustomRegionCheck_Initializer)}: {nameof(customRegionCheck)} := {nameof(internal_CustomRegionCheckWithing)}");
+#endif
+                }
+                else
+                {
+                    customRegionCheck = internal_CustomRegionCheckOutsize;
+#if DEBUG
+                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(internal_CustomRegionCheck_Initializer)}: {nameof(customRegionCheck)} := {nameof(internal_CustomRegionCheckOutsize)}");
+#endif
+                }
+            }
+            else customRegionCheck = (Entity ett) => true;
+
+            return customRegionCheck?.Invoke(e) == true;
+        }
+        private bool internal_CustomRegionCheckWithing(Entity e)
+        {
+            return getCustomRegions()?.FindIndex((cr) => e.Within(cr)) >= 0;
+        }
+        private bool internal_CustomRegionCheckOutsize(Entity e)
+        {
+            return getCustomRegions()?.FindIndex((cr) => e.Within(cr)) < 0;
         }
         #endregion
     }

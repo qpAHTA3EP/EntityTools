@@ -5,6 +5,7 @@ using System.Drawing.Design;
 using System.Windows.Forms;
 using Astral.Quester.Classes;
 using DevExpress.XtraEditors.Controls;
+using EntityTools.Extensions;
 using MyNW.Classes;
 
 
@@ -15,13 +16,10 @@ namespace EntityTools.Editors
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            List<string> list = null;
-            if (value is null || (list = value as List<string>) != null)
+            List<string> list = value as List<string>;
+            if (EntityTools.Core.GUIRequest_CustomRegions(ref list))
             {
-                if (EntityTools.Core.GUIRequest_CustomRegions(ref list))
-                {
-                    return list;
-                }
+                return list.Clone();
             }
             return value;
         }

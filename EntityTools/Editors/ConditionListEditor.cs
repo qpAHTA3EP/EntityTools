@@ -5,6 +5,7 @@ using System.Drawing.Design;
 using System.Windows.Forms;
 using Astral.Quester.Classes;
 using DevExpress.XtraEditors.Controls;
+using EntityTools.Extensions;
 using MyNW.Classes;
 using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 
@@ -21,7 +22,7 @@ namespace EntityTools.Editors
 
             if (EntityTools.Core.GUIRequest_UCCConditions(ref conditions))
             {
-                return conditions;
+                return conditions.Clone();
             }            
             else return value;
         }

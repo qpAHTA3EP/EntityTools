@@ -50,17 +50,21 @@ namespace EntityCore.Forms
         }
 
 #else
-        internal static bool GUIRequest<T>(string caption, Func<IEnumerable<T>> source, ref List<T> selecteValues)
+        internal static bool GUIRequest<T>(string caption, Func<IEnumerable<T>> source, ref List<T> selectedValues)
         {
             bool result = false;
+
             if (source != null)
             {
                 if (@this == null)
                     @this = new MultiItemSelectForm();
                 @this.Text = caption;
-                if (selecteValues != null && selecteValues.Count > 0)
+                @this.ItemList.DataSource = null;
+                @this.fillAction = null;
+
+                if (selectedValues != null && selectedValues.Count > 0)
                 {
-                    List<T> values = selecteValues;
+                    List<T> values = selectedValues;
                     @this.fillAction = () => {
 #if disabled_20200527_1229
                         // Когда selecteValues не пустой, возникает ошибка
@@ -83,26 +87,27 @@ namespace EntityCore.Forms
 #endif
                     };
                 }
-                else
-                {
-                    @this.fillAction = () => @this.ItemList.DataSource = source();
-                }
+                else @this.fillAction = () => @this.ItemList.DataSource = source();
 
                 if (@this.ShowDialog() == DialogResult.OK)
                 {
                     var checkList = @this.ItemList.CheckedItems;
                     if (checkList.Count > 0)
                     {
-                        if (selecteValues is null)
-                            selecteValues = new List<T>();
-                        else selecteValues.Clear();
+                        if (selectedValues is null)
+                            selectedValues = new List<T>();
+                        else selectedValues.Clear();
 
                         foreach (var item in checkList)
-                            selecteValues.Add((T)item);
-                        result = true;
+                            selectedValues.Add((T)item);
                     }
+                    else selectedValues?.Clear();
+                    result = true;
                 }
+                @this.ItemList.DataSource = null;
+                @this.fillAction = null;
             }
+
             return result;
         }
 #endif

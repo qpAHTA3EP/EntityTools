@@ -18,6 +18,7 @@ namespace EntityTools.Editors
             if (value is ItemFilterCoreExt<TFilterEntry> filterCore)
             {
                 if (ItemFilterEditorForm<TFilterEntry>.GUIRequiest(ref filterCore))
+                    //TODO: Добавить клонирование filterCore
                     return filterCore;
             }
             return value;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Text;
+using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
 using EntityTools.Core.Proxies;
@@ -314,6 +315,14 @@ namespace EntityTools.Quester.Conditions
             }
         }
         internal Presence _tested = Presence.Equal;
+
+
+#if DEVELOPER
+        [XmlIgnore]
+        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
+        [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
+        public string TestInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>";
+#endif
         #endregion
 
 #if CORE_DELEGATES
