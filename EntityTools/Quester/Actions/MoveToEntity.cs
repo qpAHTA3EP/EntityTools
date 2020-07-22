@@ -26,10 +26,7 @@ namespace EntityTools.Quester.Actions
 
         public MoveToEntity()
         {
-#if CORE_INTERFACES
             Engine = new QuesterActionProxy(this);
-#endif
-            // EntityTools.Core.Initialize(this);
         }
         #endregion
 
@@ -220,24 +217,6 @@ namespace EntityTools.Quester.Actions
         }
         internal List<string> _customRegionNames = new List<string>();
 
-/*#if DEVELOPER
-        [Description("Time between searches of the Entity (ms)")]
-        [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
-        public int SearchTimeInterval
-        {
-            get => _searchTimeInterval; set
-            {
-                if (_searchTimeInterval != value)
-                {
-                    _searchTimeInterval = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SearchTimeInterval)));
-                }
-            }
-        }
-        internal int _searchTimeInterval = 100;*/
 
 #if DEVELOPER
         [Description("Distance to the Entity by which it is necessary to approach")]
@@ -280,6 +259,26 @@ namespace EntityTools.Quester.Actions
         //TODO: Добавить опцию, которая автоматически прерывать бой при удалении от заданного Entity.
         // - автоматическая вставлка/удаление (при завершении команды) AbortCombat
         // - фоновый процесс
+
+#if DEVELOPER
+        [Description("True: Checking the distance to the Target entity during the battle and abort combat if it becomes greater the 'Distance'\n" +
+                     "False: The distance checking to the Target entity is not performed during the battle")]
+        [Category("Interruptions")]
+#else
+        [Browsable(false)]
+#endif
+        public bool MaintainCombatDistance
+        {
+            get => _maintainCombatDistance; set
+            {
+                if (_maintainCombatDistance != value)
+                {
+                    _maintainCombatDistance = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MaintainCombatDistance)));
+                }
+            }
+        }
+        internal bool _maintainCombatDistance = false;
 
 #if DEVELOPER
         [Description("True: Complete an action when the Entity is closer than 'Distance'\n" +
