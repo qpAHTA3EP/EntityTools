@@ -259,15 +259,18 @@ namespace EntityTools.Quester.Actions
         //TODO: Добавить опцию, которая автоматически прерывать бой при удалении от заданного Entity.
         // - автоматическая вставлка/удаление (при завершении команды) AbortCombat
         // - фоновый процесс
+        // - делегат-аргумент для CombatUnit
 
+        //TODO: Исправить описание
 #if DEVELOPER
-        [Description("True: Checking the distance to the Target entity during the battle and abort combat if it becomes greater the 'Distance'\n" +
-                     "False: The distance checking to the Target entity is not performed during the battle")]
+        [Description("Check the distance to Target entity during the battle and abort combat if it becomes greater the 'MaintainCombatDistance'\n" +
+                     "However the distance checking is not performed if the value less than 'Distance'")]
         [Category("Interruptions")]
 #else
         [Browsable(false)]
 #endif
-        public bool MaintainCombatDistance
+        [XmlElement("AbortCombatDistance")]
+        public uint MaintainCombatDistance
         {
             get => _maintainCombatDistance; set
             {
@@ -278,7 +281,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal bool _maintainCombatDistance = false;
+        internal uint _maintainCombatDistance = 0;
 
 #if DEVELOPER
         [Description("True: Complete an action when the Entity is closer than 'Distance'\n" +

@@ -1,5 +1,6 @@
 ﻿#define ActionID_Identifier
 
+using System.Linq;
 using Astral;
 using Astral.Classes;
 using Astral.Quester.Classes;
@@ -515,7 +516,7 @@ namespace EntityCore.Quester.Action
             {
                 // entity нужно атаковать
                 Astral.Logic.NW.Attackers.List.Clear();
-                if (entity.RelationToPlayer != EntityRelation.Friend)
+                if (entity.RelationToPlayer == EntityRelation.Foe)
                 {
                     string targetEntityStr = string.Empty;
                     // entity враждебно и должно быть атаковано
@@ -527,7 +528,7 @@ namespace EntityCore.Quester.Action
                         targetEntityStr = string.Concat("Entity[", @this._entityNameType == EntityNameType.InternalName ? entity.InternalName : entity.NameUntranslated, "; ", entity.RelationToPlayer, ']');
                     }
                     // атака entity
-                    if (@this._maintainCombatDistance)
+                    if (@this._maintainCombatDistance > @this._distance)
                     {
                         if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
                         {
@@ -570,12 +571,29 @@ namespace EntityCore.Quester.Action
             if (@this._ignoreCombat)
             {
                 // entity в пределах досягаемости, но не может быть атакована (entity.RelationToPlayer == EntityRelation.Friend) или не должна быть атакована принудительно (!@this._attackTargetEntity)
-                if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+
+                if (@this._maintainCombatDistance > @this._distance)
                 {
-                    string debugMsg = $"{currentMethodName}: Engage combat";
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
+                    Astral.Quester.API.IgnoreCombat = false;
+                    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                    {
+                        string debugMsg = $"{currentMethodName}: Engage combat, attack closest enemy and MaintainCombatDistance";
+                        ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
+                    }
+                    Entity closestAttacker = ClosestAttaker();
+                    if (Astral.Logic.NW.Combats.CombatUnit(closestAttacker, BreakCombat))
+                        Astral.Quester.API.IgnoreCombat = true;
                 }
-                Astral.Quester.API.IgnoreCombat = false;
+                else
+                {
+                    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                    {
+                        string debugMsg = $"{currentMethodName}: Engage combat and MaintainCombatDistance";
+                        ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
+                    }
+
+                    Astral.Quester.API.IgnoreCombat = false;
+                }
             }
         }
 
@@ -661,6 +679,30 @@ namespace EntityCore.Quester.Action
                 }
             }
         } 
+        
+        /// <summary>
+        /// Выбор ближайшего противника, из списка атакующих персонажа 
+        /// </summary>
+        /// <returns></returns>
+        private Entity ClosestAttaker()
+        {
+            Entity result = null;
+            if(Astral.Logic.NW.Attackers.List?.Count > 0)
+            {
+                double dist = double.MaxValue;
+                double curDist = double.MaxValue;
+                foreach (Entity entity in Astral.Logic.NW.Attackers.List)
+                {
+                    if(dist > (curDist = entity.Location.Distance3DFromPlayer))
+                    {
+                        dist = curDist;
+                        result = entity;
+                    }
+                }
+            }
+
+            return result ?? new Entity(IntPtr.Zero);
+        }
         #endregion
 
         public ActionResult Run()
