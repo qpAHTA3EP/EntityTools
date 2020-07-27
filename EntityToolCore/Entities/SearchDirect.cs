@@ -1,12 +1,15 @@
-﻿#define PROFILING
+﻿//#define PROFILING
 using Astral.Classes.ItemFilter;
 using EntityTools;
 using EntityTools.Enums;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Astral.Logic.UCC.Classes;
+using MyNW.Patchables.Enums;
 
 namespace EntityCore.Entities
 {
@@ -335,6 +338,47 @@ namespace EntityCore.Entities
                     ContactMinTime = time;
             }
 #endif
+        }
+
+        /// <summary>
+        /// Ближайший противник
+        /// </summary>
+        /// <returns></returns>
+        public static Entity ClosestEnemy(Predicate<Entity> predicate = null)
+        {
+            Vector3 playerPos = EntityManager.LocalPlayer.Location;
+            Entity result = null;
+            double minDist = double.MaxValue;
+            double currDist = double.MaxValue;
+            if (predicate is null)
+            {
+                foreach (Entity entity in EntityManager.GetEntities())
+                {
+                    if (IsValidEnemy(entity) && (currDist = entity.Location.Distance3DFromPlayer) < minDist)
+                    {
+                        minDist = currDist;
+                        result = entity;
+                    }
+                }
+            }
+            else
+            {
+                foreach (Entity entity in EntityManager.GetEntities())
+                {
+                    if (IsValidEnemy(entity) && predicate(entity) && (currDist = entity.Location.Distance3DFromPlayer) < minDist)
+                    {
+                        minDist = currDist;
+                        result = entity;
+                    }
+                } 
+            }
+
+            return result ?? new Entity(IntPtr.Zero);
+        }
+
+        public static bool IsValidEnemy(Entity entity)
+        {
+            return entity.IsValid && !entity.IsDead && entity.InCombat && entity.RelationToPlayer == EntityRelation.Foe && !entity.IsUnselectable && !entity.IsUntargetable && !entity.DoNotDraw && entity.Character.AttackPlayer;// && entity.Location.Distance3D(playerPos) < 60.0;
         }
     }
 }

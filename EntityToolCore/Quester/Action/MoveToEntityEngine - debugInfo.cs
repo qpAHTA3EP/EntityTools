@@ -528,7 +528,7 @@ namespace EntityCore.Quester.Action
                         targetEntityStr = string.Concat("Entity[", @this._entityNameType == EntityNameType.InternalName ? entity.InternalName : entity.NameUntranslated, "; ", entity.RelationToPlayer, ']');
                     }
                     // атака entity
-                    if (@this._maintainCombatDistance > @this._distance)
+                    if (@this._abortCombatDistance > @this._distance)
                     {
                         if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
                         {
@@ -572,7 +572,7 @@ namespace EntityCore.Quester.Action
             {
                 // entity в пределах досягаемости, но не может быть атакована (entity.RelationToPlayer == EntityRelation.Friend) или не должна быть атакована принудительно (!@this._attackTargetEntity)
 
-                if (@this._maintainCombatDistance > @this._distance)
+                if (@this._abortCombatDistance > @this._distance)
                 {
                     Astral.Quester.API.IgnoreCombat = false;
                     if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
@@ -580,7 +580,7 @@ namespace EntityCore.Quester.Action
                         string debugMsg = $"{currentMethodName}: Engage combat, attack closest enemy and MaintainCombatDistance";
                         ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
                     }
-                    Entity closestAttacker = ClosestAttaker();
+                    Entity closestAttacker = ClosestEnemy(entity);
                     if (Astral.Logic.NW.Combats.CombatUnit(closestAttacker, BreakCombat))
                         Astral.Quester.API.IgnoreCombat = true;
                 }
@@ -683,29 +683,63 @@ namespace EntityCore.Quester.Action
         /// <summary>
         /// Выбор ближайшего противника, из списка атакующих персонажа 
         /// </summary>
+        /// <param name="entity">Целевая сущность, в переделах которой активируется бой</param>
         /// <returns></returns>
-        private Entity ClosestAttaker()
+        private Entity ClosestEnemy(Entity entity)
         {
-            Entity result = null;
-            if(Astral.Logic.NW.Attackers.List?.Count > 0)
+            string currentMethodName = MethodBase.GetCurrentMethod().Name;
+            
+            Entity enemy = null;
+            if (entity != null)
             {
-                double dist = double.MaxValue;
-                double curDist = double.MaxValue;
-                foreach (Entity entity in Astral.Logic.NW.Attackers.List)
+                if (Astral.Logic.NW.Attackers.List?.Count > 0)
                 {
-                    if(dist > (curDist = entity.Location.Distance3DFromPlayer))
+                    double dist = double.MaxValue;
+                    double curDist = double.MaxValue;
+                    foreach (Entity ett in Astral.Logic.NW.Attackers.List)
                     {
-                        dist = curDist;
-                        result = entity;
+                        if (dist > (curDist = ett.Location.Distance3DFromPlayer))
+                        {
+                            dist = curDist;
+                            enemy = ett;
+                        }
+                    }
+                    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                    {
+                        string debugMsg = string.Empty;
+                        if (enemy is null)
+                            string.Concat(currentMethodName, ": No Attackers was found");
+                        else string.Concat(currentMethodName, ": Select closeat attacker [", (@this._entityNameType == EntityNameType.InternalName) ? enemy.InternalName : enemy.NameUntranslated, "] at the distance ", dist.ToString("N2"));
+                        debug.Value.AddInfo(debugMsg);
+                        ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
                     }
                 }
+                if(enemy is null)
+                {
+                    enemy = SearchDirect.ClosestEnemy(AdditionalAttackerCheck);
+                    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                    {
+                        string debugMsg = string.Empty;
+                        if (enemy is null)
+                             debugMsg = string.Concat(currentMethodName, ": No enemies was found");
+                        else debugMsg = string.Concat(currentMethodName, ": Select closeat enemy [", (@this._entityNameType == EntityNameType.InternalName) ? enemy.InternalName : enemy.NameUntranslated, "] at the distance ", enemy.Location.Distance3DFromPlayer.ToString("N2"));
+                        debug.Value.AddInfo(debugMsg);
+                        ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', debugMsg));
+                    }
+                } 
             }
-
-            return result ?? new Entity(IntPtr.Zero);
+            return enemy ?? new Entity(IntPtr.Zero);
         }
-        #endregion
 
-        public ActionResult Run()
+        private bool AdditionalAttackerCheck(Entity ett)
+        {
+            double tarDist = MathHelper.Distance3D(target.Location, ett.Location);
+            double plDist = ett.Location.Distance3DFromPlayer;
+            return tarDist<@this._abortCombatDistance && plDist< 60;
+        }
+    #endregion
+
+    public ActionResult Run()
         {
             string currentMethodName = MethodBase.GetCurrentMethod().Name;
             if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
@@ -793,6 +827,7 @@ namespace EntityCore.Quester.Action
         {
             if (ValidateEntity(target))
                 graph.drawFillEllipse(target.Location, new Size(10, 10), Brushes.Beige);
+            //TODO: Отображение на карте радиусов Distance и AbortCombatDistance
         }
 #endif
         public bool EntityDiagnosticString(out string infoString)

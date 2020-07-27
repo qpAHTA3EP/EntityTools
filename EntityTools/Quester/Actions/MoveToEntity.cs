@@ -263,25 +263,28 @@ namespace EntityTools.Quester.Actions
 
         //TODO: Исправить описание
 #if DEVELOPER
-        [Description("Check the distance to Target entity during the battle and abort combat if it becomes greater the 'MaintainCombatDistance'\n" +
-                     "However the distance checking is not performed if the value less than 'Distance'")]
+        //[Description("Check the distance to Target entity during the battle and abort combat if it becomes greater the 'MaintainCombatDistance'\n" +
+        //             "However the distance checking is not performed if the value less than 'Distance'")]
+        [Description("The battle is aborted outside 'AbortCombatDistance' radius from the target entity.\n" +
+                     "The combat is restored within the 'Distance' radius.\n" +
+                     "However, this is not performed if the value less than 'Distance' or 'IgnoreCombat' is False.")]
         [Category("Interruptions")]
 #else
         [Browsable(false)]
 #endif
-        [XmlElement("AbortCombatDistance")]
-        public uint MaintainCombatDistance
+        //[XmlElement("AbortCombatDistance")]
+        public uint AbortCombatDistance
         {
-            get => _maintainCombatDistance; set
+            get => _abortCombatDistance; set
             {
-                if (_maintainCombatDistance != value)
+                if (_abortCombatDistance != value)
                 {
-                    _maintainCombatDistance = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MaintainCombatDistance)));
+                    _abortCombatDistance = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AbortCombatDistance)));
                 }
             }
         }
-        internal uint _maintainCombatDistance = 0;
+        internal uint _abortCombatDistance = 0;
 
 #if DEVELOPER
         [Description("True: Complete an action when the Entity is closer than 'Distance'\n" +
