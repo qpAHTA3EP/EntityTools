@@ -14,7 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using EntityTools.Tools.ItemFilter;
+using EntityTools.Tools.BuySellItems;
 
 namespace EntityCore.UCC.Actions
 {

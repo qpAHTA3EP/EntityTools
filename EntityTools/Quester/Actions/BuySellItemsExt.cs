@@ -1,7 +1,4 @@
-﻿//#define grouping_filterEntry_by_priority
-#define ItemFilterGroup_for_buying
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
@@ -21,14 +18,14 @@ using Astral.Quester.UIEditors.Forms;
 using DevExpress.XtraEditors;
 using EntityTools.Editors;
 using EntityTools.Enums;
-using EntityTools.Tools.ItemFilter;
-using static EntityTools.Tools.ItemFilter.BuyFilterEntry;
+using EntityTools.Tools.BuySellItems;
 using EntityTools.Extensions;
 using EntityTools.Reflection;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
 using NPCInfos = Astral.Quester.Classes.NPCInfos;
+using static EntityTools.Tools.BuySellItems.ItemFilterEntryExt;
 using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Xml.Serialization;
@@ -64,13 +61,12 @@ namespace EntityTools.Quester.Actions
         internal List<string> _vendorMenus = new List<string>();
 
 #if DEVELOPER
-        //[Editor(typeof(ItemIdFilterEditor), typeof(UITypeEditor))]
-        [Editor(typeof(ItemFilterCoreExtEditor<CommonFilterEntry>), typeof(UITypeEditor))]
+        [Editor(typeof(ItemIdFilterEditor), typeof(UITypeEditor))]
         [Category("Setting of selling")]
 #else
         [Browsable(false)]
 #endif
-        public ItemFilterCoreExt<CommonFilterEntry> SellOptions
+        public ItemFilterCore SellOptions
         {
             get => _sellOptions;
             set
@@ -82,7 +78,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal ItemFilterCoreExt<CommonFilterEntry> _sellOptions = new ItemFilterCoreExt<CommonFilterEntry>();
+        internal ItemFilterCore _sellOptions = new ItemFilterCore();
 
 #if DEVELOPER
         [Description("Use options set in general settings to sell")]
@@ -125,35 +121,13 @@ namespace EntityTools.Quester.Actions
         internal BagsList _sellBags = BagsList.GetPlayerBags();
 
 #if DEVELOPER
-        [Editor(typeof(ItemFilterCoreExtEditor<BuyFilterEntry>), typeof(UITypeEditor))]
+        [Editor(typeof(ItemFilterEntryListEditor), typeof(UITypeEditor))]
         [Category("Setting of buying")]
 #else
         [Browsable(false)]
 #endif
-        public ItemFilterCoreExt<BuyFilterEntry> BuyOptions { get => _buyOptions; set => _buyOptions = value; }
-        internal ItemFilterCoreExt<BuyFilterEntry> _buyOptions = new ItemFilterCoreExt<BuyFilterEntry>();
-
-#if BoundingRestriction
-#if DEVELOPER
-        [Description("")]
-        [Category("Setting of buying")]
-#else
-        [Browsable(false)]
-#endif
-        public BoundingRestrictionType BoundingRestriction
-        {
-            get => _boundingRestriction;
-            set
-            {
-                if (_boundingRestriction != value)
-                {
-                    _boundingRestriction = value;
-                }
-            }
-
-        }
-        internal BoundingRestrictionType _boundingRestriction = BoundingRestrictionType.None; 
-#endif
+        public List<ItemFilterEntryExt> BuyOptions { get => _buyOptions; set => _buyOptions = value; }
+        private List<ItemFilterEntryExt> _buyOptions = new List<ItemFilterEntryExt>();
 
 #if DEVELOPER
         [Description("Use options set in general settings to buy")]
@@ -283,7 +257,7 @@ namespace EntityTools.Quester.Actions
                         slots2sellCache = slots;
                 }
 
-                if (@this._sellOptions != null && @this._sellOptions.IsValid)
+                if (@this._sellOptions != null && @this._sellOptions.Entries.Count > 0)
                 {
                     if (_sellBags.GetItems(@this._sellOptions, out List<InventorySlot> slots, true))
                         if (slots2sellCache != null)
@@ -293,7 +267,7 @@ namespace EntityTools.Quester.Actions
 
                 return slots2sellCache?.Count > 0 
                     || @this._useGeneralSettingsToBuy && Astral.Controllers.Settings.Get.SellFilter.Entries.Count > 0 
-                    || @this._buyOptions.IsValid;
+                    || @this._buyOptions.Count > 0;
             }
         }
         protected override Vector3 InternalDestination => Vendor.Position;
@@ -303,7 +277,7 @@ namespace EntityTools.Quester.Actions
             if (VendorInfoEditor.SetInfos(out VendorInfo vndInfo))
             {
                 Vendor = vndInfo;
-                if (XtraMessageBox.Show("Add a dialog ?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                if (XtraMessageBox.Show("Add a dialog ? (open the dialog window before)", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     switch (@this._vendor.VendorType)
                     {
@@ -357,8 +331,8 @@ namespace EntityTools.Quester.Actions
                 if (!@this._vendor.IsValid)
                     return new ActionValidity("Vendor does not set");
 
-                if (!(@this._useGeneralSettingsToBuy || (@this._buyOptions != null && @this._buyOptions.IsValid)
-                    || @this._useGeneralSettingsToSell || (@this._sellOptions != null && @this._sellOptions.IsValid)))
+                if (!(@this._useGeneralSettingsToBuy || (@this._buyOptions != null && @this._buyOptions.Count > 0)
+                    || @this._useGeneralSettingsToSell || (@this._sellOptions != null && @this._sellOptions.Entries.Count > 0)))
                     return new ActionValidity("The items to buy or sell are not specified!");
 
                 return new ActionValidity();
@@ -806,7 +780,7 @@ namespace EntityTools.Quester.Actions
                     } 
                 }
 #else
-                if (_buyOptions.IsValid)
+                if (_buyOptions.Count > 0)
                 {
                     if (extendedActionDebugInfo)
                     {
@@ -814,72 +788,8 @@ namespace EntityTools.Quester.Actions
                         debug.Value.AddInfo(string.Concat(methodName, ": Indexing selected Bags"));
                     }
                     // Анализируем содержимое сумок
-                    IndexedBags<BuyFilterEntry> indexedBags = new IndexedBags<BuyFilterEntry>(@this._buyOptions, @this._buyBags);
+                    IndexedBags indexedBags = new IndexedBags(@this._buyOptions, @this._buyBags);
 
-#if grouping_filterEntry_by_priority
-                    uint allowBuyPriority = uint.MaxValue;
-                    foreach(var group in indexedBags.Filters.GroupBy((f) => f.Priority))
-                    {
-                        if (allowBuyPriority >= group.Key)
-                        {
-                            foreach (var filterEntry in indexedBags.Filters)
-                            {
-                                if (extendedActionDebugInfo)
-                                    debug.Value.AddInfo(string.Concat(methodName, ": Processing FilterEntry: ", filterEntry.ToString()));
-
-                                var slotCache = indexedBags[filterEntry];
-                                List<ItemDef> boughtItems = null;
-                                BuyItemResult buyItemResult = (slotCache is null) ? BuyAnItem(filterEntry, ref boughtItems) : BuyAnItem(slotCache, ref boughtItems);
-
-                                if (extendedActionDebugInfo)
-                                    debug.Value.AddInfo(string.Concat(methodName, ": Result: ", buyItemResult));
-                                
-                                // Обработка результата покупки
-                                // Если результат не позволяет продолжать покупку - прерываем выполнение команды
-                                switch (buyItemResult)
-                                {
-                                    case BuyItemResult.Succeeded:
-                                        {
-                                            // Предмет необходимо экипировать после покупки
-                                            if (filterEntry.Wear && boughtItems != null && boughtItems.Count > 0)
-                                            {
-                                                foreach (ItemDef item in boughtItems)
-                                                {
-                                                    Thread.Sleep(1000);
-                                                    
-                                                    // Здесь не учитывается возможно приобретения и экипировки нескольких вещений (например, колец)
-                                                    InventorySlot slot = _buyBags.Find(item);
-                                                    if (slot != null)
-                                                        slot.Equip();
-                                                }
-                                            }
-                                            // можно продолжать покупки
-                                            break;
-                                        }
-                                    case BuyItemResult.Exists:
-                                        // можно продолжать покупки
-                                        break;
-                                    case BuyItemResult.Completed:
-                                        // можно продолжать покупки
-                                        break;
-                                    case BuyItemResult.FullBag:
-                                        return ActionResult.Skip;
-                                    case BuyItemResult.Error:
-                                        return ActionResult.Fail;
-                                    case BuyItemResult.NotEnoughCurrency:
-                                        // можно продолжать покупки с приоритетом не выше allowBuyPriority
-                                        allowBuyPriority = group.Key;
-                                        break;
-                                    default:
-                                        allowBuyPriority = group.Key;
-                                        break;
-                                }
-                            }
-                        }
-                    }
-#elif ItemFilterGroup_for_buying
-                    foreach(var filterGroup in indexedBags.)
-#else
                     foreach (var filterEntry in indexedBags.Filters)
                     {
                         if (extendedActionDebugInfo)
@@ -917,7 +827,6 @@ namespace EntityTools.Quester.Actions
                                 return ActionResult.Fail;
                         }
                     }
-#endif
                 }
 #endif
 
@@ -937,7 +846,7 @@ namespace EntityTools.Quester.Actions
         /// </summary>
         /// <param name="item2buy"></param>
         /// <returns></returns>
-        private BuyItemResult BuyAnItem(BuyFilterEntry item2buy, ref List<ItemDef> boughtItems)
+        private BuyItemResult BuyAnItem(ItemFilterEntryExt item2buy, ref List<ItemDef> boughtItems)
         {
             bool extendedActionDebugInfo = EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo;
             string methodName = MethodBase.GetCurrentMethod().Name;
@@ -1052,7 +961,7 @@ namespace EntityTools.Quester.Actions
 #if ReadOnlyItemFilterEntryExt
         private BuyItemResult BuyAnItem(KeyValuePair<ReadOnlyItemFilterEntryExt, SlotCache> filterEntryCache, ref List<ItemDef> boughtItems)
 #else
-        private BuyItemResult BuyAnItem(SlotCache<BuyFilterEntry> slotCache, ref List<ItemDef> boughtItems)
+        private BuyItemResult BuyAnItem(ItemFilterEntryExt filterEntry, SlotCache slotCache, ref List<ItemDef> boughtItems)
 #endif
         {
             bool extendedActionDebugInfo = EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo;
@@ -1070,23 +979,23 @@ namespace EntityTools.Quester.Actions
                     // Проверка наличия валюты заложена в storeItemInfo.CanBuyError
                     // Код ошибки (нет валюты) = 6
 
-                    if (slotCache.Filter.IsMatch(storeItemInfo.Item))
+                    if (filterEntry.IsMatch(storeItemInfo.Item))
                     {
                         // Проверка соответствия уровню персонажа
-                        if (!slotCache.Filter.CheckPlayerLevel || storeItemInfo.FitsPlayerLevel())
+                        if (!filterEntry.CheckPlayerLevel || storeItemInfo.FitsPlayerLevel())
                         {
                             // Проверка уровня предмета
-                            if (!slotCache.Filter.CheckEquipmentLevel 
+                            if (!filterEntry.CheckEquipmentLevel 
                                 //|| filterEntryCache.Value.MaxItemLevel <= storeItemInfo.Item.ItemDef.Level)
                                 || slotCache.HasWorseThen(storeItemInfo))
                             {
                                 bool succeeded = false;
-                                Astral.Classes.Timeout timeout = new Astral.Classes.Timeout((int)@this._timer);
+                                Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(@this._timer > 0 ? (int)@this._timer : int.MaxValue);
 
                                 if (!_checkFreeBags || Check_FreeSlots(_buyBags))
                                 {
                                     //Вычисляем количество предметов, которые необходимо докупить
-                                    uint toBuyNum = storeItemInfo.NumberOfItem2Buy(slotCache);
+                                    uint toBuyNum = storeItemInfo.NumberOfItem2Buy(slotCache, filterEntry);
                                     if (toBuyNum > 0)
                                     {
                                         uint mayBuyInBulk = storeItemInfo.Item.ItemDef.MayBuyInBulk;
@@ -1120,7 +1029,7 @@ namespace EntityTools.Quester.Actions
                                             {
                                                 storeItemInfo.BuyItem(1);
                                                 Thread.Sleep(250);
-                                                if (@this._timer > 0 && timeout.IsTimedOut)
+                                                if (timeout.IsTimedOut)
                                                 {
                                                     str = $"Buying time is out. Bought only {totalPurchasedNum} of {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] was bought ...";
                                                     if (extendedActionDebugInfo)
@@ -1208,77 +1117,32 @@ namespace EntityTools.Quester.Actions
                             }
 #endif
                 }
-                if (@this._sellOptions.IncludeFilters.Count > 0)
+                if (@this._sellOptions.Entries.Count > 0)
                 {
                     // Задан локальный фильтр продажи
-                    if (slots2sellCache?.Count > 0)
+                    if(slots2sellCache?.Count > 0)
                     {
                         // lots2sellCache сформирован, дополнительный происк производить не нужно
                         foreach (InventorySlot slot in slots2sellCache)
-                            TrySellAnItem(slot);
+                            if (Astral.Logic.NW.Inventory.CanSell(slot.Item))
+                            {
+                                Logger.WriteLine(string.Concat("Sell : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
+                                slot.StoreSellItem();
+                                Thread.Sleep(250);
+                            }
                     }
-                    else if (_sellBags.GetItems(@this._sellOptions, out List<InventorySlot> slots2sell, true))
-                    {
-                        foreach (InventorySlot slot in slots2sell)
-                            TrySellAnItem(slot);
-                    }
+                    else if(_sellBags.GetItems(@this._sellOptions, out List<InventorySlot> slots2sell, true))
+                        foreach(InventorySlot slot in slots2sell)
+                            if (Astral.Logic.NW.Inventory.CanSell(slot.Item))
+                            {
+                                Logger.WriteLine(string.Concat("Sell : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
+                                slot.StoreSellItem();
+                                Thread.Sleep(250);
+                            }
                     else Logger.WriteLine("Nothing to sell !");
                 }
             }
             else Logger.WriteLine("Can't sell to this vendor !");
-        }
-
-        private void TrySellAnItem(InventorySlot slot)
-        {
-            if (Astral.Logic.NW.Inventory.CanSell(slot.Item))
-#if BoundingRestriction
-                switch (_boundingRestriction)
-                {
-                    case BoundingRestrictionType.None:
-                        Logger.WriteLine(string.Concat("Sell : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
-                        slot.StoreSellItem();
-                        Thread.Sleep(250);
-                        break;
-                    case BoundingRestrictionType.Unbounded:
-                        if ((slot.Item.Flags & (uint)BoundingRestrictionType.Bounded) == 0u)
-                        {
-                            Logger.WriteLine(string.Concat("Sell unbounded items : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
-                            slot.StoreSellItem();
-                            Thread.Sleep(250);
-                        }
-                        break;
-                    case BoundingRestrictionType.Bounded:
-                        if ((slot.Item.Flags & (uint)BoundingRestrictionType.Bounded) > 0u)
-                        {
-                            Logger.WriteLine(string.Concat("Sell bounded items : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
-                            slot.StoreSellItem();
-                            Thread.Sleep(250);
-                        }
-                        break;
-                    case BoundingRestrictionType.CharacterBounded:
-                        if ((slot.Item.Flags & (uint)BoundingRestrictionType.CharacterBounded) > 0u)
-                        {
-                            Logger.WriteLine(string.Concat("Sell bounded to character items : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
-                            slot.StoreSellItem();
-                            Thread.Sleep(250);
-                        }
-                        break;
-                    case BoundingRestrictionType.AccountBounded:
-                        if ((slot.Item.Flags & (uint)BoundingRestrictionType.AccountBounded) > 0u)
-                        {
-                            Logger.WriteLine(string.Concat("Sell bounded to account items : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
-                            slot.StoreSellItem();
-                            Thread.Sleep(250);
-                        }
-                        break;
-                } 
-#else
-            {
-                Logger.WriteLine(string.Concat("Sell : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
-                slot.StoreSellItem();
-                Thread.Sleep(250);
-            }
-#endif
         }
 
 #if false

@@ -10,7 +10,7 @@ using Astral.Quester.UIEditors.Forms;
 using DevExpress.XtraEditors;
 using EntityTools.Enums;
 using EntityTools.Reflection;
-using EntityTools.Tools.BuySellItems;
+using EntityTools.Tools.ItemFilter;
 using MyNW.Classes;
 using MyNW.Internals;
 //using static EntityTools.Reflection.PrivateConsructor;

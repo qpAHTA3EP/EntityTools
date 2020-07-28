@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.0727.1130</AssemblyVersion>
+    <AssemblyVersion>0.20.0728.1251</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -189,14 +189,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Editors\CheckedListBoxEditor.cs" />
-    <Compile Include="Editors\ItemFilterCoreExtEditor.cs" />
-    <Compile Include="Editors\EntityTestEditor.cs" />
     <Compile Include="Editors\Forms\ItemFilterEditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Editors\Forms\ItemFilterEditorForm.Designer.cs">
       <DependentUpon>ItemFilterEditorForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editors\EntityTestEditor.cs" />
+    <Compile Include="Editors\ItemFilterEntryListEditor.cs" />
     <Compile Include="Editors\VendorInfoEditor.cs" />
     <Compile Include="Logger\EntityToolLogger.cs" />
     <Compile Include="Core\Interfaces\IUCCConditionEngine.cs" />
@@ -219,7 +219,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Quester\Actions\BuySellItems_Dummy.cs" />
+    <Compile Include="Quester\Actions\BuySellItemsExt.cs" />
     <Compile Include="Quester\Actions\ChangeInstanceToLeader.cs" />
     <Compile Include="Quester\Actions\InsertInsignia.cs" />
     <Compile Include="Quester\Actions\Deprecated\InteractEntity.cs" />
@@ -237,7 +237,6 @@
     <Compile Include="Quester\Conditions\TeamLeaderMapInstance.cs" />
     <Compile Include="Quester\Conditions\TeamMemberCount.cs" />
     <Compile Include="Editors\CampaignTaskEditor.cs" />
-    <Compile Include="Editors\CheckedListBoxCommonEditor.cs" />
     <Compile Include="Editors\AddTypeCommonEditor.cs" />
     <Compile Include="Editors\ConditionListEditor.cs" />
     <Compile Include="Core\MainPanel.cs">
@@ -283,15 +282,14 @@
     <Compile Include="Servises\UnstuckSpell\UnstuckSpellsSettings.cs" />
     <Compile Include="Logger\EntityToolLoggerSettings.cs" />
     <Compile Include="Tools\AuraOption.cs" />
-    <Compile Include="Tools\ItemFilter\BagsList.cs" />
-    <Compile Include="Tools\ItemFilter\BuyFilterEntry.cs" />
-    <Compile Include="Tools\ItemFilter\CommonFilterEntry.cs" />
-    <Compile Include="Tools\ItemFilter\Enums.cs" />
-    <Compile Include="Tools\ItemFilter\IFilterEntry.cs" />
-    <Compile Include="Tools\ItemFilter\IItemMatch.cs" />
-    <Compile Include="Tools\ItemFilter\ItemFilterEntryCoreExt.cs" />
-    <Compile Include="Tools\ItemFilter\ItemFilterGroup.cs" />
-    <Compile Include="Tools\ItemFilter\VendorInfo.cs" />
+    <Compile Include="Tools\BuySellItems\BagsList.cs" />
+    <Compile Include="Tools\BuySellItems\BuyItemEntry.cs" />
+    <Compile Include="Tools\BuySellItems\Enums.cs" />
+    <Compile Include="Tools\BuySellItems\Extensions.cs" />
+    <Compile Include="Tools\BuySellItems\IndexedBags.cs" />
+    <Compile Include="Tools\BuySellItems\ItemStats.cs" />
+    <Compile Include="Tools\BuySellItems\SlotCache.cs" />
+    <Compile Include="Tools\BuySellItems\VendorInfo.cs" />
     <Compile Include="Tools\CollectionTypeConverter.cs" />
     <Compile Include="Servises\EnchantHelper.cs" />
     <Compile Include="Tools\CryptoHelper.cs" />
@@ -457,6 +455,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\miniPlayAll.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Tools\ItemFilter\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

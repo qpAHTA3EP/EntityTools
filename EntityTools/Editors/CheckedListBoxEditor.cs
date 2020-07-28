@@ -1,238 +1,135 @@
-﻿using EntityTools.Tools.ItemFilter;
-using MyNW.Patchables.Enums;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
-using System.Xml.Serialization;
+using EntityTools.Tools.BuySellItems;
+using MyNW.Patchables.Enums;
 
 namespace EntityTools.Editors
 {
-#if DEVELOPER
-    internal class BagsListEditor : UITypeEditor , IDisposable
+    // Token: 0x02000091 RID: 145
+    internal class BagsListEditor : UITypeEditor, IDisposable
     {
-        private readonly CheckedListBox cbx = new CheckedListBox();
-#if Disable_Selector
-        private object editedValue;
-        private IWindowsFormsEditorService es;
-        private int toolTipIndex;
-#endif
-        public override bool IsDropDownResizable => true;
-        private ToolTip toolTip = new ToolTip() { ToolTipTitle = "Ctrl+A to select all, Ctrl+D to deselect, Ctrl+I to inverse, Ctrl+S to sort" };
+        // Token: 0x170001E4 RID: 484
+        // (get) Token: 0x060005C1 RID: 1473 RVA: 0x00027159 File Offset: 0x00025359
+        public override bool IsDropDownResizable
+        {
+            get
+            {
+                return true;
+            }
+        }
 
+        // Token: 0x060005C2 RID: 1474 RVA: 0x0002715C File Offset: 0x0002535C
         internal BagsListEditor()
         {
-#if Disable_Selector
-            cbx.Leave += cbx_Leave;
-
-#endif
-            cbx.KeyDown += cbx_KeyDown;
-            cbx.MouseHover += cbx_ShowTooltip;
+            this.cbx.KeyDown += this.cbx_KeyDown;
+            this.cbx.MouseHover += this.cbx_ShowTooltip;
         }
 
+        // Token: 0x060005C3 RID: 1475 RVA: 0x000271C4 File Offset: 0x000253C4
         private void cbx_ShowTooltip(object sender, EventArgs e)
         {
-            int toolTipIndex = cbx.IndexFromPoint(cbx.PointToClient(Control.MousePosition));
-            if (toolTipIndex > -1)
+            int num = this.cbx.IndexFromPoint(this.cbx.PointToClient(Control.MousePosition));
+            bool flag = num > -1;
+            if (flag)
             {
-                toolTip.SetToolTip(cbx, cbx.Items[toolTipIndex].ToString());
+                this.toolTip.SetToolTip(this.cbx, this.cbx.Items[num].ToString());
             }
         }
 
+        // Token: 0x060005C4 RID: 1476 RVA: 0x00027220 File Offset: 0x00025420
         private void cbx_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Control && e.KeyCode == Keys.A)
+            bool flag = e.Control && e.KeyCode == Keys.A;
+            if (flag)
             {
                 e.SuppressKeyPress = true;
-                for (int i = 0; i < cbx.Items.Count; i++)
+                for (int i = 0; i < this.cbx.Items.Count; i++)
                 {
-                    cbx.SetItemChecked(i, true);
+                    this.cbx.SetItemChecked(i, true);
                 }
             }
-            if (e.Control && e.KeyCode == Keys.D)
+            bool flag2 = e.Control && e.KeyCode == Keys.D;
+            if (flag2)
             {
                 e.SuppressKeyPress = true;
-                for (int i = 0; i < cbx.Items.Count; i++)
+                for (int j = 0; j < this.cbx.Items.Count; j++)
                 {
-                    cbx.SetItemChecked(i, false);
+                    this.cbx.SetItemChecked(j, false);
                 }
             }
-            if (e.Control && e.KeyCode == Keys.I)
+            bool flag3 = e.Control && e.KeyCode == Keys.I;
+            if (flag3)
             {
                 e.SuppressKeyPress = true;
-                for (int i = 0; i < cbx.Items.Count; i++)
+                for (int k = 0; k < this.cbx.Items.Count; k++)
                 {
-                    cbx.SetItemChecked(i, !cbx.GetItemChecked(i));
+                    this.cbx.SetItemChecked(k, !this.cbx.GetItemChecked(k));
                 }
             }
-            if (e.Control && e.KeyCode == Keys.S)
+            bool flag4 = e.Control && e.KeyCode == Keys.S;
+            if (flag4)
             {
                 e.SuppressKeyPress = true;
-                for (int i = 0; i < cbx.Items.Count; i++)
+                for (int l = 0; l < this.cbx.Items.Count; l++)
                 {
-                    cbx.Sorted = true;
+                    this.cbx.Sorted = true;
                 }
             }
         }
 
+        // Token: 0x060005C5 RID: 1477 RVA: 0x0002739C File Offset: 0x0002559C
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
         {
             return UITypeEditorEditStyle.DropDown;
         }
 
+        // Token: 0x060005C6 RID: 1478 RVA: 0x000273B0 File Offset: 0x000255B0
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            if (provider.GetService(typeof(IWindowsFormsEditorService)) is IWindowsFormsEditorService es
-                && value is BagsList bags)
+            IWindowsFormsEditorService windowsFormsEditorService;
+            BagsList bagsList = value as BagsList;
+            bool flag = (windowsFormsEditorService = (provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService)) != null && bagsList != null;
+            object result;
+            if (flag)
             {
-                foreach(InvBagIDs bagId in Enum.GetValues(typeof(InvBagIDs)))
+                foreach (object obj in Enum.GetValues(typeof(InvBagIDs)))
                 {
-                    int ind = cbx.Items.Add(bagId);
-                    cbx.SetItemChecked(ind, bags[bagId]);
+                    InvBagIDs invBagIDs = (InvBagIDs)obj;
+                    int index = this.cbx.Items.Add(invBagIDs);
+                    this.cbx.SetItemChecked(index, bagsList[invBagIDs]);
                 }
-                es.DropDownControl(cbx);
-
-                bags = new BagsList(null);
-                foreach (InvBagIDs id in cbx.CheckedItems)
-                    bags[id] = true;
-
-                return bags;
+                windowsFormsEditorService.DropDownControl(this.cbx);
+                bagsList = new BagsList(null);
+                foreach (object obj2 in this.cbx.CheckedItems)
+                {
+                    InvBagIDs bagId = (InvBagIDs)obj2;
+                    bagsList[bagId] = true;
+                }
+                result = bagsList;
             }
-            return value;
+            else
+            {
+                result = value;
+            }
+            return result;
         }
 
-#if Disable_Selector
-        private void LoadListBoxItems(object value)
-        {
-            int idx = 0;
-            var dict = value as BitMat<T>;
-            cbx.Items.Clear();
-            foreach (var item in dict.Dictionary)
-            {
-                cbx.Items.Add(item.Key);
-                cbx.SetItemChecked(idx, item.Value);
-                idx++;
-            }
-            this.editedValue = value;
-        }
-
-        private void cbx_Leave(object sender, EventArgs e)
-        {
-            var dict = new Dictionary<T, bool>();
-            for (int i = 0; i < cbx.Items.Count; i++)
-            {
-                if (i == 90)
-                {
-                    int a = 10 + i;
-                }
-                var item = (T)cbx.Items[i];
-                dict.Add(item, cbx.GetItemChecked(i));
-            }
-            var listSelector = editedValue as BitMap<T>;
-            listSelector.Dictionary = dict;
-        } 
-#endif
-
+        // Token: 0x060005C7 RID: 1479 RVA: 0x000274EC File Offset: 0x000256EC
         public void Dispose()
         {
-            cbx.Dispose();
+            this.cbx.Dispose();
         }
+
+        // Token: 0x0400037E RID: 894
+        private readonly CheckedListBox cbx = new CheckedListBox();
+
+        // Token: 0x0400037F RID: 895
+        private ToolTip toolTip = new ToolTip
+        {
+            ToolTipTitle = "Ctrl+A to select all, Ctrl+D to deselect, Ctrl+I to inverse, Ctrl+S to sort"
+        };
     }
-#endif
-#if Disable_Selector
-    [Serializable]
-    public class BitMap<T> where T : Enum, IEnumerable<T>
-    {
-        /// <summary>
-        /// Список флагов-сумок
-        /// </summary>
-        BitArray _map = new BitArray(Enum.GetValues(typeof(T)).Length, false);
-
-        public IEnumerable<T> Items
-        {
-            get
-            {
-                for (int i = 0; i < _map.Count; i++)
-                {
-                    if (_map[i])
-                        yield return (T)i;
-                }
-            }
-            set
-            {
-                _map.SetAll(false);
-                if (value != null)
-                {
-                    foreach (var v in value)
-                        _map[(int)v] = true;
-                }
-            }
-        }
-
-#if false
-        [XmlIgnore]
-        public Dictionary<T, bool> Dictionary
-        {
-            get
-            {
-                var value = new Dictionary<T, bool>();
-                if (typeof(T).BaseType.Name == nameof(Enum))
-                {
-                    foreach (var s in Enum.GetNames(typeof(T)))
-                    {
-                        if (s != "None")
-                        {
-                            var item = (T)Enum.Parse(typeof(T), s);
-                            value.Add(item, Items.Contains(item));
-                        }
-                    }
-                }
-                return value;
-            }
-            set
-            {
-                Items.Clear();
-                foreach (var item in value)
-                {
-                    if (item.Value)
-                    {
-                        Items.Add(item.Key);
-                    }
-                }
-            }
-        }
-
-#endif
-        public bool this[T id]
-        {
-            get
-            {
-                return _map[(int)id];
-            }
-            set
-            {
-                _map[(int)id] = value;
-            }
-
-        }
-
-        public override string ToString()
-        {
-            return $"{Items.Count} of {Dictionary.Count} in {typeof(T).Name}";
-        }
-
-        public BitMap<T> Clone()
-        {
-            BitMap<T> newSelector = new BitMap<T>();
-            foreach (var m in _map)
-                newSelector._map[(int)m] = true;
-
-            return newSelector;
-        }
-    }
-
-#endif
 }

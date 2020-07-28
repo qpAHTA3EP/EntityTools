@@ -16,7 +16,7 @@ using Astral.Classes.ItemFilter;
 using System.Collections.Generic;
 using MyNW.Classes;
 using DevExpress.XtraEditors;
-using EntityTools.Tools.ItemFilter;
+
 using MyNW.Patchables.Enums;
 using EntityTools.Forms;
 using System.Diagnostics;
@@ -598,15 +598,6 @@ namespace EntityTools.Core
             bUnidentified = (flags & f) == ItemFlagsExt.Unidentified;
             bAlgo = (flags & f) == ItemFlagsExt.Algo;
 #endif
-
-#if false
-            ItemFilterCoreExt<CommonFilterEntry> filter = new ItemFilterCoreExt<CommonFilterEntry>();
-            ItemFilterEditorForm<CommonFilterEntry>.GUIRequiest(ref filter);
-#else
-            ItemFilterCoreExt<BuyFilterEntry> filter = new ItemFilterCoreExt<BuyFilterEntry>();
-            ItemFilterEditorForm<BuyFilterEntry>.GUIRequiest(ref filter);
-#endif
-
         }
         private void event_Test_2(object sender, EventArgs e)
         {
