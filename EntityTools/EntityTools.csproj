@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.0728.1251</AssemblyVersion>
+    <AssemblyVersion>0.20.0804.1650</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -324,7 +324,7 @@
     <Compile Include="Tools\Reflection\PrivateConsructor.cs" />
     <Compile Include="Tools\Reflection\ReflectionHelper.cs" />
     <Compile Include="Tools\Reflection\StaticAction.cs" />
-    <Compile Include="Tools\Reflection\StaticFielsAccessor.cs" />
+    <Compile Include="Tools\Reflection\StaticFieldAccessor.cs" />
     <Compile Include="Tools\Reflection\StaticFunction.cs" />
     <Compile Include="Tools\Reflection\InstancePropertyAccessor.cs" />
     <Compile Include="Tools\Reflection\StaticPropertyAccessor.cs" />

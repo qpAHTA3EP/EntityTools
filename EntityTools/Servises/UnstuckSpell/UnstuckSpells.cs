@@ -126,12 +126,13 @@ namespace EntityTools.Services
             {
                 if (EntityTools.PluginSettings.UnstuckSpells.Active)
                 {
+                    Entity currentTarget = Astral.Logic.UCC.Core.CurrentTarget;
                     bool result = !(EntityManager.LocalPlayer.InCombat
                             || Astral.Logic.NW.Attackers.InCombat
-                            || (Astral.Logic.UCC.Core.CurrentTarget != null
-                                && Astral.Logic.UCC.Core.CurrentTarget.IsValid
-                                && !Astral.Logic.UCC.Core.CurrentTarget.IsDead
-                                && Astral.Logic.UCC.Core.CurrentTarget.Location.Distance3DFromPlayer < Astral.Quester.API.CurrentProfile.KillRadius));
+                            || (currentTarget != null
+                                && currentTarget.IsValid
+                                && !currentTarget.IsDead
+                                && currentTarget.Location.Distance3DFromPlayer < Astral.Quester.API.CurrentProfile.KillRadius));
 #if DEBUG_SPELLSTUCKMONITOR
                     EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpells)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]::{nameof(NeedToRun)} = {result}");
                     EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"\tLocalPlayer.InCombat:\t{EntityManager.LocalPlayer.InCombat}");
