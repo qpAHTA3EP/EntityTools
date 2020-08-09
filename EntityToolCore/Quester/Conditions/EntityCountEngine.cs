@@ -451,19 +451,21 @@ namespace EntityCore.Quester.Conditions
 
         private List<CustomRegion> internal_GetCustomRegion_Initializer()
         {
-            //TODO: Исправить internal_GetCustomRegion_Initializer в других класах, связанных с проверкой CustomRegion
+            //TODO: Исправить internal_GetCustomRegion_Initializer в других класах, связанных с проверкой CustomRegion (см. MoveToEntityEngine)
             if (@this._customRegionNames?.Count > 0)
             {
                 customRegions = CustomRegionExtentions.GetCustomRegions(@this._customRegionNames);
 #if DEBUG
-                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(internal_GetCustomRegion_Initializer)}: Select List of {customRegions?.Count} CustomRegions");
+                if (customRegions is null || customRegions.Count == 0)
+                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(internal_GetCustomRegion_Initializer)}: List of {nameof(@this.CustomRegionNames)} is empty");
+                else ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(internal_GetCustomRegion_Initializer)}: Select List of {customRegions.Count} CustomRegions");
 #endif
             }
             else
             {
                 customRegions = null;
 #if DEBUG
-                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(internal_GetCustomRegion_Initializer)}: Set {nameof(customRegions)} to NULL");
+                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(internal_GetCustomRegion_Initializer)}: List of {nameof(@this.CustomRegionNames)} is empty");
 #endif
             }
 

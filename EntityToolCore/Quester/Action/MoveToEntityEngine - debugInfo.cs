@@ -205,7 +205,7 @@ namespace EntityCore.Quester.Action
         }
 
         #region Декомпозиция основного функционала
-        enum EntityPreprocessingResult
+        private enum EntityPreprocessingResult
         {
             /// <summary>
             /// Некорректная сущность, обработка провалена
@@ -224,8 +224,6 @@ namespace EntityCore.Quester.Action
         /// <summary>
         /// Анализ <paramref name="entity"/> на предмет возможности вступления в бой
         /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
         private EntityPreprocessingResult Preprocessing_Entity(Entity entity)
         {
             string currentMethodName = nameof(Preprocessing_Entity);
@@ -275,7 +273,6 @@ namespace EntityCore.Quester.Action
         /// <summary>
         /// Нападение на сущность <paramref name="entity"/> в зависимости от настроек команды
         /// </summary>
-        /// <param name="entity"></param>
         private void Attack_Entity(Entity entity)
         {
             string currentMethodName = nameof(Attack_Entity);
@@ -365,12 +362,9 @@ namespace EntityCore.Quester.Action
         /// Делегат, сравнивающий <see cref="MoveToEntity.AbortCombatDistance"/> с расстоянием между игроком и <paramref name="entity"/>,
         /// и прерывающий бой, при удалении персонажа от <paramref name="entity"/>
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="callCombatEventArgs"></param>
-        /// <returns></returns>
         internal void MonitorAbortCombatDistance(Entity entity)
         {
-            //TODO: Реализовать прерывание боя через статический метод Astral.Logic.NW.Combats.AbordCombat(bool stopMove = true)
+            // Реализовано прерывание боя через статический метод Astral.Logic.NW.Combats.AbordCombat(bool stopMove = true)
             // по аналогии с 
             //Astral.Logic.UCC.Actions.AbordCombat.Run()
             //{
@@ -517,17 +511,17 @@ namespace EntityCore.Quester.Action
             if (ValidateEntity(target))
             {
                 float x = target.Location.X,
-                      y = target.Location.Y,
-                      size = 5; //*/(float)(5 * graph.Zoom);
+                      y = target.Location.Y;
+                //size = 5; //*/(float)(5 * graph.Zoom);
                 List<Vector3> coords = new List<Vector3>() {
-                    new Vector3(x, y - size, 0),
-                    new Vector3(x - size, y + 5, 0),
-                    new Vector3(x + size, y + 5, 0)
+                    new Vector3(x, y - 5, 0),
+                    new Vector3(x - 2.5f, y + 4.33f, 0),
+                    new Vector3(x + 2.5f, y + 4.33f, 0)
                 };
                 graph.drawFillPolygon(coords, Brushes.Yellow);
 
                 int diaD = (int)(@this._distance * 2.0f * graph.Zoom);
-                int diaACD = (int)(@this._abortCombatDistance * 2 * graph.Zoom);
+                int diaACD = (int)(@this._abortCombatDistance * 2.0f * graph.Zoom);
                 if (@this._distance > 11)
                 {
                     graph.drawEllipse(target.Location, new Size(diaD, diaD), Pens.Yellow);
@@ -543,9 +537,9 @@ namespace EntityCore.Quester.Action
                     x = closestEntity.Location.X;
                     y = closestEntity.Location.Y;
 
-                    coords[0].X = x; coords[0].Y = y - size;
-                    coords[1].X = x - size; coords[1].Y = y + size;
-                    coords[2].X = x + size; coords[2].Y = y + size;
+                    coords[0].X = x; coords[0].Y = y - 5;
+                    coords[1].X = x - 2.5f; coords[1].Y = y + 4.33f;
+                    coords[2].X = x + 2.5f; coords[2].Y = y + 4.33f;
                     graph.drawFillPolygon(coords, Brushes.LightYellow);
 
                     if (@this._distance > 11)
@@ -711,6 +705,10 @@ namespace EntityCore.Quester.Action
             return customRegions;
         }
 
+        /// <summary>
+        /// Набор флагов, определяющих детализацию описания <seealso cref="Entity"/>, возвращаемого <seealso cref="MoveToEntityEngine.Get_DebugStringOfEntity"/>
+        /// </summary>
+        [Flags]
         enum EntityDetail
         {
             Nope = 0,

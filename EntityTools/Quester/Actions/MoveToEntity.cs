@@ -256,12 +256,6 @@ namespace EntityTools.Quester.Actions
         }
         internal bool _ignoreCombat = true;
 
-        //TODO: Добавить опцию, которая автоматически прерывать бой при удалении от заданного Entity.
-        // - автоматическая вставлка/удаление (при завершении команды) AbortCombat
-        // - фоновый процесс
-        // - делегат-аргумент для CombatUnit
-
-        //TODO: Исправить описание
 #if DEVELOPER
         //[Description("Check the distance to Target entity during the battle and abort combat if it becomes greater the 'MaintainCombatDistance'\n" +
         //             "However the distance checking is not performed if the value less than 'Distance'")]
