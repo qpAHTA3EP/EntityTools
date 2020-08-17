@@ -30,6 +30,11 @@ namespace EntityCore.Quester.Conditions
         private int membersCount = 0;
         private string label = string.Empty;
 
+        /// <summary>
+        /// Префикс, идентифицирующий принадлежность отладочной информации, выводимой в Лог
+        /// </summary>
+        private string conditionIDstr = string.Empty;
+
         #endregion
 
         internal TeamMembersCountEngine(TeamMembersCount tmc)
@@ -42,12 +47,14 @@ namespace EntityCore.Quester.Conditions
 
             getCustomRegions = internal_GetCustomRegion_Initializer;
 
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
+            conditionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+
+            ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} initialized: {Label()}");
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (object.ReferenceEquals(sender, @this))
+            if (ReferenceEquals(sender, @this))
             {
                 if (e.PropertyName == nameof(@this.Sign)
                     || e.PropertyName == nameof(@this.MemberCount))
@@ -208,7 +215,12 @@ namespace EntityCore.Quester.Conditions
             }
         }
 
-        public void Reset() { }
+        public void Reset()
+        {
+            getCustomRegions = internal_GetCustomRegion_Initializer;
+            membersCount = 0;
+            label = string.Empty;
+        }
 
         public string TestInfos
         {
@@ -338,13 +350,26 @@ namespace EntityCore.Quester.Conditions
 
         private List<CustomRegion> internal_GetCustomRegion_Initializer()
         {
-            if (customRegions == null && @this._customRegionNames != null)
+            if (@this._customRegionNames?.Count > 0)
             {
-                getCustomRegions = internal_GetCustomRegion_Getter;
                 customRegions = CustomRegionExtentions.GetCustomRegions(@this._customRegionNames);
-                return customRegions;
+#if DEBUG
+                if (customRegions is null || customRegions.Count == 0)
+                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(internal_GetCustomRegion_Initializer)}: List of {nameof(@this.CustomRegionNames)} is empty");
+                else ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(internal_GetCustomRegion_Initializer)}: Select List of {customRegions.Count} CustomRegions");
+#endif
             }
-            return null;
+            else
+            {
+                customRegions = null;
+#if DEBUG
+                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(internal_GetCustomRegion_Initializer)}: List of {nameof(@this.CustomRegionNames)} is empty");
+#endif
+            }
+
+            getCustomRegions = internal_GetCustomRegion_Getter;
+
+            return customRegions;
         }
 
         private List<CustomRegion> internal_GetCustomRegion_Getter()
