@@ -342,6 +342,7 @@ namespace EntityCore.Quester.Conditions
         }
         public string Label()
         {
+            //ТОDO: исправить обновление метки в скиске условий, после изменения пораметров условия
             if(string.IsNullOrEmpty(label))
                 label = $"{@this.GetType().Name} {@this._sign} to {@this._memberCount}";
             return label;

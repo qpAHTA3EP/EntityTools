@@ -1,4 +1,4 @@
-﻿#define DEBUG_LOG
+﻿//#define DEBUG_LOG
 
 using System;
 using System.Reflection;
@@ -208,8 +208,8 @@ namespace EntityTools.UCC.Actions
                             debugStr.Append(']');
 #endif
 
-                                // Если множетство незалоченных условий пустое, тогда условие истино
-                                // Если оно НЕ пустое, тогда должно встретиться хотя бы одно истиное 
+                                // Если множество незалоченных условий пустое, тогда условие истинно
+                                // Если оно НЕ пустое, тогда должно встретиться хотя бы одно истинно 
                                 result = lockedTrue && (CustomConditions.Count == lockedNum || okUnlockedNum > 0);
 
                             // отрицание результата, если задан флаг

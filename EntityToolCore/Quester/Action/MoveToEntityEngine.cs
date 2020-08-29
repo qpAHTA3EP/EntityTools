@@ -23,6 +23,7 @@ using EntityTools.Reflection;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using EntityTools.Tools.Reflection;
 
 namespace EntityCore.Quester.Action
 {
@@ -286,7 +287,11 @@ namespace EntityCore.Quester.Action
             if (@this._attackTargetEntity)
             {
                 // entity нужно атаковать
-                if (entity.RelationToPlayer == EntityRelation.Foe)
+                if (entity.RelationToPlayer == EntityRelation.Foe
+                    && entity.IsLineOfSight()
+                    && !entity.DoNotDraw
+                    //&& !entity.IsUnselectable
+                    && !entity.IsUntargetable)
                 {
                     Astral.Logic.NW.Attackers.List.Clear();
                     // entity враждебно и должно быть атаковано
@@ -379,48 +384,53 @@ namespace EntityCore.Quester.Action
             Thread.Sleep(1000);
             while (EntityManager.LocalPlayer.InCombat || Astral.Logic.NW.Attackers.InCombat)
             {
-                bool anchorEntityValid = ValidateEntity(entity);
-                if (anchorEntityValid)
+                // Бой может быть прерван, если  HP > IgnoreCombatMinHP
+                if (EntityManager.LocalPlayer.Character.AttribsBasic.HealthPercent > AstralAccessors.Quester.FSM.States.Combat.IgnoreCombatMinHP)
                 {
-                    if (!@this._healthCheck || !entity.IsDead)
+                    bool anchorEntityValid = ValidateEntity(entity);
+                    if (anchorEntityValid)
                     {
-                        double dist = entity.Location.Distance3DFromPlayer;
-                        if (dist >= @this._abortCombatDistance)
+                        if (!@this._healthCheck || !entity.IsDead)
                         {
-                            if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
-                                ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(MonitorAbortCombatDistance), ": Player outside ", nameof(@this.AbortCombatDistance), " (", dist.ToString("N2"), " to ", entityStr, "). Break combat"));
-                            Astral.Quester.API.IgnoreCombat = true;
-                            abortCombat(true);
+                            double dist = entity.Location.Distance3DFromPlayer;
+                            if (dist >= @this._abortCombatDistance)
+                            {
+                                if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                                    ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(MonitorAbortCombatDistance), ": Player outside ", nameof(@this.AbortCombatDistance), " (", dist.ToString("N2"), " to ", entityStr, "). Break combat"));
+                                Astral.Quester.API.IgnoreCombat = true;
+                                abortCombat(true);
+                            }
+                            else
+                            {
+                                if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                                    ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(MonitorAbortCombatDistance), ": Player withing ", nameof(@this.AbortCombatDistance), " (", dist.ToString("N2"), " to ", entityStr, "). Continue..."));
+                                Astral.Quester.API.IgnoreCombat = false;
+                            }
                         }
                         else
                         {
                             if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
-                                ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(MonitorAbortCombatDistance), ": Player withing ", nameof(@this.AbortCombatDistance), " (", dist.ToString("N2"), " to ", entityStr, "). Continue..."));
-                            Astral.Quester.API.IgnoreCombat = false;
+                                ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(MonitorAbortCombatDistance), ": ", entityStr, " is dead. Break combat. Finish AbortCombatTask#", Task.CurrentId));
+                            Astral.Quester.API.IgnoreCombat = true;
+                            abortCombat(true);
+                            return;
                         }
                     }
                     else
                     {
                         if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(MonitorAbortCombatDistance), ": ", entityStr, " is dead. Break combat. Finish AbortCombatTask#", Task.CurrentId));
+                            ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(MonitorAbortCombatDistance), ": Entity[INVALID]. Break combat. Finish AbortCombatTask#", Task.CurrentId));
                         Astral.Quester.API.IgnoreCombat = true;
                         abortCombat(true);
                         return;
                     }
-                }
-                else
-                {
-                    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(MonitorAbortCombatDistance), ": Entity[INVALID]. Break combat. Finish AbortCombatTask#", Task.CurrentId));
-                    Astral.Quester.API.IgnoreCombat = true;
-                    abortCombat(true);
-                    return;
                 }
 
                 Thread.Sleep(500);
             }
             if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
                 ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(MonitorAbortCombatDistance), ": Combat ended. Finish AbortCombatTask#", Task.CurrentId));
+            Astral.Quester.API.IgnoreCombat = true;
         }
         #endregion
         #endregion
@@ -512,11 +522,10 @@ namespace EntityCore.Quester.Action
             {
                 float x = target.Location.X,
                       y = target.Location.Y;
-                //size = 5; //*/(float)(5 * graph.Zoom);
                 List<Vector3> coords = new List<Vector3>() {
                     new Vector3(x, y - 5, 0),
-                    new Vector3(x - 2.5f, y + 4.33f, 0),
-                    new Vector3(x + 2.5f, y + 4.33f, 0)
+                    new Vector3(x - 4.33f, y + 2.5f, 0),
+                    new Vector3(x + 4.33f, y + 2.5f, 0)
                 };
                 graph.drawFillPolygon(coords, Brushes.Yellow);
 
@@ -538,8 +547,8 @@ namespace EntityCore.Quester.Action
                     y = closestEntity.Location.Y;
 
                     coords[0].X = x; coords[0].Y = y - 5;
-                    coords[1].X = x - 2.5f; coords[1].Y = y + 4.33f;
-                    coords[2].X = x + 2.5f; coords[2].Y = y + 4.33f;
+                    coords[1].X = x - 4.33f; coords[1].Y = y + 2.5f;
+                    coords[2].X = x + 4.33f; coords[2].Y = y + 2.5f;
                     graph.drawFillPolygon(coords, Brushes.LightYellow);
 
                     if (@this._distance > 11)

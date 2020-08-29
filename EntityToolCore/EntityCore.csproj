@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.0804.1650</AssemblyVersion>
+    <AssemblyVersion>0.20.0814.0932</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -170,7 +170,7 @@
       <DependentUpon>UIViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="IEntityInfos.cs" />
-    <Compile Include="Quester\Action\MoveToEntityEngine - debugInfo.cs" />
+    <Compile Include="Quester\Action\MoveToEntityEngine.cs" />
     <Compile Include="Quester\Conditions\CheckGameGUIEngine.cs" />
     <Compile Include="Quester\Conditions\EntityDistanceEngine.cs" />
     <Compile Include="Quester\Conditions\TeamMembersCountEngine.cs" />

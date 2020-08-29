@@ -222,7 +222,7 @@ namespace EntityTools.Patches.Mapper
 
         public static void DrawMeshes(GraphicsNW graph, Graph meshes)
         {
-            object obj = meshes.Lock;
+            object obj = meshes.Locker;
             lock (obj)
             {
                 double num = graph.getWorldPos(new Point(graph.ImageWidth, graph.ImageHeight)).Distance2D(graph.CenterPosition);
