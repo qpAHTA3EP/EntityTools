@@ -23,7 +23,9 @@ namespace EntityCore.Quester.Conditions
         private Func<List<CustomRegion>> getCustomRegions = null;
 
         private List<CustomRegion> customRegions = null;
-        private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
+#if timeout
+        private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0); 
+#endif
         /// <summary>
         /// Кэшированное число членов группы, удовлетворяющих критериям
         /// </summary>
@@ -63,7 +65,9 @@ namespace EntityCore.Quester.Conditions
                     getCustomRegions = internal_GetCustomRegion_Initializer;
 
                 membersCount = 0;
-                timeout.ChangeTime(0);
+#if timeout
+                timeout.ChangeTime(0); 
+#endif
             }
         }
 
@@ -76,8 +80,10 @@ namespace EntityCore.Quester.Conditions
                 if (EntityManager.LocalPlayer.PlayerTeam?.IsInTeam == true
                     && EntityManager.LocalPlayer.PlayerTeam?.Team?.MembersCount > 1)
                 {
+#if timeout
                     if (timeout.IsTimedOut)
-                    {
+                    { 
+#endif
                         membersCount = 0;
 
                         List<CustomRegion> crList = getCustomRegions();
@@ -87,51 +93,48 @@ namespace EntityCore.Quester.Conditions
                             {
                                 case Relation.Inferior:
                                     {
-                                        membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.FindAll((TeamMember member) =>
+                                        membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.Count((TeamMember member) =>
                                                         (/* member.InternalName != EntityManager.LocalPlayer.InternalName
                                                       * Эквивалентно строке: */
                                                             member.Entity.ContainerId != EntityManager.LocalPlayer.ContainerId
                                                             && (!@this._regionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                                             && member.Entity.Location.Distance3DFromPlayer < @this._distance
-                                                            && (crList.Find((CustomRegion cr) => member.Entity.Within(cr)) != null) ? @this._customRegionCheck == Presence.Equal : @this._customRegionCheck == Presence.NotEquel)
-                                                        ).Count;
+                                                            && (crList.Find((CustomRegion cr) => member.Entity.Within(cr)) != null) ? @this._customRegionCheck == Presence.Equal : @this._customRegionCheck == Presence.NotEquel));
 
                                         break;
                                     }
                                 case Relation.Superior:
                                     {
-                                        membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.FindAll((TeamMember member) =>
+                                        membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.Count((TeamMember member) =>
                                                         (/* member.InternalName != EntityManager.LocalPlayer.InternalName
                                                       * Эквивалентно строке: */
                                                             member.Entity.ContainerId != EntityManager.LocalPlayer.ContainerId
                                                             && (!@this._regionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                                             && member.Entity.Location.Distance3DFromPlayer > @this._distance
-                                                            && (crList.Find((CustomRegion cr) => member.Entity.Within(cr)) != null) ? @this._customRegionCheck == Presence.Equal : @this._customRegionCheck == Presence.NotEquel)
-                                                        ).Count;
+                                                            && (crList.Find((CustomRegion cr) => member.Entity.Within(cr)) != null) ? @this._customRegionCheck == Presence.Equal : @this._customRegionCheck == Presence.NotEquel));
                                         break;
                                     }
                                 case Relation.Equal:
                                     {
-                                        membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.FindAll((TeamMember member) =>
+                                        membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.Count((TeamMember member) =>
                                                         (/* member.InternalName != EntityManager.LocalPlayer.InternalName
                                                       * Эквивалентно строке: */
                                                             member.Entity.ContainerId != EntityManager.LocalPlayer.ContainerId
                                                             && (!@this._regionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                                             && member.Entity.Location.Distance3DFromPlayer == @this._distance
                                                             && (crList.Find((CustomRegion cr) => member.Entity.Within(cr)) != null) ? @this._customRegionCheck == Presence.Equal : @this._customRegionCheck == Presence.NotEquel)
-                                                        ).Count;
+                                                        );
                                         break;
                                     }
                                 case Relation.NotEqual:
                                     {
-                                        membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.FindAll((TeamMember member) =>
+                                        membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.Count((TeamMember member) =>
                                                         (/* member.InternalName != EntityManager.LocalPlayer.InternalName
                                                           * Эквивалентно строке: */
                                                             member.Entity.ContainerId != EntityManager.LocalPlayer.ContainerId
                                                             && (!@this._regionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
                                                             && member.Entity.Location.Distance3DFromPlayer != @this._distance
-                                                            && (crList.Find((CustomRegion cr) => member.Entity.Within(cr)) != null) ? @this._customRegionCheck == Presence.Equal : @this._customRegionCheck == Presence.NotEquel)
-                                                        ).Count;
+                                                            && (crList.Find((CustomRegion cr) => member.Entity.Within(cr)) != null) ? @this._customRegionCheck == Presence.Equal : @this._customRegionCheck == Presence.NotEquel));
                                         break;
                                     }
                             }
@@ -187,8 +190,10 @@ namespace EntityCore.Quester.Conditions
                                     }
                             }
                         }
+#if timeout
                         timeout.ChangeTime(EntityTools.EntityTools.PluginSettings.EntityCache.LocalCacheTime);
-                    }
+                    } 
+#endif
 
                     bool result;
                     switch (@this._sign)
@@ -342,7 +347,7 @@ namespace EntityCore.Quester.Conditions
         }
         public string Label()
         {
-            //ТОDO: исправить обновление метки в скиске условий, после изменения пораметров условия
+            // ТОDO: исправить обновление метки в списке условий, после изменения параметров условия
             if(string.IsNullOrEmpty(label))
                 label = $"{@this.GetType().Name} {@this._sign} to {@this._memberCount}";
             return label;
