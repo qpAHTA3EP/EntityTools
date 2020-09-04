@@ -12,12 +12,16 @@ using Astral.Logic.UCC.Classes;
 using Astral.Controllers;
 using System.Collections.Generic;
 using EntityTools.Editors.Forms;
+using EntityTools.Reflection;
 
-namespace EntityTools.Forms
+namespace EntityTools.Editors.Forms
 {
     public partial class ConditionListForm : XtraForm //*/Form
     {
         private static UCCCondition conditionCopy;
+        // Индекс элемента списка условий Conditions.Items
+        // в котором допускается изменение состояния "Checked"
+        private int AllowConditionsItemChechedChangeInd = -1;
 
         public ConditionListForm()
         {
@@ -27,7 +31,7 @@ namespace EntityTools.Forms
         private void bntAdd_Click(object sender, EventArgs e)
         {
             //if (AddAction.Show(typeof(UCCCondition)) is UCCCondition condition)
-            if(UnoSelectForm.GetAnItem<UCCCondition>(false) is UCCCondition condition)
+            if(ItemSelectForm.GetAnItem<UCCCondition>(false) is UCCCondition condition)
             {
                 Conditions.Items.Add(condition);
                 Conditions.SelectedItem = condition;  
@@ -38,7 +42,7 @@ namespace EntityTools.Forms
         {
 
             if (Conditions.SelectedIndex >= 0
-                && XtraMessageBox.Show("Are you sure to remove selected condition ?", "Remove Condition ?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                && XtraMessageBox.Show(/*Form.ActiveForm, */"Are you sure to remove selected condition ?", "Remove Condition ?", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 Conditions.Items.RemoveAt(Conditions.SelectedIndex);
             }
@@ -51,7 +55,7 @@ namespace EntityTools.Forms
             {
                 conditionCopy = CopyHelper.CreateDeepCopy(cond); // Этот метод быстрее
                 //conditionCopy = CopyHelper.CreateXmlCopy(cond); // Этот метод дольше
-                XtraMessageBox.Show($"Condition '{conditionCopy.ToString()}' copied");
+                XtraMessageBox.Show(/*Form.ActiveForm, */$"Condition '{conditionCopy.ToString()}' copied");
             }
         }
 
@@ -85,9 +89,9 @@ namespace EntityTools.Forms
                         result = cond.IsOK(null);
                         mess = $"{cond.Target} {cond.Tested} : {cond.Value}";
                     }
-                    XtraMessageBox.Show($"{mess}\nResult: {result}");
+                    XtraMessageBox.Show(/*Form.ActiveForm, */$"{mess}\nResult: {result}");
                 }
-                else XtraMessageBox.Show("Can't test selected object!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                else XtraMessageBox.Show(/*Form.ActiveForm, */"Can't test selected object!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -105,21 +109,40 @@ namespace EntityTools.Forms
 
         private void Conditions_SelectedIndexChanged(object sender, EventArgs e)
         {
+            //if(Conditions.SelectedIndex >= 0  && Conditions.SelectedIndex < Conditions.Items.Count )
+            //    Properties.SelectedObject = Conditions.Items[Conditions.SelectedIndex];
             Properties.SelectedObject = Conditions.SelectedItem;
         }
 
         private void Conditions_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            if (Conditions.SelectedItem is UCCCondition condition)
+            // изменение состояния Checked у элемента разрешено, 
+            // если его индекс совпадает с AllowConditionsItemChechedChangeInd
+            if (e.Index != AllowConditionsItemChechedChangeInd
+                || AllowConditionsItemChechedChangeInd < 0)
             {
-                condition.Locked = (e.NewValue == CheckState.Checked);
+                // запрет изменения состояния Чекбокса
+                e.NewValue = e.CurrentValue;
             }
+            AllowConditionsItemChechedChangeInd = -1;
+
+            //if (Conditions.SelectedItem is UCCCondition condition)
+            //{
+
+            //    condition.Locked = (e.NewValue == CheckState.Checked);
+            //}
         }
 
         private void Properties_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
             if (e.ChangedItem.Label == "Locked")
+            {
+                AllowConditionsItemChechedChangeInd = Conditions.SelectedIndex;
+                //Conditions.ItemCheck -= Conditions_ItemCheck;
                 Conditions.SetItemChecked(Conditions.SelectedIndex, e.ChangedItem.Value.Equals(true));
+                //Conditions.ItemCheck += Conditions_ItemCheck;
+            }
+            Conditions.Refresh();
         }
 
         public ConditionList GetConditionList(ConditionList conditions = null)
@@ -131,7 +154,7 @@ namespace EntityTools.Forms
                 foreach (UCCCondition condition in conditions)
                 {
                     int ind = Conditions.Items.Add(CopyHelper.CreateDeepCopy(condition));
-                    Conditions.SetItemChecked(ind, condition.Locked);
+                    //Conditions.SetItemChecked(ind, condition.Locked);
                 }
             }
 
@@ -151,6 +174,26 @@ namespace EntityTools.Forms
             }
 
             return conditions;
+        }
+
+        private void btnTestAll_Click(object sender, EventArgs e)
+        {
+            if (Conditions.Items?.Count > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (UCCCondition cond in Conditions.Items)
+                {
+                    if (cond.Locked)
+                        sb.Append("[L] ");
+                    else sb.Append("[U] ");
+                    if (cond is ICustomUCCCondition iCond)
+                        sb.Append(iCond.ToString()).Append(" | Result: ").Append(iCond.IsOK(null)).AppendLine();
+                    else sb.Append(cond.ToString()).Append(" | Result: ").Append(cond.IsOK(null)).AppendLine();
+                }
+                XtraMessageBox.Show(sb.ToString());
+            }
+            else XtraMessageBox.Show("The list 'Conditions' is empty");
+
         }
     }
 }

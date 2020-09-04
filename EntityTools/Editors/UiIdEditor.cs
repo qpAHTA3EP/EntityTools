@@ -6,25 +6,16 @@ using System.Drawing.Design;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using EntityTools.Forms;
 
 namespace EntityTools.Editors
 {
+#if DEVELOPER
     public class UiIdEditor : UITypeEditor
     {
-        private static UIViewer uiViewer;
-
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            if (uiViewer == null)
-                uiViewer = new UIViewer();
-
-            string newValue = uiViewer.GetUiGenId(value as string);
-
-            if (!string.IsNullOrEmpty(newValue))
-                return newValue;
-
-            return value;
+            string newValue = value as string;
+            return EntityTools.Core.GUIRequest_UIGenId(ref newValue) ? newValue : value;
         }
 
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
@@ -32,5 +23,6 @@ namespace EntityTools.Editors
             return UITypeEditorEditStyle.Modal;
         }
     }
+#endif
 }
 

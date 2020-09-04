@@ -8,6 +8,7 @@ using System.Text;
 
 namespace EntityTools.Editors
 {
+#if DEVELOPER
     internal class CampaignTaskEditor : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
@@ -20,4 +21,5 @@ namespace EntityTools.Editors
             return UITypeEditorEditStyle.Modal;
         }
     }
+#endif
 }

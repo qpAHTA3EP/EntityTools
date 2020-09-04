@@ -24,14 +24,6 @@ namespace VariableTools.Expressions
                 {
                     StringBuilder strBldr = new StringBuilder();
 
-                    //strBldr.Append("{");
-
-                    //for (int i = 0; i < forbiddenNameParts.Length - 1; i++)
-                    //    strBldr.Append("'").Append(forbiddenNameParts[i]).Append("', ");
-
-
-                    //strBldr.Append("'").Append(forbiddenNameParts[forbiddenNameParts.Length - 1]).Append("'").Append("}");
-
                     for (int i = 0; i < Symbols.forbiddenChar.Length; i++)
                     {
                         strBldr.Append(Symbols.forbiddenChar[i]).Append(' ');                        
@@ -67,7 +59,11 @@ namespace VariableTools.Expressions
                 || name.IndexOfAny(Symbols.forbiddenChar) >= 0
                 || name.Equals(Predicates.CountItem)
                 || name.Equals(Predicates.CountNumeric)
-                || name.Equals(Predicates.Random);
+                || name.Equals(Predicates.Random)
+                || name.Equals(Predicates.Days)
+                || name.Equals(Predicates.Hours)
+                || name.Equals(Predicates.Minutes)
+                || name.Equals(Predicates.Seconds);
         }
 
         /// <summary>
@@ -81,7 +77,11 @@ namespace VariableTools.Expressions
         {
             if ( name.Equals(Predicates.CountItem)
                 || name.Equals(Predicates.CountNumeric)
-                || name.Equals(Predicates.Random))
+                || name.Equals(Predicates.Random)
+                || name.Equals(Predicates.Days)
+                || name.Equals(Predicates.Hours)
+                || name.Equals(Predicates.Minutes)
+                || name.Equals(Predicates.Seconds))
             {
                 newName = name + Symbols.Underscore;
                 return true;
@@ -622,6 +622,23 @@ namespace VariableTools.Expressions
         /// </summary>
         public class Predicates
         {
+            private static readonly string[] predicates;
+
+            static Predicates()
+            {
+                var fields = typeof(Predicates).GetFields();
+                predicates = new string[fields.Length];
+                for(int i = 0; i < fields.Length; i++)
+                {
+                    //if(fields[i].FieldType.Equals(typeof(string)))
+                    {
+                        predicates[i] = fields[i].Name;
+                    }
+                }
+            }
+
+
+
             /// <summary>
             /// Счетчик Items
             /// </summary>
@@ -636,9 +653,43 @@ namespace VariableTools.Expressions
             /// Генератор случайных чисел
             /// </summary>
             public static readonly string Random = "Random";
+
+            /// <summary>
+            /// Текущее время и дата
+            /// </summary>
+            public static readonly string Now = "Now";
+
+            /// <summary>
+            /// Количество дней
+            /// </summary>
+            public static readonly string Days = "Days";
+#if false
+            /// <summary>
+            /// Количество месяцев
+            /// </summary>
+            public static readonly string Months = "Months";
+            /// <summary>
+            /// Количество лет
+            /// </summary>
+            public static readonly string Years = "Years"; 
+#endif
+
+            /// <summary>
+            /// Количество часов
+            /// </summary>
+            public static readonly string Hours = "Hours";
+            /// <summary>
+            /// Количество минут
+            /// </summary>
+            public static readonly string Minutes = "Minutes";
+            /// <summary>
+            /// Количество секунд
+            /// </summary>
+            public static readonly string Seconds = "Seconds";
         }//class Predicates
 
 
+        #region Parsers Нужны ли они ?
         /// <summary>
         /// Перевод строки в булевый тип.
         /// Если в строке содержится "True" или целое число больше 0, тогда результат 'True' 
@@ -698,7 +749,7 @@ namespace VariableTools.Expressions
                 result = false;
                 return false;
             }
-            if (inObj is bool b )
+            if (inObj is bool b)
             {
                 result = b;
                 return true;
@@ -832,7 +883,7 @@ namespace VariableTools.Expressions
             if (inObj == null)
                 return false;
 
-            if(inObj is AccountScopeType sc)
+            if (inObj is AccountScopeType sc)
             {
                 scope = sc;
                 return true;
@@ -861,7 +912,8 @@ namespace VariableTools.Expressions
             }
 
             return Enum.TryParse(inObj.ToString(), out scope);
-        }
+        } 
+        #endregion
 
         /// <summary>
         /// Удаляет все бесполезные пробелы из <see cref="input"> и помещает результат в <see cref="out">

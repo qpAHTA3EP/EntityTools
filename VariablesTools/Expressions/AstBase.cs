@@ -10,6 +10,8 @@ namespace VariableTools.Expressions
     /// </summary>
     public abstract class AST
     {
+        protected StringBuilder sb = new StringBuilder();
+
         /// <summary>
         /// Вычислить значение терма
         /// </summary>
@@ -52,23 +54,18 @@ namespace VariableTools.Expressions
     /// <typeparam name="T"></typeparam>
     public abstract class BinOperator<T> : AstNode<T>
     {
-        //protected AstNode<T> ast;
         protected AstNode<T> leftOperand;
         protected AstNode<T> rightOperand;
 
         public override string Description(int indent = 0)
         {
-            StringBuilder sb = new StringBuilder();
+            sb.Clear();
             sb.AppendCopies(Parser.Indent, indent).Append(GetType().Name).Append(':').AppendLine();
             sb.AppendCopies(Parser.Indent, indent).Append('{').AppendLine();
             sb.Append(leftOperand.Description(indent+1)).AppendLine();
             sb.Append(rightOperand.Description(indent + 1)).AppendLine();
             sb.AppendCopies(Parser.Indent, indent).Append('}')/*.AppendLine()*/;
             return sb.ToString();
-
-            //return prefix + GetType().Name + ":\n" +
-            //    leftOperand.Description(string.IsNullOrEmpty(prefix) ? Parser.Symbols.Tab.ToString() : prefix + prefix) +
-            //    rightOperand.Description(string.IsNullOrEmpty(prefix) ? Parser.Symbols.Tab.ToString() : prefix + prefix);
         }
     }
 
@@ -79,20 +76,16 @@ namespace VariableTools.Expressions
     /// <typeparam name="T"></typeparam>
     public abstract class UnOperator<T> : AstNode<T>
     {
-        //protected AstNode<T> ast;
         protected AstNode<T> Operand;
 
         public override string Description(int indent = 0)
         {
-            StringBuilder sb = new StringBuilder();
+            sb.Clear();
             sb.AppendCopies(Parser.Indent, indent).Append(GetType().Name).Append(':').AppendLine();
             sb.AppendCopies(Parser.Indent, indent).Append('{').AppendLine();
             sb.Append(Operand.Description(indent + 1)).AppendLine();
             sb.AppendCopies(Parser.Indent, indent).Append('}')/*.AppendLine()*/;
             return sb.ToString();
-
-            //return prefix + GetType().Name + ":\n" +
-            //       Operand.Description(string.IsNullOrEmpty(prefix) ? Parser.Symbols.Tab.ToString() : prefix + prefix);
         }
     }
 }

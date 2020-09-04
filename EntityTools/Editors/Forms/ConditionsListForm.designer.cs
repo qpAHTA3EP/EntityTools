@@ -1,4 +1,4 @@
-﻿namespace EntityTools.Forms
+﻿namespace EntityTools.Editors.Forms
 {
     partial class ConditionListForm
     {
@@ -38,6 +38,7 @@
             this.btnTest = new System.Windows.Forms.Button();
             this.btnPaste = new System.Windows.Forms.Button();
             this.btnCopy = new System.Windows.Forms.Button();
+            this.btnTestAll = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -59,18 +60,16 @@
             // splitContainer.Panel2
             // 
             this.splitContainer.Panel2.Controls.Add(this.Properties);
-            this.splitContainer.Size = new System.Drawing.Size(560, 302);
-            this.splitContainer.SplitterDistance = 179;
+            this.splitContainer.Size = new System.Drawing.Size(580, 302);
+            this.splitContainer.SplitterDistance = 290;
             this.splitContainer.TabIndex = 3;
             // 
             // Conditions
             // 
-            this.Conditions.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Conditions.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Conditions.FormattingEnabled = true;
             this.Conditions.Location = new System.Drawing.Point(0, 0);
             this.Conditions.Name = "Conditions";
-            this.Conditions.Size = new System.Drawing.Size(179, 302);
+            this.Conditions.Size = new System.Drawing.Size(290, 302);
             this.Conditions.TabIndex = 0;
             this.Conditions.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.Conditions_ItemCheck);
             this.Conditions.SelectedIndexChanged += new System.EventHandler(this.Conditions_SelectedIndexChanged);
@@ -81,7 +80,7 @@
             this.Properties.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Properties.Location = new System.Drawing.Point(0, 0);
             this.Properties.Name = "Properties";
-            this.Properties.Size = new System.Drawing.Size(377, 302);
+            this.Properties.Size = new System.Drawing.Size(286, 302);
             this.Properties.TabIndex = 1;
             this.Properties.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.Properties_PropertyValueChanged);
             // 
@@ -89,11 +88,11 @@
             // 
             this.bntAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.bntAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.bntAdd.Image = global::EntityTools.Properties.Resources.Add;
+            this.bntAdd.Image = global::EntityTools.Properties.Resources.miniAdd;
             this.bntAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.bntAdd.Location = new System.Drawing.Point(13, 327);
             this.bntAdd.Name = "bntAdd";
-            this.bntAdd.Size = new System.Drawing.Size(62, 23);
+            this.bntAdd.Size = new System.Drawing.Size(58, 23);
             this.bntAdd.TabIndex = 4;
             this.bntAdd.Text = "Add";
             this.bntAdd.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -104,11 +103,11 @@
             // 
             this.btnRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnRemove.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnRemove.Image = global::EntityTools.Properties.Resources.Delete;
+            this.btnRemove.Image = global::EntityTools.Properties.Resources.miniDelete;
             this.btnRemove.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnRemove.Location = new System.Drawing.Point(81, 327);
+            this.btnRemove.Location = new System.Drawing.Point(77, 327);
             this.btnRemove.Name = "btnRemove";
-            this.btnRemove.Size = new System.Drawing.Size(78, 23);
+            this.btnRemove.Size = new System.Drawing.Size(74, 23);
             this.btnRemove.TabIndex = 4;
             this.btnRemove.Text = "Remove";
             this.btnRemove.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -120,9 +119,9 @@
             this.bntCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.bntCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.bntCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.bntCancel.Image = global::EntityTools.Properties.Resources.Cancel;
+            this.bntCancel.Image = global::EntityTools.Properties.Resources.miniCancel;
             this.bntCancel.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.bntCancel.Location = new System.Drawing.Point(504, 327);
+            this.bntCancel.Location = new System.Drawing.Point(524, 327);
             this.bntCancel.Name = "bntCancel";
             this.bntCancel.Size = new System.Drawing.Size(68, 23);
             this.bntCancel.TabIndex = 4;
@@ -135,11 +134,11 @@
             // 
             this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSave.Image = global::EntityTools.Properties.Resources.Save;
+            this.btnSave.Image = global::EntityTools.Properties.Resources.miniValid;
             this.btnSave.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnSave.Location = new System.Drawing.Point(430, 327);
+            this.btnSave.Location = new System.Drawing.Point(458, 327);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(68, 23);
+            this.btnSave.Size = new System.Drawing.Size(60, 23);
             this.btnSave.TabIndex = 4;
             this.btnSave.Text = "Save";
             this.btnSave.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -150,11 +149,11 @@
             // 
             this.btnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnTest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnTest.Image = global::EntityTools.Properties.Resources.Play;
+            this.btnTest.Image = global::EntityTools.Properties.Resources.miniPlay;
             this.btnTest.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnTest.Location = new System.Drawing.Point(303, 327);
+            this.btnTest.Location = new System.Drawing.Point(295, 327);
             this.btnTest.Name = "btnTest";
-            this.btnTest.Size = new System.Drawing.Size(62, 23);
+            this.btnTest.Size = new System.Drawing.Size(58, 23);
             this.btnTest.TabIndex = 4;
             this.btnTest.Text = "Test";
             this.btnTest.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -165,9 +164,9 @@
             // 
             this.btnPaste.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnPaste.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnPaste.Image = global::EntityTools.Properties.Resources.Paste;
+            this.btnPaste.Image = global::EntityTools.Properties.Resources.miniPaste;
             this.btnPaste.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnPaste.Location = new System.Drawing.Point(233, 327);
+            this.btnPaste.Location = new System.Drawing.Point(225, 327);
             this.btnPaste.Name = "btnPaste";
             this.btnPaste.Size = new System.Drawing.Size(64, 23);
             this.btnPaste.TabIndex = 4;
@@ -180,9 +179,9 @@
             // 
             this.btnCopy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnCopy.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCopy.Image = global::EntityTools.Properties.Resources.Copy;
+            this.btnCopy.Image = global::EntityTools.Properties.Resources.miniCopy;
             this.btnCopy.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnCopy.Location = new System.Drawing.Point(165, 327);
+            this.btnCopy.Location = new System.Drawing.Point(157, 327);
             this.btnCopy.Name = "btnCopy";
             this.btnCopy.Size = new System.Drawing.Size(62, 23);
             this.btnCopy.TabIndex = 4;
@@ -191,23 +190,39 @@
             this.btnCopy.UseVisualStyleBackColor = true;
             this.btnCopy.Click += new System.EventHandler(this.btnCopy_Click);
             // 
+            // btnTestAll
+            // 
+            this.btnTestAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnTestAll.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnTestAll.Image = global::EntityTools.Properties.Resources.miniPlayAll;
+            this.btnTestAll.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnTestAll.Location = new System.Drawing.Point(359, 327);
+            this.btnTestAll.Name = "btnTestAll";
+            this.btnTestAll.Size = new System.Drawing.Size(68, 23);
+            this.btnTestAll.TabIndex = 4;
+            this.btnTestAll.Text = "TestAll";
+            this.btnTestAll.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btnTestAll.UseVisualStyleBackColor = true;
+            this.btnTestAll.Click += new System.EventHandler(this.btnTestAll_Click);
+            // 
             // ConditionListForm
             // 
             this.AcceptButton = this.btnSave;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.bntCancel;
-            this.ClientSize = new System.Drawing.Size(584, 362);
+            this.ClientSize = new System.Drawing.Size(604, 362);
             this.ControlBox = false;
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.bntCancel);
             this.Controls.Add(this.btnCopy);
             this.Controls.Add(this.btnPaste);
+            this.Controls.Add(this.btnTestAll);
             this.Controls.Add(this.btnTest);
             this.Controls.Add(this.btnRemove);
             this.Controls.Add(this.bntAdd);
             this.Controls.Add(this.splitContainer);
-            this.MinimumSize = new System.Drawing.Size(592, 389);
+            this.MinimumSize = new System.Drawing.Size(620, 400);
             this.Name = "ConditionListForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ConditionList";
@@ -231,5 +246,6 @@
         private System.Windows.Forms.Button btnTest;
         private System.Windows.Forms.Button btnPaste;
         private System.Windows.Forms.Button btnCopy;
+        private System.Windows.Forms.Button btnTestAll;
     }
 }

@@ -1,14 +1,12 @@
 ﻿using Astral.Classes.ItemFilter;
-using Astral.Quester.UIEditors;
+using EntityTools.Extensions;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using MyNW.Classes;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using Sign = Astral.Logic.UCC.Ressources.Enums.Sign;
@@ -18,32 +16,56 @@ namespace EntityTools.Tools
     [Serializable]
     public class AuraOption
     {
+#if DEVELOPER
         [Description("An Identifier of the Aura which is checked on the the Entity")]
         [Editor(typeof(AuraIdEditor), typeof(UITypeEditor))]
+#else
+        [Browsable(false)]
+#endif   
         public string AuraName
         {
-            get => auraId;
+            get => _auraId;
             set
             {
-                if(auraId != value)
+                if (_auraId != value)
                 {
-                    patternPos = CommonTools.GetSimplePatternPos(value, out auraPattern);
-                    auraId = value;
+                    _auraId = value;
+                    patternPos = value.GetSimplePatternPosition(out auraPattern);
                 }
             }
         }
+        internal string _auraId;
 
+#if !DEVELOPER
+        [Browsable(false)]
+#endif
         public ItemFilterStringType AuraNameType { get; set; } = ItemFilterStringType.Simple;
 
-        public int Stacks { get; set; } = 0;
+#if !DEVELOPER
+        [Browsable(false)]
+#endif
+        public int Stacks
+        {
+            get => _stacks; set
+            {
+                _stacks = value;
+            }
+        }
+        internal int _stacks = 0;
 
-        public Sign Sign { get; set; } = Sign.Superior;
+#if !DEVELOPER
+        [Browsable(false)]
+#endif
+        public Sign Sign
+        {
+            get => _sign; set
+            {
+                _sign = value;
+            }
+        }
+        internal Sign _sign = Sign.Superior;
 
-        [NonSerialized]
-        private string auraId;
-        [NonSerialized]
         private string auraPattern;
-        [NonSerialized]
         private SimplePatternPos patternPos = SimplePatternPos.None;
 
         [XmlIgnore]
@@ -52,8 +74,8 @@ namespace EntityTools.Tools
         {
             get
             {
-                if (!string.IsNullOrEmpty(auraId))
-                    if(Sign == Sign.Superior)
+                if (!string.IsNullOrEmpty(_auraId))
+                    if (Sign == Sign.Superior)
                         switch (AuraNameType)
                         {
                             case ItemFilterStringType.Simple:
@@ -72,13 +94,13 @@ namespace EntityTools.Tools
             }
         }
 
-        #region Методы_сравнения
+#region Методы_сравнения
         private bool AuraCheck_SimpleSuperrior(Entity e)
         {
             int num = 0;
-            foreach(var mod in e.Character.Mods)
+            foreach (var mod in e.Character.Mods)
             {
-                if(CommonTools.SimpleMaskTextComparer(mod.PowerDef.InternalName, patternPos, auraPattern))
+                if (mod.PowerDef.InternalName.CompareToSimplePattern(patternPos, auraPattern))
                 {
                     num++;
                     if (num > Stacks)
@@ -90,7 +112,7 @@ namespace EntityTools.Tools
 
         private bool AuraCheck_Simple(Entity e)
         {
-            int num = e.Character.Mods.Count(m => CommonTools.SimpleMaskTextComparer(m.PowerDef.InternalName, patternPos, auraPattern));
+            int num = e.Character.Mods.Count(m => m.PowerDef.InternalName.CompareToSimplePattern(patternPos, auraPattern));
             switch (Sign)
             {
                 case Sign.Equal:
@@ -136,13 +158,13 @@ namespace EntityTools.Tools
             }
             return false;
         }
-        #endregion
+#endregion
 
         public override string ToString()
         {
-            if (string.IsNullOrEmpty(auraId))
+            if (string.IsNullOrEmpty(_auraId))
                 return "Empty";
-            else return $"{auraId} {Sign} {Stacks}";
+            else return $"{_auraId} {Sign} {Stacks}";
         }
     }
 }

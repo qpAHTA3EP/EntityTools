@@ -2,11 +2,11 @@
 using System.Windows.Forms;
 using Astral.Logic.NW;
 using DevExpress.XtraEditors;
-using EntityTools.Forms;
+using EntityTools.Editors.Forms;
 using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
-using static EntityTools.Forms.EntitySelectForm;
+using static EntityTools.Editors.Forms.EntitySelectForm;
 
 namespace EntityTools.Editors.Forms
 {
@@ -86,6 +86,16 @@ namespace EntityTools.Editors.Forms
                     return aura.InternalName;
             
             return string.Empty;
+        }
+
+        static public void ShowFreeTool()
+        {
+            AuraSelectForm @this = new AuraSelectForm();
+
+            @this.NameFilter.Text = string.Empty;
+            @this.InternalNameFilter.Text = string.Empty;
+
+            @this.Show(Astral.Forms.Main.ActiveForm);
         }
 
         private void FillAuraList(Character character)

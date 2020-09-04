@@ -10,36 +10,55 @@ using EntityTools.Enums;
 using EntityTools.UCC.Conditions;
 using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 using System.Xml.Serialization;
+using EntityTools;
 
-namespace EntityTools.Conditions
+namespace EntityTools.UCC.Conditions
 {
     [Serializable]
     public class UCCConditionPack : Astral.Logic.UCC.Classes.UCCCondition, ICustomUCCCondition
     {
+#if DEVELOPER
         [Description("Displayed name of the ConditionPack")]
+#else
+        [Browsable(false)]
+#endif
         public string Name { get; set; }
 
+#if DEVELOPER
         [Description("The negation of the result of the ConditionPack")]
+#else
+        [Browsable(false)]
+#endif
         public bool Not { get; set; }
 
+#if DEVELOPER
         [Description("Logical rule of the Conditions checks\n" +
             "Conjunction: All Conditions have to be True (Logical AND)\n" +
             "Disjunction: At least one of the Conditions have to be True (Logical OR)")]
+#else
+        [Browsable(false)]
+#endif
         public LogicRule TestRule { get; set; }
 
+#if DEVELOPER
         [Description("The list of the Conditions")]
         [TypeConverter(typeof(CollectionTypeConverter))]
         [Editor(typeof(UCCConditionListEditor), typeof(UITypeEditor))]
+#else
+        [Browsable(false)]
+#endif
         public ConditionList Conditions { get; set; } = new ConditionList();
 
-        #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction = null)
+#region ICustomUCCCondition
+        bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
         {
+            bool result = true;
             if (Conditions != null && Conditions.Count > 0)
                 if (TestRule == LogicRule.Disjunction)
                 {
                     int lockedNum = 0;
                     int okUnlockedNum = 0;
+                    bool lockedTrue = true;
                     foreach (UCCCondition c in Conditions)
                     {
                         if (c is ICustomUCCCondition iCond)
@@ -47,10 +66,13 @@ namespace EntityTools.Conditions
                             if (iCond.Loked)
                             {
                                 if (!iCond.IsOK(refAction))
-                                    return false;
+                                {
+                                    lockedTrue = false;
+                                    break;
+                                }
                                 lockedNum++;
                             }
-                            else if (c.IsOK(refAction))
+                            else if (iCond.IsOK(refAction))
                                 okUnlockedNum++;
                         }
                         else
@@ -58,7 +80,10 @@ namespace EntityTools.Conditions
                             if (c.Locked)
                             {
                                 if (!c.IsOK(refAction))
-                                    return false;
+                                {
+                                    lockedTrue = false;
+                                    break;
+                                }
                                 lockedNum++;
                             }
                             else if (c.IsOK(refAction))
@@ -68,7 +93,7 @@ namespace EntityTools.Conditions
 
                     // Если множетство незалоченных условий пустое, тогда условие истино
                     // Если оно НЕ пустое, тогда должно встретиться хотя бы одно истиное
-                    return (Conditions.Count > lockedNum) ? okUnlockedNum > 0 : true;
+                    result = lockedTrue && (Conditions.Count == lockedNum || okUnlockedNum > 0);
                 }
                 else
                 {
@@ -77,19 +102,23 @@ namespace EntityTools.Conditions
                         if (c is ICustomUCCCondition iCond)
                         {
                             if (!iCond.IsOK(refAction))
-                                return false;
+                            {
+                                result = false;
+                                break;
+                            }
                         }
                         else if (!c.IsOK(refAction))
-                            return false;
-
-                    return true;
+                        {
+                            result = false;
+                            break;
+                        }
                 }
-            return false;
+            return (Not) ? !result : result;
         }
 
         bool ICustomUCCCondition.Loked { get => base.Locked; set => base.Locked = value; }
 
-        string ICustomUCCCondition.TestInfos(UCCAction refAction = null)
+        string ICustomUCCCondition.TestInfos(UCCAction refAction/* = null*/)
         {
             if (Conditions.Count > 0)
             {
@@ -114,57 +143,7 @@ namespace EntityTools.Conditions
             }
             else return "The list 'Conditions' is empty";
         }
-        #endregion
-        //public override bool IsValid
-        //{
-        //    get
-        //    {
-        //        if (Conditions.Count == 0)
-        //            return false;
-
-        //        bool result = (Tested == LogicRule.Conjunction);
-
-        //        if (Tested == LogicRule.Conjunction)
-        //        {
-        //            foreach (UCCCondition cond in Conditions)
-        //                if (!cond.IsValid)
-        //                {
-        //                    result = false;
-        //                    break;
-        //                }
-        //        }
-        //        else
-        //        {
-        //            int trueNumUnlock = 0,
-        //                trueNumLock = 0;
-        //            bool lockTrue = true;
-
-        //            foreach (UCCCondition cond in Conditions)
-        //            {
-        //                if (cond.IsValid)
-        //                {
-        //                    if (cond.Locked)
-        //                    { trueNumLock++;}
-        //                    else trueNumUnlock++;
-        //                }
-        //                else
-        //                {
-        //                    if (cond.Locked)
-        //                    {
-        //                        lockTrue = false;
-        //                        break;
-        //                    }
-        //                }
-        //            }
-
-        //            result = lockTrue && (Conditions.Count == trueNumLock || trueNumUnlock > 0);
-        //        }
-                
-        //        return (Not)? !result : result;
-        //    }
-        //}
-
-        //public override void Reset() { }
+#endregion
 
         public override string ToString()
         {

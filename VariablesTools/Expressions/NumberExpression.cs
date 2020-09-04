@@ -10,6 +10,8 @@ using VariableTools.Expressions.Operators;
 using System.Diagnostics;
 using System.Xml.Serialization;
 using VariableTools.Classes;
+using VariableTools.Expressions.DateFunctions;
+using System.Reflection;
 
 namespace VariableTools.Expressions
 {
@@ -882,7 +884,6 @@ namespace VariableTools.Expressions
                         }
                         catch (ParseError brAdditionErr)
                         {
-                            //errorMess.Append(/*).Append(Parser.Symbols.Tab).Append(*/brAdditionErr.Message)/*.Append(" in expression: ").Append(expression).AppendLine()*/;
                             subError.Add(brAdditionErr);
 
                             // Входная строка не содержит выражения, соответствующего '(' Addition ')' 
@@ -1058,9 +1059,59 @@ namespace VariableTools.Expressions
         {
             string exprBackup = expr;
             ErrorList subErrors = new ErrorList();
-            
+
             try
             { 
+                if (expr.Length > 4)
+                // Минимальная длина функтора 5 символов
+                {
+                    try
+                    {
+                        switch (expr[0])
+                        {
+                            case 'I': // ItemCount
+                                return ParseItemCount(ref expr);
+                            case 'N': // NumericCount или Now
+                                switch (expr[1])
+                                {
+                                    case 'u':
+                                        return ParseNumericCount(ref expr);
+                                    case 'o':
+                                        return ParseNow(ref expr);
+                                }
+                                break;
+                            case 'R': // Random
+                                return ParseRandom(ref expr);
+                            case 'D': // Days
+                                return ParseDays(ref expr);
+                            case 'H': // Hours
+                                return ParseHours(ref expr);
+                            case 'M': // Minutes
+                                return ParseMinutes(ref expr);
+                            case 'S': // Seconds
+                                return ParseSeconds(ref expr);
+                        }
+                    }
+                    catch (ParseError err)
+                    {
+                        expr = exprBackup;
+                        subErrors.Add(err);
+                        throw new ParseError(subErrors, $"{MethodBase.GetCurrentMethod().Name}: No one functors was found", exprBackup);
+                    }
+                }
+                else throw new ParseError($"{MethodBase.GetCurrentMethod().Name}: An expression is too short", exprBackup);
+
+                throw new ParseError($"{MethodBase.GetCurrentMethod().Name}: No one functors was found", exprBackup);
+            }
+            catch (FatalParseError fatErr)
+            {
+                expr = exprBackup;
+                subErrors.Add(fatErr);
+                throw new FatalParseError(subErrors, $"{MethodBase.GetCurrentMethod().Name}: Fatal error", fatErr.expression);
+            }
+#if false
+            try
+            {
                 try
                 {
                     return ParseItemCount(ref expr);
@@ -1069,7 +1120,6 @@ namespace VariableTools.Expressions
                 {
                     expr = exprBackup;
                     subErrors.Add(itemCntErr);
-                    //errorMess.Append(/*).Append(Parser.Symbols.Tab).Append(*/itemCntErr.Message).AppendLine();
 
                     try
                     {
@@ -1079,7 +1129,7 @@ namespace VariableTools.Expressions
                     {
                         expr = exprBackup;
                         subErrors.Add(numCntErr);
-                        //errorMess.Append(/*).Append(Parser.Symbols.Tab).Append(*/numCntErr.Message).AppendLine();
+
                         try
                         {
                             return ParseRandom(ref expr);
@@ -1088,7 +1138,57 @@ namespace VariableTools.Expressions
                         {
                             expr = exprBackup;
                             subErrors.Add(rndErr);
-                            //errorMess.Append(/*).Append(Parser.Symbols.Tab).Append(*/rndErr.Message).AppendLine();
+
+                            try
+                            {
+                                return ParseNow(ref expr);
+                            }
+                            catch (ParseError dtNowErr)
+                            {
+                                expr = exprBackup;
+                                subErrors.Add(dtNowErr);
+
+                                try
+                                {
+                                    return ParseDays(ref expr);
+                                }
+                                catch (ParseError dtDaysErr)
+                                {
+                                    expr = exprBackup;
+                                    subErrors.Add(dtDaysErr);
+
+                                    try
+                                    {
+                                        return ParseHours(ref expr);
+                                    }
+                                    catch (ParseError dtHoursErr)
+                                    {
+                                        expr = exprBackup;
+                                        subErrors.Add(dtHoursErr);
+
+                                        try
+                                        {
+                                            return ParseMinutes(ref expr);
+                                        }
+                                        catch (ParseError dtMinutesErr)
+                                        {
+                                            expr = exprBackup;
+                                            subErrors.Add(dtMinutesErr);
+
+                                            try
+                                            {
+                                                return ParseSeconds(ref expr);
+                                            }
+                                            catch (ParseError dtSecondsErr)
+                                            {
+                                                expr = exprBackup;
+                                                subErrors.Add(dtSecondsErr);
+                                                throw new ParseError(subErrors, $"{MethodBase.GetCurrentMethod().Name}: No one functors was found", exprBackup);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -1097,17 +1197,22 @@ namespace VariableTools.Expressions
             {
                 expr = exprBackup;
                 subErrors.Add(fatErr);
-                throw new FatalParseError(subErrors, "ParseMultiplication: Fatal error", fatErr.expression);
-            }
+                throw new FatalParseError(subErrors, $"{MethodBase.GetCurrentMethod().Name}: Fatal error", fatErr.expression);
+            } 
+#endif
 
+#if false
             expr = exprBackup;
-            
+
             //errorMess.Insert(0, "ParseFunction: No {ItemCount}, {NumericCount} or {Random} functor was found:\n");
             //throw new ParseError(errorMess.ToString(), expression);
-            
-            throw new ParseError(subErrors, "ParseFunction: No {ItemCount}, {NumericCount} or {Random} functor was found", expr);
-        }
 
+            throw new ParseError(subErrors, "ParseFunction: No {ItemCount}, {NumericCount} or {Random} functor was found", expr);
+
+#endif
+}
+
+        #region Counters
         /// <summary>
         /// Извлечение функции 'CountItem' из входной строки expression
         /// В случае успеха соответствующая функции подстрока удаляется из expression
@@ -1132,7 +1237,7 @@ namespace VariableTools.Expressions
                 {
                     expr = expr.Substring(Parser.Predicates.CountItem.Length);
 
-                    if(Parser.Symbols.TrimOpenGroupBracesAndWhiteSpace(ref expr))
+                    if (Parser.Symbols.TrimOpenGroupBracesAndWhiteSpace(ref expr))
                     {
                         try
                         {
@@ -1142,9 +1247,9 @@ namespace VariableTools.Expressions
                                 return new ItemCount(id);
                             else throw new FatalParseError($"ParseItemCount: '{Parser.Symbols.closeGroupBrace}' does not found after {{ItemId}}", expr);
                         }
-                        catch(BaseParseError idErr)
+                        catch (BaseParseError idErr)
                         {
-                            throw new FatalParseError(new ErrorList {idErr}, $"ParseItemCount: {{ItemId}} does not found after '{Parser.Symbols.openGroupBrace}'", expr);
+                            throw new FatalParseError(new ErrorList { idErr }, $"ParseItemCount: {{ItemId}} does not found after '{Parser.Symbols.openGroupBrace}'", expr);
                         }
                     }
                     else throw new FatalParseError($"ParseItemCount: '{Parser.Symbols.openGroupBrace}' does not found after {{{Parser.Predicates.CountItem}}} predicate", expr);
@@ -1421,7 +1526,8 @@ namespace VariableTools.Expressions
                 expr = exprBackup;
                 throw e;
             }
-        }
+        } 
+        #endregion
 
         /// <summary>
         /// Извлечение функции 'Random' из входной строки expression
@@ -1498,6 +1604,387 @@ namespace VariableTools.Expressions
                 throw e;
             }
         }
+
+        #region DateTime
+        /// <summary>
+        /// Извлечение функции 'Now' из входной строки expression
+        /// В случае успеха соответствующая функции подстрока удаляется из expression
+        /// В противном случае генерируется исключение ParseError
+        /// </summary>
+        /// <param name="expr"></param>
+        /// <returns>Узел синтаксического дерева DateTimeNow</returns>
+        protected static DateTimeNow ParseNow(ref string expr)
+        {
+            string exprBackup = expr;
+            ErrorList subErrors = new ErrorList();
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
+                {
+                    throw new FatalParseError($"{MethodBase.GetCurrentMethod().Name}: Expression string is empty");
+                }
+
+                expr = expr.TrimStart();
+
+                if (expr.StartsWith(Parser.Predicates.Now, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Обнаружен предикативный литерал 'Now'
+                    expr = expr.Substring(Parser.Predicates.Now.Length);
+
+                    // Ищем открывающую скобку '('
+                    if (Parser.Symbols.TrimOpenGroupBracesAndWhiteSpace(ref expr))
+                    {
+                        // Найдена открывающая скобка '('
+
+#if false
+                        // Ищем выражение вида Addition
+                        NumberAstNode operand = null;
+                        try
+                        {
+                            operand = ParseAddition(ref expr);
+                        }
+                        catch (ParseError opErr)
+                        {
+                            // Операнд не найден, значит максимум случайного числа не определен
+                            subErrors.Add(opErr);
+
+                        } 
+#endif
+
+                        // Ищем закрывающую скобку ')'
+                        if (Parser.Symbols.TrimCloseGroupBracesAndWhiteSpace(ref expr))
+                        {
+                            // Найдена закрывающая скобка ')'
+
+                            // Конструируем функтор Random
+                            return new DateTimeNow();
+                        }
+                        else
+                        {
+                            // Закрывающая скобка ')' не найдена
+                            // следовательно входная строка не соответствует правилу Random
+                            // Восстанавливаем входную строку
+                            throw new FatalParseError(subErrors, $"{MethodBase.GetCurrentMethod().Name}: Symbol '{Parser.Symbols.closeGroupBrace}' does not found", expr);
+
+                        }
+                    }
+                    else
+                    {
+                        // Открывающая скобка '(' не найдена
+                        throw new FatalParseError($"{MethodBase.GetCurrentMethod().Name}: Symbol '{Parser.Symbols.openGroupBrace}' does not found after {{{Parser.Predicates.Random}}} predicate", expr);
+                    }
+                }
+                else throw new ParseError($"{MethodBase.GetCurrentMethod().Name}: Predicate {{{Parser.Predicates.Random}}} does not found at the beginning of the expression", expr);
+            }
+            catch (Exception e)
+            {
+                expr = exprBackup;
+                throw e;
+            }
+        }
+
+        /// <summary>
+        /// Извлечение функции 'Days' из входной строки expression
+        /// В случае успеха соответствующая функции подстрока удаляется из expression
+        /// В противном случае генерируется исключение ParseError
+        /// </summary>
+        /// <param name="expr"></param>
+        /// <returns>Узел синтаксического дерева DaysNumber</returns>
+        protected static DaysNumber ParseDays(ref string expr)
+        {
+            string exprBackup = expr;
+            ErrorList subErrors = new ErrorList();
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
+                {
+                    throw new FatalParseError($"{MethodBase.GetCurrentMethod().Name}: Expression string is empty");
+                }
+
+                expr = expr.TrimStart();
+
+                if (expr.StartsWith(Parser.Predicates.Days, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Обнаружен предикативный литерал 'Days'
+                    expr = expr.Substring(Parser.Predicates.Days.Length);
+
+                    // Ищем открывающую скобку '('
+                    if (Parser.Symbols.TrimOpenGroupBracesAndWhiteSpace(ref expr))
+                    {
+                        // Найдена открывающая скобка '('
+
+                        // Ищем выражение вида Addition
+                        NumberAstNode operand = null;
+                        try
+                        {
+                            operand = ParseAddition(ref expr);
+                        }
+                        catch (BaseParseError additionErr)
+                        {
+                            subErrors.Add(additionErr);
+                            throw new FatalParseError(subErrors, $"{MethodBase.GetCurrentMethod().Name}: {{Addition}} does not found after '{Parser.Symbols.openGroupBrace}'", expr);
+                        }
+
+                        // Ищем закрывающую скобку ')'
+                        if (Parser.Symbols.TrimCloseGroupBracesAndWhiteSpace(ref expr))
+                        {
+                            // Найдена закрывающая скобка ')'
+
+                            // Конструируем функтор Days
+                            return new DaysNumber(operand);
+                        }
+                        else
+                        {
+                            // Закрывающая скобка ')' не найдена
+                            // следовательно входная строка не соответствует правилу Random
+                            // Восстанавливаем входную строку
+                            throw new FatalParseError(subErrors, $"{MethodBase.GetCurrentMethod().Name}: Symbol '{Parser.Symbols.closeGroupBrace}' does not found", expr);
+
+                        }
+                    }
+                    else
+                    {
+                        // Открывающая скобка '(' не найдена
+                        throw new FatalParseError($"{MethodBase.GetCurrentMethod().Name}: Symbol '{Parser.Symbols.openGroupBrace}' does not found after {{{Parser.Predicates.Days}}} predicate", expr);
+                    }
+                }
+                else throw new ParseError($"{MethodBase.GetCurrentMethod().Name}: Predicate {{{Parser.Predicates.Days}}} does not found at the beginning of the expression", expr);
+            }
+            catch (Exception e)
+            {
+                expr = exprBackup;
+                throw e;
+            }
+        }
+
+        /// <summary>
+        /// Извлечение функции 'Hours' из входной строки expression
+        /// В случае успеха соответствующая функции подстрока удаляется из expression
+        /// В противном случае генерируется исключение ParseError
+        /// </summary>
+        /// <param name="expr"></param>
+        /// <returns>Узел синтаксического дерева HoursNumber</returns>
+        protected static HoursNumber ParseHours(ref string expr)
+        {
+            string exprBackup = expr;
+            ErrorList subErrors = new ErrorList();
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
+                {
+                    throw new FatalParseError($"{MethodBase.GetCurrentMethod().Name}: Expression string is empty");
+                }
+
+                expr = expr.TrimStart();
+
+                if (expr.StartsWith(Parser.Predicates.Hours, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Обнаружен предикативный литерал 'Hours'
+                    expr = expr.Substring(Parser.Predicates.Hours.Length);
+
+                    // Ищем открывающую скобку '('
+                    if (Parser.Symbols.TrimOpenGroupBracesAndWhiteSpace(ref expr))
+                    {
+                        // Найдена открывающая скобка '('
+
+                        // Ищем выражение вида Addition
+                        NumberAstNode operand = null;
+                        try
+                        {
+                            operand = ParseAddition(ref expr);
+                        }
+                        catch (BaseParseError additionErr)
+                        {
+                            subErrors.Add(additionErr);
+                            throw new FatalParseError(subErrors, $"{MethodBase.GetCurrentMethod().Name}: {{Addition}} does not found after '{Parser.Symbols.openGroupBrace}'", expr);
+                        }
+
+                        // Ищем закрывающую скобку ')'
+                        if (Parser.Symbols.TrimCloseGroupBracesAndWhiteSpace(ref expr))
+                        {
+                            // Найдена закрывающая скобка ')'
+
+                            // Конструируем функтор Hours
+                            return new HoursNumber(operand);
+                        }
+                        else
+                        {
+                            // Закрывающая скобка ')' не найдена
+                            // следовательно входная строка не соответствует правилу Random
+                            // Восстанавливаем входную строку
+                            throw new FatalParseError(subErrors, $"{MethodBase.GetCurrentMethod().Name}: Symbol '{Parser.Symbols.closeGroupBrace}' does not found", expr);
+
+                        }
+                    }
+                    else
+                    {
+                        // Открывающая скобка '(' не найдена
+                        throw new FatalParseError($"{MethodBase.GetCurrentMethod().Name}: Symbol '{Parser.Symbols.openGroupBrace}' does not found after {{{Parser.Predicates.Hours}}} predicate", expr);
+                    }
+                }
+                else throw new ParseError($"{MethodBase.GetCurrentMethod().Name}: Predicate {{{Parser.Predicates.Hours}}} does not found at the beginning of the expression", expr);
+            }
+            catch (Exception e)
+            {
+                expr = exprBackup;
+                throw e;
+            }
+        }
+
+        /// <summary>
+        /// Извлечение функции 'Minutes' из входной строки expression
+        /// В случае успеха соответствующая функции подстрока удаляется из expression
+        /// В противном случае генерируется исключение ParseError
+        /// </summary>
+        /// <param name="expr"></param>
+        /// <returns>Узел синтаксического дерева MinutesNumber</returns>
+        protected static MinutesNumber ParseMinutes(ref string expr)
+        {
+            string exprBackup = expr;
+            ErrorList subErrors = new ErrorList();
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
+                {
+                    throw new FatalParseError($"{MethodBase.GetCurrentMethod().Name}: Expression string is empty");
+                }
+
+                expr = expr.TrimStart();
+
+                if (expr.StartsWith(Parser.Predicates.Minutes, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Обнаружен предикативный литерал 'Minutes'
+                    expr = expr.Substring(Parser.Predicates.Minutes.Length);
+
+                    // Ищем открывающую скобку '('
+                    if (Parser.Symbols.TrimOpenGroupBracesAndWhiteSpace(ref expr))
+                    {
+                        // Найдена открывающая скобка '('
+
+                        // Ищем выражение вида Addition
+                        NumberAstNode operand = null;
+                        try
+                        {
+                            operand = ParseAddition(ref expr);
+                        }
+                        catch (BaseParseError additionErr)
+                        {
+                            subErrors.Add(additionErr);
+                            throw new FatalParseError(subErrors, $"{MethodBase.GetCurrentMethod().Name}: {{Addition}} does not found after '{Parser.Symbols.openGroupBrace}'", expr);
+                        }
+
+                        // Ищем закрывающую скобку ')'
+                        if (Parser.Symbols.TrimCloseGroupBracesAndWhiteSpace(ref expr))
+                        {
+                            // Найдена закрывающая скобка ')'
+
+                            // Конструируем функтор Minutes
+                            return new MinutesNumber(operand);
+                        }
+                        else
+                        {
+                            // Закрывающая скобка ')' не найдена
+                            // следовательно входная строка не соответствует правилу Random
+                            // Восстанавливаем входную строку
+                            throw new FatalParseError(subErrors, $"{MethodBase.GetCurrentMethod().Name}: Symbol '{Parser.Symbols.closeGroupBrace}' does not found", expr);
+
+                        }
+                    }
+                    else
+                    {
+                        // Открывающая скобка '(' не найдена
+                        throw new FatalParseError($"{MethodBase.GetCurrentMethod().Name}: Symbol '{Parser.Symbols.openGroupBrace}' does not found after {{{Parser.Predicates.Minutes}}} predicate", expr);
+                    }
+                }
+                else throw new ParseError($"{MethodBase.GetCurrentMethod().Name}: Predicate {{{Parser.Predicates.Minutes}}} does not found at the beginning of the expression", expr);
+            }
+            catch (Exception e)
+            {
+                expr = exprBackup;
+                throw e;
+            }
+        }
+
+
+        /// <summary>
+        /// Извлечение функции 'Seconds' из входной строки expression
+        /// В случае успеха соответствующая функции подстрока удаляется из expression
+        /// В противном случае генерируется исключение ParseError
+        /// </summary>
+        /// <param name="expr"></param>
+        /// <returns>Узел синтаксического дерева SecondsNumber</returns>
+        protected static SecondsNumber ParseSeconds(ref string expr)
+        {
+            string exprBackup = expr;
+            ErrorList subErrors = new ErrorList();
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(expr) || string.IsNullOrEmpty(expr))
+                {
+                    throw new FatalParseError($"{MethodBase.GetCurrentMethod().Name}: Expression string is empty");
+                }
+
+                expr = expr.TrimStart();
+
+                if (expr.StartsWith(Parser.Predicates.Seconds, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Обнаружен предикативный литерал 'Seconds'
+                    expr = expr.Substring(Parser.Predicates.Seconds.Length);
+
+                    // Ищем открывающую скобку '('
+                    if (Parser.Symbols.TrimOpenGroupBracesAndWhiteSpace(ref expr))
+                    {
+                        // Найдена открывающая скобка '('
+
+                        // Ищем выражение вида Addition
+                        NumberAstNode operand = null;
+                        try
+                        {
+                            operand = ParseAddition(ref expr);
+                        }
+                        catch (BaseParseError additionErr)
+                        {
+                            subErrors.Add(additionErr);
+                            throw new FatalParseError(subErrors, $"{MethodBase.GetCurrentMethod().Name}: {{Addition}} does not found after '{Parser.Symbols.openGroupBrace}'", expr);
+                        }
+
+                        // Ищем закрывающую скобку ')'
+                        if (Parser.Symbols.TrimCloseGroupBracesAndWhiteSpace(ref expr))
+                        {
+                            // Найдена закрывающая скобка ')'
+
+                            // Конструируем функтор Seconds
+                            return new SecondsNumber(operand);
+                        }
+                        else
+                        {
+                            // Закрывающая скобка ')' не найдена
+                            // следовательно входная строка не соответствует правилу Random
+                            // Восстанавливаем входную строку
+                            throw new FatalParseError(subErrors, $"{MethodBase.GetCurrentMethod().Name}: Symbol '{Parser.Symbols.closeGroupBrace}' does not found", expr);
+
+                        }
+                    }
+                    else
+                    {
+                        // Открывающая скобка '(' не найдена
+                        throw new FatalParseError($"{MethodBase.GetCurrentMethod().Name}: Symbol '{Parser.Symbols.openGroupBrace}' does not found after {{{Parser.Predicates.Seconds}}} predicate", expr);
+                    }
+                }
+                else throw new ParseError($"{MethodBase.GetCurrentMethod().Name}: Predicate {{{Parser.Predicates.Random}}} does not found at the beginning of the expression", expr);
+            }
+            catch (Exception e)
+            {
+                expr = exprBackup;
+                throw e;
+            }
+        }
+        #endregion
 
         /// <summary>
         /// Создание узла АСТ, представляющего бинарный математический оператор

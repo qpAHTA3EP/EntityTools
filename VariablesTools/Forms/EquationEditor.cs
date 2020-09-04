@@ -38,6 +38,8 @@ namespace VariableTools.Forms
             InitializeComponent();
         }
 
+        #region GUI Events
+        #region Insert Events
         private void btnInsItmCnt_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
             GetAnItem.ListItem item = GetAnItem.Show();
@@ -67,6 +69,32 @@ namespace VariableTools.Forms
             }
         }
 
+        private void btnInsNow_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            tbExpression.AppendText($" {Parser.Predicates.Now}()");
+        }
+
+        private void btnInsDays_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            tbExpression.AppendText($" {Parser.Predicates.Days}()");
+        }
+
+        private void btnInsHours_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            tbExpression.AppendText($" {Parser.Predicates.Hours}()");
+        }
+
+        private void btnInsMinutes_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            tbExpression.AppendText($" {Parser.Predicates.Minutes}()");
+        }
+
+        private void btnInsSeconds_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            tbExpression.AppendText($" {Parser.Predicates.Seconds}()");
+        }
+        #endregion
+
         private void btnValidate_Click(object sender, EventArgs e)
         {
             StringBuilder sb = new StringBuilder();
@@ -84,7 +112,7 @@ namespace VariableTools.Forms
             }
             sb.Append(description);
             sb.AppendLine();
-            if(ok)
+            if (ok)
                 XtraMessageBox.Show(this, sb.ToString(), caption, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
             else XtraMessageBox.Show(this, sb.ToString(), caption, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
@@ -95,5 +123,7 @@ namespace VariableTools.Forms
             DialogResult = DialogResult.OK;
             Close();
         }
+
+        #endregion
     }
 }

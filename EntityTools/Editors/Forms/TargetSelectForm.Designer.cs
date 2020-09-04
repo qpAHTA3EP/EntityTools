@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace EntityTools.Forms
+namespace EntityTools.Editors.Forms
 {
     partial class TargetSelectForm
     {

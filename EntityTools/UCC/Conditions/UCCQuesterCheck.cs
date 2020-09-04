@@ -6,20 +6,26 @@ using Astral.Quester.Classes;
 using EntityTools.Editors;
 using System.Drawing.Design;
 using System;
+using QuesterCondition = Astral.Quester.Classes.Condition;
 
 namespace EntityTools.UCC.Conditions
 {
     public class UCCQuesterCheck : UCCCondition, ICustomUCCCondition
     {
-        internal class QuesterConditionEditor : AddTypeCommonEditor<Condition>
+#if DEVELOPER
+        internal class QuesterConditionEditor : AddTypeCommonEditor<QuesterCondition>
         { }
 
         [Editor(typeof(QuesterConditionEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public Condition Condition { get; set; } = null;
+        [XmlElement("QuesterCondition", typeof(QuesterCondition))]
+#else
+        [Browsable(false)]
+#endif
+        public QuesterCondition Condition { get; set; } = null;
 
-        #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction = null)
+#region ICustomUCCCondition
+        bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
         {
             return Condition?.IsValid == true;
         }
@@ -30,16 +36,16 @@ namespace EntityTools.UCC.Conditions
         {
             if (Condition != null)
                 return Condition.TestInfos;
-            return "Condition doesn't set.";
+            return $"{nameof(Condition)} does not set.";
         }
-        #endregion
+#endregion
 
         public override string ToString()
         {
             return GetType().Name;
         }
 
-        #region Hide Inherited Properties
+#region Hide Inherited Properties
         [XmlIgnore]
         [Browsable(false)]
         public new Astral.Logic.UCC.Ressources.Enums.Sign Sign { get; set; }
@@ -55,6 +61,6 @@ namespace EntityTools.UCC.Conditions
         [XmlIgnore]
         [Browsable(false)]
         public new Astral.Logic.UCC.Ressources.Enums.ActionCond Tested { get; set; }
-        #endregion
+#endregion
     }
 }

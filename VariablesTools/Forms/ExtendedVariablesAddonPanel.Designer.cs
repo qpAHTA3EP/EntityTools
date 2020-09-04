@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dgvVariables = new System.Windows.Forms.DataGridView();
             this.clmnSave = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.clmnProfileScope = new System.Windows.Forms.DataGridViewComboBoxColumn();
@@ -43,6 +43,8 @@
             this.bntAdd = new System.Windows.Forms.Button();
             this.btnDelete = new System.Windows.Forms.Button();
             this.ckbDebug = new System.Windows.Forms.CheckBox();
+            this.tbLastAssign = new System.Windows.Forms.TextBox();
+            this.lblLastAssign = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgvVariables)).BeginInit();
             this.SuspendLayout();
             // 
@@ -51,8 +53,8 @@
             this.dgvVariables.AllowUserToAddRows = false;
             this.dgvVariables.AllowUserToDeleteRows = false;
             this.dgvVariables.AllowUserToResizeRows = false;
-            dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.dgvVariables.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.dgvVariables.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle5;
             this.dgvVariables.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -72,10 +74,11 @@
             this.dgvVariables.RowHeadersVisible = false;
             this.dgvVariables.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.dgvVariables.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dgvVariables.Size = new System.Drawing.Size(732, 379);
+            this.dgvVariables.Size = new System.Drawing.Size(732, 319);
             this.dgvVariables.TabIndex = 1;
             this.dgvVariables.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.dgvVariables_CellValidating);
             this.dgvVariables.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvVariables_CellValueChanged);
+            this.dgvVariables.SelectionChanged += new System.EventHandler(this.dgvVariables_SelectionChanged);
             // 
             // clmnSave
             // 
@@ -136,11 +139,11 @@
             // 
             // clmnValue
             // 
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle4.Format = "N3";
-            dataGridViewCellStyle4.NullValue = "0";
-            dataGridViewCellStyle4.Padding = new System.Windows.Forms.Padding(0, 0, 6, 0);
-            this.clmnValue.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle6.Format = "N3";
+            dataGridViewCellStyle6.NullValue = "0";
+            dataGridViewCellStyle6.Padding = new System.Windows.Forms.Padding(0, 0, 6, 0);
+            this.clmnValue.DefaultCellStyle = dataGridViewCellStyle6;
             this.clmnValue.HeaderText = "Value";
             this.clmnValue.MinimumWidth = 30;
             this.clmnValue.Name = "clmnValue";
@@ -153,7 +156,7 @@
             this.dntLoad.Location = new System.Drawing.Point(610, 389);
             this.dntLoad.Name = "dntLoad";
             this.dntLoad.Size = new System.Drawing.Size(60, 22);
-            this.dntLoad.TabIndex = 6;
+            this.dntLoad.TabIndex = 5;
             this.dntLoad.Text = "Load";
             this.dntLoad.UseVisualStyleBackColor = true;
             this.dntLoad.Click += new System.EventHandler(this.dntLoad_Click);
@@ -165,7 +168,7 @@
             this.btnSave.Location = new System.Drawing.Point(676, 389);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(60, 23);
-            this.btnSave.TabIndex = 4;
+            this.btnSave.TabIndex = 6;
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
@@ -186,10 +189,10 @@
             this.bntAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.bntAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bntAdd.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.bntAdd.Location = new System.Drawing.Point(405, 389);
+            this.bntAdd.Location = new System.Drawing.Point(431, 390);
             this.bntAdd.Name = "bntAdd";
             this.bntAdd.Size = new System.Drawing.Size(60, 22);
-            this.bntAdd.TabIndex = 6;
+            this.bntAdd.TabIndex = 3;
             this.bntAdd.Text = "Add";
             this.bntAdd.UseVisualStyleBackColor = true;
             this.bntAdd.Click += new System.EventHandler(this.bntAdd_Click);
@@ -198,31 +201,56 @@
             // 
             this.btnDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnDelete.Location = new System.Drawing.Point(471, 389);
+            this.btnDelete.Location = new System.Drawing.Point(497, 390);
             this.btnDelete.Name = "btnDelete";
             this.btnDelete.Size = new System.Drawing.Size(60, 22);
-            this.btnDelete.TabIndex = 6;
+            this.btnDelete.TabIndex = 4;
             this.btnDelete.Text = "Delete";
             this.btnDelete.UseVisualStyleBackColor = true;
             this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
             // ckbDebug
             // 
-            this.ckbDebug.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ckbDebug.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.ckbDebug.AutoSize = true;
-            this.ckbDebug.Location = new System.Drawing.Point(181, 392);
+            this.ckbDebug.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ckbDebug.Location = new System.Drawing.Point(553, 329);
             this.ckbDebug.Name = "ckbDebug";
-            this.ckbDebug.Size = new System.Drawing.Size(103, 17);
-            this.ckbDebug.TabIndex = 9;
-            this.ckbDebug.Text = "Debug message";
+            this.ckbDebug.Size = new System.Drawing.Size(183, 17);
+            this.ckbDebug.TabIndex = 2;
+            this.ckbDebug.Text = "Show debug messages in the Log";
             this.ckbDebug.UseVisualStyleBackColor = true;
             this.ckbDebug.CheckedChanged += new System.EventHandler(this.ckbDebug_CheckedChanged);
+            // 
+            // tbLastAssign
+            // 
+            this.tbLastAssign.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tbLastAssign.Location = new System.Drawing.Point(4, 352);
+            this.tbLastAssign.Multiline = true;
+            this.tbLastAssign.Name = "tbLastAssign";
+            this.tbLastAssign.ReadOnly = true;
+            this.tbLastAssign.Size = new System.Drawing.Size(732, 31);
+            this.tbLastAssign.TabIndex = 10;
+            this.tbLastAssign.TabStop = false;
+            // 
+            // lblLastAssign
+            // 
+            this.lblLastAssign.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.lblLastAssign.AutoSize = true;
+            this.lblLastAssign.Location = new System.Drawing.Point(4, 336);
+            this.lblLastAssign.Name = "lblLastAssign";
+            this.lblLastAssign.Size = new System.Drawing.Size(201, 13);
+            this.lblLastAssign.TabIndex = 7;
+            this.lblLastAssign.Text = "Last operation with the selected Variable:";
+            this.lblLastAssign.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // ExtendedVariablesToolsPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.tbLastAssign);
             this.Controls.Add(this.ckbDebug);
+            this.Controls.Add(this.lblLastAssign);
             this.Controls.Add(this.lblAuthor);
             this.Controls.Add(this.btnDelete);
             this.Controls.Add(this.bntAdd);
@@ -255,5 +283,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn clmnName;
         private System.Windows.Forms.DataGridViewTextBoxColumn clmnValue;
         private System.Windows.Forms.CheckBox ckbDebug;
+        private System.Windows.Forms.TextBox tbLastAssign;
+        private System.Windows.Forms.Label lblLastAssign;
     }
 }

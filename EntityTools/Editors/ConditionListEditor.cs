@@ -5,26 +5,26 @@ using System.Drawing.Design;
 using System.Windows.Forms;
 using Astral.Quester.Classes;
 using DevExpress.XtraEditors.Controls;
-using EntityTools.Forms;
+using EntityTools.Extensions;
 using MyNW.Classes;
 using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 
 
 namespace EntityTools.Editors
 {
+#if DEVELOPER
     class UCCConditionListEditor : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            ConditionListForm listEditor = new ConditionListForm();
 
-            ConditionList newConditions = listEditor.GetConditionList(value as ConditionList);
+            ConditionList conditions = value as ConditionList;
 
-            if (listEditor.DialogResult == DialogResult.OK)
+            if (EntityTools.Core.GUIRequest_UCCConditions(ref conditions))
             {
-                return newConditions;
+                return conditions.Clone();
             }            
-            return value;
+            else return value;
         }
 
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
@@ -32,4 +32,5 @@ namespace EntityTools.Editors
             return UITypeEditorEditStyle.Modal;
         }
     }
+#endif
 }

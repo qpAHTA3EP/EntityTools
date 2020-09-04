@@ -16,7 +16,7 @@ namespace EntityTools.Tools
         public override bool CanConvertTo(
         ITypeDescriptorContext context, Type destType)
         {
-        return destType == typeof (string);
+            return destType == typeof (string);
         }
 
         /// <summary>

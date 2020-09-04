@@ -5,11 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace EntityTools.Forms
+namespace EntityTools.Editors.Forms
 {
-    public partial class EntitySelectForm : XtraForm //*/Form
+    public partial class EntitySelectForm : XtraForm //*/ Form
     {
-        private static EntitySelectForm selectForm;
+        private static EntitySelectForm @this;
 
         public EntitySelectForm()
         {
@@ -36,6 +36,7 @@ namespace EntityTools.Forms
             }
         }
 
+#if ENTITY_DIF_BINDINGS
         /// <summary>
         /// локальный список кратких описаний Entity
         /// </summary>
@@ -59,11 +60,18 @@ namespace EntityTools.Forms
                     });
             }
         }
+#endif
+
+        public int clmnNameInd { get => clmnName.DisplayIndex; }
+        public int clmnNameUntranslatedInd { get => clmnNameUntranslated.DisplayIndex; }
+        public int clmnInternalNameInd { get => clmnInternalName.DisplayIndex; }
+        public int clmnDistanceInd { get => clmnDistance.DisplayIndex; }
+
 
         private void FillEntitiesDgv(string currentEntityId = "")
         {
             if (currentEntityId == string.Empty && dgvEntities.CurrentRow != null && !dgvEntities.CurrentRow.IsNewRow)
-                currentEntityId = dgvEntities.CurrentRow.Cells[clmnNameUntranslated.DisplayIndex].Value.ToString(); 
+                currentEntityId = dgvEntities.CurrentRow.Cells[clmnNameUntranslatedInd].Value.ToString(); 
 
             dgvEntities.DataSource = null;
 
@@ -78,10 +86,10 @@ namespace EntityTools.Forms
             {
                 DataGridViewRow row = new DataGridViewRow();
                 row.CreateCells(dgvEntities);
-                row.Cells[clmnName.DisplayIndex].Value = entity.Name;
-                row.Cells[clmnNameUntranslated.DisplayIndex].Value = entity.NameUntranslated;
-                row.Cells[clmnInternalName.DisplayIndex].Value = entity.InternalName;
-                row.Cells[clmnDistance.DisplayIndex].Value = entity.Location.Distance3DFromPlayer;
+                row.Cells[clmnNameInd].Value = entity.Name;
+                row.Cells[clmnNameUntranslatedInd].Value = entity.NameUntranslated;
+                row.Cells[clmnInternalNameInd].Value = entity.InternalName;
+                row.Cells[clmnDistanceInd].Value = entity.Location.Distance3DFromPlayer;
                 row.Tag = entity;
 
                 int ind = dgvEntities.Rows.Add(row);
@@ -97,22 +105,22 @@ namespace EntityTools.Forms
 
         public static EntityDif GetEntity()
         {
-            if(selectForm == null)
-                selectForm = new EntitySelectForm();
+            if(@this == null)
+                @this = new EntitySelectForm();
 
-            selectForm.FillEntitiesDgv();
+            @this.FillEntitiesDgv();
 
-            if (selectForm.ShowDialog() == DialogResult.OK)
+            if (@this.ShowDialog() == DialogResult.OK)
             {
-                if (!selectForm.dgvEntities.CurrentRow.IsNewRow)
+                if (!@this.dgvEntities.CurrentRow.IsNewRow)
                 {
                     return new EntityDif
                     {
-                        entity = selectForm.dgvEntities.CurrentRow.Tag as Entity,
-                        Name = selectForm.dgvEntities.CurrentRow.Cells[selectForm.clmnName.DisplayIndex].Value.ToString(),
-                        NameUntranslated = selectForm.dgvEntities.CurrentRow.Cells[selectForm.clmnNameUntranslated.DisplayIndex].Value.ToString(),
-                        InternalName = selectForm.dgvEntities.CurrentRow.Cells[selectForm.clmnInternalName.DisplayIndex].Value.ToString(),
-                        Distance = (double)selectForm.dgvEntities.CurrentRow.Cells[selectForm.clmnDistance.DisplayIndex].Value
+                        entity = @this.dgvEntities.CurrentRow.Tag as Entity,
+                        Name = @this.dgvEntities.CurrentRow.Cells[@this.clmnNameInd].Value.ToString(),
+                        NameUntranslated = @this.dgvEntities.CurrentRow.Cells[@this.clmnNameUntranslatedInd].Value.ToString(),
+                        InternalName = @this.dgvEntities.CurrentRow.Cells[@this.clmnInternalNameInd].Value.ToString(),
+                        Distance = (double)@this.dgvEntities.CurrentRow.Cells[@this.clmnDistanceInd].Value
                     };
                 }
             }
@@ -122,25 +130,25 @@ namespace EntityTools.Forms
 
         public static EntityDif GetEntity(string entityUntrName)
         {
-            if (selectForm == null)
-                selectForm = new EntitySelectForm();
+            if (@this == null)
+                @this = new EntitySelectForm();
 
-            selectForm.FillEntitiesDgv(entityUntrName);
+            @this.FillEntitiesDgv(entityUntrName);
 
-            if (selectForm.dgvEntities.RowCount > 1)
+            if (@this.dgvEntities.RowCount > 1)
             {
-                DialogResult dialogResult = selectForm.ShowDialog();
+                DialogResult dialogResult = @this.ShowDialog();
                 if (dialogResult == DialogResult.OK)
                 {
-                    if (!selectForm.dgvEntities.CurrentRow.IsNewRow)
+                    if (!@this.dgvEntities.CurrentRow.IsNewRow)
                     {
                         return new EntityDif
                         {
-                            entity = selectForm.dgvEntities.CurrentRow.Tag as Entity,
-                            Name = selectForm.dgvEntities.CurrentRow.Cells[selectForm.clmnName.DisplayIndex].Value.ToString(),
-                            NameUntranslated = selectForm.dgvEntities.CurrentRow.Cells[selectForm.clmnNameUntranslated.DisplayIndex].Value.ToString(),
-                            InternalName = selectForm.dgvEntities.CurrentRow.Cells[selectForm.clmnInternalName.DisplayIndex].Value.ToString(),
-                            Distance = (double)selectForm.dgvEntities.CurrentRow.Cells[selectForm.clmnDistance.DisplayIndex].Value
+                            entity = @this.dgvEntities.CurrentRow.Tag as Entity,
+                            Name = @this.dgvEntities.CurrentRow.Cells[@this.clmnNameInd].Value.ToString(),
+                            NameUntranslated = @this.dgvEntities.CurrentRow.Cells[@this.clmnNameUntranslatedInd].Value.ToString(),
+                            InternalName = @this.dgvEntities.CurrentRow.Cells[@this.clmnInternalNameInd].Value.ToString(),
+                            Distance = (double)@this.dgvEntities.CurrentRow.Cells[@this.clmnDistanceInd].Value
                         };
                     }
                 }
@@ -148,6 +156,15 @@ namespace EntityTools.Forms
                 return new EntityDif();
             }
             return null;
+        }
+
+        public static void ShowFreeTool()
+        {
+            EntitySelectForm localForm = new EntitySelectForm();
+
+            localForm.FillEntitiesDgv();
+
+            localForm.Show(Astral.Forms.Main.ActiveForm);
         }
 
         private void btnSelect_Click(object sender, EventArgs e)
@@ -164,9 +181,25 @@ namespace EntityTools.Forms
 
         private void btnReload_Click(object sender, EventArgs e)
         {
-            string entityUntrName = (dgvEntities.CurrentRow != null) ? dgvEntities.CurrentRow.Cells[selectForm.clmnNameUntranslated.DisplayIndex].Value.ToString() : string.Empty;
+            string entityUntrName = dgvEntities?.CurrentRow.Cells[clmnNameUntranslatedInd].Value?.ToString() ?? string.Empty;
+
+            DataGridViewColumn sortedColumn = dgvEntities.SortedColumn;
+            SortOrder sortOrder = dgvEntities.SortOrder;
 
             FillEntitiesDgv(entityUntrName);
+
+            if (sortedColumn != null)
+            {
+                switch (sortOrder)
+                {
+                    case SortOrder.Ascending:
+                        dgvEntities.Sort(dgvEntities.SortedColumn, System.ComponentModel.ListSortDirection.Ascending);
+                        break;
+                    case SortOrder.Descending:
+                        dgvEntities.Sort(dgvEntities.SortedColumn, System.ComponentModel.ListSortDirection.Descending);
+                        break;
+                }
+            }
         }
     }
 }

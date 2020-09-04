@@ -8,6 +8,7 @@ using System.Xml.Serialization;
 
 namespace EntityTools.Editors
 {
+#if DEVELOPER
     internal class CheckedListBoxCommonEditor<T> : UITypeEditor , IDisposable
     {
         private readonly CheckedListBox cbx = new CheckedListBox();
@@ -122,7 +123,7 @@ namespace EntityTools.Editors
             cbx.Dispose();
         }
     }
-
+#endif
     [Serializable]
     public class CheckedListBoxCommonSelector<T>
     {
@@ -171,4 +172,5 @@ namespace EntityTools.Editors
             return newSelector;
         }
     }
+
 }

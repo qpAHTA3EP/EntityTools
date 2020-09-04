@@ -34,7 +34,7 @@ namespace EntityTools.Forms
         {
 
             if (Conditions.SelectedIndex >= 0
-                && XtraMessageBox.Show("Are you sure to remove selected condition ?", "Remove Condition ?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                && XtraMessageBox.Show(/*Form.ActiveForm, */"Are you sure to remove selected condition ?", "Remove Condition ?", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 Conditions.Items.RemoveAt(Conditions.SelectedIndex);
             }
@@ -47,7 +47,7 @@ namespace EntityTools.Forms
             {
                 conditionCopy = CopyHelper.CreateDeepCopy(cond); // Этот метод быстрее
                 //conditionCopy = CopyHelper.CreateXmlCopy(cond); // Этот метод дольше
-                XtraMessageBox.Show($"Condition '{conditionCopy.ToString()}' copied");
+                XtraMessageBox.Show(/*Form.ActiveForm, */$"Condition '{conditionCopy.ToString()}' copied");
             }
         }
 
@@ -69,9 +69,9 @@ namespace EntityTools.Forms
                 && Conditions.SelectedItem is Condition cond)
             {
                 if (cond.IsValid)
-                    XtraMessageBox.Show(string.Concat(cond, "\nResult: True"));
+                    XtraMessageBox.Show(/*Form.ActiveForm, */string.Concat(cond, "\nResult: True"));
                 else
-                    XtraMessageBox.Show(string.Concat(cond, "\nResult: False"));
+                    XtraMessageBox.Show(/*Form.ActiveForm, */string.Concat(cond, "\nResult: False"));
 
             }
         }

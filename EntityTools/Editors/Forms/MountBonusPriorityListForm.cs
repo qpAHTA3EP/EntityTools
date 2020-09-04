@@ -10,7 +10,7 @@ using System.IO;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 
-namespace EntityTools.Forms
+namespace EntityTools.Editors.Forms
 {
     public partial class MountBonusPriorityListForm : XtraForm //*/Form
     {

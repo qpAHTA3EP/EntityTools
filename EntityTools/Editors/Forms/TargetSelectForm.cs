@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace EntityTools.Forms
+namespace EntityTools.Editors.Forms
 {
     public partial class TargetSelectForm : XtraForm
     {
@@ -38,9 +38,9 @@ namespace EntityTools.Forms
             finally
             {
                 Binds.RemoveAction(Keys.F12);
-                if (parent != null)
+                /*if (parent != null)
                     parent.Focus();
-                else CommonTools.FocusForm(typeof(Astral.Forms.Main));
+                else CommonTools.FocusForm(typeof(Astral.Forms.Main));*/
             }
         }
 
