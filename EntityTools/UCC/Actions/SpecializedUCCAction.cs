@@ -51,7 +51,7 @@ namespace EntityTools.UCC.Actions
 
 #if DEVELOPER
         [Category("Custom Conditions")]
-        [Description("The negation of the result of the ConditionPack")]
+        [Description("Отрицание результата проверки условий (логическое НЕ)")]
 #else
         [Browsable(false)]
 #endif
@@ -59,9 +59,9 @@ namespace EntityTools.UCC.Actions
 
 #if DEVELOPER
         [Category("Custom Conditions")]
-        [Description("Logical rule of the Conditions checks\n" +
-            "Conjunction: All Conditions have to be True (Logical AND)\n" +
-            "Disjunction: At least one of the Conditions have to be True (Logical OR)")]
+        [Description("Логическое правило проверки набора условий. Logical rule of the Conditions checks\n" +
+            "Conjunction: Все условия должны быть истины. All Conditions have to be True (Logical AND)\n" +
+            "Disjunction: Хотя бы одно условие должно быть истино. At least one of the Conditions have to be True (Logical OR)")]
 #else
         [Browsable(false)]
 #endif
