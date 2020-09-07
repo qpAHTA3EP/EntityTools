@@ -76,10 +76,10 @@ namespace EntityTools.Patches.Mapper
             this.menuCRAccept = new DevExpress.XtraBars.BarButtonItem();
             this.menuCRCancel = new DevExpress.XtraBars.BarButtonItem();
             this.statusBar = new DevExpress.XtraBars.Bar();
-            this.statCenterPlayer = new DevExpress.XtraBars.BarCheckItem();
-            this.statMousePos = new DevExpress.XtraBars.BarStaticItem();
+            this.statLockMapOnPlayer = new DevExpress.XtraBars.BarCheckItem();
             this.statZoom = new DevExpress.XtraBars.BarEditItem();
             this.zoomer = new DevExpress.XtraEditors.Repository.RepositoryItemZoomTrackBar();
+            this.statMousePos = new DevExpress.XtraBars.BarStaticItem();
             this.barDockControlTop = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlBottom = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlLeft = new DevExpress.XtraBars.BarDockControl();
@@ -92,7 +92,6 @@ namespace EntityTools.Patches.Mapper
             this.menuBtnStopMapping = new DevExpress.XtraBars.BarButtonItem();
             this.statCenterPlayerText = new DevExpress.XtraBars.BarStaticItem();
             this.bsrcAstralSettings = new System.Windows.Forms.BindingSource(this.components);
-            this.mapBox = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.popMenuOptions)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seWaypointDistance)).BeginInit();
@@ -102,13 +101,12 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.teCRName)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.zoomer)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bsrcAstralSettings)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.mapBox)).BeginInit();
             this.SuspendLayout();
             // 
             // backgroundWorker
             // 
             this.backgroundWorker.WorkerSupportsCancellation = true;
-            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorkUpdateFormCaption);
+            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.work_UpdateFormStatus);
             // 
             // barManager
             // 
@@ -155,8 +153,8 @@ namespace EntityTools.Patches.Mapper
             this.statMousePos,
             this.statZoom,
             this.statCenterPlayerText,
-            this.statCenterPlayer});
-            this.barManager.MaxItemId = 90;
+            this.statLockMapOnPlayer});
+            this.barManager.MaxItemId = 91;
             this.barManager.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.seDeleteRadius,
             this.seWaypointDistance,
@@ -179,6 +177,7 @@ namespace EntityTools.Patches.Mapper
             new DevExpress.XtraBars.LinkPersistInfo(this.toolGroupNodes, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.menuOptions, true)});
             this.toolbarMainMapper.Text = "MapperTools";
+            this.toolbarMainMapper.Visible = false;
             // 
             // toolGroupMapping
             // 
@@ -200,7 +199,7 @@ namespace EntityTools.Patches.Mapper
             this.menuCheckStopMapping.Id = 67;
             this.menuCheckStopMapping.ImageOptions.Image = global::EntityTools.Properties.Resources.miniStop;
             this.menuCheckStopMapping.Name = "menuCheckStopMapping";
-            this.menuCheckStopMapping.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventStopMapping);
+            this.menuCheckStopMapping.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_StopMapping);
             // 
             // menuBidirectional
             // 
@@ -209,7 +208,7 @@ namespace EntityTools.Patches.Mapper
             this.menuBidirectional.Id = 64;
             this.menuBidirectional.ImageOptions.Image = global::EntityTools.Properties.Resources.miniBiPath;
             this.menuBidirectional.Name = "menuBidirectional";
-            this.menuBidirectional.DownChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.eventStartMapping);
+            this.menuBidirectional.DownChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_StartMapping);
             // 
             // menuUnidirectional
             // 
@@ -218,7 +217,7 @@ namespace EntityTools.Patches.Mapper
             this.menuUnidirectional.Id = 44;
             this.menuUnidirectional.ImageOptions.Image = global::EntityTools.Properties.Resources.miniUniPath;
             this.menuUnidirectional.Name = "menuUnidirectional";
-            this.menuUnidirectional.DownChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.eventStartMapping);
+            this.menuUnidirectional.DownChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_StartMapping);
             // 
             // menuLinearPath
             // 
@@ -248,7 +247,7 @@ namespace EntityTools.Patches.Mapper
             this.menuRectangularCR.Id = 48;
             this.menuRectangularCR.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCRRectang;
             this.menuRectangularCR.Name = "menuRectangularCR";
-            this.menuRectangularCR.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventAddRectangularCR);
+            this.menuRectangularCR.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AddRectangularCR);
             // 
             // menuEllipticalCR
             // 
@@ -256,7 +255,7 @@ namespace EntityTools.Patches.Mapper
             this.menuEllipticalCR.Id = 49;
             this.menuEllipticalCR.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCREllipce;
             this.menuEllipticalCR.Name = "menuEllipticalCR";
-            this.menuEllipticalCR.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventAddElipticalCR);
+            this.menuEllipticalCR.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AddElipticalCR);
             // 
             // toolGroupNodes
             // 
@@ -274,7 +273,7 @@ namespace EntityTools.Patches.Mapper
             this.menuImportGame.Id = 51;
             this.menuImportGame.ImageOptions.Image = global::EntityTools.Properties.Resources.miniClone;
             this.menuImportGame.Name = "menuImportGame";
-            this.menuImportGame.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventImportNodesFromGame);
+            this.menuImportGame.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ImportNodesFromGame);
             // 
             // menuImportProfile
             // 
@@ -282,7 +281,7 @@ namespace EntityTools.Patches.Mapper
             this.menuImportProfile.Id = 52;
             this.menuImportProfile.ImageOptions.Image = global::EntityTools.Properties.Resources.miniImport;
             this.menuImportProfile.Name = "menuImportProfile";
-            this.menuImportProfile.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventImportNodesFromFile);
+            this.menuImportProfile.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ImportNodesFromFile);
             // 
             // menuExportMesh
             // 
@@ -290,7 +289,7 @@ namespace EntityTools.Patches.Mapper
             this.menuExportMesh.Id = 55;
             this.menuExportMesh.ImageOptions.Image = global::EntityTools.Properties.Resources.miniExport;
             this.menuExportMesh.Name = "menuExportMesh";
-            this.menuExportMesh.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventExportNodes2Mesh);
+            this.menuExportMesh.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ExportNodes2Mesh);
             // 
             // menuClear
             // 
@@ -298,7 +297,7 @@ namespace EntityTools.Patches.Mapper
             this.menuClear.Id = 63;
             this.menuClear.ImageOptions.Image = global::EntityTools.Properties.Resources.miniDelete;
             this.menuClear.Name = "menuClear";
-            this.menuClear.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventClearNodes);
+            this.menuClear.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ClearNodes);
             // 
             // menuOptions
             // 
@@ -419,12 +418,13 @@ namespace EntityTools.Patches.Mapper
             this.toolbarCustomRegion.BarName = "CustomRegion";
             this.toolbarCustomRegion.DockCol = 0;
             this.toolbarCustomRegion.DockRow = 0;
-            this.toolbarCustomRegion.FloatLocation = new System.Drawing.Point(80, 567);
+            this.toolbarCustomRegion.FloatLocation = new System.Drawing.Point(61, 533);
             this.toolbarCustomRegion.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
             new DevExpress.XtraBars.LinkPersistInfo(this.menuLableCR, true),
             new DevExpress.XtraBars.LinkPersistInfo(DevExpress.XtraBars.BarLinkUserDefines.Width, this.menuCRName, "", false, true, true, 152),
             new DevExpress.XtraBars.LinkPersistInfo(this.menuCRAccept),
             new DevExpress.XtraBars.LinkPersistInfo(this.menuCRCancel)});
+            this.toolbarCustomRegion.Offset = 15;
             this.toolbarCustomRegion.OptionsBar.DisableClose = true;
             this.toolbarCustomRegion.Text = "CustomRegion";
             this.toolbarCustomRegion.Visible = false;
@@ -453,7 +453,7 @@ namespace EntityTools.Patches.Mapper
             this.menuCRAccept.Id = 79;
             this.menuCRAccept.ImageOptions.Image = global::EntityTools.Properties.Resources.miniAdd;
             this.menuCRAccept.Name = "menuCRAccept";
-            this.menuCRAccept.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventMenuCRAcceptClick);
+            this.menuCRAccept.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_MenuCRAcceptClick);
             // 
             // menuCRCancel
             // 
@@ -461,7 +461,7 @@ namespace EntityTools.Patches.Mapper
             this.menuCRCancel.Id = 80;
             this.menuCRCancel.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCancel;
             this.menuCRCancel.Name = "menuCRCancel";
-            this.menuCRCancel.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventMenuCRCancelClick);
+            this.menuCRCancel.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_MenuCRCancelClick);
             // 
             // statusBar
             // 
@@ -471,37 +471,53 @@ namespace EntityTools.Patches.Mapper
             this.statusBar.DockRow = 0;
             this.statusBar.DockStyle = DevExpress.XtraBars.BarDockStyle.Bottom;
             this.statusBar.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
-            new DevExpress.XtraBars.LinkPersistInfo(this.statCenterPlayer),
-            new DevExpress.XtraBars.LinkPersistInfo(this.statMousePos, true),
-            new DevExpress.XtraBars.LinkPersistInfo(DevExpress.XtraBars.BarLinkUserDefines.Width, this.statZoom, "", false, true, true, 196)});
+            new DevExpress.XtraBars.LinkPersistInfo(this.statLockMapOnPlayer),
+            new DevExpress.XtraBars.LinkPersistInfo(this.statZoom, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.statMousePos, true)});
             this.statusBar.OptionsBar.AllowQuickCustomization = false;
             this.statusBar.OptionsBar.DrawDragBorder = false;
             this.statusBar.OptionsBar.UseWholeRow = true;
             this.statusBar.Text = "statusBar";
-            this.statusBar.Visible = false;
             // 
-            // statCenterPlayer
+            // statLockMapOnPlayer
             // 
-            this.statCenterPlayer.Id = 89;
-            this.statCenterPlayer.ImageOptions.Image = global::EntityTools.Properties.Resources.miniTarget;
-            this.statCenterPlayer.Name = "statCenterPlayer";
-            // 
-            // statMousePos
-            // 
-            this.statMousePos.Caption = "mousePos";
-            this.statMousePos.Id = 82;
-            this.statMousePos.Name = "statMousePos";
+            this.statLockMapOnPlayer.BindableChecked = true;
+            this.statLockMapOnPlayer.CheckBoxVisibility = DevExpress.XtraBars.CheckBoxVisibility.AfterText;
+            this.statLockMapOnPlayer.Checked = true;
+            this.statLockMapOnPlayer.Description = "Lock Map on the Player";
+            this.statLockMapOnPlayer.Hint = "Check to hold Player in the center of the Map";
+            this.statLockMapOnPlayer.Id = 89;
+            this.statLockMapOnPlayer.Name = "statLockMapOnPlayer";
+            this.statLockMapOnPlayer.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_MapLockOnOnPlayerChanged);
             // 
             // statZoom
             // 
             this.statZoom.Caption = "statZoom";
+            this.statZoom.Description = "Zoom of the Map";
             this.statZoom.Edit = this.zoomer;
+            this.statZoom.EditValue = 5D;
+            this.statZoom.EditWidth = 200;
+            this.statZoom.Hint = "Zoom of the Map";
             this.statZoom.Id = 83;
             this.statZoom.Name = "statZoom";
+            this.statZoom.EditValueChanged += new System.EventHandler(this.handler_ZoomChanged);
             // 
             // zoomer
             // 
+            this.zoomer.LargeChange = 1;
+            this.zoomer.Maximum = 20;
             this.zoomer.Name = "zoomer";
+            this.zoomer.ShowValueToolTip = true;
+            this.zoomer.ValueChanged += new System.EventHandler(this.handler_ZoomChanged);
+            // 
+            // statMousePos
+            // 
+            this.statMousePos.Alignment = DevExpress.XtraBars.BarItemLinkAlignment.Right;
+            this.statMousePos.Caption = "mousePos";
+            this.statMousePos.Description = "Player position";
+            this.statMousePos.Hint = "Player position";
+            this.statMousePos.Id = 82;
+            this.statMousePos.Name = "statMousePos";
             // 
             // barDockControlTop
             // 
@@ -509,15 +525,15 @@ namespace EntityTools.Patches.Mapper
             this.barDockControlTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.barDockControlTop.Location = new System.Drawing.Point(0, 0);
             this.barDockControlTop.Manager = this.barManager;
-            this.barDockControlTop.Size = new System.Drawing.Size(390, 31);
+            this.barDockControlTop.Size = new System.Drawing.Size(394, 31);
             // 
             // barDockControlBottom
             // 
             this.barDockControlBottom.CausesValidation = false;
             this.barDockControlBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.barDockControlBottom.Location = new System.Drawing.Point(0, 335);
+            this.barDockControlBottom.Location = new System.Drawing.Point(0, 336);
             this.barDockControlBottom.Manager = this.barManager;
-            this.barDockControlBottom.Size = new System.Drawing.Size(390, 27);
+            this.barDockControlBottom.Size = new System.Drawing.Size(394, 26);
             // 
             // barDockControlLeft
             // 
@@ -525,15 +541,15 @@ namespace EntityTools.Patches.Mapper
             this.barDockControlLeft.Dock = System.Windows.Forms.DockStyle.Left;
             this.barDockControlLeft.Location = new System.Drawing.Point(0, 31);
             this.barDockControlLeft.Manager = this.barManager;
-            this.barDockControlLeft.Size = new System.Drawing.Size(0, 304);
+            this.barDockControlLeft.Size = new System.Drawing.Size(0, 305);
             // 
             // barDockControlRight
             // 
             this.barDockControlRight.CausesValidation = false;
             this.barDockControlRight.Dock = System.Windows.Forms.DockStyle.Right;
-            this.barDockControlRight.Location = new System.Drawing.Point(390, 31);
+            this.barDockControlRight.Location = new System.Drawing.Point(394, 31);
             this.barDockControlRight.Manager = this.barManager;
-            this.barDockControlRight.Size = new System.Drawing.Size(0, 304);
+            this.barDockControlRight.Size = new System.Drawing.Size(0, 305);
             // 
             // barMapper
             // 
@@ -600,7 +616,7 @@ namespace EntityTools.Patches.Mapper
             this.menuBtnStopMapping.Id = 68;
             this.menuBtnStopMapping.ImageOptions.Image = global::EntityTools.Properties.Resources.miniStop;
             this.menuBtnStopMapping.Name = "menuBtnStopMapping";
-            this.menuBtnStopMapping.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventStopMapping);
+            this.menuBtnStopMapping.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_StopMapping);
             // 
             // statCenterPlayerText
             // 
@@ -608,22 +624,11 @@ namespace EntityTools.Patches.Mapper
             this.statCenterPlayerText.Id = 88;
             this.statCenterPlayerText.Name = "statCenterPlayerText";
             // 
-            // mapBox
-            // 
-            this.mapBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.mapBox.Location = new System.Drawing.Point(0, 31);
-            this.mapBox.Name = "mapBox";
-            this.mapBox.Size = new System.Drawing.Size(390, 304);
-            this.mapBox.TabIndex = 4;
-            this.mapBox.TabStop = false;
-            this.mapBox.Visible = false;
-            // 
             // MapperFormExt
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(390, 362);
-            this.Controls.Add(this.mapBox);
+            this.ClientSize = new System.Drawing.Size(394, 362);
             this.Controls.Add(this.barDockControlLeft);
             this.Controls.Add(this.barDockControlRight);
             this.Controls.Add(this.barDockControlBottom);
@@ -631,10 +636,11 @@ namespace EntityTools.Patches.Mapper
             this.DoubleBuffered = true;
             this.Name = "MapperFormExt";
             this.ShowIcon = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Mapper(Extended)";
             this.TopMost = true;
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.eventClosingMapperForm);
-            this.Load += new System.EventHandler(this.eventLoadMapperForm);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.handler_ClosingMapperForm);
+            this.Load += new System.EventHandler(this.handler_LoadMapperForm);
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.popMenuOptions)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seWaypointDistance)).EndInit();
@@ -644,7 +650,6 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.teCRName)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.zoomer)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bsrcAstralSettings)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.mapBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -653,9 +658,6 @@ namespace EntityTools.Patches.Mapper
     #endregion
 
         private static MapperFormExt @this;
-
-        private Astral.Forms.UserControls.Mapper mapper = null;
-        private GraphicsNW graphics = null;
 
         private BackgroundWorker backgroundWorker;
         private BarManager barManager;
@@ -694,7 +696,6 @@ namespace EntityTools.Patches.Mapper
         private BarButtonGroup toolGroupNodes;
         private BarButtonItem menuOptions;
         private PopupMenu popMenuOptions;
-        private BindingSource bsrcAstralSettings;
         private Bar toolbarCustomRegion;
         private BarStaticItem menuLableCR;
         private BarEditItem menuCRName;
@@ -706,9 +707,9 @@ namespace EntityTools.Patches.Mapper
         private BarStaticItem statMousePos;
         private BarEditItem statZoom;
         private RepositoryItemZoomTrackBar zoomer;
-        private BarCheckItem statCenterPlayer;
         private BarStaticItem statCenterPlayerText;
-        private PictureBox mapBox;
+        private BarCheckItem statLockMapOnPlayer;
+        private BindingSource bsrcAstralSettings;
     } 
 #endif
 }

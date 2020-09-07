@@ -2,6 +2,7 @@
 using Astral;
 using Astral.Logic.Classes.Map;
 using EntityTools.Reflection;
+using EntityTools.Reflection;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
@@ -11,18 +12,18 @@ using System.Windows.Forms;
 namespace EntityTools.Patches.Mapper
 {
 #if PATCH_ASTRAL
-    public partial class NewDrawings : Form
+    public partial class NewMapperForm : /*UserControl//*/ Form
     {
         /// <summary>
         /// Функтор доступа к графу 
         /// </summary>
-        private static readonly StaticPropertyAccessor<AStar.Graph> CoreCurrentMapMeshes = typeof(Astral.Quester.Core).GetStaticProperty<AStar.Graph>("Meshes");
+        //private static readonly StaticPropertyAccessor<AStar.Graph> CoreCurrentMapMeshes = typeof(Astral.Quester.Core).GetStaticProperty<AStar.Graph>("Meshes");
 
-        public NewDrawings()
+        public NewMapperForm()
         {
             InitializeComponent();
 
-            graphicsNW = new GraphicsNW(Math.Max(600, mapBox.ClientSize.Width), Math.Max(600, mapBox.ClientSize.Height));
+            graphicsNW = new GraphicsNW(Math.Max(100, mapBox.ClientSize.Width), Math.Max(100, mapBox.ClientSize.Height));
         }
 
         private void eventRefreshMapBox(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
@@ -37,7 +38,7 @@ namespace EntityTools.Patches.Mapper
         {
             get
             {
-                return 1d;
+                return 1;
                 //switch (menuZoom.EditValue)
                 //{
                 //    case 0:
@@ -92,21 +93,21 @@ namespace EntityTools.Patches.Mapper
         {
             try
             {
-                GraphicsNW obj = this.graphicsNW;
+                GraphicsNW obj = graphicsNW;
                 lock (obj)
                 {
                     if (menuPlayerCenter.Checked)
                     {
                         graphicsNW.CenterPosition = EntityManager.LocalPlayer.Location;
                     }
-                    this.graphicsNW.ImageWidth = Math.Max(mapBox.Width, 600);
-                    this.graphicsNW.ImageHeight = Math.Max(mapBox.Height, 600);
-                    this.graphicsNW.Zoom = Zoom;
-                    this.graphicsNW.resetImage();
-                    this.graphicsNW.drawMap();
+                    graphicsNW.ImageWidth = Math.Max(mapBox.Width, 100);
+                    graphicsNW.ImageHeight = Math.Max(mapBox.Height, 100);
+                    graphicsNW.Zoom = Zoom;
+                    graphicsNW.resetImage();
+                    graphicsNW.drawMap();
                     int deleteNodeArea = Convert.ToInt32(Astral.API.CurrentSettings.DeleteNodeRadius * Zoom * 2.0);
                     Point imagePos = mapBox.PointToClient(Control.MousePosition);
-                    this.graphicsNW.drawEllipse(imagePos, new Size(deleteNodeArea, deleteNodeArea), Pens.Beige);
+                    graphicsNW.drawEllipse(imagePos, new Size(deleteNodeArea, deleteNodeArea), Pens.Beige);
                     uint containerId = EntityManager.LocalPlayer.ContainerId;
 
                     // Отрисовка персонажей
@@ -153,7 +154,7 @@ namespace EntityTools.Patches.Mapper
                     //Roles.CurrentRole.OnMapDraw(this.graphicsNW);
 
                     // Отрисовка графа путей
-                    DrawMeshes(graphicsNW, CoreCurrentMapMeshes);
+                    DrawMeshes(graphicsNW, AstralAccessors.Quester.Core.Meshes);
 
                     // Отрисовка костров
                     /*foreach (MinimapWaypoint minimapWaypoint in Class1.LocalPlayer.Player.MissionInfo.Waypoints.OrderBy(new Func<MinimapWaypoint, double>(Mapper.<> c.<> 9.method_0)))
@@ -194,7 +195,7 @@ namespace EntityTools.Patches.Mapper
                     // Вычисление угла направления персонажа
                     float angle = EntityManager.LocalPlayer.Yaw * 180f / 3.14159274f;
                     Bitmap image = RotateImage(Properties.Resources.charArrow, angle);
-                    this.graphicsNW.drawImage(EntityManager.LocalPlayer.Location, image, default(Size));
+                    graphicsNW.drawImage(EntityManager.LocalPlayer.Location, image, default(Size));
 
                     // Отрисовка конечной точки пути
                     //this.graphicsNW.drawEllipse(Navigator.GetDestination, new Size(10, 10), Pens.Red);

@@ -21,6 +21,9 @@ using MyNW.Patchables.Enums;
 using EntityTools.Forms;
 using System.Diagnostics;
 using EntityTools.UCC.Conditions;
+using EntityTools.Patches.Mapper;
+using Astral.Controllers;
+using EntityTools.Reflection;
 
 namespace EntityTools.Core
 {
@@ -601,8 +604,9 @@ namespace EntityTools.Core
         }
         private void event_Test_2(object sender, EventArgs e)
         {
+            Action<Vector3, double> RemoveNodesFrom2DPosition = typeof(Astral.Quester.Core).GetStaticAction<Vector3, double>("RemoveNodesFrom2DPostion");
         }
-        private void event_Test_3(object sender, EventArgs e)
+    private void event_Test_3(object sender, EventArgs e)
         {
         }
 
@@ -983,6 +987,16 @@ namespace EntityTools.Core
                     '\t', nameof(entity.Character.AttribsBasic.HealthPercent), '=', entity.Character.AttribsBasic.HealthPercent);
             }
             tbDebugMonitorInfo.Text = info;
+        }
+
+        private void btnMapperTest_Click(object sender, EventArgs e)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (AOECheck.AOE aoe in AstralAccessors.Controllers.AOECheck.GetAOEList())
+            {
+                sb.AppendLine($"{aoe.Location}\t\t{aoe.ID}");
+            }
+            XtraMessageBox.Show(sb.ToString());
         }
     }
 }

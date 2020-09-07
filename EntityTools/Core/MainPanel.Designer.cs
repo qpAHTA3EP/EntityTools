@@ -701,6 +701,7 @@ namespace EntityTools.Core
             this.btnMapperTest.TabIndex = 5;
             this.btnMapperTest.Text = "Test";
             this.btnMapperTest.UseVisualStyleBackColor = true;
+            this.btnMapperTest.Click += new System.EventHandler(this.btnMapperTest_Click);
             // 
             // seWaypointEquivalenceDistance
             // 

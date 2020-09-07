@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.0814.0932</AssemblyVersion>
+    <AssemblyVersion>0.20.0907.1244</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -208,7 +208,14 @@
     <Compile Include="Core\Proxies\QuesterConditionProxy.cs" />
     <Compile Include="Core\Proxies\UCCActionProxy.cs" />
     <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
+    <Compile Include="Patches\Mapper\GraphicsNWExtensions.cs" />
     <Compile Include="Patches\Mapper\GraphicsNW\Patch_GraphicsNW.cs" />
+    <Compile Include="Patches\Mapper\MapperExt.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Patches\Mapper\MapperExt.Designer.cs">
+      <DependentUpon>MapperExt.cs</DependentUpon>
+    </Compile>
     <Compile Include="Patches\Patch_VIP_SealTraderEntity.cs" />
     <Compile Include="Patches\Patch_VIP_ProfessionVendorEntity.cs" />
     <Compile Include="Patches\UCC\Patch_ActionsPlayer_CheckAlly.cs" />
@@ -261,12 +268,6 @@
       <DependentUpon>MapperFormExt.cs</DependentUpon>
     </Compile>
     <Compile Include="Patches\Mapper\MapperGraphCache.cs" />
-    <Compile Include="Patches\Mapper\NewDrawings.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Patches\Mapper\NewDrawings.Designer.cs">
-      <DependentUpon>NewDrawings.cs</DependentUpon>
-    </Compile>
     <Compile Include="Patches\Mapper\NodeDetail.cs" />
     <Compile Include="Patches\Patcher.cs" />
     <Compile Include="Patches\Patch.cs" />
@@ -293,6 +294,7 @@
     <Compile Include="Tools\CollectionTypeConverter.cs" />
     <Compile Include="Servises\EnchantHelper.cs" />
     <Compile Include="Tools\CryptoHelper.cs" />
+    <Compile Include="Tools\ReadWriteLocker.cs" />
     <Compile Include="Tools\StringToPattern.cs" />
     <Compile Include="Tools\EntityDef.cs" />
     <Compile Include="Tools\Enums.cs" />
@@ -354,11 +356,11 @@
     <EmbeddedResource Include="Editors\Forms\ItemFilterEditorForm.resx">
       <DependentUpon>ItemFilterEditorForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Patches\Mapper\MapperExt.resx">
+      <DependentUpon>MapperExt.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Patches\Mapper\MapperFormExt.resx">
       <DependentUpon>MapperFormExt.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Patches\Mapper\NewDrawings.resx">
-      <DependentUpon>NewDrawings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">

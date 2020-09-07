@@ -39,7 +39,11 @@ namespace EntityTools.Patches.Mapper
         private static Vector3 startPoint = null;
         private static Vector3 endPoint = null;
         private static bool isElliptical = false;
-        private static Astral.Forms.UserControls.Mapper mapper;
+#if AstralMapper
+        private static Astral.Forms.UserControls.Mapper mapper; 
+#else
+        private static MapperExt mapper;
+#endif
 
         private static CustomRegion customRegion = null;
 
@@ -85,14 +89,18 @@ namespace EntityTools.Patches.Mapper
         /// Функтор обновления списка CustomRegion'ов в окне Квестер-редактора
         /// </summary>
         private static Func<Object, System.Action> QuesterEditorRefreshRegions = null;
-    #endregion
+        #endregion
 
         /// <summary>
         /// Начала процедуры добавления CustomRegion'a
         /// </summary>
         /// <param name="m"></param>
         /// <param name="elliptical"></param>
-        public static void BeginAdd(Astral.Forms.UserControls.Mapper m, bool elliptical = false)
+#if AstralMapper
+        public static void BeginAdd(Astral.Forms.UserControls.Mapper m, bool elliptical = false) 
+#else
+        public static void BeginAdd(MapperExt m, bool elliptical = false)
+#endif
         {
             startPoint = null;
             endPoint = null;
@@ -438,7 +446,7 @@ namespace EntityTools.Patches.Mapper
         internal static void RefreshQuesterEditorForm()
         {
             if (QuesterEditor.Value is QuesterEditorForm editor
-                && editor?.IsDisposed == false)
+                && !editor.IsDisposed)
             {
                 if (QuesterEditorRefreshRegions == null)
                 {

@@ -17,7 +17,11 @@ namespace EntityTools.Patches.Mapper
     public class MapperGraphCache
     {
         public MapperGraphCache() { }
-        public MapperGraphCache(Astral.Forms.UserControls.Mapper m)
+#if AstralMapper
+        public MapperGraphCache(Astral.Forms.UserControls.Mapper m) 
+#else
+        public MapperGraphCache(MapperExt m) 
+#endif
         {
             StartCache(m);
             RegenCache();
@@ -479,7 +483,11 @@ namespace EntityTools.Patches.Mapper
         /// Старт кэширования 
         /// </summary>
         /// <param name="m"></param>
-        public void StartCache(Astral.Forms.UserControls.Mapper m)
+#if AstralMapper
+        public void StartCache(Astral.Forms.UserControls.Mapper m) 
+#else
+        public void StartCache(MapperExt m)
+#endif
         {
             mapper = m;
             cacheTimeout.ChangeTime(0);
@@ -529,8 +537,12 @@ namespace EntityTools.Patches.Mapper
         }
         private static readonly StaticPropertyAccessor<AStar.Graph> coreGraph = typeof(Astral.Quester.Core).GetStaticProperty<AStar.Graph>("Meshes");
 
-    #region Mapper
-        private Astral.Forms.UserControls.Mapper mapper = null;
+        #region Mapper
+#if AstralMapper
+        private Astral.Forms.UserControls.Mapper mapper = null; 
+#else
+        MapperExt mapper = null;
+#endif
 
         /// <summary>
         /// Обновление кэша при удалении вершин

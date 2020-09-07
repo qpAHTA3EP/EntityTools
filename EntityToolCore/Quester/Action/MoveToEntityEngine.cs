@@ -23,7 +23,7 @@ using EntityTools.Reflection;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using EntityTools.Tools.Reflection;
+using EntityTools.Reflection;
 
 namespace EntityCore.Quester.Action
 {

@@ -1,6 +1,8 @@
 ﻿#define LOG
 
 #if PATCH_ASTRAL
+using Astral.Logic.Classes.Map;
+using MyNW.Classes;
 using MappingType = EntityTools.Enums.MappingType; 
 #endif
 
@@ -27,11 +29,17 @@ namespace EntityTools.Patches.Mapper
 #if PATCH_ASTRAL
     public partial class MapperFormExt : XtraForm //*/Form
     {
-    #region Reflection helpers
+#if AstralMapper
+        private Astral.Forms.UserControls.Mapper mapper = null; 
+#else
+        MapperExt mapper = null;
+#endif
+
+        #region Reflection helpers
         /// <summary>
         /// Функтор доступа к графу 
         /// </summary>
-        private static readonly StaticPropertyAccessor<AStar.Graph> CoreCurrentMapMeshes = typeof(Astral.Quester.Core).GetStaticProperty<AStar.Graph>("Meshes");
+        private static readonly StaticPropertyAccessor<AStar.Graph> CoreCurrentMapMeshes = typeof(Astral.Quester.Core).GetStaticProperty<Graph>("Meshes");
 
         /// <summary>
         /// Функтор доступа к словарю Astral.Quester.Core.MapsMeshes
@@ -44,16 +52,19 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         private static readonly Func<string, List<string>> CoreAvailableMeshesFromFile = typeof(Astral.Quester.Core).GetStaticFunction<string, List<string>>("AvailableMeshesFromFile");
 
-        //Astral.Quester.Core.LoadAllMeshes();
+        /// <summary>
+        /// Доступ к Astral.Quester.Core.LoadAllMeshes();
+        /// </summary>
         private static readonly Func<int> CoreLoadAllMeshes = typeof(Astral.Quester.Core).GetStaticFunction<int>("LoadAllMeshes");
-
-        // PictureBox Astral.Forms.UserControls.Mapper.MapPicture;
-        //private static readonly StaticFielsAccessor<PictureBox> mapperPicture = typeof(Astral.Forms.UserControls.Mapper).GetField<PictureBox>("MapPicture", BindingFlags.Instance | BindingFlags.NonPublic);
 
         /// <summary>
         /// Функтор доступа к Astral.Logic.NW.GoldenPath.GetCurrentMapGraph(...);
         /// </summary>
         //private static readonly Func<AStar.Graph, bool> GetCurrentMapGraph = typeof(Astral.Logic.NW.GoldenPath).GetStaticFunction<AStar.Graph, bool>("GetCurrentMapGraph");
+
+#if AstralMapper
+        // PictureBox Astral.Forms.UserControls.Mapper.MapPicture;
+        //private static readonly StaticFielsAccessor<PictureBox> mapperPicture = typeof(Astral.Forms.UserControls.Mapper).GetField<PictureBox>("MapPicture", BindingFlags.Instance | BindingFlags.NonPublic);
 
         /// <summary>
         /// Функтор запускающего фоновый поток отрисовки изображения Mapper'a
@@ -63,19 +74,16 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Функтор запускающего фоновый поток отрисовки изображения Mapper'a
         /// </summary>
-        private static readonly Func<object, System.Action> MapperStopDrawing = typeof(Astral.Forms.UserControls.Mapper).GetAction("\u0003", BindingFlags.Instance | BindingFlags.Public);
-    #endregion
+        private static readonly Func<object, System.Action> MapperStopDrawing = typeof(Astral.Forms.UserControls.Mapper).GetAction("\u0003", BindingFlags.Instance | BindingFlags.Public); 
+#endif
+        #endregion
 
-        /// <summary>
-        /// Кэш вершин графа путей
-        /// </summary>
-        private MapperGraphCache graphCache;
-
-    #region Инициализация формы
+        #region Инициализация формы
         private MapperFormExt()
         {
             InitializeComponent();
 
+#if AstralMapper
             mapper = new Astral.Forms.UserControls.Mapper
             {
                 Anchor = (AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right),
@@ -86,11 +94,27 @@ namespace EntityTools.Patches.Mapper
                 OnClick = null,
                 Size = new Size(372, 275),
                 TabIndex = 0
+            }; 
+#else
+            mapper = new MapperExt
+            {
+                Anchor = (AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right),
+                Dock = DockStyle.Fill,
+                CustomDraw = null,
+                Location = new Point(6, 26),
+                Name = "mapper",
+                OnClick = null,
+                Size = new Size(372, 275),
+                TabIndex = 0,
+                ZoomPos = Convert.ToInt32(statZoom.EditValue),
+                MapLockOnPlayer = statLockMapOnPlayer.Checked
             };
+            mapper.OnMapLockOnPlayerChanged += handler_SetMapLockOnPlayer;
+            //mapper.OnZoomChanged += event_SetZoom;
+#endif
             Controls.Add(mapper);
 
-            //graphics = new GraphicsNW(Math.Max(mapBox.ClientSize.Width*2, 600), Math.Max(mapBox.ClientSize.Height*2, 600));
-
+            MouseWheel += handler_MouseWheel;
             BindingControls();
         }
 
@@ -103,8 +127,8 @@ namespace EntityTools.Patches.Mapper
                                                 EntityTools.PluginSettings.Mapper,
                                                 nameof(EntityTools.PluginSettings.Mapper.WaypointDistance),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
-            menuWaypointDistance.Edit.EditValueChanged += eventWaypointDistanceChanged;
-            menuWaypointDistance.Edit.Leave += eventWaypointDistanceChanged;
+            menuWaypointDistance.Edit.EditValueChanged += handler_WaypointDistanceChanged;
+            menuWaypointDistance.Edit.Leave += handler_WaypointDistanceChanged;
 
             menuMaxZDifference.DataBindings.Add(nameof(menuMaxZDifference.EditValue),
                                                 EntityTools.PluginSettings.Mapper,
@@ -132,8 +156,8 @@ namespace EntityTools.Patches.Mapper
                                               nameof(Astral.API.CurrentSettings.DeleteNodeRadius),
                                               false, DataSourceUpdateMode.OnPropertyChanged);
             ((ISupportInitialize)bsrcAstralSettings).EndInit();
-            menuDeleteRadius.Edit.EditValueChanged += eventDeleteRadiusChanged;
-            menuDeleteRadius.Edit.Leave += eventDeleteRadiusChanged;
+            menuDeleteRadius.Edit.EditValueChanged += handler_DeleteRadiusChanged;
+            menuDeleteRadius.Edit.Leave += handler_DeleteRadiusChanged;
 
             menuForceLinkLast.DataBindings.Add(nameof(menuForceLinkLast.Checked),
                                                 EntityTools.PluginSettings.Mapper,
@@ -173,7 +197,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void eventLoadMapperForm(object sender, EventArgs e)
+        private void handler_LoadMapperForm(object sender, EventArgs e)
         {
             Binds.RemoveShiftAction(Keys.M);
             //mapper.DoubleClick += eventMapperDoubleClick;
@@ -193,13 +217,15 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void eventClosingMapperForm(object sender, FormClosingEventArgs e)
+        private void handler_ClosingMapperForm(object sender, FormClosingEventArgs e)
         {
             MappingCanceler?.Cancel();
             backgroundWorker?.CancelAsync();
+#if AstralMapper
             if (mapper != null)
             {
-                MapperStopDrawing?.Invoke(mapper);
+                MapperStopDrawing?.Invoke(mapper); 
+
                 //mapper.DoubleClick -= eventMapperDoubleClick;
                 //mapper.CustomDraw -= eventMapperDrawCache;
 
@@ -208,6 +234,7 @@ namespace EntityTools.Patches.Mapper
                 //    && ReflectionHelper.UnsubscribeEvent(mapPictureObj, "MouseDoubleClick", this, "eventMapperDoubleClick", true))
                 //    SubscribedMapperMouseDoubleClick = false;
             }
+#endif
             CustomRegionHelper.Reset();
 
             lastNodeDetail = null;
@@ -215,28 +242,44 @@ namespace EntityTools.Patches.Mapper
         }
 
         /// <summary>
-        /// Фоновый процесс обновления заголовка окна
+        /// Фоновый процесс обновления заголовка окна строки состояния
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void backgroundWorkUpdateFormCaption(object sender, DoWorkEventArgs e)
+        private void work_UpdateFormStatus(object sender, DoWorkEventArgs e)
         {
+            string formCaption = string.Empty,
+                posStr = string.Empty;
+            var UpdateFormStatus = new System.Action(() =>
+            { Text = formCaption; statMousePos.Caption = posStr; });
+
             while (!IsDisposed
                    && !backgroundWorker.CancellationPending)
             {
-                string text = EntityManager.LocalPlayer.CurrentZoneMapInfo.DisplayName + " [" + EntityManager.LocalPlayer.CurrentZoneMapInfo.MapName + "]";
-                if (Text != text)
+                formCaption = string.Concat(EntityManager.LocalPlayer.CurrentZoneMapInfo.DisplayName, " [", EntityManager.LocalPlayer.CurrentZoneMapInfo.MapName, ']');
+
+                Vector3 pos = EntityManager.LocalPlayer.Location;
+                posStr = !EntityManager.LocalPlayer.IsLoading ? $"<{pos.X:N0}|{pos.Y:N0}|{pos.Z:N0}>" : "Loading";
+
+                if (InvokeRequired)
+                    Invoke(UpdateFormStatus);
+                else
                 {
-                    if (InvokeRequired)
-                        Invoke(new System.Action(() => Text = text));
-                    else Text = text;
+                    Text = formCaption;
+                    statMousePos.Caption = posStr;
                 }
-                Thread.Sleep(1000);
+
+                Thread.Sleep(500);
             }
         }
-    #endregion
+        #endregion
 
-    #region Mapping
+        #region Mapping
+        /// <summary>
+        /// Кэш вершин графа путей
+        /// </summary>
+        private MapperGraphCache graphCache;
+
         /// <summary>
         /// Task, прокладывающий путь
         /// </summary>
@@ -252,9 +295,9 @@ namespace EntityTools.Patches.Mapper
         {
             get
             {
-                if (MapAndRegion != EntityManager.LocalPlayer.MapAndRegion)
+                if (mapAndRegion_whereMapping != EntityManager.LocalPlayer.MapAndRegion)
                 {
-                    eventStopMapping();
+                    handler_StopMapping();
                     return MappingType.Stoped;
                 }
 
@@ -268,17 +311,13 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Флаг линейного пут
         /// </summary>
-        private bool LinearPath
-        {
-            get => menuLinearPath.Checked;
-        }
+        private bool LinearPath => menuLinearPath.Checked;
+        
         /// <summary>
         /// Флаг принудительного связывания с предыдущей точкой пути
         /// </summary>
-        private bool ForceLinkLastWaypoint
-        {
-            get => menuForceLinkLast.Checked;
-        }
+        private bool ForceLinkLastWaypoint => menuForceLinkLast.Checked;
+
         /// <summary>
         /// последний добавленный узел
         /// </summary>
@@ -286,14 +325,14 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Название карты и региона, на которой активировано прокладывание пути
         /// </summary>
-        private string MapAndRegion = null;
+        private string mapAndRegion_whereMapping = null;
 
         /// <summary>
         /// Запуск потока прокладывания маршрута
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void eventStartMapping(object sender, ItemClickEventArgs e)
+        private void handler_StartMapping(object sender, ItemClickEventArgs e)
         {
             if (e.Item is BarCheckItem checkedItem
                 && checkedItem.Checked)
@@ -301,11 +340,11 @@ namespace EntityTools.Patches.Mapper
                 if (MappingTask == null
                     || MappingTask.IsCanceled || MappingTask.IsCompleted || MappingTask.IsFaulted)
                 {
-                    MapAndRegion = EntityManager.LocalPlayer.MapAndRegion;
+                    mapAndRegion_whereMapping = EntityManager.LocalPlayer.MapAndRegion;
                     MappingCanceler = new CancellationTokenSource();
-                    MappingTask = Task.Factory.StartNew(() => MappingWork(MappingCanceler.Token), MappingCanceler.Token);
+                    MappingTask = Task.Factory.StartNew(() => work_Mapping(MappingCanceler.Token), MappingCanceler.Token);
                     if (MappingTask != null)
-                        MappingTask.ContinueWith(new System.Action<Task>((Task t) => eventStopMapping()));
+                        MappingTask.ContinueWith(new System.Action<Task>((Task t) => handler_StopMapping()));
                 }
             }
         }
@@ -315,7 +354,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void eventStopMapping(object sender = null, ItemClickEventArgs e = null)
+        private void handler_StopMapping(object sender = null, ItemClickEventArgs e = null)
         {
             MappingCanceler?.Cancel();
             lastNodeDetail = null;
@@ -330,7 +369,7 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Прокладывание пути
         /// </summary>
-        private void MappingWork(CancellationToken token)
+        private void work_Mapping(CancellationToken token)
         {
             //NodeDetail nodeDetail = null;
             try
@@ -414,13 +453,15 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void eventImportNodesFromGame(object sender, ItemClickEventArgs e)
+        private void handler_ImportNodesFromGame(object sender, ItemClickEventArgs e)
         {
             if (((Graph)CoreCurrentMapMeshes)?.Nodes.Count == 0
                 || XtraMessageBox.Show(this, "Are you sure to import game nodes ? All actual nodes must be delete !", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                eventStopMapping();
-                MapperStopDrawing?.Invoke(mapper);
+                handler_StopMapping();
+#if AstralMapper
+                MapperStopDrawing?.Invoke(mapper); 
+#endif
                 //string locker = "eventImportNodesFromGame";
                 Graph graph = (Graph)CoreCurrentMapMeshes;
                 lock (graph)
@@ -429,7 +470,9 @@ namespace EntityTools.Patches.Mapper
                     Astral.Logic.NW.GoldenPath.GetCurrentMapGraph(graph);
                     //graphCache?.RegenCache(null);
                 }
-                MapperStartDrawing?.Invoke(mapper);
+#if AstralMapper
+                MapperStartDrawing?.Invoke(mapper); 
+#endif
             }
             //GoldenPath.GetCurrentMapGraph(coreMeshes);
             //GetCurrentMapGraph?.Invoke(coreMeshes);
@@ -440,7 +483,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void eventImportNodesFromFile(object sender, ItemClickEventArgs e)
+        private void handler_ImportNodesFromFile(object sender, ItemClickEventArgs e)
         {
             // Код перенесен из Astral'a
             string mapName = EntityManager.LocalPlayer.MapState.MapName;
@@ -457,7 +500,7 @@ namespace EntityTools.Patches.Mapper
             };
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                eventStopMapping();
+                handler_StopMapping();
                 Dictionary<string, Graph> profileMeshes = new Dictionary<string, Graph>();
                 List<Class88.Class89> list = new List<Class88.Class89>();
                 List<Type> baseTypeList = new List<Type>
@@ -500,15 +543,19 @@ namespace EntityTools.Patches.Mapper
                     {
                         if (((AStar.Graph)CoreCurrentMapMeshes).Nodes.Count == 0 || Class81.smethod_0("Are you sure, that will delete current map nodes ?", null))
                         {
-                            eventStopMapping();
-                            MapperStopDrawing?.Invoke(mapper);
+                            handler_StopMapping();
+#if AstralMapper
+                            MapperStopDrawing?.Invoke(mapper); 
+#endif
                             //string locker = "eventImportNodesFromFile";
                             var coreMeshes = CoreMapsMeshes.Value;
                             lock (coreMeshes)
                             {
                                 coreMeshes[mapName] = profileMeshes[mapName];
                             }
-                            MapperStartDrawing?.Invoke(mapper);
+#if AstralMapper
+                            MapperStartDrawing?.Invoke(mapper); 
+#endif
                         }
                     }
                     else
@@ -517,17 +564,21 @@ namespace EntityTools.Patches.Mapper
                     }
                 }
                 if (dialogResult == DialogResult.No
-                    && ((((AStar.Graph)CoreCurrentMapMeshes).Nodes.Count == 0 && CoreMapsMeshes.Value.Count <= 1)
+                    && ((((Graph)CoreCurrentMapMeshes).Nodes.Count == 0 && CoreMapsMeshes.Value.Count <= 1)
                     || Class81.smethod_0("Are you sure, that will delete all maps nodes ?", null)))
                 {
-                    eventStopMapping();
-                    MapperStopDrawing?.Invoke(mapper);
+                    handler_StopMapping();
+#if AstralMapper
+                    MapperStopDrawing?.Invoke(mapper); 
+#endif
                     object locker = new object();//"eventImportNodesFromFile";
                     lock (locker)
                     {
                         CoreMapsMeshes.Value = profileMeshes;
                     }
-                    MapperStartDrawing?.Invoke(mapper);
+#if AstralMapper
+                    MapperStartDrawing?.Invoke(mapper); 
+#endif
                 }
             }
         }
@@ -537,7 +588,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void eventExportNodes2Mesh(object sender, ItemClickEventArgs e)
+        private void handler_ExportNodes2Mesh(object sender, ItemClickEventArgs e)
         {
             // Код перенесен из Astral'a
             SaveFileDialog saveFileDialog = new SaveFileDialog
@@ -549,7 +600,7 @@ namespace EntityTools.Patches.Mapper
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 //Astral.Quester.Core.LoadAllMeshes();
-                eventStopMapping();
+                handler_StopMapping();
                 CoreLoadAllMeshes();
                 List<Class88.Class89> list = new List<Class88.Class89>();
                 foreach (KeyValuePair<string, Graph> keyValuePair in CoreMapsMeshes.Value)
@@ -566,18 +617,22 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void eventClearNodes(object sender, ItemClickEventArgs e)
+        private void handler_ClearNodes(object sender, ItemClickEventArgs e)
         {
             if (XtraMessageBox.Show(this, "Are you sure to delete all map nodes ?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
-                eventStopMapping();
-                MapperStopDrawing?.Invoke(mapper);
+                handler_StopMapping();
+#if AstralMapper
+                MapperStopDrawing?.Invoke(mapper); 
+#endif
                 Graph graph = CoreCurrentMapMeshes;
-                lock (graph)
+                lock (graph.Locker)
                 {
                     graph.Clear();
                 }
-                MapperStartDrawing?.Invoke(mapper);
+#if AstralMapper
+                MapperStartDrawing?.Invoke(mapper); 
+#endif
             }
         }
     #endregion
@@ -588,7 +643,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void eventAddRectangularCR(object sender, ItemClickEventArgs e)
+        private void handler_AddRectangularCR(object sender, ItemClickEventArgs e)
         {
             toolbarCustomRegion.FloatLocation = new Point(Location.X + 40, Location.Y + 60);
             toolbarCustomRegion.Visible = true;
@@ -600,7 +655,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void eventAddElipticalCR(object sender, ItemClickEventArgs e)
+        private void handler_AddElipticalCR(object sender, ItemClickEventArgs e)
         {
             toolbarCustomRegion.FloatLocation = new Point(Location.X + 40, Location.Y + 60);
             toolbarCustomRegion.Visible = true;
@@ -612,7 +667,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void eventMenuCRAcceptClick(object sender, ItemClickEventArgs e)
+        private void handler_MenuCRAcceptClick(object sender, ItemClickEventArgs e)
         {
             string crName = menuCRName.EditValue.ToString()?.Trim();
             if (string.IsNullOrEmpty(crName))
@@ -634,21 +689,49 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void eventMenuCRCancelClick(object sender, ItemClickEventArgs e)
+        private void handler_MenuCRCancelClick(object sender, ItemClickEventArgs e)
         {
             CustomRegionHelper.Reset();
             toolbarCustomRegion.Visible = false;
         }
     #endregion
 
-        private void eventDeleteRadiusChanged(object sender, EventArgs e)
+        private void handler_DeleteRadiusChanged(object sender, EventArgs e)
         {
             Astral.API.CurrentSettings.DeleteNodeRadius = Convert.ToInt32(menuDeleteRadius.EditValue);
         }
-        private void eventWaypointDistanceChanged(object sender, EventArgs e)
+        private void handler_WaypointDistanceChanged(object sender, EventArgs e)
         {
             EntityTools.PluginSettings.Mapper.WaypointDistance = Convert.ToInt32(menuWaypointDistance.EditValue);
         }
-    } 
+
+        private void handler_ZoomChanged(object sender, EventArgs e)
+        {
+            mapper.ZoomPos = Convert.ToInt32(statZoom.EditValue);
+        }
+        private void handler_MouseWheel(object sender, MouseEventArgs e)
+        {
+            int delta = 0;
+            if(e.Delta > 0)
+                delta = 1;
+            else if(e.Delta < 0)
+                delta = -1;
+            //mapper.ZoomPos += delta;
+            statZoom.EditValue = mapper.ZoomPos + delta;
+        }
+        private void handler_SetZoom(object sender, int zoomPos)
+        {
+            statZoom.EditValue = zoomPos;
+        }
+
+        private void handler_MapLockOnOnPlayerChanged(object sender, ItemClickEventArgs e)
+        {
+            mapper.MapLockOnPlayer = statLockMapOnPlayer.Checked;
+        }
+        private void handler_SetMapLockOnPlayer(object sender, DevExpress.XtraEditors.Filtering.CheckedChangedEventArgs e)
+        {
+            statLockMapOnPlayer.Checked = e.IsChecked;
+        }
+    }
 #endif
 }

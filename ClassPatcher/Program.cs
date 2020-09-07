@@ -150,6 +150,10 @@ namespace ClassPatcher
                         tDef.Name == "ItemIdEditor" ||
                         tDef.Name == "GetMailItems" ||
                         tDef.Name == "Roles" ||
+                        tDef.Name == "Entrypoint" ||
+                        tDef.Name == "Engine" ||
+                        tDef.Name == "Profile" ||
+                        tDef.Name == "Settings" ||
                         tDef.Name == "NPCVendorInfos" ||
                         tDef.Name == "BuyOptionsEditor" ||
                         tDef.Name == "DialogKeyEditor" ||
@@ -163,10 +167,16 @@ namespace ClassPatcher
                         tDef.Name == "PowerAllIdEditor" ||
                         tDef.Name == "AuraEditor" ||
                         tDef.Name == "NPCInfos" ||
+                        tDef.FullName == "Astral.Addons.Role" ||
                         tDef.FullName == "Astral.Controllers.Plugins" ||
-                        tDef.FullName == "Astral.Logic.UCC.Controllers.Movements" ||
                         tDef.FullName == "Astral.Controllers.Relogger" ||
                         tDef.FullName == "Astral.Controllers.CustomClasses" ||
+                        tDef.FullName == "Astral.Controllers.AOECheck" ||
+                        tDef.Name == "AOE" || // "Astral.Controllers.AOECheck.AOE"
+                        tDef.FullName == "Astral.Controllers.AOECheck.AOE" ||
+                        tDef.FullName == "Astral.Logic.Classes.Map.Functions.Picture" ||
+                        tDef.FullName == "Astral.Logic.UCC.Controllers.Movements" ||
+                        tDef.Name == "DodgeLosTestResult" || //Astral.Logic.NW.Movements.DodgeLosTestResult
                         tDef.FullName == "Astral.Quester.FSM.States.Combat")
 
                     {
