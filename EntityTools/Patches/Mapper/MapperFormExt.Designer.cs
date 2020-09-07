@@ -472,8 +472,8 @@ namespace EntityTools.Patches.Mapper
             this.statusBar.DockStyle = DevExpress.XtraBars.BarDockStyle.Bottom;
             this.statusBar.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
             new DevExpress.XtraBars.LinkPersistInfo(this.statLockMapOnPlayer),
-            new DevExpress.XtraBars.LinkPersistInfo(this.statZoom, true),
-            new DevExpress.XtraBars.LinkPersistInfo(this.statMousePos, true)});
+            new DevExpress.XtraBars.LinkPersistInfo(this.statZoom),
+            new DevExpress.XtraBars.LinkPersistInfo(this.statMousePos)});
             this.statusBar.OptionsBar.AllowQuickCustomization = false;
             this.statusBar.OptionsBar.DrawDragBorder = false;
             this.statusBar.OptionsBar.UseWholeRow = true;
@@ -525,7 +525,7 @@ namespace EntityTools.Patches.Mapper
             this.barDockControlTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.barDockControlTop.Location = new System.Drawing.Point(0, 0);
             this.barDockControlTop.Manager = this.barManager;
-            this.barDockControlTop.Size = new System.Drawing.Size(394, 31);
+            this.barDockControlTop.Size = new System.Drawing.Size(394, 28);
             // 
             // barDockControlBottom
             // 
@@ -539,17 +539,17 @@ namespace EntityTools.Patches.Mapper
             // 
             this.barDockControlLeft.CausesValidation = false;
             this.barDockControlLeft.Dock = System.Windows.Forms.DockStyle.Left;
-            this.barDockControlLeft.Location = new System.Drawing.Point(0, 31);
+            this.barDockControlLeft.Location = new System.Drawing.Point(0, 28);
             this.barDockControlLeft.Manager = this.barManager;
-            this.barDockControlLeft.Size = new System.Drawing.Size(0, 305);
+            this.barDockControlLeft.Size = new System.Drawing.Size(0, 308);
             // 
             // barDockControlRight
             // 
             this.barDockControlRight.CausesValidation = false;
             this.barDockControlRight.Dock = System.Windows.Forms.DockStyle.Right;
-            this.barDockControlRight.Location = new System.Drawing.Point(394, 31);
+            this.barDockControlRight.Location = new System.Drawing.Point(394, 28);
             this.barDockControlRight.Manager = this.barManager;
-            this.barDockControlRight.Size = new System.Drawing.Size(0, 305);
+            this.barDockControlRight.Size = new System.Drawing.Size(0, 308);
             // 
             // barMapper
             // 
@@ -634,6 +634,8 @@ namespace EntityTools.Patches.Mapper
             this.Controls.Add(this.barDockControlBottom);
             this.Controls.Add(this.barDockControlTop);
             this.DoubleBuffered = true;
+            this.LookAndFeel.SkinName = "Office 2013 Dark Gray";
+            this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.Name = "MapperFormExt";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
