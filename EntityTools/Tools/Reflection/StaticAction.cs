@@ -63,6 +63,9 @@ namespace EntityTools.Reflection
             if (argumentTypes == null)
                 argumentTypes = new Type[] { };
 
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
+
             if (string.IsNullOrEmpty(methodName))
             {
                 // Поиск метода по сигнатуре (без имени)

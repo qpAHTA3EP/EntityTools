@@ -38,6 +38,9 @@ namespace EntityTools.Reflection
                 return null;
             Type type = obj.GetType();
 
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
+
             if (BaseType)
             {
                 type = type.BaseType;
@@ -53,7 +56,9 @@ namespace EntityTools.Reflection
         /// <returns></returns>
         public static MethodInfo[] GetListOfMethods(Type type, BindingFlags flags = BindingFlags.Default)
         {
-            flags = DefaultFlags | flags;
+            if (flags == BindingFlags.Default)
+                flags = DefaultFlags;
+
             // get all public static methods of MyClass type
             MethodInfo[] methodInfos = type.GetMethods(flags);
 
@@ -75,7 +80,9 @@ namespace EntityTools.Reflection
 
             FieldInfo[] fields = null;
 
-            flags = DefaultFlags | flags;
+            if (flags == BindingFlags.Default)
+                flags = DefaultFlags;
+
             if (BaseType)
             {
                 type = type.BaseType;
@@ -95,6 +102,7 @@ namespace EntityTools.Reflection
         {
             if (flags == BindingFlags.Default)
                 flags = DefaultFlags;
+
             FieldInfo[] fields = type.GetFields(flags);
             if (fields != null)
             {
@@ -419,8 +427,10 @@ namespace EntityTools.Reflection
         public static bool GetStaticFieldValue(Type type, string fieldName, out object result, BindingFlags flags = BindingFlags.Default, bool BaseType = false)
         {
             result = null;
+
             if (flags == BindingFlags.Default)
                 flags = DefaultFlags;
+
             if (BaseType)
             {
                 type = type.BaseType;
@@ -488,9 +498,7 @@ namespace EntityTools.Reflection
                 flags = DefaultFlags;
 
             if (BaseType)
-            {
                 type = type.BaseType;
-            }
 
             MethodInfo methodInfo = type.GetMethod(MethodName, flags | BindingFlags.Static);
             if (methodInfo != null)
@@ -508,9 +516,7 @@ namespace EntityTools.Reflection
                 flags = DefaultFlags;
 
             if (BaseType)
-            {
                 type = type.BaseType;
-            }
             
             Type[] types;
             if (arguments != null && arguments.Length > 0)
@@ -548,6 +554,12 @@ namespace EntityTools.Reflection
             if (source != null && !string.IsNullOrEmpty(eventName)
                 && target != null && !string.IsNullOrEmpty(methodName))
             {
+                if (sourceFlags == BindingFlags.Default)
+                    sourceFlags = DefaultFlags;
+
+                if (targetFlags == BindingFlags.Default)
+                    targetFlags = ReflectionHelper.DefaultFlags;
+
                 EventInfo eventInfo = (sourceFlags == BindingFlags.Default) ? source.GetType().GetEvent(eventName)
                                                     : source.GetType().GetEvent(eventName, sourceFlags);
 
@@ -570,6 +582,12 @@ namespace EntityTools.Reflection
             if (source != null && !string.IsNullOrEmpty(eventName)
                 && target != null && !string.IsNullOrEmpty(methodName))
             {
+                if (sourceFlags == BindingFlags.Default)
+                    sourceFlags = DefaultFlags;
+
+                if (targetFlags == BindingFlags.Default)
+                    targetFlags = DefaultFlags;
+
                 EventInfo eventInfo = (sourceFlags == BindingFlags.Default) ? source.GetType().GetEvent(eventName)
                                                     : source.GetType().GetEvent(eventName, sourceFlags);
 
@@ -604,6 +622,12 @@ namespace EntityTools.Reflection
             if (source != null && !string.IsNullOrEmpty(eventName)
                 && target != null && !string.IsNullOrEmpty(methodName))
             {
+                if (sourceFlags == BindingFlags.Default)
+                    sourceFlags = DefaultFlags;
+
+                if (targetFlags == BindingFlags.Default)
+                    targetFlags = DefaultFlags;
+
                 EventInfo eventInfo = (sourceFlags == BindingFlags.Default) ? source.GetType().GetEvent(eventName)
                                                     : source.GetType().GetEvent(eventName, sourceFlags);
 
@@ -626,6 +650,12 @@ namespace EntityTools.Reflection
             if (source != null && !string.IsNullOrEmpty(eventName)
                 && target != null && !string.IsNullOrEmpty(methodName))
             {
+                if (sourceFlags == BindingFlags.Default)
+                    sourceFlags = DefaultFlags;
+
+                if (targetFlags == BindingFlags.Default)
+                    targetFlags = DefaultFlags;
+
                 EventInfo eventInfo = (sourceFlags == BindingFlags.Default) ? source.GetType().GetEvent(eventName)
                                                     : source.GetType().GetEvent(eventName, sourceFlags);
 
@@ -643,47 +673,5 @@ namespace EntityTools.Reflection
             }
             return false;
         }
-
-        //public static void DumpAssembly(string path, string methodName)
-        //{
-        //    System.IO.File.AppendAllText(methodName+".dump", "Dump started... " + Environment.NewLine);
-        //    var assembly = AssemblyDefinition.ReadAssembly(path);
-        //    foreach (var typeDef in assembly.MainModule.Types)
-        //    {
-        //        foreach (var method in typeDef.Methods)
-        //        {
-        //            if (String.IsNullOrEmpty(methodName) || method.Name == methodName)
-        //            {
-        //                System.IO.File.AppendAllText(methodName + ".dump", "Method: " + method.ToString());
-        //                System.IO.File.AppendAllText(methodName + ".dump", Environment.NewLine);
-        //                foreach (var instruction in method.Body.Instructions)
-        //                {
-        //                    System.IO.File.AppendAllText(methodName + ".dump", instruction.ToString() + Environment.NewLine);
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-        //public static bool DumpClassMethod(Type type, string methodName)
-        //{
-        //    if (type == null || string.IsNullOrEmpty(methodName))
-        //        return false;
-
-        //    TypeDefinition typeDef = new TypeDefinition(type.Namespace, type.Name, Mono.Cecil.TypeAttributes.Class | Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.NotPublic);
-        //    foreach (var method in typeDef.Methods)
-        //    {
-        //        if (string.IsNullOrEmpty(methodName) || method.Name == methodName)
-        //        {
-        //            System.IO.File.AppendAllText(methodName + ".dump", "Method: " + method.FullName);
-        //            System.IO.File.AppendAllText(methodName + ".dump", Environment.NewLine);
-
-        //            foreach (var instruction in method.Body.Instructions)
-        //                System.IO.File.AppendAllText(methodName + ".dump", instruction.ToString() + Environment.NewLine);
-
-        //            break;
-        //        }
-        //    }
-        //    return true;
-        //}
     }
 }

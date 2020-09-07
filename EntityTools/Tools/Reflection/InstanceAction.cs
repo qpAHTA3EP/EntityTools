@@ -25,6 +25,9 @@ namespace EntityTools.Reflection
             if (Equals(type, null))
                 return null;
 
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
+
             Type[] argumentTypes = new Type[] { };
 
             MethodInfo method = null;
@@ -75,6 +78,9 @@ namespace EntityTools.Reflection
             if (Equals(type, null))
                 return null;
 
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
+
             Type[] argumentTypes = new Type[] { typeof(ArgumentT1) };
 
             MethodInfo method = null;
@@ -123,6 +129,9 @@ namespace EntityTools.Reflection
         {
             if (Equals(type, null))
                 return null;
+
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
 
             Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT2) };
 
@@ -222,6 +231,9 @@ namespace EntityTools.Reflection
             if (Equals(type, null))
                 return null;
 
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
+
             Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4) };
 
             MethodInfo method = null;
@@ -270,6 +282,9 @@ namespace EntityTools.Reflection
         {
             if (Equals(type, null))
                 return null;
+
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
 
             Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4), typeof(ArgumentT5) };
 

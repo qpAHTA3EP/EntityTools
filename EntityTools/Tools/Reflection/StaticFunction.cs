@@ -105,6 +105,9 @@ namespace EntityTools.Reflection
             if (containerType is null)
                 return null;
 
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
+
             if (argumentTypes == null)
                 argumentTypes = new Type[] { };
 

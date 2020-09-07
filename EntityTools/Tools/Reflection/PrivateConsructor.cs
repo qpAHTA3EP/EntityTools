@@ -16,6 +16,9 @@ namespace EntityTools.Reflection
         /// <returns></returns>
         public static ReturnT CreateInstance(BindingFlags flags = BindingFlags.Default)
         {
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
+
             ConstructorInfo ctor = typeof(ReturnT).GetConstructor(flags | BindingFlags.NonPublic, null, new Type[0], null);
 
             if (ctor != null)
@@ -35,6 +38,9 @@ namespace EntityTools.Reflection
         /// <returns></returns>
         public static ReturnT CreateInstance<ArgumentT>(ArgumentT arg1, BindingFlags flags = BindingFlags.Default)
         {
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
+
             if (arg1 != null)
             {
                 ConstructorInfo ctor = typeof(ReturnT).GetConstructor(flags | BindingFlags.NonPublic, null, new Type[] { arg1.GetType() }, null);
@@ -54,6 +60,9 @@ namespace EntityTools.Reflection
         /// <returns></returns>
         public static ReturnT CreateInstance<ArgumentT1, ArgumentT2>(ArgumentT1 arg1, ArgumentT2 arg2, BindingFlags flags = BindingFlags.Default)
         {
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
+
             if (arg1 != null && arg2 != null)
             {
                 ConstructorInfo ctor = typeof(ReturnT).GetConstructor(flags | BindingFlags.NonPublic, null, new Type[] { arg1.GetType(), arg2.GetType() }, null);
