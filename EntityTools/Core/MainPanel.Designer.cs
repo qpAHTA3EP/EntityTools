@@ -37,9 +37,9 @@ namespace EntityTools.Core
             this.tbclMain = new DevExpress.XtraTab.XtraTabControl();
             this.tabUtilities = new DevExpress.XtraTab.XtraTabPage();
             this.cbEnchantHelperActivator = new System.Windows.Forms.CheckBox();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
-            this.btnTest = new System.Windows.Forms.Button();
+            this.btnTest1 = new System.Windows.Forms.Button();
+            this.bntTest2 = new System.Windows.Forms.Button();
+            this.btnTest3 = new System.Windows.Forms.Button();
             this.btnCheckCore = new System.Windows.Forms.Button();
             this.btnUiViewer = new System.Windows.Forms.Button();
             this.btnAuraViewer = new System.Windows.Forms.Button();
@@ -153,9 +153,9 @@ namespace EntityTools.Core
             // tabUtilities
             // 
             this.tabUtilities.Controls.Add(this.cbEnchantHelperActivator);
-            this.tabUtilities.Controls.Add(this.button2);
-            this.tabUtilities.Controls.Add(this.button1);
-            this.tabUtilities.Controls.Add(this.btnTest);
+            this.tabUtilities.Controls.Add(this.btnTest1);
+            this.tabUtilities.Controls.Add(this.bntTest2);
+            this.tabUtilities.Controls.Add(this.btnTest3);
             this.tabUtilities.Controls.Add(this.btnCheckCore);
             this.tabUtilities.Controls.Add(this.btnUiViewer);
             this.tabUtilities.Controls.Add(this.btnAuraViewer);
@@ -179,41 +179,41 @@ namespace EntityTools.Core
             this.cbEnchantHelperActivator.UseVisualStyleBackColor = true;
             this.cbEnchantHelperActivator.CheckedChanged += new System.EventHandler(this.event_EnchantHelperActivation);
             // 
-            // button2
+            // btnTest1
             // 
-            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button2.Location = new System.Drawing.Point(301, 160);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(54, 23);
-            this.button2.TabIndex = 2;
-            this.button2.Text = "Test 1";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.event_Test_1);
+            this.btnTest1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnTest1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnTest1.Location = new System.Drawing.Point(301, 160);
+            this.btnTest1.Name = "btnTest1";
+            this.btnTest1.Size = new System.Drawing.Size(54, 23);
+            this.btnTest1.TabIndex = 2;
+            this.btnTest1.Text = "Test 1";
+            this.btnTest1.UseVisualStyleBackColor = true;
+            this.btnTest1.Click += new System.EventHandler(this.event_Test_1);
             // 
-            // button1
+            // bntTest2
             // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button1.Location = new System.Drawing.Point(301, 189);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(54, 23);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "Test 2";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.event_Test_2);
+            this.bntTest2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.bntTest2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bntTest2.Location = new System.Drawing.Point(301, 189);
+            this.bntTest2.Name = "bntTest2";
+            this.bntTest2.Size = new System.Drawing.Size(54, 23);
+            this.bntTest2.TabIndex = 2;
+            this.bntTest2.Text = "Test 2";
+            this.bntTest2.UseVisualStyleBackColor = true;
+            this.bntTest2.Click += new System.EventHandler(this.event_Test_2);
             // 
-            // btnTest
+            // btnTest3
             // 
-            this.btnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnTest.Location = new System.Drawing.Point(301, 218);
-            this.btnTest.Name = "btnTest";
-            this.btnTest.Size = new System.Drawing.Size(54, 23);
-            this.btnTest.TabIndex = 2;
-            this.btnTest.Text = "Test 3";
-            this.btnTest.UseVisualStyleBackColor = true;
-            this.btnTest.Click += new System.EventHandler(this.event_Test_3);
+            this.btnTest3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnTest3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnTest3.Location = new System.Drawing.Point(301, 218);
+            this.btnTest3.Name = "btnTest3";
+            this.btnTest3.Size = new System.Drawing.Size(54, 23);
+            this.btnTest3.TabIndex = 2;
+            this.btnTest3.Text = "Test 3";
+            this.btnTest3.UseVisualStyleBackColor = true;
+            this.btnTest3.Click += new System.EventHandler(this.event_Test_3);
             // 
             // btnCheckCore
             // 
@@ -976,7 +976,7 @@ namespace EntityTools.Core
         private System.Windows.Forms.Label lblSlidingAuras;
         private System.Windows.Forms.Button btnUiViewer;
         private System.Windows.Forms.CheckBox cbEnchantHelperActivator;
-        private System.Windows.Forms.Button btnTest;
+        private System.Windows.Forms.Button btnTest3;
         private System.Windows.Forms.Button btnEntities;
         private DevExpress.XtraTab.XtraTabPage tabRelogger;
         private System.Windows.Forms.Label lblMachinId;
@@ -1019,7 +1019,7 @@ namespace EntityTools.Core
         private DevExpress.XtraTab.XtraTabPage tabDebug;
         private System.Windows.Forms.TextBox tbDebugMonitorInfo;
         private System.Windows.Forms.CheckBox ckbDebugMonitor;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnTest1;
+        private System.Windows.Forms.Button bntTest2;
     }
 }

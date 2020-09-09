@@ -336,7 +336,7 @@ namespace EntityTools.Patches.Mapper
             {
                 try
                 {
-                    if (MapPicture.Visible)
+                    if (MapPicture.Visible && MapPicture.Width > 0 && MapPicture.Height > 0)
                     {
                         using (WriteLock())
                         {

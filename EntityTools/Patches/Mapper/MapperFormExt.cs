@@ -23,6 +23,11 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Reflection;
 using AstralMapperOriginals;
+//using ICSharpCode.SharpZipLib.Zip;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO.Compression;
+using System.Text;
 
 namespace EntityTools.Patches.Mapper
 {
@@ -36,6 +41,7 @@ namespace EntityTools.Patches.Mapper
 #endif
 
         #region Reflection helpers
+#if false
         /// <summary>
         /// Функтор доступа к графу 
         /// </summary>
@@ -44,7 +50,7 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Функтор доступа к словарю Astral.Quester.Core.MapsMeshes
         /// </summary>
-        private static readonly StaticPropertyAccessor<Dictionary<string, Graph>> CoreMapsMeshes = typeof(Astral.Quester.Core).GetStaticProperty<Dictionary<string, Graph>>("MapsMeshes");
+        private static readonly StaticPropertyAccessor<Dictionary<string, Graph>> CoreMapsMeshes = typeof(Astral.Quester.Core).GetStaticProperty<Dictionary<string, Graph>>("MapsMeshes"); 
 
         /// <summary>
         /// Функтор доступа к списку карт в файле профиля
@@ -61,6 +67,7 @@ namespace EntityTools.Patches.Mapper
         /// Функтор доступа к Astral.Logic.NW.GoldenPath.GetCurrentMapGraph(...);
         /// </summary>
         //private static readonly Func<AStar.Graph, bool> GetCurrentMapGraph = typeof(Astral.Logic.NW.GoldenPath).GetStaticFunction<AStar.Graph, bool>("GetCurrentMapGraph");
+#endif
 
 #if AstralMapper
         // PictureBox Astral.Forms.UserControls.Mapper.MapPicture;
@@ -259,7 +266,7 @@ namespace EntityTools.Patches.Mapper
                 formCaption = string.Concat(EntityManager.LocalPlayer.CurrentZoneMapInfo.DisplayName, " [", EntityManager.LocalPlayer.CurrentZoneMapInfo.MapName, ']');
 
                 Vector3 pos = EntityManager.LocalPlayer.Location;
-                posStr = !EntityManager.LocalPlayer.IsLoading ? $"<{pos.X:N0}|{pos.Y:N0}|{pos.Z:N0}>" : "Loading";
+                posStr = !EntityManager.LocalPlayer.IsLoading ? $"{pos.X:N1} | {pos.Y:N1} | {pos.Z:N1}" : "Loading";
 
                 if (InvokeRequired)
                     Invoke(UpdateFormStatus);
@@ -445,25 +452,97 @@ namespace EntityTools.Patches.Mapper
                 ETLogger.WriteLine(ex.ToString());
             }
         }
-    #endregion
+        #endregion
 
-    #region Mesh_Manipulation
+        #region Meshes_Manipulation
         /// <summary>
-        /// Импорт узлов из Игры
+        /// Сохранение в файл текущего Quester-профиля
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void handler_ImportNodesFromGame(object sender, ItemClickEventArgs e)
+        private void handler_SaveCurrentMapMeshes2QuesterProfile(object sender, ItemClickEventArgs e)
         {
-            if (((Graph)CoreCurrentMapMeshes)?.Nodes.Count == 0
+            // Сохранение профиля реализовано
+            // Astral.Quester.Core.Save(false)
+
+            string mapName = EntityManager.LocalPlayer.MapState.MapName;
+            string meshName = mapName + ".bin";
+            string fileName = Astral.Controllers.Settings.Get.LastQuesterProfile;
+            if (Astral.Quester.API.CurrentProfile.UseExternalMeshFile)
+            {
+                // Профиль использует "внешние" меши
+            }
+            else
+            {
+                // Сохранение графа путей (карты) в файл текущего профиля
+                if (File.Exists(fileName))
+                {
+                    try
+                    {
+                        using (ZipArchive profile = ZipFile.Open(fileName, ZipArchiveMode.Update))
+                        {
+                            ZipArchiveEntry zipMeshEntry = null;
+
+                            // Проверяем наличие меша карты в zip-файле
+                            foreach (ZipArchiveEntry entry in profile.Entries)
+                            {
+                                if (entry.Name.Equals(meshName, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    zipMeshEntry = entry;
+                                    break;
+                                }
+                            }
+
+                            if (zipMeshEntry is null)
+                                // Меш карты не обнаружен. Создаем
+                                zipMeshEntry = profile.CreateEntry(meshName);
+                            else
+                            {
+                                // Меш карты найден. Удаляем старый и создаем новый
+                                zipMeshEntry.Delete();
+                                zipMeshEntry = profile.CreateEntry(meshName);
+                            }
+
+                            using (MemoryStream memoryStream = new MemoryStream())
+                            {
+                                BinaryFormatter binaryFormatter = new BinaryFormatter();
+                                binaryFormatter.Serialize(memoryStream, AstralAccessors.Quester.Core.Meshes.Value);
+
+                                using (var zipMeshStream = zipMeshEntry.Open())
+                                {
+                                    byte[] meshBytes = memoryStream.ToArray();
+
+                                    zipMeshStream.Write(meshBytes, 0, meshBytes.Length);
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception exc)
+                    {
+                        Logger.WriteLine(exc.ToString());
+                        XtraMessageBox.Show(exc.ToString());
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Импорт мешей карты (графа путей) из Игры
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void handler_ImportCurrentMapMeshesFromGame(object sender, ItemClickEventArgs e)
+        {
+            //if (((Graph)CoreCurrentMapMeshes)?.Nodes.Count == 0
+            if (((Graph)AstralAccessors.Quester.Core.Meshes)?.Nodes.Count == 0
                 || XtraMessageBox.Show(this, "Are you sure to import game nodes ? All actual nodes must be delete !", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 handler_StopMapping();
 #if AstralMapper
                 MapperStopDrawing?.Invoke(mapper); 
 #endif
-                //string locker = "eventImportNodesFromGame";
-                Graph graph = (Graph)CoreCurrentMapMeshes;
+                //Graph graph = (Graph)CoreCurrentMapMeshes;
+                Graph graph = AstralAccessors.Quester.Core.Meshes;
                 lock (graph)
                 {
                     graph.Clear();
@@ -479,28 +558,110 @@ namespace EntityTools.Patches.Mapper
         }
 
         /// <summary>
-        /// Импорт узлов из файла
+        /// Импорт мешей одной или всех карт из файла
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void handler_ImportNodesFromFile(object sender, ItemClickEventArgs e)
+        private void handler_ImportMapMeshesFromFile(object sender, ItemClickEventArgs e)
         {
-            // Код перенесен из Astral'a
-            string mapName = EntityManager.LocalPlayer.MapState.MapName;
-            if (string.IsNullOrEmpty(mapName))
+            string currentMapName = EntityManager.LocalPlayer.MapState.MapName;
+            if (string.IsNullOrEmpty(currentMapName))
             {
                 XtraMessageBox.Show("Impossible to get current map name !");
                 return;
             }
+            string currentMapMeshesName = currentMapName + ".bin";
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
                 InitialDirectory = Directories.ProfilesPath,
                 DefaultExt = "amp.zip",
                 Filter = "Astral mission profil (*.amp.zip)|*.amp.zip|(*.mesh.zip)|*.mesh.zip"
             };
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            if (openFileDialog.ShowDialog() == DialogResult.OK && File.Exists(openFileDialog.FileName))
             {
                 handler_StopMapping();
+                try
+                {
+                    using (ZipArchive profile = ZipFile.Open(openFileDialog.FileName, ZipArchiveMode.Read))
+                    {
+                        ZipArchiveEntry currentMapEntry = profile.GetEntry(currentMapMeshesName);
+                        if(currentMapEntry is null)
+                        {
+                            XtraMessageBox.Show("This profile doesn't contain current map !");
+                            return;
+                        }
+                        var mapsMeshes = AstralAccessors.Quester.Core.MapsMeshes.Value;
+
+                        DialogResult dialogResult = XtraMessageBox.Show("Import current map only ?\n\rElse import all.", "Map import", MessageBoxButtons.YesNoCancel);
+                        if (dialogResult == DialogResult.Yes)
+                        {
+                            // Экспорт одной "текуще" карты
+                            using (Stream stream = currentMapEntry.Open())
+                            {       
+                                BinaryFormatter binaryFormatter = new BinaryFormatter();
+                                Graph currentMapMeshes = binaryFormatter.Deserialize(stream) as Graph;
+                                if(currentMapMeshes != null)
+                                {
+                                    lock (mapsMeshes)
+                                    {
+                                        if (mapsMeshes.ContainsKey(currentMapName))
+                                            mapsMeshes[currentMapName] = currentMapMeshes;
+                                        else mapsMeshes.Add(currentMapName, currentMapMeshes);
+                                    }
+                                    Logger.WriteLine($"Import '{currentMapMeshesName}' from {openFileDialog.FileName}");
+                                    return;
+                                }
+                                else
+                                {
+                                    string msg = $"Failed to import '{currentMapMeshesName}' from {openFileDialog.FileName}";
+                                    Logger.WriteLine(msg);
+                                    XtraMessageBox.Show(msg);
+                                    return;
+                                }
+                            }
+
+                        }
+                        else if (dialogResult == DialogResult.No)
+                        {
+                            // Экспорт всех карт, содержащихся в заданном профиле
+                            BinaryFormatter binaryFormatter = new BinaryFormatter();
+                            StringBuilder sb = new StringBuilder();
+                            sb.Append("Import maps meshes from  '").Append(openFileDialog.FileName).AppendLine("':");
+                            foreach (ZipArchiveEntry entry in profile.Entries)
+                            {
+                                if (entry.Name.EndsWith(".bin", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    string entryMapName = entry.Name.Substring(0, entry.Name.Length - 4);
+                                    Graph entryMapMeshes = null;
+                                    using (Stream stream = entry.Open())
+                                    {
+                                        entryMapMeshes = binaryFormatter.Deserialize(stream) as Graph;
+                                    }
+                                    if (entryMapMeshes != null)
+                                    {
+                                        lock (mapsMeshes)
+                                        {
+                                            if (mapsMeshes.ContainsKey(entryMapName))
+                                                mapsMeshes[entryMapName] = entryMapMeshes;
+                                            else mapsMeshes.Add(entryMapName, entryMapMeshes); 
+                                        }
+                                        sb.Append("\t'").Append(currentMapMeshesName).AppendLine("' - succeeded");
+                                    }
+                                    else sb.Append("\t'").Append(currentMapMeshesName).AppendLine("' - failed");
+                                }
+                            } 
+                            Logger.WriteLine(sb.ToString());
+                        }
+
+                    }
+                }
+                catch (Exception exc)
+                {
+                    Logger.WriteLine(exc.ToString());
+                    XtraMessageBox.Show(exc.ToString());
+                }
+#if false
+                // Код перенесен из Astral'a
                 Dictionary<string, Graph> profileMeshes = new Dictionary<string, Graph>();
                 List<Class88.Class89> list = new List<Class88.Class89>();
                 List<Type> baseTypeList = new List<Type>
@@ -519,13 +680,14 @@ namespace EntityTools.Patches.Mapper
                 {
                     list.Clear();
                     profileMeshes = new Dictionary<string, Graph>();
-                    if (CoreAvailableMeshesFromFile != null)
-                        foreach (string str in CoreAvailableMeshesFromFile(openFileDialog.FileName))
-                        //foreach (string str in Astral.Quester.Core.AvailableMeshesFromFile(openFileDialog.FileName))
-                        {
-                            Class88.Class89 item = new Class88.Class89(new Graph(), Class88.Class89.Enum2.const_1, str + ".bin", null);
-                            list.Add(item);
-                        }
+                    //if (CoreAvailableMeshesFromFile != null)
+                    //    foreach (string str in CoreAvailableMeshesFromFile(openFileDialog.FileName))
+                    //    foreach (string str in Astral.Quester.Core.AvailableMeshesFromFile(openFileDialog.FileName))
+                    foreach (string str in AstralAccessors.Quester.Core.AvailableMeshesFromFile(openFileDialog.FileName))
+                    {
+                        Class88.Class89 item = new Class88.Class89(new Graph(), Class88.Class89.Enum2.const_1, str + ".bin", null);
+                        list.Add(item);
+                    }
                     Class88.smethod_4(openFileDialog.FileName, list);
                     foreach (Class88.Class89 class2 in list)
                     {
@@ -541,17 +703,19 @@ namespace EntityTools.Patches.Mapper
                 {
                     if (profileMeshes.ContainsKey(mapName))
                     {
-                        if (((AStar.Graph)CoreCurrentMapMeshes).Nodes.Count == 0 || Class81.smethod_0("Are you sure, that will delete current map nodes ?", null))
+                        //if (((Graph)CoreCurrentMapMeshes).Nodes.Count == 0 
+                        if (((Graph)AstralAccessors.Quester.Core.Meshes).Nodes.Count == 0
+                            || Class81.smethod_0("Are you sure, that will delete current map nodes ?", null))
                         {
                             handler_StopMapping();
 #if AstralMapper
                             MapperStopDrawing?.Invoke(mapper); 
 #endif
-                            //string locker = "eventImportNodesFromFile";
-                            var coreMeshes = CoreMapsMeshes.Value;
-                            lock (coreMeshes)
+                            //var coreMeshes = CoreMapsMeshes.Value;
+                            var mapsMeshes = AstralAccessors.Quester.Core.MapsMeshes.Value;
+                            lock (mapsMeshes)
                             {
-                                coreMeshes[mapName] = profileMeshes[mapName];
+                                mapsMeshes[mapName] = profileMeshes[mapName];
                             }
 #if AstralMapper
                             MapperStartDrawing?.Invoke(mapper); 
@@ -564,22 +728,24 @@ namespace EntityTools.Patches.Mapper
                     }
                 }
                 if (dialogResult == DialogResult.No
-                    && ((((Graph)CoreCurrentMapMeshes).Nodes.Count == 0 && CoreMapsMeshes.Value.Count <= 1)
+                    //&& ((((Graph)CoreCurrentMapMeshes).Nodes.Count == 0 && CoreMapsMeshes.Value.Count <= 1)
+                    && ((((Graph)AstralAccessors.Quester.Core.Meshes).Nodes.Count == 0 && AstralAccessors.Quester.Core.MapsMeshes.Value.Count <= 1)
                     || Class81.smethod_0("Are you sure, that will delete all maps nodes ?", null)))
                 {
                     handler_StopMapping();
 #if AstralMapper
                     MapperStopDrawing?.Invoke(mapper); 
 #endif
-                    object locker = new object();//"eventImportNodesFromFile";
-                    lock (locker)
+                    lock (AstralAccessors.Quester.Core.MapsMeshes)
                     {
-                        CoreMapsMeshes.Value = profileMeshes;
+                        //CoreMapsMeshes.Value = profileMeshes;
+                        AstralAccessors.Quester.Core.MapsMeshes.Value = profileMeshes;
                     }
 #if AstralMapper
                     MapperStartDrawing?.Invoke(mapper); 
 #endif
                 }
+#endif
             }
         }
 
@@ -588,8 +754,9 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void handler_ExportNodes2Mesh(object sender, ItemClickEventArgs e)
+        private void handler_ExportCurrentMapMeshes2File(object sender, ItemClickEventArgs e)
         {
+#if false
             // Код перенесен из Astral'a
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
@@ -601,23 +768,28 @@ namespace EntityTools.Patches.Mapper
             {
                 //Astral.Quester.Core.LoadAllMeshes();
                 handler_StopMapping();
-                CoreLoadAllMeshes();
+                //CoreLoadAllMeshes();
+                AstralAccessors.Quester.Core.LoadAllMeshes();
                 List<Class88.Class89> list = new List<Class88.Class89>();
-                foreach (KeyValuePair<string, Graph> keyValuePair in CoreMapsMeshes.Value)
+                //foreach (KeyValuePair<string, Graph> keyValuePair in CoreMapsMeshes.Value)
+                foreach (var keyValuePair in AstralAccessors.Quester.Core.MapsMeshes.Value)
                 {
                     Class88.Class89 item = new Class88.Class89(keyValuePair.Value, Class88.Class89.Enum2.const_1, keyValuePair.Key + ".bin", null);
                     list.Add(item);
                 }
-                Class88.SaveMeshes2Files(saveFileDialog.FileName, list, false);
+                Class88.SaveMeshes2Files(saveFileDialog.FileName, list, false); 
             }
+#else
+            throw new NotImplementedException();
+#endif
         }
 
         /// <summary>
-        /// Очистка графа мешей
+        /// Очистка мешей карты (графа)
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void handler_ClearNodes(object sender, ItemClickEventArgs e)
+        private void handler_ClearCurrentMapMeshes(object sender, ItemClickEventArgs e)
         {
             if (XtraMessageBox.Show(this, "Are you sure to delete all map nodes ?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
@@ -625,7 +797,8 @@ namespace EntityTools.Patches.Mapper
 #if AstralMapper
                 MapperStopDrawing?.Invoke(mapper); 
 #endif
-                Graph graph = CoreCurrentMapMeshes;
+                //Graph graph = CoreCurrentMapMeshes;
+                Graph graph = AstralAccessors.Quester.Core.Meshes;
                 lock (graph.Locker)
                 {
                     graph.Clear();
@@ -637,7 +810,7 @@ namespace EntityTools.Patches.Mapper
         }
     #endregion
 
-    #region CustomRegion_Manipulation
+        #region CustomRegion_Manipulation
         /// <summary>
         /// Запуск процедуры добавления прямоугольного региона
         /// </summary>
@@ -694,7 +867,7 @@ namespace EntityTools.Patches.Mapper
             CustomRegionHelper.Reset();
             toolbarCustomRegion.Visible = false;
         }
-    #endregion
+        #endregion
 
         private void handler_DeleteRadiusChanged(object sender, EventArgs e)
         {
@@ -731,6 +904,17 @@ namespace EntityTools.Patches.Mapper
         private void handler_SetMapLockOnPlayer(object sender, DevExpress.XtraEditors.Filtering.CheckedChangedEventArgs e)
         {
             statLockMapOnPlayer.Checked = e.IsChecked;
+        }
+
+        private void handler_ShowStatusBar(object sender, EventArgs e)
+        {
+            statusBar.Visible = true;
+            btnShowStatBar.Visible = false;
+        }
+
+        private void handler_VisibleChanged(object sender, EventArgs e)
+        {
+            btnShowStatBar.Visible = !statusBar.Visible && !toolbarMainMapper.Visible;
         }
     }
 #endif

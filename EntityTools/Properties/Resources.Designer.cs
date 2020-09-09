@@ -273,6 +273,16 @@ namespace EntityTools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap miniSave {
+            get {
+                object obj = ResourceManager.GetObject("miniSave", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap miniStop {
             get {
                 object obj = ResourceManager.GetObject("miniStop", resourceCulture);
@@ -316,6 +326,26 @@ namespace EntityTools.Properties {
         internal static System.Drawing.Bitmap miniZdiff {
             get {
                 object obj = ResourceManager.GetObject("miniZdiff", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap save_16x16 {
+            get {
+                object obj = ResourceManager.GetObject("save_16x16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap save_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("save_32x32", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

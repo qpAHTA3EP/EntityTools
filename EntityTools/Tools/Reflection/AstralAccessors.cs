@@ -78,9 +78,33 @@ namespace EntityTools.Reflection
             /// </summary>     
             public static class Core
             {
+                /// <summary>
+                /// Функтор доступа к графу путей (карте) текущего профиля
+                /// </summary>
                 public static readonly StaticPropertyAccessor<AStar.Graph> Meshes = typeof(Astral.Quester.Core).GetStaticProperty<AStar.Graph>("Meshes");
 
-                // Astral.Quester.Core.RemoveNodesFrom2DPostion(worldPos, Astral.Controllers.Settings.Get.DeleteNodeRadius);
+                /// <summary>
+                /// Функтор доступа к коллекции графов путей (карт) текущего профиля
+                /// Astral.Quester.Core.MapsMeshes
+                /// </summary>
+                public static readonly StaticPropertyAccessor<Dictionary<string, AStar.Graph>> MapsMeshes = typeof(Astral.Quester.Core).GetStaticProperty<Dictionary<string, AStar.Graph>>("MapsMeshes");
+
+                /// <summary>
+                /// Функтор доступа к списку названий карт в файле текущего профиля
+                /// Astral.Quester.Core.AvailableMeshesFromFile(openFileDialog.FileName)
+                /// </summary>
+                public static readonly Func<string, List<string>> AvailableMeshesFromFile = typeof(Astral.Quester.Core).GetStaticFunction<string, List<string>>("AvailableMeshesFromFile");
+
+                /// <summary>
+                /// Доступ к методу 
+                /// Astral.Quester.Core.LoadAllMeshes();
+                /// </summary>
+                public static readonly Func<int> LoadAllMeshes = typeof(Astral.Quester.Core).GetStaticFunction<int>("LoadAllMeshes");
+
+                /// <summary>
+                /// Доступ к методу удаления вершин крафаг путей в области, заданной центром окружности и её радиусом
+                /// Astral.Quester.Core.RemoveNodesFrom2DPostion(worldPos, Astral.Controllers.Settings.Get.DeleteNodeRadius);
+                /// </summary>                
                 public static readonly Action<Vector3, double> RemoveNodesFrom2DPosition = typeof(Astral.Quester.Core).GetStaticAction<Vector3, double>("RemoveNodesFrom2DPostion");
             }
 
