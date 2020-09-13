@@ -580,7 +580,7 @@ namespace EntityTools.Patches.Mapper
             if (lastAddedNode != null)
             {
                 //g.drawFillEllipse(new Vector3((float)lastNodeDetail.Node.X, (float)lastNodeDetail.Node.Y, (float)lastNodeDetail.Node.Z), new Size(9, 9), Brushes.Cyan);
-                CustomRegionHelper.DrawAnchor(g, new Vector3((float)lastAddedNode.X, (float)lastAddedNode.Y, (float)lastAddedNode.Z), Brushes.Orange);
+                CustomRegionHelper.DrawAnchor(g, new Vector3((float)lastAddedNode.X, (float)lastAddedNode.Y, (float)lastAddedNode.Z), CustomRegionHelper.DefaultAnchorSize, Brushes.Orange);
             }
         }
         private bool SubscribedMapperMouseDoubleClick = false;
