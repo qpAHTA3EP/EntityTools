@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
@@ -166,6 +167,93 @@ namespace EntityTools.Settings
         }
         //[NonSerialized]
         private bool linearPath = true;
-    } 
+
+        /// <summary>
+        /// Настройки формы <seealso cref="MapperFormExt"/>
+        /// </summary>
+        public MapperFormSettings MapperForm { get; set; } = new MapperFormSettings();
+    }
+
+    /// <summary>
+    /// Настройки формы <seealso cref="MapperFormExt"/>
+    /// </summary>
+    [Serializable]
+    public class MapperFormSettings : PluginSettingsBase
+    {
+        /// <summary>
+        /// Координаты Mapper
+        /// </summary>
+        [Bindable(true)]
+        public Point Location
+        {
+            get => location;
+            set
+            {
+                if (location != value)
+                {
+                    location = value;
+                    base.NotifyPropertyChanged(nameof(Location));
+                }
+            }
+        }
+        public Point location = new Point();
+
+        /// <summary>
+        /// Видимость главной панели инструментов
+        /// </summary>
+        [Bindable(true)]
+        public bool MainToolsBarVisible
+        {
+            get => _mainToolsBarVisible;
+            set
+            {
+                if (_mainToolsBarVisible != value)
+                {
+                    _mainToolsBarVisible = value;
+                    base.NotifyPropertyChanged(nameof(MainToolsBarVisible));
+                }
+            }
+        }
+        //[NonSerialized]
+        private bool _mainToolsBarVisible = true;
+
+        /// <summary>
+        /// Видимость панелии редактирования графа (мешей)
+        /// </summary>
+        [Bindable(true)]
+        public bool EditMeshesBarVisible
+        {
+            get => editMeshesBarVisible;
+            set
+            {
+                if (editMeshesBarVisible != value)
+                {
+                    statusBarVisible = value;
+                    base.NotifyPropertyChanged(nameof(EditMeshesBarVisible));
+                }
+            }
+        }
+        //[NonSerialized]
+        private bool editMeshesBarVisible = true;
+
+        /// <summary>
+        /// Видимость строки состояния
+        /// </summary>
+        [Bindable(true)]
+        public bool StatusBarVisible
+        {
+            get => statusBarVisible;
+            set
+            {
+                if (statusBarVisible != value)
+                {
+                    statusBarVisible = value;
+                    base.NotifyPropertyChanged(nameof(StatusBarVisible));
+                }
+            }
+        }
+        //[NonSerialized]
+        private bool statusBarVisible = true;
+    }
 #endif
 }

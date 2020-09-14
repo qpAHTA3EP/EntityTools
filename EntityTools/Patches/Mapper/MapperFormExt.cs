@@ -1,29 +1,24 @@
 ﻿#define LOG
 
 #if PATCH_ASTRAL
-using Astral.Logic.Classes.Map;
 using MyNW.Classes;
-using MappingType = EntityTools.Enums.MappingType; 
+using MappingType = EntityTools.Enums.MappingType;
 #endif
 
 using AStar;
 using Astral;
 using Astral.Controllers;
-using Astral.Quester.Classes;
 using DevExpress.XtraBars;
 using DevExpress.XtraEditors;
 using EntityTools.Reflection;
 using MyNW.Internals;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Reflection;
-using AstralMapperOriginals;
-//using ICSharpCode.SharpZipLib.Zip;
+
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO.Compression;
@@ -113,15 +108,22 @@ namespace EntityTools.Patches.Mapper
                 OnClick = null,
                 Size = new Size(372, 275),
                 TabIndex = 0,
-                ZoomPos = Convert.ToInt32(statZoom.EditValue),
-                MapLockOnPlayer = statLockMapOnPlayer.Checked
+                ZoomPos = Convert.ToInt32(trbarZoom.EditValue),
+                MapLockOnPlayer = btnLockMapOnPlayer.Checked
             };
             mapper.OnMapLockOnPlayerChanged += handler_SetMapLockOnPlayer;
             //mapper.OnZoomChanged += event_SetZoom;
 #endif
             Controls.Add(mapper);
-
             MouseWheel += handler_MouseWheel;
+
+            barMainTools.Visible = EntityTools.PluginSettings.Mapper.MapperForm.MainToolsBarVisible;
+            barEditMeshes.Visible = EntityTools.PluginSettings.Mapper.MapperForm.EditMeshesBarVisible;
+            statusBar.Visible = EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible;
+
+            btnShowStatBar.Visible = !statusBar.Visible && !barMainTools.Visible && !barEditMeshes.Visible;
+            Location = EntityTools.PluginSettings.Mapper.MapperForm.Location;
+            
             BindingControls();
         }
 
@@ -145,10 +147,12 @@ namespace EntityTools.Patches.Mapper
                                                 EntityTools.PluginSettings.Mapper,
                                                 nameof(EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
+#if false
             menuCacheActive.DataBindings.Add(nameof(menuCacheActive.Checked),
-                                                EntityTools.PluginSettings.Mapper,
-                                                nameof(EntityTools.PluginSettings.Mapper.CacheActive),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
+                                                    EntityTools.PluginSettings.Mapper,
+                                                    nameof(EntityTools.PluginSettings.Mapper.CacheActive),
+                                                    false, DataSourceUpdateMode.OnPropertyChanged); 
+#endif
 
             /* Astral.API.CurrentSettings.DeleteNodeRadius не реализует INotifyPropertyChanged
              * поэтому привязка нижеуказанным методом невозможна
@@ -166,7 +170,7 @@ namespace EntityTools.Patches.Mapper
             menuDeleteRadius.Edit.EditValueChanged += handler_DeleteRadiusChanged;
             menuDeleteRadius.Edit.Leave += handler_DeleteRadiusChanged;
 
-            menuForceLinkLast.DataBindings.Add(nameof(menuForceLinkLast.Checked),
+            btnForceLinkLast.DataBindings.Add(nameof(btnForceLinkLast.Checked),
                                                 EntityTools.PluginSettings.Mapper,
                                                 nameof(EntityTools.PluginSettings.Mapper.ForceLinkingWaypoint),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
@@ -176,6 +180,25 @@ namespace EntityTools.Patches.Mapper
              * menuLinearPath.DataBindings.Add(nameof(menuLinearPath.Checked),
                                                 EntityTools.PluginSettings.Mapper,
                                                 nameof(EntityTools.PluginSettings.Mapper.LinearPath)); */
+
+#if false
+            // Настройки панели инструментов 
+            // Привязка к элементам управления вызывает ошибку времени выполнения
+
+            Location.DataBindings.Add(nameof(Location),
+                            EntityTools.PluginSettings.Mapper.MapperForm.Location,
+                            nameof(EntityTools.PluginSettings.Mapper.MapperForm.Location),
+                            false, DataSourceUpdateMode.OnPropertyChanged);
+
+            toolbarMainMapper.DataBindings.Add(nameof(toolbarMainMapper.Visible),
+                                    EntityTools.PluginSettings.Mapper.MapperForm.MainToolBarVisible,
+                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.MainToolBarVisible),
+                                    false, DataSourceUpdateMode.OnPropertyChanged);
+            statusBar.DataBindings.Add(nameof(statusBar.Visible),
+                                    EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible,
+                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible),
+                                    false, DataSourceUpdateMode.OnPropertyChanged);
+#endif
         }
 
         /// <summary>
@@ -216,6 +239,13 @@ namespace EntityTools.Patches.Mapper
             //    && ReflectionHelper.SubscribeEvent(mapPictureObj, "MouseDoubleClick", this, "eventMapperDoubleClick", true))
             //    SubscribedMapperMouseDoubleClick = true;
 
+            barMainTools.Visible = EntityTools.PluginSettings.Mapper.MapperForm.MainToolsBarVisible;
+            barEditMeshes.Visible = EntityTools.PluginSettings.Mapper.MapperForm.EditMeshesBarVisible;
+            statusBar.Visible = EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible;
+            btnShowStatBar.Visible = !statusBar.Visible && !barMainTools.Visible && !barEditMeshes.Visible;
+
+            Location = EntityTools.PluginSettings.Mapper.MapperForm.Location;
+
             backgroundWorker.RunWorkerAsync();
         }
 
@@ -226,6 +256,11 @@ namespace EntityTools.Patches.Mapper
         /// <param name="e"></param>
         private void handler_ClosingMapperForm(object sender, FormClosingEventArgs e)
         {
+            EntityTools.PluginSettings.Mapper.MapperForm.MainToolsBarVisible = barMainTools.Visible;
+            EntityTools.PluginSettings.Mapper.MapperForm.EditMeshesBarVisible = barEditMeshes.Visible;
+            EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible = statusBar.Visible;
+            EntityTools.PluginSettings.Mapper.MapperForm.Location = Location;
+
             MappingCanceler?.Cancel();
             backgroundWorker?.CancelAsync();
 #if AstralMapper
@@ -242,7 +277,7 @@ namespace EntityTools.Patches.Mapper
                 //    SubscribedMapperMouseDoubleClick = false;
             }
 #endif
-            CustomRegionHelper.Reset();
+            MapperHelper_CustomRegion.Reset();
 
             lastNodeDetail = null;
             Binds.RemoveShiftAction(Keys.M);
@@ -258,7 +293,7 @@ namespace EntityTools.Patches.Mapper
             string formCaption = string.Empty,
                 posStr = string.Empty;
             var UpdateFormStatus = new System.Action(() =>
-            { Text = formCaption; statMousePos.Caption = posStr; });
+            { Text = formCaption; lblMousePos.Caption = posStr; });
 
             while (!IsDisposed
                    && !backgroundWorker.CancellationPending)
@@ -273,7 +308,7 @@ namespace EntityTools.Patches.Mapper
                 else
                 {
                     Text = formCaption;
-                    statMousePos.Caption = posStr;
+                    lblMousePos.Caption = posStr;
                 }
 
                 Thread.Sleep(500);
@@ -308,9 +343,9 @@ namespace EntityTools.Patches.Mapper
                     return MappingType.Stoped;
                 }
 
-                if (menuBidirectional.Checked)
+                if (btnBidirectional.Checked)
                     return MappingType.Bidirectional;
-                else if (menuUnidirectional.Checked)
+                else if (btnUnidirectional.Checked)
                     return MappingType.Unidirectional;
                 else return MappingType.Stoped;
             }
@@ -318,12 +353,12 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Флаг линейного пут
         /// </summary>
-        private bool LinearPath => menuLinearPath.Checked;
+        private bool LinearPath => btnLinearPath.Checked;
         
         /// <summary>
         /// Флаг принудительного связывания с предыдущей точкой пути
         /// </summary>
-        private bool ForceLinkLastWaypoint => menuForceLinkLast.Checked;
+        private bool ForceLinkLastWaypoint => btnForceLinkLast.Checked;
 
         /// <summary>
         /// последний добавленный узел
@@ -365,11 +400,11 @@ namespace EntityTools.Patches.Mapper
         {
             MappingCanceler?.Cancel();
             lastNodeDetail = null;
-            menuBidirectional.Checked = false;
-            menuBidirectional.Reset();
-            menuUnidirectional.Checked = false;
-            menuUnidirectional.Reset();
-            menuCheckStopMapping.Checked = true;
+            btnBidirectional.Checked = false;
+            btnBidirectional.Reset();
+            btnUnidirectional.Checked = false;
+            btnUnidirectional.Reset();
+            btnStopMapping.Checked = true;
             graphCache?.StopCache();
         }
 
@@ -464,6 +499,8 @@ namespace EntityTools.Patches.Mapper
         {
             // Сохранение профиля реализовано
             // Astral.Quester.Core.Save(false)
+
+            // TODO: сохранять файл профиля, поскольку регионы хранятся в профиле.
 
             string mapName = EntityManager.LocalPlayer.MapState.MapName;
             string meshName = mapName + ".bin";
@@ -808,7 +845,7 @@ namespace EntityTools.Patches.Mapper
 #endif
             }
         }
-    #endregion
+        #endregion
 
         #region CustomRegion_Manipulation
         /// <summary>
@@ -818,9 +855,11 @@ namespace EntityTools.Patches.Mapper
         /// <param name="e"></param>
         private void handler_AddRectangularCR(object sender, ItemClickEventArgs e)
         {
-            toolbarCustomRegion.FloatLocation = new Point(Location.X + 40, Location.Y + 60);
-            toolbarCustomRegion.Visible = true;
-            CustomRegionHelper.BeginAdd(mapper, false);
+            btnLockMapOnPlayer.Checked = false;
+
+            barCustomRegion.FloatLocation = new Point(Location.X + 40, Location.Y + 60);
+            barCustomRegion.Visible = true;
+            MapperHelper_CustomRegion.BeginAdd(mapper, false);
         }
 
         /// <summary>
@@ -830,9 +869,11 @@ namespace EntityTools.Patches.Mapper
         /// <param name="e"></param>
         private void handler_AddElipticalCR(object sender, ItemClickEventArgs e)
         {
-            toolbarCustomRegion.FloatLocation = new Point(Location.X + 40, Location.Y + 60);
-            toolbarCustomRegion.Visible = true;
-            CustomRegionHelper.BeginAdd(mapper, true);
+            btnLockMapOnPlayer.Checked = false;
+
+            barCustomRegion.FloatLocation = new Point(Location.X + 40, Location.Y + 60);
+            barCustomRegion.Visible = true;
+            MapperHelper_CustomRegion.BeginAdd(mapper, true);
         }
 
         /// <summary>
@@ -848,10 +889,10 @@ namespace EntityTools.Patches.Mapper
                 XtraMessageBox.Show("The Name of the CustomRegion is not valid !");
                 return;
             }
-            else if (CustomRegionHelper.IsComplete)
+            else if (MapperHelper_CustomRegion.IsComplete)
             {
-                if (CustomRegionHelper.Finish(crName))
-                    toolbarCustomRegion.Visible = false;
+                if (MapperHelper_CustomRegion.Finish(crName))
+                    barCustomRegion.Visible = false;
                 else XtraMessageBox.Show("The Name of the CustomRegion is not valid !");
             }
             else XtraMessageBox.Show("Finish the edition of the CuatomRegion!");
@@ -864,8 +905,8 @@ namespace EntityTools.Patches.Mapper
         /// <param name="e"></param>
         private void handler_MenuCRCancelClick(object sender, ItemClickEventArgs e)
         {
-            CustomRegionHelper.Reset();
-            toolbarCustomRegion.Visible = false;
+            MapperHelper_CustomRegion.Reset();
+            barCustomRegion.Visible = false;
         }
         #endregion
 
@@ -880,7 +921,7 @@ namespace EntityTools.Patches.Mapper
 
         private void handler_ZoomChanged(object sender, EventArgs e)
         {
-            mapper.ZoomPos = Convert.ToInt32(statZoom.EditValue);
+            mapper.ZoomPos = Convert.ToInt32(trbarZoom.EditValue);
         }
         private void handler_MouseWheel(object sender, MouseEventArgs e)
         {
@@ -890,20 +931,21 @@ namespace EntityTools.Patches.Mapper
             else if(e.Delta < 0)
                 delta = -1;
             //mapper.ZoomPos += delta;
-            statZoom.EditValue = mapper.ZoomPos + delta;
+            trbarZoom.EditValue = mapper.ZoomPos + delta;
         }
         private void handler_SetZoom(object sender, int zoomPos)
         {
-            statZoom.EditValue = zoomPos;
+            trbarZoom.EditValue = zoomPos;
         }
 
         private void handler_MapLockOnOnPlayerChanged(object sender, ItemClickEventArgs e)
         {
-            mapper.MapLockOnPlayer = statLockMapOnPlayer.Checked;
+            mapper.MapLockOnPlayer = btnLockMapOnPlayer.Checked;
         }
+
         private void handler_SetMapLockOnPlayer(object sender, DevExpress.XtraEditors.Filtering.CheckedChangedEventArgs e)
         {
-            statLockMapOnPlayer.Checked = e.IsChecked;
+            btnLockMapOnPlayer.Checked = e.IsChecked;
         }
 
         private void handler_ShowStatusBar(object sender, EventArgs e)
@@ -914,8 +956,142 @@ namespace EntityTools.Patches.Mapper
 
         private void handler_VisibleChanged(object sender, EventArgs e)
         {
-            btnShowStatBar.Visible = !statusBar.Visible && !toolbarMainMapper.Visible;
+            EntityTools.PluginSettings.Mapper.MapperForm.MainToolsBarVisible = barMainTools.Visible;
+            EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible = statusBar.Visible;
+
+            btnShowStatBar.Visible = !statusBar.Visible && !barMainTools.Visible;
         }
+
+        /// <summary>
+        /// Прерывание всех операций по изменению графа путей (мешей)
+        /// </summary>
+        private void InterruptAllModifications()
+        {
+            MappingCanceler?.Cancel();
+            handler_MenuCRCancelClick(@this, null);
+            MapperHelper_MoveNode.Reset();
+            MapperHelper_RemoveOneNode.Reset();
+        }
+
+        #region EditMeshes
+#if false
+        enum MeshesEditMode
+        {
+            None,
+            MoveNode,
+            RemoveEdge,
+            AddEdge,
+            RemoveOneNode,
+            RemoveRectangularNodesGroup,
+            RemoveEllipticalNodesGroup
+        }
+        private MeshesEditMode meshesEditMode = MeshesEditMode.None; 
+#endif
+
+        private void handler_AddEdge_ModeChanged(object sender, ItemClickEventArgs e)
+        {
+            if (btnAddEdge.Checked)
+            {
+                InterruptAllModifications();
+
+                btnMoveNode.Checked = false;
+                //btnAddEdge.Checked = false;
+                btnRemoveEdge.Checked = false;
+                btnRemoveOneNode.Checked = false;
+                btnRemoveEllNodeGroup.Checked = false;
+                btnRemoveRectNodeGroup.Checked = false;
+
+                MapperHelper_MoveNode.Initialize(mapper);
+            }
+        }
+
+        private void handler_RemoveEdge_ModeChanged(object sender, ItemClickEventArgs e)
+        {
+            if (btnRemoveEdge.Checked)
+            {
+                InterruptAllModifications();
+
+                btnMoveNode.Checked = false;
+                btnAddEdge.Checked = false;
+                //btnRemoveEdge.Checked = false;
+                btnRemoveOneNode.Checked = false;
+                btnRemoveEllNodeGroup.Checked = false;
+                btnRemoveRectNodeGroup.Checked = false;
+
+                //MapperHelper_MoveNode.Initialize(mapper);
+            }
+        }
+
+        private void handler_MoveNode_ModeChanged(object sender, ItemClickEventArgs e)
+        {
+            if (btnMoveNode.Checked)
+            {
+                InterruptAllModifications();
+
+                //btnMoveNode.Checked = false;
+                btnAddEdge.Checked = false;
+                btnRemoveEdge.Checked = false;
+                btnRemoveOneNode.Checked = false;
+                btnRemoveEllNodeGroup.Checked = false;
+                btnRemoveRectNodeGroup.Checked = false;
+
+                MapperHelper_MoveNode.Initialize(mapper);
+            }
+            else MapperHelper_MoveNode.Reset();
+        }
+
+        private void handler_RemoveNode_ModeChanged(object sender, ItemClickEventArgs e)
+        {
+            if (btnRemoveOneNode.Checked)
+            {
+                InterruptAllModifications();
+
+                btnMoveNode.Checked = false;
+                btnAddEdge.Checked = false;
+                btnRemoveEdge.Checked = false;
+                //btnRemoveOneNode.Checked = false;
+                btnRemoveEllNodeGroup.Checked = false;
+                btnRemoveRectNodeGroup.Checked = false;
+
+                MapperHelper_RemoveOneNode.Initialize(mapper);
+            }
+            else MapperHelper_RemoveOneNode.Reset();
+        }
+
+        private void handler_RemoveRectNodeGroup_ModeChanged(object sender, ItemClickEventArgs e)
+        {
+            if (btnRemoveRectNodeGroup.Checked)
+            {
+                InterruptAllModifications();
+
+                btnMoveNode.Checked = false;
+                btnAddEdge.Checked = false;
+                btnRemoveEdge.Checked = false;
+                btnRemoveOneNode.Checked = false;
+                btnRemoveEllNodeGroup.Checked = false;
+                //btnRemoveRectNodeGroup.Checked = false;
+
+                //MapperHelper_RemoveOneNode.Initialize(mapper);
+            }
+        }
+
+        private void handler_RemoveEllNodeGroup_ModeChanged(object sender, ItemClickEventArgs e)
+        {
+            if (btnRemoveEllNodeGroup.Checked)
+            {
+                InterruptAllModifications();
+
+                btnMoveNode.Checked = false;
+                btnAddEdge.Checked = false;
+                btnRemoveEdge.Checked = false;
+                btnRemoveOneNode.Checked = false;
+                //btnRemoveEllNodeGroup.Checked = false;
+                btnRemoveRectNodeGroup.Checked = false;
+
+                //MapperHelper_RemoveOneNode.Initialize(mapper);
+            }
+        }
+        #endregion
     }
 #endif
 }

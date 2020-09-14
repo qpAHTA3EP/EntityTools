@@ -64,6 +64,9 @@ namespace EntityTools.Patches.Mapper
             this.Size = new System.Drawing.Size(360, 360);
             this.Load += new System.EventHandler(this.handler_Load);
             this.VisibleChanged += new System.EventHandler(this.handler_VisibleChanged);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.handler_KeyDown);
+            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.handler_KeyPress);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.handler_KeyUp);
             ((System.ComponentModel.ISupportInitialize)(this.MapPicture)).EndInit();
             this.ResumeLayout(false);
 

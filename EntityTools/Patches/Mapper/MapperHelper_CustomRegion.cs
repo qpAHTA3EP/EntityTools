@@ -18,7 +18,7 @@ namespace EntityTools.Patches.Mapper
     /// <summary>
     /// Помощник для добавления CustomRegion
     /// </summary>
-    internal static class CustomRegionHelper
+    internal static class MapperHelper_CustomRegion
     {
         public static CustomRegion Clone(this CustomRegion @this)
         {
@@ -33,8 +33,6 @@ namespace EntityTools.Patches.Mapper
                 };
             return null;
         }
-
-
 
         private static Vector3 startPoint = null;
         private static Vector3 endPoint = null;
@@ -76,8 +74,7 @@ namespace EntityTools.Patches.Mapper
 
         private static DragMode dragMode = DragMode.Disabled;
         private static Vector3 anchorPoint = null;
-        public static readonly float DefaultAnchorSize = 8;
-        private static float anchorSize = 4;
+        public static readonly float DefaultAnchorSize = 8.5f;
 
     #region Reflection
         /// <summary>
@@ -89,7 +86,7 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Функтор обновления списка CustomRegion'ов в окне Квестер-редактора
         /// </summary>
-        private static Func<Object, System.Action> QuesterEditorRefreshRegions = null;
+        private static Func<object, System.Action> QuesterEditorRefreshRegions = null;
         #endregion
 
         /// <summary>
@@ -190,7 +187,7 @@ namespace EntityTools.Patches.Mapper
             if (cr != null
                 && cr.Position.IsValid)
             {
-                float hulfAnchorEdgeSize = Math.Max(1, Math.Min(Math.Min(Math.Abs(cr.Width / 4), Math.Abs(cr.Height/ 4)), DefaultAnchorSize / 2));
+                float hulfAnchorEdgeSize = Math.Max(1.5f, Math.Min(Math.Min(Math.Abs(cr.Width / 4), Math.Abs(cr.Height/ 4)), DefaultAnchorSize / 2));
 
                 Vector3 topLeft = cr.Position.Clone();
                 // TopLeft
@@ -406,16 +403,28 @@ namespace EntityTools.Patches.Mapper
             Brush brushCR = Brushes.LimeGreen;
             bool drawEdgeAnchors = Math.Abs(height) > DefaultAnchorSize * 3 && Math.Abs(width) > DefaultAnchorSize * 3;
             bool drawCornerAnchors = Math.Abs(height) > DefaultAnchorSize && Math.Abs(width) > DefaultAnchorSize;
-            float hulfAnchorEdgeSize = Math.Max(1, Math.Min(Math.Min(Math.Abs(width / 4), Math.Abs(height / 4)), DefaultAnchorSize / 2));
+            float hulfAnchorEdgeSize = Math.Max(1.5f, Math.Min(Math.Min(Math.Abs(width / 4), Math.Abs(height / 4)), DefaultAnchorSize / 2));
 
             // Отрисовака опорного прямоугольника якоря topLeft
             g.drawRectangle(topLeft, new Vector3(width, height, 0), penRect);
-            top = new Vector3(topLeft.X + width / 2, topLeft.Y, 0f);
-            down = new Vector3(topLeft.X + width / 2, topLeft.Y + height, 0f);
-            g.drawLine(top, down, penRect);
-            right = new Vector3(topLeft.X + width, topLeft.Y + height / 2, 0f);
-            left = new Vector3(topLeft.X, topLeft.Y + height / 2, 0f);
-            g.drawLine(left, right, penRect);
+            if (drawEdgeAnchors)
+            {
+                top = new Vector3(topLeft.X + width / 2, topLeft.Y, 0f);
+                down = new Vector3(topLeft.X + width / 2, topLeft.Y + height, 0f);
+                g.drawLine(top, down, penRect);
+                right = new Vector3(topLeft.X + width, topLeft.Y + height / 2, 0f);
+                left = new Vector3(topLeft.X, topLeft.Y + height / 2, 0f);
+                g.drawLine(left, right, penRect);
+                
+                // Отрисовака якоря top
+                DrawAnchor(g, top, hulfAnchorEdgeSize, brushCR);
+                // Отрисовака якоря left
+                DrawAnchor(g, left, hulfAnchorEdgeSize, brushCR);
+                // Отрисовака якоря right
+                DrawAnchor(g, right, hulfAnchorEdgeSize, brushCR);
+                // Отрисовака якоря down
+                DrawAnchor(g, down, hulfAnchorEdgeSize, brushCR); 
+            }
 
             if (drawCornerAnchors)
             {
@@ -432,18 +441,6 @@ namespace EntityTools.Patches.Mapper
             // Отрисовка Эллипса
             if (isElliptical)
                 g.drawComplexeEllipse(topLeft, new Vector3(width, height, 0), penCR);
-
-            if (drawEdgeAnchors)
-            {
-                // Отрисовака якоря top
-                DrawAnchor(g, top, hulfAnchorEdgeSize, brushCR);
-                // Отрисовака якоря left
-                DrawAnchor(g, left, hulfAnchorEdgeSize, brushCR);
-                // Отрисовака якоря right
-                DrawAnchor(g, right, hulfAnchorEdgeSize, brushCR);
-                // Отрисовака якоря down
-                DrawAnchor(g, down, hulfAnchorEdgeSize, brushCR); 
-            }
         }
 
         public static void DrawAnchor(GraphicsNW g, Vector3 anchor, float hulfAnchorEdgeSize, Brush brush = null)

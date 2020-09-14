@@ -77,6 +77,24 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public event CheckedChangedEventHandler OnMapLockOnPlayerChanged;
 
+        public delegate void MapperKeyPressEvent(KeyPressEventArgs e, GraphicsNW graphicsNW); 
+        public delegate void MapperKeyEvent(KeyEventArgs e, GraphicsNW graphicsNW);
+
+        /// <summary>
+        /// Делегат, уведомляющий о нажатой алфавитно-цифровой клавише
+        /// </summary>
+        public event MapperKeyPressEvent OnMapperKeyPress;
+
+        /// <summary>
+        /// Делегат, уведомляющий о нажатии клавиши
+        /// </summary>
+        public event MapperKeyEvent OnMapperKeyDown;
+
+        /// <summary>
+        /// Делегат, уведомляющий об отпускании клавиши
+        /// </summary>
+        public event MapperKeyEvent OnMapperKeyUp;
+
 #if OnZoomChanged
         /// <summary>
         /// Делегат, уведомляющий об изменении масштаба
@@ -177,6 +195,11 @@ namespace EntityTools.Patches.Mapper
                     OnClick(e, graphicsNW); 
                 }
             }
+        }
+
+        private void handler_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            OnMapperKeyPress?.Invoke(e, graphicsNW);
         }
         #endregion
 
@@ -667,6 +690,16 @@ namespace EntityTools.Patches.Mapper
             return bitmap;
         }
         #endregion
+
+        private void handler_KeyUp(object sender, KeyEventArgs e)
+        {
+            OnMapperKeyUp?.Invoke(e, graphicsNW);
+        }
+
+        private void handler_KeyDown(object sender, KeyEventArgs e)
+        {
+            OnMapperKeyDown?.Invoke(e, graphicsNW);
+        }
     }
 }
 

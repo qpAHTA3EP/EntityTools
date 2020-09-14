@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.0914.0723</AssemblyVersion>
+    <AssemblyVersion>0.20.0909.1508</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -207,8 +207,6 @@
     <Compile Include="Patches\Mapper\MapperExt.Designer.cs">
       <DependentUpon>MapperExt.cs</DependentUpon>
     </Compile>
-    <Compile Include="Patches\Mapper\MapperHelper_RemoveOneNode.cs" />
-    <Compile Include="Patches\Mapper\MapperHelper_MoveNode.cs" />
     <Compile Include="Patches\Patch_VIP_SealTraderEntity.cs" />
     <Compile Include="Patches\Patch_VIP_ProfessionVendorEntity.cs" />
     <Compile Include="Patches\UCC\Patch_ActionsPlayer_CheckAlly.cs" />
@@ -251,7 +249,7 @@
     <Compile Include="Editors\UccActionEditor.cs" />
     <Compile Include="Editors\UiIdEditor.cs" />
     <Compile Include="Patches\Mapper\AddNavigationNodeAdvanced.cs" />
-    <Compile Include="Patches\Mapper\MapperHelper_CustomRegion.cs" />
+    <Compile Include="Patches\Mapper\CustomRegionHelper.cs" />
     <Compile Include="Patches\Mapper\Enums.cs" />
     <Compile Include="Patches\Mapper\MapperFormExt.cs">
       <SubType>Form</SubType>
@@ -470,18 +468,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\save_32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniPen.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\mini_move_node.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\AddEdge_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\RemoveEdge_16x16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

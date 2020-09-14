@@ -56,21 +56,21 @@ namespace EntityTools
                 {
 
                     //LogCache.Append('[').Append(DateTime.Now.Hour.ToString("00")).Append('-').Append(DateTime.Now.Minute.ToString("00")).Append('-').Append(DateTime.Now.Second.ToString("00"));
-                    LogCache.Append(DateTime.Now.ToString("[HH-mm-ss"));
+                    LogCache.Append(DateTime.Now.ToString("[HH:mm:ss]"));
                     switch(logType)
                     {
                         case LogType.Log:
-                            LogCache.Append(" LOG] ");
+                            LogCache.Append(" [LOG] ");
                             if (toAstral)
                                 Logger.WriteLine(Logger.LogType.Log, Text);
                             break;
                         case LogType.Debug:
-                            LogCache.Append(" DBG] ");
+                            LogCache.Append(" [DBG] ");
                             if (toAstral)
                                 Logger.WriteLine(Logger.LogType.Debug, Text);
                             break;
                         case LogType.Error:
-                            LogCache.Append(" ERR] ");
+                            LogCache.Append(" [ERR] ");
                             if (toAstral)
                                 Logger.WriteLine(Logger.LogType.Debug, Text);
                             break;

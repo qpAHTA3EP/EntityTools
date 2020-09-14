@@ -93,6 +93,16 @@ namespace EntityTools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap miniAddEdge {
+            get {
+                object obj = ResourceManager.GetObject("miniAddEdge", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap miniBiPath {
             get {
                 object obj = ResourceManager.GetObject("miniBiPath", resourceCulture);
@@ -156,6 +166,16 @@ namespace EntityTools.Properties {
         internal static System.Drawing.Bitmap miniDelete {
             get {
                 object obj = ResourceManager.GetObject("miniDelete", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap miniDiskette {
+            get {
+                object obj = ResourceManager.GetObject("miniDiskette", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -233,9 +253,29 @@ namespace EntityTools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap miniMoveNode {
+            get {
+                object obj = ResourceManager.GetObject("miniMoveNode", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap miniNodeDistance {
             get {
                 object obj = ResourceManager.GetObject("miniNodeDistance", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap miniPen {
+            get {
+                object obj = ResourceManager.GetObject("miniPen", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -256,6 +296,16 @@ namespace EntityTools.Properties {
         internal static System.Drawing.Bitmap miniRefresh {
             get {
                 object obj = ResourceManager.GetObject("miniRefresh", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap miniRemoveEdge {
+            get {
+                object obj = ResourceManager.GetObject("miniRemoveEdge", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -326,26 +376,6 @@ namespace EntityTools.Properties {
         internal static System.Drawing.Bitmap miniZdiff {
             get {
                 object obj = ResourceManager.GetObject("miniZdiff", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap save_16x16 {
-            get {
-                object obj = ResourceManager.GetObject("save_16x16", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap save_32x32 {
-            get {
-                object obj = ResourceManager.GetObject("save_32x32", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -41,7 +41,7 @@ namespace EntityTools.Patches.Mapper
                         RegenCache();
                     return LN;
                 }
-                else return ((AStar.Graph)coreGraph).Nodes;
+                return ((AStar.Graph)AstralAccessors.Quester.Core.Meshes).Nodes;
             }
         }
 
@@ -58,7 +58,7 @@ namespace EntityTools.Patches.Mapper
                         RegenCache();
                     return LA;
                 }
-                else return ((AStar.Graph)coreGraph).Arcs;
+                else return ((AStar.Graph)AstralAccessors.Quester.Core.Meshes).Arcs;
             }
         }
 
@@ -74,23 +74,21 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Добавление узла
         /// </summary>
-        /// <param name="NewNode"></param>
+        /// <param name="newNode"></param>
         /// <returns></returns>
-        public bool AddNode(Node NewNode)
+        public bool AddNode(Node newNode)
         {
             if (EntityTools.PluginSettings.Mapper.CacheActive)
             {
-                //if (NeedRegenCache)
-                //    RegenCache();
-                if (((AStar.Graph)coreGraph).AddNode(NewNode))
+                if (((AStar.Graph)AstralAccessors.Quester.Core.Meshes).AddNode(newNode))
                 {
-                    LN.Add(NewNode);
-                    lastAddedNode = NewNode;
+                    LN.Add(newNode);
+                    lastAddedNode = newNode;
                     return true;
                 }
                 return false;
             }
-            else return ((AStar.Graph)coreGraph).AddNode(NewNode) == true;
+            return ((AStar.Graph)AstralAccessors.Quester.Core.Meshes).AddNode(newNode) == true;
         }
 
         /// <summary>
@@ -104,8 +102,6 @@ namespace EntityTools.Patches.Mapper
         {
             if (EntityTools.PluginSettings.Mapper.CacheActive)
             {
-                //if (NeedRegenCache)
-                //    RegenCache();
                 Node node = new Node((double)x, (double)y, (double)z);
                 if (!this.AddNode(node))
                     return null;
@@ -113,51 +109,47 @@ namespace EntityTools.Patches.Mapper
                 lastAddedNode = node;
                 return node;
             }
-            else return lastAddedNode = ((AStar.Graph)coreGraph).AddNode(x, y, z);
+            return lastAddedNode = ((AStar.Graph)AstralAccessors.Quester.Core.Meshes).AddNode(x, y, z);
         }
 
         /// <summary>
         /// Добавление связи
         /// </summary>
-        /// <param name="NewArc"></param>
+        /// <param name="newArc"></param>
         /// <returns></returns>
-        public bool AddArc(Arc NewArc)
+        public bool AddArc(Arc newArc)
         {
             if (EntityTools.PluginSettings.Mapper.CacheActive)
             {
-                //if (NeedRegenCache)
-                //    RegenCache();
-                if (((AStar.Graph)coreGraph).AddArc(NewArc))
+                if (((AStar.Graph)AstralAccessors.Quester.Core.Meshes).AddArc(newArc))
                 {
-                    LA.Add(NewArc);
+                    LA.Add(newArc);
                     return true;
                 }
                 return false;
             }
-            else return ((AStar.Graph)coreGraph).AddArc(NewArc) == true;
+            else return ((AStar.Graph)AstralAccessors.Quester.Core.Meshes).AddArc(newArc) == true;
         }
 
         /// <summary>
         /// Добавление связи
         /// </summary>
-        /// <param name="StartNode"></param>
-        /// <param name="EndNode"></param>
-        /// <param name="Weight"></param>
+        /// <param name="startNode"></param>
+        /// <param name="endNode"></param>
+        /// <param name="weight"></param>
         /// <returns></returns>
-        public Arc AddArc(Node StartNode, Node EndNode, double Weight)
+        public Arc AddArc(Node startNode, Node endNode, double weight)
         {
             if (EntityTools.PluginSettings.Mapper.CacheActive)
             {
-                //if (NeedRegenCache)
-                //    RegenCache();
-                Arc arc = new Arc(StartNode, EndNode) { Weight = Weight };
+                Arc arc = new Arc(startNode, endNode) { Weight = weight };
                 if (!AddArc(arc))
                 {
                     return null;
                 }
                 return arc;
             }
-            else return ((AStar.Graph)coreGraph).AddArc(StartNode, EndNode, (float)Weight);
+            else return ((AStar.Graph)AstralAccessors.Quester.Core.Meshes).AddArc(startNode, endNode, (float)weight);
         }
 
         /// <summary>
@@ -198,7 +190,7 @@ namespace EntityTools.Patches.Mapper
                     }
                     LN.Remove(NodeToRemove);
                 }
-                ((AStar.Graph)coreGraph).RemoveNode(NodeToRemove);
+                ((AStar.Graph)AstralAccessors.Quester.Core.Meshes).RemoveNode(NodeToRemove);
             }
             catch
             {
@@ -220,7 +212,7 @@ namespace EntityTools.Patches.Mapper
             {
                 if (EntityTools.PluginSettings.Mapper.CacheActive)
                     LA.Remove(ArcToRemove);
-                ((AStar.Graph)coreGraph).RemoveArc(ArcToRemove);
+                ((AStar.Graph)AstralAccessors.Quester.Core.Meshes).RemoveArc(ArcToRemove);
                 ArcToRemove.StartNode.OutgoingArcs.Remove(ArcToRemove);
                 ArcToRemove.EndNode.IncomingArcs.Remove(ArcToRemove);
             }
@@ -262,7 +254,7 @@ namespace EntityTools.Patches.Mapper
                 Distance = num;
                 return result;
             }
-            else return ((AStar.Graph)coreGraph).ClosestNode(PtX, PtY, PtZ, out Distance, IgnorePassableProperty);
+            else return ((AStar.Graph)AstralAccessors.Quester.Core.Meshes).ClosestNode(PtX, PtY, PtZ, out Distance, IgnorePassableProperty);
         }
 
         /// <summary>
@@ -293,7 +285,7 @@ namespace EntityTools.Patches.Mapper
                 Distance = num;
                 return result;
             }
-            else return ((AStar.Graph)coreGraph).ClosestNode(pos.X, pos.Y, pos.Z, out Distance, IgnorePassableProperty);
+            else return ((AStar.Graph)AstralAccessors.Quester.Core.Meshes).ClosestNode(pos.X, pos.Y, pos.Z, out Distance, IgnorePassableProperty);
         }
 
         /// <summary>
@@ -325,7 +317,7 @@ namespace EntityTools.Patches.Mapper
                 Distance = num;
                 return result;
             }
-            else return ((AStar.Graph)coreGraph).ClosestNode(pos.X, pos.Y, pos.Z, out Distance, IgnorePassableProperty);
+            else return ((AStar.Graph)AstralAccessors.Quester.Core.Meshes).ClosestNode(pos.X, pos.Y, pos.Z, out Distance, IgnorePassableProperty);
         }
 
         //public Arc ClosestArc(double PtX, double PtY, double PtZ, out double Distance, bool IgnorePassableProperty)
@@ -434,9 +426,9 @@ namespace EntityTools.Patches.Mapper
                     cacheInitialPos = EntityManager.LocalPlayer.Location.Clone();
                 else cacheInitialPos = newIniPos.Clone();
 
-                if (coreGraph == null)
+                if (!AstralAccessors.Quester.Core.Meshes.IsValid())
                     return false;
-                foreach (Node node in ((AStar.Graph)coreGraph).Nodes)
+                foreach (Node node in ((AStar.Graph)AstralAccessors.Quester.Core.Meshes).Nodes)
                 {
                     if (NeedCache(node))
                     {
@@ -533,9 +525,11 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public AStar.Graph FullGraph
         {
-            get => coreGraph.Value;
+            get => AstralAccessors.Quester.Core.Meshes.Value;
         }
-        private static readonly StaticPropertyAccessor<AStar.Graph> coreGraph = typeof(Astral.Quester.Core).GetStaticProperty<AStar.Graph>("Meshes");
+#if false
+        private static readonly StaticPropertyAccessor<AStar.Graph> coreGraph = typeof(Astral.Quester.Core).GetStaticProperty<AStar.Graph>("Meshes"); 
+#endif
 
         #region Mapper
 #if AstralMapper
@@ -549,7 +543,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void eventMapperDoubleClick(object sender, EventArgs e)
+        private void handler_MapperDoubleClick(object sender, EventArgs e)
         {
             // двойной клик означает удаление точек пути
             // следовательно нужно обновить кэш
@@ -570,17 +564,14 @@ namespace EntityTools.Patches.Mapper
             {
                 lock (LN)
                 {
-                    for (int i = 0; i < LN.Count; i++)
-                    {
-                        Node node = LN[i];
+                    foreach (var node in LN)
                         g.drawFillEllipse(new Vector3((float)node.X, (float)node.Y, (float)node.Z), new Size(7, 7), Brushes.Gold);
-                    }
                 }
             }
             if (lastAddedNode != null)
             {
                 //g.drawFillEllipse(new Vector3((float)lastNodeDetail.Node.X, (float)lastNodeDetail.Node.Y, (float)lastNodeDetail.Node.Z), new Size(9, 9), Brushes.Cyan);
-                CustomRegionHelper.DrawAnchor(g, new Vector3((float)lastAddedNode.X, (float)lastAddedNode.Y, (float)lastAddedNode.Z), CustomRegionHelper.DefaultAnchorSize, Brushes.Orange);
+                MapperHelper_CustomRegion.DrawAnchor(g, new Vector3((float)lastAddedNode.X, (float)lastAddedNode.Y, (float)lastAddedNode.Z), MapperHelper_CustomRegion.DefaultAnchorSize, Brushes.Orange);
             }
         }
         private bool SubscribedMapperMouseDoubleClick = false;

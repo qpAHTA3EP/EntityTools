@@ -44,23 +44,18 @@ namespace EntityTools.Patches.Mapper
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MapperFormExt));
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.barManager = new DevExpress.XtraBars.BarManager(this.components);
-            this.toolbarMainMapper = new DevExpress.XtraBars.Bar();
-            this.nemuSave = new DevExpress.XtraBars.BarButtonItem();
-            this.toolGroupMapping = new DevExpress.XtraBars.BarButtonGroup();
-            this.menuCheckStopMapping = new DevExpress.XtraBars.BarCheckItem();
-            this.menuBidirectional = new DevExpress.XtraBars.BarCheckItem();
-            this.menuUnidirectional = new DevExpress.XtraBars.BarCheckItem();
-            this.menuLinearPath = new DevExpress.XtraBars.BarCheckItem();
-            this.menuForceLinkLast = new DevExpress.XtraBars.BarCheckItem();
-            this.toolGroupCR = new DevExpress.XtraBars.BarButtonGroup();
-            this.menuRectangularCR = new DevExpress.XtraBars.BarButtonItem();
-            this.menuEllipticalCR = new DevExpress.XtraBars.BarButtonItem();
-            this.toolGroupNodes = new DevExpress.XtraBars.BarButtonGroup();
-            this.menuImportGame = new DevExpress.XtraBars.BarButtonItem();
-            this.menuImportProfile = new DevExpress.XtraBars.BarButtonItem();
-            this.menuExportMesh = new DevExpress.XtraBars.BarButtonItem();
-            this.menuClear = new DevExpress.XtraBars.BarButtonItem();
-            this.menuOptions = new DevExpress.XtraBars.BarButtonItem();
+            this.barMainTools = new DevExpress.XtraBars.Bar();
+            this.btnSaveMeshes = new DevExpress.XtraBars.BarButtonItem();
+            this.groupMapping = new DevExpress.XtraBars.BarButtonGroup();
+            this.btnStopMapping = new DevExpress.XtraBars.BarCheckItem();
+            this.btnBidirectional = new DevExpress.XtraBars.BarCheckItem();
+            this.btnUnidirectional = new DevExpress.XtraBars.BarCheckItem();
+            this.btnLinearPath = new DevExpress.XtraBars.BarCheckItem();
+            this.btnForceLinkLast = new DevExpress.XtraBars.BarCheckItem();
+            this.groupCR = new DevExpress.XtraBars.BarButtonGroup();
+            this.btnRectangularCR = new DevExpress.XtraBars.BarButtonItem();
+            this.btnEllipticalCR = new DevExpress.XtraBars.BarButtonItem();
+            this.btnOptions = new DevExpress.XtraBars.BarButtonItem();
             this.popMenuOptions = new DevExpress.XtraBars.PopupMenu(this.components);
             this.menuWaypointDistance = new DevExpress.XtraBars.BarEditItem();
             this.seWaypointDistance = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
@@ -70,29 +65,37 @@ namespace EntityTools.Patches.Mapper
             this.seEquivalenceDistance = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
             this.menuDeleteRadius = new DevExpress.XtraBars.BarEditItem();
             this.seDeleteRadius = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
-            this.menuCacheActive = new DevExpress.XtraBars.BarCheckItem();
-            this.toolbarCustomRegion = new DevExpress.XtraBars.Bar();
-            this.menuLableCR = new DevExpress.XtraBars.BarStaticItem();
+            this.barCustomRegion = new DevExpress.XtraBars.Bar();
+            this.lblCR = new DevExpress.XtraBars.BarStaticItem();
             this.menuCRName = new DevExpress.XtraBars.BarEditItem();
             this.teCRName = new DevExpress.XtraEditors.Repository.RepositoryItemTextEdit();
-            this.menuCRAccept = new DevExpress.XtraBars.BarButtonItem();
-            this.menuCRCancel = new DevExpress.XtraBars.BarButtonItem();
+            this.btnCRAccept = new DevExpress.XtraBars.BarButtonItem();
+            this.btnCRCancel = new DevExpress.XtraBars.BarButtonItem();
             this.statusBar = new DevExpress.XtraBars.Bar();
-            this.statLockMapOnPlayer = new DevExpress.XtraBars.BarCheckItem();
-            this.statZoom = new DevExpress.XtraBars.BarEditItem();
+            this.btnLockMapOnPlayer = new DevExpress.XtraBars.BarCheckItem();
+            this.trbarZoom = new DevExpress.XtraBars.BarEditItem();
             this.zoomer = new DevExpress.XtraEditors.Repository.RepositoryItemZoomTrackBar();
-            this.statMousePos = new DevExpress.XtraBars.BarStaticItem();
+            this.lblMousePos = new DevExpress.XtraBars.BarStaticItem();
+            this.barEditMeshes = new DevExpress.XtraBars.Bar();
+            this.groupImportExportNodes = new DevExpress.XtraBars.BarButtonGroup();
+            this.btnImportMeshesFromGame = new DevExpress.XtraBars.BarButtonItem();
+            this.btnImportMeshesFromProfile = new DevExpress.XtraBars.BarButtonItem();
+            this.btnExportMeshes = new DevExpress.XtraBars.BarButtonItem();
+            this.btnClearMeshes = new DevExpress.XtraBars.BarButtonItem();
+            this.groupEditMeshes = new DevExpress.XtraBars.BarButtonGroup();
+            this.btnAddEdge = new DevExpress.XtraBars.BarCheckItem();
+            this.btnRemoveEdge = new DevExpress.XtraBars.BarCheckItem();
+            this.btnMoveNode = new DevExpress.XtraBars.BarCheckItem();
+            this.groupDeleteNodes = new DevExpress.XtraBars.BarButtonGroup();
+            this.btnRemoveOneNode = new DevExpress.XtraBars.BarCheckItem();
+            this.btnRemoveRectNodeGroup = new DevExpress.XtraBars.BarCheckItem();
+            this.btnRemoveEllNodeGroup = new DevExpress.XtraBars.BarCheckItem();
             this.barDockControlTop = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlBottom = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlLeft = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlRight = new DevExpress.XtraBars.BarDockControl();
-            this.barMapper = new DevExpress.XtraBars.BarSubItem();
-            this.barCustomRegion = new DevExpress.XtraBars.BarSubItem();
-            this.barNodes = new DevExpress.XtraBars.BarSubItem();
+            this.groupNodes = new DevExpress.XtraBars.BarSubItem();
             this.menuImportMesh = new DevExpress.XtraBars.BarButtonItem();
-            this.barOptions = new DevExpress.XtraBars.BarSubItem();
-            this.menuBtnStopMapping = new DevExpress.XtraBars.BarButtonItem();
-            this.statCenterPlayerText = new DevExpress.XtraBars.BarStaticItem();
             this.bsrcAstralSettings = new System.Windows.Forms.BindingSource(this.components);
             this.btnShowStatBar = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).BeginInit();
@@ -114,51 +117,54 @@ namespace EntityTools.Patches.Mapper
             // barManager
             // 
             this.barManager.Bars.AddRange(new DevExpress.XtraBars.Bar[] {
-            this.toolbarMainMapper,
-            this.toolbarCustomRegion,
-            this.statusBar});
+            this.barMainTools,
+            this.barCustomRegion,
+            this.statusBar,
+            this.barEditMeshes});
             this.barManager.DockControls.Add(this.barDockControlTop);
             this.barManager.DockControls.Add(this.barDockControlBottom);
             this.barManager.DockControls.Add(this.barDockControlLeft);
             this.barManager.DockControls.Add(this.barDockControlRight);
             this.barManager.Form = this;
             this.barManager.Items.AddRange(new DevExpress.XtraBars.BarItem[] {
-            this.barMapper,
-            this.menuUnidirectional,
-            this.barCustomRegion,
-            this.menuRectangularCR,
-            this.menuEllipticalCR,
-            this.barNodes,
-            this.menuImportGame,
-            this.menuImportProfile,
+            this.btnUnidirectional,
+            this.btnRectangularCR,
+            this.btnEllipticalCR,
+            this.groupNodes,
+            this.btnImportMeshesFromGame,
+            this.btnImportMeshesFromProfile,
             this.menuImportMesh,
-            this.menuExportMesh,
-            this.barOptions,
+            this.btnExportMeshes,
             this.menuWaypointDistance,
             this.menuMaxZDifference,
             this.menuEquivalenceDistance,
             this.menuDeleteRadius,
-            this.menuClear,
-            this.menuBidirectional,
-            this.menuForceLinkLast,
-            this.menuLinearPath,
-            this.menuCheckStopMapping,
-            this.menuBtnStopMapping,
-            this.toolGroupMapping,
-            this.toolGroupCR,
-            this.toolGroupNodes,
-            this.menuOptions,
-            this.menuLableCR,
+            this.btnClearMeshes,
+            this.btnBidirectional,
+            this.btnForceLinkLast,
+            this.btnLinearPath,
+            this.btnStopMapping,
+            this.groupMapping,
+            this.groupCR,
+            this.groupImportExportNodes,
+            this.btnOptions,
+            this.lblCR,
             this.menuCRName,
-            this.menuCRAccept,
-            this.menuCRCancel,
-            this.menuCacheActive,
-            this.statMousePos,
-            this.statZoom,
-            this.statCenterPlayerText,
-            this.statLockMapOnPlayer,
-            this.nemuSave});
-            this.barManager.MaxItemId = 92;
+            this.btnCRAccept,
+            this.btnCRCancel,
+            this.lblMousePos,
+            this.trbarZoom,
+            this.btnLockMapOnPlayer,
+            this.btnSaveMeshes,
+            this.btnMoveNode,
+            this.btnRemoveOneNode,
+            this.btnAddEdge,
+            this.btnRemoveEdge,
+            this.groupEditMeshes,
+            this.groupDeleteNodes,
+            this.btnRemoveRectNodeGroup,
+            this.btnRemoveEllNodeGroup});
+            this.barManager.MaxItemId = 101;
             this.barManager.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.seDeleteRadius,
             this.seWaypointDistance,
@@ -168,166 +174,119 @@ namespace EntityTools.Patches.Mapper
             this.zoomer});
             this.barManager.StatusBar = this.statusBar;
             // 
-            // toolbarMainMapper
+            // barMainTools
             // 
-            this.toolbarMainMapper.BarName = "MapperTools";
-            this.toolbarMainMapper.DockCol = 0;
-            this.toolbarMainMapper.DockRow = 0;
-            this.toolbarMainMapper.DockStyle = DevExpress.XtraBars.BarDockStyle.Top;
-            this.toolbarMainMapper.FloatLocation = new System.Drawing.Point(43, 217);
-            this.toolbarMainMapper.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
-            new DevExpress.XtraBars.LinkPersistInfo(this.toolGroupMapping, true),
-            new DevExpress.XtraBars.LinkPersistInfo(this.toolGroupCR, true),
-            new DevExpress.XtraBars.LinkPersistInfo(this.toolGroupNodes, true),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuOptions, true)});
-            this.toolbarMainMapper.OptionsBar.DrawDragBorder = false;
-            this.toolbarMainMapper.OptionsBar.UseWholeRow = true;
-            this.toolbarMainMapper.Text = "MapperTools";
-            this.toolbarMainMapper.Visible = false;
-            this.toolbarMainMapper.VisibleChanged += new System.EventHandler(this.handler_VisibleChanged);
+            this.barMainTools.BarName = "MapperTools";
+            this.barMainTools.DockCol = 0;
+            this.barMainTools.DockRow = 0;
+            this.barMainTools.DockStyle = DevExpress.XtraBars.BarDockStyle.Top;
+            this.barMainTools.FloatLocation = new System.Drawing.Point(43, 217);
+            this.barMainTools.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnSaveMeshes),
+            new DevExpress.XtraBars.LinkPersistInfo(this.groupMapping, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.groupCR, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnOptions, true)});
+            this.barMainTools.Text = "MapperTools";
+            this.barMainTools.Visible = false;
+            this.barMainTools.VisibleChanged += new System.EventHandler(this.handler_VisibleChanged);
             // 
-            // nemuSave
+            // btnSaveMeshes
             // 
-            this.nemuSave.Caption = "Save";
-            this.nemuSave.Id = 91;
-            this.nemuSave.ImageOptions.Image = global::EntityTools.Properties.Resources.save_16x16;
-            this.nemuSave.ImageOptions.LargeImage = global::EntityTools.Properties.Resources.save_32x32;
-            this.nemuSave.Name = "nemuSave";
-            this.nemuSave.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_SaveCurrentMapMeshes2QuesterProfile);
+            this.btnSaveMeshes.Caption = "Save";
+            this.btnSaveMeshes.Id = 91;
+            this.btnSaveMeshes.ImageOptions.Image = global::EntityTools.Properties.Resources.miniDiskette;
+            this.btnSaveMeshes.ImageOptions.LargeImage = global::EntityTools.Properties.Resources.miniDiskette;
+            this.btnSaveMeshes.Name = "btnSaveMeshes";
+            this.btnSaveMeshes.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_SaveCurrentMapMeshes2QuesterProfile);
             // 
-            // toolGroupMapping
+            // groupMapping
             // 
-            this.toolGroupMapping.Caption = "Mapping";
-            this.toolGroupMapping.Id = 70;
-            this.toolGroupMapping.ItemLinks.Add(this.menuCheckStopMapping);
-            this.toolGroupMapping.ItemLinks.Add(this.menuBidirectional);
-            this.toolGroupMapping.ItemLinks.Add(this.menuUnidirectional);
-            this.toolGroupMapping.ItemLinks.Add(this.menuLinearPath);
-            this.toolGroupMapping.ItemLinks.Add(this.menuForceLinkLast);
-            this.toolGroupMapping.Name = "toolGroupMapping";
+            this.groupMapping.Caption = "Mapping";
+            this.groupMapping.Id = 70;
+            this.groupMapping.ItemLinks.Add(this.btnStopMapping);
+            this.groupMapping.ItemLinks.Add(this.btnBidirectional);
+            this.groupMapping.ItemLinks.Add(this.btnUnidirectional);
+            this.groupMapping.ItemLinks.Add(this.btnLinearPath);
+            this.groupMapping.ItemLinks.Add(this.btnForceLinkLast);
+            this.groupMapping.Name = "groupMapping";
             // 
-            // menuCheckStopMapping
+            // btnStopMapping
             // 
-            this.menuCheckStopMapping.BindableChecked = true;
-            this.menuCheckStopMapping.Caption = "Stop Mapping";
-            this.menuCheckStopMapping.Checked = true;
-            this.menuCheckStopMapping.GroupIndex = 1;
-            this.menuCheckStopMapping.Id = 67;
-            this.menuCheckStopMapping.ImageOptions.Image = global::EntityTools.Properties.Resources.miniStop;
-            this.menuCheckStopMapping.Name = "menuCheckStopMapping";
-            this.menuCheckStopMapping.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_StopMapping);
+            this.btnStopMapping.BindableChecked = true;
+            this.btnStopMapping.Caption = "Stop Mapping";
+            this.btnStopMapping.Checked = true;
+            this.btnStopMapping.GroupIndex = 1;
+            this.btnStopMapping.Id = 67;
+            this.btnStopMapping.ImageOptions.Image = global::EntityTools.Properties.Resources.miniStop;
+            this.btnStopMapping.Name = "btnStopMapping";
+            this.btnStopMapping.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_StopMapping);
             // 
-            // menuBidirectional
+            // btnBidirectional
             // 
-            this.menuBidirectional.Caption = "Bidirectional Mapping";
-            this.menuBidirectional.GroupIndex = 1;
-            this.menuBidirectional.Id = 64;
-            this.menuBidirectional.ImageOptions.Image = global::EntityTools.Properties.Resources.miniBiPath;
-            this.menuBidirectional.Name = "menuBidirectional";
-            this.menuBidirectional.DownChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_StartMapping);
+            this.btnBidirectional.Caption = "Bidirectional Mapping";
+            this.btnBidirectional.GroupIndex = 1;
+            this.btnBidirectional.Id = 64;
+            this.btnBidirectional.ImageOptions.Image = global::EntityTools.Properties.Resources.miniBiPath;
+            this.btnBidirectional.Name = "btnBidirectional";
+            this.btnBidirectional.DownChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_StartMapping);
             // 
-            // menuUnidirectional
+            // btnUnidirectional
             // 
-            this.menuUnidirectional.Caption = "Unidirectional Mapping";
-            this.menuUnidirectional.GroupIndex = 1;
-            this.menuUnidirectional.Id = 44;
-            this.menuUnidirectional.ImageOptions.Image = global::EntityTools.Properties.Resources.miniUniPath;
-            this.menuUnidirectional.Name = "menuUnidirectional";
-            this.menuUnidirectional.DownChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_StartMapping);
+            this.btnUnidirectional.Caption = "Unidirectional Mapping";
+            this.btnUnidirectional.GroupIndex = 1;
+            this.btnUnidirectional.Id = 44;
+            this.btnUnidirectional.ImageOptions.Image = global::EntityTools.Properties.Resources.miniUniPath;
+            this.btnUnidirectional.Name = "btnUnidirectional";
+            this.btnUnidirectional.DownChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_StartMapping);
             // 
-            // menuLinearPath
+            // btnLinearPath
             // 
-            this.menuLinearPath.Caption = "Linear Path";
-            this.menuLinearPath.Id = 66;
-            this.menuLinearPath.ImageOptions.Image = global::EntityTools.Properties.Resources.miniLinePath;
-            this.menuLinearPath.Name = "menuLinearPath";
+            this.btnLinearPath.Caption = "Linear Path";
+            this.btnLinearPath.Id = 66;
+            this.btnLinearPath.ImageOptions.Image = global::EntityTools.Properties.Resources.miniLinePath;
+            this.btnLinearPath.Name = "btnLinearPath";
             // 
-            // menuForceLinkLast
+            // btnForceLinkLast
             // 
-            this.menuForceLinkLast.Caption = "Force Linking to Last Node";
-            this.menuForceLinkLast.Id = 65;
-            this.menuForceLinkLast.ImageOptions.Image = global::EntityTools.Properties.Resources.miniHurdLink;
-            this.menuForceLinkLast.Name = "menuForceLinkLast";
+            this.btnForceLinkLast.Caption = "Force Linking to Last Node";
+            this.btnForceLinkLast.Id = 65;
+            this.btnForceLinkLast.ImageOptions.Image = global::EntityTools.Properties.Resources.miniHurdLink;
+            this.btnForceLinkLast.Name = "btnForceLinkLast";
             // 
-            // toolGroupCR
+            // groupCR
             // 
-            this.toolGroupCR.Caption = "CustomRegion";
-            this.toolGroupCR.Id = 71;
-            this.toolGroupCR.ItemLinks.Add(this.menuRectangularCR);
-            this.toolGroupCR.ItemLinks.Add(this.menuEllipticalCR);
-            this.toolGroupCR.Name = "toolGroupCR";
+            this.groupCR.Caption = "CustomRegion";
+            this.groupCR.Id = 71;
+            this.groupCR.ItemLinks.Add(this.btnRectangularCR);
+            this.groupCR.ItemLinks.Add(this.btnEllipticalCR);
+            this.groupCR.Name = "groupCR";
             // 
-            // menuRectangularCR
+            // btnRectangularCR
             // 
-            this.menuRectangularCR.Caption = "Add Rectangular";
-            this.menuRectangularCR.Id = 48;
-            this.menuRectangularCR.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCRRectang;
-            this.menuRectangularCR.Name = "menuRectangularCR";
-            this.menuRectangularCR.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AddRectangularCR);
+            this.btnRectangularCR.Caption = "Add Rectangular";
+            this.btnRectangularCR.Id = 48;
+            this.btnRectangularCR.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCRRectang;
+            this.btnRectangularCR.Name = "btnRectangularCR";
+            this.btnRectangularCR.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AddRectangularCR);
             // 
-            // menuEllipticalCR
+            // btnEllipticalCR
             // 
-            this.menuEllipticalCR.Caption = "Add Elliptical";
-            this.menuEllipticalCR.Id = 49;
-            this.menuEllipticalCR.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCREllipce;
-            this.menuEllipticalCR.Name = "menuEllipticalCR";
-            this.menuEllipticalCR.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AddElipticalCR);
+            this.btnEllipticalCR.Caption = "Add Elliptical";
+            this.btnEllipticalCR.Id = 49;
+            this.btnEllipticalCR.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCREllipce;
+            this.btnEllipticalCR.Name = "btnEllipticalCR";
+            this.btnEllipticalCR.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AddElipticalCR);
             // 
-            // toolGroupNodes
+            // btnOptions
             // 
-            this.toolGroupNodes.Caption = "Nodes";
-            this.toolGroupNodes.Id = 72;
-            this.toolGroupNodes.ItemLinks.Add(this.nemuSave);
-            this.toolGroupNodes.ItemLinks.Add(this.menuImportGame);
-            this.toolGroupNodes.ItemLinks.Add(this.menuImportProfile);
-            this.toolGroupNodes.ItemLinks.Add(this.menuExportMesh);
-            this.toolGroupNodes.ItemLinks.Add(this.menuClear);
-            this.toolGroupNodes.Name = "toolGroupNodes";
-            // 
-            // menuImportGame
-            // 
-            this.menuImportGame.Caption = "Import from Game";
-            this.menuImportGame.Id = 51;
-            this.menuImportGame.ImageOptions.Image = global::EntityTools.Properties.Resources.miniClone;
-            this.menuImportGame.Name = "menuImportGame";
-            this.menuImportGame.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ImportCurrentMapMeshesFromGame);
-            // 
-            // menuImportProfile
-            // 
-            this.menuImportProfile.Caption = "Import from Profile";
-            this.menuImportProfile.Id = 52;
-            this.menuImportProfile.ImageOptions.Image = global::EntityTools.Properties.Resources.miniImport;
-            this.menuImportProfile.Name = "menuImportProfile";
-            this.menuImportProfile.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ImportMapMeshesFromFile);
-            // 
-            // menuExportMesh
-            // 
-            this.menuExportMesh.Caption = "Export to Mesh";
-            this.menuExportMesh.Enabled = false;
-            this.menuExportMesh.Id = 55;
-            this.menuExportMesh.ImageOptions.Image = global::EntityTools.Properties.Resources.miniExport;
-            this.menuExportMesh.Name = "menuExportMesh";
-            this.menuExportMesh.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
-            this.menuExportMesh.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ExportCurrentMapMeshes2File);
-            // 
-            // menuClear
-            // 
-            this.menuClear.Caption = "Clear";
-            this.menuClear.Id = 63;
-            this.menuClear.ImageOptions.Image = global::EntityTools.Properties.Resources.miniDelete;
-            this.menuClear.Name = "menuClear";
-            this.menuClear.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ClearCurrentMapMeshes);
-            // 
-            // menuOptions
-            // 
-            this.menuOptions.ActAsDropDown = true;
-            this.menuOptions.ButtonStyle = DevExpress.XtraBars.BarButtonStyle.DropDown;
-            this.menuOptions.Caption = "Options";
-            this.menuOptions.DropDownControl = this.popMenuOptions;
-            this.menuOptions.Hint = "Options";
-            this.menuOptions.Id = 74;
-            this.menuOptions.ImageOptions.Image = global::EntityTools.Properties.Resources.miniGear;
-            this.menuOptions.Name = "menuOptions";
+            this.btnOptions.ActAsDropDown = true;
+            this.btnOptions.ButtonStyle = DevExpress.XtraBars.BarButtonStyle.DropDown;
+            this.btnOptions.Caption = "Options";
+            this.btnOptions.DropDownControl = this.popMenuOptions;
+            this.btnOptions.Hint = "Options";
+            this.btnOptions.Id = 74;
+            this.btnOptions.ImageOptions.Image = global::EntityTools.Properties.Resources.miniGear;
+            this.btnOptions.Name = "btnOptions";
             // 
             // popMenuOptions
             // 
@@ -335,8 +294,7 @@ namespace EntityTools.Patches.Mapper
             new DevExpress.XtraBars.LinkPersistInfo(this.menuWaypointDistance),
             new DevExpress.XtraBars.LinkPersistInfo(this.menuMaxZDifference),
             new DevExpress.XtraBars.LinkPersistInfo(this.menuEquivalenceDistance),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuDeleteRadius),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuCacheActive)});
+            new DevExpress.XtraBars.LinkPersistInfo(this.menuDeleteRadius)});
             this.popMenuOptions.Manager = this.barManager;
             this.popMenuOptions.Name = "popMenuOptions";
             // 
@@ -425,34 +383,27 @@ namespace EntityTools.Patches.Mapper
             0});
             this.seDeleteRadius.Name = "seDeleteRadius";
             // 
-            // menuCacheActive
+            // barCustomRegion
             // 
-            this.menuCacheActive.Caption = "Use Cache";
-            this.menuCacheActive.Id = 81;
-            this.menuCacheActive.Name = "menuCacheActive";
-            this.menuCacheActive.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
-            // 
-            // toolbarCustomRegion
-            // 
-            this.toolbarCustomRegion.BarName = "CustomRegion";
-            this.toolbarCustomRegion.DockCol = 0;
-            this.toolbarCustomRegion.DockRow = 0;
-            this.toolbarCustomRegion.FloatLocation = new System.Drawing.Point(69, 533);
-            this.toolbarCustomRegion.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuLableCR, true),
+            this.barCustomRegion.BarName = "CustomRegion";
+            this.barCustomRegion.DockCol = 0;
+            this.barCustomRegion.DockRow = 0;
+            this.barCustomRegion.FloatLocation = new System.Drawing.Point(281, 539);
+            this.barCustomRegion.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
+            new DevExpress.XtraBars.LinkPersistInfo(this.lblCR, true),
             new DevExpress.XtraBars.LinkPersistInfo(DevExpress.XtraBars.BarLinkUserDefines.Width, this.menuCRName, "", false, true, true, 152),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuCRAccept),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuCRCancel)});
-            this.toolbarCustomRegion.OptionsBar.DisableClose = true;
-            this.toolbarCustomRegion.OptionsBar.UseWholeRow = true;
-            this.toolbarCustomRegion.Text = "CustomRegion";
-            this.toolbarCustomRegion.Visible = false;
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnCRAccept),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnCRCancel)});
+            this.barCustomRegion.OptionsBar.DisableClose = true;
+            this.barCustomRegion.OptionsBar.UseWholeRow = true;
+            this.barCustomRegion.Text = "CustomRegion";
+            this.barCustomRegion.Visible = false;
             // 
-            // menuLableCR
+            // lblCR
             // 
-            this.menuLableCR.Caption = "CustomRegion";
-            this.menuLableCR.Id = 77;
-            this.menuLableCR.Name = "menuLableCR";
+            this.lblCR.Caption = "CustomRegion";
+            this.lblCR.Id = 77;
+            this.lblCR.Name = "lblCR";
             // 
             // menuCRName
             // 
@@ -465,22 +416,22 @@ namespace EntityTools.Patches.Mapper
             this.teCRName.AutoHeight = false;
             this.teCRName.Name = "teCRName";
             // 
-            // menuCRAccept
+            // btnCRAccept
             // 
-            this.menuCRAccept.Caption = "Accept";
-            this.menuCRAccept.DropDownEnabled = false;
-            this.menuCRAccept.Id = 79;
-            this.menuCRAccept.ImageOptions.Image = global::EntityTools.Properties.Resources.miniAdd;
-            this.menuCRAccept.Name = "menuCRAccept";
-            this.menuCRAccept.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_MenuCRAcceptClick);
+            this.btnCRAccept.Caption = "Accept";
+            this.btnCRAccept.DropDownEnabled = false;
+            this.btnCRAccept.Id = 79;
+            this.btnCRAccept.ImageOptions.Image = global::EntityTools.Properties.Resources.miniAdd;
+            this.btnCRAccept.Name = "btnCRAccept";
+            this.btnCRAccept.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_MenuCRAcceptClick);
             // 
-            // menuCRCancel
+            // btnCRCancel
             // 
-            this.menuCRCancel.Caption = "Cancel";
-            this.menuCRCancel.Id = 80;
-            this.menuCRCancel.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCancel;
-            this.menuCRCancel.Name = "menuCRCancel";
-            this.menuCRCancel.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_MenuCRCancelClick);
+            this.btnCRCancel.Caption = "Cancel";
+            this.btnCRCancel.Id = 80;
+            this.btnCRCancel.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCancel;
+            this.btnCRCancel.Name = "btnCRCancel";
+            this.btnCRCancel.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_MenuCRCancelClick);
             // 
             // statusBar
             // 
@@ -490,37 +441,37 @@ namespace EntityTools.Patches.Mapper
             this.statusBar.DockRow = 0;
             this.statusBar.DockStyle = DevExpress.XtraBars.BarDockStyle.Bottom;
             this.statusBar.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
-            new DevExpress.XtraBars.LinkPersistInfo(this.statLockMapOnPlayer),
-            new DevExpress.XtraBars.LinkPersistInfo(this.statZoom),
-            new DevExpress.XtraBars.LinkPersistInfo(this.statMousePos, true)});
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnLockMapOnPlayer),
+            new DevExpress.XtraBars.LinkPersistInfo(this.trbarZoom),
+            new DevExpress.XtraBars.LinkPersistInfo(this.lblMousePos, true)});
             this.statusBar.OptionsBar.AllowQuickCustomization = false;
             this.statusBar.OptionsBar.DrawDragBorder = false;
             this.statusBar.OptionsBar.UseWholeRow = true;
             this.statusBar.Text = "statusBar";
             this.statusBar.VisibleChanged += new System.EventHandler(this.handler_VisibleChanged);
             // 
-            // statLockMapOnPlayer
+            // btnLockMapOnPlayer
             // 
-            this.statLockMapOnPlayer.BindableChecked = true;
-            this.statLockMapOnPlayer.CheckBoxVisibility = DevExpress.XtraBars.CheckBoxVisibility.AfterText;
-            this.statLockMapOnPlayer.Checked = true;
-            this.statLockMapOnPlayer.Description = "Lock Map on the Player";
-            this.statLockMapOnPlayer.Hint = "Check to hold Player in the center of the Map";
-            this.statLockMapOnPlayer.Id = 89;
-            this.statLockMapOnPlayer.Name = "statLockMapOnPlayer";
-            this.statLockMapOnPlayer.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_MapLockOnOnPlayerChanged);
+            this.btnLockMapOnPlayer.BindableChecked = true;
+            this.btnLockMapOnPlayer.CheckBoxVisibility = DevExpress.XtraBars.CheckBoxVisibility.AfterText;
+            this.btnLockMapOnPlayer.Checked = true;
+            this.btnLockMapOnPlayer.Description = "Lock Map on the Player";
+            this.btnLockMapOnPlayer.Hint = "Check to hold Player in the center of the Map";
+            this.btnLockMapOnPlayer.Id = 89;
+            this.btnLockMapOnPlayer.Name = "btnLockMapOnPlayer";
+            this.btnLockMapOnPlayer.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_MapLockOnOnPlayerChanged);
             // 
-            // statZoom
+            // trbarZoom
             // 
-            this.statZoom.Caption = "statZoom";
-            this.statZoom.Description = "Zoom of the Map";
-            this.statZoom.Edit = this.zoomer;
-            this.statZoom.EditValue = 5D;
-            this.statZoom.EditWidth = 200;
-            this.statZoom.Hint = "Zoom of the Map";
-            this.statZoom.Id = 83;
-            this.statZoom.Name = "statZoom";
-            this.statZoom.EditValueChanged += new System.EventHandler(this.handler_ZoomChanged);
+            this.trbarZoom.Caption = "statZoom";
+            this.trbarZoom.Description = "Zoom of the Map";
+            this.trbarZoom.Edit = this.zoomer;
+            this.trbarZoom.EditValue = 5D;
+            this.trbarZoom.EditWidth = 200;
+            this.trbarZoom.Hint = "Zoom of the Map";
+            this.trbarZoom.Id = 83;
+            this.trbarZoom.Name = "trbarZoom";
+            this.trbarZoom.EditValueChanged += new System.EventHandler(this.handler_ZoomChanged);
             // 
             // zoomer
             // 
@@ -530,14 +481,141 @@ namespace EntityTools.Patches.Mapper
             this.zoomer.ShowValueToolTip = true;
             this.zoomer.ValueChanged += new System.EventHandler(this.handler_ZoomChanged);
             // 
-            // statMousePos
+            // lblMousePos
             // 
-            this.statMousePos.Alignment = DevExpress.XtraBars.BarItemLinkAlignment.Right;
-            this.statMousePos.Caption = "mousePos";
-            this.statMousePos.Description = "Player position";
-            this.statMousePos.Hint = "Player position";
-            this.statMousePos.Id = 82;
-            this.statMousePos.Name = "statMousePos";
+            this.lblMousePos.Alignment = DevExpress.XtraBars.BarItemLinkAlignment.Right;
+            this.lblMousePos.Caption = "mousePos";
+            this.lblMousePos.Description = "Player position";
+            this.lblMousePos.Hint = "Player position";
+            this.lblMousePos.Id = 82;
+            this.lblMousePos.Name = "lblMousePos";
+            // 
+            // barEditMeshes
+            // 
+            this.barEditMeshes.BarName = "EditMeshes";
+            this.barEditMeshes.DockCol = 0;
+            this.barEditMeshes.DockRow = 1;
+            this.barEditMeshes.DockStyle = DevExpress.XtraBars.BarDockStyle.Top;
+            this.barEditMeshes.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
+            new DevExpress.XtraBars.LinkPersistInfo(this.groupImportExportNodes, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.groupEditMeshes, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.groupDeleteNodes, true)});
+            this.barEditMeshes.Text = "EditMeshes";
+            this.barEditMeshes.Visible = false;
+            // 
+            // groupImportExportNodes
+            // 
+            this.groupImportExportNodes.Caption = "ImportExportNodes";
+            this.groupImportExportNodes.Id = 72;
+            this.groupImportExportNodes.ItemLinks.Add(this.btnImportMeshesFromGame, true);
+            this.groupImportExportNodes.ItemLinks.Add(this.btnImportMeshesFromProfile);
+            this.groupImportExportNodes.ItemLinks.Add(this.btnExportMeshes);
+            this.groupImportExportNodes.ItemLinks.Add(this.btnClearMeshes, true);
+            this.groupImportExportNodes.Name = "groupImportExportNodes";
+            // 
+            // btnImportMeshesFromGame
+            // 
+            this.btnImportMeshesFromGame.Caption = "Import from Game";
+            this.btnImportMeshesFromGame.Id = 51;
+            this.btnImportMeshesFromGame.ImageOptions.Image = global::EntityTools.Properties.Resources.miniClone;
+            this.btnImportMeshesFromGame.Name = "btnImportMeshesFromGame";
+            this.btnImportMeshesFromGame.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ImportCurrentMapMeshesFromGame);
+            // 
+            // btnImportMeshesFromProfile
+            // 
+            this.btnImportMeshesFromProfile.Caption = "Import from Profile";
+            this.btnImportMeshesFromProfile.Id = 52;
+            this.btnImportMeshesFromProfile.ImageOptions.Image = global::EntityTools.Properties.Resources.miniImport;
+            this.btnImportMeshesFromProfile.Name = "btnImportMeshesFromProfile";
+            this.btnImportMeshesFromProfile.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ImportMapMeshesFromFile);
+            // 
+            // btnExportMeshes
+            // 
+            this.btnExportMeshes.Caption = "Export to Mesh";
+            this.btnExportMeshes.Enabled = false;
+            this.btnExportMeshes.Id = 55;
+            this.btnExportMeshes.ImageOptions.Image = global::EntityTools.Properties.Resources.miniExport;
+            this.btnExportMeshes.Name = "btnExportMeshes";
+            this.btnExportMeshes.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
+            this.btnExportMeshes.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ExportCurrentMapMeshes2File);
+            // 
+            // btnClearMeshes
+            // 
+            this.btnClearMeshes.Caption = "Clear";
+            this.btnClearMeshes.Id = 63;
+            this.btnClearMeshes.ImageOptions.Image = global::EntityTools.Properties.Resources.miniDelete;
+            this.btnClearMeshes.Name = "btnClearMeshes";
+            this.btnClearMeshes.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ClearCurrentMapMeshes);
+            // 
+            // groupEditMeshes
+            // 
+            this.groupEditMeshes.Caption = "EditMeshes";
+            this.groupEditMeshes.Id = 96;
+            this.groupEditMeshes.ItemLinks.Add(this.btnAddEdge);
+            this.groupEditMeshes.ItemLinks.Add(this.btnRemoveEdge);
+            this.groupEditMeshes.ItemLinks.Add(this.btnMoveNode);
+            this.groupEditMeshes.Name = "groupEditMeshes";
+            // 
+            // btnAddEdge
+            // 
+            this.btnAddEdge.Caption = "AddEdge";
+            this.btnAddEdge.Id = 94;
+            this.btnAddEdge.ImageOptions.Image = global::EntityTools.Properties.Resources.miniAddEdge;
+            this.btnAddEdge.Name = "btnAddEdge";
+            this.btnAddEdge.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
+            this.btnAddEdge.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AddEdge_ModeChanged);
+            // 
+            // btnRemoveEdge
+            // 
+            this.btnRemoveEdge.Caption = "RemoveEdge";
+            this.btnRemoveEdge.Id = 95;
+            this.btnRemoveEdge.ImageOptions.Image = global::EntityTools.Properties.Resources.miniRemoveEdge;
+            this.btnRemoveEdge.Name = "btnRemoveEdge";
+            this.btnRemoveEdge.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
+            this.btnRemoveEdge.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_RemoveEdge_ModeChanged);
+            // 
+            // btnMoveNode
+            // 
+            this.btnMoveNode.Caption = "MoveNode";
+            this.btnMoveNode.Id = 92;
+            this.btnMoveNode.ImageOptions.Image = global::EntityTools.Properties.Resources.miniMoveNode;
+            this.btnMoveNode.Name = "btnMoveNode";
+            this.btnMoveNode.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_MoveNode_ModeChanged);
+            // 
+            // groupDeleteNodes
+            // 
+            this.groupDeleteNodes.Caption = "DeleteNodes";
+            this.groupDeleteNodes.Id = 97;
+            this.groupDeleteNodes.ItemLinks.Add(this.btnRemoveOneNode, false, "", "", true);
+            this.groupDeleteNodes.ItemLinks.Add(this.btnRemoveRectNodeGroup, false, "", "", true);
+            this.groupDeleteNodes.ItemLinks.Add(this.btnRemoveEllNodeGroup, false, "", "", true);
+            this.groupDeleteNodes.Name = "groupDeleteNodes";
+            // 
+            // btnRemoveOneNode
+            // 
+            this.btnRemoveOneNode.Caption = "RemoveOneNode";
+            this.btnRemoveOneNode.Id = 93;
+            this.btnRemoveOneNode.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCancel;
+            this.btnRemoveOneNode.Name = "btnRemoveOneNode";
+            this.btnRemoveOneNode.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_RemoveNode_ModeChanged);
+            // 
+            // btnRemoveRectNodeGroup
+            // 
+            this.btnRemoveRectNodeGroup.Caption = "RemoveRectangularNodeGroup";
+            this.btnRemoveRectNodeGroup.Id = 99;
+            this.btnRemoveRectNodeGroup.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCRRectang;
+            this.btnRemoveRectNodeGroup.Name = "btnRemoveRectNodeGroup";
+            this.btnRemoveRectNodeGroup.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
+            this.btnRemoveRectNodeGroup.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_RemoveRectNodeGroup_ModeChanged);
+            // 
+            // btnRemoveEllNodeGroup
+            // 
+            this.btnRemoveEllNodeGroup.Caption = "RemoveEllipticalNodeGroup";
+            this.btnRemoveEllNodeGroup.Id = 100;
+            this.btnRemoveEllNodeGroup.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCREllipce;
+            this.btnRemoveEllNodeGroup.Name = "btnRemoveEllNodeGroup";
+            this.btnRemoveEllNodeGroup.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
+            this.btnRemoveEllNodeGroup.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_RemoveEllNodeGroup_ModeChanged);
             // 
             // barDockControlTop
             // 
@@ -545,7 +623,7 @@ namespace EntityTools.Patches.Mapper
             this.barDockControlTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.barDockControlTop.Location = new System.Drawing.Point(0, 0);
             this.barDockControlTop.Manager = this.barManager;
-            this.barDockControlTop.Size = new System.Drawing.Size(388, 28);
+            this.barDockControlTop.Size = new System.Drawing.Size(388, 56);
             // 
             // barDockControlBottom
             // 
@@ -559,51 +637,29 @@ namespace EntityTools.Patches.Mapper
             // 
             this.barDockControlLeft.CausesValidation = false;
             this.barDockControlLeft.Dock = System.Windows.Forms.DockStyle.Left;
-            this.barDockControlLeft.Location = new System.Drawing.Point(0, 28);
+            this.barDockControlLeft.Location = new System.Drawing.Point(0, 56);
             this.barDockControlLeft.Manager = this.barManager;
-            this.barDockControlLeft.Size = new System.Drawing.Size(0, 312);
+            this.barDockControlLeft.Size = new System.Drawing.Size(0, 284);
             // 
             // barDockControlRight
             // 
             this.barDockControlRight.CausesValidation = false;
             this.barDockControlRight.Dock = System.Windows.Forms.DockStyle.Right;
-            this.barDockControlRight.Location = new System.Drawing.Point(388, 28);
+            this.barDockControlRight.Location = new System.Drawing.Point(388, 56);
             this.barDockControlRight.Manager = this.barManager;
-            this.barDockControlRight.Size = new System.Drawing.Size(0, 312);
+            this.barDockControlRight.Size = new System.Drawing.Size(0, 284);
             // 
-            // barMapper
+            // groupNodes
             // 
-            this.barMapper.Caption = "Mapping";
-            this.barMapper.Hint = "Make the Path";
-            this.barMapper.Id = 36;
-            this.barMapper.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuCheckStopMapping),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuBidirectional),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuUnidirectional),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuLinearPath, true),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuForceLinkLast, true)});
-            this.barMapper.Name = "barMapper";
-            // 
-            // barCustomRegion
-            // 
-            this.barCustomRegion.Caption = "CustomRegion";
-            this.barCustomRegion.Id = 47;
-            this.barCustomRegion.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuRectangularCR),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuEllipticalCR)});
-            this.barCustomRegion.Name = "barCustomRegion";
-            // 
-            // barNodes
-            // 
-            this.barNodes.Caption = "Nodes";
-            this.barNodes.Id = 50;
-            this.barNodes.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuImportGame),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuImportProfile),
+            this.groupNodes.Caption = "Nodes";
+            this.groupNodes.Id = 50;
+            this.groupNodes.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnImportMeshesFromGame),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnImportMeshesFromProfile),
             new DevExpress.XtraBars.LinkPersistInfo(this.menuImportMesh),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuExportMesh, true),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuClear, true)});
-            this.barNodes.Name = "barNodes";
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnExportMeshes, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnClearMeshes, true)});
+            this.groupNodes.Name = "groupNodes";
             // 
             // menuImportMesh
             // 
@@ -611,38 +667,6 @@ namespace EntityTools.Patches.Mapper
             this.menuImportMesh.Id = 53;
             this.menuImportMesh.ImageOptions.Image = global::EntityTools.Properties.Resources.miniImport;
             this.menuImportMesh.Name = "menuImportMesh";
-            // 
-            // barOptions
-            // 
-            this.barOptions.Caption = "Option";
-            this.barOptions.Hint = "Option";
-            this.barOptions.Id = 57;
-            this.barOptions.ImageOptions.Image = global::EntityTools.Properties.Resources.miniGear;
-            this.barOptions.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuWaypointDistance),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuMaxZDifference),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuEquivalenceDistance),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuDeleteRadius)});
-            this.barOptions.MenuAppearance.MenuBar.Image = global::EntityTools.Properties.Resources.miniGear;
-            this.barOptions.MenuAppearance.MenuBar.Options.UseImage = true;
-            this.barOptions.MenuAppearance.MenuCaption.Image = global::EntityTools.Properties.Resources.miniGear;
-            this.barOptions.MenuAppearance.MenuCaption.Options.UseImage = true;
-            this.barOptions.Name = "barOptions";
-            // 
-            // menuBtnStopMapping
-            // 
-            this.menuBtnStopMapping.Caption = "Stop Mapping";
-            this.menuBtnStopMapping.GroupIndex = 1;
-            this.menuBtnStopMapping.Id = 68;
-            this.menuBtnStopMapping.ImageOptions.Image = global::EntityTools.Properties.Resources.miniStop;
-            this.menuBtnStopMapping.Name = "menuBtnStopMapping";
-            this.menuBtnStopMapping.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_StopMapping);
-            // 
-            // statCenterPlayerText
-            // 
-            this.statCenterPlayerText.Caption = "Center Player";
-            this.statCenterPlayerText.Id = 88;
-            this.statCenterPlayerText.Name = "statCenterPlayerText";
             // 
             // btnShowStatBar
             // 
@@ -677,7 +701,7 @@ namespace EntityTools.Patches.Mapper
             this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.Name = "MapperFormExt";
             this.ShowIcon = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Mapper(Extended)";
             this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.handler_ClosingMapperForm);
@@ -706,18 +730,15 @@ namespace EntityTools.Patches.Mapper
         private BarDockControl barDockControlBottom;
         private BarDockControl barDockControlLeft;
         private BarDockControl barDockControlRight;
-        private BarSubItem barMapper;
-        private BarCheckItem menuUnidirectional;
+        private BarCheckItem btnUnidirectional;
         private RepositoryItemSpinEdit seDeleteRadius;
-        private BarSubItem barCustomRegion;
-        private BarButtonItem menuRectangularCR;
-        private BarButtonItem menuEllipticalCR;
-        private BarSubItem barNodes;
-        private BarButtonItem menuImportGame;
-        private BarButtonItem menuImportProfile;
+        private BarButtonItem btnRectangularCR;
+        private BarButtonItem btnEllipticalCR;
+        private BarSubItem groupNodes;
+        private BarButtonItem btnImportMeshesFromGame;
+        private BarButtonItem btnImportMeshesFromProfile;
         private BarButtonItem menuImportMesh;
-        private BarButtonItem menuExportMesh;
-        private BarSubItem barOptions;
+        private BarButtonItem btnExportMeshes;
         private BarEditItem menuWaypointDistance;
         private RepositoryItemSpinEdit seWaypointDistance;
         private BarEditItem menuMaxZDifference;
@@ -725,34 +746,40 @@ namespace EntityTools.Patches.Mapper
         private BarEditItem menuEquivalenceDistance;
         private RepositoryItemSpinEdit seEquivalenceDistance;
         private BarEditItem menuDeleteRadius;
-        private BarButtonItem menuClear;
-        private BarCheckItem menuBidirectional;
-        private BarCheckItem menuForceLinkLast;
-        private BarCheckItem menuLinearPath;
-        private BarCheckItem menuCheckStopMapping;
-        private Bar toolbarMainMapper;
-        private BarButtonItem menuBtnStopMapping;
-        private BarButtonGroup toolGroupMapping;
-        private BarButtonGroup toolGroupCR;
-        private BarButtonGroup toolGroupNodes;
-        private BarButtonItem menuOptions;
+        private BarButtonItem btnClearMeshes;
+        private BarCheckItem btnBidirectional;
+        private BarCheckItem btnForceLinkLast;
+        private BarCheckItem btnLinearPath;
+        private BarCheckItem btnStopMapping;
+        private Bar barMainTools;
+        private BarButtonGroup groupMapping;
+        private BarButtonGroup groupCR;
+        private BarButtonGroup groupImportExportNodes;
+        private BarButtonItem btnOptions;
         private PopupMenu popMenuOptions;
-        private Bar toolbarCustomRegion;
-        private BarStaticItem menuLableCR;
+        private Bar barCustomRegion;
+        private BarStaticItem lblCR;
         private BarEditItem menuCRName;
         private RepositoryItemTextEdit teCRName;
-        private BarButtonItem menuCRAccept;
-        private BarButtonItem menuCRCancel;
-        private BarCheckItem menuCacheActive;
+        private BarButtonItem btnCRAccept;
+        private BarButtonItem btnCRCancel;
         private Bar statusBar;
-        private BarStaticItem statMousePos;
-        private BarEditItem statZoom;
+        private BarStaticItem lblMousePos;
+        private BarEditItem trbarZoom;
         private RepositoryItemZoomTrackBar zoomer;
-        private BarStaticItem statCenterPlayerText;
-        private BarCheckItem statLockMapOnPlayer;
+        private BarCheckItem btnLockMapOnPlayer;
         private BindingSource bsrcAstralSettings;
         private Button btnShowStatBar;
-        private BarButtonItem nemuSave;
+        private BarButtonItem btnSaveMeshes;
+        private Bar barEditMeshes;
+        private BarCheckItem btnMoveNode;
+        private BarCheckItem btnRemoveOneNode;
+        private BarCheckItem btnAddEdge;
+        private BarCheckItem btnRemoveEdge;
+        private BarButtonGroup groupEditMeshes;
+        private BarButtonGroup groupDeleteNodes;
+        private BarCheckItem btnRemoveRectNodeGroup;
+        private BarCheckItem btnRemoveEllNodeGroup;
     } 
 #endif
 }
