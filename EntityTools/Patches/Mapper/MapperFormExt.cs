@@ -261,23 +261,7 @@ namespace EntityTools.Patches.Mapper
             EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible = statusBar.Visible;
             EntityTools.PluginSettings.Mapper.MapperForm.Location = Location;
 
-            MappingCanceler?.Cancel();
-            backgroundWorker?.CancelAsync();
-#if AstralMapper
-            if (mapper != null)
-            {
-                MapperStopDrawing?.Invoke(mapper); 
-
-                //mapper.DoubleClick -= eventMapperDoubleClick;
-                //mapper.CustomDraw -= eventMapperDrawCache;
-
-                //if (SubscribedMapperMouseDoubleClick
-                //    && ReflectionHelper.GetFieldValue(mapper, "MapPicture", out object mapPictureObj, BindingFlags.Instance | BindingFlags.NonPublic)
-                //    && ReflectionHelper.UnsubscribeEvent(mapPictureObj, "MouseDoubleClick", this, "eventMapperDoubleClick", true))
-                //    SubscribedMapperMouseDoubleClick = false;
-            }
-#endif
-            MapperHelper_CustomRegion.Reset();
+            InterruptAllModifications();
 
             lastNodeDetail = null;
             Binds.RemoveShiftAction(Keys.M);
@@ -382,6 +366,8 @@ namespace EntityTools.Patches.Mapper
                 if (MappingTask == null
                     || MappingTask.IsCanceled || MappingTask.IsCompleted || MappingTask.IsFaulted)
                 {
+                    InterruptAllModifications();
+
                     mapAndRegion_whereMapping = EntityManager.LocalPlayer.MapAndRegion;
                     MappingCanceler = new CancellationTokenSource();
                     MappingTask = Task.Factory.StartNew(() => work_Mapping(MappingCanceler.Token), MappingCanceler.Token);
@@ -401,9 +387,7 @@ namespace EntityTools.Patches.Mapper
             MappingCanceler?.Cancel();
             lastNodeDetail = null;
             btnBidirectional.Checked = false;
-            btnBidirectional.Reset();
             btnUnidirectional.Checked = false;
-            btnUnidirectional.Reset();
             btnStopMapping.Checked = true;
             graphCache?.StopCache();
         }
@@ -489,6 +473,158 @@ namespace EntityTools.Patches.Mapper
         }
         #endregion
 
+        #region CustomRegion_Manipulation
+        /// <summary>
+        /// Запуск процедуры добавления прямоугольного региона
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void handler_AddRectangularCR(object sender, ItemClickEventArgs e)
+        {
+            InterruptAllModifications();
+
+            btnLockMapOnPlayer.Checked = false;
+
+            barCustomRegion.FloatLocation = new Point(Location.X + 40, Location.Y + 60);
+            barCustomRegion.Visible = true;
+            MapperHelper_CustomRegion.BeginAdd(mapper, false);
+        }
+
+        /// <summary>
+        /// Запуск процедуры добавления элиптического региона
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void handler_AddElipticalCR(object sender, ItemClickEventArgs e)
+        {
+            InterruptAllModifications();
+
+            btnLockMapOnPlayer.Checked = false;
+
+            barCustomRegion.FloatLocation = new Point(Location.X + 40, Location.Y + 60);
+            barCustomRegion.Visible = true;
+            MapperHelper_CustomRegion.BeginAdd(mapper, true);
+        }
+
+        /// <summary>
+        /// Завершение процедуры добавления региона
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void handler_MenuCRAcceptClick(object sender, ItemClickEventArgs e)
+        {
+            string crName = menuCRName.EditValue.ToString()?.Trim();
+            if (string.IsNullOrEmpty(crName))
+            {
+                XtraMessageBox.Show("The Name of the CustomRegion is not valid !");
+                return;
+            }
+            else if (MapperHelper_CustomRegion.IsComplete)
+            {
+                if (MapperHelper_CustomRegion.Finish(crName))
+                    barCustomRegion.Visible = false;
+                else XtraMessageBox.Show("The Name of the CustomRegion is not valid !");
+            }
+            else XtraMessageBox.Show("Finish the edition of the CuatomRegion!");
+        }
+
+        /// <summary>
+        /// Прерывание процедуры добавления региона
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void handler_MenuCRCancelClick(object sender, ItemClickEventArgs e)
+        {
+            MapperHelper_CustomRegion.Reset();
+            barCustomRegion.Visible = false;
+        }
+        #endregion
+
+        private void handler_DeleteRadiusChanged(object sender, EventArgs e)
+        {
+            Astral.API.CurrentSettings.DeleteNodeRadius = Convert.ToInt32(menuDeleteRadius.EditValue);
+        }
+        private void handler_WaypointDistanceChanged(object sender, EventArgs e)
+        {
+            EntityTools.PluginSettings.Mapper.WaypointDistance = Convert.ToInt32(menuWaypointDistance.EditValue);
+        }
+
+        private void handler_ZoomChanged(object sender, EventArgs e)
+        {
+            mapper.ZoomPos = Convert.ToInt32(trbarZoom.EditValue);
+        }
+        private void handler_MouseWheel(object sender, MouseEventArgs e)
+        {
+            int delta = 0;
+            if(e.Delta > 0)
+                delta = 1;
+            else if(e.Delta < 0)
+                delta = -1;
+            //mapper.ZoomPos += delta;
+            trbarZoom.EditValue = mapper.ZoomPos + delta;
+        }
+        private void handler_SetZoom(object sender, int zoomPos)
+        {
+            trbarZoom.EditValue = zoomPos;
+        }
+
+        private void handler_MapLockOnOnPlayerChanged(object sender, ItemClickEventArgs e)
+        {
+            mapper.MapLockOnPlayer = btnLockMapOnPlayer.Checked;
+        }
+
+        private void handler_SetMapLockOnPlayer(object sender, DevExpress.XtraEditors.Filtering.CheckedChangedEventArgs e)
+        {
+            btnLockMapOnPlayer.Checked = e.IsChecked;
+        }
+
+        private void handler_ShowStatusBar(object sender, EventArgs e)
+        {
+            statusBar.Visible = true;
+            btnShowStatBar.Visible = false;
+        }
+
+        private void handler_BarVisibleChanged(object sender, EventArgs e)
+        {
+            EntityTools.PluginSettings.Mapper.MapperForm.MainToolsBarVisible = barMainTools.Visible;
+            EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible = statusBar.Visible;
+            EntityTools.PluginSettings.Mapper.MapperForm.EditMeshesBarVisible = barEditMeshes.Visible;
+
+            btnShowStatBar.Visible = !statusBar.Visible && !barMainTools.Visible && !barEditMeshes.Visible;
+        }
+
+        /// <summary>
+        /// Прерывание всех операций по изменению графа путей (мешей)
+        /// </summary>
+        private void InterruptAllModifications(MeshesEditMode mode = MeshesEditMode.None)
+        {
+            if(mode != MeshesEditMode.Mapping)
+                MappingCanceler?.Cancel();
+
+            if (mode != MeshesEditMode.EditEdges)
+            {
+                btnEditEdges.Checked = false;
+                MapperHelper_EditEdges.Reset();
+            }
+
+            if (mode != MeshesEditMode.MoveNodes)
+            {
+                btnMoveNodes.Checked = false;
+                MapperHelper_MoveNodes.Reset(); 
+            }
+            if (mode != MeshesEditMode.RemoveNodes)
+            {
+                btnRemoveNodes.Checked = false;
+                MapperHelper_RemoveNodes.Reset(); 
+            }
+
+            if (mode != MeshesEditMode.EditCustomRegion)
+            {
+                handler_MenuCRCancelClick(@this, null);
+                MapperHelper_CustomRegion.Reset();
+            }
+        }
+
         #region Meshes_Manipulation
         /// <summary>
         /// Сохранение в файл текущего Quester-профиля
@@ -500,6 +636,7 @@ namespace EntityTools.Patches.Mapper
             // Сохранение профиля реализовано
             // Astral.Quester.Core.Save(false)
 
+            // TODO: Выполнять "сжатие" графа (удалять невидимые вершины и ребра)
             // TODO: сохранять файл профиля, поскольку регионы хранятся в профиле.
 
             string mapName = EntityManager.LocalPlayer.MapState.MapName;
@@ -590,8 +727,6 @@ namespace EntityTools.Patches.Mapper
                 MapperStartDrawing?.Invoke(mapper); 
 #endif
             }
-            //GoldenPath.GetCurrentMapGraph(coreMeshes);
-            //GetCurrentMapGraph?.Invoke(coreMeshes);
         }
 
         /// <summary>
@@ -697,92 +832,6 @@ namespace EntityTools.Patches.Mapper
                     Logger.WriteLine(exc.ToString());
                     XtraMessageBox.Show(exc.ToString());
                 }
-#if false
-                // Код перенесен из Astral'a
-                Dictionary<string, Graph> profileMeshes = new Dictionary<string, Graph>();
-                List<Class88.Class89> list = new List<Class88.Class89>();
-                List<Type> baseTypeList = new List<Type>
-                {
-                    typeof(Astral.Quester.Classes.Action),
-                    typeof(Condition)
-                };
-                Class88.Class89 @class = new Class88.Class89(profileMeshes, Class88.Class89.Enum2.const_1, "meshes.bin", null);
-                list.Add(@class);
-                Class88.smethod_4(openFileDialog.FileName, list);
-                if (@class.Success)
-                {
-                    profileMeshes = (@class.Object as Dictionary<string, Graph>);
-                }
-                else
-                {
-                    list.Clear();
-                    profileMeshes = new Dictionary<string, Graph>();
-                    //if (CoreAvailableMeshesFromFile != null)
-                    //    foreach (string str in CoreAvailableMeshesFromFile(openFileDialog.FileName))
-                    //    foreach (string str in Astral.Quester.Core.AvailableMeshesFromFile(openFileDialog.FileName))
-                    foreach (string str in AstralAccessors.Quester.Core.AvailableMeshesFromFile(openFileDialog.FileName))
-                    {
-                        Class88.Class89 item = new Class88.Class89(new Graph(), Class88.Class89.Enum2.const_1, str + ".bin", null);
-                        list.Add(item);
-                    }
-                    Class88.smethod_4(openFileDialog.FileName, list);
-                    foreach (Class88.Class89 class2 in list)
-                    {
-                        ETLogger.WriteLine("found : " + class2.FileName + " : " + class2.Success.ToString());
-                        if (class2.Success)
-                        {
-                            profileMeshes.Add(class2.FileName.Replace(".bin", ""), class2.Object as Graph);
-                        }
-                    }
-                }
-                DialogResult dialogResult = XtraMessageBox.Show("Import nodes for the current map only ? Else import all.", "Nodes import", MessageBoxButtons.YesNoCancel);
-                if (dialogResult == DialogResult.Yes)
-                {
-                    if (profileMeshes.ContainsKey(mapName))
-                    {
-                        //if (((Graph)CoreCurrentMapMeshes).Nodes.Count == 0 
-                        if (((Graph)AstralAccessors.Quester.Core.Meshes).Nodes.Count == 0
-                            || Class81.smethod_0("Are you sure, that will delete current map nodes ?", null))
-                        {
-                            handler_StopMapping();
-#if AstralMapper
-                            MapperStopDrawing?.Invoke(mapper); 
-#endif
-                            //var coreMeshes = CoreMapsMeshes.Value;
-                            var mapsMeshes = AstralAccessors.Quester.Core.MapsMeshes.Value;
-                            lock (mapsMeshes)
-                            {
-                                mapsMeshes[mapName] = profileMeshes[mapName];
-                            }
-#if AstralMapper
-                            MapperStartDrawing?.Invoke(mapper); 
-#endif
-                        }
-                    }
-                    else
-                    {
-                        XtraMessageBox.Show("This profile doesn't contain nodes for this map !");
-                    }
-                }
-                if (dialogResult == DialogResult.No
-                    //&& ((((Graph)CoreCurrentMapMeshes).Nodes.Count == 0 && CoreMapsMeshes.Value.Count <= 1)
-                    && ((((Graph)AstralAccessors.Quester.Core.Meshes).Nodes.Count == 0 && AstralAccessors.Quester.Core.MapsMeshes.Value.Count <= 1)
-                    || Class81.smethod_0("Are you sure, that will delete all maps nodes ?", null)))
-                {
-                    handler_StopMapping();
-#if AstralMapper
-                    MapperStopDrawing?.Invoke(mapper); 
-#endif
-                    lock (AstralAccessors.Quester.Core.MapsMeshes)
-                    {
-                        //CoreMapsMeshes.Value = profileMeshes;
-                        AstralAccessors.Quester.Core.MapsMeshes.Value = profileMeshes;
-                    }
-#if AstralMapper
-                    MapperStartDrawing?.Invoke(mapper); 
-#endif
-                }
-#endif
             }
         }
 
@@ -835,11 +884,7 @@ namespace EntityTools.Patches.Mapper
                 MapperStopDrawing?.Invoke(mapper); 
 #endif
                 //Graph graph = CoreCurrentMapMeshes;
-                Graph graph = AstralAccessors.Quester.Core.Meshes;
-                lock (graph.Locker)
-                {
-                    graph.Clear();
-                }
+                ((Graph)AstralAccessors.Quester.Core.Meshes).Clear();
 #if AstralMapper
                 MapperStartDrawing?.Invoke(mapper); 
 #endif
@@ -847,251 +892,179 @@ namespace EntityTools.Patches.Mapper
         }
         #endregion
 
-        #region CustomRegion_Manipulation
-        /// <summary>
-        /// Запуск процедуры добавления прямоугольного региона
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void handler_AddRectangularCR(object sender, ItemClickEventArgs e)
-        {
-            btnLockMapOnPlayer.Checked = false;
-
-            barCustomRegion.FloatLocation = new Point(Location.X + 40, Location.Y + 60);
-            barCustomRegion.Visible = true;
-            MapperHelper_CustomRegion.BeginAdd(mapper, false);
-        }
-
-        /// <summary>
-        /// Запуск процедуры добавления элиптического региона
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void handler_AddElipticalCR(object sender, ItemClickEventArgs e)
-        {
-            btnLockMapOnPlayer.Checked = false;
-
-            barCustomRegion.FloatLocation = new Point(Location.X + 40, Location.Y + 60);
-            barCustomRegion.Visible = true;
-            MapperHelper_CustomRegion.BeginAdd(mapper, true);
-        }
-
-        /// <summary>
-        /// Завершение процедуры добавления региона
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void handler_MenuCRAcceptClick(object sender, ItemClickEventArgs e)
-        {
-            string crName = menuCRName.EditValue.ToString()?.Trim();
-            if (string.IsNullOrEmpty(crName))
-            {
-                XtraMessageBox.Show("The Name of the CustomRegion is not valid !");
-                return;
-            }
-            else if (MapperHelper_CustomRegion.IsComplete)
-            {
-                if (MapperHelper_CustomRegion.Finish(crName))
-                    barCustomRegion.Visible = false;
-                else XtraMessageBox.Show("The Name of the CustomRegion is not valid !");
-            }
-            else XtraMessageBox.Show("Finish the edition of the CuatomRegion!");
-        }
-
-        /// <summary>
-        /// Прерывание процедуры добавления региона
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void handler_MenuCRCancelClick(object sender, ItemClickEventArgs e)
-        {
-            MapperHelper_CustomRegion.Reset();
-            barCustomRegion.Visible = false;
-        }
-        #endregion
-
-        private void handler_DeleteRadiusChanged(object sender, EventArgs e)
-        {
-            Astral.API.CurrentSettings.DeleteNodeRadius = Convert.ToInt32(menuDeleteRadius.EditValue);
-        }
-        private void handler_WaypointDistanceChanged(object sender, EventArgs e)
-        {
-            EntityTools.PluginSettings.Mapper.WaypointDistance = Convert.ToInt32(menuWaypointDistance.EditValue);
-        }
-
-        private void handler_ZoomChanged(object sender, EventArgs e)
-        {
-            mapper.ZoomPos = Convert.ToInt32(trbarZoom.EditValue);
-        }
-        private void handler_MouseWheel(object sender, MouseEventArgs e)
-        {
-            int delta = 0;
-            if(e.Delta > 0)
-                delta = 1;
-            else if(e.Delta < 0)
-                delta = -1;
-            //mapper.ZoomPos += delta;
-            trbarZoom.EditValue = mapper.ZoomPos + delta;
-        }
-        private void handler_SetZoom(object sender, int zoomPos)
-        {
-            trbarZoom.EditValue = zoomPos;
-        }
-
-        private void handler_MapLockOnOnPlayerChanged(object sender, ItemClickEventArgs e)
-        {
-            mapper.MapLockOnPlayer = btnLockMapOnPlayer.Checked;
-        }
-
-        private void handler_SetMapLockOnPlayer(object sender, DevExpress.XtraEditors.Filtering.CheckedChangedEventArgs e)
-        {
-            btnLockMapOnPlayer.Checked = e.IsChecked;
-        }
-
-        private void handler_ShowStatusBar(object sender, EventArgs e)
-        {
-            statusBar.Visible = true;
-            btnShowStatBar.Visible = false;
-        }
-
-        private void handler_VisibleChanged(object sender, EventArgs e)
-        {
-            EntityTools.PluginSettings.Mapper.MapperForm.MainToolsBarVisible = barMainTools.Visible;
-            EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible = statusBar.Visible;
-
-            btnShowStatBar.Visible = !statusBar.Visible && !barMainTools.Visible;
-        }
-
-        /// <summary>
-        /// Прерывание всех операций по изменению графа путей (мешей)
-        /// </summary>
-        private void InterruptAllModifications()
-        {
-            MappingCanceler?.Cancel();
-            handler_MenuCRCancelClick(@this, null);
-            MapperHelper_MoveNode.Reset();
-            MapperHelper_RemoveOneNode.Reset();
-        }
-
         #region EditMeshes
-#if false
         enum MeshesEditMode
         {
             None,
-            MoveNode,
-            RemoveEdge,
-            AddEdge,
-            RemoveOneNode,
-            RemoveRectangularNodesGroup,
-            RemoveEllipticalNodesGroup
-        }
-        private MeshesEditMode meshesEditMode = MeshesEditMode.None; 
-#endif
-
-        private void handler_AddEdge_ModeChanged(object sender, ItemClickEventArgs e)
-        {
-            if (btnAddEdge.Checked)
-            {
-                InterruptAllModifications();
-
-                btnMoveNode.Checked = false;
-                //btnAddEdge.Checked = false;
-                btnRemoveEdge.Checked = false;
-                btnRemoveOneNode.Checked = false;
-                btnRemoveEllNodeGroup.Checked = false;
-                btnRemoveRectNodeGroup.Checked = false;
-
-                MapperHelper_MoveNode.Initialize(mapper);
-            }
+            Mapping,
+            MoveNodes,
+            RemoveNodes,
+            EditEdges,
+            EditCustomRegion,
         }
 
-        private void handler_RemoveEdge_ModeChanged(object sender, ItemClickEventArgs e)
+        private void handler_EditEdges_ModeChanged(object sender, ItemClickEventArgs e)
         {
-            if (btnRemoveEdge.Checked)
+            if (btnEditEdges.Checked)
             {
-                InterruptAllModifications();
+                InterruptAllModifications(MeshesEditMode.EditEdges);
 
-                btnMoveNode.Checked = false;
-                btnAddEdge.Checked = false;
-                //btnRemoveEdge.Checked = false;
-                btnRemoveOneNode.Checked = false;
-                btnRemoveEllNodeGroup.Checked = false;
-                btnRemoveRectNodeGroup.Checked = false;
+                btnLockMapOnPlayer.Checked = false;
 
-                //MapperHelper_MoveNode.Initialize(mapper);
+                MapperHelper_EditEdges.Initialize(mapper);
             }
+            else MapperHelper_EditEdges.Reset();
         }
 
-        private void handler_MoveNode_ModeChanged(object sender, ItemClickEventArgs e)
+        private void handler_MoveNodes_ModeChanged(object sender, ItemClickEventArgs e)
         {
-            if (btnMoveNode.Checked)
+            if (btnMoveNodes.Checked)
             {
-                InterruptAllModifications();
+                InterruptAllModifications(MeshesEditMode.MoveNodes);
 
-                //btnMoveNode.Checked = false;
-                btnAddEdge.Checked = false;
-                btnRemoveEdge.Checked = false;
-                btnRemoveOneNode.Checked = false;
-                btnRemoveEllNodeGroup.Checked = false;
-                btnRemoveRectNodeGroup.Checked = false;
+                btnLockMapOnPlayer.Checked = false;
 
-                MapperHelper_MoveNode.Initialize(mapper);
+                MapperHelper_MoveNodes.Initialize(mapper);
             }
-            else MapperHelper_MoveNode.Reset();
+            else MapperHelper_MoveNodes.Reset();
         }
 
-        private void handler_RemoveNode_ModeChanged(object sender, ItemClickEventArgs e)
+        private void handler_RemoveNodes_ModeChanged(object sender, ItemClickEventArgs e)
         {
-            if (btnRemoveOneNode.Checked)
+            if (btnRemoveNodes.Checked)
             {
-                InterruptAllModifications();
+                InterruptAllModifications(MeshesEditMode.RemoveNodes);
 
-                btnMoveNode.Checked = false;
-                btnAddEdge.Checked = false;
-                btnRemoveEdge.Checked = false;
-                //btnRemoveOneNode.Checked = false;
-                btnRemoveEllNodeGroup.Checked = false;
-                btnRemoveRectNodeGroup.Checked = false;
+                btnLockMapOnPlayer.Checked = false;
 
-                MapperHelper_RemoveOneNode.Initialize(mapper);
+                MapperHelper_RemoveNodes.Initialize(mapper);
             }
-            else MapperHelper_RemoveOneNode.Reset();
+            else MapperHelper_RemoveNodes.Reset();
         }
 
-        private void handler_RemoveRectNodeGroup_ModeChanged(object sender, ItemClickEventArgs e)
+        private void handler_Undo(object sender, ItemClickEventArgs e)
         {
-            if (btnRemoveRectNodeGroup.Checked)
-            {
-                InterruptAllModifications();
-
-                btnMoveNode.Checked = false;
-                btnAddEdge.Checked = false;
-                btnRemoveEdge.Checked = false;
-                btnRemoveOneNode.Checked = false;
-                btnRemoveEllNodeGroup.Checked = false;
-                //btnRemoveRectNodeGroup.Checked = false;
-
-                //MapperHelper_RemoveOneNode.Initialize(mapper);
-            }
-        }
-
-        private void handler_RemoveEllNodeGroup_ModeChanged(object sender, ItemClickEventArgs e)
-        {
-            if (btnRemoveEllNodeGroup.Checked)
-            {
-                InterruptAllModifications();
-
-                btnMoveNode.Checked = false;
-                btnAddEdge.Checked = false;
-                btnRemoveEdge.Checked = false;
-                btnRemoveOneNode.Checked = false;
-                //btnRemoveEllNodeGroup.Checked = false;
-                btnRemoveRectNodeGroup.Checked = false;
-
-                //MapperHelper_RemoveOneNode.Initialize(mapper);
-            }
+            InterruptAllModifications();
         }
         #endregion
+
+        private void btnMeshesInfo_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            int correctNodeNum = 0;
+            int unpasNodeNum = 0;
+            var nodes = ((Graph)AstralAccessors.Quester.Core.Meshes).Nodes;
+            int correctArcNum = 0;
+            int invalidArcNum = 0;
+            int unpasArcNum = 0;
+            int totalArcCount = 0;
+
+            foreach (Node nd in nodes)
+            {
+                if (!nd.Passable)
+                    unpasNodeNum++;
+                else correctNodeNum++;
+                foreach(Arc arc in nd.OutgoingArcs)
+                {
+                    totalArcCount++;
+                    if (arc.Invalid)
+                    {
+                        invalidArcNum++;
+                        if (!arc.Passable)
+                            unpasArcNum++;
+                    }
+                    else if (!arc.Passable)
+                        unpasArcNum++;
+                    else correctArcNum++;
+                }
+            }
+
+            XtraMessageBox.Show($"Total nodes: {nodes.Count}\n\r" +
+                $"\tcorrect:\t{correctNodeNum}\n\r" +
+                $"\tunpassable:\t{unpasNodeNum}\n\r" +
+                $"Total arcs: {totalArcCount}\n\r" +
+                $"\tcorrect:\t{correctArcNum}\n\r" +
+                $"\tinvalid:\t{invalidArcNum}\n\r" +
+                $"\tunpassable:\t{unpasArcNum}\n\r");
+        }
+
+        private void btnCompression_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            int correctNodeNum = 0;
+            int unpasNodeNum = 0;
+            var nodes = ((Graph)AstralAccessors.Quester.Core.Meshes).Nodes;
+            int totalNodeNum = nodes.Count;
+            int correctArcNum = 0;
+            int invalidArcNum = 0;
+            int unpasArcNum = 0;
+            int totalArcNum = 0;
+            foreach (Node nd in nodes)
+            {
+                if (!nd.Passable)
+                    unpasNodeNum++;
+                else correctNodeNum++;
+
+                foreach (Arc arc in nd.OutgoingArcs)
+                {
+                    totalArcNum++;
+                    if (arc.Invalid)
+                    {
+                        invalidArcNum++;
+                        if (!arc.Passable)
+                            unpasArcNum++;
+                    }
+                    else if (!arc.Passable)
+                        unpasArcNum++;
+                    else correctArcNum++;
+                }
+            }
+
+            if (((Graph)AstralAccessors.Quester.Core.Meshes).Compression() > 0)
+            {
+                int correctNodeNumNew = 0;
+                int unpasNodeNumNew = 0;
+                int correctArcNumNew = 0;
+                int invalidArcNumNew = 0;
+                int unpasArcNumNew = 0;
+                int totalArcNumNew = 0;
+                nodes = ((Graph)AstralAccessors.Quester.Core.Meshes).Nodes;
+                foreach (Node nd in nodes)
+                {
+                    if (!nd.Passable)
+                        unpasNodeNumNew++;
+                    else correctNodeNumNew++;
+                    foreach (Arc arc in nd.OutgoingArcs)
+                    {
+                        totalArcNumNew++;
+                        if (arc.Invalid)
+                        {
+                            invalidArcNumNew++;
+                            if (!arc.Passable)
+                                unpasArcNumNew++;
+                        }
+                        else if (!arc.Passable)
+                            unpasArcNumNew++;
+                        else correctArcNumNew++;
+                    }
+                }
+
+
+                XtraMessageBox.Show($"Total nodes: {totalNodeNum} => {nodes.Count}\n\r" +
+                    $"\tcorrect:\t{correctNodeNum} => {correctNodeNumNew}\n\r" +
+                    $"\tunpassable:\t{unpasNodeNum} => {unpasNodeNumNew}\n\r" +
+                    $"Total arcs: {totalArcNum} => {totalArcNumNew}\n\r" +
+                    $"\tcorrect:\t{correctArcNum} => {correctArcNumNew}\n\r" +
+                    $"\tinvalid:\t{invalidArcNum} => {invalidArcNumNew}\n\r" +
+                    $"\tunpassable:\t{unpasArcNum} => {unpasArcNumNew}\n\r");
+            }
+            else XtraMessageBox.Show($"Meshes doesn't compressed\n\r" +
+                                    $"Total nodes: {nodes.Count}\n\r" +
+                                    $"\tcorrect:\t{correctNodeNum}\n\r" +
+                                    $"\tunpassable:\t{unpasNodeNum}\n\r" +
+                                    $"Total arcs: {totalArcNum}\n\r" +
+                                    $"\tcorrect:\t{correctArcNum}\n\r" +
+                                    $"\tinvalid:\t{invalidArcNum}\n\r" +
+                                    $"\tunpassable:\t{unpasArcNum}\n\r");
+        }
     }
 #endif
 }

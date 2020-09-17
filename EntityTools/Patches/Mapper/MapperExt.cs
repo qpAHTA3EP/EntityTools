@@ -12,7 +12,6 @@ using MyNW.Internals;
 using Astral;
 using EntityTools.Reflection;
 using DevExpress.XtraEditors.Filtering;
-using Node = AStar.Node;
 using static AStar.Tools.RWLocker;
 
 //using Astral.Professions.Classes;
@@ -62,6 +61,10 @@ namespace EntityTools.Patches.Mapper
         }
 
         #region Events
+        public delegate void MapperMouseEvent(MouseEventArgs e, GraphicsNW graphicsNW);
+        public delegate void MapperKeyPressEvent(KeyPressEventArgs e, GraphicsNW graphicsNW);
+        public delegate void MapperKeyEvent(KeyEventArgs e, GraphicsNW graphicsNW);
+
         /// <summary>
         /// Делегат для отрисовки пользовательской графики на карте
         /// </summary>
@@ -73,12 +76,19 @@ namespace EntityTools.Patches.Mapper
         public new Action<MouseEventArgs, GraphicsNW> OnClick { get; set; }
 
         /// <summary>
+        /// Делегат, уведомляющий об отпускании клавиши
+        /// </summary>
+        public event MapperKeyEvent OnMapperKeyUp;
+
+        /// <summary>
+        /// Ltkt
+        /// </summary>
+        public event MapperKeyEvent OnMapperKeyDown;
+
+        /// <summary>
         /// Делегат уведомляющий об изменении режима центровки карты
         /// </summary>
         public event CheckedChangedEventHandler OnMapLockOnPlayerChanged;
-
-        public delegate void MapperKeyPressEvent(KeyPressEventArgs e, GraphicsNW graphicsNW); 
-        public delegate void MapperKeyEvent(KeyEventArgs e, GraphicsNW graphicsNW);
 
         /// <summary>
         /// Делегат, уведомляющий о нажатой алфавитно-цифровой клавише
@@ -86,14 +96,14 @@ namespace EntityTools.Patches.Mapper
         public event MapperKeyPressEvent OnMapperKeyPress;
 
         /// <summary>
-        /// Делегат, уведомляющий о нажатии клавиши
+        /// Делегат, уведомляющий о нажатии клавиши мыши
         /// </summary>
-        public event MapperKeyEvent OnMapperKeyDown;
+        public event MapperMouseEvent OnMapperMouseDown;
 
         /// <summary>
-        /// Делегат, уведомляющий об отпускании клавиши
+        /// Делегат, уведомляющий о нажатии клавиши мыши
         /// </summary>
-        public event MapperKeyEvent OnMapperKeyUp;
+        public event MapperMouseEvent OnMapperMouseUp;
 
 #if OnZoomChanged
         /// <summary>
@@ -109,35 +119,14 @@ namespace EntityTools.Patches.Mapper
         #region Обработчики событий
         private void handler_Load(object sender, EventArgs e)
         {
-#if DrawMapThread
-            if (Astral.Core.bool_0)
-            // Флаг Astral.Core.bool_0, по-видимому, указывает на то, что Астрал инициализирован
-            {
-                startMapThread();
-            } 
-#else
             StartMapDrawings();
-#endif
         }
 
         private void handler_VisibleChanged(object sender, EventArgs e)
         {
-#if DrawMapThread
-            try
-            {
-                if (!base.Visible)
-                {
-                    thread_0.Abort();
-                }
-            }
-            catch
-            {
-            } 
-#else
             if (Visible)
                 StartMapDrawings();
             else StopMapDrawings();
-#endif
         }
 
         private void handler_MouseMove(object sender, MouseEventArgs e)
@@ -164,19 +153,36 @@ namespace EntityTools.Patches.Mapper
         private void handler_MouseUp(object sender, MouseEventArgs e)
         {
             mousePointClickPosition = Point.Empty;
+            if(OnMapperMouseUp != null)
+                using (WriteLock())
+                    OnMapperMouseUp(e, graphicsNW);
+        }
+
+        private void handler_MouseDown(object sender, MouseEventArgs e)
+        {
+            if(OnMapperMouseDown!=null)
+                using (WriteLock())
+                    OnMapperMouseDown(e, graphicsNW);
+        }
+
+        private void handler_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (OnClick != null)
+                using (WriteLock())
+                    OnClick(e, graphicsNW);
         }
 
         private void handler_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             Vector3 worldPos;
             using (ReadLock())
-                worldPos = graphicsNW.getWorldPos(e.Location); 
+                worldPos = graphicsNW.getWorldPos(e.Location);
 
             try
             {
                 if (AstralAccessors.Controllers.Roles.CurrentRole_Name == "Quester")
                 {
-                    lock (((Graph)AstralAccessors.Quester.Core.Meshes).Locker)
+                    lock (((Graph)AstralAccessors.Quester.Core.Meshes).SyncRoot)
                         AstralAccessors.Quester.Core.RemoveNodesFrom2DPosition(worldPos, Astral.Controllers.Settings.Get.DeleteNodeRadius);
                 }
             }
@@ -186,26 +192,32 @@ namespace EntityTools.Patches.Mapper
             }
         }
 
-        private void handler_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (OnClick != null)
-            {
-                using (WriteLock())
-                {
-                    OnClick(e, graphicsNW); 
-                }
-            }
-        }
-
         private void handler_KeyPress(object sender, KeyPressEventArgs e)
         {
-            OnMapperKeyPress?.Invoke(e, graphicsNW);
+            if(OnMapperKeyPress !=null)
+                using (WriteLock())
+                    OnMapperKeyPress(e, graphicsNW);
+        }
+
+        private void handler_KeyUp(object sender, KeyEventArgs e)
+        {
+            if(OnMapperKeyUp!=null)
+                using(WriteLock())
+                    OnMapperKeyUp(e, graphicsNW);
+        }
+
+        private void handler_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(OnMapperKeyDown != null)
+                using(WriteLock())
+                    OnMapperKeyDown(e, graphicsNW);
         }
         #endregion
 
         #region Drawings
-
+        public GraphicsNW GraphicsNW => graphicsNW;
         private GraphicsNW graphicsNW = new GraphicsNW(360, 360);
+
         #region ReaderWriterLocker
         /// <summary>
         /// Объект синхронизации доступа к объекту <see cref="graphicsNW"/>
@@ -374,9 +386,11 @@ namespace EntityTools.Patches.Mapper
                             graphicsNW.drawMap();
 
                             #region Отрисовка области удаления вершин
+#if false
                             int nodeDeleteDiameter = Convert.ToInt32(Astral.Controllers.Settings.Get.DeleteNodeRadius * graphicsNW.Zoom * 2);
                             var imagePos = MapPicture.PointToClient(Control.MousePosition);
-                            graphicsNW.drawEllipse(imagePos, new Size(nodeDeleteDiameter, nodeDeleteDiameter), Pens.Beige);
+                            graphicsNW.drawEllipse(imagePos, new Size(nodeDeleteDiameter, nodeDeleteDiameter), Pens.Beige); 
+#endif
                             #endregion
 
                             #region Отрисовка персонажей
@@ -434,8 +448,8 @@ namespace EntityTools.Patches.Mapper
 #if true
                             //Roles.CurrentRole.OnMapDraw(graphicsNW_0);
                             if(!AstralAccessors.Controllers.Roles.CurrentRole_OnMapDraw(graphicsNW))
-                                lock (AstralAccessors.Quester.Core.Meshes.Value.Locker)
-                                    DrawMeshes(graphicsNW, AstralAccessors.Quester.Core.Meshes);
+                                //lock (AstralAccessors.Quester.Core.Meshes.Value.SyncRoot) <- Блогировка графа есть в DrawMeshes(..)
+                                Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes.DrawMeshes(graphicsNW, AstralAccessors.Quester.Core.Meshes);
 #else
                             DrawMeshes(graphicsNW, AstralAccessors.Quester.Core.Meshes);
 #endif
@@ -514,37 +528,9 @@ namespace EntityTools.Patches.Mapper
             }
         }
 
-        //public GraphicsNW GetGraph => graphicsNW;
-
         public Point RelativeMousePosition => MapPicture.PointToClient(Control.MousePosition);
 
-#if DrawMapThread
-        private Thread thread_0;
-        internal void startMapThread() // method_2
-        {
-            if (!bool_0)
-            {
-                if (thread_0 == null || !thread_0.IsAlive)
-                {
-                    thread_0 = new Thread(backgroundwork_DrawMap);
-                    thread_0.Start();
-                }
-                bool_0 = true;
-            }
-        }
-
-        public void abortMapThread() // method_3
-        {
-            try
-            {
-                thread_0.Abort();
-            }
-            catch
-            {
-            }
-        } 
-#else
-        private /*System.Threading.Task.*/Task mapDrawingTask = null;
+        private Task mapDrawingTask = null;
         private CancellationTokenSource mapDrawingTokenSource = null;
 
         public void StartMapDrawings()
@@ -562,50 +548,6 @@ namespace EntityTools.Patches.Mapper
         public void StopMapDrawings()
         {
             mapDrawingTokenSource?.Cancel();
-        }
-#endif
-
-        /// <summary>
-        /// Отрисовка графа путей <paramref name="meshes"/>
-        /// </summary>
-        /// <param name="graphicsNW"></param>
-        /// <param name="meshes"></param>
-        private static void DrawMeshes(GraphicsNW graphicsNW, Graph meshes)
-        {
-            lock (meshes.Locker)
-            {
-                double num = graphicsNW.getWorldPos(new Point(graphicsNW.ImageWidth, graphicsNW.ImageHeight)).Distance2D(graphicsNW.CenterPosition);
-                foreach (Arc arc in meshes.Arcs)
-                {
-                    if (arc.StartNode.Passable && arc.EndNode.Passable)
-                    {
-                        Vector3 startPos = new Vector3((float)arc.StartNode.X, (float)arc.StartNode.Y, (float)arc.StartNode.Z);
-                        Vector3 endPos = new Vector3((float)arc.EndNode.X, (float)arc.EndNode.Y, (float)arc.EndNode.Z);
-                        if (startPos.Distance2D(graphicsNW.CenterPosition) < num)
-                        {
-                            graphicsNW.drawLine(startPos, endPos, Pens.Red);
-                        }
-                    }
-                }
-                foreach (Node node in meshes.Nodes)
-                {
-                    if (node.Passable)
-                    {
-                        Brush brush = Brushes.Red;
-                        int count = node.IncomingArcs.Count;
-                        int count2 = node.OutgoingArcs.Count;
-                        if (count == 1 && count2 == 1)
-                        {
-                            brush = Brushes.SkyBlue;
-                        }
-                        Vector3 nodePos = new Vector3((float)node.X, (float)node.Y, (float)node.Z);
-                        if (nodePos.Distance2D(graphicsNW.CenterPosition) < num)
-                        {
-                            graphicsNW.drawFillEllipse(nodePos, new Size(5, 5), brush);
-                        }
-                    }
-                }
-            }
         }
 
         /// <summary>
@@ -690,16 +632,6 @@ namespace EntityTools.Patches.Mapper
             return bitmap;
         }
         #endregion
-
-        private void handler_KeyUp(object sender, KeyEventArgs e)
-        {
-            OnMapperKeyUp?.Invoke(e, graphicsNW);
-        }
-
-        private void handler_KeyDown(object sender, KeyEventArgs e)
-        {
-            OnMapperKeyDown?.Invoke(e, graphicsNW);
-        }
     }
 }
 

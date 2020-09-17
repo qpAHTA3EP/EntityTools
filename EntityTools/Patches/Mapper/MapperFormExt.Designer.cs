@@ -47,14 +47,15 @@ namespace EntityTools.Patches.Mapper
             this.barMainTools = new DevExpress.XtraBars.Bar();
             this.btnSaveMeshes = new DevExpress.XtraBars.BarButtonItem();
             this.groupMapping = new DevExpress.XtraBars.BarButtonGroup();
-            this.btnStopMapping = new DevExpress.XtraBars.BarCheckItem();
             this.btnBidirectional = new DevExpress.XtraBars.BarCheckItem();
             this.btnUnidirectional = new DevExpress.XtraBars.BarCheckItem();
             this.btnLinearPath = new DevExpress.XtraBars.BarCheckItem();
             this.btnForceLinkLast = new DevExpress.XtraBars.BarCheckItem();
+            this.btnStopMapping = new DevExpress.XtraBars.BarCheckItem();
             this.groupCR = new DevExpress.XtraBars.BarButtonGroup();
             this.btnRectangularCR = new DevExpress.XtraBars.BarButtonItem();
             this.btnEllipticalCR = new DevExpress.XtraBars.BarButtonItem();
+            this.btnEditCR = new DevExpress.XtraBars.BarCheckItem();
             this.btnOptions = new DevExpress.XtraBars.BarButtonItem();
             this.popMenuOptions = new DevExpress.XtraBars.PopupMenu(this.components);
             this.menuWaypointDistance = new DevExpress.XtraBars.BarEditItem();
@@ -83,13 +84,12 @@ namespace EntityTools.Patches.Mapper
             this.btnExportMeshes = new DevExpress.XtraBars.BarButtonItem();
             this.btnClearMeshes = new DevExpress.XtraBars.BarButtonItem();
             this.groupEditMeshes = new DevExpress.XtraBars.BarButtonGroup();
-            this.btnAddEdge = new DevExpress.XtraBars.BarCheckItem();
-            this.btnRemoveEdge = new DevExpress.XtraBars.BarCheckItem();
-            this.btnMoveNode = new DevExpress.XtraBars.BarCheckItem();
-            this.groupDeleteNodes = new DevExpress.XtraBars.BarButtonGroup();
-            this.btnRemoveOneNode = new DevExpress.XtraBars.BarCheckItem();
-            this.btnRemoveRectNodeGroup = new DevExpress.XtraBars.BarCheckItem();
-            this.btnRemoveEllNodeGroup = new DevExpress.XtraBars.BarCheckItem();
+            this.btnUndo = new DevExpress.XtraBars.BarButtonItem();
+            this.btnMoveNodes = new DevExpress.XtraBars.BarCheckItem();
+            this.btnRemoveNodes = new DevExpress.XtraBars.BarCheckItem();
+            this.btnEditEdges = new DevExpress.XtraBars.BarCheckItem();
+            this.btnMeshesInfo = new DevExpress.XtraBars.BarButtonItem();
+            this.btnCompression = new DevExpress.XtraBars.BarButtonItem();
             this.barDockControlTop = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlBottom = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlLeft = new DevExpress.XtraBars.BarDockControl();
@@ -156,15 +156,15 @@ namespace EntityTools.Patches.Mapper
             this.trbarZoom,
             this.btnLockMapOnPlayer,
             this.btnSaveMeshes,
-            this.btnMoveNode,
-            this.btnRemoveOneNode,
-            this.btnAddEdge,
-            this.btnRemoveEdge,
+            this.btnMoveNodes,
+            this.btnRemoveNodes,
+            this.btnEditEdges,
             this.groupEditMeshes,
-            this.groupDeleteNodes,
-            this.btnRemoveRectNodeGroup,
-            this.btnRemoveEllNodeGroup});
-            this.barManager.MaxItemId = 101;
+            this.btnUndo,
+            this.btnEditCR,
+            this.btnMeshesInfo,
+            this.btnCompression});
+            this.barManager.MaxItemId = 105;
             this.barManager.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.seDeleteRadius,
             this.seWaypointDistance,
@@ -180,15 +180,16 @@ namespace EntityTools.Patches.Mapper
             this.barMainTools.DockCol = 0;
             this.barMainTools.DockRow = 0;
             this.barMainTools.DockStyle = DevExpress.XtraBars.BarDockStyle.Top;
-            this.barMainTools.FloatLocation = new System.Drawing.Point(43, 217);
+            this.barMainTools.FloatLocation = new System.Drawing.Point(325, 181);
             this.barMainTools.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
             new DevExpress.XtraBars.LinkPersistInfo(this.btnSaveMeshes),
             new DevExpress.XtraBars.LinkPersistInfo(this.groupMapping, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.groupCR, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnOptions, true)});
+            this.barMainTools.OptionsBar.AllowQuickCustomization = false;
             this.barMainTools.Text = "MapperTools";
             this.barMainTools.Visible = false;
-            this.barMainTools.VisibleChanged += new System.EventHandler(this.handler_VisibleChanged);
+            this.barMainTools.VisibleChanged += new System.EventHandler(this.handler_BarVisibleChanged);
             // 
             // btnSaveMeshes
             // 
@@ -203,23 +204,12 @@ namespace EntityTools.Patches.Mapper
             // 
             this.groupMapping.Caption = "Mapping";
             this.groupMapping.Id = 70;
-            this.groupMapping.ItemLinks.Add(this.btnStopMapping);
             this.groupMapping.ItemLinks.Add(this.btnBidirectional);
             this.groupMapping.ItemLinks.Add(this.btnUnidirectional);
             this.groupMapping.ItemLinks.Add(this.btnLinearPath);
             this.groupMapping.ItemLinks.Add(this.btnForceLinkLast);
+            this.groupMapping.ItemLinks.Add(this.btnStopMapping);
             this.groupMapping.Name = "groupMapping";
-            // 
-            // btnStopMapping
-            // 
-            this.btnStopMapping.BindableChecked = true;
-            this.btnStopMapping.Caption = "Stop Mapping";
-            this.btnStopMapping.Checked = true;
-            this.btnStopMapping.GroupIndex = 1;
-            this.btnStopMapping.Id = 67;
-            this.btnStopMapping.ImageOptions.Image = global::EntityTools.Properties.Resources.miniStop;
-            this.btnStopMapping.Name = "btnStopMapping";
-            this.btnStopMapping.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_StopMapping);
             // 
             // btnBidirectional
             // 
@@ -253,12 +243,24 @@ namespace EntityTools.Patches.Mapper
             this.btnForceLinkLast.ImageOptions.Image = global::EntityTools.Properties.Resources.miniHurdLink;
             this.btnForceLinkLast.Name = "btnForceLinkLast";
             // 
+            // btnStopMapping
+            // 
+            this.btnStopMapping.BindableChecked = true;
+            this.btnStopMapping.Caption = "Stop Mapping";
+            this.btnStopMapping.Checked = true;
+            this.btnStopMapping.GroupIndex = 1;
+            this.btnStopMapping.Id = 67;
+            this.btnStopMapping.ImageOptions.Image = global::EntityTools.Properties.Resources.miniStop;
+            this.btnStopMapping.Name = "btnStopMapping";
+            this.btnStopMapping.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_StopMapping);
+            // 
             // groupCR
             // 
             this.groupCR.Caption = "CustomRegion";
             this.groupCR.Id = 71;
             this.groupCR.ItemLinks.Add(this.btnRectangularCR);
             this.groupCR.ItemLinks.Add(this.btnEllipticalCR);
+            this.groupCR.ItemLinks.Add(this.btnEditCR);
             this.groupCR.Name = "groupCR";
             // 
             // btnRectangularCR
@@ -276,6 +278,14 @@ namespace EntityTools.Patches.Mapper
             this.btnEllipticalCR.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCREllipce;
             this.btnEllipticalCR.Name = "btnEllipticalCR";
             this.btnEllipticalCR.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AddElipticalCR);
+            // 
+            // btnEditCR
+            // 
+            this.btnEditCR.Caption = "EditCR";
+            this.btnEditCR.Id = 102;
+            this.btnEditCR.ImageOptions.Image = global::EntityTools.Properties.Resources.miniEditCR;
+            this.btnEditCR.Name = "btnEditCR";
+            this.btnEditCR.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
             // 
             // btnOptions
             // 
@@ -362,6 +372,7 @@ namespace EntityTools.Patches.Mapper
             this.menuDeleteRadius.Id = 61;
             this.menuDeleteRadius.ImageOptions.Image = global::EntityTools.Properties.Resources.miniTarget;
             this.menuDeleteRadius.Name = "menuDeleteRadius";
+            this.menuDeleteRadius.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
             // 
             // seDeleteRadius
             // 
@@ -388,7 +399,7 @@ namespace EntityTools.Patches.Mapper
             this.barCustomRegion.BarName = "CustomRegion";
             this.barCustomRegion.DockCol = 0;
             this.barCustomRegion.DockRow = 0;
-            this.barCustomRegion.FloatLocation = new System.Drawing.Point(281, 539);
+            this.barCustomRegion.FloatLocation = new System.Drawing.Point(30, 568);
             this.barCustomRegion.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
             new DevExpress.XtraBars.LinkPersistInfo(this.lblCR, true),
             new DevExpress.XtraBars.LinkPersistInfo(DevExpress.XtraBars.BarLinkUserDefines.Width, this.menuCRName, "", false, true, true, 152),
@@ -447,8 +458,8 @@ namespace EntityTools.Patches.Mapper
             this.statusBar.OptionsBar.AllowQuickCustomization = false;
             this.statusBar.OptionsBar.DrawDragBorder = false;
             this.statusBar.OptionsBar.UseWholeRow = true;
-            this.statusBar.Text = "statusBar";
-            this.statusBar.VisibleChanged += new System.EventHandler(this.handler_VisibleChanged);
+            this.statusBar.Text = "StatusBar";
+            this.statusBar.VisibleChanged += new System.EventHandler(this.handler_BarVisibleChanged);
             // 
             // btnLockMapOnPlayer
             // 
@@ -499,9 +510,12 @@ namespace EntityTools.Patches.Mapper
             this.barEditMeshes.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
             new DevExpress.XtraBars.LinkPersistInfo(this.groupImportExportNodes, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.groupEditMeshes, true),
-            new DevExpress.XtraBars.LinkPersistInfo(this.groupDeleteNodes, true)});
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnMeshesInfo, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnCompression)});
+            this.barEditMeshes.OptionsBar.AllowQuickCustomization = false;
             this.barEditMeshes.Text = "EditMeshes";
             this.barEditMeshes.Visible = false;
+            this.barEditMeshes.VisibleChanged += new System.EventHandler(this.handler_BarVisibleChanged);
             // 
             // groupImportExportNodes
             // 
@@ -551,71 +565,70 @@ namespace EntityTools.Patches.Mapper
             // 
             this.groupEditMeshes.Caption = "EditMeshes";
             this.groupEditMeshes.Id = 96;
-            this.groupEditMeshes.ItemLinks.Add(this.btnAddEdge);
-            this.groupEditMeshes.ItemLinks.Add(this.btnRemoveEdge);
-            this.groupEditMeshes.ItemLinks.Add(this.btnMoveNode);
+            this.groupEditMeshes.ItemLinks.Add(this.btnUndo);
+            this.groupEditMeshes.ItemLinks.Add(this.btnMoveNodes);
+            this.groupEditMeshes.ItemLinks.Add(this.btnRemoveNodes);
+            this.groupEditMeshes.ItemLinks.Add(this.btnEditEdges);
             this.groupEditMeshes.Name = "groupEditMeshes";
             // 
-            // btnAddEdge
+            // btnUndo
             // 
-            this.btnAddEdge.Caption = "AddEdge";
-            this.btnAddEdge.Id = 94;
-            this.btnAddEdge.ImageOptions.Image = global::EntityTools.Properties.Resources.miniAddEdge;
-            this.btnAddEdge.Name = "btnAddEdge";
-            this.btnAddEdge.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
-            this.btnAddEdge.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AddEdge_ModeChanged);
+            this.btnUndo.Caption = "Undo";
+            this.btnUndo.Id = 101;
+            this.btnUndo.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnUndo.ImageOptions.Image")));
+            this.btnUndo.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnUndo.ImageOptions.LargeImage")));
+            this.btnUndo.Name = "btnUndo";
+            this.btnUndo.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
+            this.btnUndo.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Undo);
             // 
-            // btnRemoveEdge
+            // btnMoveNodes
             // 
-            this.btnRemoveEdge.Caption = "RemoveEdge";
-            this.btnRemoveEdge.Id = 95;
-            this.btnRemoveEdge.ImageOptions.Image = global::EntityTools.Properties.Resources.miniRemoveEdge;
-            this.btnRemoveEdge.Name = "btnRemoveEdge";
-            this.btnRemoveEdge.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
-            this.btnRemoveEdge.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_RemoveEdge_ModeChanged);
+            this.btnMoveNodes.Caption = "MoveNodes";
+            this.btnMoveNodes.Id = 92;
+            this.btnMoveNodes.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnMoveNodes.ImageOptions.Image")));
+            this.btnMoveNodes.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+                | System.Windows.Forms.Keys.M));
+            this.btnMoveNodes.Name = "btnMoveNodes";
+            this.btnMoveNodes.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_MoveNodes_ModeChanged);
             // 
-            // btnMoveNode
+            // btnRemoveNodes
             // 
-            this.btnMoveNode.Caption = "MoveNode";
-            this.btnMoveNode.Id = 92;
-            this.btnMoveNode.ImageOptions.Image = global::EntityTools.Properties.Resources.miniMoveNode;
-            this.btnMoveNode.Name = "btnMoveNode";
-            this.btnMoveNode.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_MoveNode_ModeChanged);
+            this.btnRemoveNodes.Caption = "RemoveNodes";
+            this.btnRemoveNodes.Id = 93;
+            this.btnRemoveNodes.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCancel;
+            this.btnRemoveNodes.ItemShortcut = new DevExpress.XtraBars.BarShortcut((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Delete));
+            this.btnRemoveNodes.Name = "btnRemoveNodes";
+            this.btnRemoveNodes.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_RemoveNodes_ModeChanged);
             // 
-            // groupDeleteNodes
+            // btnEditEdges
             // 
-            this.groupDeleteNodes.Caption = "DeleteNodes";
-            this.groupDeleteNodes.Id = 97;
-            this.groupDeleteNodes.ItemLinks.Add(this.btnRemoveOneNode, false, "", "", true);
-            this.groupDeleteNodes.ItemLinks.Add(this.btnRemoveRectNodeGroup, false, "", "", true);
-            this.groupDeleteNodes.ItemLinks.Add(this.btnRemoveEllNodeGroup, false, "", "", true);
-            this.groupDeleteNodes.Name = "groupDeleteNodes";
+            this.btnEditEdges.Caption = "EditEdges";
+            this.btnEditEdges.Id = 94;
+            this.btnEditEdges.ImageOptions.Image = global::EntityTools.Properties.Resources.miniEditEdge_2;
+            this.btnEditEdges.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+                | System.Windows.Forms.Keys.E));
+            this.btnEditEdges.Name = "btnEditEdges";
+            this.btnEditEdges.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_EditEdges_ModeChanged);
             // 
-            // btnRemoveOneNode
+            // btnMeshesInfo
             // 
-            this.btnRemoveOneNode.Caption = "RemoveOneNode";
-            this.btnRemoveOneNode.Id = 93;
-            this.btnRemoveOneNode.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCancel;
-            this.btnRemoveOneNode.Name = "btnRemoveOneNode";
-            this.btnRemoveOneNode.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_RemoveNode_ModeChanged);
+            this.btnMeshesInfo.Caption = "MeshesInfo";
+            this.btnMeshesInfo.Hint = "Meshes information";
+            this.btnMeshesInfo.Id = 103;
+            this.btnMeshesInfo.ImageOptions.Image = global::EntityTools.Properties.Resources.previewchart_16x16;
+            this.btnMeshesInfo.ImageOptions.LargeImage = global::EntityTools.Properties.Resources.previewchart_32x32;
+            this.btnMeshesInfo.Name = "btnMeshesInfo";
+            this.btnMeshesInfo.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnMeshesInfo_ItemClick);
             // 
-            // btnRemoveRectNodeGroup
+            // btnCompression
             // 
-            this.btnRemoveRectNodeGroup.Caption = "RemoveRectangularNodeGroup";
-            this.btnRemoveRectNodeGroup.Id = 99;
-            this.btnRemoveRectNodeGroup.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCRRectang;
-            this.btnRemoveRectNodeGroup.Name = "btnRemoveRectNodeGroup";
-            this.btnRemoveRectNodeGroup.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
-            this.btnRemoveRectNodeGroup.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_RemoveRectNodeGroup_ModeChanged);
-            // 
-            // btnRemoveEllNodeGroup
-            // 
-            this.btnRemoveEllNodeGroup.Caption = "RemoveEllipticalNodeGroup";
-            this.btnRemoveEllNodeGroup.Id = 100;
-            this.btnRemoveEllNodeGroup.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCREllipce;
-            this.btnRemoveEllNodeGroup.Name = "btnRemoveEllNodeGroup";
-            this.btnRemoveEllNodeGroup.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
-            this.btnRemoveEllNodeGroup.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_RemoveEllNodeGroup_ModeChanged);
+            this.btnCompression.Caption = "Compression";
+            this.btnCompression.Hint = "Удаление из графа непроходимых(невидимых) вершин и ребер";
+            this.btnCompression.Id = 104;
+            this.btnCompression.ImageOptions.Image = global::EntityTools.Properties.Resources.newwizard_16x16;
+            this.btnCompression.Name = "btnCompression";
+            this.btnCompression.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
+            this.btnCompression.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnCompression_ItemClick);
             // 
             // barDockControlTop
             // 
@@ -772,14 +785,14 @@ namespace EntityTools.Patches.Mapper
         private Button btnShowStatBar;
         private BarButtonItem btnSaveMeshes;
         private Bar barEditMeshes;
-        private BarCheckItem btnMoveNode;
-        private BarCheckItem btnRemoveOneNode;
-        private BarCheckItem btnAddEdge;
-        private BarCheckItem btnRemoveEdge;
+        private BarCheckItem btnMoveNodes;
+        private BarCheckItem btnRemoveNodes;
+        private BarCheckItem btnEditEdges;
         private BarButtonGroup groupEditMeshes;
-        private BarButtonGroup groupDeleteNodes;
-        private BarCheckItem btnRemoveRectNodeGroup;
-        private BarCheckItem btnRemoveEllNodeGroup;
+        private BarButtonItem btnUndo;
+        private BarCheckItem btnEditCR;
+        private BarButtonItem btnMeshesInfo;
+        private BarButtonItem btnCompression;
     } 
 #endif
 }

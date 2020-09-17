@@ -730,8 +730,6 @@ namespace EntityTools.Patches.Mapper
         /// <returns></returns>
         private static int SmartAddNode1(List<NodeDetail> listNodes, NodeDetail nodeDet)
         {
-            IList outArcs = nodeDet.Node.OutgoingArcs;
-
             // проверяем наличие связей узла nodePair.First с узлами из listNodes
             // при наличии такой связи nodePair.First в список не добавляется
             foreach (NodeDetail n in listNodes)
@@ -762,9 +760,6 @@ namespace EntityTools.Patches.Mapper
         /// <returns></returns>
         private static int SmartAddNode2(List<NodeDetail> listNodes, NodeDetail nodeDet)
         {
-            IList outArcs = nodeDet.Node.OutgoingArcs;
-            IList inArcs = nodeDet.Node.IncomingArcs;
-
             // проверяем наличие связей узла nodePair.First с узлами из listNodes
             // при наличии такой связи nodePair.First в список не добавляется
             foreach (NodeDetail curNodeDet in listNodes)

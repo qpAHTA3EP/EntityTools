@@ -51,7 +51,6 @@ namespace EntityTools.Patches.Mapper
             this.MapPicture.TabIndex = 0;
             this.MapPicture.TabStop = false;
             this.MapPicture.MouseClick += new System.Windows.Forms.MouseEventHandler(this.handler_MouseClick);
-            this.MapPicture.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.handler_MouseDoubleClick);
             this.MapPicture.MouseMove += new System.Windows.Forms.MouseEventHandler(this.handler_MouseMove);
             this.MapPicture.MouseUp += new System.Windows.Forms.MouseEventHandler(this.handler_MouseUp);
             // 
@@ -67,6 +66,8 @@ namespace EntityTools.Patches.Mapper
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.handler_KeyDown);
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.handler_KeyPress);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.handler_KeyUp);
+            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.handler_MouseDown);
+            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.handler_MouseUp);
             ((System.ComponentModel.ISupportInitialize)(this.MapPicture)).EndInit();
             this.ResumeLayout(false);
 

@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
+using EntityTools.Patches.Mapper;
 
 namespace EntityTools.Settings
 {
@@ -186,17 +187,17 @@ namespace EntityTools.Settings
         [Bindable(true)]
         public Point Location
         {
-            get => location;
+            get => _location;
             set
             {
-                if (location != value)
+                if (_location != value)
                 {
-                    location = value;
+                    _location = value;
                     base.NotifyPropertyChanged(nameof(Location));
                 }
             }
         }
-        public Point location = new Point();
+        public Point _location = new Point();
 
         /// <summary>
         /// Видимость главной панели инструментов
@@ -218,23 +219,23 @@ namespace EntityTools.Settings
         private bool _mainToolsBarVisible = true;
 
         /// <summary>
-        /// Видимость панелии редактирования графа (мешей)
+        /// Видимость панели редактирования графа (мешей)
         /// </summary>
         [Bindable(true)]
         public bool EditMeshesBarVisible
         {
-            get => editMeshesBarVisible;
+            get => _editMeshesBarVisible;
             set
             {
-                if (editMeshesBarVisible != value)
+                if (_editMeshesBarVisible != value)
                 {
-                    statusBarVisible = value;
+                    _editMeshesBarVisible = value;
                     base.NotifyPropertyChanged(nameof(EditMeshesBarVisible));
                 }
             }
         }
         //[NonSerialized]
-        private bool editMeshesBarVisible = true;
+        private bool _editMeshesBarVisible = true;
 
         /// <summary>
         /// Видимость строки состояния
@@ -242,18 +243,18 @@ namespace EntityTools.Settings
         [Bindable(true)]
         public bool StatusBarVisible
         {
-            get => statusBarVisible;
+            get => _statusBarVisible;
             set
             {
-                if (statusBarVisible != value)
+                if (_statusBarVisible != value)
                 {
-                    statusBarVisible = value;
+                    _statusBarVisible = value;
                     base.NotifyPropertyChanged(nameof(StatusBarVisible));
                 }
             }
         }
         //[NonSerialized]
-        private bool statusBarVisible = true;
+        private bool _statusBarVisible = true;
     }
 #endif
 }

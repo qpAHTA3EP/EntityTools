@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.0914.0723</AssemblyVersion>
+    <AssemblyVersion>0.20.0917.0806</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -207,8 +207,10 @@
     <Compile Include="Patches\Mapper\MapperExt.Designer.cs">
       <DependentUpon>MapperExt.cs</DependentUpon>
     </Compile>
-    <Compile Include="Patches\Mapper\MapperHelper_RemoveOneNode.cs" />
-    <Compile Include="Patches\Mapper\MapperHelper_MoveNode.cs" />
+    <Compile Include="Patches\Mapper\MapperHelper_EditEdges.cs" />
+    <Compile Include="Patches\Mapper\MapperHelper_RemoveNodes.cs" />
+    <Compile Include="Patches\Mapper\MapperHelper_MoveNodes.cs" />
+    <Compile Include="Patches\Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes.cs" />
     <Compile Include="Patches\Patch_VIP_SealTraderEntity.cs" />
     <Compile Include="Patches\Patch_VIP_ProfessionVendorEntity.cs" />
     <Compile Include="Patches\UCC\Patch_ActionsPlayer_CheckAlly.cs" />
@@ -437,17 +439,6 @@
     <None Include="Resources\Entity_7_40х48.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Lib.Harmony">
-      <Version>2.0.2</Version>
-    </PackageReference>
-    <PackageReference Include="System.IO.Compression">
-      <Version>4.3.0</Version>
-    </PackageReference>
-    <PackageReference Include="System.IO.Compression.ZipFile">
-      <Version>4.3.0</Version>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\miniExpand.png" />
   </ItemGroup>
   <ItemGroup>
@@ -482,6 +473,44 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\RemoveEdge_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\node_tools.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniNodeMove.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniNodeMove_3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniEditEdge.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniEditCR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniEditEdge_2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\previewchart_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\previewchart_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\newwizard_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Lib.Harmony">
+      <Version>2.0.2</Version>
+    </PackageReference>
+    <PackageReference Include="System.IO.Compression">
+      <Version>4.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.IO.Compression.ZipFile">
+      <Version>4.3.0</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

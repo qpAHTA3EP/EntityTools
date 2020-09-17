@@ -15,7 +15,7 @@ using MyNW.Internals;
 
 namespace EntityTools.Patches.Mapper
 {
-    public static class MapperHelper_MoveNode
+    public static class MapperHelper_MoveOneNode
     {
 #if AstralMapper
         private static Astral.Forms.UserControls.Mapper mapper; 

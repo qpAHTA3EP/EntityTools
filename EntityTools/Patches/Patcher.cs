@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using EntityTools.Patches.UCC;
+using EntityTools.Patches.Mapper;
 
 namespace EntityTools.Patches
 {
@@ -57,6 +58,9 @@ namespace EntityTools.Patches
 
         private static readonly Patch_VIP_ProfessionVendorEntity patchVIPProfessionVendorEntity = new Patch_VIP_ProfessionVendorEntity();
 
+#if false
+        private static readonly Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes patchAstralLogicClassesMapFunctionsPictureDrawMeshes = new Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes();
+#endif
         static bool Applied = false;
         public static void Apply()
         {
