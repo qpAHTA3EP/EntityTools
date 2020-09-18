@@ -175,15 +175,29 @@ namespace EntityTools.Enums
     /// <summary>
     /// Переключатель множетв Entity в которых производится поиск
     /// </summary>
-    public enum EntitySetType
+    public enum EntitySetType : uint
     {
+#if false
         /// <summary>
-        /// Все Entity из EntityManager.GetEntities()
+        /// Только дружелюбные Entity (Entity.RelationToPlayer == EntityRelation.Friend)
         /// </summary>
-        Complete,
+        Friends = 1,
+        /// <summary>
+        /// Только враждебные Entity (Entity.RelationToPlayer == EntityRelation.Foe)
+        /// </summary>
+        Enemies = 2,
+        /// <summary>
+        /// Нейтральные Entity (Entity.RelationToPlayer == EntityRelation.Neutral)
+        /// </summary>
+        Neutral = 4, 
+#endif
         /// <summary>
         /// Entity из подмножеств NearbyContacts и NearbyInteractCritterEnts
         /// </summary>
-        Contacts
+        Contacts = 8,
+        /// <summary>
+        /// Все Entity из EntityManager.GetEntities()
+        /// </summary>
+        Complete = uint.MaxValue
     }
 }

@@ -63,9 +63,9 @@ namespace EntityCore.UCC.Actions
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if(object.ReferenceEquals(sender, @this))
+            if(ReferenceEquals(sender, @this))
             {
-                if (object.ReferenceEquals(sender, @this))
+                if (ReferenceEquals(sender, @this))
                 {
                     switch (e.PropertyName)
                     {
@@ -246,7 +246,7 @@ namespace EntityCore.UCC.Actions
             {
                 castingTime = Powers.getEffectiveTimeCharge(powerDef);
             }
-            Entity target = new Entity(UnitRef.Pointer);//new Entity(TargetEntity.Pointer);
+            Entity target = new Entity(UnitRef.Pointer);
             if (target.ContainerId != EntityManager.LocalPlayer.ContainerId && !target.Location.IsInYawFace)
             {
                 target.Location.Face();
@@ -296,13 +296,27 @@ namespace EntityCore.UCC.Actions
                     Thread.Sleep(20);
                 }
             }
-            catch { }
+            catch (Exception e)
+            {
+#if DEBUG_ExecuteSpecificPower
+                ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Catch an exception trying activate power '{currentPower.PowerDef.InternalName}' \n\r{e.Message}");
+#endif
+            }
             finally
             {
 #if DEBUG_ExecuteSpecificPower
                 ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Deactivate ExecPower '{currentPower.PowerDef.InternalName}' on target {target.Name}[{target.InternalName}]");
 #endif
-                Powers.ExecPower(currentPower, target, false);
+                try
+                {
+                    Powers.ExecPower(currentPower, target, false);
+                }
+                catch (Exception e)
+                {
+#if DEBUG_ExecuteSpecificPower
+                    ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Catch an exception trying deactivate power '{currentPower.PowerDef.InternalName}'\n\r {e.Message}");
+#endif
+                }
             }
             if (!@this._forceMaintain)
             {
@@ -347,24 +361,27 @@ namespace EntityCore.UCC.Actions
 
         public string Label()
         {
-            if (string.IsNullOrEmpty(label))
+            if (!string.IsNullOrEmpty(@this._powerId) && string.IsNullOrEmpty(label))
             {
                 Power currentPower = GetCurrentPower();
 
                 if (ValidatePower(currentPower))
                 {
-                    StringBuilder str = new StringBuilder();
-                    if (@this._checkInTray && (slotedState = checkIsSlotted))
-                        str.Append("[Slotted] ");
                     PowerDef powDef = currentPower.EffectivePowerDef();
-                    if (powDef.DisplayName.Length > 0)
-                        str.Append(powDef.DisplayName);
-                    else str.Append(powDef.InternalName);
-
-                    label = str.ToString();
+                    if (powDef != null && powDef.IsValid)
+                        label = string.Concat((@this._checkInTray && (slotedState = checkIsSlotted)) ? "[Slotted] " : string.Empty,
+                            (powDef.DisplayName.Length > 0) ? powDef.DisplayName : powDef.InternalName);
                 }
-
-                label = "Unknow Power";
+                else
+                {
+                    var powerDefByPowerId = Powers.GetPowerDefByPowerId(@this._powerId);
+                    if (powerDefByPowerId.IsValid)
+                    {
+                        label = string.Concat(powerDefByPowerId.DisplayName, " (Unknown Power)");
+                    }
+                }
+                if (string.IsNullOrEmpty(label))
+                    label = "Unknow Power";
             }
 
             return label;
@@ -378,7 +395,9 @@ namespace EntityCore.UCC.Actions
         private bool ValidatePower(Power p)
         {
             return attachedGameProcessId == Astral.API.AttachedGameProcess.Id
-                && p != null && p.IsValid && p.PowerDef.InternalName == @this._powerId;
+                && p != null 
+                && (p.PowerDef.InternalName == @this._powerId 
+                    || p.EffectivePowerDef().InternalName == @this._powerId);
         }
         private bool ValidateEntity(Entity e)
         {

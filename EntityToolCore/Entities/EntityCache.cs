@@ -110,9 +110,9 @@ namespace EntityCore.Entities
             RegenCount++;
 #endif
             LinkedList<Entity> entts;
-            if (Key.EntitySetType == EntitySetType.Complete)
-                entts = SearchDirect.GetEntities(Key);
-            else entts = SearchDirect.GetContactEntities(Key);
+            if (Key.EntitySetType == EntitySetType.Contacts)
+                entts = SearchDirect.GetContactEntities(Key); 
+            else entts = SearchDirect.GetEntities(Key);
 
             if (entts != null)
                 entities = entts;
@@ -131,9 +131,9 @@ namespace EntityCore.Entities
             RegenCount++;
 #endif
             LinkedList<Entity> entts;
-            if (Key.EntitySetType == EntitySetType.Complete)
-                entts = SearchDirect.GetEntities(Key, action);
-            else entts = SearchDirect.GetContactEntities(Key, action);
+            if (Key.EntitySetType == EntitySetType.Contacts)
+                entts = SearchDirect.GetContactEntities(Key, action);
+            else entts = SearchDirect.GetEntities(Key, action);
 
             if (entts != null)
                 entities = entts;

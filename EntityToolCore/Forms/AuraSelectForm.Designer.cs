@@ -209,6 +209,8 @@ namespace EntityCore.Forms
             this.Controls.Add(this.lblFilters);
             this.Controls.Add(this.lblEntitySelector);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.LookAndFeel.SkinName = "Office 2013 Light Gray";
+            this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.MaximumSize = new System.Drawing.Size(400, 700);
             this.Name = "AuraSelectForm";
             this.ShowIcon = false;
