@@ -11,7 +11,6 @@ using QuesterEditorForm = Astral.Quester.Forms.Editor;
 using QuesterMainForm = Astral.Quester.Forms.Main;
 using Astral.Logic.Classes.Map;
 using System.Drawing;
-using System.Reflection;
 
 namespace EntityTools.Patches.Mapper
 {
@@ -19,9 +18,8 @@ namespace EntityTools.Patches.Mapper
     /// <summary>
     /// Помощник для добавления CustomRegion
     /// </summary>
-    internal static class MapperHelper_CustomRegion
+    internal static class MapperHelper_CustomRegionAdvanced
     {
-#if true
         public static CustomRegion Clone(this CustomRegion @this)
         {
             if (@this != null)
@@ -35,7 +33,7 @@ namespace EntityTools.Patches.Mapper
                 };
             return null;
         }
-#endif
+
         private static Vector3 startPoint = null;
         private static Vector3 endPoint = null;
         private static bool isElliptical = false;
@@ -49,7 +47,6 @@ namespace EntityTools.Patches.Mapper
 
         internal static CustomRegion GetCustomRegion()
         {
-            Assembly.GetEntryAssembly().GetType();
             if (customRegion != null
                 && customRegion.Position.IsValid
                 && customRegion.Height != 0
@@ -108,6 +105,23 @@ namespace EntityTools.Patches.Mapper
             anchorPoint = null;
             customRegion = null;
             isElliptical = elliptical;
+            dragMode = DragMode.Disabled;
+
+            mapper = m;
+            if (mapper != null && !mapper.IsDisposed)
+            {
+                mapper.OnClick += handler_MapperClick;
+                mapper.CustomDraw += handler_DrawCustomRegion;
+            }
+        }
+
+        public static void BeginEdit(MapperExt m, CustomRegion cr)
+        {
+            startPoint = cr.Position.Clone();
+            endPoint = new Vector3(cr.Position.X + cr.Width, cr.Position.Y + cr.Height, 0f);
+            anchorPoint = null;
+            customRegion = cr;
+            isElliptical = cr.Eliptic;
             dragMode = DragMode.Disabled;
 
             mapper = m;

@@ -46,15 +46,7 @@ namespace EntityTools
         public override string Name => "Entity Tools";
         public override string Author => "MichaelProg";
         public override System.Drawing.Image Icon => Properties.Resources.EntityIcon;
-        public override BasePanel Settings
-        {
-            get
-            {
-                if (_panel == null)
-                    _panel = new Core.EntityToolsMainPanel();
-                return _panel;
-            }
-        }
+        public override BasePanel Settings => _panel ?? (_panel = new Core.EntityToolsMainPanel());
         private BasePanel _panel = null;
 
         public static EntityToolsSettings PluginSettings { get; set; } = new EntityToolsSettings();

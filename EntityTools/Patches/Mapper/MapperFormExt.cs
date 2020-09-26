@@ -1,6 +1,7 @@
 ﻿#define LOG
 
 #if PATCH_ASTRAL
+using Astral.Quester.Classes;
 using MyNW.Classes;
 using MappingType = EntityTools.Enums.MappingType;
 #endif
@@ -22,7 +23,10 @@ using System.Windows.Forms;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
+using System.Xml.Serialization;
+using DevExpress.Utils.MVVM;
 
 namespace EntityTools.Patches.Mapper
 {
@@ -108,7 +112,7 @@ namespace EntityTools.Patches.Mapper
                 OnClick = null,
                 Size = new Size(372, 275),
                 TabIndex = 0,
-                ZoomPos = Convert.ToInt32(trbarZoom.EditValue),
+                ZoomPos = Convert.ToInt32(trackZoom.EditValue),
                 MapLockOnPlayer = btnLockMapOnPlayer.Checked
             };
             mapper.OnMapLockOnPlayerChanged += handler_SetMapLockOnPlayer;
@@ -119,9 +123,9 @@ namespace EntityTools.Patches.Mapper
 
             barMainTools.Visible = EntityTools.PluginSettings.Mapper.MapperForm.MainToolsBarVisible;
             barEditMeshes.Visible = EntityTools.PluginSettings.Mapper.MapperForm.EditMeshesBarVisible;
-            statusBar.Visible = EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible;
+            barStatus.Visible = EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible;
 
-            btnShowStatBar.Visible = !statusBar.Visible && !barMainTools.Visible && !barEditMeshes.Visible;
+            btnShowStatBar.Visible = !barStatus.Visible && !barMainTools.Visible && !barEditMeshes.Visible;
             Location = EntityTools.PluginSettings.Mapper.MapperForm.Location;
             
             BindingControls();
@@ -132,18 +136,18 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public void BindingControls()
         {
-            menuWaypointDistance.DataBindings.Add(nameof(menuWaypointDistance.EditValue),
+            editWaypointDistance.DataBindings.Add(nameof(editWaypointDistance.EditValue),
                                                 EntityTools.PluginSettings.Mapper,
                                                 nameof(EntityTools.PluginSettings.Mapper.WaypointDistance),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
-            menuWaypointDistance.Edit.EditValueChanged += handler_WaypointDistanceChanged;
-            menuWaypointDistance.Edit.Leave += handler_WaypointDistanceChanged;
+            editWaypointDistance.Edit.EditValueChanged += handler_WaypointDistanceChanged;
+            editWaypointDistance.Edit.Leave += handler_WaypointDistanceChanged;
 
-            menuMaxZDifference.DataBindings.Add(nameof(menuMaxZDifference.EditValue),
+            editMaxZDifference.DataBindings.Add(nameof(editMaxZDifference.EditValue),
                                                 EntityTools.PluginSettings.Mapper,
                                                 nameof(EntityTools.PluginSettings.Mapper.MaxElevationDifference),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
-            menuEquivalenceDistance.DataBindings.Add(nameof(menuEquivalenceDistance.EditValue),
+            editEquivalenceDistance.DataBindings.Add(nameof(editEquivalenceDistance.EditValue),
                                                 EntityTools.PluginSettings.Mapper,
                                                 nameof(EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
@@ -162,13 +166,13 @@ namespace EntityTools.Patches.Mapper
 
             ((ISupportInitialize)bsrcAstralSettings).BeginInit();
             bsrcAstralSettings.DataSource = Astral.API.CurrentSettings;
-            menuDeleteRadius.DataBindings.Add(nameof(menuDeleteRadius.EditValue),
+            editDeleteRadius.DataBindings.Add(nameof(editDeleteRadius.EditValue),
                                               bsrcAstralSettings,
                                               nameof(Astral.API.CurrentSettings.DeleteNodeRadius),
                                               false, DataSourceUpdateMode.OnPropertyChanged);
             ((ISupportInitialize)bsrcAstralSettings).EndInit();
-            menuDeleteRadius.Edit.EditValueChanged += handler_DeleteRadiusChanged;
-            menuDeleteRadius.Edit.Leave += handler_DeleteRadiusChanged;
+            editDeleteRadius.Edit.EditValueChanged += handler_DeleteRadiusChanged;
+            editDeleteRadius.Edit.Leave += handler_DeleteRadiusChanged;
 
             btnForceLinkLast.DataBindings.Add(nameof(btnForceLinkLast.Checked),
                                                 EntityTools.PluginSettings.Mapper,
@@ -241,8 +245,8 @@ namespace EntityTools.Patches.Mapper
 
             barMainTools.Visible = EntityTools.PluginSettings.Mapper.MapperForm.MainToolsBarVisible;
             barEditMeshes.Visible = EntityTools.PluginSettings.Mapper.MapperForm.EditMeshesBarVisible;
-            statusBar.Visible = EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible;
-            btnShowStatBar.Visible = !statusBar.Visible && !barMainTools.Visible && !barEditMeshes.Visible;
+            barStatus.Visible = EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible;
+            btnShowStatBar.Visible = !barStatus.Visible && !barMainTools.Visible && !barEditMeshes.Visible;
 
             Location = EntityTools.PluginSettings.Mapper.MapperForm.Location;
 
@@ -258,7 +262,7 @@ namespace EntityTools.Patches.Mapper
         {
             EntityTools.PluginSettings.Mapper.MapperForm.MainToolsBarVisible = barMainTools.Visible;
             EntityTools.PluginSettings.Mapper.MapperForm.EditMeshesBarVisible = barEditMeshes.Visible;
-            EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible = statusBar.Visible;
+            EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible = barStatus.Visible;
             EntityTools.PluginSettings.Mapper.MapperForm.Location = Location;
 
             InterruptAllModifications();
@@ -282,7 +286,12 @@ namespace EntityTools.Patches.Mapper
             while (!IsDisposed
                    && !backgroundWorker.CancellationPending)
             {
-                formCaption = string.Concat(EntityManager.LocalPlayer.CurrentZoneMapInfo.DisplayName, " [", EntityManager.LocalPlayer.CurrentZoneMapInfo.MapName, ']');
+                if(editMode == MapperEditMode.None)
+                formCaption = string.Concat(EntityManager.LocalPlayer.CurrentZoneMapInfo.DisplayName, 
+                    " [", EntityManager.LocalPlayer.CurrentZoneMapInfo.MapName, ']');
+                else formCaption = string.Concat(editMode, " | ",
+                    EntityManager.LocalPlayer.CurrentZoneMapInfo.DisplayName,
+                    " [", EntityManager.LocalPlayer.CurrentZoneMapInfo.MapName, ']');
 
                 Vector3 pos = EntityManager.LocalPlayer.Location;
                 posStr = !EntityManager.LocalPlayer.IsLoading ? $"{pos.X:N1} | {pos.Y:N1} | {pos.Z:N1}" : "Loading";
@@ -299,6 +308,72 @@ namespace EntityTools.Patches.Mapper
             }
         }
         #endregion
+
+        /// <summary>
+        /// Режим редактирования графа
+        /// </summary>
+        enum MapperEditMode
+        {
+            None,
+            /// <summary>
+            /// Прогладывание путей
+            /// </summary>
+            Mapping,
+            /// <summary>
+            /// Ручное перемещение вершин
+            /// </summary>
+            RelocateNodes,
+            /// <summary>
+            /// Удаление вершин
+            /// </summary>
+            DeleteNodes,
+            /// <summary>
+            /// Ручное изменение ребер
+            /// </summary>
+            EditEdges,
+            /// <summary>
+            /// Добавление CustomRegion'a
+            /// </summary>
+            AddCustomRegion,
+            /// <summary>
+            /// Редактирование CustomRegion'ов
+            /// </summary>
+            EditCustomRegion,
+        }
+        MapperEditMode editMode = MapperEditMode.None;
+
+        /// <summary>
+        /// Прерывание всех операций по изменению графа путей (мешей)
+        /// </summary>
+        private void InterruptAllModifications(MapperEditMode mode = MapperEditMode.None)
+        {
+            if (mode != MapperEditMode.Mapping)
+                handler_StopMapping();
+
+            if (mode != MapperEditMode.EditEdges)
+            {
+                btnEditEdges.Checked = false;
+                MapperHelper_EditEdges.Reset();
+            }
+
+            if (mode != MapperEditMode.RelocateNodes)
+            {
+                btnMoveNodes.Checked = false;
+                MapperHelper_MoveNodes.Reset();
+            }
+            if (mode != MapperEditMode.DeleteNodes)
+            {
+                btnRemoveNodes.Checked = false;
+                MapperHelper_RemoveNodes.Reset();
+            }
+
+            if (mode != MapperEditMode.AddCustomRegion
+                && mode != MapperEditMode.EditCustomRegion)
+            {
+                handler_CancelCRManipulation(@this, null);
+                MapperHelper_CustomRegion.Reset();
+            }
+        }
 
         #region Mapping
         /// <summary>
@@ -363,17 +438,16 @@ namespace EntityTools.Patches.Mapper
             if (e.Item is BarCheckItem checkedItem
                 && checkedItem.Checked)
             {
-                if (MappingTask == null
-                    || MappingTask.IsCanceled || MappingTask.IsCompleted || MappingTask.IsFaulted)
-                {
-                    InterruptAllModifications();
+                if (MappingTask != null && !MappingTask.IsCanceled && !MappingTask.IsCompleted &&
+                    !MappingTask.IsFaulted) return;
 
-                    mapAndRegion_whereMapping = EntityManager.LocalPlayer.MapAndRegion;
-                    MappingCanceler = new CancellationTokenSource();
-                    MappingTask = Task.Factory.StartNew(() => work_Mapping(MappingCanceler.Token), MappingCanceler.Token);
-                    if (MappingTask != null)
-                        MappingTask.ContinueWith(new System.Action<Task>((Task t) => handler_StopMapping()));
-                }
+                editMode = MapperEditMode.Mapping;
+                InterruptAllModifications(MapperEditMode.Mapping);
+
+                mapAndRegion_whereMapping = EntityManager.LocalPlayer.MapAndRegion;
+                MappingCanceler = new CancellationTokenSource();
+                MappingTask = Task.Factory.StartNew(() => work_Mapping(MappingCanceler.Token), MappingCanceler.Token);
+                MappingTask?.ContinueWith(t => handler_StopMapping());
             }
         }
 
@@ -397,7 +471,6 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         private void work_Mapping(CancellationToken token)
         {
-            //NodeDetail nodeDetail = null;
             try
             {
                 if (graphCache == null)
@@ -410,15 +483,14 @@ namespace EntityTools.Patches.Mapper
                 if (graphCache.Nodes.Count != 0)
                 {
                     if (LinearPath)
-                        lastNodeDetail = AddNavigationNodeAdvanced.LinkNearest1(EntityManager.LocalPlayer.Location.Clone(), graphCache);
-                    else lastNodeDetail = AddNavigationNodeAdvanced.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), graphCache);
+                        lastNodeDetail = MapperHelper_AddNodes.LinkNearest1(EntityManager.LocalPlayer.Location.Clone(), graphCache);
+                    else lastNodeDetail = MapperHelper_AddNodes.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), graphCache);
                 }
                 while (MappingType != MappingType.Stoped
                        && !token.IsCancellationRequested)
                 {
                     /* 3. Вариант реализации с проверкой расстояния только до предыдущего узла*/
-                    if (lastNodeDetail != null)
-                        lastNodeDetail.Rebase(EntityManager.LocalPlayer.Location);
+                    lastNodeDetail?.Rebase(EntityManager.LocalPlayer.Location);
 
                     if (lastNodeDetail == null || lastNodeDetail.Distance > EntityTools.PluginSettings.Mapper.WaypointDistance)
                     {
@@ -428,20 +500,20 @@ namespace EntityTools.Patches.Mapper
                                 if (LinearPath)
                                 {
                                     if (ForceLinkLastWaypoint)
-                                        lastNodeDetail = AddNavigationNodeAdvanced.LinkLast(EntityManager.LocalPlayer.Location.Clone(), graphCache, lastNodeDetail, false) ?? lastNodeDetail;
-                                    else lastNodeDetail = AddNavigationNodeAdvanced.LinkLast(EntityManager.LocalPlayer.Location.Clone(), graphCache, null, false) ?? lastNodeDetail;
+                                        lastNodeDetail = MapperHelper_AddNodes.LinkLast(EntityManager.LocalPlayer.Location.Clone(), graphCache, lastNodeDetail, false) ?? lastNodeDetail;
+                                    else lastNodeDetail = MapperHelper_AddNodes.LinkLast(EntityManager.LocalPlayer.Location.Clone(), graphCache, null, false) ?? lastNodeDetail;
                                 }
                                 else
                                 {
                                     // Строим комплексный (многосвязный путь)
                                     if (ForceLinkLastWaypoint)
-                                        lastNodeDetail = AddNavigationNodeAdvanced.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), graphCache, lastNodeDetail, false) ?? lastNodeDetail;
-                                    else lastNodeDetail = AddNavigationNodeAdvanced.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), graphCache, null, false) ?? lastNodeDetail;
+                                        lastNodeDetail = MapperHelper_AddNodes.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), graphCache, lastNodeDetail, false) ?? lastNodeDetail;
+                                    else lastNodeDetail = MapperHelper_AddNodes.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), graphCache, null, false) ?? lastNodeDetail;
                                 }
                                 break;
                             case MappingType.Unidirectional:
                                 {
-                                    lastNodeDetail = AddNavigationNodeAdvanced.LinkLast(EntityManager.LocalPlayer.Location.Clone(), graphCache, lastNodeDetail, true) ?? lastNodeDetail;
+                                    lastNodeDetail = MapperHelper_AddNodes.LinkLast(EntityManager.LocalPlayer.Location.Clone(), graphCache, lastNodeDetail, true) ?? lastNodeDetail;
                                 }
                                 break;
                         }
@@ -454,10 +526,9 @@ namespace EntityTools.Patches.Mapper
                     // Инициировано прерывание 
                     // Связываем текущее местоположение с графом
                     if (LinearPath)
-                        AddNavigationNodeAdvanced.LinkNearest1(EntityManager.LocalPlayer.Location.Clone(), graphCache, lastNodeDetail, MappingType == MappingType.Unidirectional);
-                    else AddNavigationNodeAdvanced.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), graphCache, lastNodeDetail, MappingType == MappingType.Unidirectional);
+                        MapperHelper_AddNodes.LinkNearest1(EntityManager.LocalPlayer.Location.Clone(), graphCache, lastNodeDetail, MappingType == MappingType.Unidirectional);
+                    else MapperHelper_AddNodes.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), graphCache, lastNodeDetail, MappingType == MappingType.Unidirectional);
                     lastNodeDetail = null;
-                    //token.ThrowIfCancellationRequested();
                 }
             }
             catch (Exception ex)
@@ -475,18 +546,40 @@ namespace EntityTools.Patches.Mapper
 
         #region CustomRegion_Manipulation
         /// <summary>
+        /// Флаг, указывающий, что CustomRegion'ы в профиле были изменены, и его необходимо "сохранить"
+        /// </summary>
+        bool CurrentProfileNeedSave
+        {
+            get
+            {
+                return !string.IsNullOrEmpty(editedQuesterProfileName) && Astral.Controllers.Settings.Get.LastQuesterProfile == editedQuesterProfileName;
+            }
+            set
+            {
+                if (value)
+                    editedQuesterProfileName = Astral.Controllers.Settings.Get.LastQuesterProfile;
+                else editedQuesterProfileName = string.Empty;
+            }
+        }
+        string editedQuesterProfileName = string.Empty;
+
+
+        /// <summary>
         /// Запуск процедуры добавления прямоугольного региона
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void handler_AddRectangularCR(object sender, ItemClickEventArgs e)
         {
-            InterruptAllModifications();
+            editMode = MapperEditMode.EditCustomRegion;
+            InterruptAllModifications(MapperEditMode.EditCustomRegion);
 
             btnLockMapOnPlayer.Checked = false;
 
             barCustomRegion.FloatLocation = new Point(Location.X + 40, Location.Y + 60);
+            barCustomRegion.DockStyle = BarDockStyle.None;
             barCustomRegion.Visible = true;
+            barEditCustomRegion.Visible = false;
             MapperHelper_CustomRegion.BeginAdd(mapper, false);
         }
 
@@ -497,12 +590,15 @@ namespace EntityTools.Patches.Mapper
         /// <param name="e"></param>
         private void handler_AddElipticalCR(object sender, ItemClickEventArgs e)
         {
-            InterruptAllModifications();
+            editMode = MapperEditMode.EditCustomRegion;
+            InterruptAllModifications(MapperEditMode.EditCustomRegion);
 
             btnLockMapOnPlayer.Checked = false;
 
-            barCustomRegion.FloatLocation = new Point(Location.X + 40, Location.Y + 60);
+            barCustomRegion.FloatLocation = new Point(Location.X + mapper.Location.X + 40, Location.Y + mapper.Location.Y + 60);
+            barCustomRegion.DockStyle = BarDockStyle.None;
             barCustomRegion.Visible = true;
+            barEditCustomRegion.Visible = false;
             MapperHelper_CustomRegion.BeginAdd(mapper, true);
         }
 
@@ -511,21 +607,63 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void handler_MenuCRAcceptClick(object sender, ItemClickEventArgs e)
+        private void handler_FinishCRAddition(object sender, ItemClickEventArgs e)
         {
-            string crName = menuCRName.EditValue.ToString()?.Trim();
+            string crName = editCRName.EditValue.ToString()?.Trim();
             if (string.IsNullOrEmpty(crName))
-            {
                 XtraMessageBox.Show("The Name of the CustomRegion is not valid !");
-                return;
-            }
             else if (MapperHelper_CustomRegion.IsComplete)
             {
                 if (MapperHelper_CustomRegion.Finish(crName))
+                {
                     barCustomRegion.Visible = false;
+                    CurrentProfileNeedSave = true;
+                    editMode = MapperEditMode.None;
+                }
                 else XtraMessageBox.Show("The Name of the CustomRegion is not valid !");
             }
-            else XtraMessageBox.Show("Finish the edition of the CuatomRegion!");
+            else XtraMessageBox.Show("Finish the edition of the CustomRegion!");
+        }
+
+        /// <summary>
+        /// Выбор и редактирование существующего CustomRegion'а
+        /// </summary>
+        private void handler_EditCR(object sender, ItemClickEventArgs e)
+        {
+
+            if (btnEditCR.Checked)
+            {
+                if (Astral.Quester.API.CurrentProfile.CustomRegions?.Count > 0)
+                {
+                    editMode = MapperEditMode.EditCustomRegion;
+                    InterruptAllModifications(MapperEditMode.EditCustomRegion);
+
+                    btnLockMapOnPlayer.Checked = false;
+
+                    // Привязываем список CustomRegion'ов
+                    if(!ReferenceEquals(listCRSelector.DataSource, Astral.Quester.API.CurrentProfile.CustomRegions))
+                    {
+                        listCRSelector.DataSource = Astral.Quester.API.CurrentProfile.CustomRegions;
+                        listCRSelector.ValueMember = "Name";
+                        listCRSelector.DisplayMember = "Name";
+                        editCRSelector.EditValue = Astral.Quester.API.CurrentProfile.CustomRegions.First();
+                    }
+
+                    btnRenameCR.Checked = false;
+
+                    barEditCustomRegion.FloatLocation = new Point(Location.X + mapper.Location.X + 40,
+                        Location.Y + mapper.Location.Y + 60);
+                    barEditCustomRegion.DockStyle = BarDockStyle.None;
+                    btnRenameCR.Checked = false;
+
+                    handler_ChangedRenameCRMode();
+                    barEditCustomRegion.Visible = true;
+                    barCustomRegion.Visible = false;
+                    return;
+                }
+                btnEditCR.Checked = false;
+            }
+            barEditCustomRegion.Visible = false;
         }
 
         /// <summary>
@@ -533,25 +671,67 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void handler_MenuCRCancelClick(object sender, ItemClickEventArgs e)
+        private void handler_CancelCRManipulation(object sender, ItemClickEventArgs e)
         {
+            editMode = MapperEditMode.None;
             MapperHelper_CustomRegion.Reset();
+
             barCustomRegion.Visible = false;
+            barEditCustomRegion.Visible = false;
+            btnEditCR.Checked = false;
+        }
+
+        private void handler_ChangeCustomRegionType(object sender, ItemClickEventArgs e)
+        {
+            if (btnCRTypeSelector.Checked)
+            {
+                btnCRTypeSelector.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCREllipce;
+            }
+            else
+            {
+                btnCRTypeSelector.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCRRectang;
+            }
+        }
+
+        private void handler_ChangeEditedCR(object sender, EventArgs e)
+        {
+            if (editCRSelector.EditValue is CustomRegion cr)
+            {
+                editCRName.EditValue = cr.Name;
+            }
+            else
+            {
+                editCRName.EditValue = string.Empty;
+            }
+        }
+
+        private void handler_ChangedRenameCRMode(object sender = null, ItemClickEventArgs e = null)
+        {
+            if (btnRenameCR.Checked)
+            {
+                editCRSelector.Visibility = BarItemVisibility.Never;
+                editCRName.Visibility = BarItemVisibility.Always;
+            }
+            else
+            {
+                editCRSelector.Visibility = BarItemVisibility.Always;
+                editCRName.Visibility = BarItemVisibility.Never;
+            }
         }
         #endregion
 
         private void handler_DeleteRadiusChanged(object sender, EventArgs e)
         {
-            Astral.API.CurrentSettings.DeleteNodeRadius = Convert.ToInt32(menuDeleteRadius.EditValue);
+            Astral.API.CurrentSettings.DeleteNodeRadius = Convert.ToInt32(editDeleteRadius.EditValue);
         }
         private void handler_WaypointDistanceChanged(object sender, EventArgs e)
         {
-            EntityTools.PluginSettings.Mapper.WaypointDistance = Convert.ToInt32(menuWaypointDistance.EditValue);
+            EntityTools.PluginSettings.Mapper.WaypointDistance = Convert.ToInt32(editWaypointDistance.EditValue);
         }
 
         private void handler_ZoomChanged(object sender, EventArgs e)
         {
-            mapper.ZoomPos = Convert.ToInt32(trbarZoom.EditValue);
+            mapper.ZoomPos = Convert.ToInt32(trackZoom.EditValue);
         }
         private void handler_MouseWheel(object sender, MouseEventArgs e)
         {
@@ -561,11 +741,11 @@ namespace EntityTools.Patches.Mapper
             else if(e.Delta < 0)
                 delta = -1;
             //mapper.ZoomPos += delta;
-            trbarZoom.EditValue = mapper.ZoomPos + delta;
+            trackZoom.EditValue = mapper.ZoomPos + delta;
         }
         private void handler_SetZoom(object sender, int zoomPos)
         {
-            trbarZoom.EditValue = zoomPos;
+            trackZoom.EditValue = zoomPos;
         }
 
         private void handler_MapLockOnOnPlayerChanged(object sender, ItemClickEventArgs e)
@@ -580,49 +760,17 @@ namespace EntityTools.Patches.Mapper
 
         private void handler_ShowStatusBar(object sender, EventArgs e)
         {
-            statusBar.Visible = true;
+            barStatus.Visible = true;
             btnShowStatBar.Visible = false;
         }
 
         private void handler_BarVisibleChanged(object sender, EventArgs e)
         {
             EntityTools.PluginSettings.Mapper.MapperForm.MainToolsBarVisible = barMainTools.Visible;
-            EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible = statusBar.Visible;
+            EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible = barStatus.Visible;
             EntityTools.PluginSettings.Mapper.MapperForm.EditMeshesBarVisible = barEditMeshes.Visible;
 
-            btnShowStatBar.Visible = !statusBar.Visible && !barMainTools.Visible && !barEditMeshes.Visible;
-        }
-
-        /// <summary>
-        /// Прерывание всех операций по изменению графа путей (мешей)
-        /// </summary>
-        private void InterruptAllModifications(MeshesEditMode mode = MeshesEditMode.None)
-        {
-            if(mode != MeshesEditMode.Mapping)
-                MappingCanceler?.Cancel();
-
-            if (mode != MeshesEditMode.EditEdges)
-            {
-                btnEditEdges.Checked = false;
-                MapperHelper_EditEdges.Reset();
-            }
-
-            if (mode != MeshesEditMode.MoveNodes)
-            {
-                btnMoveNodes.Checked = false;
-                MapperHelper_MoveNodes.Reset(); 
-            }
-            if (mode != MeshesEditMode.RemoveNodes)
-            {
-                btnRemoveNodes.Checked = false;
-                MapperHelper_RemoveNodes.Reset(); 
-            }
-
-            if (mode != MeshesEditMode.EditCustomRegion)
-            {
-                handler_MenuCRCancelClick(@this, null);
-                MapperHelper_CustomRegion.Reset();
-            }
+            btnShowStatBar.Visible = !barStatus.Visible && !barMainTools.Visible && !barEditMeshes.Visible;
         }
 
         #region Meshes_Manipulation
@@ -631,9 +779,9 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void handler_SaveCurrentMapMeshes2QuesterProfile(object sender, ItemClickEventArgs e)
+        private void handler_SaveChanges2QuesterProfile(object sender, ItemClickEventArgs e)
         {
-            // Сохранение профиля реализовано
+            // Сохранение профиля реализовано в
             // Astral.Quester.Core.Save(false)
 
             // TODO: Выполнять "сжатие" графа (удалять невидимые вершины и ребра)
@@ -653,12 +801,12 @@ namespace EntityTools.Patches.Mapper
                 {
                     try
                     {
-                        using (ZipArchive profile = ZipFile.Open(fileName, ZipArchiveMode.Update))
+                        using (ZipArchive zipFile = ZipFile.Open(fileName, ZipArchiveMode.Update))
                         {
                             ZipArchiveEntry zipMeshEntry = null;
 
                             // Проверяем наличие меша карты в zip-файле
-                            foreach (ZipArchiveEntry entry in profile.Entries)
+                            foreach (ZipArchiveEntry entry in zipFile.Entries)
                             {
                                 if (entry.Name.Equals(meshName, StringComparison.OrdinalIgnoreCase))
                                 {
@@ -669,14 +817,15 @@ namespace EntityTools.Patches.Mapper
 
                             if (zipMeshEntry is null)
                                 // Меш карты не обнаружен. Создаем
-                                zipMeshEntry = profile.CreateEntry(meshName);
+                                zipMeshEntry = zipFile.CreateEntry(meshName);
                             else
                             {
                                 // Меш карты найден. Удаляем старый и создаем новый
                                 zipMeshEntry.Delete();
-                                zipMeshEntry = profile.CreateEntry(meshName);
+                                zipMeshEntry = zipFile.CreateEntry(meshName);
                             }
 
+                            // Сохранение графа путей (мешей) активной карты
                             using (MemoryStream memoryStream = new MemoryStream())
                             {
                                 BinaryFormatter binaryFormatter = new BinaryFormatter();
@@ -688,6 +837,29 @@ namespace EntityTools.Patches.Mapper
 
                                     zipMeshStream.Write(meshBytes, 0, meshBytes.Length);
                                 }
+                            }
+
+                            // Сохранение регионов
+                            if(CurrentProfileNeedSave)
+                            {
+                                ZipArchiveEntry zipProfileEntry = zipFile.GetEntry("profile.xml");
+
+                                if(zipProfileEntry is null)
+                                    zipProfileEntry = zipFile.CreateEntry("profile.xml");
+                                else
+                                {
+                                    zipProfileEntry.Delete();
+                                    zipProfileEntry = zipFile.CreateEntry("profile.xml");
+                                }
+
+                                XmlSerializer serializer = new XmlSerializer(Astral.Quester.API.CurrentProfile.GetType(), Patch_XmlSerializer_GetExtraTypes.QuesterTypes.ToArray());
+                                using (var zipProfileStream = zipProfileEntry.Open())
+                                {
+                                    serializer.Serialize(zipProfileStream, Astral.Quester.API.CurrentProfile);
+                                    Astral.Quester.API.CurrentProfile.Saved = true;
+                                }
+
+                                CurrentProfileNeedSave = false;
                             }
                         }
                     }
@@ -893,21 +1065,12 @@ namespace EntityTools.Patches.Mapper
         #endregion
 
         #region EditMeshes
-        enum MeshesEditMode
-        {
-            None,
-            Mapping,
-            MoveNodes,
-            RemoveNodes,
-            EditEdges,
-            EditCustomRegion,
-        }
-
         private void handler_EditEdges_ModeChanged(object sender, ItemClickEventArgs e)
         {
             if (btnEditEdges.Checked)
             {
-                InterruptAllModifications(MeshesEditMode.EditEdges);
+                editMode = MapperEditMode.EditEdges;
+                InterruptAllModifications(MapperEditMode.EditEdges);
 
                 btnLockMapOnPlayer.Checked = false;
 
@@ -916,11 +1079,12 @@ namespace EntityTools.Patches.Mapper
             else MapperHelper_EditEdges.Reset();
         }
 
-        private void handler_MoveNodes_ModeChanged(object sender, ItemClickEventArgs e)
+        private void handler_RelocateNodes_ModeChanged(object sender, ItemClickEventArgs e)
         {
             if (btnMoveNodes.Checked)
             {
-                InterruptAllModifications(MeshesEditMode.MoveNodes);
+                editMode = MapperEditMode.RelocateNodes;
+                InterruptAllModifications(MapperEditMode.RelocateNodes);
 
                 btnLockMapOnPlayer.Checked = false;
 
@@ -929,11 +1093,12 @@ namespace EntityTools.Patches.Mapper
             else MapperHelper_MoveNodes.Reset();
         }
 
-        private void handler_RemoveNodes_ModeChanged(object sender, ItemClickEventArgs e)
+        private void handler_DeleteNodes_ModeChanged(object sender, ItemClickEventArgs e)
         {
             if (btnRemoveNodes.Checked)
             {
-                InterruptAllModifications(MeshesEditMode.RemoveNodes);
+                editMode = MapperEditMode.DeleteNodes;
+                InterruptAllModifications(MapperEditMode.DeleteNodes);
 
                 btnLockMapOnPlayer.Checked = false;
 
@@ -948,7 +1113,7 @@ namespace EntityTools.Patches.Mapper
         }
         #endregion
 
-        private void btnMeshesInfo_ItemClick(object sender, ItemClickEventArgs e)
+        private void handler_MeshesInfo(object sender, ItemClickEventArgs e)
         {
             int correctNodeNum = 0;
             int unpasNodeNum = 0;
@@ -987,7 +1152,7 @@ namespace EntityTools.Patches.Mapper
                 $"\tunpassable:\t{unpasArcNum}\n\r");
         }
 
-        private void btnCompression_ItemClick(object sender, ItemClickEventArgs e)
+        private void handler_MeshesCompression(object sender, ItemClickEventArgs e)
         {
             int correctNodeNum = 0;
             int unpasNodeNum = 0;

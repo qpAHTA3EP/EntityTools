@@ -71,14 +71,14 @@
             this.lbl.TabIndex = 2;
             this.lbl.Text = "Select several items from the list:";
             // 
-            // Items
+            // ItemList
             // 
             this.ItemList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ItemList.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.ItemList.CheckOnClick = true;
             this.ItemList.Location = new System.Drawing.Point(12, 36);
-            this.ItemList.Name = "Items";
+            this.ItemList.Name = "ItemList";
             this.ItemList.Size = new System.Drawing.Size(300, 315);
             this.ItemList.SortOrder = System.Windows.Forms.SortOrder.Ascending;
             this.ItemList.TabIndex = 5;
@@ -94,9 +94,11 @@
             this.Controls.Add(this.btnReload);
             this.Controls.Add(this.btnSelect);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.LookAndFeel.SkinName = "Office 2013 Light Gray";
+            this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(332, 429);
+            this.MinimumSize = new System.Drawing.Size(332, 426);
             this.Name = "MultiItemSelectForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

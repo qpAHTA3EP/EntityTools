@@ -76,6 +76,8 @@ namespace EntityCore.Forms
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.value);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.LookAndFeel.SkinName = "Office 2013 Light Gray";
+            this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.Name = "InputBox";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

@@ -1,4 +1,4 @@
-﻿#define DEBUG_INTERACTENTITIES
+﻿//#define DEBUG_INTERACTENTITIES
 
 using System;
 using System.Collections.Generic;
@@ -108,7 +108,7 @@ namespace EntityCore.Quester.Action
                                                                    @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, customRegions, IsNotInBlackList);
 #if DEBUG_INTERACTENTITIES
                     if (closestEntity != null && closestEntity.IsValid)
-                        EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::NeedToRun: Found Entity[{closestEntity.ContainerId.ToString("X8")}] (closest)");
+                        EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::NeedToRun: Found Entity[{closestEntity.ContainerId:X8}] (closest)");
 #endif
                     timeout.ChangeTime(@this.SearchTimeInterval);
                 }
@@ -157,12 +157,12 @@ namespace EntityCore.Quester.Action
                 moved = false;
                 combat = false;
 #if DEBUG && DEBUG_INTERACTENTITIES
-                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Approach Entity[{target.ContainerId.ToString("X8")}] for interaction");
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Approach Entity[{target.ContainerId:X8}] for interaction");
 #endif
                 if (Approach.EntityForInteraction(target, CheckCombat/*new Func<Approach.BreakInfos>(CheckCombat)*/))
                 {
 #if DEBUG && DEBUG_INTERACTENTITIES
-                    EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Interact Entity[{target.ContainerId.ToString("X8")}]");
+                    EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Interact Entity[{target.ContainerId:X8}]");
 #endif
                     target.Interact();
                     Thread.Sleep(@this._interactTime);
@@ -206,7 +206,7 @@ namespace EntityCore.Quester.Action
                 if (moved)
                 {
 #if DEBUG && DEBUG_INTERACTENTITIES
-                    EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Entity[{target.ContainerId.ToString("X8")}] moved, skip...");
+                    EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Entity[{target.ContainerId:X8}] moved, skip...");
 #else
                     EntityToolsLogger.WriteLine("Entity moved, skip...");
 #endif
@@ -327,7 +327,7 @@ namespace EntityCore.Quester.Action
                                                                    @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, getCustomRegions(), IsNotInBlackList);
 #if DEBUG_INTERACTENTITIES
                     if (closestEntity != null && closestEntity.IsValid)
-                        ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}::{MethodBase.GetCurrentMethod().Name}: Found Entity[{closestEntity.ContainerId.ToString("X8")}] (closest)");
+                        ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}::{MethodBase.GetCurrentMethod().Name}: Found Entity[{closestEntity.ContainerId:X8}] (closest)");
                     
 #endif
                     timeout.ChangeTime(EntityTools.EntityTools.PluginSettings.EntityCache.LocalCacheTime);
@@ -370,20 +370,20 @@ namespace EntityCore.Quester.Action
 
         public ActionResult Run()
         {
+            moved = false;
+            combat = false;
             try
             {
 #if DEBUG && PROFILING
                 RunCount++;
 #endif
-                moved = false;
-                combat = false;
 #if DEBUG && DEBUG_INTERACTENTITIES
-                ETLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Approach Entity[{target.ContainerId.ToString("X8")}] for interaction");
+                ETLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Approach Entity[{target.ContainerId:X8}] for interaction");
 #endif
                 if (Approach.EntityForInteraction(target, CheckCombat/*new Func<Approach.BreakInfos>(CheckCombat)*/))
                 {
 #if DEBUG && DEBUG_INTERACTENTITIES
-                    ETLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Interact Entity[{target.ContainerId.ToString("X8")}]");
+                    ETLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Interact Entity[{target.ContainerId:X8}]");
 #endif
                     target.Interact();
                     Thread.Sleep(@this._interactTime);
@@ -427,7 +427,7 @@ namespace EntityCore.Quester.Action
                 if (moved)
                 {
 #if DEBUG && DEBUG_INTERACTENTITIES
-                    ETLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Entity[{target.ContainerId.ToString("X8")}] moved, skip...");
+                    ETLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Entity[{target.ContainerId:X8}] moved, skip...");
 #else
                     ETLogger.WriteLine("Entity moved, skip...", true);
 #endif
@@ -437,7 +437,8 @@ namespace EntityCore.Quester.Action
             }
             finally
             {
-                if (@this._interactOnce || (@this._skipMoving && moved))
+                // В случае неудачного интеракта из-за боя InteractOnce не должно помещать в черный список до повторной попытки
+                if (!combat && @this._interactOnce || @this._skipMoving && moved)
                 {
                     PushToBlackList(target);
 
@@ -604,27 +605,19 @@ namespace EntityCore.Quester.Action
 
 
         private bool IsNotInBlackList(Entity ent)
-            {
-                /* 2 */
-                return !blackList.Contains(ent.ContainerId);
-
-                /* 4
-                BlackEntityDef def = blackList.Find(x => x.Equals(ent));
-                if (def != null && def.IsTimedOut)
-                {
-                    blackList.Remove(def);
-                    return true;
-                }
-                return def == null; */
-            }
+        {
+            return !blackList.Contains(ent.ContainerId);
+        }
 
         private void PushToBlackList(Entity ent)
         {
-            /* 2 */
-            blackList.Add(target.ContainerId, @this._interactingTimeout);
-    #if DEBUG && DEBUG_INTERACTENTITIES
-            ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}::PushToBlackList: Entity[{target.ContainerId.ToString("X8")}]");
-    #endif
+            if (target != null && target.IsValid)
+            {
+                blackList.Add(target.ContainerId, @this._interactingTimeout);
+#if DEBUG && DEBUG_INTERACTENTITIES
+                ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}::PushToBlackList: Entity[{target.ContainerId:X8}]");
+#endif
+            }
         }
 
         private Approach.BreakInfos CheckCombat()

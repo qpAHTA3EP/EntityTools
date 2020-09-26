@@ -273,8 +273,6 @@ namespace EntityTools.Quester.Actions
         }
         internal EntitySetType _entitySetType = EntitySetType.Contacts;
 
-        EntityRelation
-
 #if disabled_at_20200506_1318
         // Более не используется, т.к. реализована единая настройка:
         // EntityTools.PluginSettings.EntityCache.LocalCacheTime

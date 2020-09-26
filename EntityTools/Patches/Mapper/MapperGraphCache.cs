@@ -24,7 +24,7 @@ namespace EntityTools.Patches.Mapper
 #endif
         {
             StartCache(m);
-            RegenCache();
+            RegenerateCache();
         }
 
     #region Дублирование интерфейса AStar.Graph
@@ -37,8 +37,8 @@ namespace EntityTools.Patches.Mapper
             {
                 if (EntityTools.PluginSettings.Mapper.CacheActive)
                 {
-                    if (NeedRegenCache)
-                        RegenCache();
+                    if (NeedCacheRegeneration)
+                        RegenerateCache();
                     return LN;
                 }
                 return ((AStar.Graph)AstralAccessors.Quester.Core.Meshes).Nodes;
@@ -54,8 +54,8 @@ namespace EntityTools.Patches.Mapper
             {
                 if (EntityTools.PluginSettings.Mapper.CacheActive)
                 {
-                    if (NeedRegenCache)
-                        RegenCache();
+                    if (NeedCacheRegeneration)
+                        RegenerateCache();
                     foreach (Node node in LN)
                         foreach (Arc arc in node.OutgoingArcs)
                             yield return arc;
@@ -332,7 +332,7 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Флаг проверки 
         /// </summary>
-        public bool NeedRegenCache
+        public bool NeedCacheRegeneration
         {
             get
             {
@@ -353,7 +353,7 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// обновление Кэша
         /// </summary>
-        public bool RegenCache(Vector3 newIniPos = null)
+        public bool RegenerateCache(Vector3 newIniPos = null)
         {
             LN.Clear();
 
@@ -383,7 +383,7 @@ namespace EntityTools.Patches.Mapper
         {
             if (mapper != null && !mapper.IsDisposed)
             {
-                mapper.CustomDraw -= eventMapperDrawCache;
+                mapper.CustomDraw -= handler_MapperDrawCache;
                 object mapPictureObj = null;
                 if (SubscribedMapperMouseDoubleClick
                     && ReflectionHelper.GetFieldValue(mapper, "\u000E", out mapPictureObj, BindingFlags.Instance | BindingFlags.NonPublic)
@@ -413,7 +413,7 @@ namespace EntityTools.Patches.Mapper
 
             if (mapper != null && !mapper.IsDisposed)
             {
-                mapper.CustomDraw += eventMapperDrawCache;
+                mapper.CustomDraw += handler_MapperDrawCache;
                 object mapPictureObj = null;
                 if (ReflectionHelper.GetFieldValue(mapper, "\u000E", out mapPictureObj, BindingFlags.Instance | BindingFlags.NonPublic)
                     && ReflectionHelper.SubscribeEvent(mapPictureObj, "MouseDoubleClick", this, "eventMapperDoubleClick", true, BindingFlags.Instance | BindingFlags.Public, BindingFlags.Instance | BindingFlags.NonPublic))
@@ -424,7 +424,7 @@ namespace EntityTools.Patches.Mapper
                     SubscribedMapperDoubleClick = true;
             }
 
-            RegenCache();
+            RegenerateCache();
         }
 
         /// <summary>
@@ -450,10 +450,7 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Полный граф
         /// </summary>
-        public AStar.Graph FullGraph
-        {
-            get => AstralAccessors.Quester.Core.Meshes.Value;
-        }
+        public Graph FullGraph => AstralAccessors.Quester.Core.Meshes;
 #if false
         private static readonly StaticPropertyAccessor<AStar.Graph> coreGraph = typeof(Astral.Quester.Core).GetStaticProperty<AStar.Graph>("Meshes"); 
 #endif
@@ -474,7 +471,7 @@ namespace EntityTools.Patches.Mapper
         {
             // двойной клик означает удаление точек пути
             // следовательно нужно обновить кэш
-            RegenCache();
+            RegenerateCache();
 
 #if DEBUG
             ETLogger.WriteLine(LogType.Debug, "MapperFormExt::eventMapperDoubleClick");
@@ -485,7 +482,7 @@ namespace EntityTools.Patches.Mapper
         /// Отрисовка на Mapper'e кэшированных вершин
         /// </summary>
         /// <param name="g"></param>
-        private void eventMapperDrawCache(GraphicsNW g)
+        private void handler_MapperDrawCache(GraphicsNW g)
         {
             if (LN != null)
             {
@@ -498,7 +495,8 @@ namespace EntityTools.Patches.Mapper
             if (lastAddedNode != null)
             {
                 //g.drawFillEllipse(new Vector3((float)lastNodeDetail.Node.X, (float)lastNodeDetail.Node.Y, (float)lastNodeDetail.Node.Z), new Size(9, 9), Brushes.Cyan);
-                MapperHelper_CustomRegion.DrawAnchor(g, new Vector3((float)lastAddedNode.X, (float)lastAddedNode.Y, (float)lastAddedNode.Z), MapperHelper_CustomRegion.DefaultAnchorSize, Brushes.Orange);
+                float anchorSize = (float)Math.Max(1, MapperHelper_CustomRegion.DefaultAnchorSize / mapper.Zoom);
+                MapperHelper_CustomRegion.DrawAnchor(g, new Vector3((float)lastAddedNode.X, (float)lastAddedNode.Y, (float)lastAddedNode.Z), anchorSize, Brushes.Orange);
             }
         }
         private bool SubscribedMapperMouseDoubleClick = false;

@@ -369,7 +369,7 @@ namespace EntityCore.UCC.Actions
                 {
                     PowerDef powDef = currentPower.EffectivePowerDef();
                     if (powDef != null && powDef.IsValid)
-                        label = string.Concat((@this._checkInTray && (slotedState = checkIsSlotted)) ? "[Slotted] " : string.Empty,
+                        label = string.Concat((@this._checkInTray && (slotedState = СurrentPowerIsSlotted)) ? "[Slotted] " : string.Empty,
                             (powDef.DisplayName.Length > 0) ? powDef.DisplayName : powDef.InternalName);
                 }
                 else
@@ -391,7 +391,7 @@ namespace EntityCore.UCC.Actions
         #region Вспомогательные функции
         [XmlIgnore]
         [Browsable(false)]
-        private bool checkIsSlotted => power?.IsInTray == true;
+        private bool СurrentPowerIsSlotted => power?.IsInTray == true;
         private bool ValidatePower(Power p)
         {
             return attachedGameProcessId == Astral.API.AttachedGameProcess.Id

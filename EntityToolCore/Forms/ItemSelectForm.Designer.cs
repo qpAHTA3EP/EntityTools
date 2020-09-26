@@ -94,9 +94,11 @@
             this.Controls.Add(this.btnReload);
             this.Controls.Add(this.btnSelect);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.LookAndFeel.SkinName = "Office 2013 Light Gray";
+            this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(332, 429);
+            this.MinimumSize = new System.Drawing.Size(332, 426);
             this.Name = "ItemSelectForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

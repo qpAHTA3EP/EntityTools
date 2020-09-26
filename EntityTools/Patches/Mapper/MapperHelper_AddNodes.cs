@@ -17,7 +17,7 @@ using System.Diagnostics;
 namespace EntityTools.Patches.Mapper
 {
 #if PATCH_ASTRAL
-    internal static class AddNavigationNodeAdvanced
+    internal static class MapperHelper_AddNodes
     {
 #if PROFILING && DEBUG
         internal static int WatchCounter = 0;
@@ -35,10 +35,10 @@ namespace EntityTools.Patches.Mapper
         {
             if (WatchCounter != 0)
             {
-                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"AddNavigationNodeStatic::WatchCounter: {WatchCounter}");
-                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"AddNavigationNodeStatic::TotalWatchTiks: {totalWatchTiks}");
-                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"AddNavigationNodeStatic::TotalWatchMs: {totalWatchMs}");
-                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"AddNavigationNodeStatic::Average: {(totalWatchMs / WatchCounter).ToString("N3")} ms; {(totalWatchTiks / WatchCounter).ToString("N0")} Ticks");
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"WatchCounter: {WatchCounter}");
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"TotalWatchTiks: {totalWatchTiks}");
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"TotalWatchMs: {totalWatchMs}");
+                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"Average: {(totalWatchMs / WatchCounter):N3} ms; {(totalWatchTiks / WatchCounter).ToString("N0")} Ticks");
             }
 
         }
@@ -71,9 +71,9 @@ namespace EntityTools.Patches.Mapper
                 NodeDetail backND = null;
                 // Косое произведение веторов A и B
                 // D = Ax * By - Bx * Ay
-                // Если D == 0 - вектора коллиенарны
-                // Если D > 0 - точека B в верхней полуплоскости
-                // Если D < 0 - точека B в нижней полуплоскости
+                // Если D == 0 - вектора коллиниарны
+                // Если D > 0 - точка B в верхней полуплоскости
+                // Если D < 0 - точка B в нижней полуплоскости
 
                 try
                 {
@@ -133,21 +133,21 @@ namespace EntityTools.Patches.Mapper
                             }
                             else if (curNodeDet.Distance <= maxDistance)
                             {
-                                // вычисляем коссинус угла меду векторами для определения четверти (впереди, сзади, слева, справа)
+                                // вычисляем косинус угла меду векторами для определения четверти (впереди, сзади, слева, справа)
                                 // в которой находится curNode
                                 double cos = CosinusXY(lastND, curNodeDet);
 
                                 if (cos < -0.7071d)
                                 {
                                     // Угол между векторами больше 135 градусов
-                                    // Значит точка находится в переди
+                                    // Значит точка находится впереди
                                     if (frontND == null
                                         || frontND.Distance > curNodeDet.Distance)
                                         frontND = curNodeDet;
                                 }
                                 else if (cos < 0.7071d)
                                 {
-                                    // Угол между веторками в диапазоне 45~125 градусов
+                                    // Угол между векторами в диапазоне 45~125 градусов
 
                                     // Вычисляем в какой полуплоскости находится curNode
                                     // относительно вектора lastNodeDetail.Vector
@@ -186,18 +186,18 @@ namespace EntityTools.Patches.Mapper
                     if (equivalentND != null)
                     {
 #if DEBUG && LOG
-                        ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: Detect 'EQUIVALENT' Node <{equivalentND.Node.X.ToString("N3")}{equivalentND.Node.Y.ToString("N3")}{equivalentND.Node.Z.ToString("N3")}>");
+                        ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: Detect 'EQUIVALENT' Node <{equivalentND.Node.X:N3}{equivalentND.Node.Y:N3}{equivalentND.Node.Z:N3}>");
 #endif
                         // Добавляем связь от узла equivalentNodeDetail 
-                        // к узлам front, left, roght
+                        // к узлам front, left, right
                         if (frontND != null)
                         {
                             frontND.Rebase(equivalentND.Node);
                             AddArcFunc(equivalentND.Node, frontND.Node, frontND.Distance);
 #if DEBUG && LOG
                             if (uniDirection)
-                                ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: UniLink {{equivalent -> front}} <{frontND.Node.X.ToString("N3")}{frontND.Node.Y.ToString("N3")}{frontND.Node.Z.ToString("N3")}>");
-                            else ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: BiLink {{equivalent <-> front}} <{frontND.Node.X.ToString("N3")}{frontND.Node.Y.ToString("N3")}{frontND.Node.Z.ToString("N3")}>");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: UniLink {{equivalent -> front}} <{frontND.Node.X:N3}{frontND.Node.Y:N3}{frontND.Node.Z:N3}>");
+                            else ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: BiLink {{equivalent <-> front}} <{frontND.Node.X:N3}{frontND.Node.Y:N3}{frontND.Node.Z:N3}>");
 #endif
                         }
                         if (leftND != null)
@@ -206,8 +206,8 @@ namespace EntityTools.Patches.Mapper
                             AddArcFunc(leftND.Node, equivalentND.Node, leftND.Distance);
 #if DEBUG && LOG
                             if (uniDirection)
-                                ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: UniLink {{left -> equivalent}} <{leftND.Node.X.ToString("N3")}{leftND.Node.Y.ToString("N3")}{leftND.Node.Z.ToString("N3")}>");
-                            else ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: BiLink {{left <-> quivalent}} <{leftND.Node.X.ToString("N3")}{leftND.Node.Y.ToString("N3")}{leftND.Node.Z.ToString("N3")}>");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: UniLink {{left -> equivalent}} <{leftND.Node.X:N3}{leftND.Node.Y:N3}{leftND.Node.Z:N3}>");
+                            else ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: BiLink {{left <-> equivalent}} <{leftND.Node.X:N3}{leftND.Node.Y:N3}{leftND.Node.Z:N3}>");
 #endif
                         }
                         if (rightND != null)
@@ -216,8 +216,8 @@ namespace EntityTools.Patches.Mapper
                             AddArcFunc(rightND.Node, equivalentND.Node, rightND.Distance);
 #if DEBUG && LOG
                             if (uniDirection)
-                                ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: UniLink {{right -> equivalent}} <{rightND.Node.X.ToString("N3")}{rightND.Node.Y.ToString("N3")}{rightND.Node.Z.ToString("N3")}>");
-                            else ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: BiLink {{right <-> quivalent}} <{rightND.Node.X.ToString("N3")}{rightND.Node.Y.ToString("N3")}{rightND.Node.Z.ToString("N3")}>");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: UniLink {{right -> equivalent}} <{rightND.Node.X:N3}{rightND.Node.Y:N3}{rightND.Node.Z:N3}>");
+                            else ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: BiLink {{right <-> equivalent}} <{rightND.Node.X:N3}{rightND.Node.Y:N3}{rightND.Node.Z:N3}>");
 #endif
                         }
                         if (backND != null)
@@ -226,8 +226,8 @@ namespace EntityTools.Patches.Mapper
                             AddArcFunc(backND.Node, equivalentND.Node, rightND.Distance);
 #if DEBUG && LOG
                             if (uniDirection)
-                                ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: UniLink {{back -> equivalent}} <{backND.Node.X.ToString("N3")}{backND.Node.Y.ToString("N3")}{backND.Node.Z.ToString("N3")}>");
-                            else ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: BiLink {{back <-> quivalent}} <{backND.Node.X.ToString("N3")}{backND.Node.Y.ToString("N3")}{backND.Node.Z.ToString("N3")}>");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: UniLink {{back -> equivalent}} <{backND.Node.X:N3}{backND.Node.Y:N3}{backND.Node.Z:N3}>");
+                            else ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: BiLink {{back <-> equivalent}} <{backND.Node.X:N3}{backND.Node.Y:N3}{backND.Node.Z:N3}>");
 #endif
                         }
 
@@ -238,8 +238,8 @@ namespace EntityTools.Patches.Mapper
                             AddArcFunc(lastND.Node, equivalentND.Node, lastND.Distance);
 #if DEBUG && LOG
                             if (uniDirection)
-                                ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: UniLink {{last -> equivalent}} <{lastND.Node.X.ToString("N3")}{lastND.Node.Y.ToString("N3")}{lastND.Node.Z.ToString("N3")}>");
-                            else ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: BiLink {{last <-> equivalent}} <{lastND.Node.X.ToString("N3")}{lastND.Node.Y.ToString("N3")}{lastND.Node.Z.ToString("N3")}>");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: UniLink {{last -> equivalent}} <{lastND.Node.X:N3}{lastND.Node.Y:N3}{lastND.Node.Z:N3}>");
+                            else ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: BiLink {{last <-> equivalent}} <{lastND.Node.X:N3}{lastND.Node.Y:N3}{lastND.Node.Z:N3}>");
 #endif
                         }
 
@@ -250,7 +250,7 @@ namespace EntityTools.Patches.Mapper
                         if (Graph.AddNode(newNode))
                         {
 #if DEBUG && LOG
-                            ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: Add 'NEW' node <{newNode.X.ToString("N3")}{newNode.Y.ToString("N3")}{newNode.Z.ToString("N3")}>");
+                            ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: Add 'NEW' node <{newNode.X:N3}{newNode.Y:N3}{newNode.Z:N3}>");
 #endif
                             // Добавляем связь от узла equivalentNodeDetail 
                             // к узлам front, left, roght
@@ -259,8 +259,8 @@ namespace EntityTools.Patches.Mapper
                                 AddArcFunc(newNode, frontND.Node, frontND.Distance);
 #if DEBUG && LOG
                                 if (uniDirection)
-                                    ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: UniLink {{new -> front}} <{frontND.Node.X.ToString("N3")}{frontND.Node.Y.ToString("N3")}{frontND.Node.Z.ToString("N3")}>");
-                                else ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: BiLink {{new <-> front}} <{frontND.Node.X.ToString("N3")}{frontND.Node.Y.ToString("N3")}{frontND.Node.Z.ToString("N3")}>");
+                                    ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: UniLink {{new -> front}} <{frontND.Node.X:N3}{frontND.Node.Y:N3}{frontND.Node.Z:N3}>");
+                                else ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: BiLink {{new <-> front}} <{frontND.Node.X:N3}{frontND.Node.Y:N3}{frontND.Node.Z:N3}>");
 #endif
                             }
                             if (leftND != null)
@@ -268,8 +268,8 @@ namespace EntityTools.Patches.Mapper
                                 AddArcFunc(leftND.Node, newNode, leftND.Distance);
 #if DEBUG && LOG
                                 if (uniDirection)
-                                    ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: UniLink {{left -> new}} <{leftND.Node.X.ToString("N3")}{leftND.Node.Y.ToString("N3")}{leftND.Node.Z.ToString("N3")}>");
-                                else ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: BiLink {{left <-> new}} <{leftND.Node.X.ToString("N3")}{leftND.Node.Y.ToString("N3")}{leftND.Node.Z.ToString("N3")}>");
+                                    ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: UniLink {{left -> new}} <{leftND.Node.X:N3}{leftND.Node.Y:N3}{leftND.Node.Z:N3}>");
+                                else ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: BiLink {{left <-> new}} <{leftND.Node.X:N3}{leftND.Node.Y:N3}{leftND.Node.Z:N3}>");
 #endif
                             }
                             if (rightND != null)
@@ -277,8 +277,8 @@ namespace EntityTools.Patches.Mapper
                                 AddArcFunc(rightND.Node, newNode, rightND.Distance);
 #if DEBUG && LOG
                                 if (uniDirection)
-                                    ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: UniLink {{(right -> new}} <{rightND.Node.X.ToString("N3")}{rightND.Node.Y.ToString("N3")}{rightND.Node.Z.ToString("N3")}>");
-                                else ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: BiLink {{(right <-> new}} <{rightND.Node.X.ToString("N3")}{rightND.Node.Y.ToString("N3")}{rightND.Node.Z.ToString("N3")}>");
+                                    ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: UniLink {{(right -> new}} <{rightND.Node.X:N3}{rightND.Node.Y:N3}{rightND.Node.Z:N3}>");
+                                else ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: BiLink {{(right <-> new}} <{rightND.Node.X:N3}{rightND.Node.Y:N3}{rightND.Node.Z:N3}>");
 #endif
                             }
                             if (backND != null)
@@ -287,8 +287,8 @@ namespace EntityTools.Patches.Mapper
                                 AddArcFunc(backND.Node, newNode, rightND.Distance);
 #if DEBUG && LOG
                                 if (uniDirection)
-                                    ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: UniLink {{back -> new}} <{backND.Node.X.ToString("N3")}{backND.Node.Y.ToString("N3")}{backND.Node.Z.ToString("N3")}>");
-                                else ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: BiLink {{back <-> new}} <{backND.Node.X.ToString("N3")}{backND.Node.Y.ToString("N3")}{backND.Node.Z.ToString("N3")}>");
+                                    ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: UniLink {{back -> new}} <{backND.Node.X:N3}{backND.Node.Y:N3}{backND.Node.Z:N3}>");
+                                else ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: BiLink {{back <-> new}} <{backND.Node.X:N3}{backND.Node.Y:N3}{backND.Node.Z:N3}>");
 #endif
                             }
 
@@ -298,8 +298,8 @@ namespace EntityTools.Patches.Mapper
                                 AddArcFunc(lastND.Node, newNode, lastND.Distance);
 #if DEBUG && LOG
                                 if (uniDirection)
-                                    ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: UniLink {{last -> new}} <{lastND.Node.X.ToString("N3")}{lastND.Node.Y.ToString("N3")}{lastND.Node.Z.ToString("N3")}>");
-                                else ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: BiLink {{last <-> new}} <{lastND.Node.X.ToString("N3")}{lastND.Node.Y.ToString("N3")}{lastND.Node.Z.ToString("N3")}>");
+                                    ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: UniLink {{last -> new}} <{lastND.Node.X:N3}{lastND.Node.Y:N3}{lastND.Node.Z:N3}>");
+                                else ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: BiLink {{last <-> new}} <{lastND.Node.X:N3}{lastND.Node.Y:N3}{lastND.Node.Z:N3}>");
 #endif
                             }
                             return new NodeDetail(newNode);
@@ -307,7 +307,7 @@ namespace EntityTools.Patches.Mapper
                         else
                         {
 #if DEBUG && LOG
-                            ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: Fail to add Node <{newNode.X.ToString("N3")}, {newNode.Y.ToString("N3")}, {newNode.Z.ToString("N3")}>");
+                            ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: Fail to add Node <{newNode.X:N3}, {newNode.Y:N3}, {newNode.Z:N3}>");
 #endif
                             return lastND;
                         }
@@ -328,7 +328,7 @@ namespace EntityTools.Patches.Mapper
                     totalWatchTiks += stopwatch.ElapsedTicks;
                     totalWatchMs += stopwatch.ElapsedMilliseconds;
 #if DEBUG && LOG
-                    EntityToolsLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest3Side: ElapsedTime is {stopwatch.ElapsedMilliseconds} ms ({stopwatch.ElapsedTicks})");
+                    EntityToolsLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: ElapsedTime is {stopwatch.ElapsedMilliseconds} ms ({stopwatch.ElapsedTicks})");
 #endif
                 }
 #endif
@@ -392,20 +392,20 @@ namespace EntityTools.Patches.Mapper
                         {
                             lastND.Rebase(equivalentND.Node);
 #if DEBUG && LOG
-                            ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkLast: Detect 'EQUIVALENT' Node <{equivalentND.Node.X.ToString("N3")}{equivalentND.Node.Y.ToString("N3")}{equivalentND.Node.Z.ToString("N3")}>");
+                            ETLogger.WriteLine(LogType.Debug, $"LinkLast: Detect 'EQUIVALENT' Node <{equivalentND.Node.X:N3}{equivalentND.Node.Y:N3}{equivalentND.Node.Z:N3}>");
 #endif
                             if (uniDirection)
                             {
                                 Graph.AddArc(lastND.Node, equivalentND.Node, lastND.Distance);
 #if DEBUG && LOG
-                                ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkLast: UniLink {{last -> quivalent}} <{lastND.Node.X.ToString("N3")}{lastND.Node.Y.ToString("N3")}{lastND.Node.Z.ToString("N3")}>");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkLast: UniLink {{last -> equivalent}} <{lastND.Node.X:N3}{lastND.Node.Y:N3}{lastND.Node.Z:N3}>");
 #endif
                             }
                             else
                             {
                                 Graph.Add2Arcs(lastND.Node, equivalentND.Node, lastND.Distance);
 #if DEBUG && LOG
-                                ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkLast: BiLink {{last <-> quivalent}} <{lastND.Node.X.ToString("N3")}{lastND.Node.Y.ToString("N3")}{lastND.Node.Z.ToString("N3")}>");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkLast: BiLink {{last <-> equivalent}} <{lastND.Node.X:N3}{lastND.Node.Y:N3}{lastND.Node.Z:N3}>");
 #endif
                             }
                         }
@@ -414,7 +414,7 @@ namespace EntityTools.Patches.Mapper
                             // предыдущий узел "отсутствует"
                             // связывать несчем
 #if DEBUG && LOG
-                            ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkLast: Nodthing to link to detected 'EQUIVALENT' Node <{equivalentND.Node.X.ToString("N3")}{equivalentND.Node.Y.ToString("N3")}{equivalentND.Node.Z.ToString("N3")}>");
+                            ETLogger.WriteLine(LogType.Debug, $"LinkLast: Nodthing to link to detected 'EQUIVALENT' Node <{equivalentND.Node.X:N3}{equivalentND.Node.Y:N3}{equivalentND.Node.Z:N3}>");
 #endif
                         }
                         return equivalentND;
@@ -427,20 +427,20 @@ namespace EntityTools.Patches.Mapper
                             if (Graph.AddNode(newNode))
                             {
 #if DEBUG && LOG
-                                ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkLast: Add 'NEW' Node <{newNode.X.ToString("N3")}{newNode.Y.ToString("N3")}{newNode.Z.ToString("N3")}>");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkLast: Add 'NEW' Node <{newNode.X:N3}{newNode.Y:N3}{newNode.Z:N3}>");
 #endif
                                 if (uniDirection)
                                 {
                                     Graph.AddArc(lastND.Node, newNode, lastND.Distance);
 #if DEBUG && LOG
-                                    ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkLast: UniLink {{last -> ew}} <{lastND.Node.X.ToString("N3")}{lastND.Node.Y.ToString("N3")}{lastND.Node.Z.ToString("N3")}>");
+                                    ETLogger.WriteLine(LogType.Debug, $"LinkLast: UniLink {{last -> ew}} <{lastND.Node.X:N3}{lastND.Node.Y:N3}{lastND.Node.Z:N3}>");
 #endif
                                 }
                                 else
                                 {
                                     Graph.Add2Arcs(lastND.Node, newNode, lastND.Distance);
 #if DEBUG && LOG
-                                    ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkLast: BiLink {{last <-> ew}} <{lastND.Node.X.ToString("N3")}{lastND.Node.Y.ToString("N3")}{lastND.Node.Z.ToString("N3")}>");
+                                    ETLogger.WriteLine(LogType.Debug, $"LinkLast: BiLink {{last <-> ew}} <{lastND.Node.X:N3}{lastND.Node.Y:N3}{lastND.Node.Z:N3}>");
 #endif
                                 }
                                 return new NodeDetail(newNode);
@@ -448,7 +448,7 @@ namespace EntityTools.Patches.Mapper
                             else
                             {
 #if DEBUG && LOG
-                                ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkLast: Fail to add Node <{newNode.X.ToString("N3")}, {newNode.Y.ToString("N3")}, {newNode.Z.ToString("N3")}>");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkLast: Fail to add Node <{newNode.X:N3}, {newNode.Y:N3}, {newNode.Z:N3}>");
 #endif
                                 return lastND;
                             }
@@ -460,14 +460,14 @@ namespace EntityTools.Patches.Mapper
                             if (Graph.AddNode(newNode))
                             {
 #if DEBUG && LOG
-                                ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkLast: Add 'NEW' Node <{newNode.X.ToString("N3")}{newNode.Y.ToString("N3")}{newNode.Z.ToString("N3")}> without links");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkLast: Add 'NEW' Node <{newNode.X:N3}{newNode.Y:N3}{newNode.Z:N3}> without links");
 #endif
                                 return new NodeDetail(newNode);
                             }
                             else
                             {
 #if DEBUG && LOG
-                                ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkLast: Fail to add Node <{newNode.X.ToString("N3")}, {newNode.Y.ToString("N3")}, {newNode.Z.ToString("N3")}>");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkLast: Fail to add Node <{newNode.X:N3}, {newNode.Y:N3}, {newNode.Z:N3}>");
 #endif
                                 return null;
                             }
@@ -491,7 +491,7 @@ namespace EntityTools.Patches.Mapper
                     totalWatchTiks += stopwatch.ElapsedTicks;
                     totalWatchMs += stopwatch.ElapsedMilliseconds;
 #if DEBUG && LOG
-                    Logger.WriteLine(Logger.LogType.Debug, $"AddNavigationNodeStatic::LinkLast: ElapsedTime is {stopwatch.ElapsedMilliseconds} ms ({stopwatch.ElapsedTicks})");
+                    Logger.WriteLine(Logger.LogType.Debug, $"LinkLast: ElapsedTime is {stopwatch.ElapsedMilliseconds} ms ({stopwatch.ElapsedTicks})");
 #endif
                 }
 #endif
@@ -554,7 +554,7 @@ namespace EntityTools.Patches.Mapper
                     if (equivalentND != null)
                     {
 #if DEBUG && LOG
-                        ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest1: Detect 'EQUIVALENT' node <{equivalentND.Node.X.ToString("N3")}{equivalentND.Node.Y.ToString("N3")}{equivalentND.Node.Z.ToString("N3")}>");
+                        ETLogger.WriteLine(LogType.Debug, $"LinkNearest1: Detect 'EQUIVALENT' node <{equivalentND.Node.X:N3}{equivalentND.Node.Y:N3}{equivalentND.Node.Z:N3}>");
 #endif
                         // Найден эквивалентный узел
                         // строим связи к equivalentND
@@ -565,14 +565,14 @@ namespace EntityTools.Patches.Mapper
                             {
                                 Graph.AddArc(lastND.Node, equivalentND.Node, lastND.Distance);
 #if DEBUG && LOG
-                                ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest1: UniLink {{las  -> quivalent}} <{lastND.Node.X.ToString("N3")}{lastND.Node.Y.ToString("N3")}{lastND.Node.Z.ToString("N3")}>");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkNearest1: UniLink {{las  -> equivalent}} <{lastND.Node.X:N3}{lastND.Node.Y:N3}{lastND.Node.Z:N3}>");
 #endif
                             }
                             else
                             {
                                 Graph.Add2Arcs(lastND.Node, equivalentND.Node, lastND.Distance);
 #if DEBUG && LOG
-                                ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest1: BiLink {{las < -> quivalent}} <{lastND.Node.X.ToString("N3")}{lastND.Node.Y.ToString("N3")}{lastND.Node.Z.ToString("N3")}>");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkNearest1: BiLink {{las < -> equivalent}} <{lastND.Node.X:N3}{lastND.Node.Y:N3}{lastND.Node.Z:N3}>");
 #endif
                             }
                         }
@@ -583,14 +583,14 @@ namespace EntityTools.Patches.Mapper
                             {
                                 Graph.AddArc(nearestND.Node, equivalentND.Node, nearestND.Distance);
 #if DEBUG && LOG
-                                ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest1: UniLink {{nearest -> equivalent}} <{nearestND.Node.X.ToString("N3")}{nearestND.Node.Y.ToString("N3")}{nearestND.Node.Z.ToString("N3")}>");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkNearest1: UniLink {{nearest -> equivalent}} <{nearestND.Node.X:N3}{nearestND.Node.Y:N3}{nearestND.Node.Z:N3}>");
 #endif
                             }
                             else
                             {
                                 Graph.Add2Arcs(nearestND.Node, equivalentND.Node, nearestND.Distance);
 #if DEBUG && LOG
-                                ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest1: BiLink {{nearest -> equivalent}} <{nearestND.Node.X.ToString("N3")}{nearestND.Node.Y.ToString("N3")}{nearestND.Node.Z.ToString("N3")}>");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkNearest1: BiLink {{nearest -> equivalent}} <{nearestND.Node.X:N3}{nearestND.Node.Y:N3}{nearestND.Node.Z:N3}>");
 #endif
                             }
                         }
@@ -601,7 +601,7 @@ namespace EntityTools.Patches.Mapper
                     else if (Graph.AddNode(newNode))
                     {
 #if DEBUG && LOG
-                        ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest1: Add 'NEW' node <{newNode.X.ToString("N3")}, {newNode.Y.ToString("N3")}, {newNode.Z.ToString("N3")}>");
+                        ETLogger.WriteLine(LogType.Debug, $"LinkNearest1: Add 'NEW' node <{newNode.X:N3}, {newNode.Y:N3}, {newNode.Z:N3}>");
 #endif
                         if (lastND != null)
                         {
@@ -609,14 +609,14 @@ namespace EntityTools.Patches.Mapper
                             {
                                 Graph.AddArc(lastND.Node, newNode, lastND.Distance);
 #if DEBUG && LOG
-                                ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest1: Link {{last -> new}} <{lastND.Node.X.ToString("N3")}, {lastND.Node.Y.ToString("N3")}, {lastND.Node.Z.ToString("N3")}>");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkNearest1: Link {{last -> new}} <{lastND.Node.X:N3}, {lastND.Node.Y:N3}, {lastND.Node.Z:N3}>");
 #endif
                             }
                             else
                             {
                                 Graph.Add2Arcs(lastND.Node, newNode, lastND.Distance);
 #if DEBUG && LOG
-                                ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest1: Link {{las <->ew}} <{lastND.Node.X.ToString("N3")}, {lastND.Node.Y.ToString("N3")}, {lastND.Node.Z.ToString("N3")}>");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkNearest1: Link {{las <->ew}} <{lastND.Node.X:N3}, {lastND.Node.Y:N3}, {lastND.Node.Z:N3}>");
 #endif
                             }
                         }
@@ -626,27 +626,27 @@ namespace EntityTools.Patches.Mapper
                             {
                                 Graph.AddArc(nearestND.Node, newNode, nearestND.Distance);
 #if DEBUG && LOG
-                                ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest1: Link {{nearest -> new}} <{nearestND.Node.X.ToString("N3")}, {nearestND.Node.Y.ToString("N3")}, {nearestND.Node.Z.ToString("N3")}>");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkNearest1: Link {{nearest -> new}} <{nearestND.Node.X:N3}, {nearestND.Node.Y:N3}, {nearestND.Node.Z:N3}>");
 #endif
                             }
                             else
                             {
                                 Graph.Add2Arcs(nearestND.Node, newNode, nearestND.Distance);
 #if DEBUG && LOG
-                                ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest1: Link {{nearestNod <->ewNode}} <{nearestND.Node.X.ToString("N3")}, {nearestND.Node.Y.ToString("N3")}, {nearestND.Node.Z.ToString("N3")}>");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkNearest1: Link {{nearestNod <->ewNode}} <{nearestND.Node.X:N3}, {nearestND.Node.Y:N3}, {nearestND.Node.Z:N3}>");
 #endif
                             }
 
                         }
 #if DEBUG && LOG
-                        ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest1: Link newNode <{newNode.X.ToString("N3")}, {newNode.Y.ToString("N3")}, {newNode.Z.ToString("N3")}>");
+                        ETLogger.WriteLine(LogType.Debug, $"LinkNearest1: Link newNode <{newNode.X:N3}, {newNode.Y:N3}, {newNode.Z:N3}>");
 #endif
                         return new NodeDetail(newNode);
                     }
                     else
                     {
 #if DEBUG && LOG
-                        ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest1: Fail to add Node <{newNode.X.ToString("N3")}, {newNode.Y.ToString("N3")}, {newNode.Z.ToString("N3")}>");
+                        ETLogger.WriteLine(LogType.Debug, $"LinkNearest1: Fail to add Node <{newNode.X:N3}, {newNode.Y:N3}, {newNode.Z:N3}>");
 #endif
                         return lastND;
                     }
@@ -668,7 +668,7 @@ namespace EntityTools.Patches.Mapper
                     totalWatchTiks += stopwatch.ElapsedTicks;
                     totalWatchMs += stopwatch.ElapsedMilliseconds;
 #if DEBUG && LOG
-                    ETLogger.WriteLine(LogType.Debug, $"AddNavigationNodeStatic::LinkNearest1: ElapsedTime is {stopwatch.ElapsedMilliseconds} ms ({stopwatch.ElapsedTicks})");
+                    ETLogger.WriteLine(LogType.Debug, $"LinkNearest1: ElapsedTime is {stopwatch.ElapsedMilliseconds} ms ({stopwatch.ElapsedTicks})");
 #endif
                 }
 #endif
@@ -698,14 +698,14 @@ namespace EntityTools.Patches.Mapper
 
         private static bool NodesEquals(Node node1, Node node2)
         {
-            return node1.Position == node2.Position;
+            return node1.Position.Equals(node2.Position);
         }
         private static bool NodesEquals(NodeDetail nodeDet1, NodeDetail nodeDet2)
         {
             /*return nodeDet1.Node.X == nodeDet2.Node.X
                 && nodeDet1.Node.Y == nodeDet2.Node.Y
                 && nodeDet1.Node.Z == nodeDet2.Node.Z;*/
-            return nodeDet1.Node.Position == nodeDet2.Node.Position;
+            return nodeDet1.Node.Position.Equals(nodeDet2.Node.Position);
         }
 
     #region Методы фильтрации (проверка связей и расстояний) или без таковых и добавления узлов в список ближайших

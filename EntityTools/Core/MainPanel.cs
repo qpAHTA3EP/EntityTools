@@ -50,10 +50,11 @@ namespace EntityTools.Core
                                                 nameof(EntityTools.PluginSettings.Mapper.Patch),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 
+#if false
             seMapperWaipointDistance.DataBindings.Add(nameof(seMapperWaipointDistance.Value),
-                                                EntityTools.PluginSettings.Mapper,
-                                                nameof(EntityTools.PluginSettings.Mapper.WaypointDistance),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
+                                        EntityTools.PluginSettings.Mapper,
+                                        nameof(EntityTools.PluginSettings.Mapper.WaypointDistance),
+                                        false, DataSourceUpdateMode.OnPropertyChanged);
             seMapperMaxZDif.DataBindings.Add(nameof(seMapperMaxZDif.Value),
                                                 EntityTools.PluginSettings.Mapper,
                                                 nameof(EntityTools.PluginSettings.Mapper.MaxElevationDifference),
@@ -70,7 +71,8 @@ namespace EntityTools.Core
             ckbMapperLinearPath.DataBindings.Add(nameof(ckbMapperLinearPath.Checked),
                                                 EntityTools.PluginSettings.Mapper,
                                                 nameof(EntityTools.PluginSettings.Mapper.LinearPath),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
+                                                false, DataSourceUpdateMode.OnPropertyChanged); 
+#endif
 
             // Настройки EntityToolsLogger
             ckbEnableLogger.DataBindings.Add(nameof(ckbEnableLogger.Checked),
@@ -317,9 +319,9 @@ namespace EntityTools.Core
             EntityToolsLogger.WriteLine("========================================================");
             EntityToolsLogger.WriteLine(string.Empty);
             EntityToolsLogger.WriteLine("LinkedList<Entity> Test:");
-            EntityToolsLogger.WriteLine($"\tCreate Total (t):\t {LinkListTotal.First.Ticks.ToString("N3")}");
+            EntityToolsLogger.WriteLine($"\tCreate Total (t):\t {LinkListTotal.First.Ticks:N3}");
             EntityToolsLogger.WriteLine($"\tCreate Total (ms):\t {LinkListTotal.First.Millisecond}");
-            EntityToolsLogger.WriteLine($"\tRemote Total (t):\t {LinkListTotal.Second.Ticks.ToString("N3")}");
+            EntityToolsLogger.WriteLine($"\tRemote Total (t):\t {LinkListTotal.Second.Ticks:N3}");
             EntityToolsLogger.WriteLine($"\tRemote Total (ms):\t {LinkListTotal.Second.Millisecond}");
             EntityToolsLogger.WriteLine("--------------------------------------------------------");
             foreach (var w in linkedListWatches)

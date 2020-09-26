@@ -379,6 +379,7 @@ namespace EntityTools.Patches.Mapper
                             {
                                 graphicsNW.CenterPosition = EntityManager.LocalPlayer.Location;
                             }
+
                             graphicsNW.ImageWidth = Math.Max(MapPicture.Width, 100);
                             graphicsNW.ImageHeight = Math.Max(MapPicture.Height, 100);
                             graphicsNW.Zoom = Zoom;
@@ -386,14 +387,18 @@ namespace EntityTools.Patches.Mapper
                             graphicsNW.drawMap();
 
                             #region Отрисовка области удаления вершин
+
 #if false
-                            int nodeDeleteDiameter = Convert.ToInt32(Astral.Controllers.Settings.Get.DeleteNodeRadius * graphicsNW.Zoom * 2);
+                            int nodeDeleteDiameter =
+ Convert.ToInt32(Astral.Controllers.Settings.Get.DeleteNodeRadius * graphicsNW.Zoom * 2);
                             var imagePos = MapPicture.PointToClient(Control.MousePosition);
-                            graphicsNW.drawEllipse(imagePos, new Size(nodeDeleteDiameter, nodeDeleteDiameter), Pens.Beige); 
+                            graphicsNW.drawEllipse(imagePos, new Size(nodeDeleteDiameter, nodeDeleteDiameter), Pens.Beige);
 #endif
+
                             #endregion
 
                             #region Отрисовка персонажей
+
                             uint playerContainerId = EntityManager.LocalPlayer.ContainerId;
                             foreach (Entity entity in EntityManager.GetEntities())
                             {
@@ -402,9 +407,11 @@ namespace EntityTools.Patches.Mapper
                                     graphicsNW.drawFillEllipse(entity.Location, new Size(6, 6), Brushes.AliceBlue);
                                 }
                             }
+
                             #endregion
 
                             #region Отрисовка АОЕ
+
 #if false
                             //foreach (AOECheck.AOE aoe in AOECheck.List)
                             if (AstralAccessors.Controllers.AOECheck.List != null)
@@ -430,34 +437,42 @@ namespace EntityTools.Patches.Mapper
                                         graphicsNW.drawFillEllipse(vector, (double)aoe.Radius, brush);
                                     }
                                 }
-                            } 
+                            }
 #endif
+
                             #endregion
 
                             #region Отрисовка нодов
-                            foreach (TargetableNode targetableNode in EntityManager.LocalPlayer.Player.InteractStatus.TargetableNodes)
+
+                            foreach (TargetableNode targetableNode in EntityManager.LocalPlayer.Player.InteractStatus
+                                .TargetableNodes)
                             {
                                 if (targetableNode.Categories.Contains("Loot"))
                                 {
-                                    graphicsNW.drawFillEllipse(targetableNode.WorldInteractionNode.Location, new Size(6, 6), Brushes.Gold);
+                                    graphicsNW.drawFillEllipse(targetableNode.WorldInteractionNode.Location,
+                                        new Size(6, 6), Brushes.Gold);
                                 }
                             }
+
                             #endregion
 
                             // Отрисовка графики, связанной с выполняемой ролью 
 #if true
                             //Roles.CurrentRole.OnMapDraw(graphicsNW_0);
-                            if(!AstralAccessors.Controllers.Roles.CurrentRole_OnMapDraw(graphicsNW))
+                            if (!AstralAccessors.Controllers.Roles.CurrentRole_OnMapDraw(graphicsNW))
                                 //lock (AstralAccessors.Quester.Core.Meshes.Value.SyncRoot) <- Блогировка графа есть в DrawMeshes(..)
-                                Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes.DrawMeshes(graphicsNW, AstralAccessors.Quester.Core.Meshes);
+                                Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes.DrawMeshes(graphicsNW,
+                                    AstralAccessors.Quester.Core.Meshes);
 #else
                             DrawMeshes(graphicsNW, AstralAccessors.Quester.Core.Meshes);
 #endif
 
                             // Отрисовка костров
-                            foreach (MinimapWaypoint minimapWaypoint in EntityManager.LocalPlayer.Player.MissionInfo.Waypoints)
+                            foreach (MinimapWaypoint minimapWaypoint in EntityManager.LocalPlayer.Player.MissionInfo
+                                .Waypoints)
                                 if (minimapWaypoint.IsCampFire)
-                                    graphicsNW.drawFillEllipse(minimapWaypoint.Position, new Size(6, 6), Brushes.DarkOrange);
+                                    graphicsNW.drawFillEllipse(minimapWaypoint.Position, new Size(6, 6),
+                                        Brushes.DarkOrange);
 
 
                             // Отрисовка специального объекта, заданного методом showObjectOnMap 
@@ -468,6 +483,7 @@ namespace EntityTools.Patches.Mapper
                             CustomDraw?.Invoke(graphicsNW);
 
                             #region Отрисовка области уклонения от АОЕ
+
 #if false
                             //if (Astral.Logic.NW.Movements.LastValidPoses != null && !Astral.Logic.NW.Movements.lastvlidposto.IsTimedOut)
                             if (AstralAccessors.Logic.NW.Movements.LastValidPoses.IsValid()
@@ -485,32 +501,43 @@ namespace EntityTools.Patches.Mapper
                                         graphicsNW.drawFillEllipse(dodgeLosTestResult.TestedPos, new Size(4, 4), Brushes.Green);
                                     }
                                 }
-                            } 
+                            }
 #endif
+
                             #endregion
 
                             #region Отрисовка персонажа
+
                             float angle = EntityManager.LocalPlayer.Yaw * 180f / 3.14159274f;
                             Bitmap image = RotateImage(Properties.Resources.charArrow, angle);
                             graphicsNW.drawImage(EntityManager.LocalPlayer.Location, image, default(Size));
+
                             #endregion
 
                             // Отрисовка точки назначения
-                            graphicsNW.drawEllipse(Navigator.GetDestination, new Size(10, 10), Pens.Red); 
+                            graphicsNW.drawEllipse(Navigator.GetDestination, new Size(10, 10), Pens.Red);
                         }
+
                         Astral.Controllers.Forms.InvokeOnMainThread(() =>
                         {
                             using (ReadLock())
-                                MapPicture.Image = graphicsNW.getImage(); 
+                                MapPicture.Image = graphicsNW.getImage();
                         });
                     }
                 }
-                catch (ObjectDisposedException)
+                catch (ObjectDisposedException ex)
                 {
+                    Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex.ToString());
                     break;
                 }
-                catch (InvalidOperationException)
+                catch (InvalidOperationException ex)
                 {
+                    Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex.ToString());
+                    break;
+                }
+                catch (ThreadAbortException ex)
+                {
+                    Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex.ToString());
                     break;
                 }
                 catch (Exception ex)

@@ -66,6 +66,8 @@ namespace EntityCore.Forms
             this.Controls.Add(this.lblMessage);
             this.Controls.Add(this.btnOK);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.LookAndFeel.SkinName = "Office 2013 Light Gray";
+            this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.Name = "TargetSelectForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

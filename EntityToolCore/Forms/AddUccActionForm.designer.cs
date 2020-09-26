@@ -120,7 +120,9 @@
             this.Controls.Add(this.bntCancel);
             this.Controls.Add(this.splitContainer);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
-            this.MinimumSize = new System.Drawing.Size(620, 400);
+            this.LookAndFeel.SkinName = "Office 2013 Light Gray";
+            this.LookAndFeel.UseDefaultLookAndFeel = false;
+            this.MinimumSize = new System.Drawing.Size(612, 390);
             this.Name = "AddUccActionForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

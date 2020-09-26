@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.cbPlayersClass = new System.Windows.Forms.ComboBox();
             this.dgvBonusPriorityList = new System.Windows.Forms.DataGridView();
@@ -66,6 +67,14 @@
             this.clmnBonusName,
             this.clmnNumber,
             this.clmnButton});
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Tahoma", 8.25F);
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(32)))), ((int)(((byte)(31)))), ((int)(((byte)(53)))));
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgvBonusPriorityList.DefaultCellStyle = dataGridViewCellStyle2;
             this.dgvBonusPriorityList.Location = new System.Drawing.Point(12, 48);
             this.dgvBonusPriorityList.MultiSelect = false;
             this.dgvBonusPriorityList.Name = "dgvBonusPriorityList";
@@ -185,6 +194,8 @@
             this.Controls.Add(this.btnDown);
             this.Controls.Add(this.dgvBonusPriorityList);
             this.Controls.Add(this.cbPlayersClass);
+            this.LookAndFeel.SkinName = "Office 2013 Light Gray";
+            this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.MinimumSize = new System.Drawing.Size(380, 324);
             this.Name = "MountBonusPriorityListForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

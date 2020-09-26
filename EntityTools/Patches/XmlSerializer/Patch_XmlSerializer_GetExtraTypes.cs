@@ -49,8 +49,9 @@ namespace EntityTools.Patches
                 FillTypeLists(Assembly.GetEntryAssembly().GetTypes());
 
                 // Проверяем типы, объявленные в плагинах
-                if (GetPluginTypes != null)
-                    FillTypeLists(GetPluginTypes()); 
+                var types = GetPluginTypes();
+                if (types != null && types.Count > 0)
+                    FillTypeLists(types); 
 #else
                 FillTypeLists();
 #endif
