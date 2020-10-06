@@ -2,17 +2,13 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using AStar;
 using Astral.Logic.Classes.Map;
-using Astral.Quester.Classes;
-using EntityTools.Enums;
 using EntityTools.Reflection;
 using MyNW.Classes;
 using MyNW.Internals;
-using static EntityTools.Patches.Mapper.GraphicsNWExtensions;
+using static EntityTools.Patches.Mapper.MapperGraphicsHelper;
 
 namespace EntityTools.Patches.Mapper
 {
@@ -32,45 +28,50 @@ namespace EntityTools.Patches.Mapper
 
         public static void Initialize(MapperExt m)
         {
+#if false
             nodes.Clear();
             mapper = m;
             mapper.OnClick += handler_MapperClick;
             mapper.CustomDraw += handler_DrawSelectionOnMapper;
-            mapper.OnMapperKeyUp += handler_KeyUp;
+            mapper.OnMapperKeyUp += handler_KeyUp; 
+#endif
         }
 
-        private static void handler_DrawSelectionOnMapper(GraphicsNW g)
+        private static void handler_DrawSelectionOnMapper(MapperGraphics graphics)
         {
-            Vector3 currentWorldPos = g.getWorldPos(mapper.RelativeMousePosition);
+#if false
+            //Vector3 currentWorldPos = graphics.getWorldPos(mapper.RelativeMousePosition);
+            graphics.GetMouseCursorWorldPosition(out double x, out double y);
 
             bool drawSelectRegion = startSelectRegionPos.IsValid && (Control.ModifierKeys & Keys.Shift) == Keys.Shift;
 
             if (nodes.Count > 0 && mapper != null)
             {
                 foreach (Node node in nodes)
-                    g.drawSelectedNode(node);
+                    graphics.drawSelectedNode(node);
             }
 
             if (drawSelectRegion)
             {
-                Vector3 topLeft = new Vector3(Math.Min(startSelectRegionPos.X, currentWorldPos.X), Math.Max(startSelectRegionPos.Y, currentWorldPos.Y), 0f);
-                Vector3 downRight = new Vector3(Math.Max(startSelectRegionPos.X, currentWorldPos.X), Math.Min(startSelectRegionPos.Y, currentWorldPos.Y), 0f);
+                //Vector3 topLeft = new Vector3(Math.Min(, currentWorldPos.X), Math.Max(startSelectRegionPos.Y, currentWorldPos.Y), 0f);
+                //Vector3 downRight = new Vector3(Math.Max(startSelectRegionPos.X, currentWorldPos.X), Math.Min(startSelectRegionPos.Y, currentWorldPos.Y), 0f);
 
-                Vector3 selectRegionSize = new Vector3(downRight.X - topLeft.X, downRight.Y - topLeft.Y, 0f);
+                //Vector3 selectRegionSize = new Vector3(downRight.X - topLeft.X, downRight.Y - topLeft.Y, 0f);
 
-                g.drawRectangle(topLeft, selectRegionSize, Pens.PowderBlue);
-            }
+                graphics.DrawRectangle(Pens.PowderBlue, startSelectRegionPos.X, startSelectRegionPos.Y, x, y);
+            } 
+#endif
         }
 
         /// <summary>
         /// Отрисовка выбранной вершины
         /// </summary>
         /// <param name="node"></param>
-        /// <param name="graphicsNW"></param>
-        private static void drawSelectedNode(this GraphicsNW graphicsNW, Node node)
+        /// <param name="graphics"></param>
+        private static void drawSelectedNode(this MapperGraphics graphics, Node node)
         {
-            graphicsNW.drawFillEllipse(node.Position.AsVector3(), size14, Brushes.White);
-            graphicsNW.drawFillEllipse(node.Position.AsVector3(), size8, Brushes.Red);
+            graphics.FillCircleCentered(Brushes.White, node.Position, 14);
+            graphics.FillCircleCentered(Brushes.Red, node.Position, 8);
         }
 
         /// <summary>
@@ -209,6 +210,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         internal static void Reset()
         {
+#if false
             if (mapper != null && !mapper.IsDisposed)
             {
                 mapper.OnClick -= handler_MapperClick;
@@ -217,7 +219,8 @@ namespace EntityTools.Patches.Mapper
                 mapper = null;
             }
 
-            nodes.Clear();
+            nodes.Clear(); 
+#endif
         }
 
     }

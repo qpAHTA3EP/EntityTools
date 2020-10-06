@@ -1,27 +1,17 @@
-﻿#if PATCH_ASTRAL && HARMONY
-using HarmonyLib;
-# endif
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Reflection;
-using Astral.Logic.Classes.Map;
-using AStar;
+﻿using System;
 using System.Drawing;
+using System.Reflection;
+using AStar;
+using Astral.Logic.Classes.Map;
 using MyNW.Classes;
 using EntityTools.Reflection;
 
 namespace EntityTools.Patches.Mapper
 {
-//namespace Astral.Logic.Classes.Map.Functions
-//{
-//	    internal class Picture
-//	    {
-//		    public static void DrawMeshes(GraphicsNW graph, Graph meshes)
-    
+    /// <summary>
+    /// Патч метода void Astral.Logic.Classes.Map.Functions.Picture.DrawMeshes(GraphicsNW graph, Graph meshes)
+    /// </summary>
+
     internal class Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes : Patch
     {
         internal Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes()
@@ -33,7 +23,7 @@ namespace EntityTools.Patches.Mapper
             }
             else throw new Exception("Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes: fail to initialize 'methodToReplace'");
 
-            methodToInject = typeof(Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes).GetMethod("DrawMeshes", ReflectionHelper.DefaultFlags);
+            methodToInject = GetType().GetMethod(nameof(DrawMeshes), ReflectionHelper.DefaultFlags);
         }
 
 
@@ -44,60 +34,93 @@ namespace EntityTools.Patches.Mapper
         /// <param name="meshes"></param>
         public static void DrawMeshes(GraphicsNW graphicsNW, Graph meshes)
         {
-            lock (meshes.SyncRoot)
+            if (graphicsNW is MapperGraphics mapGraphics)
             {
-                double num = graphicsNW.getWorldPos(new Point(graphicsNW.ImageWidth, graphicsNW.ImageHeight)).Distance2D(graphicsNW.CenterPosition);
-#if false
-                foreach (Arc arc in meshes.Arcs)
+                lock (meshes.SyncRoot)
                 {
-                    if (arc.StartNode.Passable && arc.EndNode.Passable)
-                    {
-                        Vector3 startPos = new Vector3((float)arc.StartNode.X, (float)arc.StartNode.Y, (float)arc.StartNode.Z);
-                        Vector3 endPos = new Vector3((float)arc.EndNode.X, (float)arc.EndNode.Y, (float)arc.EndNode.Z);
-                        if (startPos.Distance2D(graphicsNW.CenterPosition) < num)
-                        {
-                            graphicsNW.drawLine(startPos, endPos, Pens.Red);
-                        }
-                    }
-                } 
-#endif
+                    mapGraphics.GetWorldPosition(0, 0, out double left, out double top);
+                    mapGraphics.GetWorldPosition(mapGraphics.ImageWidth, mapGraphics.ImageHeight, out double right, out double down);
 
-                var nodeSize = new Size(5, 5);
-                foreach (Node node in meshes.Nodes)
-                {
-                    if (node.Passable)
+                    foreach (Node node in meshes.Nodes)
                     {
-                        Brush brush = Brushes.Red;
-                        Vector3 nodePos = new Vector3((float)node.X, (float)node.Y, (float)node.Z);
-                        if (nodePos.Distance2D(graphicsNW.CenterPosition) < num)
+                        if (node.Passable)
                         {
-                            int inCount = node.IncomingArcsCount;
-                            int outCount = node.OutgoingArcsCount;
-                            if (inCount == 1 && outCount == 1)
-                                brush = Brushes.SkyBlue;
-
-                            foreach (Arc arc in node.OutgoingArcs)
+                            // Отсеиваем и не отрисовываем вершины и ребра, расположенные за пределами видимого изображения
+                            if (left <= node.X && node.X <= right
+                                && down <= node.Y && node.Y <= top)
                             {
-                                if (arc.EndNode.Passable)
+                                bool uniPath = node.IncomingArcsCount <= 1 && node.OutgoingArcsCount <= 1;
+                                Brush brush = (uniPath) ? Brushes.SkyBlue : Brushes.Red;
+                                Pen pen = (uniPath) ? Pens.SkyBlue : Pens.Red;
+
+                                foreach (Arc arc in node.OutgoingArcs)
                                 {
-                                    Vector3 endPos = new Vector3((float)arc.EndNode.X, (float)arc.EndNode.Y, (float)arc.EndNode.Z);
-                                    graphicsNW.drawLine(nodePos, endPos, Pens.Red);
+                                    if (arc.EndNode.Passable)
+                                        mapGraphics.DrawLine(pen, node.X, node.Y, arc.EndNode.X, arc.EndNode.Y);
                                 }
+                                mapGraphics.FillCircleCentered(brush, node.Position, 5);
                             }
-#if true
-                            foreach (Arc arc in node.IncomingArcs)
-                            {
-                                if (arc.StartNode.Passable)
-                                {
-                                    Vector3 startPos = new Vector3((float)arc.StartNode.X, (float)arc.StartNode.Y, (float)arc.StartNode.Z);
-                                    graphicsNW.drawLine(startPos, nodePos, Pens.Red);
-                                }
-                            } 
-#endif
-                            graphicsNW.drawFillEllipse(nodePos, nodeSize, brush);
                         }
                     }
                 }
+            }
+            else
+            {
+                lock (meshes.SyncRoot)
+                {
+                    double num = graphicsNW.getWorldPos(new Point(graphicsNW.ImageWidth, graphicsNW.ImageHeight)).Distance2D(graphicsNW.CenterPosition);
+#if false
+                    foreach (Arc arc in meshes.Arcs)
+                    {
+                        if (arc.StartNode.Passable && arc.EndNode.Passable)
+                        {
+                            Vector3 startPos = new Vector3((float)arc.StartNode.X, (float)arc.StartNode.Y, (float)arc.StartNode.Z);
+                            Vector3 endPos = new Vector3((float)arc.EndNode.X, (float)arc.EndNode.Y, (float)arc.EndNode.Z);
+                            if (startPos.Distance2D(graphicsNW.CenterPosition) < num)
+                            {
+                                graphicsNW.drawLine(startPos, endPos, Pens.Red);
+                            }
+                        }
+                    } 
+#endif
+
+                    var nodeSize = new Size(5, 5);
+                    foreach (Node node in meshes.Nodes)
+                    {
+                        if (node.Passable)
+                        {
+                            Brush brush = Brushes.Red;
+                            Vector3 nodePos = new Vector3((float)node.X, (float)node.Y, (float)node.Z);
+                            if (nodePos.Distance2D(graphicsNW.CenterPosition) < num)
+                            {
+                                int inCount = node.IncomingArcsCount;
+                                int outCount = node.OutgoingArcsCount;
+                                if (inCount == 1 && outCount == 1)
+                                    brush = Brushes.SkyBlue;
+
+                                foreach (Arc arc in node.OutgoingArcs)
+                                {
+                                    if (arc.EndNode.Passable)
+                                    {
+                                        Vector3 endPos = new Vector3((float)arc.EndNode.X, (float)arc.EndNode.Y, (float)arc.EndNode.Z);
+                                        graphicsNW.drawLine(nodePos, endPos, Pens.Red);
+                                    }
+                                }
+#if true
+                                foreach (Arc arc in node.IncomingArcs)
+                                {
+                                    if (arc.StartNode.Passable)
+                                    {
+                                        Vector3 startPos = new Vector3((float)arc.StartNode.X, (float)arc.StartNode.Y, (float)arc.StartNode.Z);
+                                        graphicsNW.drawLine(startPos, nodePos, Pens.Red);
+                                    }
+                                }
+#endif
+                                graphicsNW.drawFillEllipse(nodePos, nodeSize, brush);
+                            }
+                        }
+                    }
+                } 
             }
         }
     }

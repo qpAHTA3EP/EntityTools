@@ -82,10 +82,9 @@ namespace EntityTools.Patches.Mapper
                     //int closestNodeInd = -1; // Индекс ближайшего узла в списке nearestNodeList
                     //bool isEquivalent = false; // флаг, указывающий, что newNode был заменена на эквивалентный существующий узел
                     NodeDetail equivalentND = null;
-                    for (int i = 0; i < Graph.Nodes.Count; i++)
+                    foreach (Node currentNode in Graph.NodesCollection)
                     {
-                        if (!(Graph.Nodes[i] is Node currentNode)
-                            || NodesEquals(lastND.Node, currentNode))
+                        if (NodesEquals(lastND.Node, currentNode))
                             continue;
 
                         //Проверяем разницу высот
@@ -359,30 +358,27 @@ namespace EntityTools.Patches.Mapper
                 try
                 {
                     // сканируем узлы графа, для определения ближайшего
-                    for (int i = 0; i < Graph.Nodes.Count; i++)
+                    foreach (Node iNode in Graph.NodesCollection)
                     {
                         //Проверяем разницу высот
-                        if (Graph.Nodes[i] is Node iNode)
+                        NodeDetail currentND = new NodeDetail(iNode, newNode);
+                        if (Math.Sign(currentND.Vector.Z) * currentND.Vector.Z < maxZDifference)
                         {
-                            NodeDetail currentND = new NodeDetail(iNode, newNode);
-                            if (Math.Sign(currentND.Vector.Z) * currentND.Vector.Z < maxZDifference)
+                            // Разница высот в пределах допустимой величины,
+                            // проверяем расстояние от добавляемой точки до текущей
+                            if (currentND.Distance < equivalenceDistance)
                             {
-                                // Разница высот в пределах допустимой величины,
-                                // проверяем расстояние от добавляемой точки до текущей
-                                if (currentND.Distance < equivalenceDistance)
-                                {
-                                    // NewNode CurNode в пределах equivalenceDistance
-                                    if (equivalentND == null
-                                        || equivalentND.Distance > currentND.Distance)
-                                        equivalentND = currentND;
-                                }
-                                /*else if (currentND.Distance <= minNodeDistance
-                                         && (nearestND == null || currentND.Distance < nearestND.Distance))
-                                {
-                                    // curNodeDet - близажший существующий узел к NewNode
-                                    nearestND = currentND;
-                                }*/
+                                // NewNode CurNode в пределах equivalenceDistance
+                                if (equivalentND == null
+                                    || equivalentND.Distance > currentND.Distance)
+                                    equivalentND = currentND;
                             }
+                            /*else if (currentND.Distance <= minNodeDistance
+                                        && (nearestND == null || currentND.Distance < nearestND.Distance))
+                            {
+                                // curNodeDet - близажший существующий узел к NewNode
+                                nearestND = currentND;
+                            }*/
                         }
                     }
 
@@ -524,29 +520,26 @@ namespace EntityTools.Patches.Mapper
                 try
                 {
                     // сканируем узлы графа, для определения ближайшего
-                    for (int i = 0; i < Graph.Nodes.Count; i++)
+                    foreach (Node iNode in Graph.NodesCollection)
                     {
                         //Проверяем разницу высот
-                        if (Graph.Nodes[i] is Node iNode)
+                        NodeDetail currentND = new NodeDetail(iNode, newNode);
+                        if (Math.Sign(currentND.Vector.Z) * currentND.Vector.Z < maxZDifference)
                         {
-                            NodeDetail currentND = new NodeDetail(iNode, newNode);
-                            if (Math.Sign(currentND.Vector.Z) * currentND.Vector.Z < maxZDifference)
+                            // Разница высот в пределах допустимой величины,
+                            // проверяем расстояние от добавляемой точки до текущей
+                            if (currentND.Distance < equivalenceDistance)
                             {
-                                // Разница высот в пределах допустимой величины,
-                                // проверяем расстояние от добавляемой точки до текущей
-                                if (currentND.Distance < equivalenceDistance)
-                                {
-                                    // NewNode CurNode в пределах equivalenceDistance
-                                    if (equivalentND == null
-                                        || equivalentND.Distance > currentND.Distance)
-                                        equivalentND = currentND;
-                                }
-                                else if (currentND.Distance <= minNodeDistance
-                                         && (nearestND == null || currentND.Distance < nearestND.Distance))
-                                {
-                                    // curNodeDet - близажший существующий узел к NewNode
-                                    nearestND = currentND;
-                                }
+                                // NewNode CurNode в пределах equivalenceDistance
+                                if (equivalentND == null
+                                    || equivalentND.Distance > currentND.Distance)
+                                    equivalentND = currentND;
+                            }
+                            else if (currentND.Distance <= minNodeDistance
+                                        && (nearestND == null || currentND.Distance < nearestND.Distance))
+                            {
+                                // curNodeDet - близажший существующий узел к NewNode
+                                nearestND = currentND;
                             }
                         }
                     }

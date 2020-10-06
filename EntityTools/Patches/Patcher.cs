@@ -58,9 +58,16 @@ namespace EntityTools.Patches
 
         private static readonly Patch_VIP_ProfessionVendorEntity patchVIPProfessionVendorEntity = new Patch_VIP_ProfessionVendorEntity();
 
-#if false
-        private static readonly Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes patchAstralLogicClassesMapFunctionsPictureDrawMeshes = new Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes();
+#if true
+        private static readonly Patch_Astral_Quester_Core_Save patchAstralQuesterCoreSave = new Patch_Astral_Quester_Core_Save();
 #endif
+#if true
+        // Патч механизмов отрисовки Mapper'a
+        private static readonly Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes patchAstralLogicClassesMapFunctionsPictureDrawMeshes = new Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes();
+        private static readonly Patch_Astral_Navmesh_DrawRoad patchAstralNavmeshDrawRoad = new Patch_Astral_Navmesh_DrawRoad();
+        private static readonly Patch_Astral_Navmesh_DrawHotSpots patchAstralNavmeshDrawHotSpots = new Patch_Astral_Navmesh_DrawHotSpots();
+#endif
+
         static bool Applied = false;
         public static void Apply()
         {
@@ -105,7 +112,7 @@ namespace EntityTools.Patches
                 }
                 catch
                 {
-                    ETLogger.WriteLine(LogType.Error, "Harmonies patches are failed!",true);
+                    ETLogger.WriteLine(LogType.Error, "Harmony patches are failed!",true);
                 }
 #endif
                 Applied = true;

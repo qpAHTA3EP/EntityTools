@@ -24,6 +24,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using EntityTools.Reflection;
+using EntityTools.Patches.Mapper;
 
 namespace EntityCore.Quester.Action
 {
@@ -520,43 +521,76 @@ namespace EntityCore.Quester.Action
         {
             if (ValidateEntity(target))
             {
-                float x = target.Location.X,
-                      y = target.Location.Y;
-                List<Vector3> coords = new List<Vector3>() {
-                    new Vector3(x, y - 5, 0),
-                    new Vector3(x - 4.33f, y + 2.5f, 0),
-                    new Vector3(x + 4.33f, y + 2.5f, 0)
-                };
-                graph.drawFillPolygon(coords, Brushes.Yellow);
-
-                int diaD = (int)(@this._distance * 2.0f * graph.Zoom);
-                int diaACD = (int)(@this._abortCombatDistance * 2.0f * graph.Zoom);
-                if (@this._distance > 11)
+                if (graph is MapperGraphics mapGraphics)
                 {
-                    graph.drawEllipse(target.Location, new Size(diaD, diaD), Pens.Yellow);
+                    float x = target.Location.X,
+                        y = target.Location.Y,
+                        diaD = @this._distance * 2,
+                        diaACD = @this._abortCombatDistance * 2;
 
-                    if (@this._abortCombatDistance > @this._distance)
-                    {
-                        graph.drawEllipse(target.Location, new Size(diaACD, diaACD), Pens.Orange);
-                    }
-                }
-
-                if (ValidateEntity(closestEntity) && target.ContainerId != closestEntity.ContainerId)
-                {
-                    x = closestEntity.Location.X;
-                    y = closestEntity.Location.Y;
-
-                    coords[0].X = x; coords[0].Y = y - 5;
-                    coords[1].X = x - 4.33f; coords[1].Y = y + 2.5f;
-                    coords[2].X = x + 4.33f; coords[2].Y = y + 2.5f;
-                    graph.drawFillPolygon(coords, Brushes.LightYellow);
-
+                    mapGraphics.FillUpsideTriangleCentered(Brushes.Yellow, target.Location, 10);
                     if (@this._distance > 11)
                     {
-                        graph.drawEllipse(closestEntity.Location, new Size(diaD, diaD), Pens.Yellow);
+                        mapGraphics.DrawEllipse(Pens.Yellow, x - @this._distance, y + @this._distance, diaD, diaD, true);
                         if (@this._abortCombatDistance > @this._distance)
-                            graph.drawEllipse(closestEntity.Location, new Size(diaACD, diaACD), Pens.Orange);
+                            mapGraphics.DrawEllipse(Pens.Yellow, x - @this._abortCombatDistance, y + @this._abortCombatDistance, diaACD, diaACD, true);
                     }
+                    
+                    if (ValidateEntity(closestEntity) && target.ContainerId != closestEntity.ContainerId)
+                    {
+                        x = closestEntity.Location.X;
+                        y = closestEntity.Location.Y;
+
+                        mapGraphics.FillUpsideTriangleCentered(Brushes.LightYellow, target.Location, 10);
+
+                        if (@this._distance > 11)
+                        {
+                            mapGraphics.DrawEllipse(Pens.Yellow, x - @this._distance, y + @this._distance, diaD, diaD, true);
+                            if (@this._abortCombatDistance > @this._distance)
+                                mapGraphics.DrawEllipse(Pens.Yellow, x - @this._abortCombatDistance, y + @this._abortCombatDistance, diaACD, diaACD, true);
+                        }
+                    }
+                }
+                else
+                {
+                    float x = target.Location.X,
+                                  y = target.Location.Y;
+                    List<Vector3> coords = new List<Vector3>() {
+                        new Vector3(x, y - 5, 0),
+                        new Vector3(x - 4.33f, y + 2.5f, 0),
+                        new Vector3(x + 4.33f, y + 2.5f, 0)
+                    };
+                    graph.drawFillPolygon(coords, Brushes.Yellow);
+
+                    int diaD = (int)(@this._distance * 2.0f * graph.Zoom);
+                    int diaACD = (int)(@this._abortCombatDistance * 2.0f * graph.Zoom);
+                    if (@this._distance > 11)
+                    {
+                        graph.drawEllipse(target.Location, new Size(diaD, diaD), Pens.Yellow);
+
+                        if (@this._abortCombatDistance > @this._distance)
+                        {
+                            graph.drawEllipse(target.Location, new Size(diaACD, diaACD), Pens.Orange);
+                        }
+                    }
+
+                    if (ValidateEntity(closestEntity) && target.ContainerId != closestEntity.ContainerId)
+                    {
+                        x = closestEntity.Location.X;
+                        y = closestEntity.Location.Y;
+
+                        coords[0].X = x; coords[0].Y = y - 5;
+                        coords[1].X = x - 4.33f; coords[1].Y = y + 2.5f;
+                        coords[2].X = x + 4.33f; coords[2].Y = y + 2.5f;
+                        graph.drawFillPolygon(coords, Brushes.LightYellow);
+
+                        if (@this._distance > 11)
+                        {
+                            graph.drawEllipse(closestEntity.Location, new Size(diaD, diaD), Pens.Yellow);
+                            if (@this._abortCombatDistance > @this._distance)
+                                graph.drawEllipse(closestEntity.Location, new Size(diaACD, diaACD), Pens.Orange);
+                        }
+                    } 
                 }
             }
         }

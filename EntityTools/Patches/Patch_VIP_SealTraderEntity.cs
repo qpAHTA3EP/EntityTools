@@ -29,7 +29,7 @@ namespace EntityTools.Patches
             if (methodToReplace == null)
                 throw new Exception("Patch_VIP_SealTraderEntity: fail to initialize 'methodToReplace'");
 
-            methodToInject = typeof(Patch_VIP_SealTraderEntity).GetMethod("get_SealTraderEntity", ReflectionHelper.DefaultFlags);
+            methodToInject = GetType().GetMethod(nameof(get_SealTraderEntity), ReflectionHelper.DefaultFlags);
         }
 
         internal static Entity get_SealTraderEntity()

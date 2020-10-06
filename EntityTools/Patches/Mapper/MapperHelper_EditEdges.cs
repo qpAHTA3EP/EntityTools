@@ -28,12 +28,14 @@ namespace EntityTools.Patches.Mapper
 
         public static void Initialize(MapperExt m)
         {
+#if false
             startNode = null;
             startNodePos = null;
             mapper = m;
             mapper.OnClick += handler_MapperClick;
             mapper.CustomDraw += handler_DrawSelectionOnMapper;
-            mapper.OnMapperKeyUp += handler_KeyUp;
+            mapper.OnMapperKeyUp += handler_KeyUp; 
+#endif
         }
 
         private static void handler_DrawSelectionOnMapper(GraphicsNW g)
@@ -173,6 +175,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         internal static void Reset()
         {
+#if false
             if (mapper != null && !mapper.IsDisposed)
             {
                 mapper.OnClick -= handler_MapperClick;
@@ -181,7 +184,8 @@ namespace EntityTools.Patches.Mapper
             }
 
             startNode = null;
-            startNodePos = null;
+            startNodePos = null; 
+#endif
         }
 
     }

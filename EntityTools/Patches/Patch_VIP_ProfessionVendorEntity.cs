@@ -3,10 +3,7 @@ using EntityTools.Reflection;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace EntityTools.Patches
 {
@@ -29,7 +26,7 @@ namespace EntityTools.Patches
             if (methodToReplace == null)
                 throw new Exception("Patch_VIP_ProfessionVendorEntity: fail to initialize 'methodToReplace'");
 
-            methodToInject = typeof(Patch_VIP_ProfessionVendorEntity).GetMethod("get_ProfessionVendorEntity", ReflectionHelper.DefaultFlags);
+            methodToInject = GetType().GetMethod(nameof(get_ProfessionVendorEntity), ReflectionHelper.DefaultFlags);
         }
 
         internal static Entity get_ProfessionVendorEntity()

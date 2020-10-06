@@ -7,9 +7,6 @@ using MyNW.Patchables.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using EntityTools.Reflection;
-using static EntityTools.Tools.BuySellItems.ItemFilterEntryExt;
 
 namespace EntityTools.Extensions
 {

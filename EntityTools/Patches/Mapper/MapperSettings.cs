@@ -187,17 +187,59 @@ namespace EntityTools.Settings
         [Bindable(true)]
         public Point Location
         {
-            get => _location;
+            get
+            {
+                var screenSize = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size;
+                if (_location.X < 0 || _location.X > screenSize.Width)
+                    _location.X = 60;
+                if (_location.Y < 0 || _location.Y > screenSize.Height)
+                    _location.Y = 60;
+                return _location;
+            }
+
             set
             {
                 if (_location != value)
                 {
+                    var screenSize = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size;
+                    if (value.X < 0 || value.X > screenSize.Width)
+                        value.X = 60;
+                    if (value.Y < 0 || value.Y > screenSize.Height)
+                        value.Y = 60;
+
                     _location = value;
                     base.NotifyPropertyChanged(nameof(Location));
                 }
             }
         }
-        public Point _location = new Point();
+        private Point _location = new Point(0, 0);
+
+        /// <summary>
+        /// Координаты Mapper
+        /// </summary>
+        [Bindable(true)]
+        public Size Size
+        {
+            get
+            {
+                var screenSize = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size;
+                if (_size.Width < 10 || _size.Width > screenSize.Width)
+                    _size.Width = 406;
+                if (_size.Height < 10 || _size.Height > screenSize.Height)
+                    _size.Height = 406;
+                return _size;
+            }
+
+            set
+            {
+                if (_size != value)
+                {
+                    _size = value;
+                    base.NotifyPropertyChanged(nameof(Size));
+                }
+            }
+        }
+        private Size _size = new Size(396, 396);
 
         /// <summary>
         /// Видимость главной панели инструментов
@@ -255,6 +297,26 @@ namespace EntityTools.Settings
         }
         //[NonSerialized]
         private bool _statusBarVisible = true;
+
+        /// <summary>
+        /// Время обновления кэша
+        /// </summary>
+        [Bindable(true)]
+        public int RedrawMapperTimeout
+        {
+            get => redrawMapperTimeout;
+            set
+            {
+                if (value != redrawMapperTimeout)
+                {
+                    redrawMapperTimeout = Math.Max(100, value);
+                    base.NotifyPropertyChanged(nameof(RedrawMapperTimeout));
+                }
+            }
+        }
+        //[NonSerialized]
+        private int redrawMapperTimeout = 100;
+
     }
 #endif
 }

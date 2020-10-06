@@ -530,6 +530,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         internal static void Reset()
         {
+#if false
             startPoint = null;
             endPoint = null;
             anchorPoint = null;
@@ -541,7 +542,8 @@ namespace EntityTools.Patches.Mapper
                 mapper.OnClick -= handler_MapperClick;
                 mapper.CustomDraw -= handler_DrawCustomRegion;
                 mapper = null;
-            }
+            } 
+#endif
         }
     } 
 #endif

@@ -92,7 +92,7 @@ namespace EntityTools
             if (PluginSettings.Logger.Active)
                 ETLogger.Start();
 
-            // Загрузка ядрая из ресурса
+            // Загрузка ядра из ресурса
 #if false
             Assembly.Load(Properties.Resources.EntityCore);
             //if (!File.Exists(@".\Logs\Assemplies.log"))
@@ -526,7 +526,11 @@ namespace EntityTools
                                         if (assembly != null)
                                             foreach (Type type in assembly.GetTypes())
                                             {
+#if false
+                                                if (type.GetInterface(nameof(IEntityToolsCore)) != null) 
+#else
                                                 if (type.GetInterfaces().Contains(typeof(IEntityToolsCore)))
+#endif
                                                 {
                                                     if (Activator.CreateInstance(type) is IEntityToolsCore core)
                                                     {
@@ -569,11 +573,6 @@ namespace EntityTools
             }
             private static bool internal_DoNothing()
             {
-                //Astral.Controllers.Roles.ToggleRole(false);
-
-                //Astral.Logger.WriteLine($"EntityToolsCore is invalid. Stop bot");
-                //ETLogger.WriteLine($"EntityToolsCore is invalid. Stop bot");
-
                 return false;
             }
         }

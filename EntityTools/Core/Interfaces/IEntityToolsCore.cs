@@ -11,6 +11,8 @@ namespace EntityTools.Core.Interfaces
 {
     public interface IEntityToolsCore
     {
+        bool CheckCore();
+
         bool Initialize(object obj);
         bool Initialize(Astral.Quester.Classes.Action action);
         bool Initialize(Astral.Quester.Classes.Condition condition);
@@ -37,6 +39,5 @@ namespace EntityTools.Core.Interfaces
                                          Predicate<Entity> specialCheck = null);
 #endif
 
-        bool CheckCore();
     }
 }
