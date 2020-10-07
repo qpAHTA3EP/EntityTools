@@ -415,8 +415,8 @@ namespace EntityTools.Patches.Mapper
             if (useScale)
                 edge *= Zoom;
             float dx = (float)edge / 2,
-                  dy = dx * MapperGraphicsHelper.tg30,
-                  r = dx / MapperGraphicsHelper.cos30;
+                  dy = dx * MapperHelper.tg30,
+                  r = dx / MapperHelper.cos30;
 
             PointF[] points = new PointF[] {
                     new PointF((float)x,      (float)y - r),
@@ -435,8 +435,8 @@ namespace EntityTools.Patches.Mapper
             if (useScale)
                 edge *= (float)Zoom;
             float dx = (float)edge / 2,
-                  dy = dx * MapperGraphicsHelper.tg30,
-                  r = dx / MapperGraphicsHelper.cos30;
+                  dy = dx * MapperHelper.tg30,
+                  r = dx / MapperHelper.cos30;
 
             PointF[] points = new PointF[] {
                     new PointF((float)x,      (float)y + r),

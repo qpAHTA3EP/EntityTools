@@ -4,173 +4,169 @@ using System.Windows.Forms;
 using AStar;
 using EntityTools.Patches.Mapper.Tools;
 
-namespace EntityTools.Patches.Mapper
+namespace EntityTools.Patches.Mapper.Tools
 {
-    public partial class MapperFormExt
+    /// <summary>
+    /// Инструмент для удаления вершин
+    /// </summary>
+    public class RemoveNodesTool : IMapperTool
     {
-        protected class RemoveNodesTool : IMapperTool
+        /// <summary>
+        /// Список вершин, помеченных на удаление (Unpassable)
+        /// </summary>
+        readonly List<Node> deletedNodes = new List<Node>();
+
+        public RemoveNodesTool() { }
+        private RemoveNodesTool(IEnumerable<Node> nodes)
         {
-            /// <summary>
-            /// Список вершин, помеченных на удаление (Unpassable)
-            /// </summary>
-            readonly List<Node> deletedNodes = new List<Node>();
+            deletedNodes.AddRange(nodes);
+            deletedNodes.ForEach(nd => nd.Passable = false);
+        }
+        private RemoveNodesTool(Node node)
+        {
+            node.Passable = false;
+            deletedNodes.Add(node);
+        }
+#if false
+        public RemoveNodesTool(MapperFormExt form)
+        {
+            BindTo(form);
+        } 
+#endif
 
-            MapperFormExt mapper;
+        /// <summary>
+        /// Режим редактирования
+        /// </summary>
+        public MapperEditMode EditMode => MapperEditMode.DeleteNodes;
 
-            private RemoveNodesTool() { }
-            private RemoveNodesTool(IEnumerable<Node> nodes)
-            {
-                deletedNodes.AddRange(nodes);
-                deletedNodes.ForEach(nd => nd.Passable = false);
-            }
-            private RemoveNodesTool(Node node)
-            {
-                node.Passable = false;
-                deletedNodes.Add(node);
-            }
-            public RemoveNodesTool(MapperFormExt form)
-            {
-                BindTo(form);
-            }
-
-            /// <summary>
-            /// Режим редактирования
-            /// </summary>
-            public MapperEditMode EditMode => mapper is null ? MapperEditMode.None : MapperEditMode.DeleteNodes;
-
-            /// <summary>
-            /// Привязка (активация) инструмента к окну 
-            /// </summary>
-            /// <param name="form"></param>
-            public void BindTo(MapperFormExt form)
-            {
-                if (!ReferenceEquals(mapper, form))
-                {
-                    Unbind();
-                    mapper = form;
-                    if (mapper != null)
-                    {
-                        mapper.OnMapperMouseClick += handler_RightMouseClick;
-                        mapper.OnMapperKeyUp += handler_KeyUp;
-                        mapper.OnMapperDraw += CustomDraw;
-                    } 
-                }
-            }
-
-            /// <summary>
-            /// Отвязка (деактивация) инструмента
-            /// </summary>
-            public void Unbind()
-            {
-                if (mapper != null)
-                {
-                    mapper.OnMapperMouseClick -= handler_RightMouseClick;
-                    mapper.OnMapperKeyUp -= handler_KeyUp;
-                    mapper.OnMapperDraw -= CustomDraw;
-                    mapper = null;
-                }
-            }
-
-            public void Dispose()
+#if false
+        /// <summary>
+        /// Привязка (активация) инструмента к окну 
+        /// </summary>
+        /// <param name="form"></param>
+        public void BindTo(MapperFormExt form)
+        {
+            if (!ReferenceEquals(mapper, form))
             {
                 Unbind();
+                mapper = form;
+                if (mapper != null)
+                {
+                    mapper.OnMapperMouseClick += handler_RightMouseClick;
+                    mapper.OnMapperKeyUp += handler_KeyUp;
+                    mapper.OnMapperDraw += CustomDraw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Отвязка (деактивация) инструмента
+        /// </summary>
+        public void Unbind()
+        {
+            if (mapper != null)
+            {
+                mapper.btnRemoveNodes.Checked = false;
+                mapper.OnMapperMouseClick -= handler_RightMouseClick;
+                mapper.OnMapperKeyUp -= handler_KeyUp;
+                mapper.OnMapperDraw -= CustomDraw;
+                mapper = null;
+            }
+        } 
+
+        public void Dispose()
+        {
+            Unbind();
+            deletedNodes.Clear();
+        }
+#endif
+
+        public bool HandleCustomDraw => true;
+        /// <summary>
+        /// Отрисовка удаляемых вершин
+        /// </summary>
+        public void OnCustomDraw(MapperGraphics graphics, NodeSelectTool nodes, double worldMouseX, double worldMouseY)
+        {
+            if (nodes.Count > 0)
+            {
+                foreach (Node node in nodes)
+                    drawSelectedNode(graphics, node);
+            }
+        }
+
+        /// <summary>
+        /// Отрисовка выбранной вершины
+        /// </summary>
+        private static void drawSelectedNode(MapperGraphics graphics, Node node)
+        {
+            graphics.FillCircleCentered(Brushes.White, node.Position, 14);
+            graphics.FillCircleCentered(Brushes.Red, node.Position, 8);
+        }
+
+        public bool HandleKeyUp => true;
+        public void OnKeyUp(IGraph graph, NodeSelectTool nodes, KeyEventArgs e, double worldMouseX, double worldMouseY, out IMapperTool undo)
+        {
+            undo = null;
+            if (e.KeyCode == Keys.Delete
+                && nodes.Count > 0)
+            {
+
+                undo = new RemoveNodesTool(nodes);
+                nodes.Clear();
+            }
+        }
+
+        public bool HandleMouseClick => true;
+        public void OnMouseClick(IGraph graph, NodeSelectTool nodes, MapperMouseEventArgs e, out IMapperTool undo)
+        {
+            undo = null;
+            if (e.Button == MouseButtons.Right
+                && Control.ModifierKeys == Keys.Alt)
+            {
+                // производим поиск вершины
+                double minDistance = EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance;
+                Node node = graph.ClosestNodeOxyProjection(e.X, e.Y, minDistance);
+
+                // удаление выбранной вершины
+                if (node != null)
+                {
+                    node.Passable = false;
+
+                    undo = new RemoveNodesTool(node);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Указывает, что инструмент был применен
+        /// </summary>
+        public bool Applied => deletedNodes.Count > 0;
+
+#if false
+        public bool Apply()
+        {
+            if (mapper._selectedNodes.Count > 0)
+            {
+                deletedNodes.AddRange(mapper._selectedNodes);
+                mapper._selectedNodes.Clear();
+                foreach (var node in deletedNodes)
+                    node.Passable = false;
+                return true;
+            }
+
+            return false;
+        } 
+#endif
+
+        /// <summary>
+        /// Откат изменений, внесенных инструментом
+        /// </summary>
+        public void Undo()
+        {
+            if (deletedNodes.Count > 0)
+            {
+                deletedNodes.ForEach(nd => nd.Passable = true);
                 deletedNodes.Clear();
-            }
-
-            /// <summary>
-            /// Отрисовка удаляемых вершин
-            /// </summary>
-            public void CustomDraw(MapperFormExt form, MapperGraphics graphics)
-            {
-                if (form.selectedNodes.Count > 0)
-                {
-                    foreach (Node node in form.selectedNodes)
-                        drawSelectedNode(form.Graphics, node);
-                }
-            }
-
-            /// <summary>
-            /// Отрисовка выбранной вершины
-            /// </summary>
-            private static void drawSelectedNode(MapperGraphics graphics, Node node)
-            {
-                graphics.FillCircleCentered(Brushes.White, node.Position, 14);
-                graphics.FillCircleCentered(Brushes.Red, node.Position, 8);
-            }
-
-            private void handler_KeyUp(MapperFormExt form, MapperGraphics graphics, KeyEventArgs e)
-            {
-                if (e.KeyCode == Keys.Delete
-                    && form.selectedNodes.Count > 0)
-                {
-                    // Помечаем вершины "непроходимыми"
-#if false
-                    deletedNodes.AddRange(form.selectedNodes);
-                    deletedNodes.ForEach(nd => nd.Passable = false);
-                    form.selectedNodes.Clear(); 
-#else
-                    var deleteNodeTool = new RemoveNodesTool(form.selectedNodes);
-                    form.selectedNodes.Clear();
-                    form.undoStack.Push(deleteNodeTool);
-#endif
-                }
-            }
-
-            private void handler_RightMouseClick(MapperFormExt form, MapperGraphics graphics, MouseEventArgs e)
-            {
-                if (e.Button == MouseButtons.Right
-                    && ModifierKeys == Keys.Alt)
-                {
-                    // Получаем игровые координаты, соответствующие координатам клика
-                    form.Graphics.GetWorldPosition(e.Location, out double worldX, out double worldY);
-
-                    // производим поиск вершины
-                    double minDistance = EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance;
-                    Node node = graphics.VisibleGraph.ClosestNodeOxyProjection(worldX, worldY, minDistance);
-
-                    // удаление выбранной вершины
-                    if (node != null)
-                    {
-                        node.Passable = false;
-#if false
-                        deletedNodes.Add(node); 
-#else
-                        var deleteNodeTool = new RemoveNodesTool(node);
-                        form.undoStack.Push(deleteNodeTool);
-#endif
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Указывает, что инструмент был применен
-            /// </summary>
-            public bool Applied => deletedNodes.Count > 0;
-
-            public bool Apply()
-            {
-                if (mapper.selectedNodes.Count > 0)
-                {
-                    foreach (var node in mapper.selectedNodes)
-                        node.Passable = false;
-                    deletedNodes.AddRange(mapper.selectedNodes);
-                    mapper.selectedNodes.Clear();
-                    return true;
-                }
-
-                return false;
-            }
-
-            /// <summary>
-            /// Откат изменений, внесенных инструментом
-            /// </summary>
-            public void Undo(MapperFormExt mapper)
-            {
-                if (deletedNodes.Count > 0)
-                {
-                    deletedNodes.ForEach(nd => nd.Passable = true);
-                    deletedNodes.Clear();
-                }
             }
         }
     }

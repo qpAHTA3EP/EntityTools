@@ -732,7 +732,7 @@ namespace EntityTools.Patches.Mapper
         {
             if (x1 != 0 && x2 != 0)
             {
-                MapperGraphicsHelper.FixRange(x1, x2, out minX, out maxX);
+                MapperHelper.FixRange(x1, x2, out minX, out maxX);
                 cacheX = (maxX - minX) / 2;
                 cacheX_0_75 = cacheX * 0.75;
                 centerX = minX + cacheX;
@@ -747,7 +747,7 @@ namespace EntityTools.Patches.Mapper
             }
             if (z1 != 0 && z2 != 0)
             {
-                MapperGraphicsHelper.FixRange(y1, y2, out minY, out maxY);
+                MapperHelper.FixRange(y1, y2, out minY, out maxY);
                 cacheY = (maxY - minY) / 2;
                 cacheY_0_75 = cacheY * 0.75;
                 centerY = minY + cacheY;
@@ -762,7 +762,7 @@ namespace EntityTools.Patches.Mapper
             }
             if (z1 != 0 && z2 != 0)
             {
-                MapperGraphicsHelper.FixRange(z1, z2, out minZ, out maxZ);
+                MapperHelper.FixRange(z1, z2, out minZ, out maxZ);
                 cacheZ = (maxZ - minZ) / 2;
                 cacheZ_0_75 = cacheZ * 0.75;
                 centerZ = minZ + cacheZ;

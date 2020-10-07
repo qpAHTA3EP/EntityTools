@@ -119,7 +119,7 @@ namespace EntityTools.Patches.Mapper
             // backgroundWorker
             // 
             this.backgroundWorker.WorkerSupportsCancellation = true;
-            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.work_FormStatusUpdate);
+            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.work_MapperFormUpdate);
             // 
             // barManager
             // 
@@ -796,7 +796,6 @@ namespace EntityTools.Patches.Mapper
             this.MapPicture.TabIndex = 9;
             this.MapPicture.TabStop = false;
             this.MapPicture.MouseClick += new System.Windows.Forms.MouseEventHandler(this.handler_MouseClick);
-            this.MapPicture.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.handler_MouseDoubleClick);
             this.MapPicture.MouseMove += new System.Windows.Forms.MouseEventHandler(this.handler_MouseMove);
             this.MapPicture.MouseUp += new System.Windows.Forms.MouseEventHandler(this.handler_MouseUp);
             // 

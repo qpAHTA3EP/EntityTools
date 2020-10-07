@@ -12,7 +12,7 @@ using EntityTools.Enums;
 using EntityTools.Reflection;
 using MyNW.Classes;
 using MyNW.Internals;
-using static EntityTools.Patches.Mapper.MapperGraphicsHelper;
+using static EntityTools.Patches.Mapper.MapperHelper;
 
 namespace EntityTools.Patches.Mapper
 {
@@ -163,8 +163,8 @@ namespace EntityTools.Patches.Mapper
                         //Vector3 downLeft = new Vector3(Math.Min(startSelectRegionPos.X, endSelectRegionPos.X), Math.Min(startSelectRegionPos.Y, endSelectRegionPos.Y), 0f);
                         //Vector3 topRight = new Vector3(Math.Max(startSelectRegionPos.X, endSelectRegionPos.X), Math.Max(startSelectRegionPos.Y, endSelectRegionPos.Y), 0f);
 
-                        MapperGraphicsHelper.FixRange(worldPosX, startSelectRegionPos.X, out double left, out double right);
-                        MapperGraphicsHelper.FixRange(worldPosX, startSelectRegionPos.Y, out double down, out double top);
+                        MapperHelper.FixRange(worldPosX, startSelectRegionPos.X, out double left, out double right);
+                        MapperHelper.FixRange(worldPosX, startSelectRegionPos.Y, out double down, out double top);
 
                         // Выделяем все вершины, охваченные областью выделения и добавляем в группу 
                         //foreach (Node nd in AstralAccessors.Quester.Core.Meshes.Value.Nodes)

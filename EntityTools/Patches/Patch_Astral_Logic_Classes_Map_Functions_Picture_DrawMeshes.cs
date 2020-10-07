@@ -55,7 +55,7 @@ namespace EntityTools.Patches.Mapper
 
                                 foreach (Arc arc in node.OutgoingArcs)
                                 {
-                                    if (arc.EndNode.Passable)
+                                    if (arc.Passable)
                                         mapGraphics.DrawLine(pen, node.X, node.Y, arc.EndNode.X, arc.EndNode.Y);
                                 }
                                 mapGraphics.FillCircleCentered(brush, node.Position, 5);

@@ -10,6 +10,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using DevExpress.XtraEditors;
 using System.Xml.Serialization;
 using System.IO.Compression;
+using DevExpress.LookAndFeel;
 
 namespace EntityTools.Patches
 {
@@ -206,8 +207,11 @@ namespace EntityTools.Patches
         /// <param name="meshName"></param>
         /// <param name="mesh"></param>
         /// <param name="binaryFormatter"></param>
-        public static void SaveMesh(ZipArchive zipFile, string meshName, Graph mesh, BinaryFormatter binaryFormatter = null)
+        public static bool SaveMesh(ZipArchive zipFile, string meshName, Graph mesh, BinaryFormatter binaryFormatter = null)
         {
+            if (zipFile is null)
+                return false;
+
             if (binaryFormatter is null)
                 binaryFormatter = new BinaryFormatter();
 
@@ -230,6 +234,8 @@ namespace EntityTools.Patches
                     byte[] meshBytes = memoryStream.ToArray();
 
                     zipMeshStream.Write(meshBytes, 0, meshBytes.Length);
+
+                    return true;
                 }
             }
         }

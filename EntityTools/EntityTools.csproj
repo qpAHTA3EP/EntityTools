@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.1005.1524</AssemblyVersion>
+    <AssemblyVersion>0.20.1007.0935</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -208,7 +208,7 @@
     <Compile Include="Core\Proxies\UCCActionProxy.cs" />
     <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
     <Compile Include="Patches\Mapper\MapperGraphics.cs" />
-    <Compile Include="Patches\Mapper\MapperGraphicsHelper.cs" />
+    <Compile Include="Patches\Mapper\MapperHelper.cs" />
     <Compile Include="Patches\Mapper\PointHelper.cs" />
     <Compile Include="Patches\Mapper\MapperExt.cs">
       <SubType>UserControl</SubType>
@@ -216,17 +216,13 @@
     <Compile Include="Patches\Mapper\MapperExt.Designer.cs">
       <DependentUpon>MapperExt.cs</DependentUpon>
     </Compile>
-    <Compile Include="Patches\Mapper\MapperHelper_EditEdges.cs" />
-    <Compile Include="Patches\Mapper\MapperHelper_MoveNodes.cs" />
     <Compile Include="Patches\Mapper\Tools\Enums.cs" />
-    <Compile Include="Patches\Mapper\Tools\NodeSelectTool.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Patches\Mapper\Tools\IMapperForm.cs" />
+    <Compile Include="Patches\Mapper\Tools\MapperMouseEventArgs.cs" />
+    <Compile Include="Patches\Mapper\Tools\NodeSelectTool.cs" />
     <Compile Include="Patches\Mapper\Tools\IMapperTool.cs" />
-    <Compile Include="Patches\Mapper\Tools\RemoveNodesTool.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Patches\Mapper\Tools\RelocateNodesTool.cs" />
+    <Compile Include="Patches\Mapper\Tools\EditEdgeTool.cs" />
+    <Compile Include="Patches\Mapper\Tools\RemoveNodesTool.cs" />
     <Compile Include="Patches\Patch_Astral_Navmesh_DrawHotSpots.cs" />
     <Compile Include="Patches\Patch_Astral_Quester_Core_Save.cs" />
     <Compile Include="Patches\Patch_Astral_Navmesh_DrawRoad.cs" />
