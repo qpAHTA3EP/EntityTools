@@ -213,18 +213,8 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public void FillCircleCentered<TPoint>(Brush brush, TPoint worldCenterPoint, double diameter = 8, bool useScale = false)
         {
-#if true
             PointHelper.GetXY(worldCenterPoint, out double x, out double y);
             FillCircleCentered(brush, x, y, (float) diameter, useScale);
-#else
-            GetImagePosition(worldCenterPoint, out double x, out double y);
-            if (useScale)
-                diameter *= Zoom;
-
-            double radius = diameter / 2;
-            graphics.FillEllipse(brush, (float)(x - radius), (float)(y - radius), (float)diameter, (float)diameter);
-#endif
-
         }
         /// <summary>
         /// Нарисовать закрашенный круг с центром в точке c игровыми координатами <paramref name="worldX"/>, <paramref name="worldY"/>
@@ -244,17 +234,8 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public void DrawCircleCentered<TPoint>(Pen pen, TPoint worldCenterPoint, double diameter = 8, bool useScale = false)
         {
-#if true
             PointHelper.GetXY(worldCenterPoint, out double x, out double y);
             DrawCircleCentered(pen, x, y, diameter, useScale);
-#else
-            GetImagePosition(worldCenterPoint, out double x, out double y);
-            if (useScale)
-                diameter *= Zoom;
-
-            double radius = diameter / 2;
-            graphics.DrawEllipse(pen, (float)(x - radius), (float)(y - radius), (float)diameter, (float)diameter);
-#endif
         }
         /// <summary>
         /// Нарисовать круг с центром в точке c игровыми координатами <paramref name="worldX"/>, <paramref name="worldY"/>
@@ -419,7 +400,7 @@ namespace EntityTools.Patches.Mapper
         {
             GetImagePosition(worldCenterPoint, out double x, out double y);
             if (useScale)
-                edge *= Zoom;
+                edge /= Zoom;
             float dx = (float)edge / 2,
                   dy = dx * MapperHelper.tg30,
                   r = dx / MapperHelper.cos30;
@@ -457,16 +438,29 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public void FillSquareCentered<TPoint>(Brush brush, TPoint worldCenterPoint, double edge, bool useScale = false)
         {
-            GetImagePosition(worldCenterPoint, out double x, out double y);
+            PointHelper.GetXY(worldCenterPoint, out double x, out double y);
+            FillSquareCentered(brush, x, y, useScale);
+        }
+        /// <summary>
+        /// Отрисовка заполненного квадрата со стороной <paramref name="edge"/>
+        /// с центром в точке <paramref name="worldCenterPoint"/>, заданной в координатах игрового мира
+        /// </summary>
+        public void FillSquareCentered(Brush brush, double worldCenterX, double worldCenterY, double edge, bool useScale = false)
+        {
+            GetImagePosition(worldCenterX, worldCenterY, out double x, out double y);
             if (useScale)
                 edge *= (float)Zoom;
-            float halfEdge = (float)edge / 2;
+            float halfEdge = (float)edge / 2, 
+                x1 = (float)x - halfEdge, 
+                x2 = (float)x + halfEdge, 
+                y1 = (float)y - halfEdge,
+                y2 = (float)y + halfEdge;
 
             PointF[] points = new PointF[] {
-                    new PointF((float)x - halfEdge, (float)y - halfEdge),
-                    new PointF((float)x - halfEdge, (float)y + halfEdge),
-                    new PointF((float)x + halfEdge, (float)y + halfEdge),
-                    new PointF((float)x + halfEdge, (float)y - halfEdge)
+                    new PointF(x1, y1),
+                    new PointF(x1, y2),
+                    new PointF(x2, y2),
+                    new PointF(x2, y1)
                 };
             graphics.FillPolygon(brush, points);
         }

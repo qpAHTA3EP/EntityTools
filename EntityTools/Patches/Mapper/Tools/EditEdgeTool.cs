@@ -27,53 +27,16 @@ namespace EntityTools.Patches.Mapper.Tools
         public EditEdgeTool() { }
 
         /// <summary>
+        /// Использование механизма выделения вершин
+        /// </summary>
+        public bool AllowNodeSelection => true;
+
+        /// <summary>
         /// Режим редактирования
         /// </summary>
         public MapperEditMode EditMode => MapperEditMode.EditEdges;
 
-#if false
-        /// <summary>
-        /// Привязка (активация) инструмента к окну 
-        /// </summary>
-        /// <param name="form"></param>
-        public void BindTo(MapperFormExt form)
-        {
-            if (!ReferenceEquals(mapper, form))
-            {
-                Unbind();
-                mapper = form;
-                if (mapper != null)
-                {
-                    mapper.OnMapperMouseClick += handler_RightMouseClick;
-                    mapper.OnMapperKeyUp += handler_KeyUp;
-                    mapper.OnMapperDraw += CustomDraw;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Отвязка (деактивация) инструмента
-        /// </summary>
-        public void Unbind()
-        {
-            if (mapper != null)
-            {
-                mapper.btnRemoveNodes.Checked = false;
-                mapper.OnMapperMouseClick -= handler_RightMouseClick;
-                mapper.OnMapperKeyUp -= handler_KeyUp;
-                mapper.OnMapperDraw -= CustomDraw;
-                mapper = null;
-            }
-        } 
-
-        public void Dispose()
-        {
-            Unbind();
-            deletedNodes.Clear();
-        }
-#endif
-
-        public bool HandleCustomDraw => true;
+        public bool HandleCustomDraw => startNode != null;
         /// <summary>
         /// Отрисовка выделенной вершины
         /// </summary>
@@ -173,22 +136,6 @@ namespace EntityTools.Patches.Mapper.Tools
         /// Указывает, что инструмент был применен
         /// </summary>
         public bool Applied => modifiedArcs.Count > 0;
-
-#if false
-        public bool Apply()
-        {
-            if (mapper._selectedNodes.Count > 0)
-            {
-                deletedNodes.AddRange(mapper._selectedNodes);
-                mapper._selectedNodes.Clear();
-                foreach (var node in deletedNodes)
-                    node.Passable = false;
-                return true;
-            }
-
-            return false;
-        } 
-#endif
 
         /// <summary>
         /// Откат изменений, внесенных инструментом

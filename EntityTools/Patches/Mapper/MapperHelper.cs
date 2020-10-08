@@ -5,15 +5,14 @@ using MyNW.Classes;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static EntityTools.Reflection.InstanceFieldAccessorFactory;
 
 namespace EntityTools.Patches.Mapper
 {
     public static class MapperHelper
     {
+        public static readonly double DefaultAnchorSize = 16;
+
         public static readonly Size Square5 = new Size(5, 5);
         public static readonly Size Square8 = new Size(8, 8);
         public static readonly Size Square10 = new Size(10, 10);
@@ -343,6 +342,223 @@ namespace EntityTools.Patches.Mapper
         {
             foreach (T elem in collection)
                 action(elem);
+        }
+
+#if false
+        /// <summary>
+        /// Вычисление размера (стороны квадрата) якоря для прямоугольника, 
+        /// заданного верхней левой точкой с координатами <paramref name="leftX"/>, <paramref name="topY"/> 
+        /// и правой нижней точкой с координатами <paramref name="rightX"/>, <paramref name="downY"/>.
+        /// </summary>
+        public static double AnchorWorldSize(double leftX, double topY, double rightX, double downY)
+        {
+            double width = rightX - leftX,
+                   height = topY - downY,
+                   anchorSize = Math.Max(2, Math.Min(Math.Min(width / 3, height / 3), DefaultAnchorSize));
+            return anchorSize;
+        } 
+#endif
+        /// <summary>
+        /// Вычисление размера (стороны квадрата) якоря для прямоугольника со сторонами <paramref name="width"/> и <paramref name="height"/>
+        /// </summary>
+        public static double AnchorWorldSize(double width, double height)
+        {
+            //return DefaultAnchorSize;
+            return Math.Max(2, Math.Min(Math.Min(width / 2, height / 2), DefaultAnchorSize));
+            //return Math.Max(2, Math.Min(width / 3, height / 3));
+        }
+
+        /// <summary>
+        /// Выбор якоря прямоугольника, заданного верхней левой точкой с координатами <paramref name="leftX"/>, <paramref name="topY"/> 
+        /// и правой нижней точкой с координатами <paramref name="rightX"/>, <paramref name="downY"/>.
+        /// Якорь квадратной формы определяется попаданием точки с координатами <paramref name="x"/>, <paramref name="y"/> в квадрат со стороной <paramref name="anchorSize"/>
+        /// </summary>
+        public static bool SelectAnchor(double leftX, double topY, double rightX, double downY, double x, double y, double anchorSize, out RegionTransformMode mode)
+        {
+            double hulfAnchorEdgeSize = anchorSize / 2;
+
+            // TopLeft
+            if (CheckAnchorSelection(leftX, topY, x, y, hulfAnchorEdgeSize))
+            {
+                mode = RegionTransformMode.TopLeft;
+                return true;
+            }
+
+            // TopCenter
+            double centerX = (rightX + leftX) / 2;
+            if (CheckAnchorSelection(centerX, topY, x, y, hulfAnchorEdgeSize))
+            {
+                mode = RegionTransformMode.TopCenter;
+                return true;
+            }
+
+            // TopRight
+            if (CheckAnchorSelection(rightX, topY, x, y, hulfAnchorEdgeSize))
+            {
+                mode = RegionTransformMode.TopRight;
+                return true;
+            }
+
+            // Left
+            double centerY = (topY + downY) / 2;
+            if (CheckAnchorSelection(leftX, centerY, x, y, hulfAnchorEdgeSize))
+            {
+                mode = RegionTransformMode.Left;
+                return true;
+            }
+
+            // Center
+            if (CheckAnchorSelection(centerX, centerY, x, y, hulfAnchorEdgeSize))
+            {
+                mode = RegionTransformMode.Center;
+                return true;
+            }
+
+            // Right
+            if (CheckAnchorSelection(rightX, centerY, x, y, hulfAnchorEdgeSize))
+            {
+                mode = RegionTransformMode.Right;
+                return true;
+            }
+
+            // DownLeft
+            if (CheckAnchorSelection(leftX, downY, x, y, hulfAnchorEdgeSize))
+            {
+                mode = RegionTransformMode.DownLeft;
+                return true;
+            }
+
+            // DownCenter
+            if (CheckAnchorSelection(centerX, downY, x, y, hulfAnchorEdgeSize))
+            {
+                mode = RegionTransformMode.DownCenter;
+                return true;
+            }
+
+            // DownRight
+            if (CheckAnchorSelection(rightX, downY, x, y, hulfAnchorEdgeSize))
+            {
+                mode = RegionTransformMode.DownRight;
+                return true;
+            }
+
+            mode = RegionTransformMode.None;
+            return false;
+        }
+
+        private static bool CheckAnchorSelection(double anchorX, double anchorY, double x, double y, double halfAnchorSize)
+        {
+            return anchorX - halfAnchorSize <= x && x <= anchorX + halfAnchorSize
+                && anchorY - halfAnchorSize <= y && y <= anchorY + halfAnchorSize;
+        }
+
+        /// <summary>
+        /// Изменение координат прямоугольника, заданного верхней левой точкой с координатами <paramref name="leftX"/>, <paramref name="topY"/> 
+        /// и правой нижней точкой с координатами <paramref name="rightX"/>, <paramref name="downY"/>, в соответствии с режимом трансформации <paramref name="mode"/>
+        /// </summary>
+        public static void TransformRegion(ref double leftX, ref double topY, ref double rightX, ref double downY, double x, double y, RegionTransformMode mode)
+        {
+            switch (mode)
+            {
+                case RegionTransformMode.TopLeft:
+                    leftX = x;
+                    topY = y;
+                    break;
+                case RegionTransformMode.TopCenter:
+                    topY = y;
+                    break;
+                case RegionTransformMode.TopRight:
+                    rightX = x;
+                    topY = y;
+                    break;
+                case RegionTransformMode.Left:
+                    leftX = x;
+                    break;
+                case RegionTransformMode.Center:
+                    double dx = (rightX + leftX) / 2 - x,
+                           dy = (topY + downY) / 2 - y;
+                    leftX -= dx;
+                    rightX -= dx;
+                    topY -= dy;
+                    downY -= dy;
+                    return;
+                case RegionTransformMode.Right:
+                    rightX = x;
+                    break;
+                case RegionTransformMode.DownLeft:
+                    leftX = x;
+                    downY = y;
+                    break;
+                case RegionTransformMode.DownCenter:
+                    downY = y;
+                    break;
+                case RegionTransformMode.DownRight:
+                    rightX = x;
+                    downY = y;
+                    break;
+                default: return;
+            }
+            FixRange(leftX, rightX, out leftX, out rightX);
+            FixRange(downY, topY, out downY, out topY);
+        }
+
+        /// <summary>
+        /// Отрисовка региона, ограниченного прямоугольником с верхней левой точкой с координатами <paramref name="leftX"/>, <paramref name="topY"/> 
+        /// и правой нижней точкой с координатами <paramref name="rightX"/>, <paramref name="downY"/>.
+        /// Тип реоигна задается флагом <paramref name="isElliptical"/>
+        /// </summary>
+        public static void DrawCustomRegion(this MapperGraphics graphics, double leftX, double topY, double rightX, double downY, bool isElliptical, bool drawAnchors = true)
+        {
+            // Ось Oy в игровых координатах инвертирована по сравнению с координатами экрана windows (MapPicture)
+            // Поэтому координата верхнего правого в экранных координатах имеет минимальное значение
+
+            double width = Math.Abs(rightX - leftX),
+                   height = Math.Abs(topY - downY),
+                   centerX = (leftX + rightX) / 2,
+                   centerY = (downY + topY) / 2,
+                   anchorSize = AnchorWorldSize(width, height);
+
+            Pen penRect = (isElliptical) ? Pens.DarkOliveGreen : Pens.LimeGreen;
+            Pen penCR = Pens.LimeGreen;
+            Brush brushRect = (isElliptical) ? Brushes.DarkOliveGreen : Brushes.LimeGreen;
+            Brush brushCR = Brushes.LimeGreen;
+            bool drawEdgeAnchors = drawAnchors && height > anchorSize * 3 && width > anchorSize * 3;
+            bool drawCornerAnchors = drawAnchors && height > anchorSize && width > anchorSize;
+
+            // Отрисовака опорного прямоугольника якоря topLeft
+            graphics.DrawRectangle(penRect, leftX, topY, rightX, downY);
+            if (drawEdgeAnchors)
+            {
+                graphics.DrawLine(penRect, centerX, topY, centerX, downY);
+                graphics.DrawLine(penRect, leftX, centerY, rightX, centerY);
+
+                // Отрисовака якоря top
+                graphics.FillSquareCentered(brushCR, centerX, topY, anchorSize, true);
+                // Отрисовака якоря left
+                graphics.FillSquareCentered(brushCR, leftX, centerY, anchorSize, true);
+                // Отрисовака якоря right
+                graphics.FillSquareCentered(brushCR, rightX, centerY, anchorSize, true);
+                // Отрисовака якоря down
+                graphics.FillSquareCentered(brushCR, centerX, downY, anchorSize, true);
+            }
+
+            if (drawCornerAnchors)
+            {
+                // Отрисовка якоря TopLeft
+                graphics.FillSquareCentered(brushCR, leftX, topY, anchorSize, true);
+                // Отрисовка якоря TopRight
+                graphics.FillSquareCentered(brushCR, rightX, topY, anchorSize, true);
+                // Отрисовка якоря Center
+                graphics.FillSquareCentered(brushCR, centerX, centerY, anchorSize, true);
+                // Отрисовка якоря DownLeft
+                graphics.FillSquareCentered(brushCR, leftX, downY, anchorSize, true);
+                // Отрисовка якоря DownRight
+                graphics.FillSquareCentered(brushCR, rightX, downY, anchorSize, true);
+            }
+
+            // Отрисовка Эллипса
+            if (isElliptical)
+                graphics.DrawEllipse(penCR, leftX, Math.Max(topY, downY), width, height, true);
         }
     }
 }

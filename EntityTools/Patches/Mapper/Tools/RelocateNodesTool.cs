@@ -3,7 +3,6 @@ using System.Linq;
 using System.Drawing;
 using System.Windows.Forms;
 using AStar;
-using EntityTools.Patches.Mapper.Tools;
 
 namespace EntityTools.Patches.Mapper.Tools
 {
@@ -41,56 +40,14 @@ namespace EntityTools.Patches.Mapper.Tools
         }
 
         /// <summary>
+        /// Использование механизма выделения вершин
+        /// </summary>
+        public bool AllowNodeSelection => true;
+
+        /// <summary>
         /// Режим редактирования
         /// </summary>
         public MapperEditMode EditMode => MapperEditMode.RelocateNodes;
-
-#if false
-        public RelocateNodesTool(MapperFormExt form)
-        {
-            BindTo(form);
-        }
-
-        /// <summary>
-        /// Привязка (активация) инструмента к окну 
-        /// </summary>
-        /// <param name="form"></param>
-        public void BindTo(MapperFormExt form)
-        {
-            if (!ReferenceEquals(mapper, form))
-            {
-                Unbind();
-                mapper = form;
-                if (mapper != null)
-                {
-                    mapper.OnMapperMouseClick += handler_RightMouseClick;
-                    mapper.OnMapperKeyUp += handler_KeyUp;
-                    mapper.OnMapperDraw += CustomDraw;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Отвязка (деактивация) инструмента
-        /// </summary>
-        public void Unbind()
-        {
-            if (mapper != null)
-            {
-                mapper.btnMoveNodes.Checked = false;
-                mapper.OnMapperMouseClick -= handler_RightMouseClick;
-                mapper.OnMapperKeyUp -= handler_KeyUp;
-                mapper.OnMapperDraw -= CustomDraw;
-                mapper = null;
-            }
-        }
-
-        public void Dispose()
-        {
-            Unbind();
-            movedNodes.Clear();
-        } 
-#endif
 
         public bool HandleCustomDraw => true;
         /// <summary>
@@ -252,20 +209,6 @@ namespace EntityTools.Patches.Mapper.Tools
         /// Указывает, что инструмент был применен
         /// </summary>
         public bool Applied => movedNodes.Count > 0;
-
-#if false
-        public bool Apply()
-        {
-            if (mapper._selectedNodes.Count > 0)
-            {
-                movedNodes.AddRange(mapper._selectedNodes);
-                movedNodes.ForEach(nd => nd.Move(dX, dY, 0));
-                return true;
-            }
-
-            return false;
-        } 
-#endif
 
         /// <summary>
         /// Откат изменений, внесенных инструментом

@@ -24,6 +24,10 @@ namespace EntityTools.Patches.Mapper.Tools
         /// </summary>
         void Unbind(); 
 #endif
+        /// <summary>
+        /// Активация механизма выделения вершин
+        /// </summary>
+        bool AllowNodeSelection { get; }
 
         /// <summary>
         /// Обработчик события MouseClick

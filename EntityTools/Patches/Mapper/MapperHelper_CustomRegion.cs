@@ -49,7 +49,6 @@ namespace EntityTools.Patches.Mapper
 
         internal static CustomRegion GetCustomRegion()
         {
-            Assembly.GetEntryAssembly().GetType();
             if (customRegion != null
                 && customRegion.Position.IsValid
                 && customRegion.Height != 0
@@ -75,7 +74,7 @@ namespace EntityTools.Patches.Mapper
             return null;
         }
 
-        private static DragMode dragMode = DragMode.Disabled;
+        private static RegionTransformMode dragMode = RegionTransformMode.Disabled;
         private static Vector3 anchorPoint = null;
         public static readonly float DefaultAnchorSize = 8.5f;
 
@@ -108,7 +107,7 @@ namespace EntityTools.Patches.Mapper
             anchorPoint = null;
             customRegion = null;
             isElliptical = elliptical;
-            dragMode = DragMode.Disabled;
+            dragMode = RegionTransformMode.Disabled;
 
             mapper = m;
             if (mapper != null && !mapper.IsDisposed)
@@ -122,7 +121,7 @@ namespace EntityTools.Patches.Mapper
         {
             get
             {
-                return dragMode == DragMode.None
+                return dragMode == RegionTransformMode.None
                        && ((customRegion != null
                                 && customRegion.Position.IsValid
                                 && customRegion.Height != 0
@@ -146,7 +145,7 @@ namespace EntityTools.Patches.Mapper
                 if (endPoint == null)
                 {
                     endPoint = new Vector3(worldPos.X, worldPos.Y, 0f);
-                    dragMode = DragMode.None;
+                    dragMode = RegionTransformMode.None;
                 }
 
                 if (customRegion == null
@@ -161,11 +160,11 @@ namespace EntityTools.Patches.Mapper
                         Height = (int)(downRight.Y - topLeft.Y),
                         Width = (int)(downRight.X - topLeft.X),
                     };
-                    dragMode = DragMode.None;
+                    dragMode = RegionTransformMode.None;
                     return;
                 }
 
-                if (dragMode != DragMode.Disabled)
+                if (dragMode != RegionTransformMode.Disabled)
                 {
                     if (anchorPoint == null)
                         // вычисление якоря
@@ -177,7 +176,7 @@ namespace EntityTools.Patches.Mapper
                         if (cr != null)
                         {
                             customRegion = cr;
-                            dragMode = DragMode.None;
+                            dragMode = RegionTransformMode.None;
                             anchorPoint = null;
                         }
                     }
@@ -185,7 +184,7 @@ namespace EntityTools.Patches.Mapper
             }
         }
 
-        private static bool SelectAnchor(CustomRegion cr, Vector3 pos, out Vector3 anchor, out DragMode mode)
+        private static bool SelectAnchor(CustomRegion cr, Vector3 pos, out Vector3 anchor, out RegionTransformMode mode)
         {
             if (cr != null
                 && cr.Position.IsValid)
@@ -197,7 +196,7 @@ namespace EntityTools.Patches.Mapper
                 if (CheckAnchorSelection(topLeft, pos, hulfAnchorEdgeSize))
                 {
                     anchor = topLeft;
-                    mode = DragMode.TopLeft;
+                    mode = RegionTransformMode.TopLeft;
                     return true;
                 }
 
@@ -206,7 +205,7 @@ namespace EntityTools.Patches.Mapper
                 if (CheckAnchorSelection(topCenter, pos, hulfAnchorEdgeSize))
                 {
                     anchor = topCenter;
-                    mode = DragMode.TopCenter;
+                    mode = RegionTransformMode.TopCenter;
                     return true;
                 }
 
@@ -215,7 +214,7 @@ namespace EntityTools.Patches.Mapper
                 if (CheckAnchorSelection(topRight, pos, hulfAnchorEdgeSize))
                 {
                     anchor = topRight;
-                    mode = DragMode.TopRight;
+                    mode = RegionTransformMode.TopRight;
                     return true;
                 }
 
@@ -224,7 +223,7 @@ namespace EntityTools.Patches.Mapper
                 if (CheckAnchorSelection(left, pos, hulfAnchorEdgeSize))
                 {
                     anchor = left;
-                    mode = DragMode.Left;
+                    mode = RegionTransformMode.Left;
                     return true;
                 }
 
@@ -233,7 +232,7 @@ namespace EntityTools.Patches.Mapper
                 if (CheckAnchorSelection(center, pos, hulfAnchorEdgeSize))
                 {
                     anchor = center;
-                    mode = DragMode.Center;
+                    mode = RegionTransformMode.Center;
                     return true;
                 }
 
@@ -242,7 +241,7 @@ namespace EntityTools.Patches.Mapper
                 if (CheckAnchorSelection(right, pos, hulfAnchorEdgeSize))
                 {
                     anchor = right;
-                    mode = DragMode.Right;
+                    mode = RegionTransformMode.Right;
                     return true;
                 }
 
@@ -251,7 +250,7 @@ namespace EntityTools.Patches.Mapper
                 if (CheckAnchorSelection(downLeft, pos, hulfAnchorEdgeSize))
                 {
                     anchor = downLeft;
-                    mode = DragMode.DownLeft;
+                    mode = RegionTransformMode.DownLeft;
                     return true;
                 }
 
@@ -260,7 +259,7 @@ namespace EntityTools.Patches.Mapper
                 if (CheckAnchorSelection(downCenter, pos, hulfAnchorEdgeSize))
                 {
                     anchor = downCenter;
-                    mode = DragMode.DownCenter;
+                    mode = RegionTransformMode.DownCenter;
                     return true;
                 }
 
@@ -270,12 +269,12 @@ namespace EntityTools.Patches.Mapper
                 if (CheckAnchorSelection(downRight, pos, hulfAnchorEdgeSize))
                 {
                     anchor = downRight;
-                    mode = DragMode.DownRight;
+                    mode = RegionTransformMode.DownRight;
                     return true;
                 }
             }
             anchor = null;
-            mode = DragMode.None;
+            mode = RegionTransformMode.None;
             return false;
         }
 
@@ -287,7 +286,7 @@ namespace EntityTools.Patches.Mapper
                 && Math.Abs(dy) <= hulfAnchorEdgeSize;
         }
 
-        public static CustomRegion TransformCustomRegion(CustomRegion cr, Vector3 anchorPoint, Vector3 worldPos, DragMode mode)
+        public static CustomRegion TransformCustomRegion(CustomRegion cr, Vector3 anchorPoint, Vector3 worldPos, RegionTransformMode mode)
         {
             if (cr != null
                 && cr.Position.IsValid)
@@ -297,41 +296,41 @@ namespace EntityTools.Patches.Mapper
 
                 switch (mode)
                 {
-                    case DragMode.TopLeft:
+                    case RegionTransformMode.TopLeft:
                         cr.Position.X += dx;
                         cr.Position.Y += dy;
                         cr.Width -= dx;
                         cr.Height -= dy;
                         return cr;
-                    case DragMode.TopCenter:
+                    case RegionTransformMode.TopCenter:
                         cr.Position.Y += dy;
                         cr.Height -= dy;
                         return cr;
-                    case DragMode.TopRight:
+                    case RegionTransformMode.TopRight:
                         cr.Position.Y += dy;
                         cr.Width += dx;
                         cr.Height -= dy;
                         return cr;
-                    case DragMode.Left:
+                    case RegionTransformMode.Left:
                         cr.Position.X += dx;
                         cr.Width -= dx;
                         return cr;
-                    case DragMode.Center:
+                    case RegionTransformMode.Center:
                         cr.Position.X += dx;
                         cr.Position.Y += dy;
                         return cr;
-                    case DragMode.Right:
+                    case RegionTransformMode.Right:
                         cr.Width += dx;
                         return cr;
-                    case DragMode.DownLeft:
+                    case RegionTransformMode.DownLeft:
                         cr.Position.X += dx;
                         cr.Width -= dx;
                         cr.Height += dy;
                         return cr;
-                    case DragMode.DownCenter:
+                    case RegionTransformMode.DownCenter:
                         cr.Height += dy;
                         return cr;
-                    case DragMode.DownRight:
+                    case RegionTransformMode.DownRight:
                         cr.Width += dx;
                         cr.Height += dy;
                         return cr;
@@ -384,7 +383,7 @@ namespace EntityTools.Patches.Mapper
             else
             {
                 CustomRegion cr;
-                if (dragMode == DragMode.None)
+                if (dragMode == RegionTransformMode.None)
                     cr = customRegion;
                 else
                     cr = TransformCustomRegion(customRegion.Clone(), anchorPoint, g.getWorldPos(mapper.RelativeMousePosition), dragMode);
@@ -492,7 +491,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         internal static bool Finish(string crName)
         {
-            if (dragMode == DragMode.None)
+            if (dragMode == RegionTransformMode.None)
             {
                 CustomRegion cr = GetCustomRegion();
                 if (cr != null

@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.1007.1551</AssemblyVersion>
+    <AssemblyVersion>0.20.1008.1557</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -216,7 +216,7 @@
     <Compile Include="Patches\Mapper\MapperExt.Designer.cs">
       <DependentUpon>MapperExt.cs</DependentUpon>
     </Compile>
-    <Compile Include="Patches\Mapper\Tools\Enums.cs" />
+    <Compile Include="Patches\Mapper\Tools\AddCustomRegionTool.cs" />
     <Compile Include="Patches\Mapper\Tools\MapperMouseEventArgs.cs" />
     <Compile Include="Patches\Mapper\Tools\NodeSelectTool.cs" />
     <Compile Include="Patches\Mapper\Tools\IMapperTool.cs" />
@@ -269,7 +269,6 @@
     <Compile Include="Editors\UccActionEditor.cs" />
     <Compile Include="Editors\UiIdEditor.cs" />
     <Compile Include="Patches\Mapper\MapperHelper_AddNodes.cs" />
-    <Compile Include="Patches\Mapper\MapperHelper_CustomRegion.cs" />
     <Compile Include="Patches\Mapper\Enums.cs" />
     <Compile Include="Patches\Mapper\MapperFormExt.cs">
       <SubType>Form</SubType>
