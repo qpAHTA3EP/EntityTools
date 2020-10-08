@@ -715,7 +715,7 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Центр кэшированной области
         /// </summary>
-        public Vector3 CacheCenter
+        public Vector3 CenterPosition
         {
             get => cacheInitialPosition.Clone();
             set
@@ -724,56 +724,88 @@ namespace EntityTools.Patches.Mapper
                     SetCacheInitialPosition(value);
             }
         }
+        public void MoveCenterPosition(double dx, double dy, double dz)
+        {
+            //TODO: добавить проверку переполнения в MoveCenterPosition, в SetCacheArea и в SetCacheInitialPosition
+            checked
+            {
+                cacheInitialPosition.X += (float)dx;
+                cacheInitialPosition.Y += (float)dy;
+                cacheInitialPosition.Z += (float)dz;
+                centerX += dx;
+                if (cacheX != double.MaxValue)
+                {
+                    minX += dx;
+                    maxX += dx;
+                }
+                centerY += dy;
+                if (cacheY != double.MaxValue)
+                {
+
+                    minY += dy;
+                    maxY += dy;
+                }
+                centerZ += dz;
+                if (cacheZ != double.MaxValue)
+                {
+                    minZ += dz;
+                    maxZ += dz;
+                } 
+            }
+        }
 
         /// <summary>
         /// Установка области кеширования координатами противолежащих точек параллелограмма с <param name="x1"/>, <param name="y1"/>, <param name="z1"/> и <param name="x2"/>, <param name="y2"/>, <param name="z2"/>
         /// </summary>
         public void SetCacheArea(double x1, double y1, double z1, double x2, double y2, double z2)
         {
-            if (x1 != 0 && x2 != 0)
+            checked
             {
-                MapperHelper.FixRange(x1, x2, out minX, out maxX);
-                cacheX = (maxX - minX) / 2;
-                cacheX_0_75 = cacheX * 0.75;
-                centerX = minX + cacheX;
-            }
-            else
-            {
-                minX = double.MinValue;
-                maxX = double.MaxValue;
-                cacheX = double.MaxValue;
-                cacheX_0_75 = double.MaxValue;
-                centerX = 0;
-            }
-            if (z1 != 0 && z2 != 0)
-            {
-                MapperHelper.FixRange(y1, y2, out minY, out maxY);
-                cacheY = (maxY - minY) / 2;
-                cacheY_0_75 = cacheY * 0.75;
-                centerY = minY + cacheY;
-            }
-            else
-            {
-                minY = double.MinValue;
-                maxY = double.MaxValue;
-                cacheY = double.MaxValue;
-                cacheY_0_75 = double.MaxValue;
-                centerY = 0;
-            }
-            if (z1 != 0 && z2 != 0)
-            {
-                MapperHelper.FixRange(z1, z2, out minZ, out maxZ);
-                cacheZ = (maxZ - minZ) / 2;
-                cacheZ_0_75 = cacheZ * 0.75;
-                centerZ = minZ + cacheZ;
-            }
-            else
-            {
-                minZ = double.MinValue;
-                maxZ = double.MaxValue;
-                cacheZ = double.MaxValue;
-                cacheZ_0_75 = double.MaxValue;
-                centerZ = 0;
+                if (x1 != 0 && x2 != 0)
+                {
+                    MapperHelper.FixRange(x1, x2, out minX, out maxX);
+                    cacheX = (maxX - minX) / 2;
+                    cacheX_0_75 = cacheX * 0.75;
+                    centerX = minX + cacheX;
+                }
+                else
+                {
+                    minX = double.MinValue;
+                    maxX = double.MaxValue;
+                    cacheX = double.MaxValue;
+                    cacheX_0_75 = double.MaxValue;
+                    centerX = 0;
+                }
+                if (z1 != 0 && z2 != 0)
+                {
+                    MapperHelper.FixRange(y1, y2, out minY, out maxY);
+                    cacheY = (maxY - minY) / 2;
+                    cacheY_0_75 = cacheY * 0.75;
+                    centerY = minY + cacheY;
+                }
+                else
+                {
+                    minY = double.MinValue;
+                    maxY = double.MaxValue;
+                    cacheY = double.MaxValue;
+                    cacheY_0_75 = double.MaxValue;
+                    centerY = 0;
+                }
+                if (z1 != 0 && z2 != 0)
+                {
+                    MapperHelper.FixRange(z1, z2, out minZ, out maxZ);
+                    cacheZ = (maxZ - minZ) / 2;
+                    cacheZ_0_75 = cacheZ * 0.75;
+                    centerZ = minZ + cacheZ;
+                }
+                else
+                {
+                    minZ = double.MinValue;
+                    maxZ = double.MaxValue;
+                    cacheZ = double.MaxValue;
+                    cacheZ_0_75 = double.MaxValue;
+                    centerZ = 0;
+                } 
             }
         }
         public void SetCacheArea(double x1, double y1, double x2, double y2)
@@ -789,43 +821,46 @@ namespace EntityTools.Patches.Mapper
         }
         private void SetCacheInitialPosition(double x, double y, double z)
         {
-            centerX = x;
-            centerY = y;
-            centerZ = z;
+            checked
+            {
+                centerX = x;
+                centerY = y;
+                centerZ = z;
 
-            cacheInitialPosition.X = (float)x;
-            cacheInitialPosition.Y = (float)y;
-            cacheInitialPosition.Z = (float)z;
+                cacheInitialPosition.X = (float)x;
+                cacheInitialPosition.Y = (float)y;
+                cacheInitialPosition.Z = (float)z;
 
-            if (cacheX == double.MaxValue)
-            {
-                minX = double.MinValue;
-                maxX = double.MaxValue;
-            }
-            else
-            {
-                minX = centerX - cacheX;
-                maxX = centerX + cacheX;
-            }
-            if (cacheY == double.MaxValue)
-            {
-                minY = double.MinValue;
-                maxY = double.MaxValue;
-            }
-            else
-            {
-                minY = centerY - cacheY;
-                maxY = centerY + cacheY;
-            }
-            if (cacheZ == double.MaxValue)
-            {
-                minZ = double.MinValue;
-                maxZ = double.MaxValue;
-            }
-            else
-            {
-                minZ = centerZ - cacheZ;
-                maxZ = centerZ + cacheZ;
+                if (cacheX == double.MaxValue)
+                {
+                    minX = double.MinValue;
+                    maxX = double.MaxValue;
+                }
+                else
+                {
+                    minX = centerX - cacheX;
+                    maxX = centerX + cacheX;
+                }
+                if (cacheY == double.MaxValue)
+                {
+                    minY = double.MinValue;
+                    maxY = double.MaxValue;
+                }
+                else
+                {
+                    minY = centerY - cacheY;
+                    maxY = centerY + cacheY;
+                }
+                if (cacheZ == double.MaxValue)
+                {
+                    minZ = double.MinValue;
+                    maxZ = double.MaxValue;
+                }
+                else
+                {
+                    minZ = centerZ - cacheZ;
+                    maxZ = centerZ + cacheZ;
+                } 
             }
         }
 

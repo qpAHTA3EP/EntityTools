@@ -1,4 +1,5 @@
 ﻿#define LOG
+#define DrawMapper_Measuring
 
 #if PATCH_ASTRAL
 using Astral.Logic.NW;
@@ -28,6 +29,7 @@ using System.Linq;
 using System.Text;
 using EntityTools.Patches.Mapper.Tools;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace EntityTools.Patches.Mapper
 {
@@ -292,17 +294,23 @@ namespace EntityTools.Patches.Mapper
         private void work_MapperFormUpdate(object sender, DoWorkEventArgs e)
         {
             string formCaption = string.Empty,
-                   posStr = string.Empty;
+                   statusStr = string.Empty;
             //Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
 
             var updateFormStatus = new System.Action(() =>
             {
                 Text = formCaption;
-                lblMousePos.Caption = posStr;
+                lblMousePos.Caption = statusStr;
                 using (_graphics.ReadLock())
                     MapPicture.Image = _graphics.getImage();
             });
 
+
+#if DrawMapper_Measuring
+            Stopwatch sw = new Stopwatch();
+            long[] drawMapperMeasures = new long[10];
+            int currentMesure = 0;
+#endif
             try
             {
                 while (!IsDisposed
@@ -318,8 +326,10 @@ namespace EntityTools.Patches.Mapper
 #endif
 
                     var player = EntityManager.LocalPlayer;
+#if !DrawMapper_Measuring
                     Vector3 pos = player.Location;
-                    posStr = !player.IsLoading && pos.IsValid ? $"{pos.X:N1} | {pos.Y:N1} | {pos.Z:N1}" : "Loading";
+                    statusStr = !player.IsLoading && pos.IsValid ? $"{pos.X:N1} | {pos.Y:N1} | {pos.Z:N1}" : "Loading"; 
+#endif
 
                     int hash = AstralAccessors.Quester.Core.Meshes.Value.GetHashCode();
                     if (currentMapHash != hash)
@@ -334,20 +344,28 @@ namespace EntityTools.Patches.Mapper
                         _undoStack.Clear();
                     }
 
+#if DrawMapper_Measuring
+                    sw.Restart();
                     DrawMapper();
+                    sw.Stop();
+                    drawMapperMeasures[currentMesure % 10] = sw.ElapsedTicks;
+                    currentMesure++;
+                    statusStr = (drawMapperMeasures.Sum() / 10_0000d).ToString("N2");
+#endif
+
 
                     if (InvokeRequired)
                         Invoke(updateFormStatus);
                     else
                     {
                         Text = formCaption;
-                        lblMousePos.Caption = posStr;
+                        lblMousePos.Caption = statusStr;
                         using (_graphics.ReadLock())
                             MapPicture.Image = _graphics.getImage();
                     }
 
 #if Non_MonoMapper
-                Thread.Sleep(500); 
+                    Thread.Sleep(150); 
 #else
                     Thread.Sleep(EntityTools.PluginSettings.Mapper.MapperForm.RedrawMapperTimeout);
 #endif
@@ -421,6 +439,11 @@ namespace EntityTools.Patches.Mapper
             }
         }
 
+        private void handler_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            e.IsInputKey = true;
+        }
+
         /// <summary>
         /// Обработчик события KeyUp - уведомления активного иснтрумента о нажатой клавише
         /// </summary>
@@ -472,9 +495,8 @@ namespace EntityTools.Patches.Mapper
                 //if (dx > 5 || dy > 5)
                 {
                     MapLockOnPlayer = false;
-                    _graphics.CenterPosition.X += (float)dx;
-                    _graphics.CenterPosition.Y += (float)dy;
-
+                    using (_graphics.WriteLock())
+                        _graphics.MoveCenterPosition(dx, dy);
                     mouseClickPosition.X = e.X;
                     mouseClickPosition.Y = e.Y;
                 }
@@ -597,6 +619,7 @@ namespace EntityTools.Patches.Mapper
             set => btnLockMapOnPlayer.Checked = value;
         }
 
+#if false
         /// <summary>
         /// Координаты центра отображаемой карты
         /// </summary>
@@ -617,7 +640,8 @@ namespace EntityTools.Patches.Mapper
                         _graphics.CenterPosition = value.Clone();
                     }
             }
-        }
+        } 
+#endif
 
         /// <summary>
         /// Координаты курсора мыши, относительно формы <see cref="MapperFormExt"/>
@@ -1687,16 +1711,16 @@ namespace EntityTools.Patches.Mapper
 #if AstralMapper
                 MapperStopDrawing?.Invoke(mapper); 
 #endif
-                //Graph graph = CoreCurrentMapMeshes;
+                currentMapHash = 0;
                 ((Graph)AstralAccessors.Quester.Core.Meshes).Clear();
 #if AstralMapper
                 MapperStartDrawing?.Invoke(mapper); 
 #endif
             }
         }
-            #endregion
+        #endregion
 
-            #region EditMeshes
+        #region EditMeshes
         private void handler_EditEdges_ModeChanged(object sender, ItemClickEventArgs e)
         {
             EditEdgeTool editEdgeTool = CurrentTool as EditEdgeTool;
@@ -1884,6 +1908,7 @@ namespace EntityTools.Patches.Mapper
                                     $"\tdisabled:\t{disabledArcNum}\n\r" +
                                     $"\tunpassable:\t{unpasArcNum}\n\r");
         }
+
     }
 #endif
 }

@@ -56,12 +56,18 @@ namespace EntityTools.Patches.Mapper
         }
         public new Vector3 CenterPosition
         {
-            get => base.CenterPosition;
+            get => base.CenterPosition.Clone();
             set
             {
                 base.CenterPosition = value;
-                _cache.CacheCenter = value;
+                _cache.CenterPosition = value;
             }
+        }
+        public void MoveCenterPosition(double dx, double dy)
+        {
+            base.CenterPosition.X += (float)dx;
+            base.CenterPosition.Y += (float)dy;
+            VisibleGraph.MoveCenterPosition(dx, dy, 0);
         }
         #endregion
 

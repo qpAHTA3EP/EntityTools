@@ -73,11 +73,6 @@ namespace EntityTools.Patches.Mapper
             this.teCRName = new DevExpress.XtraEditors.Repository.RepositoryItemTextEdit();
             this.btnCRAccept = new DevExpress.XtraBars.BarButtonItem();
             this.btnCRCancel = new DevExpress.XtraBars.BarButtonItem();
-            this.barStatus = new DevExpress.XtraBars.Bar();
-            this.btnLockMapOnPlayer = new DevExpress.XtraBars.BarCheckItem();
-            this.trackZoom = new DevExpress.XtraBars.BarEditItem();
-            this.zoomer = new DevExpress.XtraEditors.Repository.RepositoryItemZoomTrackBar();
-            this.lblMousePos = new DevExpress.XtraBars.BarStaticItem();
             this.barEditMeshes = new DevExpress.XtraBars.Bar();
             this.groupImportExportNodes = new DevExpress.XtraBars.BarButtonGroup();
             this.btnImportMeshesFromGame = new DevExpress.XtraBars.BarButtonItem();
@@ -95,6 +90,11 @@ namespace EntityTools.Patches.Mapper
             this.listCRSelector = new DevExpress.XtraEditors.Repository.RepositoryItemLookUpEdit();
             this.btnRenameCR = new DevExpress.XtraBars.BarCheckItem();
             this.btnAcceptCREdition = new DevExpress.XtraBars.BarButtonItem();
+            this.barStatus = new DevExpress.XtraBars.Bar();
+            this.btnLockMapOnPlayer = new DevExpress.XtraBars.BarCheckItem();
+            this.trackZoom = new DevExpress.XtraBars.BarEditItem();
+            this.zoomer = new DevExpress.XtraEditors.Repository.RepositoryItemZoomTrackBar();
+            this.lblMousePos = new DevExpress.XtraBars.BarStaticItem();
             this.barDockControlTop = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlBottom = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlLeft = new DevExpress.XtraBars.BarDockControl();
@@ -110,8 +110,8 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.seEquivalenceDistance)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seDeleteRadius)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.teCRName)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.zoomer)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.listCRSelector)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.zoomer)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bsrcAstralSettings)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.MapPicture)).BeginInit();
             this.SuspendLayout();
@@ -128,9 +128,9 @@ namespace EntityTools.Patches.Mapper
             this.barManager.Bars.AddRange(new DevExpress.XtraBars.Bar[] {
             this.barMainTools,
             this.barCustomRegion,
-            this.barStatus,
             this.barEditMeshes,
-            this.barEditCustomRegion});
+            this.barEditCustomRegion,
+            this.barStatus});
             this.barManager.DockControls.Add(this.barDockControlTop);
             this.barManager.DockControls.Add(this.barDockControlBottom);
             this.barManager.DockControls.Add(this.barDockControlLeft);
@@ -497,61 +497,6 @@ namespace EntityTools.Patches.Mapper
             this.btnCRCancel.Name = "btnCRCancel";
             this.btnCRCancel.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_CancelCRManipulation);
             // 
-            // barStatus
-            // 
-            this.barStatus.BarName = "statusBar";
-            this.barStatus.CanDockStyle = DevExpress.XtraBars.BarCanDockStyle.Bottom;
-            this.barStatus.DockCol = 0;
-            this.barStatus.DockRow = 0;
-            this.barStatus.DockStyle = DevExpress.XtraBars.BarDockStyle.Bottom;
-            this.barStatus.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnLockMapOnPlayer),
-            new DevExpress.XtraBars.LinkPersistInfo(this.trackZoom),
-            new DevExpress.XtraBars.LinkPersistInfo(this.lblMousePos, true)});
-            this.barStatus.OptionsBar.AllowQuickCustomization = false;
-            this.barStatus.OptionsBar.DrawDragBorder = false;
-            this.barStatus.OptionsBar.UseWholeRow = true;
-            this.barStatus.Text = "StatusBar";
-            this.barStatus.VisibleChanged += new System.EventHandler(this.handler_BarVisibleChanged);
-            // 
-            // btnLockMapOnPlayer
-            // 
-            this.btnLockMapOnPlayer.BindableChecked = true;
-            this.btnLockMapOnPlayer.CheckBoxVisibility = DevExpress.XtraBars.CheckBoxVisibility.AfterText;
-            this.btnLockMapOnPlayer.Checked = true;
-            this.btnLockMapOnPlayer.Hint = "Check to hold Player in the center of the Map";
-            this.btnLockMapOnPlayer.Id = 114;
-            this.btnLockMapOnPlayer.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
-                | System.Windows.Forms.Keys.P));
-            this.btnLockMapOnPlayer.Name = "btnLockMapOnPlayer";
-            // 
-            // trackZoom
-            // 
-            this.trackZoom.Caption = "statZoom";
-            this.trackZoom.Description = "Zoom of the Map";
-            this.trackZoom.Edit = this.zoomer;
-            this.trackZoom.EditValue = 5D;
-            this.trackZoom.EditWidth = 200;
-            this.trackZoom.Hint = "Zoom of the Map";
-            this.trackZoom.Id = 83;
-            this.trackZoom.Name = "trackZoom";
-            // 
-            // zoomer
-            // 
-            this.zoomer.LargeChange = 1;
-            this.zoomer.Maximum = 20;
-            this.zoomer.Name = "zoomer";
-            this.zoomer.ShowValueToolTip = true;
-            // 
-            // lblMousePos
-            // 
-            this.lblMousePos.Alignment = DevExpress.XtraBars.BarItemLinkAlignment.Right;
-            this.lblMousePos.Caption = "mousePos";
-            this.lblMousePos.Description = "Player position";
-            this.lblMousePos.Hint = "Player position";
-            this.lblMousePos.Id = 82;
-            this.lblMousePos.Name = "lblMousePos";
-            // 
             // barEditMeshes
             // 
             this.barEditMeshes.BarName = "EditMeshes";
@@ -729,6 +674,61 @@ namespace EntityTools.Patches.Mapper
             this.btnAcceptCREdition.ImageOptions.Image = global::EntityTools.Properties.Resources.miniValid;
             this.btnAcceptCREdition.Name = "btnAcceptCREdition";
             // 
+            // barStatus
+            // 
+            this.barStatus.BarName = "statusBar";
+            this.barStatus.CanDockStyle = DevExpress.XtraBars.BarCanDockStyle.Bottom;
+            this.barStatus.DockCol = 0;
+            this.barStatus.DockRow = 0;
+            this.barStatus.DockStyle = DevExpress.XtraBars.BarDockStyle.Bottom;
+            this.barStatus.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnLockMapOnPlayer),
+            new DevExpress.XtraBars.LinkPersistInfo(this.trackZoom),
+            new DevExpress.XtraBars.LinkPersistInfo(this.lblMousePos, true)});
+            this.barStatus.OptionsBar.AllowQuickCustomization = false;
+            this.barStatus.OptionsBar.DrawDragBorder = false;
+            this.barStatus.OptionsBar.UseWholeRow = true;
+            this.barStatus.Text = "StatusBar";
+            this.barStatus.VisibleChanged += new System.EventHandler(this.handler_BarVisibleChanged);
+            // 
+            // btnLockMapOnPlayer
+            // 
+            this.btnLockMapOnPlayer.BindableChecked = true;
+            this.btnLockMapOnPlayer.CheckBoxVisibility = DevExpress.XtraBars.CheckBoxVisibility.AfterText;
+            this.btnLockMapOnPlayer.Checked = true;
+            this.btnLockMapOnPlayer.Hint = "Check to hold Player in the center of the Map";
+            this.btnLockMapOnPlayer.Id = 114;
+            this.btnLockMapOnPlayer.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+                | System.Windows.Forms.Keys.P));
+            this.btnLockMapOnPlayer.Name = "btnLockMapOnPlayer";
+            // 
+            // trackZoom
+            // 
+            this.trackZoom.Caption = "statZoom";
+            this.trackZoom.Description = "Zoom of the Map";
+            this.trackZoom.Edit = this.zoomer;
+            this.trackZoom.EditValue = 5D;
+            this.trackZoom.EditWidth = 200;
+            this.trackZoom.Hint = "Zoom of the Map";
+            this.trackZoom.Id = 83;
+            this.trackZoom.Name = "trackZoom";
+            // 
+            // zoomer
+            // 
+            this.zoomer.LargeChange = 1;
+            this.zoomer.Maximum = 20;
+            this.zoomer.Name = "zoomer";
+            this.zoomer.ShowValueToolTip = true;
+            // 
+            // lblMousePos
+            // 
+            this.lblMousePos.Alignment = DevExpress.XtraBars.BarItemLinkAlignment.Right;
+            this.lblMousePos.Caption = "mousePos";
+            this.lblMousePos.Description = "Player position";
+            this.lblMousePos.Hint = "Player position";
+            this.lblMousePos.Id = 82;
+            this.lblMousePos.Name = "lblMousePos";
+            // 
             // barDockControlTop
             // 
             this.barDockControlTop.CausesValidation = false;
@@ -736,6 +736,7 @@ namespace EntityTools.Patches.Mapper
             this.barDockControlTop.Location = new System.Drawing.Point(0, 0);
             this.barDockControlTop.Manager = this.barManager;
             this.barDockControlTop.Size = new System.Drawing.Size(398, 112);
+            this.barDockControlTop.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
             // barDockControlBottom
             // 
@@ -798,6 +799,7 @@ namespace EntityTools.Patches.Mapper
             this.MapPicture.MouseClick += new System.Windows.Forms.MouseEventHandler(this.handler_MouseClick);
             this.MapPicture.MouseMove += new System.Windows.Forms.MouseEventHandler(this.handler_MouseMove);
             this.MapPicture.MouseUp += new System.Windows.Forms.MouseEventHandler(this.handler_MouseUp);
+            this.MapPicture.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
             // MapperFormExt
             // 
@@ -821,6 +823,7 @@ namespace EntityTools.Patches.Mapper
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.handler_FormClose);
             this.Load += new System.EventHandler(this.handler_FormLoad);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.handler_KeyUp);
+            this.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.popMenuOptions)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seWaypointDistance)).EndInit();
@@ -828,8 +831,8 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.seEquivalenceDistance)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seDeleteRadius)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.teCRName)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.zoomer)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.listCRSelector)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.zoomer)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bsrcAstralSettings)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.MapPicture)).EndInit();
             this.ResumeLayout(false);

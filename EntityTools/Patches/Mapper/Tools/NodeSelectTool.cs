@@ -245,7 +245,7 @@ namespace EntityTools.Patches.Mapper.Tools
             }
         }
 
-        #region Интерфейс HashSet
+        #region Интерфейс коллекции
         #region IEnumerable
         public IEnumerator<Node> GetEnumerator()
         {

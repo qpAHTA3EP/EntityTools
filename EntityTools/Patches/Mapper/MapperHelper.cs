@@ -232,7 +232,20 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public static double Distance2D(double x1, double y1, double x2, double y2)
         {
-            return Math.Sqrt((x2- x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+            double dx = x2 - x1;
+            double dy = y2 - y1;
+
+            return Math.Sqrt(dx * dx + dy * dy);
+        }
+        /// <summary>
+        /// Квадрат расстояния между точками в плоскости Oxy
+        /// </summary>
+        public static double SquareDistance2D(double x1, double y1, double x2, double y2)
+        {
+            double dx = x2 - x1;
+            double dy = y2 - y1;
+
+            return dx * dx + dy * dy;
         }
         /// <summary>
         /// Расстояние между проекциями точек <paramref name="p1"/> и <paramref name="p2"/> на плоскость Оху
@@ -273,17 +286,18 @@ namespace EntityTools.Patches.Mapper
         {
             if (distance < 0)
                 distance = double.MaxValue;
+            else distance *= distance;
 
             Node result = null;
             foreach(Node node in graph.NodesCollection)
             {
                 if(node.Passable)
                 {
-                    double dist = Distance2D(x, y, node.X, node.Y);
-                    if(distance > dist)
+                    double sqDist = SquareDistance2D(x, y, node.X, node.Y);
+                    if(distance > sqDist)
                     {
                         result = node;
-                        distance = dist;
+                        distance = sqDist;
                     }
                 }
             }

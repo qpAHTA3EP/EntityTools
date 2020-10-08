@@ -529,7 +529,7 @@ namespace EntityCore.Quester.Action
                         diaACD = @this._abortCombatDistance * 2;
 
                     //mapGraphics.FillUpsideTriangleCentered(Brushes.Yellow, target.Location, 10);
-                    mapGraphics.FillRhombCentered(Brushes.OrangeRed, target.Location, 14, 14);
+                    mapGraphics.FillRhombCentered(Brushes.Yellow, target.Location, 16, 16);
                     if (@this._distance > 11)
                     {
                         mapGraphics.DrawEllipse(Pens.Yellow, x - @this._distance, y + @this._distance, diaD, diaD, true);
