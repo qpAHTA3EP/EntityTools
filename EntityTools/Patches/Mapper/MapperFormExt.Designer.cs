@@ -54,8 +54,7 @@ namespace EntityTools.Patches.Mapper
             this.btnLinearPath = new DevExpress.XtraBars.BarCheckItem();
             this.btnForceLinkLast = new DevExpress.XtraBars.BarCheckItem();
             this.groupCR = new DevExpress.XtraBars.BarButtonGroup();
-            this.btnRectangularCR = new DevExpress.XtraBars.BarButtonItem();
-            this.btnEllipticalCR = new DevExpress.XtraBars.BarButtonItem();
+            this.btnAddCR = new DevExpress.XtraBars.BarButtonItem();
             this.btnEditCR = new DevExpress.XtraBars.BarCheckItem();
             this.btnOptions = new DevExpress.XtraBars.BarButtonItem();
             this.popMenuOptions = new DevExpress.XtraBars.PopupMenu(this.components);
@@ -67,10 +66,6 @@ namespace EntityTools.Patches.Mapper
             this.seEquivalenceDistance = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
             this.editDeleteRadius = new DevExpress.XtraBars.BarEditItem();
             this.seDeleteRadius = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
-            this.btnCRTypeSelector = new DevExpress.XtraBars.BarCheckItem();
-            this.editCRName = new DevExpress.XtraBars.BarEditItem();
-            this.teCRName = new DevExpress.XtraEditors.Repository.RepositoryItemTextEdit();
-            this.btnCRCancel = new DevExpress.XtraBars.BarButtonItem();
             this.barEditMeshes = new DevExpress.XtraBars.Bar();
             this.groupImportExportNodes = new DevExpress.XtraBars.BarButtonGroup();
             this.btnImportMeshesFromGame = new DevExpress.XtraBars.BarButtonItem();
@@ -84,21 +79,28 @@ namespace EntityTools.Patches.Mapper
             this.btnMeshesInfo = new DevExpress.XtraBars.BarButtonItem();
             this.btnCompression = new DevExpress.XtraBars.BarButtonItem();
             this.barEditCustomRegion = new DevExpress.XtraBars.Bar();
+            this.btnCRTypeSelector = new DevExpress.XtraBars.BarCheckItem();
             this.editCRSelector = new DevExpress.XtraBars.BarEditItem();
-            this.listCRSelector = new DevExpress.XtraEditors.Repository.RepositoryItemLookUpEdit();
-            this.btnRenameCR = new DevExpress.XtraBars.BarCheckItem();
-            this.btnAcceptCRAddition = new DevExpress.XtraBars.BarButtonItem();
-            this.btnAcceptCREdition = new DevExpress.XtraBars.BarButtonItem();
+            this.itemEditCRList = new DevExpress.XtraEditors.Repository.RepositoryItemLookUpEdit();
+            this.editCRName = new DevExpress.XtraBars.BarEditItem();
+            this.itemEditCRName = new DevExpress.XtraEditors.Repository.RepositoryItemTextEdit();
+            this.btnCRRename = new DevExpress.XtraBars.BarCheckItem();
+            this.btnCRAdditionAccept = new DevExpress.XtraBars.BarButtonItem();
+            this.btnCREditionAccept = new DevExpress.XtraBars.BarButtonItem();
+            this.btnCRCancel = new DevExpress.XtraBars.BarButtonItem();
             this.barStatus = new DevExpress.XtraBars.Bar();
             this.btnLockMapOnPlayer = new DevExpress.XtraBars.BarCheckItem();
-            this.trackZoom = new DevExpress.XtraBars.BarEditItem();
-            this.zoomer = new DevExpress.XtraEditors.Repository.RepositoryItemZoomTrackBar();
+            this.groupZoom = new DevExpress.XtraBars.BarButtonGroup();
+            this.btnZoomIn = new DevExpress.XtraBars.BarButtonItem();
+            this.lblZoom = new DevExpress.XtraBars.BarStaticItem();
+            this.btnZoomOut = new DevExpress.XtraBars.BarButtonItem();
             this.lblMousePos = new DevExpress.XtraBars.BarStaticItem();
             this.barDockControlTop = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlBottom = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlLeft = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlRight = new DevExpress.XtraBars.BarDockControl();
             this.menuImportMesh = new DevExpress.XtraBars.BarButtonItem();
+            this.repositoryItemZoomTrackBar1 = new DevExpress.XtraEditors.Repository.RepositoryItemZoomTrackBar();
             this.bsrcAstralSettings = new System.Windows.Forms.BindingSource(this.components);
             this.btnShowStatBar = new System.Windows.Forms.Button();
             this.MapPicture = new System.Windows.Forms.PictureBox();
@@ -108,9 +110,9 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.seMaxZDifference)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seEquivalenceDistance)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seDeleteRadius)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.teCRName)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.listCRSelector)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.zoomer)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.itemEditCRList)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.itemEditCRName)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.repositoryItemZoomTrackBar1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bsrcAstralSettings)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.MapPicture)).BeginInit();
             this.SuspendLayout();
@@ -136,8 +138,7 @@ namespace EntityTools.Patches.Mapper
             this.barManager.Form = this;
             this.barManager.Items.AddRange(new DevExpress.XtraBars.BarItem[] {
             this.btnUnidirectional,
-            this.btnRectangularCR,
-            this.btnEllipticalCR,
+            this.btnAddCR,
             this.btnImportMeshesFromGame,
             this.btnImportMeshesFromProfile,
             this.menuImportMesh,
@@ -156,10 +157,9 @@ namespace EntityTools.Patches.Mapper
             this.groupImportExportNodes,
             this.btnOptions,
             this.editCRName,
-            this.btnAcceptCRAddition,
+            this.btnCRAdditionAccept,
             this.btnCRCancel,
             this.lblMousePos,
-            this.trackZoom,
             this.btnSaveMeshes,
             this.btnMoveNodes,
             this.btnRemoveNodes,
@@ -170,20 +170,24 @@ namespace EntityTools.Patches.Mapper
             this.btnMeshesInfo,
             this.btnCompression,
             this.btnCRTypeSelector,
-            this.btnAcceptCREdition,
+            this.btnCREditionAccept,
             this.editCRSelector,
             this.btnLockMapOnPlayer,
-            this.btnRenameCR});
-            this.barManager.MaxItemId = 116;
+            this.btnCRRename,
+            this.groupZoom,
+            this.btnZoomIn,
+            this.btnZoomOut,
+            this.lblZoom});
+            this.barManager.MaxItemId = 125;
             this.barManager.OptionsLayout.AllowAddNewItems = false;
             this.barManager.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.seDeleteRadius,
             this.seWaypointDistance,
             this.seMaxZDifference,
             this.seEquivalenceDistance,
-            this.teCRName,
-            this.zoomer,
-            this.listCRSelector});
+            this.itemEditCRName,
+            this.itemEditCRList,
+            this.repositoryItemZoomTrackBar1});
             this.barManager.StatusBar = this.barStatus;
             // 
             // barMainTools
@@ -291,34 +295,25 @@ namespace EntityTools.Patches.Mapper
             // 
             this.groupCR.Caption = "CustomRegion";
             this.groupCR.Id = 71;
-            this.groupCR.ItemLinks.Add(this.btnRectangularCR);
-            this.groupCR.ItemLinks.Add(this.btnEllipticalCR);
+            this.groupCR.ItemLinks.Add(this.btnAddCR);
             this.groupCR.ItemLinks.Add(this.btnEditCR);
             this.groupCR.Name = "groupCR";
             // 
-            // btnRectangularCR
+            // btnAddCR
             // 
-            this.btnRectangularCR.Caption = "Add Rectangular";
-            this.btnRectangularCR.Id = 48;
-            this.btnRectangularCR.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCRRectang;
-            this.btnRectangularCR.Name = "btnRectangularCR";
-            this.btnRectangularCR.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AddCustomRegion);
-            // 
-            // btnEllipticalCR
-            // 
-            this.btnEllipticalCR.Caption = "Add Elliptical";
-            this.btnEllipticalCR.Id = 49;
-            this.btnEllipticalCR.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCREllipce;
-            this.btnEllipticalCR.Name = "btnEllipticalCR";
-            this.btnEllipticalCR.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
+            this.btnAddCR.Caption = "Add CustomRegion";
+            this.btnAddCR.Id = 48;
+            this.btnAddCR.ImageOptions.Image = global::EntityTools.Properties.Resources.miniAddCR_3;
+            this.btnAddCR.Name = "btnAddCR";
+            this.btnAddCR.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AddCustomRegion);
             // 
             // btnEditCR
             // 
-            this.btnEditCR.Caption = "EditCR";
+            this.btnEditCR.Caption = "Edit CustomRegion";
             this.btnEditCR.Id = 102;
             this.btnEditCR.ImageOptions.Image = global::EntityTools.Properties.Resources.miniEditCR;
             this.btnEditCR.Name = "btnEditCR";
-            this.btnEditCR.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_EditCR);
+            this.btnEditCR.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_EditCustomRegion);
             // 
             // btnOptions
             // 
@@ -427,35 +422,6 @@ namespace EntityTools.Patches.Mapper
             0});
             this.seDeleteRadius.Name = "seDeleteRadius";
             // 
-            // btnCRTypeSelector
-            // 
-            this.btnCRTypeSelector.Caption = "CustormRegion Type";
-            this.btnCRTypeSelector.Hint = "Change type of the CustomRegion (Rectangular to Elliptical)";
-            this.btnCRTypeSelector.Id = 106;
-            this.btnCRTypeSelector.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCRRectang;
-            this.btnCRTypeSelector.Name = "btnCRTypeSelector";
-            this.btnCRTypeSelector.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ChangeCustomRegionType);
-            // 
-            // editCRName
-            // 
-            this.editCRName.Edit = this.teCRName;
-            this.editCRName.Hint = "Enter name of the CustomRegion";
-            this.editCRName.Id = 78;
-            this.editCRName.Name = "editCRName";
-            // 
-            // teCRName
-            // 
-            this.teCRName.AutoHeight = false;
-            this.teCRName.Name = "teCRName";
-            // 
-            // btnCRCancel
-            // 
-            this.btnCRCancel.Caption = "Cancel";
-            this.btnCRCancel.Id = 80;
-            this.btnCRCancel.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCancel;
-            this.btnCRCancel.Name = "btnCRCancel";
-            this.btnCRCancel.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_CancelCRManipulation);
-            // 
             // barEditMeshes
             // 
             this.barEditMeshes.BarName = "EditMeshes";
@@ -551,7 +517,7 @@ namespace EntityTools.Patches.Mapper
             // 
             this.btnEditEdges.Caption = "Edit Edges";
             this.btnEditEdges.Id = 94;
-            this.btnEditEdges.ImageOptions.Image = global::EntityTools.Properties.Resources.miniEditEdge_2;
+            this.btnEditEdges.ImageOptions.Image = global::EntityTools.Properties.Resources.miniEditEdge;
             this.btnEditEdges.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
                 | System.Windows.Forms.Keys.E));
             this.btnEditEdges.Name = "btnEditEdges";
@@ -562,7 +528,7 @@ namespace EntityTools.Patches.Mapper
             this.btnMeshesInfo.Caption = "MeshesInfo";
             this.btnMeshesInfo.Hint = "Meshes information";
             this.btnMeshesInfo.Id = 103;
-            this.btnMeshesInfo.ImageOptions.Image = global::EntityTools.Properties.Resources.previewchart_16x16;
+            this.btnMeshesInfo.ImageOptions.Image = global::EntityTools.Properties.Resources.miniAnalize;
             this.btnMeshesInfo.Name = "btnMeshesInfo";
             this.btnMeshesInfo.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_MeshesInfo);
             // 
@@ -571,7 +537,7 @@ namespace EntityTools.Patches.Mapper
             this.btnCompression.Caption = "Compression";
             this.btnCompression.Hint = "Удаление из графа непроходимых(невидимых) вершин и ребер";
             this.btnCompression.Id = 104;
-            this.btnCompression.ImageOptions.Image = global::EntityTools.Properties.Resources.newwizard_16x16;
+            this.btnCompression.ImageOptions.Image = global::EntityTools.Properties.Resources.miniWizard;
             this.btnCompression.Name = "btnCompression";
             this.btnCompression.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_MeshesCompression);
             // 
@@ -582,65 +548,98 @@ namespace EntityTools.Patches.Mapper
             | DevExpress.XtraBars.BarCanDockStyle.Bottom) 
             | DevExpress.XtraBars.BarCanDockStyle.Standalone)));
             this.barEditCustomRegion.DockCol = 0;
-            this.barEditCustomRegion.DockRow = 2;
-            this.barEditCustomRegion.FloatLocation = new System.Drawing.Point(63, 208);
-            this.barEditCustomRegion.FloatSize = new System.Drawing.Size(387, 132);
+            this.barEditCustomRegion.DockRow = 0;
+            this.barEditCustomRegion.FloatLocation = new System.Drawing.Point(64, 218);
+            this.barEditCustomRegion.FloatSize = new System.Drawing.Size(397, 88);
             this.barEditCustomRegion.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
             new DevExpress.XtraBars.LinkPersistInfo(this.btnCRTypeSelector),
-            new DevExpress.XtraBars.LinkPersistInfo(DevExpress.XtraBars.BarLinkUserDefines.Width, this.editCRSelector, "", false, true, true, 261),
-            new DevExpress.XtraBars.LinkPersistInfo(DevExpress.XtraBars.BarLinkUserDefines.Width, this.editCRName, "", false, true, true, 258),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnRenameCR),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnAcceptCRAddition),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnAcceptCREdition),
+            new DevExpress.XtraBars.LinkPersistInfo(DevExpress.XtraBars.BarLinkUserDefines.Width, this.editCRSelector, "", false, true, true, 231),
+            new DevExpress.XtraBars.LinkPersistInfo(DevExpress.XtraBars.BarLinkUserDefines.Width, this.editCRName, "", false, true, true, 216),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnCRRename),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnCRAdditionAccept),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnCREditionAccept),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnCRCancel)});
-            this.barEditCustomRegion.Offset = 2;
+            this.barEditCustomRegion.Offset = 6;
             this.barEditCustomRegion.OptionsBar.AllowQuickCustomization = false;
             this.barEditCustomRegion.OptionsBar.DisableClose = true;
             this.barEditCustomRegion.Text = "Edit CustomRegion";
             this.barEditCustomRegion.Visible = false;
             // 
+            // btnCRTypeSelector
+            // 
+            this.btnCRTypeSelector.Caption = "CustormRegion Type";
+            this.btnCRTypeSelector.Hint = "Change type of the CustomRegion (Rectangular to Elliptical)";
+            this.btnCRTypeSelector.Id = 106;
+            this.btnCRTypeSelector.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCRRectang;
+            this.btnCRTypeSelector.Name = "btnCRTypeSelector";
+            this.btnCRTypeSelector.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ChangeCustomRegionType);
+            // 
             // editCRSelector
             // 
-            this.editCRSelector.Edit = this.listCRSelector;
+            this.editCRSelector.Edit = this.itemEditCRList;
             this.editCRSelector.Id = 112;
             this.editCRSelector.Name = "editCRSelector";
+            this.editCRSelector.EditValueChanged += new System.EventHandler(this.handler_ChangeSelectedCustomRegion);
             // 
-            // listCRSelector
+            // itemEditCRList
             // 
-            this.listCRSelector.AcceptEditorTextAsNewValue = DevExpress.Utils.DefaultBoolean.False;
-            this.listCRSelector.AutoHeight = false;
-            this.listCRSelector.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            this.itemEditCRList.AcceptEditorTextAsNewValue = DevExpress.Utils.DefaultBoolean.False;
+            this.itemEditCRList.AllowDropDownWhenReadOnly = DevExpress.Utils.DefaultBoolean.True;
+            this.itemEditCRList.AllowNullInput = DevExpress.Utils.DefaultBoolean.False;
+            this.itemEditCRList.AutoHeight = false;
+            this.itemEditCRList.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.listCRSelector.EditFormat.FormatType = DevExpress.Utils.FormatType.Custom;
-            this.listCRSelector.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Buffered;
-            this.listCRSelector.Name = "listCRSelector";
-            this.listCRSelector.NullText = "";
+            this.itemEditCRList.Columns.AddRange(new DevExpress.XtraEditors.Controls.LookUpColumnInfo[] {
+            new DevExpress.XtraEditors.Controls.LookUpColumnInfo("Name", "", 20, DevExpress.Utils.FormatType.None, "", true, DevExpress.Utils.HorzAlignment.Default, DevExpress.Data.ColumnSortOrder.Ascending, DevExpress.Utils.DefaultBoolean.Default)});
+            this.itemEditCRList.Name = "itemEditCRList";
+            this.itemEditCRList.NullText = "";
+            this.itemEditCRList.ShowFooter = false;
             // 
-            // btnRenameCR
+            // editCRName
             // 
-            this.btnRenameCR.Caption = "Edit CRName";
-            this.btnRenameCR.Id = 115;
-            this.btnRenameCR.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnRenameCR.ImageOptions.Image")));
-            this.btnRenameCR.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnRenameCR.ImageOptions.LargeImage")));
-            this.btnRenameCR.Name = "btnRenameCR";
-            this.btnRenameCR.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ChangedRenameCRMode);
+            this.editCRName.Edit = this.itemEditCRName;
+            this.editCRName.Hint = "Enter name of the CustomRegion";
+            this.editCRName.Id = 78;
+            this.editCRName.Name = "editCRName";
             // 
-            // btnAcceptCRAddition
+            // itemEditCRName
             // 
-            this.btnAcceptCRAddition.Caption = "Accept";
-            this.btnAcceptCRAddition.DropDownEnabled = false;
-            this.btnAcceptCRAddition.Id = 79;
-            this.btnAcceptCRAddition.ImageOptions.Image = global::EntityTools.Properties.Resources.miniAdd;
-            this.btnAcceptCRAddition.Name = "btnAcceptCRAddition";
-            this.btnAcceptCRAddition.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AcceptCRAddition);
+            this.itemEditCRName.AutoHeight = false;
+            this.itemEditCRName.Name = "itemEditCRName";
             // 
-            // btnAcceptCREdition
+            // btnCRRename
             // 
-            this.btnAcceptCREdition.Caption = "Accept";
-            this.btnAcceptCREdition.Id = 107;
-            this.btnAcceptCREdition.ImageOptions.Image = global::EntityTools.Properties.Resources.miniValid;
-            this.btnAcceptCREdition.Name = "btnAcceptCREdition";
-            this.btnAcceptCREdition.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AcceptCREdition);
+            this.btnCRRename.Caption = "Edit CRName";
+            this.btnCRRename.Id = 115;
+            this.btnCRRename.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnCRRename.ImageOptions.Image")));
+            this.btnCRRename.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnCRRename.ImageOptions.LargeImage")));
+            this.btnCRRename.Name = "btnCRRename";
+            this.btnCRRename.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ChangedRenameCRMode);
+            // 
+            // btnCRAdditionAccept
+            // 
+            this.btnCRAdditionAccept.Caption = "Accept";
+            this.btnCRAdditionAccept.DropDownEnabled = false;
+            this.btnCRAdditionAccept.Id = 79;
+            this.btnCRAdditionAccept.ImageOptions.Image = global::EntityTools.Properties.Resources.miniAdd;
+            this.btnCRAdditionAccept.Name = "btnCRAdditionAccept";
+            this.btnCRAdditionAccept.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AcceptCRAddition);
+            // 
+            // btnCREditionAccept
+            // 
+            this.btnCREditionAccept.Caption = "Accept";
+            this.btnCREditionAccept.Id = 107;
+            this.btnCREditionAccept.ImageOptions.Image = global::EntityTools.Properties.Resources.miniValid;
+            this.btnCREditionAccept.Name = "btnCREditionAccept";
+            this.btnCREditionAccept.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AcceptCREdition);
+            // 
+            // btnCRCancel
+            // 
+            this.btnCRCancel.Caption = "Cancel";
+            this.btnCRCancel.Id = 80;
+            this.btnCRCancel.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCancel;
+            this.btnCRCancel.Name = "btnCRCancel";
+            this.btnCRCancel.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_CancelCRManipulation);
             // 
             // barStatus
             // 
@@ -651,7 +650,7 @@ namespace EntityTools.Patches.Mapper
             this.barStatus.DockStyle = DevExpress.XtraBars.BarDockStyle.Bottom;
             this.barStatus.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
             new DevExpress.XtraBars.LinkPersistInfo(this.btnLockMapOnPlayer),
-            new DevExpress.XtraBars.LinkPersistInfo(this.trackZoom),
+            new DevExpress.XtraBars.LinkPersistInfo(this.groupZoom, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.lblMousePos, true)});
             this.barStatus.OptionsBar.AllowQuickCustomization = false;
             this.barStatus.OptionsBar.DrawDragBorder = false;
@@ -670,22 +669,38 @@ namespace EntityTools.Patches.Mapper
                 | System.Windows.Forms.Keys.P));
             this.btnLockMapOnPlayer.Name = "btnLockMapOnPlayer";
             // 
-            // trackZoom
+            // groupZoom
             // 
-            this.trackZoom.Caption = "statZoom";
-            this.trackZoom.Description = "Zoom of the Map";
-            this.trackZoom.Edit = this.zoomer;
-            this.trackZoom.EditValue = 5D;
-            this.trackZoom.EditWidth = 200;
-            this.trackZoom.Hint = "Zoom of the Map";
-            this.trackZoom.Id = 83;
-            this.trackZoom.Name = "trackZoom";
+            this.groupZoom.Caption = "Zoom";
+            this.groupZoom.Id = 118;
+            this.groupZoom.ItemLinks.Add(this.btnZoomIn);
+            this.groupZoom.ItemLinks.Add(this.lblZoom);
+            this.groupZoom.ItemLinks.Add(this.btnZoomOut);
+            this.groupZoom.Name = "groupZoom";
             // 
-            // zoomer
+            // btnZoomIn
             // 
-            this.zoomer.LargeChange = 1;
-            this.zoomer.Maximum = 20;
-            this.zoomer.Name = "zoomer";
+            this.btnZoomIn.Caption = "ZoomIn";
+            this.btnZoomIn.Id = 119;
+            this.btnZoomIn.ImageOptions.Image = global::EntityTools.Properties.Resources.miniZoomIn;
+            this.btnZoomIn.Name = "btnZoomIn";
+            this.btnZoomIn.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ZoomIn);
+            // 
+            // lblZoom
+            // 
+            this.lblZoom.Border = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.lblZoom.Caption = "lblZoom";
+            this.lblZoom.Id = 122;
+            this.lblZoom.Name = "lblZoom";
+            this.lblZoom.ItemDoubleClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_DoubleClickZoom);
+            // 
+            // btnZoomOut
+            // 
+            this.btnZoomOut.Caption = "ZoomOut";
+            this.btnZoomOut.Id = 120;
+            this.btnZoomOut.ImageOptions.Image = global::EntityTools.Properties.Resources.miniZoomOut;
+            this.btnZoomOut.Name = "btnZoomOut";
+            this.btnZoomOut.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ZoomOut);
             // 
             // lblMousePos
             // 
@@ -709,9 +724,9 @@ namespace EntityTools.Patches.Mapper
             // 
             this.barDockControlBottom.CausesValidation = false;
             this.barDockControlBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.barDockControlBottom.Location = new System.Drawing.Point(0, 355);
+            this.barDockControlBottom.Location = new System.Drawing.Point(0, 351);
             this.barDockControlBottom.Manager = this.barManager;
-            this.barDockControlBottom.Size = new System.Drawing.Size(398, 24);
+            this.barDockControlBottom.Size = new System.Drawing.Size(398, 28);
             // 
             // barDockControlLeft
             // 
@@ -719,7 +734,7 @@ namespace EntityTools.Patches.Mapper
             this.barDockControlLeft.Dock = System.Windows.Forms.DockStyle.Left;
             this.barDockControlLeft.Location = new System.Drawing.Point(0, 56);
             this.barDockControlLeft.Manager = this.barManager;
-            this.barDockControlLeft.Size = new System.Drawing.Size(0, 299);
+            this.barDockControlLeft.Size = new System.Drawing.Size(0, 295);
             // 
             // barDockControlRight
             // 
@@ -727,7 +742,7 @@ namespace EntityTools.Patches.Mapper
             this.barDockControlRight.Dock = System.Windows.Forms.DockStyle.Right;
             this.barDockControlRight.Location = new System.Drawing.Point(398, 56);
             this.barDockControlRight.Manager = this.barManager;
-            this.barDockControlRight.Size = new System.Drawing.Size(0, 299);
+            this.barDockControlRight.Size = new System.Drawing.Size(0, 295);
             // 
             // menuImportMesh
             // 
@@ -735,6 +750,10 @@ namespace EntityTools.Patches.Mapper
             this.menuImportMesh.Id = 53;
             this.menuImportMesh.ImageOptions.Image = global::EntityTools.Properties.Resources.miniImport;
             this.menuImportMesh.Name = "menuImportMesh";
+            // 
+            // repositoryItemZoomTrackBar1
+            // 
+            this.repositoryItemZoomTrackBar1.Name = "repositoryItemZoomTrackBar1";
             // 
             // btnShowStatBar
             // 
@@ -760,7 +779,7 @@ namespace EntityTools.Patches.Mapper
             this.MapPicture.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MapPicture.Location = new System.Drawing.Point(0, 56);
             this.MapPicture.Name = "MapPicture";
-            this.MapPicture.Size = new System.Drawing.Size(398, 299);
+            this.MapPicture.Size = new System.Drawing.Size(398, 295);
             this.MapPicture.TabIndex = 9;
             this.MapPicture.TabStop = false;
             this.MapPicture.MouseClick += new System.Windows.Forms.MouseEventHandler(this.handler_MouseClick);
@@ -797,9 +816,9 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.seMaxZDifference)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seEquivalenceDistance)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seDeleteRadius)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.teCRName)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.listCRSelector)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.zoomer)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.itemEditCRList)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.itemEditCRName)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.repositoryItemZoomTrackBar1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bsrcAstralSettings)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.MapPicture)).EndInit();
             this.ResumeLayout(false);
@@ -819,8 +838,7 @@ namespace EntityTools.Patches.Mapper
         private BarDockControl barDockControlRight;
         private BarCheckItem btnUnidirectional;
         private RepositoryItemSpinEdit seDeleteRadius;
-        private BarButtonItem btnRectangularCR;
-        private BarButtonItem btnEllipticalCR;
+        private BarButtonItem btnAddCR;
         private BarButtonItem btnImportMeshesFromGame;
         private BarButtonItem btnImportMeshesFromProfile;
         private BarButtonItem menuImportMesh;
@@ -844,13 +862,11 @@ namespace EntityTools.Patches.Mapper
         private BarButtonItem btnOptions;
         private PopupMenu popMenuOptions;
         private BarEditItem editCRName;
-        private RepositoryItemTextEdit teCRName;
-        private BarButtonItem btnAcceptCRAddition;
+        private RepositoryItemTextEdit itemEditCRName;
+        private BarButtonItem btnCRAdditionAccept;
         private BarButtonItem btnCRCancel;
         private Bar barStatus;
         private BarStaticItem lblMousePos;
-        private BarEditItem trackZoom;
-        private RepositoryItemZoomTrackBar zoomer;
         private BindingSource bsrcAstralSettings;
         private Button btnShowStatBar;
         private BarButtonItem btnSaveMeshes;
@@ -865,12 +881,17 @@ namespace EntityTools.Patches.Mapper
         private BarButtonItem btnCompression;
         private Bar barEditCustomRegion;
         private BarCheckItem btnCRTypeSelector;
-        private BarButtonItem btnAcceptCREdition;
+        private BarButtonItem btnCREditionAccept;
         private BarEditItem editCRSelector;
-        private RepositoryItemLookUpEdit listCRSelector;
+        private RepositoryItemLookUpEdit itemEditCRList;
         private BarCheckItem btnLockMapOnPlayer;
-        private BarCheckItem btnRenameCR;
+        private BarCheckItem btnCRRename;
         private PictureBox MapPicture;
+        private BarButtonGroup groupZoom;
+        private BarButtonItem btnZoomIn;
+        private BarButtonItem btnZoomOut;
+        private BarStaticItem lblZoom;
+        private RepositoryItemZoomTrackBar repositoryItemZoomTrackBar1;
     } 
 #endif
 }

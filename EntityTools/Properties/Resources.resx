@@ -136,9 +136,6 @@
   <data name="miniClone" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniClone.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="previewchart_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\previewchart_16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="miniImport" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniImport.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -154,9 +151,6 @@
   <data name="EntityIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Entity_7_40х48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="miniDiskette" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\save_16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="miniHurdLink" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniLink.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -165,9 +159,6 @@
   </data>
   <data name="miniUniPath" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniUniPath.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="miniEditEdge_2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\miniEditEdge_2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="miniRefresh" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniRefresh.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -184,9 +175,6 @@
   <data name="miniPlayAll" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniPlayAll.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="miniEditEdge" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\miniEditEdge.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="miniBiPath" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniBiPath.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -199,11 +187,11 @@
   <data name="miniEditCR" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniEditCR.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="miniAnalize" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\previewchart_16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="miniExport" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniExport.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="miniNodeMove" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\miniNodeMove_3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="miniCREllipce" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniEllipceCR.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -220,7 +208,34 @@
   <data name="miniExpand" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniExpand_2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="newwizard_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\newwizard_16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="miniDiskette" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\minisave_1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="miniEditEdge" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\minieditedge.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="miniNodeMove" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\mininodemove.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="miniWizard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\miniwizard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="miniZoom" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\minizoom.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="miniZoomIn" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\minizoomin.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="miniZoomOut" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\minizoomout.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="miniAddCR" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\miniAddCR.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="miniAddCR_2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\miniAddCR_2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="miniAddCR_3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\miniAddCR_3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

@@ -47,10 +47,10 @@ public static void DrawHotSpots(List<Vector3> hotspots, GraphicsNW graph)
         /// </summary>
         public static void DrawHotSpots(List<Vector3> hotspots, GraphicsNW graphicsNW)
         {
-            if (graphicsNW is MapperGraphics mapGraphics)
+            if (graphicsNW is MapperGraphics graphics)
             {
-                mapGraphics.GetWorldPosition(0, 0, out double leftX, out double topY);
-                mapGraphics.GetWorldPosition(mapGraphics.ImageWidth, mapGraphics.ImageHeight, out double rightX, out double downY);
+                graphics.GetWorldPosition(0, 0, out double leftX, out double topY);
+                graphics.GetWorldPosition(graphics.ImageWidth, graphics.ImageHeight, out double rightX, out double downY);
 
                 Brush brush = Brushes.Yellow;
                 for(int i = 0; i < hotspots.Count; i++)
@@ -61,8 +61,8 @@ public static void DrawHotSpots(List<Vector3> hotspots, GraphicsNW graph)
                     if (leftX <= spot.X && spot.X <= rightX
                         && downY <= spot.Y && spot.Y <= topY)
                     {
-                        mapGraphics.FillCircleCentered(brush, spot, 12);
-                        mapGraphics.drawString(spot, i.ToString(), 8, Brushes.Blue, -1, (i < 10) ? -6 : -12);
+                        graphics.FillCircleCentered(brush, spot, 12);
+                        graphics.drawString(spot, i.ToString(), 8, Brushes.Blue, -1, (i < 10) ? -6 : -12);
                     }
                 } 
             }

@@ -1,13 +1,9 @@
 ﻿using Astral.Classes.ItemFilter;
-using EntityTools.Reflection;
 using MyNW.Classes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using Astral.Grinder.Classes;
-using EntityTools.Reflection;
 using Astral.Logic.Classes.Map;
 using HarmonyLib;
 
