@@ -6,24 +6,16 @@
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Text;
-using System.Threading;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
-using Astral.Controllers;
-using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
 using Astral.Quester.UIEditors;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
-using EntityTools.Reflection;
 using EntityTools.Tools;
 using MyNW.Classes;
-using MyNW.Internals;
-using MyNW.Patchables.Enums;
-using Unit = Astral.Logic.UCC.Ressources.Enums.Unit;
 
 namespace EntityTools.UCC.Actions
 {
@@ -39,7 +31,7 @@ namespace EntityTools.UCC.Actions
 
         public ExecuteSpecificPower()
         {
-            Target = Unit.Target;
+            Target = Astral.Logic.UCC.Ressources.Enums.Unit.Target;
 #if CORE_INTERFACES
             Engine = new UCCActionProxy(this);
 #endif
@@ -85,7 +77,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal bool _checkPowerCooldown = false;
+        internal bool _checkPowerCooldown;
 
 #if DEVELOPER
         [Category("Optional")]
@@ -104,7 +96,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal bool _checkInTray = false;
+        internal bool _checkInTray;
 
 #if DEVELOPER
         [Category("Optional")]
@@ -124,7 +116,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal int _castingTime = 0;
+        internal int _castingTime;
 
 #if DEVELOPER
         [Category("Optional")]
@@ -143,7 +135,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal bool _forceMaintain = false;
+        internal bool _forceMaintain;
 
 #if DEVELOPER
         [Description("ID of the Entity that is preferred to attack\n" +
@@ -314,7 +306,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal float _reactionZRange = 0;
+        internal float _reactionZRange;
 
 #if DEVELOPER
         [XmlIgnore]
@@ -339,24 +331,24 @@ namespace EntityTools.UCC.Actions
 
         public override UCCAction Clone()
         {
-            return base.BaseClone(new ExecuteSpecificPower
+            return BaseClone(new ExecuteSpecificPower
             {
-                _powerId = this._powerId,
-                _checkPowerCooldown = this._checkPowerCooldown,
-                _checkInTray = this._checkInTray,
-                _castingTime = this._castingTime,
-                _forceMaintain = this._forceMaintain,
-                _entityId = this._entityId,
-                _entityIdType = this._entityIdType,
-                _entityNameType = this._entityNameType,
-                _regionCheck = this._regionCheck,
-                _healthCheck = this._healthCheck,
+                _powerId = _powerId,
+                _checkPowerCooldown = _checkPowerCooldown,
+                _checkInTray = _checkInTray,
+                _castingTime = _castingTime,
+                _forceMaintain = _forceMaintain,
+                _entityId = _entityId,
+                _entityIdType = _entityIdType,
+                _entityNameType = _entityNameType,
+                _regionCheck = _regionCheck,
+                _healthCheck = _healthCheck,
                 _aura = new AuraOption
                 {
-                    AuraName = this._aura.AuraName,
-                    AuraNameType = this._aura.AuraNameType,
-                    Sign = this._aura.Sign,
-                    Stacks = this._aura.Stacks
+                    AuraName = _aura.AuraName,
+                    AuraNameType = _aura.AuraNameType,
+                    Sign = _aura.Sign,
+                    Stacks = _aura.Stacks
                 }
             });
         }

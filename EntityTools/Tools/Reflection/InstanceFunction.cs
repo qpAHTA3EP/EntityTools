@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace EntityTools.Reflection
 {
@@ -29,7 +26,7 @@ namespace EntityTools.Reflection
             if (flags == BindingFlags.Default)
                 flags = ReflectionHelper.DefaultFlags;
 
-            Type[] argumentTypes = new Type[] { };
+            Type[] argumentTypes = { };
 
             MethodInfo method = null;
 
@@ -47,21 +44,21 @@ namespace EntityTools.Reflection
             }
             if (method!=null)
             {
-                return new Func<object, Func<ReturnT>>((object o) =>
-                                {
-                                    if (o != null
-                                        && Equals(o.GetType(), type))
-                                    {
-                                        return new Func<ReturnT>(() =>
-                                            {
-                                                object result = method.Invoke(o, new object[] { });
-                                                if (Equals(result, null))
-                                                    return default(ReturnT);
-                                                else return (ReturnT)result;
-                                            });
-                                    }
-                                    return null;
-                                });
+                return o =>
+                {
+                    if (o != null
+                        && Equals(o.GetType(), type))
+                    {
+                        return () =>
+                        {
+                            object result = method.Invoke(o, new object[] { });
+                            if (Equals(result, null))
+                                return default;
+                            return (ReturnT)result;
+                        };
+                    }
+                    return null;
+                };
             }
             return null;
         }
@@ -85,7 +82,7 @@ namespace EntityTools.Reflection
             if (flags == BindingFlags.Default)
                 flags = ReflectionHelper.DefaultFlags;
 
-            Type[] argumentTypes = new Type[] { typeof(ArgumentT1) };
+            Type[] argumentTypes = { typeof(ArgumentT1) };
 
             MethodInfo method = null;
 
@@ -103,21 +100,21 @@ namespace EntityTools.Reflection
             }
             if (method != null)
             {
-                return new Func<object, Func<ArgumentT1, ReturnT>>((object o) =>
+                return o =>
                 {
                     if (o != null
                         && Equals(o.GetType(), type))
                     {
-                        return new Func<ArgumentT1, ReturnT>((ArgumentT1 a1) =>
+                        return a1 =>
                         {
                             object result = method.Invoke(o, new object[] { a1 });
                             if (Equals(result, null))
-                                return default(ReturnT);
-                            else return (ReturnT)result;
-                        });
+                                return default;
+                            return (ReturnT)result;
+                        };
                     }
                     return null;
-                });
+                };
             }
             return null;
         }
@@ -140,7 +137,7 @@ namespace EntityTools.Reflection
             if (flags == BindingFlags.Default)
                 flags = ReflectionHelper.DefaultFlags;
 
-            Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT2) };
+            Type[] argumentTypes = { typeof(ArgumentT1), typeof(ArgumentT2) };
 
             MethodInfo method = null;
 
@@ -158,21 +155,21 @@ namespace EntityTools.Reflection
             }
             if (method != null)
             {
-                return new Func<object, Func<ArgumentT1, ArgumentT2, ReturnT>>((object o) =>
+                return o =>
                 {
                     if (o != null
                         && Equals(o.GetType(), type))
                     {
-                        return new Func<ArgumentT1, ArgumentT2, ReturnT>((ArgumentT1 a1, ArgumentT2 a2) =>
+                        return (a1, a2) =>
                         {
                             object result = method.Invoke(o, new object[] { a1, a2 });
                             if (Equals(result, null))
-                                return default(ReturnT);
-                            else return (ReturnT)result;
-                        });
+                                return default;
+                            return (ReturnT)result;
+                        };
                     }
                     return null;
-                });
+                };
             }
             return null;
         }
@@ -198,7 +195,7 @@ namespace EntityTools.Reflection
             if (flags == BindingFlags.Default)
                 flags = ReflectionHelper.DefaultFlags;
 
-            Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3) };
+            Type[] argumentTypes = { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3) };
 
             MethodInfo method = null;
 
@@ -216,21 +213,21 @@ namespace EntityTools.Reflection
             }
             if (method != null)
             {
-                return new Func<object, Func<ArgumentT1, ArgumentT2, ArgumentT3, ReturnT>>((object o) =>
+                return o =>
                 {
                     if (o != null
                         && Equals(o.GetType(), type))
                     {
-                        return new Func<ArgumentT1, ArgumentT2, ArgumentT3, ReturnT>((ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3) =>
+                        return (a1, a2, a3) =>
                         {
                             object result = method.Invoke(o, new object[] { a1, a2, a3 });
                             if (Equals(result, null))
-                                return default(ReturnT);
-                            else return (ReturnT)result;
-                        });
+                                return default;
+                            return (ReturnT)result;
+                        };
                     }
                     return null;
-                });
+                };
             }
             return null;
         }
@@ -257,7 +254,7 @@ namespace EntityTools.Reflection
             if (flags == BindingFlags.Default)
                 flags = ReflectionHelper.DefaultFlags;
 
-            Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4) };
+            Type[] argumentTypes = { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4) };
 
             MethodInfo method = null;
 
@@ -275,21 +272,21 @@ namespace EntityTools.Reflection
             }
             if (method != null)
             {
-                return new Func<object, Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ReturnT>>((object o) =>
+                return o =>
                 {
                     if (o != null
                         && Equals(o.GetType(), type))
                     {
-                        return new Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ReturnT>((ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3, ArgumentT4 a4) =>
+                        return (a1, a2, a3, a4) =>
                         {
                             object result = method.Invoke(o, new object[] { a1, a2, a3, a4 });
                             if (Equals(result, null))
-                                return default(ReturnT);
-                            else return (ReturnT)result;
-                        });
+                                return default;
+                            return (ReturnT)result;
+                        };
                     }
                     return null;
-                });
+                };
             }
             return null;
         }
@@ -317,7 +314,7 @@ namespace EntityTools.Reflection
             if (flags == BindingFlags.Default)
                 flags = ReflectionHelper.DefaultFlags;
 
-            Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4), typeof(ArgumentT5) };
+            Type[] argumentTypes = { typeof(ArgumentT1), typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4), typeof(ArgumentT5) };
 
             MethodInfo method = null;
 
@@ -335,21 +332,21 @@ namespace EntityTools.Reflection
             }
             if (method != null)
             {
-                return new Func<object, Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5, ReturnT>>((object o) =>
+                return o =>
                 {
                     if (o != null
                         && Equals(o.GetType(), type))
                     {
-                        return new Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5, ReturnT>((ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3, ArgumentT4 a4, ArgumentT5 a5) =>
+                        return (a1, a2, a3, a4, a5) =>
                         {
                             object result = method.Invoke(o, new object[] { a1, a2, a3, a4, a5 });
                             if (Equals(result, null))
-                                return default(ReturnT);
-                            else return (ReturnT)result;
-                        });
+                                return default;
+                            return (ReturnT)result;
+                        };
                     }
                     return null;
-                });
+                };
             }
             return null;
         }
@@ -373,11 +370,8 @@ namespace EntityTools.Reflection
                 {
                     if (method.ReturnType.Equals(returnType))
                         return true;
-                    else
-                    {
-                        method = null;
-                        return false;
-                    }
+                    method = null;
+                    return false;
                 }
                 return FindByNameAndSignature(type.BaseType, methodName, returnType, inputTypes, flags, out method);
             }
@@ -445,7 +439,7 @@ namespace EntityTools.Reflection
 
             Type type = typeof(ContainerType);
 
-            Type[] argumentTypes = new Type[] { };
+            Type[] argumentTypes = { };
 
             MethodInfo method = null;
 
@@ -461,16 +455,16 @@ namespace EntityTools.Reflection
             }
             if (method != null)
             {
-                return new Func<ContainerType, Func<ReturnT>>((ContainerType o) =>
+                return o =>
                 {
-                    return new Func<ReturnT>(() =>
+                    return () =>
                     {
                         object result = method.Invoke(o, new object[] { });
                         if (Equals(result, null))
-                            return default(ReturnT);
-                        else return (ReturnT)result;
-                    });
-                });
+                            return default;
+                        return (ReturnT)result;
+                    };
+                };
             }
 
             return new Dummy<ReturnT>(methodName).DummyMethod; 
@@ -493,7 +487,7 @@ namespace EntityTools.Reflection
 
             Type type = typeof(ContainerType);
 
-            Type[] argumentTypes = new Type[] { typeof(ArgumentT1) };
+            Type[] argumentTypes = { typeof(ArgumentT1) };
 
             MethodInfo method = null;
 
@@ -509,16 +503,16 @@ namespace EntityTools.Reflection
             }
             if (method != null)
             {
-                return new Func<ContainerType, Func<ArgumentT1, ReturnT>>((ContainerType o) =>
+                return o =>
                 {
-                    return new Func<ArgumentT1, ReturnT>((ArgumentT1 a1) =>
+                    return a1 =>
                     {
                         object result = method.Invoke(o, new object[] { a1 });
                         if (Equals(result, null))
-                            return default(ReturnT);
-                        else return (ReturnT)result;
-                    });
-                });
+                            return default;
+                        return (ReturnT)result;
+                    };
+                };
             }
             return new Dummy<ReturnT>(methodName).DummyMethod<ArgumentT1>;
         }
@@ -542,7 +536,7 @@ namespace EntityTools.Reflection
 
             Type type = typeof(ContainerType);
 
-            Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT2) };
+            Type[] argumentTypes = { typeof(ArgumentT1), typeof(ArgumentT2) };
 
             MethodInfo method = null;
 
@@ -558,16 +552,16 @@ namespace EntityTools.Reflection
             }
             if (method != null)
             {
-                return new Func<ContainerType, Func<ArgumentT1, ArgumentT2, ReturnT>>((ContainerType o) =>
+                return o =>
                 {
-                    return new Func<ArgumentT1, ArgumentT2, ReturnT>((ArgumentT1 a1, ArgumentT2 a2) =>
+                    return (a1, a2) =>
                     {
                         object result = method.Invoke(o, new object[] { a1, a2 });
                         if (Equals(result, null))
-                            return default(ReturnT);
-                        else return (ReturnT)result;
-                    });
-                });
+                            return default;
+                        return (ReturnT)result;
+                    };
+                };
             }
             return new Dummy<ReturnT>(methodName).DummyMethod<ArgumentT1, ArgumentT2>;
         }
@@ -592,7 +586,7 @@ namespace EntityTools.Reflection
 
             Type type = typeof(ContainerType);
 
-            Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3) };
+            Type[] argumentTypes = { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3) };
 
             MethodInfo method = null;
 
@@ -608,16 +602,16 @@ namespace EntityTools.Reflection
             }
             if (method != null)
             {
-                return new Func<ContainerType, Func<ArgumentT1, ArgumentT2, ArgumentT3, ReturnT>>((ContainerType o) =>
+                return o =>
                 {
-                    return new Func<ArgumentT1, ArgumentT2, ArgumentT3, ReturnT>((ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3) =>
+                    return (a1, a2, a3) =>
                     {
                         object result = method.Invoke(o, new object[] { a1, a2, a3 });
                         if (Equals(result, null))
-                            return default(ReturnT);
-                        else return (ReturnT)result;
-                    });
-                });
+                            return default;
+                        return (ReturnT)result;
+                    };
+                };
             }
             return new Dummy<ReturnT>(methodName).DummyMethod<ArgumentT1, ArgumentT2, ArgumentT3>;
         }
@@ -643,7 +637,7 @@ namespace EntityTools.Reflection
 
             Type type = typeof(ContainerType);
 
-            Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4) };
+            Type[] argumentTypes = { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4) };
 
             MethodInfo method = null;
 
@@ -659,16 +653,16 @@ namespace EntityTools.Reflection
             }
             if (method != null)
             {
-                return new Func<ContainerType, Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ReturnT>>((ContainerType o) =>
+                return o =>
                 {
-                    return new Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ReturnT>((ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3, ArgumentT4 a4) =>
+                    return (a1, a2, a3, a4) =>
                     {
                         object result = method.Invoke(o, new object[] { a1, a2, a3, a4 });
                         if (Equals(result, null))
-                            return default(ReturnT);
-                        else return (ReturnT)result;
-                    });
-                });
+                            return default;
+                        return (ReturnT)result;
+                    };
+                };
             }
             return new Dummy<ReturnT>(methodName).DummyMethod<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4>;
         }
@@ -695,7 +689,7 @@ namespace EntityTools.Reflection
 
             Type type = typeof(ContainerType);
 
-            Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4), typeof(ArgumentT5) };
+            Type[] argumentTypes = { typeof(ArgumentT1), typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4), typeof(ArgumentT5) };
 
             MethodInfo method = null;
 
@@ -711,16 +705,16 @@ namespace EntityTools.Reflection
             }
             if (method != null)
             {
-                return new Func<ContainerType, Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5, ReturnT>>((ContainerType o) =>
+                return o =>
                 {
-                    return new Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5, ReturnT>((ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3, ArgumentT4 a4, ArgumentT5 a5) =>
+                    return (a1, a2, a3, a4, a5) =>
                     {
                         object result = method.Invoke(o, new object[] { a1, a2, a3, a4, a5 });
                         if (Equals(result, null))
                             return default;
-                        else return (ReturnT)result;
-                    });
-                });
+                        return (ReturnT)result;
+                    };
+                };
             }
             return new Dummy<ReturnT>(methodName).DummyMethod<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5>;
         }

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace EntityTools.Reflection
 {
@@ -28,7 +25,7 @@ namespace EntityTools.Reflection
             if (flags == BindingFlags.Default)
                 flags = ReflectionHelper.DefaultFlags;
 
-            Type[] argumentTypes = new Type[] { };
+            Type[] argumentTypes = { };
 
             MethodInfo method = null;
 
@@ -46,18 +43,18 @@ namespace EntityTools.Reflection
             }
             if (method!=null)
             {
-                return new Func<object, Action>((object o) =>
-                                {
-                                    if (o != null
-                                        && Equals(o.GetType(), type))
-                                    {
-                                        return new Action(() =>
-                                            {
-                                                method.Invoke(o, new object[] { });
-                                            });
-                                    }
-                                    return null;
-                                });
+                return o =>
+                {
+                    if (o != null
+                        && Equals(o.GetType(), type))
+                    {
+                        return () =>
+                        {
+                            method.Invoke(o, new object[] { });
+                        };
+                    }
+                    return null;
+                };
             }
             return null;
         }
@@ -81,7 +78,7 @@ namespace EntityTools.Reflection
             if (flags == BindingFlags.Default)
                 flags = ReflectionHelper.DefaultFlags;
 
-            Type[] argumentTypes = new Type[] { typeof(ArgumentT1) };
+            Type[] argumentTypes = { typeof(ArgumentT1) };
 
             MethodInfo method = null;
 
@@ -99,18 +96,18 @@ namespace EntityTools.Reflection
             }
             if (method != null)
             {
-                return new Func<object, Action<ArgumentT1>>((object o) =>
+                return o =>
                 {
                     if (o != null
                         && Equals(o.GetType(), type))
                     {
-                        return new Action<ArgumentT1>((ArgumentT1 a1) =>
+                        return a1 =>
                         {
                             method.Invoke(o, new object[] { a1 });
-                        });
+                        };
                     }
                     return null;
-                });
+                };
             }
             return null;
         }
@@ -133,7 +130,7 @@ namespace EntityTools.Reflection
             if (flags == BindingFlags.Default)
                 flags = ReflectionHelper.DefaultFlags;
 
-            Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT2) };
+            Type[] argumentTypes = { typeof(ArgumentT1), typeof(ArgumentT2) };
 
             MethodInfo method = null;
 
@@ -151,18 +148,18 @@ namespace EntityTools.Reflection
             }
             if (method != null)
             {
-                return new Func<object, Action<ArgumentT1, ArgumentT2>>((object o) =>
+                return o =>
                 {
                     if (o != null
                         && Equals(o.GetType(), type))
                     {
-                        return new Action<ArgumentT1, ArgumentT2>((ArgumentT1 a1, ArgumentT2 a2) =>
+                        return (a1, a2) =>
                         {
                             method.Invoke(o, new object[] { a1, a2 });
-                        });
+                        };
                     }
                     return null;
-                });
+                };
             }
             return null;
         }
@@ -182,7 +179,7 @@ namespace EntityTools.Reflection
             if (Equals(type, null))
                 return null;
 
-            Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3) };
+            Type[] argumentTypes = { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3) };
 
             MethodInfo method = null;
 
@@ -200,18 +197,18 @@ namespace EntityTools.Reflection
             }
             if (method != null)
             {
-                return new Func<object, Action<ArgumentT1, ArgumentT2, ArgumentT3>>((object o) =>
+                return o =>
                 {
                     if (o != null
                         && Equals(o.GetType(), type))
                     {
-                        return new Action<ArgumentT1, ArgumentT2, ArgumentT3>((ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3) =>
+                        return (a1, a2, a3) =>
                         {
                             method.Invoke(o, new object[] { a1, a2, a3 });
-                        });
+                        };
                     }
                     return null;
-                });
+                };
             }
             return null;
         }
@@ -234,7 +231,7 @@ namespace EntityTools.Reflection
             if (flags == BindingFlags.Default)
                 flags = ReflectionHelper.DefaultFlags;
 
-            Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4) };
+            Type[] argumentTypes = { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4) };
 
             MethodInfo method = null;
 
@@ -252,18 +249,18 @@ namespace EntityTools.Reflection
             }
             if (method != null)
             {
-                return new Func<object, Action<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4>>((object o) =>
+                return o =>
                 {
                     if (o != null
                         && Equals(o.GetType(), type))
                     {
-                        return new Action<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4>((ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3, ArgumentT4 a4) =>
+                        return (a1, a2, a3, a4) =>
                         {
                             method.Invoke(o, new object[] { a1, a2, a3, a4 });
-                        });
+                        };
                     }
                     return null;
-                });
+                };
             }
             return null;
         }
@@ -286,7 +283,7 @@ namespace EntityTools.Reflection
             if (flags == BindingFlags.Default)
                 flags = ReflectionHelper.DefaultFlags;
 
-            Type[] argumentTypes = new Type[] { typeof(ArgumentT1), typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4), typeof(ArgumentT5) };
+            Type[] argumentTypes = { typeof(ArgumentT1), typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4), typeof(ArgumentT5) };
 
             MethodInfo method = null;
 
@@ -304,18 +301,18 @@ namespace EntityTools.Reflection
             }
             if (method != null)
             {
-                return new Func<object, Action<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5>>((object o) =>
+                return o =>
                 {
                     if (o != null
                         && Equals(o.GetType(), type))
                     {
-                        return new Action<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5>((ArgumentT1 a1, ArgumentT2 a2, ArgumentT3 a3, ArgumentT4 a4, ArgumentT5 a5) =>
+                        return (a1, a2, a3, a4, a5) =>
                         {
                             method.Invoke(o, new object[] { a1, a2, a3, a4, a5 });
-                        });
+                        };
                     }
                     return null;
-                });
+                };
             }
             return null;
         }

@@ -1,10 +1,7 @@
-﻿using Astral.Logic.UCC.Classes;
+﻿using System;
+using Astral.Logic.UCC.Classes;
 using EntityTools.Core.Interfaces;
 using EntityTools.UCC.Conditions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace EntityTools.Core.Proxies
 {
@@ -22,7 +19,7 @@ namespace EntityTools.Core.Proxies
             if (EntityTools.Core.Initialize(condition))
                 return condition.IsOK(refAction);
 
-            ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
+            ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
 
             EntityTools.StopBot();
 
@@ -33,7 +30,7 @@ namespace EntityTools.Core.Proxies
         {
             if (EntityTools.Core.Initialize(condition))
                 return condition.ToString();
-            else return condition.GetType().Name;
+            return condition.GetType().Name;
         }
 
         public string TestInfos(UCCAction refAction)
@@ -42,9 +39,10 @@ namespace EntityTools.Core.Proxies
             {
                 if (condition is ICustomUCCCondition iCond)
                     return iCond.TestInfos(refAction);
-                else return $"{condition.GetType().Name} | Result: {condition.IsOK(refAction)}!";
+                return $"{condition.GetType().Name} | Result: {condition.IsOK(refAction)}!";
             }
-            else return $"{condition.GetType().Name}: not initialized!";
+
+            return $"{condition.GetType().Name}: not initialized!";
         }
     }
 }

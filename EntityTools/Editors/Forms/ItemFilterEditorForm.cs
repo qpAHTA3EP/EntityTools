@@ -1,26 +1,21 @@
-﻿using Astral.Classes.ItemFilter;
-using Astral.Controllers;
-using Astral.Quester.Forms;
-using DevExpress.XtraBars;
-using DevExpress.XtraEditors;
-using DevExpress.XtraEditors.Controls;
-using DevExpress.XtraEditors.Repository;
-using EntityTools.Enums;
-using EntityTools.Tools.BuySellItems;
-using MyNW.Classes;
-using MyNW.Internals;
-using MyNW.Patchables.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using System.Xml;
 using System.Xml.Serialization;
+using Astral.Classes.ItemFilter;
+using Astral.Controllers;
+using Astral.Quester.Forms;
+using DevExpress.XtraEditors;
+using DevExpress.XtraEditors.Controls;
+using DevExpress.XtraGrid.Views.Grid;
+using EntityTools.Enums;
+using EntityTools.Reflection;
+using EntityTools.Tools.BuySellItems;
+using MyNW.Internals;
+using MyNW.Patchables.Enums;
 
 namespace EntityTools.Forms
 {
@@ -72,7 +67,7 @@ namespace EntityTools.Forms
                     @this.filter.Clear();
                     if (originalList != null)
                         foreach (var f in originalList)
-                            @this.filter.Add(Reflection.CopyHelper.CreateDeepCopy(f));
+                            @this.filter.Add(CopyHelper.CreateDeepCopy(f));
                 };
             else @this.fillListAction = null;
 
@@ -83,7 +78,8 @@ namespace EntityTools.Forms
                 list = @this.filter.ToList();
                 return true;
             }
-            else return false;
+
+            return false;
         }
 
         #region Обработчики
@@ -237,11 +233,9 @@ namespace EntityTools.Forms
                                 return;
                         }
                     }
-                    else
-                    {
-                        foreach (var item in newFilter)
-                            filter.Add(item);
-                    }
+
+                    foreach (var item in newFilter)
+                        filter.Add(item);
                 }
                 else
                 {
@@ -268,7 +262,8 @@ namespace EntityTools.Forms
                                 return;
                         }
                     }
-                    else XtraMessageBox.Show("Empty or file opening error.");
+
+                    XtraMessageBox.Show("Empty or file opening error.");
                 }
             }
         }
@@ -292,7 +287,7 @@ namespace EntityTools.Forms
         /// <param name="e"></param>
         private void btnEditItemFilterEntry_ButtonClick(object sender, ButtonPressedEventArgs e)
         {
-            if (purchaseOptions.FocusedView is DevExpress.XtraGrid.Views.Grid.GridView gridView)
+            if (purchaseOptions.FocusedView is GridView gridView)
             {
                 if (gridView.GetFocusedRowCellValue(colEntryType) is ItemFilterEntryType fType)
                 {
@@ -321,7 +316,7 @@ namespace EntityTools.Forms
                         if (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.ScreenType == ScreenType.Store
                             || EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.ScreenType == ScreenType.StoreCollection)
                             rewardItem = GetAnItem.Show(1);
-                        else rewardItem = GetAnItem.Show(0);
+                        else rewardItem = GetAnItem.Show();
 
                         if (rewardItem != null && !string.IsNullOrEmpty(rewardItem.ItemId))
                         {

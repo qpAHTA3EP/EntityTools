@@ -1,15 +1,12 @@
-﻿using Astral.Classes.ItemFilter;
+﻿using System;
+using System.Collections.Generic;
+using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
 using Astral.Quester.Classes;
 using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
-using EntityTools.Tools;
 using MyNW.Classes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
+using Action = System.Action;
 
 namespace EntityTools.Core
 {
@@ -19,7 +16,7 @@ namespace EntityTools.Core
         {
             throw new NotImplementedException();
         }
-        internal static void Initialize(ref System.Action method)
+        internal static void Initialize(ref Action method)
         {
             throw new NotImplementedException(); 
         }

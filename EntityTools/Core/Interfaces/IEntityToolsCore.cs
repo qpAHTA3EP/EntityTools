@@ -1,10 +1,11 @@
-﻿using Astral.Classes.ItemFilter;
+﻿using System;
+using System.Collections.Generic;
+using Astral.Classes.ItemFilter;
+using Astral.Logic.UCC.Classes;
 using Astral.Quester.Classes;
 using EntityTools.Enums;
-using EntityTools.Tools;
 using MyNW.Classes;
-using System;
-using System.Collections.Generic;
+using Action = Astral.Quester.Classes.Action;
 using UCCConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 
 namespace EntityTools.Core.Interfaces
@@ -14,10 +15,10 @@ namespace EntityTools.Core.Interfaces
         bool CheckCore();
 
         bool Initialize(object obj);
-        bool Initialize(Astral.Quester.Classes.Action action);
-        bool Initialize(Astral.Quester.Classes.Condition condition);
-        bool Initialize(Astral.Logic.UCC.Classes.UCCAction action);
-        bool Initialize(Astral.Logic.UCC.Classes.UCCCondition condition);
+        bool Initialize(Action action);
+        bool Initialize(Condition condition);
+        bool Initialize(UCCAction action);
+        bool Initialize(UCCCondition condition);
 #if DEVELOPER
         bool GUIRequest_Item<T>(Func<IEnumerable<T>> source, ref T selectedValue);
         bool GUIRequest_AuraId(ref string id);
@@ -29,7 +30,7 @@ namespace EntityTools.Core.Interfaces
         bool GUIRequest_NodeLocation(ref Vector3 pos, string caption);
         bool GUIRequest_NPCInfos(ref NPCInfos npc);
 
-        bool GUIRequest_UCCAction(out Astral.Logic.UCC.Classes.UCCAction action);
+        bool GUIRequest_UCCAction(out UCCAction action);
 
         string EntityDiagnosticInfos(object obj);
 #endif

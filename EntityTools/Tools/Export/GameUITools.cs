@@ -1,10 +1,7 @@
-﻿using MyNW.Classes;
-using MyNW.Internals;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Serialization;
+using MyNW.Classes;
+using MyNW.Internals;
 
 namespace EntityTools.Tools
 {
@@ -45,7 +42,7 @@ namespace EntityTools.Tools
             IsVisible = uiGen.IsVisible;
             foreach (UIVar v in uiGen.Vars)
             {
-                uiVars.Add(new UIVarDef()
+                uiVars.Add(new UIVarDef
                 {
                     Name = v.Name,
                     Value = v.Value
@@ -59,7 +56,5 @@ namespace EntityTools.Tools
     {
         public string Name { get; set; } = string.Empty;
         public object Value { get; set; } = string.Empty;
-
-        public UIVarDef() { }
     }
 }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace EntityTools.Extensions
+﻿namespace EntityTools.Extensions
 {
     public static class ArrayExtensions
     {
@@ -52,7 +47,6 @@ namespace EntityTools.Extensions
             {
                 array[i] = value;
             }
-            return;
         }
     }
 }

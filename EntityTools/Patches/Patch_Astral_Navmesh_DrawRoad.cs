@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-using Astral.Logic.Classes.Map;
 using System.Drawing;
-using MyNW.Classes;
+using System.Reflection;
+using Astral.Logic;
+using Astral.Logic.Classes.Map;
 using EntityTools.Reflection;
+using MyNW.Classes;
 
 namespace EntityTools.Patches.Mapper
 {
@@ -12,7 +13,7 @@ namespace EntityTools.Patches.Mapper
     {
         internal Patch_Astral_Navmesh_DrawRoad()
         {
-            MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("DrawRoad", ReflectionHelper.DefaultFlags);
+            MethodInfo mi = typeof(Navmesh).GetMethod("DrawRoad", ReflectionHelper.DefaultFlags);
             if (mi != null)
             {
                 methodToReplace = mi;

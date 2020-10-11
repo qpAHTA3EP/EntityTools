@@ -1,10 +1,9 @@
-﻿using AStar;
-using Astral.Logic.Classes.Map;
-using EntityTools.Reflection;
-using MyNW.Classes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using AStar;
+using Astral.Logic.Classes.Map;
+using MyNW.Classes;
 using static EntityTools.Reflection.InstanceFieldAccessorFactory;
 
 namespace EntityTools.Patches.Mapper
@@ -170,7 +169,7 @@ namespace EntityTools.Patches.Mapper
                 Point[] destPoints;
                 if (num3 >= 0.0 && num3 < 1.5707963267948966)
                 {
-                    destPoints = new Point[]
+                    destPoints = new[]
                     {
                         new Point((int)num7, 0),
                         new Point(num8, (int)num5),
@@ -179,7 +178,7 @@ namespace EntityTools.Patches.Mapper
                 }
                 else if (num3 >= 1.5707963267948966 && num3 < 3.1415926535897931)
                 {
-                    destPoints = new Point[]
+                    destPoints = new[]
                     {
                         new Point(num8, (int)num5),
                         new Point((int)num4, num9),
@@ -188,7 +187,7 @@ namespace EntityTools.Patches.Mapper
                 }
                 else if (num3 >= 3.1415926535897931 && num3 < 4.71238898038469)
                 {
-                    destPoints = new Point[]
+                    destPoints = new[]
                     {
                         new Point((int)num4, num9),
                         new Point(0, (int)num6),
@@ -197,7 +196,7 @@ namespace EntityTools.Patches.Mapper
                 }
                 else
                 {
-                    destPoints = new Point[]
+                    destPoints = new[]
                     {
                         new Point(0, (int)num6),
                         new Point((int)num7, 0),

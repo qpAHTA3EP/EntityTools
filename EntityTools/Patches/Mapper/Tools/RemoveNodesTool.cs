@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.Windows.Forms;
 using AStar;
-using EntityTools.Patches.Mapper.Tools;
 
 namespace EntityTools.Patches.Mapper.Tools
 {
@@ -57,7 +56,7 @@ namespace EntityTools.Patches.Mapper.Tools
         private static void drawSelectedNode(MapperGraphics graphics, Node node)
         {
             graphics.FillCircleCentered(Brushes.White, node.Position, 14);
-            graphics.FillCircleCentered(Brushes.Red, node.Position, 8);
+            graphics.FillCircleCentered(Brushes.Red, node.Position);
         }
 
         public bool HandleKeyUp => true;

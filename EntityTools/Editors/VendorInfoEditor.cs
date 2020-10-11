@@ -1,20 +1,16 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Linq;
 using System.Windows.Forms;
 using Astral.Logic.NW;
 using Astral.Quester.Classes;
 using Astral.Quester.Forms;
-using Astral.Quester.UIEditors.Forms;
 using DevExpress.XtraEditors;
 using EntityTools.Enums;
-using EntityTools.Reflection;
 using EntityTools.Tools.BuySellItems;
 using MyNW.Classes;
 using MyNW.Internals;
 //using static EntityTools.Reflection.PrivateConsructor;
-using NPCInfos = Astral.Quester.Classes.NPCInfos;
 
 namespace EntityTools.Editors
 {
@@ -26,7 +22,7 @@ namespace EntityTools.Editors
         static readonly InstanceFieldAccessor<GetAnId, System.Action> vendorTypeSelectForm_RefreshList;
         static readonly InstanceFieldAccessor<GetAnId, ListBoxControl> vendorTypeSelectForm_List; 
 #else
-        private static readonly VendorType[] displayedVendors = new VendorType[] { //VendorType.Auto,
+        private static readonly VendorType[] displayedVendors = { //VendorType.Auto,
                                                                           VendorType.Normal,
                                                                           VendorType.ArtifactVendor,
                                                                           VendorType.RemoteVendor,
@@ -89,14 +85,14 @@ namespace EntityTools.Editors
                             Entity betterEntityToInteract = Interact.GetBetterEntityToInteract();
                             if (betterEntityToInteract.IsValid)
                             {
-                                vendor = new VendorInfo()
+                                vendor = new VendorInfo
                                 {
                                     VendorType = vndType,
                                     CostumeName = betterEntityToInteract.CostumeRef.CostumeName,
                                     DisplayName = betterEntityToInteract.Name,
                                     Position = betterEntityToInteract.Location.Clone(),
                                     MapName = EntityManager.LocalPlayer.MapState.MapName,
-                                    RegionName = EntityManager.LocalPlayer.RegionInternalName,
+                                    RegionName = EntityManager.LocalPlayer.RegionInternalName
                                 };
                                 return true;
                             }
@@ -106,11 +102,11 @@ namespace EntityTools.Editors
                         string contactName = GetAnId.GetARemoteContact();
                         if (!string.IsNullOrEmpty(contactName))
                         {
-                            vendor = new VendorInfo()
+                            vendor = new VendorInfo
                             {
                                 VendorType = vndType,
                                 CostumeName = contactName,
-                                DisplayName = contactName,
+                                DisplayName = contactName
                             };
                             if ((XtraMessageBox.Show("Call it now ?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes))
                             {
@@ -127,11 +123,11 @@ namespace EntityTools.Editors
                         }
                         return !string.IsNullOrEmpty(contactName);
                     default:
-                        vendor = new VendorInfo()
+                        vendor = new VendorInfo
                         {
                             VendorType = vndType,
                             CostumeName = vndType.ToString(),
-                            DisplayName = vndType.ToString(),
+                            DisplayName = vndType.ToString()
                         };
                         return true;
                 }

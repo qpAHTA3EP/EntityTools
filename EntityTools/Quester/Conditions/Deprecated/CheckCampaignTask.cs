@@ -1,15 +1,10 @@
-﻿using Astral.Logic.NW;
+﻿using System;
+using System.ComponentModel;
+using System.Drawing.Design;
 using Astral.Quester.Classes;
 using EntityTools.Editors;
 using MyNW.Classes.GroupProject;
 using MyNW.Internals;
-using MyNW.Patchables.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Linq;
-using System.Text;
 
 namespace EntityTools.Quester.Conditions
 {
@@ -21,7 +16,7 @@ namespace EntityTools.Quester.Conditions
     }
 
     [Serializable]
-    public class CheckCampaignTask : Astral.Quester.Classes.Condition
+    public class CheckCampaignTask : Condition
     {
         public override void Reset() { }
 
@@ -92,7 +87,7 @@ namespace EntityTools.Quester.Conditions
                         if(taskDef != null && taskDef.IsValid)
                             return $"Task [{Task.TaskName}] completed";
                             //return $"Task {{[{Task.GroupProject}] {Task.TaskName}}} completed";
-                        else return $"Task [{Task.TaskName}] NOT completed";
+                        return $"Task [{Task.TaskName}] NOT completed";
                     }
                 }
 

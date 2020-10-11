@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace EntityTools.Reflection
 {
@@ -21,21 +18,21 @@ namespace EntityTools.Reflection
                              GetStaticAction<ArgumentT1>(this Type containerType, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
             return ConstructStaticAction<Action<ArgumentT1>>(containerType, methodName,
-                            new Type[] { typeof(ArgumentT1) }, flags);
+                            new[] { typeof(ArgumentT1) }, flags);
         }
 
         public static Action<ArgumentT1, ArgumentT2>
                              GetStaticAction<ArgumentT1, ArgumentT2>(this Type containerType, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
             return ConstructStaticAction<Action<ArgumentT1, ArgumentT2>>(containerType, methodName,
-                            new Type[] { typeof(ArgumentT1), typeof(ArgumentT2) }, flags);
+                            new[] { typeof(ArgumentT1), typeof(ArgumentT2) }, flags);
         }
 
         public static Action<ArgumentT1, ArgumentT2, ArgumentT3>
                              GetStaticAction<ArgumentT1, ArgumentT2, ArgumentT3>(this Type containerType, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
             return ConstructStaticAction<Action<ArgumentT1, ArgumentT2, ArgumentT3>>(containerType, methodName,
-                            new Type[] { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3) },
+                            new[] { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3) },
                             flags);
         }
 
@@ -43,7 +40,7 @@ namespace EntityTools.Reflection
                              GetStaticAction<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4>(this Type containerType, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
             return ConstructStaticAction<Action<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4>>(containerType, methodName,
-                            new Type[] { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4) },
+                            new[] { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4) },
                             flags);
         }
 
@@ -51,7 +48,7 @@ namespace EntityTools.Reflection
                              GetStaticVoidDelegate<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5>(this Type containerType, string methodName, BindingFlags flags = BindingFlags.Default)
         {
             return ConstructStaticAction<Action<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5>>(containerType, methodName,
-                            new Type[] { typeof(ArgumentT1), typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4), typeof(ArgumentT5) },
+                            new[] { typeof(ArgumentT1), typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4), typeof(ArgumentT5) },
                             flags);
         }
 

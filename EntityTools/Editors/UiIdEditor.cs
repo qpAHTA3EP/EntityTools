@@ -1,11 +1,6 @@
-﻿using MyNW.Internals;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
 
 namespace EntityTools.Editors
 {

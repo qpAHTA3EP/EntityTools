@@ -1,20 +1,21 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using Astral.Logic.Classes.Map;
-using Astral.Quester.Forms;
-using Astral.Quester.UIEditors;
-using MyNW.Classes;
 using System.Runtime.CompilerServices;
-using EntityTools.Core.Proxies;
+using Astral.Logic.Classes.Map;
+using Astral.Quester.UIEditors;
 using EntityTools.Core.Interfaces;
+using EntityTools.Core.Proxies;
+using MyNW.Classes;
+using Action = Astral.Quester.Classes.Action;
+using NPCInfos = Astral.Quester.Classes.NPCInfos;
 
 [assembly: InternalsVisibleTo("EntityCore")]
 
 namespace EntityTools.Quester.Actions
 {
     [Serializable]
-    public class PickUpMissionExt : Astral.Quester.Classes.Action,
+    public class PickUpMissionExt : Action,
                                     INotifyPropertyChanged
     {
         #region Опции команды
@@ -55,7 +56,7 @@ namespace EntityTools.Quester.Actions
 
             }
         }
-        internal bool _skipOnFail = false;
+        internal bool _skipOnFail;
 
 #if DEVELOPER
         [Editor(typeof(Astral.Quester.UIEditors.NPCInfos), typeof(UITypeEditor))]
@@ -63,7 +64,7 @@ namespace EntityTools.Quester.Actions
 #else
         [Browsable(false)]
 #endif
-        public Astral.Quester.Classes.NPCInfos Giver
+        public NPCInfos Giver
         {
             get => _giver;
             set
@@ -75,7 +76,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal Astral.Quester.Classes.NPCInfos _giver = new Astral.Quester.Classes.NPCInfos();
+        internal NPCInfos _giver = new NPCInfos();
 
 #if !DEVELOPER
         [Browsable(false)]
@@ -92,7 +93,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal bool _closeContactDialog = false;
+        internal bool _closeContactDialog;
 
 #if !DEVELOPER
         [Browsable(false)]
@@ -109,7 +110,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal float _interactDistance = 0f;
+        internal float _interactDistance;
 
 #if !DEVELOPER
         [Browsable(false)]

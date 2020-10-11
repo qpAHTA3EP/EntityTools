@@ -1,10 +1,8 @@
-﻿using Astral.Quester.Classes;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Linq;
-using System.Text;
+using Astral.Quester.Classes;
+using Astral.Quester.Forms;
 
 namespace EntityTools.Editors
 {
@@ -13,7 +11,7 @@ namespace EntityTools.Editors
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            return Astral.Quester.Forms.GetACampaignTask.Show(value as CampaignTask);
+            return GetACampaignTask.Show(value as CampaignTask);
         }
 
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)

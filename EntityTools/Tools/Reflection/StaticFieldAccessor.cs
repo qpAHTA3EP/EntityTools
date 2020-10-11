@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace EntityTools.Reflection
 {
@@ -72,7 +69,7 @@ namespace EntityTools.Reflection
                 object result = fieldInfo?.GetValue(null);
                 if (result != null)
                     return (FieldType)result;
-                else return default(FieldType);                
+                return default;
             }
             set
             {

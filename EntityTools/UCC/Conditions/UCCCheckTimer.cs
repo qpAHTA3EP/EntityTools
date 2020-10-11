@@ -1,15 +1,9 @@
-﻿using Astral.Logic.UCC.Classes;
-using Astral.Logic.UCC.Ressources;
+﻿using System;
 using System.ComponentModel;
 using System.Xml.Serialization;
-using Astral.Quester.Classes;
-using EntityTools.Editors;
-using System.Drawing.Design;
-using System;
-using Sign = Astral.Logic.UCC.Ressources.Enums.Sign;
+using Astral.Logic.UCC.Classes;
 using EntityTools.Enums;
 using EntityTools.Tools;
-using EntityTools;
 
 namespace EntityTools.UCC.Conditions
 {
@@ -35,7 +29,7 @@ namespace EntityTools.UCC.Conditions
 
         [Category("Timer")]
         [Description("Тип сопоставления 'Time' со периодом времени, заданным 'TestTimer'\n\rComparison type for Time")]
-        public new Sign Sign { get; set; }
+        public new Astral.Logic.UCC.Ressources.Enums.Sign Sign { get; set; }
         #endregion
 
         #region ICustomUCCCondition
@@ -51,13 +45,13 @@ namespace EntityTools.UCC.Conditions
 
                         switch (Sign)
                         {
-                            case Sign.Equal:
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
                                 return left == Time;
-                            case Sign.NotEqual:
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
                                 return left != Time;
-                            case Sign.Inferior:
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
                                 return left < Time;
-                            case Sign.Superior:
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
                                 return left > Time;
                         }
                         break;
@@ -66,13 +60,13 @@ namespace EntityTools.UCC.Conditions
 
                         switch (Sign)
                         {
-                            case Sign.Equal:
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
                                 return passed == Time;
-                            case Sign.NotEqual:
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
                                 return passed != Time;
-                            case Sign.Inferior:
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
                                 return passed < Time;
-                            case Sign.Superior:
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
                                 return passed > Time;
                         }
                         break;
@@ -84,20 +78,20 @@ namespace EntityTools.UCC.Conditions
                 // время с момента старта таймера также 0 мс
                 switch (Sign)
                 {
-                    case Sign.Equal:
+                    case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
                         return Time == 0;
-                    case Sign.NotEqual:
+                    case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
                         return Time != 0;
-                    case Sign.Inferior:
+                    case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
                         return false;
-                    case Sign.Superior:
+                    case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
                         return false;
                 }
             } 
             return false;
         }
 
-        bool ICustomUCCCondition.Loked { get => base.Locked; set => base.Locked = value; }
+        bool ICustomUCCCondition.Loked { get => Locked; set => Locked = value; }
 
         string ICustomUCCCondition.TestInfos(UCCAction refAction)
         {
@@ -111,7 +105,8 @@ namespace EntityTools.UCC.Conditions
                     $"\tLeft: {left} ms\n" +
                     $"\tPassed: {passed} ms";
             }
-            else return $"Timer '{TimerName}' was not initialized";
+
+            return $"Timer '{TimerName}' was not initialized";
         }
         #endregion
 

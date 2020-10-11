@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Drawing;
 using System.Windows.Forms;
 using AStar;
-using EntityTools.Patches.Mapper.Tools;
-using HarmonyLib;
 using Astral.Quester.Classes;
-using MyNW.Classes;
 
 namespace EntityTools.Patches.Mapper.Tools
 {
@@ -63,12 +57,12 @@ namespace EntityTools.Patches.Mapper.Tools
         /// </summary>
         private CustomRegion customRegion;
 
-        private bool changed = false;
+        private bool changed;
 
         /// <summary>
         /// Флаг, указывающий является ли CustomRegion элиптическим
         /// </summary>
-        public bool IsElliptical { get; set; } = false;
+        public bool IsElliptical { get; set; }
 
         /// <summary>
         /// Имя CustomRegion'a
@@ -210,7 +204,7 @@ namespace EntityTools.Patches.Mapper.Tools
         }
 
         public bool Applied => _applied;
-        private bool _applied = false;
+        private bool _applied;
 
         public CustomRegion Apply(string name = "")
         {

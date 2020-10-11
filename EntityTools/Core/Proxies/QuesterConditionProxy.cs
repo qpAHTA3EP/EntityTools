@@ -1,15 +1,13 @@
-﻿using EntityTools.Quester.Conditions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
+using Astral.Quester.Classes;
+using EntityTools.Quester.Conditions;
 
 namespace EntityTools.Core.Proxies
 {
     internal class QuesterConditionProxy : IQuesterConditionEngine
     {
-        Astral.Quester.Classes.Condition condition;
-        internal QuesterConditionProxy(Astral.Quester.Classes.Condition c)
+        Condition condition;
+        internal QuesterConditionProxy(Condition c)
         {
             condition = c ?? throw new ArgumentNullException();
 

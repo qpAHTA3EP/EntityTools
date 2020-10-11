@@ -1,10 +1,11 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Threading;
+using System.Windows.Forms;
+using Astral;
 using Astral.Logic.NW;
-using EntityTools.Enums;
 using MyNW.Classes;
 using MyNW.Internals;
-using System;
-using System.Threading;
+using Timeout = Astral.Classes.Timeout;
 
 namespace EntityTools.Tools
 {
@@ -20,7 +21,7 @@ namespace EntityTools.Tools
         {
             if (!MapTransfer.CanChangeInstance)
             {
-                Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);
+                Timeout timeout = new Timeout(5000);
                 while (!MapTransfer.CanChangeInstance)
                 {
                     if (EntityManager.LocalPlayer.InCombat)
@@ -53,7 +54,7 @@ namespace EntityTools.Tools
 
                 if (!EntityManager.LocalPlayer.InCombat)
                 {
-                    Astral.Logger.WriteLine($"Change to instance {mapInstance.InstanceIndex} ...");
+                    Logger.WriteLine($"Change to instance {mapInstance.InstanceIndex} ...");
                     ETLogger.WriteLine($"Change to instance {mapInstance.InstanceIndex} ...");
                     mapInstance.Transfer();
                     Thread.Sleep(7500);

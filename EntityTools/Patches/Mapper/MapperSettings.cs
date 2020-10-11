@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
-using System.Text;
+using System.Windows.Forms;
 using System.Xml.Serialization;
 using EntityTools.Patches.Mapper;
 
@@ -25,7 +23,7 @@ namespace EntityTools.Settings
                 if (patch != value)
                 {
                     patch = value;
-                    base.NotifyPropertyChanged(nameof(Patch));
+                    NotifyPropertyChanged(nameof(Patch));
                 }
             }
         }
@@ -44,7 +42,7 @@ namespace EntityTools.Settings
                 if (waypointDistance != value)
                 {
                     waypointDistance = Math.Max(5, value);
-                    base.NotifyPropertyChanged(nameof(WaypointDistance));
+                    NotifyPropertyChanged(nameof(WaypointDistance));
                     WaypointEquivalenceDistance = Math.Min(waypointDistance / 2, waypointEquivalenceDistance);
                 }
             }
@@ -64,12 +62,12 @@ namespace EntityTools.Settings
                 if (waypointEquivalenceDistance != value)
                 {
                     waypointEquivalenceDistance = Math.Max(2, Math.Min(value, WaypointDistance / 2)); ;
-                    base.NotifyPropertyChanged(nameof(WaypointEquivalenceDistance));
+                    NotifyPropertyChanged(nameof(WaypointEquivalenceDistance));
                 }
             }
         }
         //[NonSerialized]
-        private int waypointEquivalenceDistance = 5;
+        private int waypointEquivalenceDistance = 10;
 
         /// <summary>
         /// Максимальная допустимая разница высот между точками пути, соединяемыми в режиме добавления
@@ -83,7 +81,7 @@ namespace EntityTools.Settings
                 if (maxElevationDifference != value)
                 {
                     maxElevationDifference = Math.Max(2, value);
-                    base.NotifyPropertyChanged(nameof(MaxElevationDifference));
+                    NotifyPropertyChanged(nameof(MaxElevationDifference));
                 }
             }
         }
@@ -102,12 +100,32 @@ namespace EntityTools.Settings
                 if (cacheActive != value)
                 {
                     cacheActive = value;
-                    base.NotifyPropertyChanged(nameof(CacheActive));
+                    NotifyPropertyChanged(nameof(CacheActive));
                 }
             }
         }
         //[NonSerialized]
         private bool cacheActive = true;
+        
+        /// <summary>
+        /// Радиус кэширования
+        /// </summary>
+        [Bindable(true)]
+        public int CacheRadius
+        {
+            get => cacheRadius;
+            set
+            {
+                if (value != cacheRadius)
+                {
+                    cacheRadius = Math.Max(value, Math.Max(50, waypointDistance * 3));
+                    NotifyPropertyChanged(nameof(CacheRadius));
+                }
+            }
+        }
+        //[NonSerialized]
+        private int cacheRadius = 50;
+
 
         /// <summary>
         /// Время обновления кэша
@@ -120,13 +138,13 @@ namespace EntityTools.Settings
             {
                 if (value != cacheRegenTimeout)
                 {
-                    cacheRegenTimeout = Math.Max(1000, value);
-                    base.NotifyPropertyChanged(nameof(cacheRegenTimeout));
+                    cacheRegenTimeout = Math.Max(500, value);
+                    NotifyPropertyChanged(nameof(cacheRegenTimeout));
                 }
             }
         }
         //[NonSerialized]
-        private int cacheRegenTimeout = 5000;
+        private int cacheRegenTimeout = 500;
 
         /// <summary>
         /// Принудительное связывание новой точки пути с предыдущей точкой
@@ -142,7 +160,7 @@ namespace EntityTools.Settings
                 if (forceLinkingWaypoint != value)
                 {
                     forceLinkingWaypoint = value;
-                    base.NotifyPropertyChanged(nameof(ForceLinkingWaypoint));
+                    NotifyPropertyChanged(nameof(ForceLinkingWaypoint));
                 }
             }
         }
@@ -162,7 +180,7 @@ namespace EntityTools.Settings
                 if (linearPath != value)
                 {
                     linearPath = value;
-                    base.NotifyPropertyChanged(nameof(LinearPath));
+                    NotifyPropertyChanged(nameof(LinearPath));
                 }
             }
         }
@@ -189,7 +207,7 @@ namespace EntityTools.Settings
         {
             get
             {
-                var screenSize = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size;
+                var screenSize = Screen.PrimaryScreen.Bounds.Size;
                 if (_location.X < 0 || _location.X > screenSize.Width)
                     _location.X = 60;
                 if (_location.Y < 0 || _location.Y > screenSize.Height)
@@ -201,14 +219,14 @@ namespace EntityTools.Settings
             {
                 if (_location != value)
                 {
-                    var screenSize = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size;
+                    var screenSize = Screen.PrimaryScreen.Bounds.Size;
                     if (value.X < 0 || value.X > screenSize.Width)
                         value.X = 60;
                     if (value.Y < 0 || value.Y > screenSize.Height)
                         value.Y = 60;
 
                     _location = value;
-                    base.NotifyPropertyChanged(nameof(Location));
+                    NotifyPropertyChanged(nameof(Location));
                 }
             }
         }
@@ -222,7 +240,7 @@ namespace EntityTools.Settings
         {
             get
             {
-                var screenSize = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size;
+                var screenSize = Screen.PrimaryScreen.Bounds.Size;
                 if (_size.Width < 10 || _size.Width > screenSize.Width)
                     _size.Width = 406;
                 if (_size.Height < 10 || _size.Height > screenSize.Height)
@@ -235,7 +253,7 @@ namespace EntityTools.Settings
                 if (_size != value)
                 {
                     _size = value;
-                    base.NotifyPropertyChanged(nameof(Size));
+                    NotifyPropertyChanged(nameof(Size));
                 }
             }
         }
@@ -245,39 +263,77 @@ namespace EntityTools.Settings
         /// Видимость главной панели инструментов
         /// </summary>
         [Bindable(true)]
-        public bool MainToolsBarVisible
+        public bool MappingBarVisible
         {
-            get => _mainToolsBarVisible;
+            get => _mappingBarVisible;
             set
             {
-                if (_mainToolsBarVisible != value)
+                if (_mappingBarVisible != value)
                 {
-                    _mainToolsBarVisible = value;
-                    base.NotifyPropertyChanged(nameof(MainToolsBarVisible));
+                    _mappingBarVisible = value;
+                    NotifyPropertyChanged(nameof(MappingBarVisible));
                 }
             }
         }
         //[NonSerialized]
-        private bool _mainToolsBarVisible = true;
+        private bool _mappingBarVisible = true;
 
         /// <summary>
         /// Видимость панели редактирования графа (мешей)
         /// </summary>
         [Bindable(true)]
-        public bool EditMeshesBarVisible
+        public bool MeshesBarVisible
         {
-            get => _editMeshesBarVisible;
+            get => _meshesBarVisible;
             set
             {
-                if (_editMeshesBarVisible != value)
+                if (_meshesBarVisible != value)
                 {
-                    _editMeshesBarVisible = value;
-                    base.NotifyPropertyChanged(nameof(EditMeshesBarVisible));
+                    _meshesBarVisible = value;
+                    NotifyPropertyChanged(nameof(MeshesBarVisible));
                 }
             }
         }
         //[NonSerialized]
-        private bool _editMeshesBarVisible = true;
+        private bool _meshesBarVisible = true;
+
+        /// <summary>
+        /// Видимость панели редактирования вершины и ребер
+        /// </summary>
+        [Bindable(true)]
+        public bool NodeToolsBarVisible
+        {
+            get => _nodeToolsBarVisible;
+            set
+            {
+                if (_nodeToolsBarVisible != value)
+                {
+                    _nodeToolsBarVisible = value;
+                    NotifyPropertyChanged(nameof(NodeToolsBarVisible));
+                }
+            }
+        }
+        //[NonSerialized]
+        private bool _nodeToolsBarVisible = true;
+
+        /// <summary>
+        /// Видимость панели редактирования CustomRegion
+        /// </summary>
+        [Bindable(true)]
+        public bool CustomRegionBarVisible
+        {
+            get => _customRegionBarVisible;
+            set
+            {
+                if (_customRegionBarVisible != value)
+                {
+                    _customRegionBarVisible = value;
+                    NotifyPropertyChanged(nameof(CustomRegionBarVisible));
+                }
+            }
+        }
+        //[NonSerialized]
+        private bool _customRegionBarVisible = true;
 
         /// <summary>
         /// Видимость строки состояния
@@ -291,7 +347,7 @@ namespace EntityTools.Settings
                 if (_statusBarVisible != value)
                 {
                     _statusBarVisible = value;
-                    base.NotifyPropertyChanged(nameof(StatusBarVisible));
+                    NotifyPropertyChanged(nameof(StatusBarVisible));
                 }
             }
         }
@@ -310,7 +366,7 @@ namespace EntityTools.Settings
                 if (value != redrawMapperTimeout)
                 {
                     redrawMapperTimeout = Math.Max(100, value);
-                    base.NotifyPropertyChanged(nameof(RedrawMapperTimeout));
+                    NotifyPropertyChanged(nameof(RedrawMapperTimeout));
                 }
             }
         }

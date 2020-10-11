@@ -1,15 +1,14 @@
-﻿using Astral.Classes.ItemFilter;
-using EntityTools.Extensions;
-using EntityTools.Editors;
-using EntityTools.Enums;
-using MyNW.Classes;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
-using Sign = Astral.Logic.UCC.Ressources.Enums.Sign;
+using Astral.Classes.ItemFilter;
+using EntityTools.Editors;
+using EntityTools.Enums;
+using EntityTools.Extensions;
+using MyNW.Classes;
 
 namespace EntityTools.Tools
 {
@@ -51,19 +50,19 @@ namespace EntityTools.Tools
                 _stacks = value;
             }
         }
-        internal int _stacks = 0;
+        internal int _stacks;
 
 #if !DEVELOPER
         [Browsable(false)]
 #endif
-        public Sign Sign
+        public Astral.Logic.UCC.Ressources.Enums.Sign Sign
         {
             get => _sign; set
             {
                 _sign = value;
             }
         }
-        internal Sign _sign = Sign.Superior;
+        internal Astral.Logic.UCC.Ressources.Enums.Sign _sign = Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
 
         private string auraPattern;
         private SimplePatternPos patternPos = SimplePatternPos.None;
@@ -75,7 +74,7 @@ namespace EntityTools.Tools
             get
             {
                 if (!string.IsNullOrEmpty(_auraId))
-                    if (Sign == Sign.Superior)
+                    if (Sign == Astral.Logic.UCC.Ressources.Enums.Sign.Superior)
                         switch (AuraNameType)
                         {
                             case ItemFilterStringType.Simple:
@@ -115,13 +114,13 @@ namespace EntityTools.Tools
             int num = e.Character.Mods.Count(m => m.PowerDef.InternalName.CompareToSimplePattern(patternPos, auraPattern));
             switch (Sign)
             {
-                case Sign.Equal:
+                case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
                     return num == Stacks;
-                case Sign.NotEqual:
+                case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
                     return num != Stacks;
-                case Sign.Inferior:
+                case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
                     return num < Stacks;
-                case Sign.Superior:
+                case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
                     return num > Stacks;
             }
             return false;
@@ -147,13 +146,13 @@ namespace EntityTools.Tools
             int num = e.Character.Mods.Count(m => Regex.IsMatch(m.PowerDef.InternalName, auraPattern));
             switch (Sign)
             {
-                case Sign.Equal:
+                case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
                     return num == Stacks;
-                case Sign.NotEqual:
+                case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
                     return num != Stacks;
-                case Sign.Inferior:
+                case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
                     return num < Stacks;
-                case Sign.Superior:
+                case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
                     return num > Stacks;
             }
             return false;
@@ -164,7 +163,7 @@ namespace EntityTools.Tools
         {
             if (string.IsNullOrEmpty(_auraId))
                 return "Empty";
-            else return $"{_auraId} {Sign} {Stacks}";
+            return $"{_auraId} {Sign} {Stacks}";
         }
     }
 }

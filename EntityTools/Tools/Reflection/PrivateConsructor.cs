@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Reflection;
 
 namespace EntityTools.Reflection
@@ -43,7 +40,7 @@ namespace EntityTools.Reflection
 
             if (arg1 != null)
             {
-                ConstructorInfo ctor = typeof(ReturnT).GetConstructor(flags | BindingFlags.NonPublic, null, new Type[] { arg1.GetType() }, null);
+                ConstructorInfo ctor = typeof(ReturnT).GetConstructor(flags | BindingFlags.NonPublic, null, new[] { arg1.GetType() }, null);
                 if (ctor != null)
                 {
                     if (ctor.Invoke(new object[] { arg1 }) is ReturnT result)
@@ -65,7 +62,7 @@ namespace EntityTools.Reflection
 
             if (arg1 != null && arg2 != null)
             {
-                ConstructorInfo ctor = typeof(ReturnT).GetConstructor(flags | BindingFlags.NonPublic, null, new Type[] { arg1.GetType(), arg2.GetType() }, null);
+                ConstructorInfo ctor = typeof(ReturnT).GetConstructor(flags | BindingFlags.NonPublic, null, new[] { arg1.GetType(), arg2.GetType() }, null);
                 if (ctor != null)
                 {
                     if (ctor.Invoke(new object[] { arg1 }) is ReturnT result)

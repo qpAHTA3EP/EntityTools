@@ -24,18 +24,18 @@ namespace EntityTools.Editors
         // Token: 0x060005C2 RID: 1474 RVA: 0x0002715C File Offset: 0x0002535C
         internal BagsListEditor()
         {
-            this.cbx.KeyDown += this.cbx_KeyDown;
-            this.cbx.MouseHover += this.cbx_ShowTooltip;
+            cbx.KeyDown += cbx_KeyDown;
+            cbx.MouseHover += cbx_ShowTooltip;
         }
 
         // Token: 0x060005C3 RID: 1475 RVA: 0x000271C4 File Offset: 0x000253C4
         private void cbx_ShowTooltip(object sender, EventArgs e)
         {
-            int num = this.cbx.IndexFromPoint(this.cbx.PointToClient(Control.MousePosition));
+            int num = cbx.IndexFromPoint(cbx.PointToClient(Control.MousePosition));
             bool flag = num > -1;
             if (flag)
             {
-                this.toolTip.SetToolTip(this.cbx, this.cbx.Items[num].ToString());
+                toolTip.SetToolTip(cbx, cbx.Items[num].ToString());
             }
         }
 
@@ -46,36 +46,36 @@ namespace EntityTools.Editors
             if (flag)
             {
                 e.SuppressKeyPress = true;
-                for (int i = 0; i < this.cbx.Items.Count; i++)
+                for (int i = 0; i < cbx.Items.Count; i++)
                 {
-                    this.cbx.SetItemChecked(i, true);
+                    cbx.SetItemChecked(i, true);
                 }
             }
             bool flag2 = e.Control && e.KeyCode == Keys.D;
             if (flag2)
             {
                 e.SuppressKeyPress = true;
-                for (int j = 0; j < this.cbx.Items.Count; j++)
+                for (int j = 0; j < cbx.Items.Count; j++)
                 {
-                    this.cbx.SetItemChecked(j, false);
+                    cbx.SetItemChecked(j, false);
                 }
             }
             bool flag3 = e.Control && e.KeyCode == Keys.I;
             if (flag3)
             {
                 e.SuppressKeyPress = true;
-                for (int k = 0; k < this.cbx.Items.Count; k++)
+                for (int k = 0; k < cbx.Items.Count; k++)
                 {
-                    this.cbx.SetItemChecked(k, !this.cbx.GetItemChecked(k));
+                    cbx.SetItemChecked(k, !cbx.GetItemChecked(k));
                 }
             }
             bool flag4 = e.Control && e.KeyCode == Keys.S;
             if (flag4)
             {
                 e.SuppressKeyPress = true;
-                for (int l = 0; l < this.cbx.Items.Count; l++)
+                for (int l = 0; l < cbx.Items.Count; l++)
                 {
-                    this.cbx.Sorted = true;
+                    cbx.Sorted = true;
                 }
             }
         }
@@ -98,12 +98,12 @@ namespace EntityTools.Editors
                 foreach (object obj in Enum.GetValues(typeof(InvBagIDs)))
                 {
                     InvBagIDs invBagIDs = (InvBagIDs)obj;
-                    int index = this.cbx.Items.Add(invBagIDs);
-                    this.cbx.SetItemChecked(index, bagsList[invBagIDs]);
+                    int index = cbx.Items.Add(invBagIDs);
+                    cbx.SetItemChecked(index, bagsList[invBagIDs]);
                 }
-                windowsFormsEditorService.DropDownControl(this.cbx);
+                windowsFormsEditorService.DropDownControl(cbx);
                 bagsList = new BagsList(null);
-                foreach (object obj2 in this.cbx.CheckedItems)
+                foreach (object obj2 in cbx.CheckedItems)
                 {
                     InvBagIDs bagId = (InvBagIDs)obj2;
                     bagsList[bagId] = true;
@@ -120,7 +120,7 @@ namespace EntityTools.Editors
         // Token: 0x060005C7 RID: 1479 RVA: 0x000274EC File Offset: 0x000256EC
         public void Dispose()
         {
-            this.cbx.Dispose();
+            cbx.Dispose();
         }
 
         // Token: 0x0400037E RID: 894

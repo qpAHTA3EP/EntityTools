@@ -1,18 +1,15 @@
 ﻿//#define HARMONY
-#if PATCH_ASTRAL && HARMONY 
+
+using System.Reflection;
+using Astral.Quester.Forms;
+using EntityTools.Patches.Mapper;
+using EntityTools.Patches.UCC;
+using EntityTools.Reflection;
+#if PATCH_ASTRAL && HARMONY
 using HarmonyLib; 
 #else
 //#define Patch_AstralXmlSerializer
 #endif
-
-using EntityTools.Reflection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using EntityTools.Patches.UCC;
-using EntityTools.Patches.Mapper;
 
 namespace EntityTools.Patches
 {
@@ -27,8 +24,8 @@ namespace EntityTools.Patches
         /// </summary>
         private static readonly Patch patchMapper = (EntityTools.PluginSettings.Mapper.Patch) ?
             new Patch(
-                typeof(Astral.Quester.Forms.MapperForm).GetMethod("Open", ReflectionHelper.DefaultFlags),
-                typeof(Mapper.MapperFormExt).GetMethod(nameof(Mapper.MapperFormExt.Open), ReflectionHelper.DefaultFlags))
+                typeof(MapperForm).GetMethod("Open", ReflectionHelper.DefaultFlags),
+                typeof(MapperFormExt).GetMethod(nameof(MapperFormExt.Open), ReflectionHelper.DefaultFlags))
             : null;
 
 #if Patch_AstralXmlSerializer
@@ -68,7 +65,7 @@ namespace EntityTools.Patches
         private static readonly Patch_Astral_Navmesh_DrawHotSpots patchAstralNavmeshDrawHotSpots = new Patch_Astral_Navmesh_DrawHotSpots();
 #endif
 
-        static bool Applied = false;
+        static bool Applied;
         public static void Apply()
         {
             //TODO: Реализовать механизм отключения патчей (всех)

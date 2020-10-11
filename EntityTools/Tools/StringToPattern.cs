@@ -1,12 +1,6 @@
-﻿using Astral.Classes.ItemFilter;
-using EntityTools;
-using EntityTools.Enums;
-using EntityTools.Extensions;
-using MyNW.Classes;
-using System;
-using System.Reflection;
-using System.Runtime.CompilerServices;
+﻿using System;
 using System.Text.RegularExpressions;
+using Astral.Classes.ItemFilter;
 
 namespace EntityTools.Tools
 {
@@ -34,19 +28,19 @@ namespace EntityTools.Tools
                     if (pattern == "*" || pattern == "**")
                     {
                         // pattern == '*' || '**'
-                        predicate = (string str) => true;
+                        predicate = str => true;
                     }
                     else if (pattern[0] == '*')
                     {
                         if (pattern[pattern.Length - 1] == '*')
                         {
                             matchText = pattern.Trim('*');
-                            predicate = (string str) => str.Contains(matchText);
+                            predicate = str => str.Contains(matchText);
                         }
                         else
                         {
                             matchText = pattern.TrimStart('*');
-                            predicate = (string str) => str.EndsWith(matchText);
+                            predicate = str => str.EndsWith(matchText);
                         }
                     }
                     else
@@ -54,21 +48,21 @@ namespace EntityTools.Tools
                         if (pattern[pattern.Length - 1] == '*')
                         {
                             matchText = pattern.TrimEnd('*');
-                            predicate = (string str) => str.StartsWith(matchText);
+                            predicate = str => str.StartsWith(matchText);
                         }
                         else
                         {
                             matchText = pattern;
-                            predicate = (string str) => str.Equals(matchText);
+                            predicate = str => str.Equals(matchText);
                         }
                     }
                 }
                 else
                 {
-                    predicate = (string str) => Regex.IsMatch(str, pattern);
+                    predicate = str => Regex.IsMatch(str, pattern);
                 }
             }
-            else predicate = (str) =>
+            else predicate = str =>
             {
 #if DEBUG
                 ETLogger.WriteLine($"Invalid prediate to compare string to '{pattern}'[{strMatchType}]");
@@ -90,7 +84,7 @@ namespace EntityTools.Tools
         {
             Predicate<string> predicate = Get(pattern, strMatchType);
 
-            return (T obj) => predicate(selector(obj)); 
+            return obj => predicate(selector(obj)); 
         }
 
     }

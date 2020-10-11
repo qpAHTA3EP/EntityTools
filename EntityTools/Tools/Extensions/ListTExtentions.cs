@@ -1,6 +1,6 @@
-﻿using EntityTools.Reflection;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using EntityTools.Reflection;
 
 namespace EntityTools.Extensions
 {
@@ -30,7 +30,7 @@ namespace EntityTools.Extensions
         /// <returns></returns>
         public static bool ContainsAny<T>(this IEnumerable<T> list, IEnumerable<T> elements)
         {
-            return list.Any((t) => elements.Contains(t));
+            return list.Any(t => elements.Contains(t));
         }
     }
 }

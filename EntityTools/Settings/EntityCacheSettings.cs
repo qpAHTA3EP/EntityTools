@@ -21,7 +21,7 @@ namespace EntityTools.Settings
                 if (_cacheTime != value)
                 {
                     _cacheTime = Math.Max(value, 500);
-                    base.NotifyPropertyChanged(nameof(GlobalCacheTime));
+                    NotifyPropertyChanged(nameof(GlobalCacheTime));
                 }
             }
         }
@@ -40,7 +40,7 @@ namespace EntityTools.Settings
                 {
 
                     _combatCacheTime = Math.Max(value, 100);
-                    base.NotifyPropertyChanged(nameof(CombatCacheTime));
+                    NotifyPropertyChanged(nameof(CombatCacheTime));
                 }
             }
         }
@@ -58,7 +58,7 @@ namespace EntityTools.Settings
                 if (_localCacheTime != value)
                 {
                     _localCacheTime = Math.Max(value, 100);
-                    base.NotifyPropertyChanged(nameof(LocalCacheTime));
+                    NotifyPropertyChanged(nameof(LocalCacheTime));
                 }
             }
         }

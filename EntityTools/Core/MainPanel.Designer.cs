@@ -1,5 +1,8 @@
-﻿using EntityTools.Tools;
-using System.IO;
+﻿using System.ComponentModel;
+using System.Windows.Forms;
+using DevExpress.XtraEditors;
+using DevExpress.XtraTab;
+using ComboBox = System.Windows.Forms.ComboBox;
 
 namespace EntityTools.Core
 {
@@ -8,7 +11,7 @@ namespace EntityTools.Core
         /// <summary> 
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary> 
         /// Clean up any resources being used.
@@ -746,56 +749,56 @@ namespace EntityTools.Core
 
         #endregion
 
-        private System.Windows.Forms.Button btnUccEditor;
-        private System.Windows.Forms.FolderBrowserDialog fldrBroserDlg;
-        private DevExpress.XtraTab.XtraTabControl tbclMain;
-        private DevExpress.XtraTab.XtraTabPage tabUtilities;
-        private DevExpress.XtraTab.XtraTabPage tabOptions;
-        private System.Windows.Forms.CheckBox ckbSpellStuckMonitor;
-        private System.Windows.Forms.Label lblTimerUnslide;
-        private System.Windows.Forms.Label lblSlideTimer;
-        private System.Windows.Forms.Label lblSlideFilter;
-        private DevExpress.XtraEditors.SpinEdit seSlideFilter;
-        private System.Windows.Forms.CheckBox cbSlideMonitor;
-        private System.Windows.Forms.GroupBox gbxSlideMonitor;
-        private System.Windows.Forms.TextBox tbSlidingAuras;
-        private System.Windows.Forms.Label lblSlidingAuras;
-        private System.Windows.Forms.Button btnUiViewer;
-        private System.Windows.Forms.CheckBox cbEnchantHelperActivator;
-        private System.Windows.Forms.Button btnTest3;
-        private System.Windows.Forms.Button btnEntities;
-        private DevExpress.XtraTab.XtraTabPage tabRelogger;
-        private System.Windows.Forms.Label lblMachinId;
-        private System.Windows.Forms.Label lblAccount;
-        private DevExpress.XtraEditors.SimpleButton btnGetMachineId;
-        private DevExpress.XtraEditors.SimpleButton btnSetMachineId;
-        private System.Windows.Forms.TextBox tbMashingId;
-        private System.Windows.Forms.Button btnAuraViewer;
-        private System.Windows.Forms.ComboBox cbbxExportSelector;
-        private DevExpress.XtraEditors.ButtonEdit tbExportFileSelector;
-        private System.Windows.Forms.SaveFileDialog dlgSaveFile;
-        private System.Windows.Forms.Button btnExport;
-        private System.Windows.Forms.GroupBox gbxExport;
-        private System.Windows.Forms.Button btnDefault;
-        private System.Windows.Forms.CheckBox ckbMapperPatch;
-        private DevExpress.XtraTab.XtraTabPage tabLogger;
-        private System.Windows.Forms.CheckBox ckbEnableLogger;
-        private System.Windows.Forms.Button btnOpenLog;
-        private System.Windows.Forms.GroupBox gbxLogger;
-        private System.Windows.Forms.GroupBox gbxEntityCache;
-        private DevExpress.XtraEditors.SpinEdit seGlobalCacheTime;
-        private System.Windows.Forms.Label lblGlobalCacheTime;
-        private DevExpress.XtraEditors.SpinEdit seCombatCacheTime;
-        private System.Windows.Forms.Label lblCombatCacheTime;
-        private DevExpress.XtraEditors.SpinEdit seLocalCacheTime;
-        private System.Windows.Forms.Label lblLocalCacheTime;
-        private System.Windows.Forms.ToolTip toolTip;
-        private System.Windows.Forms.CheckBox ckbExtendedActionDebugInfo;
-        private System.Windows.Forms.Button btnCheckCore;
-        private DevExpress.XtraTab.XtraTabPage tabDebug;
-        private System.Windows.Forms.TextBox tbDebugMonitorInfo;
-        private System.Windows.Forms.CheckBox ckbDebugMonitor;
-        private System.Windows.Forms.Button btnTest1;
-        private System.Windows.Forms.Button bntTest2;
+        private Button btnUccEditor;
+        private FolderBrowserDialog fldrBroserDlg;
+        private XtraTabControl tbclMain;
+        private XtraTabPage tabUtilities;
+        private XtraTabPage tabOptions;
+        private CheckBox ckbSpellStuckMonitor;
+        private Label lblTimerUnslide;
+        private Label lblSlideTimer;
+        private Label lblSlideFilter;
+        private SpinEdit seSlideFilter;
+        private CheckBox cbSlideMonitor;
+        private GroupBox gbxSlideMonitor;
+        private TextBox tbSlidingAuras;
+        private Label lblSlidingAuras;
+        private Button btnUiViewer;
+        private CheckBox cbEnchantHelperActivator;
+        private Button btnTest3;
+        private Button btnEntities;
+        private XtraTabPage tabRelogger;
+        private Label lblMachinId;
+        private Label lblAccount;
+        private SimpleButton btnGetMachineId;
+        private SimpleButton btnSetMachineId;
+        private TextBox tbMashingId;
+        private Button btnAuraViewer;
+        private ComboBox cbbxExportSelector;
+        private ButtonEdit tbExportFileSelector;
+        private SaveFileDialog dlgSaveFile;
+        private Button btnExport;
+        private GroupBox gbxExport;
+        private Button btnDefault;
+        private CheckBox ckbMapperPatch;
+        private XtraTabPage tabLogger;
+        private CheckBox ckbEnableLogger;
+        private Button btnOpenLog;
+        private GroupBox gbxLogger;
+        private GroupBox gbxEntityCache;
+        private SpinEdit seGlobalCacheTime;
+        private Label lblGlobalCacheTime;
+        private SpinEdit seCombatCacheTime;
+        private Label lblCombatCacheTime;
+        private SpinEdit seLocalCacheTime;
+        private Label lblLocalCacheTime;
+        private ToolTip toolTip;
+        private CheckBox ckbExtendedActionDebugInfo;
+        private Button btnCheckCore;
+        private XtraTabPage tabDebug;
+        private TextBox tbDebugMonitorInfo;
+        private CheckBox ckbDebugMonitor;
+        private Button btnTest1;
+        private Button bntTest2;
     }
 }

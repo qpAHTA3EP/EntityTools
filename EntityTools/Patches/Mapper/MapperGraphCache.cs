@@ -1,16 +1,11 @@
-﻿using AStar;
-using Astral;
-using Astral.Logic.Classes.Map;
-using EntityTools.Reflection;
-using MyNW.Classes;
-using MyNW.Internals;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Reflection;
 using System.Threading;
+using AStar;
 using AStar.Tools;
+using MyNW.Classes;
+using MyNW.Internals;
 using Timeout = Astral.Classes.Timeout;
 
 namespace EntityTools.Patches.Mapper
@@ -439,7 +434,7 @@ namespace EntityTools.Patches.Mapper
         /// Последняя добавленная вершина (узел)
         /// </summary>
         internal Node LastAddedNode { get => lastAddedNode; set => lastAddedNode = value; }
-        private Node lastAddedNode = null;
+        private Node lastAddedNode;
 
         /// <summary>
         /// Флаг проверки необходимости обновления кэша
@@ -459,7 +454,8 @@ namespace EntityTools.Patches.Mapper
                                 || cacheZ_0_75 != double.MaxValue && Math.Abs(location.Z - centerZ) > cacheZ_0_75
                                 || player.MapAndRegion != cachedMapAndRegion );
                 }
-                else return player.IsValid && !player.IsLoading && (cacheTimeout.IsTimedOut || player.MapAndRegion != cachedMapAndRegion);
+
+                return player.IsValid && !player.IsLoading && (cacheTimeout.IsTimedOut || player.MapAndRegion != cachedMapAndRegion);
             }
         }
 
@@ -727,30 +723,27 @@ namespace EntityTools.Patches.Mapper
         public void MoveCenterPosition(double dx, double dy, double dz)
         {
             //TODO: добавить проверку переполнения в MoveCenterPosition, в SetCacheArea и в SetCacheInitialPosition
-            checked
+            cacheInitialPosition.X += (float)dx;
+            cacheInitialPosition.Y += (float)dy;
+            cacheInitialPosition.Z += (float)dz;
+            centerX += dx;
+            if (cacheX != double.MaxValue)
             {
-                cacheInitialPosition.X += (float)dx;
-                cacheInitialPosition.Y += (float)dy;
-                cacheInitialPosition.Z += (float)dz;
-                centerX += dx;
-                if (cacheX != double.MaxValue)
-                {
-                    minX += dx;
-                    maxX += dx;
-                }
-                centerY += dy;
-                if (cacheY != double.MaxValue)
-                {
+                minX += dx;
+                maxX += dx;
+            }
+            centerY += dy;
+            if (cacheY != double.MaxValue)
+            {
 
-                    minY += dy;
-                    maxY += dy;
-                }
-                centerZ += dz;
-                if (cacheZ != double.MaxValue)
-                {
-                    minZ += dz;
-                    maxZ += dz;
-                } 
+                minY += dy;
+                maxY += dy;
+            }
+            centerZ += dz;
+            if (cacheZ != double.MaxValue)
+            {
+                minZ += dz;
+                maxZ += dz;
             }
         }
 

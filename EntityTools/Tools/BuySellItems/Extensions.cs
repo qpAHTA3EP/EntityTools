@@ -1,12 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Astral.Classes.ItemFilter;
 using EntityTools.Reflection;
 using EntityTools.Tools.BuySellItems;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Inventory = Astral.Logic.NW.Inventory;
 
 namespace EntityTools.Extensions
 {
@@ -26,7 +27,7 @@ namespace EntityTools.Extensions
             var slots = bags[item2buy];
             uint num = 0;
             if (slots != null && slots.Count > 0)
-                num = (uint)slots.Sum((s) => s.Item.Count);
+                num = (uint)slots.Sum(s => s.Item.Count);
             return num;
         }
 
@@ -298,7 +299,7 @@ namespace EntityTools.Extensions
                         //restrictBagsList[bagId] = true;
                     } 
 #else
-                var equipBags = storeItem.Item.ItemDef.RestrictBagIDs.FindAll((bagId) => BagsList.IsEquipmentsBag(bagId));
+                var equipBags = storeItem.Item.ItemDef.RestrictBagIDs.FindAll(bagId => BagsList.IsEquipmentsBag(bagId));
                 isEquitable = equipBags.Count > 0;
 #endif
 
@@ -398,7 +399,7 @@ namespace EntityTools.Extensions
                         return bagSlot;
                 } 
 #else
-                InventorySlot slot = bag.GetItems.Find((s) => s.Item.Count > 0 && s.Item.ItemDef.InternalName == itemInternalName);
+                InventorySlot slot = bag.GetItems.Find(s => s.Item.Count > 0 && s.Item.ItemDef.InternalName == itemInternalName);
                 if (slot != null)
                     return slot;
 #endif
@@ -473,12 +474,12 @@ namespace EntityTools.Extensions
                 Predicate<Item> predicate;
                 if (checkSellable)
                 {
-                    predicate = (Item item) => {
-                        return Astral.Logic.NW.Inventory.CanSell(item)
+                    predicate = item => {
+                        return Inventory.CanSell(item)
                                && AstralAccessors.ItemFilter.IsMatch(filter)(item);
                     };
                 }
-                else predicate = (Item item) => AstralAccessors.ItemFilter.IsMatch(filter)(item);
+                else predicate = item => AstralAccessors.ItemFilter.IsMatch(filter)(item);
 
                 List<InventorySlot> slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.Inventory).GetItems;
                 if (slots != null && slots.Count > 0)
@@ -544,12 +545,12 @@ namespace EntityTools.Extensions
                 Predicate<Item> predicate;
                 if(checkSellable)
                 {
-                    predicate = (Item item) => {
-                        return Astral.Logic.NW.Inventory.CanSell(item)
+                    predicate = item => {
+                        return Inventory.CanSell(item)
                                && AstralAccessors.ItemFilter.IsMatch(filter)(item);
                     };
                 }
-                else predicate = (Item item) => AstralAccessors.ItemFilter.IsMatch(filter)(item);
+                else predicate = item => AstralAccessors.ItemFilter.IsMatch(filter)(item);
 #endif
 
                 // Сканируем все выбранные сумки и добавляем подходящие предметы в список

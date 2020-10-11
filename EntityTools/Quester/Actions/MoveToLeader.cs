@@ -1,22 +1,19 @@
-﻿using Astral.Classes;
+﻿using System;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Design;
 using Astral.Logic.Classes.Map;
+using Astral.Quester;
 using Astral.Quester.UIEditors;
 using DevExpress.XtraEditors;
 using MyNW.Classes;
 using MyNW.Internals;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Design;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
+using Action = Astral.Quester.Classes.Action;
 
 namespace EntityTools.Quester.Actions
 {
     [Serializable]
-    public class MoveToLeader : Astral.Quester.Classes.Action
+    public class MoveToLeader : Action
     {
         #region Опции команды
         [Description("Distance to the Team Leader by which it is necessary to approach")]
@@ -42,8 +39,6 @@ namespace EntityTools.Quester.Actions
         public Vector3 Position { get; set; } = new Vector3(); 
         #endregion
 
-        public MoveToLeader() { }
-
         public override string ActionLabel
         {
             get
@@ -62,15 +57,13 @@ namespace EntityTools.Quester.Actions
                 if (InternalDestination.Distance3DFromPlayer > Distance )
                 {
                     if(IgnoreCombat)
-                        Astral.Quester.API.IgnoreCombat = true;
+                        API.IgnoreCombat = true;
                     return false;
                 }
-                else
-                {
-                    if (IgnoreCombat)
-                        Astral.Quester.API.IgnoreCombat = false;
-                    return true;
-                }
+
+                if (IgnoreCombat)
+                    API.IgnoreCombat = false;
+                return true;
             }
         }
 
@@ -80,14 +73,12 @@ namespace EntityTools.Quester.Actions
             {
                 if (StopOnApproached)
                     return ActionResult.Completed;
-                else return ActionResult.Running;
-            }
-            else
-            {
-                if (IgnoreCombat)
-                    Astral.Quester.API.IgnoreCombat = true;
                 return ActionResult.Running;
             }
+
+            if (IgnoreCombat)
+                API.IgnoreCombat = true;
+            return ActionResult.Running;
         }
 
         protected override bool IntenalConditions
@@ -124,7 +115,7 @@ namespace EntityTools.Quester.Actions
             {
                 if (Position.IsValid)
                     return new ActionValidity();
-                else return new ActionValidity($"Property '{nameof(Position)}' is not set.");
+                return new ActionValidity($"Property '{nameof(Position)}' is not set.");
             }
         }
         public override void GatherInfos()

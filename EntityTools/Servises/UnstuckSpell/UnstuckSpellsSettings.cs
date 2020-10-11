@@ -1,5 +1,4 @@
-﻿using EntityTools.Services;
-using System;
+﻿using System;
 using System.ComponentModel;
 
 namespace EntityTools.Settings
@@ -23,7 +22,7 @@ namespace EntityTools.Settings
                 if (active != value)
                 {
                     active = value;
-                    base.NotifyPropertyChanged(nameof(Active));
+                    NotifyPropertyChanged(nameof(Active));
                 }
             }
         }
@@ -42,7 +41,7 @@ namespace EntityTools.Settings
                 if (checkInterval != value)
                 {
                     checkInterval = Math.Max(value, 500);
-                    base.NotifyPropertyChanged(nameof(Active));
+                    NotifyPropertyChanged(nameof(Active));
                 }
             }
         }

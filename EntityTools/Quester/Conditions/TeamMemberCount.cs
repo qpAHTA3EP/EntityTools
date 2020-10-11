@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using Astral.Quester.Classes;
-using EntityTools.Editors;
 using EntityTools.Core.Proxies;
+using EntityTools.Editors;
 
 namespace EntityTools.Quester.Conditions
 {
@@ -14,7 +14,7 @@ namespace EntityTools.Quester.Conditions
         #region взаимодействие с ядром
         public event PropertyChangedEventHandler PropertyChanged;
 #if CORE_INTERFACES
-        internal IQuesterConditionEngine ConditionEngine = null;
+        internal IQuesterConditionEngine ConditionEngine;
 #endif
         public TeamMembersCount()
         {
@@ -44,7 +44,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal List<string> _customRegionNames = null;
+        internal List<string> _customRegionNames;
 
 #if DEVELOPER
         [Description("The Check of the Team member's location relative to the custom regions\n" +
@@ -78,7 +78,7 @@ namespace EntityTools.Quester.Conditions
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionCheck)));
             }
         }
-        internal float _distance = 0;
+        internal float _distance;
 
 #if DEVELOPER
         [Description("Option specifies the comparison of the distance to the group member")]
@@ -144,7 +144,7 @@ namespace EntityTools.Quester.Conditions
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionCheck)));
             }
         }
-        internal bool _regionCheck = false;
+        internal bool _regionCheck;
 
 /*#if DEVELOPER
         [Description("Time between searches of the TeamMembers (ms)")]

@@ -1,12 +1,9 @@
-﻿using Astral;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using DevExpress.XtraBars.Alerter;
 using System.Threading.Tasks;
+using Astral;
 
 namespace EntityTools
 {
@@ -98,7 +95,7 @@ namespace EntityTools
                     }
                     catch (Exception ex)
                     {
-                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, ex.ToString());
+                        Logger.WriteLine(Logger.LogType.Debug, ex.ToString());
                     }
                     Thread.Sleep(200);
                 }

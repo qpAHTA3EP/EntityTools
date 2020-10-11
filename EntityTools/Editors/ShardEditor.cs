@@ -1,8 +1,8 @@
-﻿using MyNW.Internals;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Windows.Forms;
+using MyNW.Internals;
 
 namespace EntityTools.Editors
 {

@@ -229,7 +229,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal float _reactionZRange = 0;
+        internal float _reactionZRange;
 
 #if DEVELOPER
         [DisplayName("Moving time")]
@@ -282,7 +282,7 @@ namespace EntityTools.UCC.Actions
         #region Hide Inherited Properties
         [XmlIgnore]
         [Browsable(false)]
-        public new Astral.Logic.UCC.Ressources.Enums.Unit Target { get; set; }
+        public new Unit Target { get; set; }
 
         [XmlIgnore]
         [Browsable(false)]
@@ -309,22 +309,22 @@ namespace EntityTools.UCC.Actions
 
         public override UCCAction Clone()
         {
-            return base.BaseClone(new DodgeFromEntity
+            return BaseClone(new DodgeFromEntity
             {
-                _entityId = this._entityId,
-                _entityIdType = this._entityIdType,
-                _entityNameType = this._entityNameType,
-                _regionCheck = this._regionCheck,
-                _healthCheck = this._healthCheck,
-                _entityRadius = this._entityRadius,
-                _reactionRange = this._reactionRange,
-                _reactionZRange = this._reactionZRange,
+                _entityId = _entityId,
+                _entityIdType = _entityIdType,
+                _entityNameType = _entityNameType,
+                _regionCheck = _regionCheck,
+                _healthCheck = _healthCheck,
+                _entityRadius = _entityRadius,
+                _reactionRange = _reactionRange,
+                _reactionZRange = _reactionZRange,
                 _aura = new AuraOption
                 {
-                    AuraName = this._aura.AuraName,
-                    AuraNameType = this._aura.AuraNameType,
-                    Sign = this._aura.Sign,
-                    Stacks = this._aura.Stacks
+                    AuraName = _aura.AuraName,
+                    AuraNameType = _aura.AuraNameType,
+                    Sign = _aura.Sign,
+                    Stacks = _aura.Stacks
                 }
             });
         }

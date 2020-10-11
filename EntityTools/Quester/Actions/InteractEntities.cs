@@ -1,30 +1,28 @@
 ﻿#define DEBUG_INTERACTENTITIES
 //#define PROFILING
 
-using Astral;
-using Astral.Classes.ItemFilter;
-using Astral.Logic.Classes.Map;
-using Astral.Quester.UIEditors;
-using EntityTools.Core.Proxies;
-using EntityTools.Core.Interfaces;
-using EntityTools.Editors;
-using EntityTools.Enums;
-using MyNW.Classes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.Drawing.Design;
 using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
-using MyNW.Patchables.Enums;
+using Astral.Classes.ItemFilter;
+using Astral.Logic.Classes.Map;
+using Astral.Quester.UIEditors;
+using EntityTools.Core.Interfaces;
+using EntityTools.Core.Proxies;
+using EntityTools.Editors;
+using EntityTools.Enums;
+using MyNW.Classes;
+using Action = Astral.Quester.Classes.Action;
 
 [assembly: InternalsVisibleTo("EntityCore")]
 
 namespace EntityTools.Quester.Actions
 {
     [Serializable]
-    public class InteractEntities : Astral.Quester.Classes.Action,
+    public class InteractEntities : Action,
                                     INotifyPropertyChanged
     {
 #if DEBUG && PROFILING
@@ -125,7 +123,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal bool _regionCheck = false;
+        internal bool _regionCheck;
 
 #if DEVELOPER
         [Description("Check if Entity's health greater than zero:\n" +
@@ -187,7 +185,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal bool _skipMoving = false;
+        internal bool _skipMoving;
 
 #if DEVELOPER
         [Description("The maximum distance from the character within which the Entity is searched\n" +
@@ -227,7 +225,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal float _reactionZRange = 0;
+        internal float _reactionZRange;
 
 #if DEVELOPER
         [Description("CustomRegion names collection")]
@@ -357,7 +355,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal bool _interactOnce = false;
+        internal bool _interactOnce;
 
 #if DEVELOPER
         [Category("Interaction")]

@@ -1,6 +1,6 @@
-﻿using AStar;
+﻿using System;
+using AStar;
 using MyNW.Classes;
-using System;
 
 namespace EntityTools.Patches.Mapper
 {

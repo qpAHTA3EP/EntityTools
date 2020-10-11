@@ -1,43 +1,49 @@
-﻿using Astral.Forms;
-using Astral.Logic.UCC.Forms;
-using EntityTools.Patches;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using System.Reflection;
-using EntityTools.Core.Interfaces;
-using Astral.Logic.UCC.Classes;
+using Astral.Addons;
 using Astral.Classes.ItemFilter;
-using EntityTools.Enums;
-using MyNW.Classes;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Runtime.CompilerServices;
+using Astral.Controllers;
+using Astral.Forms;
+using Astral.Logic.UCC;
+using Astral.Logic.UCC.Classes;
+using Astral.Logic.UCC.Forms;
 using Astral.Quester.Classes;
-using EntityTools.Extensions;
-using EntityTools.Tools;
-using EntityTools.Reflection;
 using DevExpress.XtraEditors;
-using System.Threading.Tasks;
+using EntityTools.Core;
+using EntityTools.Core.Interfaces;
+using EntityTools.Enums;
+using EntityTools.Patches;
+using EntityTools.Properties;
+using EntityTools.Reflection;
+using EntityTools.Services;
+using EntityTools.Tools;
+using MyNW.Classes;
+using Action = Astral.Quester.Classes.Action;
 
 [assembly: InternalsVisibleTo("EntityCore")]
 
 namespace EntityTools
 {
-    public class EntityTools : Astral.Addons.Plugin
+    public class EntityTools : Plugin
     {
         internal static string CoreHash;
         internal static IEntityToolsCore Core { get; private set; } = new EntityCoreProxy();
 
-        private static bool assemblyResolve_Deletage_Binded = false;
+        private static bool assemblyResolve_Deletage_Binded;
         private static readonly string assemblyResolve_Name = $"^{Assembly.GetExecutingAssembly().GetName().Name},";
 
         /// <summary>
         /// Управление выбранной ролью (запуск/остановка)
         /// </summary>
-        private static readonly Action<bool> ToggleRole = typeof(Astral.Controllers.Roles).GetStaticAction<bool>("ToggleRole", BindingFlags.Public);
+        private static readonly Action<bool> ToggleRole = typeof(Roles).GetStaticAction<bool>("ToggleRole", BindingFlags.Public);
         public static void StopBot()
         {
             ToggleRole(false);
@@ -45,16 +51,16 @@ namespace EntityTools
 
         public override string Name => "Entity Tools";
         public override string Author => "MichaelProg";
-        public override System.Drawing.Image Icon => Properties.Resources.EntityIcon;
-        public override BasePanel Settings => _panel ?? (_panel = new Core.EntityToolsMainPanel());
-        private BasePanel _panel = null;
+        public override Image Icon => Resources.EntityIcon;
+        public override BasePanel Settings => _panel ?? (_panel = new EntityToolsMainPanel());
+        private BasePanel _panel;
 
         public static EntityToolsSettings PluginSettings { get; set; } = new EntityToolsSettings();
 
         public override void OnBotStart()
         {
             if(PluginSettings.UnstuckSpells.Active)
-                Services.UnstuckSpells.Start();
+                UnstuckSpells.Start();
 
 #if PROFILING && DEBUG
             InteractEntities.ResetWatch();
@@ -86,7 +92,7 @@ namespace EntityTools
         {
             if (!assemblyResolve_Deletage_Binded)
             {
-                System.AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+                AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
                 assemblyResolve_Deletage_Binded = true;
             }
             if (PluginSettings.Logger.Active)
@@ -124,12 +130,12 @@ namespace EntityTools
             string lastCustomClass = Astral.Controllers.Settings.Get.LastCustomClass;
 
             if (lastCustomClass == "UCC" 
-                && Astral.Logic.UCC.API.CurrentProfile.ActionsCombat.Count == 0
+                && API.CurrentProfile.ActionsCombat.Count == 0
                 && File.Exists(Astral.Controllers.Settings.Get.LastUCCProfile))
             {
                 // Повторная попытка загрузить последний использовавшийся UCC-профиль
                 ETLogger.WriteLine($"{GetType().Name}: Second try to load ucc-profile '{Astral.Controllers.Settings.Get.LastUCCProfile}'", true);
-                Astral.Logic.UCC.API.LoadProfile(Astral.Controllers.Settings.Get.LastUCCProfile);
+                API.LoadProfile(Astral.Controllers.Settings.Get.LastUCCProfile);
             }
 #endif
         }
@@ -286,7 +292,7 @@ namespace EntityTools
         {
             MessageBox.Show("ucc_Editor_Click(...)");
 
-            Editor uccEditor = new Editor(Astral.Logic.UCC.Core.Get.mProfil, false);
+            Editor uccEditor = new Editor(Astral.Logic.UCC.Core.Get.mProfil);
             uccEditor.ShowDialog();
         }
         #endregion
@@ -323,14 +329,14 @@ namespace EntityTools
                 return false;
             }
 
-            public bool Initialize(Astral.Quester.Classes.Action action)
+            public bool Initialize(Action action)
             {
                 if (InternalInitialize())
                     return Core.Initialize(action);
                 return false;
             }
 
-            public bool Initialize(Astral.Quester.Classes.Condition condition)
+            public bool Initialize(Condition condition)
             {
                 if (InternalInitialize())
                     return Core.Initialize(condition);
@@ -451,7 +457,7 @@ namespace EntityTools
             {
                 if (InternalInitialize())
                     return Core.GUIRequest_UCCAction(out action);
-                else action = null;
+                action = null;
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rUCCAction request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
@@ -479,7 +485,7 @@ namespace EntityTools
             {
                 if (InternalInitialize())
                     return Core.CheckCore();
-                else return false;
+                return false;
             }
 
             /// <summary>
@@ -490,7 +496,7 @@ namespace EntityTools
             {
                 if (!assemblyResolve_Deletage_Binded)
                 {
-                    System.AppDomain.CurrentDomain.AssemblyResolve += EntityTools.CurrentDomain_AssemblyResolve;
+                    AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
                     assemblyResolve_Deletage_Binded = true;
                 }
                 if (assemblyResolve_Deletage_Binded)

@@ -1,19 +1,18 @@
-﻿using Astral;
+﻿using System;
+using Astral;
 using Astral.Logic.Classes.Map;
 using EntityTools.Enums;
 using MyNW.Classes;
-using System;
+using Action = Astral.Quester.Classes.Action;
 
 namespace EntityTools.Quester.Actions
 {
     [Serializable]
-    public class ChangePluginSetting : Astral.Quester.Classes.Action
+    public class ChangePluginSetting : Action
     {
         public PluginSettingsCommand Command {get; set;}
 
         public string Value { get; set; }
-
-        public ChangePluginSetting() { }
 
         public override bool NeedToRun => true;
 
@@ -27,7 +26,7 @@ namespace EntityTools.Quester.Actions
                         if (bool.TryParse(Value, out bool result))
                         {
                             //SlideMonitor.Activate = !result;
-                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, "SlideMonitor was removed. This command is deprecated");
+                            Logger.WriteLine(Logger.LogType.Debug, "SlideMonitor was removed. This command is deprecated");
                             return ActionResult.Skip;
                         }
                         else return ActionResult.Fail;

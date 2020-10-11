@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace EntityTools.Reflection
 {
@@ -39,7 +35,7 @@ namespace EntityTools.Reflection
             Type type = obj.GetType();
 
             if (flags == BindingFlags.Default)
-                flags = ReflectionHelper.DefaultFlags;
+                flags = DefaultFlags;
 
             if (BaseType)
             {
@@ -128,7 +124,7 @@ namespace EntityTools.Reflection
                 {
                     if (fullTypeName)
                         return assambly.GetTypes().FirstOrDefault(t => t.FullName == typeName);
-                    else return assambly.GetTypes().FirstOrDefault(t => t.Name == typeName);
+                    return assambly.GetTypes().FirstOrDefault(t => t.Name == typeName);
                 }
             }
             return null;
@@ -160,7 +156,7 @@ namespace EntityTools.Reflection
                 MethodInfo[] accessors = pi.GetAccessors((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
                 if (accessors != null && accessors.Length == 2)
                 {
-                    object[] arg = new object[] { value };
+                    object[] arg = { value };
                     accessors[1]?.Invoke(obj, arg);
                     return true;
                 }
@@ -181,16 +177,13 @@ namespace EntityTools.Reflection
             PropertyInfo pi = type.GetProperty(propName, flags | BindingFlags.Instance);//GetPrivateFieldInfo(type, fieldName, flags);
             if (pi == null)
                 return SetBasePropertyValue(type.BaseType, obj, propName, value, flags | BindingFlags.Instance);
-            else
+            MethodInfo[] accessors = pi.GetAccessors((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
+            if (accessors != null && accessors.Length == 2)
             {
-                MethodInfo[] accessors = pi.GetAccessors((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
-                if (accessors != null && accessors.Length == 2)
-                {
-                    object[] arg = new object[] { value };
-                    accessors[1]?.Invoke(obj, arg);
-                    return true;
-                }
-            }            
+                object[] arg = { value };
+                accessors[1]?.Invoke(obj, arg);
+                return true;
+            }
 
             return false;
         }
@@ -219,7 +212,7 @@ namespace EntityTools.Reflection
                 MethodInfo[] accessors = pi.GetAccessors((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
                 if (accessors != null && accessors.Length == 2)
                 {
-                    object[] arg = new object[] { value };
+                    object[] arg = { value };
                     accessors[1]?.Invoke(null, arg);
                     return true;
                 }
@@ -255,7 +248,7 @@ namespace EntityTools.Reflection
                 MethodInfo getter = pi.GetGetMethod((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
                 if(getter != null)
                 {
-                    object[] arg = new object[] { };
+                    object[] arg = { };
                     result = getter.Invoke(obj, arg);
                     return true;
                 }                
@@ -278,23 +271,20 @@ namespace EntityTools.Reflection
             PropertyInfo pi = type.GetProperty(propName, flags);
             if (pi == null)
                 return GetBasePropertyValue(type.BaseType, obj, propName, out result, flags);
-            else
+            MethodInfo[] accessors = pi.GetAccessors((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
+            if (accessors != null && accessors.Length > 0)
             {
-                MethodInfo[] accessors = pi.GetAccessors((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
-                if (accessors != null && accessors.Length > 0)
-                {
-                    object[] arg = new object[] { };
-                    result = accessors[0]?.Invoke(obj, arg);
-                    return true;
-                }
-                //MethodInfo getter = pi.GetGetMethod();
-                //if (getter != null)
-                //{
-                //    object[] arg = new object[] { };
-                //    result = getter.Invoke(obj, arg);
-                //    return true;
-                //}
-            }            
+                object[] arg = { };
+                result = accessors[0]?.Invoke(obj, arg);
+                return true;
+            }
+            //MethodInfo getter = pi.GetGetMethod();
+            //if (getter != null)
+            //{
+            //    object[] arg = new object[] { };
+            //    result = getter.Invoke(obj, arg);
+            //    return true;
+            //}
 
             return false;
         }
@@ -316,7 +306,7 @@ namespace EntityTools.Reflection
                 MethodInfo getter = pi.GetGetMethod((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
                 if (getter != null)
                 {
-                    object[] arg = new object[] { };
+                    object[] arg = { };
                     result = getter.Invoke(null, arg);
                     return true;
                 }
@@ -356,7 +346,8 @@ namespace EntityTools.Reflection
                 info.SetValue(obj, value);
                 return true;
             }
-            else return false;
+
+            return false;
         }
 
         /// <summary>
@@ -383,7 +374,8 @@ namespace EntityTools.Reflection
                 info.SetValue(type, value);
                 return true;
             }
-            else return false;
+
+            return false;
         }
 
         /// <summary>
@@ -558,7 +550,7 @@ namespace EntityTools.Reflection
                     sourceFlags = DefaultFlags;
 
                 if (targetFlags == BindingFlags.Default)
-                    targetFlags = ReflectionHelper.DefaultFlags;
+                    targetFlags = DefaultFlags;
 
                 EventInfo eventInfo = (sourceFlags == BindingFlags.Default) ? source.GetType().GetEvent(eventName)
                                                     : source.GetType().GetEvent(eventName, sourceFlags);

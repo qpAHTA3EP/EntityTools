@@ -8,8 +8,6 @@ using EntityTools.Tools;
 using System.Management;
 using System.Text;
 
-using System.IO;
-
 namespace SysInfo
 {
     internal static class SysInformer

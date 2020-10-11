@@ -1,18 +1,14 @@
-﻿#if PATCH_ASTRAL && HARMONY
-using HarmonyLib;
-# endif
-
+﻿
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Reflection;
-using Astral.Logic.Classes.Map;
-using AStar;
 using System.Drawing;
-using MyNW.Classes;
+using System.Reflection;
+using Astral.Logic;
+using Astral.Logic.Classes.Map;
 using EntityTools.Reflection;
+#if PATCH_ASTRAL && HARMONY
+using MyNW.Classes;
+# endif
 
 namespace EntityTools.Patches.Mapper
 {
@@ -20,7 +16,7 @@ namespace EntityTools.Patches.Mapper
     {
         internal Patch_Astral_Navmesh_DrawHotSpots()
         {
-            MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("DrawHotSpots", ReflectionHelper.DefaultFlags);
+            MethodInfo mi = typeof(Navmesh).GetMethod("DrawHotSpots", ReflectionHelper.DefaultFlags);
             if (mi != null)
             {
                 methodToReplace = mi;

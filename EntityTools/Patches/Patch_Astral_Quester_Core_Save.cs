@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-using AStar;
-using EntityTools.Reflection;
-using System.Windows.Forms;
-using MyNW.Internals;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using DevExpress.XtraEditors;
-using System.Xml.Serialization;
 using System.IO.Compression;
-using DevExpress.LookAndFeel;
+using System.Reflection;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Windows.Forms;
+using System.Xml.Serialization;
+using AStar;
+using Astral.Controllers;
+using Astral.Quester;
+using DevExpress.XtraEditors;
+using EntityTools.Reflection;
+using MyNW.Internals;
 
 namespace EntityTools.Patches
 {
@@ -110,15 +111,15 @@ namespace EntityTools.Patches
         public static void Save(bool saveAs = false)
         {
             string profileName = Astral.Controllers.Settings.Get.LastQuesterProfile;
-            var currentProfile  = Astral.Quester.API.CurrentProfile;
+            var currentProfile  = API.CurrentProfile;
             bool useExternalMeshes = currentProfile.UseExternalMeshFile && currentProfile.ExternalMeshFileName.Length >= 10;
             string externalMeshFileName = string.Empty;
             bool needLoadAllMeshes = false;
 
-            if (!Astral.Quester.API.CurrentProfile.Saved || saveAs)
+            if (!API.CurrentProfile.Saved || saveAs)
             {
                 SaveFileDialog saveFileDialog = new SaveFileDialog();
-                saveFileDialog.InitialDirectory = Astral.Controllers.Directories.ProfilesPath;
+                saveFileDialog.InitialDirectory = Directories.ProfilesPath;
                 saveFileDialog.DefaultExt = "amp.zip";
                 saveFileDialog.Filter = "Astral mission profil (*.amp.zip)|*.amp.zip";
                 saveFileDialog.FileName = string.IsNullOrEmpty(profileName) ? EntityManager.LocalPlayer.MapState.MapName : profileName;
@@ -255,11 +256,11 @@ namespace EntityTools.Patches
             zipProfileEntry = zipFile.CreateEntry("profile.xml");
 
             Patch_XmlSerializer_GetExtraTypes.GetExtraTypes(out List<Type> types, 2);
-            XmlSerializer serializer = new XmlSerializer(Astral.Quester.API.CurrentProfile.GetType(), types.ToArray());
+            XmlSerializer serializer = new XmlSerializer(API.CurrentProfile.GetType(), types.ToArray());
             using (var zipProfileStream = zipProfileEntry.Open())
             {
-                serializer.Serialize(zipProfileStream, Astral.Quester.API.CurrentProfile);
-                Astral.Quester.API.CurrentProfile.Saved = true;
+                serializer.Serialize(zipProfileStream, API.CurrentProfile);
+                API.CurrentProfile.Saved = true;
             }
         }
 

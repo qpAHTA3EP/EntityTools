@@ -1,7 +1,7 @@
-﻿using MyNW.Classes;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using MyNW.Classes;
 
 namespace EntityTools.Editors
 {
@@ -15,7 +15,8 @@ namespace EntityTools.Editors
             {
                 return pos.Clone();
             }
-            else return value;
+
+            return value;
         }
 
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)

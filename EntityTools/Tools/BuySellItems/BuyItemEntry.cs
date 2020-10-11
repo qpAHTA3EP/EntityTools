@@ -1,17 +1,13 @@
-﻿using Astral.Classes.ItemFilter;
+﻿using System;
+using System.Collections;
+using System.ComponentModel;
+using System.Text.RegularExpressions;
+using System.Xml.Serialization;
+using Astral.Classes.ItemFilter;
 using EntityTools.Enums;
-using EntityTools.Extensions;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml.Serialization;
 
 namespace EntityTools.Tools.BuySellItems
 {
@@ -104,7 +100,7 @@ namespace EntityTools.Tools.BuySellItems
                     _priority = value;
             }
         }
-        internal uint _priority = 0;
+        internal uint _priority;
 
         public uint Count
         {
@@ -126,7 +122,7 @@ namespace EntityTools.Tools.BuySellItems
                     _keepNumber = value;
             }
         }
-        internal bool _keepNumber = false;
+        internal bool _keepNumber;
 
 #if false
         // Максимальное количество предметов, которые можно купить за одну транзакцию (стак)
@@ -153,7 +149,7 @@ namespace EntityTools.Tools.BuySellItems
                 if(!_readOnly) _checkEquipmentLevel = value;
             }
         }
-        internal bool _checkEquipmentLevel = false;
+        internal bool _checkEquipmentLevel;
 
         [Category("Optional")]
         [Description("Покупать экипировку, подходящую персонажу по уровню")]
@@ -164,7 +160,7 @@ namespace EntityTools.Tools.BuySellItems
                 if(!_readOnly) _checkPlayerLevel = value;
             }
         }
-        internal bool _checkPlayerLevel = false;
+        internal bool _checkPlayerLevel;
 
         [Category("Optional")]
         [Description("Экипировать предмет после покупки")]
@@ -176,12 +172,12 @@ namespace EntityTools.Tools.BuySellItems
                 if (!_readOnly) _putOnItem = value;
             }
         }
-        internal bool _putOnItem = false;
+        internal bool _putOnItem;
         #endregion
 
         [XmlIgnore]
         public bool IsReadOnly => _readOnly;
-        private bool _readOnly = false;
+        private bool _readOnly;
 
         public ItemFilterEntryExt()
         {
@@ -369,7 +365,8 @@ namespace EntityTools.Tools.BuySellItems
                 }
                 return IsMatch_Regex_Id(item);
             }
-            else if(_entryType == ItemFilterEntryType.Category)
+
+            if(_entryType == ItemFilterEntryType.Category)
             {
                 pattern = string.Empty;
                 BitArray categories = new BitArray(Enum.GetValues(typeof(ItemCategory)).Length, false); 
@@ -439,11 +436,12 @@ namespace EntityTools.Tools.BuySellItems
                     }
                 }
 
-                isMatchPredicate = (Item itm) => IsMatch_Category(itm, categories);
+                isMatchPredicate = itm => IsMatch_Category(itm, categories);
 
                 return IsMatch_Regex_Id(item);
             }
-            else if(_entryType == ItemFilterEntryType.ItemType)
+
+            if(_entryType == ItemFilterEntryType.ItemType)
             {
                 pattern = string.Empty;
                 BitArray itemTypes = new BitArray(Enum.GetValues(typeof(ItemType)).Length, false);
@@ -513,7 +511,7 @@ namespace EntityTools.Tools.BuySellItems
                     }
                 }
 
-                isMatchPredicate = (Item itm) => IsMatch_ItemType(itm, itemTypes);
+                isMatchPredicate = itm => IsMatch_ItemType(itm, itemTypes);
 
                 return IsMatch_Regex_Id(item);
             }
@@ -575,7 +573,7 @@ namespace EntityTools.Tools.BuySellItems
         /// <returns></returns>
         private bool IsMatch_Category(Item item, BitArray categories)
         {
-            return item.ItemDef.Categories.FindIndex((ctg) => categories[(int)ctg]) >= 0;
+            return item.ItemDef.Categories.FindIndex(ctg => categories[(int)ctg]) >= 0;
         }
         #endregion
         #region IsMatch_ItemType

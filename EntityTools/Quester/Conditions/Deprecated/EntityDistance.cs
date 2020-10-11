@@ -1,14 +1,10 @@
-﻿using Astral.Classes.ItemFilter;
+﻿using System;
+using System.ComponentModel;
+using System.Drawing.Design;
+using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
-using EntityTools.Enums;
-using EntityTools.Tools;
-using MyNW.Classes;
-using MyNW.Internals;
-using System;
-using System.ComponentModel;
-using System.Drawing.Design;
 
 namespace EntityTools.Quester.Conditions
 {
@@ -18,7 +14,7 @@ namespace EntityTools.Quester.Conditions
         #region Взаимодействие с ядром EntityTools
         public event PropertyChangedEventHandler PropertyChanged;
 #if CORE_INTERFACES
-        internal IQuesterConditionEngine Engine = null;
+        internal IQuesterConditionEngine Engine;
 #endif
         #endregion
 
@@ -121,7 +117,7 @@ namespace EntityTools.Quester.Conditions
 #else
         [Browsable(false)]
 #endif
-        public Condition.Relation Sign
+        public Relation Sign
         {
             get => _sign;
             set

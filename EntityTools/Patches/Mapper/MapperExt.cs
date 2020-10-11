@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Drawing;
-using System.Windows.Forms;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using AStar;
+using Astral;
 using Astral.Logic.Classes.Map;
 using Astral.Logic.NW;
 using DevExpress.XtraEditors;
+using DevExpress.XtraEditors.Filtering;
+using EntityTools.Properties;
+using EntityTools.Reflection;
 using MyNW.Classes;
 using MyNW.Internals;
-using Astral;
-using EntityTools.Reflection;
-using DevExpress.XtraEditors.Filtering;
 using static AStar.Tools.RWLocker;
+using Timeout = Astral.Classes.Timeout;
 
 //using Astral.Professions.Classes;
 
@@ -73,7 +75,7 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Делегат для расширения реакции на событие OnClick
         /// </summary>
-        public new Action<MouseEventArgs, GraphicsNW> OnClick { get; set; }
+        public Action<MouseEventArgs, GraphicsNW> OnClick { get; set; }
 
         /// <summary>
         /// Делегат, уведомляющий об отпускании клавиши
@@ -366,7 +368,7 @@ namespace EntityTools.Patches.Mapper
         /// <param name="token"></param>
         private void work_DrawMap(CancellationToken token) // method_1
         {
-            Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
+            Timeout timeout = new Timeout(0);
             while (!IsDisposed && Visible && !token.IsCancellationRequested)
             {
                 try
@@ -509,8 +511,8 @@ namespace EntityTools.Patches.Mapper
                             #region Отрисовка персонажа
 
                             float angle = EntityManager.LocalPlayer.Yaw * 180f / 3.14159274f;
-                            Bitmap image = RotateImage(Properties.Resources.charArrow, angle);
-                            graphicsNW.drawImage(EntityManager.LocalPlayer.Location, image, default(Size));
+                            Bitmap image = RotateImage(Resources.charArrow, angle);
+                            graphicsNW.drawImage(EntityManager.LocalPlayer.Location, image);
 
                             #endregion
 
@@ -527,17 +529,17 @@ namespace EntityTools.Patches.Mapper
                 }
                 catch (ObjectDisposedException ex)
                 {
-                    Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex.ToString());
+                    Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex);
                     break;
                 }
                 catch (InvalidOperationException ex)
                 {
-                    Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex.ToString());
+                    Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex);
                     break;
                 }
                 catch (ThreadAbortException ex)
                 {
-                    Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex.ToString());
+                    Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex);
                     break;
                 }
                 catch (Exception ex)
@@ -545,7 +547,7 @@ namespace EntityTools.Patches.Mapper
                     if (timeout.IsTimedOut)
                     {
                         timeout.ChangeTime(2000);
-                        Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex.ToString());
+                        Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex);
                     }
                 }
                 finally
@@ -555,10 +557,10 @@ namespace EntityTools.Patches.Mapper
             }
         }
 
-        public Point RelativeMousePosition => MapPicture.PointToClient(Control.MousePosition);
+        public Point RelativeMousePosition => MapPicture.PointToClient(MousePosition);
 
-        private Task mapDrawingTask = null;
-        private CancellationTokenSource mapDrawingTokenSource = null;
+        private Task mapDrawingTask;
+        private CancellationTokenSource mapDrawingTokenSource;
 
         public void StartMapDrawings()
         {
@@ -586,8 +588,8 @@ namespace EntityTools.Patches.Mapper
             {
                 throw new ArgumentNullException("image");
             }
-            double w = (double)image.Width;
-            double h = (double)image.Height;
+            double w = image.Width;
+            double h = image.Height;
             double num3;
             for (num3 = (double)angle * 3.1415926535897931 / 180.0; num3 < 0.0; num3 += 6.2831853071795862)
             {
@@ -620,7 +622,7 @@ namespace EntityTools.Patches.Mapper
                 Point[] destPoints;
                 if (num3 >= 0.0 && num3 < 1.5707963267948966)
                 {
-                    destPoints = new Point[]
+                    destPoints = new[]
                     {
                         new Point((int)num7, 0),
                         new Point(num8, (int)num5),
@@ -629,7 +631,7 @@ namespace EntityTools.Patches.Mapper
                 }
                 else if (num3 >= 1.5707963267948966 && num3 < 3.1415926535897931)
                 {
-                    destPoints = new Point[]
+                    destPoints = new[]
                     {
                         new Point(num8, (int)num5),
                         new Point((int)num4, num9),
@@ -638,7 +640,7 @@ namespace EntityTools.Patches.Mapper
                 }
                 else if (num3 >= 3.1415926535897931 && num3 < 4.71238898038469)
                 {
-                    destPoints = new Point[]
+                    destPoints = new[]
                     {
                         new Point((int)num4, num9),
                         new Point(0, (int)num6),
@@ -647,7 +649,7 @@ namespace EntityTools.Patches.Mapper
                 }
                 else
                 {
-                    destPoints = new Point[]
+                    destPoints = new[]
                     {
                         new Point(0, (int)num6),
                         new Point((int)num7, 0),

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using AStar;
 
@@ -97,7 +97,7 @@ namespace EntityTools.Patches.Mapper.Tools
         private static void drawSelectedNode(MapperGraphics graphics, Node node)
         {
             graphics.FillCircleCentered(Brushes.Red, node.Position, 14);
-            graphics.FillCircleCentered(Brushes.Orange, node.Position, 8);
+            graphics.FillCircleCentered(Brushes.Orange, node.Position);
         }
         /// <summary>
         /// Отрисовка нового положения вершины
@@ -194,7 +194,7 @@ namespace EntityTools.Patches.Mapper.Tools
             {
                 if (movedNodes.Count > 0)
                 {
-                    undo = new RelocateNodesTool { movedNodes = this.movedNodes, dX = this.dX, dY = this.dY };
+                    undo = new RelocateNodesTool { movedNodes = movedNodes, dX = dX, dY = dY };
                     movedNodes = new List<Node>(nodes);
 
                 }

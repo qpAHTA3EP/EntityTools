@@ -6,11 +6,12 @@ using Astral.Logic.Classes.Map;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
 using MyNW.Classes;
+using Action = Astral.Quester.Classes.Action;
 
 namespace EntityTools.Quester.Actions
 {
     [Serializable]
-    public class InsertInsignia : Astral.Quester.Classes.Action, INotifyPropertyChanged
+    public class InsertInsignia : Action, INotifyPropertyChanged
     {
         #region Взаимодействие с EntityToolsCore
         public event PropertyChangedEventHandler PropertyChanged;

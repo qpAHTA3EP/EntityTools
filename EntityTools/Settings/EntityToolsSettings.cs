@@ -1,12 +1,5 @@
-﻿using EntityTools.Settings;
-using EntityTools.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using System.IO;
-using System.Xml;
+﻿using System;
+using EntityTools.Settings;
 
 namespace EntityTools
 {

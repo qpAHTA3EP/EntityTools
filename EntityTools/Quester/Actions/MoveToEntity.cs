@@ -5,16 +5,17 @@ using System.Drawing.Design;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.Classes.Map;
-using EntityTools.Editors;
-using MyNW.Classes;
-using EntityTools.Enums;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
+using EntityTools.Editors;
+using EntityTools.Enums;
+using MyNW.Classes;
+using Action = Astral.Quester.Classes.Action;
 
 namespace EntityTools.Quester.Actions
 {
     [Serializable]
-    public class MoveToEntity : Astral.Quester.Classes.Action, INotifyPropertyChanged
+    public class MoveToEntity : Action, INotifyPropertyChanged
     {
         #region Взаимодействие с ядром EntityToolsCore
         public event PropertyChangedEventHandler PropertyChanged;
@@ -113,7 +114,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal bool _regionCheck = false;
+        internal bool _regionCheck;
 
 #if DEVELOPER
         [Description("Check if Entity's health greater than zero:\n" +
@@ -174,7 +175,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal float _reactionRange = 0;
+        internal float _reactionRange;
 
 #if DEVELOPER
         [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
@@ -194,7 +195,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal float _reactionZRange = 0;
+        internal float _reactionZRange;
 
 #if DEVELOPER
         [Description("CustomRegion names collection")]
@@ -278,7 +279,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal uint _abortCombatDistance = 0;
+        internal uint _abortCombatDistance;
 
 #if DEVELOPER
         [Description("True: Complete an action when the Entity is closer than 'Distance'\n" +
@@ -298,7 +299,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal bool _stopOnApproached = false;
+        internal bool _stopOnApproached;
 
 #if DEVELOPER
         [Description("True: Clear the list of attackers and attack the target Entity when it is approached\n" +

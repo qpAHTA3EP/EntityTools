@@ -1,16 +1,11 @@
-﻿using MyNW.Classes;
-using MyNW.Internals;
-using MyNW.Patchables.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Collections.ObjectModel;
 using System.Text;
 using Astral.Classes.ItemFilter;
-using EntityTools.Enums;
-using System.Collections;
-using System.Collections.ObjectModel;
-using static EntityTools.Tools.BuySellItems.ItemFilterEntryExt;
 using EntityTools.Reflection;
+using MyNW.Classes;
+using MyNW.Patchables.Enums;
 
 namespace EntityTools.Tools.BuySellItems
 {
@@ -139,7 +134,7 @@ namespace EntityTools.Tools.BuySellItems
         /// <summary>
         /// Запрещающий предикат, исключающий из анализа
         /// </summary>
-        Predicate<Item> _exclude = null;
+        Predicate<Item> _exclude;
 
         /// <summary>
         /// Фильтр слотов сумки
@@ -311,7 +306,7 @@ namespace EntityTools.Tools.BuySellItems
                     {
                         if (fltrSlots.Value != null && fltrSlots.Value.Count > 0)
                         {
-                            sb.Append(fltrSlots.Key.ToString()).AppendLine(" matches to:");
+                            sb.Append(fltrSlots.Key).AppendLine(" matches to:");
                             foreach (var slot in fltrSlots.Value)
                             {
                                 sb.Append('\t').Append(slot.Item.ItemDef.DisplayName).Append('[').Append(slot.Item.ItemDef.InternalName).Append("] {");

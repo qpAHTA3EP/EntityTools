@@ -1,19 +1,18 @@
-﻿using Astral.Logic.NW;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Reflection;
+using System.Windows.Forms;
+using Astral.Controllers;
+using Astral.Logic.NW;
+using Astral.Logic.UCC;
 using Astral.Logic.UCC.Actions;
 using Astral.Logic.UCC.Classes;
 using Astral.Logic.UCC.Forms;
 using EntityTools.Reflection;
-using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Windows.Forms;
 using static Astral.Logic.UCC.Ressources.Enums;
 
 namespace EntityTools.UCC.Extensions
@@ -23,13 +22,13 @@ namespace EntityTools.UCC.Extensions
         /// <summary>
         /// Кэшированный экземпляр модифицированного окна Astral.Logic.UCC.Forms.AddClass, предназначенного для выбора UCC-команды
         /// </summary>
-        private static AddClass addUccActionEditor = null;
+        private static AddClass addUccActionEditor;
         // ссылка на поле AddClass.typesList
-        private static object addUccActionEditor_typesListBoxControlObj = null;
+        private static object addUccActionEditor_typesListBoxControlObj;
         // ссылка на поле AddClass.actions
-        private static Dictionary<string, Type> addUccActionEditor_uccActionsDictionary = null;
+        private static Dictionary<string, Type> addUccActionEditor_uccActionsDictionary;
         // ссылка на поле AddClass.valuesList
-        private static object addUccActionEditor_valuesListObj = null;
+        private static object addUccActionEditor_valuesListObj;
 
         private static readonly Type uccActionEditorType = typeof(AddClass);
 
@@ -52,7 +51,7 @@ namespace EntityTools.UCC.Extensions
 
             if (editor == null || editor.IsDisposed)
             {
-                ConstructorInfo ctor = uccActionEditorType.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null, new Type[] { typeof(Type) }, null);
+                ConstructorInfo ctor = uccActionEditorType.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { typeof(Type) }, null);
                 if (ctor != null)
                 {
                     // Создаем экземпляр окна AddClass 
@@ -69,7 +68,7 @@ namespace EntityTools.UCC.Extensions
                 // А также доступ к приватным полям класса AddClass
                 // AddClass.typesList
                 // AddClass.actions
-                if (ReflectionHelper.ExecStaticMethod(typeof(Astral.Controllers.Plugins)/*ReflectionHelper.GetTypeByName("Astral.Controllers.Plugins", true)*/,
+                if (ReflectionHelper.ExecStaticMethod(typeof(Plugins)/*ReflectionHelper.GetTypeByName("Astral.Controllers.Plugins", true)*/,
                                                         "GetTypes", new object[] { }, out object typelistObj)
                     && ReflectionHelper.GetFieldValue(editor, "typesList", out addUccActionEditor_typesListBoxControlObj)
                     && ReflectionHelper.GetFieldValue(editor, "actions", out object actionsDicObj)
@@ -135,7 +134,7 @@ namespace EntityTools.UCC.Extensions
         {
             if (GetUccAction(out UCCAction action))
                 return action;
-            else return null;
+            return null;
         }
         internal static bool GetUccAction(out UCCAction action, AddClass editor = null)
         {
@@ -152,121 +151,118 @@ namespace EntityTools.UCC.Extensions
                 if (ReflectionHelper.GetFieldValue(editor, "valid", out object valid)
                     && valid.Equals(false))
                     return false;
-                else
+                // Получает название выбранной ucc-команды
+                if (!ReflectionHelper.GetFieldValue(editor, "selecteType", out object selecteType))
+                    return false;
+                // Получаем тип выбранной ucc-команды
+                if (!addUccActionEditor_uccActionsDictionary.TryGetValue(selecteType.ToString(), out Type selectedActionType))
+                    return false;
+                // Создаем экземпляр ucc-команды
+                UCCAction uccAction = Activator.CreateInstance(selectedActionType) as UCCAction;
+
+
+                // Если выбрана команда типа Spell
+                if (selecteType.Equals(typeof(Spell).Name))
                 {
-                    // Получает название выбранной ucc-команды
-                    if (!ReflectionHelper.GetFieldValue(editor, "selecteType", out object selecteType))
-                        return false;
-                    // Получаем тип выбранной ucc-команды
-                    if (!addUccActionEditor_uccActionsDictionary.TryGetValue(selecteType.ToString(), out Type selectedActionType))
-                        return false;
-                    // Создаем экземпляр ucc-команды
-                    UCCAction uccAction = Activator.CreateInstance(selectedActionType) as UCCAction;
+                    Spell spell = uccAction as Spell;
 
+                    // Получаем название выбранного спелла
+                    if (!ReflectionHelper.GetPropertyValue(addUccActionEditor_valuesListObj, "SelectedItem", out object selectedSpellDisplayName))
+                        return false;
 
-                    // Если выбрана команда типа Spell
-                    if (selecteType.Equals(typeof(Spell).Name))
+                    // Получаем идентификатор выбранного спелла
+                    // Просматриваем список Power текущего персонажа, перобразовываем его описание в "отображаемое имя" с помощью метода AddClass.PowerDisplayName
+                    // и сравниваем с selectedSpellDisplayName, выбранным пользователем в элементе управления AddClass.valuesList
+                    Power selectedPower = EntityManager.LocalPlayer.Character.Powers.Find(p =>
                     {
-                        Spell spell = uccAction as Spell;
+                        return ReflectionHelper.ExecMethod(editor, "PowerDisplayName", new object[] { p.PowerDef }, out object currrentPowerDisplayName)
+                               && currrentPowerDisplayName.Equals(selectedSpellDisplayName);
+                    });
 
-                        // Получаем название выбранного спелла
-                        if (!ReflectionHelper.GetPropertyValue(addUccActionEditor_valuesListObj, "SelectedItem", out object selectedSpellDisplayName))
-                            return false;
-
-                        // Получаем идентификатор выбранного спелла
-                        // Просматриваем список Power текущего персонажа, перобразовываем его описание в "отображаемое имя" с помощью метода AddClass.PowerDisplayName
-                        // и сравниваем с selectedSpellDisplayName, выбранным пользователем в элементе управления AddClass.valuesList
-                        Power selectedPower = EntityManager.LocalPlayer.Character.Powers.Find((Power p) =>
-                                                                {
-                                                                    return ReflectionHelper.ExecMethod(editor, "PowerDisplayName", new object[] { p.PowerDef }, out object currrentPowerDisplayName)
-                                                                              && currrentPowerDisplayName.Equals(selectedSpellDisplayName);
-                                                                });
-
-                        if (selectedPower != null)
-                        {
-                            spell.SpellID = selectedPower.PowerDef.InternalName;
-                            action = spell;
-                            return true;
-                        }
-
-                        // Пролуем найти идентификатор спелла в Powers.CurrentPlayerClassPowers
-                        PowerDef selectedPowerDef = Powers.CurrentPlayerClassPowers.Find((PowerDef pDef) =>
-                                                                {
-                                                                    return ReflectionHelper.ExecMethod(editor, "PowerDisplayName", new object[] { pDef }, out object currrentPowerDisplayName)
-                                                                                && currrentPowerDisplayName.Equals(selectedSpellDisplayName);
-                                                                });
-                        if (selectedPowerDef != null)
-                        {
-                            spell.SpellID = selectedPowerDef.InternalName;
-                            action = spell;
-                            return true;
-                        }
-
-                        // Настроить команду Spell не удалось
-                        return false;
-                    }
-                    // Если выбрана команда типа Special
-                    if (selecteType.Equals(typeof(Special).Name))
+                    if (selectedPower != null)
                     {
-                        Special special = uccAction as Special;
-
-                        // Получаем название типа Special, выбранного пользователем
-                        if (!ReflectionHelper.GetPropertyValue(addUccActionEditor_valuesListObj, "SelectedItem", out object selectedSpellDisplayName))
-                            return false;
-
-                        // Парсим название типа Special
-                        if (!Enum.TryParse(selectedSpellDisplayName.ToString(), out SpecialUCCAction currentCpecialAction))
-                            return false;
-                        special.Action = currentCpecialAction;
-
-                        action = special;
+                        spell.SpellID = selectedPower.PowerDef.InternalName;
+                        action = spell;
                         return true;
                     }
 
-                    // Если выбрана команда типа Dodge
-                    if (selecteType.Equals(typeof(Dodge).Name))
+                    // Пролуем найти идентификатор спелла в Powers.CurrentPlayerClassPowers
+                    PowerDef selectedPowerDef = Powers.CurrentPlayerClassPowers.Find(pDef =>
                     {
-                        Dodge dodge = uccAction as Dodge;
-
-                        // Получаем название типа Dodge, выбранного пользователем
-                        if (!ReflectionHelper.GetPropertyValue(addUccActionEditor_valuesListObj, "SelectedItem", out object selectedSpellDisplayName))
-                            return false;
-
-                        // Парсим название типа Dodge
-                        if (!Enum.TryParse(selectedSpellDisplayName.ToString(), out DodgeDirection currentDodgeDirection))
-                            return false;
-                        dodge.Direction = currentDodgeDirection;
-
-                        action = dodge;
+                        return ReflectionHelper.ExecMethod(editor, "PowerDisplayName", new object[] { pDef }, out object currrentPowerDisplayName)
+                               && currrentPowerDisplayName.Equals(selectedSpellDisplayName);
+                    });
+                    if (selectedPowerDef != null)
+                    {
+                        spell.SpellID = selectedPowerDef.InternalName;
+                        action = spell;
                         return true;
                     }
 
-                    // Если выбрана команда типа Consumables
-                    if (selecteType.Equals(typeof(Consumables).Name))
-                    {
-                        Consumables consumable = uccAction as Consumables;
+                    // Настроить команду Spell не удалось
+                    return false;
+                }
+                // Если выбрана команда типа Special
+                if (selecteType.Equals(typeof(Special).Name))
+                {
+                    Special special = uccAction as Special;
 
-                        // Получаем название типа Consumables, выбранного пользователем
-                        if (!ReflectionHelper.GetPropertyValue(addUccActionEditor_valuesListObj, "SelectedItem", out object selectedConsumableName))
-                            return false;
-
-                        // Ищем идентификатор выбранного Consumable
-                        InventorySlot consumableSlot = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.Potions).GetItems.Find((InventorySlot iSlot) => iSlot.Item.ItemDef.DisplayName.Equals(selectedConsumableName));
-
-                        if (consumableSlot != null)
-                        {
-                            consumable.ItemId = consumableSlot.Item.ItemDef.InternalName;
-
-                            action = consumable;
-                            return true;
-                        }
-
+                    // Получаем название типа Special, выбранного пользователем
+                    if (!ReflectionHelper.GetPropertyValue(addUccActionEditor_valuesListObj, "SelectedItem", out object selectedSpellDisplayName))
                         return false;
-                    }
 
-                    action = uccAction;
+                    // Парсим название типа Special
+                    if (!Enum.TryParse(selectedSpellDisplayName.ToString(), out SpecialUCCAction currentCpecialAction))
+                        return false;
+                    special.Action = currentCpecialAction;
+
+                    action = special;
                     return true;
                 }
+
+                // Если выбрана команда типа Dodge
+                if (selecteType.Equals(typeof(Dodge).Name))
+                {
+                    Dodge dodge = uccAction as Dodge;
+
+                    // Получаем название типа Dodge, выбранного пользователем
+                    if (!ReflectionHelper.GetPropertyValue(addUccActionEditor_valuesListObj, "SelectedItem", out object selectedSpellDisplayName))
+                        return false;
+
+                    // Парсим название типа Dodge
+                    if (!Enum.TryParse(selectedSpellDisplayName.ToString(), out DodgeDirection currentDodgeDirection))
+                        return false;
+                    dodge.Direction = currentDodgeDirection;
+
+                    action = dodge;
+                    return true;
+                }
+
+                // Если выбрана команда типа Consumables
+                if (selecteType.Equals(typeof(Consumables).Name))
+                {
+                    Consumables consumable = uccAction as Consumables;
+
+                    // Получаем название типа Consumables, выбранного пользователем
+                    if (!ReflectionHelper.GetPropertyValue(addUccActionEditor_valuesListObj, "SelectedItem", out object selectedConsumableName))
+                        return false;
+
+                    // Ищем идентификатор выбранного Consumable
+                    InventorySlot consumableSlot = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.Potions).GetItems.Find(iSlot => iSlot.Item.ItemDef.DisplayName.Equals(selectedConsumableName));
+
+                    if (consumableSlot != null)
+                    {
+                        consumable.ItemId = consumableSlot.Item.ItemDef.InternalName;
+
+                        action = consumable;
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                action = uccAction;
+                return true;
             }
             catch
             {
@@ -279,7 +275,7 @@ namespace EntityTools.UCC.Extensions
         /// <summary>
         /// Кэшированный экзмепляр модифицированного окна UCC-редактора (Astral.Logic.UCC.Forms.Editor)
         /// </summary>
-        private static Editor uccEditor = null;
+        private static Editor uccEditor;
 
         /// <summary>
         /// Создание экземпляра модифицированного окна UCC-редактора (Editor)
@@ -301,7 +297,7 @@ namespace EntityTools.UCC.Extensions
             if (editor == null || editor.IsDisposed)
             {
                 // Создаем экземпляр окна
-                editor = new Editor(Astral.Logic.UCC.API.CurrentProfile);
+                editor = new Editor(API.CurrentProfile);
             }
 
             // Замена обработчика кнопки Editor.btn_addAction
@@ -351,7 +347,7 @@ namespace EntityTools.UCC.Extensions
                 //}    
                 ReflectionHelper.GetFieldValue(editor, "profile", out object profile, BindingFlags.Instance | BindingFlags.NonPublic);
                 ReflectionHelper.GetPropertyValue(editor, "CurrentMoment", out object currentMoment, BindingFlags.Instance | BindingFlags.NonPublic);
-                ReflectionHelper.ExecMethod(profile, "getActionList", new object[] { currentMoment }, out object currentActionListObj);
+                ReflectionHelper.ExecMethod(profile, "getActionList", new[] { currentMoment }, out object currentActionListObj);
                 if (profile != null
                     && currentMoment != null
                     && currentActionListObj is List<UCCAction> currentActionList)

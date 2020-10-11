@@ -1,10 +1,9 @@
-﻿using MyNW.Classes;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
+using MyNW.Classes;
 
 namespace EntityTools.Tools.BuySellItems
 {
@@ -30,7 +29,7 @@ namespace EntityTools.Tools.BuySellItems
         {
             MaxItemLevel = slot.Item.ItemDef.Level;
             TotalItemsCount = slot.Item.Count;
-            _slots = new List<InventorySlot>() { slot };
+            _slots = new List<InventorySlot> { slot };
             _readOnly = false;
         }
 
@@ -42,7 +41,7 @@ namespace EntityTools.Tools.BuySellItems
         private List<InventorySlot> _slots = new List<InventorySlot>();
 
         public bool IsReadOnly => _readOnly;
-        private bool _readOnly = false;
+        private bool _readOnly;
 
         public bool IsFixedSize => throw new NotImplementedException();
 

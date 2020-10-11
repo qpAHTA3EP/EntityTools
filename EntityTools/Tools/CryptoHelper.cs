@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 #if ENCRYPTOR
 using Extensions;
 using Encrypter;
 #else
-using EntityTools.Extensions;
-using EntityTools.Tools;
+
 #endif
 
 namespace EntityTools.Tools

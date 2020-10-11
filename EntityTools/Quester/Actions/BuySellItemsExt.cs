@@ -3,39 +3,36 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
-using System.Text;
+using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 using Astral;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.Classes.Map;
 using Astral.Logic.NW;
 using Astral.Quester.Classes;
-using Astral.Quester.Forms;
 using Astral.Quester.UIEditors;
 using Astral.Quester.UIEditors.Forms;
 using DevExpress.XtraEditors;
 using EntityTools.Editors;
 using EntityTools.Enums;
-using EntityTools.Tools.BuySellItems;
 using EntityTools.Extensions;
 using EntityTools.Reflection;
+using EntityTools.Tools.BuySellItems;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
-using NPCInfos = Astral.Quester.Classes.NPCInfos;
-using static EntityTools.Tools.BuySellItems.ItemFilterEntryExt;
-using System.Collections.ObjectModel;
-using System.Reflection;
-using System.Xml.Serialization;
+using Action = Astral.Quester.Classes.Action;
+using Inventory = Astral.Logic.NW.Inventory;
+using Timeout = Astral.Classes.Timeout;
 
 namespace EntityTools.Quester.Actions
 {
     [Serializable]
-    public class BuySellItemsExt : Astral.Quester.Classes.Action
+    public class BuySellItemsExt : Action
     {
-        internal readonly InstancePropertyAccessor<BuySellItemsExt, ActionDebug> debug = null;
+        internal readonly InstancePropertyAccessor<BuySellItemsExt, ActionDebug> debug;
 
         BuySellItemsExt @this => this;
 
@@ -136,7 +133,7 @@ namespace EntityTools.Quester.Actions
         [Browsable(false)]
 #endif
         public bool UseGeneralSettingsToBuy { get => _useGeneralSettingsToBuy; set => _useGeneralSettingsToBuy = value; }
-        internal bool _useGeneralSettingsToBuy = false;
+        internal bool _useGeneralSettingsToBuy;
 
 #if DEVELOPER
         [Description("Проверять наличие свободных слотов сумки")]
@@ -154,7 +151,7 @@ namespace EntityTools.Quester.Actions
         [Browsable(false)]
 #endif
         public bool CloseContactDialog { get => _closeContactDialog; set => _closeContactDialog = value; }
-        internal bool _closeContactDialog = false;
+        internal bool _closeContactDialog;
 
 #if DEVELOPER
         [Description("Список сумок, в которых производится поиск предметов для сравнения с предлагаемыми в магазине")]
@@ -212,7 +209,7 @@ namespace EntityTools.Quester.Actions
         /// <summary>
         /// Кэшированный список слотов, которые подлежат продаже
         /// </summary>
-        private List<InventorySlot> slots2sellCache = null;
+        private List<InventorySlot> slots2sellCache;
 
         #region Интерфейс Quester.Action
         public override string ActionLabel => GetType().Name;
@@ -297,7 +294,7 @@ namespace EntityTools.Quester.Actions
                             Interact.WaitForInteraction();
                             break;
                         case VendorType.RemoteVendor:
-                            RemoteContact remoteContact = EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts.Find((ct) => ct.ContactDef == Vendor.CostumeName);
+                            RemoteContact remoteContact = EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts.Find(ct => ct.ContactDef == Vendor.CostumeName);
                             if (remoteContact != null)
                             {
                                 remoteContact.Start();
@@ -305,7 +302,7 @@ namespace EntityTools.Quester.Actions
                             }
                             break;
                         default:
-                            ContactInfo contactInfo = EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts.Find((ct) => ct.Entity.IsValid && Vendor.IsMatch(ct.Entity));
+                            ContactInfo contactInfo = EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts.Find(ct => ct.Entity.IsValid && Vendor.IsMatch(ct.Entity));
                             if (contactInfo != null)
                             {
                                 Interact.Vendor(contactInfo.Entity);
@@ -432,7 +429,7 @@ namespace EntityTools.Quester.Actions
                     case VendorType.RemoteVendor:
                         if (extendedActionDebugInfo)
                             debug.Value.AddInfo(string.Concat(methodName, ": Call 'RemoteVendor'"));
-                        RemoteContact remoteContact = EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts.Find((ct) => ct.ContactDef == _vendor.CostumeName);
+                        RemoteContact remoteContact = EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts.Find(ct => ct.ContactDef == _vendor.CostumeName);
                         if (extendedActionDebugInfo)
                         {
                             if (remoteContact != null && remoteContact.IsValid)
@@ -464,7 +461,8 @@ namespace EntityTools.Quester.Actions
                         return Traiding(contactInfo.Entity);
                 }
             }
-            else return ActionResult.Fail;
+
+            return ActionResult.Fail;
         }
 
         /// <summary>
@@ -521,7 +519,7 @@ namespace EntityTools.Quester.Actions
                             {
                                 string key = @this._vendorMenus.Last();
                                 if (contactDialog.HasOptionByKey(key))
-                                    contactDialog.SelectOptionByKey(key, "");
+                                    contactDialog.SelectOptionByKey(key);
                             }
                         }
                         if (@this._closeContactDialog)
@@ -641,9 +639,10 @@ namespace EntityTools.Quester.Actions
 
                         return ready;
                     }
-                    else if (screenType == ScreenType.Store || screenType == ScreenType.StoreCollection)
-                    // Открыто витрина магазина (список товаров)
-                    // необходимо переключиться на нужную вкладку
+
+                    if (screenType == ScreenType.Store || screenType == ScreenType.StoreCollection)
+                        // Открыто витрина магазина (список товаров)
+                        // необходимо переключиться на нужную вкладку
                     {
                         if (@this._vendorMenus.Count > 0)
                         {
@@ -653,7 +652,7 @@ namespace EntityTools.Quester.Actions
                                 if (extendedActionDebugInfo)
                                     debug.Value.AddInfo(string.Concat(methodName, ": Select Shop-Tab"));
 
-                                contactDialog.SelectOptionByKey(key, "");
+                                contactDialog.SelectOptionByKey(key);
                             }
                         }
                         ready = Check_ReadyToTraid(contactDialog.ScreenType);
@@ -694,7 +693,8 @@ namespace EntityTools.Quester.Actions
 
                 return ready;
             }
-		    else if (extendedActionDebugInfo)
+
+            if (extendedActionDebugInfo)
                 debug.Value.AddInfo(string.Concat(methodName, ": VendorEntity checks failed"));
 
             return false;
@@ -832,13 +832,11 @@ namespace EntityTools.Quester.Actions
 
                 return ActionResult.Completed;
             }
-            else
-            {
-                if (extendedActionDebugInfo)
-                    debug.Value.AddInfo(string.Concat(methodName, ": Bags is full. Skip"));
 
-                return ActionResult.Skip;
-            }
+            if (extendedActionDebugInfo)
+                debug.Value.AddInfo(string.Concat(methodName, ": Bags is full. Skip"));
+
+            return ActionResult.Skip;
         }
 
         /// <summary>
@@ -868,7 +866,7 @@ namespace EntityTools.Quester.Actions
                             if (!item2buy.CheckEquipmentLevel || _buyBags.ContainsBetterItemEquipmentLevel(storeItemInfo))
                             {
                                 bool succeeded = false;
-                                Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(@this._timer > 0 ? (int)@this._timer : int.MaxValue);
+                                Timeout timeout = new Timeout(@this._timer > 0 ? (int)@this._timer : int.MaxValue);
 
                                 if (!_checkFreeBags || Check_FreeSlots(_buyBags))
                                 {
@@ -990,7 +988,7 @@ namespace EntityTools.Quester.Actions
                                 || slotCache.HasWorseThen(storeItemInfo))
                             {
                                 bool succeeded = false;
-                                Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(@this._timer > 0 ? (int)@this._timer : int.MaxValue);
+                                Timeout timeout = new Timeout(@this._timer > 0 ? (int)@this._timer : int.MaxValue);
 
                                 if (!_checkFreeBags || Check_FreeSlots(_buyBags))
                                 {
@@ -1109,7 +1107,7 @@ namespace EntityTools.Quester.Actions
                     // Производим поиск и продажу предметов, подходящих под глобальный фильтр продажи
                     if (_sellBags.GetItems(Astral.Controllers.Settings.Get.SellFilter, out List<InventorySlot> generalSellSlotsCache, true))
                         foreach(InventorySlot slot in generalSellSlotsCache)
-                            if (Astral.Logic.NW.Inventory.CanSell(slot.Item))
+                            if (Inventory.CanSell(slot.Item))
                             {
                                 Logger.WriteLine(string.Concat("Sell : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
                                 slot.StoreSellItem();
@@ -1124,7 +1122,7 @@ namespace EntityTools.Quester.Actions
                     {
                         // lots2sellCache сформирован, дополнительный происк производить не нужно
                         foreach (InventorySlot slot in slots2sellCache)
-                            if (Astral.Logic.NW.Inventory.CanSell(slot.Item))
+                            if (Inventory.CanSell(slot.Item))
                             {
                                 Logger.WriteLine(string.Concat("Sell : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
                                 slot.StoreSellItem();
@@ -1133,7 +1131,7 @@ namespace EntityTools.Quester.Actions
                     }
                     else if(_sellBags.GetItems(@this._sellOptions, out List<InventorySlot> slots2sell, true))
                         foreach(InventorySlot slot in slots2sell)
-                            if (Astral.Logic.NW.Inventory.CanSell(slot.Item))
+                            if (Inventory.CanSell(slot.Item))
                             {
                                 Logger.WriteLine(string.Concat("Sell : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
                                 slot.StoreSellItem();

@@ -1,20 +1,14 @@
-﻿using Astral.Classes.ItemFilter;
-using Astral.Logic.UCC.Classes;
-using Astral.Logic.UCC.Ressources;
-using Astral.Quester.Classes;
-using EntityTools;
-using EntityTools.Extensions;
-using EntityTools.Editors;
-using EntityTools.Enums;
-using EntityTools.Tools;
-using MyNW.Classes;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Text.RegularExpressions;
 using System.Xml.Serialization;
+using Astral.Classes.ItemFilter;
+using Astral.Logic.UCC.Classes;
+using Astral.Quester.Classes;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
+using EntityTools.Editors;
+using EntityTools.Enums;
 
 namespace EntityTools.UCC.Conditions
 {
@@ -176,7 +170,7 @@ namespace EntityTools.UCC.Conditions
         #region ICustomUCCCondition
         bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/) => Engine.IsOK(refAction);
 
-        bool ICustomUCCCondition.Loked { get => base.Locked; set => base.Locked = value; }
+        bool ICustomUCCCondition.Loked { get => Locked; set => Locked = value; }
 
         string ICustomUCCCondition.TestInfos(UCCAction refAction) => Engine.TestInfos(refAction);
         #endregion

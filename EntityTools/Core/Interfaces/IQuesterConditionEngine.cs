@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace EntityTools.Quester.Conditions
+﻿namespace EntityTools.Quester.Conditions
 {
 #if CORE_INTERFACES
     public interface IQuesterConditionEngine

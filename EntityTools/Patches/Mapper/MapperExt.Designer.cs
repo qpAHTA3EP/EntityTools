@@ -1,11 +1,7 @@
-﻿using Astral.Logic.Classes.Map;
-using DevExpress.XtraEditors;
-using MyNW.Classes;
-using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Drawing;
-using System.Threading;
 using System.Windows.Forms;
+using MyNW.Classes;
 
 namespace EntityTools.Patches.Mapper
 {
@@ -14,7 +10,7 @@ namespace EntityTools.Patches.Mapper
         /// <summary> 
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary> 
         /// Clean up any resources being used.

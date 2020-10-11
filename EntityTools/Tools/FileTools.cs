@@ -1,8 +1,7 @@
-﻿using Microsoft.Win32.SafeHandles;
-using MyNW.Internals;
-using System;
+﻿using System;
 using System.IO;
-using System.Runtime.InteropServices;
+using Astral.Controllers;
+using MyNW.Internals;
 
 namespace EntityTools.Tools
 {
@@ -18,17 +17,17 @@ namespace EntityTools.Tools
         public static readonly string MaskAD = "%AD%";
         public static readonly string MaskRAD = "%rAD%";
 
-        public static readonly string defaultExportFolderStates = Path.Combine(Astral.Controllers.Directories.LogsPath, "States");
-        public static readonly string defaultExportFolderInterfaces = Path.Combine(Astral.Controllers.Directories.LogsPath, "Interfaces");
-        public static readonly string defaultExportFolderAuras = Path.Combine(Astral.Controllers.Directories.LogsPath, "Auras");
-        public static readonly string defaultExportFolderMissions = Path.Combine(Astral.Controllers.Directories.LogsPath, "Missions");
+        public static readonly string defaultExportFolderStates = Path.Combine(Directories.LogsPath, "States");
+        public static readonly string defaultExportFolderInterfaces = Path.Combine(Directories.LogsPath, "Interfaces");
+        public static readonly string defaultExportFolderAuras = Path.Combine(Directories.LogsPath, "Auras");
+        public static readonly string defaultExportFolderMissions = Path.Combine(Directories.LogsPath, "Missions");
         public static readonly string defaultFileStates = "States.txt";
         public static readonly string defaultFileInterfaces = "Interfaces.xml";
         public static readonly string defaultFileAuras = "Auras.xml";
         public static readonly string defaultFileMissions = "Missions.xml";
         public static readonly string defaultExportFileName = "%character%_%account%_%datetime%.xml";
 
-        public static readonly string SettingsFile = Path.Combine(Astral.Controllers.Directories.SettingsPath, nameof(EntityTools), nameof(EntityTools) + ".xml");
+        public static readonly string SettingsFile = Path.Combine(Directories.SettingsPath, nameof(EntityTools), nameof(EntityTools) + ".xml");
         //public static bool ReplaceMask(ref string str)
         //{
         //    if (!string.IsNullOrEmpty(str))

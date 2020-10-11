@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using System.Threading;
-using System.Windows.Forms;
 using AStar.Tools;
 using Astral.Logic.Classes.Map;
 using EntityTools.Reflection;
@@ -93,7 +92,7 @@ namespace EntityTools.Patches.Mapper
         /// Отображаемый подграф (часть карты путей, на которой находится персонаж)
         /// </summary>
         public MapperGraphCache VisibleGraph => _cache;
-        protected MapperGraphCache _cache = null;
+        protected MapperGraphCache _cache;
 
         #region Перевод координат
         /// <summary>
@@ -405,7 +404,7 @@ namespace EntityTools.Patches.Mapper
                   dy = dx * MapperHelper.tg30,
                   r = dx / MapperHelper.cos30;
 
-            PointF[] points = new PointF[] {
+            PointF[] points = {
                     new PointF((float)x,      (float)y - r),
                     new PointF((float)x - dx, (float)y + dy),
                     new PointF((float)x + dx, (float)y + dy)
@@ -425,7 +424,7 @@ namespace EntityTools.Patches.Mapper
                   dy = dx * MapperHelper.tg30,
                   r = dx / MapperHelper.cos30;
 
-            PointF[] points = new PointF[] {
+            PointF[] points = {
                     new PointF((float)x,      (float)y + r),
                     new PointF((float)x - dx, (float)y - dy),
                     new PointF((float)x + dx, (float)y - dy)
@@ -456,7 +455,7 @@ namespace EntityTools.Patches.Mapper
                 y1 = (float)y - halfEdge,
                 y2 = (float)y + halfEdge;
 
-            PointF[] points = new PointF[] {
+            PointF[] points = {
                     new PointF(x1, y1),
                     new PointF(x1, y2),
                     new PointF(x2, y2),
@@ -480,7 +479,7 @@ namespace EntityTools.Patches.Mapper
             float dx = (float)width / 2,
                   dy = (float)height / 2;
 
-            PointF[] points = new PointF[] {
+            PointF[] points = {
                     new PointF((float)x + dx, (float)y),
                     new PointF((float)x,      (float)y + dy),
                     new PointF((float)x - dx, (float)y),

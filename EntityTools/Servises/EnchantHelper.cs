@@ -1,12 +1,8 @@
-﻿using Astral.Classes;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Astral;
 using MyNW.Classes;
 using MyNW.Internals;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace EntityTools.Services
 {
@@ -14,25 +10,25 @@ namespace EntityTools.Services
     {
         //private Timeout timeout = new Timeout(1000);
         private static CancellationTokenSource tokenSource;
-        private static Task task = null;
+        private static Task task;
 
         public static int CheckingTime { get; set; } = 150;
 
 
         // Элемент GUI: пункт контекстного меню "Зачаровать предмет" на вкладке "Персонажа" в окне "Листок персонажа"
-        private static UIGen Equippeditemmenu_Enchant = null;
+        private static UIGen Equippeditemmenu_Enchant;
         // Элемент GUI: пункт контекстного меню "Зачаровать предмет" в сумке инвентаря
-        private static UIGen Itemmenu_Enchant = null;
+        private static UIGen Itemmenu_Enchant;
         // Элемент GUI: пункт контекстного меню "Зачаровать предмет" на вкладке "Спутники" в окне "Листок персонажа"
-        private static UIGen Petitemmenu_Enchant = null;
+        private static UIGen Petitemmenu_Enchant;
         // Элемент GUI: пункт контекстного меню "Извлечь целым" в окне "Наложение чар"
-        private static UIGen Enchantmenu_Itemremoveintact = null;
+        private static UIGen Enchantmenu_Itemremoveintact;
         // Элемент GUI: кнопка подтверждение в окне предупреждения о взимании платы за извлечение волшебного камня
-        private static UIGen Enchantitem_Unslotdialog_Resources = null;
+        private static UIGen Enchantitem_Unslotdialog_Resources;
         // Элемент GUI: кнопка "Зачаровать" в окне "Наложение чар"
-        private static UIGen Enchantitem_Commit = null;
+        private static UIGen Enchantitem_Commit;
         // Элемент GUI: кнопка подтверждения в окне предупреждения о бесплатной вставке волшебного камня и о взимании платы за его извлечение
-        private static UIGen Modaldialog_Ok = null;
+        private static UIGen Modaldialog_Ok;
 
 
         public static void Start()
@@ -41,8 +37,8 @@ namespace EntityTools.Services
             {
                 tokenSource = new CancellationTokenSource();
                 task = Task.Factory.StartNew(() => Run(tokenSource.Token), tokenSource.Token);
-                Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"EnchantHelper: Start new background Task");
-                ETLogger.WriteLine(LogType.Debug, $"EnchantHelper: Start new background Task");
+                Logger.WriteLine(Logger.LogType.Debug, "EnchantHelper: Start new background Task");
+                ETLogger.WriteLine(LogType.Debug, "EnchantHelper: Start new background Task");
             }
         }
         public static void Stop()
@@ -96,7 +92,7 @@ namespace EntityTools.Services
                     if (Enchantitem_Unslotdialog_Resources != null && Enchantitem_Unslotdialog_Resources.IsValid && Enchantitem_Unslotdialog_Resources.IsVisible)
                     {
                         GameCommands.Execute("GenButtonClick Enchantitem_Unslotdialog_Resources");
-                        ETLogger.WriteLine(LogType.Debug, $"EnchantHelper: Enchant unsloted");
+                        ETLogger.WriteLine(LogType.Debug, "EnchantHelper: Enchant unsloted");
                     }
                 }
 
@@ -115,7 +111,7 @@ namespace EntityTools.Services
                     if (Modaldialog_Ok != null && Modaldialog_Ok.IsValid && Modaldialog_Ok.IsVisible)
                     {
                         GameCommands.Execute("GenButtonClick Modaldialog_Ok");
-                        ETLogger.WriteLine(LogType.Debug, $"EnchantHelper: Enchant sloted");
+                        ETLogger.WriteLine(LogType.Debug, "EnchantHelper: Enchant sloted");
                     }
 
                 }
@@ -123,8 +119,8 @@ namespace EntityTools.Services
                 Thread.Sleep(CheckingTime);
             }
 
-            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, $"EnchantHelper: Background Task stoped");
-            ETLogger.WriteLine(LogType.Debug, $"EnchantHelper: Background Task stoped");
+            Logger.WriteLine(Logger.LogType.Debug, "EnchantHelper: Background Task stoped");
+            ETLogger.WriteLine(LogType.Debug, "EnchantHelper: Background Task stoped");
 
             Equippeditemmenu_Enchant = null;
             Enchantmenu_Itemremoveintact = null;

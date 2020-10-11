@@ -2,12 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Windows.Forms;
-using Astral.Quester.Classes;
-using DevExpress.XtraEditors.Controls;
 using EntityTools.Extensions;
-using MyNW.Classes;
-
 
 namespace EntityTools.Editors
 {

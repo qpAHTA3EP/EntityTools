@@ -1,11 +1,13 @@
-﻿using Astral.Classes.ItemFilter;
-using MyNW.Classes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using AStar;
+using Astral.Classes;
+using Astral.Classes.ItemFilter;
 using Astral.Grinder.Classes;
 using Astral.Logic.Classes.Map;
 using HarmonyLib;
+using MyNW.Classes;
 
 namespace EntityTools.Reflection
 {
@@ -77,13 +79,13 @@ namespace EntityTools.Reflection
                 /// <summary>
                 /// Функтор доступа к графу путей (карте) текущего профиля
                 /// </summary>
-                public static readonly StaticPropertyAccessor<AStar.Graph> Meshes = typeof(Astral.Quester.Core).GetStaticProperty<AStar.Graph>("Meshes");
+                public static readonly StaticPropertyAccessor<Graph> Meshes = typeof(Astral.Quester.Core).GetStaticProperty<Graph>("Meshes");
 
                 /// <summary>
                 /// Функтор доступа к коллекции графов путей (карт) текущего профиля
                 /// Astral.Quester.Core.MapsMeshes
                 /// </summary>
-                public static readonly StaticPropertyAccessor<Dictionary<string, AStar.Graph>> MapsMeshes = typeof(Astral.Quester.Core).GetStaticProperty<Dictionary<string, AStar.Graph>>("MapsMeshes");
+                public static readonly StaticPropertyAccessor<Dictionary<string, Graph>> MapsMeshes = typeof(Astral.Quester.Core).GetStaticProperty<Dictionary<string, Graph>>("MapsMeshes");
 
                 /// <summary>
                 /// Функтор доступа к списку названий карт в файле текущего профиля
@@ -273,7 +275,7 @@ namespace EntityTools.Reflection
                 public static class Movements
                 {
                     public static readonly StaticPropertyAccessor<List<Astral.Logic.NW.Movements.DodgeLosTestResult>> LastValidPoses = typeof(Astral.Logic.NW.Movements).GetStaticProperty<List<Astral.Logic.NW.Movements.DodgeLosTestResult>>("LastValidPoses");
-                    public static readonly StaticFieldAccessor<Astral.Classes.Timeout> LastValidPosesTimeout = typeof(Astral.Logic.NW.Movements).GetStaticField<Astral.Classes.Timeout>("lastvlidposto");
+                    public static readonly StaticFieldAccessor<Timeout> LastValidPosesTimeout = typeof(Astral.Logic.NW.Movements).GetStaticField<Timeout>("lastvlidposto");
                 }
             }
         }

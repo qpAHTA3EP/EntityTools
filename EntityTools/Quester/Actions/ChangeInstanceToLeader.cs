@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using Astral.Logic.Classes.Map;
 using Astral.Logic.NW;
-using Astral.Quester.Classes;
 using EntityTools.Tools;
-using MyNW;
 using MyNW.Classes;
 using MyNW.Internals;
 using Action = Astral.Quester.Classes.Action;
@@ -15,13 +9,8 @@ using Action = Astral.Quester.Classes.Action;
 namespace EntityTools.Quester.Actions
 {
     [Serializable]
-    public class ChangeInstanceToLeader : Astral.Quester.Classes.Action
+    public class ChangeInstanceToLeader : Action
     {
-        public ChangeInstanceToLeader()
-        {
-            //MaxRunningTime = 1;
-        }
-
         public override string ActionLabel => GetType().Name;
 
         public override bool NeedToRun
@@ -81,7 +70,7 @@ namespace EntityTools.Quester.Actions
                     if (changeInstanceResult == Instances.ChangeInstanceResult.Combat 
                         || changeInstanceResult == Instances.ChangeInstanceResult.CantChange)
                     {
-                        return Action.ActionResult.Running;
+                        return ActionResult.Running;
                     }
                     if (changeInstanceResult == Instances.ChangeInstanceResult.Success)
                     {
@@ -96,11 +85,11 @@ namespace EntityTools.Quester.Actions
                         //    }
                         //    Thread.Sleep(500);
                         //}
-                        return Action.ActionResult.Completed;
+                        return ActionResult.Completed;
                     }
                 }
             }
-            return Action.ActionResult.Fail;
+            return ActionResult.Fail;
         }
     }
 }

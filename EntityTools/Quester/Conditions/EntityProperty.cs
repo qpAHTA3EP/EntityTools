@@ -1,13 +1,13 @@
-﻿using Astral.Classes.ItemFilter;
-using Astral.Quester.Classes;
-using EntityTools.Core.Proxies;
-using EntityTools.Editors;
-using EntityTools.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Xml.Serialization;
+using Astral.Classes.ItemFilter;
+using Astral.Quester.Classes;
+using EntityTools.Core.Proxies;
+using EntityTools.Editors;
+using EntityTools.Enums;
 
 namespace EntityTools.Quester.Conditions
 {
@@ -23,7 +23,7 @@ namespace EntityTools.Quester.Conditions
         public System.Action doReset = null;
 #endif
 #if CORE_INTERFACES
-        internal IQuesterConditionEngine Engine = null;
+        internal IQuesterConditionEngine Engine;
 #endif
         #endregion
 
@@ -118,7 +118,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal bool _regionCheck = false;
+        internal bool _regionCheck;
 
 #if DEVELOPER
         [Description("Check if Entity's health greater than zero:\n" +
@@ -184,7 +184,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal float _reactionRange = 0;
+        internal float _reactionRange;
 
 #if DEVELOPER
         [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
@@ -205,7 +205,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal float _reactionZRange = 0;
+        internal float _reactionZRange;
 
 #if DEVELOPER
         [Description("CustomRegion names collection")]
@@ -263,7 +263,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal float _value = 0;
+        internal float _value;
 
 #if DEVELOPER
         [Description("Value comparison type to the closest Entity")]

@@ -1,15 +1,10 @@
-﻿using Astral.Classes.ItemFilter;
+﻿using System.ComponentModel;
 using DevExpress.XtraBars;
 using DevExpress.XtraEditors;
-using DevExpress.XtraEditors.Controls;
 using DevExpress.XtraEditors.Repository;
 using DevExpress.XtraGrid;
 using DevExpress.XtraGrid.Columns;
-using DevExpress.XtraGrid.Views.Base;
 using DevExpress.XtraGrid.Views.Grid;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 
 namespace EntityTools.Forms
 {
@@ -18,7 +13,7 @@ namespace EntityTools.Forms
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.

@@ -2,16 +2,10 @@
 #define LOG
 
 using System;
-using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using AStar;
-using Astral;
 using MyNW.Classes;
-using EntityTools.Tools;
-using System.Threading.Tasks;
-using System.Diagnostics;
+
 //using NodeDistPair = EntityTools.Tools.Pair<AStar.Node, double>;
 
 namespace EntityTools.Patches.Mapper
@@ -60,7 +54,7 @@ namespace EntityTools.Patches.Mapper
                 Node newNode = new Node(pos.X, pos.Y, pos.Z);
 
                 //double minDistance = (double)EntityTools.PluginSettings.Mapper.WaypointDistance / 2d;
-                double maxDistance = Math.Max(25d, (double)EntityTools.PluginSettings.Mapper.WaypointDistance * 1.25d);
+                double maxDistance = Math.Max(25d, EntityTools.PluginSettings.Mapper.WaypointDistance * 1.25d);
                 double maxZDifference = EntityTools.PluginSettings.Mapper.MaxElevationDifference;
                 double equivalenceDistance = EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance;
 
@@ -244,73 +238,68 @@ namespace EntityTools.Patches.Mapper
 
                         return equivalentND;
                     }
-                    else
-                    {
-                        if (Graph.AddNode(newNode))
-                        {
-#if DEBUG && LOG
-                            ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: Add 'NEW' node <{newNode.X:N3}{newNode.Y:N3}{newNode.Z:N3}>");
-#endif
-                            // Добавляем связь от узла equivalentNodeDetail 
-                            // к узлам front, left, roght
-                            if (frontND != null)
-                            {
-                                AddArcFunc(newNode, frontND.Node, frontND.Distance);
-#if DEBUG && LOG
-                                if (uniDirection)
-                                    ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: UniLink {{new -> front}} <{frontND.Node.X:N3}{frontND.Node.Y:N3}{frontND.Node.Z:N3}>");
-                                else ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: BiLink {{new <-> front}} <{frontND.Node.X:N3}{frontND.Node.Y:N3}{frontND.Node.Z:N3}>");
-#endif
-                            }
-                            if (leftND != null)
-                            {
-                                AddArcFunc(leftND.Node, newNode, leftND.Distance);
-#if DEBUG && LOG
-                                if (uniDirection)
-                                    ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: UniLink {{left -> new}} <{leftND.Node.X:N3}{leftND.Node.Y:N3}{leftND.Node.Z:N3}>");
-                                else ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: BiLink {{left <-> new}} <{leftND.Node.X:N3}{leftND.Node.Y:N3}{leftND.Node.Z:N3}>");
-#endif
-                            }
-                            if (rightND != null)
-                            {
-                                AddArcFunc(rightND.Node, newNode, rightND.Distance);
-#if DEBUG && LOG
-                                if (uniDirection)
-                                    ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: UniLink {{(right -> new}} <{rightND.Node.X:N3}{rightND.Node.Y:N3}{rightND.Node.Z:N3}>");
-                                else ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: BiLink {{(right <-> new}} <{rightND.Node.X:N3}{rightND.Node.Y:N3}{rightND.Node.Z:N3}>");
-#endif
-                            }
-                            if (backND != null)
-                            {
-                                backND.Rebase(newNode);
-                                AddArcFunc(backND.Node, newNode, rightND.Distance);
-#if DEBUG && LOG
-                                if (uniDirection)
-                                    ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: UniLink {{back -> new}} <{backND.Node.X:N3}{backND.Node.Y:N3}{backND.Node.Z:N3}>");
-                                else ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: BiLink {{back <-> new}} <{backND.Node.X:N3}{backND.Node.Y:N3}{backND.Node.Z:N3}>");
-#endif
-                            }
 
-                            // Если задан узел lastNodeDetail - добавляем связь с ним
-                            if (lastND != null)
-                            {
-                                AddArcFunc(lastND.Node, newNode, lastND.Distance);
+                    if (Graph.AddNode(newNode))
+                    {
 #if DEBUG && LOG
-                                if (uniDirection)
-                                    ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: UniLink {{last -> new}} <{lastND.Node.X:N3}{lastND.Node.Y:N3}{lastND.Node.Z:N3}>");
-                                else ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: BiLink {{last <-> new}} <{lastND.Node.X:N3}{lastND.Node.Y:N3}{lastND.Node.Z:N3}>");
+                        ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: Add 'NEW' node <{newNode.X:N3}{newNode.Y:N3}{newNode.Z:N3}>");
 #endif
-                            }
-                            return new NodeDetail(newNode);
-                        }
-                        else
+                        // Добавляем связь от узла equivalentNodeDetail 
+                        // к узлам front, left, roght
+                        if (frontND != null)
                         {
+                            AddArcFunc(newNode, frontND.Node, frontND.Distance);
 #if DEBUG && LOG
-                            ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: Fail to add Node <{newNode.X:N3}, {newNode.Y:N3}, {newNode.Z:N3}>");
+                            if (uniDirection)
+                                ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: UniLink {{new -> front}} <{frontND.Node.X:N3}{frontND.Node.Y:N3}{frontND.Node.Z:N3}>");
+                            else ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: BiLink {{new <-> front}} <{frontND.Node.X:N3}{frontND.Node.Y:N3}{frontND.Node.Z:N3}>");
 #endif
-                            return lastND;
                         }
+                        if (leftND != null)
+                        {
+                            AddArcFunc(leftND.Node, newNode, leftND.Distance);
+#if DEBUG && LOG
+                            if (uniDirection)
+                                ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: UniLink {{left -> new}} <{leftND.Node.X:N3}{leftND.Node.Y:N3}{leftND.Node.Z:N3}>");
+                            else ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: BiLink {{left <-> new}} <{leftND.Node.X:N3}{leftND.Node.Y:N3}{leftND.Node.Z:N3}>");
+#endif
+                        }
+                        if (rightND != null)
+                        {
+                            AddArcFunc(rightND.Node, newNode, rightND.Distance);
+#if DEBUG && LOG
+                            if (uniDirection)
+                                ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: UniLink {{(right -> new}} <{rightND.Node.X:N3}{rightND.Node.Y:N3}{rightND.Node.Z:N3}>");
+                            else ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: BiLink {{(right <-> new}} <{rightND.Node.X:N3}{rightND.Node.Y:N3}{rightND.Node.Z:N3}>");
+#endif
+                        }
+                        if (backND != null)
+                        {
+                            backND.Rebase(newNode);
+                            AddArcFunc(backND.Node, newNode, rightND.Distance);
+#if DEBUG && LOG
+                            if (uniDirection)
+                                ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: UniLink {{back -> new}} <{backND.Node.X:N3}{backND.Node.Y:N3}{backND.Node.Z:N3}>");
+                            else ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: BiLink {{back <-> new}} <{backND.Node.X:N3}{backND.Node.Y:N3}{backND.Node.Z:N3}>");
+#endif
+                        }
+
+                        // Если задан узел lastNodeDetail - добавляем связь с ним
+                        if (lastND != null)
+                        {
+                            AddArcFunc(lastND.Node, newNode, lastND.Distance);
+#if DEBUG && LOG
+                            if (uniDirection)
+                                ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: UniLink {{last -> new}} <{lastND.Node.X:N3}{lastND.Node.Y:N3}{lastND.Node.Z:N3}>");
+                            else ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: BiLink {{last <-> new}} <{lastND.Node.X:N3}{lastND.Node.Y:N3}{lastND.Node.Z:N3}>");
+#endif
+                        }
+                        return new NodeDetail(newNode);
                     }
+#if DEBUG && LOG
+                    ETLogger.WriteLine(LogType.Debug, $"LinkNearest3Side: Fail to add Node <{newNode.X:N3}, {newNode.Y:N3}, {newNode.Z:N3}>");
+#endif
+                    return lastND;
                 }
                 catch (Exception ex)
                 {
@@ -347,7 +336,7 @@ namespace EntityTools.Patches.Mapper
                 stopwatch.Restart();
 #endif
                 double minNodeDistance = EntityTools.PluginSettings.Mapper.WaypointDistance;
-                double maxDistance = Math.Max(25d, (double)EntityTools.PluginSettings.Mapper.WaypointDistance * 1.25d);
+                double maxDistance = Math.Max(25d, EntityTools.PluginSettings.Mapper.WaypointDistance * 1.25d);
                 double maxZDifference = EntityTools.PluginSettings.Mapper.MaxElevationDifference;
                 double equivalenceDistance = EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance;
 
@@ -415,60 +404,50 @@ namespace EntityTools.Patches.Mapper
                         }
                         return equivalentND;
                     }
-                    else
+
+                    if (lastND != null && lastND.Node != null)
                     {
-                        if (lastND != null && lastND.Node != null)
+                        // Вставляем узел и связываем его с предыдущим узлом lastNode
+                        if (Graph.AddNode(newNode))
                         {
-                            // Вставляем узел и связываем его с предыдущим узлом lastNode
-                            if (Graph.AddNode(newNode))
+#if DEBUG && LOG
+                            ETLogger.WriteLine(LogType.Debug, $"LinkLast: Add 'NEW' Node <{newNode.X:N3}{newNode.Y:N3}{newNode.Z:N3}>");
+#endif
+                            if (uniDirection)
                             {
+                                Graph.AddArc(lastND.Node, newNode, lastND.Distance);
 #if DEBUG && LOG
-                                ETLogger.WriteLine(LogType.Debug, $"LinkLast: Add 'NEW' Node <{newNode.X:N3}{newNode.Y:N3}{newNode.Z:N3}>");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkLast: UniLink {{last -> ew}} <{lastND.Node.X:N3}{lastND.Node.Y:N3}{lastND.Node.Z:N3}>");
 #endif
-                                if (uniDirection)
-                                {
-                                    Graph.AddArc(lastND.Node, newNode, lastND.Distance);
-#if DEBUG && LOG
-                                    ETLogger.WriteLine(LogType.Debug, $"LinkLast: UniLink {{last -> ew}} <{lastND.Node.X:N3}{lastND.Node.Y:N3}{lastND.Node.Z:N3}>");
-#endif
-                                }
-                                else
-                                {
-                                    Graph.Add2Arcs(lastND.Node, newNode, lastND.Distance);
-#if DEBUG && LOG
-                                    ETLogger.WriteLine(LogType.Debug, $"LinkLast: BiLink {{last <-> ew}} <{lastND.Node.X:N3}{lastND.Node.Y:N3}{lastND.Node.Z:N3}>");
-#endif
-                                }
-                                return new NodeDetail(newNode);
                             }
                             else
                             {
+                                Graph.Add2Arcs(lastND.Node, newNode, lastND.Distance);
 #if DEBUG && LOG
-                                ETLogger.WriteLine(LogType.Debug, $"LinkLast: Fail to add Node <{newNode.X:N3}, {newNode.Y:N3}, {newNode.Z:N3}>");
+                                ETLogger.WriteLine(LogType.Debug, $"LinkLast: BiLink {{last <-> ew}} <{lastND.Node.X:N3}{lastND.Node.Y:N3}{lastND.Node.Z:N3}>");
 #endif
-                                return lastND;
                             }
+                            return new NodeDetail(newNode);
                         }
-                        else
-                        {
-                            // предыдущий узел "отсутствует"
-                            // связывать несчем
-                            if (Graph.AddNode(newNode))
-                            {
 #if DEBUG && LOG
-                                ETLogger.WriteLine(LogType.Debug, $"LinkLast: Add 'NEW' Node <{newNode.X:N3}{newNode.Y:N3}{newNode.Z:N3}> without links");
+                        ETLogger.WriteLine(LogType.Debug, $"LinkLast: Fail to add Node <{newNode.X:N3}, {newNode.Y:N3}, {newNode.Z:N3}>");
 #endif
-                                return new NodeDetail(newNode);
-                            }
-                            else
-                            {
-#if DEBUG && LOG
-                                ETLogger.WriteLine(LogType.Debug, $"LinkLast: Fail to add Node <{newNode.X:N3}, {newNode.Y:N3}, {newNode.Z:N3}>");
-#endif
-                                return null;
-                            }
-                        }
+                        return lastND;
                     }
+
+                    // предыдущий узел "отсутствует"
+                    // связывать несчем
+                    if (Graph.AddNode(newNode))
+                    {
+#if DEBUG && LOG
+                        ETLogger.WriteLine(LogType.Debug, $"LinkLast: Add 'NEW' Node <{newNode.X:N3}{newNode.Y:N3}{newNode.Z:N3}> without links");
+#endif
+                        return new NodeDetail(newNode);
+                    }
+#if DEBUG && LOG
+                    ETLogger.WriteLine(LogType.Debug, $"LinkLast: Fail to add Node <{newNode.X:N3}, {newNode.Y:N3}, {newNode.Z:N3}>");
+#endif
+                    return null;
                 }
 #if DEBUG
                 catch (Exception ex)
@@ -591,7 +570,8 @@ namespace EntityTools.Patches.Mapper
                     }
                     // Вставляем в Граф узел newNode
                     // связываем его с предыдущим узлом lastNode и с ближайшим узлом
-                    else if (Graph.AddNode(newNode))
+
+                    if (Graph.AddNode(newNode))
                     {
 #if DEBUG && LOG
                         ETLogger.WriteLine(LogType.Debug, $"LinkNearest1: Add 'NEW' node <{newNode.X:N3}, {newNode.Y:N3}, {newNode.Z:N3}>");
@@ -636,13 +616,10 @@ namespace EntityTools.Patches.Mapper
 #endif
                         return new NodeDetail(newNode);
                     }
-                    else
-                    {
 #if DEBUG && LOG
-                        ETLogger.WriteLine(LogType.Debug, $"LinkNearest1: Fail to add Node <{newNode.X:N3}, {newNode.Y:N3}, {newNode.Z:N3}>");
+                    ETLogger.WriteLine(LogType.Debug, $"LinkNearest1: Fail to add Node <{newNode.X:N3}, {newNode.Y:N3}, {newNode.Z:N3}>");
 #endif
-                        return lastND;
-                    }
+                    return lastND;
                 }
 #if DEBUG
                 catch (Exception ex)

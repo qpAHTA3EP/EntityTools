@@ -1,5 +1,4 @@
-﻿using Astral;
-using System;
+﻿using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -42,8 +41,8 @@ namespace EntityTools.Patches
             else
             {
                 string msg = string.Concat("Fail to inject:", Environment.NewLine,
-                                            (methodToReplace == null) ? $"MethodToReplace: NULL" : $"MethodToReplace: {methodToReplace.Name}", Environment.NewLine,
-                                            (methodToInject == null) ? $"MethodToInject: NULL" : $"MethodToInject: {methodToInject.Name}");
+                                            (methodToReplace == null) ? "MethodToReplace: NULL" : $"MethodToReplace: {methodToReplace.Name}", Environment.NewLine,
+                                            (methodToInject == null) ? "MethodToInject: NULL" : $"MethodToInject: {methodToInject.Name}");
                 ETLogger.WriteLine(LogType.Error, msg, true);
             }
         }

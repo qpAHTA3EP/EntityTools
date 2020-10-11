@@ -30,10 +30,10 @@
         /// <summary>
         /// Редактирование CustomRegion'ов
         /// </summary>
-        EditCustomRegion,
+        EditCustomRegion
     }
 
-    public enum MappingType
+    public enum MappingMode
     {
         Bidirectional,
         Unidirectional,

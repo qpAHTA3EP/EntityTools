@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace EntityTools.Reflection
 {
@@ -80,7 +77,8 @@ namespace EntityTools.Reflection
                         }
                         return result;
                     }
-                    else return false;
+
+                    return false;
                 }
                 return Initialize(t.BaseType, propName, flags);
             }
@@ -99,7 +97,7 @@ namespace EntityTools.Reflection
                 object result = getter?.Invoke(null, new object[] { });
                 if (result != null)
                     return (PropertyType)result;
-                else return default(PropertyType);                
+                return default;
             }
             set
             {

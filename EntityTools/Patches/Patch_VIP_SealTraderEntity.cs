@@ -1,12 +1,9 @@
-﻿using Astral.Logic.NW;
+﻿using System;
+using System.Reflection;
+using Astral.Logic.NW;
 using EntityTools.Reflection;
 using MyNW.Classes;
 using MyNW.Internals;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 
 namespace EntityTools.Patches
 {

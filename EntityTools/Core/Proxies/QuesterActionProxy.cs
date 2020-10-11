@@ -1,10 +1,11 @@
-﻿using Astral.Logic.Classes.Map;
+﻿using System;
+using System.Reflection;
+using Astral.Logic.Classes.Map;
 using EntityTools.Core.Interfaces;
 using EntityTools.Reflection;
-using System.Reflection;
 using MyNW.Classes;
-using System;
 using static Astral.Quester.Classes.Action;
+using Action = Astral.Quester.Classes.Action;
 
 namespace EntityTools.Core.Proxies
 {
@@ -13,11 +14,11 @@ namespace EntityTools.Core.Proxies
     /// </summary>
     internal sealed class QuesterActionProxy : IQuesterActionEngine
     {
-        private Astral.Quester.Classes.Action action;
+        private Action action;
 
         private QuesterActionProxy() { }
 
-        internal QuesterActionProxy(Astral.Quester.Classes.Action a)
+        internal QuesterActionProxy(Action a)
         {
             action = a ?? throw new ArgumentNullException();
         }
@@ -29,7 +30,7 @@ namespace EntityTools.Core.Proxies
                 if (EntityTools.Core.Initialize(action))
                     return action.NeedToRun;
 
-                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
 
                 EntityTools.StopBot();
 
@@ -43,7 +44,7 @@ namespace EntityTools.Core.Proxies
             {
                 if (EntityTools.Core.Initialize(action))
                     return action.ActionLabel;
-                else return action.GetType().Name;
+                return action.GetType().Name;
             }
         }
 
@@ -56,7 +57,7 @@ namespace EntityTools.Core.Proxies
                         && result != null)
                         return result.Equals(true);
 
-                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
 
                 EntityTools.StopBot();
 
@@ -85,7 +86,7 @@ namespace EntityTools.Core.Proxies
                         && result != null)
                         return result as Vector3;
 
-                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
 
                 EntityTools.StopBot();
 
@@ -98,7 +99,7 @@ namespace EntityTools.Core.Proxies
             {
                 if (EntityTools.Core.Initialize(action))
                     return action.UseHotSpots;
-                else return false;
+                return false;
             }
         }
 
@@ -125,7 +126,7 @@ namespace EntityTools.Core.Proxies
             if (EntityTools.Core.Initialize(action))
                 return action.Run();
 
-            ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
+            ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
 
             EntityTools.StopBot();
 

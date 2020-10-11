@@ -215,6 +215,7 @@
     <Compile Include="Patches\Mapper\Tools\EditCustomRegionTool.cs" />
     <Compile Include="Patches\Mapper\Tools\AddCustomRegionTool.cs" />
     <Compile Include="Patches\Mapper\Tools\MapperMouseEventArgs.cs" />
+    <Compile Include="Patches\Mapper\Tools\MappingTool.cs" />
     <Compile Include="Patches\Mapper\Tools\NodeSelectTool.cs" />
     <Compile Include="Patches\Mapper\Tools\IMapperTool.cs" />
     <Compile Include="Patches\Mapper\Tools\RelocateNodesTool.cs" />

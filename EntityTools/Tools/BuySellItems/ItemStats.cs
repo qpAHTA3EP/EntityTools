@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace EntityTools.Tools.BuySellItems
+﻿namespace EntityTools.Tools.BuySellItems
 {
     /// <summary>
     /// Статистические данные по предметам
@@ -22,7 +17,7 @@ namespace EntityTools.Tools.BuySellItems
 
         public ItemStats Clone()
         {
-            return new ItemStats() { MaxItemLevel = this.MaxItemLevel, TotalItemsCount = this.TotalItemsCount };
+            return new ItemStats { MaxItemLevel = MaxItemLevel, TotalItemsCount = TotalItemsCount };
         }
     }
 }

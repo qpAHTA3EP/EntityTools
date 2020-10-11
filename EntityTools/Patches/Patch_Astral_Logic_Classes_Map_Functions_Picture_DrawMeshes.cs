@@ -3,8 +3,9 @@ using System.Drawing;
 using System.Reflection;
 using AStar;
 using Astral.Logic.Classes.Map;
-using MyNW.Classes;
+using Astral.Logic.Classes.Map.Functions;
 using EntityTools.Reflection;
+using MyNW.Classes;
 
 namespace EntityTools.Patches.Mapper
 {
@@ -16,7 +17,7 @@ namespace EntityTools.Patches.Mapper
     {
         internal Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes()
         {
-            MethodInfo mi = typeof(Astral.Logic.Classes.Map.Functions.Picture).GetMethod("DrawMeshes", ReflectionHelper.DefaultFlags);
+            MethodInfo mi = typeof(Picture).GetMethod("DrawMeshes", ReflectionHelper.DefaultFlags);
             if (mi != null)
             {
                 methodToReplace = mi;

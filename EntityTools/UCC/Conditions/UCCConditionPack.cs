@@ -1,21 +1,18 @@
-﻿using Astral.Quester.Classes;
-using EntityTools.Tools;
-using EntityTools.Editors;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Text;
-using Astral.Logic.UCC.Classes;
-using EntityTools.Enums;
-using EntityTools.UCC.Conditions;
-using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 using System.Xml.Serialization;
-using EntityTools;
+using Astral.Logic.UCC.Classes;
+using EntityTools.Editors;
+using EntityTools.Enums;
+using EntityTools.Tools;
+using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 
 namespace EntityTools.UCC.Conditions
 {
     [Serializable]
-    public class UCCConditionPack : Astral.Logic.UCC.Classes.UCCCondition, ICustomUCCCondition
+    public class UCCConditionPack : UCCCondition, ICustomUCCCondition
     {
 #if DEVELOPER
         [Description("Displayed name of the ConditionPack")]
@@ -116,7 +113,7 @@ namespace EntityTools.UCC.Conditions
             return (Not) ? !result : result;
         }
 
-        bool ICustomUCCCondition.Loked { get => base.Locked; set => base.Locked = value; }
+        bool ICustomUCCCondition.Loked { get => Locked; set => Locked = value; }
 
         string ICustomUCCCondition.TestInfos(UCCAction refAction/* = null*/)
         {
@@ -132,7 +129,7 @@ namespace EntityTools.UCC.Conditions
                     if (cond.Locked)
                         sb.Append("\t[L] ");
                     else sb.Append("\t[U] ");
-                    sb.Append(cond.ToString()).Append(" | Result: ");
+                    sb.Append(cond).Append(" | Result: ");
                     if (cond is ICustomUCCCondition iCond)
                         sb.Append(iCond.IsOK(refAction));
                     else sb.Append(cond.IsOK(refAction));
@@ -141,7 +138,8 @@ namespace EntityTools.UCC.Conditions
                 sb.Append("Negation flag (Not): ").Append(Not).AppendLine();
                 return sb.ToString();
             }
-            else return "The list 'Conditions' is empty";
+
+            return "The list 'Conditions' is empty";
         }
 #endregion
 
@@ -149,7 +147,7 @@ namespace EntityTools.UCC.Conditions
         {
             if (string.IsNullOrEmpty(Name))
                 return "ConditionPack";
-            else return $"ConditionPack: {Name}";
+            return $"ConditionPack: {Name}";
         }
 
         #region Hide Inherited Properties

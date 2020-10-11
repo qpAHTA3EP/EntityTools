@@ -1,8 +1,7 @@
-﻿using EntityTools.Services;
-using EntityTools.Settings;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.IO;
+using Astral.Controllers;
 
 namespace EntityTools.Settings
 {
@@ -24,7 +23,7 @@ namespace EntityTools.Settings
                 if (_active != value)
                 {
                     _active = value;
-                    base.NotifyPropertyChanged(nameof(Active));
+                    NotifyPropertyChanged(nameof(Active));
                 }
             }
         }
@@ -41,12 +40,12 @@ namespace EntityTools.Settings
             {
                 if(_logFilePath != value)
                 {
-                    _logFilePath = value.Replace(Astral.Controllers.Directories.AstralStartupPath, ".");
-                    base.NotifyPropertyChanged(nameof(Active));
+                    _logFilePath = value.Replace(Directories.AstralStartupPath, ".");
+                    NotifyPropertyChanged(nameof(Active));
                 }
             }
         }
-        private string _logFilePath = string.Concat(Astral.Controllers.Directories.LogsPath.Replace(Astral.Controllers.Directories.AstralStartupPath, "."), Path.DirectorySeparatorChar, nameof(EntityTools), Path.DirectorySeparatorChar);
+        private string _logFilePath = string.Concat(Directories.LogsPath.Replace(Directories.AstralStartupPath, "."), Path.DirectorySeparatorChar, nameof(EntityTools), Path.DirectorySeparatorChar);
 
         /// <summary>
         /// Активания расширенной отладочной информации
@@ -60,10 +59,10 @@ namespace EntityTools.Settings
                 if (_extendedActionDebugInfo != value)
                 {
                     _extendedActionDebugInfo = value;
-                    base.NotifyPropertyChanged(nameof(ExtendedActionDebugInfo));
+                    NotifyPropertyChanged(nameof(ExtendedActionDebugInfo));
                 }
             }
         }
-        private bool _extendedActionDebugInfo = false;
+        private bool _extendedActionDebugInfo;
     }
 }

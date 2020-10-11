@@ -1,9 +1,7 @@
-﻿using MyNW.Classes;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
+using MyNW.Classes;
 
 namespace EntityTools.Tools
 {
@@ -55,7 +53,7 @@ namespace EntityTools.Tools
         {
             if (obj is AuraDef aura)
                 return Equals(aura);
-            else if (obj is AttribModNet mod)
+            if (obj is AttribModNet mod)
                 return Equals(mod);
             return false;
         }

@@ -1,21 +1,13 @@
 ﻿using System;
-using System.Linq;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
 using Astral.Quester.UIEditors;
-using EntityTools.Extensions;
-using EntityTools.Editors;
-using EntityTools.Enums;
-using MyNW.Classes;
-using MyNW.Internals;
-using MyNW.Patchables.Enums;
-using EntityTools.Core.Proxies;
 using EntityTools.Core.Interfaces;
+using EntityTools.Core.Proxies;
+using EntityTools.Editors;
 #if true
 using EntityTools.Tools.BuySellItems;
 #else
@@ -109,7 +101,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal bool _checkItemCooldown = false;
+        internal bool _checkItemCooldown;
 
 
 #if disabled_20200527_1854
@@ -231,12 +223,12 @@ namespace EntityTools.UCC.Actions
 
         public override UCCAction Clone()
         {
-            return base.BaseClone(new UseItemSpecial
+            return BaseClone(new UseItemSpecial
             {
-                _itemId = this._itemId,
-                _itemIdType = this._itemIdType,
-                _checkItemCooldown = this._checkItemCooldown,
-                _bags = this._bags.Clone()
+                _itemId = _itemId,
+                _itemIdType = _itemIdType,
+                _checkItemCooldown = _checkItemCooldown,
+                _bags = _bags.Clone()
             });
         }
     }

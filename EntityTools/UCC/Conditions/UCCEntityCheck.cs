@@ -1,16 +1,14 @@
-﻿using Astral.Classes.ItemFilter;
-using Astral.Logic.UCC.Classes;
-using EntityTools.Editors;
-using EntityTools.Tools;
-using MyNW.Classes;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Xml.Serialization;
-using EntityTools.Enums;
-using System;
-using System.Text;
+using Astral.Classes.ItemFilter;
+using Astral.Logic.UCC.Classes;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
+using EntityTools.Editors;
+using EntityTools.Enums;
+using EntityTools.Tools;
 
 namespace EntityTools.UCC.Conditions
 {
@@ -118,7 +116,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal bool _regionCheck = false;
+        internal bool _regionCheck;
 
 #if DEVELOPER
         [Description("Check if Entity's health greater than zero:\n" +
@@ -161,7 +159,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal float _reactionRange = 0;
+        internal float _reactionRange;
 
 #if DEVELOPER
         [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
@@ -182,7 +180,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal float _reactionZRange = 0;
+        internal float _reactionZRange;
 
 #if DEVELOPER
         [Description("Aura which checked on the Entity")]
@@ -234,7 +232,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal float _propertyValue = 0;
+        internal float _propertyValue;
 
 #if DEVELOPER
         [XmlIgnore]
@@ -265,7 +263,7 @@ namespace EntityTools.UCC.Conditions
         #region ICustomUCCCondition
         bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/) => Engine.IsOK(refAction);
 
-        bool ICustomUCCCondition.Loked { get => base.Locked; set => base.Locked = value; }
+        bool ICustomUCCCondition.Loked { get => Locked; set => Locked = value; }
 
         string ICustomUCCCondition.TestInfos(UCCAction refAction) => Engine.TestInfos(refAction);
         #endregion

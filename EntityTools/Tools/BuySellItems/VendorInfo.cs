@@ -1,11 +1,8 @@
-﻿using Astral.Logic.NW;
+﻿using System;
+using Astral.Logic.NW;
 using EntityTools.Enums;
 using MyNW.Classes;
 using MyNW.Internals;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace EntityTools.Tools.BuySellItems
 {
@@ -373,14 +370,7 @@ namespace EntityTools.Tools.BuySellItems
                     case VendorType.Normal:
                         if (_mapName.Length > 0)
                         {
-                            label = string.Concat(new string[]
-                            {
-                                _displayName,
-                                " (",
-                                _mapName,
-                                (_regionName.Length > 0) ? ("/" + _regionName) : string.Empty,
-                                ")"
-                            });
+                            label = string.Concat(_displayName, " (", _mapName, (_regionName.Length > 0) ? ("/" + _regionName) : string.Empty, ")");
                         }
                         else label = "Not set";
                         break;

@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Drawing;
 using System.Windows.Forms;
 using AStar;
-using EntityTools.Patches.Mapper.Tools;
-using HarmonyLib;
 
 namespace EntityTools.Patches.Mapper.Tools
 {
@@ -22,9 +19,7 @@ namespace EntityTools.Patches.Mapper.Tools
         /// </summary>
         readonly LinkedList<Tuple<Arc, bool>> modifiedArcs = new LinkedList<Tuple<Arc, bool>>();
 
-        private Node startNode = null;
-
-        public EditEdgeTool() { }
+        private Node startNode;
 
         /// <summary>
         /// Использование механизма выделения вершин

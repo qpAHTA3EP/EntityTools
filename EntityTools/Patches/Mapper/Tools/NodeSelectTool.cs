@@ -1,13 +1,10 @@
-﻿using AStar;
-using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Windows.Forms;
-using DevExpress.Data.Filtering.Helpers;
 using System.Threading;
+using System.Windows.Forms;
+using AStar;
 using AStar.Tools;
-using EntityTools.Patches.Mapper.Tools;
 
 namespace EntityTools.Patches.Mapper.Tools
 {

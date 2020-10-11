@@ -2,32 +2,34 @@
 //#define DUMP_TEST
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using EntityTools.Tools;
-using MyNW.Internals;
-using MyNW;
-using EntityTools.UCC.Extensions;
-using EntityTools.Enums;
-using EntityTools.Services;
+using Astral;
 using Astral.Classes.ItemFilter;
-using System.Collections.Generic;
-using MyNW.Classes;
-using DevExpress.XtraEditors;
-
-using MyNW.Patchables.Enums;
-using EntityTools.Forms;
-using System.Diagnostics;
-using EntityTools.UCC.Conditions;
-using EntityTools.Patches.Mapper;
 using Astral.Controllers;
+using Astral.Forms;
+using Astral.Logic.Classes.FSM;
+using Astral.Quester.Forms;
+using DevExpress.XtraEditors;
+using DevExpress.XtraEditors.Controls;
+using EntityTools.Enums;
+using EntityTools.Patches.UCC;
 using EntityTools.Reflection;
+using EntityTools.Services;
+using EntityTools.Tools;
+using EntityTools.UCC.Extensions;
+using MyNW;
+using MyNW.Classes;
+using MyNW.Internals;
+using API = Astral.Quester.API;
+using Editor = Astral.Logic.UCC.Forms.Editor;
 
 namespace EntityTools.Core
 {
-    public partial class EntityToolsMainPanel : /* UserControl //*/ Astral.Forms.BasePanel
+    public partial class EntityToolsMainPanel : /* UserControl //*/ BasePanel
     {
         private EntityDef entDif = new EntityDef();
 
@@ -614,7 +616,7 @@ namespace EntityTools.Core
 
         private void event_OpenUccEditor(object sender, EventArgs e)
         {
-            Astral.Logic.UCC.Forms.Editor uccEditor = null;
+            Editor uccEditor = null;
             if (UCCEditorExtensions.GetUccEditor(ref uccEditor))
             {
                 uccEditor.Show();
@@ -816,15 +818,15 @@ namespace EntityTools.Core
             tbMashingId.Text = machineid;
         }
 
-        private void event_ChangeExportingFileName(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
+        private void event_ChangeExportingFileName(object sender, ButtonPressedEventArgs e)
         {
             if (cbbxExportSelector.SelectedItem is ExportTypes expType)
             {
                 string fileName;
                 if (string.IsNullOrEmpty(tbExportFileSelector.Text))
                 {
-                    fileName = Path.Combine(Astral.Controllers.Directories.LogsPath, expType.ToString(), FileTools.defaultExportFileName);
-                    fileName.Replace(Astral.Controllers.Directories.AstralStartupPath, @".\");
+                    fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.defaultExportFileName);
+                    fileName.Replace(Directories.AstralStartupPath, @".\");
                 }
                 else fileName = tbExportFileSelector.Text;
 
@@ -844,8 +846,8 @@ namespace EntityTools.Core
             if (cbbxExportSelector.SelectedItem is ExportTypes expType)
             {
                 string fileName;
-                fileName = Path.Combine(Astral.Controllers.Directories.LogsPath, expType.ToString(), FileTools.defaultExportFileName);
-                fileName.Replace(Astral.Controllers.Directories.AstralStartupPath, @".\");
+                fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.defaultExportFileName);
+                fileName.Replace(Directories.AstralStartupPath, @".\");
                 tbExportFileSelector.Text = fileName;
             }
         }
@@ -855,8 +857,8 @@ namespace EntityTools.Core
             if (cbbxExportSelector.SelectedItem is ExportTypes expType)
             {
 
-                string fileName = Path.Combine(Astral.Controllers.Directories.LogsPath, expType.ToString(), FileTools.defaultExportFileName);
-                fileName.Replace(Astral.Controllers.Directories.AstralStartupPath, @".\");
+                string fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.defaultExportFileName);
+                fileName.Replace(Directories.AstralStartupPath, @".\");
                 tbExportFileSelector.Text = fileName;
             }
         }
@@ -869,7 +871,7 @@ namespace EntityTools.Core
 
                 if (string.IsNullOrEmpty(fullFileName) || fullFileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
                 {
-                    fullFileName = Path.Combine(Astral.Controllers.Directories.LogsPath, expType.ToString(), FileTools.ReplaceMask(FileTools.defaultExportFileName));
+                    fullFileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.ReplaceMask(FileTools.defaultExportFileName));
                     MessageBox.Show("The specified filename is incorrect.\n" +
                                     $"{expType} will be saved in the file:\n" +
                                     fullFileName, "Caution!", MessageBoxButtons.OK);
@@ -918,7 +920,7 @@ namespace EntityTools.Core
                                 sw.WriteLine($"Character: {EntityManager.LocalPlayer.InternalName}");
                                 sw.WriteLine($"DateTime: {DateTime.Now.ToLongDateString()} {DateTime.Now.ToLongTimeString()}");
                                 sw.WriteLine();
-                                foreach (Astral.Logic.Classes.FSM.State state in Astral.Quester.API.Engine.States)
+                                foreach (State state in API.Engine.States)
                                 {
                                     sw.WriteLine($"{state.DisplayName} {state.Priority}");
                                     sw.WriteLine($"\t{state.GetType().FullName}");
@@ -929,13 +931,13 @@ namespace EntityTools.Core
                 }
 
                 if (MessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?", $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                    System.Diagnostics.Process.Start(fullFileName);
+                    Process.Start(fullFileName);
             }
         }
 
         private void event_ShowMapper(object sender, EventArgs e)
         {
-            Astral.Quester.Forms.MapperForm.Open();
+            MapperForm.Open();
         }
 
         private void ckbEnableLogger_CheckedChanged(object sender, EventArgs e)
@@ -949,7 +951,7 @@ namespace EntityTools.Core
         private void event_OpenLogFile(object sender, EventArgs e)
         {
             if(File.Exists(ETLogger.LogFilePath))
-                System.Diagnostics.Process.Start(ETLogger.LogFilePath);
+                Process.Start(ETLogger.LogFilePath);
         }
 
         private void event_CheckCore(object sender, EventArgs e)
@@ -958,13 +960,13 @@ namespace EntityTools.Core
             {
 
                 XtraMessageBox.Show($"EntityToolsCore is VALID!\n\rCore hash: {EntityTools.CoreHash}");
-                Astral.Logger.WriteLine($"EntityToolsCore is VALID! Core hash: {EntityTools.CoreHash}");
+                Logger.WriteLine($"EntityToolsCore is VALID! Core hash: {EntityTools.CoreHash}");
             }
             else
             {
-                XtraMessageBox.Show($"EntityToolsCore is INVALID!",//\n\rCore hash: {EntityTools.CoreHash}", 
+                XtraMessageBox.Show("EntityToolsCore is INVALID!",//\n\rCore hash: {EntityTools.CoreHash}", 
                                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                Astral.Logger.WriteLine($"EntityToolsCore is INVALID!\n\rCore hash: {EntityTools.CoreHash}");
+                Logger.WriteLine($"EntityToolsCore is INVALID!\n\rCore hash: {EntityTools.CoreHash}");
             }
         }
 
@@ -972,8 +974,8 @@ namespace EntityTools.Core
         {
 #if DEVELOPER
             if (ckbDebugMonitor.Checked)
-                Patches.UCC.Patch_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = ShowMonitor;
-            else Patches.UCC.Patch_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = null; 
+                Patch_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = ShowMonitor;
+            else Patch_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = null; 
 #endif
         }
 

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace EntityTools.Reflection
 {
@@ -25,7 +22,7 @@ namespace EntityTools.Reflection
             {
                 if (fi.FieldType.Equals(typeof(FieldType)))
                 {
-                    return (ContainerType instance) =>
+                    return instance =>
                     {
                         object result = fi.GetValue(instance);
                         return (FieldType)result;
@@ -90,7 +87,8 @@ namespace EntityTools.Reflection
                         fieldInfo = fi;
                         return true;
                     }
-                    else return false;
+
+                    return false;
                 }
                 return Initialize(type.BaseType, fieldName, flags);
             }
@@ -108,7 +106,7 @@ namespace EntityTools.Reflection
             {
                 if (IsValid() && fieldInfo.GetValue(instance) is FieldType result)
                     return result;
-                else return default;                
+                return default;
             }
             set
             {

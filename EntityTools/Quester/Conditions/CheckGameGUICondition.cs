@@ -1,22 +1,20 @@
-﻿using Astral.Classes.ItemFilter;
+﻿using System.ComponentModel;
+using System.Drawing.Design;
+using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
-using EntityTools.Extensions;
+using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
-using MyNW.Classes;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Text.RegularExpressions;
-using EntityTools.Core.Proxies;
+using EntityTools.Patches;
 
 namespace EntityTools.Quester.Conditions
 {
-    public class CheckGameGUI : Astral.Quester.Classes.Condition
+    public class CheckGameGUI : Condition
     {
         #region Взаимодействие с ядром EntityTools
         public event PropertyChangedEventHandler PropertyChanged;
 #if CORE_INTERFACES
-        internal IQuesterConditionEngine ConditionEngine = null;
+        internal IQuesterConditionEngine ConditionEngine;
 #endif
 
         public CheckGameGUI()
@@ -32,7 +30,7 @@ namespace EntityTools.Quester.Conditions
         static CheckGameGUI()
         {
             // Пременение патча на этапе десериализации (до инициализации плагина)
-            Patches.ETPatcher.Apply();
+            ETPatcher.Apply();
         }
 #endif
 
@@ -140,7 +138,7 @@ namespace EntityTools.Quester.Conditions
 #else
         [Browsable(false)]
 #endif
-        public Condition.Presence PropertySign
+        public Presence PropertySign
         {
             get => _propertySign;
             set

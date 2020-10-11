@@ -1,13 +1,13 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using Astral.Classes.ItemFilter;
+using EntityTools.Enums;
 using EntityTools.Quester.Actions;
 using EntityTools.Quester.Conditions;
+using EntityTools.Reflection;
 using EntityTools.UCC.Actions;
 using EntityTools.UCC.Conditions;
-using EntityTools.Enums;
-using EntityTools.Reflection;
-using Astral.Classes.ItemFilter;
 
 namespace EntityTools.Editors
 {

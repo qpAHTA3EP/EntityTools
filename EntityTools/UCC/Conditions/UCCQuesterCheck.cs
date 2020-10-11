@@ -1,11 +1,8 @@
-﻿using Astral.Logic.UCC.Classes;
-using Astral.Logic.UCC.Ressources;
-using System.ComponentModel;
-using System.Xml.Serialization;
-using Astral.Quester.Classes;
-using EntityTools.Editors;
+﻿using System.ComponentModel;
 using System.Drawing.Design;
-using System;
+using System.Xml.Serialization;
+using Astral.Logic.UCC.Classes;
+using EntityTools.Editors;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
 namespace EntityTools.UCC.Conditions
@@ -22,7 +19,7 @@ namespace EntityTools.UCC.Conditions
 #else
         [Browsable(false)]
 #endif
-        public QuesterCondition Condition { get; set; } = null;
+        public QuesterCondition Condition { get; set; }
 
 #region ICustomUCCCondition
         bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
@@ -30,7 +27,7 @@ namespace EntityTools.UCC.Conditions
             return Condition?.IsValid == true;
         }
 
-        bool ICustomUCCCondition.Loked { get => base.Locked; set => base.Locked = value; }
+        bool ICustomUCCCondition.Loked { get => Locked; set => Locked = value; }
 
         string ICustomUCCCondition.TestInfos(UCCAction refAction)
         {

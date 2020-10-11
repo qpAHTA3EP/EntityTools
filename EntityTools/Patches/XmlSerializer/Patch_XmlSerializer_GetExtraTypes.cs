@@ -1,17 +1,18 @@
-﻿#if PATCH_ASTRAL && HARMONY
-using HarmonyLib; 
-#endif
-
+﻿
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using Astral.Classes.SkillTrain;
+using Astral.Controllers;
+using Astral.Functions;
 using Astral.Logic.UCC.Classes;
 using Astral.MultiTasks.Classes;
+using Astral.Quester.Classes;
 using EntityTools.Reflection;
-using System.Windows.Forms;
+using Action = Astral.Quester.Classes.Action;
+#if PATCH_ASTRAL && HARMONY
+using HarmonyLib; 
+#endif
 
 namespace EntityTools.Patches
 {
@@ -20,17 +21,17 @@ namespace EntityTools.Patches
     /// Патч метода Astral.Functions.XmlSerializer.GetExtraTypes()
     /// </summary>
 #if HARMONY
-    [HarmonyPatch(typeof(Astral.Functions.XmlSerializer), "GetExtraTypes")] 
+    [HarmonyPatch(typeof(XmlSerializer), "GetExtraTypes")] 
 #endif
     internal class Patch_XmlSerializer_GetExtraTypes : Patch
     {
-        static Func<List<Type>> GetPluginTypes = typeof(Astral.Controllers.Plugins).GetStaticFunction<List<Type>>("GetTypes");
+        static Func<List<Type>> GetPluginTypes = typeof(Plugins).GetStaticFunction<List<Type>>("GetTypes");
         internal static List<Type> UCCTypes = new List<Type>(20);
         internal static List<Type> QuesterTypes = new List<Type>(100);
         internal static List<Type> MultitaskTypes = new List<Type>(10);
         internal static List<Type> SkillTrainTypes = new List<Type>(50);
 
-        internal Patch_XmlSerializer_GetExtraTypes() : base(typeof(Astral.Functions.XmlSerializer).GetMethod("GetExtraTypes", ReflectionHelper.DefaultFlags), typeof(Patch_XmlSerializer_GetExtraTypes).GetMethod(nameof(GetExtraTypes), ReflectionHelper.DefaultFlags)){ }
+        internal Patch_XmlSerializer_GetExtraTypes() : base(typeof(XmlSerializer).GetMethod("GetExtraTypes", ReflectionHelper.DefaultFlags), typeof(Patch_XmlSerializer_GetExtraTypes).GetMethod(nameof(GetExtraTypes), ReflectionHelper.DefaultFlags)){ }
 
 #if HARMONY
         [HarmonyPrefix] 
@@ -131,11 +132,11 @@ namespace EntityTools.Patches
                 {
                     UCCTypes.Add(type);
                 }
-                else if (type.BaseType == typeof(Astral.Quester.Classes.Action))
+                else if (type.BaseType == typeof(Action))
                 {
                     QuesterTypes.Add(type);
                 }
-                else if (type.BaseType == typeof(Astral.Quester.Classes.Condition))
+                else if (type.BaseType == typeof(Condition))
                 {
                     UCCTypes.Add(type);
                     QuesterTypes.Add(type);
@@ -170,11 +171,11 @@ namespace EntityTools.Patches
                     {
                         UCCTypes.Add(type);
                     }
-                    else if (type.BaseType == typeof(Astral.Quester.Classes.Action))
+                    else if (type.BaseType == typeof(Action))
                     {
                         QuesterTypes.Add(type);
                     }
-                    else if (type.BaseType == typeof(Astral.Quester.Classes.Condition))
+                    else if (type.BaseType == typeof(Condition))
                     {
                         UCCTypes.Add(type);
                         QuesterTypes.Add(type);

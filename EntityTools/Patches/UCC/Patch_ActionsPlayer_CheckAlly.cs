@@ -1,12 +1,9 @@
-﻿using Astral.Logic.UCC.Classes;
-using MyNW.Classes;
-using MyNW.Internals;
-using MyNW.Patchables.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Astral.Logic.UCC.Classes;
 using EntityTools.Reflection;
+using MyNW.Classes;
+using MyNW.Patchables.Enums;
 
 namespace EntityTools.Patches.UCC
 {
@@ -23,10 +20,10 @@ namespace EntityTools.Patches.UCC
         /// <summary>
         /// Доступ к полю Astral.Logic.UCC.Classes.ActionsPlayer.mostInjuredAlly
         /// </summary>
-        static readonly StaticFieldAccessor<Entity> mostInjuredAlly = typeof(Astral.Logic.UCC.Classes.ActionsPlayer).GetStaticField<Entity>("mostInjuredAlly");
+        static readonly StaticFieldAccessor<Entity> mostInjuredAlly = typeof(ActionsPlayer).GetStaticField<Entity>("mostInjuredAlly");
 
         internal Patch_ActionsPlayer_CheckAlly() : 
-            base(typeof(Astral.Logic.UCC.Classes.ActionsPlayer).GetMethod("CheckAlly", ReflectionHelper.DefaultFlags), typeof(Patch_ActionsPlayer_CheckAlly).GetMethod(nameof(CheckAlly), ReflectionHelper.DefaultFlags))
+            base(typeof(ActionsPlayer).GetMethod("CheckAlly", ReflectionHelper.DefaultFlags), typeof(Patch_ActionsPlayer_CheckAlly).GetMethod(nameof(CheckAlly), ReflectionHelper.DefaultFlags))
         { }
 
         /// <summary>

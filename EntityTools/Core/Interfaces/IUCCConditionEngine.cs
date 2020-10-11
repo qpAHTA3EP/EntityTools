@@ -1,5 +1,4 @@
 ﻿using Astral.Logic.UCC.Classes;
-using MyNW.Classes;
 
 namespace EntityTools.Core.Interfaces
 {

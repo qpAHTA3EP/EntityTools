@@ -2,20 +2,18 @@
 //#define BagsList_Items
 #define BagsList_IXmlSerializable
 
-using EntityTools.Reflection;
-using MyNW.Classes;
-using MyNW.Internals;
-using MyNW.Patchables.Enums;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using EntityTools.Reflection;
+using MyNW.Classes;
+using MyNW.Internals;
+using MyNW.Patchables.Enums;
 
 namespace EntityTools.Tools.BuySellItems
 {
@@ -282,7 +280,7 @@ namespace EntityTools.Tools.BuySellItems
         /// Количество выбранных сумок
         /// </summary>
         public uint Count { get => _count; }
-        uint _count = 0;
+        uint _count;
 
         /// <summary>
         /// Сброс всех сумок
@@ -363,7 +361,8 @@ namespace EntityTools.Tools.BuySellItems
                     {
                         return (InvBagIDs)ind;
                     }
-                    else throw new IndexOutOfRangeException();
+
+                    throw new IndexOutOfRangeException();
                 }
             }
 
@@ -375,7 +374,8 @@ namespace EntityTools.Tools.BuySellItems
                     {
                         return (InvBagIDs)ind;
                     }
-                    else throw new IndexOutOfRangeException();
+
+                    throw new IndexOutOfRangeException();
                 }
             }
 
@@ -487,7 +487,7 @@ namespace EntityTools.Tools.BuySellItems
                 {
                     if (!reader.IsStartElement())
                         return;
-                    else throw new XmlException($"{MethodBase.GetCurrentMethod().Name}: Unexpected XmlStartElement '{name}' while there are should be the XmlEndElement '{xmlEndElement}'");
+                    throw new XmlException($"{MethodBase.GetCurrentMethod().Name}: Unexpected XmlStartElement '{name}' while there are should be the XmlEndElement '{xmlEndElement}'");
                 }
                 else if (name == nameof(BagsList)
 #if BagsList_Items

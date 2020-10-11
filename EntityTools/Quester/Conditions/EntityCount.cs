@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Text;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
-using MyNW.Classes;
 
 namespace EntityTools.Quester.Conditions
 {
@@ -21,7 +19,7 @@ namespace EntityTools.Quester.Conditions
     public class EntityCount : Condition, INotifyPropertyChanged
     {
 #if CORE_INTERFACES
-        internal IQuesterConditionEngine Engine = null;
+        internal IQuesterConditionEngine Engine;
 #endif
         public EntityCount()
         {
@@ -149,7 +147,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal bool _regionCheck = false;
+        internal bool _regionCheck;
 
 #if DEVELOPER
         [Description("Check if Entity's health greater than zero:\n" +
@@ -190,7 +188,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal uint _value = 0;
+        internal uint _value;
 
 #if DEVELOPER
         [Description("The comparison type for the number of the Entities with 'Value'")]
@@ -231,7 +229,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal float _reactionRange = 0;
+        internal float _reactionRange;
 
 #if DEVELOPER
         [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
@@ -251,7 +249,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal float _reactionZRange = 0;
+        internal float _reactionZRange;
 
 #if false
 #if DEVELOPER

@@ -1,90 +1,62 @@
 ﻿#define LOG
 #define DrawMapper_Measuring
 
-#if PATCH_ASTRAL
-using Astral.Logic.NW;
-using Astral.Quester.Classes;
-using EntityTools.Settings;
-using MyNW.Classes;
-#endif
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
+using System.Threading;
+using System.Windows.Forms;
 using AStar;
 using Astral;
 using Astral.Controllers;
+using Astral.Quester.Forms;
 using DevExpress.XtraBars;
 using DevExpress.XtraEditors;
+using EntityTools.Patches.Mapper.Tools;
+using EntityTools.Properties;
 using EntityTools.Reflection;
 using MyNW.Internals;
-using System;
-using System.ComponentModel;
-using System.Drawing;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using EntityTools.Patches.Mapper.Tools;
-using System.Collections.Generic;
-using System.Diagnostics;
+using MyNW.Patchables.Enums;
+using Action = System.Action;
+using GoldenPath = Astral.Logic.NW.GoldenPath;
+using MinimapWaypoint = MyNW.Classes.MinimapWaypoint;
+using Timeout = Astral.Classes.Timeout;
+#if PATCH_ASTRAL
+using Astral.Logic.NW;
+using Astral.Quester.Classes;
+using MyNW.Classes;
+#endif
 
 namespace EntityTools.Patches.Mapper
 {
 #if PATCH_ASTRAL
     public partial class MapperFormExt : XtraForm//, IMapperForm //*/Form
     {
-        #region Reflection helpers
-#if false
-        /// <summary>
-        /// Функтор доступа к графу 
-        /// </summary>
-        private static readonly StaticPropertyAccessor<AStar.Graph> CoreCurrentMapMeshes = typeof(Astral.Quester.Core).GetStaticProperty<Graph>("Meshes");
-
-        /// <summary>
-        /// Функтор доступа к словарю Astral.Quester.Core.MapsMeshes
-        /// </summary>
-        private static readonly StaticPropertyAccessor<Dictionary<string, Graph>> CoreMapsMeshes = typeof(Astral.Quester.Core).GetStaticProperty<Dictionary<string, Graph>>("MapsMeshes"); 
-
-        /// <summary>
-        /// Функтор доступа к списку карт в файле профиля
-        /// Astral.Quester.Core.AvailableMeshesFromFile(openFileDialog.FileName)
-        /// </summary>
-        private static readonly Func<string, List<string>> CoreAvailableMeshesFromFile = typeof(Astral.Quester.Core).GetStaticFunction<string, List<string>>("AvailableMeshesFromFile");
-
-        /// <summary>
-        /// Доступ к Astral.Quester.Core.LoadAllMeshes();
-        /// </summary>
-        private static readonly Func<int> CoreLoadAllMeshes = typeof(Astral.Quester.Core).GetStaticFunction<int>("LoadAllMeshes");
-
-        /// <summary>
-        /// Функтор доступа к Astral.Logic.NW.GoldenPath.GetCurrentMapGraph(...);
-        /// </summary>
-        //private static readonly Func<AStar.Graph, bool> GetCurrentMapGraph = typeof(Astral.Logic.NW.GoldenPath).GetStaticFunction<AStar.Graph, bool>("GetCurrentMapGraph");
-#endif
-        #endregion
-
-#if true
-        /// <summary>
-        /// Кэш вершин графа путей
-        /// </summary>
-        //protected MapperGraphCache MappingCache;
-
-#endif
         /// <summary>
         /// Инструмент для выделения вершин
         /// </summary>
         private readonly NodeSelectTool _selectedNodes = new NodeSelectTool();
-
+        /// <summary>
+        /// Список изменений (для отката)
+        /// </summary>
         private readonly Stack<IMapperTool> _undoStack = new Stack<IMapperTool>();
 
         /// <summary>
-        /// Кэш-код текущей активной карты
+        /// Хэш-код текущей активной карты
         /// </summary>
-        private int currentMapHash = 0;
+        private int _currentMapHash;
 
+        /// <summary>
+        /// Активный инструмент изменения графа
+        /// </summary>
         private IMapperTool CurrentTool
         {
             get => _currentTool;
@@ -101,7 +73,47 @@ namespace EntityTools.Patches.Mapper
                 else _selectedNodes.Clear();
             }
         }
-        private IMapperTool _currentTool = null;
+        private IMapperTool _currentTool;
+
+        /// <summary>
+        /// Флаг удержания персонажа в центре карты
+        /// 
+        /// </summary>
+        public bool LockOnPlayer
+        {
+            get => btnLockMapOnPlayer.Checked;
+            set => btnLockMapOnPlayer.Checked = value;
+        }
+
+        /// <summary>
+        /// Координаты центра отображаемой карты
+        /// </summary>
+        public Vector3 CenterOfMap
+        {
+            get
+            {
+                using (_graphics.ReadLock())
+                {
+                    return _graphics.CenterPosition.Clone();
+                }
+            }
+            set
+            {
+                if (value != null && value.IsValid)
+                {
+                    using (_graphics.WriteLock())
+                    {
+                        _graphics.CenterPosition = value.Clone();
+                    }
+                    LockOnPlayer = false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Координаты курсора мыши, относительно формы <see cref="MapperFormExt"/>
+        /// </summary>
+        public Point RelativeMousePosition => MapPicture.PointToClient(MousePosition);
 
         private void ResetToolState()
         {
@@ -117,47 +129,19 @@ namespace EntityTools.Patches.Mapper
         {
             InitializeComponent();
 
-#if Not_MonoMapper
-#if AstralMapper
-            mapper = new Astral.Forms.UserControls.Mapper
-            {
-                Anchor = (AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right),
-                Dock = DockStyle.Fill,
-                CustomDraw = null,
-                Location = new Point(6, 26),
-                Name = "mapper",
-                OnClick = null,
-                Size = new Size(372, 275),
-                TabIndex = 0
-            }; 
-#else
-            mapper = new MapperExt
-            {
-                Anchor = (AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right),
-                Dock = DockStyle.Fill,
-                CustomDraw = null,
-                Location = new Point(6, 26),
-                Name = "mapper",
-                OnClick = null,
-                Size = new Size(372, 275),
-                TabIndex = 0,
-                ZoomPos = Convert.ToInt32(trackZoom.EditValue),
-                MapLockOnPlayer = btnLockMapOnPlayer.Checked
-            };
-            mapper.OnMapLockOnPlayerChanged += handler_SetMapLockOnPlayer;
-            //mapper.OnZoomChanged += event_SetZoom;
-#endif
-            Controls.Add(mapper); 
-#endif
             MouseWheel += handler_MouseWheel;
 
-            barMainTools.Visible = EntityTools.PluginSettings.Mapper.MapperForm.MainToolsBarVisible;
-            barEditMeshes.Visible = EntityTools.PluginSettings.Mapper.MapperForm.EditMeshesBarVisible;
+            barMapping.Visible = EntityTools.PluginSettings.Mapper.MapperForm.MappingBarVisible;
+            barMeshes.Visible = EntityTools.PluginSettings.Mapper.MapperForm.MeshesBarVisible;
+            barNodeTools.Visible = EntityTools.PluginSettings.Mapper.MapperForm.NodeToolsBarVisible;
+            barCustomRegions.Visible = EntityTools.PluginSettings.Mapper.MapperForm.CustomRegionBarVisible;
             barStatus.Visible = EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible;
 
-            btnShowStatBar.Visible = !barStatus.Visible && !barMainTools.Visible && !barEditMeshes.Visible;
+            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barNodeTools.Visible && !barCustomRegions.Visible;
 
             Location = EntityTools.PluginSettings.Mapper.MapperForm.Location;
+
+            _mappingTool = new MappingTool(GetMappingGraph);
 
             BindingControls();
         }
@@ -165,7 +149,7 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Привязка элементов управления к данным
         /// </summary>
-        public void BindingControls()
+        private void BindingControls()
         {
             editWaypointDistance.DataBindings.Add(nameof(editWaypointDistance.EditValue),
                                                 EntityTools.PluginSettings.Mapper,
@@ -196,10 +180,10 @@ namespace EntityTools.Patches.Mapper
                                                 nameof(Astral.API.CurrentSettings.DeleteNodeRadius))); //*/
 
             ((ISupportInitialize)bsrcAstralSettings).BeginInit();
-            bsrcAstralSettings.DataSource = Astral.API.CurrentSettings;
+            bsrcAstralSettings.DataSource = API.CurrentSettings;
             editDeleteRadius.DataBindings.Add(nameof(editDeleteRadius.EditValue),
                                               bsrcAstralSettings,
-                                              nameof(Astral.API.CurrentSettings.DeleteNodeRadius),
+                                              nameof(API.CurrentSettings.DeleteNodeRadius),
                                               false, DataSourceUpdateMode.OnPropertyChanged);
             ((ISupportInitialize)bsrcAstralSettings).EndInit();
             editDeleteRadius.Edit.EditValueChanged += handler_DeleteRadiusChanged;
@@ -251,7 +235,7 @@ namespace EntityTools.Patches.Mapper
                     @this.Show();
                 }
             }
-            else Astral.Quester.Forms.MapperForm.Open();
+            else MapperForm.Open();
         }
 
         /// <summary>
@@ -263,10 +247,10 @@ namespace EntityTools.Patches.Mapper
         {
             Binds.RemoveShiftAction(Keys.M);
 
-            barMainTools.Visible = EntityTools.PluginSettings.Mapper.MapperForm.MainToolsBarVisible;
-            barEditMeshes.Visible = EntityTools.PluginSettings.Mapper.MapperForm.EditMeshesBarVisible;
+            barMapping.Visible = EntityTools.PluginSettings.Mapper.MapperForm.MappingBarVisible;
+            barMeshes.Visible = EntityTools.PluginSettings.Mapper.MapperForm.MeshesBarVisible;
             barStatus.Visible = EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible;
-            btnShowStatBar.Visible = !barStatus.Visible && !barMainTools.Visible && !barEditMeshes.Visible;
+            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible;
 
             Location = EntityTools.PluginSettings.Mapper.MapperForm.Location;
             Size = EntityTools.PluginSettings.Mapper.MapperForm.Size;
@@ -282,8 +266,8 @@ namespace EntityTools.Patches.Mapper
         {
             backgroundWorker.CancelAsync();
 
-            EntityTools.PluginSettings.Mapper.MapperForm.MainToolsBarVisible = barMainTools.Visible;
-            EntityTools.PluginSettings.Mapper.MapperForm.EditMeshesBarVisible = barEditMeshes.Visible;
+            EntityTools.PluginSettings.Mapper.MapperForm.MappingBarVisible = barMapping.Visible;
+            EntityTools.PluginSettings.Mapper.MapperForm.MeshesBarVisible = barMeshes.Visible;
             EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible = barStatus.Visible;
             EntityTools.PluginSettings.Mapper.MapperForm.Location = Location;
             EntityTools.PluginSettings.Mapper.MapperForm.Size = Size;
@@ -305,7 +289,7 @@ namespace EntityTools.Patches.Mapper
                    zoomStr = string.Empty;
             //Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
 
-            var updateFormStatus = new System.Action(() =>
+            var updateFormStatus = new Action(() =>
             {
                 Text = formCaption;
                 lblMousePos.Caption = statusStr;
@@ -321,7 +305,7 @@ namespace EntityTools.Patches.Mapper
             int currentMesure = 0;
 
             int time = 5000;
-            Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
+            Timeout timeout = new Timeout(0);
             double frames = 0;
             double fps = 0;
 #endif
@@ -347,11 +331,11 @@ namespace EntityTools.Patches.Mapper
                     zoomStr = string.Concat(Zoom * 100, '%');
 
                     int hash = AstralAccessors.Quester.Core.Meshes.Value.GetHashCode();
-                    if (currentMapHash != hash)
+                    if (_currentMapHash != hash)
                     {
                         var currentMapInfo = player.CurrentZoneMapInfo;
                         formCaption = formCaption = string.Concat(currentMapInfo.DisplayName, '[', currentMapInfo.MapName, ']');
-                        currentMapHash = hash;
+                        _currentMapHash = hash;
 
                         // Карта изменилась - сбрасываем состояние инструментов
                         ResetToolState();
@@ -400,7 +384,6 @@ namespace EntityTools.Patches.Mapper
             }
         }
         #endregion
-
 
 #if false
         public delegate void CustomMapperDraw(/*MapperFormExt sender,*/ MapperGraphics graphics);
@@ -521,7 +504,8 @@ namespace EntityTools.Patches.Mapper
         #endregion
 
         #region Перемещение изображения
-        private Point mouseClickPosition = new Point();
+        private Point mouseClickPosition;
+
         private void handler_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -537,13 +521,14 @@ namespace EntityTools.Patches.Mapper
                 double dx = (mouseClickPosition.X - e.Location.X) / scale;
                 double dy = (e.Location.Y - mouseClickPosition.Y) / scale;
 
-                MapLockOnPlayer = false;
+                LockOnPlayer = false;
                 using (_graphics.WriteLock())
                     _graphics.MoveCenterPosition(dx, dy);
                 mouseClickPosition.X = e.X;
                 mouseClickPosition.Y = e.Y;
             }
         }
+
         private void handler_MouseUp(object sender, MouseEventArgs e)
         {
             mouseClickPosition.X = 0;
@@ -632,7 +617,7 @@ namespace EntityTools.Patches.Mapper
             Zoom = 1;
         }
 
-        Astral.Classes.Timeout mouseWeelTimeout = new Astral.Classes.Timeout(0);
+        Timeout mouseWeelTimeout = new Timeout(0);
         private void handler_MouseWheel(object sender, MouseEventArgs e)
         {
             if (mouseWeelTimeout.IsTimedOut)
@@ -645,55 +630,6 @@ namespace EntityTools.Patches.Mapper
             }
         } 
         #endregion
-#if true
-        /// <summary>
-        /// Флаг удержания персонажа в центре карты
-        /// 
-        /// </summary>
-        public bool MapLockOnPlayer
-        {
-            get => btnLockMapOnPlayer.Checked;
-            set => btnLockMapOnPlayer.Checked = value;
-        } 
-#endif
-
-#if true
-        /// <summary>
-        /// Координаты центра отображаемой карты
-        /// </summary>
-        public Vector3 CenterOfMap
-        {
-            get
-            {
-                using (_graphics.ReadLock())
-                {
-                    return _graphics.CenterPosition.Clone();
-                }
-            }
-            set
-            {
-                if (value != null && value.IsValid)
-                {
-                    using (_graphics.WriteLock())
-                    {
-                        _graphics.CenterPosition = value.Clone();
-                    }
-                    MapLockOnPlayer = false;
-                }
-            }
-        } 
-#endif
-
-        /// <summary>
-        /// Координаты курсора мыши, относительно формы <see cref="MapperFormExt"/>
-        /// </summary>
-        public Point RelativeMousePosition
-        {
-            get
-            {
-                return MapPicture.PointToClient(Control.MousePosition);
-            }
-        }
 
         #region Drawings
         private readonly MapperGraphics _graphics = new MapperGraphics(360, 360);
@@ -703,7 +639,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         private void DrawMapper()
         {
-            Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
+            Timeout timeout = new Timeout(0);
 #if Not_MonoMapper
             while (!IsDisposed && Visible && !token.IsCancellationRequested) 
 #else
@@ -715,7 +651,7 @@ namespace EntityTools.Patches.Mapper
                 {
                     using (_graphics.WriteLock())
                     {
-                        if (MapLockOnPlayer)
+                        if (LockOnPlayer)
                             _graphics.CenterPosition = EntityManager.LocalPlayer.Location;
 
                         int imgWidth = MapPicture.Width;
@@ -832,9 +768,9 @@ namespace EntityTools.Patches.Mapper
                                 else if (!entity.IsDead && !entity.Critter.IsLootable)
                                 {
                                     var relationToPlayer = entity.RelationToPlayer;
-                                    if (relationToPlayer == MyNW.Patchables.Enums.EntityRelation.Foe)
+                                    if (relationToPlayer == EntityRelation.Foe)
                                         _graphics.FillRhombCentered(Brushes.OrangeRed, location, 10, 10);
-                                    else if (relationToPlayer == MyNW.Patchables.Enums.EntityRelation.Friend)
+                                    else if (relationToPlayer == EntityRelation.Friend)
                                         _graphics.FillRhombCentered(Brushes.Green, location, 6, 6);
                                     else _graphics.FillRhombCentered(Brushes.LightGray, location, 6, 6);
                                 }
@@ -843,6 +779,7 @@ namespace EntityTools.Patches.Mapper
                         #endregion
 
                         #region Отрисовка специальной графики
+                        // Отрисовка активного инструмента редактирования
                         var tool = CurrentTool;
                         if (tool != null
                             && (tool.AllowNodeSelection || tool.HandleCustomDraw))
@@ -861,6 +798,10 @@ namespace EntityTools.Patches.Mapper
                             else if (tool.HandleCustomDraw)
                                 tool.OnCustomDraw(_graphics, null, mouseX, mouseY);
                         }
+                        
+                        // Отрисовка инструмента прокладывания пути
+                        if(_mappingTool.MappingMode != MappingMode.Stoped)
+                            _mappingTool.OnCustomDraw(_graphics);
                         #endregion
 
                         #region Отрисовка области уклонения от АОЕ
@@ -903,7 +844,7 @@ namespace EntityTools.Patches.Mapper
                         {
                             double angle = EntityManager.LocalPlayer.Yaw * 180 / Math.PI;
 #if true
-                            Bitmap image = MapperHelper.RotateImage(Properties.Resources.charArrow, (float)angle);
+                            Bitmap image = MapperHelper.RotateImage(Resources.charArrow, (float)angle);
                             //_graphics.FillCircleCentered(Brushes.DarkGoldenrod, EntityManager.LocalPlayer.Location, 15);
                             _graphics.drawImage(location, image);
 #else
@@ -911,7 +852,7 @@ namespace EntityTools.Patches.Mapper
                         _graphics.DrawImageCentered(EntityManager.LocalPlayer.Location, Properties.Resources.charArrow, angle);
 #endif
                         }
-                         #endregion
+                        #endregion
                     }
                 }
 #if Not_MonoMapper
@@ -958,7 +899,834 @@ namespace EntityTools.Patches.Mapper
         }
         #endregion
 
+        #region Добавление и изменение CustomRegion'ов
+        /// <summary>
+        /// Флаг, указывающий, что CustomRegion'ы в профиле были изменены, и его необходимо "сохранить"
+        /// </summary>
+        bool сurrentProfileNeedSave
+        {
+            get
+            {
+                return !string.IsNullOrEmpty(editedQuesterProfileName) && Astral.Controllers.Settings.Get.LastQuesterProfile == editedQuesterProfileName;
+            }
+            set
+            {
+                if (value)
+                    editedQuesterProfileName = Astral.Controllers.Settings.Get.LastQuesterProfile;
+                else editedQuesterProfileName = string.Empty;
+            }
+        }
+        string editedQuesterProfileName = string.Empty;
+
+        /// <summary>
+        /// Запуск процедуры добавления CustomRegion'а
+        /// </summary>
+        private void handler_AddCustomRegion(object sender, ItemClickEventArgs e)
+        {
+            AddCustomRegionTool addCRTool = CurrentTool as AddCustomRegionTool;
+            if (addCRTool is null)
+                CurrentTool = new AddCustomRegionTool(btnCRTypeSelector.Checked);
+
+            btnLockMapOnPlayer.Checked = false;
+
+            barEditCustomRegion.Text = "Add CustomRegion";
+            barEditCustomRegion.DockStyle = BarDockStyle.None;
+            barEditCustomRegion.FloatLocation = new Point(Location.X + MapPicture.Location.X + 20, 
+                Location.Y + MapPicture.Location.Y + 20 
+                + (barMapping.Visible && barMapping.DockStyle == BarDockStyle.Top ? barMapping.Size.Height : 0)
+                + (barMeshes.Visible && barMeshes.DockStyle == BarDockStyle.Top ? barMeshes.Size.Height : 0));
+            //barEditCustomRegion.FloatSize = new Size(Math.Max(100, MapPicture.Width - 40), 0);
+            editCRName.EditWidth = Math.Max(300, Width - 40);
+            editCRSelector.EditWidth = Math.Max(300, Width - 40);
+
+            btnCRTypeSelector.Visibility = BarItemVisibility.Always;
+            editCRSelector.Visibility = BarItemVisibility.Never;
+            editCRName.Visibility = BarItemVisibility.Always;
+            btnCRRename.Visibility = BarItemVisibility.Never;
+            btnCRAdditionAccept.Visibility = BarItemVisibility.Always;
+            btnCREditionAccept.Visibility = BarItemVisibility.Never;
+
+            barEditCustomRegion.Visible = true;
+        }
+
+        /// <summary>
+        /// Выбор и редактирование существующего CustomRegion'а
+        /// </summary>
+        private void handler_EditCustomRegion(object sender, ItemClickEventArgs e)
+        {
+            var customRegions = Astral.Quester.API.CurrentProfile.CustomRegions;
+            if (customRegions.Count == 0)
+            {
+                XtraMessageBox.Show("No CustomRegions available to change");
+                btnEditCR.Checked = false;
+                return;
+            }
+
+            EditCustomRegionTool editCRTool = CurrentTool as EditCustomRegionTool;
+            if (btnEditCR.Checked)
+            {
+                btnLockMapOnPlayer.Checked = false;
+
+                barEditCustomRegion.Text = "Edit CustomRegion";
+                barEditCustomRegion.DockStyle = BarDockStyle.None;
+                barEditCustomRegion.FloatLocation = new Point(Location.X + MapPicture.Location.X + 20,
+                    Location.Y + MapPicture.Location.Y + 20
+                    + (barMapping.Visible && barMapping.DockStyle == BarDockStyle.Top
+                        ? barMapping.Size.Height
+                        : 0)
+                    + (barMeshes.Visible && barMeshes.DockStyle == BarDockStyle.Top
+                        ? barMeshes.Size.Height
+                        : 0));
+                //barEditCustomRegion.FloatSize = new Size(Math.Max(100, MapPicture.Width - 40), 0);
+                editCRName.EditWidth = Math.Max(300, Width - 40);
+                editCRSelector.EditWidth = Math.Max(300, Width - 40);
+
+                btnCRTypeSelector.Visibility = BarItemVisibility.Always;
+                editCRSelector.Visibility = BarItemVisibility.Always;
+                editCRName.Visibility = BarItemVisibility.Never;
+                btnCRRename.Visibility = BarItemVisibility.Always;
+                btnCRAdditionAccept.Visibility = BarItemVisibility.Never;
+                btnCREditionAccept.Visibility = BarItemVisibility.Always;
+
+                // Привязываем список CustomRegion'ов
+                if (!ReferenceEquals(itemEditCRList.DataSource, customRegions))
+                {
+                    itemEditCRList.DataSource = customRegions;
+                    itemEditCRList.DisplayMember = "Name";
+                    editCRSelector.EditValue = customRegions.First();
+                }
+                else handler_ChangeSelectedCustomRegion(sender);
+
+                barEditCustomRegion.Visible = true;
+            }
+            else if (editCRTool != null)
+                CurrentTool = null;
+        }
+
+        /// <summary>
+        /// Изменение модифицируемого CustomRegion'a
+        /// </summary>
+        private void handler_ChangeSelectedCustomRegion(object sender, EventArgs e = null)
+        {
+            var tool = CurrentTool;
+            EditCustomRegionTool editCRTool = tool as EditCustomRegionTool;
+
+            if (editCRSelector.EditValue is CustomRegion cr)
+            {
+                if (editCRTool is null)
+                    CurrentTool = new EditCustomRegionTool(cr);
+                else
+                {
+                    if (editCRTool.Modified
+                        && XtraMessageBox.Show($"Changes of the '{editCRTool.Name}' can be lost!\n\r" +
+                                               "Press 'Yes' to save changes or 'No' to proceed", "", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning) == DialogResult.Yes)
+                    {
+                        editCRTool.Apply(Convert.ToString(editCRName.EditValue));
+                        сurrentProfileNeedSave = true;
+                        CurrentTool = new EditCustomRegionTool(cr);
+                    }
+                    else editCRTool.AttachTo(cr);
+                }
+                CenterOfMap = cr.Position;
+                btnCRTypeSelector.Checked = cr.Eliptic;
+            }
+            else if (editCRTool != null)
+                CurrentTool = null;
+        }
+
+        /// <summary>
+        /// Завершение процедуры добавления региона
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void handler_AcceptCRAddition(object sender, ItemClickEventArgs e)
+        {
+            if (CurrentTool is AddCustomRegionTool addCRtool)
+            {
+                if (!addCRtool.IsCorrect)
+                {
+                    XtraMessageBox.Show("Coordinates  of the CustomRegion is not valid!");
+                    return;
+                }
+
+                string crName = editCRName.EditValue.ToString()?.Trim();
+                if (string.IsNullOrEmpty(crName))
+                    XtraMessageBox.Show("The Name of the CustomRegion is not valid !");
+                else 
+                {
+                    var crList = Astral.Quester.API.CurrentProfile.CustomRegions;
+                    if (crList.Count > 0 && (crList.Find(cr => cr.Name == crName) != null)
+                        && XtraMessageBox.Show($"CustomRegion '{crName}' is already exist.\n\r" +
+                                "Press 'Yes' to proceed or 'No' to change name", $"{crName} is exist", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.OK)
+                            return;
+                    {
+                        var cr = addCRtool.GetCustomRegion(crName);
+                        if (cr != null)
+                        {
+                            crList.Add(cr);
+                            сurrentProfileNeedSave = true;
+
+                            //TODO: Добавить обновление списка CustomRegion'ов в Quester-редакторе
+
+                            //_undoStack.Push(addCRtool); <- вызывается в CurrentTool.set
+
+                            CurrentTool = null;
+                            barEditCustomRegion.Visible = false;
+                        }
+                        else XtraMessageBox.Show($"Something wrong. '{crName}' was not added");
+                    }
+                }
+            }
+        }
+
+        private void handler_AcceptCREdition(object sender, ItemClickEventArgs e)
+        {
+            if (CurrentTool is EditCustomRegionTool editCRTool && editCRTool.Modified)
+            {
+                editCRTool.Apply(Convert.ToString(editCRName.EditValue));
+                сurrentProfileNeedSave = true;
+                editCRName.EditValue = string.Empty;
+                editCRName.Visibility = BarItemVisibility.Never;
+                editCRSelector.Visibility = BarItemVisibility.Always;
+            }
+        }
+
+        /// <summary>
+        /// Прерывание процедуры добавления/редактирования региона
+        /// </summary>
+        private void handler_CancelCRManipulation(object sender, ItemClickEventArgs e)
+        {
+            var tool = CurrentTool;
+            if (tool is AddCustomRegionTool addCRtool
+                || tool is EditCustomRegionTool editCRtool)
+                CurrentTool = null;
+            barEditCustomRegion.Visible = false;
+            btnEditCR.Checked = false;
+        }
+
+        /// <summary>
+        /// Переключение типа CustomRegion'a
+        /// </summary>
+        private void handler_ChangeCustomRegionType(object sender, ItemClickEventArgs e)
+        {
+            if (btnCRTypeSelector.Checked)
+                btnCRTypeSelector.ImageOptions.Image = Resources.miniCREllipce;
+            else
+                btnCRTypeSelector.ImageOptions.Image = Resources.miniCRRectang;
+
+            var tool = CurrentTool;
+            if (tool is AddCustomRegionTool addCRtool)
+                addCRtool.IsElliptical = btnCRTypeSelector.Checked;
+            else if(tool is EditCustomRegionTool editCRtool)
+                editCRtool.IsElliptical = btnCRTypeSelector.Checked;
+        }
+
+        private void handler_ChangedRenameCRMode(object sender = null, ItemClickEventArgs e = null)
+        {
+            if (btnCRRename.Checked)
+            {
+                if (editCRSelector.EditValue is CustomRegion cr)
+                    editCRName.EditValue = cr.Name;
+                else editCRName.EditValue = string.Empty;
+                editCRSelector.Visibility = BarItemVisibility.Never;
+                editCRName.Visibility = BarItemVisibility.Always;
+                editCRName.EditWidth = editCRSelector.EditWidth;
+            }
+            else
+            {
+                editCRName.EditValue = string.Empty;
+                editCRSelector.Visibility = BarItemVisibility.Always;
+                editCRName.Visibility = BarItemVisibility.Never;
+            }
+        }
+        #endregion
+
+        private void handler_DeleteRadiusChanged(object sender, EventArgs e)
+        {
+            API.CurrentSettings.DeleteNodeRadius = Convert.ToInt32(editDeleteRadius.EditValue);
+        }
+        private void handler_WaypointDistanceChanged(object sender, EventArgs e)
+        {
+            int value = Convert.ToInt32(editWaypointDistance.EditValue);
+            EntityTools.PluginSettings.Mapper.WaypointDistance = value;
+            EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance = value / 2;
+        }
+
+        private void handler_ShowStatusBar(object sender, EventArgs e)
+        {
+            barStatus.Visible = true;
+            btnShowStatBar.Visible = false;
+        }
+
+        private void handler_BarVisibleChanged(object sender, EventArgs e)
+        {
+            EntityTools.PluginSettings.Mapper.MapperForm.MappingBarVisible = barMapping.Visible;
+            EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible = barStatus.Visible;
+            EntityTools.PluginSettings.Mapper.MapperForm.MeshesBarVisible = barMeshes.Visible;
+            EntityTools.PluginSettings.Mapper.MapperForm.NodeToolsBarVisible = barNodeTools.Visible;
+            EntityTools.PluginSettings.Mapper.MapperForm.CustomRegionBarVisible = barCustomRegions.Visible;
+
+            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barNodeTools.Visible && !barCustomRegions.Visible;
+        }
+
+        #region Meshes_Manipulation
+        /// <summary>
+        /// Сохранение в файл текущего Quester-профиля
+        /// </summary>
+        private void handler_SaveChanges2QuesterProfile(object sender, ItemClickEventArgs e)
+        {
+            // Штатное сохранение профиля реализовано в
+            // Astral.Quester.Core.Save(false)
+
+            string meshName = EntityManager.LocalPlayer.MapState.MapName + ".bin";
+            string profileName = Astral.Controllers.Settings.Get.LastQuesterProfile;
+            var currentProfile = Astral.Quester.API.CurrentProfile;
+            bool useExternalMeshFile = currentProfile.UseExternalMeshFile && currentProfile.ExternalMeshFileName.Length >= 10;
+            string externalMeshFileName = useExternalMeshFile ? Path.Combine(Path.GetDirectoryName(profileName), currentProfile.ExternalMeshFileName) : string.Empty;
+            Graph mesh = AstralAccessors.Quester.Core.Meshes;
+
+#if true
+            if (File.Exists(profileName))
+            {
+                ZipArchive zipFile = null;
+                try
+                {
+                    bool profileUpdated = false;
+                    if (сurrentProfileNeedSave)
+                    {
+                        // Открываем архивный файл профиля
+                        zipFile = ZipFile.Open(profileName, File.Exists(profileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create);
+                        
+                        // Сохраняем в архив файл профиля "profile.xml"
+                        lock (currentProfile)
+                        {
+                            Patch_Astral_Quester_Core_Save.SaveProfile(zipFile);
+                            currentProfile.Saved = true; 
+                        }
+
+                        сurrentProfileNeedSave = false;
+                        profileUpdated = true;
+                    }
+
+                    // Сохраняем файлы мешей
+                    if (useExternalMeshFile)
+                    {
+                        // закрываем архив профиля
+                        zipFile?.Dispose();
+                        
+                        // открываем архив с внешними мешами
+                        zipFile = ZipFile.Open(externalMeshFileName, 
+                            File.Exists(externalMeshFileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create);
+                    } 
+                    else if(zipFile is null)
+                        zipFile = ZipFile.Open(profileName, File.Exists(profileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create);
+
+                    bool succeeded;
+                    lock (mesh)
+                    {
+                        // удаляем мусор (скрытые вершины и ребра)
+                        mesh.RemoveUnpassable();
+                        // сохраняем меш в архивный файл
+                        succeeded = Patch_Astral_Quester_Core_Save.SaveMesh(zipFile, meshName, mesh); 
+                    }
+
+                    if(succeeded)
+                        XtraMessageBox.Show(string.Concat("The profile '", Path.GetFileName(profileName), "' updated:\n\r\t",
+                                                        useExternalMeshFile ? externalMeshFileName +'\\' : string.Empty, meshName,
+                                                        profileUpdated ? "\n\r\tprofile.xml" : string.Empty));
+                    else XtraMessageBox.Show(string.Concat("Fail to save changes to the profile '", Path.GetFileName(profileName), '\''), "Failed !", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                catch (Exception exc)
+                {
+                    Logger.WriteLine(exc.ToString());
+                    XtraMessageBox.Show(exc.ToString());
+                }
+                finally
+                {
+                    zipFile?.Dispose();
+                }
+            }
+#else
+            if (Astral.Quester.API.CurrentProfile.UseExternalMeshFile)
+            {
+                // Профиль использует "внешние" меши
+                XtraMessageBox.Show($"The '{nameof(MapperFormExt)}' doesn't support external Meshes");
+            }
+            else
+            {
+                // Сохранение графа путей (карты) в файл текущего профиля
+                if (File.Exists(profileName))
+                {
+                    try
+                    {
+                        // удаляем мусор (скрытые вершины)
+                        AstralAccessors.Quester.Core.Meshes.Value.RemoveUnpassable();
+
+                        bool profileUpdated = false;
+                        using (ZipArchive zipFile = ZipFile.Open(fileName, ZipArchiveMode.Update))
+                        {
+                            ZipArchiveEntry zipMeshEntry = zipFile.GetEntry(meshName);
+
+#if false
+                            // Проверяем наличие меша карты в zip-файле
+                            foreach (ZipArchiveEntry entry in zipFile.Entries)
+                            {
+                                if (entry.Name.Equals(meshName, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    zipMeshEntry = entry;
+                                    break;
+                                }
+                            } 
+#endif
+
+                            if (zipMeshEntry != null)
+                                // Меш карты найден. Удаляем старый и создаем новый
+                                zipMeshEntry.Delete();
+                            zipMeshEntry = zipFile.CreateEntry(meshName);
+
+                            // Сохранение графа путей (мешей) активной карты
+                            using (MemoryStream memoryStream = new MemoryStream())
+                            {
+                                BinaryFormatter binaryFormatter = new BinaryFormatter();
+                                binaryFormatter.Serialize(memoryStream, AstralAccessors.Quester.Core.Meshes.Value);
+
+                                using (var zipMeshStream = zipMeshEntry.Open())
+                                {
+                                    byte[] meshBytes = memoryStream.ToArray();
+
+                                    zipMeshStream.Write(meshBytes, 0, meshBytes.Length);
+                                }
+                            }
+
+                            // Сохранение регионов
+                            if (CurrentProfileNeedSave)
+                            {
+                                ZipArchiveEntry zipProfileEntry = zipFile.GetEntry("profile.xml");
+
+                                if (zipProfileEntry is null)
+                                    zipProfileEntry = zipFile.CreateEntry("profile.xml");
+                                else
+                                {
+                                    zipProfileEntry.Delete();
+                                    zipProfileEntry = zipFile.CreateEntry("profile.xml");
+                                }
+
+                                XmlSerializer serializer = new XmlSerializer(Astral.Quester.API.CurrentProfile.GetType(), Patch_XmlSerializer_GetExtraTypes.QuesterTypes.ToArray());
+                                using (var zipProfileStream = zipProfileEntry.Open())
+                                {
+                                    serializer.Serialize(zipProfileStream, Astral.Quester.API.CurrentProfile);
+                                    Astral.Quester.API.CurrentProfile.Saved = true;
+                                    profileUpdated = true;
+                                }
+
+                                CurrentProfileNeedSave = false;
+                            }
+                        }
+
+                        XtraMessageBox.Show(string.Concat("The profile '", Path.GetFileName(fileName), "' updated:\n\r\t",
+                                                            meshName,
+                                                            profileUpdated ? "profile.xml" : string.Empty));
+                    }
+                    catch (Exception exc)
+                    {
+                        Logger.WriteLine(exc.ToString());
+                        XtraMessageBox.Show(exc.ToString());
+                    }
+                }
+            } 
+#endif
+        }
+
+        /// <summary>
+        /// Импорт мешей карты (графа путей) из Игры
+        /// </summary>
+        private void handler_ImportCurrentMapMeshesFromGame(object sender, ItemClickEventArgs e)
+        {
+            //if (((Graph)CoreCurrentMapMeshes)?.NodesCollection.Count == 0
+            if (((Graph)AstralAccessors.Quester.Core.Meshes)?.Nodes.Count == 0
+                || XtraMessageBox.Show(this, "Are you sure to import game nodes ? All actual nodes must be delete !", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                handler_Mapping_Stop();
+#if AstralMapper
+                MapperStopDrawing?.Invoke(mapper); 
+#endif
+                //Graph graph = (Graph)CoreCurrentMapMeshes;
+                Graph graph = AstralAccessors.Quester.Core.Meshes;
+                lock (graph)
+                {
+                    graph.Clear();
+                    GoldenPath.GetCurrentMapGraph(graph);
+                    //graphCache?.RegenCache(null);
+                }
+#if AstralMapper
+                MapperStartDrawing?.Invoke(mapper); 
+#endif
+            }
+        }
+
+        /// <summary>
+        /// Импорт мешей одной или всех карт из файла
+        /// </summary>
+        private void handler_ImportMapMeshesFromFile(object sender, ItemClickEventArgs e)
+        {
+            string currentMapName = EntityManager.LocalPlayer.MapState.MapName;
+            if (string.IsNullOrEmpty(currentMapName))
+            {
+                XtraMessageBox.Show("Impossible to get current map name !");
+                return;
+            }
+            string currentMapMeshesName = currentMapName + ".bin";
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                InitialDirectory = Directories.ProfilesPath,
+                DefaultExt = "amp.zip",
+                Filter = @"Astral mission profil (*.amp.zip)|*.amp.zip|(*.mesh.zip)|*.mesh.zip"
+            };
+            if (openFileDialog.ShowDialog() == DialogResult.OK && File.Exists(openFileDialog.FileName))
+            {
+                handler_Mapping_Stop();
+                try
+                {
+                    using (ZipArchive profile = ZipFile.Open(openFileDialog.FileName, ZipArchiveMode.Read))
+                    {
+                        ZipArchiveEntry currentMapEntry = profile.GetEntry(currentMapMeshesName);
+                        if(currentMapEntry is null)
+                        {
+                            XtraMessageBox.Show("This profile doesn't contain current map !");
+                            return;
+                        }
+                        var mapsMeshes = AstralAccessors.Quester.Core.MapsMeshes.Value;
+
+                        DialogResult dialogResult = XtraMessageBox.Show("Import current map only ?\n\rElse import all.", "Map import", MessageBoxButtons.YesNoCancel);
+                        if (dialogResult == DialogResult.Yes)
+                        {
+                            // Экспорт одной "текуще" карты
+                            using (Stream stream = currentMapEntry.Open())
+                            {       
+                                BinaryFormatter binaryFormatter = new BinaryFormatter();
+                                Graph currentMapMeshes = binaryFormatter.Deserialize(stream) as Graph;
+                                if(currentMapMeshes != null)
+                                {
+                                    ResetToolState();
+
+                                    lock (mapsMeshes)
+                                    {
+                                        if (mapsMeshes.ContainsKey(currentMapName))
+                                            mapsMeshes[currentMapName] = currentMapMeshes;
+                                        else mapsMeshes.Add(currentMapName, currentMapMeshes);
+                                    }
+                                    Logger.WriteLine($"Import '{currentMapMeshesName}' from {openFileDialog.FileName}");
+                                    return;
+                                }
+
+                                string msg = $"Failed to import '{currentMapMeshesName}' from {openFileDialog.FileName}";
+                                Logger.WriteLine(msg);
+                                XtraMessageBox.Show(msg);
+                                return;
+                            }
+
+                        }
+                        if (dialogResult == DialogResult.No)
+                        {
+                            // Экспорт всех карт, содержащихся в заданном профиле
+                            BinaryFormatter binaryFormatter = new BinaryFormatter();
+                            StringBuilder sb = new StringBuilder();
+                            sb.Append("Import maps meshes from  '").Append(openFileDialog.FileName).AppendLine("':");
+                            foreach (ZipArchiveEntry entry in profile.Entries)
+                            {
+                                if (entry.Name.EndsWith(".bin", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    string entryMapName = entry.Name.Substring(0, entry.Name.Length - 4);
+                                    Graph entryMapMeshes;
+                                    using (Stream stream = entry.Open())
+                                    {
+                                        entryMapMeshes = binaryFormatter.Deserialize(stream) as Graph;
+                                    }
+                                    if (entryMapMeshes != null)
+                                    {
+                                        ResetToolState();
+
+                                        lock (mapsMeshes)
+                                        {
+                                            if (mapsMeshes.ContainsKey(entryMapName))
+                                                mapsMeshes[entryMapName] = entryMapMeshes;
+                                            else mapsMeshes.Add(entryMapName, entryMapMeshes); 
+                                        }
+                                        sb.Append("\t'").Append(currentMapMeshesName).AppendLine("' - succeeded");
+                                    }
+                                    else sb.Append("\t'").Append(currentMapMeshesName).AppendLine("' - failed");
+                                }
+                            } 
+                            Logger.WriteLine(sb.ToString());
+                        }
+
+                    }
+                }
+                catch (Exception exc)
+                {
+                    Logger.WriteLine(exc.ToString());
+                    XtraMessageBox.Show(exc.ToString());
+                }
+            }
+        }
+
+        /// <summary>
+        /// Экспорт узлов в файл 
+        /// </summary>
+        private void handler_ExportCurrentMapMeshes2File(object sender, ItemClickEventArgs e)
+        {
+#if false
+            // Код перенесен из Astral'a
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                InitialDirectory = Directories.ProfilesPath,
+                DefaultExt = "amp.zip",
+                Filter = "Astral mesh file (*.mesh.zip)|*.mesh.zip"
+            };
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                //Astral.Quester.Core.LoadAllMeshes();
+                handler_StopMapping();
+                //CoreLoadAllMeshes();
+                AstralAccessors.Quester.Core.LoadAllMeshes();
+                List<Class88.Class89> list = new List<Class88.Class89>();
+                //foreach (KeyValuePair<string, Graph> keyValuePair in CoreMapsMeshes.Value)
+                foreach (var keyValuePair in AstralAccessors.Quester.Core.MapsMeshes.Value)
+                {
+                    Class88.Class89 item = new Class88.Class89(keyValuePair.Value, Class88.Class89.Enum2.const_1, keyValuePair.Key + ".bin", null);
+                    list.Add(item);
+                }
+                Class88.SaveMeshes2Files(saveFileDialog.FileName, list, false); 
+            }
+#else
+            throw new NotImplementedException();
+#endif
+        }
+
+        /// <summary>
+        /// Очистка мешей карты (графа)
+        /// </summary>
+        private void handler_ClearCurrentMapMeshes(object sender, ItemClickEventArgs e)
+        {
+            if (XtraMessageBox.Show(this, "Are you sure to delete all map nodes ?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                handler_Mapping_Stop();
+                ResetToolState();
+#if AstralMapper
+                MapperStopDrawing?.Invoke(mapper); 
+#endif
+                _currentMapHash = 0;
+                ((Graph)AstralAccessors.Quester.Core.Meshes).Clear();
+#if AstralMapper
+                MapperStartDrawing?.Invoke(mapper); 
+#endif
+            }
+        }
+
+        /// <summary>
+        /// Оценка графа на наличие мусора
+        /// </summary>
+        private void handler_MeshesInfo(object sender, ItemClickEventArgs e)
+        {
+            int correctNodeNum = 0;
+            int unpasNodeNum = 0;
+            var nodes = ((Graph)AstralAccessors.Quester.Core.Meshes).Nodes;
+            int correctArcNum = 0;
+            int disabledArcNum = 0;
+            int unpasArcNum = 0;
+            int totalArcCount = 0;
+
+            foreach (Node nd in nodes)
+            {
+                if (!nd.Passable)
+                    unpasNodeNum++;
+                else correctNodeNum++;
+                foreach(Arc arc in nd.OutgoingArcs)
+                {
+                    totalArcCount++;
+                    if (arc.Disabled)
+                    {
+                        disabledArcNum++;
+                        if (!arc.Passable)
+                            unpasArcNum++;
+                    }
+                    else if (!arc.Passable)
+                        unpasArcNum++;
+                    else correctArcNum++;
+                }
+            }
+
+            XtraMessageBox.Show($"Total nodes: {nodes.Count}\n\r" +
+                $"\tcorrect:\t{correctNodeNum}\n\r" +
+                $"\tunpassable:\t{unpasNodeNum}\n\r" +
+                $"Total arcs: {totalArcCount}\n\r" +
+                $"\tcorrect:\t{correctArcNum}\n\r" +
+                $"\tdisabled:\t{disabledArcNum}\n\r" +
+                $"\tunpassable:\t{unpasArcNum}\n\r");
+        }
+
+        /// <summary>
+        /// Сжатие графа (удаление мусора)
+        /// </summary>
+        private void handler_MeshesCompression(object sender, ItemClickEventArgs e)
+        {
+            ResetToolState();
+
+            int correctNodeNum = 0;
+            int unpasNodeNum = 0;
+            var nodes = ((Graph)AstralAccessors.Quester.Core.Meshes).Nodes;
+            int totalNodeNum = nodes.Count;
+            int correctArcNum = 0;
+            int disabledArcNum = 0;
+            int unpasArcNum = 0;
+            int totalArcNum = 0;
+            foreach (Node nd in nodes)
+            {
+                if (!nd.Passable)
+                    unpasNodeNum++;
+                else correctNodeNum++;
+
+                foreach (Arc arc in nd.OutgoingArcs)
+                {
+                    totalArcNum++;
+                    if (arc.Disabled)
+                    {
+                        disabledArcNum++;
+                        if (!arc.Passable)
+                            unpasArcNum++;
+                    }
+                    else if (!arc.Passable)
+                        unpasArcNum++;
+                    else correctArcNum++;
+                }
+            }
+
+            if (unpasNodeNum > 0 && ((Graph)AstralAccessors.Quester.Core.Meshes).RemoveUnpassable() > 0)
+            {
+                ResetToolState();
+
+                int correctNodeNumNew = 0;
+                int unpasNodeNumNew = 0;
+                int correctArcNumNew = 0;
+                int disabledArcNumNew = 0;
+                int unpasArcNumNew = 0;
+                int totalArcNumNew = 0;
+                nodes = ((Graph)AstralAccessors.Quester.Core.Meshes).Nodes;
+                foreach (Node nd in nodes)
+                {
+                    if (!nd.Passable)
+                        unpasNodeNumNew++;
+                    else correctNodeNumNew++;
+                    foreach (Arc arc in nd.OutgoingArcs)
+                    {
+                        totalArcNumNew++;
+                        if (arc.Disabled)
+                        {
+                            disabledArcNumNew++;
+                            if (!arc.Passable)
+                                unpasArcNumNew++;
+                        }
+                        else if (!arc.Passable)
+                            unpasArcNumNew++;
+                        else correctArcNumNew++;
+                    }
+                }
+
+
+                XtraMessageBox.Show($"Total nodes: {totalNodeNum} => {nodes.Count}\n\r" +
+                    $"\tcorrect:\t{correctNodeNum} => {correctNodeNumNew}\n\r" +
+                    $"\tunpassable:\t{unpasNodeNum} => {unpasNodeNumNew}\n\r" +
+                    $"Total arcs: {totalArcNum} => {totalArcNumNew}\n\r" +
+                    $"\tcorrect:\t{correctArcNum} => {correctArcNumNew}\n\r" +
+                    $"\tdisabled:\t{disabledArcNum} => {disabledArcNumNew}\n\r" +
+                    $"\tunpassable:\t{unpasArcNum} => {unpasArcNumNew}\n\r");
+            }
+            else XtraMessageBox.Show("Meshes doesn't compressed\n\r" +
+                                    $"Total nodes: {nodes.Count}\n\r" +
+                                    $"\tcorrect:\t{correctNodeNum}\n\r" +
+                                    $"\tunpassable:\t{unpasNodeNum}\n\r" +
+                                    $"Total arcs: {totalArcNum}\n\r" +
+                                    $"\tcorrect:\t{correctArcNum}\n\r" +
+                                    $"\tdisabled:\t{disabledArcNum}\n\r" +
+                                    $"\tunpassable:\t{unpasArcNum}\n\r");
+        }
+        
+        #region EditMeshes
+        private void handler_EditEdges_ModeChanged(object sender, ItemClickEventArgs e)
+        {
+            EditEdgeTool editEdgeTool = CurrentTool as EditEdgeTool;
+            if (btnEditEdges.Checked)
+            {
+                if (editEdgeTool is null)
+                    CurrentTool = new EditEdgeTool();
+                LockOnPlayer = false;
+            }
+            else if (editEdgeTool != null)
+                    CurrentTool = null;
+        }
+
+        private void handler_RelocateNodes_ModeChanged(object sender, ItemClickEventArgs e)
+        {
+            RelocateNodesTool relocateTool = CurrentTool as RelocateNodesTool;
+            if (btnMoveNodes.Checked)
+            {
+                if (relocateTool is null)
+                    CurrentTool = new RelocateNodesTool();
+                LockOnPlayer = false;
+            }
+            else if (relocateTool != null)
+                CurrentTool = null; 
+        }
+
+        private void handler_DeleteNodes_ModeChanged(object sender, ItemClickEventArgs e)
+        {
+            RemoveNodesTool removeTool = CurrentTool as RemoveNodesTool;
+            if (btnRemoveNodes.Checked)
+            {
+                if (removeTool is null)
+                    CurrentTool = new RemoveNodesTool();
+                LockOnPlayer = false;
+            }
+            else if (removeTool != null)
+                    CurrentTool = null;
+        }
+        #endregion
+        #endregion
+
+        /// <summary>
+        /// Откат изменений
+        /// </summary>
+        private void handler_Undo(object sender, ItemClickEventArgs e)
+        {
+            // TODO: добавить перемещение карты к координатам, в которых было совершено изменение
+            // TODO: Добавить hint к кнопке отката, указывающий на изменения, которые будут отменены
+            IMapperTool tool = CurrentTool;
+            if (tool != null
+                && tool.Applied)
+            {
+                tool.Undo();
+                CurrentTool = null;
+                return;
+            }
+            CurrentTool = null;
+
+            if (_undoStack.Count > 0)
+            {
+                tool = _undoStack.Pop();
+                if(tool.Applied)
+                    tool.Undo();
+            }
+        }
+
         #region Mapping
+        private readonly MappingTool _mappingTool;
+
+        private IGraph GetMappingGraph()
+        {
+            if (_graphics.CenterPosition.Distance2DFromPlayer < EntityTools.PluginSettings.Mapper.CacheRadius)
+                return _graphics.VisibleGraph;
+            else return AstralAccessors.Quester.Core.Meshes.Value;
+        }
 #if false
 
         /// <summary>
@@ -1126,831 +1894,35 @@ namespace EntityTools.Patches.Mapper
                 ETLogger.WriteLine(ex.ToString());
             }
         } 
-#else
-        private void handler_StopMapping(object sender = null, ItemClickEventArgs e = null)
-        {
-        }
 #endif
-        #endregion
-
-        #region Добавление и изменение CustomRegion'ов
-        /// <summary>
-        /// Флаг, указывающий, что CustomRegion'ы в профиле были изменены, и его необходимо "сохранить"
-        /// </summary>
-        bool сurrentProfileNeedSave
+        private void handler_Mapping_Stop(object sender = null, ItemClickEventArgs e = null)
         {
-            get
-            {
-                return !string.IsNullOrEmpty(editedQuesterProfileName) && Astral.Controllers.Settings.Get.LastQuesterProfile == editedQuesterProfileName;
-            }
-            set
-            {
-                if (value)
-                    editedQuesterProfileName = Astral.Controllers.Settings.Get.LastQuesterProfile;
-                else editedQuesterProfileName = string.Empty;
-            }
-        }
-        string editedQuesterProfileName = string.Empty;
-
-        /// <summary>
-        /// Запуск процедуры добавления CustomRegion'а
-        /// </summary>
-        private void handler_AddCustomRegion(object sender, ItemClickEventArgs e)
-        {
-            AddCustomRegionTool addCRTool = CurrentTool as AddCustomRegionTool;
-            if (addCRTool is null)
-                CurrentTool = new AddCustomRegionTool(btnCRTypeSelector.Checked);
-
-            btnLockMapOnPlayer.Checked = false;
-
-            barEditCustomRegion.Text = "Add CustomRegion";
-            barEditCustomRegion.DockStyle = BarDockStyle.None;
-            barEditCustomRegion.FloatLocation = new Point(Location.X + MapPicture.Location.X + 20, 
-                Location.Y + MapPicture.Location.Y + 20 
-                + (barMainTools.Visible && barMainTools.DockStyle == BarDockStyle.Top ? barMainTools.Size.Height : 0)
-                + (barEditMeshes.Visible && barEditMeshes.DockStyle == BarDockStyle.Top ? barEditMeshes.Size.Height : 0));
-            //barEditCustomRegion.FloatSize = new Size(Math.Max(100, MapPicture.Width - 40), 0);
-            editCRName.EditWidth = Math.Max(300, Width - 40);
-            editCRSelector.EditWidth = Math.Max(300, Width - 40);
-
-            btnCRTypeSelector.Visibility = BarItemVisibility.Always;
-            editCRSelector.Visibility = BarItemVisibility.Never;
-            editCRName.Visibility = BarItemVisibility.Always;
-            btnCRRename.Visibility = BarItemVisibility.Never;
-            btnCRAdditionAccept.Visibility = BarItemVisibility.Always;
-            btnCREditionAccept.Visibility = BarItemVisibility.Never;
-
-            barEditCustomRegion.Visible = true;
+            if(btnStopMapping.Checked)
+                _mappingTool.MappingMode = MappingMode.Stoped;
         }
 
-        /// <summary>
-        /// Выбор и редактирование существующего CustomRegion'а
-        /// </summary>
-        private void handler_EditCustomRegion(object sender, ItemClickEventArgs e)
+        private void handler_Mapping_ForceLink(object sender, ItemClickEventArgs e)
         {
-            var customRegions = Astral.Quester.API.CurrentProfile.CustomRegions;
-            if (customRegions.Count == 0)
-            {
-                XtraMessageBox.Show("No CustomRegions available to change");
-                btnEditCR.Checked = false;
-                return;
-            }
-
-            EditCustomRegionTool editCRTool = CurrentTool as EditCustomRegionTool;
-            if (btnEditCR.Checked)
-            {
-                btnLockMapOnPlayer.Checked = false;
-
-                barEditCustomRegion.Text = "Edit CustomRegion";
-                barEditCustomRegion.DockStyle = BarDockStyle.None;
-                barEditCustomRegion.FloatLocation = new Point(Location.X + MapPicture.Location.X + 20,
-                    Location.Y + MapPicture.Location.Y + 20
-                    + (barMainTools.Visible && barMainTools.DockStyle == BarDockStyle.Top
-                        ? barMainTools.Size.Height
-                        : 0)
-                    + (barEditMeshes.Visible && barEditMeshes.DockStyle == BarDockStyle.Top
-                        ? barEditMeshes.Size.Height
-                        : 0));
-                //barEditCustomRegion.FloatSize = new Size(Math.Max(100, MapPicture.Width - 40), 0);
-                editCRName.EditWidth = Math.Max(300, Width - 40);
-                editCRSelector.EditWidth = Math.Max(300, Width - 40);
-
-                btnCRTypeSelector.Visibility = BarItemVisibility.Always;
-                editCRSelector.Visibility = BarItemVisibility.Always;
-                editCRName.Visibility = BarItemVisibility.Never;
-                btnCRRename.Visibility = BarItemVisibility.Always;
-                btnCRAdditionAccept.Visibility = BarItemVisibility.Never;
-                btnCREditionAccept.Visibility = BarItemVisibility.Always;
-
-                // Привязываем список CustomRegion'ов
-                if (!ReferenceEquals(itemEditCRList.DataSource, customRegions))
-                {
-                    itemEditCRList.DataSource = customRegions;
-                    itemEditCRList.DisplayMember = "Name";
-                    editCRSelector.EditValue = customRegions.First();
-                }
-                else handler_ChangeSelectedCustomRegion(sender);
-
-                barEditCustomRegion.Visible = true;
-            }
-            else if (editCRTool != null)
-                CurrentTool = null;
+            _mappingTool.ForceLink = btnForceLinkLast.Checked;
         }
 
-        /// <summary>
-        /// Изменение модифицируемого CustomRegion'a
-        /// </summary>
-        private void handler_ChangeSelectedCustomRegion(object sender, EventArgs e = null)
+        private void handler_Mapping_LinearPath(object sender, ItemClickEventArgs e)
         {
-            var tool = CurrentTool;
-            EditCustomRegionTool editCRTool = tool as EditCustomRegionTool;
-
-            if (editCRSelector.EditValue is CustomRegion cr)
-            {
-                if (editCRTool is null)
-                    CurrentTool = new EditCustomRegionTool(cr);
-                else
-                {
-                    if (editCRTool.Modified
-                        && XtraMessageBox.Show($"Changes of the '{editCRTool.Name}' can be lost!\n\r" +
-                                               $"Press 'Yes' to save changes or 'No' to proceed", "", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning) == DialogResult.Yes)
-                    {
-                        editCRTool.Apply(Convert.ToString(editCRName.EditValue));
-                        сurrentProfileNeedSave = true;
-                        CurrentTool = new EditCustomRegionTool(cr);
-                    }
-                    else editCRTool.AttachTo(cr);
-                }
-                CenterOfMap = cr.Position;
-                btnCRTypeSelector.Checked = cr.Eliptic;
-            }
-            else if (editCRTool != null)
-                CurrentTool = null;
+            _mappingTool.Linear = btnLinearPath.Checked;
         }
 
-        /// <summary>
-        /// Завершение процедуры добавления региона
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void handler_AcceptCRAddition(object sender, ItemClickEventArgs e)
+        private void handler_Mapping_BidirectionalPath(object sender, ItemClickEventArgs e)
         {
-            if (CurrentTool is AddCustomRegionTool addCRtool)
-            {
-                if (!addCRtool.IsCorrect)
-                {
-                    XtraMessageBox.Show("Coordinates  of the CustomRegion is not valid!");
-                    return;
-                }
-
-                string crName = editCRName.EditValue.ToString()?.Trim();
-                if (string.IsNullOrEmpty(crName))
-                    XtraMessageBox.Show("The Name of the CustomRegion is not valid !");
-                else 
-                {
-                    var crList = Astral.Quester.API.CurrentProfile.CustomRegions;
-                    if (crList.Count > 0 && (crList.Find(cr => cr.Name == crName) != null)
-                        && XtraMessageBox.Show($"CustomRegion '{crName}' is already exist.\n\r" +
-                                $"Press 'Yes' to proceed or 'No' to change name", $"{crName} is exist", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.OK)
-                            return;
-                    {
-                        var cr = addCRtool.GetCustomRegion(crName);
-                        if (cr != null)
-                        {
-                            crList.Add(cr);
-                            сurrentProfileNeedSave = true;
-
-                            //TODO: Добавить обновление списка CustomRegion'ов в Quester-редакторе
-
-                            //_undoStack.Push(addCRtool); <- вызывается в CurrentTool.set
-
-                            CurrentTool = null;
-                            barEditCustomRegion.Visible = false;
-                        }
-                        else XtraMessageBox.Show($"Something wrong. '{crName}' was not added");
-                    }
-                }
-            }
+            if (btnStopMapping.Checked)
+                _mappingTool.MappingMode = MappingMode.Bidirectional;
         }
 
-        private void handler_AcceptCREdition(object sender, ItemClickEventArgs e)
+        private void handler_Mapping_UnidirectionalPath(object sender, ItemClickEventArgs e)
         {
-            if (CurrentTool is EditCustomRegionTool editCRTool && editCRTool.Modified)
-            {
-                editCRTool.Apply(Convert.ToString(editCRName.EditValue));
-                сurrentProfileNeedSave = true;
-                editCRName.EditValue = string.Empty;
-                editCRName.Visibility = BarItemVisibility.Never;
-                editCRSelector.Visibility = BarItemVisibility.Always;
-            }
-        }
-
-        /// <summary>
-        /// Прерывание процедуры добавления/редактирования региона
-        /// </summary>
-        private void handler_CancelCRManipulation(object sender, ItemClickEventArgs e)
-        {
-            var tool = CurrentTool;
-            if (tool is AddCustomRegionTool addCRtool
-                || tool is EditCustomRegionTool editCRtool)
-                CurrentTool = null;
-            barEditCustomRegion.Visible = false;
-            btnEditCR.Checked = false;
-        }
-
-        /// <summary>
-        /// Переключение типа CustomRegion'a
-        /// </summary>
-        private void handler_ChangeCustomRegionType(object sender, ItemClickEventArgs e)
-        {
-            if (btnCRTypeSelector.Checked)
-                btnCRTypeSelector.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCREllipce;
-            else
-                btnCRTypeSelector.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCRRectang;
-
-            var tool = CurrentTool;
-            if (tool is AddCustomRegionTool addCRtool)
-                addCRtool.IsElliptical = btnCRTypeSelector.Checked;
-            else if(tool is EditCustomRegionTool editCRtool)
-                editCRtool.IsElliptical = btnCRTypeSelector.Checked;
-        }
-
-        private void handler_ChangedRenameCRMode(object sender = null, ItemClickEventArgs e = null)
-        {
-            if (btnCRRename.Checked)
-            {
-                if (editCRSelector.EditValue is CustomRegion cr)
-                    editCRName.EditValue = cr.Name;
-                else editCRName.EditValue = string.Empty;
-                editCRSelector.Visibility = BarItemVisibility.Never;
-                editCRName.Visibility = BarItemVisibility.Always;
-                editCRName.EditWidth = editCRSelector.EditWidth;
-            }
-            else
-            {
-                editCRName.EditValue = string.Empty;
-                editCRSelector.Visibility = BarItemVisibility.Always;
-                editCRName.Visibility = BarItemVisibility.Never;
-            }
+            if (btnStopMapping.Checked)
+                _mappingTool.MappingMode = MappingMode.Bidirectional;
         }
         #endregion
-
-        private void handler_DeleteRadiusChanged(object sender, EventArgs e)
-        {
-            Astral.API.CurrentSettings.DeleteNodeRadius = Convert.ToInt32(editDeleteRadius.EditValue);
-        }
-        private void handler_WaypointDistanceChanged(object sender, EventArgs e)
-        {
-            int value = Convert.ToInt32(editWaypointDistance.EditValue);
-            EntityTools.PluginSettings.Mapper.WaypointDistance = value;
-            EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance = value / 2;
-        }
-
-        private void handler_ShowStatusBar(object sender, EventArgs e)
-        {
-            barStatus.Visible = true;
-            btnShowStatBar.Visible = false;
-        }
-
-        private void handler_BarVisibleChanged(object sender, EventArgs e)
-        {
-            EntityTools.PluginSettings.Mapper.MapperForm.MainToolsBarVisible = barMainTools.Visible;
-            EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible = barStatus.Visible;
-            EntityTools.PluginSettings.Mapper.MapperForm.EditMeshesBarVisible = barEditMeshes.Visible;
-
-            btnShowStatBar.Visible = !barStatus.Visible && !barMainTools.Visible && !barEditMeshes.Visible;
-        }
-
-        #region Meshes_Manipulation
-        /// <summary>
-        /// Сохранение в файл текущего Quester-профиля
-        /// </summary>
-        private void handler_SaveChanges2QuesterProfile(object sender, ItemClickEventArgs e)
-        {
-            // Штатное сохранение профиля реализовано в
-            // Astral.Quester.Core.Save(false)
-
-            string meshName = EntityManager.LocalPlayer.MapState.MapName + ".bin";
-            string profileName = Astral.Controllers.Settings.Get.LastQuesterProfile;
-            var currentProfile = Astral.Quester.API.CurrentProfile;
-            bool useExternalMeshFile = currentProfile.UseExternalMeshFile && currentProfile.ExternalMeshFileName.Length >= 10;
-            string externalMeshFileName = useExternalMeshFile ? Path.Combine(Path.GetDirectoryName(profileName), currentProfile.ExternalMeshFileName) : string.Empty;
-            Graph mesh = AstralAccessors.Quester.Core.Meshes;
-
-#if true
-            if (File.Exists(profileName))
-            {
-                ZipArchive zipFile = null;
-                try
-                {
-                    bool profileUpdated = false;
-                    if (сurrentProfileNeedSave)
-                    {
-                        // Открываем архивный файл профиля
-                        zipFile = ZipFile.Open(profileName, File.Exists(profileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create);
-                        
-                        // Сохраняем в архив файл профиля "profile.xml"
-                        lock (currentProfile)
-                        {
-                            Patch_Astral_Quester_Core_Save.SaveProfile(zipFile);
-                            currentProfile.Saved = true; 
-                        }
-
-                        сurrentProfileNeedSave = false;
-                        profileUpdated = true;
-                    }
-
-                    // Сохраняем файлы мешей
-                    if (useExternalMeshFile)
-                    {
-                        // закрываем архив профиля
-                        zipFile?.Dispose();
-                        
-                        // открываем архив с внешними мешами
-                        zipFile = ZipFile.Open(externalMeshFileName, 
-                            File.Exists(externalMeshFileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create);
-                    } 
-                    else if(zipFile is null)
-                        zipFile = ZipFile.Open(profileName, File.Exists(profileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create);
-
-                    bool succeeded = false;
-                    lock (mesh)
-                    {
-                        // удаляем мусор (скрытые вершины и ребра)
-                        mesh.RemoveUnpassable();
-                        // сохраняем меш в архивный файл
-                        succeeded = Patch_Astral_Quester_Core_Save.SaveMesh(zipFile, meshName, mesh); 
-                    }
-
-                    if(succeeded)
-                        XtraMessageBox.Show(string.Concat("The profile '", Path.GetFileName(profileName), "' updated:\n\r\t",
-                                                        useExternalMeshFile ? externalMeshFileName +'\\' : string.Empty, meshName,
-                                                        profileUpdated ? "\n\r\tprofile.xml" : string.Empty));
-                    else XtraMessageBox.Show(string.Concat("Fail to save changes to the profile '", Path.GetFileName(profileName), '\''), "Failed !", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-                catch (Exception exc)
-                {
-                    Logger.WriteLine(exc.ToString());
-                    XtraMessageBox.Show(exc.ToString());
-                }
-                finally
-                {
-                    zipFile?.Dispose();
-                }
-            }
-#else
-            if (Astral.Quester.API.CurrentProfile.UseExternalMeshFile)
-            {
-                // Профиль использует "внешние" меши
-                XtraMessageBox.Show($"The '{nameof(MapperFormExt)}' doesn't support external Meshes");
-            }
-            else
-            {
-                // Сохранение графа путей (карты) в файл текущего профиля
-                if (File.Exists(profileName))
-                {
-                    try
-                    {
-                        // удаляем мусор (скрытые вершины)
-                        AstralAccessors.Quester.Core.Meshes.Value.RemoveUnpassable();
-
-                        bool profileUpdated = false;
-                        using (ZipArchive zipFile = ZipFile.Open(fileName, ZipArchiveMode.Update))
-                        {
-                            ZipArchiveEntry zipMeshEntry = zipFile.GetEntry(meshName);
-
-#if false
-                            // Проверяем наличие меша карты в zip-файле
-                            foreach (ZipArchiveEntry entry in zipFile.Entries)
-                            {
-                                if (entry.Name.Equals(meshName, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    zipMeshEntry = entry;
-                                    break;
-                                }
-                            } 
-#endif
-
-                            if (zipMeshEntry != null)
-                                // Меш карты найден. Удаляем старый и создаем новый
-                                zipMeshEntry.Delete();
-                            zipMeshEntry = zipFile.CreateEntry(meshName);
-
-                            // Сохранение графа путей (мешей) активной карты
-                            using (MemoryStream memoryStream = new MemoryStream())
-                            {
-                                BinaryFormatter binaryFormatter = new BinaryFormatter();
-                                binaryFormatter.Serialize(memoryStream, AstralAccessors.Quester.Core.Meshes.Value);
-
-                                using (var zipMeshStream = zipMeshEntry.Open())
-                                {
-                                    byte[] meshBytes = memoryStream.ToArray();
-
-                                    zipMeshStream.Write(meshBytes, 0, meshBytes.Length);
-                                }
-                            }
-
-                            // Сохранение регионов
-                            if (CurrentProfileNeedSave)
-                            {
-                                ZipArchiveEntry zipProfileEntry = zipFile.GetEntry("profile.xml");
-
-                                if (zipProfileEntry is null)
-                                    zipProfileEntry = zipFile.CreateEntry("profile.xml");
-                                else
-                                {
-                                    zipProfileEntry.Delete();
-                                    zipProfileEntry = zipFile.CreateEntry("profile.xml");
-                                }
-
-                                XmlSerializer serializer = new XmlSerializer(Astral.Quester.API.CurrentProfile.GetType(), Patch_XmlSerializer_GetExtraTypes.QuesterTypes.ToArray());
-                                using (var zipProfileStream = zipProfileEntry.Open())
-                                {
-                                    serializer.Serialize(zipProfileStream, Astral.Quester.API.CurrentProfile);
-                                    Astral.Quester.API.CurrentProfile.Saved = true;
-                                    profileUpdated = true;
-                                }
-
-                                CurrentProfileNeedSave = false;
-                            }
-                        }
-
-                        XtraMessageBox.Show(string.Concat("The profile '", Path.GetFileName(fileName), "' updated:\n\r\t",
-                                                            meshName,
-                                                            profileUpdated ? "profile.xml" : string.Empty));
-                    }
-                    catch (Exception exc)
-                    {
-                        Logger.WriteLine(exc.ToString());
-                        XtraMessageBox.Show(exc.ToString());
-                    }
-                }
-            } 
-#endif
-        }
-
-        /// <summary>
-        /// Импорт мешей карты (графа путей) из Игры
-        /// </summary>
-        private void handler_ImportCurrentMapMeshesFromGame(object sender, ItemClickEventArgs e)
-        {
-            //if (((Graph)CoreCurrentMapMeshes)?.NodesCollection.Count == 0
-            if (((Graph)AstralAccessors.Quester.Core.Meshes)?.Nodes.Count == 0
-                || XtraMessageBox.Show(this, "Are you sure to import game nodes ? All actual nodes must be delete !", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
-            {
-                handler_StopMapping();
-#if AstralMapper
-                MapperStopDrawing?.Invoke(mapper); 
-#endif
-                //Graph graph = (Graph)CoreCurrentMapMeshes;
-                Graph graph = AstralAccessors.Quester.Core.Meshes;
-                lock (graph)
-                {
-                    graph.Clear();
-                    Astral.Logic.NW.GoldenPath.GetCurrentMapGraph(graph);
-                    //graphCache?.RegenCache(null);
-                }
-#if AstralMapper
-                MapperStartDrawing?.Invoke(mapper); 
-#endif
-            }
-        }
-
-        /// <summary>
-        /// Импорт мешей одной или всех карт из файла
-        /// </summary>
-        private void handler_ImportMapMeshesFromFile(object sender, ItemClickEventArgs e)
-        {
-            string currentMapName = EntityManager.LocalPlayer.MapState.MapName;
-            if (string.IsNullOrEmpty(currentMapName))
-            {
-                XtraMessageBox.Show("Impossible to get current map name !");
-                return;
-            }
-            string currentMapMeshesName = currentMapName + ".bin";
-            OpenFileDialog openFileDialog = new OpenFileDialog
-            {
-                InitialDirectory = Directories.ProfilesPath,
-                DefaultExt = "amp.zip",
-                Filter = "Astral mission profil (*.amp.zip)|*.amp.zip|(*.mesh.zip)|*.mesh.zip"
-            };
-            if (openFileDialog.ShowDialog() == DialogResult.OK && File.Exists(openFileDialog.FileName))
-            {
-                handler_StopMapping();
-                try
-                {
-                    using (ZipArchive profile = ZipFile.Open(openFileDialog.FileName, ZipArchiveMode.Read))
-                    {
-                        ZipArchiveEntry currentMapEntry = profile.GetEntry(currentMapMeshesName);
-                        if(currentMapEntry is null)
-                        {
-                            XtraMessageBox.Show("This profile doesn't contain current map !");
-                            return;
-                        }
-                        var mapsMeshes = AstralAccessors.Quester.Core.MapsMeshes.Value;
-
-                        DialogResult dialogResult = XtraMessageBox.Show("Import current map only ?\n\rElse import all.", "Map import", MessageBoxButtons.YesNoCancel);
-                        if (dialogResult == DialogResult.Yes)
-                        {
-                            // Экспорт одной "текуще" карты
-                            using (Stream stream = currentMapEntry.Open())
-                            {       
-                                BinaryFormatter binaryFormatter = new BinaryFormatter();
-                                Graph currentMapMeshes = binaryFormatter.Deserialize(stream) as Graph;
-                                if(currentMapMeshes != null)
-                                {
-                                    ResetToolState();
-
-                                    lock (mapsMeshes)
-                                    {
-                                        if (mapsMeshes.ContainsKey(currentMapName))
-                                            mapsMeshes[currentMapName] = currentMapMeshes;
-                                        else mapsMeshes.Add(currentMapName, currentMapMeshes);
-                                    }
-                                    Logger.WriteLine($"Import '{currentMapMeshesName}' from {openFileDialog.FileName}");
-                                    return;
-                                }
-                                else
-                                {
-                                    string msg = $"Failed to import '{currentMapMeshesName}' from {openFileDialog.FileName}";
-                                    Logger.WriteLine(msg);
-                                    XtraMessageBox.Show(msg);
-                                    return;
-                                }
-                            }
-
-                        }
-                        if (dialogResult == DialogResult.No)
-                        {
-                            // Экспорт всех карт, содержащихся в заданном профиле
-                            BinaryFormatter binaryFormatter = new BinaryFormatter();
-                            StringBuilder sb = new StringBuilder();
-                            sb.Append("Import maps meshes from  '").Append(openFileDialog.FileName).AppendLine("':");
-                            foreach (ZipArchiveEntry entry in profile.Entries)
-                            {
-                                if (entry.Name.EndsWith(".bin", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    string entryMapName = entry.Name.Substring(0, entry.Name.Length - 4);
-                                    Graph entryMapMeshes = null;
-                                    using (Stream stream = entry.Open())
-                                    {
-                                        entryMapMeshes = binaryFormatter.Deserialize(stream) as Graph;
-                                    }
-                                    if (entryMapMeshes != null)
-                                    {
-                                        ResetToolState();
-
-                                        lock (mapsMeshes)
-                                        {
-                                            if (mapsMeshes.ContainsKey(entryMapName))
-                                                mapsMeshes[entryMapName] = entryMapMeshes;
-                                            else mapsMeshes.Add(entryMapName, entryMapMeshes); 
-                                        }
-                                        sb.Append("\t'").Append(currentMapMeshesName).AppendLine("' - succeeded");
-                                    }
-                                    else sb.Append("\t'").Append(currentMapMeshesName).AppendLine("' - failed");
-                                }
-                            } 
-                            Logger.WriteLine(sb.ToString());
-                        }
-
-                    }
-                }
-                catch (Exception exc)
-                {
-                    Logger.WriteLine(exc.ToString());
-                    XtraMessageBox.Show(exc.ToString());
-                }
-            }
-        }
-
-        /// <summary>
-        /// Экспорт узлов в файл 
-        /// </summary>
-        private void handler_ExportCurrentMapMeshes2File(object sender, ItemClickEventArgs e)
-        {
-#if false
-            // Код перенесен из Astral'a
-            SaveFileDialog saveFileDialog = new SaveFileDialog
-            {
-                InitialDirectory = Directories.ProfilesPath,
-                DefaultExt = "amp.zip",
-                Filter = "Astral mesh file (*.mesh.zip)|*.mesh.zip"
-            };
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                //Astral.Quester.Core.LoadAllMeshes();
-                handler_StopMapping();
-                //CoreLoadAllMeshes();
-                AstralAccessors.Quester.Core.LoadAllMeshes();
-                List<Class88.Class89> list = new List<Class88.Class89>();
-                //foreach (KeyValuePair<string, Graph> keyValuePair in CoreMapsMeshes.Value)
-                foreach (var keyValuePair in AstralAccessors.Quester.Core.MapsMeshes.Value)
-                {
-                    Class88.Class89 item = new Class88.Class89(keyValuePair.Value, Class88.Class89.Enum2.const_1, keyValuePair.Key + ".bin", null);
-                    list.Add(item);
-                }
-                Class88.SaveMeshes2Files(saveFileDialog.FileName, list, false); 
-            }
-#else
-            throw new NotImplementedException();
-#endif
-        }
-
-        /// <summary>
-        /// Очистка мешей карты (графа)
-        /// </summary>
-        private void handler_ClearCurrentMapMeshes(object sender, ItemClickEventArgs e)
-        {
-            if (XtraMessageBox.Show(this, "Are you sure to delete all map nodes ?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
-            {
-                handler_StopMapping();
-                ResetToolState();
-#if AstralMapper
-                MapperStopDrawing?.Invoke(mapper); 
-#endif
-                currentMapHash = 0;
-                ((Graph)AstralAccessors.Quester.Core.Meshes).Clear();
-#if AstralMapper
-                MapperStartDrawing?.Invoke(mapper); 
-#endif
-            }
-        }
-
-        /// <summary>
-        /// Оценка графа на наличие мусора
-        /// </summary>
-        private void handler_MeshesInfo(object sender, ItemClickEventArgs e)
-        {
-            int correctNodeNum = 0;
-            int unpasNodeNum = 0;
-            var nodes = ((Graph)AstralAccessors.Quester.Core.Meshes).Nodes;
-            int correctArcNum = 0;
-            int disabledArcNum = 0;
-            int unpasArcNum = 0;
-            int totalArcCount = 0;
-
-            foreach (Node nd in nodes)
-            {
-                if (!nd.Passable)
-                    unpasNodeNum++;
-                else correctNodeNum++;
-                foreach(Arc arc in nd.OutgoingArcs)
-                {
-                    totalArcCount++;
-                    if (arc.Disabled)
-                    {
-                        disabledArcNum++;
-                        if (!arc.Passable)
-                            unpasArcNum++;
-                    }
-                    else if (!arc.Passable)
-                        unpasArcNum++;
-                    else correctArcNum++;
-                }
-            }
-
-            XtraMessageBox.Show($"Total nodes: {nodes.Count}\n\r" +
-                $"\tcorrect:\t{correctNodeNum}\n\r" +
-                $"\tunpassable:\t{unpasNodeNum}\n\r" +
-                $"Total arcs: {totalArcCount}\n\r" +
-                $"\tcorrect:\t{correctArcNum}\n\r" +
-                $"\tdisabled:\t{disabledArcNum}\n\r" +
-                $"\tunpassable:\t{unpasArcNum}\n\r");
-        }
-
-        /// <summary>
-        /// Сжатие графа (удаление мусора)
-        /// </summary>
-        private void handler_MeshesCompression(object sender, ItemClickEventArgs e)
-        {
-            ResetToolState();
-
-            int correctNodeNum = 0;
-            int unpasNodeNum = 0;
-            var nodes = ((Graph)AstralAccessors.Quester.Core.Meshes).Nodes;
-            int totalNodeNum = nodes.Count;
-            int correctArcNum = 0;
-            int disabledArcNum = 0;
-            int unpasArcNum = 0;
-            int totalArcNum = 0;
-            foreach (Node nd in nodes)
-            {
-                if (!nd.Passable)
-                    unpasNodeNum++;
-                else correctNodeNum++;
-
-                foreach (Arc arc in nd.OutgoingArcs)
-                {
-                    totalArcNum++;
-                    if (arc.Disabled)
-                    {
-                        disabledArcNum++;
-                        if (!arc.Passable)
-                            unpasArcNum++;
-                    }
-                    else if (!arc.Passable)
-                        unpasArcNum++;
-                    else correctArcNum++;
-                }
-            }
-
-            if (unpasNodeNum > 0 && ((Graph)AstralAccessors.Quester.Core.Meshes).RemoveUnpassable() > 0)
-            {
-                ResetToolState();
-
-                int correctNodeNumNew = 0;
-                int unpasNodeNumNew = 0;
-                int correctArcNumNew = 0;
-                int disabledArcNumNew = 0;
-                int unpasArcNumNew = 0;
-                int totalArcNumNew = 0;
-                nodes = ((Graph)AstralAccessors.Quester.Core.Meshes).Nodes;
-                foreach (Node nd in nodes)
-                {
-                    if (!nd.Passable)
-                        unpasNodeNumNew++;
-                    else correctNodeNumNew++;
-                    foreach (Arc arc in nd.OutgoingArcs)
-                    {
-                        totalArcNumNew++;
-                        if (arc.Disabled)
-                        {
-                            disabledArcNumNew++;
-                            if (!arc.Passable)
-                                unpasArcNumNew++;
-                        }
-                        else if (!arc.Passable)
-                            unpasArcNumNew++;
-                        else correctArcNumNew++;
-                    }
-                }
-
-
-                XtraMessageBox.Show($"Total nodes: {totalNodeNum} => {nodes.Count}\n\r" +
-                    $"\tcorrect:\t{correctNodeNum} => {correctNodeNumNew}\n\r" +
-                    $"\tunpassable:\t{unpasNodeNum} => {unpasNodeNumNew}\n\r" +
-                    $"Total arcs: {totalArcNum} => {totalArcNumNew}\n\r" +
-                    $"\tcorrect:\t{correctArcNum} => {correctArcNumNew}\n\r" +
-                    $"\tdisabled:\t{disabledArcNum} => {disabledArcNumNew}\n\r" +
-                    $"\tunpassable:\t{unpasArcNum} => {unpasArcNumNew}\n\r");
-            }
-            else XtraMessageBox.Show($"Meshes doesn't compressed\n\r" +
-                                    $"Total nodes: {nodes.Count}\n\r" +
-                                    $"\tcorrect:\t{correctNodeNum}\n\r" +
-                                    $"\tunpassable:\t{unpasNodeNum}\n\r" +
-                                    $"Total arcs: {totalArcNum}\n\r" +
-                                    $"\tcorrect:\t{correctArcNum}\n\r" +
-                                    $"\tdisabled:\t{disabledArcNum}\n\r" +
-                                    $"\tunpassable:\t{unpasArcNum}\n\r");
-        }
-        #endregion
-
-        #region EditMeshes
-        private void handler_EditEdges_ModeChanged(object sender, ItemClickEventArgs e)
-        {
-            EditEdgeTool editEdgeTool = CurrentTool as EditEdgeTool;
-            if (btnEditEdges.Checked)
-            {
-                if (editEdgeTool is null)
-                    CurrentTool = new EditEdgeTool();
-                MapLockOnPlayer = false;
-            }
-            else if (editEdgeTool != null)
-                    CurrentTool = null;
-        }
-
-        private void handler_RelocateNodes_ModeChanged(object sender, ItemClickEventArgs e)
-        {
-            RelocateNodesTool relocateTool = CurrentTool as RelocateNodesTool;
-            if (btnMoveNodes.Checked)
-            {
-                if (relocateTool is null)
-                    CurrentTool = new RelocateNodesTool();
-                MapLockOnPlayer = false;
-            }
-            else if (relocateTool != null)
-                CurrentTool = null; 
-        }
-
-        private void handler_DeleteNodes_ModeChanged(object sender, ItemClickEventArgs e)
-        {
-            RemoveNodesTool removeTool = CurrentTool as RemoveNodesTool;
-            if (btnRemoveNodes.Checked)
-            {
-                if (removeTool is null)
-                    CurrentTool = new RemoveNodesTool();
-                MapLockOnPlayer = false;
-            }
-            else if (removeTool != null)
-                    CurrentTool = null;
-        }
-        #endregion
-
-        /// <summary>
-        /// Откат изменений
-        /// </summary>
-        private void handler_Undo(object sender, ItemClickEventArgs e)
-        {
-            // TODO: добавить перемещение карты к координатам, в которых было совершено изменение
-            // TODO: Добавить hint к кнопке отката, указывающий на изменения, которые будут отменены
-            IMapperTool tool = CurrentTool;
-            if (tool != null
-                && tool.Applied)
-            {
-                tool.Undo();
-                CurrentTool = null;
-                return;
-            }
-            CurrentTool = null;
-
-            if (_undoStack.Count > 0)
-            {
-                tool = _undoStack.Pop();
-                if(tool.Applied)
-                    tool.Undo();
-            }
-        }
     }
 #endif
 }

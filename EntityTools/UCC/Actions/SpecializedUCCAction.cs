@@ -1,20 +1,17 @@
 ﻿//#define DEBUG_LOG
 
 using System;
-using System.Reflection;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Xml.Serialization;
 using Astral.Logic.UCC.Classes;
-using EntityTools.Reflection;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Extensions;
+using EntityTools.Reflection;
 using EntityTools.Tools;
 using EntityTools.UCC.Conditions;
-using Unit = Astral.Logic.UCC.Ressources.Enums.Unit;
-using System.Text;
 
 namespace EntityTools.UCC.Actions
 {
@@ -84,7 +81,7 @@ namespace EntityTools.UCC.Actions
 
         public SpecializedUCCAction()
         {
-            Target = Unit.Player;
+            Target = Astral.Logic.UCC.Ressources.Enums.Unit.Player;
         }
 
         public override bool NeedToRun
@@ -312,16 +309,16 @@ namespace EntityTools.UCC.Actions
         {
             if (ManagedAction is null)
                 return $"Property '{nameof(ManagedAction)}' does not set !";
-            else return "(SP) " + ManagedAction.ToString();
+            return "(SP) " + ManagedAction;
         }
 
         public override UCCAction Clone()
         {
-            return base.BaseClone(new SpecializedUCCAction()
+            return BaseClone(new SpecializedUCCAction
             {
-                ManagedAction = CopyHelper.CreateDeepCopy(this.ManagedAction),
-                CustomConditionCheck = this.CustomConditionCheck,
-                CustomConditions = this.CustomConditions.Clone() ?? new List<UCCCondition>()
+                ManagedAction = CopyHelper.CreateDeepCopy(ManagedAction),
+                CustomConditionCheck = CustomConditionCheck,
+                CustomConditions = CustomConditions.Clone() ?? new List<UCCCondition>()
             });
         }
 
@@ -377,9 +374,9 @@ namespace EntityTools.UCC.Actions
         }
         [XmlIgnore]
         [Browsable(false)]
-        public new Unit Target
+        public new Astral.Logic.UCC.Ressources.Enums.Unit Target
         {
-            get => (ManagedAction == null) ? Unit.Player : ManagedAction.Target;
+            get => (ManagedAction == null) ? Astral.Logic.UCC.Ressources.Enums.Unit.Player : ManagedAction.Target;
             set
             {
                 if (ManagedAction != null)

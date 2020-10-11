@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Drawing;
 using System.Windows.Forms;
 using AStar;
-using EntityTools.Patches.Mapper.Tools;
-using HarmonyLib;
+using Astral.Quester;
 using Astral.Quester.Classes;
 using MyNW.Classes;
 
@@ -41,7 +37,7 @@ namespace EntityTools.Patches.Mapper.Tools
         /// <summary>
         /// Флаг, указывающий является ли CustomRegion элиптическим
         /// </summary>
-        public bool IsElliptical { get; set; } = false;
+        public bool IsElliptical { get; set; }
         #endregion
 
         /// <summary>
@@ -185,7 +181,7 @@ namespace EntityTools.Patches.Mapper.Tools
                                                    
 
                 if (customRegion is null)
-                    return customRegion = new CustomRegion()
+                    return customRegion = new CustomRegion
                     {
                         Position = new Vector3((float)Math.Round(startX), (float)Math.Round(startY), 0),
                         Eliptic = IsElliptical,
@@ -193,17 +189,14 @@ namespace EntityTools.Patches.Mapper.Tools
                         Width = width,
                         Name = name
                     };
-                else
-                {
-                    customRegion.Name = name;
-                    customRegion.Position.X = (float)Math.Round(startX);
-                    customRegion.Position.Y = (float)Math.Round(startY);
-                    customRegion.Eliptic = IsElliptical;
-                    customRegion.Height = height;
-                    customRegion.Width = width;
+                customRegion.Name = name;
+                customRegion.Position.X = (float)Math.Round(startX);
+                customRegion.Position.Y = (float)Math.Round(startY);
+                customRegion.Eliptic = IsElliptical;
+                customRegion.Height = height;
+                customRegion.Width = width;
 
-                    return customRegion;
-                }
+                return customRegion;
             }
             return null;
         }
@@ -215,7 +208,7 @@ namespace EntityTools.Patches.Mapper.Tools
         {
             if (customRegion != null)
             {
-                Astral.Quester.API.CurrentProfile.CustomRegions.Remove(customRegion);
+                API.CurrentProfile.CustomRegions.Remove(customRegion);
                 customRegion = null;
             }
         }

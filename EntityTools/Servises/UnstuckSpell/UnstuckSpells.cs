@@ -3,16 +3,15 @@
 #endif
 
 #define UnstuckSpell_Tasks
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Astral;
-using Astral.Logic.Classes.FSM;
 using Astral.Logic.NW;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using API = Astral.Logic.UCC.API;
 
 namespace EntityTools.Services
 {
@@ -42,24 +41,24 @@ namespace EntityTools.Services
         /// Реализация через System.Threading.Tasks
         /// и Astral.Logic.UCC.API.AfterCallCombat
         /// </summary>
-        private static Task monitor = null;
-        private static bool afterCallCombatSubcription = false;
+        private static Task monitor;
+        private static bool afterCallCombatSubcription;
 
         public static void Start()
         {
             if (!afterCallCombatSubcription)
             {
-                Astral.Logic.UCC.API.AfterCallCombat += ArterCallCombat;
+                API.AfterCallCombat += ArterCallCombat;
                 afterCallCombatSubcription = true;
-                Astral.Logger.WriteLine($"{nameof(UnstuckSpells)} activated");
+                Logger.WriteLine($"{nameof(UnstuckSpells)} activated");
                 ETLogger.WriteLine($"{nameof(UnstuckSpells)} activated");
             }
         }
         public static void Stop()
         {
-                Astral.Logic.UCC.API.AfterCallCombat -= ArterCallCombat;
+                API.AfterCallCombat -= ArterCallCombat;
                 afterCallCombatSubcription = false;
-                Astral.Logger.WriteLine($"{nameof(UnstuckSpells)} deactivated");
+                Logger.WriteLine($"{nameof(UnstuckSpells)} deactivated");
                 ETLogger.WriteLine($"{nameof(UnstuckSpells)} deactivated");
         }
 
@@ -69,7 +68,7 @@ namespace EntityTools.Services
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="arg"></param>
-        private static void ArterCallCombat(object sender, Astral.Logic.UCC.API.AfterCallCombatEventArgs arg)
+        private static void ArterCallCombat(object sender, API.AfterCallCombatEventArgs arg)
         {
             if (EntityTools.PluginSettings.UnstuckSpells.Active)
             {
@@ -85,7 +84,7 @@ namespace EntityTools.Services
             else
             {
                 afterCallCombatSubcription = false;
-                Astral.Logic.UCC.API.AfterCallCombat -= ArterCallCombat;
+                API.AfterCallCombat -= ArterCallCombat;
             }
         }
 
@@ -128,7 +127,7 @@ namespace EntityTools.Services
                 {
                     Entity currentTarget = Astral.Logic.UCC.Core.CurrentTarget;
                     bool result = !(EntityManager.LocalPlayer.InCombat
-                            || Astral.Logic.NW.Attackers.InCombat
+                            || Attackers.InCombat
                             || (currentTarget != null
                                 && currentTarget.IsValid
                                 && !currentTarget.IsDead
@@ -149,7 +148,8 @@ namespace EntityTools.Services
 #endif
                     return result;
                 }
-                else Astral.Logic.UCC.API.AfterCallCombat -= ArterCallCombat;
+
+                API.AfterCallCombat -= ArterCallCombat;
                 return false;
             }
         }

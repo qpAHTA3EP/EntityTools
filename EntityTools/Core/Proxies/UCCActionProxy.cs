@@ -1,19 +1,17 @@
-﻿using EntityTools.Core.Interfaces;
+﻿using System;
+using System.Reflection;
+using Astral.Logic.UCC.Classes;
+using EntityTools.Core.Interfaces;
 using EntityTools.Reflection;
 using MyNW.Classes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 
 namespace EntityTools.Core.Proxies
 {
     public class UCCActionProxy : IUCCActionEngine
     {
-        private Astral.Logic.UCC.Classes.UCCAction action;
+        private UCCAction action;
 
-        internal UCCActionProxy(Astral.Logic.UCC.Classes.UCCAction a)
+        internal UCCActionProxy(UCCAction a)
         {
             action = a ?? throw new ArgumentNullException();
         }
@@ -24,7 +22,7 @@ namespace EntityTools.Core.Proxies
                 if (EntityTools.Core.Initialize(action))
                     return action.NeedToRun;
 
-                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
 
                 EntityTools.StopBot();
 
@@ -48,7 +46,7 @@ namespace EntityTools.Core.Proxies
         {
             if (EntityTools.Core.Initialize(action))
                 return action.ToString();
-            else return action.GetType().Name;
+            return action.GetType().Name;
         }
 
         public bool Run()
@@ -56,7 +54,7 @@ namespace EntityTools.Core.Proxies
             if (EntityTools.Core.Initialize(action))
                 return action.Run();
 
-            ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
+            ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
 
             EntityTools.StopBot();
 

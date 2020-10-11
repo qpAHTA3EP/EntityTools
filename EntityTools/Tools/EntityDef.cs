@@ -1,8 +1,5 @@
-﻿using MyNW.Classes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
+using MyNW.Classes;
 
 namespace EntityTools.Tools
 {
