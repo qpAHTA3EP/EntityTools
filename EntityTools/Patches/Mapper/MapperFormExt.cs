@@ -79,7 +79,7 @@ namespace EntityTools.Patches.Mapper
         /// Флаг удержания персонажа в центре карты
         /// 
         /// </summary>
-        public bool LockOnPlayer
+        private bool LockOnPlayer
         {
             get => btnLockMapOnPlayer.Checked;
             set => btnLockMapOnPlayer.Checked = value;
@@ -88,7 +88,7 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Координаты центра отображаемой карты
         /// </summary>
-        public Vector3 CenterOfMap
+        private Vector3 CenterOfMap
         {
             get
             {
@@ -113,7 +113,7 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Координаты курсора мыши, относительно формы <see cref="MapperFormExt"/>
         /// </summary>
-        public Point RelativeMousePosition => MapPicture.PointToClient(MousePosition);
+        private Point RelativeMousePosition => MapPicture.PointToClient(MousePosition);
 
         private void ResetToolState()
         {
@@ -141,9 +141,13 @@ namespace EntityTools.Patches.Mapper
 
             Location = EntityTools.PluginSettings.Mapper.MapperForm.Location;
 
-            _mappingTool = new MappingTool(GetMappingGraph);
-
             BindingControls();
+            _mappingTool = new MappingTool(() => AstralAccessors.Quester.Core.Meshes.Value)
+            {
+                Linear = EntityTools.PluginSettings.Mapper.LinearPath,
+                ForceLink = EntityTools.PluginSettings.Mapper.ForceLinkingWaypoint
+            };// (GetMappingGraph);
+
         }
 
         /// <summary>
@@ -189,7 +193,7 @@ namespace EntityTools.Patches.Mapper
             editDeleteRadius.Edit.EditValueChanged += handler_DeleteRadiusChanged;
             editDeleteRadius.Edit.Leave += handler_DeleteRadiusChanged;
 
-            btnForceLinkLast.DataBindings.Add(nameof(btnForceLinkLast.Checked),
+            btnMappingForceLink.DataBindings.Add(nameof(btnMappingForceLink.Checked),
                                                 EntityTools.PluginSettings.Mapper,
                                                 nameof(EntityTools.PluginSettings.Mapper.ForceLinkingWaypoint),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
@@ -543,7 +547,7 @@ namespace EntityTools.Patches.Mapper
         {
             if (mode != MapperEditMode.Mapping)
             {
-                btnStopMapping.Checked = true;
+                btnMappingStop.Checked = true;
             }
             if (mode != MapperEditMode.EditEdges)
             {
@@ -614,7 +618,7 @@ namespace EntityTools.Patches.Mapper
 
         private void handler_DoubleClickZoom(object sender, ItemClickEventArgs e)
         {
-            Zoom = 1;
+            Zoom = 2.5;
         }
 
         Timeout mouseWeelTimeout = new Timeout(0);
@@ -780,28 +784,52 @@ namespace EntityTools.Patches.Mapper
 
                         #region Отрисовка специальной графики
                         // Отрисовка активного инструмента редактирования
-                        var tool = CurrentTool;
-                        if (tool != null
-                            && (tool.AllowNodeSelection || tool.HandleCustomDraw))
+                        try
                         {
-                            _graphics.GetWorldPosition(RelativeMousePosition, out double mouseX, out double mouseY);
-                            if (tool.AllowNodeSelection)
+                            var tool = CurrentTool;
+                            if (tool != null
+                                && (tool.AllowNodeSelection || tool.HandleCustomDraw))
                             {
-                                using (_selectedNodes.ReadLock())
+                                _graphics.GetWorldPosition(RelativeMousePosition, out double mouseX, out double mouseY);
+                                if (tool.AllowNodeSelection)
                                 {
-                                    _selectedNodes.OnCustomDraw(_graphics, mouseX, mouseY);
+                                    using (_selectedNodes.ReadLock())
+                                    {
+                                        _selectedNodes.OnCustomDraw(_graphics, mouseX, mouseY);
 
-                                    if (tool.HandleCustomDraw)
-                                        tool.OnCustomDraw(_graphics, _selectedNodes, mouseX, mouseY);
+                                        if (tool.HandleCustomDraw)
+                                            tool.OnCustomDraw(_graphics, _selectedNodes, mouseX, mouseY);
+                                    }
                                 }
+                                else if (tool.HandleCustomDraw)
+                                    tool.OnCustomDraw(_graphics, null, mouseX, mouseY);
                             }
-                            else if (tool.HandleCustomDraw)
-                                tool.OnCustomDraw(_graphics, null, mouseX, mouseY);
                         }
-                        
+                        catch (Exception ex)
+                        {
+                            if (timeout.IsTimedOut)
+                            {
+                                ETLogger.WriteLine(LogType.Error,
+                                    string.Concat(nameof(DrawMapper), ": Перехвачено исключение \n\r", ex), true);
+                                timeout.ChangeTime(2000);
+                            }
+                        }
+
                         // Отрисовка инструмента прокладывания пути
-                        if(_mappingTool.MappingMode != MappingMode.Stoped)
-                            _mappingTool.OnCustomDraw(_graphics);
+                        try
+                        {
+                            if (_mappingTool.MappingMode != MappingMode.Stoped)
+                                _mappingTool.OnCustomDraw(_graphics);
+                        }
+                        catch (Exception ex)
+                        {
+                            if (timeout.IsTimedOut)
+                            {
+                                ETLogger.WriteLine(LogType.Error,
+                                    string.Concat(nameof(DrawMapper), ": Перехвачено исключение \n\r", ex), true);
+                                timeout.ChangeTime(2000);
+                            }
+                        }
                         #endregion
 
                         #region Отрисовка области уклонения от АОЕ
@@ -831,9 +859,7 @@ namespace EntityTools.Patches.Mapper
                         x = location.X;
                         y = location.Y;
                         if (leftBorder <= x && x <= rightBorder && downBorder <= y && y <= topBorder)
-                        {
                             _graphics.DrawCircleCentered(Pens.Red, location, 12);
-                        } 
                         #endregion
 
                         #region Отрисовка персонажа
@@ -1723,204 +1749,37 @@ namespace EntityTools.Patches.Mapper
 
         private IGraph GetMappingGraph()
         {
-            if (_graphics.CenterPosition.Distance2DFromPlayer < EntityTools.PluginSettings.Mapper.CacheRadius)
+            if (_graphics.CenterPosition.Distance2DFromPlayer < EntityTools.PluginSettings.Mapper.CacheRadius * 0.75)
                 return _graphics.VisibleGraph;
-            else return AstralAccessors.Quester.Core.Meshes.Value;
-        }
-#if false
-
-        /// <summary>
-        /// Task, прокладывающий путь
-        /// </summary>
-        private Task MappingTask;
-        /// <summary>
-        /// Токен отмены MappingTask
-        /// </summary>
-        private CancellationTokenSource MappingCanceler = null;
-        /// <summary>
-        /// Тип текущего режим прокладывания пути
-        /// </summary>
-        private MappingType MappingType
-        {
-            get
-            {
-                if (mapAndRegion_whereMapping != EntityManager.LocalPlayer.MapAndRegion)
-                {
-                    handler_StopMapping();
-                    return MappingType.Stoped;
-                }
-
-                if (btnBidirectional.Checked)
-                    return MappingType.Bidirectional;
-                else if (btnUnidirectional.Checked)
-                    return MappingType.Unidirectional;
-                else return MappingType.Stoped;
-            }
-        }
-        /// <summary>
-        /// Флаг линейного пут
-        /// </summary>
-        private bool LinearPath => btnLinearPath.Checked;
-
-        /// <summary>
-        /// Флаг принудительного связывания с предыдущей точкой пути
-        /// </summary>
-        private bool ForceLinkLastWaypoint => btnForceLinkLast.Checked;
-
-        /// <summary>
-        /// последний добавленный узел
-        /// </summary>
-        private NodeDetail lastNodeDetail = null;
-        /// <summary>
-        /// Название карты и региона, на которой активировано прокладывание пути
-        /// </summary>
-        private string mapAndRegion_whereMapping = null;
-
-        /// <summary>
-        /// Запуск потока прокладывания маршрута
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void handler_StartMapping(object sender, ItemClickEventArgs e)
-        {
-            if (e.Item is BarCheckItem checkedItem
-                && checkedItem.Checked)
-            {
-                if (MappingTask != null && !MappingTask.IsCanceled && !MappingTask.IsCompleted &&
-                    !MappingTask.IsFaulted) return;
-
-                editMode = MapperEditMode.Mapping;
-                InterruptAllModifications(MapperEditMode.Mapping);
-
-                mapAndRegion_whereMapping = EntityManager.LocalPlayer.MapAndRegion;
-                MappingCanceler = new CancellationTokenSource();
-                MappingTask = Task.Factory.StartNew(() => work_Mapping(MappingCanceler.Token), MappingCanceler.Token);
-                MappingTask?.ContinueWith(t => handler_StopMapping());
-            }
-        }
-
-        /// <summary>
-        /// Событие остановки прокладывания маршрута
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void handler_StopMapping(object sender = null, ItemClickEventArgs e = null)
-        {
-            MappingCanceler?.Cancel();
-            lastNodeDetail = null;
-            btnBidirectional.Checked = false;
-            btnUnidirectional.Checked = false;
-            btnStopMapping.Checked = true;
-            MappingCache?.StopCache();
-        }
-
-        /// <summary>
-        /// Прокладывание пути
-        /// </summary>
-        private void work_Mapping(CancellationToken token)
-        {
-            try
-            {
-#if Not_MonoMapper
-                if (graphCache == null)
-                    graphCache = new MapperGraphCache(mapper);
-                else graphCache.StartCache(mapper); 
-#else
-                throw new NotImplementedException();
-#endif
-
-#if PROFILING && DEBUG
-                AddNavigationNodeChached.ResetWatch();
-#endif
-                if (MappingCache.NodesCount != 0)
-                {
-                    if (LinearPath)
-                        lastNodeDetail = MapperHelper_AddNodes.LinkNearest1(EntityManager.LocalPlayer.Location.Clone(), MappingCache);
-                    else lastNodeDetail = MapperHelper_AddNodes.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), MappingCache);
-                }
-                while (MappingType != MappingType.Stoped
-                       && !token.IsCancellationRequested)
-                {
-                    /* 3. Вариант реализации с проверкой расстояния только до предыдущего узла*/
-                    lastNodeDetail?.Rebase(EntityManager.LocalPlayer.Location);
-
-                    if (lastNodeDetail == null || lastNodeDetail.Distance > EntityTools.PluginSettings.Mapper.WaypointDistance)
-                    {
-                        switch (MappingType)
-                        {
-                            case MappingType.Bidirectional:
-                                if (LinearPath)
-                                {
-                                    if (ForceLinkLastWaypoint)
-                                        lastNodeDetail = MapperHelper_AddNodes.LinkLast(EntityManager.LocalPlayer.Location.Clone(), MappingCache, lastNodeDetail, false) ?? lastNodeDetail;
-                                    else lastNodeDetail = MapperHelper_AddNodes.LinkLast(EntityManager.LocalPlayer.Location.Clone(), MappingCache, null, false) ?? lastNodeDetail;
-                                }
-                                else
-                                {
-                                    // Строим комплексный (многосвязный путь)
-                                    if (ForceLinkLastWaypoint)
-                                        lastNodeDetail = MapperHelper_AddNodes.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), MappingCache, lastNodeDetail, false) ?? lastNodeDetail;
-                                    else lastNodeDetail = MapperHelper_AddNodes.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), MappingCache, null, false) ?? lastNodeDetail;
-                                }
-                                break;
-                            case MappingType.Unidirectional:
-                                {
-                                    lastNodeDetail = MapperHelper_AddNodes.LinkLast(EntityManager.LocalPlayer.Location.Clone(), MappingCache, lastNodeDetail, true) ?? lastNodeDetail;
-                                }
-                                break;
-                        }
-                        MappingCache.LastAddedNode = lastNodeDetail?.Node;
-                    }
-                    Thread.Sleep(100);
-                }
-                if (token.IsCancellationRequested)
-                {
-                    // Инициировано прерывание 
-                    // Связываем текущее местоположение с графом
-                    if (LinearPath)
-                        MapperHelper_AddNodes.LinkNearest1(EntityManager.LocalPlayer.Location.Clone(), MappingCache, lastNodeDetail, MappingType == MappingType.Unidirectional);
-                    else MapperHelper_AddNodes.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), MappingCache, lastNodeDetail, MappingType == MappingType.Unidirectional);
-                    lastNodeDetail = null;
-                }
-            }
-            catch (Exception ex)
-            {
-#if PROFILING && DEBUG
-                AddNavigationNodeStatic.LogWatch();
-#endif
-#if LOG && DEBUG
-                ETLogger.WriteLine(LogType.Debug, $"MapperExtWithCache:: Graph Nodes: {MappingCache.FullGraph.NodesCount}");
-#endif
-                ETLogger.WriteLine(ex.ToString());
-            }
-        } 
-#endif
-        private void handler_Mapping_Stop(object sender = null, ItemClickEventArgs e = null)
-        {
-            if(btnStopMapping.Checked)
-                _mappingTool.MappingMode = MappingMode.Stoped;
-        }
-
-        private void handler_Mapping_ForceLink(object sender, ItemClickEventArgs e)
-        {
-            _mappingTool.ForceLink = btnForceLinkLast.Checked;
-        }
-
-        private void handler_Mapping_LinearPath(object sender, ItemClickEventArgs e)
-        {
-            _mappingTool.Linear = btnLinearPath.Checked;
+            return AstralAccessors.Quester.Core.Meshes.Value;
         }
 
         private void handler_Mapping_BidirectionalPath(object sender, ItemClickEventArgs e)
         {
-            if (btnStopMapping.Checked)
+            if (btnMappingBidirectional.Checked)
                 _mappingTool.MappingMode = MappingMode.Bidirectional;
         }
 
         private void handler_Mapping_UnidirectionalPath(object sender, ItemClickEventArgs e)
         {
-            if (btnStopMapping.Checked)
-                _mappingTool.MappingMode = MappingMode.Bidirectional;
+            if (btnMappingUnidirectional.Checked)
+                _mappingTool.MappingMode = MappingMode.Unidirectional;
+        }
+
+        private void handler_Mapping_Stop(object sender = null, ItemClickEventArgs e = null)
+        {
+            if(btnMappingStop.Checked)
+                _mappingTool.MappingMode = MappingMode.Stoped;
+        }
+
+        private void handler_Mapping_ForceLink(object sender, ItemClickEventArgs e)
+        {
+            _mappingTool.ForceLink = btnMappingForceLink.Checked;
+        }
+
+        private void handler_Mapping_LinearPath(object sender, ItemClickEventArgs e)
+        {
+            _mappingTool.Linear = btnMappingLinearPath.Checked;
         }
         #endregion
     }

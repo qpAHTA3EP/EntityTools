@@ -37,7 +37,7 @@ namespace EntityTools.Patches.Mapper
         {
             if (graphicsNW is MapperGraphics mapGraphics)
             {
-                lock (meshes.SyncRoot)
+                using (meshes.ReadLock())
                 {
                     mapGraphics.GetWorldPosition(0, 0, out double left, out double top);
                     mapGraphics.GetWorldPosition(mapGraphics.ImageWidth, mapGraphics.ImageHeight, out double right, out double down);
@@ -67,7 +67,7 @@ namespace EntityTools.Patches.Mapper
             }
             else
             {
-                lock (meshes.SyncRoot)
+                using (meshes.ReadLock())
                 {
                     double num = graphicsNW.getWorldPos(new Point(graphicsNW.ImageWidth, graphicsNW.ImageHeight)).Distance2D(graphicsNW.CenterPosition);
 #if false

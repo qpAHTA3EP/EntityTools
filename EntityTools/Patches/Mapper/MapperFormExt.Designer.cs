@@ -40,11 +40,11 @@ namespace EntityTools.Patches.Mapper
             this.barManager = new DevExpress.XtraBars.BarManager(this.components);
             this.barMapping = new DevExpress.XtraBars.Bar();
             this.groupMapping = new DevExpress.XtraBars.BarButtonGroup();
-            this.btnBidirectional = new DevExpress.XtraBars.BarCheckItem();
-            this.btnUnidirectional = new DevExpress.XtraBars.BarCheckItem();
-            this.btnStopMapping = new DevExpress.XtraBars.BarCheckItem();
-            this.btnLinearPath = new DevExpress.XtraBars.BarCheckItem();
-            this.btnForceLinkLast = new DevExpress.XtraBars.BarCheckItem();
+            this.btnMappingBidirectional = new DevExpress.XtraBars.BarCheckItem();
+            this.btnMappingUnidirectional = new DevExpress.XtraBars.BarCheckItem();
+            this.btnMappingStop = new DevExpress.XtraBars.BarCheckItem();
+            this.btnMappingLinearPath = new DevExpress.XtraBars.BarCheckItem();
+            this.btnMappingForceLink = new DevExpress.XtraBars.BarCheckItem();
             this.btnOptions = new DevExpress.XtraBars.BarButtonItem();
             this.popMenuOptions = new DevExpress.XtraBars.PopupMenu(this.components);
             this.editWaypointDistance = new DevExpress.XtraBars.BarEditItem();
@@ -135,7 +135,7 @@ namespace EntityTools.Patches.Mapper
             this.barManager.DockControls.Add(this.barDockControlRight);
             this.barManager.Form = this;
             this.barManager.Items.AddRange(new DevExpress.XtraBars.BarItem[] {
-            this.btnUnidirectional,
+            this.btnMappingUnidirectional,
             this.btnAddCR,
             this.btnImportMeshesFromGame,
             this.btnImportMeshesFromProfile,
@@ -146,10 +146,10 @@ namespace EntityTools.Patches.Mapper
             this.editEquivalenceDistance,
             this.editDeleteRadius,
             this.btnClearMeshes,
-            this.btnBidirectional,
-            this.btnForceLinkLast,
-            this.btnLinearPath,
-            this.btnStopMapping,
+            this.btnMappingBidirectional,
+            this.btnMappingForceLink,
+            this.btnMappingLinearPath,
+            this.btnMappingStop,
             this.groupMapping,
             this.groupCR,
             this.groupImportExportNodes,
@@ -207,69 +207,68 @@ namespace EntityTools.Patches.Mapper
             // 
             this.groupMapping.Caption = "Mapping";
             this.groupMapping.Id = 70;
-            this.groupMapping.ItemLinks.Add(this.btnBidirectional);
-            this.groupMapping.ItemLinks.Add(this.btnUnidirectional);
-            this.groupMapping.ItemLinks.Add(this.btnStopMapping);
-            this.groupMapping.ItemLinks.Add(this.btnLinearPath, true);
-            this.groupMapping.ItemLinks.Add(this.btnForceLinkLast);
+            this.groupMapping.ItemLinks.Add(this.btnMappingBidirectional);
+            this.groupMapping.ItemLinks.Add(this.btnMappingUnidirectional);
+            this.groupMapping.ItemLinks.Add(this.btnMappingStop);
+            this.groupMapping.ItemLinks.Add(this.btnMappingLinearPath, true);
+            this.groupMapping.ItemLinks.Add(this.btnMappingForceLink);
             this.groupMapping.Name = "groupMapping";
             // 
             // btnBidirectional
             // 
-            this.btnBidirectional.Caption = "Bidirectional Mapping";
-            this.btnBidirectional.GroupIndex = 1;
-            this.btnBidirectional.Id = 64;
-            this.btnBidirectional.ImageOptions.Image = global::EntityTools.Properties.Resources.miniBiPath;
-            this.btnBidirectional.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            this.btnMappingBidirectional.Caption = "Bidirectional Mapping";
+            this.btnMappingBidirectional.GroupIndex = 1;
+            this.btnMappingBidirectional.Id = 64;
+            this.btnMappingBidirectional.ImageOptions.Image = global::EntityTools.Properties.Resources.miniBiPath;
+            this.btnMappingBidirectional.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
                 | System.Windows.Forms.Keys.B));
-            this.btnBidirectional.Name = "btnBidirectional";
-            this.btnBidirectional.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Mapping_BidirectionalPath);
+            this.btnMappingBidirectional.Name = "btnMappingBidirectional";
+            this.btnMappingBidirectional.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Mapping_BidirectionalPath);
             // 
             // btnUnidirectional
             // 
-            this.btnUnidirectional.Caption = "Unidirectional Mapping";
-            this.btnUnidirectional.GroupIndex = 1;
-            this.btnUnidirectional.Id = 44;
-            this.btnUnidirectional.ImageOptions.Image = global::EntityTools.Properties.Resources.miniUniPath;
-            this.btnUnidirectional.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            this.btnMappingUnidirectional.Caption = "Unidirectional Mapping";
+            this.btnMappingUnidirectional.GroupIndex = 1;
+            this.btnMappingUnidirectional.Id = 44;
+            this.btnMappingUnidirectional.ImageOptions.Image = global::EntityTools.Properties.Resources.miniUniPath;
+            this.btnMappingUnidirectional.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
                 | System.Windows.Forms.Keys.U));
-            this.btnUnidirectional.Name = "btnUnidirectional";
-            this.btnUnidirectional.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Mapping_UnidirectionalPath);
+            this.btnMappingUnidirectional.Name = "btnMappingUnidirectional";
+            this.btnMappingUnidirectional.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Mapping_UnidirectionalPath);
             // 
             // btnStopMapping
             // 
-            this.btnStopMapping.BindableChecked = true;
-            this.btnStopMapping.Caption = "Stop Mapping";
-            this.btnStopMapping.Checked = true;
-            this.btnStopMapping.GroupIndex = 1;
-            this.btnStopMapping.Id = 67;
-            this.btnStopMapping.ImageOptions.Image = global::EntityTools.Properties.Resources.miniStop;
-            this.btnStopMapping.ItemShortcut = new DevExpress.XtraBars.BarShortcut((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.End));
-            this.btnStopMapping.Name = "btnStopMapping";
-            this.btnStopMapping.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.btnStopMapping_CheckedChanged);
-            this.btnStopMapping.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Mapping_Stop);
+            this.btnMappingStop.BindableChecked = true;
+            this.btnMappingStop.Caption = "Stop Mapping";
+            this.btnMappingStop.Checked = true;
+            this.btnMappingStop.GroupIndex = 1;
+            this.btnMappingStop.Id = 67;
+            this.btnMappingStop.ImageOptions.Image = global::EntityTools.Properties.Resources.miniStop;
+            this.btnMappingStop.ItemShortcut = new DevExpress.XtraBars.BarShortcut((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.End));
+            this.btnMappingStop.Name = "btnMappingStop";
+            this.btnMappingStop.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Mapping_Stop);
             // 
             // btnLinearPath
             // 
-            this.btnLinearPath.Caption = "Linear Path";
-            this.btnLinearPath.Id = 66;
-            this.btnLinearPath.ImageOptions.Image = global::EntityTools.Properties.Resources.miniLinePath;
-            this.btnLinearPath.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            this.btnMappingLinearPath.Caption = "Linear Path";
+            this.btnMappingLinearPath.Id = 66;
+            this.btnMappingLinearPath.ImageOptions.Image = global::EntityTools.Properties.Resources.miniLinePath;
+            this.btnMappingLinearPath.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
                 | System.Windows.Forms.Keys.L));
-            this.btnLinearPath.Name = "btnLinearPath";
-            this.btnLinearPath.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Mapping_LinearPath);
+            this.btnMappingLinearPath.Name = "btnMappingLinearPath";
+            this.btnMappingLinearPath.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Mapping_LinearPath);
             // 
             // btnForceLinkLast
             // 
-            this.btnForceLinkLast.BindableChecked = true;
-            this.btnForceLinkLast.Caption = "Force Linking to Last Node";
-            this.btnForceLinkLast.Checked = true;
-            this.btnForceLinkLast.Id = 65;
-            this.btnForceLinkLast.ImageOptions.Image = global::EntityTools.Properties.Resources.miniHurdLink;
-            this.btnForceLinkLast.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
+            this.btnMappingForceLink.BindableChecked = true;
+            this.btnMappingForceLink.Caption = "Force Linking to Last Node";
+            this.btnMappingForceLink.Checked = true;
+            this.btnMappingForceLink.Id = 65;
+            this.btnMappingForceLink.ImageOptions.Image = global::EntityTools.Properties.Resources.miniHurdLink;
+            this.btnMappingForceLink.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
                 | System.Windows.Forms.Keys.L));
-            this.btnForceLinkLast.Name = "btnForceLinkLast";
-            this.btnForceLinkLast.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Mapping_ForceLink);
+            this.btnMappingForceLink.Name = "btnMappingForceLink";
+            this.btnMappingForceLink.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Mapping_ForceLink);
             // 
             // btnOptions
             // 
@@ -864,7 +863,7 @@ namespace EntityTools.Patches.Mapper
         private BarDockControl barDockControlBottom;
         private BarDockControl barDockControlLeft;
         private BarDockControl barDockControlRight;
-        private BarCheckItem btnUnidirectional;
+        private BarCheckItem btnMappingUnidirectional;
         private RepositoryItemSpinEdit seDeleteRadius;
         private BarButtonItem btnAddCR;
         private BarButtonItem btnImportMeshesFromGame;
@@ -879,10 +878,10 @@ namespace EntityTools.Patches.Mapper
         private RepositoryItemSpinEdit seEquivalenceDistance;
         private BarEditItem editDeleteRadius;
         private BarButtonItem btnClearMeshes;
-        private BarCheckItem btnBidirectional;
-        private BarCheckItem btnForceLinkLast;
-        private BarCheckItem btnLinearPath;
-        private BarCheckItem btnStopMapping;
+        private BarCheckItem btnMappingBidirectional;
+        private BarCheckItem btnMappingForceLink;
+        private BarCheckItem btnMappingLinearPath;
+        private BarCheckItem btnMappingStop;
         private Bar barMapping;
         private BarButtonGroup groupMapping;
         private BarButtonGroup groupCR;

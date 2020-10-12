@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using AStar;
+using MyNW.Internals;
 
 namespace EntityTools.Patches.Mapper.Tools
 {
@@ -12,11 +15,25 @@ namespace EntityTools.Patches.Mapper.Tools
         public MappingTool(Func<IGraph> getGraph, MappingMode mode = Mapper.MappingMode.Stoped)
         {
             this.getGraph = getGraph;
-            _mappingCache = new MapperGraphCache(getGraph);
+            _mappingCache = new MapperGraphCache(getGraph, true, true)
+            { 
+                CacheDistanceX = EntityTools.PluginSettings.Mapper.CacheRadius,
+                CacheDistanceY = EntityTools.PluginSettings.Mapper.CacheRadius,
+                CacheDistanceZ = EntityTools.PluginSettings.Mapper.MaxElevationDifference
+            };
             MappingMode = mode;
         }
 
         #region данные
+        /// <summary>
+        /// Task, прокладывающий путь
+        /// </summary>
+        private Task _mappingTask;
+        /// <summary>
+        /// Токен отмены MappingTask
+        /// </summary>
+        private CancellationTokenSource _mappingCanceler = null;
+
         /// <summary>
         /// Кэш вершин графа путей
         /// </summary>
@@ -25,13 +42,33 @@ namespace EntityTools.Patches.Mapper.Tools
         private Func<IGraph> getGraph;
 
         /// <summary>
+        /// Последняя добавленная вершина
+        /// </summary>
+        private NodeDetail _lastNodeDetail;
+
+        /// <summary>
+        /// Название карты и региона, на которой активировано прокладывание пути
+        /// </summary>
+        private string _mapAndRegion_whereMapping = null;
+
+        private int _mapHash = 0;
+
+        /// <summary>
         /// Тип пути
         /// </summary>
         public MappingMode MappingMode
         {
             get => _mode;
-            set => _mode = value;
+            set
+            {
+                if(value == MappingMode.Stoped)
+                    StopMapping();
+                else StartMapping();
+
+                _mode = value;
+            }
         }
+
         private MappingMode _mode = MappingMode.Stoped;
 
         /// <summary>
@@ -60,8 +97,116 @@ namespace EntityTools.Patches.Mapper.Tools
         /// </summary>
         public void OnCustomDraw(MapperGraphics graphics)
         {
+#if true
+            using(_mappingCache.ReadLock())
+                _mappingCache.ForEachNode(nd => graphics.FillCircleCentered(Brushes.Gold, nd, 7));
 
+            if (_lastNodeDetail != null)
+            {
+                graphics.FillRhombCentered(Brushes.Gold, _lastNodeDetail, MapperHelper.DefaultAnchorSize, MapperHelper.DefaultAnchorSize);
+                graphics.FillSquareCentered(Brushes.Gold, _lastNodeDetail, MapperHelper.DefaultAnchorSize);
+                //graphics.FillSquareCentered(Brushes.ForestGreen, lastNodeDetail, MapperHelper.DefaultAnchorSize * 0.66);
+            } 
+#endif
         }
 
+        /// <summary>
+        /// Запуск потока прокладывания маршрута
+        /// </summary>
+        private void StartMapping()
+        {
+            if (_mappingTask != null && !_mappingTask.IsCanceled && !_mappingTask.IsCompleted &&
+                !_mappingTask.IsFaulted) return;
+
+            _mapAndRegion_whereMapping = EntityManager.LocalPlayer.MapAndRegion;
+            _mappingCanceler = new CancellationTokenSource();
+            _mappingTask = Task.Factory.StartNew(() => work_Mapping(_mappingCanceler.Token), _mappingCanceler.Token);
+            _mappingTask?.ContinueWith(t => StopMapping());
+        }
+
+        /// <summary>
+        /// Событие остановки прокладывания маршрута
+        /// </summary>
+        private void StopMapping()
+        {
+            _mappingCanceler?.Cancel();
+            _lastNodeDetail = null;
+        }
+
+        /// <summary>
+        /// Прокладывание пути
+        /// </summary>
+        private void work_Mapping(CancellationToken token)
+        {
+            try
+            {
+#if PROFILING && DEBUG
+                AddNavigationNodeChached.ResetWatch();
+#endif
+                if (_mappingCache.NodesCount != 0)
+                {
+                    if (_linear)
+                        _lastNodeDetail = MappingToolHelper.LinkNearest1(EntityManager.LocalPlayer.Location.Clone(), _mappingCache);
+                    else _lastNodeDetail = MappingToolHelper.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), _mappingCache);
+                }
+                while (_mode != MappingMode.Stoped
+                       && !token.IsCancellationRequested)
+                {
+                    // Проверяем расстояние только до предыдущего узла
+                    _lastNodeDetail?.Rebase(EntityManager.LocalPlayer.Location);
+
+                    if (_lastNodeDetail == null || _lastNodeDetail.Distance > EntityTools.PluginSettings.Mapper.WaypointDistance)
+                    {
+                        switch (MappingMode)
+                        {
+                            case MappingMode.Bidirectional:
+                                if (_linear)
+                                {
+                                    if (_forceLink)
+                                        _lastNodeDetail = MappingToolHelper.LinkLast(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, _lastNodeDetail, false) ?? _lastNodeDetail;
+                                    else _lastNodeDetail = MappingToolHelper.LinkLast(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, null, false) ?? _lastNodeDetail;
+                                }
+                                else
+                                {
+                                    // Строим комплексный (многосвязный путь)
+                                    if (_forceLink)
+                                        _lastNodeDetail = MappingToolHelper.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, _lastNodeDetail, false) ?? _lastNodeDetail;
+                                    else _lastNodeDetail = MappingToolHelper.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, null, false) ?? _lastNodeDetail;
+                                }
+                                break;
+                            case MappingMode.Unidirectional:
+                                {
+                                    _lastNodeDetail = MappingToolHelper.LinkLast(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, _lastNodeDetail, true) ?? _lastNodeDetail;
+                                }
+                                break;
+                        }
+#if LastAddedNode
+                        _mappingCache.LastAddedNode = lastNodeDetail?.Node; 
+#endif
+                    }
+                    Thread.Sleep(100);
+                }
+                if (token.IsCancellationRequested)
+                {
+                    // Инициировано прерывание 
+                    // Связываем текущее местоположение с графом
+                    if (_linear)
+                        // TODO: Проверять наличие вершины по курсу и связывать с найденной
+                        MappingToolHelper.LinkNearest1(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, _lastNodeDetail, _mode == MappingMode.Unidirectional);
+                    else MappingToolHelper.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, _lastNodeDetail, _mode == MappingMode.Unidirectional);
+                    _lastNodeDetail = null;
+                }
+            }
+            catch (Exception ex)
+            {
+#if PROFILING && DEBUG
+                AddNavigationNodeStatic.LogWatch();
+#endif
+#if LOG && DEBUG
+                ETLogger.WriteLine(LogType.Debug, $"MapperExtWithCache:: Graph Nodes: {MappingCache.FullGraph.NodesCount}");
+#endif
+                ETLogger.WriteLine(LogType.Error, ex.ToString(), true);
+            }
+        }
     }
 }

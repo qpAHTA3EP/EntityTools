@@ -1,11 +1,13 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
+﻿#define nodesLocker
+
 using AStar;
 using AStar.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Threading;
 using Timeout = Astral.Classes.Timeout;
 
 namespace EntityTools.Patches.Mapper
@@ -13,49 +15,52 @@ namespace EntityTools.Patches.Mapper
 #if PATCH_ASTRAL
     public class MapperGraphCache :IGraph
     {
-        public object SyncRoot => FullGraph.SyncRoot;
-
-        public MapperGraphCache(Func<IGraph> getGraph, bool activate = false)
+        public MapperGraphCache(Func<IGraph> getGraph, bool activate = true, bool hold = true)
         {
             this.getGraph = getGraph;
+            _holdPlayer = hold;
             _active = activate;
-            if (activate)
-            {
-                StartCache();
+            if (_active)
                 RegenerateCache();
-            }
         }
 
-        #region ReaderWriterLocker
-        /// <summary>
-        /// Объект синхронизации доступа к объекту <see cref="MapperGraphCache"/>
-        /// </summary>
+        #region Synchronization
+        public object SyncRoot => getGraph().SyncRoot;
+
         private readonly ReaderWriterLockSlim @lock = new ReaderWriterLockSlim();
 
         /// <summary>
         /// Объект синхронизации для "чтения", допускающий одновременное чтение
         /// </summary>
-        /// <returns></returns>
         public RWLocker.ReadLockToken ReadLock() => new RWLocker.ReadLockToken(@lock);
+        /// <summary>
+        /// Объект синхронизации для "чтения", допускающий ужесточение блокировки до 
+        /// </summary>
+        public RWLocker.UpgradableReadToken UpgradableReadLock() => new RWLocker.UpgradableReadToken(@lock);
         /// <summary>
         /// Объект синхронизации для "записи".
         /// </summary>
-        /// <returns></returns>
         public RWLocker.WriteLockToken WriteLock() => new RWLocker.WriteLockToken(@lock);
+
+        public bool IsReadLockHeld => @lock.IsReadLockHeld;
+        public bool IsUpgradeableReadLockHeld => @lock.IsUpgradeableReadLockHeld;
+        public bool IsWriteLockHeld => @lock.IsWriteLockHeld;
         #endregion
 
         /// <summary>
         /// Полный граф
         /// </summary>
-        public IGraph FullGraph => getGraph();
-        private Func<IGraph> getGraph;
+#if FullGraph
+        private IGraph FullGraph => getGraph(); 
+#endif
+        private readonly Func<IGraph> getGraph;
 
         public override int GetHashCode()
         {
             return getGraph().GetHashCode();
         }
 
-        #region Дублирование интерфейса AStar.Graph
+        #region IGraph
         /// <summary>
         /// Список кэшированных узлов
         /// </summary>
@@ -63,18 +68,42 @@ namespace EntityTools.Patches.Mapper
         {
             get
             {
-                if (Active)
+                if (_active)
                 {
                     if (CacheRegenerationNeeded)
                         RegenerateCache();
-                    foreach (Node node in nodes)
-                        yield return node;
+#if nodesLocker
+                    using (_nodesLocker.ReadLock())
+                        foreach (Node node in _nodes)
+                            yield return node; 
+#else
+                    return nodes;
+#endif
                 }
-                else foreach (Node node in FullGraph.NodesCollection)
-                        yield return node;
+                else
+                {
+                    var graph = getGraph();
+#if nodesLocker
+                    using (graph.ReadLock())
+                        foreach (Node node in graph.NodesCollection)
+                            yield return node; 
+#else 
+                    return graph.NodesCollection;
+#endif
+                }
             }
         }
-        public int NodesCount => nodes.Count;
+
+        public int NodesCount
+        {
+            get
+            {
+                if (CacheRegenerationNeeded)
+                    RegenerateCache();
+
+                return _nodes.Count;
+            }
+        }
 
         /// <summary>
         /// Список кэшированных связей
@@ -83,66 +112,84 @@ namespace EntityTools.Patches.Mapper
         {
             get
             {
-                if (Active)
+                if (_active)
                 {
                     if (CacheRegenerationNeeded)
                         RegenerateCache();
-                    foreach (Node node in nodes)
-                        foreach (Arc arc in node.OutgoingArcs)
+#if nodesLocker
+                    using (_nodesLocker.ReadLock()) 
+#endif
+                    foreach (Node node in _nodes)
+                            foreach (Arc arc in node.OutgoingArcs)
+                                yield return arc;
+                }
+                else
+                {
+                    var graph = getGraph();
+                    using (graph.ReadLock())
+                        foreach (Arc arc in graph.ArcsCollection)
                             yield return arc;
                 }
-                else foreach (Arc arc in FullGraph.ArcsCollection)
-                        yield return arc;
             }
         }
 
         /// <summary>
         /// Применение <paramref name="action"/> к каждой кэшированной вершине
         /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
         public int ForEachNode(Action<Node> action, bool ignorePassableProperty = false)
         {
             int num = 0;
-            if (Active)
+            var graph = getGraph();
+            if (_active)
             {
                 if (CacheRegenerationNeeded)
                 {
-                    var graph = FullGraph;
-                    lock (graph.SyncRoot)
+                    using (_nodesLocker.WriteLock())
                     {
-                        if (ignorePassableProperty)
+                        _nodes.Clear();
+                        using (graph.ReadLock())
                         {
-                            foreach (Node node in graph.NodesCollection)
-                                if (InCacheArea(node.Position))
-                                {
-                                    if (node.Passable)
-                                        nodes.AddLast(node);
-                                    action(node);
-                                    num++;
-                                }
-                        }
-                        else foreach (Node node in graph.NodesCollection)
-                                if (NeedCache(node))
-                                {
-                                    nodes.AddLast(node);
-                                    action(node);
-                                    num++;
-                                }
+                            if (ignorePassableProperty)
+                            {
+                                foreach (Node node in graph.NodesCollection)
+                                    if (NeedCache(node))
+                                    {
+                                        _nodes.AddLast(node);
+                                        action(node);
+                                        num++;
+                                    }
+                            }
+                            else 
+                            {
+                                foreach (Node node in graph.NodesCollection)
+                                    if (InCacheArea(node.Position))
+                                    {
+                                        if (node.Passable)
+                                            _nodes.AddLast(node);
+                                        action(node);
+                                        num++;
+                                    }
+                            }
+                        } 
                     }
-                    cachedMapAndRegion = EntityManager.LocalPlayer.MapAndRegion;
+                    _cachedMapAndRegion = EntityManager.LocalPlayer.MapAndRegion;
                     cacheTimeout.ChangeTime(EntityTools.PluginSettings.Mapper.CacheRegenTimeout);
                 }
-                else foreach (Node node in nodes)
-                    {
-                        action(node);
-                        num++;
-                    }
+                else
+                {
+#if nodesLocker
+                    using (_nodesLocker.ReadLock()) 
+#endif
+                        foreach (Node node in _nodes)
+                            {
+                                action(node);
+                                num++;
+                            }
+                }
             }
             else
             {
-                var graph = FullGraph;
-                lock (graph.SyncRoot)
+                using(graph.ReadLock())
                     graph.ForEachNode(action, ignorePassableProperty);
             }
             return num;
@@ -153,7 +200,10 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public void Clear()
         {
-            nodes.Clear();
+#if nodesLocker
+            using (_nodesLocker.WriteLock()) 
+#endif
+            _nodes.Clear();
         }
 
         /// <summary>
@@ -163,32 +213,35 @@ namespace EntityTools.Patches.Mapper
         /// <returns></returns>
         public bool AddNode(Node newNode)
         {
-            if (Active)
+            bool result;
+            var graph = getGraph();
+            if (_active)
             {
-                var graph = FullGraph;
-                lock (graph.SyncRoot)
+                using (graph.WriteLock())
+                    result = graph.AddNode(newNode);
+                if (result)
                 {
-                    if (graph.AddNode(newNode))
-                    {
-                        nodes.AddLast(newNode);
-                        lastAddedNode = newNode;
-                        return true;
-                    }
+#if nodesLocker
+                    using (_nodesLocker.WriteLock()) 
+#endif
+                    _nodes.AddLast(newNode);
+#if LastAddedNode
+                    lastAddedNode = newNode; 
+#endif
                 }
             }
             else
             {
-                var graph = FullGraph;
-                lock (graph.SyncRoot)
+                using (graph.WriteLock())
+                    result = graph.AddNode(newNode);
+                if (result)
                 {
-                    if (graph.AddNode(newNode))
-                    {
-                        lastAddedNode = newNode;
-                        return true;
-                    }
+#if LastAddedNode
+                    lastAddedNode = newNode; 
+#endif
                 }
             }
-            return false;
+            return result;
         }
 
         /// <summary>
@@ -196,20 +249,24 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public Node AddNode(float x, float y, float z)
         {
-            if (Active)
+            var graph = getGraph();
+            if (_active)
             {
                 Node node = new Node(x, y, z);
                 if (!AddNode(node))
                     return null;
 
-                lastAddedNode = node;
+#if LastAddedNode
+                lastAddedNode = node; 
+#endif
                 return node;
             }
-            var graph = FullGraph;
-            lock (graph.SyncRoot)
-            {
-                return lastAddedNode = graph.AddNode(x, y, z);
-            }
+            using(graph.WriteLock())
+#if LastAddedNode
+                return lastAddedNode = graph.AddNode(x, y, z); 
+#else
+                return graph.AddNode(x, y, z);
+#endif
         }
 
         /// <summary>
@@ -219,51 +276,42 @@ namespace EntityTools.Patches.Mapper
         /// <param name="endNode"></param>
         /// <param name="weight"></param>
         /// <returns></returns>
-        public Arc AddArc(Node startNode, Node endNode, double weight)
+        public Arc AddArc(Node startNode, Node endNode, double weight = 1)
         {
-            var graph = FullGraph;
-            lock (graph.SyncRoot)
-            {
+            var graph = getGraph();
+            using (graph.WriteLock())
                 return graph.AddArc(startNode, endNode, (float)weight);
-            }
         }
 
         /// <summary>
         /// Добавление связи
         /// </summary>
-        /// <param name="node1"></param>
-        /// <param name="node2"></param>
-        /// <param name="Weight"></param>
-        public void Add2Arcs(Node node1, Node node2, double weight)
+        public void Add2Arcs(Node node1, Node node2, double weight = 1)
         {
-            var graph = FullGraph;
-            lock (graph.SyncRoot)
-            {
+            var graph = getGraph();
+            using (graph.WriteLock())
                 graph.Add2Arcs(node1, node2, (float)weight);
-            }
         }
 
         /// <summary>
         /// Удаление узла
         /// </summary>
-        /// <param name="NodeToRemove"></param>
-        /// <returns></returns>
-        public bool RemoveNode(Node NodeToRemove)
+        public bool RemoveNode(Node nodeToRemove)
         {
-            if (NodeToRemove == null)
+            if (nodeToRemove == null)
                 return false;
             bool removed = false;
             try
             {
-                var graph = FullGraph;
-                lock (graph.SyncRoot)
-                {
-                    removed = graph.RemoveNode(NodeToRemove);
-                }
+                var graph = getGraph();
+                using (graph.WriteLock())
+                    removed = graph.RemoveNode(nodeToRemove);
                 if(removed)
                 {
-                    nodes.Remove(NodeToRemove);
-                    return true;
+#if nodesLocker
+                    using (_nodesLocker.WriteLock()) 
+#endif
+                    removed = _nodes.Remove(nodeToRemove);
                 }
             }
             catch
@@ -274,21 +322,17 @@ namespace EntityTools.Patches.Mapper
         }
 
         /// <summary>
-        /// Удаление связи
+        /// Удаление ребра
         /// </summary>
-        /// <param name="ArcToRemove"></param>
-        /// <returns></returns>
-        public bool RemoveArc(Arc ArcToRemove)
+        public bool RemoveArc(Arc arcToRemove)
         {
-            if (ArcToRemove is null)
+            if (arcToRemove is null)
                 return false;
             try
             {
-                var graph = FullGraph;
-                lock (graph.SyncRoot)
-                {
-                    return graph.RemoveArc(ArcToRemove);
-                }
+                var graph = getGraph();
+                using (graph.WriteLock())
+                    return graph.RemoveArc(arcToRemove);
             }
             catch
             {
@@ -299,12 +343,6 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Поиск ближайшего узла
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="z"></param>
-        /// <param name="distance"></param>
-        /// <param name="ignorePassableProperty"></param>
-        /// <returns></returns>
         public Node ClosestNode(double x, double y, double z, out double distance, bool ignorePassableProperty = false)
         {
             if (Active && InCacheArea(x, y, z))
@@ -327,11 +365,9 @@ namespace EntityTools.Patches.Mapper
                 distance = minDist;
                 return result;
             }
-            var graph = FullGraph;
-            lock (graph.SyncRoot)
-            {
+            var graph = getGraph();
+            using(graph.ReadLock())
                 return graph.ClosestNode(x, y, z, out distance, ignorePassableProperty);
-            }
         }
 
         /// <summary>
@@ -343,22 +379,16 @@ namespace EntityTools.Patches.Mapper
         /// <returns></returns>
         public Node ClosestNode(Point3D pos, out double distance, bool ignorePassableProperty = false)
         {
-            if (Active)
+            if (_active)
                 return ClosestNode(pos.X, pos.Y, pos.Z, out distance, ignorePassableProperty);
-            var graph = FullGraph;
-            lock (graph.SyncRoot)
-            {
+            var graph = getGraph();
+            using (graph.ReadLock())
                 return graph.ClosestNode(pos.X, pos.Y, pos.Z, out distance, ignorePassableProperty);
-            }
         }
 
         /// <summary>
         /// Поиск ближайшего узла
         /// </summary>
-        /// <param name="pos"></param>
-        /// <param name="distance"></param>
-        /// <param name="ignorePassableProperty"></param>
-        /// <returns></returns>
         public Node ClosestNode(Vector3 pos, out double distance, bool ignorePassableProperty = false)
         {
             return ClosestNode(pos.X, pos.Y, pos.Z, out distance, ignorePassableProperty);
@@ -366,40 +396,33 @@ namespace EntityTools.Patches.Mapper
 
         public Arc AddArc(Node startNode, Node endNode, float weight)
         {
-            var graph = FullGraph;
-            lock (graph.SyncRoot)
-            {
+            var graph = getGraph();
+            using (graph.WriteLock())
                 return graph.AddArc(startNode, endNode, weight);
-            }
         }
 
-        public void Add2Arcs(Node Node1, Node Node2, float Weight)
+        public void Add2Arcs(Node node1, Node node2, float weight)
         {
-            var graph = FullGraph;
-            lock (graph.SyncRoot)
-            {
-                graph.Add2Arcs(Node1, Node2, Weight);
-            }
+            var graph = getGraph();
+            using (graph.WriteLock())
+                graph.Add2Arcs(node1, node2, weight);
         }
 
-        public int RemoveArcs(ArrayList ArcsToRemome)
+        public int RemoveArcs(ArrayList arcsToRemome)
         {
-            var graph = FullGraph;
-            lock (graph.SyncRoot)
-            {
-                return graph.RemoveArcs(ArcsToRemome);
-            }
+            var graph = getGraph();
+            using(graph.WriteLock())
+                return graph.RemoveArcs(arcsToRemome);
         }
 
         /// <summary>
         /// Кэшированные узлы
         /// </summary>
-        private LinkedList<Node> nodes = new LinkedList<Node>();
-#if false
-        /// <summary>
-        /// Кэшированные ребра
-        /// </summary>
-        private List<Arc> LA = new List<Arc>(); 
+        private readonly LinkedList<Node> _nodes = new LinkedList<Node>();
+        //private List<Node> nodes = new List<Node>(300);
+
+#if nodesLocker
+        private readonly RWLocker _nodesLocker = new RWLocker(); 
 #endif
         #endregion
 
@@ -407,39 +430,35 @@ namespace EntityTools.Patches.Mapper
         /// Флаг активности кэша
         /// При неактивном кэше чтение-запись производится напрямую
         /// </summary>
-        internal bool Active
+        public bool Active
         {
             get => _active;// || EntityTools.PluginSettings.Mapper.CacheActive;
-            set
-            {
-                if (value)
-                    StartCache();
-                else StopCache();
-                _active = value;
-            }
+            set => _active = value;
         }
         bool _active;
 
         /// <summary>
         /// Флаг удержания персонажа в центре области кэширования
         /// </summary>
-        internal bool HoldPlayer
+        public bool HoldPlayer
         {
             get => _holdPlayer;
             set => _holdPlayer = value;
         }
         bool _holdPlayer;
 
+#if LastAddedNode
         /// <summary>
         /// Последняя добавленная вершина (узел)
         /// </summary>
-        internal Node LastAddedNode { get => lastAddedNode; set => lastAddedNode = value; }
-        private Node lastAddedNode;
+        public Node LastAddedNode { get => lastAddedNode; set => lastAddedNode = value; }
+        private Node lastAddedNode; 
+#endif
 
         /// <summary>
         /// Флаг проверки необходимости обновления кэша
         /// </summary>
-        public bool CacheRegenerationNeeded
+        private bool CacheRegenerationNeeded
         {
             get
             {
@@ -448,101 +467,87 @@ namespace EntityTools.Patches.Mapper
                 {
                     var location = player.Location;
                     return player.IsValid && !player.IsLoading
+                            && !(_nodesLocker.IsReadLockHeld || _nodesLocker.IsUpgradeableReadLockHeld || _nodesLocker.IsWriteLockHeld)
                             && (cacheTimeout.IsTimedOut
                                 || cacheX_0_75 != double.MaxValue && Math.Abs(location.X - centerX) > cacheX_0_75
                                 || cacheY_0_75 != double.MaxValue && Math.Abs(location.Y - centerY) > cacheY_0_75
                                 || cacheZ_0_75 != double.MaxValue && Math.Abs(location.Z - centerZ) > cacheZ_0_75
-                                || player.MapAndRegion != cachedMapAndRegion );
+                                || player.MapAndRegion != _cachedMapAndRegion);
                 }
 
-                return player.IsValid && !player.IsLoading && (cacheTimeout.IsTimedOut || player.MapAndRegion != cachedMapAndRegion);
+                return player.IsValid && !player.IsLoading && (cacheTimeout.IsTimedOut || player.MapAndRegion != _cachedMapAndRegion)
+                    && !(_nodesLocker.IsReadLockHeld || _nodesLocker.IsUpgradeableReadLockHeld || _nodesLocker.IsWriteLockHeld);
             }
         }
 
         /// <summary>
         /// Имя кэшированной карты и региона
         /// </summary>
-        private string cachedMapAndRegion = string.Empty;
+        private string _cachedMapAndRegion = string.Empty;
 
         /// <summary>
         /// Обновление кэша
         /// </summary>
-        public bool RegenerateCache()
+        private void RegenerateCache()
         {
             if (_holdPlayer)
             {
                 var location = EntityManager.LocalPlayer.Location;
-                return RegenerateCache(location.X, location.Y, location.Z);
+                SetCacheInitialPosition(location.X, location.Y, location.Z);
             }
 
-            nodes.Clear();
-            return ScanNodes();
+            ScanNodes();
         }
 
         /// <summary>
         /// обновление Кэша вокруг заданной точки <paramref name="newIniPos"/>
         /// </summary>
-        public bool RegenerateCache(Vector3 newIniPos)
+        private void RegenerateCache(Vector3 newIniPos)
         {
-            return RegenerateCache(newIniPos.X, newIniPos.Y, newIniPos.Z);
+            RegenerateCache(newIniPos.X, newIniPos.Y, newIniPos.Z);
         }
 
         /// <summary>
         /// обновление Кэша вокруг точки c координатами <paramref name="x"/>, <paramref name="y"/>, <paramref name="z"/>
         /// </summary>
-        public bool RegenerateCache(double x, double y, double z)
+        private void RegenerateCache(double x, double y, double z)
         {
             _holdPlayer = false;
-            nodes.Clear();
-
-            if (Active)
-            {
-                SetCacheInitialPosition(x, y, z);
-                return ScanNodes();
-            }
-            return false;
+            
+            SetCacheInitialPosition(x, y, z);
+            ScanNodes();
         }
 
         /// <summary>
         /// Сканирование графа и заполнение кэша
         /// </summary>
         /// <returns></returns>
-        private bool ScanNodes()
+        private void ScanNodes()
         {
-            var graph = FullGraph;
-            lock (graph.SyncRoot)
+#if nodesLocker
+            using (_nodesLocker.WriteLock()) 
+#endif
             {
-                foreach (Node node in graph.NodesCollection)
-                    if (NeedCache(node))
-                        nodes.AddLast(node);
+                _nodes.Clear();
+                var graph = getGraph();//FullGraph;
+                using (graph.ReadLock())
+                {
+                    foreach (Node node in graph.NodesCollection)
+                        if (NeedCache(node))
+                            _nodes.AddLast(node);
+                }
             }
-            cachedMapAndRegion = EntityManager.LocalPlayer.MapAndRegion;
+            _cachedMapAndRegion = EntityManager.LocalPlayer.MapAndRegion;
             cacheTimeout.ChangeTime(EntityTools.PluginSettings.Mapper.CacheRegenTimeout);
-            return true;
         }
 
+#if false
         /// <summary>
         /// Остановка кэширования
         /// </summary>
         public void StopCache()
         {
             _active = false;
-#if false
-            if (mapper != null && !mapper.IsDisposed)
-            {
-                mapper.CustomDraw -= handler_MapperDrawCache;
-                object mapPictureObj = null;
-                if (SubscribedMapperMouseDoubleClick
-                    && ReflectionHelper.GetFieldValue(mapper, "\u000E", out mapPictureObj, BindingFlags.Instance | BindingFlags.NonPublic)
-                    && ReflectionHelper.UnsubscribeEvent(mapPictureObj, "MouseDoubleClick", this, "eventMapperDoubleClick", true, BindingFlags.Instance | BindingFlags.Public, BindingFlags.Instance | BindingFlags.NonPublic))
-                    SubscribedMapperMouseDoubleClick = false;
-
-                if (SubscribedMapperDoubleClick
-                    && mapPictureObj != null
-                    && ReflectionHelper.UnsubscribeEvent(mapPictureObj, "DoubleClick", this, "eventMapperDoubleClick", true, BindingFlags.Instance | BindingFlags.Public, BindingFlags.Instance | BindingFlags.NonPublic))
-                    SubscribedMapperDoubleClick = false;
-            } 
-#endif
             lastAddedNode = null;
         }
 
@@ -553,24 +558,9 @@ namespace EntityTools.Patches.Mapper
         {
             _active = true;
             cacheTimeout.ChangeTime(0);
-#if false
-            mapper = m;
-            if (mapper != null && !mapper.IsDisposed)
-            {
-                mapper.CustomDraw += handler_MapperDrawCache;
-                object mapPictureObj = null;
-                if (ReflectionHelper.GetFieldValue(mapper, "\u000E", out mapPictureObj, BindingFlags.Instance | BindingFlags.NonPublic)
-                    && ReflectionHelper.SubscribeEvent(mapPictureObj, "MouseDoubleClick", this, "eventMapperDoubleClick", true, BindingFlags.Instance | BindingFlags.Public, BindingFlags.Instance | BindingFlags.NonPublic))
-                    SubscribedMapperMouseDoubleClick = true;
-
-                if (mapPictureObj != null
-                    && ReflectionHelper.SubscribeEvent(mapPictureObj, "DoubleClick", this, "eventMapperDoubleClick", true, BindingFlags.Instance | BindingFlags.Public, BindingFlags.Instance | BindingFlags.NonPublic))
-                    SubscribedMapperDoubleClick = true;
-            } 
-#endif
-
             RegenerateCache();
-        }
+        } 
+#endif
 
         /// <summary>
         /// Проверка попадания узла node в кэшируемый объем
@@ -595,52 +585,6 @@ namespace EntityTools.Patches.Mapper
                 && minY <= y && y <= maxY
                 && minZ <= z && z <= maxZ;
         }
-
-        #region взаимодействие с Mapper'ом
-#if false
-        MapperExt mapper = null;
-
-        /// <summary>
-        /// Обновление кэша при удалении вершин
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void handler_MapperDoubleClick(object sender, EventArgs e)
-        {
-            // двойной клик означает удаление точек пути
-            // следовательно нужно обновить кэш
-            RegenerateCache();
-
-#if DEBUG
-            ETLogger.WriteLine(LogType.Debug, "MapperFormExt::eventMapperDoubleClick");
-#endif
-        }
-
-        /// <summary>
-        /// Отрисовка на Mapper'e кэшированных вершин
-        /// </summary>
-        /// <param name="g"></param>
-        private void handler_MapperDrawCache(GraphicsNW g)
-        {
-            if (nodes != null)
-            {
-                lock (nodes)
-                {
-                    foreach (var node in nodes)
-                        g.drawFillEllipse(new Vector3((float)node.X, (float)node.Y, (float)node.Z), new Size(7, 7), Brushes.Gold);
-                }
-            }
-            if (lastAddedNode != null)
-            {
-                //g.drawFillEllipse(new Vector3((float)lastNodeDetail.Node.X, (float)lastNodeDetail.Node.Y, (float)lastNodeDetail.Node.Z), new Size(9, 9), Brushes.Cyan);
-                float anchorSize = (float)Math.Max(1, MapperHelper_CustomRegion.DefaultAnchorSize / mapper.Zoom);
-                MapperHelper_CustomRegion.DrawAnchor(g, new Vector3((float)lastAddedNode.X, (float)lastAddedNode.Y, (float)lastAddedNode.Z), anchorSize, Brushes.Orange);
-            }
-        }
-        private bool SubscribedMapperMouseDoubleClick = false;
-        private bool SubscribedMapperDoubleClick = false; 
-#endif
-        #endregion
 
         /// <summary>
         /// Размер кэшируемой области вдоль оси X

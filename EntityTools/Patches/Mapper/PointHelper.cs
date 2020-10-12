@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using AStar;
+using EntityTools.Patches.Mapper.Tools;
 using MyNW.Classes;
 
 namespace EntityTools.Patches.Mapper
@@ -40,6 +41,12 @@ namespace EntityTools.Patches.Mapper
                     x = pos.X;
                     y = pos.Y;
                 }
+                else if (point is NodeDetail ndt)
+                {
+                    var pos = ndt.Node.Position;
+                    x = pos.X;
+                    y = pos.Y;
+                }
                 else throw new NotImplementedException();
             }
             public static void GetXYZ<TPoint>(TPoint point, out double x, out double y, out double z)
@@ -63,6 +70,13 @@ namespace EntityTools.Patches.Mapper
                     y = pos.Y;
                     z = pos.Z;
                 }
+                else if (point is NodeDetail ndt)
+                {
+                    var pos = ndt.Node.Position;
+                    x = pos.X;
+                    y = pos.Y;
+                    z = pos.Z;
+                }
                 else throw new NotImplementedException();
             }
 
@@ -73,6 +87,7 @@ namespace EntityTools.Patches.Mapper
                 if (point is Point p) return p.X;
                 if (point is Point3D p3d) return p3d.X;
                 if (point is Node nd) return nd.X;
+                if (point is NodeDetail ndt) return ndt.Node.Position.X;
                 throw new NotImplementedException();
             }
             public static double GetY<TPoint>(TPoint point)
@@ -82,6 +97,7 @@ namespace EntityTools.Patches.Mapper
                 if (point is Point p) return p.Y;
                 if (point is Point3D p3d) return p3d.Y;
                 if (point is Node nd) return nd.Y;
+                if (point is NodeDetail ndt) return ndt.Node.Position.Y;
                 throw new NotImplementedException();
             }
             public static double GetZ<TPoint>(TPoint point)
@@ -89,6 +105,7 @@ namespace EntityTools.Patches.Mapper
                 if (point is Vector3 v3) return v3.Z;
                 if (point is Point3D p3d) return p3d.Z;
                 if (point is Node nd) return nd.Z;
+                if (point is NodeDetail ndt) return ndt.Node.Position.Z;
                 throw new NotImplementedException();
             }
             public static void SetX<TPoint>(TPoint point, double value)
@@ -98,6 +115,7 @@ namespace EntityTools.Patches.Mapper
                 else if (point is Point p) p.X = (int)value;
                 else if (point is Point3D p3d) p3d.X = value;
                 else if (point is Node nd) nd.Position.X = value;
+                else if (point is NodeDetail ndt) ndt.Node.Position.X = value;
                 else throw new NotImplementedException();
             }
             public static void SetY<TPoint>(TPoint point, double value)
@@ -107,6 +125,7 @@ namespace EntityTools.Patches.Mapper
                 else if (point is Point p) p.Y = (int)value;
                 else if (point is Point3D p3d) p3d.Y = value;
                 else if (point is Node nd) nd.Position.Y = value;
+                else if (point is NodeDetail ndt) ndt.Node.Position.Y = value;
                 else throw new NotImplementedException();
             }
             public static void SetZ<TPoint>(TPoint point, double value)
@@ -114,6 +133,7 @@ namespace EntityTools.Patches.Mapper
                 if (point is Vector3 v3) v3.Z = (float)value;
                 else if (point is Point3D p3d) p3d.Z = value;
                 else if (point is Node nd) nd.Position.Z = value;
+                else if (point is NodeDetail ndt) ndt.Node.Position.Z = value;
                 else throw new NotImplementedException();
             }
 

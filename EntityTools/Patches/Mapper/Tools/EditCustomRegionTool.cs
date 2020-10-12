@@ -29,7 +29,6 @@ namespace EntityTools.Patches.Mapper.Tools
             crHeight = cr.Height;
             endY = startY + crHeight;
 
-            changed = false;
             transformMode = RegionTransformMode.None;
         }
 
@@ -56,8 +55,6 @@ namespace EntityTools.Patches.Mapper.Tools
         /// Сконструированный CustomRegion (для выполнения Undo)
         /// </summary>
         private CustomRegion customRegion;
-
-        private bool changed;
 
         /// <summary>
         /// Флаг, указывающий является ли CustomRegion элиптическим

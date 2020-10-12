@@ -438,7 +438,7 @@ namespace EntityTools.Patches.Mapper
         public void FillSquareCentered<TPoint>(Brush brush, TPoint worldCenterPoint, double edge, bool useScale = false)
         {
             PointHelper.GetXY(worldCenterPoint, out double x, out double y);
-            FillSquareCentered(brush, x, y, useScale);
+            FillSquareCentered(brush, x, y, edge, useScale);
         }
         /// <summary>
         /// Отрисовка заполненного квадрата со стороной <paramref name="edge"/>
