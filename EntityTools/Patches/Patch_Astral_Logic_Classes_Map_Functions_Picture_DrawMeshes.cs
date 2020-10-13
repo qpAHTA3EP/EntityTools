@@ -35,6 +35,11 @@ namespace EntityTools.Patches.Mapper
         /// <param name="meshes"></param>
         public static void DrawMeshes(GraphicsNW graphicsNW, Graph meshes)
         {
+            SolidBrush bidirBrush = new SolidBrush(EntityTools.PluginSettings.Mapper.MapperForm.BidirectionalPathColor);
+            SolidBrush unidirBrush = new SolidBrush(EntityTools.PluginSettings.Mapper.MapperForm.UnidirectionalPathColor);
+            Pen bidirPen = new Pen(EntityTools.PluginSettings.Mapper.MapperForm.BidirectionalPathColor, 1);
+            Pen unidirPen = new Pen(EntityTools.PluginSettings.Mapper.MapperForm.UnidirectionalPathColor, 1);
+
             if (graphicsNW is MapperGraphics mapGraphics)
             {
                 using (meshes.ReadLock())
@@ -47,12 +52,15 @@ namespace EntityTools.Patches.Mapper
                         if (node.Passable)
                         {
                             // Отсеиваем и не отрисовываем вершины и ребра, расположенные за пределами видимого изображения
+#if false
+                            // Отрисовываются только кэшированные вершины, попадающие в отображаемую область
                             if (left <= node.X && node.X <= right
-                                && down <= node.Y && node.Y <= top)
+                                && down <= node.Y && node.Y <= top) 
+#endif
                             {
                                 bool uniPath = node.IncomingArcsCount <= 1 && node.OutgoingArcsCount <= 1;
-                                Brush brush = (uniPath) ? Brushes.SkyBlue : Brushes.Red;
-                                Pen pen = (uniPath) ? Pens.SkyBlue : Pens.Red;
+                                Brush brush = (uniPath) ? unidirBrush : bidirBrush;
+                                Pen pen = (uniPath) ? unidirPen : bidirPen;
 
                                 foreach (Arc arc in node.OutgoingArcs)
                                 {

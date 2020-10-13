@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using EntityTools.Patches.Mapper;
+using EntityTools.Tools;
 
 namespace EntityTools.Settings
 {
@@ -27,7 +28,6 @@ namespace EntityTools.Settings
                 }
             }
         }
-        //[NonSerialized]
         private bool patch = true;
 
         /// <summary>
@@ -47,7 +47,6 @@ namespace EntityTools.Settings
                 }
             }
         }
-        //[NonSerialized]
         private int waypointDistance = 20;
 
         /// <summary>
@@ -66,7 +65,6 @@ namespace EntityTools.Settings
                 }
             }
         }
-        //[NonSerialized]
         private int waypointEquivalenceDistance = 10;
 
         /// <summary>
@@ -85,7 +83,6 @@ namespace EntityTools.Settings
                 }
             }
         }
-        //[NonSerialized]
         private int maxElevationDifference = 10;
 
         /// <summary>
@@ -104,7 +101,6 @@ namespace EntityTools.Settings
                 }
             }
         }
-        //[NonSerialized]
         private bool cacheActive = true;
         
         /// <summary>
@@ -123,7 +119,6 @@ namespace EntityTools.Settings
                 }
             }
         }
-        //[NonSerialized]
         private int cacheRadius = 50;
 
 
@@ -143,7 +138,6 @@ namespace EntityTools.Settings
                 }
             }
         }
-        //[NonSerialized]
         private int cacheRegenTimeout = 500;
 
         /// <summary>
@@ -164,7 +158,6 @@ namespace EntityTools.Settings
                 }
             }
         }
-        //[NonSerialized]
         private bool forceLinkingWaypoint = true;
 
         /// <summary>
@@ -184,7 +177,6 @@ namespace EntityTools.Settings
                 }
             }
         }
-        //[NonSerialized]
         private bool linearPath = true;
 
         /// <summary>
@@ -275,7 +267,6 @@ namespace EntityTools.Settings
                 }
             }
         }
-        //[NonSerialized]
         private bool _mappingBarVisible = true;
 
         /// <summary>
@@ -294,7 +285,6 @@ namespace EntityTools.Settings
                 }
             }
         }
-        //[NonSerialized]
         private bool _meshesBarVisible = true;
 
         /// <summary>
@@ -313,7 +303,6 @@ namespace EntityTools.Settings
                 }
             }
         }
-        //[NonSerialized]
         private bool _nodeToolsBarVisible = true;
 
         /// <summary>
@@ -332,7 +321,6 @@ namespace EntityTools.Settings
                 }
             }
         }
-        //[NonSerialized]
         private bool _customRegionBarVisible = true;
 
         /// <summary>
@@ -351,7 +339,6 @@ namespace EntityTools.Settings
                 }
             }
         }
-        //[NonSerialized]
         private bool _statusBarVisible = true;
 
         /// <summary>
@@ -370,9 +357,55 @@ namespace EntityTools.Settings
                 }
             }
         }
-        //[NonSerialized]
         private int redrawMapperTimeout = 100;
 
+        [Bindable(true)]
+        [XmlElement(Type = typeof(XmlColor))]
+        public Color BidirectionalPathColor
+        {
+            get => biPathColor;
+            set
+            {
+                if (value != biPathColor)
+                {
+                    biPathColor = value;
+                    NotifyPropertyChanged(nameof(BidirectionalPathColor));
+                }
+            }
+        }
+        private Color biPathColor = Color.Red;
+
+#if false
+        public int BidirectionalPathRGBColor
+        {
+            get => biPathColor.ToArgb();
+            set => BidirectionalPathColor = Color.FromArgb(value);
+        } 
+#endif
+
+        [Bindable(true)]
+        [XmlElement(Type = typeof(XmlColor))]
+        public Color UnidirectionalPathColor
+        {
+            get => uniPathColor;
+            set
+            {
+                if (value != uniPathColor)
+                {
+                    uniPathColor = value;
+                    NotifyPropertyChanged(nameof(UnidirectionalPathColor));
+                }
+            }
+        }
+        private Color uniPathColor = Color.SkyBlue;
+
+#if false
+        public int UnidirectionalPathRGB
+        {
+            get => uniPathColor.ToArgb();
+            set => UnidirectionalPathColor = Color.FromArgb(value);
+        } 
+#endif
     }
 #endif
 }

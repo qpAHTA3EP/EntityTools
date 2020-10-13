@@ -305,7 +305,11 @@ namespace EntityTools.Patches.Mapper
         public static void ClosestNodeOxyProjection(this IGraph graph, double x, double y, out Node node, out int hash,
             double distance = -1)
         {
-            lock (graph.SyncRoot)
+#if false
+            lock (graph.SyncRoot) 
+#else
+            using (graph.ReadLock())
+#endif
             {
                 node = graph.ClosestNodeOxyProjection(x, y, distance);
                 hash = graph.GetHashCode();

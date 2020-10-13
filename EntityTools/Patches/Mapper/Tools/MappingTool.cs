@@ -104,9 +104,17 @@ namespace EntityTools.Patches.Mapper.Tools
             if (_lastNodeDetail != null)
             {
                 graphics.FillRhombCentered(Brushes.Gold, _lastNodeDetail, MapperHelper.DefaultAnchorSize, MapperHelper.DefaultAnchorSize);
-                graphics.FillSquareCentered(Brushes.Gold, _lastNodeDetail, MapperHelper.DefaultAnchorSize);
+                //graphics.FillSquareCentered(Brushes.Gold, _lastNodeDetail, MapperHelper.DefaultAnchorSize / 1.4142135623730950488016887242097);
                 //graphics.FillSquareCentered(Brushes.ForestGreen, lastNodeDetail, MapperHelper.DefaultAnchorSize * 0.66);
-            } 
+            }
+
+            var eqvDist = EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance;
+            if (eqvDist >= 2)
+            {
+                var location = EntityManager.LocalPlayer.Location;
+                graphics.DrawCircleCentered(Pens.Gold, location.X, location.Y, eqvDist * 2, true);
+            }
+
 #endif
         }
 
@@ -146,8 +154,8 @@ namespace EntityTools.Patches.Mapper.Tools
                 if (_mappingCache.NodesCount != 0)
                 {
                     if (_linear)
-                        _lastNodeDetail = MappingToolHelper.LinkNearest1(EntityManager.LocalPlayer.Location.Clone(), _mappingCache);
-                    else _lastNodeDetail = MappingToolHelper.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), _mappingCache);
+                        _lastNodeDetail = MappingToolHelper.LinkNearest_1(EntityManager.LocalPlayer.Location.Clone(), _mappingCache);
+                    else _lastNodeDetail = MappingToolHelper.LinkNearest_8_Side(EntityManager.LocalPlayer.Location.Clone(), _mappingCache);
                 }
                 while (_mode != MappingMode.Stoped
                        && !token.IsCancellationRequested)
@@ -170,8 +178,8 @@ namespace EntityTools.Patches.Mapper.Tools
                                 {
                                     // Строим комплексный (многосвязный путь)
                                     if (_forceLink)
-                                        _lastNodeDetail = MappingToolHelper.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, _lastNodeDetail, false) ?? _lastNodeDetail;
-                                    else _lastNodeDetail = MappingToolHelper.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, null, false) ?? _lastNodeDetail;
+                                        _lastNodeDetail = MappingToolHelper.LinkNearest_8_Side(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, _lastNodeDetail, false) ?? _lastNodeDetail;
+                                    else _lastNodeDetail = MappingToolHelper.LinkNearest_8_Side(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, null, false) ?? _lastNodeDetail;
                                 }
                                 break;
                             case MappingMode.Unidirectional:
@@ -192,8 +200,8 @@ namespace EntityTools.Patches.Mapper.Tools
                     // Связываем текущее местоположение с графом
                     if (_linear)
                         // TODO: Проверять наличие вершины по курсу и связывать с найденной
-                        MappingToolHelper.LinkNearest1(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, _lastNodeDetail, _mode == MappingMode.Unidirectional);
-                    else MappingToolHelper.LinkNearest3Side(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, _lastNodeDetail, _mode == MappingMode.Unidirectional);
+                        MappingToolHelper.LinkLinear(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, _lastNodeDetail, _mode == MappingMode.Unidirectional);
+                    else MappingToolHelper.LinkNearest_8_Side(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, _lastNodeDetail, _mode == MappingMode.Unidirectional);
                     _lastNodeDetail = null;
                 }
             }

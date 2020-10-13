@@ -40,6 +40,7 @@ namespace EntityTools.Patches.Mapper
 #if PATCH_ASTRAL
     public partial class MapperFormExt : XtraForm//, IMapperForm //*/Form
     {
+        #region Инструменты точечного редактирования графа
         /// <summary>
         /// Инструмент для выделения вершин
         /// </summary>
@@ -70,10 +71,15 @@ namespace EntityTools.Patches.Mapper
                 _currentTool = value;
                 if (value != null)
                     InterruptAllModifications(value.EditMode);
-                else _selectedNodes.Clear();
+                else
+                {
+                    _selectedNodes.Clear();
+                    InterruptAllModifications(MapperEditMode.None);
+                }
             }
         }
-        private IMapperTool _currentTool;
+        private IMapperTool _currentTool; 
+        #endregion
 
         /// <summary>
         /// Флаг удержания персонажа в центре карты
@@ -198,6 +204,16 @@ namespace EntityTools.Patches.Mapper
                                                 nameof(EntityTools.PluginSettings.Mapper.ForceLinkingWaypoint),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 
+            editBidirPathColor.DataBindings.Add(nameof(editBidirPathColor.EditValue),
+                                                EntityTools.PluginSettings.Mapper.MapperForm,
+                                                nameof(EntityTools.PluginSettings.Mapper.MapperForm.BidirectionalPathColor),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
+
+            editUnidirPathColor.DataBindings.Add(nameof(editUnidirPathColor.EditValue),
+                                                EntityTools.PluginSettings.Mapper.MapperForm,
+                                                nameof(EntityTools.PluginSettings.Mapper.MapperForm.UnidirectionalPathColor),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
+
             /* Сохранение опции между сессиями не требуется
              * Отслеживание флага производится через свойство LinearPath
              * menuLinearPath.DataBindings.Add(nameof(menuLinearPath.Checked),
@@ -253,9 +269,11 @@ namespace EntityTools.Patches.Mapper
 
             barMapping.Visible = EntityTools.PluginSettings.Mapper.MapperForm.MappingBarVisible;
             barMeshes.Visible = EntityTools.PluginSettings.Mapper.MapperForm.MeshesBarVisible;
+            barNodeTools.Visible = EntityTools.PluginSettings.Mapper.MapperForm.NodeToolsBarVisible;
+            barCustomRegions.Visible = EntityTools.PluginSettings.Mapper.MapperForm.CustomRegionBarVisible;
             barStatus.Visible = EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible;
-            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible;
 
+            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barNodeTools.Visible && !barCustomRegions.Visible;
             Location = EntityTools.PluginSettings.Mapper.MapperForm.Location;
             Size = EntityTools.PluginSettings.Mapper.MapperForm.Size;
             backgroundWorker.RunWorkerAsync();
@@ -272,7 +290,12 @@ namespace EntityTools.Patches.Mapper
 
             EntityTools.PluginSettings.Mapper.MapperForm.MappingBarVisible = barMapping.Visible;
             EntityTools.PluginSettings.Mapper.MapperForm.MeshesBarVisible = barMeshes.Visible;
+            EntityTools.PluginSettings.Mapper.MapperForm.NodeToolsBarVisible = barNodeTools.Visible;
+            EntityTools.PluginSettings.Mapper.MapperForm.CustomRegionBarVisible = barCustomRegions.Visible;
             EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible = barStatus.Visible;
+
+            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barNodeTools.Visible && !barCustomRegions.Visible;
+
             EntityTools.PluginSettings.Mapper.MapperForm.Location = Location;
             EntityTools.PluginSettings.Mapper.MapperForm.Size = Size;
 
@@ -570,6 +593,7 @@ namespace EntityTools.Patches.Mapper
             if (mode != MapperEditMode.EditCustomRegion)
             {
                 btnEditCR.Checked = false;
+                barEditCustomRegion.Visible = false;
             }
         }
 
@@ -1688,7 +1712,9 @@ namespace EntityTools.Patches.Mapper
                 LockOnPlayer = false;
             }
             else if (editEdgeTool != null)
-                    CurrentTool = null;
+            {
+                CurrentTool = null;
+            }
         }
 
         private void handler_RelocateNodes_ModeChanged(object sender, ItemClickEventArgs e)

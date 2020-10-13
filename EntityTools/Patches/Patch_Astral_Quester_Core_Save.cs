@@ -210,6 +210,7 @@ namespace EntityTools.Patches
         /// <param name="binaryFormatter"></param>
         public static bool SaveMesh(ZipArchive zipFile, string meshName, Graph mesh, BinaryFormatter binaryFormatter = null)
         {
+            //TODO: Безопасное сохранение mesh'а, чтобы при возникновении ошибки старое содержимое не удалялось
             if (zipFile is null)
                 return false;
 
@@ -246,6 +247,7 @@ namespace EntityTools.Patches
         /// </summary>
         public static void SaveProfile(ZipArchive zipFile)
         {
+            //TODO: Безопасное сохранение профиля, чтобы при возникновении ошибки старое содержимое не удалялось
             ZipArchiveEntry zipProfileEntry = null;
             if (zipFile.Mode == ZipArchiveMode.Update)
             {

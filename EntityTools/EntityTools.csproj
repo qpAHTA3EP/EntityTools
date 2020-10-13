@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.1012.1414</AssemblyVersion>
+    <AssemblyVersion>0.20.1013.1423</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -316,6 +316,7 @@
     <Compile Include="Tools\Reflection\InstancePropertyAccessor.cs" />
     <Compile Include="Tools\Reflection\StaticPropertyAccessor.cs" />
     <Compile Include="Tools\SysInformer.cs" />
+    <Compile Include="Tools\XmlColor.cs" />
     <Compile Include="UCC\Extensions\UCCActionExtention.cs" />
     <Compile Include="UCC\Extensions\UCCEditorExtensions.cs" />
     <Compile Include="Tools\Export\GameUITools.cs" />
