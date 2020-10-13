@@ -583,7 +583,7 @@ namespace EntityTools.Patches.Mapper
             | DevExpress.XtraBars.BarCanDockStyle.Standalone)));
             this.barEditCustomRegion.DockCol = 0;
             this.barEditCustomRegion.DockRow = 0;
-            this.barEditCustomRegion.FloatLocation = new System.Drawing.Point(30, 304);
+            this.barEditCustomRegion.FloatLocation = new System.Drawing.Point(62, 213);
             this.barEditCustomRegion.FloatSize = new System.Drawing.Size(397, 88);
             this.barEditCustomRegion.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
             new DevExpress.XtraBars.LinkPersistInfo(this.btnCRTypeSelector),

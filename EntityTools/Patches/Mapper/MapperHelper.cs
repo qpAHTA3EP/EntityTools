@@ -307,7 +307,7 @@ namespace EntityTools.Patches.Mapper
         {
 #if false
             lock (graph.SyncRoot) 
-#else
+#elif false
             using (graph.ReadLock())
 #endif
             {

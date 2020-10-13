@@ -549,7 +549,7 @@ namespace EntityTools.Patches.Mapper
                 double dy = (e.Location.Y - mouseClickPosition.Y) / scale;
 
                 LockOnPlayer = false;
-                using (_graphics.WriteLock())
+                using (_graphics.ReadLock())
                     _graphics.MoveCenterPosition(dx, dy);
                 mouseClickPosition.X = e.X;
                 mouseClickPosition.Y = e.Y;
