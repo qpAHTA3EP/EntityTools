@@ -136,7 +136,9 @@ public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool al
                 lock(@lock)
 #endif
                 {
-                    stopwatch.Start();
+#if PATCH_LOG
+                    stopwatch.Start(); 
+#endif
                     if (Astral.Controllers.Settings.Get.UsePathfinding3)
                     {
                         List<Vector3> waypoints = new List<Vector3>();
@@ -167,9 +169,9 @@ public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool al
                             bool tcpClientConnected = AstralAccessors.Controllers.BotComs.BotClient.Client_TcpClient.Connected;
                             if (graph?.NodesCount > 0 && !tcpClientConnected)
                             {
-#if PATCH_LOG
                                 double dist1 = 0, dist2 = 0;
                                 Node startNode = null, endNode = null;
+#if PATCH_LOG
                                 standardGraphSearching_Time = stopwatch.ElapsedTicks; 
 #endif
                                 using (graph.ReadLock())
@@ -233,8 +235,9 @@ public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool al
 
                             if (waypoints.Count > 0)
                             {
-                                partialPathSearch_Time = stopwatch.ElapsedTicks;
-
+#if PATCH_LOG
+                                partialPathSearch_Time = stopwatch.ElapsedTicks; 
+#endif
                                 Vector3 vector = new Vector3();
                                 if (PathFinding.CheckDirection(start, waypoints[0], ref vector))
                                 {
