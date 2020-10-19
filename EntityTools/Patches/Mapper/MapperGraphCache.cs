@@ -27,7 +27,7 @@ namespace EntityTools.Patches.Mapper
         #region Synchronization
         public object SyncRoot => getGraph().SyncRoot;
 
-        private readonly ReaderWriterLockSlim @lock = new ReaderWriterLockSlim();
+        private readonly ReaderWriterLockSlim @lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
         /// <summary>
         /// Объект синхронизации для "чтения", допускающий одновременное чтение
@@ -54,6 +54,8 @@ namespace EntityTools.Patches.Mapper
         private IGraph FullGraph => getGraph(); 
 #endif
         private readonly Func<IGraph> getGraph;
+
+        public int Version { get; private set; }
 
         public override int GetHashCode()
         {
@@ -174,6 +176,7 @@ namespace EntityTools.Patches.Mapper
                     }
                     _cachedMapAndRegion = EntityManager.LocalPlayer.MapAndRegion;
                     cacheTimeout.ChangeTime(EntityTools.PluginSettings.Mapper.CacheRegenTimeout);
+                    Version++;
                 }
                 else
                 {
@@ -181,10 +184,10 @@ namespace EntityTools.Patches.Mapper
                     using (_nodesLocker.ReadLock()) 
 #endif
                         foreach (Node node in _nodes)
-                            {
-                                action(node);
-                                num++;
-                            }
+                        {
+                            action(node);
+                            num++;
+                        }
                 }
             }
             else
@@ -203,7 +206,7 @@ namespace EntityTools.Patches.Mapper
 #if nodesLocker
             using (_nodesLocker.WriteLock()) 
 #endif
-            _nodes.Clear();
+                _nodes.Clear();
         }
 
         /// <summary>
@@ -408,12 +411,14 @@ namespace EntityTools.Patches.Mapper
                 graph.Add2Arcs(node1, node2, weight);
         }
 
+#if false
         public int RemoveArcs(ArrayList arcsToRemome)
         {
             var graph = getGraph();
-            using(graph.WriteLock())
+            using (graph.WriteLock())
                 return graph.RemoveArcs(arcsToRemome);
-        }
+        } 
+#endif
 
         /// <summary>
         /// Кэшированные узлы
@@ -539,6 +544,7 @@ namespace EntityTools.Patches.Mapper
             }
             _cachedMapAndRegion = EntityManager.LocalPlayer.MapAndRegion;
             cacheTimeout.ChangeTime(EntityTools.PluginSettings.Mapper.CacheRegenTimeout);
+            Version++;
         }
 
 #if false

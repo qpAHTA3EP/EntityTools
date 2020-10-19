@@ -136,14 +136,14 @@ namespace EntityCore.Quester.Conditions
             if (string.IsNullOrEmpty(uiVar.Value) && string.IsNullOrEmpty(@this._uiGenPropertyValue))
                 result = true;
             else switch (@this._uiGenPropertyValueType)
-                {
-                    case ItemFilterStringType.Simple:
-                        result = uiVar.Value.CompareToSimplePattern(@this._uiGenPropertyValue);
-                        break;
-                    case ItemFilterStringType.Regex:
-                        result = Regex.IsMatch(uiVar.Value, @this._uiGenPropertyValue);
-                        break;
-                }
+            {
+                case ItemFilterStringType.Simple:
+                    result = uiVar.Value.CompareToSimplePattern(@this._uiGenPropertyValue);
+                    break;
+                case ItemFilterStringType.Regex:
+                    result = Regex.IsMatch(uiVar.Value, @this._uiGenPropertyValue);
+                    break;
+            }
 
             if (@this._propertySign == Presence.Equal)
                 return result;

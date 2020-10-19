@@ -3,6 +3,7 @@
 using System.Reflection;
 using Astral.Quester.Forms;
 using EntityTools.Patches.Mapper;
+using EntityTools.Patches.Navmesh;
 using EntityTools.Patches.UCC;
 using EntityTools.Reflection;
 #if PATCH_ASTRAL && HARMONY
@@ -47,60 +48,51 @@ namespace EntityTools.Patches
         /// <summary>
         /// Подмена ActionsPlayer.CheckAlly(..)
         /// </summary>
-        private static readonly Patch_ActionsPlayer_CheckAlly patchActionsPlayerCheckAlly = new Patch_ActionsPlayer_CheckAlly();
+        private static readonly Patch_ActionsPlayer_CheckAlly Patch_ActionsPlayer_CheckAlly = new Patch_ActionsPlayer_CheckAlly();
 
-        private static readonly Patch_AddClass_Show patchAddClassShow = new Patch_AddClass_Show();
+        private static readonly Patch_AddClass_Show patchAddCPatch_AddClass_ShowlassShow = new Patch_AddClass_Show();
 
-        private static readonly Patch_VIP_SealTraderEntity patchVIPSealTraderEntity = new Patch_VIP_SealTraderEntity();
+        private static readonly Patch_VIP_SealTraderEntity Patch_VIP_SealTraderEntity = new Patch_VIP_SealTraderEntity();
 
-        private static readonly Patch_VIP_ProfessionVendorEntity patchVIPProfessionVendorEntity = new Patch_VIP_ProfessionVendorEntity();
+        private static readonly Patch_VIP_ProfessionVendorEntity Patch_VIP_ProfessionVendorEntity = new Patch_VIP_ProfessionVendorEntity();
 
 #if true
-        private static readonly Patch_Astral_Quester_Core_Save patchAstralQuesterCoreSave = new Patch_Astral_Quester_Core_Save();
+        private static readonly Patch_Astral_Quester_Core_Save Patch_Astral_Quester_Core_Save = new Patch_Astral_Quester_Core_Save();
 #endif
 #if true
         // Патч механизмов отрисовки Mapper'a
-        private static readonly Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes patchAstralLogicClassesMapFunctionsPictureDrawMeshes = new Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes();
-        private static readonly Patch_Astral_Navmesh_DrawRoad patchAstralNavmeshDrawRoad = new Patch_Astral_Navmesh_DrawRoad();
-        private static readonly Patch_Astral_Navmesh_DrawHotSpots patchAstralNavmeshDrawHotSpots = new Patch_Astral_Navmesh_DrawHotSpots();
+        private static readonly Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes = new Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes();
+        private static readonly Patch_Astral_Logic_Navmesh_DrawRoad Patch_Astral_Logic_Navmesh_DrawRoad = new Patch_Astral_Logic_Navmesh_DrawRoad();
+        private static readonly Patch_Astral_Logic_Navmesh_DrawHotSpots Patch_Astral_Logic_Navmesh_DrawHotSpots = new Patch_Astral_Logic_Navmesh_DrawHotSpots();
 #endif
+#if true
+        // Патч методов построения пути
+        private static readonly Patch_Astral_Logic_Navmesh_getPath Patch_Astral_Logic_Navmesh_getPath = new Patch_Astral_Logic_Navmesh_getPath();
+        private static readonly Patch_Astral_Logic_Navmesh_GenerateRoad Patch_Astral_Logic_Navmesh_GenerateRoad = new Patch_Astral_Logic_Navmesh_GenerateRoad();
 
-        static bool Applied;
+        private static readonly Patch_Astral_Logic_Navmesh_TotalDistance Patch_Astral_Logic_Navmesh_TotalDistance = new Patch_Astral_Logic_Navmesh_TotalDistance();
+
+        private static readonly Patch_Astral_Logic_Navmesh_GetNearestNodeFromPosition Patch_Astral_Logic_Navmesh_GetNearestNodeFromPosition = new Patch_Astral_Logic_Navmesh_GetNearestNodeFromPosition();
+
+        private static readonly Patch_Quester_Controllers_Road_GenerateRoadFromPlayer Patch_Quester_Controllers_Road_GenerateRoadFromPlayer = new Patch_Quester_Controllers_Road_GenerateRoadFromPlayer();
+        private static readonly Patch_Quester_Controllers_Road_PathDistance Patch_Quester_Controllers_Road_PathDistance = new Patch_Quester_Controllers_Road_PathDistance();
+#endif
+        static bool _applied;
         public static void Apply()
         {
             //TODO: Реализовать механизм отключения патчей (всех)
-            // В первую очерещь эта касается патчей Patch_VIP_SealTraderEntity и Patch_VIP_ProfessionVendorEntity
 
-
-            if (!Applied)
+            if (!_applied)
             {
-#if true
                 foreach (var field in typeof(ETPatcher).GetFields(BindingFlags.NonPublic | BindingFlags.Static))
                 {
-                    if (field.GetValue(null) is Patch patch
-                        && patch != null)
+                    if (field.GetValue(null) is Patch patch)
                     {
                         patch.Inject();
                     }
-#if false
-                    else
-                    {
-                        ETLogger.WriteLine($"Failed to apply patch '{field.FieldType.Name}' named '{field.Name}'");
-                    } 
-#endif
+
                 }
-#else
 
-                patchMapper?.Inject();
-
-                patchActionsPlayerCheckAlly.Inject();
-
-                PatchAddClassShow.Inject();
-#endif
-
-#if Patch_AstralXmlSerializer
-                patchXmlSerializerGetExtraTypes.Inject();
-#endif
 #if HARMONY
                 try
                 {
@@ -112,7 +104,7 @@ namespace EntityTools.Patches
                     ETLogger.WriteLine(LogType.Error, "Harmony patches are failed!",true);
                 }
 #endif
-                Applied = true;
+                _applied = true;
             }
 
         }

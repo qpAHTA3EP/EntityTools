@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Reflection;
 using AStar;
 using Astral.Classes;
@@ -265,6 +266,21 @@ namespace EntityTools.Reflection
                 }
             }
 
+            public static class BotComs
+            {
+                public static class BotClient
+                {
+                    public static readonly StaticPropertyAccessor<Astral.Functions.TCP.Client.Client> Client =
+                        typeof(Astral.Controllers.BotComs.BotClient)
+                            .GetStaticProperty<Astral.Functions.TCP.Client.Client>("Client");
+
+                    private static readonly Func<Astral.Functions.TCP.Client.Client, System.Net.Sockets.TcpClient>
+                        _tcpClientAccessor = InstanceFieldAccessorFactory
+                            .GetInstanceFieldAccessor<Astral.Functions.TCP.Client.Client, System.Net.Sockets.TcpClient>("\u0002");
+
+                    public static TcpClient Client_TcpClient => _tcpClientAccessor(Client);
+                }
+            }
 
         }
 

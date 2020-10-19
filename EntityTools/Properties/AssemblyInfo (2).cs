@@ -1,16 +1,16 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
+using System.Resources;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("EntityToolCore")]
+[assembly: AssemblyTitle("EntityTools")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("MichaelProg")]
-[assembly: AssemblyProduct("EntityToolCore")]
-[assembly: AssemblyCopyright("MichaelProg ©  2020")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("EntityTools")]
+[assembly: AssemblyCopyright("MichaelProg ©  2019")]
 [assembly: AssemblyTrademark("MichaelProg")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("bd4ed31e-fda2-4b75-a5ff-ac385a9b20df")]
+[assembly: Guid("df7f797e-db7e-44f9-a96a-020cfdb3c51e")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -31,6 +31,10 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.20.1019.0824")]
-[assembly: AssemblyFileVersion("0.20.1019.0824")]
+//[assembly: AssemblyVersion("0.1.*")]
+[assembly: AssemblyVersion("0.20.1018.1958")]
+#pragma warning disable CS7035 // The specified version string does not conform to the recommended format - major.minor.build.revision
+[assembly: AssemblyFileVersion("0.20.1018.1958")]
+#pragma warning restore CS7035 // The specified version string does not conform to the recommended format - major.minor.build.revision
+[assembly: NeutralResourcesLanguage("")]
+

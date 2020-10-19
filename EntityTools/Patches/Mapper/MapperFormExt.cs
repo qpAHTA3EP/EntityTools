@@ -38,7 +38,7 @@ using MyNW.Classes;
 namespace EntityTools.Patches.Mapper
 {
 #if PATCH_ASTRAL
-    public partial class MapperFormExt : XtraForm//, IMapperForm //*/Form
+    public partial class MapperFormExt : XtraForm //*/Form
     {
         #region Инструменты точечного редактирования графа
         /// <summary>
@@ -54,7 +54,7 @@ namespace EntityTools.Patches.Mapper
         /// Хэш-код текущей активной карты
         /// </summary>
         private int _currentMapHash;
-
+        
         /// <summary>
         /// Активный инструмент изменения графа
         /// </summary>
@@ -78,7 +78,16 @@ namespace EntityTools.Patches.Mapper
                 }
             }
         }
-        private IMapperTool _currentTool; 
+        private IMapperTool _currentTool;
+
+        private void ResetToolState()
+        {
+            _currentTool = null;
+            using (_selectedNodes.WriteLock())
+                _selectedNodes.Clear();
+            _undoStack.Clear();
+            InterruptAllModifications();
+        }
         #endregion
 
         /// <summary>
@@ -117,18 +126,14 @@ namespace EntityTools.Patches.Mapper
         }
 
         /// <summary>
+        /// Специальный объект
+        /// </summary>
+        public static Vector3 SpecialObject { get; set; }
+
+        /// <summary>
         /// Координаты курсора мыши, относительно формы <see cref="MapperFormExt"/>
         /// </summary>
         private Point RelativeMousePosition => MapPicture.PointToClient(MousePosition);
-
-        private void ResetToolState()
-        {
-            _currentTool = null;
-            using (_selectedNodes.WriteLock())
-                _selectedNodes.Clear();
-            _undoStack.Clear();
-            InterruptAllModifications();
-        }
 
         #region Инициализация формы
         private MapperFormExt()
@@ -172,6 +177,7 @@ namespace EntityTools.Patches.Mapper
                                                 EntityTools.PluginSettings.Mapper,
                                                 nameof(EntityTools.PluginSettings.Mapper.MaxElevationDifference),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
+
             editEquivalenceDistance.DataBindings.Add(nameof(editEquivalenceDistance.EditValue),
                                                 EntityTools.PluginSettings.Mapper,
                                                 nameof(EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance),
@@ -183,11 +189,14 @@ namespace EntityTools.Patches.Mapper
                                                     false, DataSourceUpdateMode.OnPropertyChanged); 
 #endif
 
+#if false
+            // Удаление двойным кликом мыши больше не используется
+
             /* Astral.API.CurrentSettings.DeleteNodeRadius не реализует INotifyPropertyChanged
              * поэтому привязка нижеуказанным методом невозможна
              * menuDeleteRadius.DataBindings.Add(new Binding(nameof(menuDeleteRadius.EditValue),
-                                                EntityTools.PluginSettings.Mapper,
-                                                nameof(Astral.API.CurrentSettings.DeleteNodeRadius))); //*/
+                                        EntityTools.PluginSettings.Mapper,
+                                        nameof(Astral.API.CurrentSettings.DeleteNodeRadius))); //*/
 
             ((ISupportInitialize)bsrcAstralSettings).BeginInit();
             bsrcAstralSettings.DataSource = API.CurrentSettings;
@@ -197,7 +206,8 @@ namespace EntityTools.Patches.Mapper
                                               false, DataSourceUpdateMode.OnPropertyChanged);
             ((ISupportInitialize)bsrcAstralSettings).EndInit();
             editDeleteRadius.Edit.EditValueChanged += handler_DeleteRadiusChanged;
-            editDeleteRadius.Edit.Leave += handler_DeleteRadiusChanged;
+            editDeleteRadius.Edit.Leave += handler_DeleteRadiusChanged; 
+#endif
 
             btnMappingForceLink.DataBindings.Add(nameof(btnMappingForceLink.Checked),
                                                 EntityTools.PluginSettings.Mapper,
@@ -294,7 +304,9 @@ namespace EntityTools.Patches.Mapper
             EntityTools.PluginSettings.Mapper.MapperForm.CustomRegionBarVisible = barCustomRegions.Visible;
             EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible = barStatus.Visible;
 
-            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barNodeTools.Visible && !barCustomRegions.Visible;
+#if false
+            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barNodeTools.Visible && !barCustomRegions.Visible; 
+#endif
 
             EntityTools.PluginSettings.Mapper.MapperForm.Location = Location;
             EntityTools.PluginSettings.Mapper.MapperForm.Size = Size;
@@ -323,6 +335,11 @@ namespace EntityTools.Patches.Mapper
                 lblZoom.Caption = zoomStr;
                 using (_graphics.ReadLock())
                     MapPicture.Image = _graphics.getImage();
+#if true
+                if (SpecialObject?.IsValid == true)
+                    btnLockOnSpecialObject.Visibility = BarItemVisibility.Always;
+                else btnLockOnSpecialObject.Visibility = BarItemVisibility.Never; 
+#endif
             });
 
 
@@ -372,7 +389,7 @@ namespace EntityTools.Patches.Mapper
                     sw.Restart();
                     DrawMapper();
                     sw.Stop();
-                    drawMapperMeasures[currentMesure % 10] = sw.ElapsedTicks;
+                    drawMapperMeasures[currentMesure % 10] = sw.ElapsedMilliseconds;
                     currentMesure++;
                     frames++;
                     if (timeout.IsTimedOut)
@@ -382,7 +399,7 @@ namespace EntityTools.Patches.Mapper
                         frames = 0;
                         timeout.ChangeTime(time);
                     }
-                    statusStr = string.Concat(fps.ToString("N1"), " fps | ", (drawMapperMeasures.Sum() / 10_0000d).ToString("N2"), " ms");
+                    statusStr = string.Concat(fps.ToString("N1"), " fps | ", (drawMapperMeasures.Sum() / 10).ToString("N1"), " ms");
 #endif
 
 
@@ -458,7 +475,7 @@ namespace EntityTools.Patches.Mapper
                     MapperMouseEventArgs me = new MapperMouseEventArgs(e.Button, e.Clicks, x, y);
 
                     var graph = _graphics.VisibleGraph;
-                    using (graph.WriteLock())
+                    using (graph.ReadLock())
                     {
                         using (_selectedNodes.WriteLock())
                         {
@@ -505,7 +522,7 @@ namespace EntityTools.Patches.Mapper
                         _graphics.GetWorldPosition(RelativeMousePosition, out x, out y);
 
                     var graph = _graphics.VisibleGraph;
-                    using (graph.WriteLock())
+                    using (graph.ReadLock())
                     {
                         using (_selectedNodes.WriteLock())
                         {
@@ -561,6 +578,13 @@ namespace EntityTools.Patches.Mapper
             mouseClickPosition.X = 0;
             mouseClickPosition.Y = 0;
         }
+
+        private void handler_LockOnSpecialObject(object sender, ItemClickEventArgs e)
+        {
+            if (SpecialObject?.IsValid == true)
+                CenterOfMap = SpecialObject;
+        }
+
         #endregion
 
         /// <summary>
@@ -726,12 +750,14 @@ namespace EntityTools.Patches.Mapper
                         #endregion
 
                         #region Отрисовка специального объекта, заданного методом showObjectOnMap
-#if false
+#if true
+                        var objectPosition = SpecialObject;
                         if (objectPosition != null && objectPosition.IsValid)
-                            graphicsNW.drawFillEllipse(objectPosition, new Size(7, 7), Brushes.Orange);
+                        {
+                            _graphics.FillTriangleCentered(Brushes.Red, objectPosition, 16);
+                            _graphics.DrawText("!", objectPosition);
+                        }
 
-                        // Отрисовка специальной графики
-                        CustomDraw?.Invoke(graphicsNW); 
 #endif
                         #endregion
 
@@ -1210,12 +1236,13 @@ namespace EntityTools.Patches.Mapper
 
         private void handler_BarVisibleChanged(object sender, EventArgs e)
         {
+#if false
             EntityTools.PluginSettings.Mapper.MapperForm.MappingBarVisible = barMapping.Visible;
             EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible = barStatus.Visible;
             EntityTools.PluginSettings.Mapper.MapperForm.MeshesBarVisible = barMeshes.Visible;
             EntityTools.PluginSettings.Mapper.MapperForm.NodeToolsBarVisible = barNodeTools.Visible;
-            EntityTools.PluginSettings.Mapper.MapperForm.CustomRegionBarVisible = barCustomRegions.Visible;
-
+            EntityTools.PluginSettings.Mapper.MapperForm.CustomRegionBarVisible = barCustomRegions.Visible; 
+#endif
             btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barNodeTools.Visible && !barCustomRegions.Visible;
         }
 
@@ -1280,16 +1307,28 @@ namespace EntityTools.Patches.Mapper
                         succeeded = Patch_Astral_Quester_Core_Save.SaveMesh(zipFile, meshName, mesh); 
                     }
 
-                    if(succeeded)
+#if false
+                    if (succeeded)
                         XtraMessageBox.Show(string.Concat("The profile '", Path.GetFileName(profileName), "' updated:\n\r\t",
-                                                        useExternalMeshFile ? externalMeshFileName +'\\' : string.Empty, meshName,
+                                                        useExternalMeshFile ? externalMeshFileName + '\\' : string.Empty, meshName,
                                                         profileUpdated ? "\n\r\tprofile.xml" : string.Empty));
-                    else XtraMessageBox.Show(string.Concat("Fail to save changes to the profile '", Path.GetFileName(profileName), '\''), "Failed !", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    else XtraMessageBox.Show(string.Concat("Fail to save changes to the profile '", Path.GetFileName(profileName), '\''), "Failed !", MessageBoxButtons.OK, MessageBoxIcon.Warning); 
+#else
+                    if (succeeded)
+                        Astral.Logger.Notify(string.Concat("The profile '", Path.GetFileName(profileName), "' updated:\n\r\t",
+                                                        useExternalMeshFile ? externalMeshFileName + '\\' : string.Empty, meshName,
+                                                        profileUpdated ? "\n\r\tprofile.xml" : string.Empty));
+                    else Astral.Logger.Notify(string.Concat("Fail to save changes to the profile '", Path.GetFileName(profileName), '\''), true);
+#endif
                 }
                 catch (Exception exc)
                 {
                     Logger.WriteLine(exc.ToString());
-                    XtraMessageBox.Show(exc.ToString());
+#if false
+                    XtraMessageBox.Show(exc.ToString()); 
+#else
+                    Astral.Logger.Notify(exc.ToString(), true);
+#endif
                 }
                 finally
                 {

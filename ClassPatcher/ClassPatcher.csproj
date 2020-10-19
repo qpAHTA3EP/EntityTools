@@ -105,8 +105,7 @@
   <ItemGroup>
     <Reference Include="Astral, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\x64\Astral.exe</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\References\x64\Astral.exe</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil, Version=0.11.2.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
       <HintPath>..\packages\Mono.Cecil.0.11.2\lib\net40\Mono.Cecil.dll</HintPath>

@@ -1,27 +1,29 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
-using Astral.Logic;
 using Astral.Logic.Classes.Map;
+using EntityTools.Patches.Mapper;
 using EntityTools.Reflection;
-#if PATCH_ASTRAL && HARMONY
 using MyNW.Classes;
+#if PATCH_ASTRAL && HARMONY
+
 # endif
 
-namespace EntityTools.Patches.Mapper
+namespace EntityTools.Patches.Navmesh
 {
-    internal class Patch_Astral_Navmesh_DrawHotSpots : Patch
+    internal class Patch_Astral_Logic_Navmesh_DrawHotSpots : Patch
     {
-        internal Patch_Astral_Navmesh_DrawHotSpots()
+        private static readonly Brush brush = Brushes.Yellow;
+
+        internal Patch_Astral_Logic_Navmesh_DrawHotSpots()
         {
-            MethodInfo mi = typeof(Navmesh).GetMethod("DrawHotSpots", ReflectionHelper.DefaultFlags);
+            MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("DrawHotSpots", ReflectionHelper.DefaultFlags);
             if (mi != null)
             {
                 methodToReplace = mi;
             }
-            else throw new Exception("Patch_Astral_Navmesh_DrawHotSpots: fail to initialize 'methodToReplace'");
+            else throw new Exception("Patch_Astral_Logic_Navmesh_DrawHotSpots: fail to initialize 'methodToReplace'");
 
             methodToInject = GetType().GetMethod(nameof(DrawHotSpots), ReflectionHelper.DefaultFlags);
         }
@@ -48,27 +50,27 @@ public static void DrawHotSpots(List<Vector3> hotspots, GraphicsNW graph)
                 graphics.GetWorldPosition(0, 0, out double leftX, out double topY);
                 graphics.GetWorldPosition(graphics.ImageWidth, graphics.ImageHeight, out double rightX, out double downY);
 
-                Brush brush = Brushes.Yellow;
                 for(int i = 0; i < hotspots.Count; i++)
                 {
                     Vector3 spot = hotspots[i];
-
+                    double x = spot.X;
+                    double y = spot.Y;
                     // Отсеиваем и не отрисовываем HotSpot'ы, расположенные за пределами видимого изображения
-                    if (leftX <= spot.X && spot.X <= rightX
-                        && downY <= spot.Y && spot.Y <= topY)
+                    if (leftX <= x && x <= rightX
+                        && downY <= y && y <= topY)
                     {
-                        graphics.FillCircleCentered(brush, spot, 12);
-                        graphics.drawString(spot, i.ToString(), 8, Brushes.Blue, -1, (i < 10) ? -6 : -12);
+                        graphics.FillCircleCentered(brush, x, y, 16);
+                        //graphics.drawString(spot, i.ToString(), 8, Brushes.Blue, -1, (i < 10) ? -6 : -12);
+                        graphics.DrawText(i.ToString(), x, y);
                     }
                 } 
             }
             else
             {
-                Brush blue = Brushes.Yellow;
                 Vector3 startPos = new Vector3();
                 foreach (Vector3 vector in hotspots)
                 {
-                    graphicsNW.drawFillEllipse(vector, new Size(12, 12), blue);
+                    graphicsNW.drawFillEllipse(vector, new Size(12, 12), Brushes.Blue);
                     graphicsNW.drawString(vector, hotspots.IndexOf(vector).ToString(), 8, Brushes.Blue, -1, -6);
                 }
             }

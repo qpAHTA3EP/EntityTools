@@ -175,6 +175,7 @@ namespace EntityTools.Core
             this.btnTest1.TabIndex = 2;
             this.btnTest1.Text = "Test 1";
             this.btnTest1.UseVisualStyleBackColor = true;
+            this.btnTest1.Visible = false;
             this.btnTest1.Click += new System.EventHandler(this.event_Test_1);
             // 
             // bntTest2
@@ -187,17 +188,18 @@ namespace EntityTools.Core
             this.bntTest2.TabIndex = 2;
             this.bntTest2.Text = "Test 2";
             this.bntTest2.UseVisualStyleBackColor = true;
+            this.bntTest2.Visible = false;
             this.bntTest2.Click += new System.EventHandler(this.event_Test_2);
             // 
             // btnTest3
             // 
             this.btnTest3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnTest3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnTest3.Location = new System.Drawing.Point(301, 218);
+            this.btnTest3.Location = new System.Drawing.Point(185, 218);
             this.btnTest3.Name = "btnTest3";
-            this.btnTest3.Size = new System.Drawing.Size(54, 23);
+            this.btnTest3.Size = new System.Drawing.Size(170, 23);
             this.btnTest3.TabIndex = 2;
-            this.btnTest3.Text = "Test 3";
+            this.btnTest3.Text = "Test current Graph";
             this.btnTest3.UseVisualStyleBackColor = true;
             this.btnTest3.Click += new System.EventHandler(this.event_Test_3);
             // 

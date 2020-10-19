@@ -252,7 +252,7 @@ namespace EntityTools.Settings
         private Size _size = new Size(396, 396);
 
         /// <summary>
-        /// Видимость главной панели инструментов
+        /// Видимость панели прокладывания путей
         /// </summary>
         [Bindable(true)]
         public bool MappingBarVisible
@@ -288,7 +288,7 @@ namespace EntityTools.Settings
         private bool _meshesBarVisible = true;
 
         /// <summary>
-        /// Видимость панели редактирования вершины и ребер
+        /// Видимость панели редактирования вершин и ребер
         /// </summary>
         [Bindable(true)]
         public bool NodeToolsBarVisible

@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.1013.1451</AssemblyVersion>
+    <AssemblyVersion>0.20.1019.0824</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -20,7 +20,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, PATCH_ASTRAL, HARMONY, ENTITYTOOLS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, PATCH_LOG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
@@ -187,6 +187,8 @@
     <Compile Include="Core\Proxies\QuesterConditionProxy.cs" />
     <Compile Include="Core\Proxies\UCCActionProxy.cs" />
     <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
+    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_GetNearestNodeFromPosition.cs" />
+    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_TotalDistance.cs" />
     <Compile Include="Patches\Mapper\MapperGraphics.cs" />
     <Compile Include="Patches\Mapper\MapperHelper.cs" />
     <Compile Include="Patches\Mapper\PointHelper.cs" />
@@ -199,12 +201,16 @@
     <Compile Include="Patches\Mapper\Tools\RelocateNodesTool.cs" />
     <Compile Include="Patches\Mapper\Tools\EditEdgeTool.cs" />
     <Compile Include="Patches\Mapper\Tools\RemoveNodesTool.cs" />
-    <Compile Include="Patches\Patch_Astral_Navmesh_DrawHotSpots.cs" />
+    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_DrawHotSpots.cs" />
+    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_getPath.cs" />
+    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_GenerateRoad.cs" />
     <Compile Include="Patches\Patch_Astral_Quester_Core_Save.cs" />
-    <Compile Include="Patches\Patch_Astral_Navmesh_DrawRoad.cs" />
+    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_DrawRoad.cs" />
     <Compile Include="Patches\Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes.cs" />
     <Compile Include="Patches\Patch_VIP_SealTraderEntity.cs" />
     <Compile Include="Patches\Patch_VIP_ProfessionVendorEntity.cs" />
+    <Compile Include="Patches\Quester.Controllers.Road\Patch_Quester_Controllers_Road_PathDistance.cs" />
+    <Compile Include="Patches\Quester.Controllers.Road\Patch_Quester_Controllers_Road_GenerateRoadFromPlayer.cs" />
     <Compile Include="Patches\UCC\Patch_ActionsPlayer_CheckAlly.cs" />
     <Compile Include="Patches\UCC\Patch_AddClass_Show.cs" />
     <Compile Include="Patches\XmlSerializer\Patch_XmlSerializer_GetExtraTypes.cs" />

@@ -188,12 +188,20 @@ namespace EntityTools.Patches
 
                 Astral.Controllers.Settings.Get.LastQuesterProfile = profileName;
 
-                XtraMessageBox.Show(string.Concat("Profile '", profileName, "' saved"));
+#if false
+                XtraMessageBox.Show(string.Concat("Profile '", profileName, "' saved")); 
+#else
+                Astral.Logger.Notify(string.Concat("Profile '", profileName, "' saved"));
+#endif
             }
             catch (Exception exc)
             {
                 ETLogger.WriteLine(LogType.Error, exc.ToString(), true);
-                XtraMessageBox.Show(exc.ToString());
+#if false
+                XtraMessageBox.Show(exc.ToString()); 
+#else
+                Astral.Logger.Notify(string.Concat("Profile '", profileName, "' saved"), true);
+#endif
             }
             finally
             {

@@ -39,6 +39,21 @@
         Unidirectional,
         Stoped
     }
+    /// <summary>
+    /// Выравнивание (точки в прямоугольнике)
+    /// </summary>
+    public enum Alignment
+    {
+        TopLeft,
+        TopCenter,
+        TopRight,
+        MiddleLeft,
+        MiddleCenter,
+        MiddleRight,
+        BottomLeft,
+        BottomCenter,
+        BottomRight,
+    }
 
     /// <summary>
     /// Режим перетаскивания якорей CustomRegion'a

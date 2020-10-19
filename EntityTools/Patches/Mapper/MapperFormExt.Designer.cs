@@ -55,6 +55,9 @@ namespace EntityTools.Patches.Mapper
             this.seEquivalenceDistance = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
             this.editDeleteRadius = new DevExpress.XtraBars.BarEditItem();
             this.seDeleteRadius = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
+            this.editBidirPathColor = new DevExpress.XtraBars.BarEditItem();
+            this.editItemColor = new DevExpress.XtraEditors.Repository.RepositoryItemColorEdit();
+            this.editUnidirPathColor = new DevExpress.XtraBars.BarEditItem();
             this.barNodeTools = new DevExpress.XtraBars.Bar();
             this.btnUndo = new DevExpress.XtraBars.BarButtonItem();
             this.groupEditMeshes = new DevExpress.XtraBars.BarButtonGroup();
@@ -85,10 +88,12 @@ namespace EntityTools.Patches.Mapper
             this.btnCRCancel = new DevExpress.XtraBars.BarButtonItem();
             this.barStatus = new DevExpress.XtraBars.Bar();
             this.btnLockMapOnPlayer = new DevExpress.XtraBars.BarCheckItem();
+            this.groupSaveUndo = new DevExpress.XtraBars.BarButtonGroup();
             this.groupZoom = new DevExpress.XtraBars.BarButtonGroup();
             this.btnZoomIn = new DevExpress.XtraBars.BarButtonItem();
             this.lblZoom = new DevExpress.XtraBars.BarStaticItem();
             this.btnZoomOut = new DevExpress.XtraBars.BarButtonItem();
+            this.btnLockOnSpecialObject = new DevExpress.XtraBars.BarButtonItem();
             this.lblMousePos = new DevExpress.XtraBars.BarStaticItem();
             this.barDockControlTop = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlBottom = new DevExpress.XtraBars.BarDockControl();
@@ -99,21 +104,17 @@ namespace EntityTools.Patches.Mapper
             this.bsrcAstralSettings = new System.Windows.Forms.BindingSource(this.components);
             this.btnShowStatBar = new System.Windows.Forms.Button();
             this.MapPicture = new System.Windows.Forms.PictureBox();
-            this.groupSaveUndo = new DevExpress.XtraBars.BarButtonGroup();
-            this.editBidirPathColor = new DevExpress.XtraBars.BarEditItem();
-            this.editItemColor = new DevExpress.XtraEditors.Repository.RepositoryItemColorEdit();
-            this.editUnidirPathColor = new DevExpress.XtraBars.BarEditItem();
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.popMenuOptions)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seWaypointDistance)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seMaxZDifference)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seEquivalenceDistance)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seDeleteRadius)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.editItemColor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.itemEditCRList)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.itemEditCRName)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bsrcAstralSettings)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.MapPicture)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.editItemColor)).BeginInit();
             this.SuspendLayout();
             // 
             // backgroundWorker
@@ -181,8 +182,9 @@ namespace EntityTools.Patches.Mapper
             this.lblZoom,
             this.groupSaveUndo,
             this.editBidirPathColor,
-            this.editUnidirPathColor});
-            this.barManager.MaxItemId = 128;
+            this.editUnidirPathColor,
+            this.btnLockOnSpecialObject});
+            this.barManager.MaxItemId = 129;
             this.barManager.OptionsLayout.AllowAddNewItems = false;
             this.barManager.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.seDeleteRadius,
@@ -388,6 +390,31 @@ namespace EntityTools.Patches.Mapper
             0,
             0});
             this.seDeleteRadius.Name = "seDeleteRadius";
+            // 
+            // editBidirPathColor
+            // 
+            this.editBidirPathColor.Caption = "Bidir Path";
+            this.editBidirPathColor.Edit = this.editItemColor;
+            this.editBidirPathColor.Id = 126;
+            this.editBidirPathColor.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.editBidirPathColor.ImageOptions.Image = global::EntityTools.Properties.Resources.miniBiPath;
+            this.editBidirPathColor.Name = "editBidirPathColor";
+            // 
+            // editItemColor
+            // 
+            this.editItemColor.AutoHeight = false;
+            this.editItemColor.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.editItemColor.Name = "editItemColor";
+            // 
+            // editUnidirPathColor
+            // 
+            this.editUnidirPathColor.Caption = "Unid Path";
+            this.editUnidirPathColor.Edit = this.editItemColor;
+            this.editUnidirPathColor.Id = 127;
+            this.editUnidirPathColor.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.editUnidirPathColor.ImageOptions.Image = global::EntityTools.Properties.Resources.miniUniPath;
+            this.editUnidirPathColor.Name = "editUnidirPathColor";
             // 
             // barNodeTools
             // 
@@ -686,6 +713,7 @@ namespace EntityTools.Patches.Mapper
             new DevExpress.XtraBars.LinkPersistInfo(this.btnLockMapOnPlayer),
             new DevExpress.XtraBars.LinkPersistInfo(this.groupSaveUndo, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.groupZoom, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnLockOnSpecialObject),
             new DevExpress.XtraBars.LinkPersistInfo(this.lblMousePos, true)});
             this.barStatus.OptionsBar.AllowQuickCustomization = false;
             this.barStatus.OptionsBar.DrawDragBorder = false;
@@ -703,6 +731,14 @@ namespace EntityTools.Patches.Mapper
             this.btnLockMapOnPlayer.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
                 | System.Windows.Forms.Keys.P));
             this.btnLockMapOnPlayer.Name = "btnLockMapOnPlayer";
+            // 
+            // groupSaveUndo
+            // 
+            this.groupSaveUndo.Caption = "SaveUndo";
+            this.groupSaveUndo.Id = 125;
+            this.groupSaveUndo.ItemLinks.Add(this.btnUndo);
+            this.groupSaveUndo.ItemLinks.Add(this.btnSaveMeshes);
+            this.groupSaveUndo.Name = "groupSaveUndo";
             // 
             // groupZoom
             // 
@@ -738,6 +774,16 @@ namespace EntityTools.Patches.Mapper
             this.btnZoomOut.ImageOptions.Image = global::EntityTools.Properties.Resources.miniZoomOut;
             this.btnZoomOut.Name = "btnZoomOut";
             this.btnZoomOut.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ZoomOut);
+            // 
+            // btnLockOnSpecialObject
+            // 
+            this.btnLockOnSpecialObject.Alignment = DevExpress.XtraBars.BarItemLinkAlignment.Right;
+            this.btnLockOnSpecialObject.Caption = "Lock On SpecialObject";
+            this.btnLockOnSpecialObject.Id = 128;
+            this.btnLockOnSpecialObject.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.btnLockOnSpecialObject.ImageOptions.Image = global::EntityTools.Properties.Resources.miniTarget;
+            this.btnLockOnSpecialObject.Name = "btnLockOnSpecialObject";
+            this.btnLockOnSpecialObject.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_LockOnSpecialObject);
             // 
             // lblMousePos
             // 
@@ -828,39 +874,6 @@ namespace EntityTools.Patches.Mapper
             this.MapPicture.MouseUp += new System.Windows.Forms.MouseEventHandler(this.handler_MouseUp);
             this.MapPicture.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
-            // groupSaveUndo
-            // 
-            this.groupSaveUndo.Caption = "SaveUndo";
-            this.groupSaveUndo.Id = 125;
-            this.groupSaveUndo.ItemLinks.Add(this.btnUndo);
-            this.groupSaveUndo.ItemLinks.Add(this.btnSaveMeshes);
-            this.groupSaveUndo.Name = "groupSaveUndo";
-            // 
-            // editBidirPathColor
-            // 
-            this.editBidirPathColor.Caption = "Bidir Path";
-            this.editBidirPathColor.Edit = this.editItemColor;
-            this.editBidirPathColor.Id = 126;
-            this.editBidirPathColor.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
-            this.editBidirPathColor.ImageOptions.Image = global::EntityTools.Properties.Resources.miniBiPath;
-            this.editBidirPathColor.Name = "editBidirPathColor";
-            // 
-            // editItemColor
-            // 
-            this.editItemColor.AutoHeight = false;
-            this.editItemColor.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.editItemColor.Name = "editItemColor";
-            // 
-            // editUnidirPathColor
-            // 
-            this.editUnidirPathColor.Caption = "Unid Path";
-            this.editUnidirPathColor.Edit = this.editItemColor;
-            this.editUnidirPathColor.Id = 127;
-            this.editUnidirPathColor.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
-            this.editUnidirPathColor.ImageOptions.Image = global::EntityTools.Properties.Resources.miniUniPath;
-            this.editUnidirPathColor.Name = "editUnidirPathColor";
-            // 
             // MapperFormExt
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -890,11 +903,11 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.seMaxZDifference)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seEquivalenceDistance)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seDeleteRadius)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.editItemColor)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.itemEditCRList)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.itemEditCRName)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bsrcAstralSettings)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.MapPicture)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.editItemColor)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -971,6 +984,7 @@ namespace EntityTools.Patches.Mapper
         private BarEditItem editBidirPathColor;
         private RepositoryItemColorEdit editItemColor;
         private BarEditItem editUnidirPathColor;
+        private BarButtonItem btnLockOnSpecialObject;
     } 
 #endif
 }

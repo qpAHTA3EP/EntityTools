@@ -611,7 +611,14 @@ namespace EntityTools.Core
             Action<Vector3, double> RemoveNodesFrom2DPosition = typeof(Astral.Quester.Core).GetStaticAction<Vector3, double>("RemoveNodesFrom2DPostion");
         }
     private void event_Test_3(object sender, EventArgs e)
-        {
+    {
+        var graph = AstralAccessors.Quester.Core.Meshes.Value;
+
+        int errorNum = graph.Validate();
+
+        if (errorNum > 0)
+            XtraMessageBox.Show("Graph is correct");
+        else XtraMessageBox.Show($"There is {errorNum} errors in the Graph");
         }
 
         private void event_OpenUccEditor(object sender, EventArgs e)

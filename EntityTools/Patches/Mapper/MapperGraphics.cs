@@ -74,7 +74,7 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Объект синхронизации доступа к объекту <see cref="graphicsNW"/>
         /// </summary>
-        private readonly ReaderWriterLockSlim @lock = new ReaderWriterLockSlim();
+        private readonly ReaderWriterLockSlim @lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
         /// <summary>
         /// Объект синхронизации для "чтения", допускающий одновременное чтение
@@ -529,6 +529,70 @@ namespace EntityTools.Patches.Mapper
             GetImagePosition(worldX1, worldY1, out double x1, out double y1);
             GetImagePosition(worldX2, worldY2, out double x2, out double y2);
             graphics.DrawLine(pen, (float)x1, (float)y1, (float)x2, (float)y2);
+        }
+
+        /// <summary>
+        /// Отрисовка текста<paramref name="text"/> в точке  <paramref name="worldPoint"/>,
+        /// положение которой в прямоугольнике, охватывающем текс задано параметром <paramref name="align"/>
+        /// </summary>
+        public void DrawText<TPoint>(string text, TPoint worldPoint, Alignment align = Alignment.TopLeft, Font font = null, Brush brush = null)
+        {
+            PointHelper.GetXY(worldPoint, out double x, out double y);
+            DrawText(text, x, y, align, font, brush);
+        }
+
+        public void DrawText(string text, double worldX, double worldY, Alignment align = Alignment.MiddleCenter, Font font = null, Brush brush = null)
+        {
+            if (font is null)
+                font = SystemFonts.DefaultFont;
+            if (brush is null)
+                brush = Brushes.Black;
+
+            var size = graphics.MeasureString(text, font);
+
+            GetImagePosition(worldX, worldY, out double x, out double y);
+
+            switch (align)
+            {
+                case Alignment.TopLeft:
+                    x += 0.5f;
+                    y += 0.5f;
+                    break;
+                case Alignment.TopCenter:
+                    x -= size.Width / 2 - 0.5f;
+                    y += 0.5f;
+                    break;
+                case Alignment.TopRight:
+                    x -= size.Width - 0.5f;
+                    y += 0.5f;
+                    break;
+                case Alignment.MiddleLeft:
+                    x += 0.5f;
+                    y -= size.Height / 2 - 0.5f;
+                    break;
+                case Alignment.MiddleCenter:
+                    x -= size.Width / 2 - 0.5f;
+                    y -= size.Height / 2 - 0.5f;
+                    break;
+                case Alignment.MiddleRight:
+                    x -= size.Width - 0.5f;
+                    y -= size.Height / 2 - 0.5f;
+                    break;
+                case Alignment.BottomLeft:
+                    x += 0.5f;
+                    y -= size.Height - 0.5f;
+                    break;
+                case Alignment.BottomCenter:
+                    x -= size.Width / 2;
+                    y -= size.Height - 0.5f;
+                    break;
+                case Alignment.BottomRight:
+                    x -= size.Width - 0.5f;
+                    y -= size.Height - 0.5f;
+                    break;
+            }
+
+            graphics.DrawString(text, font, brush, (float)x, (float)y);
         }
     }
 }

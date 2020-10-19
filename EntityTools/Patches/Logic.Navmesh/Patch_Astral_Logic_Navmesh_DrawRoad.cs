@@ -2,23 +2,27 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
-using Astral.Logic;
 using Astral.Logic.Classes.Map;
+using EntityTools.Patches.Mapper;
 using EntityTools.Reflection;
 using MyNW.Classes;
 
-namespace EntityTools.Patches.Mapper
+namespace EntityTools.Patches.Navmesh
 {
-    internal class Patch_Astral_Navmesh_DrawRoad : Patch
+    internal class Patch_Astral_Logic_Navmesh_DrawRoad : Patch
     {
-        internal Patch_Astral_Navmesh_DrawRoad()
+
+        private static readonly Brush brush = Brushes.Blue;
+        private static readonly Pen pen = new Pen(Color.Blue, 2);
+
+        internal Patch_Astral_Logic_Navmesh_DrawRoad()
         {
-            MethodInfo mi = typeof(Navmesh).GetMethod("DrawRoad", ReflectionHelper.DefaultFlags);
+            MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("DrawRoad", ReflectionHelper.DefaultFlags);
             if (mi != null)
             {
                 methodToReplace = mi;
             }
-            else throw new Exception("Patch_Astral_Navmesh_DrawRoad: fail to initialize 'methodToReplace'");
+            else throw new Exception("Patch_Astral_Logic_Navmesh_DrawRoad: fail to initialize 'methodToReplace'");
 
             methodToInject = GetType().GetMethod(nameof(DrawRoad), ReflectionHelper.DefaultFlags);
         }
@@ -44,42 +48,59 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Отрисовка пути <paramref name="waypoints"/> на <paramref name="graphicsNW"/>
         /// </summary>
-        public static void DrawRoad(List<Vector3> road, GraphicsNW graphicsNW)
+        public static void DrawRoad(List<Vector3> waypoints, GraphicsNW graphicsNW)
         {
             if (graphicsNW is MapperGraphics mapGraphics)
             {
                 mapGraphics.GetWorldPosition(0, 0, out double topLeftX, out double topLeftY);
                 mapGraphics.GetWorldPosition(mapGraphics.ImageWidth, mapGraphics.ImageHeight, out double downRightX, out double downRightY);
 
-                Brush brush = Brushes.Blue;
-                Pen pen = new Pen(Color.Blue, 2);
-                
-                using (var wp = road.GetEnumerator())
+                using (var wp = waypoints.GetEnumerator())
                 {
                     if(wp.MoveNext())
                     {
+#if Labeling_Waypoints
+                        int i = 0; 
+#endif
                         Vector3 startPos = wp.Current;
                         bool startVisible = false,
                             endVisible = false;
+                        double x = startPos.X,
+                               y = startPos.Y;
                         // Отсеиваем и не отрисовываем точки пути, расположенные за пределами видимого изображения
-                        if (topLeftX <= startPos.X && startPos.X <= downRightX
-                            && downRightY <= startPos.Y && startPos.Y <= topLeftY)
+                        if (topLeftX <= x && x <= downRightX
+                            && downRightY <= y && y <= topLeftY)
                         {
-                            mapGraphics.FillCircleCentered(brush, startPos, 6);
+                            mapGraphics.FillCircleCentered(brush, x, y, 6);
+#if Labeling_Waypoints
+                            mapGraphics.DrawText(i.ToString(), x, y, Alignment.TopLeft, SystemFonts.DefaultFont, Brushes.White); 
+#endif
+
                             startVisible = true;
                         }
+#if Labeling_Waypoints
+                        i++; 
+#endif
                         while (wp.MoveNext())
                         {
                             Vector3 endPos = wp.Current;
+                            x = endPos.X;
+                            y = endPos.Y;
                             // Отсеиваем и не отрисовываем точки пути, расположенные за пределами видимого изображения
-                            if (topLeftX <= endPos.X && endPos.X <= downRightX
-                                && downRightY <= endPos.Y && endPos.Y <= topLeftY)
+                            if (topLeftX <= x && x <= downRightX
+                                && downRightY <= y && y <= topLeftY)
                             {
-                                mapGraphics.FillCircleCentered(brush, endPos, 6);
+                                mapGraphics.FillCircleCentered(brush, x, y, 6);
+#if Labeling_Waypoints
+                                mapGraphics.DrawText(i.ToString(), x, y, Alignment.TopLeft, SystemFonts.DefaultFont, Brushes.White); 
+#endif
                                 endVisible = true;
                             }
                             else endVisible = false;
-                            if(startVisible || endVisible)
+#if Labeling_Waypoints
+                            i++; 
+#endif
+                            if (startVisible || endVisible)
                                 mapGraphics.DrawLine(pen, startPos.X, startPos.Y, endPos.X, endPos.Y);
                             startPos = endPos;
                             startVisible = endVisible;
@@ -91,7 +112,7 @@ namespace EntityTools.Patches.Mapper
             {
                 Brush blue = Brushes.Blue;
                 Vector3 startPos = new Vector3();
-                foreach (Vector3 endPos in road)
+                foreach (Vector3 endPos in waypoints)
                 {
                     graphicsNW.drawFillEllipse(endPos, new Size(4, 4), blue);
                     if (startPos.IsValid)

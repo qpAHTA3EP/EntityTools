@@ -527,9 +527,9 @@ namespace EntityCore.Quester.Action
                     mapGraphics.FillRhombCentered(Brushes.Yellow, target.Location, 16, 16);
                     if (@this._distance > 11)
                     {
-                        mapGraphics.DrawEllipse(Pens.Yellow, x - @this._distance, y + @this._distance, diaD, diaD, true);
+                        mapGraphics.DrawCircleCentered(Pens.Yellow, x, y, diaD, true);
                         if (@this._abortCombatDistance > @this._distance)
-                            mapGraphics.DrawEllipse(Pens.Yellow, x - @this._abortCombatDistance, y + @this._abortCombatDistance, diaACD, diaACD, true);
+                            mapGraphics.DrawCircleCentered(Pens.Yellow, x, y, diaACD, true);
                     }
                     
                     if (ValidateEntity(closestEntity) && target.ContainerId != closestEntity.ContainerId)
@@ -537,13 +537,13 @@ namespace EntityCore.Quester.Action
                         x = closestEntity.Location.X;
                         y = closestEntity.Location.Y;
 
-                        mapGraphics.FillUpsideTriangleCentered(Brushes.LightYellow, target.Location, 10);
+                        mapGraphics.FillRhombCentered(Brushes.White, closestEntity.Location, 16, 16);
 
                         if (@this._distance > 11)
                         {
-                            mapGraphics.DrawEllipse(Pens.Yellow, x - @this._distance, y + @this._distance, diaD, diaD, true);
+                            mapGraphics.DrawCircleCentered(Pens.White, x, y, diaD, true);
                             if (@this._abortCombatDistance > @this._distance)
-                                mapGraphics.DrawEllipse(Pens.Yellow, x - @this._abortCombatDistance, y + @this._abortCombatDistance, diaACD, diaACD, true);
+                                mapGraphics.DrawCircleCentered(Pens.White, x, y, diaACD, true);
                         }
                     }
                 }

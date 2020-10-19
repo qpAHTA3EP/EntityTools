@@ -36,7 +36,7 @@ namespace ClassPatcher
                                             foreach (var mDef in tDef.Methods)
                                             {
                                                 dump.WriteLine();
-                                                dump.WriteLine("Method: " + mDef.ToString());
+                                                dump.WriteLine("Method: " + mDef);
                                                 dump.WriteLine();
                                                 dump.WriteLine("Variables:");
                                                 foreach (var varDef in mDef.Body.Variables)
@@ -172,12 +172,15 @@ namespace ClassPatcher
                         tDef.FullName == "Astral.Controllers.Relogger" ||
                         tDef.FullName == "Astral.Controllers.CustomClasses" ||
                         tDef.FullName == "Astral.Controllers.AOECheck" ||
+                        tDef.FullName == "Astral.Controllers.BotComs.BotClient" ||
                         tDef.Name == "AOE" || // "Astral.Controllers.AOECheck.AOE"
                         tDef.FullName == "Astral.Controllers.AOECheck.AOE" ||
                         tDef.FullName == "Astral.Logic.Classes.Map.Functions.Picture" ||
                         tDef.FullName == "Astral.Logic.UCC.Controllers.Movements" ||
                         tDef.Name == "DodgeLosTestResult" || //Astral.Logic.NW.Movements.DodgeLosTestResult
-                        tDef.FullName == "Astral.Quester.FSM.States.Combat")
+                        tDef.FullName == "Astral.Quester.FSM.States.Combat" ||
+                        tDef.FullName == "Astral.Quester.Controllers.Road"||
+                        tDef.Name == "Road")
 
                     {
                         tDef.IsPublic = true;
