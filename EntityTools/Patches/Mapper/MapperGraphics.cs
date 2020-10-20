@@ -103,12 +103,11 @@ namespace EntityTools.Patches.Mapper
         /// <returns></returns>
         public PointF GetImagePosition<TPoint>(TPoint worldPos)
         {
-            var img = image;
             double scale = Zoom;
             PointHelper.GetXY(worldPos, out double worldX, out double worldY);
 
-            double x = img.Width / 2.0 - (CenterPosition.X - worldY) * scale;// - 0.5f;
-            double y = img.Height / 2.0 - (worldX - CenterPosition.Y) * scale;// - 0.5f;
+            double x = ImageWidth / 2.0 - (CenterPosition.X - worldY) * scale;// - 0.5f;
+            double y = ImageHeight / 2.0 - (worldX - CenterPosition.Y) * scale;// - 0.5f;
 
             return new PointF((float)x, (float)y);
 #if false
@@ -132,23 +131,21 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public void GetImagePosition<TPoint>(TPoint worldPos, out double x, out double y)
         {
-            var img = image;
             double scale = Zoom;
             PointHelper.GetXY(worldPos, out double worldX, out double worldY);
 
-            x = img.Width / 2.0 - (CenterPosition.X - worldX) * scale;// - 0.5;
-            y = img.Height / 2.0 - (worldY - CenterPosition.Y) * scale;// - 0.5;
+            x = ImageWidth / 2.0 - (CenterPosition.X - worldX) * scale;// - 0.5;
+            y = ImageHeight / 2.0 - (worldY - CenterPosition.Y) * scale;// - 0.5;
         }
         /// <summary>
         /// Перевод игровых координат <param name="worldX"/>, <param name="worldY"/> в координаты изображения
         /// </summary>
         public void GetImagePosition(double worldX, double worldY, out double x, out double y)
         {
-            var img = image;
             double scale = Zoom;
 
-            x = img.Width / 2.0 - (CenterPosition.X - worldX) * scale;// - 0.5;
-            y = img.Height / 2.0 - (worldY - CenterPosition.Y) * scale;// - 0.5;
+            x = ImageWidth / 2.0 - (CenterPosition.X - worldX) * scale;// - 0.5;
+            y = ImageHeight / 2.0 - (worldY - CenterPosition.Y) * scale;// - 0.5;
         }
 
         /// <summary>
@@ -157,11 +154,10 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public void GetWorldPosition(Point imgPos, out double x, out double y)
         {
-            var img = image;
             double scale = Zoom;
 
-            x = CenterPosition.X - (img.Width / 2.0 - imgPos.X /*- 0.75*/) / scale;
-            y = CenterPosition.Y + (img.Height / 2.0 - imgPos.Y /*- 0.75*/) / scale;
+            x = CenterPosition.X - (ImageWidth / 2.0 - imgPos.X /*- 0.75*/) / scale;
+            y = CenterPosition.Y + (ImageHeight / 2.0 - imgPos.Y /*- 0.75*/) / scale;
 #if false
         public static Vector3 getWorldPos(Point imgPoint, int boxWidth, int boxHeight, Vector3 centerPos, double Zoom)
 		{
@@ -184,11 +180,10 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public void GetWorldPosition(double imgX, double imgY, out double x, out double y)
         {
-            var img = image;
             double scale = Zoom;
 
-            x = CenterPosition.X - (img.Width / 2.0 - imgX /*- 0.75*/) / scale;
-            y = CenterPosition.Y + (img.Height / 2.0 - imgY /*- 0.75*/) / scale;
+            x = CenterPosition.X - (ImageWidth / 2.0 - imgX /*- 0.75*/) / scale;
+            y = CenterPosition.Y + (ImageHeight / 2.0 - imgY /*- 0.75*/) / scale;
         }
 
 #if false
