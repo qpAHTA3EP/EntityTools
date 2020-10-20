@@ -164,19 +164,26 @@ namespace EntityTools.Patches.Mapper
                                                 nameof(EntityTools.PluginSettings.Mapper.ForceLinkingWaypoint),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 
-            editBidirPathColor.DataBindings.Add(nameof(editBidirPathColor.EditValue),
-                                                EntityTools.PluginSettings.Mapper.MapperForm,
-                                                nameof(EntityTools.PluginSettings.Mapper.MapperForm.BidirectionalPathColor),
+            btnMappingLinearPath.DataBindings.Add(nameof(btnMappingLinearPath.Checked),
+                                                EntityTools.PluginSettings.Mapper,
+                                                nameof(EntityTools.PluginSettings.Mapper.LinearPath),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 
-            colorEditBidirPath.DataBindings.Add(nameof(colorEditBidirPath.EditValue),
-                                                EntityTools.PluginSettings.Mapper.MapperForm,
-                                                nameof(EntityTools.PluginSettings.Mapper.MapperForm.BidirectionalPathColor),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
+#if false
+            editBidirPathColor.DataBindings.Add(nameof(editBidirPathColor.EditValue),
+                                        EntityTools.PluginSettings.Mapper.MapperForm,
+                                        nameof(EntityTools.PluginSettings.Mapper.MapperForm.BidirectionalPathColor),
+                                        false, DataSourceUpdateMode.OnPropertyChanged); 
 
             editUnidirPathColor.DataBindings.Add(nameof(editUnidirPathColor.EditValue),
                                                 EntityTools.PluginSettings.Mapper.MapperForm,
                                                 nameof(EntityTools.PluginSettings.Mapper.MapperForm.UnidirectionalPathColor),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
+#endif
+
+            colorEditBidirPath.DataBindings.Add(nameof(colorEditBidirPath.EditValue),
+                                                EntityTools.PluginSettings.Mapper.MapperForm,
+                                                nameof(EntityTools.PluginSettings.Mapper.MapperForm.BidirectionalPathColor),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 
             colorEditUnidirPath.DataBindings.Add(nameof(colorEditUnidirPath.EditValue),
@@ -285,17 +292,21 @@ namespace EntityTools.Patches.Mapper
         {
             string formCaption = string.Empty,
                    statusStr = string.Empty,
+                   playerPosStr = string.Empty,
+                   mousePosStr = string.Empty,
                    zoomStr = string.Empty;
             //Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
 
             var updateFormStatus = new Action(() =>
             {
                 Text = formCaption;
-                lblMousePos.Caption = statusStr;
+                lblMousePos.Caption = mousePosStr;
+                lblPlayerPos.Caption = playerPosStr;
+                lblDrawInfo.Caption = statusStr;
                 lblZoom.Caption = zoomStr;
                 using (_graphics.ReadLock())
                     MapPicture.Image = _graphics.getImage();
-#if true
+#if false
                 if (SpecialObject?.IsValid == true)
                     btnLockOnSpecialObject.Visibility = BarItemVisibility.Always;
                 else btnLockOnSpecialObject.Visibility = BarItemVisibility.Never; 
@@ -304,12 +315,13 @@ namespace EntityTools.Patches.Mapper
 
 
 #if DrawMapper_Measuring
+            Timeout timeout = new Timeout(0);
+
             Stopwatch sw = new Stopwatch();
             long[] drawMapperMeasures = new long[10];
             int currentMesure = 0;
 
             int time = 5000;
-            Timeout timeout = new Timeout(0);
             double frames = 0;
             double fps = 0;
 #endif
@@ -327,10 +339,11 @@ namespace EntityTools.Patches.Mapper
                     " [", EntityManager.LocalPlayer.CurrentZoneMapInfo.MapName, ']'); 
 #endif
 
+
                     var player = EntityManager.LocalPlayer;
-#if !DrawMapper_Measuring
+#if true
                     Vector3 pos = player.Location;
-                    statusStr = !player.IsLoading && pos.IsValid ? $"{pos.X:N1} | {pos.Y:N1} | {pos.Z:N1}" : "Loading"; 
+                    playerPosStr = !player.IsLoading && pos.IsValid ? $"{pos.X:N1} | {pos.Y:N1} | {pos.Z:N1}" : "Loading"; 
 #endif
                     zoomStr = string.Concat(Zoom * 100, '%');
 
@@ -361,7 +374,8 @@ namespace EntityTools.Patches.Mapper
                     }
                     statusStr = string.Concat(fps.ToString("N1"), " fps | ", (drawMapperMeasures.Sum() / 10).ToString("N1"), " ms");
 #endif
-
+                    _graphics.GetWorldPosition(RelativeMousePosition, out double mouseX, out double mouseY);
+                    mousePosStr = string.Concat(mouseX.ToString("N1"), " | ", mouseY.ToString("N1"));
 
                     if (InvokeRequired)
                         Invoke(updateFormStatus);
@@ -760,7 +774,7 @@ namespace EntityTools.Patches.Mapper
                         #endregion
 
                         #region Отрисовка специального объекта, заданного методом showObjectOnMap
-#if true
+#if false
                         var objectPosition = SpecialObject;
                         if (objectPosition != null && objectPosition.IsValid)
                         {
@@ -842,6 +856,14 @@ namespace EntityTools.Patches.Mapper
                         }
                         #endregion
 
+                        #region Отрисовка указателя мыши
+                        _graphics.GetWorldPosition(RelativeMousePosition, out double mouseX, out double mouseY);
+                        _graphics.DrawLine(Pens.Gray, mouseX, topBorder, mouseX, downBorder);
+                        _graphics.DrawLine(Pens.Gray, leftBorder, mouseY, rightBorder, mouseY);
+                        _graphics.DrawText(mouseX.ToString("N2"), mouseX, mouseY, Alignment.BottomLeft, DefaultFont, Brushes.Gray);
+                        _graphics.DrawText(mouseY.ToString("N2"), mouseX, mouseY, Alignment.TopLeft, DefaultFont, Brushes.Gray);
+                        #endregion
+
                         #region Отрисовка специальной графики
                         // Отрисовка активного инструмента редактирования
                         try
@@ -850,7 +872,7 @@ namespace EntityTools.Patches.Mapper
                             if (tool != null
                                 && (tool.AllowNodeSelection || tool.HandleCustomDraw))
                             {
-                                _graphics.GetWorldPosition(RelativeMousePosition, out double mouseX, out double mouseY);
+                                //_graphics.GetWorldPosition(RelativeMousePosition, out double mouseX, out double mouseY);
                                 if (tool.AllowNodeSelection)
                                 {
                                     using (_selectedNodes.ReadLock())
@@ -919,7 +941,7 @@ namespace EntityTools.Patches.Mapper
                         x = location.X;
                         y = location.Y;
                         if (leftBorder <= x && x <= rightBorder && downBorder <= y && y <= topBorder)
-                            _graphics.DrawCircleCentered(Pens.Red, location, 12);
+                            _graphics.DrawCircleCentered(Pens.Red, x, y, 14);
                         #endregion
 
                         #region Отрисовка персонажа

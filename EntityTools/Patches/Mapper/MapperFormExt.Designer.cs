@@ -53,11 +53,6 @@ namespace EntityTools.Patches.Mapper
             this.seMaxZDifference = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
             this.editEquivalenceDistance = new DevExpress.XtraBars.BarEditItem();
             this.seEquivalenceDistance = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
-            this.editDeleteRadius = new DevExpress.XtraBars.BarEditItem();
-            this.seDeleteRadius = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
-            this.editBidirPathColor = new DevExpress.XtraBars.BarEditItem();
-            this.editItemColor = new DevExpress.XtraEditors.Repository.RepositoryItemColorEdit();
-            this.editUnidirPathColor = new DevExpress.XtraBars.BarEditItem();
             this.barNodeTools = new DevExpress.XtraBars.Bar();
             this.btnUndo = new DevExpress.XtraBars.BarButtonItem();
             this.groupEditMeshes = new DevExpress.XtraBars.BarButtonGroup();
@@ -87,21 +82,28 @@ namespace EntityTools.Patches.Mapper
             this.btnCREditionAccept = new DevExpress.XtraBars.BarButtonItem();
             this.btnCRCancel = new DevExpress.XtraBars.BarButtonItem();
             this.barStatus = new DevExpress.XtraBars.Bar();
-            this.btnSettings = new DevExpress.XtraBars.BarCheckItem();
             this.btnLockMapOnPlayer = new DevExpress.XtraBars.BarCheckItem();
+            this.btnSettings = new DevExpress.XtraBars.BarCheckItem();
             this.groupSaveUndo = new DevExpress.XtraBars.BarButtonGroup();
             this.groupZoom = new DevExpress.XtraBars.BarButtonGroup();
             this.btnZoomIn = new DevExpress.XtraBars.BarButtonItem();
             this.lblZoom = new DevExpress.XtraBars.BarStaticItem();
             this.btnZoomOut = new DevExpress.XtraBars.BarButtonItem();
-            this.btnLockOnSpecialObject = new DevExpress.XtraBars.BarButtonItem();
+            this.lblPlayerPos = new DevExpress.XtraBars.BarStaticItem();
             this.lblMousePos = new DevExpress.XtraBars.BarStaticItem();
+            this.lblDrawInfo = new DevExpress.XtraBars.BarStaticItem();
             this.barDockControlTop = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlBottom = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlLeft = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlRight = new DevExpress.XtraBars.BarDockControl();
             this.menuImportMesh = new DevExpress.XtraBars.BarButtonItem();
+            this.editDeleteRadius = new DevExpress.XtraBars.BarEditItem();
+            this.seDeleteRadius = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
             this.groupCR = new DevExpress.XtraBars.BarButtonGroup();
+            this.editBidirPathColor = new DevExpress.XtraBars.BarEditItem();
+            this.editItemColor = new DevExpress.XtraEditors.Repository.RepositoryItemColorEdit();
+            this.editUnidirPathColor = new DevExpress.XtraBars.BarEditItem();
+            this.btnLockOnSpecialObject = new DevExpress.XtraBars.BarButtonItem();
             this.bsrcAstralSettings = new System.Windows.Forms.BindingSource(this.components);
             this.btnShowStatBar = new System.Windows.Forms.Button();
             this.MapPicture = new System.Windows.Forms.PictureBox();
@@ -118,10 +120,10 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.seWaypointDistance)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seMaxZDifference)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seEquivalenceDistance)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.seDeleteRadius)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.editItemColor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.itemEditCRList)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.itemEditCRName)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.seDeleteRadius)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.editItemColor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bsrcAstralSettings)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.MapPicture)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelSettings)).BeginInit();
@@ -200,8 +202,10 @@ namespace EntityTools.Patches.Mapper
             this.editBidirPathColor,
             this.editUnidirPathColor,
             this.btnLockOnSpecialObject,
-            this.btnSettings});
-            this.barManager.MaxItemId = 130;
+            this.btnSettings,
+            this.lblPlayerPos,
+            this.lblDrawInfo});
+            this.barManager.MaxItemId = 132;
             this.barManager.OptionsLayout.AllowAddNewItems = false;
             this.barManager.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.seDeleteRadius,
@@ -374,61 +378,6 @@ namespace EntityTools.Patches.Mapper
             this.seEquivalenceDistance.IsFloatValue = false;
             this.seEquivalenceDistance.Mask.EditMask = "N00";
             this.seEquivalenceDistance.Name = "seEquivalenceDistance";
-            // 
-            // editDeleteRadius
-            // 
-            this.editDeleteRadius.Caption = "Node Delete Radius";
-            this.editDeleteRadius.Edit = this.seDeleteRadius;
-            this.editDeleteRadius.Id = 61;
-            this.editDeleteRadius.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
-            this.editDeleteRadius.ImageOptions.Image = global::EntityTools.Properties.Resources.miniTarget;
-            this.editDeleteRadius.Name = "editDeleteRadius";
-            this.editDeleteRadius.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
-            // 
-            // seDeleteRadius
-            // 
-            this.seDeleteRadius.AutoHeight = false;
-            this.seDeleteRadius.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.seDeleteRadius.IsFloatValue = false;
-            this.seDeleteRadius.Mask.EditMask = "N00";
-            this.seDeleteRadius.MaxLength = 4;
-            this.seDeleteRadius.MaxValue = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
-            this.seDeleteRadius.MinValue = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.seDeleteRadius.Name = "seDeleteRadius";
-            // 
-            // editBidirPathColor
-            // 
-            this.editBidirPathColor.Caption = "Bidir Path";
-            this.editBidirPathColor.Edit = this.editItemColor;
-            this.editBidirPathColor.Id = 126;
-            this.editBidirPathColor.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
-            this.editBidirPathColor.ImageOptions.Image = global::EntityTools.Properties.Resources.miniBiPath;
-            this.editBidirPathColor.Name = "editBidirPathColor";
-            // 
-            // editItemColor
-            // 
-            this.editItemColor.AutoHeight = false;
-            this.editItemColor.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.editItemColor.Name = "editItemColor";
-            // 
-            // editUnidirPathColor
-            // 
-            this.editUnidirPathColor.Caption = "Unid Path";
-            this.editUnidirPathColor.Edit = this.editItemColor;
-            this.editUnidirPathColor.Id = 127;
-            this.editUnidirPathColor.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
-            this.editUnidirPathColor.ImageOptions.Image = global::EntityTools.Properties.Resources.miniUniPath;
-            this.editUnidirPathColor.Name = "editUnidirPathColor";
             // 
             // barNodeTools
             // 
@@ -725,16 +674,29 @@ namespace EntityTools.Patches.Mapper
             this.barStatus.DockStyle = DevExpress.XtraBars.BarDockStyle.Bottom;
             this.barStatus.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
             new DevExpress.XtraBars.LinkPersistInfo(this.btnLockMapOnPlayer),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnSettings),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnSettings, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.groupSaveUndo, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.groupZoom, true),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnLockOnSpecialObject),
-            new DevExpress.XtraBars.LinkPersistInfo(this.lblMousePos, true)});
+            new DevExpress.XtraBars.LinkPersistInfo(this.lblPlayerPos, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.lblMousePos, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.lblDrawInfo, true)});
             this.barStatus.OptionsBar.AllowQuickCustomization = false;
             this.barStatus.OptionsBar.DrawDragBorder = false;
             this.barStatus.OptionsBar.UseWholeRow = true;
             this.barStatus.Text = "StatusBar";
             this.barStatus.VisibleChanged += new System.EventHandler(this.handler_BarVisibleChanged);
+            // 
+            // btnLockMapOnPlayer
+            // 
+            this.btnLockMapOnPlayer.BindableChecked = true;
+            this.btnLockMapOnPlayer.CheckBoxVisibility = DevExpress.XtraBars.CheckBoxVisibility.AfterText;
+            this.btnLockMapOnPlayer.Checked = true;
+            this.btnLockMapOnPlayer.Hint = "Check to hold Player in the center of the Map";
+            this.btnLockMapOnPlayer.Id = 114;
+            this.btnLockMapOnPlayer.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.btnLockMapOnPlayer.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+                | System.Windows.Forms.Keys.P));
+            this.btnLockMapOnPlayer.Name = "btnLockMapOnPlayer";
             // 
             // btnSettings
             // 
@@ -747,17 +709,6 @@ namespace EntityTools.Patches.Mapper
             this.btnSettings.ImageOptions.LargeImage = global::EntityTools.Properties.Resources.customization_32x32;
             this.btnSettings.Name = "btnSettings";
             this.btnSettings.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnSettings_ItemClick);
-            // 
-            // btnLockMapOnPlayer
-            // 
-            this.btnLockMapOnPlayer.BindableChecked = true;
-            this.btnLockMapOnPlayer.CheckBoxVisibility = DevExpress.XtraBars.CheckBoxVisibility.AfterText;
-            this.btnLockMapOnPlayer.Checked = true;
-            this.btnLockMapOnPlayer.Hint = "Check to hold Player in the center of the Map";
-            this.btnLockMapOnPlayer.Id = 114;
-            this.btnLockMapOnPlayer.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
-                | System.Windows.Forms.Keys.P));
-            this.btnLockMapOnPlayer.Name = "btnLockMapOnPlayer";
             // 
             // groupSaveUndo
             // 
@@ -802,24 +753,44 @@ namespace EntityTools.Patches.Mapper
             this.btnZoomOut.Name = "btnZoomOut";
             this.btnZoomOut.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ZoomOut);
             // 
-            // btnLockOnSpecialObject
+            // lblPlayerPos
             // 
-            this.btnLockOnSpecialObject.Alignment = DevExpress.XtraBars.BarItemLinkAlignment.Right;
-            this.btnLockOnSpecialObject.Caption = "Lock On SpecialObject";
-            this.btnLockOnSpecialObject.Id = 128;
-            this.btnLockOnSpecialObject.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
-            this.btnLockOnSpecialObject.ImageOptions.Image = global::EntityTools.Properties.Resources.miniTarget;
-            this.btnLockOnSpecialObject.Name = "btnLockOnSpecialObject";
-            this.btnLockOnSpecialObject.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_LockOnSpecialObject);
+            this.lblPlayerPos.Alignment = DevExpress.XtraBars.BarItemLinkAlignment.Right;
+            this.lblPlayerPos.Border = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.lblPlayerPos.Caption = "player";
+            this.lblPlayerPos.Hint = "Player coordinates";
+            this.lblPlayerPos.Id = 130;
+            this.lblPlayerPos.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.lblPlayerPos.ImageOptions.Image = global::EntityTools.Properties.Resources.navigationbar_16x16;
+            this.lblPlayerPos.Name = "lblPlayerPos";
+            this.lblPlayerPos.PaintStyle = DevExpress.XtraBars.BarItemPaintStyle.CaptionGlyph;
             // 
             // lblMousePos
             // 
             this.lblMousePos.Alignment = DevExpress.XtraBars.BarItemLinkAlignment.Right;
-            this.lblMousePos.Caption = "mousePos";
-            this.lblMousePos.Description = "Player position";
-            this.lblMousePos.Hint = "Player position";
+            this.lblMousePos.Border = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.lblMousePos.Caption = "mouse";
+            this.lblMousePos.Description = "Mouse position";
+            this.lblMousePos.Hint = "The coordinates of the mouse pointer";
             this.lblMousePos.Id = 82;
+            this.lblMousePos.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.lblMousePos.ImageOptions.Image = global::EntityTools.Properties.Resources.select_16x16;
+            this.lblMousePos.ImageOptions.LargeImage = global::EntityTools.Properties.Resources.select_32x32;
             this.lblMousePos.Name = "lblMousePos";
+            this.lblMousePos.PaintStyle = DevExpress.XtraBars.BarItemPaintStyle.CaptionGlyph;
+            // 
+            // lblDrawInfo
+            // 
+            this.lblDrawInfo.Alignment = DevExpress.XtraBars.BarItemLinkAlignment.Right;
+            this.lblDrawInfo.Border = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.lblDrawInfo.Caption = "form";
+            this.lblDrawInfo.Hint = "Windows redraw information";
+            this.lblDrawInfo.Id = 131;
+            this.lblDrawInfo.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.lblDrawInfo.ImageOptions.Image = global::EntityTools.Properties.Resources.info_16x16;
+            this.lblDrawInfo.ImageOptions.LargeImage = global::EntityTools.Properties.Resources.info_32x32;
+            this.lblDrawInfo.Name = "lblDrawInfo";
+            this.lblDrawInfo.PaintStyle = DevExpress.XtraBars.BarItemPaintStyle.CaptionGlyph;
             // 
             // barDockControlTop
             // 
@@ -861,6 +832,36 @@ namespace EntityTools.Patches.Mapper
             this.menuImportMesh.ImageOptions.Image = global::EntityTools.Properties.Resources.miniImport;
             this.menuImportMesh.Name = "menuImportMesh";
             // 
+            // editDeleteRadius
+            // 
+            this.editDeleteRadius.Caption = "Node Delete Radius";
+            this.editDeleteRadius.Edit = this.seDeleteRadius;
+            this.editDeleteRadius.Id = 61;
+            this.editDeleteRadius.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.editDeleteRadius.ImageOptions.Image = global::EntityTools.Properties.Resources.miniTarget;
+            this.editDeleteRadius.Name = "editDeleteRadius";
+            this.editDeleteRadius.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
+            // 
+            // seDeleteRadius
+            // 
+            this.seDeleteRadius.AutoHeight = false;
+            this.seDeleteRadius.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.seDeleteRadius.IsFloatValue = false;
+            this.seDeleteRadius.Mask.EditMask = "N00";
+            this.seDeleteRadius.MaxLength = 4;
+            this.seDeleteRadius.MaxValue = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.seDeleteRadius.MinValue = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.seDeleteRadius.Name = "seDeleteRadius";
+            // 
             // groupCR
             // 
             this.groupCR.Caption = "CustomRegion";
@@ -868,6 +869,41 @@ namespace EntityTools.Patches.Mapper
             this.groupCR.ItemLinks.Add(this.btnAddCR);
             this.groupCR.ItemLinks.Add(this.btnEditCR);
             this.groupCR.Name = "groupCR";
+            // 
+            // editBidirPathColor
+            // 
+            this.editBidirPathColor.Caption = "Bidir Path";
+            this.editBidirPathColor.Edit = this.editItemColor;
+            this.editBidirPathColor.Id = 126;
+            this.editBidirPathColor.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.editBidirPathColor.ImageOptions.Image = global::EntityTools.Properties.Resources.miniBiPath;
+            this.editBidirPathColor.Name = "editBidirPathColor";
+            // 
+            // editItemColor
+            // 
+            this.editItemColor.AutoHeight = false;
+            this.editItemColor.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.editItemColor.Name = "editItemColor";
+            // 
+            // editUnidirPathColor
+            // 
+            this.editUnidirPathColor.Caption = "Unid Path";
+            this.editUnidirPathColor.Edit = this.editItemColor;
+            this.editUnidirPathColor.Id = 127;
+            this.editUnidirPathColor.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.editUnidirPathColor.ImageOptions.Image = global::EntityTools.Properties.Resources.miniUniPath;
+            this.editUnidirPathColor.Name = "editUnidirPathColor";
+            // 
+            // btnLockOnSpecialObject
+            // 
+            this.btnLockOnSpecialObject.Alignment = DevExpress.XtraBars.BarItemLinkAlignment.Right;
+            this.btnLockOnSpecialObject.Caption = "Lock On SpecialObject";
+            this.btnLockOnSpecialObject.Id = 128;
+            this.btnLockOnSpecialObject.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.btnLockOnSpecialObject.ImageOptions.Image = global::EntityTools.Properties.Resources.miniTarget;
+            this.btnLockOnSpecialObject.Name = "btnLockOnSpecialObject";
+            this.btnLockOnSpecialObject.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_LockOnSpecialObject);
             // 
             // btnShowStatBar
             // 
@@ -1018,10 +1054,10 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.seWaypointDistance)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seMaxZDifference)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seEquivalenceDistance)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.seDeleteRadius)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.editItemColor)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.itemEditCRList)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.itemEditCRName)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.seDeleteRadius)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.editItemColor)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bsrcAstralSettings)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.MapPicture)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelSettings)).EndInit();
@@ -1118,6 +1154,8 @@ namespace EntityTools.Patches.Mapper
         private DevExpress.XtraEditors.ColorEdit colorEditUnidirPath;
         private DevExpress.XtraEditors.ColorEdit colorEditBidirPath;
         private BarCheckItem btnSettings;
+        private BarStaticItem lblPlayerPos;
+        private BarStaticItem lblDrawInfo;
     } 
 #endif
 }

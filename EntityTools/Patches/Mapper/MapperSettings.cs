@@ -177,7 +177,7 @@ namespace EntityTools.Settings
                 }
             }
         }
-        private bool linearPath = true;
+        private bool linearPath = false;
 
         /// <summary>
         /// Настройки формы <seealso cref="MapperFormExt"/>

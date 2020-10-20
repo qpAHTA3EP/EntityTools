@@ -199,7 +199,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     // Инициировано прерывание 
                     // Связываем текущее местоположение с графом
                     if (_linear)
-                        // TODO: Проверять наличие вершины по курсу и связывать с найденной
+                        // Проверяется наличие вершины по курсу и связывается с найденной
                         MappingToolHelper.LinkLinear(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, _lastNodeDetail, _mode == MappingMode.Unidirectional);
                     else MappingToolHelper.LinkNearest_8_Side(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, _lastNodeDetail, _mode == MappingMode.Unidirectional);
                     _lastNodeDetail = null;

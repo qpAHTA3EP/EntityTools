@@ -103,6 +103,26 @@ namespace EntityTools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap info_16x16 {
+            get {
+                object obj = ResourceManager.GetObject("info_16x16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap info_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("info_32x32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap miniAdd {
             get {
                 object obj = ResourceManager.GetObject("miniAdd", resourceCulture);
@@ -476,6 +496,36 @@ namespace EntityTools.Properties {
         internal static System.Drawing.Bitmap miniZoomOut {
             get {
                 object obj = ResourceManager.GetObject("miniZoomOut", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap navigationbar_16x16 {
+            get {
+                object obj = ResourceManager.GetObject("navigationbar_16x16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap select_16x16 {
+            get {
+                object obj = ResourceManager.GetObject("select_16x16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap select_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("select_32x32", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

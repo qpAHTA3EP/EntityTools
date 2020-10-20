@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.1020.1037</AssemblyVersion>
+    <AssemblyVersion>0.20.1020.1336</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -515,6 +515,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\customization_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\select_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\select_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\navigationbar_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\info_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\info_32x32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
