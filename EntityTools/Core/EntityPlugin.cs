@@ -29,6 +29,9 @@ using MyNW.Classes;
 using Action = Astral.Quester.Classes.Action;
 
 [assembly: InternalsVisibleTo("EntityCore")]
+#if !ENCRYPTED_CORE
+[assembly: SuppressIldasmAttribute()] 
+#endif
 
 namespace EntityTools
 {

@@ -116,6 +116,36 @@ namespace EntityTools.Reflection
                 public static readonly Func<object, Action> Stop = typeof(Astral.Quester.Entrypoint).GetAction("Stop");
                 public static readonly Func<object, Action> TooMuchStuckReaction = typeof(Astral.Quester.Entrypoint).GetAction("TooMuchStuckReaction");
             }
+
+            public static class Forms
+            {
+                public static class Editor
+                {
+                    /// <summary>
+                    /// Функтор доступа к экземпляру Квестер-редактора
+                    /// Astral.Quester.Forms.Main.editorForm
+                    /// </summary>
+                    public static readonly StaticFieldAccessor<Astral.Quester.Forms.Editor> ActiveEditor = typeof(Astral.Quester.Forms.Main).GetStaticField<Astral.Quester.Forms.Editor>("editorForm");
+                    
+                    /// <summary>
+                    /// Функтор обновления списка CustomRegion'ов в окне Квестер-редактора
+                    /// </summary>
+                    private static Func<object, System.Action> QuesterEditor_RefreshRegions = null;
+                    public static void RefreshRegions()
+                    {
+                        if (ActiveEditor.Value is Astral.Quester.Forms.Editor editor
+                            && !editor.IsDisposed)
+                        {
+                            if (QuesterEditor_RefreshRegions == null)
+                            {
+                                if ((QuesterEditor_RefreshRegions = typeof(Astral.Quester.Forms.Editor).GetAction("RefreshRegions")) != null)
+                                    QuesterEditor_RefreshRegions(editor)();
+                            }
+                            else QuesterEditor_RefreshRegions(editor)();
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>

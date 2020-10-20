@@ -40,56 +40,6 @@ namespace EntityTools.Patches.Mapper
 #if PATCH_ASTRAL
     public partial class MapperFormExt : XtraForm //*/Form
     {
-        #region Инструменты точечного редактирования графа
-        /// <summary>
-        /// Инструмент для выделения вершин
-        /// </summary>
-        private readonly NodeSelectTool _selectedNodes = new NodeSelectTool();
-        /// <summary>
-        /// Список изменений (для отката)
-        /// </summary>
-        private readonly Stack<IMapperTool> _undoStack = new Stack<IMapperTool>();
-
-        /// <summary>
-        /// Хэш-код текущей активной карты
-        /// </summary>
-        private int _currentMapHash;
-        
-        /// <summary>
-        /// Активный инструмент изменения графа
-        /// </summary>
-        private IMapperTool CurrentTool
-        {
-            get => _currentTool;
-            set
-            {
-                if (_currentTool != null)
-                {
-                    if (_currentTool.Applied)
-                        _undoStack.Push(_currentTool);
-                }
-                _currentTool = value;
-                if (value != null)
-                    InterruptAllModifications(value.EditMode);
-                else
-                {
-                    _selectedNodes.Clear();
-                    InterruptAllModifications(MapperEditMode.None);
-                }
-            }
-        }
-        private IMapperTool _currentTool;
-
-        private void ResetToolState()
-        {
-            _currentTool = null;
-            using (_selectedNodes.WriteLock())
-                _selectedNodes.Clear();
-            _undoStack.Clear();
-            InterruptAllModifications();
-        }
-        #endregion
-
         /// <summary>
         /// Флаг удержания персонажа в центре карты
         /// 
@@ -219,7 +169,17 @@ namespace EntityTools.Patches.Mapper
                                                 nameof(EntityTools.PluginSettings.Mapper.MapperForm.BidirectionalPathColor),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 
+            colorEditBidirPath.DataBindings.Add(nameof(colorEditBidirPath.EditValue),
+                                                EntityTools.PluginSettings.Mapper.MapperForm,
+                                                nameof(EntityTools.PluginSettings.Mapper.MapperForm.BidirectionalPathColor),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
+
             editUnidirPathColor.DataBindings.Add(nameof(editUnidirPathColor.EditValue),
+                                                EntityTools.PluginSettings.Mapper.MapperForm,
+                                                nameof(EntityTools.PluginSettings.Mapper.MapperForm.UnidirectionalPathColor),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
+
+            colorEditUnidirPath.DataBindings.Add(nameof(colorEditUnidirPath.EditValue),
                                                 EntityTools.PluginSettings.Mapper.MapperForm,
                                                 nameof(EntityTools.PluginSettings.Mapper.MapperForm.UnidirectionalPathColor),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
@@ -545,6 +505,56 @@ namespace EntityTools.Patches.Mapper
                 }
             }
         } 
+        #endregion
+
+        #region Инструменты точечного редактирования графа
+        /// <summary>
+        /// Инструмент для выделения вершин
+        /// </summary>
+        private readonly NodeSelectTool _selectedNodes = new NodeSelectTool();
+        /// <summary>
+        /// Список изменений (для отката)
+        /// </summary>
+        private readonly Stack<IMapperTool> _undoStack = new Stack<IMapperTool>();
+
+        /// <summary>
+        /// Хэш-код текущей активной карты
+        /// </summary>
+        private int _currentMapHash;
+        
+        /// <summary>
+        /// Активный инструмент изменения графа
+        /// </summary>
+        private IMapperTool CurrentTool
+        {
+            get => _currentTool;
+            set
+            {
+                if (_currentTool != null)
+                {
+                    if (_currentTool.Applied)
+                        _undoStack.Push(_currentTool);
+                }
+                _currentTool = value;
+                if (value != null)
+                    InterruptAllModifications(value.EditMode);
+                else
+                {
+                    _selectedNodes.Clear();
+                    InterruptAllModifications(MapperEditMode.None);
+                }
+            }
+        }
+        private IMapperTool _currentTool;
+
+        private void ResetToolState()
+        {
+            _currentTool = null;
+            using (_selectedNodes.WriteLock())
+                _selectedNodes.Clear();
+            _undoStack.Clear();
+            InterruptAllModifications();
+        }
         #endregion
 
         #region Перемещение изображения
@@ -1099,6 +1109,10 @@ namespace EntityTools.Patches.Mapper
                     {
                         editCRTool.Apply(Convert.ToString(editCRName.EditValue));
                         сurrentProfileNeedSave = true;
+
+                        //Обновление списка CustomRegion'ов в Quester-редакторе
+                        AstralAccessors.Quester.Forms.Editor.RefreshRegions();
+
                         CurrentTool = new EditCustomRegionTool(cr);
                     }
                     else editCRTool.AttachTo(cr);
@@ -1142,10 +1156,10 @@ namespace EntityTools.Patches.Mapper
                             crList.Add(cr);
                             сurrentProfileNeedSave = true;
 
-                            //TODO: Добавить обновление списка CustomRegion'ов в Quester-редакторе
+                            //Обновление списка CustomRegion'ов в Quester-редакторе
+                            AstralAccessors.Quester.Forms.Editor.RefreshRegions();
 
                             //_undoStack.Push(addCRtool); <- вызывается в CurrentTool.set
-
                             CurrentTool = null;
                             barEditCustomRegion.Visible = false;
                         }
@@ -1161,6 +1175,10 @@ namespace EntityTools.Patches.Mapper
             {
                 editCRTool.Apply(Convert.ToString(editCRName.EditValue));
                 сurrentProfileNeedSave = true;
+
+                //Обновление списка CustomRegion'ов в Quester-редакторе
+                AstralAccessors.Quester.Forms.Editor.RefreshRegions();
+
                 editCRName.EditValue = string.Empty;
                 editCRName.Visibility = BarItemVisibility.Never;
                 editCRSelector.Visibility = BarItemVisibility.Always;
@@ -1217,6 +1235,7 @@ namespace EntityTools.Patches.Mapper
         }
         #endregion
 
+        #region Изменение настроек
         private void handler_DeleteRadiusChanged(object sender, EventArgs e)
         {
             API.CurrentSettings.DeleteNodeRadius = Convert.ToInt32(editDeleteRadius.EditValue);
@@ -1236,17 +1255,23 @@ namespace EntityTools.Patches.Mapper
 
         private void handler_BarVisibleChanged(object sender, EventArgs e)
         {
-#if false
+#if true
             EntityTools.PluginSettings.Mapper.MapperForm.MappingBarVisible = barMapping.Visible;
             EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible = barStatus.Visible;
             EntityTools.PluginSettings.Mapper.MapperForm.MeshesBarVisible = barMeshes.Visible;
             EntityTools.PluginSettings.Mapper.MapperForm.NodeToolsBarVisible = barNodeTools.Visible;
-            EntityTools.PluginSettings.Mapper.MapperForm.CustomRegionBarVisible = barCustomRegions.Visible; 
+            EntityTools.PluginSettings.Mapper.MapperForm.CustomRegionBarVisible = barCustomRegions.Visible;
 #endif
             btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barNodeTools.Visible && !barCustomRegions.Visible;
         }
 
-        #region Meshes_Manipulation
+        private void btnSettings_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            panelSettings.Visible = btnSettings.Checked;
+        }
+        #endregion
+
+        #region Изменение графа (Meshes)
         /// <summary>
         /// Сохранение в файл текущего Quester-профиля
         /// </summary>

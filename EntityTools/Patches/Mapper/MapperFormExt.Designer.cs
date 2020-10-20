@@ -87,6 +87,7 @@ namespace EntityTools.Patches.Mapper
             this.btnCREditionAccept = new DevExpress.XtraBars.BarButtonItem();
             this.btnCRCancel = new DevExpress.XtraBars.BarButtonItem();
             this.barStatus = new DevExpress.XtraBars.Bar();
+            this.btnSettings = new DevExpress.XtraBars.BarCheckItem();
             this.btnLockMapOnPlayer = new DevExpress.XtraBars.BarCheckItem();
             this.groupSaveUndo = new DevExpress.XtraBars.BarButtonGroup();
             this.groupZoom = new DevExpress.XtraBars.BarButtonGroup();
@@ -104,6 +105,14 @@ namespace EntityTools.Patches.Mapper
             this.bsrcAstralSettings = new System.Windows.Forms.BindingSource(this.components);
             this.btnShowStatBar = new System.Windows.Forms.Button();
             this.MapPicture = new System.Windows.Forms.PictureBox();
+            this.panelSettings = new DevExpress.XtraEditors.PanelControl();
+            this.tabPaneSettings = new DevExpress.XtraBars.Navigation.TabPane();
+            this.tabGeneral = new DevExpress.XtraBars.Navigation.TabNavigationPage();
+            this.tabCustomization = new DevExpress.XtraBars.Navigation.TabNavigationPage();
+            this.lblUnidirPath = new DevExpress.XtraEditors.LabelControl();
+            this.lblBidirPath = new DevExpress.XtraEditors.LabelControl();
+            this.colorEditUnidirPath = new DevExpress.XtraEditors.ColorEdit();
+            this.colorEditBidirPath = new DevExpress.XtraEditors.ColorEdit();
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.popMenuOptions)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seWaypointDistance)).BeginInit();
@@ -115,6 +124,13 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.itemEditCRName)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bsrcAstralSettings)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.MapPicture)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.panelSettings)).BeginInit();
+            this.panelSettings.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tabPaneSettings)).BeginInit();
+            this.tabPaneSettings.SuspendLayout();
+            this.tabCustomization.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.colorEditUnidirPath.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorEditBidirPath.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // backgroundWorker
@@ -183,8 +199,9 @@ namespace EntityTools.Patches.Mapper
             this.groupSaveUndo,
             this.editBidirPathColor,
             this.editUnidirPathColor,
-            this.btnLockOnSpecialObject});
-            this.barManager.MaxItemId = 129;
+            this.btnLockOnSpecialObject,
+            this.btnSettings});
+            this.barManager.MaxItemId = 130;
             this.barManager.OptionsLayout.AllowAddNewItems = false;
             this.barManager.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.seDeleteRadius,
@@ -294,10 +311,7 @@ namespace EntityTools.Patches.Mapper
             this.popMenuOptions.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
             new DevExpress.XtraBars.LinkPersistInfo(this.editWaypointDistance),
             new DevExpress.XtraBars.LinkPersistInfo(this.editMaxZDifference),
-            new DevExpress.XtraBars.LinkPersistInfo(this.editEquivalenceDistance),
-            new DevExpress.XtraBars.LinkPersistInfo(this.editDeleteRadius),
-            new DevExpress.XtraBars.LinkPersistInfo(this.editBidirPathColor),
-            new DevExpress.XtraBars.LinkPersistInfo(this.editUnidirPathColor)});
+            new DevExpress.XtraBars.LinkPersistInfo(this.editEquivalenceDistance)});
             this.popMenuOptions.Manager = this.barManager;
             this.popMenuOptions.Name = "popMenuOptions";
             // 
@@ -610,7 +624,7 @@ namespace EntityTools.Patches.Mapper
             | DevExpress.XtraBars.BarCanDockStyle.Standalone)));
             this.barEditCustomRegion.DockCol = 0;
             this.barEditCustomRegion.DockRow = 0;
-            this.barEditCustomRegion.FloatLocation = new System.Drawing.Point(62, 213);
+            this.barEditCustomRegion.FloatLocation = new System.Drawing.Point(52, 570);
             this.barEditCustomRegion.FloatSize = new System.Drawing.Size(397, 88);
             this.barEditCustomRegion.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
             new DevExpress.XtraBars.LinkPersistInfo(this.btnCRTypeSelector),
@@ -620,7 +634,7 @@ namespace EntityTools.Patches.Mapper
             new DevExpress.XtraBars.LinkPersistInfo(this.btnCRAdditionAccept),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnCREditionAccept),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnCRCancel)});
-            this.barEditCustomRegion.Offset = 7;
+            this.barEditCustomRegion.Offset = 3;
             this.barEditCustomRegion.OptionsBar.AllowQuickCustomization = false;
             this.barEditCustomRegion.OptionsBar.DisableClose = true;
             this.barEditCustomRegion.Text = "Edit CustomRegion";
@@ -711,6 +725,7 @@ namespace EntityTools.Patches.Mapper
             this.barStatus.DockStyle = DevExpress.XtraBars.BarDockStyle.Bottom;
             this.barStatus.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
             new DevExpress.XtraBars.LinkPersistInfo(this.btnLockMapOnPlayer),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnSettings),
             new DevExpress.XtraBars.LinkPersistInfo(this.groupSaveUndo, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.groupZoom, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnLockOnSpecialObject),
@@ -720,6 +735,18 @@ namespace EntityTools.Patches.Mapper
             this.barStatus.OptionsBar.UseWholeRow = true;
             this.barStatus.Text = "StatusBar";
             this.barStatus.VisibleChanged += new System.EventHandler(this.handler_BarVisibleChanged);
+            // 
+            // btnSettings
+            // 
+            this.btnSettings.Alignment = DevExpress.XtraBars.BarItemLinkAlignment.Left;
+            this.btnSettings.Caption = "Settings";
+            this.btnSettings.Hint = "Open Mapper settings panel";
+            this.btnSettings.Id = 129;
+            this.btnSettings.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.btnSettings.ImageOptions.Image = global::EntityTools.Properties.Resources.customization_16x16;
+            this.btnSettings.ImageOptions.LargeImage = global::EntityTools.Properties.Resources.customization_32x32;
+            this.btnSettings.Name = "btnSettings";
+            this.btnSettings.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnSettings_ItemClick);
             // 
             // btnLockMapOnPlayer
             // 
@@ -874,11 +901,100 @@ namespace EntityTools.Patches.Mapper
             this.MapPicture.MouseUp += new System.Windows.Forms.MouseEventHandler(this.handler_MouseUp);
             this.MapPicture.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
+            // panelSettings
+            // 
+            this.panelSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelSettings.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.panelSettings.Controls.Add(this.tabPaneSettings);
+            this.panelSettings.Location = new System.Drawing.Point(0, 0);
+            this.panelSettings.Name = "panelSettings";
+            this.panelSettings.Size = new System.Drawing.Size(398, 351);
+            this.panelSettings.TabIndex = 14;
+            this.panelSettings.Visible = false;
+            // 
+            // tabPaneSettings
+            // 
+            this.tabPaneSettings.AllowCollapse = DevExpress.Utils.DefaultBoolean.Default;
+            this.tabPaneSettings.Controls.Add(this.tabGeneral);
+            this.tabPaneSettings.Controls.Add(this.tabCustomization);
+            this.tabPaneSettings.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabPaneSettings.Location = new System.Drawing.Point(0, 0);
+            this.tabPaneSettings.Name = "tabPaneSettings";
+            this.tabPaneSettings.Pages.AddRange(new DevExpress.XtraBars.Navigation.NavigationPageBase[] {
+            this.tabGeneral,
+            this.tabCustomization});
+            this.tabPaneSettings.RegularSize = new System.Drawing.Size(398, 351);
+            this.tabPaneSettings.SelectedPage = this.tabCustomization;
+            this.tabPaneSettings.Size = new System.Drawing.Size(398, 351);
+            this.tabPaneSettings.TabIndex = 0;
+            // 
+            // tabGeneral
+            // 
+            this.tabGeneral.Caption = "General";
+            this.tabGeneral.Name = "tabGeneral";
+            this.tabGeneral.Size = new System.Drawing.Size(398, 324);
+            // 
+            // tabCustomization
+            // 
+            this.tabCustomization.Caption = "Customization";
+            this.tabCustomization.Controls.Add(this.lblUnidirPath);
+            this.tabCustomization.Controls.Add(this.lblBidirPath);
+            this.tabCustomization.Controls.Add(this.colorEditUnidirPath);
+            this.tabCustomization.Controls.Add(this.colorEditBidirPath);
+            this.tabCustomization.Name = "tabCustomization";
+            this.tabCustomization.Size = new System.Drawing.Size(398, 324);
+            // 
+            // lblUnidirPath
+            // 
+            this.lblUnidirPath.ImageOptions.Alignment = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lblUnidirPath.ImageOptions.Image = global::EntityTools.Properties.Resources.miniUniPath;
+            this.lblUnidirPath.Location = new System.Drawing.Point(12, 38);
+            this.lblUnidirPath.Name = "lblUnidirPath";
+            this.lblUnidirPath.Size = new System.Drawing.Size(139, 16);
+            this.lblUnidirPath.TabIndex = 1;
+            this.lblUnidirPath.Text = "        Unidirectional path color";
+            // 
+            // lblBidirPath
+            // 
+            this.lblBidirPath.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.False;
+            this.lblBidirPath.ImageOptions.Alignment = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lblBidirPath.ImageOptions.Image = global::EntityTools.Properties.Resources.miniBiPath;
+            this.lblBidirPath.Location = new System.Drawing.Point(12, 12);
+            this.lblBidirPath.Name = "lblBidirPath";
+            this.lblBidirPath.Size = new System.Drawing.Size(132, 16);
+            this.lblBidirPath.TabIndex = 1;
+            this.lblBidirPath.Text = "        Bidirectional path color";
+            this.lblBidirPath.UseMnemonic = false;
+            // 
+            // colorEditUnidirPath
+            // 
+            this.colorEditUnidirPath.EditValue = System.Drawing.Color.Empty;
+            this.colorEditUnidirPath.Location = new System.Drawing.Point(157, 36);
+            this.colorEditUnidirPath.Name = "colorEditUnidirPath";
+            this.colorEditUnidirPath.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.colorEditUnidirPath.Size = new System.Drawing.Size(150, 20);
+            this.colorEditUnidirPath.TabIndex = 0;
+            // 
+            // colorEditBidirPath
+            // 
+            this.colorEditBidirPath.EditValue = System.Drawing.Color.Empty;
+            this.colorEditBidirPath.Location = new System.Drawing.Point(157, 10);
+            this.colorEditBidirPath.MenuManager = this.barManager;
+            this.colorEditBidirPath.Name = "colorEditBidirPath";
+            this.colorEditBidirPath.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.colorEditBidirPath.Size = new System.Drawing.Size(150, 20);
+            this.colorEditBidirPath.TabIndex = 0;
+            // 
             // MapperFormExt
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(398, 379);
+            this.Controls.Add(this.panelSettings);
             this.Controls.Add(this.btnShowStatBar);
             this.Controls.Add(this.MapPicture);
             this.Controls.Add(this.barDockControlLeft);
@@ -908,6 +1024,14 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.itemEditCRName)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bsrcAstralSettings)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.MapPicture)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.panelSettings)).EndInit();
+            this.panelSettings.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.tabPaneSettings)).EndInit();
+            this.tabPaneSettings.ResumeLayout(false);
+            this.tabCustomization.ResumeLayout(false);
+            this.tabCustomization.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.colorEditUnidirPath.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorEditBidirPath.Properties)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -985,6 +1109,15 @@ namespace EntityTools.Patches.Mapper
         private RepositoryItemColorEdit editItemColor;
         private BarEditItem editUnidirPathColor;
         private BarButtonItem btnLockOnSpecialObject;
+        private DevExpress.XtraEditors.PanelControl panelSettings;
+        private DevExpress.XtraBars.Navigation.TabPane tabPaneSettings;
+        private DevExpress.XtraBars.Navigation.TabNavigationPage tabGeneral;
+        private DevExpress.XtraBars.Navigation.TabNavigationPage tabCustomization;
+        private DevExpress.XtraEditors.LabelControl lblUnidirPath;
+        private DevExpress.XtraEditors.LabelControl lblBidirPath;
+        private DevExpress.XtraEditors.ColorEdit colorEditUnidirPath;
+        private DevExpress.XtraEditors.ColorEdit colorEditBidirPath;
+        private BarCheckItem btnSettings;
     } 
 #endif
 }

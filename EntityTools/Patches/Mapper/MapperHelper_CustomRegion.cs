@@ -78,7 +78,7 @@ namespace EntityTools.Patches.Mapper
         private static Vector3 anchorPoint = null;
         public static readonly float DefaultAnchorSize = 8.5f;
 
-    #region Reflection
+#region Reflection
         /// <summary>
         /// Функтор доступа к экземпляру Квестер-редактора
         /// Astral.Quester.Forms.Main.editorForm
@@ -89,7 +89,19 @@ namespace EntityTools.Patches.Mapper
         /// Функтор обновления списка CustomRegion'ов в окне Квестер-редактора
         /// </summary>
         private static Func<object, System.Action> QuesterEditor_RefreshRegions = null;
-        #endregion
+        internal static void RefreshQuesterEditorForm()
+        {
+            if (QuesterEditor.Value is QuesterEditorForm editor
+                && !editor.IsDisposed)
+            {
+                if (QuesterEditor_RefreshRegions == null)
+                {
+                    if ((QuesterEditor_RefreshRegions = typeof(QuesterEditorForm).GetAction("RefreshRegions")) != null)
+                        QuesterEditor_RefreshRegions(editor)();
+                }
+                else QuesterEditor_RefreshRegions(editor)();
+            }
+        }        #endregion
 
         /// <summary>
         /// Начала процедуры добавления CustomRegion'a
