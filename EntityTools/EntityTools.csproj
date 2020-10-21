@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.1020.1336</AssemblyVersion>
+    <AssemblyVersion>0.20.1021.1052</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -196,6 +196,7 @@
     <Compile Include="Patches\Mapper\Tools\AddCustomRegionTool.cs" />
     <Compile Include="Patches\Mapper\Tools\MapperMouseEventArgs.cs" />
     <Compile Include="Patches\Mapper\Tools\MappingTool.cs" />
+    <Compile Include="Patches\Mapper\Tools\DistanceMeasurementTool.cs" />
     <Compile Include="Patches\Mapper\Tools\NodeSelectTool.cs" />
     <Compile Include="Patches\Mapper\Tools\IMapperTool.cs" />
     <Compile Include="Patches\Mapper\Tools\RelocateNodesTool.cs" />
@@ -530,6 +531,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\info_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\rulervertical_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\rulervertical_32x32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

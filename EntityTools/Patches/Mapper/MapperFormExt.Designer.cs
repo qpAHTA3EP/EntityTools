@@ -115,6 +115,7 @@ namespace EntityTools.Patches.Mapper
             this.lblBidirPath = new DevExpress.XtraEditors.LabelControl();
             this.colorEditUnidirPath = new DevExpress.XtraEditors.ColorEdit();
             this.colorEditBidirPath = new DevExpress.XtraEditors.ColorEdit();
+            this.btnDistanceMeasurement = new DevExpress.XtraBars.BarCheckItem();
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.popMenuOptions)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seWaypointDistance)).BeginInit();
@@ -204,8 +205,9 @@ namespace EntityTools.Patches.Mapper
             this.btnLockOnSpecialObject,
             this.btnSettings,
             this.lblPlayerPos,
-            this.lblDrawInfo});
-            this.barManager.MaxItemId = 132;
+            this.lblDrawInfo,
+            this.btnDistanceMeasurement});
+            this.barManager.MaxItemId = 133;
             this.barManager.OptionsLayout.AllowAddNewItems = false;
             this.barManager.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.seDeleteRadius,
@@ -414,7 +416,7 @@ namespace EntityTools.Patches.Mapper
             // 
             // btnMoveNodes
             // 
-            this.btnMoveNodes.Caption = "Relocation Nodes";
+            this.btnMoveNodes.Caption = "Relocate Nodes";
             this.btnMoveNodes.Id = 92;
             this.btnMoveNodes.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnMoveNodes.ImageOptions.Image")));
             this.btnMoveNodes.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
@@ -453,7 +455,8 @@ namespace EntityTools.Patches.Mapper
             new DevExpress.XtraBars.LinkPersistInfo(this.btnSaveMeshes),
             new DevExpress.XtraBars.LinkPersistInfo(this.groupImportExportNodes, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnMeshesInfo, true),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnCompression)});
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnCompression),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnDistanceMeasurement, true)});
             this.barMeshes.OptionsBar.AllowQuickCustomization = false;
             this.barMeshes.Text = "Graph Tools";
             this.barMeshes.Visible = false;
@@ -708,7 +711,7 @@ namespace EntityTools.Patches.Mapper
             this.btnSettings.ImageOptions.Image = global::EntityTools.Properties.Resources.customization_16x16;
             this.btnSettings.ImageOptions.LargeImage = global::EntityTools.Properties.Resources.customization_32x32;
             this.btnSettings.Name = "btnSettings";
-            this.btnSettings.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.btnSettings_ItemClick);
+            this.btnSettings.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ShowSettingsTab);
             // 
             // groupSaveUndo
             // 
@@ -739,7 +742,7 @@ namespace EntityTools.Patches.Mapper
             // lblZoom
             // 
             this.lblZoom.Border = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
-            this.lblZoom.Caption = "lblZoom";
+            this.lblZoom.Caption = "zoom";
             this.lblZoom.Id = 122;
             this.lblZoom.Name = "lblZoom";
             this.lblZoom.ItemDoubleClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_DoubleClickZoom);
@@ -1025,6 +1028,15 @@ namespace EntityTools.Patches.Mapper
             this.colorEditBidirPath.Size = new System.Drawing.Size(150, 20);
             this.colorEditBidirPath.TabIndex = 0;
             // 
+            // btnDistanceMeasurement
+            // 
+            this.btnDistanceMeasurement.Caption = "DistanceMeasurement";
+            this.btnDistanceMeasurement.Id = 132;
+            this.btnDistanceMeasurement.ImageOptions.Image = global::EntityTools.Properties.Resources.rulervertical_16x16;
+            this.btnDistanceMeasurement.ImageOptions.LargeImage = global::EntityTools.Properties.Resources.rulervertical_32x32;
+            this.btnDistanceMeasurement.Name = "btnDistanceMeasurement";
+            this.btnDistanceMeasurement.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_DistanceMeasurement_ModeChanged);
+            // 
             // MapperFormExt
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1156,6 +1168,7 @@ namespace EntityTools.Patches.Mapper
         private BarCheckItem btnSettings;
         private BarStaticItem lblPlayerPos;
         private BarStaticItem lblDrawInfo;
+        private BarCheckItem btnDistanceMeasurement;
     } 
 #endif
 }

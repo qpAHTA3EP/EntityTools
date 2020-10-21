@@ -643,6 +643,11 @@ namespace EntityTools.Patches.Mapper
                 btnEditCR.Checked = false;
                 barEditCustomRegion.Visible = false;
             }
+
+            if(mode != MapperEditMode.DistanceMeasurement)
+            {
+                btnDistanceMeasurement.Checked = false;
+            }
         }
 
         #region Управление масштабом
@@ -858,10 +863,12 @@ namespace EntityTools.Patches.Mapper
 
                         #region Отрисовка указателя мыши
                         _graphics.GetWorldPosition(RelativeMousePosition, out double mouseX, out double mouseY);
+
                         _graphics.DrawLine(Pens.Gray, mouseX, topBorder, mouseX, downBorder);
                         _graphics.DrawLine(Pens.Gray, leftBorder, mouseY, rightBorder, mouseY);
-                        _graphics.DrawText(mouseX.ToString("N2"), mouseX, mouseY, Alignment.BottomLeft, DefaultFont, Brushes.Gray);
-                        _graphics.DrawText(mouseY.ToString("N2"), mouseX, mouseY, Alignment.TopLeft, DefaultFont, Brushes.Gray);
+
+                        _graphics.DrawText(string.Concat("(x)", mouseX.ToString("N2")), mouseX, mouseY, Alignment.BottomLeft, DefaultFont, Brushes.Gray);
+                        _graphics.DrawText(string.Concat("(y)", mouseY.ToString("N2")), mouseX, mouseY, Alignment.TopLeft, DefaultFont, Brushes.Gray);
                         #endregion
 
                         #region Отрисовка специальной графики
@@ -1287,7 +1294,7 @@ namespace EntityTools.Patches.Mapper
             btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barNodeTools.Visible && !barCustomRegions.Visible;
         }
 
-        private void btnSettings_ItemClick(object sender, ItemClickEventArgs e)
+        private void handler_ShowSettingsTab(object sender, ItemClickEventArgs e)
         {
             panelSettings.Visible = btnSettings.Checked;
         }
@@ -1894,6 +1901,19 @@ namespace EntityTools.Patches.Mapper
             _mappingTool.Linear = btnMappingLinearPath.Checked;
         }
         #endregion
+
+        private void handler_DistanceMeasurement_ModeChanged(object sender, ItemClickEventArgs e)
+        {
+            DistanceMeasurementTool measurementTool = CurrentTool as DistanceMeasurementTool;
+            if (btnDistanceMeasurement.Checked)
+            {
+                if (measurementTool is null)
+                    CurrentTool = new DistanceMeasurementTool();
+                LockOnPlayer = false;
+            }
+            else if (measurementTool != null)
+                CurrentTool = null;
+        }
     }
 #endif
 }

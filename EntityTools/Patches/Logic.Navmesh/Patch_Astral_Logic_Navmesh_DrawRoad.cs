@@ -12,8 +12,8 @@ namespace EntityTools.Patches.Navmesh
     internal class Patch_Astral_Logic_Navmesh_DrawRoad : Patch
     {
 
-        private static readonly Brush brush = Brushes.Blue;
-        private static readonly Pen pen = new Pen(Color.Blue, 2);
+        private static readonly Brush defaultBrush = Brushes.Blue;
+        private static readonly Pen defaultPen = new Pen(Color.Blue, 2);
 
         internal Patch_Astral_Logic_Navmesh_DrawRoad()
         {
@@ -24,7 +24,7 @@ namespace EntityTools.Patches.Navmesh
             }
             else throw new Exception("Patch_Astral_Logic_Navmesh_DrawRoad: fail to initialize 'methodToReplace'");
 
-            methodToInject = GetType().GetMethod(nameof(DrawRoad), ReflectionHelper.DefaultFlags);
+            methodToInject = GetType().GetMethod(nameof(DrawRoad), ReflectionHelper.DefaultFlags, null, new Type[]{ typeof(List<Vector3>), typeof(GraphicsNW) }, null);
         }
 
 
@@ -52,61 +52,7 @@ namespace EntityTools.Patches.Navmesh
         {
             if (graphicsNW is MapperGraphics mapGraphics)
             {
-                mapGraphics.GetWorldPosition(0, 0, out double topLeftX, out double topLeftY);
-                mapGraphics.GetWorldPosition(mapGraphics.ImageWidth, mapGraphics.ImageHeight, out double downRightX, out double downRightY);
-
-                using (var wp = waypoints.GetEnumerator())
-                {
-                    if(wp.MoveNext())
-                    {
-#if Labeling_Waypoints
-                        int i = 0; 
-#endif
-                        Vector3 startPos = wp.Current;
-                        bool startVisible = false,
-                            endVisible = false;
-                        double x = startPos.X,
-                               y = startPos.Y;
-                        // Отсеиваем и не отрисовываем точки пути, расположенные за пределами видимого изображения
-                        if (topLeftX <= x && x <= downRightX
-                            && downRightY <= y && y <= topLeftY)
-                        {
-                            mapGraphics.FillCircleCentered(brush, x, y, 6);
-#if Labeling_Waypoints
-                            mapGraphics.DrawText(i.ToString(), x, y, Alignment.TopLeft, SystemFonts.DefaultFont, Brushes.White); 
-#endif
-
-                            startVisible = true;
-                        }
-#if Labeling_Waypoints
-                        i++; 
-#endif
-                        while (wp.MoveNext())
-                        {
-                            Vector3 endPos = wp.Current;
-                            x = endPos.X;
-                            y = endPos.Y;
-                            // Отсеиваем и не отрисовываем точки пути, расположенные за пределами видимого изображения
-                            if (topLeftX <= x && x <= downRightX
-                                && downRightY <= y && y <= topLeftY)
-                            {
-                                mapGraphics.FillCircleCentered(brush, x, y, 6);
-#if Labeling_Waypoints
-                                mapGraphics.DrawText(i.ToString(), x, y, Alignment.TopLeft, SystemFonts.DefaultFont, Brushes.White); 
-#endif
-                                endVisible = true;
-                            }
-                            else endVisible = false;
-#if Labeling_Waypoints
-                            i++; 
-#endif
-                            if (startVisible || endVisible)
-                                mapGraphics.DrawLine(pen, startPos.X, startPos.Y, endPos.X, endPos.Y);
-                            startPos = endPos;
-                            startVisible = endVisible;
-                        }
-                    }
-                }   
+                DrawRoad(waypoints, mapGraphics, defaultPen, defaultBrush);
             }
             else
             {
@@ -118,6 +64,65 @@ namespace EntityTools.Patches.Navmesh
                     if (startPos.IsValid)
                         graphicsNW.drawLine(startPos, endPos, Pens.Blue);
                     startPos = endPos;
+                }
+            }
+        }
+
+        public static void DrawRoad(List<Vector3> waypoints, MapperGraphics mapGraphics, Pen pen, Brush brush)
+        {
+            mapGraphics.GetWorldPosition(0, 0, out double topLeftX, out double topLeftY);
+            mapGraphics.GetWorldPosition(mapGraphics.ImageWidth, mapGraphics.ImageHeight, out double downRightX, out double downRightY);
+
+            using (var wp = waypoints.GetEnumerator())
+            {
+                if (wp.MoveNext())
+                {
+#if Labeling_Waypoints
+                        int i = 0; 
+#endif
+                    Vector3 startPos = wp.Current;
+                    bool startVisible = false,
+                        endVisible = false;
+                    double x = startPos.X,
+                           y = startPos.Y;
+                    // Отсеиваем и не отрисовываем точки пути, расположенные за пределами видимого изображения
+                    if (topLeftX <= x && x <= downRightX
+                        && downRightY <= y && y <= topLeftY)
+                    {
+                        mapGraphics.FillCircleCentered(brush, x, y, 6);
+#if Labeling_Waypoints
+                            mapGraphics.DrawText(i.ToString(), x, y, Alignment.TopLeft, SystemFonts.DefaultFont, Brushes.White); 
+#endif
+
+                        startVisible = true;
+                    }
+#if Labeling_Waypoints
+                        i++; 
+#endif
+                    while (wp.MoveNext())
+                    {
+                        Vector3 endPos = wp.Current;
+                        x = endPos.X;
+                        y = endPos.Y;
+                        // Отсеиваем и не отрисовываем точки пути, расположенные за пределами видимого изображения
+                        if (topLeftX <= x && x <= downRightX
+                            && downRightY <= y && y <= topLeftY)
+                        {
+                            mapGraphics.FillCircleCentered(brush, x, y, 6);
+#if Labeling_Waypoints
+                                mapGraphics.DrawText(i.ToString(), x, y, Alignment.TopLeft, SystemFonts.DefaultFont, Brushes.White); 
+#endif
+                            endVisible = true;
+                        }
+                        else endVisible = false;
+#if Labeling_Waypoints
+                            i++; 
+#endif
+                        if (startVisible || endVisible)
+                            mapGraphics.DrawLine(pen, startPos.X, startPos.Y, endPos.X, endPos.Y);
+                        startPos = endPos;
+                        startVisible = endVisible;
+                    }
                 }
             }
         }

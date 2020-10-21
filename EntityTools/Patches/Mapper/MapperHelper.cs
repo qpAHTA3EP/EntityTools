@@ -25,6 +25,7 @@ namespace EntityTools.Patches.Mapper
         public static readonly float tg60 = (float)Math.Tan(Math.PI / 3);
         public static readonly float sin30 = 0.5f;
 
+#if false
         private static readonly Func<GraphicsNW, Graphics> getGraphicsFrom = GetInstanceFieldAccessor<GraphicsNW, Graphics>("g");
 
         /// <summary>
@@ -37,7 +38,6 @@ namespace EntityTools.Patches.Mapper
             return getGraphicsFrom(graphicsNW);
         }
 
-#if false
         /// <summary>
         /// Отрисовка заполненного равностороннего треугольника с основанием <paramref name="edge"/> внизу
         /// </summary>
@@ -213,7 +213,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public static void FixRange(double num1, double num2, out double min, out double max)
         {
-            if(num1 > num2)
+            if (num1 > num2)
             {
                 min = num2;
                 max = num1;
@@ -222,6 +222,96 @@ namespace EntityTools.Patches.Mapper
             {
                 min = num1;
                 max = num2;
+            }
+        }
+
+        /// <summary>
+        /// Вычисление мещения текстовой метки относительно пары точек с координатами <paramref name="x1"/>, <paramref name="y1"/> и <paramref name="x2"/>, <paramref name="y2"/>
+        /// </summary>
+        public static void GetLableAlingment(double x1, double y1, double x2, double y2, out Alignment alignment1, out Alignment alignment2)
+        {
+            double dx = Math.Abs(x1 - x2),
+                   dy = Math.Abs(y1 - y2);
+
+            if (dx > 20)
+            {
+                if (dy > 20)
+                {
+                    if (x1 > x2)
+                    {
+                        // Point1 - справа
+                        // Point2 - слева
+                        if (y1 > y2)
+                        {
+                            // Point1 - выше
+                            // Point2 - ниже
+                            alignment1 = Alignment.BottomLeft;
+                            alignment2 = Alignment.TopRight;
+                        }
+                        else
+                        {
+                            // Point1 - ниже
+                            // Point2 - выше
+                            alignment1 = Alignment.TopLeft;
+                            alignment2 = Alignment.BottomRight;
+                        }
+                    }
+                    else
+                    {
+                        // Point1 - слева
+                        // Point2 - справа
+                        if (y1 > y2)
+                        {
+                            // Point1 - выше
+                            // Point2 - ниже
+                            alignment1 = Alignment.BottomRight;
+                            alignment2 = Alignment.TopLeft;
+                        }
+                        else
+                        {
+                            // Point1 - ниже
+                            // Point2 - выше
+                            alignment1 = Alignment.TopRight;
+                            alignment2 = Alignment.BottomLeft;
+                        }
+                    }
+                }
+                else
+                {
+                    // Point1 и Point2 приблизительно на одной горизонтальной линии
+                    if (x1 > x2)
+                    {
+                        // Point1 - справа
+                        // Point2 - слева
+                        alignment1 = Alignment.MiddleLeft;
+                        alignment2 = Alignment.MiddleRight;
+                    }
+                    else
+                    {
+                        // Point1 - слева
+                        // Point2 - справа
+                        alignment1 = Alignment.MiddleRight;
+                        alignment2 = Alignment.MiddleLeft;
+                    }
+                }
+            }
+            else
+            {
+                // Point1 и Point2 приблизительно на одной вертикальной линии
+                if (y1 > y2)
+                {
+                    // Point1 - выше
+                    // Point2 - ниже
+                    alignment1 = Alignment.BottomCenter;
+                    alignment2 = Alignment.TopCenter;
+                }
+                else
+                {
+                    // Point1 - ниже
+                    // Point2 - выше
+                    alignment1 = Alignment.TopCenter;
+                    alignment2 = Alignment.BottomCenter;
+                }
             }
         }
 
@@ -282,9 +372,11 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public static Node ClosestNodeOxyProjection(this IGraph graph, double x, double y, double distance = -1)
         {
-            if (distance < 0)
+            if (distance <= 0)
                 distance = double.MaxValue;
-            else distance *= distance;
+            else if(distance != double.MaxValue)
+                distance *= distance;
+
 
             Node result = null;
             foreach(Node node in graph.NodesCollection)
@@ -300,6 +392,38 @@ namespace EntityTools.Patches.Mapper
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// Поиск элемента коллекции <paramref name="enumerable"/>, проекция которого на плоскость Oxy от точки с координатами <paramref name="x"/>, <paramref name="y"/>
+        /// находится не дальше <paramref name="distance"/>. Координаты извлекаются функтором <paramref name="selector"/>
+        /// Координаты элемента возвращаются через параметры <paramref name="pX"/>, <paramref name="pY"/>, <paramref name="pZ"/>
+        /// </summary>
+        public static T ClosestNodeOxyProjection<T, TPoint>(this IEnumerable<T> enumerable, double x, double y, Func<T, TPoint> selector, out double pX, out double pY, out double pZ, double distance = -1)
+        {
+            if (distance <= 0)
+                distance = double.MaxValue;
+            else if (distance != double.MaxValue)
+                distance *= distance;
+
+            foreach (T element in enumerable)
+            {
+                TPoint point = selector(element);
+
+                if (point != null)
+                {
+                    MapperGraphics.PointHelper.GetXYZ(point, out pX, out pY, out pZ);
+                    double sqDist = SquareDistance2D(x, y, pX, pY);
+
+                    if (distance > sqDist)
+                    {
+                        distance = sqDist;
+                        return element;
+                    }
+                }
+            }
+            pX = 0; pY = 0;  pZ = 0;
+            return default(T);
         }
 
         public static void ClosestNodeOxyProjection(this IGraph graph, double x, double y, out Node node, out int hash,

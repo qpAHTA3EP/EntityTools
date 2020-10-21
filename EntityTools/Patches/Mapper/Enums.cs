@@ -30,7 +30,11 @@
         /// <summary>
         /// Редактирование CustomRegion'ов
         /// </summary>
-        EditCustomRegion
+        EditCustomRegion,
+        /// <summary>
+        /// Измерение расстояниямежду точками
+        /// </summary>
+        DistanceMeasurement
     }
 
     public enum MappingMode
