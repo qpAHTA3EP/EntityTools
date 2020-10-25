@@ -49,8 +49,8 @@ namespace EntityTools.Patches.Mapper.Tools
                     y = worldMouseY;
                     z = startZ;
                     double dist = Point3D.DistanceBetween(startX, startY, startZ, x, y, z);
-                    endLbl = string.Concat("(x)", worldMouseX.ToString("N1"), "; (y)", worldMouseY.ToString("N1"), Environment.NewLine,
-                            "Distance (2D): ", dist.ToString("N0"));
+                    endLbl = string.Concat(//"(x)", worldMouseX.ToString("N1"), "; (y)", worldMouseY.ToString("N1"), Environment.NewLine,
+                            "Distance (2D): ", dist.ToString("N1"));
                 }
                 else
                 {
@@ -138,10 +138,10 @@ namespace EntityTools.Patches.Mapper.Tools
                             }
                             if (pathLen > 0)
                                 endLable = string.Concat("(x)", endX.ToString("N1"), "; (y)", endY.ToString("N1"), "; (z)", endZ.ToString("N1"), Environment.NewLine,
-                                                         "Path length: ", pathLen.ToString("N2"), Environment.NewLine,
-                                                         "Distance (3D): ", dist2D.ToString("N0"));
+                                                         "Path length: ", pathLen.ToString("N1"), Environment.NewLine,
+                                                         "Distance (3D): ", dist2D.ToString("N1"));
                             else endLable = string.Concat("(x)", endX.ToString("N1"), "; (y)", endY.ToString("N1"), "; (z)", endZ.ToString("N1"), Environment.NewLine,
-                                                          "Distance (3D): ", dist2D.ToString("N0"));
+                                                          "Distance (3D): ", dist2D.ToString("N1"));
                             ETLogger.WriteLine(LogType.Log, string.Concat(nameof(DistanceMeasurementTool), ": from ", startLable, " to ", endLable));
                         }
                     }
@@ -162,7 +162,7 @@ namespace EntityTools.Patches.Mapper.Tools
                         endZ = startZ;
                         double dist = Point3D.DistanceBetween(startX, startY, startZ, endX, endY, endZ);
                         endLable = string.Concat("(x)", endX.ToString("N1"), "; (y)", endY.ToString("N1"), Environment.NewLine,
-                                "Distance (2D): ", dist.ToString("N0"));
+                                "Distance (2D): ", dist.ToString("N1"));
                         road = null;
                     }
                 } 

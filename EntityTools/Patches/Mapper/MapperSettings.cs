@@ -375,14 +375,6 @@ namespace EntityTools.Settings
         }
         private Color biPathColor = Color.Red;
 
-#if false
-        public int BidirectionalPathRGBColor
-        {
-            get => biPathColor.ToArgb();
-            set => BidirectionalPathColor = Color.FromArgb(value);
-        } 
-#endif
-
         [Bindable(true)]
         [XmlElement(Type = typeof(XmlColor))]
         public Color UnidirectionalPathColor
@@ -399,13 +391,208 @@ namespace EntityTools.Settings
         }
         private Color uniPathColor = Color.SkyBlue;
 
-#if false
-        public int UnidirectionalPathRGB
+        [Bindable(true)]
+        [XmlElement(Type = typeof(XmlColor))]
+        public Color BackgroundColor
         {
-            get => uniPathColor.ToArgb();
-            set => UnidirectionalPathColor = Color.FromArgb(value);
-        } 
-#endif
+            get => backgroundColor;
+            set
+            {
+                if (value != backgroundColor)
+                {
+                    backgroundColor = value;
+                    NotifyPropertyChanged(nameof(BackgroundColor));
+                }
+            }
+        }
+        private Color backgroundColor = Color.Black;
+
+        [Bindable(true)]
+        public bool DrawEnemies
+        {
+            get => _drawEnemies;
+            set
+            {
+                if (_drawEnemies != value)
+                {
+                    _drawEnemies = value;
+                    NotifyPropertyChanged(nameof(DrawEnemies));
+                }
+            }
+        }
+        private bool _drawEnemies = true;
+
+        [Bindable(true)]
+        [XmlElement(Type = typeof(XmlColor))]
+        public Color EnemyColor
+        {
+            get => enemiesColor;
+            set
+            {
+                if (value != enemiesColor)
+                {
+                    enemiesColor = value;
+                    NotifyPropertyChanged(nameof(EnemyColor));
+                }
+            }
+        }
+        private Color enemiesColor = Color.OrangeRed;
+
+
+        [Bindable(true)]
+        public bool DrawFriends
+        {
+            get => _drawFriends;
+            set
+            {
+                if (_drawFriends != value)
+                {
+                    _drawFriends = value;
+                    NotifyPropertyChanged(nameof(DrawFriends));
+                }
+            }
+        }
+        private bool _drawFriends = true;
+
+        [Bindable(true)]
+        [XmlElement(Type = typeof(XmlColor))]
+        public Color FriendColor
+        {
+            get => friendsColor;
+            set
+            {
+                if (value != friendsColor)
+                {
+                    friendsColor = value;
+                    NotifyPropertyChanged(nameof(FriendColor));
+                }
+            }
+        }
+        private Color friendsColor = Color.Green;
+
+        [Bindable(true)]
+        public bool DrawPlayers
+        {
+            get => _drawPlayers;
+            set
+            {
+                if (_drawPlayers != value)
+                {
+                    _drawPlayers = value;
+                    NotifyPropertyChanged(nameof(DrawPlayers));
+                }
+            }
+        }
+        private bool _drawPlayers = true;
+
+        [Bindable(true)]
+        [XmlElement(Type = typeof(XmlColor))]
+        public Color PlayerColor
+        {
+            get => playersColor;
+            set
+            {
+                if (value != playersColor)
+                {
+                    playersColor = value;
+                    NotifyPropertyChanged(nameof(PlayerColor));
+                }
+            }
+        }
+        private Color playersColor = Color.LawnGreen;
+
+        [Bindable(true)]
+        public bool DrawOtherNPC
+        {
+            get => _drawOtherNpc;
+            set
+            {
+                if (_drawOtherNpc != value)
+                {
+                    _drawOtherNpc = value;
+                    NotifyPropertyChanged(nameof(DrawOtherNPC));
+                }
+            }
+        }
+        private bool _drawOtherNpc = true;
+
+        [Bindable(true)]
+        [XmlElement(Type = typeof(XmlColor))]
+        public Color OtherNPCColor
+        {
+            get => npcColor;
+            set
+            {
+                if (value != npcColor)
+                {
+                    npcColor = value;
+                    NotifyPropertyChanged(nameof(OtherNPCColor));
+                }
+            }
+        }
+        private Color npcColor = Color.LightGray;
+
+        [Bindable(true)]
+        public bool DrawNodes
+        {
+            get => _drawNodes;
+            set
+            {
+                if (_drawNodes != value)
+                {
+                    _drawNodes = value;
+                    NotifyPropertyChanged(nameof(DrawNodes));
+                }
+            }
+        }
+        private bool _drawNodes = true;
+
+        [Bindable(true)]
+        [XmlElement(Type = typeof(XmlColor))]
+        public Color NodeColor
+        {
+            get => nodesColor;
+            set
+            {
+                if (value != nodesColor)
+                {
+                    nodesColor = value;
+                    NotifyPropertyChanged(nameof(NodeColor));
+                }
+            }
+        }
+        private Color nodesColor = Color.YellowGreen;
+
+        [Bindable(true)]
+        public bool DrawSkillNodes
+        {
+            get => _drawSkillnodes;
+            set
+            {
+                if (_drawSkillnodes != value)
+                {
+                    _drawSkillnodes = value;
+                    NotifyPropertyChanged(nameof(DrawSkillNodes));
+                }
+            }
+        }
+        private bool _drawSkillnodes = true;
+
+        [Bindable(true)]
+        [XmlElement(Type = typeof(XmlColor))]
+        public Color SkillNodeColor
+        {
+            get => skillnodesColor;
+            set
+            {
+                if (value != skillnodesColor)
+                {
+                    skillnodesColor = value;
+                    NotifyPropertyChanged(nameof(SkillNodeColor));
+                }
+            }
+        }
+        private Color skillnodesColor = Color.Gold;
     }
 #endif
 }

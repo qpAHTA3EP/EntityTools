@@ -121,11 +121,8 @@
   <data name="miniAddCR_2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniAddCR_2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="miniWizard" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\miniwizard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="miniCREllipce" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\miniEllipceCR.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="customization_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\customization_32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="miniGear" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniGear.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -136,11 +133,14 @@
   <data name="navigationbar_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\navigationbar_16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="miniPen" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\miniPen.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="rulervertical_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\rulervertical_32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="miniCancel" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniCancel.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="miniZdiff" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\miniZdiff.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="select_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\select_32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -190,11 +190,17 @@
   <data name="info_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\info_32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="customization_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\customization_16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="miniRefresh" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniRefresh.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="miniLinePath" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniLinPath.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="rulerhorizontal_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\rulerhorizontal_16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="charArrow" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\charArrow.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -208,8 +214,11 @@
   <data name="miniPlayAll" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniPlayAll.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="miniAddCR" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\miniAddCR.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="miniPen" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\miniPen.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="miniDistance" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\miniDistance.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="miniZoom" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\minizoom.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -223,17 +232,14 @@
   <data name="miniReverse" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniReverse.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="miniEditCR" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\miniEditCR.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="miniTarget" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniTarget.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="miniStop" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniStop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="miniDistance" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\miniDistance.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="miniEditCR" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\miniEditCR.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="miniAnalize" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\previewchart_16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -241,11 +247,11 @@
   <data name="miniExport" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniExport.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="customization_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\customization_32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="miniWizard" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\miniwizard.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="customization_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\customization_16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="miniCREllipce" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\miniEllipceCR.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="info_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\info_16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -256,13 +262,16 @@
   <data name="miniNodeDistance" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniNodeDistance.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="miniZdiff" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\miniZdiff.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="rulerhorizontal_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\rulerhorizontal_32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="miniAddCR" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\miniAddCR.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="miniExpand" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\miniExpand_2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="rulervertical_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\rulervertical_32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="label_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\label_16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.1021.1052</AssemblyVersion>
+    <AssemblyVersion>0.20.1023.0933</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -149,6 +149,11 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.XtraGrid.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraNavBar.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
     <Reference Include="MyMemory-x64">
@@ -189,6 +194,7 @@
     <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
     <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_GetNearestNodeFromPosition.cs" />
     <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_TotalDistance.cs" />
+    <Compile Include="Patches\Mapper\MapperDrawingTools.cs" />
     <Compile Include="Patches\Mapper\MapperGraphics.cs" />
     <Compile Include="Patches\Mapper\MapperHelper.cs" />
     <Compile Include="Patches\Mapper\PointHelper.cs" />
@@ -537,6 +543,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\rulervertical_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\rulerhorizontal_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\rulerhorizontal_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\label_16x16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

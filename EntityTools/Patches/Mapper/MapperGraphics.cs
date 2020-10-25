@@ -4,6 +4,7 @@ using System.Threading;
 using AStar.Tools;
 using Astral.Logic.Classes.Map;
 using EntityTools.Reflection;
+using EntityTools.Settings;
 using MyNW.Classes;
 using static EntityTools.Reflection.InstanceFieldAccessorFactory;
 
@@ -16,10 +17,22 @@ namespace EntityTools.Patches.Mapper
     {
         public MapperGraphics(int width, int height) : base(width, height)
         {
+            backColor = EntityTools.PluginSettings.Mapper.MapperForm.BackgroundColor;
+
+            EntityTools.PluginSettings.Mapper.MapperForm.PropertyChanged += handler_PropertyChanged;
             GetWorldPosition(0, 0, out double left, out double top);
             GetWorldPosition(width, height, out double right, out double down);
             _cache = new MapperGraphCache(() => AstralAccessors.Quester.Core.Meshes.Value, true);
             _cache.SetCacheArea(left, top, right, down);
+        }
+
+        private void handler_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if(sender is MapperFormSettings mapperFormSettings
+                && e.PropertyName == nameof(MapperFormSettings.BackgroundColor))
+            {
+                backColor = mapperFormSettings.BackgroundColor;
+            }
         }
 
         #region Reflection
@@ -93,6 +106,8 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public MapperGraphCache VisibleGraph => _cache;
         protected MapperGraphCache _cache;
+
+        public MapperDrawingTools DrawingTools { get; } = new MapperDrawingTools();
 
         #region Перевод координат
         /// <summary>

@@ -123,6 +123,16 @@ namespace EntityTools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap label_16x16 {
+            get {
+                object obj = ResourceManager.GetObject("label_16x16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap miniAdd {
             get {
                 object obj = ResourceManager.GetObject("miniAdd", resourceCulture);
@@ -506,6 +516,26 @@ namespace EntityTools.Properties {
         internal static System.Drawing.Bitmap navigationbar_16x16 {
             get {
                 object obj = ResourceManager.GetObject("navigationbar_16x16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap rulerhorizontal_16x16 {
+            get {
+                object obj = ResourceManager.GetObject("rulerhorizontal_16x16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap rulerhorizontal_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("rulerhorizontal_32x32", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

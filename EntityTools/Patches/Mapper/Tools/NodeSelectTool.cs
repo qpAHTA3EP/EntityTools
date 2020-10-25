@@ -115,11 +115,13 @@ namespace EntityTools.Patches.Mapper.Tools
                     graphics.DrawRectangle(Pens.Gainsboro, selectAreaStartX, selectAreaStartY, worldX, worldY);
 #endif
                 }
+#if false
                 else
                 {
                     selectAreaStartX = 0;
                     selectAreaStartY = 0;
-                }
+                } 
+#endif
             }
 
 #if false

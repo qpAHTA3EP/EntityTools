@@ -35,13 +35,13 @@ namespace EntityTools.Patches.Mapper
         /// <param name="meshes"></param>
         public static void DrawMeshes(GraphicsNW graphicsNW, Graph meshes)
         {
-            SolidBrush bidirBrush = new SolidBrush(EntityTools.PluginSettings.Mapper.MapperForm.BidirectionalPathColor);
-            SolidBrush unidirBrush = new SolidBrush(EntityTools.PluginSettings.Mapper.MapperForm.UnidirectionalPathColor);
-            Pen bidirPen = new Pen(EntityTools.PluginSettings.Mapper.MapperForm.BidirectionalPathColor, 1);
-            Pen unidirPen = new Pen(EntityTools.PluginSettings.Mapper.MapperForm.UnidirectionalPathColor, 1);
-
             if (graphicsNW is MapperGraphics mapGraphics)
             {
+                var bidirBrush = mapGraphics.DrawingTools.BidirectionalPathBrush;
+                var unidirBrush = mapGraphics.DrawingTools.UnidirectionalPathBrush;
+                var bidirPen = mapGraphics.DrawingTools.BidirectionalPathPen;
+                var unidirPen = mapGraphics.DrawingTools.UnidirectionalPathPen;
+
                 using (meshes.ReadLock())
                 {
                     mapGraphics.GetWorldPosition(0, 0, out double left, out double top);

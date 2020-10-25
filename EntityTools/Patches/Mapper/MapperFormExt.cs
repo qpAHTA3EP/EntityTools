@@ -103,11 +103,12 @@ namespace EntityTools.Patches.Mapper
             Location = EntityTools.PluginSettings.Mapper.MapperForm.Location;
 
             BindingControls();
+
             _mappingTool = new MappingTool(() => AstralAccessors.Quester.Core.Meshes.Value)
             {
                 Linear = EntityTools.PluginSettings.Mapper.LinearPath,
                 ForceLink = EntityTools.PluginSettings.Mapper.ForceLinkingWaypoint
-            };// (GetMappingGraph);
+            };
 
         }
 
@@ -169,49 +170,101 @@ namespace EntityTools.Patches.Mapper
                                                 nameof(EntityTools.PluginSettings.Mapper.LinearPath),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 
-#if false
-            editBidirPathColor.DataBindings.Add(nameof(editBidirPathColor.EditValue),
-                                        EntityTools.PluginSettings.Mapper.MapperForm,
-                                        nameof(EntityTools.PluginSettings.Mapper.MapperForm.BidirectionalPathColor),
-                                        false, DataSourceUpdateMode.OnPropertyChanged); 
 
-            editUnidirPathColor.DataBindings.Add(nameof(editUnidirPathColor.EditValue),
-                                                EntityTools.PluginSettings.Mapper.MapperForm,
-                                                nameof(EntityTools.PluginSettings.Mapper.MapperForm.UnidirectionalPathColor),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-#endif
-
+            #region Customization
             colorEditBidirPath.DataBindings.Add(nameof(colorEditBidirPath.EditValue),
-                                                EntityTools.PluginSettings.Mapper.MapperForm,
-                                                nameof(EntityTools.PluginSettings.Mapper.MapperForm.BidirectionalPathColor),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
+                                                    EntityTools.PluginSettings.Mapper.MapperForm,
+                                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.BidirectionalPathColor),
+                                                    false, DataSourceUpdateMode.OnPropertyChanged);
 
             colorEditUnidirPath.DataBindings.Add(nameof(colorEditUnidirPath.EditValue),
                                                 EntityTools.PluginSettings.Mapper.MapperForm,
                                                 nameof(EntityTools.PluginSettings.Mapper.MapperForm.UnidirectionalPathColor),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 
-            /* Сохранение опции между сессиями не требуется
-             * Отслеживание флага производится через свойство LinearPath
-             * menuLinearPath.DataBindings.Add(nameof(menuLinearPath.Checked),
-                                                EntityTools.PluginSettings.Mapper,
-                                                nameof(EntityTools.PluginSettings.Mapper.LinearPath)); */
+            colorBackground.DataBindings.Add(nameof(colorBackground.EditValue),
+                                                EntityTools.PluginSettings.Mapper.MapperForm,
+                                                nameof(EntityTools.PluginSettings.Mapper.MapperForm.BackgroundColor),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
+
+
+            ckbEnemies.DataBindings.Add(nameof(ckbEnemies.Checked),
+                                            EntityTools.PluginSettings.Mapper.MapperForm,
+                                            nameof(EntityTools.PluginSettings.Mapper.MapperForm.DrawEnemies),
+                                            false, DataSourceUpdateMode.OnPropertyChanged);
+
+            colorEnemies.DataBindings.Add(nameof(colorEnemies.EditValue),
+                                    EntityTools.PluginSettings.Mapper.MapperForm,
+                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.EnemyColor),
+                                    false, DataSourceUpdateMode.OnPropertyChanged);
+
+            ckbFriends.DataBindings.Add(nameof(ckbFriends.Checked),
+                                    EntityTools.PluginSettings.Mapper.MapperForm,
+                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.DrawFriends),
+                                    false, DataSourceUpdateMode.OnPropertyChanged);
+
+            colorFriends.DataBindings.Add(nameof(colorFriends.EditValue),
+                                    EntityTools.PluginSettings.Mapper.MapperForm,
+                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.FriendColor),
+                                    false, DataSourceUpdateMode.OnPropertyChanged);
+
+            ckbPlayers.DataBindings.Add(nameof(ckbPlayers.Checked),
+                                    EntityTools.PluginSettings.Mapper.MapperForm,
+                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.DrawPlayers),
+                                    false, DataSourceUpdateMode.OnPropertyChanged);
+
+            colorPlayers.DataBindings.Add(nameof(colorPlayers.EditValue),
+                                    EntityTools.PluginSettings.Mapper.MapperForm,
+                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.PlayerColor),
+                                    false, DataSourceUpdateMode.OnPropertyChanged);
+
+            ckbOtherNPC.DataBindings.Add(nameof(ckbOtherNPC.Checked),
+                                    EntityTools.PluginSettings.Mapper.MapperForm,
+                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.DrawOtherNPC),
+                                    false, DataSourceUpdateMode.OnPropertyChanged);
+
+            colorOtherNPC.DataBindings.Add(nameof(colorOtherNPC.EditValue),
+                                    EntityTools.PluginSettings.Mapper.MapperForm,
+                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.OtherNPCColor),
+                                    false, DataSourceUpdateMode.OnPropertyChanged);
+
+            ckbNodes.DataBindings.Add(nameof(ckbNodes.Checked),
+                                    EntityTools.PluginSettings.Mapper.MapperForm,
+                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.DrawNodes),
+                                    false, DataSourceUpdateMode.OnPropertyChanged);
+
+            colorNodes.DataBindings.Add(nameof(colorNodes.EditValue),
+                                    EntityTools.PluginSettings.Mapper.MapperForm,
+                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.NodeColor),
+                                    false, DataSourceUpdateMode.OnPropertyChanged);
+
+            ckbSkillnodes.DataBindings.Add(nameof(ckbSkillnodes.Checked),
+                                    EntityTools.PluginSettings.Mapper.MapperForm,
+                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.DrawSkillNodes),
+                                    false, DataSourceUpdateMode.OnPropertyChanged);
+
+            colorSkillnodes.DataBindings.Add(nameof(colorSkillnodes.EditValue),
+                                    EntityTools.PluginSettings.Mapper.MapperForm,
+                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.SkillNodeColor),
+                                    false, DataSourceUpdateMode.OnPropertyChanged); 
+            #endregion
+
 
 #if false
             // Настройки панели инструментов 
             // Привязка к элементам управления вызывает ошибку времени выполнения
 
             Location.DataBindings.Add(nameof(Location),
-                            EntityTools.PluginSettings.Mapper.MapperForm.Location,
+                            EntityTools.PluginSettings.Mapper.MapperForm,
                             nameof(EntityTools.PluginSettings.Mapper.MapperForm.Location),
                             false, DataSourceUpdateMode.OnPropertyChanged);
 
-            toolbarMainMapper.DataBindings.Add(nameof(toolbarMainMapper.Visible),
-                                    EntityTools.PluginSettings.Mapper.MapperForm.MainToolBarVisible,
-                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.MainToolBarVisible),
+            barMapping.DataBindings.Add(nameof(barMapping.Visible),
+                                    EntityTools.PluginSettings.Mapper.MapperForm,
+                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.MappingBarVisible),
                                     false, DataSourceUpdateMode.OnPropertyChanged);
-            statusBar.DataBindings.Add(nameof(statusBar.Visible),
-                                    EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible,
+            barStatus.DataBindings.Add(nameof(barStatus.Visible),
+                                    EntityTools.PluginSettings.Mapper.MapperForm,
                                     nameof(EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible),
                                     false, DataSourceUpdateMode.OnPropertyChanged);
 #endif
@@ -398,6 +451,12 @@ namespace EntityTools.Patches.Mapper
             catch (Exception exc)
             {
                 ETLogger.WriteLine(LogType.Error, "MapperFormUpdate: Перехвачено исключение: " + exc);
+                if (InvokeRequired)
+                    Invoke(new Action(() => Text = exc.Message));
+                else
+                {
+                    Text = exc.Message;
+                }
                 throw;
             }
         }
@@ -750,16 +809,27 @@ namespace EntityTools.Patches.Mapper
                         float x, y;
 
                         #region Отрисовка нодов
-                        foreach (TargetableNode targetableNode in EntityManager.LocalPlayer.Player.InteractStatus.TargetableNodes)
+                        bool drawNode = EntityTools.PluginSettings.Mapper.MapperForm.DrawNodes;
+                        bool drawSkillNode = EntityTools.PluginSettings.Mapper.MapperForm.DrawSkillNodes;
+                        if (drawNode || drawSkillNode)
                         {
-                            location = targetableNode.WorldInteractionNode.Location;
-                            x = location.X;
-                            y = location.Y;
-                            if (leftBorder <= x && x <= rightBorder && downBorder <= y && y <= topBorder)
+                            var lootBrush = _graphics.DrawingTools.SkillnodeBrush;
+                            var brush = _graphics.DrawingTools.NodeBrush;
+                            foreach (TargetableNode targetableNode in EntityManager.LocalPlayer.Player.InteractStatus.TargetableNodes)
                             {
-                                if (targetableNode.Categories.Contains("Loot"))
-                                    _graphics.FillCircleCentered(Brushes.Gold, x, y, 6);
-                                else _graphics.FillSquareCentered(Brushes.YellowGreen, x, y, 6);
+                                location = targetableNode.WorldInteractionNode.Location;
+                                x = location.X;
+                                y = location.Y;
+                                if (leftBorder <= x && x <= rightBorder && downBorder <= y && y <= topBorder)
+                                {
+                                    if (targetableNode.Categories.Contains("Loot"))
+                                    {
+                                        if (drawNode)
+                                            _graphics.FillCircleCentered(lootBrush, x, y, 6);
+                                    }
+                                    else if (drawSkillNode)
+                                        _graphics.FillSquareCentered(brush, x, y, 6);
+                                }
                             }
                         }
                         #endregion
@@ -837,27 +907,48 @@ namespace EntityTools.Patches.Mapper
                         #endregion
 
                         #region Отрисовка игроков и НПС
-                        uint playerContainerId = EntityManager.LocalPlayer.ContainerId;
-                        foreach (Entity entity in EntityManager.GetEntities())
+                        bool drawEnemies = EntityTools.PluginSettings.Mapper.MapperForm.DrawEnemies;
+                        bool drawFriends = EntityTools.PluginSettings.Mapper.MapperForm.DrawFriends;
+                        bool drawPlayers = EntityTools.PluginSettings.Mapper.MapperForm.DrawPlayers;
+                        bool drawOtherNpc = EntityTools.PluginSettings.Mapper.MapperForm.DrawOtherNPC;
+                        if (drawEnemies || drawFriends || drawPlayers || drawOtherNpc)
                         {
-                            location = entity.Location;
-                            x = location.X;
-                            y = location.Y;
-                            if (entity.ContainerId != playerContainerId
-                                && leftBorder <= x && x <= rightBorder && downBorder <= y && y <= topBorder)
+                            var enemyBrush = _graphics.DrawingTools.EnemyBrush;
+                            var friendBrush = _graphics.DrawingTools.FriendBrush;
+                            var playerBrush = _graphics.DrawingTools.PlayerBrush;
+                            var otherBrush = _graphics.DrawingTools.OtherNPCBrush;
+                            uint playerContainerId = EntityManager.LocalPlayer.ContainerId;
+                            foreach (Entity entity in EntityManager.GetEntities())
                             {
-                                if (entity.IsPlayer)
-                                    _graphics.FillRhombCentered(Brushes.LawnGreen, location, 10, 17);
-                                else if (!entity.IsDead && !entity.Critter.IsLootable)
+                                location = entity.Location;
+                                x = location.X;
+                                y = location.Y;
+                                if (entity.ContainerId != playerContainerId
+                                    && leftBorder <= x && x <= rightBorder && downBorder <= y && y <= topBorder)
                                 {
-                                    var relationToPlayer = entity.RelationToPlayer;
-                                    if (relationToPlayer == EntityRelation.Foe)
-                                        _graphics.FillRhombCentered(Brushes.OrangeRed, location, 10, 10);
-                                    else if (relationToPlayer == EntityRelation.Friend)
-                                        _graphics.FillRhombCentered(Brushes.Green, location, 6, 6);
-                                    else _graphics.FillRhombCentered(Brushes.LightGray, location, 6, 6);
+                                    if (entity.IsPlayer)
+                                    {
+                                        if (drawPlayers)
+                                            _graphics.FillRhombCentered(playerBrush, location, 10, 17);
+                                    }
+                                    else if (!entity.IsDead && !entity.Critter.IsLootable)
+                                    {
+                                        var relationToPlayer = entity.RelationToPlayer;
+                                        if (relationToPlayer == EntityRelation.Foe)
+                                        {
+                                            if (drawEnemies)
+                                                _graphics.FillRhombCentered(enemyBrush, location, 10, 10);
+                                        }
+                                        else if (relationToPlayer == EntityRelation.Friend)
+                                        {
+                                            if(drawFriends)
+                                            _graphics.FillRhombCentered(friendBrush, location, 6, 6);
+                                        }
+                                        else if(drawOtherNpc)
+                                            _graphics.FillRhombCentered(otherBrush, location, 6, 6);
+                                    }
                                 }
-                            }
+                            } 
                         }
                         #endregion
 
@@ -896,6 +987,7 @@ namespace EntityTools.Patches.Mapper
                         }
                         catch (Exception ex)
                         {
+                            InterruptAllModifications();
                             if (timeout.IsTimedOut)
                             {
                                 ETLogger.WriteLine(LogType.Error,
@@ -912,6 +1004,7 @@ namespace EntityTools.Patches.Mapper
                         }
                         catch (Exception ex)
                         {
+                            InterruptAllModifications();
                             if (timeout.IsTimedOut)
                             {
                                 ETLogger.WriteLine(LogType.Error,
@@ -970,36 +1063,21 @@ namespace EntityTools.Patches.Mapper
                         #endregion
                     }
                 }
-#if Not_MonoMapper
                 catch (ObjectDisposedException ex)
                 {
                     Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex);
-                    break; 
+                    throw;
                 }
                 catch (InvalidOperationException ex)
                 {
                     Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex);
-                    break; 
+                    throw;
                 }
                 catch (ThreadAbortException ex)
                 {
                     Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex);
-                    break; 
                     throw;
                 }
-                catch (Exception ex)
-                {
-                    if (timeout.IsTimedOut)
-                    {
-                        timeout.ChangeTime(2000);
-                        Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex);
-                    }
-                }
-                finally
-                {
-                    Thread.Sleep(150);
-                } 
-#else
                 catch (Exception ex)
                 {
                     if (timeout.IsTimedOut)
@@ -1009,7 +1087,6 @@ namespace EntityTools.Patches.Mapper
                         timeout.ChangeTime(2000);
                     }
                 }
-#endif
             }
         }
         #endregion
@@ -1284,13 +1361,6 @@ namespace EntityTools.Patches.Mapper
 
         private void handler_BarVisibleChanged(object sender, EventArgs e)
         {
-#if true
-            EntityTools.PluginSettings.Mapper.MapperForm.MappingBarVisible = barMapping.Visible;
-            EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible = barStatus.Visible;
-            EntityTools.PluginSettings.Mapper.MapperForm.MeshesBarVisible = barMeshes.Visible;
-            EntityTools.PluginSettings.Mapper.MapperForm.NodeToolsBarVisible = barNodeTools.Visible;
-            EntityTools.PluginSettings.Mapper.MapperForm.CustomRegionBarVisible = barCustomRegions.Visible;
-#endif
             btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barNodeTools.Visible && !barCustomRegions.Visible;
         }
 
@@ -1866,12 +1936,14 @@ namespace EntityTools.Patches.Mapper
         #region Mapping
         private readonly MappingTool _mappingTool;
 
+#if false
         private IGraph GetMappingGraph()
         {
             if (_graphics.CenterPosition.Distance2DFromPlayer < EntityTools.PluginSettings.Mapper.CacheRadius * 0.75)
                 return _graphics.VisibleGraph;
             return AstralAccessors.Quester.Core.Meshes.Value;
-        }
+        } 
+#endif
 
         private void handler_Mapping_BidirectionalPath(object sender, ItemClickEventArgs e)
         {
