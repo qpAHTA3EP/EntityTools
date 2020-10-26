@@ -22,7 +22,7 @@ namespace EntityTools.Patches.Mapper
             EntityTools.PluginSettings.Mapper.MapperForm.PropertyChanged += handler_PropertyChanged;
             GetWorldPosition(0, 0, out double left, out double top);
             GetWorldPosition(width, height, out double right, out double down);
-            _cache = new MapperGraphCache(() => AstralAccessors.Quester.Core.Meshes.Value, true);
+            _cache = new MapperGraphCache(() => AstralAccessors.Quester.Core.Meshes.Value, EntityTools.PluginSettings.Mapper.CacheActive);
             _cache.SetCacheArea(left, top, right, down);
         }
 
@@ -54,7 +54,7 @@ namespace EntityTools.Patches.Mapper
             set
             {
                 base.ImageHeight = value;
-                _cache.CacheDistanceY = value / 2.0 / Zoom;
+                _cache.CacheDistanceY = value / 1.8d / Zoom;
             }
         }
         public new int ImageWidth
@@ -63,9 +63,25 @@ namespace EntityTools.Patches.Mapper
             set
             {
                 base.ImageWidth = value;
-                _cache.CacheDistanceX = value / 2.0 / Zoom;
+                _cache.CacheDistanceX = value / 1.8d / Zoom;
             }
         }
+
+        public new double Zoom
+        {
+            get => base.Zoom;
+            set
+            {
+
+                if(base.Zoom != value)
+                {
+                    base.Zoom = value;
+                    _cache.CacheDistanceX = base.ImageWidth / 1.8d / value;
+                    _cache.CacheDistanceY = base.ImageHeight / 1.8d / value;
+                }
+            }
+        }
+
         public new Vector3 CenterPosition
         {
             get => base.CenterPosition.Clone();
@@ -75,12 +91,106 @@ namespace EntityTools.Patches.Mapper
                 _cache.CenterPosition = value;
             }
         }
+        /// <summary>
+        /// Перемещение центра изображения на величины <paramref name="dx"/> и <paramref name="dy"/>
+        /// </summary>
         public void MoveCenterPosition(double dx, double dy)
         {
             base.CenterPosition.X += (float)dx;
             base.CenterPosition.Y += (float)dy;
             VisibleGraph.MoveCenterPosition(dx, dy, 0);
         }
+
+        /// <summary>
+        /// Задание геометрических атрибутов изображения с переносом центра в точку <paramref name="centerX"/>, <paramref name="centerY"/>, <paramref name="centerZ"/>
+        /// </summary>
+        public void Reinitialize(double centerX, double centerY, double centerZ, int width, int height, double zoom)
+        {
+            Reinitialize(centerX, centerY, centerZ, width, height, zoom, out _, out _, out _, out _);
+        }
+
+        /// <summary>
+        /// Задание геометрических атрибутов изображения с переносом центра в <paramref name="centerPosition"/>
+        /// </summary>
+        public void Reinitialize(Vector3 centerPosition, int width, int height, double zoom)
+        {
+            Reinitialize(centerPosition.X, centerPosition.Y, centerPosition.Z, width, height, zoom, out _, out _, out _, out _);
+        }
+        /// <summary>
+        /// Задание геометрических атрибутов изображения с переносом центра в <paramref name="centerPosition"/>
+        /// </summary>
+        public void Reinitialize(Vector3 centerPosition, int width, int height, double zoom, out double x1, out double y1, out double x2, out double y2)
+        {
+            Reinitialize(centerPosition.X, centerPosition.Y, centerPosition.Z, width, height, zoom, out x1, out y1, out x2, out y2);
+        }
+        /// <summary>
+        /// Задание геометрических атрибутов изображения без переноса центра
+        /// </summary>
+        public void Reinitialize(int width, int height, double zoom, out double x1, out double y1, out double x2, out double y2)
+        {
+            int imgWidth = base.ImageHeight,
+                imgHeight = base.ImageHeight;
+
+            double dx = width / 2d / zoom;
+            double dy = height / 2d / zoom;
+
+            var centerPos = base.CenterPosition;
+            x1 = centerPos.X - dx;
+            x2 = centerPos.X + dx;
+            y1 = centerPos.Y + dy;
+            y2 = centerPos.Y - dy;
+
+            if (imgWidth != width || imgHeight != height || base.Zoom != zoom)
+            {
+                if (_cache.CacheDistanceX > dx * 1.25
+                    || _cache.CacheDistanceY > dy * 1.25
+                    || !_cache.InCacheArea(x1, y1) 
+                    || !_cache.InCacheArea(x2, y2))
+                        _cache.SetCacheArea(x1, y1, x2, y2);
+
+                base.ImageHeight = height;
+                base.ImageWidth = width;
+                base.Zoom = zoom;
+            }
+        }
+
+        /// <summary>
+        /// Задание геометрических атрибутов изображения и вычисление игровых координат верхнего левого угла <paramref name="x1"/>, <paramref name="y1"/>
+        /// и нижнего правого угла <paramref name="x2"/>, <paramref name="y2"/>
+        /// </summary>
+        public void Reinitialize(double centerX, double centerY, double centerZ, int width, int height, double zoom, out double x1, out double y1, out double x2, out double y2)
+        {
+            int imgWidth = base.ImageHeight,
+                imgHeight = base.ImageHeight;
+
+            double dx = width / 2d / zoom;
+            double dy = height / 2d / zoom;
+
+            x1 = centerX - dx;
+            x2 = centerX + dx;
+            y1 = centerY + dy;
+            y2 = centerY - dy;
+
+            if (imgWidth != width || imgHeight != height || base.Zoom != zoom
+                || base.CenterPosition.X != centerX
+                || base.CenterPosition.Y != centerY
+                || base.CenterPosition.Z != centerZ)
+            {
+                if (_cache.CacheDistanceX > dx * 1.25
+                    || _cache.CacheDistanceY > dy * 1.25
+                    || !_cache.InCacheArea(x1, y1)
+                    || !_cache.InCacheArea(x2, y2))
+                    _cache.SetCacheArea(x1, y1, x2, y2);
+
+                base.CenterPosition.X = (float)centerX;
+                base.CenterPosition.Y = (float)centerY;
+                base.CenterPosition.Z = (float)centerZ;
+                base.ImageHeight = height;
+                base.ImageWidth = width;
+                base.Zoom = zoom;
+            }
+        }
+
         #endregion
 
         #region ReaderWriterLocker
@@ -547,8 +657,11 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public void DrawText<TPoint>(string text, TPoint worldPoint, Alignment align = Alignment.TopLeft, Font font = null, Brush brush = null)
         {
-            PointHelper.GetXY(worldPoint, out double x, out double y);
-            DrawText(text, x, y, align, font, brush);
+            if (align != Alignment.None)
+            {
+                PointHelper.GetXY(worldPoint, out double x, out double y);
+                DrawText(text, x, y, align, font, brush);
+            }
         }
 
         public void DrawText(string text, double worldX, double worldY, Alignment align = Alignment.MiddleCenter, Font font = null, Brush brush = null)
@@ -557,52 +670,54 @@ namespace EntityTools.Patches.Mapper
                 font = SystemFonts.DefaultFont;
             if (brush is null)
                 brush = Brushes.Black;
-
-            var size = graphics.MeasureString(text, font);
-
-            GetImagePosition(worldX, worldY, out double x, out double y);
-
-            switch (align)
+            if (align != Alignment.None)
             {
-                case Alignment.TopLeft:
-                    x += 0.5f;
-                    y += 0.5f;
-                    break;
-                case Alignment.TopCenter:
-                    x -= size.Width / 2 - 0.5f;
-                    y += 0.5f;
-                    break;
-                case Alignment.TopRight:
-                    x -= size.Width - 0.5f;
-                    y += 0.5f;
-                    break;
-                case Alignment.MiddleLeft:
-                    x += 0.5f;
-                    y -= size.Height / 2 - 0.5f;
-                    break;
-                case Alignment.MiddleCenter:
-                    x -= size.Width / 2 - 0.5f;
-                    y -= size.Height / 2 - 0.5f;
-                    break;
-                case Alignment.MiddleRight:
-                    x -= size.Width - 0.5f;
-                    y -= size.Height / 2 - 0.5f;
-                    break;
-                case Alignment.BottomLeft:
-                    x += 0.5f;
-                    y -= size.Height - 0.5f;
-                    break;
-                case Alignment.BottomCenter:
-                    x -= size.Width / 2;
-                    y -= size.Height - 0.5f;
-                    break;
-                case Alignment.BottomRight:
-                    x -= size.Width - 0.5f;
-                    y -= size.Height - 0.5f;
-                    break;
-            }
+                var size = graphics.MeasureString(text, font);
 
-            graphics.DrawString(text, font, brush, (float)x, (float)y);
+                GetImagePosition(worldX, worldY, out double x, out double y);
+
+                switch (align)
+                {
+                    case Alignment.TopLeft:
+                        x += 0.5f;
+                        y += 0.5f;
+                        break;
+                    case Alignment.TopCenter:
+                        x -= size.Width / 2 - 0.5f;
+                        y += 0.5f;
+                        break;
+                    case Alignment.TopRight:
+                        x -= size.Width - 0.5f;
+                        y += 0.5f;
+                        break;
+                    case Alignment.MiddleLeft:
+                        x += 0.5f;
+                        y -= size.Height / 2 - 0.5f;
+                        break;
+                    case Alignment.MiddleCenter:
+                        x -= size.Width / 2 - 0.5f;
+                        y -= size.Height / 2 - 0.5f;
+                        break;
+                    case Alignment.MiddleRight:
+                        x -= size.Width - 0.5f;
+                        y -= size.Height / 2 - 0.5f;
+                        break;
+                    case Alignment.BottomLeft:
+                        x += 0.5f;
+                        y -= size.Height - 0.5f;
+                        break;
+                    case Alignment.BottomCenter:
+                        x -= size.Width / 2;
+                        y -= size.Height - 0.5f;
+                        break;
+                    case Alignment.BottomRight:
+                        x -= size.Width - 0.5f;
+                        y -= size.Height - 0.5f;
+                        break;
+                }
+
+                graphics.DrawString(text, font, brush, (float)x, (float)y);
+            }
         }
     }
 }

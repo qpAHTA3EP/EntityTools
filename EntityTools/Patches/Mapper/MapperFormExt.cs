@@ -170,6 +170,10 @@ namespace EntityTools.Patches.Mapper
                                                 nameof(EntityTools.PluginSettings.Mapper.LinearPath),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 
+            ckbChacheEnable.DataBindings.Add(nameof(ckbChacheEnable.Checked),
+                                                EntityTools.PluginSettings.Mapper,
+                                                nameof(EntityTools.PluginSettings.Mapper.CacheActive),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
 
             #region Customization
             colorEditBidirPath.DataBindings.Add(nameof(colorEditBidirPath.EditValue),
@@ -348,6 +352,7 @@ namespace EntityTools.Patches.Mapper
                    playerPosStr = string.Empty,
                    mousePosStr = string.Empty,
                    zoomStr = string.Empty;
+            Image img = null;
             //Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
 
             var updateFormStatus = new Action(() =>
@@ -357,8 +362,8 @@ namespace EntityTools.Patches.Mapper
                 lblPlayerPos.Caption = playerPosStr;
                 lblDrawInfo.Caption = statusStr;
                 lblZoom.Caption = zoomStr;
-                using (_graphics.ReadLock())
-                    MapPicture.Image = _graphics.getImage();
+
+                MapPicture.Image = img;
 #if false
                 if (SpecialObject?.IsValid == true)
                     btnLockOnSpecialObject.Visibility = BarItemVisibility.Always;
@@ -376,7 +381,9 @@ namespace EntityTools.Patches.Mapper
 
             int time = 5000;
             double frames = 0;
-            double fps = 0;
+            double fps = 0, cps = 0;
+
+            int cacheVer = 0;
 #endif
             try
             {
@@ -394,41 +401,58 @@ namespace EntityTools.Patches.Mapper
 
 
                     var player = EntityManager.LocalPlayer;
-#if true
-                    Vector3 pos = player.Location;
-                    playerPosStr = !player.IsLoading && pos.IsValid ? $"{pos.X:N1} | {pos.Y:N1} | {pos.Z:N1}" : "Loading"; 
-#endif
-                    zoomStr = string.Concat(Zoom * 100, '%');
-
-                    int hash = AstralAccessors.Quester.Core.Meshes.Value.GetHashCode();
-                    if (_currentMapHash != hash)
+                    bool isLoading = player.IsLoading || !player.MapState.IsValid;
+                    if (isLoading)
                     {
-                        var currentMapInfo = player.CurrentZoneMapInfo;
-                        formCaption = formCaption = string.Concat(currentMapInfo.DisplayName, '[', currentMapInfo.MapName, ']');
-                        _currentMapHash = hash;
-
-                        // Карта изменилась - сбрасываем состояние инструментов
-                        ResetToolState();
+                        _currentMapHash = 0;
+                        playerPosStr = "Loading";
+                        statusStr = "-";
+                        mousePosStr = "-";
                     }
+                    else
+                    {
+                        Vector3 pos = player.Location;
+                        playerPosStr = $"{pos.X:N1} | {pos.Y:N1} | {pos.Z:N1}";
+                        zoomStr = string.Concat(Zoom * 100, '%');
+
+                        int hash = AstralAccessors.Quester.Core.Meshes.Value.GetHashCode();
+                        if (_currentMapHash != hash)
+                        {
+                            var currentMapInfo = player.CurrentZoneMapInfo;
+                            formCaption = formCaption = string.Concat(currentMapInfo.DisplayName, '[', currentMapInfo.MapName, ']');
+                            _currentMapHash = hash;
+
+                            // Карта изменилась - сбрасываем состояние инструментов
+                            ResetToolState();
+                        }
 
 #if DrawMapper_Measuring
-                    sw.Restart();
-                    DrawMapper();
-                    sw.Stop();
-                    drawMapperMeasures[currentMesure % 10] = sw.ElapsedMilliseconds;
-                    currentMesure++;
-                    frames++;
-                    if (timeout.IsTimedOut)
-                    {
+                        sw.Restart();
+                        DrawMapper();
+                        sw.Stop();
+                        using (_graphics.ReadLock())
+                            img = _graphics.getImage();
+                        
+                        drawMapperMeasures[currentMesure % 10] = sw.ElapsedMilliseconds;
+                        currentMesure++;
+                        frames++;
+                        if (timeout.IsTimedOut)
+                        {
+                            int curCacheVer = _graphics.VisibleGraph.Version;
 
-                        fps = frames / time * 1000;
-                        frames = 0;
-                        timeout.ChangeTime(time);
-                    }
-                    statusStr = string.Concat(fps.ToString("N1"), " fps | ", (drawMapperMeasures.Sum() / 10).ToString("N1"), " ms");
+                            cps = (curCacheVer - cacheVer) / (double)time * 1000d;
+                            fps = frames / time * 1000d;
+                            frames = 0;
+                            timeout.ChangeTime(time);
+
+                            cacheVer = curCacheVer;
+                        }
+                        statusStr = string.Concat(fps.ToString("N1"), " fps | ", (drawMapperMeasures.Sum() / 10d).ToString("N1"), " ms | ", cps.ToString("N1"), " cps");
 #endif
-                    _graphics.GetWorldPosition(RelativeMousePosition, out double mouseX, out double mouseY);
-                    mousePosStr = string.Concat(mouseX.ToString("N1"), " | ", mouseY.ToString("N1"));
+                        _graphics.GetWorldPosition(RelativeMousePosition, out double mouseX, out double mouseY);
+                        mousePosStr = string.Concat(mouseX.ToString("N1"), " | ", mouseY.ToString("N1"));
+
+                    }
 
                     if (InvokeRequired)
                         Invoke(updateFormStatus);
@@ -437,15 +461,10 @@ namespace EntityTools.Patches.Mapper
                         Text = formCaption;
                         lblMousePos.Caption = statusStr;
                         lblZoom.Caption = zoomStr;
-                        using (_graphics.ReadLock())
-                            MapPicture.Image = _graphics.getImage();
+                        MapPicture.Image = img;
                     }
 
-#if Non_MonoMapper
-                    Thread.Sleep(150); 
-#else
                     Thread.Sleep(EntityTools.PluginSettings.Mapper.MapperForm.RedrawMapperTimeout);
-#endif
                 }
             }
             catch (Exception exc)
@@ -791,19 +810,37 @@ namespace EntityTools.Patches.Mapper
                 {
                     using (_graphics.WriteLock())
                     {
-                        if (LockOnPlayer)
-                            _graphics.CenterPosition = EntityManager.LocalPlayer.Location;
-
                         int imgWidth = MapPicture.Width;
                         int imgHeight = MapPicture.Height;
-                        _graphics.ImageWidth = imgWidth;
-                        _graphics.ImageHeight = imgHeight;
-                        _graphics.Zoom = Zoom;
-                        _graphics.resetImage();
+
+#if false
+                        if (LockOnPlayer)
+                            _graphics.CenterPosition = EntityManager.LocalPlayer.Location;
 
                         // Вычисляем координаты границ изображения
                         _graphics.GetWorldPosition(0, 0, out double leftBorder, out double topBorder);
                         _graphics.GetWorldPosition(imgWidth, imgHeight, out double rightBorder, out double downBorder);
+
+                        _graphics.ImageWidth = imgWidth;
+                        _graphics.ImageHeight = imgHeight;
+                        _graphics.Zoom = Zoom;
+                        _graphics.resetImage(); 
+#else
+                        double leftBorder, topBorder, rightBorder, downBorder;
+
+                        if (LockOnPlayer)
+                            _graphics.Reinitialize(EntityManager.LocalPlayer.Location, imgWidth, imgHeight, Zoom, out leftBorder, out topBorder, out rightBorder, out downBorder);
+                        else _graphics.Reinitialize(imgWidth, imgHeight, Zoom, out leftBorder, out topBorder, out rightBorder, out downBorder);
+
+#endif
+                        // Вычисляем координаты границ изображения
+                        _graphics.GetWorldPosition(0, 0, out double leftBorder1, out double topBorder1);
+                        _graphics.GetWorldPosition(imgWidth, imgHeight, out double rightBorder1, out double downBorder1);
+
+#if false
+                        // Центр кэша графа
+                        _graphics.FillCircleCentered(Brushes.Yellow, _graphics.VisibleGraph.CenterPosition, 8, true); 
+#endif
 
                         Vector3 location = null;
                         float x, y;
@@ -952,37 +989,50 @@ namespace EntityTools.Patches.Mapper
                         }
                         #endregion
 
-                        #region Отрисовка указателя мыши
-                        _graphics.GetWorldPosition(RelativeMousePosition, out double mouseX, out double mouseY);
-
-                        _graphics.DrawLine(Pens.Gray, mouseX, topBorder, mouseX, downBorder);
-                        _graphics.DrawLine(Pens.Gray, leftBorder, mouseY, rightBorder, mouseY);
-
-                        _graphics.DrawText(string.Concat("(x)", mouseX.ToString("N2")), mouseX, mouseY, Alignment.BottomLeft, DefaultFont, Brushes.Gray);
-                        _graphics.DrawText(string.Concat("(y)", mouseY.ToString("N2")), mouseX, mouseY, Alignment.TopLeft, DefaultFont, Brushes.Gray);
-                        #endregion
-
-                        #region Отрисовка специальной графики
+                        #region Отрисовка специальной графики и указателя мыши
                         // Отрисовка активного инструмента редактирования
                         try
                         {
+                            _graphics.GetWorldPosition(RelativeMousePosition, out double mouseX, out double mouseY);
                             var tool = CurrentTool;
-                            if (tool != null
-                                && (tool.AllowNodeSelection || tool.HandleCustomDraw))
-                            {
-                                //_graphics.GetWorldPosition(RelativeMousePosition, out double mouseX, out double mouseY);
-                                if (tool.AllowNodeSelection)
-                                {
-                                    using (_selectedNodes.ReadLock())
-                                    {
-                                        _selectedNodes.OnCustomDraw(_graphics, mouseX, mouseY);
+                            bool customMouseCursor = false;
+                            string mcText = string.Empty;
+                            Alignment mcAlign = Alignment.None;
+                            Font mcFont = DefaultFont;
+                            Brush mcBrush = Brushes.Gray;
 
-                                        if (tool.HandleCustomDraw)
-                                            tool.OnCustomDraw(_graphics, _selectedNodes, mouseX, mouseY);
+                            if (tool != null)
+                            {
+                                customMouseCursor = tool.CustomMouseCusor(mouseX, mouseY, out mcText, out mcAlign, out mcFont, out mcBrush);
+
+                                if (tool.AllowNodeSelection || tool.HandleCustomDraw)
+                                {
+                                    //_graphics.GetWorldPosition(RelativeMousePosition, out double mouseX, out double mouseY);
+                                    if (tool.AllowNodeSelection)
+                                    {
+                                        using (_selectedNodes.ReadLock())
+                                        {
+                                            _selectedNodes.OnCustomDraw(_graphics, mouseX, mouseY);
+
+                                            if (tool.HandleCustomDraw)
+                                                tool.OnCustomDraw(_graphics, _selectedNodes, mouseX, mouseY);
+                                        }
                                     }
+                                    else if (tool.HandleCustomDraw)
+                                        tool.OnCustomDraw(_graphics, null, mouseX, mouseY);
                                 }
-                                else if (tool.HandleCustomDraw)
-                                    tool.OnCustomDraw(_graphics, null, mouseX, mouseY);
+                            }
+                            _graphics.DrawLine(Pens.Gray, mouseX, topBorder, mouseX, downBorder);
+                            _graphics.DrawLine(Pens.Gray, leftBorder, mouseY, rightBorder, mouseY);
+
+                            if(customMouseCursor)
+                            {
+                                _graphics.DrawText(mcText, mouseX, mouseY, mcAlign, mcFont, mcBrush);
+                            }
+                            else
+                            {
+                                _graphics.DrawText(string.Concat("(x)", mouseX.ToString("N2")), mouseX, mouseY, Alignment.BottomLeft, mcFont, mcBrush);
+                                _graphics.DrawText(string.Concat("(y)", mouseY.ToString("N2")), mouseX, mouseY, Alignment.TopLeft, mcFont, mcBrush);
                             }
                         }
                         catch (Exception ex)

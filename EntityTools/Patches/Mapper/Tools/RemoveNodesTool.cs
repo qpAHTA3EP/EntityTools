@@ -51,6 +51,20 @@ namespace EntityTools.Patches.Mapper.Tools
         }
 
         /// <summary>
+        /// Специальный курсор мыши
+        /// </summary>
+        public bool CustomMouseCusor(double worldMouseX, double worldMouseY, out string text, out Alignment textAlignment, out Font font, out Brush brush)
+        {
+            text = string.Empty;
+            textAlignment = Alignment.None;
+            font = Control.DefaultFont;
+            brush = Brushes.White;
+
+            return false;
+        }
+
+
+        /// <summary>
         /// Отрисовка выбранной вершины
         /// </summary>
         private static void drawSelectedNode(MapperGraphics graphics, Node node)

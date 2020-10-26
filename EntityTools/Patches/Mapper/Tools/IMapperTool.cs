@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.Drawing;
+using System.Windows.Forms;
 using AStar;
 
 namespace EntityTools.Patches.Mapper.Tools
@@ -44,6 +45,11 @@ namespace EntityTools.Patches.Mapper.Tools
         /// </summary>
         void OnCustomDraw(MapperGraphics graphics, NodeSelectTool nodes, double worldMouseX, double worldMouseY);
         bool HandleCustomDraw { get; }
+
+        /// <summary>
+        /// Инструмент предусматривает вывод специальной информации рядом с курсором мыши
+        /// </summary>
+        bool CustomMouseCusor(double worldMouseX, double worldMouseY, out string text, out Alignment textAlignment, out Font font, out Brush brush);
 
         /// <summary>
         /// Проверка того, что инструмент был использован и его результаты можно "откатить"

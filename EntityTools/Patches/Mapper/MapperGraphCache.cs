@@ -591,7 +591,11 @@ namespace EntityTools.Patches.Mapper
                 && minY <= y && y <= maxY
                 && minZ <= z && z <= maxZ;
         }
-
+        public bool InCacheArea(double x, double y)
+        {
+            return minX <= x && x <= maxX
+                && minY <= y && y <= maxY;
+        }
         /// <summary>
         /// Размер кэшируемой области вдоль оси X
         /// </summary>
@@ -603,11 +607,16 @@ namespace EntityTools.Patches.Mapper
                 if (value >= 0)
                 {
                     cacheX = value;
+                    float x = cacheInitialPosition.X;
+                    minX = x - value;
+                    maxX = x + value;
                     cacheX_0_75 = value * 0.75;
                 }
                 else
                 {
                     cacheX = double.MaxValue;
+                    minX = double.MaxValue;
+                    maxX = double.MaxValue;
                     cacheX_0_75 = double.MaxValue;
                 }
             }
@@ -625,11 +634,17 @@ namespace EntityTools.Patches.Mapper
                 if (value >= 0)
                 {
                     cacheY = value;
+                    float y = cacheInitialPosition.Y;
+                    minY = y - value;
+                    maxY = y + value;
                     cacheY_0_75 = value * 0.75;
                 }
                 else
                 {
                     cacheY = double.MaxValue;
+                    float y = cacheInitialPosition.Y;
+                    minY = y - value;
+                    maxY = y + value;
                     cacheY_0_75 = double.MaxValue;
                 }
             }
@@ -647,11 +662,16 @@ namespace EntityTools.Patches.Mapper
                 if (value >= 0)
                 {
                     cacheZ = value;
+                    float z = cacheInitialPosition.Z;
+                    minZ = z - value;
+                    maxZ = z + value;
                     cacheZ_0_75 = value * 0.75;
                 }
                 else
                 {
                     cacheZ = double.MaxValue;
+                    minZ = double.MaxValue;
+                    maxZ = double.MaxValue;
                     cacheZ_0_75 = double.MaxValue;
                 }
             }
@@ -672,6 +692,8 @@ namespace EntityTools.Patches.Mapper
         }
         public void MoveCenterPosition(double dx, double dy, double dz)
         {
+            _holdPlayer = false;
+
             //TODO: добавить проверку переполнения в MoveCenterPosition, в SetCacheArea и в SetCacheInitialPosition
             cacheInitialPosition.X += (float)dx;
             cacheInitialPosition.Y += (float)dy;
@@ -702,6 +724,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public void SetCacheArea(double x1, double y1, double z1, double x2, double y2, double z2)
         {
+            _holdPlayer = false;
             checked
             {
                 if (x1 != 0 && x2 != 0)
@@ -759,11 +782,11 @@ namespace EntityTools.Patches.Mapper
         private void SetCacheInitialPosition(Vector3 pos)
         {
             _holdPlayer = false;
-
             SetCacheInitialPosition(pos.X, pos.Y, pos.Z);
         }
         private void SetCacheInitialPosition(double x, double y, double z)
         {
+            _holdPlayer = false;
             checked
             {
                 centerX = x;

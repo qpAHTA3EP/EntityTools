@@ -22,12 +22,14 @@ namespace EntityTools.Patches.Mapper.Tools
         private double startY;
         private double startZ;
         private string startLable;
+        Alignment startAlignment;
 
         // координаты конечной точки
         private double endX;
         private double endY;
         private double endZ;
         private string endLable;
+        Alignment endAlignment;
 
         private Road road;
 
@@ -35,11 +37,36 @@ namespace EntityTools.Patches.Mapper.Tools
 
         public bool AllowNodeSelection => false;
 
+        public bool CustomMouseCusor(double worldMouseX, double worldMouseY, out string text, out Alignment textAlignment, out Font font, out Brush brush)
+        {
+            bool handleMouseCursor = false;
+            text = string.Empty;
+            textAlignment = Alignment.None;
+            font = Control.DefaultFont;
+            brush = Brushes.RoyalBlue;
+
+            if (!(startX == 0 && startY == 0 && startZ == 0))
+            {
+                if (endX == 0 && endY == 0 && endZ == 0)
+                {
+                    double dist = Point3D.DistanceBetween(startX, startY, startZ, worldMouseX, worldMouseY, startZ);
+                    text = string.Concat("(x)", worldMouseX.ToString("N1"), "; (y)", worldMouseY.ToString("N1"), Environment.NewLine,
+                            "Distance (2D): ", dist.ToString("N1"));
+
+                    MapperHelper.GetLableAlingment(startX, startY, worldMouseX, worldMouseY, out startAlignment, out textAlignment);
+                    handleMouseCursor = true;
+                }
+            }
+
+            return handleMouseCursor;
+        }
+
         public bool HandleCustomDraw => true;
         public void OnCustomDraw(MapperGraphics graphics, NodeSelectTool nodes, double worldMouseX, double worldMouseY)
         {
             if (!(startX == 0 && startY == 0 && startZ == 0))
             {
+#if false
                 double x, y, z;
                 string endLbl;
 
@@ -59,11 +86,11 @@ namespace EntityTools.Patches.Mapper.Tools
                     z = endZ;
                     endLbl = endLable;
 
-                    if(road?.Waypoints.Count > 0)
+                    if (road?.Waypoints.Count > 0)
                         Patch_Astral_Logic_Navmesh_DrawRoad.DrawRoad(road.Waypoints, graphics, Pens.RoyalBlue, Brushes.RoyalBlue);
                 }
-
-                MapperHelper.GetLableAlingment(startX, startY, x, y, out Alignment startAlignment, out Alignment endAlignment);
+                if (startAlignment == Alignment.None || endAlignment == Alignment.None)
+                    MapperHelper.GetLableAlingment(startX, startY, x, y, out Alignment startAlignment, out Alignment endAlignment);
 
                 graphics.FillCircleCentered(Brushes.RoyalBlue, startX, startY, 8);
                 graphics.DrawText(startLable, startX, startY, startAlignment, Control.DefaultFont, Brushes.RoyalBlue);
@@ -72,7 +99,31 @@ namespace EntityTools.Patches.Mapper.Tools
 
                 graphics.FillCircleCentered(Brushes.RoyalBlue, x, y, 8);
                 graphics.DrawText(endLbl, x, y, endAlignment, Control.DefaultFont, Brushes.RoyalBlue);
-            }
+#else
+                double x, y;
+                if (endX == 0 && endY == 0 && endZ == 0)
+                {
+                    x = worldMouseX;
+                    y = worldMouseY;
+                }
+                else
+                {
+                    x = endX;
+                    y = endY;
+
+                    if (road?.Waypoints.Count > 0)
+                        Patch_Astral_Logic_Navmesh_DrawRoad.DrawRoad(road.Waypoints, graphics, Pens.RoyalBlue, Brushes.RoyalBlue);
+
+                    graphics.FillCircleCentered(Brushes.RoyalBlue, endX, endY, 8);
+                    graphics.DrawText(endLable, endX, endY, endAlignment, Control.DefaultFont, Brushes.RoyalBlue);
+                }
+
+                graphics.DrawLine(Pens.AliceBlue, startX, startY, x, y);
+
+                graphics.FillCircleCentered(Brushes.RoyalBlue, startX, startY, 8);
+                graphics.DrawText(startLable, startX, startY, startAlignment, Control.DefaultFont, Brushes.RoyalBlue);
+#endif
+            } 
         }
 
         public bool HandleKeyUp => true;
@@ -87,6 +138,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     startY = 0;
                     startZ = 0;
                     startLable = string.Empty;
+                    startAlignment = Alignment.None;
                 }
                 else
                 {
@@ -94,6 +146,8 @@ namespace EntityTools.Patches.Mapper.Tools
                     endY = 0;
                     endZ = 0;
                     road = null;
+                    endLable = string.Empty;
+                    endAlignment = Alignment.None;
                 }
             }
         }
@@ -124,6 +178,8 @@ namespace EntityTools.Patches.Mapper.Tools
                             endY = y;
                             endZ = z;
                             double dist2D = Point3D.DistanceBetween(startX, startY, startZ, endX, endY, endZ);
+                            MapperHelper.GetLableAlingment(startX, startY, endX, endY, out startAlignment, out endAlignment);
+
                             double pathLen = 0;
                             DialogResult userAnswer = XtraMessageBox.Show("Generate road with Pathfinding?\n\r" +
                                 "\tYes: Road generated by the Pathfinding\n\r" +
@@ -160,6 +216,8 @@ namespace EntityTools.Patches.Mapper.Tools
                         endX = e.X;
                         endY = e.Y;
                         endZ = startZ;
+                        MapperHelper.GetLableAlingment(startX, startY, endX, endY, out startAlignment, out endAlignment);
+
                         double dist = Point3D.DistanceBetween(startX, startY, startZ, endX, endY, endZ);
                         endLable = string.Concat("(x)", endX.ToString("N1"), "; (y)", endY.ToString("N1"), Environment.NewLine,
                                 "Distance (2D): ", dist.ToString("N1"));

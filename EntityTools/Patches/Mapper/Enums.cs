@@ -48,6 +48,7 @@
     /// </summary>
     public enum Alignment
     {
+        None,
         TopLeft,
         TopCenter,
         TopRight,

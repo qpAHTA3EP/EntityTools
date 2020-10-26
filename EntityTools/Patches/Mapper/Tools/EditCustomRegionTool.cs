@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 using AStar;
 using Astral.Quester.Classes;
@@ -116,6 +117,19 @@ namespace EntityTools.Patches.Mapper.Tools
                     graphics.DrawCustomRegion(left, top, right, down, IsElliptical);
                 }
             }
+        }
+
+        /// <summary>
+        /// Специальный курсор мыши
+        /// </summary>
+        public bool CustomMouseCusor(double worldMouseX, double worldMouseY, out string text, out Alignment textAlignment, out Font font, out Brush brush)
+        {
+            text = string.Empty;
+            textAlignment = Alignment.None;
+            font = Control.DefaultFont;
+            brush = Brushes.White;
+
+            return false;
         }
 
         public bool HandleKeyUp => true;

@@ -105,19 +105,21 @@ namespace EntityTools.Patches.Mapper
             this.editItemColor = new DevExpress.XtraEditors.Repository.RepositoryItemColorEdit();
             this.editUnidirPathColor = new DevExpress.XtraBars.BarEditItem();
             this.btnLockOnSpecialObject = new DevExpress.XtraBars.BarButtonItem();
+            this.btnAddRoad = new DevExpress.XtraBars.BarCheckItem();
             this.bsrcAstralSettings = new System.Windows.Forms.BindingSource(this.components);
             this.btnShowStatBar = new System.Windows.Forms.Button();
             this.MapPicture = new System.Windows.Forms.PictureBox();
             this.panelSettings = new DevExpress.XtraEditors.PanelControl();
             this.tabPaneSettings = new DevExpress.XtraBars.Navigation.TabPane();
             this.tabGeneral = new DevExpress.XtraBars.Navigation.TabNavigationPage();
+            this.ckbChacheEnable = new DevExpress.XtraEditors.CheckEdit();
             this.tabCustomization = new DevExpress.XtraBars.Navigation.TabNavigationPage();
             this.navBarCustomization = new DevExpress.XtraNavBar.NavBarControl();
             this.navGroupMeshes = new DevExpress.XtraNavBar.NavBarGroup();
             this.navGroupMeshesControlContainer = new DevExpress.XtraNavBar.NavBarGroupControlContainer();
-            this.lblBidirPath = new DevExpress.XtraEditors.LabelControl();
-            this.lblBackground = new DevExpress.XtraEditors.LabelControl();
-            this.lblUnidirPath = new DevExpress.XtraEditors.LabelControl();
+            this.lblBackground = new System.Windows.Forms.Label();
+            this.lblUnidirPath = new System.Windows.Forms.Label();
+            this.lblBidirPath = new System.Windows.Forms.Label();
             this.colorEditBidirPath = new DevExpress.XtraEditors.ColorEdit();
             this.colorBackground = new DevExpress.XtraEditors.ColorEdit();
             this.colorEditUnidirPath = new DevExpress.XtraEditors.ColorEdit();
@@ -152,6 +154,8 @@ namespace EntityTools.Patches.Mapper
             this.panelSettings.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tabPaneSettings)).BeginInit();
             this.tabPaneSettings.SuspendLayout();
+            this.tabGeneral.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ckbChacheEnable.Properties)).BeginInit();
             this.tabCustomization.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.navBarCustomization)).BeginInit();
             this.navBarCustomization.SuspendLayout();
@@ -248,8 +252,9 @@ namespace EntityTools.Patches.Mapper
             this.btnSettings,
             this.lblPlayerPos,
             this.lblDrawInfo,
-            this.btnDistanceMeasurement});
-            this.barManager.MaxItemId = 133;
+            this.btnDistanceMeasurement,
+            this.btnAddRoad});
+            this.barManager.MaxItemId = 134;
             this.barManager.OptionsLayout.AllowAddNewItems = false;
             this.barManager.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.seDeleteRadius,
@@ -582,8 +587,7 @@ namespace EntityTools.Patches.Mapper
             // 
             this.btnDistanceMeasurement.Caption = "DistanceMeasurement";
             this.btnDistanceMeasurement.Id = 132;
-            this.btnDistanceMeasurement.ImageOptions.Image = global::EntityTools.Properties.Resources.rulerhorizontal_16x16;
-            this.btnDistanceMeasurement.ImageOptions.LargeImage = global::EntityTools.Properties.Resources.rulerhorizontal_32x32;
+            this.btnDistanceMeasurement.ImageOptions.Image = global::EntityTools.Properties.Resources.miniRuler;
             this.btnDistanceMeasurement.Name = "btnDistanceMeasurement";
             this.btnDistanceMeasurement.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_DistanceMeasurement_ModeChanged);
             // 
@@ -607,7 +611,7 @@ namespace EntityTools.Patches.Mapper
             // 
             this.btnAddCR.Caption = "Add CustomRegion";
             this.btnAddCR.Id = 48;
-            this.btnAddCR.ImageOptions.Image = global::EntityTools.Properties.Resources.miniAddCR_3;
+            this.btnAddCR.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnAddCR.ImageOptions.Image")));
             this.btnAddCR.Name = "btnAddCR";
             this.btnAddCR.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AddCustomRegion);
             // 
@@ -759,8 +763,7 @@ namespace EntityTools.Patches.Mapper
             this.btnSettings.Hint = "Open Mapper settings panel";
             this.btnSettings.Id = 129;
             this.btnSettings.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
-            this.btnSettings.ImageOptions.Image = global::EntityTools.Properties.Resources.customization_16x16;
-            this.btnSettings.ImageOptions.LargeImage = global::EntityTools.Properties.Resources.customization_32x32;
+            this.btnSettings.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCustomization;
             this.btnSettings.Name = "btnSettings";
             this.btnSettings.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ShowSettingsTab);
             // 
@@ -815,7 +818,7 @@ namespace EntityTools.Patches.Mapper
             this.lblPlayerPos.Hint = "Player coordinates";
             this.lblPlayerPos.Id = 130;
             this.lblPlayerPos.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
-            this.lblPlayerPos.ImageOptions.Image = global::EntityTools.Properties.Resources.navigationbar_16x16;
+            this.lblPlayerPos.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCompas;
             this.lblPlayerPos.Name = "lblPlayerPos";
             this.lblPlayerPos.PaintStyle = DevExpress.XtraBars.BarItemPaintStyle.CaptionGlyph;
             // 
@@ -828,8 +831,7 @@ namespace EntityTools.Patches.Mapper
             this.lblMousePos.Hint = "The coordinates of the mouse pointer";
             this.lblMousePos.Id = 82;
             this.lblMousePos.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
-            this.lblMousePos.ImageOptions.Image = global::EntityTools.Properties.Resources.select_16x16;
-            this.lblMousePos.ImageOptions.LargeImage = global::EntityTools.Properties.Resources.select_32x32;
+            this.lblMousePos.ImageOptions.Image = global::EntityTools.Properties.Resources.miniMousePointer;
             this.lblMousePos.Name = "lblMousePos";
             this.lblMousePos.PaintStyle = DevExpress.XtraBars.BarItemPaintStyle.CaptionGlyph;
             // 
@@ -841,8 +843,7 @@ namespace EntityTools.Patches.Mapper
             this.lblDrawInfo.Hint = "Windows redraw information";
             this.lblDrawInfo.Id = 131;
             this.lblDrawInfo.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
-            this.lblDrawInfo.ImageOptions.Image = global::EntityTools.Properties.Resources.info_16x16;
-            this.lblDrawInfo.ImageOptions.LargeImage = global::EntityTools.Properties.Resources.info_32x32;
+            this.lblDrawInfo.ImageOptions.Image = global::EntityTools.Properties.Resources.miniInfo;
             this.lblDrawInfo.Name = "lblDrawInfo";
             this.lblDrawInfo.PaintStyle = DevExpress.XtraBars.BarItemPaintStyle.CaptionGlyph;
             // 
@@ -959,6 +960,14 @@ namespace EntityTools.Patches.Mapper
             this.btnLockOnSpecialObject.Name = "btnLockOnSpecialObject";
             this.btnLockOnSpecialObject.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_LockOnSpecialObject);
             // 
+            // btnAddRoad
+            // 
+            this.btnAddRoad.Caption = "Add Road";
+            this.btnAddRoad.Description = "Добавить путь между двумя точками";
+            this.btnAddRoad.Id = 133;
+            this.btnAddRoad.ImageOptions.Image = global::EntityTools.Properties.Resources.miniRoad;
+            this.btnAddRoad.Name = "btnAddRoad";
+            // 
             // btnShowStatBar
             // 
             this.btnShowStatBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -979,6 +988,7 @@ namespace EntityTools.Patches.Mapper
             // 
             // MapPicture
             // 
+            this.MapPicture.BackColor = System.Drawing.Color.Black;
             this.MapPicture.Cursor = System.Windows.Forms.Cursors.Cross;
             this.MapPicture.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MapPicture.Location = new System.Drawing.Point(0, 56);
@@ -1024,9 +1034,19 @@ namespace EntityTools.Patches.Mapper
             // tabGeneral
             // 
             this.tabGeneral.Caption = "General";
+            this.tabGeneral.Controls.Add(this.ckbChacheEnable);
             this.tabGeneral.Name = "tabGeneral";
             this.tabGeneral.Size = new System.Drawing.Size(398, 324);
             this.tabGeneral.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            // 
+            // ckbChacheEnable
+            // 
+            this.ckbChacheEnable.Location = new System.Drawing.Point(12, 10);
+            this.ckbChacheEnable.MenuManager = this.barManager;
+            this.ckbChacheEnable.Name = "ckbChacheEnable";
+            this.ckbChacheEnable.Properties.Caption = "Enable caching of the visible meshes";
+            this.ckbChacheEnable.Size = new System.Drawing.Size(205, 19);
+            this.ckbChacheEnable.TabIndex = 0;
             // 
             // tabCustomization
             // 
@@ -1056,7 +1076,8 @@ namespace EntityTools.Patches.Mapper
             // 
             this.navGroupMeshes.Caption = "Meshes";
             this.navGroupMeshes.ControlContainer = this.navGroupMeshesControlContainer;
-            this.navGroupMeshes.GroupClientHeight = 92;
+            this.navGroupMeshes.Expanded = true;
+            this.navGroupMeshes.GroupClientHeight = 81;
             this.navGroupMeshes.GroupStyle = DevExpress.XtraNavBar.NavBarGroupStyle.ControlContainer;
             this.navGroupMeshes.Name = "navGroupMeshes";
             // 
@@ -1064,51 +1085,46 @@ namespace EntityTools.Patches.Mapper
             // 
             this.navGroupMeshesControlContainer.Appearance.BackColor = System.Drawing.SystemColors.Control;
             this.navGroupMeshesControlContainer.Appearance.Options.UseBackColor = true;
-            this.navGroupMeshesControlContainer.Controls.Add(this.lblBidirPath);
             this.navGroupMeshesControlContainer.Controls.Add(this.lblBackground);
             this.navGroupMeshesControlContainer.Controls.Add(this.lblUnidirPath);
+            this.navGroupMeshesControlContainer.Controls.Add(this.lblBidirPath);
             this.navGroupMeshesControlContainer.Controls.Add(this.colorEditBidirPath);
             this.navGroupMeshesControlContainer.Controls.Add(this.colorBackground);
             this.navGroupMeshesControlContainer.Controls.Add(this.colorEditUnidirPath);
             this.navGroupMeshesControlContainer.Name = "navGroupMeshesControlContainer";
-            this.navGroupMeshesControlContainer.Size = new System.Drawing.Size(390, 85);
+            this.navGroupMeshesControlContainer.Size = new System.Drawing.Size(390, 74);
             this.navGroupMeshesControlContainer.TabIndex = 0;
             this.navGroupMeshesControlContainer.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
-            // lblBidirPath
-            // 
-            this.lblBidirPath.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.False;
-            this.lblBidirPath.ImageOptions.Alignment = System.Drawing.ContentAlignment.MiddleLeft;
-            this.lblBidirPath.ImageOptions.Image = global::EntityTools.Properties.Resources.miniBiPath;
-            this.lblBidirPath.Location = new System.Drawing.Point(3, 3);
-            this.lblBidirPath.Name = "lblBidirPath";
-            this.lblBidirPath.Size = new System.Drawing.Size(132, 16);
-            this.lblBidirPath.TabIndex = 1;
-            this.lblBidirPath.Text = "        Bidirectional path color";
-            this.lblBidirPath.UseMnemonic = false;
-            this.lblBidirPath.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
-            // 
             // lblBackground
             // 
-            this.lblBackground.ImageOptions.Alignment = System.Drawing.ContentAlignment.MiddleLeft;
-            this.lblBackground.ImageOptions.Image = global::EntityTools.Properties.Resources.label_16x16;
-            this.lblBackground.Location = new System.Drawing.Point(3, 55);
+            this.lblBackground.Image = global::EntityTools.Properties.Resources.miniBackground;
+            this.lblBackground.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lblBackground.Location = new System.Drawing.Point(5, 56);
             this.lblBackground.Name = "lblBackground";
-            this.lblBackground.Size = new System.Drawing.Size(80, 16);
-            this.lblBackground.TabIndex = 1;
+            this.lblBackground.Size = new System.Drawing.Size(139, 16);
+            this.lblBackground.TabIndex = 2;
             this.lblBackground.Text = "        Background";
-            this.lblBackground.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
             // lblUnidirPath
             // 
-            this.lblUnidirPath.ImageOptions.Alignment = System.Drawing.ContentAlignment.MiddleLeft;
-            this.lblUnidirPath.ImageOptions.Image = global::EntityTools.Properties.Resources.miniUniPath;
-            this.lblUnidirPath.Location = new System.Drawing.Point(3, 29);
+            this.lblUnidirPath.Image = global::EntityTools.Properties.Resources.miniUniPath;
+            this.lblUnidirPath.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lblUnidirPath.Location = new System.Drawing.Point(5, 30);
             this.lblUnidirPath.Name = "lblUnidirPath";
             this.lblUnidirPath.Size = new System.Drawing.Size(139, 16);
-            this.lblUnidirPath.TabIndex = 1;
+            this.lblUnidirPath.TabIndex = 2;
             this.lblUnidirPath.Text = "        Unidirectional path color";
-            this.lblUnidirPath.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            // 
+            // lblBidirPath
+            // 
+            this.lblBidirPath.Image = global::EntityTools.Properties.Resources.miniBiPath;
+            this.lblBidirPath.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lblBidirPath.Location = new System.Drawing.Point(5, 4);
+            this.lblBidirPath.Name = "lblBidirPath";
+            this.lblBidirPath.Size = new System.Drawing.Size(139, 16);
+            this.lblBidirPath.TabIndex = 2;
+            this.lblBidirPath.Text = "        Bidirectional path color";
             // 
             // colorEditBidirPath
             // 
@@ -1379,11 +1395,12 @@ namespace EntityTools.Patches.Mapper
             this.panelSettings.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.tabPaneSettings)).EndInit();
             this.tabPaneSettings.ResumeLayout(false);
+            this.tabGeneral.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.ckbChacheEnable.Properties)).EndInit();
             this.tabCustomization.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.navBarCustomization)).EndInit();
             this.navBarCustomization.ResumeLayout(false);
             this.navGroupMeshesControlContainer.ResumeLayout(false);
-            this.navGroupMeshesControlContainer.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.colorEditBidirPath.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.colorBackground.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.colorEditUnidirPath.Properties)).EndInit();
@@ -1485,8 +1502,6 @@ namespace EntityTools.Patches.Mapper
         private DevExpress.XtraBars.Navigation.TabPane tabPaneSettings;
         private DevExpress.XtraBars.Navigation.TabNavigationPage tabGeneral;
         private DevExpress.XtraBars.Navigation.TabNavigationPage tabCustomization;
-        private DevExpress.XtraEditors.LabelControl lblUnidirPath;
-        private DevExpress.XtraEditors.LabelControl lblBidirPath;
         private DevExpress.XtraEditors.ColorEdit colorEditUnidirPath;
         private DevExpress.XtraEditors.ColorEdit colorEditBidirPath;
         private BarCheckItem btnSettings;
@@ -1506,7 +1521,6 @@ namespace EntityTools.Patches.Mapper
         private DevExpress.XtraEditors.ColorEdit colorEnemies;
         private DevExpress.XtraEditors.CheckEdit ckbPlayers;
         private DevExpress.XtraEditors.ColorEdit colorPlayers;
-        private DevExpress.XtraEditors.LabelControl lblBackground;
         private DevExpress.XtraEditors.ColorEdit colorBackground;
         private DevExpress.XtraEditors.CheckEdit ckbSkillnodes;
         private DevExpress.XtraEditors.ColorEdit colorSkillnodes;
@@ -1514,6 +1528,11 @@ namespace EntityTools.Patches.Mapper
         private DevExpress.XtraEditors.ColorEdit colorOtherNPC;
         private DevExpress.XtraEditors.GroupControl grpNodeCustomization;
         private DevExpress.XtraEditors.GroupControl grpEntityCustomization;
+        private BarCheckItem btnAddRoad;
+        private Label lblBackground;
+        private Label lblUnidirPath;
+        private Label lblBidirPath;
+        private DevExpress.XtraEditors.CheckEdit ckbChacheEnable;
     } 
 #endif
 }

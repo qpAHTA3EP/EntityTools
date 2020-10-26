@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 using AStar;
 using Astral.Quester;
@@ -90,6 +91,20 @@ namespace EntityTools.Patches.Mapper.Tools
                 }
             }
         }
+
+        /// <summary>
+        /// Специальный курсор мыши
+        /// </summary>
+        public bool CustomMouseCusor(double worldMouseX, double worldMouseY, out string text, out Alignment textAlignment, out Font font, out Brush brush)
+        {
+            text = string.Empty;
+            textAlignment = Alignment.None;
+            font = Control.DefaultFont;
+            brush = Brushes.White;
+
+            return false;
+        }
+
 
         public bool HandleKeyUp => true;
         public void OnKeyUp(IGraph graph, NodeSelectTool nodes, KeyEventArgs e, double worldMouseX, double worldMouseY, out IMapperTool undo)

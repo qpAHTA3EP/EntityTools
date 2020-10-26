@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Threading;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.Classes.Map;
@@ -20,14 +21,18 @@ namespace EntityTools.Quester.Actions
         #region Взаимодействие с ядром EntityToolsCore
         public event PropertyChangedEventHandler PropertyChanged;
 
-#if CORE_INTERFACES
+        [XmlIgnore]
         [NonSerialized]
         internal IQuesterActionEngine Engine;
-#endif
 
         public MoveToEntity()
         {
             Engine = new QuesterActionProxy(this);
+        }
+
+        private IQuesterActionEngine internal_GetProxie()
+        {
+            return new QuesterActionProxy(this);
         }
         #endregion
 
@@ -333,19 +338,17 @@ namespace EntityTools.Quester.Actions
         public override string Category => "Basic";
         #endregion
 
-#if CORE_INTERFACES
         // Интерфес Quester.Action, реализованный через ActionEngine
-        public override bool NeedToRun => Engine.NeedToRun;
-        public override ActionResult Run() => Engine.Run();
-        public override string ActionLabel => Engine.ActionLabel;
+        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).NeedToRun;
+        public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).Run();
+        public override string ActionLabel => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).ActionLabel;
         public override string InternalDisplayName => string.Empty;
-        public override bool UseHotSpots => Engine.UseHotSpots;
-        protected override bool IntenalConditions => Engine.InternalConditions;
-        protected override Vector3 InternalDestination => Engine.InternalDestination;
-        protected override ActionValidity InternalValidity => Engine.InternalValidity;
-        public override void GatherInfos() => Engine.GatherInfos();
-        public override void InternalReset() => Engine.InternalReset();
-        public override void OnMapDraw(GraphicsNW graph) => Engine.OnMapDraw(graph);
-#endif
+        public override bool UseHotSpots => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).UseHotSpots;
+        protected override bool IntenalConditions => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).InternalConditions;
+        protected override Vector3 InternalDestination => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).InternalDestination;
+        protected override ActionValidity InternalValidity => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).InternalValidity;
+        public override void GatherInfos() => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).GatherInfos();
+        public override void InternalReset() => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).InternalReset();
+        public override void OnMapDraw(GraphicsNW graph) => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).OnMapDraw(graph);
     }
 }
