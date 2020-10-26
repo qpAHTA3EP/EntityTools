@@ -56,11 +56,11 @@ namespace EntityCore
             {
                 if (obj is QuesterAction qAction)
                     return Initialize(qAction);
-                else if (obj is QuesterCondition qCondition)
+                if (obj is QuesterCondition qCondition)
                     return Initialize(qCondition);
                 if (obj is UCCAction uccAction)
                     return Initialize(uccAction);
-                else if (obj is UCCCondition uccCondition)
+                if (obj is UCCCondition uccCondition)
                     return Initialize(uccCondition);
             }
             catch { }
@@ -74,28 +74,35 @@ namespace EntityCore
                 {
                     if (!dictionary.ContainsKey(m2e))
                         dictionary.Add(m2e, new MoveToEntityEngine(m2e));
+                    else ((MoveToEntityEngine) dictionary[m2e]).Rebase(m2e);
                     return true;
                 }
-                else if (action is InteractEntities ie)
+
+                if (action is InteractEntities ie)
                 {
-                    if(!dictionary.ContainsKey(ie))
+                    if (!dictionary.ContainsKey(ie))
                         dictionary.Add(ie, new InteractEntitiesEngine(ie));
                     return true;
                 }
-                else if (action is PickUpMissionExt pum)
+
+                if (action is PickUpMissionExt pum)
                 {
                     if (!dictionary.ContainsKey(pum))
                         dictionary.Add(pum, new PickUpMissionEngine(pum));
                     return true;
                 }
-                else if (action is InsertInsignia ii)
+
+                if (action is InsertInsignia ii)
                 {
                     if (!dictionary.ContainsKey(ii))
                         dictionary.Add(ii, new InsertInsigniaEngine(ii));
                     return true;
                 }
             }
-            catch { }
+            catch (Exception e)
+            {
+                ETLogger.WriteLine(LogType.Error, e.ToString());
+            }
             return false;
         }
         public bool Initialize(QuesterCondition condition)
@@ -108,32 +115,35 @@ namespace EntityCore
                         dictionary.Add(ettCount, new EntityCountEngine(ettCount));
                     return true;
                 }
-                else if(condition is EntityProperty ettProperty)
+                if(condition is EntityProperty ettProperty)
                 {
                     if (!dictionary.ContainsKey(ettProperty))
                         dictionary.Add(ettProperty, new EntityPropertyEngine(ettProperty));
                     return true;
                 }
-                else if (condition is TeamMembersCount teamCount)
+                if (condition is TeamMembersCount teamCount)
                 {
                     if (!dictionary.ContainsKey(teamCount))
                         dictionary.Add(teamCount, new TeamMembersCountEngine(teamCount));
                     return true;
                 }
-                else if (condition is CheckGameGUI guiCheck)
+                if (condition is CheckGameGUI guiCheck)
                 {
                     if (!dictionary.ContainsKey(guiCheck))
                         dictionary.Add(guiCheck, new CheckGameGUIEngine(guiCheck));
                     return true;
                 }
-                else if (condition is EntityDistance ettDist)
+                if (condition is EntityDistance ettDist)
                 {
                     if (!dictionary.ContainsKey(ettDist))
                         dictionary.Add(ettDist, new EntityDistanceEngine(ettDist));
                     return true;
                 }
             }
-            catch { }
+            catch (Exception e)
+            {
+                ETLogger.WriteLine(LogType.Error, e.ToString());
+            }
             return false;
         }
         public bool Initialize(UCCAction action)
@@ -146,26 +156,29 @@ namespace EntityCore
                         dictionary.Add(ettApproach, new ApproachEntityEngine(ettApproach));
                     return true;
                 }
-                else if(action is DodgeFromEntity ettDodge)
+                if(action is DodgeFromEntity ettDodge)
                 {
                     if (!dictionary.ContainsKey(ettDodge))
                         dictionary.Add(ettDodge, new DodgeFromEntityEngine(ettDodge));
                     return true;
                 }
-                else if (action is ExecuteSpecificPower execPower)
+                if (action is ExecuteSpecificPower execPower)
                 {
                     if (!dictionary.ContainsKey(execPower))
                         dictionary.Add(execPower, new ExecuteSpecificPowerEngine(execPower));
                     return true;
                 }
-                else if (action is UseItemSpecial useItem)
+                if (action is UseItemSpecial useItem)
                 {
                     if (!dictionary.ContainsKey(useItem))
                         dictionary.Add(useItem, new UseItemSpecialEngine(useItem));
                     return true;
                 }
             }
-            catch { }
+            catch (Exception e)
+            {
+                ETLogger.WriteLine(LogType.Error, e.ToString());
+            }
             return false;
         }
         public bool Initialize(UCCCondition condition)
@@ -178,13 +191,13 @@ namespace EntityCore
                         dictionary.Add(ettCheck, new UCCEntityCheckEngine(ettCheck));
                     return true;
                 }
-                else if (condition is UCCTargetMatchEntity targMatch)
+                if (condition is UCCTargetMatchEntity targMatch)
                 {
                     if (!dictionary.ContainsKey(targMatch))
                         dictionary.Add(targMatch, new UCCTargetMatchEntityEngine(targMatch));
                     return true;
                 }
-                else if (condition is UCCGameUICheck uiCheck)
+                if (condition is UCCGameUICheck uiCheck)
                 {
                     if (!dictionary.ContainsKey(uiCheck))
                         dictionary.Add(uiCheck, new UCCGameUICheckEngine(uiCheck));
@@ -250,7 +263,7 @@ namespace EntityCore
 
         public bool GUIRequest_CustomRegions(ref List<string> crList)
         {
-            //TODO: Исправить ошибку отображения списка CustomRegion (отображается предыдущий списко), а также ошибку приведения ListBoxItem к System.String
+            //TODO: Исправить ошибку отображения списка CustomRegion (отображается предыдущий список), а также ошибку приведения ListBoxItem к System.String
             if(crList is null)
                 crList = new List<string>();
 

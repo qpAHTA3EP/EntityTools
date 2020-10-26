@@ -120,6 +120,5 @@ namespace EntityCore.Entities
         {
             return string.IsNullOrEmpty(e.InternalName) && string.IsNullOrEmpty(e.NameUntranslated);
         }
-
     }
 }
