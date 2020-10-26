@@ -123,7 +123,7 @@ namespace EntityCore.Entities
             if (EntityManager.LocalPlayer.InCombat
                 && !Astral.Quester.API.IgnoreCombat)
                     Timer = new Timeout(EntityTools.EntityTools.PluginSettings.EntityCache.GlobalCacheTime);
-            else Timer = new Timeout(EntityCache.CombatChacheTime);
+            else Timer = new Timeout(EntityTools.EntityTools.PluginSettings.EntityCache.CombatCacheTime);
         }
         public void Regen(Action<Entity> action)
         {
@@ -144,7 +144,7 @@ namespace EntityCore.Entities
             if (EntityManager.LocalPlayer.InCombat
                 && !Astral.Quester.API.IgnoreCombat)
                     Timer = new Timeout(EntityTools.EntityTools.PluginSettings.EntityCache.GlobalCacheTime);
-            else Timer = new Timeout(EntityCache.CombatChacheTime);
+            else Timer = new Timeout(EntityTools.EntityTools.PluginSettings.EntityCache.CombatCacheTime);
         }
 
         /// <summary>
@@ -191,65 +191,64 @@ namespace EntityCore.Entities
     public class EntityCache : KeyedCollection<CacheRecordKey, EntityCacheRecord>
     {
 #if DEBUG && PROFILING
-        private static int MatchCount = 0;
-        private static int MismatchCount = 0;
+        private static int matchCount = 0;
+        private static int mismatchCount = 0;
 
         public static void ResetWatch()
         {
-            MatchCount = 0;
-            MismatchCount = 0;
+            matchCount = 0;
+            mismatchCount = 0;
             ETLogger.WriteLine(LogType.Debug, $"EntityCache::ResetWatch()");
         }
 
         public static void LogWatch()
         {
-            ETLogger.WriteLine(LogType.Debug, $"EntityCache: MatchCount: {MatchCount}, MismatchCount: {MismatchCount}");
+            ETLogger.WriteLine(LogType.Debug, $"EntityCache: matchCount: {matchCount}, mismatchCount: {mismatchCount}");
         }
 #endif
+#if false
         /// <summary>
         /// Интервал времени между обновлениями кэша
         /// </summary>
-        //public static int ChacheTime { get; set; } = 500;
+        public static int ChacheTime { get; set; } = 500;
 
         /// <summary>
         /// Интервал времени между обновлениями кэша во время боя
         /// </summary>
-        public static int CombatChacheTime { get; set; } = 200;
+        public static int CombatChacheTime { get; set; } = 200; 
+#endif
 
         protected override CacheRecordKey GetKeyForItem(EntityCacheRecord item)
         {
             return item.Key;
         }
 
-        public bool TryGetValue(out EntityCacheRecord record, string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete)
+        public bool TryGetValue(out EntityCacheRecord record, string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.InternalName, EntitySetType setType = EntitySetType.Complete)
         {
             record = null;
             CacheRecordKey key = new CacheRecordKey(pattern, matchType, nameType, setType);
             if (base.Contains(key))
             {
 #if DEBUG && PROFILING
-                MatchCount++;
+                matchCount++;
 #endif
                 record = this[key];
                 return true;
             }
-            else
-            {
 #if DEBUG && PROFILING
-                MismatchCount++;
+            mismatchCount++;
 #endif
-                return false;
-            }
+            return false;
         }
 
-        public EntityCacheRecord MakeCache(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete)
+        public EntityCacheRecord MakeCache(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.InternalName, EntitySetType setType = EntitySetType.Complete)
         {
             EntityCacheRecord record = new EntityCacheRecord(pattern, matchType, nameType, setType);
             base.Add(record);
             return record;
         }
 
-        public bool Contains(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete)
+        public bool Contains(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.InternalName, EntitySetType setType = EntitySetType.Complete)
         {
             CacheRecordKey key = new CacheRecordKey(pattern, matchType, nameType, setType);
             return base.Contains(key);
