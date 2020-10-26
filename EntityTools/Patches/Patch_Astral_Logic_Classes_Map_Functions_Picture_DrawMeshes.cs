@@ -31,8 +31,6 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Отрисовка графа путей <paramref name="meshes"/> на <paramref name="graphicsNW"/>
         /// </summary>
-        /// <param name="graphicsNW"></param>
-        /// <param name="meshes"></param>
         public static void DrawMeshes(GraphicsNW graphicsNW, Graph meshes)
         {
             if (graphicsNW is MapperGraphics mapGraphics)
@@ -42,12 +40,13 @@ namespace EntityTools.Patches.Mapper
                 var bidirPen = mapGraphics.DrawingTools.BidirectionalPathPen;
                 var unidirPen = mapGraphics.DrawingTools.UnidirectionalPathPen;
 
-                using (meshes.ReadLock())
+                var graph = mapGraphics.VisibleGraph;
+                using (graph.ReadLock())
                 {
                     mapGraphics.GetWorldPosition(0, 0, out double left, out double top);
                     mapGraphics.GetWorldPosition(mapGraphics.ImageWidth, mapGraphics.ImageHeight, out double right, out double down);
 
-                    foreach (Node node in meshes.Nodes)
+                    foreach (Node node in graph.NodesCollection)
                     {
                         if (node.Passable)
                         {
