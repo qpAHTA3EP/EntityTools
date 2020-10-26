@@ -40,7 +40,7 @@ namespace EntityCore.Quester.Action
         internal readonly InstancePropertyAccessor<MoveToEntity, ActionDebug> debug = null; 
 #endif
 
-        private readonly string actionIDstr = string.Empty;
+        private string actionIDstr = string.Empty;
         private List<CustomRegion> customRegions = null;
         private string label = string.Empty;
         private Entity target = null;
@@ -52,10 +52,11 @@ namespace EntityCore.Quester.Action
 
         internal MoveToEntityEngine(MoveToEntity m2e)
         {
+#if false
             @this = m2e;
             @this.PropertyChanged += PropertyChanged;
 
-            actionIDstr = string.Concat(@this.GetType().Name, '[', @this.ActionID, ']'); 
+            actionIDstr = string.Concat(@this.GetType().Name, '[', @this.ActionID, ']');
 #if M2EE_ActionDebug
             debug = @this.GetInstanceProperty<MoveToEntity, ActionDebug>("Debug");
             debug.Value.AddInfo($"{actionIDstr} initialized"); 
@@ -68,10 +69,40 @@ namespace EntityCore.Quester.Action
             timeout.ChangeTime(0); 
 #endif
             @this.Engine = this;
+            ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} initialized"); 
+#else
+            InternalRebase(m2e);
             ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} initialized");
+#endif
         }
 
-        internal void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        public void Rebase(MoveToEntity m2e)
+        {
+            InternalRebase(m2e);
+            ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} reinitialized");
+        }
+
+        private void InternalRebase(MoveToEntity m2e)
+        {
+            @this = m2e;
+            @this.PropertyChanged += PropertyChanged;
+
+            actionIDstr = string.Concat(@this.GetType().Name, '[', @this.ActionID, ']');
+#if M2EE_ActionDebug
+            debug = @this.GetInstanceProperty<MoveToEntity, ActionDebug>("Debug");
+            debug.Value.AddInfo($"{actionIDstr} initialized");
+#endif
+
+            checkEntity = functor_CheckEntity_Initializer;
+            getCustomRegions = functor_GetCustomRegion_Initializer;
+
+#if timeout
+            timeout.ChangeTime(0);
+#endif
+            @this.Engine = this;
+        }
+
+        public void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if(ReferenceEquals(sender, @this))
             {
@@ -123,13 +154,16 @@ namespace EntityCore.Quester.Action
                     ETLogger.WriteLine(LogType.Debug, debugMsg);
                 }
 
-                // closestEntity = null;
+                if (entityPreprocessingResult == EntityPreprocessingResult.Failed)
+                {
+                    // target не валидный - сбрасываем
+                    target = null;
+                }
 
                 if (entityPreprocessingResult != EntityPreprocessingResult.Succeeded
                     /*&& timeout.IsTimedOut*/)
                 {
                     // target не был обработан
-
                     // перерыв между поисками ближайшей сущности истек
                     Entity entity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
                                                                    @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, getCustomRegions());
@@ -495,7 +529,7 @@ namespace EntityCore.Quester.Action
                 {
                     if (target.Location.Distance3DFromPlayer > @this._distance)
                         return target.Location.Clone();
-                    else return EntityManager.LocalPlayer.Location.Clone();
+                    return EntityManager.LocalPlayer.Location.Clone();
                 }
                 return new Vector3();
             }
@@ -677,6 +711,7 @@ namespace EntityCore.Quester.Action
 #if DEBUG && ExtendedActionDebugInfo
             bool isNull = e is null;
             bool isValid = isNull ? false : e.IsValid;
+            bool critterOk = isNull ? false : e.Critter.IsValid;
             bool checkOk = isNull ? false : checkEntity(e);
 
             bool result = isValid && checkOk;
@@ -691,7 +726,7 @@ namespace EntityCore.Quester.Action
 
             return result;
 #else
-            return e != null && e.IsValid /*&& !e.DoNotDraw*/ && checkEntity(e);
+            return e != null && e.IsValid && e.Critter.IsValid /*&& !e.DoNotDraw*/ && checkEntity(e);
 #endif
         }
 
