@@ -158,19 +158,17 @@ namespace EntityCore.Entities
             else if (entities != null && entities.Count > 0)
             {
                 // Если Entity валидна - оно передается для обработки в action
-                // в противном случае - удаляется из коллекции
-                LinkedList<Entity> newEntities = new LinkedList<Entity>();
-                
-                while(entities.Count > 0)
+                // в противном случае - удаляется из коллекции                
+                LinkedListNode<Entity> eNode = entities.First;
+
+                do
                 {
-                    LinkedListNode<Entity> eNode = entities.First;
-                    entities.RemoveFirst();
                     if (Key.Comparer(eNode.Value))
-                    {
                         action(eNode.Value);
-                        newEntities.AddLast(eNode);
-                    }
-                }
+                    else entities.Remove(eNode);
+
+                    eNode = eNode.Next;
+                } while (eNode != null) ;
             }
         }
 
