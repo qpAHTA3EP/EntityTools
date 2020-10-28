@@ -444,6 +444,7 @@ namespace EntityCore.Quester.Action
 
                     target = new Entity(IntPtr.Zero);
                 }
+                @this.CurrentHotSpotIndex = -1;
             }
 
         }
@@ -582,7 +583,9 @@ namespace EntityCore.Quester.Action
 #region Вспомогательный функции
         public bool ValidateEntity(Entity e)
         {
-            return e != null && e.IsValid && checkEntity(e);
+            return e != null && e.IsValid
+                //&& e.Critter.IsValid  <- Некоторые Entity, например игроки, имеют априори невалидный Critter
+                && checkEntity(e);
         }
 
 

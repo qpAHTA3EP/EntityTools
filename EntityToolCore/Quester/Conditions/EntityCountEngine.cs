@@ -429,7 +429,9 @@ namespace EntityCore.Quester.Conditions
         #region Вспомогательные методы
         internal bool ValidateEntity(Entity e)
         {
-            return e != null && e.IsValid && checkEntity(e);
+            return e != null && e.IsValid
+                //&& e.Critter.IsValid  <- Некоторые Entity, например игроки, имеют априори невалидный Critter
+                && checkEntity(e);
         }
 
         private bool internal_CheckEntity_Initializer(Entity e)
@@ -444,14 +446,14 @@ namespace EntityCore.Quester.Conditions
                 return e != null && checkEntity(e);
             }
 #if DEBUG
-            else ETLogger.WriteLine(LogType.Error, $"{conditionIDstr}: Fail to initialize the Comparer.");
+            ETLogger.WriteLine(LogType.Error, $"{conditionIDstr}: Fail to initialize the Comparer.");
 #endif
             return false;
         }
 
         private List<CustomRegion> internal_GetCustomRegion_Initializer()
         {
-            //TODO: Исправить internal_GetCustomRegion_Initializer в других класах, связанных с проверкой CustomRegion (см. MoveToEntityEngine)
+            //TODO: Исправить internal_GetCustomRegion_Initializer в других клаcсах, связанных с проверкой CustomRegion (см. MoveToEntityEngine)
             if (@this._customRegionNames?.Count > 0)
             {
                 customRegions = CustomRegionExtentions.GetCustomRegions(@this._customRegionNames);
@@ -497,17 +499,17 @@ namespace EntityCore.Quester.Conditions
 #endif
                 }
             }
-            else customRegionCheck = (Entity ett) => true;
+            else customRegionCheck = _ => true;
 
             return customRegionCheck?.Invoke(e) == true;
         }
         private bool internal_CustomRegionCheckWithing(Entity e)
         {
-            return getCustomRegions()?.FindIndex((cr) => e.Within(cr)) >= 0;
+            return getCustomRegions()?.FindIndex(e.Within) >= 0;
         }
         private bool internal_CustomRegionCheckOutsize(Entity e)
         {
-            return getCustomRegions()?.FindIndex((cr) => e.Within(cr)) < 0;
+            return getCustomRegions()?.FindIndex(e.Within) < 0;
         }
         #endregion
     }

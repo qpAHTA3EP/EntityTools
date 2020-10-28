@@ -487,6 +487,7 @@ namespace EntityCore.Quester.Action
             if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
                 ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": ActionResult=", actionResult));
 
+            @this.CurrentHotSpotIndex = -1;
             return actionResult;
         }
 
@@ -726,7 +727,10 @@ namespace EntityCore.Quester.Action
 
             return result;
 #else
-            return e != null && e.IsValid && e.Critter.IsValid /*&& !e.DoNotDraw*/ && checkEntity(e);
+            return e != null && e.IsValid 
+                //&& e.Critter.IsValid <- Некоторые Entity, например игроки, имеют априори невалидный Critter
+                //&& !e.DoNotDraw
+                && checkEntity(e);
 #endif
         }
 

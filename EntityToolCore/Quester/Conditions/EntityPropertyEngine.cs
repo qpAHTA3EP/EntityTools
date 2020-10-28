@@ -157,51 +157,50 @@ namespace EntityCore.Quester.Conditions
 
                 if (ValidateEntity(entity))
                 {
-                    bool result = false;
                     switch (@this.PropertyType)
                     {
                         case EntityPropertyType.Distance:
                             switch (@this.Sign)
                             {
                                 case Relation.Equal:
-                                    return result = (entity.Location.Distance3DFromPlayer == @this._value);
+                                    return Math.Abs(entity.Location.Distance3DFromPlayer - @this._value) < 0.1;
                                 case Relation.NotEqual:
-                                    return result = (entity.Location.Distance3DFromPlayer != @this._value);
+                                    return Math.Abs(entity.Location.Distance3DFromPlayer - @this._value) > 0.1;
                                 case Relation.Inferior:
-                                    return result = (entity.Location.Distance3DFromPlayer < @this._value);
+                                    return entity.Location.Distance3DFromPlayer < @this._value;
                                 case Relation.Superior:
-                                    return result = (entity.Location.Distance3DFromPlayer > @this._value);
+                                    return entity.Location.Distance3DFromPlayer > @this._value;
                             }
                             break;
                         case EntityPropertyType.HealthPercent:
                             switch (@this.Sign)
                             {
                                 case Relation.Equal:
-                                    return result = (entity.Character?.AttribsBasic?.HealthPercent == @this._value);
+                                    return Math.Abs(entity.Character.AttribsBasic.HealthPercent - @this._value) < 0.1;
                                 case Relation.NotEqual:
-                                    return result = (entity.Character?.AttribsBasic?.HealthPercent != @this._value);
+                                    return Math.Abs(entity.Character.AttribsBasic.HealthPercent - @this._value) > 0.1;
                                 case Relation.Inferior:
-                                    return result = (entity.Character?.AttribsBasic?.HealthPercent < @this._value);
+                                    return entity.Character.AttribsBasic.HealthPercent < @this._value;
                                 case Relation.Superior:
-                                    return result = (entity.Character?.AttribsBasic?.HealthPercent > @this._value);
+                                    return entity.Character.AttribsBasic.HealthPercent > @this._value;
                             }
                             break;
                         case EntityPropertyType.ZAxis:
                             switch (@this.Sign)
                             {
                                 case Relation.Equal:
-                                    return result = (entity.Location.Z == @this._value);
+                                    return Math.Abs(entity.Location.Z - @this._value) < 0.1;
                                 case Relation.NotEqual:
-                                    return result = (entity.Location.Z != @this._value);
+                                    return Math.Abs(entity.Location.Z - @this._value) > 0.1;
                                 case Relation.Inferior:
-                                    return result = (entity.Location.Z < @this._value);
+                                    return entity.Location.Z < @this._value;
                                 case Relation.Superior:
-                                    return result = (entity.Location.Z > @this._value);
+                                    return entity.Location.Z > @this._value;
                             }
                             break;
                     }
                 }
-                else return (@this._propertyType == EntityPropertyType.Distance && @this._sign == Relation.Superior);
+                else return @this._propertyType == EntityPropertyType.Distance && @this._sign == Relation.Superior;
 
                 return false;
             }
@@ -214,11 +213,12 @@ namespace EntityCore.Quester.Conditions
             get
             {
                 entity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
-                                                               @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, getCustomRegions());
+                                                        @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, getCustomRegions());
 
                 if (ValidateEntity(entity))
                 {
-                    StringBuilder sb = new StringBuilder("Found closect Entity");
+#if false
+                    StringBuilder sb = new StringBuilder("Found closest Entity");
                     sb.Append(" [");
                     switch (@this._entityNameType)
                     {
@@ -239,18 +239,30 @@ namespace EntityCore.Quester.Conditions
                             sb.Append(entity.Location.Z);
                             break;
                         case EntityPropertyType.HealthPercent:
-                            sb.Append(entity.Character?.AttribsBasic?.HealthPercent);
+                            sb.Append(entity.Character.AttribsBasic.HealthPercent);
                             break;
                     }
-                    return sb.ToString();
+                    return sb.ToString(); 
+#else
+                    return string.Concat("Found closest Entity [",
+                        @this._entityNameType == EntityNameType.NameUntranslated ? entity.NameUntranslated : entity.InternalName,
+                        "] which ", @this.PropertyType, " = ",
+                        @this.PropertyType == EntityPropertyType.Distance ? entity.Location.Distance3DFromPlayer.ToString("N2") :
+                        @this.PropertyType == EntityPropertyType.ZAxis ? entity.Location.Z .ToString("N2") : entity.Character.AttribsBasic.HealthPercent.ToString("N2"));
+#endif
                 }
                 else
                 {
+#if false
                     StringBuilder sb = new StringBuilder("No one Entity matched to");
                     sb.Append(" [").Append(@this._entityId).Append(']').AppendLine();
                     if (@this.PropertyType == EntityPropertyType.Distance)
                         sb.AppendLine("The distance to the missing Entity is considered equal to infinity.");
-                    return sb.ToString();
+                    return sb.ToString(); 
+#else
+                    return string.Concat("No one Entity matched to [", @this._entityId, ']', Environment.NewLine,
+                        @this.PropertyType == EntityPropertyType.Distance ? "The distance to the missing Entity is considered equal to infinity." : string.Empty);
+#endif
                 }
             }
         }
@@ -267,7 +279,9 @@ namespace EntityCore.Quester.Conditions
         #region Вспомогательные методы
         internal bool ValidateEntity(Entity e)
         {
-            return e != null && e.IsValid && checkEntity(e);
+            return e != null && e.IsValid
+                //&& e.Critter.IsValid  <- Некоторые Entity, например игроки, имеют априори невалидный Critter
+                && checkEntity(e);
         }
 
         private bool internal_CheckEntity_Initializer(Entity e)

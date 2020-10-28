@@ -126,17 +126,16 @@ namespace EntityCore.Quester.Conditions
 #else
                     Entity closestEntity = SearchCached.FindClosestEntity(@this._entityID, @this._entityIdType, EntityNameType.NameUntranslated, EntitySetType.Complete, false, 0, 0, @this._regionCheck);
 #endif
-                    bool result = false;
                     switch (@this._sign)
                     {
                         case Relation.Equal:
-                            return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer == @this._distance);
+                            return closestEntity != null && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer == @this._distance);
                         case Relation.NotEqual:
-                            return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer != @this._distance);
+                            return closestEntity != null && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer != @this._distance);
                         case Relation.Inferior:
-                            return result = (closestEntity != null) && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer < @this._distance);
+                            return closestEntity != null && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer < @this._distance);
                         case Relation.Superior:
-                            return result = (closestEntity == null) || !closestEntity.IsValid || (closestEntity.Location.Distance3DFromPlayer > @this._distance);
+                            return closestEntity == null || !closestEntity.IsValid || (closestEntity.Location.Distance3DFromPlayer > @this._distance);
                     }
                 }
 
@@ -157,7 +156,7 @@ namespace EntityCore.Quester.Conditions
 #endif
                 if (closestEntity.IsValid)
                      return $"Found closect Entity [{closestEntity.NameUntranslated}] at the {nameof(@this.Distance)} = {closestEntity.Location.Distance3DFromPlayer}";
-                else return $"No one Entity matched to [{@this._entityID}]";
+                return $"No one Entity matched to [{@this._entityID}]";
             }
         }
 
