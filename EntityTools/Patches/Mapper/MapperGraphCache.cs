@@ -18,6 +18,7 @@ namespace EntityTools.Patches.Mapper
         public MapperGraphCache(Func<IGraph> getGraph, bool activate = true, bool hold = true)
         {
             this.getGraph = getGraph;
+
             _holdPlayer = hold;
             _active = activate;
             if (_active)
@@ -166,10 +167,12 @@ namespace EntityTools.Patches.Mapper
                                 foreach (Node node in graph.NodesCollection)
                                     if (InCacheArea(node.Position))
                                     {
+                                        _nodes.AddLast(node);
                                         if (node.Passable)
-                                            _nodes.AddLast(node);
-                                        action(node);
-                                        num++;
+                                        {
+                                            action(node);
+                                            num++;
+                                        }
                                     }
                             }
                         } 
@@ -180,14 +183,21 @@ namespace EntityTools.Patches.Mapper
                 }
                 else
                 {
-#if nodesLocker
-                    using (_nodesLocker.ReadLock()) 
-#endif
-                        foreach (Node node in _nodes)
-                        {
-                            action(node);
-                            num++;
-                        }
+                    using (_nodesLocker.ReadLock())
+                    {
+                        if (ignorePassableProperty)
+                            foreach (Node node in _nodes)
+                            {
+                                action(node);
+                                num++;
+                            }
+                        else foreach (Node node in _nodes)
+                                if (node.Passable)
+                                {
+                                    action(node);
+                                    num++;
+                                }
+                    }
                 }
             }
             else
@@ -498,7 +508,7 @@ namespace EntityTools.Patches.Mapper
             if (_holdPlayer)
             {
                 var location = EntityManager.LocalPlayer.Location;
-                SetCacheInitialPosition(location.X, location.Y, location.Z);
+                internal_SetCacheInitialPosition(location.X, location.Y, location.Z);
             }
 
             ScanNodes();
@@ -519,7 +529,7 @@ namespace EntityTools.Patches.Mapper
         {
             _holdPlayer = false;
             
-            SetCacheInitialPosition(x, y, z);
+            internal_SetCacheInitialPosition(x, y, z);
             ScanNodes();
         }
 
@@ -604,12 +614,11 @@ namespace EntityTools.Patches.Mapper
             get => cacheX;
             set
             {
-                if (value >= 0)
+                if (value >= 10)
                 {
                     cacheX = value;
-                    float x = cacheInitialPosition.X;
-                    minX = x - value;
-                    maxX = x + value;
+                    minX = centerX - value;
+                    maxX = centerX + value;
                     cacheX_0_75 = value * 0.75;
                 }
                 else
@@ -631,20 +640,18 @@ namespace EntityTools.Patches.Mapper
             get => cacheY;
             set
             {
-                if (value >= 0)
+                if (value >= 10)
                 {
                     cacheY = value;
-                    float y = cacheInitialPosition.Y;
-                    minY = y - value;
-                    maxY = y + value;
+                    minY = centerY - value;
+                    maxY = centerY + value;
                     cacheY_0_75 = value * 0.75;
                 }
                 else
                 {
                     cacheY = double.MaxValue;
-                    float y = cacheInitialPosition.Y;
-                    minY = y - value;
-                    maxY = y + value;
+                    minY = double.MaxValue;
+                    maxY = double.MaxValue;
                     cacheY_0_75 = double.MaxValue;
                 }
             }
@@ -659,12 +666,11 @@ namespace EntityTools.Patches.Mapper
             get => cacheZ;
             set
             {
-                if (value >= 0)
+                if (value >= 10)
                 {
                     cacheZ = value;
-                    float z = cacheInitialPosition.Z;
-                    minZ = z - value;
-                    maxZ = z + value;
+                    minZ = centerZ - value;
+                    maxZ = centerZ + value;
                     cacheZ_0_75 = value * 0.75;
                 }
                 else
@@ -677,7 +683,8 @@ namespace EntityTools.Patches.Mapper
             }
         }
         private double cacheZ = 30, cacheZ_0_75;
-        
+
+#if false
         /// <summary>
         /// Центр кэшированной области
         /// </summary>
@@ -686,18 +693,21 @@ namespace EntityTools.Patches.Mapper
             get => cacheInitialPosition.Clone();
             set
             {
-                if(!Equals(cacheInitialPosition, value))
+                if (!Equals(cacheInitialPosition, value))
                     SetCacheInitialPosition(value);
             }
-        }
+        } 
+#endif
         public void MoveCenterPosition(double dx, double dy, double dz)
         {
             _holdPlayer = false;
 
             //TODO: добавить проверку переполнения в MoveCenterPosition, в SetCacheArea и в SetCacheInitialPosition
+#if cacheInitialPosition
             cacheInitialPosition.X += (float)dx;
             cacheInitialPosition.Y += (float)dy;
-            cacheInitialPosition.Z += (float)dz;
+            cacheInitialPosition.Z += (float)dz; 
+#endif
             centerX += dx;
             if (cacheX != double.MaxValue)
             {
@@ -779,23 +789,31 @@ namespace EntityTools.Patches.Mapper
             SetCacheArea(x1, y1, 0, x2, y2, 0);
         }
 
-        private void SetCacheInitialPosition(Vector3 pos)
+        /// <summary>
+        /// Задание нового центра кэширования
+        /// </summary>
+        /// <param name="pos"></param>
+        public void SetCacheInitialPosition(Vector3 pos)
         {
             _holdPlayer = false;
-            SetCacheInitialPosition(pos.X, pos.Y, pos.Z);
+            internal_SetCacheInitialPosition(pos.X, pos.Y, pos.Z);
         }
-        private void SetCacheInitialPosition(double x, double y, double z)
+        /// <summary>
+        /// Вспомогательный метод изменения позиции центра области "кэширования"
+        /// </summary>
+        private void internal_SetCacheInitialPosition(double x, double y, double z)
         {
-            _holdPlayer = false;
             checked
             {
                 centerX = x;
                 centerY = y;
                 centerZ = z;
 
+#if cacheInitialPosition
                 cacheInitialPosition.X = (float)x;
                 cacheInitialPosition.Y = (float)y;
-                cacheInitialPosition.Z = (float)z;
+                cacheInitialPosition.Z = (float)z; 
+#endif
 
                 if (cacheX == double.MaxValue)
                 {
@@ -830,7 +848,9 @@ namespace EntityTools.Patches.Mapper
             }
         }
 
-        private Vector3 cacheInitialPosition = new Vector3(0, 0, 0);
+#if cacheInitialPosition
+        private Vector3 cacheInitialPosition = new Vector3(0, 0, 0); 
+#endif
         private double centerX, centerY, centerZ;
 
         /// <summary>
@@ -841,4 +861,4 @@ namespace EntityTools.Patches.Mapper
         private Timeout cacheTimeout = new Timeout(0);
     } 
 #endif
-}
+                }
