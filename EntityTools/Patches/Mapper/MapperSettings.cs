@@ -359,6 +359,25 @@ namespace EntityTools.Settings
         }
         private int redrawMapperTimeout = 100;
 
+        /// <summary>
+        /// Толщина слоя, отображаемого в Mapper'e
+        /// Задает максимальную разность высот целевой точки (игрока) и вершин
+        /// </summary>
+        [Bindable(true)]
+        public uint LayerDepth
+        {
+            get => layerDepth;
+            set
+            {
+                if (value != layerDepth)
+                {
+                    layerDepth = value;
+                    NotifyPropertyChanged(nameof(LayerDepth));
+                }
+            }
+        }
+        private uint layerDepth = 100;
+
         [Bindable(true)]
         [XmlElement(Type = typeof(XmlColor))]
         public Color BidirectionalPathColor

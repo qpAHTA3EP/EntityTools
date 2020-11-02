@@ -49,26 +49,26 @@ namespace EntityTools.Core
             this.btnEntities = new System.Windows.Forms.Button();
             this.ckbSpellStuckMonitor = new System.Windows.Forms.CheckBox();
             this.gbxExport = new System.Windows.Forms.GroupBox();
-            this.cbbxExportSelector = new System.Windows.Forms.ComboBox();
+            this.cbxExportSelector = new System.Windows.Forms.ComboBox();
             this.tbExportFileSelector = new DevExpress.XtraEditors.ButtonEdit();
             this.btnExport = new System.Windows.Forms.Button();
             this.btnDefault = new System.Windows.Forms.Button();
             this.ckbMapperPatch = new System.Windows.Forms.CheckBox();
             this.tabOptions = new DevExpress.XtraTab.XtraTabPage();
-            this.cbSlideMonitor = new System.Windows.Forms.CheckBox();
             this.gbxSlideMonitor = new System.Windows.Forms.GroupBox();
+            this.cbxSlideMonitor = new System.Windows.Forms.ComboBox();
             this.tbSlidingAuras = new System.Windows.Forms.TextBox();
             this.lblSlideFilter = new System.Windows.Forms.Label();
             this.lblSlidingAuras = new System.Windows.Forms.Label();
-            this.lblTimerUnslide = new System.Windows.Forms.Label();
-            this.seSlideFilter = new DevExpress.XtraEditors.SpinEdit();
+            this.editSlideTimeout = new DevExpress.XtraEditors.SpinEdit();
+            this.editSlideFilter = new DevExpress.XtraEditors.SpinEdit();
             this.lblSlideTimer = new System.Windows.Forms.Label();
             this.gbxEntityCache = new System.Windows.Forms.GroupBox();
-            this.seCombatCacheTime = new DevExpress.XtraEditors.SpinEdit();
+            this.editCombatCacheTime = new DevExpress.XtraEditors.SpinEdit();
             this.lblCombatCacheTime = new System.Windows.Forms.Label();
-            this.seLocalCacheTime = new DevExpress.XtraEditors.SpinEdit();
+            this.editLocalCacheTime = new DevExpress.XtraEditors.SpinEdit();
             this.lblLocalCacheTime = new System.Windows.Forms.Label();
-            this.seGlobalCacheTime = new DevExpress.XtraEditors.SpinEdit();
+            this.editGlobalCacheTime = new DevExpress.XtraEditors.SpinEdit();
             this.lblGlobalCacheTime = new System.Windows.Forms.Label();
             this.tabRelogger = new DevExpress.XtraTab.XtraTabPage();
             this.lblMachinId = new System.Windows.Forms.Label();
@@ -93,11 +93,12 @@ namespace EntityTools.Core
             ((System.ComponentModel.ISupportInitialize)(this.tbExportFileSelector.Properties)).BeginInit();
             this.tabOptions.SuspendLayout();
             this.gbxSlideMonitor.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.seSlideFilter.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.editSlideTimeout.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.editSlideFilter.Properties)).BeginInit();
             this.gbxEntityCache.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.seCombatCacheTime.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.seLocalCacheTime.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.seGlobalCacheTime.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.editCombatCacheTime.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.editLocalCacheTime.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.editGlobalCacheTime.Properties)).BeginInit();
             this.tabRelogger.SuspendLayout();
             this.tabLogger.SuspendLayout();
             this.gbxLogger.SuspendLayout();
@@ -118,7 +119,7 @@ namespace EntityTools.Core
             this.btnUccEditor.Text = "Extended UCC Editor";
             this.btnUccEditor.UseVisualStyleBackColor = true;
             this.btnUccEditor.Visible = false;
-            this.btnUccEditor.Click += new System.EventHandler(this.event_OpenUccEditor);
+            this.btnUccEditor.Click += new System.EventHandler(this.handler_OpenUccEditor);
             // 
             // tbclMain
             // 
@@ -163,7 +164,7 @@ namespace EntityTools.Core
             this.cbEnchantHelperActivator.TabIndex = 10;
             this.cbEnchantHelperActivator.Text = "Enable EnchantHelper";
             this.cbEnchantHelperActivator.UseVisualStyleBackColor = true;
-            this.cbEnchantHelperActivator.CheckedChanged += new System.EventHandler(this.event_EnchantHelperActivation);
+            this.cbEnchantHelperActivator.CheckedChanged += new System.EventHandler(this.handler_EnchantHelperActivation);
             // 
             // btnTest1
             // 
@@ -175,8 +176,7 @@ namespace EntityTools.Core
             this.btnTest1.TabIndex = 2;
             this.btnTest1.Text = "Test 1";
             this.btnTest1.UseVisualStyleBackColor = true;
-            this.btnTest1.Visible = false;
-            this.btnTest1.Click += new System.EventHandler(this.event_Test_1);
+            this.btnTest1.Click += new System.EventHandler(this.handler_Test_1);
             // 
             // bntTest2
             // 
@@ -188,8 +188,7 @@ namespace EntityTools.Core
             this.bntTest2.TabIndex = 2;
             this.bntTest2.Text = "Test 2";
             this.bntTest2.UseVisualStyleBackColor = true;
-            this.bntTest2.Visible = false;
-            this.bntTest2.Click += new System.EventHandler(this.event_Test_2);
+            this.bntTest2.Click += new System.EventHandler(this.handler_Test_2);
             // 
             // btnTest3
             // 
@@ -201,7 +200,7 @@ namespace EntityTools.Core
             this.btnTest3.TabIndex = 2;
             this.btnTest3.Text = "Test current Graph";
             this.btnTest3.UseVisualStyleBackColor = true;
-            this.btnTest3.Click += new System.EventHandler(this.event_Test_3);
+            this.btnTest3.Click += new System.EventHandler(this.handler_Test_3);
             // 
             // btnCheckCore
             // 
@@ -215,7 +214,7 @@ namespace EntityTools.Core
             this.btnCheckCore.TabIndex = 0;
             this.btnCheckCore.Text = "Check EntityTools";
             this.btnCheckCore.UseVisualStyleBackColor = true;
-            this.btnCheckCore.Click += new System.EventHandler(this.event_CheckCore);
+            this.btnCheckCore.Click += new System.EventHandler(this.handler_CheckCore);
             // 
             // btnUiViewer
             // 
@@ -229,7 +228,7 @@ namespace EntityTools.Core
             this.btnUiViewer.TabIndex = 0;
             this.btnUiViewer.Text = "UI Viewer";
             this.btnUiViewer.UseVisualStyleBackColor = true;
-            this.btnUiViewer.Click += new System.EventHandler(this.event_OpenUiViewer);
+            this.btnUiViewer.Click += new System.EventHandler(this.handler_OpenUiViewer);
             // 
             // btnAuraViewer
             // 
@@ -242,7 +241,7 @@ namespace EntityTools.Core
             this.btnAuraViewer.TabIndex = 0;
             this.btnAuraViewer.Text = "Auras";
             this.btnAuraViewer.UseVisualStyleBackColor = true;
-            this.btnAuraViewer.Click += new System.EventHandler(this.event_OpenAuraViewer);
+            this.btnAuraViewer.Click += new System.EventHandler(this.handler_OpenAuraViewer);
             // 
             // btnEntities
             // 
@@ -255,7 +254,7 @@ namespace EntityTools.Core
             this.btnEntities.TabIndex = 0;
             this.btnEntities.Text = "Entities";
             this.btnEntities.UseVisualStyleBackColor = true;
-            this.btnEntities.Click += new System.EventHandler(this.event_OpenEntitiesViewer);
+            this.btnEntities.Click += new System.EventHandler(this.handler_OpenEntitiesViewer);
             // 
             // ckbSpellStuckMonitor
             // 
@@ -268,11 +267,11 @@ namespace EntityTools.Core
             this.ckbSpellStuckMonitor.TabIndex = 1;
             this.ckbSpellStuckMonitor.Text = "Enable SpellStuckMonitor";
             this.ckbSpellStuckMonitor.UseVisualStyleBackColor = true;
-            this.ckbSpellStuckMonitor.CheckedChanged += new System.EventHandler(this.event_SpellStuckMonitorActivation);
+            this.ckbSpellStuckMonitor.CheckedChanged += new System.EventHandler(this.handler_SpellStuckMonitorActivation);
             // 
             // gbxExport
             // 
-            this.gbxExport.Controls.Add(this.cbbxExportSelector);
+            this.gbxExport.Controls.Add(this.cbxExportSelector);
             this.gbxExport.Controls.Add(this.tbExportFileSelector);
             this.gbxExport.Controls.Add(this.btnExport);
             this.gbxExport.Controls.Add(this.btnDefault);
@@ -283,18 +282,18 @@ namespace EntityTools.Core
             this.gbxExport.TabStop = false;
             this.gbxExport.Text = "Export";
             // 
-            // cbbxExportSelector
+            // cbxExportSelector
             // 
-            this.cbbxExportSelector.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.cbxExportSelector.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbbxExportSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbbxExportSelector.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cbbxExportSelector.Location = new System.Drawing.Point(6, 20);
-            this.cbbxExportSelector.Name = "cbbxExportSelector";
-            this.cbbxExportSelector.Size = new System.Drawing.Size(219, 21);
-            this.cbbxExportSelector.Sorted = true;
-            this.cbbxExportSelector.TabIndex = 11;
-            this.cbbxExportSelector.SelectedIndexChanged += new System.EventHandler(this.event_ChangeExportingData);
+            this.cbxExportSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxExportSelector.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbxExportSelector.Location = new System.Drawing.Point(6, 20);
+            this.cbxExportSelector.Name = "cbxExportSelector";
+            this.cbxExportSelector.Size = new System.Drawing.Size(219, 21);
+            this.cbxExportSelector.Sorted = true;
+            this.cbxExportSelector.TabIndex = 11;
+            this.cbxExportSelector.SelectedIndexChanged += new System.EventHandler(this.handler_ChangeExportingData);
             // 
             // tbExportFileSelector
             // 
@@ -312,7 +311,7 @@ namespace EntityTools.Core
             this.tbExportFileSelector.TabIndex = 6;
             this.tbExportFileSelector.ToolTip = "File name to store selected data. \r\nAllow mask %character%, %account%, %dateTime%" +
     ".";
-            this.tbExportFileSelector.ButtonClick += new DevExpress.XtraEditors.Controls.ButtonPressedEventHandler(this.event_ChangeExportingFileName);
+            this.tbExportFileSelector.ButtonClick += new DevExpress.XtraEditors.Controls.ButtonPressedEventHandler(this.handler_ChangeExportingFileName);
             // 
             // btnExport
             // 
@@ -324,7 +323,7 @@ namespace EntityTools.Core
             this.btnExport.TabIndex = 2;
             this.btnExport.Text = "Export";
             this.btnExport.UseVisualStyleBackColor = true;
-            this.btnExport.Click += new System.EventHandler(this.event_Export);
+            this.btnExport.Click += new System.EventHandler(this.handler_Export);
             // 
             // btnDefault
             // 
@@ -336,7 +335,7 @@ namespace EntityTools.Core
             this.btnDefault.TabIndex = 2;
             this.btnDefault.Text = "Default";
             this.btnDefault.UseVisualStyleBackColor = true;
-            this.btnDefault.Click += new System.EventHandler(this.event_ResetExportSettings);
+            this.btnDefault.Click += new System.EventHandler(this.handler_ResetExportSettings);
             // 
             // ckbMapperPatch
             // 
@@ -350,23 +349,13 @@ namespace EntityTools.Core
             // 
             // tabOptions
             // 
-            this.tabOptions.Controls.Add(this.cbSlideMonitor);
+            this.tabOptions.Controls.Add(this.cbxSlideMonitor);
             this.tabOptions.Controls.Add(this.gbxSlideMonitor);
             this.tabOptions.Controls.Add(this.gbxEntityCache);
             this.tabOptions.Name = "tabOptions";
             this.tabOptions.Padding = new System.Windows.Forms.Padding(6);
             this.tabOptions.Size = new System.Drawing.Size(364, 388);
             this.tabOptions.Text = "Options";
-            // 
-            // cbSlideMonitor
-            // 
-            this.cbSlideMonitor.Location = new System.Drawing.Point(18, 220);
-            this.cbSlideMonitor.Name = "cbSlideMonitor";
-            this.cbSlideMonitor.Size = new System.Drawing.Size(119, 17);
-            this.cbSlideMonitor.TabIndex = 3;
-            this.cbSlideMonitor.Text = "Enable SlideMonitor";
-            this.cbSlideMonitor.UseVisualStyleBackColor = true;
-            this.cbSlideMonitor.Visible = false;
             // 
             // gbxSlideMonitor
             // 
@@ -375,15 +364,27 @@ namespace EntityTools.Core
             this.gbxSlideMonitor.Controls.Add(this.tbSlidingAuras);
             this.gbxSlideMonitor.Controls.Add(this.lblSlideFilter);
             this.gbxSlideMonitor.Controls.Add(this.lblSlidingAuras);
-            this.gbxSlideMonitor.Controls.Add(this.lblTimerUnslide);
-            this.gbxSlideMonitor.Controls.Add(this.seSlideFilter);
+            this.gbxSlideMonitor.Controls.Add(this.editSlideTimeout);
+            this.gbxSlideMonitor.Controls.Add(this.editSlideFilter);
             this.gbxSlideMonitor.Controls.Add(this.lblSlideTimer);
-            this.gbxSlideMonitor.Location = new System.Drawing.Point(9, 219);
+            this.gbxSlideMonitor.Location = new System.Drawing.Point(9, 117);
             this.gbxSlideMonitor.Name = "gbxSlideMonitor";
-            this.gbxSlideMonitor.Size = new System.Drawing.Size(347, 160);
+            this.gbxSlideMonitor.Size = new System.Drawing.Size(347, 78);
             this.gbxSlideMonitor.TabIndex = 4;
             this.gbxSlideMonitor.TabStop = false;
-            this.gbxSlideMonitor.Visible = false;
+            this.gbxSlideMonitor.Text = "Slide Monitor";
+            // 
+            // cbxSlideMonitor
+            // 
+            this.cbxSlideMonitor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbxSlideMonitor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxSlideMonitor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbxSlideMonitor.FormattingEnabled = true;
+            this.cbxSlideMonitor.Location = new System.Drawing.Point(196, 114);
+            this.cbxSlideMonitor.Name = "cbxSlideMonitor";
+            this.cbxSlideMonitor.Size = new System.Drawing.Size(154, 21);
+            this.cbxSlideMonitor.TabIndex = 4;
             // 
             // tbSlidingAuras
             // 
@@ -395,7 +396,7 @@ namespace EntityTools.Core
             this.tbSlidingAuras.Location = new System.Drawing.Point(6, 94);
             this.tbSlidingAuras.Multiline = true;
             this.tbSlidingAuras.Name = "tbSlidingAuras";
-            this.tbSlidingAuras.Size = new System.Drawing.Size(335, 60);
+            this.tbSlidingAuras.Size = new System.Drawing.Size(335, 0);
             this.tbSlidingAuras.TabIndex = 3;
             this.tbSlidingAuras.Text = "M10_Becritter_Boat_Costume\r\nVolume_Ground_Slippery\r\nVolume_Ground_Slippery_Player" +
     "only";
@@ -404,7 +405,7 @@ namespace EntityTools.Core
             // lblSlideFilter
             // 
             this.lblSlideFilter.AutoSize = true;
-            this.lblSlideFilter.Location = new System.Drawing.Point(6, 17);
+            this.lblSlideFilter.Location = new System.Drawing.Point(6, 27);
             this.lblSlideFilter.Name = "lblSlideFilter";
             this.lblSlideFilter.Size = new System.Drawing.Size(198, 13);
             this.lblSlideFilter.TabIndex = 2;
@@ -418,57 +419,72 @@ namespace EntityTools.Core
             this.lblSlidingAuras.Size = new System.Drawing.Size(72, 13);
             this.lblSlidingAuras.TabIndex = 2;
             this.lblSlidingAuras.Text = "Sliding Auras:";
+            this.lblSlidingAuras.Visible = false;
             // 
-            // lblTimerUnslide
+            // editSlideTimeout
             // 
-            this.lblTimerUnslide.AutoSize = true;
-            this.lblTimerUnslide.Location = new System.Drawing.Point(139, 58);
-            this.lblTimerUnslide.Name = "lblTimerUnslide";
-            this.lblTimerUnslide.Size = new System.Drawing.Size(84, 13);
-            this.lblTimerUnslide.TabIndex = 2;
-            this.lblTimerUnslide.Text = "when not sliding";
-            // 
-            // seSlideFilter
-            // 
-            this.seSlideFilter.EditValue = new decimal(new int[] {
+            this.editSlideTimeout.EditValue = new decimal(new int[] {
             60,
             0,
             0,
             0});
-            this.seSlideFilter.Location = new System.Drawing.Point(210, 14);
-            this.seSlideFilter.Name = "seSlideFilter";
-            this.seSlideFilter.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            this.editSlideTimeout.Location = new System.Drawing.Point(221, 50);
+            this.editSlideTimeout.Name = "editSlideTimeout";
+            this.editSlideTimeout.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.seSlideFilter.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-            this.seSlideFilter.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
-            this.seSlideFilter.Properties.IsFloatValue = false;
-            this.seSlideFilter.Properties.Mask.EditMask = "N00";
-            this.seSlideFilter.Properties.MaxValue = new decimal(new int[] {
+            this.editSlideTimeout.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.editSlideTimeout.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
+            this.editSlideTimeout.Properties.IsFloatValue = false;
+            this.editSlideTimeout.Properties.Mask.EditMask = "N00";
+            this.editSlideTimeout.Properties.MaxValue = new decimal(new int[] {
             200,
             0,
             0,
             0});
-            this.seSlideFilter.Size = new System.Drawing.Size(56, 20);
-            this.seSlideFilter.TabIndex = 0;
+            this.editSlideTimeout.Size = new System.Drawing.Size(56, 20);
+            this.editSlideTimeout.TabIndex = 0;
+            // 
+            // editSlideFilter
+            // 
+            this.editSlideFilter.EditValue = new decimal(new int[] {
+            60,
+            0,
+            0,
+            0});
+            this.editSlideFilter.Location = new System.Drawing.Point(221, 24);
+            this.editSlideFilter.Name = "editSlideFilter";
+            this.editSlideFilter.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.editSlideFilter.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.editSlideFilter.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
+            this.editSlideFilter.Properties.IsFloatValue = false;
+            this.editSlideFilter.Properties.Mask.EditMask = "N00";
+            this.editSlideFilter.Properties.MaxValue = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
+            this.editSlideFilter.Size = new System.Drawing.Size(56, 20);
+            this.editSlideFilter.TabIndex = 0;
             // 
             // lblSlideTimer
             // 
             this.lblSlideTimer.AutoSize = true;
-            this.lblSlideTimer.Location = new System.Drawing.Point(6, 39);
+            this.lblSlideTimer.Location = new System.Drawing.Point(6, 53);
             this.lblSlideTimer.Name = "lblSlideTimer";
-            this.lblSlideTimer.Size = new System.Drawing.Size(194, 13);
+            this.lblSlideTimer.Size = new System.Drawing.Size(216, 13);
             this.lblSlideTimer.TabIndex = 2;
-            this.lblSlideTimer.Text = "Time between aura check (millisecond):";
+            this.lblSlideTimer.Text = "Time between waypoint check (millisecond):";
             // 
             // gbxEntityCache
             // 
             this.gbxEntityCache.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.gbxEntityCache.Controls.Add(this.seCombatCacheTime);
+            this.gbxEntityCache.Controls.Add(this.editCombatCacheTime);
             this.gbxEntityCache.Controls.Add(this.lblCombatCacheTime);
-            this.gbxEntityCache.Controls.Add(this.seLocalCacheTime);
+            this.gbxEntityCache.Controls.Add(this.editLocalCacheTime);
             this.gbxEntityCache.Controls.Add(this.lblLocalCacheTime);
-            this.gbxEntityCache.Controls.Add(this.seGlobalCacheTime);
+            this.gbxEntityCache.Controls.Add(this.editGlobalCacheTime);
             this.gbxEntityCache.Controls.Add(this.lblGlobalCacheTime);
             this.gbxEntityCache.Location = new System.Drawing.Point(9, 9);
             this.gbxEntityCache.Name = "gbxEntityCache";
@@ -477,23 +493,23 @@ namespace EntityTools.Core
             this.gbxEntityCache.TabStop = false;
             this.gbxEntityCache.Text = "EntityCache settings";
             // 
-            // seCombatCacheTime
+            // editCombatCacheTime
             // 
-            this.seCombatCacheTime.EditValue = new decimal(new int[] {
+            this.editCombatCacheTime.EditValue = new decimal(new int[] {
             5,
             0,
             0,
             0});
-            this.seCombatCacheTime.Location = new System.Drawing.Point(9, 72);
-            this.seCombatCacheTime.Name = "seCombatCacheTime";
-            this.seCombatCacheTime.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            this.editCombatCacheTime.Location = new System.Drawing.Point(9, 72);
+            this.editCombatCacheTime.Name = "editCombatCacheTime";
+            this.editCombatCacheTime.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.seCombatCacheTime.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-            this.seCombatCacheTime.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
-            this.seCombatCacheTime.Properties.IsFloatValue = false;
-            this.seCombatCacheTime.Properties.Mask.EditMask = "N00";
-            this.seCombatCacheTime.Size = new System.Drawing.Size(58, 20);
-            this.seCombatCacheTime.TabIndex = 3;
+            this.editCombatCacheTime.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.editCombatCacheTime.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
+            this.editCombatCacheTime.Properties.IsFloatValue = false;
+            this.editCombatCacheTime.Properties.Mask.EditMask = "N00";
+            this.editCombatCacheTime.Size = new System.Drawing.Size(58, 20);
+            this.editCombatCacheTime.TabIndex = 3;
             // 
             // lblCombatCacheTime
             // 
@@ -504,24 +520,24 @@ namespace EntityTools.Core
             this.lblCombatCacheTime.TabIndex = 4;
             this.lblCombatCacheTime.Text = "Combat entity cache refresh time (UCC)";
             // 
-            // seLocalCacheTime
+            // editLocalCacheTime
             // 
-            this.seLocalCacheTime.EditValue = new decimal(new int[] {
+            this.editLocalCacheTime.EditValue = new decimal(new int[] {
             5,
             0,
             0,
             0});
-            this.seLocalCacheTime.Location = new System.Drawing.Point(9, 46);
-            this.seLocalCacheTime.Name = "seLocalCacheTime";
-            this.seLocalCacheTime.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            this.editLocalCacheTime.Location = new System.Drawing.Point(9, 46);
+            this.editLocalCacheTime.Name = "editLocalCacheTime";
+            this.editLocalCacheTime.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.seLocalCacheTime.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-            this.seLocalCacheTime.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
-            this.seLocalCacheTime.Properties.IsFloatValue = false;
-            this.seLocalCacheTime.Properties.Mask.EditMask = "N00";
-            this.seLocalCacheTime.Size = new System.Drawing.Size(58, 20);
-            this.seLocalCacheTime.TabIndex = 3;
-            this.seLocalCacheTime.ToolTip = "Time between the refresh of the local Entities cache of the actions and condition" +
+            this.editLocalCacheTime.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.editLocalCacheTime.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
+            this.editLocalCacheTime.Properties.IsFloatValue = false;
+            this.editLocalCacheTime.Properties.Mask.EditMask = "N00";
+            this.editLocalCacheTime.Size = new System.Drawing.Size(58, 20);
+            this.editLocalCacheTime.TabIndex = 3;
+            this.editLocalCacheTime.ToolTip = "Time between the refresh of the local Entities cache of the actions and condition" +
     "s";
             // 
             // lblLocalCacheTime
@@ -533,24 +549,24 @@ namespace EntityTools.Core
             this.lblLocalCacheTime.TabIndex = 4;
             this.lblLocalCacheTime.Text = "Local entity cache refresh time (Quester)";
             // 
-            // seGlobalCacheTime
+            // editGlobalCacheTime
             // 
-            this.seGlobalCacheTime.EditValue = new decimal(new int[] {
+            this.editGlobalCacheTime.EditValue = new decimal(new int[] {
             5,
             0,
             0,
             0});
-            this.seGlobalCacheTime.Location = new System.Drawing.Point(9, 20);
-            this.seGlobalCacheTime.Name = "seGlobalCacheTime";
-            this.seGlobalCacheTime.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            this.editGlobalCacheTime.Location = new System.Drawing.Point(9, 20);
+            this.editGlobalCacheTime.Name = "editGlobalCacheTime";
+            this.editGlobalCacheTime.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.seGlobalCacheTime.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-            this.seGlobalCacheTime.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
-            this.seGlobalCacheTime.Properties.IsFloatValue = false;
-            this.seGlobalCacheTime.Properties.Mask.EditMask = "N00";
-            this.seGlobalCacheTime.Size = new System.Drawing.Size(58, 20);
-            this.seGlobalCacheTime.TabIndex = 3;
-            this.seGlobalCacheTime.ToolTip = "Time between the refresh of the global entity cache";
+            this.editGlobalCacheTime.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.editGlobalCacheTime.Properties.EditValueChangedFiringMode = DevExpress.XtraEditors.Controls.EditValueChangedFiringMode.Default;
+            this.editGlobalCacheTime.Properties.IsFloatValue = false;
+            this.editGlobalCacheTime.Properties.Mask.EditMask = "N00";
+            this.editGlobalCacheTime.Size = new System.Drawing.Size(58, 20);
+            this.editGlobalCacheTime.TabIndex = 3;
+            this.editGlobalCacheTime.ToolTip = "Time between the refresh of the global entity cache";
             // 
             // lblGlobalCacheTime
             // 
@@ -600,7 +616,7 @@ namespace EntityTools.Core
             this.btnGetMachineId.Size = new System.Drawing.Size(50, 23);
             this.btnGetMachineId.TabIndex = 1;
             this.btnGetMachineId.Text = "Get";
-            this.btnGetMachineId.Click += new System.EventHandler(this.event_GetMachineId);
+            this.btnGetMachineId.Click += new System.EventHandler(this.handler_GetMachineId);
             // 
             // btnSetMachineId
             // 
@@ -638,7 +654,7 @@ namespace EntityTools.Core
             this.ckbEnableLogger.TabIndex = 6;
             this.ckbEnableLogger.Text = "Enable EntityTools Logger";
             this.ckbEnableLogger.UseVisualStyleBackColor = true;
-            this.ckbEnableLogger.CheckedChanged += new System.EventHandler(this.ckbEnableLogger_CheckedChanged);
+            this.ckbEnableLogger.CheckedChanged += new System.EventHandler(this.handler_EnableLogger);
             // 
             // gbxLogger
             // 
@@ -675,7 +691,7 @@ namespace EntityTools.Core
             this.btnOpenLog.TabIndex = 5;
             this.btnOpenLog.Text = "Open EntityTools log file";
             this.btnOpenLog.UseVisualStyleBackColor = true;
-            this.btnOpenLog.Click += new System.EventHandler(this.event_OpenLogFile);
+            this.btnOpenLog.Click += new System.EventHandler(this.handler_OpenLogFile);
             // 
             // tabDebug
             // 
@@ -707,7 +723,7 @@ namespace EntityTools.Core
             this.ckbDebugMonitor.TabIndex = 8;
             this.ckbDebugMonitor.Text = "DebugMonitor";
             this.ckbDebugMonitor.UseVisualStyleBackColor = true;
-            this.ckbDebugMonitor.CheckedChanged += new System.EventHandler(this.event_DebugMonitorActivation);
+            this.ckbDebugMonitor.CheckedChanged += new System.EventHandler(this.handler_DebugMonitorActivate);
             // 
             // dlgSaveFile
             // 
@@ -731,12 +747,13 @@ namespace EntityTools.Core
             this.tabOptions.ResumeLayout(false);
             this.gbxSlideMonitor.ResumeLayout(false);
             this.gbxSlideMonitor.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.seSlideFilter.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.editSlideTimeout.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.editSlideFilter.Properties)).EndInit();
             this.gbxEntityCache.ResumeLayout(false);
             this.gbxEntityCache.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.seCombatCacheTime.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.seLocalCacheTime.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.seGlobalCacheTime.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.editCombatCacheTime.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.editLocalCacheTime.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.editGlobalCacheTime.Properties)).EndInit();
             this.tabRelogger.ResumeLayout(false);
             this.tabRelogger.PerformLayout();
             this.tabLogger.ResumeLayout(false);
@@ -757,11 +774,9 @@ namespace EntityTools.Core
         private XtraTabPage tabUtilities;
         private XtraTabPage tabOptions;
         private CheckBox ckbSpellStuckMonitor;
-        private Label lblTimerUnslide;
         private Label lblSlideTimer;
         private Label lblSlideFilter;
-        private SpinEdit seSlideFilter;
-        private CheckBox cbSlideMonitor;
+        private SpinEdit editSlideFilter;
         private GroupBox gbxSlideMonitor;
         private TextBox tbSlidingAuras;
         private Label lblSlidingAuras;
@@ -776,7 +791,7 @@ namespace EntityTools.Core
         private SimpleButton btnSetMachineId;
         private TextBox tbMashingId;
         private Button btnAuraViewer;
-        private ComboBox cbbxExportSelector;
+        private ComboBox cbxExportSelector;
         private ButtonEdit tbExportFileSelector;
         private SaveFileDialog dlgSaveFile;
         private Button btnExport;
@@ -788,11 +803,11 @@ namespace EntityTools.Core
         private Button btnOpenLog;
         private GroupBox gbxLogger;
         private GroupBox gbxEntityCache;
-        private SpinEdit seGlobalCacheTime;
+        private SpinEdit editGlobalCacheTime;
         private Label lblGlobalCacheTime;
-        private SpinEdit seCombatCacheTime;
+        private SpinEdit editCombatCacheTime;
         private Label lblCombatCacheTime;
-        private SpinEdit seLocalCacheTime;
+        private SpinEdit editLocalCacheTime;
         private Label lblLocalCacheTime;
         private ToolTip toolTip;
         private CheckBox ckbExtendedActionDebugInfo;
@@ -802,5 +817,7 @@ namespace EntityTools.Core
         private CheckBox ckbDebugMonitor;
         private Button btnTest1;
         private Button bntTest2;
+        private ComboBox cbxSlideMonitor;
+        private SpinEdit editSlideTimeout;
     }
 }

@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using AStar;
 using Astral.Logic.Classes.FSM;
@@ -162,7 +158,7 @@ namespace EntityTools.Patches.Mapper.Tools
                 if (Control.ModifierKeys == Keys.Control)
                 {
                     var obj = SelectObjectByPosition(e.X, e.Y, out double x, out double y, out double z,
-                        EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance, graph);
+                        EntityTools.Config.Mapper.WaypointEquivalenceDistance, graph);
                     if (obj != null)
                     {
                         if (startX == 0 && startY == 0 && startZ == 0)
@@ -204,14 +200,14 @@ namespace EntityTools.Patches.Mapper.Tools
                 }
                 else
                 {
-                    if (startX == 0 && startY == 0 && startZ == 0)
+                    if (startX.Equals(0) && startY.Equals(0) && startZ.Equals(0))
                     {
                         startX = e.X;
                         startY = e.Y;
                         startZ = 0;
                         startLable = string.Concat("(x)", startX.ToString("N1"), "; (y)", startY.ToString("N1"));
                     }
-                    else if (endX == 0 && endY == 0 && endZ == 0)
+                    else if (endX.Equals(0) && endY.Equals(0) && endZ.Equals(0))
                     {
                         endX = e.X;
                         endY = e.Y;

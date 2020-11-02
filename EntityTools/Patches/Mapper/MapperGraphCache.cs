@@ -178,7 +178,7 @@ namespace EntityTools.Patches.Mapper
                         } 
                     }
                     _cachedMapAndRegion = EntityManager.LocalPlayer.MapAndRegion;
-                    cacheTimeout.ChangeTime(EntityTools.PluginSettings.Mapper.CacheRegenTimeout);
+                    cacheTimeout.ChangeTime(EntityTools.Config.Mapper.CacheRegenTimeout);
                     Version++;
                 }
                 else
@@ -447,7 +447,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public bool Active
         {
-            get => _active;// || EntityTools.PluginSettings.Mapper.CacheActive;
+            get => _active;// || EntityTools.Config.Mapper.CacheActive;
             set => _active = value;
         }
         bool _active;
@@ -553,7 +553,7 @@ namespace EntityTools.Patches.Mapper
                 }
             }
             _cachedMapAndRegion = EntityManager.LocalPlayer.MapAndRegion;
-            cacheTimeout.ChangeTime(EntityTools.PluginSettings.Mapper.CacheRegenTimeout);
+            cacheTimeout.ChangeTime(EntityTools.Config.Mapper.CacheRegenTimeout);
             Version++;
         }
 
@@ -709,20 +709,21 @@ namespace EntityTools.Patches.Mapper
             cacheInitialPosition.Z += (float)dz; 
 #endif
             centerX += dx;
-            if (cacheX != double.MaxValue)
+            
+            if (!cacheX.Equals(double.MaxValue))
             {
                 minX += dx;
                 maxX += dx;
             }
             centerY += dy;
-            if (cacheY != double.MaxValue)
+            if (!cacheY.Equals(double.MaxValue))
             {
 
                 minY += dy;
                 maxY += dy;
             }
             centerZ += dz;
-            if (cacheZ != double.MaxValue)
+            if (!cacheZ.Equals(double.MaxValue))
             {
                 minZ += dz;
                 maxZ += dz;
@@ -786,7 +787,7 @@ namespace EntityTools.Patches.Mapper
         }
         public void SetCacheArea(double x1, double y1, double x2, double y2)
         {
-            SetCacheArea(x1, y1, 0, x2, y2, 0);
+            SetCacheArea(x1, y1, minZ, x2, y2, maxZ);
         }
 
         /// <summary>
@@ -815,7 +816,7 @@ namespace EntityTools.Patches.Mapper
                 cacheInitialPosition.Z = (float)z; 
 #endif
 
-                if (cacheX == double.MaxValue)
+                if (cacheX.Equals(double.MaxValue))
                 {
                     minX = double.MinValue;
                     maxX = double.MaxValue;
@@ -825,7 +826,7 @@ namespace EntityTools.Patches.Mapper
                     minX = centerX - cacheX;
                     maxX = centerX + cacheX;
                 }
-                if (cacheY == double.MaxValue)
+                if (cacheY.Equals(double.MaxValue))
                 {
                     minY = double.MinValue;
                     maxY = double.MaxValue;
@@ -835,7 +836,7 @@ namespace EntityTools.Patches.Mapper
                     minY = centerY - cacheY;
                     maxY = centerY + cacheY;
                 }
-                if (cacheZ == double.MaxValue)
+                if (cacheZ.Equals(double.MaxValue))
                 {
                     minZ = double.MinValue;
                     maxZ = double.MaxValue;
@@ -861,4 +862,4 @@ namespace EntityTools.Patches.Mapper
         private Timeout cacheTimeout = new Timeout(0);
     } 
 #endif
-                }
+}

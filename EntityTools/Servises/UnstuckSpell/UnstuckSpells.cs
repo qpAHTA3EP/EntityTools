@@ -70,7 +70,7 @@ namespace EntityTools.Services
         /// <param name="arg"></param>
         private static void ArterCallCombat(object sender, API.AfterCallCombatEventArgs arg)
         {
-            if (EntityTools.PluginSettings.UnstuckSpells.Active)
+            if (EntityTools.Config.UnstuckSpells.Active)
             {
                 afterCallCombatSubcription = true;
                 if (monitor == null || (monitor.Status != TaskStatus.Running))
@@ -96,8 +96,8 @@ namespace EntityTools.Services
 #if DEBUG_SPELLSTUCKMONITOR
             EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpells)}[{Thread.CurrentThread.ManagedThreadId.ToString("X")}]::Run() starts");
 #endif
-            Thread.Sleep(EntityTools.PluginSettings.UnstuckSpells.CheckInterval * 2);
-            while (EntityTools.PluginSettings.UnstuckSpells.Active)
+            Thread.Sleep(EntityTools.Config.UnstuckSpells.CheckInterval * 2);
+            while (EntityTools.Config.UnstuckSpells.Active)
             {
                 if (NeedToRun)
                 {
@@ -108,7 +108,7 @@ namespace EntityTools.Services
                     DisableSpells();
                     break;
                 }
-                Thread.Sleep(EntityTools.PluginSettings.UnstuckSpells.CheckInterval);
+                Thread.Sleep(EntityTools.Config.UnstuckSpells.CheckInterval);
             }
 
 #if DEBUG_SPELLSTUCKMONITOR
@@ -123,7 +123,7 @@ namespace EntityTools.Services
         {
             get
             {
-                if (EntityTools.PluginSettings.UnstuckSpells.Active)
+                if (EntityTools.Config.UnstuckSpells.Active)
                 {
                     Entity currentTarget = Astral.Logic.UCC.Core.CurrentTarget;
                     bool result = !(EntityManager.LocalPlayer.InCombat

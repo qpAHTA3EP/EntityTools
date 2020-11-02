@@ -18,9 +18,9 @@ namespace EntityTools.Patches.Mapper.Tools
             this.getGraph = getGraph;
             _mappingCache = new MapperGraphCache(getGraph, true, true)
             { 
-                CacheDistanceX = EntityTools.PluginSettings.Mapper.CacheRadius,
-                CacheDistanceY = EntityTools.PluginSettings.Mapper.CacheRadius,
-                CacheDistanceZ = EntityTools.PluginSettings.Mapper.MaxElevationDifference
+                CacheDistanceX = EntityTools.Config.Mapper.CacheRadius,
+                CacheDistanceY = EntityTools.Config.Mapper.CacheRadius,
+                CacheDistanceZ = EntityTools.Config.Mapper.MaxElevationDifference
             };
             MappingMode = mode;
         }
@@ -109,7 +109,7 @@ namespace EntityTools.Patches.Mapper.Tools
                 //graphics.FillSquareCentered(Brushes.ForestGreen, lastNodeDetail, MapperHelper.DefaultAnchorSize * 0.66);
             }
 
-            var eqvDist = EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance;
+            var eqvDist = EntityTools.Config.Mapper.WaypointEquivalenceDistance;
             if (eqvDist >= 2)
             {
                 var location = EntityManager.LocalPlayer.Location;
@@ -166,20 +166,25 @@ namespace EntityTools.Patches.Mapper.Tools
 #if PROFILING && DEBUG
                 AddNavigationNodeChached.ResetWatch();
 #endif
+                bool unitdirPath = _mode == MappingMode.Unidirectional;
                 if (_mappingCache.NodesCount != 0)
                 {
-                    if (_linear)
-                        _lastNodeDetail = MappingToolHelper.LinkNearest_1(EntityManager.LocalPlayer.Location.Clone(), _mappingCache);
-                    else _lastNodeDetail = MappingToolHelper.LinkNearest_8_Side(EntityManager.LocalPlayer.Location.Clone(), _mappingCache);
+                    if (_linear || unitdirPath)
+                        _lastNodeDetail = MappingToolHelper.LinkNearest_1(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, null, unitdirPath);
+                    else _lastNodeDetail = MappingToolHelper.LinkNearest_8_Side(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, null, unitdirPath);
                 }
+
                 while (_mode != MappingMode.Stoped
                        && !token.IsCancellationRequested)
                 {
                     // Проверяем расстояние только до предыдущего узла
                     _lastNodeDetail?.Rebase(EntityManager.LocalPlayer.Location);
 
-                    if (_lastNodeDetail == null || _lastNodeDetail.Distance > EntityTools.PluginSettings.Mapper.WaypointDistance)
+                    if (_lastNodeDetail == null || _lastNodeDetail.Distance > EntityTools.Config.Mapper.WaypointDistance)
                     {
+
+
+#if false
                         switch (MappingMode)
                         {
                             case MappingMode.Bidirectional:
@@ -202,23 +207,43 @@ namespace EntityTools.Patches.Mapper.Tools
                                     _lastNodeDetail = MappingToolHelper.LinkLast(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, _lastNodeDetail, true) ?? _lastNodeDetail;
                                 }
                                 break;
+                        } 
+#else
+                        unitdirPath = _mode == MappingMode.Unidirectional;
+                        if (_linear || unitdirPath)
+                        {
+                            _lastNodeDetail = MappingToolHelper.LinkLast(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, 
+                                                    _forceLink ? _lastNodeDetail : null, unitdirPath) ?? _lastNodeDetail;
                         }
+                        else
+                        {
+                            // Строим комплексный (многосвязный путь)
+                            _lastNodeDetail = MappingToolHelper.LinkNearest_8_Side(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, 
+                                                    _forceLink ? _lastNodeDetail : null, unitdirPath) ?? _lastNodeDetail;
+                        }
+#endif
 #if LastAddedNode
                         _mappingCache.LastAddedNode = lastNodeDetail?.Node; 
 #endif
                     }
                     Thread.Sleep(100);
                 }
-                if (token.IsCancellationRequested)
+#if false
+                if (token.IsCancellationRequested) 
+#endif
                 {
                     // Инициировано прерывание 
                     // Связываем текущее местоположение с графом
+
+                    // unitdirPath - тип пути задается внутри основного цикла
+                    // т.к. в момент прерывания режим связывания установлен в MappingMode.Stoped
+
                     if (_linear)
                         // Проверяется наличие вершины по курсу и связывается с найденной
-                        MappingToolHelper.LinkLinear(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, _lastNodeDetail, _mode == MappingMode.Unidirectional);
-                    else MappingToolHelper.LinkNearest_8_Side(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, _lastNodeDetail, _mode == MappingMode.Unidirectional);
-                    _lastNodeDetail = null;
+                        MappingToolHelper.LinkLinear(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, _lastNodeDetail, unitdirPath);
+                    else MappingToolHelper.LinkNearest_8_Side(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, _lastNodeDetail, unitdirPath);
                 }
+                _lastNodeDetail = null;
             }
             catch (Exception ex)
             {

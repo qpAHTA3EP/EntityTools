@@ -9,7 +9,6 @@ using System.Xml.Serialization;
 using AStar;
 using Astral.Controllers;
 using Astral.Quester;
-using DevExpress.XtraEditors;
 using EntityTools.Reflection;
 using MyNW.Internals;
 
@@ -121,7 +120,7 @@ namespace EntityTools.Patches
                 SaveFileDialog saveFileDialog = new SaveFileDialog();
                 saveFileDialog.InitialDirectory = Directories.ProfilesPath;
                 saveFileDialog.DefaultExt = "amp.zip";
-                saveFileDialog.Filter = "Astral mission profil (*.amp.zip)|*.amp.zip";
+                saveFileDialog.Filter = @"Astral mission profil (*.amp.zip)|*.amp.zip";
                 saveFileDialog.FileName = string.IsNullOrEmpty(profileName) ? EntityManager.LocalPlayer.MapState.MapName : profileName;
                 if (saveFileDialog.ShowDialog() != DialogResult.OK)
                 {
@@ -131,7 +130,7 @@ namespace EntityTools.Patches
                 needLoadAllMeshes = true;
             }
             if(useExternalMeshes)
-                externalMeshFileName = Path.Combine(Path.GetDirectoryName(profileName), currentProfile.ExternalMeshFileName);
+                externalMeshFileName = Path.Combine(Path.GetDirectoryName(profileName)?? string.Empty, currentProfile.ExternalMeshFileName);
 
             if (needLoadAllMeshes && !useExternalMeshes)
                 AstralAccessors.Quester.Core.LoadAllMeshes();
@@ -188,20 +187,12 @@ namespace EntityTools.Patches
 
                 Astral.Controllers.Settings.Get.LastQuesterProfile = profileName;
 
-#if false
-                XtraMessageBox.Show(string.Concat("Profile '", profileName, "' saved")); 
-#else
                 Astral.Logger.Notify(string.Concat("Profile '", profileName, "' saved"));
-#endif
             }
             catch (Exception exc)
             {
                 ETLogger.WriteLine(LogType.Error, exc.ToString(), true);
-#if false
-                XtraMessageBox.Show(exc.ToString()); 
-#else
                 Astral.Logger.Notify(string.Concat("Profile '", profileName, "' saved"), true);
-#endif
             }
             finally
             {
@@ -225,7 +216,7 @@ namespace EntityTools.Patches
             if (binaryFormatter is null)
                 binaryFormatter = new BinaryFormatter();
 
-            ZipArchiveEntry zipMeshEntry = null;
+            ZipArchiveEntry zipMeshEntry;
             if (zipFile.Mode == ZipArchiveMode.Update)
             {
                 zipMeshEntry = zipFile.GetEntry(meshName);
@@ -256,12 +247,11 @@ namespace EntityTools.Patches
         public static void SaveProfile(ZipArchive zipFile)
         {
             //TODO: Безопасное сохранение профиля, чтобы при возникновении ошибки старое содержимое не удалялось
-            ZipArchiveEntry zipProfileEntry = null;
+            ZipArchiveEntry zipProfileEntry;
             if (zipFile.Mode == ZipArchiveMode.Update)
             {
                 zipProfileEntry = zipFile.GetEntry("profile.xml");
-                if(zipProfileEntry != null)
-                    zipProfileEntry.Delete();
+                zipProfileEntry?.Delete();
             } 
             zipProfileEntry = zipFile.CreateEntry("profile.xml");
 

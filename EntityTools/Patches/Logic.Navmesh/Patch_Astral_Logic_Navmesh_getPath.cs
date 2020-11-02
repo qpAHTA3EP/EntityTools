@@ -10,16 +10,16 @@ using MyNW.Classes;
 
 namespace EntityTools.Patches.Navmesh
 {
-    internal class Patch_Astral_Logic_Navmesh_getPath : Patch
+    internal class Patch_Astral_Logic_Navmesh_GetPath : Patch
     {
-        internal Patch_Astral_Logic_Navmesh_getPath()
+        internal Patch_Astral_Logic_Navmesh_GetPath()
         {
             MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("getPath", ReflectionHelper.DefaultFlags);
             if (mi != null)
             {
                 methodToReplace = mi;
             }
-            else throw new Exception("Patch_Astral_Logic_Navmesh_getPath: fail to initialize 'methodToReplace'");
+            else throw new Exception("Patch_Astral_Logic_Navmesh_GetPath: fail to initialize 'methodToReplace'");
 
             methodToInject = GetType().GetMethod(nameof(GetPath), ReflectionHelper.DefaultFlags, null, new Type[]{ typeof(Graph), typeof(Vector3), typeof(Vector3)}, null);
         }
@@ -31,7 +31,7 @@ namespace EntityTools.Patches.Navmesh
 
 #if false
     Astral.Logic.Navmesh
-    	private static List<Vector3> GetPath(Graph graph, Vector3 Start, Vector3 End)
+    	private static List<Vector3> GetPathAndCorrect(Graph graph, Vector3 Start, Vector3 End)
         {
 	        List<Vector3> list = new List<Vector3>();
 	        if (graph == null)
@@ -68,7 +68,7 @@ namespace EntityTools.Patches.Navmesh
                 graph.ClosestNodes(start.X, start.Y, start.Z, out double dist1, out Node startNode,
                     end.X, end.Y, end.Z, out double dist2, out Node endNode);
 
-                GetPath(graph, startNode, endNode, ref waypoints);
+                GetPathAndCorrect(graph, startNode, endNode, ref waypoints, start);
             }
             return waypoints;
         }
@@ -102,7 +102,103 @@ namespace EntityTools.Patches.Navmesh
                     if (waypoints.Count == 0)
                     {
                         stringBuilder.Clear();
-                        stringBuilder.AppendLine(nameof(Patch_Astral_Logic_Navmesh_getPath));
+                        stringBuilder.AppendLine(nameof(Patch_Astral_Logic_Navmesh_GetPath));
+                        stringBuilder.Append("\tFrom '").Append(startNode).Append("' to '").Append(endNode).AppendLine("'");
+                        stringBuilder.Append("\tElapsedTime: ").Append(stopwatch.ElapsedMilliseconds).AppendLine(" ms");
+                        stringBuilder.AppendLine(Environment.StackTrace);
+
+                        ETLogger.WriteLine(LogType.Debug, stringBuilder.ToString());
+                    } 
+#endif
+
+                }
+
+            }
+            return waypoints.Count > 1;
+        }
+
+        internal static bool GetPathAndCorrect(Graph graph, Node startNode, Node endNode, ref List<Vector3> waypoints, Vector3 from)
+        {
+            if (waypoints is null)
+                waypoints = new List<Vector3>();
+            if (graph != null)
+            {
+                AStar.AStar astar = new AStar.AStar(graph);
+
+#if PATCH_LOG
+                stopwatch.Restart(); 
+#endif
+                astar.SearchPath(startNode, endNode);
+#if PATCH_LOG
+                stopwatch.Stop(); 
+#endif
+
+                if (astar.PathFound)
+                {
+
+                    using (var wpe = astar.PathNodes.GetEnumerator())
+                    {
+                        if (wpe.MoveNext())
+                        {
+                            var wp0 = wpe.Current;
+                            if (wpe.MoveNext())
+                            {
+                                var wp1 = wpe.Current;
+                                if(from!= null && from.IsValid)
+                                {
+                                    var pos0 = wp0.Position;
+                                    var pos1 = wp1.Position;
+
+                                    // найденный путь содержит не менее 2 вершин
+                                    // проверяем направления и корректируем "возврат"
+                                    double x0 = pos0.X - from.X,
+                                           y0 = pos0.Y - from.Y,
+                                           z0 = pos0.Z - from.Z,
+                                           x1 = pos1.X - from.X,
+                                           y1 = pos1.Y - from.Y,
+                                           z1 = pos1.Z - from.Z,
+                                           d0 = x0 * x0 + y0 * y0 + z0 * z0, //
+                                           d1 = x1 * x1 + y1 * y1 + z1 * z1;
+
+                                    double cos = (x0 * x1 + y0 * y1 + z0 * z1) / Math.Sqrt(d0 * d1);
+
+                                    if (cos > 0 /*|| d1 > d0 * 1.21*/ || (z1 > 0 && z1 * z1 / d1 > 0.25))
+                                    {
+                                        // угол между векторами (from -> wp0) и (from -> wp1) меньше 90 градусов,
+                                        // либо расстояние до обеих точек различается более чем на 10%,
+                                        // крутизна угла на wp1 больше 30 град. к горизонту Oxy (z1 *z1 / d1 определяет квадрат синус угла между вектором (from -> wp1) и его проектцией на Oxy)
+                                        // поэтому добавляем в путь обе точки
+                                        waypoints.Add(wp0.Position);
+                                        waypoints.Add(wp1.Position);
+                                    }
+                                    else 
+                                    {
+                                        // угол между направлениями из точки from на точки wp0 и wp1
+                                        // больше 90 градусов, поэтому точку wp0 нужно "пропустить" (чтобы не возвращаться "назад")
+                                        waypoints.Add(wp1.Position);
+                                    }
+                                }
+                                else
+                                {
+                                    waypoints.Add(wp0.Position);
+                                    waypoints.Add(wp1.Position);
+                                }
+
+                                while (wpe.MoveNext())
+                                {
+                                    waypoints.Add(wpe.Current.Position);
+                                }
+                            }
+                            else if(wp0 != null)
+                                waypoints.Add(wp0.Position);
+                        }
+                    }
+
+#if PATCH_LOG
+                    if (waypoints.Count == 0)
+                    {
+                        stringBuilder.Clear();
+                        stringBuilder.AppendLine(nameof(Patch_Astral_Logic_Navmesh_GetPath));
                         stringBuilder.Append("\tFrom '").Append(startNode).Append("' to '").Append(endNode).AppendLine("'");
                         stringBuilder.Append("\tElapsedTime: ").Append(stopwatch.ElapsedMilliseconds).AppendLine(" ms");
                         stringBuilder.AppendLine(Environment.StackTrace);

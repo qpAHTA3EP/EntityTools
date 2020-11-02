@@ -58,11 +58,11 @@ namespace EntityTools
         public override BasePanel Settings => _panel ?? (_panel = new EntityToolsMainPanel());
         private BasePanel _panel;
 
-        public static EntityToolsSettings PluginSettings { get; set; } = new EntityToolsSettings();
+        public static EntityToolsSettings Config { get; set; } = new EntityToolsSettings();
 
         public override void OnBotStart()
         {
-            if(PluginSettings.UnstuckSpells.Active)
+            if(Config.UnstuckSpells.Active)
                 UnstuckSpells.Start();
 
 #if PROFILING && DEBUG
@@ -98,7 +98,7 @@ namespace EntityTools
                 AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
                 assemblyResolve_Deletage_Binded = true;
             }
-            if (PluginSettings.Logger.Active)
+            if (Config.Logger.Active)
                 ETLogger.Start();
 
             // Загрузка ядра из ресурса
@@ -157,17 +157,17 @@ namespace EntityTools
             {
                 if (File.Exists(FileTools.SettingsFile))
                 {
-                    XmlSerializer serialiser = new XmlSerializer(PluginSettings.GetType());
+                    XmlSerializer serialiser = new XmlSerializer(Config.GetType());
                     using (StreamReader fileStream = new StreamReader(FileTools.SettingsFile))
                     {
                         if (serialiser.Deserialize(fileStream) is EntityToolsSettings settings)
                         {
-                            PluginSettings = settings;
+                            Config = settings;
                             ETLogger.WriteLine($"{GetType().Name}: Load settings from {Path.GetFileName(FileTools.SettingsFile)}", true);
                         }
                         else
                         {
-                            PluginSettings = new EntityToolsSettings();
+                            Config = new EntityToolsSettings();
                             ETLogger.WriteLine($"{GetType().Name}: Settings file not found. Use default", true);
                         }
                     }
@@ -175,7 +175,7 @@ namespace EntityTools
             }
             catch
             {
-                PluginSettings = new EntityToolsSettings();
+                Config = new EntityToolsSettings();
                 ETLogger.WriteLine(LogType.Error, $"{GetType().Name}: Error load settings file {Path.GetFileName(FileTools.SettingsFile)}. Use default", true);
             }
         }
@@ -192,10 +192,10 @@ namespace EntityTools
                 if (!Directory.Exists(Path.GetDirectoryName(FileTools.SettingsFile)))
                     Directory.CreateDirectory(Path.GetDirectoryName(FileTools.SettingsFile));
 
-                XmlSerializer serialiser = new XmlSerializer(/*typeof(SettingsContainer)*/PluginSettings.GetType());
+                XmlSerializer serialiser = new XmlSerializer(/*typeof(SettingsContainer)*/Config.GetType());
                 using (TextWriter FileStream = new StreamWriter(FileTools.SettingsFile, false))
                 {
-                    serialiser.Serialize(FileStream, PluginSettings);
+                    serialiser.Serialize(FileStream, Config);
                 }
             }
             catch (Exception exp)

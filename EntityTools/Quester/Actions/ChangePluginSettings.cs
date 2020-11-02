@@ -40,7 +40,7 @@ namespace EntityTools.Quester.Actions
                     case PluginSettingsCommand.DisableUnstuckSpell:
                         if (bool.TryParse(Value, out result))
                         {
-                            EntityTools.PluginSettings.UnstuckSpells.Active = !result;
+                            EntityTools.Config.UnstuckSpells.Active = !result;
                             return ActionResult.Completed;
                         }
                         else return ActionResult.Fail;

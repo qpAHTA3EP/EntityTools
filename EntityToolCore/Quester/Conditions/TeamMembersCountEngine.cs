@@ -191,7 +191,7 @@ namespace EntityCore.Quester.Conditions
                             }
                         }
 #if timeout
-                        timeout.ChangeTime(EntityTools.EntityTools.PluginSettings.EntityCache.LocalCacheTime);
+                        timeout.ChangeTime(EntityTools.EntityTools.Config.EntityCache.LocalCacheTime);
                     } 
 #endif
 

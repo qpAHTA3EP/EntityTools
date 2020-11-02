@@ -50,7 +50,7 @@ public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool al
 			List<Vector3> list = new List<Vector3>();
 			if (allowPathFinding || graph.Nodes.Count == 0)
 			{
-				list = PathFinding.GetPath(Start, End, Class1.CurrentSettings.AllowPartialPath);
+				list = PathFinding.GetPathAndCorrect(Start, End, Class1.CurrentSettings.AllowPartialPath);
 			}
 			if (list.Count > 0)
 			{
@@ -77,21 +77,21 @@ public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool al
 				if (list2.Count == 0)
 				{
 					road.Type = Road.RoadGenType.GoldenPathGraph;
-					list2 = Navmesh.GetPath(GoldenPath.GetCurrentMapGraphFromCache(), Start, End);
+					list2 = Navmesh.GetPathAndCorrect(GoldenPath.GetCurrentMapGraphFromCache(), Start, End);
 				}
 				if (list2.Count > 0)
 				{
 					Vector3 vector = new Vector3();
 					if (PathFinding.CheckDirection(Start, list2[0], ref vector))
 					{
-						List<Vector3> path = PathFinding.GetPath(Start, list2[0], true);
+						List<Vector3> path = PathFinding.GetPathAndCorrect(Start, list2[0], true);
 						road.Waypoints.AddRange(path);
 					}
 					road.Waypoints.AddRange(list2);
 				}
 				else
 				{
-					List<Vector3> path2 = PathFinding.GetPath(Start, End, true);
+					List<Vector3> path2 = PathFinding.GetPathAndCorrect(Start, End, true);
 					road.Type = Road.RoadGenType.PartialPathFinding;
 					road.Waypoints = path2;
 				}
@@ -103,7 +103,7 @@ public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool al
 		}
 		else
 		{
-			road.Waypoints = Navmesh.GetPath(graph, Start, End);
+			road.Waypoints = Navmesh.GetPathAndCorrect(graph, Start, End);
 		}
 		result = road;
 	}
@@ -183,7 +183,7 @@ public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool al
                                     if (dist1 < 130.0)
                                     {
                                         road.Type = Road.RoadGenType.StandardGraph;
-                                        if(Patch_Astral_Logic_Navmesh_getPath.GetPath(graph, startNode, endNode, ref waypoints))
+                                        if(Patch_Astral_Logic_Navmesh_GetPath.GetPathAndCorrect(graph, startNode, endNode, ref waypoints, start))
                                             waypoints.Add(end.Clone());
                                     }
                                 }
@@ -223,7 +223,7 @@ public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool al
                                 {
                                     goldGraph.ClosestNodes(start.X, start.Y, start.Z, out double _, out Node startNode,
                                                            end.X, end.Y, end.Z, out _, out Node endNode);
-                                    if(Patch_Astral_Logic_Navmesh_getPath.GetPath(goldGraph, startNode, endNode, ref waypoints))
+                                    if(Patch_Astral_Logic_Navmesh_GetPath.GetPathAndCorrect(goldGraph, startNode, endNode, ref waypoints, start))
                                         waypoints.Add(end.Clone());
                                 }
 #if PATCH_LOG
@@ -279,7 +279,7 @@ public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool al
 #endif
                         using (graph.ReadLock())
                         {
-                            road.Waypoints = Patch_Astral_Logic_Navmesh_getPath.GetPath(graph, start, end);
+                            road.Waypoints = Patch_Astral_Logic_Navmesh_GetPath.GetPath(graph, start, end);
                         }
 #if PATCH_LOG
                         directPathFinding_Time = stopwatch.ElapsedTicks - directPathFinding_Time;

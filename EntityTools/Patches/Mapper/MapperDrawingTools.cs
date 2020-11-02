@@ -15,7 +15,7 @@ namespace EntityTools.Patches.Mapper
     {
         public MapperDrawingTools()
         {
-            var mapperFormSettings = EntityTools.PluginSettings.Mapper.MapperForm;
+            var mapperFormSettings = EntityTools.Config.Mapper.MapperForm;
 
             _unidirectionalPathBrush = new SolidBrush(mapperFormSettings.UnidirectionalPathColor);
             _unidirectionalPathPen = new Pen(mapperFormSettings.UnidirectionalPathColor);
@@ -30,7 +30,7 @@ namespace EntityTools.Patches.Mapper
             _nodeBrush = new SolidBrush(mapperFormSettings.NodeColor);                
             _skillnodeBrush = new SolidBrush(mapperFormSettings.SkillNodeColor);
 
-            EntityTools.PluginSettings.Mapper.MapperForm.PropertyChanged += MapperForm_PropertyChanged;
+            EntityTools.Config.Mapper.MapperForm.PropertyChanged += MapperForm_PropertyChanged;
         }
 
         private void MapperForm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -74,7 +74,7 @@ namespace EntityTools.Patches.Mapper
         public Pen UnidirectionalPathPen => _unidirectionalPathPen;
         private Pen _unidirectionalPathPen;
 
-        public Color BackgroundColor => EntityTools.PluginSettings.Mapper.MapperForm.BackgroundColor;
+        public Color BackgroundColor => EntityTools.Config.Mapper.MapperForm.BackgroundColor;
 
         public Brush EnemyBrush => _enemyBrush;
         private Brush _enemyBrush;

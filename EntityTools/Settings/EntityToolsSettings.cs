@@ -28,6 +28,11 @@ namespace EntityTools
         /// </summary>
         public EntityCacheSettings EntityCache { get; set; } = new EntityCacheSettings();
 
+        /// <summary>
+        /// Настройки службы SlideMonitor
+        /// </summary>
+        public SlideMonitorSettings SlideMonitor { get; set; } = new SlideMonitorSettings();
+
 #if false
         #region Сериализация/десериализация статических полей класса статического класса
         /// <summary>

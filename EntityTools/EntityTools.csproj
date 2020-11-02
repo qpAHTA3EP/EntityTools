@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.1026.1626</AssemblyVersion>
+    <AssemblyVersion>0.20.1102.1604</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -200,7 +200,13 @@
     <Compile Include="Core\Proxies\QuesterConditionProxy.cs" />
     <Compile Include="Core\Proxies\UCCActionProxy.cs" />
     <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
+    <Compile Include="Patches\Logic.Classes.FSM.Navigation\CharacterEx.cs" />
+    <Compile Include="Patches\Logic.Classes.FSM.Navigation\EntityEx.cs" />
+    <Compile Include="Patches\Logic.Classes.FSM.Navigation\Enums.cs" />
+    <Compile Include="Patches\Logic.Classes.FSM.Navigation\MountCostumeDef.cs" />
+    <Compile Include="Patches\Logic.Classes.FSM.Navigation\SlideMonitorSettings.cs" />
     <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_GetNearestNodeFromPosition.cs" />
+    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_FixPath.cs" />
     <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_TotalDistance.cs" />
     <Compile Include="Patches\Mapper\MapperDrawingTools.cs" />
     <Compile Include="Patches\Mapper\MapperGraphics.cs" />
@@ -217,13 +223,14 @@
     <Compile Include="Patches\Mapper\Tools\EditEdgeTool.cs" />
     <Compile Include="Patches\Mapper\Tools\RemoveNodesTool.cs" />
     <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_DrawHotSpots.cs" />
-    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_getPath.cs" />
+    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_GetPath.cs" />
     <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_GenerateRoad.cs" />
     <Compile Include="Patches\Patch_Astral_Quester_Core_Save.cs" />
     <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_DrawRoad.cs" />
     <Compile Include="Patches\Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes.cs" />
     <Compile Include="Patches\Patch_VIP_SealTraderEntity.cs" />
     <Compile Include="Patches\Patch_VIP_ProfessionVendorEntity.cs" />
+    <Compile Include="Patches\Logic.Classes.FSM.Navigation\Astral_Logic_Classes_FSM_Navigation_ChangeWPDist.cs" />
     <Compile Include="Patches\Quester.Controllers.Road\Patch_Quester_Controllers_Road_PathDistance.cs" />
     <Compile Include="Patches\Quester.Controllers.Road\Patch_Quester_Controllers_Road_GenerateRoadFromPlayer.cs" />
     <Compile Include="Patches\UCC\Patch_ActionsPlayer_CheckAlly.cs" />
@@ -534,6 +541,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\miniRoad.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\charArrow_16x16..png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.IO.Compression.ZipFile">

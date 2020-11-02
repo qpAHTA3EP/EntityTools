@@ -55,9 +55,9 @@ namespace EntityTools.Patches.Mapper.Tools
 #endif
             Node newNode = new Node(pos.X, pos.Y, pos.Z);
 
-            double maxDistance = Math.Max(10d, EntityTools.PluginSettings.Mapper.WaypointDistance * 1.25d);
-            double maxZDifference = EntityTools.PluginSettings.Mapper.MaxElevationDifference;
-            double equivalenceDistance = EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance;
+            double maxDistance = Math.Max(10d, EntityTools.Config.Mapper.WaypointDistance * 1.25d);
+            double maxZDifference = EntityTools.Config.Mapper.MaxElevationDifference;
+            double equivalenceDistance = EntityTools.Config.Mapper.WaypointEquivalenceDistance;
 
             // Ближайшие узлы разделенные по направлению движения
             NodeDetail frontND = null; // впереди 
@@ -381,8 +381,9 @@ namespace EntityTools.Patches.Mapper.Tools
             if (graph is null || pos is null || !pos.IsValid)
                 return null;
 
+            //TODO: добавить связывание с несколькими ближайшими вершинами (по сторонам света)
             if (lastND is null)
-                return LinkNearest_1(pos, graph, null, uniDirection);
+                return LinkNearest_3_Side(pos, graph, null, uniDirection); 
 
 
 #if PROFILING && DEBUG
@@ -390,9 +391,9 @@ namespace EntityTools.Patches.Mapper.Tools
 #endif
             Node newNode = new Node(pos.X, pos.Y, pos.Z);
 
-            double maxDistance = Math.Max(10d, EntityTools.PluginSettings.Mapper.WaypointDistance * 1.25d);
-            double maxZDifference = EntityTools.PluginSettings.Mapper.MaxElevationDifference;
-            double equivalenceDistance = EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance;
+            double maxDistance = Math.Max(10d, EntityTools.Config.Mapper.WaypointDistance * 1.25d);
+            double maxZDifference = EntityTools.Config.Mapper.MaxElevationDifference;
+            double equivalenceDistance = EntityTools.Config.Mapper.WaypointEquivalenceDistance;
 
             // Ближайшие узлы разделенные по направлению движения
             NodeDetail frontND = null; // впереди (+/-15)
@@ -855,11 +856,11 @@ namespace EntityTools.Patches.Mapper.Tools
             stopwatch.Restart();
 #endif
 #if false
-            double minNodeDistance = EntityTools.PluginSettings.Mapper.WaypointDistance;
-            double maxDistance = Math.Max(10d, EntityTools.PluginSettings.Mapper.WaypointDistance * 1.25d);
+            double minNodeDistance = EntityTools.Config.Mapper.WaypointDistance;
+            double maxDistance = Math.Max(10d, EntityTools.Config.Mapper.WaypointDistance * 1.25d);
 #endif
-            double maxZDifference = EntityTools.PluginSettings.Mapper.MaxElevationDifference;
-            double equivalenceDistance = EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance;
+            double maxZDifference = EntityTools.Config.Mapper.MaxElevationDifference;
+            double equivalenceDistance = EntityTools.Config.Mapper.WaypointEquivalenceDistance;
 
             Node newNode = new Node(pos.X, pos.Y, pos.Z);
 
@@ -1032,9 +1033,9 @@ namespace EntityTools.Patches.Mapper.Tools
 #endif
             Node newNode = new Node(pos.X, pos.Y, pos.Z);
 
-            double maxDistance = Math.Max(10d, EntityTools.PluginSettings.Mapper.WaypointDistance * 1.25d);
-            double maxZDifference = EntityTools.PluginSettings.Mapper.MaxElevationDifference;
-            double equivalenceDistance = EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance;
+            double maxDistance = Math.Max(10d, EntityTools.Config.Mapper.WaypointDistance * 1.25d);
+            double maxZDifference = EntityTools.Config.Mapper.MaxElevationDifference;
+            double equivalenceDistance = EntityTools.Config.Mapper.WaypointEquivalenceDistance;
             NodeDetail nearestND = null; // ближайший узел
             NodeDetail equivalentND = null;// узел, считающийся "эквивалентным" newNode, в результате чего newNode не добавляется к графу
 
@@ -1244,9 +1245,9 @@ namespace EntityTools.Patches.Mapper.Tools
 #endif
             Node newNode = new Node(pos.X, pos.Y, pos.Z);
 
-            double maxDistance = Math.Max(10d, EntityTools.PluginSettings.Mapper.WaypointDistance * 1.25d);
-            double maxZDifference = EntityTools.PluginSettings.Mapper.MaxElevationDifference;
-            double equivalenceDistance = EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance;
+            double maxDistance = Math.Max(10d, EntityTools.Config.Mapper.WaypointDistance * 1.25d);
+            double maxZDifference = EntityTools.Config.Mapper.MaxElevationDifference;
+            double equivalenceDistance = EntityTools.Config.Mapper.WaypointEquivalenceDistance;
 #if false
             NodeDetail nearestND = null; // ближайший узел  
 #endif
@@ -1519,10 +1520,7 @@ namespace EntityTools.Patches.Mapper.Tools
         /// <summary>
         /// Вычисление косинуса угла между проекциями веторов <paramref name="A"/> и <paramref name="B"/> на плоскость Oxy
         /// </summary>
-        /// <param name="A"></param>
-        /// <param name="B"></param>
-        /// <returns></returns>
-        private static double CosineOxy(NodeDetail A, NodeDetail B)
+        internal static double CosineOxy(NodeDetail A, NodeDetail B)
         {
             // вычисляем Cos угла между векторами из формулы скалярного произведения векторов
             // a * b = |a| * |b| * cos (alpha) = xa * xb + ya * yb
@@ -1530,6 +1528,21 @@ namespace EntityTools.Patches.Mapper.Tools
             double cos = (A.X * B.X + A.Y * B.Y)
                           / Math.Sqrt((A.X * A.X + A.Y * A.Y)
                                       * (B.X * B.X + B.Y * B.Y));
+
+            return cos;
+        }
+
+        /// <summary>
+        /// Вычисление косинуса угла между проекциями веторов <paramref name="A"/> и <paramref name="B"/> на плоскость Oxy
+        /// </summary>
+        internal static double CosineOxy(Vector3 Origin, Vector3 A, Vector3 B)
+        {
+            // вычисляем Cos угла между векторами из формулы скалярного произведения векторов
+            // a * b = |a| * |b| * cos (alpha) = xa * xb + ya * yb
+
+            double cos = (A.X * B.X + A.Y * B.Y)
+                         / Math.Sqrt((A.X * A.X + A.Y * A.Y)
+                                     * (B.X * B.X + B.Y * B.Y));
 
             return cos;
         }

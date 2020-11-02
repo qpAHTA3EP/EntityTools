@@ -78,7 +78,7 @@ namespace EntityCore.UCC.Actions
                     {
                         entity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
                                                                 @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, null, @this._aura.Checker);
-                        timeout.ChangeTime(EntityTools.EntityTools.PluginSettings.EntityCache.CombatCacheTime);
+                        timeout.ChangeTime(EntityTools.EntityTools.Config.EntityCache.CombatCacheTime);
                     }
 
                     return ValidateEntity(entity) && entity.Location.Distance3DFromPlayer <= @this._entityRadius;

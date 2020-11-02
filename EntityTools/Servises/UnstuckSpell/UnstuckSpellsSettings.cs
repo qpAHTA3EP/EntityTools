@@ -41,7 +41,7 @@ namespace EntityTools.Settings
                 if (checkInterval != value)
                 {
                     checkInterval = Math.Max(value, 500);
-                    NotifyPropertyChanged(nameof(Active));
+                    NotifyPropertyChanged(nameof(CheckInterval));
                 }
             }
         }

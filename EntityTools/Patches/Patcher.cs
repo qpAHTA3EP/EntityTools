@@ -23,7 +23,7 @@ namespace EntityTools.Patches
         /// <summary>
         /// Подмена штатного окна Mapper'a
         /// </summary>
-        private static readonly Patch patchMapper = (EntityTools.PluginSettings.Mapper.Patch) ?
+        private static readonly Patch patchMapper = (EntityTools.Config.Mapper.Patch) ?
             new Patch(
                 typeof(MapperForm).GetMethod("Open", ReflectionHelper.DefaultFlags),
                 typeof(MapperFormExt).GetMethod(nameof(MapperFormExt.Open), ReflectionHelper.DefaultFlags))
@@ -67,7 +67,9 @@ namespace EntityTools.Patches
 #endif
 #if true
         // Патч методов построения пути
-        private static readonly Patch_Astral_Logic_Navmesh_getPath Patch_Astral_Logic_Navmesh_getPath = new Patch_Astral_Logic_Navmesh_getPath();
+        private static readonly Patch_Astral_Logic_Navmesh_GetPath Patch_Astral_Logic_Navmesh_GetPath = new Patch_Astral_Logic_Navmesh_GetPath();
+        private static readonly Patch_Astral_Logic_Navmesh_FixPath Patch_Astral_Logic_Navmesh_FixPath = new Patch_Astral_Logic_Navmesh_FixPath();
+
         private static readonly Patch_Astral_Logic_Navmesh_GenerateRoad Patch_Astral_Logic_Navmesh_GenerateRoad = new Patch_Astral_Logic_Navmesh_GenerateRoad();
 
         private static readonly Patch_Astral_Logic_Navmesh_TotalDistance Patch_Astral_Logic_Navmesh_TotalDistance = new Patch_Astral_Logic_Navmesh_TotalDistance();

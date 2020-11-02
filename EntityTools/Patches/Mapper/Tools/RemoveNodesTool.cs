@@ -94,7 +94,7 @@ namespace EntityTools.Patches.Mapper.Tools
                 && Control.ModifierKeys == Keys.Alt)
             {
                 // производим поиск вершины
-                double minDistance = EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance;
+                double minDistance = EntityTools.Config.Mapper.WaypointEquivalenceDistance;
                 Node node = graph.ClosestNodeOxyProjection(e.X, e.Y, minDistance);
 
                 // удаление выбранной вершины

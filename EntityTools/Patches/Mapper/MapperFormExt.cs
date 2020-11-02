@@ -92,24 +92,24 @@ namespace EntityTools.Patches.Mapper
 
             MouseWheel += handler_MouseWheel;
 
-            barMapping.Visible = EntityTools.PluginSettings.Mapper.MapperForm.MappingBarVisible;
-            barMeshes.Visible = EntityTools.PluginSettings.Mapper.MapperForm.MeshesBarVisible;
-            barNodeTools.Visible = EntityTools.PluginSettings.Mapper.MapperForm.NodeToolsBarVisible;
-            barCustomRegions.Visible = EntityTools.PluginSettings.Mapper.MapperForm.CustomRegionBarVisible;
-            barStatus.Visible = EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible;
+            barMapping.Visible = EntityTools.Config.Mapper.MapperForm.MappingBarVisible;
+            barMeshes.Visible = EntityTools.Config.Mapper.MapperForm.MeshesBarVisible;
+            barNodeTools.Visible = EntityTools.Config.Mapper.MapperForm.NodeToolsBarVisible;
+            barCustomRegions.Visible = EntityTools.Config.Mapper.MapperForm.CustomRegionBarVisible;
+            barStatus.Visible = EntityTools.Config.Mapper.MapperForm.StatusBarVisible;
 
             btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barNodeTools.Visible && !barCustomRegions.Visible;
 
-            Location = EntityTools.PluginSettings.Mapper.MapperForm.Location;
+            Location = EntityTools.Config.Mapper.MapperForm.Location;
 
             BindingControls();
 
-            _mappingTool = new MappingTool(() => AstralAccessors.Quester.Core.Meshes.Value)
-            {
-                Linear = EntityTools.PluginSettings.Mapper.LinearPath,
-                ForceLink = EntityTools.PluginSettings.Mapper.ForceLinkingWaypoint
+            _mappingTool = new MappingTool(() => AstralAccessors.Quester.Core.Meshes.Value) {
+                Linear = EntityTools.Config.Mapper.LinearPath,
+                ForceLink = EntityTools.Config.Mapper.ForceLinkingWaypoint
             };
 
+            _graphics.GraphCache.CacheDistanceZ = EntityTools.Config.Mapper.MapperForm.LayerDepth;
         }
 
         /// <summary>
@@ -118,25 +118,25 @@ namespace EntityTools.Patches.Mapper
         private void BindingControls()
         {
             editWaypointDistance.DataBindings.Add(nameof(editWaypointDistance.EditValue),
-                                                EntityTools.PluginSettings.Mapper,
-                                                nameof(EntityTools.PluginSettings.Mapper.WaypointDistance),
+                                                EntityTools.Config.Mapper,
+                                                nameof(EntityTools.Config.Mapper.WaypointDistance),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
             editWaypointDistance.Edit.EditValueChanged += handler_WaypointDistanceChanged;
             editWaypointDistance.Edit.Leave += handler_WaypointDistanceChanged;
 
             editMaxZDifference.DataBindings.Add(nameof(editMaxZDifference.EditValue),
-                                                EntityTools.PluginSettings.Mapper,
-                                                nameof(EntityTools.PluginSettings.Mapper.MaxElevationDifference),
+                                                EntityTools.Config.Mapper,
+                                                nameof(EntityTools.Config.Mapper.MaxElevationDifference),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 
             editEquivalenceDistance.DataBindings.Add(nameof(editEquivalenceDistance.EditValue),
-                                                EntityTools.PluginSettings.Mapper,
-                                                nameof(EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance),
+                                                EntityTools.Config.Mapper,
+                                                nameof(EntityTools.Config.Mapper.WaypointEquivalenceDistance),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 #if false
             menuCacheActive.DataBindings.Add(nameof(menuCacheActive.Checked),
-                                                    EntityTools.PluginSettings.Mapper,
-                                                    nameof(EntityTools.PluginSettings.Mapper.CacheActive),
+                                                    EntityTools.Config.Mapper,
+                                                    nameof(EntityTools.Config.Mapper.CacheActive),
                                                     false, DataSourceUpdateMode.OnPropertyChanged); 
 #endif
 
@@ -146,7 +146,7 @@ namespace EntityTools.Patches.Mapper
             /* Astral.API.CurrentSettings.DeleteNodeRadius не реализует INotifyPropertyChanged
              * поэтому привязка нижеуказанным методом невозможна
              * menuDeleteRadius.DataBindings.Add(new Binding(nameof(menuDeleteRadius.EditValue),
-                                        EntityTools.PluginSettings.Mapper,
+                                        EntityTools.Config.Mapper,
                                         nameof(Astral.API.CurrentSettings.DeleteNodeRadius))); //*/
 
             ((ISupportInitialize)bsrcAstralSettings).BeginInit();
@@ -161,95 +161,100 @@ namespace EntityTools.Patches.Mapper
 #endif
 
             btnMappingForceLink.DataBindings.Add(nameof(btnMappingForceLink.Checked),
-                                                EntityTools.PluginSettings.Mapper,
-                                                nameof(EntityTools.PluginSettings.Mapper.ForceLinkingWaypoint),
+                                                EntityTools.Config.Mapper,
+                                                nameof(EntityTools.Config.Mapper.ForceLinkingWaypoint),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 
             btnMappingLinearPath.DataBindings.Add(nameof(btnMappingLinearPath.Checked),
-                                                EntityTools.PluginSettings.Mapper,
-                                                nameof(EntityTools.PluginSettings.Mapper.LinearPath),
+                                                EntityTools.Config.Mapper,
+                                                nameof(EntityTools.Config.Mapper.LinearPath),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 
             ckbChacheEnable.DataBindings.Add(nameof(ckbChacheEnable.Checked),
-                                                EntityTools.PluginSettings.Mapper,
-                                                nameof(EntityTools.PluginSettings.Mapper.CacheActive),
+                                                EntityTools.Config.Mapper,
+                                                nameof(EntityTools.Config.Mapper.CacheActive),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
+
+            editLayerDepth.DataBindings.Add(nameof(editLayerDepth.Value),
+                                                EntityTools.Config.Mapper.MapperForm,
+                                                nameof(EntityTools.Config.Mapper.MapperForm.LayerDepth),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 
             #region Customization
             colorEditBidirPath.DataBindings.Add(nameof(colorEditBidirPath.EditValue),
-                                                    EntityTools.PluginSettings.Mapper.MapperForm,
-                                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.BidirectionalPathColor),
+                                                    EntityTools.Config.Mapper.MapperForm,
+                                                    nameof(EntityTools.Config.Mapper.MapperForm.BidirectionalPathColor),
                                                     false, DataSourceUpdateMode.OnPropertyChanged);
 
             colorEditUnidirPath.DataBindings.Add(nameof(colorEditUnidirPath.EditValue),
-                                                EntityTools.PluginSettings.Mapper.MapperForm,
-                                                nameof(EntityTools.PluginSettings.Mapper.MapperForm.UnidirectionalPathColor),
+                                                EntityTools.Config.Mapper.MapperForm,
+                                                nameof(EntityTools.Config.Mapper.MapperForm.UnidirectionalPathColor),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 
             colorBackground.DataBindings.Add(nameof(colorBackground.EditValue),
-                                                EntityTools.PluginSettings.Mapper.MapperForm,
-                                                nameof(EntityTools.PluginSettings.Mapper.MapperForm.BackgroundColor),
+                                                EntityTools.Config.Mapper.MapperForm,
+                                                nameof(EntityTools.Config.Mapper.MapperForm.BackgroundColor),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 
 
             ckbEnemies.DataBindings.Add(nameof(ckbEnemies.Checked),
-                                            EntityTools.PluginSettings.Mapper.MapperForm,
-                                            nameof(EntityTools.PluginSettings.Mapper.MapperForm.DrawEnemies),
+                                            EntityTools.Config.Mapper.MapperForm,
+                                            nameof(EntityTools.Config.Mapper.MapperForm.DrawEnemies),
                                             false, DataSourceUpdateMode.OnPropertyChanged);
 
             colorEnemies.DataBindings.Add(nameof(colorEnemies.EditValue),
-                                    EntityTools.PluginSettings.Mapper.MapperForm,
-                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.EnemyColor),
+                                    EntityTools.Config.Mapper.MapperForm,
+                                    nameof(EntityTools.Config.Mapper.MapperForm.EnemyColor),
                                     false, DataSourceUpdateMode.OnPropertyChanged);
 
             ckbFriends.DataBindings.Add(nameof(ckbFriends.Checked),
-                                    EntityTools.PluginSettings.Mapper.MapperForm,
-                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.DrawFriends),
+                                    EntityTools.Config.Mapper.MapperForm,
+                                    nameof(EntityTools.Config.Mapper.MapperForm.DrawFriends),
                                     false, DataSourceUpdateMode.OnPropertyChanged);
 
             colorFriends.DataBindings.Add(nameof(colorFriends.EditValue),
-                                    EntityTools.PluginSettings.Mapper.MapperForm,
-                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.FriendColor),
+                                    EntityTools.Config.Mapper.MapperForm,
+                                    nameof(EntityTools.Config.Mapper.MapperForm.FriendColor),
                                     false, DataSourceUpdateMode.OnPropertyChanged);
 
             ckbPlayers.DataBindings.Add(nameof(ckbPlayers.Checked),
-                                    EntityTools.PluginSettings.Mapper.MapperForm,
-                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.DrawPlayers),
+                                    EntityTools.Config.Mapper.MapperForm,
+                                    nameof(EntityTools.Config.Mapper.MapperForm.DrawPlayers),
                                     false, DataSourceUpdateMode.OnPropertyChanged);
 
             colorPlayers.DataBindings.Add(nameof(colorPlayers.EditValue),
-                                    EntityTools.PluginSettings.Mapper.MapperForm,
-                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.PlayerColor),
+                                    EntityTools.Config.Mapper.MapperForm,
+                                    nameof(EntityTools.Config.Mapper.MapperForm.PlayerColor),
                                     false, DataSourceUpdateMode.OnPropertyChanged);
 
             ckbOtherNPC.DataBindings.Add(nameof(ckbOtherNPC.Checked),
-                                    EntityTools.PluginSettings.Mapper.MapperForm,
-                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.DrawOtherNPC),
+                                    EntityTools.Config.Mapper.MapperForm,
+                                    nameof(EntityTools.Config.Mapper.MapperForm.DrawOtherNPC),
                                     false, DataSourceUpdateMode.OnPropertyChanged);
 
             colorOtherNPC.DataBindings.Add(nameof(colorOtherNPC.EditValue),
-                                    EntityTools.PluginSettings.Mapper.MapperForm,
-                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.OtherNPCColor),
+                                    EntityTools.Config.Mapper.MapperForm,
+                                    nameof(EntityTools.Config.Mapper.MapperForm.OtherNPCColor),
                                     false, DataSourceUpdateMode.OnPropertyChanged);
 
             ckbNodes.DataBindings.Add(nameof(ckbNodes.Checked),
-                                    EntityTools.PluginSettings.Mapper.MapperForm,
-                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.DrawNodes),
+                                    EntityTools.Config.Mapper.MapperForm,
+                                    nameof(EntityTools.Config.Mapper.MapperForm.DrawNodes),
                                     false, DataSourceUpdateMode.OnPropertyChanged);
 
             colorNodes.DataBindings.Add(nameof(colorNodes.EditValue),
-                                    EntityTools.PluginSettings.Mapper.MapperForm,
-                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.NodeColor),
+                                    EntityTools.Config.Mapper.MapperForm,
+                                    nameof(EntityTools.Config.Mapper.MapperForm.NodeColor),
                                     false, DataSourceUpdateMode.OnPropertyChanged);
 
             ckbSkillnodes.DataBindings.Add(nameof(ckbSkillnodes.Checked),
-                                    EntityTools.PluginSettings.Mapper.MapperForm,
-                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.DrawSkillNodes),
+                                    EntityTools.Config.Mapper.MapperForm,
+                                    nameof(EntityTools.Config.Mapper.MapperForm.DrawSkillNodes),
                                     false, DataSourceUpdateMode.OnPropertyChanged);
 
             colorSkillnodes.DataBindings.Add(nameof(colorSkillnodes.EditValue),
-                                    EntityTools.PluginSettings.Mapper.MapperForm,
-                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.SkillNodeColor),
+                                    EntityTools.Config.Mapper.MapperForm,
+                                    nameof(EntityTools.Config.Mapper.MapperForm.SkillNodeColor),
                                     false, DataSourceUpdateMode.OnPropertyChanged); 
             #endregion
 
@@ -259,17 +264,17 @@ namespace EntityTools.Patches.Mapper
             // Привязка к элементам управления вызывает ошибку времени выполнения
 
             Location.DataBindings.Add(nameof(Location),
-                            EntityTools.PluginSettings.Mapper.MapperForm,
-                            nameof(EntityTools.PluginSettings.Mapper.MapperForm.Location),
+                            EntityTools.Config.Mapper.MapperForm,
+                            nameof(EntityTools.Config.Mapper.MapperForm.Location),
                             false, DataSourceUpdateMode.OnPropertyChanged);
 
             barMapping.DataBindings.Add(nameof(barMapping.Visible),
-                                    EntityTools.PluginSettings.Mapper.MapperForm,
-                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.MappingBarVisible),
+                                    EntityTools.Config.Mapper.MapperForm,
+                                    nameof(EntityTools.Config.Mapper.MapperForm.MappingBarVisible),
                                     false, DataSourceUpdateMode.OnPropertyChanged);
             barStatus.DataBindings.Add(nameof(barStatus.Visible),
-                                    EntityTools.PluginSettings.Mapper.MapperForm,
-                                    nameof(EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible),
+                                    EntityTools.Config.Mapper.MapperForm,
+                                    nameof(EntityTools.Config.Mapper.MapperForm.StatusBarVisible),
                                     false, DataSourceUpdateMode.OnPropertyChanged);
 #endif
         }
@@ -279,7 +284,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public static void Open()
         {
-            if (EntityTools.PluginSettings.Mapper.Patch)
+            if (EntityTools.Config.Mapper.Patch)
             {
                 if (@this != null && !@this.IsDisposed)
                     @this.Focus();
@@ -301,15 +306,15 @@ namespace EntityTools.Patches.Mapper
         {
             Binds.RemoveShiftAction(Keys.M);
 
-            barMapping.Visible = EntityTools.PluginSettings.Mapper.MapperForm.MappingBarVisible;
-            barMeshes.Visible = EntityTools.PluginSettings.Mapper.MapperForm.MeshesBarVisible;
-            barNodeTools.Visible = EntityTools.PluginSettings.Mapper.MapperForm.NodeToolsBarVisible;
-            barCustomRegions.Visible = EntityTools.PluginSettings.Mapper.MapperForm.CustomRegionBarVisible;
-            barStatus.Visible = EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible;
+            barMapping.Visible = EntityTools.Config.Mapper.MapperForm.MappingBarVisible;
+            barMeshes.Visible = EntityTools.Config.Mapper.MapperForm.MeshesBarVisible;
+            barNodeTools.Visible = EntityTools.Config.Mapper.MapperForm.NodeToolsBarVisible;
+            barCustomRegions.Visible = EntityTools.Config.Mapper.MapperForm.CustomRegionBarVisible;
+            barStatus.Visible = EntityTools.Config.Mapper.MapperForm.StatusBarVisible;
 
             btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barNodeTools.Visible && !barCustomRegions.Visible;
-            Location = EntityTools.PluginSettings.Mapper.MapperForm.Location;
-            Size = EntityTools.PluginSettings.Mapper.MapperForm.Size;
+            Location = EntityTools.Config.Mapper.MapperForm.Location;
+            Size = EntityTools.Config.Mapper.MapperForm.Size;
             backgroundWorker.RunWorkerAsync();
         }
 
@@ -322,18 +327,18 @@ namespace EntityTools.Patches.Mapper
         {
             backgroundWorker.CancelAsync();
 
-            EntityTools.PluginSettings.Mapper.MapperForm.MappingBarVisible = barMapping.Visible;
-            EntityTools.PluginSettings.Mapper.MapperForm.MeshesBarVisible = barMeshes.Visible;
-            EntityTools.PluginSettings.Mapper.MapperForm.NodeToolsBarVisible = barNodeTools.Visible;
-            EntityTools.PluginSettings.Mapper.MapperForm.CustomRegionBarVisible = barCustomRegions.Visible;
-            EntityTools.PluginSettings.Mapper.MapperForm.StatusBarVisible = barStatus.Visible;
+            EntityTools.Config.Mapper.MapperForm.MappingBarVisible = barMapping.Visible;
+            EntityTools.Config.Mapper.MapperForm.MeshesBarVisible = barMeshes.Visible;
+            EntityTools.Config.Mapper.MapperForm.NodeToolsBarVisible = barNodeTools.Visible;
+            EntityTools.Config.Mapper.MapperForm.CustomRegionBarVisible = barCustomRegions.Visible;
+            EntityTools.Config.Mapper.MapperForm.StatusBarVisible = barStatus.Visible;
 
 #if false
             btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barNodeTools.Visible && !barCustomRegions.Visible; 
 #endif
 
-            EntityTools.PluginSettings.Mapper.MapperForm.Location = Location;
-            EntityTools.PluginSettings.Mapper.MapperForm.Size = Size;
+            EntityTools.Config.Mapper.MapperForm.Location = Location;
+            EntityTools.Config.Mapper.MapperForm.Size = Size;
 
             InterruptAllModifications();
 
@@ -411,7 +416,7 @@ namespace EntityTools.Patches.Mapper
                     }
                     else
                     {
-                        Vector3 pos = player.Location;
+                        Vector3 pos = LockOnPlayer ? player.Location : _graphics.CenterPosition;
                         playerPosStr = $"{pos.X:N1} | {pos.Y:N1} | {pos.Z:N1}";
                         zoomStr = string.Concat(Zoom * 100, '%');
 
@@ -438,7 +443,7 @@ namespace EntityTools.Patches.Mapper
                         frames++;
                         if (timeout.IsTimedOut)
                         {
-                            int curCacheVer = _graphics.VisibleGraph.Version;
+                            int curCacheVer = _graphics.GraphCache.Version;
 
                             cps = (curCacheVer - cacheVer) / (double)time * 1000d;
                             fps = frames / time * 1000d;
@@ -464,7 +469,7 @@ namespace EntityTools.Patches.Mapper
                         MapPicture.Image = img;
                     }
 
-                    Thread.Sleep(EntityTools.PluginSettings.Mapper.MapperForm.RedrawMapperTimeout);
+                    Thread.Sleep(EntityTools.Config.Mapper.MapperForm.RedrawMapperTimeout);
                 }
             }
             catch (Exception exc)
@@ -526,7 +531,7 @@ namespace EntityTools.Patches.Mapper
 
                     MapperMouseEventArgs me = new MapperMouseEventArgs(e.Button, e.Clicks, x, y);
 
-                    var graph = _graphics.VisibleGraph;
+                    var graph = _graphics.GraphCache;
                     using (graph.ReadLock())
                     {
                         using (_selectedNodes.WriteLock())
@@ -546,7 +551,7 @@ namespace EntityTools.Patches.Mapper
 
                     MapperMouseEventArgs me = new MapperMouseEventArgs(e.Button, e.Clicks, x, y);
 
-                    var graph = _graphics.VisibleGraph;
+                    var graph = _graphics.GraphCache;
                     using (graph.WriteLock())
                         tool.OnMouseClick(graph, null, me, out undo);
                 }
@@ -573,7 +578,7 @@ namespace EntityTools.Patches.Mapper
                     using (_graphics.ReadLock())
                         _graphics.GetWorldPosition(RelativeMousePosition, out x, out y);
 
-                    var graph = _graphics.VisibleGraph;
+                    var graph = _graphics.GraphCache;
                     using (graph.ReadLock())
                     {
                         using (_selectedNodes.WriteLock())
@@ -591,7 +596,7 @@ namespace EntityTools.Patches.Mapper
                     using (_graphics.ReadLock())
                         _graphics.GetWorldPosition(RelativeMousePosition, out x, out y);
 
-                    var graph = _graphics.VisibleGraph;
+                    var graph = _graphics.GraphCache;
                     using (graph.WriteLock())
                         tool.OnKeyUp(graph, _selectedNodes, e, x, y, out undo);
                 }
@@ -669,7 +674,7 @@ namespace EntityTools.Patches.Mapper
 
                 LockOnPlayer = false;
                 using (_graphics.ReadLock())
-                    _graphics.MoveCenterPosition(dx, dy);
+                    _graphics.MoveCenterPosition(dx, dy, 0);
                 mouseClickPosition.X = e.X;
                 mouseClickPosition.Y = e.Y;
             }
@@ -777,14 +782,39 @@ namespace EntityTools.Patches.Mapper
         }
 
         Timeout mouseWeelTimeout = new Timeout(0);
+
         private void handler_MouseWheel(object sender, MouseEventArgs e)
         {
             if (mouseWeelTimeout.IsTimedOut)
             {
-                if (e.Delta > 0)
-                    handler_ZoomIn(sender);
-                else if (e.Delta < 0)
-                    handler_ZoomOut(sender);
+                if (LockOnPlayer)
+                {
+                    if (mouseWeelTimeout.IsTimedOut)
+                    {
+                        if (e.Delta > 0)
+                            handler_ZoomIn(sender);
+                        else if (e.Delta < 0)
+                            handler_ZoomOut(sender);
+                        mouseWeelTimeout.ChangeTime(100);
+                    }
+                }
+                else
+                {
+                    if (ModifierKeys == Keys.Alt)
+                    {
+                        if (e.Delta > 0)
+                            _graphics.MoveCenterPosition(0, 0, 50);
+                        else _graphics.MoveCenterPosition(0, 0, -50);
+                    }
+                    else
+                    {
+                        if (e.Delta > 0)
+                            handler_ZoomIn(sender);
+                        else if (e.Delta < 0)
+                            handler_ZoomOut(sender);
+                    }
+                }
+
                 mouseWeelTimeout.ChangeTime(100);
             }
         } 
@@ -839,15 +869,15 @@ namespace EntityTools.Patches.Mapper
 
 #if false
                         // Центр кэша графа
-                        _graphics.FillCircleCentered(Brushes.Yellow, _graphics.VisibleGraph.CenterPosition, 8, true); 
+                        _graphics.FillCircleCentered(Brushes.Yellow, _graphics.GraphCache.CenterPosition, 8, true); 
 #endif
 
                         Vector3 location = null;
                         float x, y;
 
                         #region Отрисовка нодов
-                        bool drawNode = EntityTools.PluginSettings.Mapper.MapperForm.DrawNodes;
-                        bool drawSkillNode = EntityTools.PluginSettings.Mapper.MapperForm.DrawSkillNodes;
+                        bool drawNode = EntityTools.Config.Mapper.MapperForm.DrawNodes;
+                        bool drawSkillNode = EntityTools.Config.Mapper.MapperForm.DrawSkillNodes;
                         if (drawNode || drawSkillNode)
                         {
                             var lootBrush = _graphics.DrawingTools.SkillnodeBrush;
@@ -944,10 +974,10 @@ namespace EntityTools.Patches.Mapper
                         #endregion
 
                         #region Отрисовка игроков и НПС
-                        bool drawEnemies = EntityTools.PluginSettings.Mapper.MapperForm.DrawEnemies;
-                        bool drawFriends = EntityTools.PluginSettings.Mapper.MapperForm.DrawFriends;
-                        bool drawPlayers = EntityTools.PluginSettings.Mapper.MapperForm.DrawPlayers;
-                        bool drawOtherNpc = EntityTools.PluginSettings.Mapper.MapperForm.DrawOtherNPC;
+                        bool drawEnemies = EntityTools.Config.Mapper.MapperForm.DrawEnemies;
+                        bool drawFriends = EntityTools.Config.Mapper.MapperForm.DrawFriends;
+                        bool drawPlayers = EntityTools.Config.Mapper.MapperForm.DrawPlayers;
+                        bool drawOtherNpc = EntityTools.Config.Mapper.MapperForm.DrawOtherNPC;
                         if (drawEnemies || drawFriends || drawPlayers || drawOtherNpc)
                         {
                             var enemyBrush = _graphics.DrawingTools.EnemyBrush;
@@ -1399,8 +1429,8 @@ namespace EntityTools.Patches.Mapper
         private void handler_WaypointDistanceChanged(object sender, EventArgs e)
         {
             int value = Convert.ToInt32(editWaypointDistance.EditValue);
-            EntityTools.PluginSettings.Mapper.WaypointDistance = value;
-            EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance = value / 2;
+            EntityTools.Config.Mapper.WaypointDistance = value;
+            EntityTools.Config.Mapper.WaypointEquivalenceDistance = value / 2;
         }
 
         private void handler_ShowStatusBar(object sender, EventArgs e)
@@ -1417,6 +1447,11 @@ namespace EntityTools.Patches.Mapper
         private void handler_ShowSettingsTab(object sender, ItemClickEventArgs e)
         {
             panelSettings.Visible = btnSettings.Checked;
+        }
+
+        private void handler_LayerDepth_Changed(object sender, EventArgs e)
+        {
+            _graphics.GraphCache.CacheDistanceZ = editLayerDepth.Value > 0 ? Convert.ToDouble(editLayerDepth.Value) : double.MaxValue;
         }
         #endregion
 
@@ -1989,8 +2024,8 @@ namespace EntityTools.Patches.Mapper
 #if false
         private IGraph GetMappingGraph()
         {
-            if (_graphics.CenterPosition.Distance2DFromPlayer < EntityTools.PluginSettings.Mapper.CacheRadius * 0.75)
-                return _graphics.VisibleGraph;
+            if (_graphics.CenterPosition.Distance2DFromPlayer < EntityTools.Config.Mapper.CacheRadius * 0.75)
+                return _graphics.GraphCache;
             return AstralAccessors.Quester.Core.Meshes.Value;
         } 
 #endif

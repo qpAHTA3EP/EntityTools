@@ -17,12 +17,12 @@ namespace EntityTools.Patches.Mapper
     {
         public MapperGraphics(int width, int height) : base(width, height)
         {
-            backColor = EntityTools.PluginSettings.Mapper.MapperForm.BackgroundColor;
+            backColor = EntityTools.Config.Mapper.MapperForm.BackgroundColor;
 
-            EntityTools.PluginSettings.Mapper.MapperForm.PropertyChanged += handler_PropertyChanged;
+            EntityTools.Config.Mapper.MapperForm.PropertyChanged += handler_PropertyChanged;
             GetWorldPosition(0, 0, out double left, out double top);
             GetWorldPosition(width, height, out double right, out double down);
-            _cache = new MapperGraphCache(() => AstralAccessors.Quester.Core.Meshes.Value, EntityTools.PluginSettings.Mapper.CacheActive);
+            _cache = new MapperGraphCache(() => AstralAccessors.Quester.Core.Meshes.Value, EntityTools.Config.Mapper.CacheActive);
             _cache.SetCacheArea(left, top, right, down);
         }
 
@@ -88,17 +88,18 @@ namespace EntityTools.Patches.Mapper
             set
             {
                 base.CenterPosition = value;
-                _cache.CenterPosition = value;
+                _cache.SetCacheInitialPosition(value);
             }
         }
         /// <summary>
         /// Перемещение центра изображения на величины <paramref name="dx"/> и <paramref name="dy"/>
         /// </summary>
-        public void MoveCenterPosition(double dx, double dy)
+        public void MoveCenterPosition(double dx, double dy, double dz)
         {
             base.CenterPosition.X += (float)dx;
             base.CenterPosition.Y += (float)dy;
-            VisibleGraph.MoveCenterPosition(dx, dy, 0);
+            base.CenterPosition.Z += (float)dz;
+            GraphCache.MoveCenterPosition(dx, dy, dz);
         }
 
         /// <summary>
@@ -140,7 +141,7 @@ namespace EntityTools.Patches.Mapper
             y1 = centerPos.Y + dy;
             y2 = centerPos.Y - dy;
 
-            if (imgWidth != width || imgHeight != height || base.Zoom != zoom)
+            if (imgWidth != width || imgHeight != height || !base.Zoom.Equals(zoom))
             {
                 if (_cache.CacheDistanceX > dx * 1.25
                     || _cache.CacheDistanceY > dy * 1.25
@@ -152,6 +153,7 @@ namespace EntityTools.Patches.Mapper
                 base.ImageWidth = width;
                 base.Zoom = zoom;
             }
+            base.resetImage();
         }
 
         /// <summary>
@@ -171,20 +173,27 @@ namespace EntityTools.Patches.Mapper
             y1 = centerY + dy;
             y2 = centerY - dy;
 
-            if (imgWidth != width || imgHeight != height || base.Zoom != zoom
-                || base.CenterPosition.X != centerX
-                || base.CenterPosition.Y != centerY
-                || base.CenterPosition.Z != centerZ)
+            var pos = base.CenterPosition;
+            if (imgWidth != width || imgHeight != height || !base.Zoom.Equals(zoom)
+                || Math.Abs(pos.X - centerX) > 0.1
+                || Math.Abs(pos.Y - centerY) > 0.1
+                || Math.Abs(pos.Z - centerZ) > 0.1)
             {
                 if (_cache.CacheDistanceX > dx * 1.25
                     || _cache.CacheDistanceY > dy * 1.25
                     || !_cache.InCacheArea(x1, y1)
                     || !_cache.InCacheArea(x2, y2))
-                    _cache.SetCacheArea(x1, y1, x2, y2);
+                    _cache.SetCacheArea(x1, y1, centerZ + _cache.CacheDistanceZ, x2, y2, centerZ - _cache.CacheDistanceZ);
 
+#if false
                 base.CenterPosition.X = (float)centerX;
                 base.CenterPosition.Y = (float)centerY;
-                base.CenterPosition.Z = (float)centerZ;
+                base.CenterPosition.Z = (float)centerZ; 
+#else
+                pos.X = (float)centerX;
+                pos.Y = (float)centerY;
+                pos.Z = (float)centerZ;
+#endif
                 base.ImageHeight = height;
                 base.ImageWidth = width;
                 base.Zoom = zoom;
@@ -214,7 +223,7 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Отображаемый подграф (часть карты путей, на которой находится персонаж)
         /// </summary>
-        public MapperGraphCache VisibleGraph => _cache;
+        public MapperGraphCache GraphCache => _cache;
         protected MapperGraphCache _cache;
 
         public MapperDrawingTools DrawingTools { get; } = new MapperDrawingTools();

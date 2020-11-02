@@ -40,7 +40,7 @@ namespace EntityTools.Patches.Mapper
                 var bidirPen = mapGraphics.DrawingTools.BidirectionalPathPen;
                 var unidirPen = mapGraphics.DrawingTools.UnidirectionalPathPen;
 
-                var graph = mapGraphics.VisibleGraph;
+                var graph = mapGraphics.GraphCache;
                 using (graph.ReadLock())
                 {
                     mapGraphics.GetWorldPosition(0, 0, out double left, out double top);

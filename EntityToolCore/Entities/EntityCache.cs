@@ -122,8 +122,8 @@ namespace EntityCore.Entities
 #endif
             if (EntityManager.LocalPlayer.InCombat
                 && !Astral.Quester.API.IgnoreCombat)
-                    Timer = new Timeout(EntityTools.EntityTools.PluginSettings.EntityCache.GlobalCacheTime);
-            else Timer = new Timeout(EntityTools.EntityTools.PluginSettings.EntityCache.CombatCacheTime);
+                    Timer = new Timeout(EntityTools.EntityTools.Config.EntityCache.GlobalCacheTime);
+            else Timer = new Timeout(EntityTools.EntityTools.Config.EntityCache.CombatCacheTime);
         }
         public void Regen(Action<Entity> action)
         {
@@ -143,8 +143,8 @@ namespace EntityCore.Entities
 #endif
             if (EntityManager.LocalPlayer.InCombat
                 && !Astral.Quester.API.IgnoreCombat)
-                    Timer = new Timeout(EntityTools.EntityTools.PluginSettings.EntityCache.GlobalCacheTime);
-            else Timer = new Timeout(EntityTools.EntityTools.PluginSettings.EntityCache.CombatCacheTime);
+                    Timer = new Timeout(EntityTools.EntityTools.Config.EntityCache.GlobalCacheTime);
+            else Timer = new Timeout(EntityTools.EntityTools.Config.EntityCache.CombatCacheTime);
         }
 
         /// <summary>

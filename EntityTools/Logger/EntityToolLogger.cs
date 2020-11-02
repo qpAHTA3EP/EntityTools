@@ -19,14 +19,14 @@ namespace EntityTools
         internal static void Start()
         {
             if (backgroundLoggerTask?.Status != TaskStatus.Running
-                && EntityTools.PluginSettings.Logger.Active)
+                && EntityTools.Config.Logger.Active)
             {
-                LogFilePath = string.Concat(EntityTools.PluginSettings.Logger.LogsPath, DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"),
+                LogFilePath = string.Concat(EntityTools.Config.Logger.LogsPath, DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"),
                                             //DateTime.Now.Year.ToString("00"), "-", DateTime.Now.Month.ToString("00"), "-", DateTime.Now.Day.ToString("00"), "_", 
                                             //DateTime.Now.Hour.ToString("00"), "-", DateTime.Now.Minute.ToString("00"), "-", DateTime.Now.Second.ToString("00"), 
                                             ".log");
-                if (!Directory.Exists(EntityTools.PluginSettings.Logger.LogsPath))
-                    Directory.CreateDirectory(EntityTools.PluginSettings.Logger.LogsPath);
+                if (!Directory.Exists(EntityTools.Config.Logger.LogsPath))
+                    Directory.CreateDirectory(EntityTools.Config.Logger.LogsPath);
 
                 cancellationTokenSource = new CancellationTokenSource();
                 cancellationToken = cancellationTokenSource.Token;
@@ -41,13 +41,13 @@ namespace EntityTools
 
         public static void WriteLine(string Text, bool toAstral = false)
         {
-            if(EntityTools.PluginSettings.Logger.Active)
+            if(EntityTools.Config.Logger.Active)
                 WriteLine(LogType.Log, Text, toAstral);
         }
 
         public static void WriteLine(LogType logType, string Text, bool toAstral = false)
         {
-            if (EntityTools.PluginSettings.Logger.Active)
+            if (EntityTools.Config.Logger.Active)
             {
                 try
                 {
@@ -82,7 +82,7 @@ namespace EntityTools
         {
             if (!string.IsNullOrEmpty(LogFilePath))
             {
-                while (EntityTools.PluginSettings.Logger.Active
+                while (EntityTools.Config.Logger.Active
                        && !cancellationToken.IsCancellationRequested)
                 {
                     try

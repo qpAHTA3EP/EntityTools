@@ -37,69 +37,88 @@ namespace EntityTools.Core
         {
             InitializeComponent();
 
-            cbbxExportSelector.DataSource = Enum.GetValues(typeof(ExportTypes));
+            cbxExportSelector.DataSource = Enum.GetValues(typeof(ExportTypes));
 
-            //ckbSpellStuckMonitor.Checked = EntityTools.PluginSettings.UnstuckSpells.Active;
+            //ckbSpellStuckMonitor.Checked = EntityTools.Config.UnstuckSpells.Active;
             ckbSpellStuckMonitor.DataBindings.Add(nameof(ckbSpellStuckMonitor.Checked),
-                                                EntityTools.PluginSettings.UnstuckSpells,
-                                                nameof(EntityTools.PluginSettings.UnstuckSpells.Active),
+                                                EntityTools.Config.UnstuckSpells,
+                                                nameof(EntityTools.Config.UnstuckSpells.Active),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 
 #if DEVELOPER
             // Настройки Mapper'a
             ckbMapperPatch.DataBindings.Add(nameof(ckbMapperPatch.Checked),
-                                                EntityTools.PluginSettings.Mapper,
-                                                nameof(EntityTools.PluginSettings.Mapper.Patch),
+                                                EntityTools.Config.Mapper,
+                                                nameof(EntityTools.Config.Mapper.Patch),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 
 #if false
             seMapperWaipointDistance.DataBindings.Add(nameof(seMapperWaipointDistance.Value),
-                                        EntityTools.PluginSettings.Mapper,
-                                        nameof(EntityTools.PluginSettings.Mapper.WaypointDistance),
+                                        EntityTools.Config.Mapper,
+                                        nameof(EntityTools.Config.Mapper.WaypointDistance),
                                         false, DataSourceUpdateMode.OnPropertyChanged);
             seMapperMaxZDif.DataBindings.Add(nameof(seMapperMaxZDif.Value),
-                                                EntityTools.PluginSettings.Mapper,
-                                                nameof(EntityTools.PluginSettings.Mapper.MaxElevationDifference),
+                                                EntityTools.Config.Mapper,
+                                                nameof(EntityTools.Config.Mapper.MaxElevationDifference),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
             seWaypointEquivalenceDistance.DataBindings.Add(nameof(seWaypointEquivalenceDistance.Value),
-                                                EntityTools.PluginSettings.Mapper,
-                                                nameof(EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance),
+                                                EntityTools.Config.Mapper,
+                                                nameof(EntityTools.Config.Mapper.WaypointEquivalenceDistance),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 
             ckbMapperForceLinkingWaypoint.DataBindings.Add(nameof(ckbMapperForceLinkingWaypoint.Checked),
-                                                EntityTools.PluginSettings.Mapper,
-                                                nameof(EntityTools.PluginSettings.Mapper.ForceLinkingWaypoint),
+                                                EntityTools.Config.Mapper,
+                                                nameof(EntityTools.Config.Mapper.ForceLinkingWaypoint),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
             ckbMapperLinearPath.DataBindings.Add(nameof(ckbMapperLinearPath.Checked),
-                                                EntityTools.PluginSettings.Mapper,
-                                                nameof(EntityTools.PluginSettings.Mapper.LinearPath),
+                                                EntityTools.Config.Mapper,
+                                                nameof(EntityTools.Config.Mapper.LinearPath),
                                                 false, DataSourceUpdateMode.OnPropertyChanged); 
 #endif
 
             // Настройки EntityToolsLogger
             ckbEnableLogger.DataBindings.Add(nameof(ckbEnableLogger.Checked),
-                                                EntityTools.PluginSettings.Logger,
-                                                nameof(EntityTools.PluginSettings.Logger.Active),
+                                                EntityTools.Config.Logger,
+                                                nameof(EntityTools.Config.Logger.Active),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
             ckbExtendedActionDebugInfo.DataBindings.Add(nameof(ckbExtendedActionDebugInfo.Checked),
-                                                EntityTools.PluginSettings.Logger,
-                                                nameof(EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo),
+                                                EntityTools.Config.Logger,
+                                                nameof(EntityTools.Config.Logger.ExtendedActionDebugInfo),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
             
 
             // Настройки EntityCache
-            seGlobalCacheTime.DataBindings.Add( nameof(seGlobalCacheTime.Value),
-                                                EntityTools.PluginSettings.EntityCache,
-                                                nameof(EntityTools.PluginSettings.EntityCache.GlobalCacheTime),
+            editGlobalCacheTime.DataBindings.Add( nameof(editGlobalCacheTime.Value),
+                                                EntityTools.Config.EntityCache,
+                                                nameof(EntityTools.Config.EntityCache.GlobalCacheTime),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
-            seLocalCacheTime.DataBindings.Add(nameof(seLocalCacheTime.Value),
-                                                EntityTools.PluginSettings.EntityCache,
-                                                nameof(EntityTools.PluginSettings.EntityCache.LocalCacheTime),
+            editLocalCacheTime.DataBindings.Add(nameof(editLocalCacheTime.Value),
+                                                EntityTools.Config.EntityCache,
+                                                nameof(EntityTools.Config.EntityCache.LocalCacheTime),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
-            seCombatCacheTime.DataBindings.Add(nameof(seCombatCacheTime.Value),
-                                                EntityTools.PluginSettings.EntityCache,
-                                                nameof(EntityTools.PluginSettings.EntityCache.CombatCacheTime),
+            editCombatCacheTime.DataBindings.Add(nameof(editCombatCacheTime.Value),
+                                                EntityTools.Config.EntityCache,
+                                                nameof(EntityTools.Config.EntityCache.CombatCacheTime),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
+
+            // Настройки SlideMonitor
+            cbxSlideMonitor.DataSource = Enum.GetValues(typeof(SlideMonitorState));
+
+            cbxSlideMonitor.DataBindings.Add(nameof(cbxSlideMonitor.SelectedItem),
+                                             EntityTools.Config.SlideMonitor,
+                                             nameof(EntityTools.Config.SlideMonitor.State),
+                                             false, DataSourceUpdateMode.OnPropertyChanged);
+
+            editSlideTimeout.DataBindings.Add(nameof(editSlideTimeout.Value),
+                                                EntityTools.Config.SlideMonitor,
+                                                nameof(EntityTools.Config.SlideMonitor.Timeout),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
+
+            editSlideFilter.DataBindings.Add(nameof(editSlideFilter.Value),
+                                                EntityTools.Config.SlideMonitor,
+                                                nameof(EntityTools.Config.SlideMonitor.Filter),
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
+
 
 #else
             btnEntities.Visible = false;
@@ -117,7 +136,7 @@ namespace EntityTools.Core
         Action<string> action { get; set; } 
 #endif
 
-        private void event_Test_1(object sender, EventArgs e)
+        private void handler_Test_1(object sender, EventArgs e)
         {
             #region Старые тесты
 #if Test_MultiSelectCustomRegion
@@ -605,23 +624,68 @@ namespace EntityTools.Core
             bUnidentified = (flags & f) == ItemFlagsExt.Unidentified;
             bAlgo = (flags & f) == ItemFlagsExt.Algo;
 #endif
+            i++;
+            if (boatAura == null)
+            {
+                foreach (var aura in EntityManager.LocalPlayer.Character.Mods)
+                {
+                    var inName = aura.PowerDef.InternalName;
+                    if (inName.StartsWith("M10_Becritter_Boat_Costume"))
+                    {
+                        boatAura = aura;
+                        break;
+                    }
+                }
+            }
+            if (boatAura != null)
+                XtraMessageBox.Show($"{boatAura.Pointer.ToString("X")}: {boatAura.IsValid} \n\r{boatAura.PowerDef.InternalName} \n\r{boatAura.PowerDef.DisplayName}");
+            else XtraMessageBox.Show("NULL");
+            if (i > 5)
+            {
+                boatAura = null;
+                i = 0;
+            }
         }
-        private void event_Test_2(object sender, EventArgs e)
+        private AttribModNet boatAura;
+        private int i;
+
+        private void handler_Test_2(object sender, EventArgs e)
         {
-            Action<Vector3, double> RemoveNodesFrom2DPosition = typeof(Astral.Quester.Core).GetStaticAction<Vector3, double>("RemoveNodesFrom2DPostion");
+            var ptr = (IntPtr)EntityManager.LocalPlayer.CostumeRef.pMountCostume;
+
+            StringBuilder sb = new StringBuilder("MountCostume read bytes");
+            sb.AppendLine();
+            for(int i = 0; i < 100; i++)
+            {
+                try
+                {
+                    var ptr_i = Memory.MMemory.Read<IntPtr>(ptr + i);
+                    var str = Memory.MMemory.ReadString(ptr_i);
+                    sb.Append(i).Append(":\t[").Append(ptr_i).Append("] ").AppendLine(str);
+                    for(int j = 0; j < 100; j++)
+                    {
+                        var ptr_j = Memory.MMemory.Read<IntPtr>(ptr_i + j);
+                        var str_j = Memory.MMemory.ReadString(ptr_j);
+                        sb.Append(i).Append('+').Append(j).Append(":\t[").Append(ptr_j).Append("] ").AppendLine(str_j);
+                    }
+                }
+                catch { sb.Append(i).AppendLine(": ERROR"); }
+            }
+
+            ETLogger.WriteLine(LogType.Debug, sb.ToString(), true);
         }
-    private void event_Test_3(object sender, EventArgs e)
-    {
-        var graph = AstralAccessors.Quester.Core.Meshes.Value;
+        private void handler_Test_3(object sender, EventArgs e)
+        {
+            var graph = AstralAccessors.Quester.Core.Meshes.Value;
 
-        int errorNum = graph.Validate();
+            int errorNum = graph.Validate();
 
-        if (errorNum > 0)
-            XtraMessageBox.Show("Graph is correct");
-        else XtraMessageBox.Show($"There is {errorNum} errors in the Graph");
+            if (errorNum == 0)
+                XtraMessageBox.Show("Graph is correct");
+            else XtraMessageBox.Show($"There is {errorNum} errors in the Graph");
         }
 
-        private void event_OpenUccEditor(object sender, EventArgs e)
+        private void handler_OpenUccEditor(object sender, EventArgs e)
         {
             Editor uccEditor = null;
             if (UCCEditorExtensions.GetUccEditor(ref uccEditor))
@@ -780,19 +844,19 @@ namespace EntityTools.Core
         } 
 #endif
 
-        private void event_SpellStuckMonitorActivation(object sender, EventArgs e)
+        private void handler_SpellStuckMonitorActivation(object sender, EventArgs e)
         {
-            EntityTools.PluginSettings.UnstuckSpells.Active = ckbSpellStuckMonitor.Checked;
+            EntityTools.Config.UnstuckSpells.Active = ckbSpellStuckMonitor.Checked;
         }
 
-        private void event_EnchantHelperActivation(object sender, EventArgs e)
+        private void handler_EnchantHelperActivation(object sender, EventArgs e)
         {
             if(cbEnchantHelperActivator.Checked)
                 EnchantHelper.Start();
             else EnchantHelper.Stop();
         }
 
-        private void event_OpenUiViewer(object sender, EventArgs e)
+        private void handler_OpenUiViewer(object sender, EventArgs e)
         {
 #if DEVELOPER
             string uiGenId = string.Empty;
@@ -800,7 +864,7 @@ namespace EntityTools.Core
 #endif
         }
 
-        private void event_OpenEntitiesViewer(object sender, EventArgs e)
+        private void handler_OpenEntitiesViewer(object sender, EventArgs e)
         {
 #if DEVELOPER
             string pattern = string.Empty;
@@ -810,7 +874,7 @@ namespace EntityTools.Core
 #endif
         }
 
-        private void event_OpenAuraViewer(object sender, EventArgs e)
+        private void handler_OpenAuraViewer(object sender, EventArgs e)
         {
 #if DEVELOPER
             string auraId = string.Empty;
@@ -818,16 +882,16 @@ namespace EntityTools.Core
 #endif
         }
 
-        private void event_GetMachineId(object sender, EventArgs e)
+        private void handler_GetMachineId(object sender, EventArgs e)
         {
             var machineid = Memory.MMemory.ReadString(Memory.BaseAdress + 0x2640BD0, Encoding.UTF8, 64);
             lblAccount.Text = $"Account:   @{EntityManager.LocalPlayer.AccountLoginUsername}";
             tbMashingId.Text = machineid;
         }
 
-        private void event_ChangeExportingFileName(object sender, ButtonPressedEventArgs e)
+        private void handler_ChangeExportingFileName(object sender, ButtonPressedEventArgs e)
         {
-            if (cbbxExportSelector.SelectedItem is ExportTypes expType)
+            if (cbxExportSelector.SelectedItem is ExportTypes expType)
             {
                 string fileName;
                 if (string.IsNullOrEmpty(tbExportFileSelector.Text))
@@ -848,9 +912,9 @@ namespace EntityTools.Core
             }
         }
 
-        private void event_ChangeExportingData(object sender, EventArgs e)
+        private void handler_ChangeExportingData(object sender, EventArgs e)
         {
-            if (cbbxExportSelector.SelectedItem is ExportTypes expType)
+            if (cbxExportSelector.SelectedItem is ExportTypes expType)
             {
                 string fileName;
                 fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.defaultExportFileName);
@@ -859,9 +923,9 @@ namespace EntityTools.Core
             }
         }
 
-        private void event_ResetExportSettings(object sender, EventArgs e)
+        private void handler_ResetExportSettings(object sender, EventArgs e)
         {
-            if (cbbxExportSelector.SelectedItem is ExportTypes expType)
+            if (cbxExportSelector.SelectedItem is ExportTypes expType)
             {
 
                 string fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.defaultExportFileName);
@@ -870,9 +934,9 @@ namespace EntityTools.Core
             }
         }
 
-        private void event_Export(object sender, EventArgs e)
+        private void handler_Export(object sender, EventArgs e)
         {
-            if (cbbxExportSelector.SelectedItem is ExportTypes expType)
+            if (cbxExportSelector.SelectedItem is ExportTypes expType)
             {
                 string fullFileName = FileTools.ReplaceMask(tbExportFileSelector.Text);
 
@@ -942,12 +1006,12 @@ namespace EntityTools.Core
             }
         }
 
-        private void event_ShowMapper(object sender, EventArgs e)
+        private void handler_ShowMapper(object sender, EventArgs e)
         {
             MapperForm.Open();
         }
 
-        private void ckbEnableLogger_CheckedChanged(object sender, EventArgs e)
+        private void handler_EnableLogger(object sender, EventArgs e)
         {
             gbxLogger.Enabled = ckbEnableLogger.Checked;
             if (ckbEnableLogger.Checked)
@@ -955,13 +1019,13 @@ namespace EntityTools.Core
             else ETLogger.Stop();
         }
 
-        private void event_OpenLogFile(object sender, EventArgs e)
+        private void handler_OpenLogFile(object sender, EventArgs e)
         {
             if(File.Exists(ETLogger.LogFilePath))
                 Process.Start(ETLogger.LogFilePath);
         }
 
-        private void event_CheckCore(object sender, EventArgs e)
+        private void handler_CheckCore(object sender, EventArgs e)
         {
             if (EntityTools.Core.CheckCore())
             {
@@ -977,16 +1041,20 @@ namespace EntityTools.Core
             }
         }
 
-        private void event_DebugMonitorActivation(object sender, EventArgs e)
+        private void handler_DebugMonitorActivate(object sender, EventArgs e)
         {
 #if DEVELOPER
+#if true
             if (ckbDebugMonitor.Checked)
-                Patch_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = ShowMonitor;
+                Patch_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = ShowMostInjuredAlly;
             else Patch_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = null; 
+#else
+
+#endif
 #endif
         }
 
-        private void ShowMonitor(Entity entity)
+        private void ShowMostInjuredAlly(Entity entity)
         {
             string info = string.Empty;
             if(entity != null)
@@ -1000,7 +1068,7 @@ namespace EntityTools.Core
             tbDebugMonitorInfo.Text = info;
         }
 
-        private void btnMapperTest_Click(object sender, EventArgs e)
+        private void handler_MapperTest(object sender, EventArgs e)
         {
             StringBuilder sb = new StringBuilder();
             foreach (AOECheck.AOE aoe in AstralAccessors.Controllers.AOECheck.GetAOEList())

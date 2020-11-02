@@ -75,7 +75,7 @@ namespace EntityCore.UCC.Actions
                                                                 @this._healthCheck, @this._reactionRange, (@this._reactionZRange > 0) ? @this._reactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference,
                                                                 @this._regionCheck, null, @this._aura.Checker);
 
-                        timeout.ChangeTime(EntityTools.EntityTools.PluginSettings.EntityCache.CombatCacheTime);
+                        timeout.ChangeTime(EntityTools.EntityTools.Config.EntityCache.CombatCacheTime);
                     }
 
                     return ValidateTarget(entity) && !(@this._healthCheck && entity.IsDead) && entity.CombatDistance > @this._entityRadius;

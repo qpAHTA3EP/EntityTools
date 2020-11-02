@@ -273,7 +273,7 @@ namespace EntityTools.Quester.Actions
 
 #if disabled_at_20200506_1318
         // Более не используется, т.к. реализована единая настройка:
-        // EntityTools.PluginSettings.EntityCache.LocalCacheTime
+        // EntityTools.Config.EntityCache.LocalCacheTime
 #if DEVELOPER
         [Description("Time between searches of the Entity (ms)")]
         [Category("Optional")]

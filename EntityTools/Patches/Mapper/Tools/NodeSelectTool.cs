@@ -187,7 +187,7 @@ namespace EntityTools.Patches.Mapper.Tools
                 }
                 else 
                 {
-                    double minDistance = EntityTools.PluginSettings.Mapper.WaypointEquivalenceDistance;
+                    double minDistance = EntityTools.Config.Mapper.WaypointEquivalenceDistance;
                     graph.ClosestNodeOxyProjection(mouseX, mouseY, out Node node, out int hash, minDistance);
 
                     if (node != null)
@@ -249,7 +249,7 @@ namespace EntityTools.Patches.Mapper.Tools
         public IEnumerator<Node> GetEnumerator()
         {
 #if false
-            int hash = mapper._graphics.VisibleGraph.GetHashCode();
+            int hash = mapper._graphics.GraphCache.GetHashCode();
             if (graphHash != hash)
             {
                 selectedNodes.Clear();
@@ -270,7 +270,7 @@ namespace EntityTools.Patches.Mapper.Tools
 #if false
         public void Add(Node node)
         {
-            int hash = mapper._graphics.VisibleGraph.GetHashCode();
+            int hash = mapper._graphics.GraphCache.GetHashCode();
             if (graphHash == hash)
                 selectedNodes.AddLast(node);
             else

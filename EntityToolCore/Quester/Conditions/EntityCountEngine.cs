@@ -83,7 +83,7 @@ namespace EntityCore.Quester.Conditions
             get
             {
                 bool result = false;
-                if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
                 {
 #if timeout
                     string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Begins. Timeout left:", timeout.Left);
@@ -104,7 +104,7 @@ namespace EntityCore.Quester.Conditions
 
                     uint entCount = (entities is null) ? 0u: (uint)entities.Count;
 
-                    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                    if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
                     {
                         string debugMsg;
                         if (entities?.Count > 0)
@@ -114,9 +114,9 @@ namespace EntityCore.Quester.Conditions
                         ETLogger.WriteLine(LogType.Debug, debugMsg);
                     }
 #if timeout
-                    timeout.ChangeTime(EntityTools.EntityTools.PluginSettings.EntityCache.LocalCacheTime);
+                    timeout.ChangeTime(EntityTools.EntityTools.Config.EntityCache.LocalCacheTime);
                 }
-                else if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                else if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
                 {
                     string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Total entities cached (irrespectively CustomRegion): ", entities.Count);
 
@@ -140,7 +140,7 @@ namespace EntityCore.Quester.Conditions
                             break;
                     }
 
-                    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                    if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
                     {
                         string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Result=", result, " (", entCount, " entities mutched)");
 
@@ -152,7 +152,7 @@ namespace EntityCore.Quester.Conditions
 #if disabled_20200709_1325
             get
             {
-                if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
                 {
 #if timeout
                     string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Begins. Timeout left:", timeout.Left);
@@ -170,7 +170,7 @@ namespace EntityCore.Quester.Conditions
 #endif
                     entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
                        @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck/*, getCustomRegions()*/);
-                    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                    if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
                     {
                         string debugMsg;
                         if (entities is null || entities.Count == 0)
@@ -180,9 +180,9 @@ namespace EntityCore.Quester.Conditions
                         ETLogger.WriteLine(LogType.Debug, debugMsg);
                     }
 #if timeout
-                    timeout.ChangeTime(EntityTools.EntityTools.PluginSettings.EntityCache.LocalCacheTime);
+                    timeout.ChangeTime(EntityTools.EntityTools.Config.EntityCache.LocalCacheTime);
                 }
-                else if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                else if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
                 {
                     string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Total entities cached (irrespectively CustomRegion): ", entities.Count);
 
@@ -233,7 +233,7 @@ namespace EntityCore.Quester.Conditions
                             break;
                     }
 
-                    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                    if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
                     {
                         string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Result=", result, " (", entCount, " entities mutched)");
 
@@ -320,7 +320,7 @@ namespace EntityCore.Quester.Conditions
                     strBldr.Append($"Timeout left: {timeout.Left}"); 
 #endif
 
-                    if (EntityTools.EntityTools.PluginSettings.Logger.ExtendedActionDebugInfo)
+                    if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
                     {
                         string debugMsg = string.Concat(conditionIDstr, '.', nameof(TestInfos), ':', strBldr.ToString());
 
