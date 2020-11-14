@@ -17,16 +17,20 @@ namespace EntityTools.Patches.Mapper
     {
         internal Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes()
         {
-            MethodInfo mi = typeof(Picture).GetMethod("DrawMeshes", ReflectionHelper.DefaultFlags);
-            if (mi != null)
+            if (NeedInjecttion)
             {
-                methodToReplace = mi;
-            }
-            else throw new Exception("Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes: fail to initialize 'methodToReplace'");
+                MethodInfo mi = typeof(Picture).GetMethod("DrawMeshes", ReflectionHelper.DefaultFlags);
+                if (mi != null)
+                {
+                    methodToReplace = mi;
+                }
+                else throw new Exception("Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes: fail to initialize 'methodToReplace'");
 
-            methodToInject = GetType().GetMethod(nameof(DrawMeshes), ReflectionHelper.DefaultFlags);
+                methodToInject = GetType().GetMethod(nameof(DrawMeshes), ReflectionHelper.DefaultFlags);
+            }
         }
 
+        public sealed override bool NeedInjecttion => EntityTools.Config.Mapper.Patch;
 
         /// <summary>
         /// Отрисовка графа путей <paramref name="meshes"/> на <paramref name="graphicsNW"/>

@@ -13,21 +13,26 @@ namespace EntityTools.Patches
 
         internal Patch_VIP_SealTraderEntity()
         {
-            PropertyInfo pi = typeof(VIP).GetProperty("SealTraderEntity", ReflectionHelper.DefaultFlags);
-            if (pi != null)
+            if (NeedInjecttion)
             {
-                MethodInfo getter = pi.GetGetMethod((ReflectionHelper.DefaultFlags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
-                if (getter != null)
+                PropertyInfo pi = typeof(VIP).GetProperty("SealTraderEntity", ReflectionHelper.DefaultFlags);
+                if (pi != null)
                 {
-                    methodToReplace = getter;
+                    MethodInfo getter = pi.GetGetMethod((ReflectionHelper.DefaultFlags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
+                    if (getter != null)
+                    {
+                        methodToReplace = getter;
+                    }
                 }
+
+                if (methodToReplace == null)
+                    throw new Exception("Patch_VIP_SealTraderEntity: fail to initialize 'methodToReplace'");
+
+                methodToInject = GetType().GetMethod(nameof(get_SealTraderEntity), ReflectionHelper.DefaultFlags);
             }
-
-            if (methodToReplace == null)
-                throw new Exception("Patch_VIP_SealTraderEntity: fail to initialize 'methodToReplace'");
-
-            methodToInject = GetType().GetMethod(nameof(get_SealTraderEntity), ReflectionHelper.DefaultFlags);
         }
+
+        public sealed override bool NeedInjecttion => EntityTools.Config.Patches.VipSealTraderEntity;
 
         internal static Entity get_SealTraderEntity()
         {

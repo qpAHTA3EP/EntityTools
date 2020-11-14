@@ -16,16 +16,20 @@ namespace EntityTools.Patches.Navmesh
     {
         internal Patch_Quester_Controllers_Road_PathDistance()
         {
-            MethodInfo mi = typeof(Astral.Quester.Controllers.Road).GetMethod("PathDistance", ReflectionHelper.DefaultFlags);
-            if (mi != null)
+            if (NeedInjecttion)
             {
-                methodToReplace = mi;
-            }
-            else throw new Exception("Patch_Quester_Controllers_Road_PathDistance: fail to initialize 'methodToReplace'");
+                MethodInfo mi = typeof(Astral.Quester.Controllers.Road).GetMethod("PathDistance", ReflectionHelper.DefaultFlags);
+                if (mi != null)
+                {
+                    methodToReplace = mi;
+                }
+                else throw new Exception("Patch_Quester_Controllers_Road_PathDistance: fail to initialize 'methodToReplace'");
 
-            methodToInject = GetType().GetMethod(nameof(PathDistance), ReflectionHelper.DefaultFlags);
+                methodToInject = GetType().GetMethod(nameof(PathDistance), ReflectionHelper.DefaultFlags); 
+            }
         }
 
+        public override bool NeedInjecttion => EntityTools.Config.Patches.Navigation;
 
 #if false
 class Astral.Quester.Controllers.Road

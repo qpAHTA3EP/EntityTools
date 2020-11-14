@@ -18,16 +18,20 @@ namespace EntityTools.Patches
     {
         internal Patch_Astral_Quester_Core_Save()
         {
-            MethodInfo mi = typeof(Astral.Quester.Core).GetMethod("Save", ReflectionHelper.DefaultFlags);
-            if (mi != null)
+            if (NeedInjecttion)
             {
-                methodToReplace = mi;
-            }
-            else throw new Exception("Patch_Astral_Quester_Core_Save: fail to initialize 'methodToReplace'");
+                MethodInfo mi = typeof(Astral.Quester.Core).GetMethod("Save", ReflectionHelper.DefaultFlags);
+                if (mi != null)
+                {
+                    methodToReplace = mi;
+                }
+                else throw new Exception("Patch_Astral_Quester_Core_Save: fail to initialize 'methodToReplace'");
 
-            methodToInject = GetType().GetMethod(nameof(Save), ReflectionHelper.DefaultFlags);
+                methodToInject = GetType().GetMethod(nameof(Save), ReflectionHelper.DefaultFlags);
+            }
         }
 
+        public sealed override bool NeedInjecttion => EntityTools.Config.Patches.SaveQuesterProfile;
 
 #if false
     Astral.Quester.Core
@@ -255,7 +259,7 @@ namespace EntityTools.Patches
             } 
             zipProfileEntry = zipFile.CreateEntry("profile.xml");
 
-            Patch_XmlSerializer_GetExtraTypes.GetExtraTypes(out List<Type> types, 2);
+            HarmonyPatch_XmlSerializer_GetExtraTypes.GetExtraTypes(out List<Type> types, 2);
             XmlSerializer serializer = new XmlSerializer(API.CurrentProfile.GetType(), types.ToArray());
             using (var zipProfileStream = zipProfileEntry.Open())
             {

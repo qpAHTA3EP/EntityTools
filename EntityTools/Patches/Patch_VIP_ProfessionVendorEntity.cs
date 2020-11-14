@@ -13,21 +13,26 @@ namespace EntityTools.Patches
 
         internal Patch_VIP_ProfessionVendorEntity()
         {
-            PropertyInfo pi = typeof(VIP).GetProperty("ProfessionVendorEntity", ReflectionHelper.DefaultFlags);
-            if (pi != null)
+            if (NeedInjecttion)
             {
-                MethodInfo getter = pi.GetGetMethod((ReflectionHelper.DefaultFlags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
-                if (getter != null)
+                PropertyInfo pi = typeof(VIP).GetProperty("ProfessionVendorEntity", ReflectionHelper.DefaultFlags);
+                if (pi != null)
                 {
-                    methodToReplace = getter;
+                    MethodInfo getter = pi.GetGetMethod((ReflectionHelper.DefaultFlags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
+                    if (getter != null)
+                    {
+                        methodToReplace = getter;
+                    }
                 }
+
+                if (methodToReplace == null)
+                    throw new Exception("Patch_VIP_ProfessionVendorEntity: fail to initialize 'methodToReplace'");
+
+                methodToInject = GetType().GetMethod(nameof(get_ProfessionVendorEntity), ReflectionHelper.DefaultFlags);
             }
-
-            if (methodToReplace == null)
-                throw new Exception("Patch_VIP_ProfessionVendorEntity: fail to initialize 'methodToReplace'");
-
-            methodToInject = GetType().GetMethod(nameof(get_ProfessionVendorEntity), ReflectionHelper.DefaultFlags);
         }
+
+        public sealed override bool NeedInjecttion => EntityTools.Config.Patches.VipProfessionVendorEntity;
 
         internal static Entity get_ProfessionVendorEntity()
         {
