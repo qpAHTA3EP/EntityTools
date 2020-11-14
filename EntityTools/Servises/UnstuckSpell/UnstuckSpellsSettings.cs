@@ -47,5 +47,10 @@ namespace EntityTools.Settings
         }
         //[NonSerialized]
         private int checkInterval = 500;
+
+        public override string ToString()
+        {
+            return active ? "Active" : "Disabled";
+        }
     }
 }

@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.1102.1604</AssemblyVersion>
+    <AssemblyVersion>0.20.1111.1628</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -20,7 +20,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
@@ -33,12 +33,15 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>TRACE;NOT_DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
+    <DefineConstants>TRACE;DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
     <LangVersion>7.3</LangVersion>
     <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -203,17 +206,27 @@
     <Compile Include="Patches\Logic.Classes.FSM.Navigation\CharacterEx.cs" />
     <Compile Include="Patches\Logic.Classes.FSM.Navigation\EntityEx.cs" />
     <Compile Include="Patches\Logic.Classes.FSM.Navigation\Enums.cs" />
+    <Compile Include="Patches\Logic.Classes.FSM.Navigation\HarmonyPatch_Astral_Logic_Classes_FSM_Navigation_SetNextWaypoint.cs" />
     <Compile Include="Patches\Logic.Classes.FSM.Navigation\MountCostumeDef.cs" />
     <Compile Include="Patches\Logic.Classes.FSM.Navigation\SlideMonitorSettings.cs" />
+    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_TotalDistance.cs" />
     <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_GetNearestNodeFromPosition.cs" />
     <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_FixPath.cs" />
-    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_TotalDistance.cs" />
+    <Compile Include="Patches\Logic.General\Astral_Logic_General_GetNearestIndexInPositionList.cs" />
     <Compile Include="Patches\Mapper\MapperDrawingTools.cs" />
     <Compile Include="Patches\Mapper\MapperGraphics.cs" />
     <Compile Include="Patches\Mapper\MapperHelper.cs" />
+    <Compile Include="Patches\Mapper\ObjectInfoForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Patches\Mapper\ObjectInfoForm.Designer.cs">
+      <DependentUpon>ObjectInfoForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Patches\Mapper\Patch_Astral_Quester_Forms_Mapper.cs" />
     <Compile Include="Patches\Mapper\PointHelper.cs" />
     <Compile Include="Patches\Mapper\Tools\EditCustomRegionTool.cs" />
     <Compile Include="Patches\Mapper\Tools\AddCustomRegionTool.cs" />
+    <Compile Include="Patches\Mapper\Tools\ObjectInfoTool.cs" />
     <Compile Include="Patches\Mapper\Tools\MapperMouseEventArgs.cs" />
     <Compile Include="Patches\Mapper\Tools\MappingTool.cs" />
     <Compile Include="Patches\Mapper\Tools\DistanceMeasurementTool.cs" />
@@ -230,12 +243,13 @@
     <Compile Include="Patches\Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes.cs" />
     <Compile Include="Patches\Patch_VIP_SealTraderEntity.cs" />
     <Compile Include="Patches\Patch_VIP_ProfessionVendorEntity.cs" />
-    <Compile Include="Patches\Logic.Classes.FSM.Navigation\Astral_Logic_Classes_FSM_Navigation_ChangeWPDist.cs" />
+    <Compile Include="Patches\Logic.Classes.FSM.Navigation\HarmonyPatch_Astral_Logic_Classes_FSM_Navigation_ChangeWPDist.cs" />
     <Compile Include="Patches\Quester.Controllers.Road\Patch_Quester_Controllers_Road_PathDistance.cs" />
     <Compile Include="Patches\Quester.Controllers.Road\Patch_Quester_Controllers_Road_GenerateRoadFromPlayer.cs" />
     <Compile Include="Patches\UCC\Patch_ActionsPlayer_CheckAlly.cs" />
-    <Compile Include="Patches\UCC\Patch_AddClass_Show.cs" />
-    <Compile Include="Patches\XmlSerializer\Patch_XmlSerializer_GetExtraTypes.cs" />
+    <Compile Include="Patches\UCC\Patch_Logic_UCC_Forms_AddClass_Show.cs" />
+    <Compile Include="Patches\PatchesSettings.cs" />
+    <Compile Include="Patches\XmlSerializer\HarmonyPatch_XmlSerializer_GetExtraTypes.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -346,7 +360,6 @@
     <Compile Include="Tools\SysInformer.cs" />
     <Compile Include="Tools\XmlColor.cs" />
     <Compile Include="UCC\Extensions\UCCActionExtention.cs" />
-    <Compile Include="UCC\Extensions\UCCEditorExtensions.cs" />
     <Compile Include="Tools\Export\GameUITools.cs" />
     <Compile Include="UCC\Conditions\UCCConditionPack.cs" />
     <Compile Include="UCC\Conditions\ICustomUCCCondition.cs" />
@@ -372,6 +385,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Patches\Mapper\MapperFormExt.resx">
       <DependentUpon>MapperFormExt.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Patches\Mapper\ObjectInfoForm.resx">
+      <DependentUpon>ObjectInfoForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -544,6 +560,24 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\charArrow_16x16..png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\show_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\show_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\zoomin_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\zoomin_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\zoomout_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\zoomout_32x32.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.IO.Compression.ZipFile">

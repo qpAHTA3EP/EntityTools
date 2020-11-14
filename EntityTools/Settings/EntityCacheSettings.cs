@@ -13,6 +13,7 @@ namespace EntityTools.Settings
         /// Интервал времени между обновлениями общего кэша Entity
         /// </summary>
         [Bindable(true)]
+        [Description("Интервал времени между обновлениями общего кэша Entity")]
         public int GlobalCacheTime
         {
             get => _cacheTime;
@@ -31,6 +32,7 @@ namespace EntityTools.Settings
         /// Интервал времени между обновлениями кэша во время боя
         /// </summary>
         [Bindable(true)]
+        [Description("Интервал времени между обновлениями кэша во время боя")]
         public int CombatCacheTime
         {
             get => _combatCacheTime;
@@ -50,6 +52,7 @@ namespace EntityTools.Settings
         /// Интервал времени обновления Entity, кэшированного в командах и условиях локально
         /// </summary>
         [Bindable(true)]
+        [Description("Интервал времени обновления Entity, кэшированного в командах и условиях локально")]
         public int LocalCacheTime
         {
             get => _localCacheTime;
@@ -63,5 +66,11 @@ namespace EntityTools.Settings
             }
         }
         private int _localCacheTime = 500;
+
+
+        public override string ToString()
+        {
+            return nameof(EntityCacheSettings);
+        }
     }
 }

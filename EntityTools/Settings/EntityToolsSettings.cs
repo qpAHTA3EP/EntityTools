@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using EntityTools.Settings;
 
 namespace EntityTools
@@ -9,29 +10,46 @@ namespace EntityTools
         /// <summary>
         /// Настройки UnstuckSpellTask
         /// </summary>
+        [Description("Настройки фонового отключения умений (UnstuckSpell)")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
         public UnstuckSpellsSettings UnstuckSpells { get; set; } = new UnstuckSpellsSettings();
 
 #if DEVELOPER
         /// <summary>
         /// Настройки Mapper'a
         /// </summary>
+        [Description("Настройки окна Mapper'a")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
         public MapperSettings Mapper { get; set; } = new MapperSettings();
 
 #endif
         /// <summary>
         /// Настройки EntityToolsLogger
         /// </summary>
+        [Description("Настройки логирования EntityTools")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
         public ETLoggerSettings Logger { get; set; } = new ETLoggerSettings();
 
         /// <summary>
         /// Настройки EntityCache
         /// </summary>
+        [Description("Настройки службы кэширования сущностей (Entities)")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
         public EntityCacheSettings EntityCache { get; set; } = new EntityCacheSettings();
 
         /// <summary>
         /// Настройки службы SlideMonitor
         /// </summary>
+        [Description("Настройки компенсации скольжения (SlideMonitor)")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
         public SlideMonitorSettings SlideMonitor { get; set; } = new SlideMonitorSettings();
+
+        /// <summary>
+        /// Настройка патчей
+        /// </summary>
+        [Description("Настройки патчей Astra'a")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public PatchesSettings Patches { get; set; } = new PatchesSettings();
 
 #if false
         #region Сериализация/десериализация статических полей класса статического класса

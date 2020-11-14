@@ -64,5 +64,10 @@ namespace EntityTools.Settings
             }
         }
         private bool _extendedActionDebugInfo;
+
+        public override string ToString()
+        {
+            return _active ? "Active" : "Disabled";
+        }
     }
 }

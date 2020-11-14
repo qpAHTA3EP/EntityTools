@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Reflection;
 using Astral.Classes.SkillTrain;
 using Astral.Controllers;
-using Astral.Functions;
 using Astral.Logic.UCC.Classes;
 using Astral.MultiTasks.Classes;
 using Astral.Quester.Classes;
 using EntityTools.Reflection;
 using Action = Astral.Quester.Classes.Action;
+
 #if PATCH_ASTRAL && HARMONY
 using HarmonyLib; 
 #endif
@@ -20,10 +20,8 @@ namespace EntityTools.Patches
     /// <summary>
     /// Патч метода Astral.Functions.XmlSerializer.GetExtraTypes()
     /// </summary>
-#if HARMONY
-    [HarmonyPatch(typeof(XmlSerializer), "GetExtraTypes")] 
-#endif
-    internal class Patch_XmlSerializer_GetExtraTypes : Patch
+    [HarmonyPatch(typeof(Astral.Functions.XmlSerializer), "GetExtraTypes")] 
+    internal class HarmonyPatch_XmlSerializer_GetExtraTypes
     {
         static Func<List<Type>> GetPluginTypes = typeof(Plugins).GetStaticFunction<List<Type>>("GetTypes");
         internal static List<Type> UCCTypes = new List<Type>(20);
@@ -31,9 +29,12 @@ namespace EntityTools.Patches
         internal static List<Type> MultitaskTypes = new List<Type>(10);
         internal static List<Type> SkillTrainTypes = new List<Type>(50);
 
-        internal Patch_XmlSerializer_GetExtraTypes() : base(typeof(XmlSerializer).GetMethod("GetExtraTypes", ReflectionHelper.DefaultFlags), typeof(Patch_XmlSerializer_GetExtraTypes).GetMethod(nameof(GetExtraTypes), ReflectionHelper.DefaultFlags)){ }
+#if false
+        internal HarmonyPatch_XmlSerializer_GetExtraTypes() : base(typeof(Astral.Functions.XmlSerializer).GetMethod("GetExtraTypes", ReflectionHelper.DefaultFlags), typeof(HarmonyPatch_XmlSerializer_GetExtraTypes).GetMethod(nameof(GetExtraTypes), ReflectionHelper.DefaultFlags)) { }
 
-#if HARMONY
+        public override bool NeedInjecttion => true;
+#endif
+
         [HarmonyPrefix] 
         internal static bool GetExtraTypes(out List<Type> __result, int typeNum)
         {
@@ -43,9 +44,7 @@ namespace EntityTools.Patches
                 QuesterTypes.Clear();
                 MultitaskTypes.Clear();
                 SkillTrainTypes.Clear();
-                // Заполняем все списки одновременно
 
-#if true
                 // Проверяем типы, объявленные в Астрале
                 FillTypeLists(Assembly.GetEntryAssembly().GetTypes());
 
@@ -53,9 +52,6 @@ namespace EntityTools.Patches
                 var types = GetPluginTypes();
                 if (types != null && types.Count > 0)
                     FillTypeLists(types); 
-#else
-                FillTypeLists();
-#endif
             }
 
             switch (typeNum)
@@ -78,40 +74,6 @@ namespace EntityTools.Patches
             }
             return false;
         }
-#else
-        internal static List<Type> GetExtraTypes(int typeNum)
-        {
-            if (UCCTypes.Count == 0 || QuesterTypes.Count == 0 || MultitaskTypes.Count == 0 || SkillTrainTypes.Count == 0)
-            {
-                UCCTypes.Clear();
-                QuesterTypes.Clear();
-                MultitaskTypes.Clear();
-                SkillTrainTypes.Clear();
-                // Заполняем все списки одновременно
-
-                // Проверяем типы, объявленные в Астрале
-                FillTypeLists(Assembly.GetEntryAssembly().GetTypes());
-
-                // Проверяем типы, объявленные в плагинах
-                if (GetPluginTypes != null)
-                    FillTypeLists(GetPluginTypes());
-            }
-
-            switch (typeNum)
-            {
-                case 1: // UCC types
-                    return UCCTypes;
-                case 2: // Quester types
-                    return QuesterTypes;
-                case 3: // SkillTrain types
-                    return MultitaskTypes;
-                case 4: // Multitask types
-                    return SkillTrainTypes;
-                default:
-                    return new List<Type>();
-            }
-        }
-#endif
 
         internal static void FillTypeLists(IEnumerable<Type> types)
         {
@@ -151,6 +113,7 @@ namespace EntityTools.Patches
                 }
             }
         }
+#if false
         internal static void FillTypeLists()
         {
             foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
@@ -190,7 +153,8 @@ namespace EntityTools.Patches
                     }
                 }
             }
-        }
+        } 
+#endif
     } 
 #endif
 }

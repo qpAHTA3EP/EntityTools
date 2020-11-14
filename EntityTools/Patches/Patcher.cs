@@ -1,12 +1,12 @@
 ﻿//#define HARMONY
 
 using System.Reflection;
-using Astral.Quester.Forms;
 using EntityTools.Patches.Mapper;
 using EntityTools.Patches.Navmesh;
 using EntityTools.Patches.UCC;
 using EntityTools.Reflection;
 #if PATCH_ASTRAL && HARMONY
+using EntityTools.Patches.Logic.General;
 using HarmonyLib; 
 #else
 //#define Patch_AstralXmlSerializer
@@ -23,11 +23,15 @@ namespace EntityTools.Patches
         /// <summary>
         /// Подмена штатного окна Mapper'a
         /// </summary>
+#if false
         private static readonly Patch patchMapper = (EntityTools.Config.Mapper.Patch) ?
-            new Patch(
-                typeof(MapperForm).GetMethod("Open", ReflectionHelper.DefaultFlags),
-                typeof(MapperFormExt).GetMethod(nameof(MapperFormExt.Open), ReflectionHelper.DefaultFlags))
-            : null;
+    new Patch(
+        typeof(MapperForm).GetMethod("Open", ReflectionHelper.DefaultFlags),
+        typeof(MapperFormExt).GetMethod(nameof(MapperFormExt.Open), ReflectionHelper.DefaultFlags))
+    : null; 
+#else
+        private static readonly Patch_Astral_Quester_Forms_Mapper Patch_Astral_Quester_Forms_Mapper = new Patch_Astral_Quester_Forms_Mapper();
+#endif
 
 #if Patch_AstralXmlSerializer
         /// <summary>
@@ -50,7 +54,7 @@ namespace EntityTools.Patches
         /// </summary>
         private static readonly Patch_ActionsPlayer_CheckAlly Patch_ActionsPlayer_CheckAlly = new Patch_ActionsPlayer_CheckAlly();
 
-        private static readonly Patch_AddClass_Show patchAddCPatch_AddClass_ShowlassShow = new Patch_AddClass_Show();
+        private static readonly Patch_Logic_UCC_Forms_AddClass_Show Patch_Logic_UCC_Forms_AddClass_Show = new Patch_Logic_UCC_Forms_AddClass_Show();
 
         private static readonly Patch_VIP_SealTraderEntity Patch_VIP_SealTraderEntity = new Patch_VIP_SealTraderEntity();
 
@@ -78,12 +82,15 @@ namespace EntityTools.Patches
 
         private static readonly Patch_Quester_Controllers_Road_GenerateRoadFromPlayer Patch_Quester_Controllers_Road_GenerateRoadFromPlayer = new Patch_Quester_Controllers_Road_GenerateRoadFromPlayer();
         private static readonly Patch_Quester_Controllers_Road_PathDistance Patch_Quester_Controllers_Road_PathDistance = new Patch_Quester_Controllers_Road_PathDistance();
+
+        // Патч метода выбора текущего индекса
+        private static readonly Astral_Logic_General_GetNearestIndexInPositionList Astral_Logic_General_GetNearestIndexInPositionList = new Astral_Logic_General_GetNearestIndexInPositionList();
 #endif
+
+
         static bool _applied;
         public static void Apply()
         {
-            //TODO: Реализовать механизм отключения патчей (всех)
-
             if (!_applied)
             {
                 foreach (var field in typeof(ETPatcher).GetFields(BindingFlags.NonPublic | BindingFlags.Static))

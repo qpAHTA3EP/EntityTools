@@ -39,7 +39,6 @@ namespace EntityTools.Core
 
             cbxExportSelector.DataSource = Enum.GetValues(typeof(ExportTypes));
 
-            //ckbSpellStuckMonitor.Checked = EntityTools.Config.UnstuckSpells.Active;
             ckbSpellStuckMonitor.DataBindings.Add(nameof(ckbSpellStuckMonitor.Checked),
                                                 EntityTools.Config.UnstuckSpells,
                                                 nameof(EntityTools.Config.UnstuckSpells.Active),
@@ -116,7 +115,7 @@ namespace EntityTools.Core
 
             editSlideFilter.DataBindings.Add(nameof(editSlideFilter.Value),
                                                 EntityTools.Config.SlideMonitor,
-                                                nameof(EntityTools.Config.SlideMonitor.Filter),
+                                                nameof(EntityTools.Config.SlideMonitor.BoatFilter),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 
 
@@ -130,6 +129,8 @@ namespace EntityTools.Core
             tabMapper.PageVisible = false;
             tabDebug.PageVisible = false;
 #endif
+
+            pgConfigs.SelectedObject = EntityTools.Config;
         }
 
 #if Test_Null_SystemAction
@@ -683,15 +684,6 @@ namespace EntityTools.Core
             if (errorNum == 0)
                 XtraMessageBox.Show("Graph is correct");
             else XtraMessageBox.Show($"There is {errorNum} errors in the Graph");
-        }
-
-        private void handler_OpenUccEditor(object sender, EventArgs e)
-        {
-            Editor uccEditor = null;
-            if (UCCEditorExtensions.GetUccEditor(ref uccEditor))
-            {
-                uccEditor.Show();
-            }
         }
 
 #if старый_экспорт

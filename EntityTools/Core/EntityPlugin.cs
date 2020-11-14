@@ -21,6 +21,7 @@ using EntityTools.Core;
 using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
 using EntityTools.Patches;
+using EntityTools.Patches.Mapper;
 using EntityTools.Properties;
 using EntityTools.Reflection;
 using EntityTools.Services;
@@ -145,6 +146,7 @@ namespace EntityTools
 
         public override void OnUnload()
         {
+            Patch_Astral_Quester_Forms_Mapper.CloseMapper();
             SaveSettings();
         }
 

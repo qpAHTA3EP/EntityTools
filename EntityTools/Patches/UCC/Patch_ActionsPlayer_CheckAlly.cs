@@ -22,9 +22,16 @@ namespace EntityTools.Patches.UCC
         /// </summary>
         static readonly StaticFieldAccessor<Entity> mostInjuredAlly = typeof(ActionsPlayer).GetStaticField<Entity>("mostInjuredAlly");
 
-        internal Patch_ActionsPlayer_CheckAlly() : 
-            base(typeof(ActionsPlayer).GetMethod("CheckAlly", ReflectionHelper.DefaultFlags), typeof(Patch_ActionsPlayer_CheckAlly).GetMethod(nameof(CheckAlly), ReflectionHelper.DefaultFlags))
-        { }
+        internal Patch_ActionsPlayer_CheckAlly()
+        {
+            if (NeedInjecttion)
+            {
+                methodToReplace = typeof(ActionsPlayer).GetMethod("CheckAlly", ReflectionHelper.DefaultFlags);
+                methodToInject = typeof(Patch_ActionsPlayer_CheckAlly).GetMethod(nameof(CheckAlly), ReflectionHelper.DefaultFlags);
+            }
+        }
+
+        public override bool NeedInjecttion => true;
 
         /// <summary>
         /// Astral.Logic.UCC.Classes.ActionsPlayer.CheckAlly(List<Entity> entities)

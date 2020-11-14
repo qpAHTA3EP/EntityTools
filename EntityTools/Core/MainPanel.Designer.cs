@@ -35,7 +35,6 @@ namespace EntityTools.Core
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.btnUccEditor = new System.Windows.Forms.Button();
             this.fldrBroserDlg = new System.Windows.Forms.FolderBrowserDialog();
             this.tbclMain = new DevExpress.XtraTab.XtraTabControl();
             this.tabUtilities = new DevExpress.XtraTab.XtraTabPage();
@@ -54,9 +53,11 @@ namespace EntityTools.Core
             this.btnExport = new System.Windows.Forms.Button();
             this.btnDefault = new System.Windows.Forms.Button();
             this.ckbMapperPatch = new System.Windows.Forms.CheckBox();
+            this.tabSettings = new DevExpress.XtraTab.XtraTabPage();
+            this.pgConfigs = new System.Windows.Forms.PropertyGrid();
             this.tabOptions = new DevExpress.XtraTab.XtraTabPage();
-            this.gbxSlideMonitor = new System.Windows.Forms.GroupBox();
             this.cbxSlideMonitor = new System.Windows.Forms.ComboBox();
+            this.gbxSlideMonitor = new System.Windows.Forms.GroupBox();
             this.tbSlidingAuras = new System.Windows.Forms.TextBox();
             this.lblSlideFilter = new System.Windows.Forms.Label();
             this.lblSlidingAuras = new System.Windows.Forms.Label();
@@ -91,6 +92,7 @@ namespace EntityTools.Core
             this.tabUtilities.SuspendLayout();
             this.gbxExport.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tbExportFileSelector.Properties)).BeginInit();
+            this.tabSettings.SuspendLayout();
             this.tabOptions.SuspendLayout();
             this.gbxSlideMonitor.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editSlideTimeout.Properties)).BeginInit();
@@ -105,22 +107,6 @@ namespace EntityTools.Core
             this.tabDebug.SuspendLayout();
             this.SuspendLayout();
             // 
-            // btnUccEditor
-            // 
-            this.btnUccEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnUccEditor.Enabled = false;
-            this.btnUccEditor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnUccEditor.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnUccEditor.Location = new System.Drawing.Point(9, 201);
-            this.btnUccEditor.Name = "btnUccEditor";
-            this.btnUccEditor.Size = new System.Drawing.Size(287, 40);
-            this.btnUccEditor.TabIndex = 0;
-            this.btnUccEditor.Text = "Extended UCC Editor";
-            this.btnUccEditor.UseVisualStyleBackColor = true;
-            this.btnUccEditor.Visible = false;
-            this.btnUccEditor.Click += new System.EventHandler(this.handler_OpenUccEditor);
-            // 
             // tbclMain
             // 
             this.tbclMain.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -131,6 +117,7 @@ namespace EntityTools.Core
             this.tbclMain.TabIndex = 7;
             this.tbclMain.TabPages.AddRange(new DevExpress.XtraTab.XtraTabPage[] {
             this.tabUtilities,
+            this.tabSettings,
             this.tabOptions,
             this.tabRelogger,
             this.tabLogger,
@@ -146,7 +133,6 @@ namespace EntityTools.Core
             this.tabUtilities.Controls.Add(this.btnUiViewer);
             this.tabUtilities.Controls.Add(this.btnAuraViewer);
             this.tabUtilities.Controls.Add(this.btnEntities);
-            this.tabUtilities.Controls.Add(this.btnUccEditor);
             this.tabUtilities.Controls.Add(this.ckbSpellStuckMonitor);
             this.tabUtilities.Controls.Add(this.gbxExport);
             this.tabUtilities.Controls.Add(this.ckbMapperPatch);
@@ -176,6 +162,7 @@ namespace EntityTools.Core
             this.btnTest1.TabIndex = 2;
             this.btnTest1.Text = "Test 1";
             this.btnTest1.UseVisualStyleBackColor = true;
+            this.btnTest1.Visible = false;
             this.btnTest1.Click += new System.EventHandler(this.handler_Test_1);
             // 
             // bntTest2
@@ -188,6 +175,7 @@ namespace EntityTools.Core
             this.bntTest2.TabIndex = 2;
             this.bntTest2.Text = "Test 2";
             this.bntTest2.UseVisualStyleBackColor = true;
+            this.bntTest2.Visible = false;
             this.bntTest2.Click += new System.EventHandler(this.handler_Test_2);
             // 
             // btnTest3
@@ -200,6 +188,7 @@ namespace EntityTools.Core
             this.btnTest3.TabIndex = 2;
             this.btnTest3.Text = "Test current Graph";
             this.btnTest3.UseVisualStyleBackColor = true;
+            this.btnTest3.Visible = false;
             this.btnTest3.Click += new System.EventHandler(this.handler_Test_3);
             // 
             // btnCheckCore
@@ -347,6 +336,26 @@ namespace EntityTools.Core
             this.ckbMapperPatch.Text = "Mapper Patch (need Relog)";
             this.ckbMapperPatch.UseVisualStyleBackColor = true;
             // 
+            // tabSettings
+            // 
+            this.tabSettings.Controls.Add(this.pgConfigs);
+            this.tabSettings.Name = "tabSettings";
+            this.tabSettings.Padding = new System.Windows.Forms.Padding(6);
+            this.tabSettings.Size = new System.Drawing.Size(364, 388);
+            this.tabSettings.Text = "Settings";
+            // 
+            // pgConfigs
+            // 
+            this.pgConfigs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pgConfigs.HelpBackColor = System.Drawing.SystemColors.Window;
+            this.pgConfigs.Location = new System.Drawing.Point(9, 9);
+            this.pgConfigs.Name = "pgConfigs";
+            this.pgConfigs.Size = new System.Drawing.Size(346, 370);
+            this.pgConfigs.TabIndex = 6;
+            this.pgConfigs.ToolbarVisible = false;
+            // 
             // tabOptions
             // 
             this.tabOptions.Controls.Add(this.cbxSlideMonitor);
@@ -356,6 +365,18 @@ namespace EntityTools.Core
             this.tabOptions.Padding = new System.Windows.Forms.Padding(6);
             this.tabOptions.Size = new System.Drawing.Size(364, 388);
             this.tabOptions.Text = "Options";
+            // 
+            // cbxSlideMonitor
+            // 
+            this.cbxSlideMonitor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbxSlideMonitor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxSlideMonitor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbxSlideMonitor.FormattingEnabled = true;
+            this.cbxSlideMonitor.Location = new System.Drawing.Point(196, 114);
+            this.cbxSlideMonitor.Name = "cbxSlideMonitor";
+            this.cbxSlideMonitor.Size = new System.Drawing.Size(154, 21);
+            this.cbxSlideMonitor.TabIndex = 4;
             // 
             // gbxSlideMonitor
             // 
@@ -373,18 +394,6 @@ namespace EntityTools.Core
             this.gbxSlideMonitor.TabIndex = 4;
             this.gbxSlideMonitor.TabStop = false;
             this.gbxSlideMonitor.Text = "Slide Monitor";
-            // 
-            // cbxSlideMonitor
-            // 
-            this.cbxSlideMonitor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbxSlideMonitor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxSlideMonitor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cbxSlideMonitor.FormattingEnabled = true;
-            this.cbxSlideMonitor.Location = new System.Drawing.Point(196, 114);
-            this.cbxSlideMonitor.Name = "cbxSlideMonitor";
-            this.cbxSlideMonitor.Size = new System.Drawing.Size(154, 21);
-            this.cbxSlideMonitor.TabIndex = 4;
             // 
             // tbSlidingAuras
             // 
@@ -405,7 +414,7 @@ namespace EntityTools.Core
             // lblSlideFilter
             // 
             this.lblSlideFilter.AutoSize = true;
-            this.lblSlideFilter.Location = new System.Drawing.Point(6, 27);
+            this.lblSlideFilter.Location = new System.Drawing.Point(71, 23);
             this.lblSlideFilter.Name = "lblSlideFilter";
             this.lblSlideFilter.Size = new System.Drawing.Size(198, 13);
             this.lblSlideFilter.TabIndex = 2;
@@ -428,7 +437,7 @@ namespace EntityTools.Core
             0,
             0,
             0});
-            this.editSlideTimeout.Location = new System.Drawing.Point(221, 50);
+            this.editSlideTimeout.Location = new System.Drawing.Point(9, 46);
             this.editSlideTimeout.Name = "editSlideTimeout";
             this.editSlideTimeout.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
@@ -451,7 +460,7 @@ namespace EntityTools.Core
             0,
             0,
             0});
-            this.editSlideFilter.Location = new System.Drawing.Point(221, 24);
+            this.editSlideFilter.Location = new System.Drawing.Point(9, 20);
             this.editSlideFilter.Name = "editSlideFilter";
             this.editSlideFilter.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
@@ -470,7 +479,7 @@ namespace EntityTools.Core
             // lblSlideTimer
             // 
             this.lblSlideTimer.AutoSize = true;
-            this.lblSlideTimer.Location = new System.Drawing.Point(6, 53);
+            this.lblSlideTimer.Location = new System.Drawing.Point(71, 49);
             this.lblSlideTimer.Name = "lblSlideTimer";
             this.lblSlideTimer.Size = new System.Drawing.Size(216, 13);
             this.lblSlideTimer.TabIndex = 2;
@@ -642,6 +651,7 @@ namespace EntityTools.Core
             this.tabLogger.Controls.Add(this.gbxLogger);
             this.tabLogger.Name = "tabLogger";
             this.tabLogger.Padding = new System.Windows.Forms.Padding(6);
+            this.tabLogger.PageVisible = false;
             this.tabLogger.Size = new System.Drawing.Size(364, 388);
             this.tabLogger.Text = "Logger";
             // 
@@ -699,6 +709,7 @@ namespace EntityTools.Core
             this.tabDebug.Controls.Add(this.ckbDebugMonitor);
             this.tabDebug.Name = "tabDebug";
             this.tabDebug.Padding = new System.Windows.Forms.Padding(6);
+            this.tabDebug.PageVisible = false;
             this.tabDebug.Size = new System.Drawing.Size(364, 388);
             this.tabDebug.Text = "Debug";
             // 
@@ -744,6 +755,7 @@ namespace EntityTools.Core
             this.tabUtilities.PerformLayout();
             this.gbxExport.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.tbExportFileSelector.Properties)).EndInit();
+            this.tabSettings.ResumeLayout(false);
             this.tabOptions.ResumeLayout(false);
             this.gbxSlideMonitor.ResumeLayout(false);
             this.gbxSlideMonitor.PerformLayout();
@@ -767,8 +779,6 @@ namespace EntityTools.Core
         }
 
         #endregion
-
-        private Button btnUccEditor;
         private FolderBrowserDialog fldrBroserDlg;
         private XtraTabControl tbclMain;
         private XtraTabPage tabUtilities;
@@ -819,5 +829,7 @@ namespace EntityTools.Core
         private Button bntTest2;
         private ComboBox cbxSlideMonitor;
         private SpinEdit editSlideTimeout;
+        private PropertyGrid pgConfigs;
+        private XtraTabPage tabSettings;
     }
 }
