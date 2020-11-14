@@ -583,9 +583,15 @@ namespace EntityCore.Quester.Action
 #region Вспомогательный функции
         public bool ValidateEntity(Entity e)
         {
+#if false
             return e != null && e.IsValid
-                //&& e.Critter.IsValid  <- Некоторые Entity, например игроки, имеют априори невалидный Critter
-                && checkEntity(e);
+                    //&& e.Critter.IsValid  <- Некоторые Entity, например игроки, имеют априори невалидный Critter
+                    && checkEntity(e); 
+#else
+            return e != null && e.IsValid
+                    && (e.Character.IsValid || e.Critter.IsValid || e.Player.IsValid)
+                    && checkEntity(e);
+#endif
         }
 
 

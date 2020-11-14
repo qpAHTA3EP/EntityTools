@@ -726,10 +726,14 @@ namespace EntityCore.Quester.Action
             } 
 
             return result;
-#else
+#elif false
             return e != null && e.IsValid 
                 //&& e.Critter.IsValid <- Некоторые Entity, например игроки, имеют априори невалидный Critter
                 //&& !e.DoNotDraw
+                && checkEntity(e);
+#else
+            return e != null && e.IsValid
+                && (e.Character.IsValid || e.Critter.IsValid || e.Player.IsValid)
                 && checkEntity(e);
 #endif
         }

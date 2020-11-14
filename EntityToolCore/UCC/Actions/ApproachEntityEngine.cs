@@ -123,7 +123,13 @@ namespace EntityCore.UCC.Actions
 
         private bool ValidateTarget(Entity e)
         {
-            return e != null && e.IsValid && checkEntity(e);
+#if false
+            return e != null && e.IsValid && checkEntity(e); 
+#else
+            return e != null && e.IsValid
+                    && (e.Character.IsValid || e.Critter.IsValid || e.Player.IsValid)
+                    && checkEntity(e);
+#endif
         }
 
         private bool internal_CheckEntity_Initializer(Entity e)
