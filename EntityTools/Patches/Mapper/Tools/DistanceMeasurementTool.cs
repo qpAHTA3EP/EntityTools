@@ -157,7 +157,7 @@ namespace EntityTools.Patches.Mapper.Tools
             {
                 if (Control.ModifierKeys == Keys.Control)
                 {
-                    var obj = SelectObjectByPosition(e.X, e.Y, out double x, out double y, out double z,
+                    var obj = MapperHelper.SelectObjectByPosition(e.X, e.Y, out double x, out double y, out double z,
                         EntityTools.Config.Mapper.WaypointEquivalenceDistance, graph);
                     if (obj != null)
                     {
@@ -221,44 +221,6 @@ namespace EntityTools.Patches.Mapper.Tools
                     }
                 } 
             }
-        }
-
-        /// <summary>
-        /// Поиск объекта, проекция которого на Oxy расположена не далее <paramref name="distance"/> 
-        /// от точки, заданной координатами <paramref name="worldX"/>, <paramref name="worldY"/>
-        /// </summary>
-        private object SelectObjectByPosition(double worldX, double worldY, out double x, out double y, out double z, double distance = -1, IGraph graph = null)
-        {
-            if(distance <= 0)
-                distance = double.MaxValue;
-
-            if (graph is null)
-                graph = AstralAccessors.Quester.Core.Meshes.Value;
-
-            Node node = graph.ClosestNodeOxyProjection(worldX, worldY, distance);
-            if(node != null)
-            {
-                var pos = node.Position;
-                x = pos.X;
-                y = pos.Y;
-                z = pos.Z;
-                return node;
-            }
-
-            var entities = EntityManager.GetEntities();
-            var ent = entities.ClosestNodeOxyProjection(worldX, worldY, (e) => e.Location, out x, out y, out z, distance);
-            if(ent != null)
-            {
-                return ent;
-            }
-
-            var targetableNodes = EntityManager.LocalPlayer.Player.InteractStatus.TargetableNodes;
-            var targetNode = targetableNodes.ClosestNodeOxyProjection(worldX, worldY, (nd) => nd.WorldInteractionNode.Location, out x, out y, out z, distance);
-            if (targetNode != null)
-                return targetNode;
-
-            x = 0; y = 0; z = 0;
-            return null;
         }
 
         public bool Applied => false;

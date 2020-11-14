@@ -16,6 +16,7 @@ namespace EntityTools.Settings
         /// Активация и деактивация патча
         /// </summary>
         [Bindable(true)]
+        [Description("Активация патча окна Mapper'a")]
         public bool Patch
         {
             get => patch;
@@ -34,6 +35,8 @@ namespace EntityTools.Settings
         /// Расстояние между соединяемыми точками пути, в режиме добавления
         /// </summary>
         [Bindable(true)]
+        [Category("Mapping")]
+        [Description("Расстояние между добавляемыми путевыми точками")]
         public int WaypointDistance
         {
             get => waypointDistance;
@@ -53,6 +56,8 @@ namespace EntityTools.Settings
         /// Расстояние между точками пути, меньше которого они считаются совпадающими
         /// </summary>
         [Bindable(true)]
+        [Category("Mapping")]
+        [Description("Радиус, в пределах которого точки пути считаются эквивалентными (новые не добавляются)")]
         public int WaypointEquivalenceDistance
         {
             get => waypointEquivalenceDistance;
@@ -71,6 +76,8 @@ namespace EntityTools.Settings
         /// Максимальная допустимая разница высот между точками пути, соединяемыми в режиме добавления
         /// </summary>
         [Bindable(true)]
+        [Category("Mapping")]
+        [Description("Максимальная допустимая разница высот между соединяемыми точками пути")]
         public int MaxElevationDifference
         {
             get => maxElevationDifference;
@@ -89,6 +96,8 @@ namespace EntityTools.Settings
         /// Использование кэша при прокладывании пути
         /// </summary>
         [Bindable(true)]
+        [Category("Mapping Cache")]
+        [Description("Активация кэша путевых точек в режиме прокладывания пути")]
         public bool CacheActive
         {
             get => cacheActive;
@@ -107,6 +116,8 @@ namespace EntityTools.Settings
         /// Радиус кэширования
         /// </summary>
         [Bindable(true)]
+        [Category("Mapping Cache")]
+        [Description("Радиус в пределах которого кэшируются путевые точки")]
         public int CacheRadius
         {
             get => cacheRadius;
@@ -121,11 +132,12 @@ namespace EntityTools.Settings
         }
         private int cacheRadius = 50;
 
-
         /// <summary>
         /// Время обновления кэша
         /// </summary>
         [Bindable(true)]
+        [Category("Mapping Cache")]
+        [Description("Период времени между обновлениями кэша")]
         public int CacheRegenTimeout
         {
             get => cacheRegenTimeout;
@@ -146,6 +158,8 @@ namespace EntityTools.Settings
         /// </summary>
         [XmlIgnore]
         [Bindable(true)]
+        [Category("Mapping")]
+        [Description("Флаг принудительного связывания с предыдущей точкой пути")]
         public bool ForceLinkingWaypoint
         {
             get => forceLinkingWaypoint;
@@ -165,6 +179,8 @@ namespace EntityTools.Settings
         /// </summary>
         [XmlIgnore]
         [Bindable(true)]
+        [Category("Mapping")]
+        [Description("Флаг прокладывания линейного пути (без связей с пересекающимися путями)")]
         public bool LinearPath
         {
             get => linearPath;
@@ -182,7 +198,13 @@ namespace EntityTools.Settings
         /// <summary>
         /// Настройки формы <seealso cref="MapperFormExt"/>
         /// </summary>
+        [TypeConverter(typeof(ExpandableObjectConverter))]
         public MapperFormSettings MapperForm { get; set; } = new MapperFormSettings();
+
+        public override string ToString()
+        {
+            return patch ? "Advanced Mapper" : "Standard Mapper";
+        }
     }
 
     /// <summary>
@@ -195,6 +217,8 @@ namespace EntityTools.Settings
         /// Координаты Mapper
         /// </summary>
         [Bindable(true)]
+        [Category("Window")]
+        [Description("Координаты окна на экране")]
         public Point Location
         {
             get
@@ -228,6 +252,8 @@ namespace EntityTools.Settings
         /// Координаты Mapper
         /// </summary>
         [Bindable(true)]
+        [Category("Window")]
+        [Description("Размер окна на экране в пикселях")]
         public Size Size
         {
             get
@@ -255,6 +281,8 @@ namespace EntityTools.Settings
         /// Видимость панели прокладывания путей
         /// </summary>
         [Bindable(true)]
+        [Category("Toolbar")]
+        [Description("Видимость панели инструментов 'Mapping Tools'")]
         public bool MappingBarVisible
         {
             get => _mappingBarVisible;
@@ -273,6 +301,8 @@ namespace EntityTools.Settings
         /// Видимость панели редактирования графа (мешей)
         /// </summary>
         [Bindable(true)]
+        [Category("Toolbar")]
+        [Description("Видимость панели инструментов 'Mashes Tools'")]
         public bool MeshesBarVisible
         {
             get => _meshesBarVisible;
@@ -291,6 +321,8 @@ namespace EntityTools.Settings
         /// Видимость панели редактирования вершин и ребер
         /// </summary>
         [Bindable(true)]
+        [Category("Toolbar")]
+        [Description("Видимость панели инструментов 'Node Tools'")]
         public bool NodeToolsBarVisible
         {
             get => _nodeToolsBarVisible;
@@ -309,6 +341,8 @@ namespace EntityTools.Settings
         /// Видимость панели редактирования CustomRegion
         /// </summary>
         [Bindable(true)]
+        [Category("Toolbar")]
+        [Description("Видимость панели инструментов 'CustomRegion Tools'")]
         public bool CustomRegionBarVisible
         {
             get => _customRegionBarVisible;
@@ -327,6 +361,8 @@ namespace EntityTools.Settings
         /// Видимость строки состояния
         /// </summary>
         [Bindable(true)]
+        [Category("Toolbar")]
+        [Description("Видимость строки состояния")]
         public bool StatusBarVisible
         {
             get => _statusBarVisible;
@@ -345,6 +381,8 @@ namespace EntityTools.Settings
         /// Время обновления кэша
         /// </summary>
         [Bindable(true)]
+        [Category("Window")]
+        [Description("Интервал времени между обновлением (перерисовкой) окна Mapper'a")]
         public int RedrawMapperTimeout
         {
             get => redrawMapperTimeout;
@@ -364,6 +402,9 @@ namespace EntityTools.Settings
         /// Задает максимальную разность высот целевой точки (игрока) и вершин
         /// </summary>
         [Bindable(true)]
+        [Category("Advanced")]
+        [Description("Толщина слоя, отображаемого в Mapper'e\n\r" +
+            "Задает максимальную разность высот целевой точки (игрока) и отображаемых путевых точек")]
         public uint LayerDepth
         {
             get => layerDepth;
@@ -379,6 +420,8 @@ namespace EntityTools.Settings
         private uint layerDepth = 100;
 
         [Bindable(true)]
+        [Category("Customization")]
+        [Description("Цвет двунаправленного пути (BidirectionalPath)")]
         [XmlElement(Type = typeof(XmlColor))]
         public Color BidirectionalPathColor
         {
@@ -395,6 +438,8 @@ namespace EntityTools.Settings
         private Color biPathColor = Color.Red;
 
         [Bindable(true)]
+        [Category("Customization")]
+        [Description("Цвет однонаправленного пути (UnidirectionalPath)")]
         [XmlElement(Type = typeof(XmlColor))]
         public Color UnidirectionalPathColor
         {
@@ -411,6 +456,8 @@ namespace EntityTools.Settings
         private Color uniPathColor = Color.SkyBlue;
 
         [Bindable(true)]
+        [Category("Customization")]
+        [Description("Цвет фона")]
         [XmlElement(Type = typeof(XmlColor))]
         public Color BackgroundColor
         {
@@ -427,6 +474,8 @@ namespace EntityTools.Settings
         private Color backgroundColor = Color.Black;
 
         [Bindable(true)]
+        [Category("Customization")]
+        [Description("Отображение врагов")]
         public bool DrawEnemies
         {
             get => _drawEnemies;
@@ -443,6 +492,8 @@ namespace EntityTools.Settings
 
         [Bindable(true)]
         [XmlElement(Type = typeof(XmlColor))]
+        [Category("Customization")]
+        [Description("Цвет врагов")]
         public Color EnemyColor
         {
             get => enemiesColor;
@@ -459,6 +510,8 @@ namespace EntityTools.Settings
 
 
         [Bindable(true)]
+        [Category("Customization")]
+        [Description("Отображение дружественных NPC")]
         public bool DrawFriends
         {
             get => _drawFriends;
@@ -474,6 +527,8 @@ namespace EntityTools.Settings
         private bool _drawFriends = true;
 
         [Bindable(true)]
+        [Category("Customization")]
+        [Description("Цвет дружественных NPC")]
         [XmlElement(Type = typeof(XmlColor))]
         public Color FriendColor
         {
@@ -490,6 +545,8 @@ namespace EntityTools.Settings
         private Color friendsColor = Color.Green;
 
         [Bindable(true)]
+        [Category("Customization")]
+        [Description("Отображение игроков")]
         public bool DrawPlayers
         {
             get => _drawPlayers;
@@ -505,6 +562,8 @@ namespace EntityTools.Settings
         private bool _drawPlayers = true;
 
         [Bindable(true)]
+        [Category("Customization")]
+        [Description("Цвет игроков")]
         [XmlElement(Type = typeof(XmlColor))]
         public Color PlayerColor
         {
@@ -521,6 +580,8 @@ namespace EntityTools.Settings
         private Color playersColor = Color.LawnGreen;
 
         [Bindable(true)]
+        [Category("Customization")]
+        [Description("Отображение прочих NPC")]
         public bool DrawOtherNPC
         {
             get => _drawOtherNpc;
@@ -537,6 +598,8 @@ namespace EntityTools.Settings
 
         [Bindable(true)]
         [XmlElement(Type = typeof(XmlColor))]
+        [Category("Customization")]
+        [Description("Цвет прочих NPC")]
         public Color OtherNPCColor
         {
             get => npcColor;
@@ -552,6 +615,8 @@ namespace EntityTools.Settings
         private Color npcColor = Color.LightGray;
 
         [Bindable(true)]
+        [Category("Customization")]
+        [Description("Отображение точек взаимодействия (Node)")]
         public bool DrawNodes
         {
             get => _drawNodes;
@@ -567,6 +632,8 @@ namespace EntityTools.Settings
         private bool _drawNodes = true;
 
         [Bindable(true)]
+        [Category("Customization")]
+        [Description("Цвет точек взаимодействия (Node)")]
         [XmlElement(Type = typeof(XmlColor))]
         public Color NodeColor
         {
@@ -583,6 +650,8 @@ namespace EntityTools.Settings
         private Color nodesColor = Color.YellowGreen;
 
         [Bindable(true)]
+        [Category("Customization")]
+        [Description("Отображение точек проверки талантов (SkillNode)")]
         public bool DrawSkillNodes
         {
             get => _drawSkillnodes;
@@ -598,6 +667,8 @@ namespace EntityTools.Settings
         private bool _drawSkillnodes = true;
 
         [Bindable(true)]
+        [Category("Customization")]
+        [Description("Цвет точек проверки талантов (SkillNode)")]
         [XmlElement(Type = typeof(XmlColor))]
         public Color SkillNodeColor
         {
@@ -612,6 +683,11 @@ namespace EntityTools.Settings
             }
         }
         private Color skillnodesColor = Color.Gold;
+
+        public override string ToString()
+        {
+            return "Advanced Mapper settings";
+        }
     }
 #endif
 }

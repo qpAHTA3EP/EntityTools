@@ -34,9 +34,10 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MapperFormExt));
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
-            this.barManager = new DevExpress.XtraBars.BarManager();
+            this.barManager = new DevExpress.XtraBars.BarManager(this.components);
             this.barMapping = new DevExpress.XtraBars.Bar();
             this.groupMapping = new DevExpress.XtraBars.BarButtonGroup();
             this.btnMappingBidirectional = new DevExpress.XtraBars.BarCheckItem();
@@ -45,7 +46,7 @@ namespace EntityTools.Patches.Mapper
             this.btnMappingLinearPath = new DevExpress.XtraBars.BarCheckItem();
             this.btnMappingForceLink = new DevExpress.XtraBars.BarCheckItem();
             this.btnOptions = new DevExpress.XtraBars.BarButtonItem();
-            this.popMenuOptions = new DevExpress.XtraBars.PopupMenu();
+            this.popMenuOptions = new DevExpress.XtraBars.PopupMenu(this.components);
             this.editWaypointDistance = new DevExpress.XtraBars.BarEditItem();
             this.seWaypointDistance = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
             this.editMaxZDifference = new DevExpress.XtraBars.BarEditItem();
@@ -68,6 +69,7 @@ namespace EntityTools.Patches.Mapper
             this.btnMeshesInfo = new DevExpress.XtraBars.BarButtonItem();
             this.btnCompression = new DevExpress.XtraBars.BarButtonItem();
             this.btnDistanceMeasurement = new DevExpress.XtraBars.BarCheckItem();
+            this.btnObjectInfo = new DevExpress.XtraBars.BarCheckItem();
             this.barCustomRegions = new DevExpress.XtraBars.Bar();
             this.btnAddCR = new DevExpress.XtraBars.BarButtonItem();
             this.btnEditCR = new DevExpress.XtraBars.BarCheckItem();
@@ -105,13 +107,13 @@ namespace EntityTools.Patches.Mapper
             this.editUnidirPathColor = new DevExpress.XtraBars.BarEditItem();
             this.btnLockOnSpecialObject = new DevExpress.XtraBars.BarButtonItem();
             this.btnAddRoad = new DevExpress.XtraBars.BarCheckItem();
-            this.bsrcAstralSettings = new System.Windows.Forms.BindingSource();
+            this.bsrcAstralSettings = new System.Windows.Forms.BindingSource(this.components);
             this.btnShowStatBar = new System.Windows.Forms.Button();
             this.MapPicture = new System.Windows.Forms.PictureBox();
             this.panelSettings = new DevExpress.XtraEditors.PanelControl();
             this.tabPaneSettings = new DevExpress.XtraBars.Navigation.TabPane();
             this.tabGeneral = new DevExpress.XtraBars.Navigation.TabNavigationPage();
-            this.label1 = new System.Windows.Forms.Label();
+            this.lblLayerDepth = new System.Windows.Forms.Label();
             this.editLayerDepth = new DevExpress.XtraEditors.SpinEdit();
             this.ckbChacheEnable = new DevExpress.XtraEditors.CheckEdit();
             this.tabCustomization = new DevExpress.XtraBars.Navigation.TabNavigationPage();
@@ -255,8 +257,9 @@ namespace EntityTools.Patches.Mapper
             this.lblPlayerPos,
             this.lblDrawInfo,
             this.btnDistanceMeasurement,
-            this.btnAddRoad});
-            this.barManager.MaxItemId = 134;
+            this.btnAddRoad,
+            this.btnObjectInfo});
+            this.barManager.MaxItemId = 135;
             this.barManager.OptionsLayout.AllowAddNewItems = false;
             this.barManager.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.seDeleteRadius,
@@ -505,7 +508,8 @@ namespace EntityTools.Patches.Mapper
             new DevExpress.XtraBars.LinkPersistInfo(this.groupImportExportNodes, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnMeshesInfo, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnCompression),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnDistanceMeasurement, true)});
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnDistanceMeasurement, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnObjectInfo)});
             this.barMeshes.OptionsBar.AllowQuickCustomization = false;
             this.barMeshes.Text = "Graph Tools";
             this.barMeshes.Visible = false;
@@ -592,6 +596,15 @@ namespace EntityTools.Patches.Mapper
             this.btnDistanceMeasurement.ImageOptions.Image = global::EntityTools.Properties.Resources.miniRuler;
             this.btnDistanceMeasurement.Name = "btnDistanceMeasurement";
             this.btnDistanceMeasurement.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_DistanceMeasurement_ModeChanged);
+            // 
+            // btnObjectInfo
+            // 
+            this.btnObjectInfo.Caption = "ObjectInfo";
+            this.btnObjectInfo.Id = 134;
+            this.btnObjectInfo.ImageOptions.Image = global::EntityTools.Properties.Resources.show_16x16;
+            this.btnObjectInfo.ImageOptions.LargeImage = global::EntityTools.Properties.Resources.show_32x32;
+            this.btnObjectInfo.Name = "btnObjectInfo";
+            this.btnObjectInfo.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ObjectInfo);
             // 
             // barCustomRegions
             // 
@@ -791,7 +804,7 @@ namespace EntityTools.Patches.Mapper
             this.btnZoomIn.Caption = "ZoomIn";
             this.btnZoomIn.Id = 119;
             this.btnZoomIn.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
-            this.btnZoomIn.ImageOptions.Image = global::EntityTools.Properties.Resources.miniZoomIn;
+            this.btnZoomIn.ImageOptions.Image = global::EntityTools.Properties.Resources.zoomin_16x16;
             this.btnZoomIn.Name = "btnZoomIn";
             this.btnZoomIn.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ZoomIn);
             // 
@@ -808,7 +821,7 @@ namespace EntityTools.Patches.Mapper
             this.btnZoomOut.Caption = "ZoomOut";
             this.btnZoomOut.Id = 120;
             this.btnZoomOut.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
-            this.btnZoomOut.ImageOptions.Image = global::EntityTools.Properties.Resources.miniZoomOut;
+            this.btnZoomOut.ImageOptions.Image = global::EntityTools.Properties.Resources.zoomout_16x16;
             this.btnZoomOut.Name = "btnZoomOut";
             this.btnZoomOut.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ZoomOut);
             // 
@@ -1036,21 +1049,21 @@ namespace EntityTools.Patches.Mapper
             // tabGeneral
             // 
             this.tabGeneral.Caption = "General";
-            this.tabGeneral.Controls.Add(this.label1);
+            this.tabGeneral.Controls.Add(this.lblLayerDepth);
             this.tabGeneral.Controls.Add(this.editLayerDepth);
             this.tabGeneral.Controls.Add(this.ckbChacheEnable);
             this.tabGeneral.Name = "tabGeneral";
             this.tabGeneral.Size = new System.Drawing.Size(398, 324);
             this.tabGeneral.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
-            // label1
+            // lblLayerDepth
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 37);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(238, 13);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "The limit of the layer\'s depth drawing on Mapper";
+            this.lblLayerDepth.AutoSize = true;
+            this.lblLayerDepth.Location = new System.Drawing.Point(12, 37);
+            this.lblLayerDepth.Name = "lblLayerDepth";
+            this.lblLayerDepth.Size = new System.Drawing.Size(238, 13);
+            this.lblLayerDepth.TabIndex = 3;
+            this.lblLayerDepth.Text = "The limit of the layer\'s depth drawing on Mapper";
             // 
             // editLayerDepth
             // 
@@ -1470,8 +1483,6 @@ namespace EntityTools.Patches.Mapper
 
     #endregion
 
-        private static MapperFormExt @this;
-
         private BackgroundWorker backgroundWorker;
         private BarManager barManager;
         private BarDockControl barDockControlTop;
@@ -1576,7 +1587,8 @@ namespace EntityTools.Patches.Mapper
         private Label lblBidirPath;
         private DevExpress.XtraEditors.CheckEdit ckbChacheEnable;
         private DevExpress.XtraEditors.SpinEdit editLayerDepth;
-        private Label label1;
+        private Label lblLayerDepth;
+        private BarCheckItem btnObjectInfo;
     } 
 #endif
 }

@@ -2,6 +2,7 @@
 using System.Drawing;
 using AStar;
 using EntityTools.Patches.Mapper.Tools;
+using EntityTools.Settings;
 using MyNW.Classes;
 
 namespace EntityTools.Patches.Mapper
@@ -47,6 +48,18 @@ namespace EntityTools.Patches.Mapper
                     x = pos.X;
                     y = pos.Y;
                 }
+                else if (point is Entity ett)
+                {
+                    var pos = ett.Location;
+                    x = pos.X;
+                    y = pos.Y;
+                }
+                else if (point is TargetableNode tgNode)
+                {
+                    var pos = tgNode.WorldInteractionNode.Location;
+                    x = pos.X;
+                    y = pos.Y;
+                }
                 else throw new NotImplementedException();
             }
             public static void GetXYZ<TPoint>(TPoint point, out double x, out double y, out double z)
@@ -77,9 +90,105 @@ namespace EntityTools.Patches.Mapper
                     y = pos.Y;
                     z = pos.Z;
                 }
+                else if (point is Entity ett)
+                {
+                    var pos = ett.Location;
+                    x = pos.X;
+                    y = pos.Y;
+                    z = pos.Z;
+                }
+                else if (point is TargetableNode tgNode)
+                {
+                    var pos = tgNode.WorldInteractionNode.Location;
+                    x = pos.X;
+                    y = pos.Y;
+                    z = pos.Z;
+                }
                 else throw new NotImplementedException();
             }
-
+            public static void GetXYZext<TPoint>(TPoint point, out double x, out double y, out double z)
+            {
+                if (point is Vector3 v3)
+                {
+                    x = v3.X;
+                    y = v3.Y;
+                    z = v3.Z;
+                }
+                else if (point is Point3D p3d)
+                {
+                    x = p3d.X;
+                    y = p3d.Y;
+                    z = p3d.Z;
+                }
+                else if (point is Node nd)
+                {
+                    var pos = nd.Position;
+                    x = pos.X;
+                    y = pos.Y;
+                    z = pos.Z;
+                }
+                else if (point is NodeDetail ndt)
+                {
+                    var pos = ndt.Node.Position;
+                    x = pos.X;
+                    y = pos.Y;
+                    z = pos.Z;
+                }
+                else if (point is Entity ett)
+                {
+                    var pos = ett.Location;
+                    x = pos.X;
+                    y = pos.Y;
+                    z = pos.Z;
+                }
+                else if (point is TargetableNode tgNode)
+                {
+                    var pos = tgNode.WorldInteractionNode.Location;
+                    x = pos.X;
+                    y = pos.Y;
+                    z = pos.Z;
+                }
+                else
+                {
+                    x = 0;
+                    y = 0;
+                    z = 0;
+                    bool xOk = false, yOk = false, zOk = false;
+                    foreach (var propInfo in point.GetType().GetProperties())
+                    {
+                        switch (propInfo.Name)
+                        {
+                            case "X":
+                                x = Convert.ToDouble(propInfo.GetValue(point));
+                                xOk = true;
+                                break;
+                            case "Y":
+                                y = Convert.ToDouble(propInfo.GetValue(point));
+                                yOk = true;
+                                break;
+                            case "Z":
+                                y = Convert.ToDouble(propInfo.GetValue(point));
+                                zOk = true;
+                                break;
+                            case "Location":
+                                GetXYZ(propInfo.GetValue(point), out x, out y, out z);
+                                xOk = true;
+                                yOk = true;
+                                zOk = true;
+                                break;
+                            case "Position":
+                                GetXYZ(propInfo.GetValue(point), out x, out y, out z);
+                                xOk = true;
+                                yOk = true;
+                                zOk = true;
+                                break;
+                        }
+                        if(xOk && yOk && zOk)
+                            return;
+                    }
+                    throw new NotImplementedException();
+                }
+            }
             public static double GetX<TPoint>(TPoint point)
             {
                 if (point is Vector3 v3) return v3.X;
@@ -88,6 +197,8 @@ namespace EntityTools.Patches.Mapper
                 if (point is Point3D p3d) return p3d.X;
                 if (point is Node nd) return nd.X;
                 if (point is NodeDetail ndt) return ndt.Node.Position.X;
+                if (point is Entity ett) return ett.X;
+                if (point is TargetableNode tgNode) return tgNode.WorldInteractionNode.Location.X;
                 throw new NotImplementedException();
             }
             public static double GetY<TPoint>(TPoint point)
@@ -98,6 +209,8 @@ namespace EntityTools.Patches.Mapper
                 if (point is Point3D p3d) return p3d.Y;
                 if (point is Node nd) return nd.Y;
                 if (point is NodeDetail ndt) return ndt.Node.Position.Y;
+                if (point is Entity ett) return ett.Y;
+                if (point is TargetableNode tgNode) return tgNode.WorldInteractionNode.Location.Y;
                 throw new NotImplementedException();
             }
             public static double GetZ<TPoint>(TPoint point)
@@ -106,6 +219,8 @@ namespace EntityTools.Patches.Mapper
                 if (point is Point3D p3d) return p3d.Z;
                 if (point is Node nd) return nd.Z;
                 if (point is NodeDetail ndt) return ndt.Node.Position.Z;
+                if (point is Entity ett) return ett.Z;
+                if (point is TargetableNode tgNode) return tgNode.WorldInteractionNode.Location.Z;
                 throw new NotImplementedException();
             }
             public static void SetX<TPoint>(TPoint point, double value)

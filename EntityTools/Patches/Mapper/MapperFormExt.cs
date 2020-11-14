@@ -86,7 +86,7 @@ namespace EntityTools.Patches.Mapper
         private Point RelativeMousePosition => MapPicture.PointToClient(MousePosition);
 
         #region Инициализация формы
-        private MapperFormExt()
+        internal MapperFormExt()
         {
             InitializeComponent();
 
@@ -279,6 +279,7 @@ namespace EntityTools.Patches.Mapper
 #endif
         }
 
+#if false
         /// <summary>
         /// Открытие формы
         /// </summary>
@@ -295,7 +296,8 @@ namespace EntityTools.Patches.Mapper
                 }
             }
             else MapperForm.Open();
-        }
+        } 
+#endif
 
         /// <summary>
         /// Событие при загрузке формы
@@ -367,7 +369,6 @@ namespace EntityTools.Patches.Mapper
                 lblPlayerPos.Caption = playerPosStr;
                 lblDrawInfo.Caption = statusStr;
                 lblZoom.Caption = zoomStr;
-
                 MapPicture.Image = img;
 #if false
                 if (SpecialObject?.IsValid == true)
@@ -379,12 +380,26 @@ namespace EntityTools.Patches.Mapper
 
 #if DrawMapper_Measuring
             Timeout timeout = new Timeout(0);
-
+            const int SPEED_MEASURES_NUM = 10;
+            const int MAPPER_MEASURES_NUM = 10;
             Stopwatch sw = new Stopwatch();
-            long[] drawMapperMeasures = new long[10];
+
+            long[] drawMapperMeasures = new long[MAPPER_MEASURES_NUM];
+#if false
+            // Tuple<PlayerLocation, TickCount, Ticks from last, Distance, Speed>
+            Tuple<Vector3, int, int, double, double>[] speedMeasures = new Tuple<Vector3, int, int, double, double>[SPEED_MEASURES_NUM];
+#else
+            // Tuple<PlayerLocation, TickCount, Speed>
+            Tuple<Vector3, int, double>[] speedMeasures = new Tuple<Vector3, int, double>[SPEED_MEASURES_NUM];
+#endif
+            Vector3 lastPlayerPos = null;
+            int lastTickCount = Environment.TickCount;
+            int movingTime = 0;
+            double pathDistance = 0;
+
             int currentMesure = 0;
 
-            int time = 5000;
+            const int time = 5000;
             double frames = 0;
             double fps = 0, cps = 0;
 
@@ -413,11 +428,103 @@ namespace EntityTools.Patches.Mapper
                         playerPosStr = "Loading";
                         statusStr = "-";
                         mousePosStr = "-";
+                        movingTime = 0;
+                        pathDistance = 0;
+                        lastPlayerPos = null;
                     }
                     else
                     {
-                        Vector3 pos = LockOnPlayer ? player.Location : _graphics.CenterPosition;
-                        playerPosStr = $"{pos.X:N1} | {pos.Y:N1} | {pos.Z:N1}";
+                        var playerPos = player.Location.Clone();
+                        Vector3 pos = LockOnPlayer ? playerPos : _graphics.CenterPosition;
+
+                        // Вычисляем скорость перемещения;
+                        int currMeasureInd = currentMesure % SPEED_MEASURES_NUM;
+                        int prevMeasureInd = currMeasureInd == 0 ? SPEED_MEASURES_NUM - 1 : currMeasureInd - 1;
+                        var prevMeasure = speedMeasures[prevMeasureInd];
+                        if (prevMeasure != null)
+                        {
+                            int tickCount = Environment.TickCount;
+                            int ticks = tickCount - prevMeasure.Item2;
+                            double distance = prevMeasure.Item1.Distance3DFromPlayer;
+#if false
+                            speedMeasures[currMeasureInd] = Tuple.Create(playerPos, tickCount, ticks, distance, ticks > 0 ? distance / ticks : 0d); //new Tuple<Vector3, int, double>(playerPos, ticks, distance);
+#else
+                            speedMeasures[currMeasureInd] = Tuple.Create(playerPos, tickCount, ticks > 0 ? distance / ticks * 1000d : 0d);
+#endif
+                        }
+                        else
+                        {
+#if false
+                            speedMeasures[currMeasureInd] = Tuple.Create(playerPos, Environment.TickCount, 0, 0d, 0d); //new Tuple<Vector3, int, double>(playerPos, ticks, distance);  
+#else
+                            speedMeasures[currMeasureInd] = Tuple.Create(playerPos, Environment.TickCount, 0d);
+#endif
+                        }
+#if false
+                        int totalTicks = 0;
+                        double totalDistance = 0; 
+#endif
+                        double speed = 0;
+                        int num = 0;
+                        for (currMeasureInd = 0; currMeasureInd < SPEED_MEASURES_NUM; currMeasureInd++)
+                        {
+                            var measure = speedMeasures[currMeasureInd];
+#if false
+                            if (measure != null && measure.Item4 > 0)
+                            {
+                                totalTicks += measure.Item3;
+                                totalDistance += measure.Item4;
+                                speed1 += measure.Item5;
+                                num++;
+                            } 
+#else
+                            if (measure != null && measure.Item3 > 0)
+                            {
+                                speed += measure.Item3;
+                                num++;
+                            }
+#endif
+                        }
+                        if (num > 0)
+                            speed /= num;
+#if false
+                        double speed2 = totalTicks > 0 ? totalDistance / totalTicks * 1000d : 0d;
+#endif
+#if false               // Вывод в лог слокости и статистики перемещения
+                        if (timeout.IsTimedOut)
+                        {
+                            ETLogger.WriteLine(LogType.Debug, $"{speed1:N3} ({num}) | {speed2:N3} ({totalDistance:N2}/{totalTicks/1000d:N2})");
+                            foreach(var slot in speedMeasures)
+                            {
+                                if (slot != null)
+                                {
+                                    var vec = slot.Item1;
+                                    ETLogger.WriteLine(LogType.Debug,
+                                        string.Concat(vec is null ? "\tNULL\t" : $"{{ {vec.X:N1}, {vec.Y:N1}, {vec.Z:N1} }};\t", slot.Item2.ToString("N0"), ";\t",
+                                        slot.Item3.ToString("N0"), ";\t", slot.Item4.ToString("N2"), ";\t", slot.Item5.ToString("N3")));
+                                }
+                                else ETLogger.WriteLine(LogType.Debug, "\tNULL");
+                            }
+                        } 
+#endif
+
+#if false               // Вычисляем скорость перемещения 2м способом
+                        distance = lastPlayerPos?.Distance3DFromPlayer ?? 0;
+                        int tickCount = ticks - lastTickCount;
+                        if (distance > 0)
+                        {
+                            movingTime += tickCount;
+                            pathDistance += distance;
+                        }
+                        lastPlayerPos = playerPos;
+                        lastTickCount = ticks;
+                        double speed2 = movingTime > 0 ? pathDistance / movingTime * 1000d : 0d; 
+#endif
+#if false
+                        playerPosStr = $"{pos.X:N1} | {pos.Y:N1} | {pos.Z:N1} || ";  
+#else
+                        playerPosStr = string.Concat(pos.X.ToString("N1"), " | ", pos.Y.ToString("N1"), " | ", pos.Z.ToString("N1"), " || ", speed.ToString("N3"), "f/s (", num, ")");
+#endif
                         zoomStr = string.Concat(Zoom * 100, '%');
 
                         int hash = AstralAccessors.Quester.Core.Meshes.Value.GetHashCode();
@@ -431,14 +538,14 @@ namespace EntityTools.Patches.Mapper
                             ResetToolState();
                         }
 
-#if DrawMapper_Measuring
                         sw.Restart();
                         DrawMapper();
                         sw.Stop();
                         using (_graphics.ReadLock())
                             img = _graphics.getImage();
                         
-                        drawMapperMeasures[currentMesure % 10] = sw.ElapsedMilliseconds;
+                        drawMapperMeasures[currentMesure % MAPPER_MEASURES_NUM] = sw.ElapsedMilliseconds;
+
                         currentMesure++;
                         frames++;
                         if (timeout.IsTimedOut)
@@ -453,8 +560,12 @@ namespace EntityTools.Patches.Mapper
                             cacheVer = curCacheVer;
                         }
                         statusStr = string.Concat(fps.ToString("N1"), " fps | ", (drawMapperMeasures.Sum() / 10d).ToString("N1"), " ms | ", cps.ToString("N1"), " cps");
-#endif
+                        //statusStr = string.Concat("(1) ", speed.ToString("N2"), "fps (", distance.ToString("N2"), '/', (totalTicks / 1000d).ToString("N2"), ") || (2) ", speed2.ToString("N2"), " fps (", pathDistance.ToString("N2"), '/', (movingTime / 1000d).ToString("N2"), ')');
+                        //statusStr = string.Concat(speed1.ToString("N3"), "f/ms (", num, ") | ",speed2.ToString("N3"), "f/s (", totalDistance.ToString("N2"), '/', (totalTicks / 1000d).ToString("N2"), ")");
+
                         _graphics.GetWorldPosition(RelativeMousePosition, out double mouseX, out double mouseY);
+
+
                         mousePosStr = string.Concat(mouseX.ToString("N1"), " | ", mouseY.ToString("N1"));
 
                     }
@@ -484,34 +595,7 @@ namespace EntityTools.Patches.Mapper
                 throw;
             }
         }
-        #endregion
-
-#if false
-        public delegate void CustomMapperDraw(/*MapperFormExt sender,*/ MapperGraphics graphics);
-        public delegate void CustomMouseEvent(/*MapperFormExt sender,*/ MapperGraphics graphics, MouseEventArgs e);
-        public delegate void CustomKeyEvent(/*MapperFormExt sender,*/ MapperGraphics graphics, KeyEventArgs e);
-
-        /// <summary>
-        /// Событие  отрисовки специальной графики на карте
-        /// </summary>
-        public event CustomMapperDraw OnMapperDraw;
-        /// <summary>
-        /// Клик мыши на Mapper'e
-        /// </summary>
-        public event CustomMouseEvent OnMapperMouseClick;
-        /// <summary>
-        /// Двойной клик мыши на Mapper'e
-        /// </summary>
-        public event CustomMouseEvent OnMapperMouseDoubleClick;
-        /// <summary>
-        /// Отпускание клавиши на Mapper'e
-        /// </summary>
-        public event CustomKeyEvent OnMapperKeyUp;
-        /// <summary>
-        /// Отпускание клавиши мыши
-        /// </summary>
-        public event CustomMouseEvent OnMapperMouseUp; 
-#endif
+#endregion
 
         #region Переадресация событий инструментам
         /// <summary>
@@ -638,7 +722,14 @@ namespace EntityTools.Patches.Mapper
                 else
                 {
                     _selectedNodes.Clear();
-                    InterruptAllModifications(MapperEditMode.None);
+#if true
+                    MapperEditMode mode = MapperEditMode.None;
+                    if (_mappingTool.MappingMode != MappingMode.Stoped)
+                        mode = MapperEditMode.Mapping;
+                    InterruptAllModifications(mode); 
+#else
+                    InterruptAllModifications();
+#endif
                 }
             }
         }
@@ -692,14 +783,14 @@ namespace EntityTools.Patches.Mapper
                 CenterOfMap = SpecialObject;
         }
 
-        #endregion
+                        #endregion
 
         /// <summary>
         /// Прерывание всех операций по изменению графа путей (мешей)
         /// </summary>
         private void InterruptAllModifications(MapperEditMode mode = MapperEditMode.None)
         {
-            if (mode != MapperEditMode.Mapping)
+            if (/*mode != MapperEditMode.Mapping && */_mappingTool?.MappingMode == MappingMode.Stoped)
             {
                 btnMappingStop.Checked = true;
             }
@@ -731,6 +822,11 @@ namespace EntityTools.Patches.Mapper
             {
                 btnDistanceMeasurement.Checked = false;
             }
+
+            if (mode != MapperEditMode.Information)
+            {
+                btnObjectInfo.Checked = false;
+            }
         }
 
         #region Управление масштабом
@@ -754,8 +850,7 @@ namespace EntityTools.Patches.Mapper
                 Zoom = 0.1;
             else if (Zoom > 8)
                 Zoom = 8;
-            //editZoom.EditValue = Zoom;
-            lblZoom.Caption = $"{Zoom * 100}%";
+            lblZoom.Caption = string.Concat(Zoom * 100d, '%');
         }
 
         private void handler_ZoomOut(object sender, ItemClickEventArgs e = null)
@@ -772,8 +867,7 @@ namespace EntityTools.Patches.Mapper
                 Zoom = 0.1;
             else if (Zoom > 8)
                 Zoom = 8;
-            //editZoom.EditValue = Zoom;
-            lblZoom.Caption = $"{Zoom * 100}%";
+            lblZoom.Caption = string.Concat(Zoom * 100d, '%');
         }
 
         private void handler_DoubleClickZoom(object sender, ItemClickEventArgs e)
@@ -818,7 +912,7 @@ namespace EntityTools.Patches.Mapper
                 mouseWeelTimeout.ChangeTime(100);
             }
         } 
-        #endregion
+                        #endregion
 
         #region Drawings
         private readonly MapperGraphics _graphics = new MapperGraphics(360, 360);
@@ -1009,7 +1103,7 @@ namespace EntityTools.Patches.Mapper
                                         else if (relationToPlayer == EntityRelation.Friend)
                                         {
                                             if(drawFriends)
-                                            _graphics.FillRhombCentered(friendBrush, location, 6, 6);
+                                                _graphics.FillRhombCentered(friendBrush, location, 6, 6);
                                         }
                                         else if(drawOtherNpc)
                                             _graphics.FillRhombCentered(otherBrush, location, 6, 6);
@@ -1169,7 +1263,7 @@ namespace EntityTools.Patches.Mapper
                 }
             }
         }
-        #endregion
+                        #endregion
 
         #region Добавление и изменение CustomRegion'ов
         /// <summary>
@@ -1265,7 +1359,7 @@ namespace EntityTools.Patches.Mapper
                 {
                     itemEditCRList.DataSource = customRegions;
                     itemEditCRList.DisplayMember = "Name";
-                    editCRSelector.EditValue = customRegions.First();
+                    editCRSelector.EditValue = customRegions.First();//null; 
                 }
                 else handler_ChangeSelectedCustomRegion(sender);
 
@@ -1280,8 +1374,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         private void handler_ChangeSelectedCustomRegion(object sender, EventArgs e = null)
         {
-            var tool = CurrentTool;
-            EditCustomRegionTool editCRTool = tool as EditCustomRegionTool;
+            EditCustomRegionTool editCRTool = CurrentTool as EditCustomRegionTool;
 
             if (editCRSelector.EditValue is CustomRegion cr)
             {
@@ -1303,7 +1396,15 @@ namespace EntityTools.Patches.Mapper
                     }
                     else editCRTool.AttachTo(cr);
                 }
-                CenterOfMap = cr.Position;
+#if false
+                CenterOfMap = cr.Position; 
+#else
+                var crPos = cr.Position.Clone();
+                crPos.Z = CenterOfMap.Z;
+                CenterOfMap = crPos;
+#endif
+
+
                 btnCRTypeSelector.Checked = cr.Eliptic;
             }
             else if (editCRTool != null)
@@ -1419,7 +1520,7 @@ namespace EntityTools.Patches.Mapper
                 editCRName.Visibility = BarItemVisibility.Never;
             }
         }
-        #endregion
+                        #endregion
 
         #region Изменение настроек
         private void handler_DeleteRadiusChanged(object sender, EventArgs e)
@@ -1453,7 +1554,7 @@ namespace EntityTools.Patches.Mapper
         {
             _graphics.GraphCache.CacheDistanceZ = editLayerDepth.Value > 0 ? Convert.ToDouble(editLayerDepth.Value) : double.MaxValue;
         }
-        #endregion
+                        #endregion
 
         #region Изменение графа (Meshes)
         /// <summary>
@@ -1949,7 +2050,7 @@ namespace EntityTools.Patches.Mapper
                                     $"\tunpassable:\t{unpasArcNum}\n\r");
         }
         
-        #region EditMeshes
+                        #region EditMeshes
         private void handler_EditEdges_ModeChanged(object sender, ItemClickEventArgs e)
         {
             EditEdgeTool editEdgeTool = CurrentTool as EditEdgeTool;
@@ -1990,8 +2091,8 @@ namespace EntityTools.Patches.Mapper
             else if (removeTool != null)
                     CurrentTool = null;
         }
-        #endregion
-        #endregion
+                        #endregion
+                        #endregion
 
         /// <summary>
         /// Откат изменений
@@ -2021,31 +2122,31 @@ namespace EntityTools.Patches.Mapper
         #region Mapping
         private readonly MappingTool _mappingTool;
 
-#if false
-        private IGraph GetMappingGraph()
-        {
-            if (_graphics.CenterPosition.Distance2DFromPlayer < EntityTools.Config.Mapper.CacheRadius * 0.75)
-                return _graphics.GraphCache;
-            return AstralAccessors.Quester.Core.Meshes.Value;
-        } 
-#endif
-
         private void handler_Mapping_BidirectionalPath(object sender, ItemClickEventArgs e)
         {
             if (btnMappingBidirectional.Checked)
+            {
                 _mappingTool.MappingMode = MappingMode.Bidirectional;
+                InterruptAllModifications(MapperEditMode.Mapping);
+            }
         }
 
         private void handler_Mapping_UnidirectionalPath(object sender, ItemClickEventArgs e)
         {
             if (btnMappingUnidirectional.Checked)
+            {
                 _mappingTool.MappingMode = MappingMode.Unidirectional;
+                InterruptAllModifications(MapperEditMode.Mapping);
+            }
         }
 
         private void handler_Mapping_Stop(object sender = null, ItemClickEventArgs e = null)
         {
-            if(btnMappingStop.Checked)
+            if (btnMappingStop.Checked)
+            {
                 _mappingTool.MappingMode = MappingMode.Stoped;
+                InterruptAllModifications();
+            }
         }
 
         private void handler_Mapping_ForceLink(object sender, ItemClickEventArgs e)
@@ -2069,6 +2170,19 @@ namespace EntityTools.Patches.Mapper
                 LockOnPlayer = false;
             }
             else if (measurementTool != null)
+                CurrentTool = null;
+        }
+
+        private void handler_ObjectInfo(object sender, ItemClickEventArgs e)
+        {
+            ObjectInfoTool infoTool = CurrentTool as ObjectInfoTool;
+            if (btnObjectInfo.Checked)
+            {
+                if (infoTool is null)
+                    CurrentTool = new ObjectInfoTool();
+                LockOnPlayer = false;
+            }
+            else if (infoTool != null)
                 CurrentTool = null;
         }
     }

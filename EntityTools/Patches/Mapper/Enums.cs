@@ -8,7 +8,7 @@
     {
         None,
         /// <summary>
-        /// Прогладывание путей
+        /// Прокладывание путей
         /// </summary>
         Mapping,
         /// <summary>
@@ -34,7 +34,11 @@
         /// <summary>
         /// Измерение расстояниямежду точками
         /// </summary>
-        DistanceMeasurement
+        DistanceMeasurement,
+        /// <summary>
+        /// Информация о выбранном объекте
+        /// </summary>
+        Information
     }
 
     public enum MappingMode
