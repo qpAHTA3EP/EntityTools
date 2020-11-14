@@ -429,9 +429,15 @@ namespace EntityCore.Quester.Conditions
         #region Вспомогательные методы
         internal bool ValidateEntity(Entity e)
         {
+#if false
             return e != null && e.IsValid
-                //&& e.Critter.IsValid  <- Некоторые Entity, например игроки, имеют априори невалидный Critter
+        //&& e.Critter.IsValid  <- Некоторые Entity, например игроки, имеют априори невалидный Critter
+        && checkEntity(e); 
+#else
+            return e != null && e.IsValid
+                && (e.Character.IsValid || e.Critter.IsValid || e.Player.IsValid)
                 && checkEntity(e);
+#endif
         }
 
         private bool internal_CheckEntity_Initializer(Entity e)
