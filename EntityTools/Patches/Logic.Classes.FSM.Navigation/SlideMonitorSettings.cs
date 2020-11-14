@@ -30,9 +30,10 @@ namespace EntityTools.Settings
         private SlideMonitorState state = SlideMonitorState.Disabled;
 
         /// <summary>
-        /// Интервал проверки залипания умений (милисекунд)
+        /// Период обновления расстояния до целевой путевой точки
         /// </summary>
         [Bindable(true)]
+        [Description("Период обновления расстояния до целевой путевой точки")]
         public int Timeout
         {
             get => timeout;
@@ -48,24 +49,49 @@ namespace EntityTools.Settings
         //[NonSerialized]
         private int timeout = 250;
 
-
         /// <summary>
-        /// Интервал проверки залипания умений (милисекунд)
+        /// Расстояние до целевой путевой точки при 'скольжении' (на лодке или ледяной поверхности)
         /// </summary>
         [Bindable(true)]
-        public int Filter
+        [Description("Расстояние до целевой путевой точки при 'скольжении' (на лодке или ледяной поверхности)")]
+        public int BoatFilter
         {
-            get => filter;
+            get => boatFilter;
             set
             {
-                if (filter != value)
+                if (boatFilter != value)
                 {
-                    filter = Math.Max(value, 40);
-                    NotifyPropertyChanged(nameof(Filter));
+                    boatFilter = Math.Max(value, 40);
+                    NotifyPropertyChanged(nameof(BoatFilter));
                 }
             }
         }
         //[NonSerialized]
-        private int filter = 60;
+        private int boatFilter = 60;
+
+        /// <summary>
+        /// Расстояние до целевой путевой точки при 'скольжении' (на лодке или ледяной поверхности)
+        /// </summary>
+        [Bindable(true)]
+        [Description("Расстояние до целевой путевой точки при езде на 'Адской машине'")]
+        public int InfernalMachineFilter
+        {
+            get => infernalMachineFilter;
+            set
+            {
+                if (infernalMachineFilter != value)
+                {
+                    infernalMachineFilter = Math.Max(value, 40);
+                    NotifyPropertyChanged(nameof(InfernalMachineFilter));
+                }
+            }
+        }
+        //[NonSerialized]
+        private int infernalMachineFilter = 400;
+
+        public override string ToString()
+        {
+            return state.ToString();
+        }
     }
 }
