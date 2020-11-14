@@ -14,15 +14,20 @@ namespace EntityTools.Patches.Navmesh
     {
         internal Patch_Astral_Logic_Navmesh_GetPath()
         {
-            MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("getPath", ReflectionHelper.DefaultFlags);
-            if (mi != null)
+            if (NeedInjecttion)
             {
-                methodToReplace = mi;
-            }
-            else throw new Exception("Patch_Astral_Logic_Navmesh_GetPath: fail to initialize 'methodToReplace'");
+                MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("getPath", ReflectionHelper.DefaultFlags);
+                if (mi != null)
+                {
+                    methodToReplace = mi;
+                }
+                else throw new Exception("Patch_Astral_Logic_Navmesh_GetPath: fail to initialize 'methodToReplace'");
 
-            methodToInject = GetType().GetMethod(nameof(GetPath), ReflectionHelper.DefaultFlags, null, new Type[]{ typeof(Graph), typeof(Vector3), typeof(Vector3)}, null);
+                methodToInject = GetType().GetMethod(nameof(GetPath), ReflectionHelper.DefaultFlags, null, new Type[] { typeof(Graph), typeof(Vector3), typeof(Vector3) }, null);
+            }
         }
+
+        public sealed override bool NeedInjecttion => EntityTools.Config.Patches.Navigation;
 
 #if PATCH_LOG
         private static StringBuilder stringBuilder = new StringBuilder();
@@ -68,7 +73,7 @@ namespace EntityTools.Patches.Navmesh
                 graph.ClosestNodes(start.X, start.Y, start.Z, out double dist1, out Node startNode,
                     end.X, end.Y, end.Z, out double dist2, out Node endNode);
 
-                GetPathAndCorrect(graph, startNode, endNode, ref waypoints, start);
+                GetPathAndCorrect(graph, startNode, start, endNode, end, ref waypoints);
             }
             return waypoints;
         }
@@ -117,83 +122,86 @@ namespace EntityTools.Patches.Navmesh
             return waypoints.Count > 1;
         }
 
-        internal static bool GetPathAndCorrect(Graph graph, Node startNode, Node endNode, ref List<Vector3> waypoints, Vector3 from)
+        internal static bool GetPathAndCorrect(Graph graph, Node startNode, Vector3 start, Node endNode, Vector3 end,
+            ref List<Vector3> waypoints)
         {
             if (waypoints is null)
                 waypoints = new List<Vector3>();
-            if (graph != null)
-            {
-                AStar.AStar astar = new AStar.AStar(graph);
+            if (ReferenceEquals(startNode, endNode) || graph is null)
+                return false;
+
+            AStar.AStar astar = new AStar.AStar(graph);
 
 #if PATCH_LOG
                 stopwatch.Restart(); 
 #endif
-                astar.SearchPath(startNode, endNode);
+            bool searchResult = astar.SearchPath(startNode, endNode);
 #if PATCH_LOG
                 stopwatch.Stop(); 
 #endif
 
-                if (astar.PathFound)
+            if (!searchResult || !astar.PathFound) return false;
+
+            using (var wpe = astar.PathNodes.GetEnumerator())
+            {
+                if (wpe.MoveNext())
                 {
-
-                    using (var wpe = astar.PathNodes.GetEnumerator())
+                    var wp0 = wpe.Current;
+                    if (wpe.MoveNext())
                     {
-                        if (wpe.MoveNext())
+                        var wp1 = wpe.Current;
+                        if(start!= null && start.IsValid)
                         {
-                            var wp0 = wpe.Current;
-                            if (wpe.MoveNext())
+                            var pos0 = wp0.Position;
+                            var pos1 = wp1.Position;
+
+                            // найденный путь содержит не менее 2 вершин
+                            // проверяем направления и корректируем "возврат"
+                            double x0 = pos0.X - start.X,
+                                y0 = pos0.Y - start.Y,
+                                z0 = pos0.Z - start.Z,
+                                x1 = pos1.X - start.X,
+                                y1 = pos1.Y - start.Y,
+                                z1 = pos1.Z - start.Z,
+                                d0 = x0 * x0 + y0 * y0 + z0 * z0, 
+                                d1 = x1 * x1 + y1 * y1 + z1 * z1;
+
+                            // Вычисляем косинус угла между векторами (pos -> wp0) и (pos -> wp1)
+                            // из формулы скалярного произведения векторов
+                            double cos = (x0 * x1 + y0 * y1 + z0 * z1) / Math.Sqrt(d0 * d1);
+
+                            if (cos > 0 /*|| d1 > d0 * 1.21*/ || (z1 > 0 && z1 * z1 / d1 > 0.25))
                             {
-                                var wp1 = wpe.Current;
-                                if(from!= null && from.IsValid)
-                                {
-                                    var pos0 = wp0.Position;
-                                    var pos1 = wp1.Position;
-
-                                    // найденный путь содержит не менее 2 вершин
-                                    // проверяем направления и корректируем "возврат"
-                                    double x0 = pos0.X - from.X,
-                                           y0 = pos0.Y - from.Y,
-                                           z0 = pos0.Z - from.Z,
-                                           x1 = pos1.X - from.X,
-                                           y1 = pos1.Y - from.Y,
-                                           z1 = pos1.Z - from.Z,
-                                           d0 = x0 * x0 + y0 * y0 + z0 * z0, //
-                                           d1 = x1 * x1 + y1 * y1 + z1 * z1;
-
-                                    double cos = (x0 * x1 + y0 * y1 + z0 * z1) / Math.Sqrt(d0 * d1);
-
-                                    if (cos > 0 /*|| d1 > d0 * 1.21*/ || (z1 > 0 && z1 * z1 / d1 > 0.25))
-                                    {
-                                        // угол между векторами (from -> wp0) и (from -> wp1) меньше 90 градусов,
-                                        // либо расстояние до обеих точек различается более чем на 10%,
-                                        // крутизна угла на wp1 больше 30 град. к горизонту Oxy (z1 *z1 / d1 определяет квадрат синус угла между вектором (from -> wp1) и его проектцией на Oxy)
-                                        // поэтому добавляем в путь обе точки
-                                        waypoints.Add(wp0.Position);
-                                        waypoints.Add(wp1.Position);
-                                    }
-                                    else 
-                                    {
-                                        // угол между направлениями из точки from на точки wp0 и wp1
-                                        // больше 90 градусов, поэтому точку wp0 нужно "пропустить" (чтобы не возвращаться "назад")
-                                        waypoints.Add(wp1.Position);
-                                    }
-                                }
-                                else
-                                {
-                                    waypoints.Add(wp0.Position);
-                                    waypoints.Add(wp1.Position);
-                                }
-
-                                while (wpe.MoveNext())
-                                {
-                                    waypoints.Add(wpe.Current.Position);
-                                }
-                            }
-                            else if(wp0 != null)
+                                // угол между векторами (from -> wp0) и (from -> wp1) меньше 90 градусов,
+                                // либо расстояние до обеих точек различается более чем на 10%,
+                                // крутизна угла на wp1 больше 30 град. к горизонту Oxy (z1 *z1 / d1 определяет квадрат синуса угла между вектором (from -> wp1) и его проектцией на Oxy)
+                                // поэтому добавляем в путь обе точки
                                 waypoints.Add(wp0.Position);
+                                waypoints.Add(wp1.Position);
+                            }
+                            else 
+                            {
+                                // угол между направлениями из точки from на точки wp0 и wp1
+                                // больше 90 градусов, поэтому точку wp0 нужно "пропустить" (чтобы не возвращаться "назад")
+                                waypoints.Add(wp1.Position);
+                            }
+                        }
+                        else
+                        {
+                            waypoints.Add(wp0.Position);
+                            waypoints.Add(wp1.Position);
+                        }
+
+                        while (wpe.MoveNext())
+                        {
+                            waypoints.Add(wpe.Current.Position);
                         }
                     }
-
+                    else if(wp0 != null)
+                        waypoints.Add(wp0.Position);
+                }
+            }
+            waypoints.Add(end);
 #if PATCH_LOG
                     if (waypoints.Count == 0)
                     {
@@ -206,10 +214,6 @@ namespace EntityTools.Patches.Navmesh
                         ETLogger.WriteLine(LogType.Debug, stringBuilder.ToString());
                     } 
 #endif
-
-                }
-
-            }
             return waypoints.Count > 1;
         }
     }

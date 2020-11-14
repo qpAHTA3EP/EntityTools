@@ -13,16 +13,20 @@ namespace EntityTools.Patches.Navmesh
     {
         internal Patch_Astral_Logic_Navmesh_TotalDistance()
         {
-            MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("TotalDistance", ReflectionHelper.DefaultFlags);
-            if (mi != null)
+            if (NeedInjecttion)
             {
-                methodToReplace = mi;
-            }
-            else throw new Exception("Patch_Astral_Logic_Navmesh_TotalDistance: fail to initialize 'methodToReplace'");
+                MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("TotalDistance", ReflectionHelper.DefaultFlags);
+                if (mi != null)
+                {
+                    methodToReplace = mi;
+                }
+                else throw new Exception("Patch_Astral_Logic_Navmesh_TotalDistance: fail to initialize 'methodToReplace'");
 
-            methodToInject = GetType().GetMethod(nameof(TotalDistance), ReflectionHelper.DefaultFlags);
+                methodToInject = GetType().GetMethod(nameof(TotalDistance), ReflectionHelper.DefaultFlags);
+            }
         }
 
+        public sealed override bool NeedInjecttion => EntityTools.Config.Patches.Navigation;
 
 #if false
     Astral.Logic.Navmesh

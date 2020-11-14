@@ -17,16 +17,20 @@ namespace EntityTools.Patches.Navmesh
 
         internal Patch_Astral_Logic_Navmesh_DrawRoad()
         {
-            MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("DrawRoad", ReflectionHelper.DefaultFlags);
-            if (mi != null)
+            if (NeedInjecttion)
             {
-                methodToReplace = mi;
-            }
-            else throw new Exception("Patch_Astral_Logic_Navmesh_DrawRoad: fail to initialize 'methodToReplace'");
+                MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("DrawRoad", ReflectionHelper.DefaultFlags);
+                if (mi != null)
+                {
+                    methodToReplace = mi;
+                }
+                else throw new Exception("Patch_Astral_Logic_Navmesh_DrawRoad: fail to initialize 'methodToReplace'");
 
-            methodToInject = GetType().GetMethod(nameof(DrawRoad), ReflectionHelper.DefaultFlags, null, new Type[]{ typeof(List<Vector3>), typeof(GraphicsNW) }, null);
+                methodToInject = GetType().GetMethod(nameof(DrawRoad), ReflectionHelper.DefaultFlags, null, new Type[] { typeof(List<Vector3>), typeof(GraphicsNW) }, null);
+            }
         }
 
+        public sealed override bool NeedInjecttion => EntityTools.Config.Mapper.Patch;
 
 #if false
     Astral.Logic.Navmesh

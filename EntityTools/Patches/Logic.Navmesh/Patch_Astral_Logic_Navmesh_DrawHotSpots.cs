@@ -18,16 +18,20 @@ namespace EntityTools.Patches.Navmesh
 
         internal Patch_Astral_Logic_Navmesh_DrawHotSpots()
         {
-            MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("DrawHotSpots", ReflectionHelper.DefaultFlags);
-            if (mi != null)
+            if (NeedInjecttion)
             {
-                methodToReplace = mi;
-            }
-            else throw new Exception("Patch_Astral_Logic_Navmesh_DrawHotSpots: fail to initialize 'methodToReplace'");
+                MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("DrawHotSpots", ReflectionHelper.DefaultFlags);
+                if (mi != null)
+                {
+                    methodToReplace = mi;
+                }
+                else throw new Exception("Patch_Astral_Logic_Navmesh_DrawHotSpots: fail to initialize 'methodToReplace'");
 
-            methodToInject = GetType().GetMethod(nameof(DrawHotSpots), ReflectionHelper.DefaultFlags);
+                methodToInject = GetType().GetMethod(nameof(DrawHotSpots), ReflectionHelper.DefaultFlags);
+            }
         }
 
+        public sealed override bool NeedInjecttion => EntityTools.Config.Mapper.Patch;
 
 #if false
 public static void DrawHotSpots(List<Vector3> hotspots, GraphicsNW graph)

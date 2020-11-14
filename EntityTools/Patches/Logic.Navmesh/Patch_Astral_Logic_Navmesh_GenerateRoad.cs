@@ -16,15 +16,20 @@ namespace EntityTools.Patches.Navmesh
     {
         internal Patch_Astral_Logic_Navmesh_GenerateRoad()
         {
-            MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("GenerateRoad", ReflectionHelper.DefaultFlags);
-            if (mi != null)
+            if (NeedInjecttion)
             {
-                methodToReplace = mi;
-            }
-            else throw new Exception("Patch_Astral_Logic_Navmesh_GenerateRoad: fail to initialize 'methodToReplace'");
+                MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("GenerateRoad", ReflectionHelper.DefaultFlags);
+                if (mi != null)
+                {
+                    methodToReplace = mi;
+                }
+                else throw new Exception("Patch_Astral_Logic_Navmesh_GenerateRoad: fail to initialize 'methodToReplace'");
 
-            methodToInject = GetType().GetMethod(nameof(GenerateRoad), ReflectionHelper.DefaultFlags);
+                methodToInject = GetType().GetMethod(nameof(GenerateRoad), ReflectionHelper.DefaultFlags);
+            }
         }
+
+        public sealed override bool NeedInjecttion => EntityTools.Config.Patches.Navigation;
 
 #if PATCH_LOG
         private static StringBuilder stringBuilder = new StringBuilder();
@@ -180,11 +185,10 @@ public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool al
                                     graph.ClosestNodes(start.X, start.Y, start.Z, out dist1, out startNode,
                                         end.X, end.Y, end.Z, out dist2, out endNode);
 
-                                    if (dist1 < 130.0)
+                                    if (dist1 < 130.0 && !ReferenceEquals(startNode, endNode))
                                     {
                                         road.Type = Road.RoadGenType.StandardGraph;
-                                        if(Patch_Astral_Logic_Navmesh_GetPath.GetPathAndCorrect(graph, startNode, endNode, ref waypoints, start))
-                                            waypoints.Add(end.Clone());
+                                        Patch_Astral_Logic_Navmesh_GetPath.GetPathAndCorrect(graph, startNode, start, endNode, end, ref waypoints);
                                     }
                                 }
 #if PATCH_LOG
@@ -223,8 +227,7 @@ public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool al
                                 {
                                     goldGraph.ClosestNodes(start.X, start.Y, start.Z, out double _, out Node startNode,
                                                            end.X, end.Y, end.Z, out _, out Node endNode);
-                                    if(Patch_Astral_Logic_Navmesh_GetPath.GetPathAndCorrect(goldGraph, startNode, endNode, ref waypoints, start))
-                                        waypoints.Add(end.Clone());
+                                    Patch_Astral_Logic_Navmesh_GetPath.GetPathAndCorrect(goldGraph, startNode, start, endNode, end, ref waypoints);
                                 }
 #if PATCH_LOG
                                 goldenPathSearch_Time = stopwatch.ElapsedTicks - goldenPathSearch_Time;
@@ -242,10 +245,16 @@ public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool al
                                 if (PathFinding.CheckDirection(start, waypoints[0], ref vector))
                                 {
                                     List<Vector3> path = PathFinding.GetPath(start, waypoints[0], true);
+#if false
                                     road.Waypoints.AddRange(path);
                                 }
 
-                                road.Waypoints.AddRange(waypoints);
+                                road.Waypoints.AddRange(waypoints);  
+#else
+                                    waypoints.InsertRange(0, path);
+                                }
+                                road.Waypoints = waypoints;
+#endif
 #if PATCH_LOG
                                 partialPathSearch_Time = stopwatch.ElapsedTicks - partialPathSearch_Time;
                                 stringBuilder.Append("Search PartialPath from {").Append(start).Append("} => {").Append(waypoints[0]).AppendLine("}")
