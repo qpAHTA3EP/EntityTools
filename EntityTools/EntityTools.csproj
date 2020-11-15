@@ -206,7 +206,6 @@
     <Compile Include="Patches\Logic.Classes.FSM.Navigation\CharacterEx.cs" />
     <Compile Include="Patches\Logic.Classes.FSM.Navigation\EntityEx.cs" />
     <Compile Include="Patches\Logic.Classes.FSM.Navigation\Enums.cs" />
-    <Compile Include="Patches\Logic.Classes.FSM.Navigation\HarmonyPatch_Astral_Logic_Classes_FSM_Navigation_SetNextWaypoint.cs" />
     <Compile Include="Patches\Logic.Classes.FSM.Navigation\MountCostumeDef.cs" />
     <Compile Include="Patches\Logic.Classes.FSM.Navigation\SlideMonitorSettings.cs" />
     <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_TotalDistance.cs" />
