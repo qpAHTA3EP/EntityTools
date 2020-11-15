@@ -259,9 +259,9 @@ namespace EntityTools.Settings
             get
             {
                 var screenSize = Screen.PrimaryScreen.Bounds.Size;
-                if (_size.Width < 10 || _size.Width > screenSize.Width)
+                if (_size.Width < 200 || _size.Width > screenSize.Width)
                     _size.Width = 406;
-                if (_size.Height < 10 || _size.Height > screenSize.Height)
+                if (_size.Height < 200 || _size.Height > screenSize.Height)
                     _size.Height = 406;
                 return _size;
             }
@@ -270,7 +270,15 @@ namespace EntityTools.Settings
             {
                 if (_size != value)
                 {
-                    _size = value;
+                    if (value.Width < 200)
+                    {
+                        if (value.Height < 200)
+                            _size = new Size(200, 200);
+                        else _size = new Size(200, value.Height);
+                    }
+                    else if(value.Height < 200)
+                        _size = new Size(value.Width, 200);
+                    else _size = value;
                     NotifyPropertyChanged(nameof(Size));
                 }
             }
