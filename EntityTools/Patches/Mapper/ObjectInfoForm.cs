@@ -1,12 +1,13 @@
 ﻿using DevExpress.XtraEditors;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace EntityTools.Patches.Mapper
 {
     public partial class ObjectInfoForm : XtraForm
     {
-        //MenuItem miDetail;
+        readonly List<ObjectInfoForm> childForms = new List<ObjectInfoForm>();
 
         public ObjectInfoForm(object obj = null)
         {
@@ -18,12 +19,6 @@ namespace EntityTools.Patches.Mapper
             }
         }
 
-        public sealed override string Text
-        {
-            get => base.Text;
-            set => base.Text = value;
-        }
-
         public void Show(object obj)
         {
             pgObjectInfos.SelectedObject = obj;
@@ -32,19 +27,31 @@ namespace EntityTools.Patches.Mapper
             Show();
         }
 
+        public sealed override string Text
+        {
+            get => base.Text;
+            set => base.Text = value;
+        }
+
         private void handler_ItemDetail(object sender, EventArgs e)
         {
             var obj = pgObjectInfos.SelectedGridItem.Value;
             if (obj != null && obj.GetType().IsClass)
             {
                 var form = new ObjectInfoForm(obj);
+                childForms.Add(form);
                 form.Show();
             }
         }
 
-        private void pgObjectInfos_SelectedGridItemChanged(object sender, SelectedGridItemChangedEventArgs e)
+        private void handler_SelectedGridItemChanged(object sender, SelectedGridItemChangedEventArgs e)
         {
             miDetail.Enabled = e.NewSelection.Value?.GetType().IsClass == true;
+        }
+
+        private void handler_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            childForms.ForEach(f => f.Close());
         }
     }
 }

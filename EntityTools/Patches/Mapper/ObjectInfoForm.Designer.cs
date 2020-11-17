@@ -46,7 +46,7 @@
             this.pgObjectInfos.Size = new System.Drawing.Size(332, 310);
             this.pgObjectInfos.TabIndex = 0;
             this.pgObjectInfos.ToolbarVisible = false;
-            this.pgObjectInfos.SelectedGridItemChanged += new System.Windows.Forms.SelectedGridItemChangedEventHandler(this.pgObjectInfos_SelectedGridItemChanged);
+            this.pgObjectInfos.SelectedGridItemChanged += new System.Windows.Forms.SelectedGridItemChangedEventHandler(this.handler_SelectedGridItemChanged);
             // 
             // contextMenu
             // 
@@ -78,6 +78,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "ObjectInfoForm";
             this.TopMost = true;
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.handler_FormClosed);
             this.contextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
