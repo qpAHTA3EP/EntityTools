@@ -19,6 +19,7 @@ using EntityTools;
 using EntityTools.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using EntityCore.Forms;
 using EntityTools.Patches.Mapper;
 
 namespace EntityCore.Quester.Action
@@ -545,7 +546,14 @@ namespace EntityCore.Quester.Action
             label = string.Empty;
         }
 
-        public void GatherInfos() { }
+        public void GatherInfos()
+        {
+            if (@this.HotSpots.Count == 0)
+                @this.HotSpots.Add(EntityManager.LocalPlayer.Location.Clone());
+
+            if (string.IsNullOrEmpty(@this._entityId))
+                EntitySelectForm.GUIRequest(ref @this._entityId, ref @this._entityIdType, ref @this._entityNameType);
+        }
 
         public void OnMapDraw(GraphicsNW graph)
         {
