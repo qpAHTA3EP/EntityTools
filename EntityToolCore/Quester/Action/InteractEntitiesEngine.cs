@@ -20,27 +20,25 @@ using System.Drawing;
 using static Astral.Quester.Classes.Action;
 using EntityTools;
 using System.Reflection;
+using EntityCore.Forms;
 
 namespace EntityCore.Quester.Action
 {
-    public class InteractEntitiesEngine : IEntityInfos
-#if CORE_INTERFACES
-        , IQuesterActionEngine
-#endif
+    public class InteractEntitiesEngine : IEntityInfos, IQuesterActionEngine
     {
-        InteractEntities @this = null;
+        InteractEntities @this;
 
         #region Данные ядра
-        private Func<List<CustomRegion>> getCustomRegions = null;
-        private Predicate<Entity> checkEntity = null;
+        private Func<List<CustomRegion>> GetCustomRegions;
+        private Predicate<Entity> CheckEntity;
 
-        private TempBlackList<uint> blackList = new TempBlackList<uint>();
+        private readonly TempBlackList<uint> blackList = new TempBlackList<uint>();
         private bool combat;
         private bool moved;
-        private Entity target = null;
+        private Entity target;
         private Vector3 initialPos = new Vector3();
         private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
-        private List<CustomRegion> customRegions = null;
+        private List<CustomRegion> customRegions;
         private string label = string.Empty; 
         #endregion
 
@@ -52,270 +50,36 @@ namespace EntityCore.Quester.Action
 #endif
             @this.PropertyChanged += PropertyChanged;
 
-            checkEntity = internal_CheckEntity_Initializer;
-            getCustomRegions = internal_GetCustomRegion_Initializer;
+            CheckEntity = internal_CheckEntity_Initializer;
+            GetCustomRegions = internal_GetCustomRegion_Initializer;
 
             ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {ActionLabel}");
         }
 
-        public void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (object.ReferenceEquals(sender, @this))
+            if (!ReferenceEquals(sender, @this)) return;
+            switch (e.PropertyName)
             {
-                switch (e.PropertyName)
-                {
-                    case "EntityID":
-                        checkEntity = internal_CheckEntity_Initializer;//EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
-                        label = string.Empty;
-                        break;
-                    case "EntityIdType":
-                        checkEntity = internal_CheckEntity_Initializer; //EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
-                        break;
-                    case "EntityNameType":
-                        checkEntity = internal_CheckEntity_Initializer; //EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
-                        break;
-                    case "CustomRegionNames":
-                        getCustomRegions = internal_GetCustomRegion_Initializer; //CustomRegionExtentions.GetCustomRegions(@this._customRegionNames);
-                        break;
-                }
-
-                target = null;
-                timeout.ChangeTime(0);
+                case "EntityID":
+                    CheckEntity = internal_CheckEntity_Initializer;//EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                    label = string.Empty;
+                    break;
+                case "EntityIdType":
+                    CheckEntity = internal_CheckEntity_Initializer; //EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                    break;
+                case "EntityNameType":
+                    CheckEntity = internal_CheckEntity_Initializer; //EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                    break;
+                case "CustomRegionNames":
+                    GetCustomRegions = internal_GetCustomRegion_Initializer; //CustomRegionExtentions.GetCustomRegions(@this._customRegionNames);
+                    break;
             }
-        }
 
-#if CORE_DELEGATES
-        #region IQuesterActionEngine
-        public bool NeedToRun
-        {
-            get
-            {
-                if (@this.CustomRegionNames != null && (customRegions == null || customRegions.Count != @this.CustomRegionNames.Count))
-                    customRegions = CustomRegionExtentions.GetCustomRegions(@this.CustomRegionNames);
-
-                if (checkEntity == null && !string.IsNullOrEmpty(@this.EntityID))
-                {
-#if DEBUG
-                    EntityToolsLogger.WriteLine(Logger.LogType.Debug, "InteractEntitiesEngine::NeedToRun: Comparer is null. Initialize.");
-#endif
-                    checkEntity = EntityToPatternComparer.Get(@this.EntityID, @this.EntityIdType, @this.EntityNameType);
-                }
-
-                Entity closestEntity = null;
-                if (timeout.IsTimedOut/* || (target != null && (!Validate(target) || (HealthCheck && target.IsDead)))*/)
-                {
-                    closestEntity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
-                                                                   @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, customRegions, IsNotInBlackList);
-#if DEBUG_INTERACTENTITIES
-                    if (closestEntity != null && closestEntity.IsValid)
-                        EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::NeedToRun: Found Entity[{closestEntity.ContainerId:X8}] (closest)");
-#endif
-                    timeout.ChangeTime(@this.SearchTimeInterval);
-                }
-
-                if (!@this._holdTargetEntity || !ValidateEntity(target) || (@this._healthCheck && target.IsDead))
-                    target = closestEntity;
-
-                if (ValidateEntity(target) && !(@this._healthCheck && target.IsDead))
-                {
-                    if (@this.IgnoreCombat)
-                    {
-                        if (target.Location.Distance3DFromPlayer > @this._combatDistance)
-                        {
-                            Astral.Quester.API.IgnoreCombat = true;
-                            return false;
-                        }
-                        else
-                        {
-                            Astral.Logic.NW.Attackers.List.Clear();
-                            Astral.Quester.API.IgnoreCombat = false;
-                        }
-                    }
-                    initialPos = target.Location/*.Clone()*/;
-                    return true;
-                }
-                else if (@this._ignoreCombat && ValidateEntity(closestEntity)
-                         && !(@this._healthCheck && closestEntity.IsDead)
-                         && (closestEntity.Location.Distance3DFromPlayer <= @this._combatDistance))
-                {
-                    Astral.Logic.NW.Attackers.List.Clear();
-                    Astral.Quester.API.IgnoreCombat = false;
-                }
-                else if (@this._ignoreCombat)
-                    Astral.Quester.API.IgnoreCombat = true;
-
-                return false;
-            }
-        }
-        public ActionResult Run()
-        {
-            try
-            {
-#if DEBUG && PROFILING
-                RunCount++;
-#endif
-                moved = false;
-                combat = false;
-#if DEBUG && DEBUG_INTERACTENTITIES
-                EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Approach Entity[{target.ContainerId:X8}] for interaction");
-#endif
-                if (Approach.EntityForInteraction(target, CheckCombat/*new Func<Approach.BreakInfos>(CheckCombat)*/))
-                {
-#if DEBUG && DEBUG_INTERACTENTITIES
-                    EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Interact Entity[{target.ContainerId:X8}]");
-#endif
-                    target.Interact();
-                    Thread.Sleep(@this._interactTime);
-                    Interact.WaitForInteraction();
-                    if (@this.Dialogs.Count > 0)
-                    {
-                        Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);
-                        while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count == 0)
-                        {
-                            if (timeout.IsTimedOut)
-                            {
-                                return ActionResult.Fail;
-                            }
-                            Thread.Sleep(100);
-                        }
-                        Thread.Sleep(500);
-                        foreach (string key in @this.Dialogs)
-                        {
-                            EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.SelectOptionByKey(key, "");
-                            Thread.Sleep(1000);
-                        }
-                    }
-                    EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
-                    return ActionResult.Completed;
-                }
-                if (@this._ignoreCombat && target.Location.Distance3DFromPlayer <= @this._combatDistance)
-                {
-#if DEBUG && DEBUG_INTERACTENTITIES
-                    EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Engage combat");
-#endif
-                    Astral.Quester.API.IgnoreCombat = false;
-                    return ActionResult.Running;
-                }
-                if (combat)
-                {
-#if DEBUG && DEBUG_INTERACTENTITIES
-                    EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Player in combat...");
-#endif
-                    return ActionResult.Running;
-                }
-                if (moved)
-                {
-#if DEBUG && DEBUG_INTERACTENTITIES
-                    EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"InteractEntitiesEngine::Run: Entity[{target.ContainerId:X8}] moved, skip...");
-#else
-                    EntityToolsLogger.WriteLine("Entity moved, skip...");
-#endif
-                    return ActionResult.Fail;
-                }
-                return ActionResult.Fail;
-            }
-            finally
-            {
-                if (@this._interactOnce || (@this._skipMoving && moved))
-                {
-                    PushToBlackList(target);
-
-                    target = new Entity(IntPtr.Zero);
-                }
-            }
-        }
-
-        public string ActionLabel
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(label))
-                    label = $"{@this.GetType().Name} [{@this._entityId}]";
-                return label;
-            }
-        }
-
-        public bool InternalConditions
-        {
-            get
-            {
-                return !string.IsNullOrEmpty(@this._entityId) || @this._entityNameType == EntityNameType.Empty;
-            }
-        }
-
-        public ActionValidity InternalValidity
-        {
-            get
-            {
-                if (!InternalConditions)
-                    return new ActionValidity($"'{nameof(@this.EntityID)}' property not valid.");
-                return new ActionValidity();
-            }
-        }
-
-        public bool UseHotSpots => true;
-
-        public Vector3 InternalDestination
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public Entity Target()
-        {
-            return target;
-        }
-
-        public bool TargetValidate()
-        {
-            return ValidateEntity(target);
-        }
-        public bool ValidateEntity(Entity e)
-        {
-            return e != null && e.IsValid && checkEntity?.Invoke(e) == true;
-        }
-
-        public void Reset()
-        {
-            combat = false;
-            moved = false;
             target = null;
-            initialPos = new Vector3();
             timeout.ChangeTime(0);
         }
 
-        public void GatherInfos()
-        {
-            //XtraMessageBox.Show("Target Entity and press ok.");
-            //Form editor = Application.OpenForms.Find<Astral.Quester.Forms.Editor>();
-            TargetSelectForm.TargetGuiRequest("Target Entity and press ok."/*, editor*/);
-            Entity betterEntityToInteract = Interact.GetBetterEntityToInteract();
-            if (betterEntityToInteract.IsValid)
-            {
-                if (@this._entityNameType == EntityNameType.NameUntranslated)
-                    @this._entityId = betterEntityToInteract.NameUntranslated;
-                else @this._entityId = betterEntityToInteract.InternalName;
-                if (@this.HotSpots.Count == 0)
-                    @this.HotSpots.Add(betterEntityToInteract.Location.Clone());
-            }
-            if (XtraMessageBox.Show(/*editor, */"Add a dialog ? (open the dialog window before)", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                Astral.Quester.UIEditors.Forms.DialogEdit.Show(@this.Dialogs);
-        }
-
-        public void InternalReset()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void OnMapDraw(GraphicsNW graph)
-        {
-            throw new NotImplementedException();
-        }
-        #endregion
-#endif
-#if CORE_INTERFACES
         public bool NeedToRun
         {
             get
@@ -324,7 +88,7 @@ namespace EntityCore.Quester.Action
                 if (timeout.IsTimedOut/* || (target != null && (!Validate(target) || (HealthCheck && target.IsDead)))*/)
                 {
                     closestEntity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
-                                                                   @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, getCustomRegions(), IsNotInBlackList);
+                                                                   @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, GetCustomRegions(), IsNotInBlackList);
 #if DEBUG_INTERACTENTITIES
                     if (closestEntity != null && closestEntity.IsValid)
                         ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}::{MethodBase.GetCurrentMethod().Name}: Found Entity[{closestEntity.ContainerId:X8}] (closest)");
@@ -345,18 +109,15 @@ namespace EntityCore.Quester.Action
                             Astral.Quester.API.IgnoreCombat = true;
                             return false;
                         }
-                        else
-                        {
-                            Astral.Logic.NW.Attackers.List.Clear();
-                            Astral.Quester.API.IgnoreCombat = false;
-                        }
+                        Astral.Logic.NW.Attackers.List.Clear();
+                        Astral.Quester.API.IgnoreCombat = false;
                     }
                     initialPos = target.Location/*.Clone()*/;
                     return true;
                 }
-                else if (@this._ignoreCombat && ValidateEntity(closestEntity)
-                         && !(@this._healthCheck && closestEntity.IsDead)
-                         && (closestEntity.Location.Distance3DFromPlayer <= @this._combatDistance))
+                if (@this._ignoreCombat && ValidateEntity(closestEntity)
+                    && !(@this._healthCheck && closestEntity.IsDead)
+                    && closestEntity.Location.Distance3DFromPlayer <= @this._combatDistance)
                 {
                     Astral.Logic.NW.Attackers.List.Clear();
                     Astral.Quester.API.IgnoreCombat = false;
@@ -380,7 +141,11 @@ namespace EntityCore.Quester.Action
 #if DEBUG && DEBUG_INTERACTENTITIES
                 ETLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Approach Entity[{target.ContainerId:X8}] for interaction");
 #endif
-                if (Approach.EntityForInteraction(target, CheckCombat/*new Func<Approach.BreakInfos>(CheckCombat)*/))
+                //TODO: Заменить EntityForInteraction собственной функцией перемещения и взаимодействия
+                if (target?.Location.Distance3DFromPlayer < @this._interactDistance
+                    //|| Approach.EntityForInteraction(target, CheckCombat/*new Func<Approach.BreakInfos>(CheckCombat)*/))
+                    || Approach.EntityByDistance(target, @this._interactDistance, CheckCombat))
+
                 {
 #if DEBUG && DEBUG_INTERACTENTITIES
                     ETLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Interact Entity[{target.ContainerId:X8}]");
@@ -390,10 +155,10 @@ namespace EntityCore.Quester.Action
                     Interact.WaitForInteraction();
                     if (@this.Dialogs.Count > 0)
                     {
-                        Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);
+                        Astral.Classes.Timeout timer = new Astral.Classes.Timeout(5000);
                         while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count == 0)
                         {
-                            if (timeout.IsTimedOut)
+                            if (timer.IsTimedOut)
                             {
                                 return ActionResult.Fail;
                             }
@@ -485,7 +250,7 @@ namespace EntityCore.Quester.Action
                 {
                     if (target.Location.Distance3DFromPlayer > @this._combatDistance)
                         return target.Location.Clone();
-                    else return EntityManager.LocalPlayer.Location.Clone();
+                    return EntityManager.LocalPlayer.Location.Clone();
                 }
                 return new Vector3();
             }
@@ -494,17 +259,25 @@ namespace EntityCore.Quester.Action
         public void InternalReset()
         {
             target = null;
-            checkEntity = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
-            getCustomRegions = internal_GetCustomRegion_Initializer;
-            label = String.Empty;
+            CheckEntity = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+            GetCustomRegions = internal_GetCustomRegion_Initializer;
+            label = string.Empty;
         }
-        public void GatherInfos() { }
+
+        public void GatherInfos()
+        {
+            if (@this.HotSpots.Count == 0)
+                @this.HotSpots.Add(EntityManager.LocalPlayer.Location.Clone());
+
+            if (string.IsNullOrEmpty(@this._entityId))
+                EntitySelectForm.GUIRequest(ref @this._entityId, ref @this._entityIdType, ref @this._entityNameType);
+        }
+
         public void OnMapDraw(GraphicsNW graph)
         {
             if (ValidateEntity(target))
                 graph.drawFillEllipse(target.Location, new Size(10, 10), Brushes.Beige);
         }
-#endif
 
         public bool EntityDiagnosticString(out string infoString)
         {
@@ -533,11 +306,11 @@ namespace EntityCore.Quester.Action
             // список всех Entity, удовлетворяющих условиям
 #if false
             LinkedList<Entity> entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
-                                                             @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, getCustomRegions(), IsNotInBlackList);
+                                                             @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, GetCustomRegions(), IsNotInBlackList);
 
 #else
             LinkedList<Entity> entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
-                                                             false, 0, 0, @this._regionCheck, getCustomRegions(), IsNotInBlackList);
+                                                             false, 0, 0, @this._regionCheck, GetCustomRegions(), IsNotInBlackList);
 #endif
             // Количество Entity, удовлетворяющих условиям
             if (entities != null)
@@ -547,7 +320,7 @@ namespace EntityCore.Quester.Action
 
             // Ближайшее Entity (найдено при вызове ie.NeedToRun, поэтому строка ниже закомментирована)
             target = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
-                                                    @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, getCustomRegions(), IsNotInBlackList);
+                                                    @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, GetCustomRegions(), IsNotInBlackList);
             if (target != null && target.IsValid)
             {
                 bool distOk = @this._reactionRange <= 0 || target.Location.Distance3DFromPlayer < @this._reactionRange;
@@ -586,11 +359,11 @@ namespace EntityCore.Quester.Action
 #if false
             return e != null && e.IsValid
                     //&& e.Critter.IsValid  <- Некоторые Entity, например игроки, имеют априори невалидный Critter
-                    && checkEntity(e); 
+                    && CheckEntity(e); 
 #else
             return e != null && e.IsValid
                     && (e.Character.IsValid || e.Critter.IsValid || e.Player.IsValid)
-                    && checkEntity(e);
+                    && CheckEntity(e);
 #endif
         }
 
@@ -603,8 +376,8 @@ namespace EntityCore.Quester.Action
 #if DEBUG
                 ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Comparer does not defined. Initialize.");
 #endif
-                checkEntity = predicate;
-                return e!= null && checkEntity(e);
+                CheckEntity = predicate;
+                return e!= null && CheckEntity(e);
             }
 #if DEBUG
             else ETLogger.WriteLine(LogType.Error, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Fail to initialize the Comparer.");
@@ -648,7 +421,7 @@ namespace EntityCore.Quester.Action
         {
             if (customRegions == null && @this._customRegionNames != null)
             {
-                getCustomRegions = internal_GetCustomRegion_Getter;
+                GetCustomRegions = internal_GetCustomRegion_Getter;
                 customRegions = CustomRegionExtentions.GetCustomRegions(@this._customRegionNames);
                 return customRegions;
             }

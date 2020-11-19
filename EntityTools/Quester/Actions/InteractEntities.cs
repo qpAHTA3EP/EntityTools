@@ -397,6 +397,26 @@ namespace EntityTools.Quester.Actions
         internal int _interactTime = 2000;
 
 #if DEVELOPER
+        [Category("Interaction")]
+        [Description("Interaction timeout (sec) if InteractitOnce flag is set")]
+#else
+        [Browsable(false)]
+#endif
+        public int InteractDistance
+        {
+            get => _interactDistance;
+            set
+            {
+                if (_interactDistance != value)
+                {
+                    _interactDistance = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractDistance)));
+                }
+            }
+        }
+        internal int _interactDistance = 60;
+
+#if DEVELOPER
         [Description("Answers in dialog while interact with Entity")]
         [Editor(typeof(DialogEditor), typeof(UITypeEditor))]
         [Category("Interaction")]
