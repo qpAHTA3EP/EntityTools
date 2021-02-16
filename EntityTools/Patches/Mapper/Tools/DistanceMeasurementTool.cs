@@ -49,7 +49,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     text = string.Concat("(x)", worldMouseX.ToString("N1"), "; (y)", worldMouseY.ToString("N1"), Environment.NewLine,
                             "Distance (2D): ", dist.ToString("N1"));
 
-                    MapperHelper.GetLableAlingment(startX, startY, worldMouseX, worldMouseY, out startAlignment, out textAlignment);
+                    MapperHelper.GetLabelAlignment(startX, startY, worldMouseX, worldMouseY, out startAlignment, out textAlignment);
                     handleMouseCursor = true;
                 }
             }
@@ -86,7 +86,7 @@ namespace EntityTools.Patches.Mapper.Tools
                         Patch_Astral_Logic_Navmesh_DrawRoad.DrawRoad(road.Waypoints, graphics, Pens.RoyalBlue, Brushes.RoyalBlue);
                 }
                 if (startAlignment == Alignment.None || endAlignment == Alignment.None)
-                    MapperHelper.GetLableAlingment(startX, startY, x, y, out Alignment startAlignment, out Alignment endAlignment);
+                    MapperHelper.GetLabelAlignment(startX, startY, x, y, out Alignment startAlignment, out Alignment endAlignment);
 
                 graphics.FillCircleCentered(Brushes.RoyalBlue, startX, startY, 8);
                 graphics.DrawText(startLable, startX, startY, startAlignment, Control.DefaultFont, Brushes.RoyalBlue);
@@ -174,7 +174,7 @@ namespace EntityTools.Patches.Mapper.Tools
                             endY = y;
                             endZ = z;
                             double dist2D = Point3D.DistanceBetween(startX, startY, startZ, endX, endY, endZ);
-                            MapperHelper.GetLableAlingment(startX, startY, endX, endY, out startAlignment, out endAlignment);
+                            MapperHelper.GetLabelAlignment(startX, startY, endX, endY, out startAlignment, out endAlignment);
 
                             double pathLen = 0;
                             DialogResult userAnswer = XtraMessageBox.Show("Generate road with Pathfinding?\n\r" +
@@ -183,7 +183,7 @@ namespace EntityTools.Patches.Mapper.Tools
                             if (userAnswer != DialogResult.Cancel)
                             {
                                 bool pathfinding = userAnswer == DialogResult.Yes;
-                                var fullGraph = AstralAccessors.Quester.Core.Meshes.Value;
+                                var fullGraph = AstralAccessors.Quester.Core.UsedMeshes;
                                 road = Patch_Astral_Logic_Navmesh_GenerateRoad.GenerateRoad(fullGraph, new Vector3((float)startX, (float)startY, (float)startZ), new Vector3((float)endX, (float)endY, (float)endZ), pathfinding);
                                 if (road?.Waypoints.Count > 0)
                                     pathLen = Patch_Astral_Logic_Navmesh_TotalDistance.TotalDistance(road.Waypoints);
@@ -212,7 +212,7 @@ namespace EntityTools.Patches.Mapper.Tools
                         endX = e.X;
                         endY = e.Y;
                         endZ = startZ;
-                        MapperHelper.GetLableAlingment(startX, startY, endX, endY, out startAlignment, out endAlignment);
+                        MapperHelper.GetLabelAlignment(startX, startY, endX, endY, out startAlignment, out endAlignment);
 
                         double dist = Point3D.DistanceBetween(startX, startY, startZ, endX, endY, endZ);
                         endLable = string.Concat("(x)", endX.ToString("N1"), "; (y)", endY.ToString("N1"), Environment.NewLine,

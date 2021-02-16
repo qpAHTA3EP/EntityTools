@@ -868,16 +868,16 @@ namespace EntityTools.Patches.Mapper
             this.barDockControlTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.barDockControlTop.Location = new System.Drawing.Point(0, 0);
             this.barDockControlTop.Manager = this.barManager;
-            this.barDockControlTop.Size = new System.Drawing.Size(398, 56);
+            this.barDockControlTop.Size = new System.Drawing.Size(401, 56);
             this.barDockControlTop.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
             // barDockControlBottom
             // 
             this.barDockControlBottom.CausesValidation = false;
             this.barDockControlBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.barDockControlBottom.Location = new System.Drawing.Point(0, 351);
+            this.barDockControlBottom.Location = new System.Drawing.Point(0, 364);
             this.barDockControlBottom.Manager = this.barManager;
-            this.barDockControlBottom.Size = new System.Drawing.Size(398, 28);
+            this.barDockControlBottom.Size = new System.Drawing.Size(401, 28);
             // 
             // barDockControlLeft
             // 
@@ -885,15 +885,15 @@ namespace EntityTools.Patches.Mapper
             this.barDockControlLeft.Dock = System.Windows.Forms.DockStyle.Left;
             this.barDockControlLeft.Location = new System.Drawing.Point(0, 56);
             this.barDockControlLeft.Manager = this.barManager;
-            this.barDockControlLeft.Size = new System.Drawing.Size(0, 295);
+            this.barDockControlLeft.Size = new System.Drawing.Size(0, 308);
             // 
             // barDockControlRight
             // 
             this.barDockControlRight.CausesValidation = false;
             this.barDockControlRight.Dock = System.Windows.Forms.DockStyle.Right;
-            this.barDockControlRight.Location = new System.Drawing.Point(398, 56);
+            this.barDockControlRight.Location = new System.Drawing.Point(401, 56);
             this.barDockControlRight.Manager = this.barManager;
-            this.barDockControlRight.Size = new System.Drawing.Size(0, 295);
+            this.barDockControlRight.Size = new System.Drawing.Size(0, 308);
             // 
             // menuImportMesh
             // 
@@ -993,7 +993,7 @@ namespace EntityTools.Patches.Mapper
             this.btnShowStatBar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Transparent;
             this.btnShowStatBar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
             this.btnShowStatBar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnShowStatBar.Location = new System.Drawing.Point(382, 363);
+            this.btnShowStatBar.Location = new System.Drawing.Point(384, 375);
             this.btnShowStatBar.Name = "btnShowStatBar";
             this.btnShowStatBar.Size = new System.Drawing.Size(16, 16);
             this.btnShowStatBar.TabIndex = 4;
@@ -1008,7 +1008,7 @@ namespace EntityTools.Patches.Mapper
             this.MapPicture.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MapPicture.Location = new System.Drawing.Point(0, 56);
             this.MapPicture.Name = "MapPicture";
-            this.MapPicture.Size = new System.Drawing.Size(398, 295);
+            this.MapPicture.Size = new System.Drawing.Size(401, 308);
             this.MapPicture.TabIndex = 9;
             this.MapPicture.TabStop = false;
             this.MapPicture.MouseClick += new System.Windows.Forms.MouseEventHandler(this.handler_MouseClick);
@@ -1025,13 +1025,12 @@ namespace EntityTools.Patches.Mapper
             this.panelSettings.Controls.Add(this.tabPaneSettings);
             this.panelSettings.Location = new System.Drawing.Point(0, 0);
             this.panelSettings.Name = "panelSettings";
-            this.panelSettings.Size = new System.Drawing.Size(398, 351);
+            this.panelSettings.Size = new System.Drawing.Size(401, 364);
             this.panelSettings.TabIndex = 14;
             this.panelSettings.Visible = false;
             // 
             // tabPaneSettings
             // 
-            this.tabPaneSettings.AllowCollapse = DevExpress.Utils.DefaultBoolean.Default;
             this.tabPaneSettings.Controls.Add(this.tabGeneral);
             this.tabPaneSettings.Controls.Add(this.tabCustomization);
             this.tabPaneSettings.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -1040,9 +1039,9 @@ namespace EntityTools.Patches.Mapper
             this.tabPaneSettings.Pages.AddRange(new DevExpress.XtraBars.Navigation.NavigationPageBase[] {
             this.tabGeneral,
             this.tabCustomization});
-            this.tabPaneSettings.RegularSize = new System.Drawing.Size(398, 351);
+            this.tabPaneSettings.RegularSize = new System.Drawing.Size(401, 364);
             this.tabPaneSettings.SelectedPage = this.tabCustomization;
-            this.tabPaneSettings.Size = new System.Drawing.Size(398, 351);
+            this.tabPaneSettings.Size = new System.Drawing.Size(401, 364);
             this.tabPaneSettings.TabIndex = 0;
             this.tabPaneSettings.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
@@ -1053,7 +1052,7 @@ namespace EntityTools.Patches.Mapper
             this.tabGeneral.Controls.Add(this.editLayerDepth);
             this.tabGeneral.Controls.Add(this.ckbChacheEnable);
             this.tabGeneral.Name = "tabGeneral";
-            this.tabGeneral.Size = new System.Drawing.Size(398, 324);
+            this.tabGeneral.Size = new System.Drawing.Size(415, 344);
             this.tabGeneral.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
             // lblLayerDepth
@@ -1064,6 +1063,7 @@ namespace EntityTools.Patches.Mapper
             this.lblLayerDepth.Size = new System.Drawing.Size(238, 13);
             this.lblLayerDepth.TabIndex = 3;
             this.lblLayerDepth.Text = "The limit of the layer\'s depth drawing on Mapper";
+            this.lblLayerDepth.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
             // editLayerDepth
             // 
@@ -1091,6 +1091,7 @@ namespace EntityTools.Patches.Mapper
             this.editLayerDepth.Size = new System.Drawing.Size(120, 20);
             this.editLayerDepth.TabIndex = 2;
             this.editLayerDepth.EditValueChanged += new System.EventHandler(this.handler_LayerDepth_Changed);
+            this.editLayerDepth.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
             // ckbChacheEnable
             // 
@@ -1100,13 +1101,14 @@ namespace EntityTools.Patches.Mapper
             this.ckbChacheEnable.Properties.Caption = "Caching of the visible meshes (will take effect in a new Mapper window)";
             this.ckbChacheEnable.Size = new System.Drawing.Size(374, 19);
             this.ckbChacheEnable.TabIndex = 0;
+            this.ckbChacheEnable.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
             // tabCustomization
             // 
             this.tabCustomization.Caption = "Customization";
             this.tabCustomization.Controls.Add(this.navBarCustomization);
             this.tabCustomization.Name = "tabCustomization";
-            this.tabCustomization.Size = new System.Drawing.Size(398, 324);
+            this.tabCustomization.Size = new System.Drawing.Size(401, 337);
             // 
             // navBarCustomization
             // 
@@ -1119,8 +1121,8 @@ namespace EntityTools.Patches.Mapper
             this.navGroupObjects});
             this.navBarCustomization.Location = new System.Drawing.Point(0, 0);
             this.navBarCustomization.Name = "navBarCustomization";
-            this.navBarCustomization.OptionsNavPane.ExpandedWidth = 398;
-            this.navBarCustomization.Size = new System.Drawing.Size(398, 324);
+            this.navBarCustomization.OptionsNavPane.ExpandedWidth = 401;
+            this.navBarCustomization.Size = new System.Drawing.Size(401, 337);
             this.navBarCustomization.TabIndex = 2;
             this.navBarCustomization.Text = "Customization";
             this.navBarCustomization.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
@@ -1129,7 +1131,6 @@ namespace EntityTools.Patches.Mapper
             // 
             this.navGroupMeshes.Caption = "Meshes";
             this.navGroupMeshes.ControlContainer = this.navGroupMeshesControlContainer;
-            this.navGroupMeshes.Expanded = true;
             this.navGroupMeshes.GroupClientHeight = 95;
             this.navGroupMeshes.GroupStyle = DevExpress.XtraNavBar.NavBarGroupStyle.ControlContainer;
             this.navGroupMeshes.Name = "navGroupMeshes";
@@ -1404,7 +1405,6 @@ namespace EntityTools.Patches.Mapper
             // 
             this.navGroupObjects.Caption = "Objects";
             this.navGroupObjects.ControlContainer = this.navGroupObjectsControlContainer;
-            this.navGroupObjects.Expanded = true;
             this.navGroupObjects.GroupClientHeight = 182;
             this.navGroupObjects.GroupStyle = DevExpress.XtraNavBar.NavBarGroupStyle.ControlContainer;
             this.navGroupObjects.Name = "navGroupObjects";
@@ -1413,19 +1413,19 @@ namespace EntityTools.Patches.Mapper
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(398, 379);
-            this.Controls.Add(this.panelSettings);
+            this.ClientSize = new System.Drawing.Size(401, 392);
             this.Controls.Add(this.btnShowStatBar);
+            this.Controls.Add(this.panelSettings);
             this.Controls.Add(this.MapPicture);
             this.Controls.Add(this.barDockControlLeft);
             this.Controls.Add(this.barDockControlRight);
             this.Controls.Add(this.barDockControlBottom);
             this.Controls.Add(this.barDockControlTop);
             this.DoubleBuffered = true;
+            this.IconOptions.ShowIcon = false;
             this.LookAndFeel.SkinName = "Office 2013 Dark Gray";
             this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.Name = "MapperFormExt";
-            this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Mapper(Extended)";
             this.TopMost = true;

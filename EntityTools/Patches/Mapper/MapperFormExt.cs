@@ -104,7 +104,7 @@ namespace EntityTools.Patches.Mapper
 
             BindingControls();
 
-            _mappingTool = new MappingTool(() => AstralAccessors.Quester.Core.Meshes.Value) {
+            _mappingTool = new MappingTool(() => AstralAccessors.Quester.Core.UsedMeshes) {
                 Linear = EntityTools.Config.Mapper.LinearPath,
                 ForceLink = EntityTools.Config.Mapper.ForceLinkingWaypoint
             };
@@ -340,7 +340,8 @@ namespace EntityTools.Patches.Mapper
 #endif
 
             EntityTools.Config.Mapper.MapperForm.Location = Location;
-            EntityTools.Config.Mapper.MapperForm.Size = Size;
+            if(WindowState == FormWindowState.Normal)
+                EntityTools.Config.Mapper.MapperForm.Size = Size;
 
             InterruptAllModifications();
 
@@ -527,7 +528,7 @@ namespace EntityTools.Patches.Mapper
 #endif
                         zoomStr = string.Concat(Zoom * 100, '%');
 
-                        int hash = AstralAccessors.Quester.Core.Meshes.Value.GetHashCode();
+                        int hash = AstralAccessors.Quester.Core.UsedMeshes?.GetHashCode() ?? 0;
                         if (_currentMapHash != hash)
                         {
                             var currentMapInfo = player.CurrentZoneMapInfo;
@@ -1054,16 +1055,16 @@ namespace EntityTools.Patches.Mapper
                         #region Отрисовка графики, связанной с выполняемой ролью 
                         try
                         {
-                            if (!AstralAccessors.Controllers.Roles.CurrentRole_OnMapDraw(_graphics))
+                            if (!AstralAccessors.Controllers.Roles.CurrentRole.OnMapDraw(_graphics))
                                 //lock (AstralAccessors.Quester.Core.Meshes.Value.SyncRoot) <- Блокировка графа есть в DrawMeshes(..)
                                 Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes.DrawMeshes(_graphics,
-                                    AstralAccessors.Quester.Core.Meshes);
+                                    AstralAccessors.Quester.Core.UsedMeshes);
                         }
                         catch (Exception ex)
                         {
                             ETLogger.WriteLine(LogType.Error, string.Concat(nameof(DrawMapper), ": Перехвачено исключение \n\r", ex), true);
                             Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes.DrawMeshes(_graphics,
-                                    AstralAccessors.Quester.Core.Meshes);
+                                    AstralAccessors.Quester.Core.UsedMeshes);
                         }
                         #endregion
 
@@ -1570,7 +1571,7 @@ namespace EntityTools.Patches.Mapper
             var currentProfile = Astral.Quester.API.CurrentProfile;
             bool useExternalMeshFile = currentProfile.UseExternalMeshFile && currentProfile.ExternalMeshFileName.Length >= 10;
             string externalMeshFileName = useExternalMeshFile ? Path.Combine(Path.GetDirectoryName(profileName), currentProfile.ExternalMeshFileName) : string.Empty;
-            Graph mesh = AstralAccessors.Quester.Core.Meshes;
+            Graph mesh = AstralAccessors.Quester.Core.UsedMeshes;
 
 #if true
             if (File.Exists(profileName))
@@ -1608,13 +1609,16 @@ namespace EntityTools.Patches.Mapper
                     else if(zipFile is null)
                         zipFile = ZipFile.Open(profileName, File.Exists(profileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create);
 
-                    bool succeeded;
-                    lock (mesh)
+                    bool succeeded = false;
+                    if (mesh?.NodesCount > 0)
                     {
-                        // удаляем мусор (скрытые вершины и ребра)
-                        mesh.RemoveUnpassable();
-                        // сохраняем меш в архивный файл
-                        succeeded = Patch_Astral_Quester_Core_Save.SaveMesh(zipFile, meshName, mesh); 
+                        lock (mesh)
+                        {
+                            // удаляем мусор (скрытые вершины и ребра)
+                            mesh.RemoveUnpassable();
+                            // сохраняем меш в архивный файл
+                            succeeded = Patch_Astral_Quester_Core_Save.SaveMesh(zipFile, meshName, mesh);
+                        } 
                     }
 
 #if false
@@ -1741,25 +1745,20 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         private void handler_ImportCurrentMapMeshesFromGame(object sender, ItemClickEventArgs e)
         {
-            //if (((Graph)CoreCurrentMapMeshes)?.NodesCollection.Count == 0
-            if (((Graph)AstralAccessors.Quester.Core.Meshes)?.Nodes.Count == 0
-                || XtraMessageBox.Show(this, "Are you sure to import game nodes ? All actual nodes must be delete !", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            Graph graph = AstralAccessors.Quester.Core.UsedMeshes;
+            if (graph != null
+                && (graph.NodesCount == 0
+                    || XtraMessageBox.Show(this, "Are you sure to import game nodes ? All actual nodes must be delete !", "", 
+                        MessageBoxButtons.YesNo) == DialogResult.Yes))
             {
                 handler_Mapping_Stop();
-#if AstralMapper
-                MapperStopDrawing?.Invoke(mapper); 
-#endif
-                //Graph graph = (Graph)CoreCurrentMapMeshes;
-                Graph graph = AstralAccessors.Quester.Core.Meshes;
+                ResetToolState();
                 lock (graph)
                 {
                     graph.Clear();
                     GoldenPath.GetCurrentMapGraph(graph);
                     //graphCache?.RegenCache(null);
                 }
-#if AstralMapper
-                MapperStartDrawing?.Invoke(mapper); 
-#endif
             }
         }
 
@@ -1784,6 +1783,7 @@ namespace EntityTools.Patches.Mapper
             if (openFileDialog.ShowDialog() == DialogResult.OK && File.Exists(openFileDialog.FileName))
             {
                 handler_Mapping_Stop();
+                ResetToolState();
                 try
                 {
                     using (ZipArchive profile = ZipFile.Open(openFileDialog.FileName, ZipArchiveMode.Read))
@@ -1907,18 +1907,14 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         private void handler_ClearCurrentMapMeshes(object sender, ItemClickEventArgs e)
         {
-            if (XtraMessageBox.Show(this, "Are you sure to delete all map nodes ?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            var graph = AstralAccessors.Quester.Core.UsedMeshes;
+            if (graph?.NodesCount > 0 && XtraMessageBox.Show(this, "Are you sure to delete all map nodes ?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 handler_Mapping_Stop();
                 ResetToolState();
-#if AstralMapper
-                MapperStopDrawing?.Invoke(mapper); 
-#endif
+
                 _currentMapHash = 0;
-                ((Graph)AstralAccessors.Quester.Core.Meshes).Clear();
-#if AstralMapper
-                MapperStartDrawing?.Invoke(mapper); 
-#endif
+                graph.Clear();
             }
         }
 
@@ -1927,41 +1923,45 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         private void handler_MeshesInfo(object sender, ItemClickEventArgs e)
         {
-            int correctNodeNum = 0;
-            int unpasNodeNum = 0;
-            var nodes = ((Graph)AstralAccessors.Quester.Core.Meshes).Nodes;
-            int correctArcNum = 0;
-            int disabledArcNum = 0;
-            int unpasArcNum = 0;
-            int totalArcCount = 0;
-
-            foreach (Node nd in nodes)
+            var graph = AstralAccessors.Quester.Core.UsedMeshes;
+            if (graph?.NodesCount > 0)
             {
-                if (!nd.Passable)
-                    unpasNodeNum++;
-                else correctNodeNum++;
-                foreach(Arc arc in nd.OutgoingArcs)
-                {
-                    totalArcCount++;
-                    if (arc.Disabled)
-                    {
-                        disabledArcNum++;
-                        if (!arc.Passable)
-                            unpasArcNum++;
-                    }
-                    else if (!arc.Passable)
-                        unpasArcNum++;
-                    else correctArcNum++;
-                }
-            }
+                int correctNodeNum = 0;
+                int unpasNodeNum = 0;
+                var nodes = graph.Nodes;
+                int correctArcNum = 0;
+                int disabledArcNum = 0;
+                int unpasArcNum = 0;
+                int totalArcCount = 0;
 
-            XtraMessageBox.Show($"Total nodes: {nodes.Count}\n\r" +
-                $"\tcorrect:\t{correctNodeNum}\n\r" +
-                $"\tunpassable:\t{unpasNodeNum}\n\r" +
-                $"Total arcs: {totalArcCount}\n\r" +
-                $"\tcorrect:\t{correctArcNum}\n\r" +
-                $"\tdisabled:\t{disabledArcNum}\n\r" +
-                $"\tunpassable:\t{unpasArcNum}\n\r");
+                foreach (Node nd in nodes)
+                {
+                    if (!nd.Passable)
+                        unpasNodeNum++;
+                    else correctNodeNum++;
+                    foreach (Arc arc in nd.OutgoingArcs)
+                    {
+                        totalArcCount++;
+                        if (arc.Disabled)
+                        {
+                            disabledArcNum++;
+                            if (!arc.Passable)
+                                unpasArcNum++;
+                        }
+                        else if (!arc.Passable)
+                            unpasArcNum++;
+                        else correctArcNum++;
+                    }
+                }
+
+                XtraMessageBox.Show($"Total nodes: {nodes.Count}\n\r" +
+                    $"\tcorrect:\t{correctNodeNum}\n\r" +
+                    $"\tunpassable:\t{unpasNodeNum}\n\r" +
+                    $"Total arcs: {totalArcCount}\n\r" +
+                    $"\tcorrect:\t{correctArcNum}\n\r" +
+                    $"\tdisabled:\t{disabledArcNum}\n\r" +
+                    $"\tunpassable:\t{unpasArcNum}\n\r"); 
+            }
         }
 
         /// <summary>
@@ -1969,88 +1969,91 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         private void handler_MeshesCompression(object sender, ItemClickEventArgs e)
         {
+            handler_Mapping_Stop();
             ResetToolState();
+            var graph = AstralAccessors.Quester.Core.UsedMeshes;
 
-            int correctNodeNum = 0;
-            int unpasNodeNum = 0;
-            var nodes = ((Graph)AstralAccessors.Quester.Core.Meshes).Nodes;
-            int totalNodeNum = nodes.Count;
-            int correctArcNum = 0;
-            int disabledArcNum = 0;
-            int unpasArcNum = 0;
-            int totalArcNum = 0;
-            foreach (Node nd in nodes)
+            if (graph?.NodesCount > 0)
             {
-                if (!nd.Passable)
-                    unpasNodeNum++;
-                else correctNodeNum++;
-
-                foreach (Arc arc in nd.OutgoingArcs)
-                {
-                    totalArcNum++;
-                    if (arc.Disabled)
-                    {
-                        disabledArcNum++;
-                        if (!arc.Passable)
-                            unpasArcNum++;
-                    }
-                    else if (!arc.Passable)
-                        unpasArcNum++;
-                    else correctArcNum++;
-                }
-            }
-
-            if (unpasNodeNum > 0 && ((Graph)AstralAccessors.Quester.Core.Meshes).RemoveUnpassable() > 0)
-            {
-                ResetToolState();
-
-                int correctNodeNumNew = 0;
-                int unpasNodeNumNew = 0;
-                int correctArcNumNew = 0;
-                int disabledArcNumNew = 0;
-                int unpasArcNumNew = 0;
-                int totalArcNumNew = 0;
-                nodes = ((Graph)AstralAccessors.Quester.Core.Meshes).Nodes;
-                foreach (Node nd in nodes)
+                int correctNodeNum = 0;
+                int unpasNodeNum = 0;
+                int totalNodeNum = graph.NodesCount;
+                int correctArcNum = 0;
+                int disabledArcNum = 0;
+                int unpasArcNum = 0;
+                int totalArcNum = 0;
+                foreach (Node nd in graph.Nodes)
                 {
                     if (!nd.Passable)
-                        unpasNodeNumNew++;
-                    else correctNodeNumNew++;
+                        unpasNodeNum++;
+                    else correctNodeNum++;
+
                     foreach (Arc arc in nd.OutgoingArcs)
                     {
-                        totalArcNumNew++;
+                        totalArcNum++;
                         if (arc.Disabled)
                         {
-                            disabledArcNumNew++;
+                            disabledArcNum++;
                             if (!arc.Passable)
-                                unpasArcNumNew++;
+                                unpasArcNum++;
                         }
                         else if (!arc.Passable)
-                            unpasArcNumNew++;
-                        else correctArcNumNew++;
+                            unpasArcNum++;
+                        else correctArcNum++;
                     }
                 }
 
+                if (unpasNodeNum > 0 && graph.RemoveUnpassable() > 0)
+                {
+                    ResetToolState();
 
-                XtraMessageBox.Show($"Total nodes: {totalNodeNum} => {nodes.Count}\n\r" +
-                    $"\tcorrect:\t{correctNodeNum} => {correctNodeNumNew}\n\r" +
-                    $"\tunpassable:\t{unpasNodeNum} => {unpasNodeNumNew}\n\r" +
-                    $"Total arcs: {totalArcNum} => {totalArcNumNew}\n\r" +
-                    $"\tcorrect:\t{correctArcNum} => {correctArcNumNew}\n\r" +
-                    $"\tdisabled:\t{disabledArcNum} => {disabledArcNumNew}\n\r" +
-                    $"\tunpassable:\t{unpasArcNum} => {unpasArcNumNew}\n\r");
+                    int correctNodeNumNew = 0;
+                    int unpasNodeNumNew = 0;
+                    int correctArcNumNew = 0;
+                    int disabledArcNumNew = 0;
+                    int unpasArcNumNew = 0;
+                    int totalArcNumNew = 0;
+                    foreach (Node nd in graph.Nodes)
+                    {
+                        if (!nd.Passable)
+                            unpasNodeNumNew++;
+                        else correctNodeNumNew++;
+                        foreach (Arc arc in nd.OutgoingArcs)
+                        {
+                            totalArcNumNew++;
+                            if (arc.Disabled)
+                            {
+                                disabledArcNumNew++;
+                                if (!arc.Passable)
+                                    unpasArcNumNew++;
+                            }
+                            else if (!arc.Passable)
+                                unpasArcNumNew++;
+                            else correctArcNumNew++;
+                        }
+                    }
+
+
+                    XtraMessageBox.Show($"Total nodes: {totalNodeNum} => {graph.NodesCount}\n\r" +
+                        $"\tcorrect:\t{correctNodeNum} => {correctNodeNumNew}\n\r" +
+                        $"\tunpassable:\t{unpasNodeNum} => {unpasNodeNumNew}\n\r" +
+                        $"Total arcs: {totalArcNum} => {totalArcNumNew}\n\r" +
+                        $"\tcorrect:\t{correctArcNum} => {correctArcNumNew}\n\r" +
+                        $"\tdisabled:\t{disabledArcNum} => {disabledArcNumNew}\n\r" +
+                        $"\tunpassable:\t{unpasArcNum} => {unpasArcNumNew}\n\r");
+                }
+                else XtraMessageBox.Show("Meshes doesn't compressed\n\r" +
+                                        $"Total nodes: {graph.NodesCount}\n\r" +
+                                        $"\tcorrect:\t{correctNodeNum}\n\r" +
+                                        $"\tunpassable:\t{unpasNodeNum}\n\r" +
+                                        $"Total arcs: {totalArcNum}\n\r" +
+                                        $"\tcorrect:\t{correctArcNum}\n\r" +
+                                        $"\tdisabled:\t{disabledArcNum}\n\r" +
+                                        $"\tunpassable:\t{unpasArcNum}\n\r"); 
             }
-            else XtraMessageBox.Show("Meshes doesn't compressed\n\r" +
-                                    $"Total nodes: {nodes.Count}\n\r" +
-                                    $"\tcorrect:\t{correctNodeNum}\n\r" +
-                                    $"\tunpassable:\t{unpasNodeNum}\n\r" +
-                                    $"Total arcs: {totalArcNum}\n\r" +
-                                    $"\tcorrect:\t{correctArcNum}\n\r" +
-                                    $"\tdisabled:\t{disabledArcNum}\n\r" +
-                                    $"\tunpassable:\t{unpasArcNum}\n\r");
         }
         
-                        #region EditMeshes
+        #region EditMeshes
         private void handler_EditEdges_ModeChanged(object sender, ItemClickEventArgs e)
         {
             EditEdgeTool editEdgeTool = CurrentTool as EditEdgeTool;

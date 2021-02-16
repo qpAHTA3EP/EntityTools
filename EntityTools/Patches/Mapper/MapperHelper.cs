@@ -14,12 +14,13 @@ namespace EntityTools.Patches.Mapper
     {
         public static readonly double DefaultAnchorSize = 16;
 
-        public static readonly Size Square5 = new Size(5, 5);
-        public static readonly Size Square8 = new Size(8, 8);
-        public static readonly Size Square10 = new Size(10, 10);
-        public static readonly Size Square12 = new Size(12, 12);
-        public static readonly Size Square14 = new Size(14, 14);
-        public static readonly Size Square16 = new Size(16, 16);
+        public static readonly Size Size_4x4 = new Size(4, 4);
+        public static readonly Size Size_5x5 = new Size(5, 5);
+        public static readonly Size Size_8x8 = new Size(8, 8);
+        public static readonly Size Size_10x10 = new Size(10, 10);
+        public static readonly Size Size_12x12 = new Size(12, 12);
+        public static readonly Size Size_14x14 = new Size(14, 14);
+        public static readonly Size Size_16x16 = new Size(16, 16);
 
         public static readonly float cos30 = (float)Math.Cos(Math.PI / 6);
         public static readonly float cos60 = (float)Math.Cos(Math.PI / 3);
@@ -230,7 +231,7 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Вычисление мещения текстовой метки относительно пары точек с координатами <paramref name="x1"/>, <paramref name="y1"/> и <paramref name="x2"/>, <paramref name="y2"/>
         /// </summary>
-        public static void GetLableAlingment(double x1, double y1, double x2, double y2, out Alignment alignment1, out Alignment alignment2)
+        public static void GetLabelAlignment(double x1, double y1, double x2, double y2, out Alignment alignment1, out Alignment alignment2)
         {
             double dx = Math.Abs(x1 - x2),
                    dy = Math.Abs(y1 - y2);
@@ -701,9 +702,9 @@ namespace EntityTools.Patches.Mapper
                 distance = double.MaxValue;
 
             if (graph is null)
-                graph = AstralAccessors.Quester.Core.Meshes.Value;
+                graph = AstralAccessors.Quester.Core.UsedMeshes;
 
-            Node node = graph.ClosestNodeOxyProjection(worldX, worldY, distance);
+            Node node = graph?.ClosestNodeOxyProjection(worldX, worldY, distance);
             if (node != null)
             {
                 var pos = node.Position;
