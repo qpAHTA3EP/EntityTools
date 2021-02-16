@@ -77,10 +77,21 @@ namespace EntityTools.Reflection
             /// </summary>     
             public static class Core
             {
+                //TODO: Пропатчить методы доступа к графу, чтобы геттер устанавливал ReadLock, а Setter - WriteLock
                 /// <summary>
                 /// Функтор доступа к графу путей (карте) текущего профиля
                 /// </summary>
                 public static readonly StaticPropertyAccessor<Graph> Meshes = typeof(Astral.Quester.Core).GetStaticProperty<Graph>("Meshes");
+
+                public static Graph UsedMeshes
+                {
+                    get
+                    {
+                        if (Meshes.IsValid())
+                            return Meshes.Value;
+                        return null;
+                    }
+                }
 
                 /// <summary>
                 /// Функтор доступа к коллекции графов путей (карт) текущего профиля
@@ -176,13 +187,14 @@ namespace EntityTools.Reflection
                         CurrentRole = type.GetStaticProperty<Astral.Addons.Role>("CurrentRole");
                 } 
 #endif
+
                 /// <summary>
                 /// Объект, соответствующий текущей роли Астрала
                 /// </summary>
-                public static object CurrentRole => _currentRole.GetValue();
                 private static Traverse _currentRole;
                 private static object _currentRoleObject;
 
+#if false
                 /// <summary>
                 /// Вызов метода CurrentRole.OnMapDraw(GraphicsNW graphicsNW)
                 /// </summary>
@@ -190,7 +202,7 @@ namespace EntityTools.Reflection
                 public static bool CurrentRole_OnMapDraw(GraphicsNW graphicsNW)
                 {
                     object role = _currentRole.GetValue();
-                    if(role is null)
+                    if (role is null)
                     {
                         _currentRoleObject = null;
                         _currentRole_OnMapDraw = null;
@@ -233,11 +245,107 @@ namespace EntityTools.Reflection
                             _currentRole_Name = Traverse.Create(_currentRoleObject).Property<string>("Name");
                         }
                         if (_currentRole_Name != null)
-                                return _currentRole_Name.Value;
+                            return _currentRole_Name.Value;
                         return string.Empty;
                     }
                 }
-                private static Traverse<string> _currentRole_Name;
+                private static Traverse<string> _currentRole_Name; 
+#endif
+
+                public static class CurrentRole
+                {
+                    public static Graph UsedMeshes
+                    {
+                        get
+                        {
+                            object role = _currentRole.GetValue();
+                            if (role is null)
+                            {
+                                ResetTraverses();
+                                return null;
+                            }
+                            if (role != _currentRoleObject || _usedMeshes == null)
+                            {
+                                _currentRoleObject = role;
+                                _usedMeshes = Traverse.Create(_currentRoleObject).Property<Graph>("UsedMeshes");
+                            }
+
+                            return _usedMeshes?.Value;
+                        }
+                    }
+                    private static Traverse<Graph> _usedMeshes;
+
+                    /// <summary>
+                    /// Вызов метода CurrentRole.OnMapDraw(GraphicsNW graphicsNW)
+                    /// </summary>
+                    /// <param name="graphicsNW"></param>
+                    public static bool OnMapDraw(GraphicsNW graphicsNW)
+                    {
+                        object role = _currentRole.GetValue();
+                        if (role is null)
+                        {
+                            ResetTraverses();
+                            return false;
+                        }
+                        if (role != _currentRoleObject)
+                        {
+                            _currentRoleObject = role;
+                            _OnMapDraw = Traverse.Create(_currentRoleObject).Method("OnMapDraw", graphicsNW);
+                        }
+                        if (_currentRoleObject != null && _OnMapDraw is null)
+                            _OnMapDraw = Traverse.Create(_currentRoleObject).Method("OnMapDraw", graphicsNW);
+
+                        if (_OnMapDraw != null)
+                        {
+                            _OnMapDraw.GetValue(graphicsNW);
+                            return true;
+                        }
+                        return false;
+                    }
+                    private static Traverse _OnMapDraw;
+
+                    /// <summary>
+                    /// Чтение имени роли, выполняемой Астралом
+                    /// </summary>
+                    public static string Name
+                    {
+                        get
+                        {
+                            object role = _currentRole.GetValue();
+                            if (role is null)
+                            {
+                                ResetTraverses();
+                                return string.Empty;
+                            }
+                            if (role != _currentRoleObject || _name == null)
+                            {
+                                _currentRoleObject = role;
+                                _name = Traverse.Create(_currentRoleObject).Property<string>("Name");
+                            }
+                            if (_name != null)
+                                return _name.Value;
+                            return string.Empty;
+                        }
+                    }
+                    private static Traverse<string> _name;
+
+                    static CurrentRole()
+                    {
+                        _currentRoleObject = _currentRole.GetValue();
+                        if (_currentRoleObject != null)
+                        {
+                            _name = Traverse.Create(_currentRoleObject).Property<string>("Name");
+                        }
+                    }
+
+                    private static void ResetTraverses()
+                    {
+                        _currentRoleObject = null;
+                        _usedMeshes = null;
+                        _OnMapDraw = null;
+                        _name = null;
+                    }
+                }
 
                 static Roles()
                 {
@@ -246,10 +354,6 @@ namespace EntityTools.Reflection
                     {
                         _currentRole = Traverse.Create(type).Property("CurrentRole");
                         _currentRoleObject = _currentRole.GetValue();
-                        if (_currentRoleObject != null)
-                        {
-                            _currentRole_Name = Traverse.Create(_currentRoleObject).Property<string>("Name");
-                        }
                     }
                 }
             }
@@ -312,6 +416,21 @@ namespace EntityTools.Reflection
                 }
             }
 
+            public static class Engine
+            {
+                private static StaticPropertyAccessor<Astral.Logic.Classes.FSM.Engine> mainEngine =
+                    typeof(Astral.Controllers.Engine).GetStaticProperty<Astral.Logic.Classes.FSM.Engine>("MainEngine");
+
+                public static Astral.Logic.Classes.FSM.Engine MainEngine
+                {
+                    get
+                    {
+                        if(mainEngine.IsValid())
+                            return mainEngine.Value;
+                        return null;
+                    }
+                }
+            }
         }
 
         public  static class Logic
@@ -320,8 +439,10 @@ namespace EntityTools.Reflection
             {
                 public static class Movements
                 {
-                    public static readonly StaticPropertyAccessor<List<Astral.Logic.NW.Movements.DodgeLosTestResult>> LastValidPoses = typeof(Astral.Logic.NW.Movements).GetStaticProperty<List<Astral.Logic.NW.Movements.DodgeLosTestResult>>("LastValidPoses");
-                    public static readonly StaticFieldAccessor<Timeout> LastValidPosesTimeout = typeof(Astral.Logic.NW.Movements).GetStaticField<Timeout>("lastvlidposto");
+                    public static readonly StaticPropertyAccessor<List<Astral.Logic.NW.Movements.DodgeLosTestResult>> LastValidPoses 
+                        = typeof(Astral.Logic.NW.Movements).GetStaticProperty<List<Astral.Logic.NW.Movements.DodgeLosTestResult>>("LastValidPoses");
+                    public static readonly StaticFieldAccessor<Timeout> LastValidPosesTimeout 
+                        = typeof(Astral.Logic.NW.Movements).GetStaticField<Timeout>("lastvlidposto");
                 }
             }
         }
@@ -334,6 +455,5 @@ namespace EntityTools.Reflection
         {
             public static readonly Func<ItemFilterCore, Func<Item, bool>> IsMatch = InstanceAccessor<ItemFilterCore>.GetFunction<Item, bool>("\u0001");
         }
-
     }
 }
