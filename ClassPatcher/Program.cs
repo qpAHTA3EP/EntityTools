@@ -148,6 +148,15 @@ namespace ClassPatcher
                 {
                     if (tDef.Name == "ItemIdFilterEditor" ||
                         tDef.Name == "ItemIdEditor" ||
+                        tDef.Name == "BuyOptionsEditor" ||
+                        tDef.Name == "DialogKeyEditor" ||
+                        tDef.Name == "DialogEditor" ||
+                        tDef.Name == "RemoteContactEditor" ||
+                        tDef.Name == "MainMissionEditor" ||
+                        tDef.Name == "PowerAllIdEditor" ||
+                        tDef.Name == "AuraEditor" ||
+                        tDef.FullName == "Astral.Quester.UIEditors.CurrentMapEdit" ||
+                        tDef.FullName == "Astral.Quester.UIEditors.CurrentRegionEdit" ||
                         tDef.Name == "GetMailItems" ||
                         tDef.Name == "Roles" ||
                         tDef.Name == "Entrypoint" ||
@@ -155,17 +164,9 @@ namespace ClassPatcher
                         tDef.Name == "Profile" ||
                         tDef.Name == "Settings" ||
                         tDef.Name == "NPCVendorInfos" ||
-                        tDef.Name == "BuyOptionsEditor" ||
-                        tDef.Name == "DialogKeyEditor" ||
-                        tDef.Name == "DialogEditor" ||
                         tDef.Name == "Core" ||
                         tDef.Name == "ProcessInfos" ||
-                        tDef.Name == "RemoteContactEditor" ||
                         tDef.Name == "Movements" ||
-                        tDef.Name == "MainMissionEditor" ||
-                        tDef.Name == "AuraEditor" ||
-                        tDef.Name == "PowerAllIdEditor" ||
-                        tDef.Name == "AuraEditor" ||
                         tDef.Name == "NPCInfos" ||
                         tDef.FullName == "Astral.Addons.Role" ||
                         tDef.FullName == "Astral.Controllers.Plugins" ||
