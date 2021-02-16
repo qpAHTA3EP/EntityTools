@@ -50,24 +50,20 @@ namespace EntityTools.Services
             {
                 API.AfterCallCombat += ArterCallCombat;
                 afterCallCombatSubcription = true;
-                Logger.WriteLine($"{nameof(UnstuckSpells)} activated");
-                ETLogger.WriteLine($"{nameof(UnstuckSpells)} activated");
+                ETLogger.WriteLine($"{nameof(UnstuckSpells)} activated", true);
             }
         }
         public static void Stop()
         {
                 API.AfterCallCombat -= ArterCallCombat;
                 afterCallCombatSubcription = false;
-                Logger.WriteLine($"{nameof(UnstuckSpells)} deactivated");
-                ETLogger.WriteLine($"{nameof(UnstuckSpells)} deactivated");
+                ETLogger.WriteLine($"{nameof(UnstuckSpells)} deactivated", true);
         }
 
         /// <summary>
         /// Эвент активируется в момент активации UCC в боевом режиме
         /// Запускает монитор "окончания боя"
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="arg"></param>
         private static void ArterCallCombat(object sender, API.AfterCallCombatEventArgs arg)
         {
             if (EntityTools.Config.UnstuckSpells.Active)
@@ -158,9 +154,11 @@ namespace EntityTools.Services
         /// Отключение активных умений в зависимости от класса
         /// Перед отключением проводится проверка ауры/активности
         /// </summary>
+#if false
         private static void DisableSpells_AurasCheck()
         {
             var player = EntityManager.LocalPlayer;
+            var tastIdStr = $"{nameof(UnstuckSpells)}[{Task.CurrentId?.ToString("X") ?? "null"}]";
 
 #if DEBUG_SPELLSTUCKMONITOR
             EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpells)}::DisableSpells_AurasCheck()");
@@ -170,41 +168,44 @@ namespace EntityTools.Services
             {
                 case CharClassCategory.DevotedCleric:
                     {
+                        bool searchArbiterMechanic = player.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Cleric_Arbiter;
 
-                        // Флаги, предотвращающие повторное "выключение" умений
-                        bool searchChanneldivinity = true;
-                        bool searchArbiterMechanic = EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Cleric_Arbiter;
-
-                        foreach (AttribModNet mod in player.Character.Mods) // x64 
+                        // После изменения механии TabSpell у "Благочестивца" залипание умения возможно только у "Арбитра"
+                        if (searchArbiterMechanic)
                         {
-                            // Поиск ауры 'Devoted_Special_Channeldivinity'
-                            if (searchChanneldivinity && mod.PowerDef.InternalName.StartsWith(Cleric_Channeldivinity))
-                            {    // отключение скила 'Channeldivinity'
-                                GameCommands.Execute("specialClassPower 0");
-                                ETLogger.WriteLine($"{nameof(UnstuckSpells)}[{Task.CurrentId?.ToString("X") ?? "null"}]: Deactivate SpecialClassPower[{Cleric_Channeldivinity}]");
-                                searchChanneldivinity = false;
-                            }
+                            // Флаги, предотвращающие повторное "выключение" умений
+                            bool searchChanneldivinity = true;
 
-                            // Поиск ауры 'Devoted_Mechanic_Dps_Scales_Radiant' или 'Devoted_Mechanic_Dps_Scales_Fire'
-                            if (searchArbiterMechanic && mod.PowerDef.InternalName.StartsWith(Cleric_Arbiter_Mechanic))
+                            foreach (var mod in player.Character.Mods) // x64 
                             {
-                                try
-                                {
-                                    GameCommands.Execute("specialClassPower 1");
-                                    Thread.Sleep(100);
-                                }
-                                catch { }
-                                finally
-                                {
+                                // Поиск ауры 'Devoted_Special_Channeldivinity'
+                                if (searchChanneldivinity && mod.PowerDef.InternalName.StartsWith(Cleric_Channeldivinity))
+                                {    // отключение скила 'Channeldivinity'
                                     GameCommands.Execute("specialClassPower 0");
-                                    ETLogger.WriteLine($"{nameof(UnstuckSpells)}[{Task.CurrentId?.ToString("X") ?? "null"}]: Convert '{Cleric_Arbiter_Mechanic}' to [Devinity]");
-                                    searchArbiterMechanic = false;
+                                    ETLogger.WriteLine($"{tastIdStr}: Deactivate SpecialClassPower[{Cleric_Channeldivinity}]");
+                                    searchChanneldivinity = false;
                                 }
-                            }
 
-                            if (!searchChanneldivinity && !searchArbiterMechanic)
-                                break;
-                        }
+                                // Поиск ауры 'Devoted_Mechanic_Dps_Scales_Radiant' или 'Devoted_Mechanic_Dps_Scales_Fire'
+                                if (/*searchArbiterMechanic && */mod.PowerDef.InternalName.StartsWith(Cleric_Arbiter_Mechanic))
+                                {
+                                    try
+                                    {
+                                        GameCommands.Execute("specialClassPower 1");
+                                        Thread.Sleep(100);
+                                    }
+                                    catch { }
+                                    finally
+                                    {
+                                        GameCommands.Execute("specialClassPower 0");
+                                        ETLogger.WriteLine($"{tastIdStr}: Convert '{Cleric_Arbiter_Mechanic}' to [Devinity]");
+                                        searchArbiterMechanic = false;
+                                    }
+                                }
+
+                                if (!searchChanneldivinity && !searchArbiterMechanic)
+                                    break;
+                            }
 
 #if DEBUG_SPELLSTUCKMONITOR
                         //Если все Mods перебрали, а флаги не сброшены, значит соответствующие им умения неактивны
@@ -214,6 +215,7 @@ namespace EntityTools.Services
                             EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpells)}: Aura '{Cleric_Arbiter_Mechanic}' not detected");
 #endif
 
+                        }
                         break;
                     }
                 case CharClassCategory.OathboundPaladin:
@@ -242,16 +244,16 @@ namespace EntityTools.Services
 
                         // Флаги, предотвращающие повторное "выключение" умений
                         bool searchSanctuary = true;
-                        bool searchDivinechampion = EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Paladin_Justicar;
+                        bool searchDivinechampion = player.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Paladin_Justicar;
 
-                        foreach (AttribModNet mod in player.Character.Mods) // x64
+                        foreach (var mod in player.Character.Mods) // x64
                         {
 
                             // Поиск ауры 'Paladin_Shift_Sanctuary' 
                             if (searchSanctuary && mod.PowerDef.InternalName.StartsWith(Paladin_Shift))
                             {
                                 GameCommands.Execute("tacticalSpecial 0");
-                                ETLogger.WriteLine($"{nameof(UnstuckSpells)}[{Task.CurrentId?.ToString("X") ?? "null"}]: Deactivate TacticalSpecial[{Paladin_Shift}]");
+                                ETLogger.WriteLine($"{tastIdStr}: Deactivate TacticalSpecial[{Paladin_Shift}]");
                                 searchSanctuary = false;
                             }
 
@@ -267,7 +269,7 @@ namespace EntityTools.Services
                                 finally
                                 {
                                     GameCommands.Execute("specialClassPower 0");
-                                    ETLogger.WriteLine($"{nameof(UnstuckSpells)}[{Task.CurrentId?.ToString("X") ?? "null"}]: Deactivate SpecialClassPower[{Paladin_Justicar_Mechanic}]");
+                                    ETLogger.WriteLine($"{tastIdStr}: Deactivate SpecialClassPower[{Paladin_Justicar_Mechanic}]");
                                     searchDivinechampion = false;
                                 }
                             }
@@ -289,7 +291,7 @@ namespace EntityTools.Services
                             if (power != null && power.IsValid && power.IsActive)
                             {
                                 GameCommands.Execute("specialClassPower 0");
-                                ETLogger.WriteLine(LogType.Debug, $"{nameof(UnstuckSpells)}: Deactivate SpecialClassPower[{Paladin_Oathkeeper_Mechanic}]");
+                                ETLogger.WriteLine(LogType.Debug, $"{tastIdStr}: Deactivate SpecialClassPower[{Paladin_Oathkeeper_Mechanic}]");
                             }
 #if DEBUG_SPELLSTUCKMONITOR
                             else EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpells)}: SpecialClassPower[{Paladin_Oathkeeper_Mechanic}] not active");
@@ -305,6 +307,7 @@ namespace EntityTools.Services
                     //    break;
             }
         }
+#endif
 
         /// <summary>
         /// Отключение активных умений в зависимости от класса
@@ -313,6 +316,7 @@ namespace EntityTools.Services
         private static void DisableSpells()
         {
             var player = EntityManager.LocalPlayer;
+            var tastIdStr = $"{nameof(UnstuckSpells)}[{Task.CurrentId?.ToString("X") ?? "null"}]";
 
 #if DEBUG_SPELLSTUCKMONITOR
             EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpells)}::DisableSpells_AurasCheck()");
@@ -322,13 +326,14 @@ namespace EntityTools.Services
             {
                 case CharClassCategory.DevotedCleric:
                     {
-                        // Отключение скила 'Channeldivinity'
-                        GameCommands.Execute("specialClassPower 0");
-                        ETLogger.WriteLine($"{nameof(UnstuckSpells)}[{Task.CurrentId?.ToString("X") ?? "null"}]: '{player.Character.Class.Category}' deactivate SpecialClassPower[{Cleric_Channeldivinity}]");
-
-                        // Ауры 'Devoted_Mechanic_Dps_Scales_Radiant' или 'Devoted_Mechanic_Dps_Scales_Fire'
+                        // После изменения механии TabSpell у "Благочестивца" залипание умения возможно только у "Арбитра"
                         if (EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Cleric_Arbiter)
                         {
+                            // Отключение скила 'Channeldivinity'
+                            GameCommands.Execute("specialClassPower 0");
+                            ETLogger.WriteLine($"{tastIdStr}: '{player.Character.Class.Category}' deactivate SpecialClassPower[{Cleric_Channeldivinity}]");
+
+                            // Ауры 'Devoted_Mechanic_Dps_Scales_Radiant' или 'Devoted_Mechanic_Dps_Scales_Fire'
                             try
                             {
                                 GameCommands.Execute("specialClassPower 1");
@@ -338,7 +343,7 @@ namespace EntityTools.Services
                             finally
                             {
                                 GameCommands.Execute("specialClassPower 0");
-                                ETLogger.WriteLine($"{nameof(UnstuckSpells)}[{Task.CurrentId?.ToString("X") ?? "null"}]: '{player.Character.Class.Category}' convert '{Cleric_Arbiter_Mechanic}' to [Devinity]");
+                                ETLogger.WriteLine($"{tastIdStr}: '{player.Character.Class.Category}' convert '{Cleric_Arbiter_Mechanic}' to [Devinity]");
                             }
                         }
 
@@ -348,14 +353,14 @@ namespace EntityTools.Services
                     {
                         // Отключение 'Paladin_Shift_Sanctuary' 
                         GameCommands.Execute("tacticalSpecial 0");
-                        ETLogger.WriteLine($"{nameof(UnstuckSpells)}[{Task.CurrentId?.ToString("X") ?? "null"}]: Deactivate TacticalSpecial[{Paladin_Shift}]");
+                        ETLogger.WriteLine($"{tastIdStr}: Deactivate TacticalSpecial[{Paladin_Shift}]");
 
                         if (EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Paladin_Oathkeeper)
                         {
                             // Paladin_Oathkeeper
                             // Отключаем "Paladin_Special_Divinecall"
                             GameCommands.Execute("specialClassPower 0");
-                            ETLogger.WriteLine(LogType.Debug, $"{nameof(UnstuckSpells)}[{Task.CurrentId?.ToString("X")??"null"}]: '{player.Character.Class.Category}' deactivate SpecialClassPower[{Paladin_Oathkeeper_Mechanic}]");
+                            ETLogger.WriteLine(LogType.Debug, $"{tastIdStr}: '{player.Character.Class.Category}' deactivate SpecialClassPower[{Paladin_Oathkeeper_Mechanic}]");
                         }
                         else
                         {
@@ -375,7 +380,7 @@ namespace EntityTools.Services
                                     finally
                                     {
                                         GameCommands.Execute("specialClassPower 0");
-                                        ETLogger.WriteLine($"{nameof(UnstuckSpells)}[{Task.CurrentId?.ToString("X") ?? "null"}]: Deactivate SpecialClassPower[{Paladin_Justicar_Mechanic}]");
+                                        ETLogger.WriteLine($"{tastIdStr}: Deactivate SpecialClassPower[{Paladin_Justicar_Mechanic}]");
                                     }
                                     break;
                                 }
