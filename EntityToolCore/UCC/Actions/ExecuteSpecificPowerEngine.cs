@@ -262,7 +262,7 @@ namespace EntityCore.UCC.Actions
 
             try
             {
-                if (!powerDef.GroundTargeted && !powerDef.Categories.Contains(PowerCategory.IgnorePitch))
+                if (!powerDef.GroundTargeted && !powerDef.Categories.Contains(PowerCategory.Ignorepitch))
                 {
                     target.Location.Face();
 #if DEBUG_ExecuteSpecificPower
