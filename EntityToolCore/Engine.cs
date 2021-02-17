@@ -74,29 +74,44 @@ namespace EntityCore
                 {
                     if (!dictionary.ContainsKey(m2e))
                         dictionary.Add(m2e, new MoveToEntityEngine(m2e));
-                    else ((MoveToEntityEngine) dictionary[m2e]).Rebase(m2e);
-                    return true;
+                    else if (dictionary[m2e] is MoveToEntityEngine m2ee)
+                    {
+                        m2e.Engine = m2ee;
+                        return true;
+                    }
                 }
 
                 if (action is InteractEntities ie)
                 {
                     if (!dictionary.ContainsKey(ie))
                         dictionary.Add(ie, new InteractEntitiesEngine(ie));
-                    return true;
+                    else if (dictionary[ie] is InteractEntitiesEngine iee)
+                    {
+                        ie.ActionEngine = iee;
+                        return true;
+                    }
                 }
 
                 if (action is PickUpMissionExt pum)
                 {
                     if (!dictionary.ContainsKey(pum))
                         dictionary.Add(pum, new PickUpMissionEngine(pum));
-                    return true;
+                    else if (dictionary[pum] is PickUpMissionEngine pume)
+                    {
+                        pum.ActionEngine = pume;
+                        return true;
+                    }
                 }
 
                 if (action is InsertInsignia ii)
                 {
                     if (!dictionary.ContainsKey(ii))
                         dictionary.Add(ii, new InsertInsigniaEngine(ii));
-                    return true;
+                    else if (dictionary[ii] is InsertInsigniaEngine iie)
+                    {
+                        ii.ActionEngine = iie;
+                        return true;
+                    }
                 }
             }
             catch (Exception e)
@@ -113,31 +128,51 @@ namespace EntityCore
                 {
                     if (!dictionary.ContainsKey(ettCount))
                         dictionary.Add(ettCount, new EntityCountEngine(ettCount));
-                    return true;
+                    else if (dictionary[ettCount] is EntityCountEngine ettCountEngine)
+                    {
+                        ettCount.Engine = ettCountEngine;
+                        return true;
+                    }
                 }
                 if(condition is EntityProperty ettProperty)
                 {
                     if (!dictionary.ContainsKey(ettProperty))
                         dictionary.Add(ettProperty, new EntityPropertyEngine(ettProperty));
-                    return true;
+                    else if (dictionary[ettProperty] is EntityPropertyEngine ettPropertyEngine)
+                    {
+                        ettProperty.Engine = ettPropertyEngine;
+                        return true;
+                    }
                 }
                 if (condition is TeamMembersCount teamCount)
                 {
                     if (!dictionary.ContainsKey(teamCount))
                         dictionary.Add(teamCount, new TeamMembersCountEngine(teamCount));
-                    return true;
+                    else if (dictionary[teamCount] is TeamMembersCountEngine teamCountEngine)
+                    {
+                        teamCount.ConditionEngine = teamCountEngine;
+                        return true;
+                    }
                 }
                 if (condition is CheckGameGUI guiCheck)
                 {
                     if (!dictionary.ContainsKey(guiCheck))
                         dictionary.Add(guiCheck, new CheckGameGUIEngine(guiCheck));
-                    return true;
+                    else if (dictionary[guiCheck] is CheckGameGUIEngine guiCheckEngine)
+                    {
+                        guiCheck.ConditionEngine = guiCheckEngine;
+                        return true;
+                    }
                 }
                 if (condition is EntityDistance ettDist)
                 {
                     if (!dictionary.ContainsKey(ettDist))
                         dictionary.Add(ettDist, new EntityDistanceEngine(ettDist));
-                    return true;
+                    else if (dictionary[ettDist] is EntityDistanceEngine ettDistEngine)
+                    {
+                        ettDist.Engine = ettDistEngine;
+                        return true;
+                    }
                 }
             }
             catch (Exception e)
@@ -154,25 +189,41 @@ namespace EntityCore
                 {
                     if (!dictionary.ContainsKey(ettApproach))
                         dictionary.Add(ettApproach, new ApproachEntityEngine(ettApproach));
-                    return true;
+                    else if (dictionary[ettApproach] is ApproachEntityEngine ettApproachEngine)
+                    {
+                        ettApproach.Engine = ettApproachEngine;
+                        return true;
+                    }
                 }
-                if(action is DodgeFromEntity ettDodge)
+                if (action is DodgeFromEntity ettDodge)
                 {
                     if (!dictionary.ContainsKey(ettDodge))
                         dictionary.Add(ettDodge, new DodgeFromEntityEngine(ettDodge));
-                    return true;
+                    else if (dictionary[ettDodge] is DodgeFromEntityEngine engine)
+                    {
+                        ettDodge.Engine = engine;
+                        return true;
+                    }
                 }
                 if (action is ExecuteSpecificPower execPower)
                 {
                     if (!dictionary.ContainsKey(execPower))
                         dictionary.Add(execPower, new ExecuteSpecificPowerEngine(execPower));
-                    return true;
+                    else if (dictionary[execPower] is ExecuteSpecificPowerEngine engine)
+                    {
+                        execPower.Engine = engine;
+                        return true;
+                    }
                 }
                 if (action is UseItemSpecial useItem)
                 {
                     if (!dictionary.ContainsKey(useItem))
                         dictionary.Add(useItem, new UseItemSpecialEngine(useItem));
-                    return true;
+                    else if (dictionary[useItem] is UseItemSpecialEngine engine)
+                    {
+                        useItem.Engine = engine;
+                        return true;
+                    }
                 }
             }
             catch (Exception e)
@@ -189,19 +240,31 @@ namespace EntityCore
                 {
                     if (!dictionary.ContainsKey(ettCheck))
                         dictionary.Add(ettCheck, new UCCEntityCheckEngine(ettCheck));
-                    return true;
+                    else if (dictionary[ettCheck] is UCCEntityCheckEngine engine)
+                    {
+                        ettCheck.Engine = engine;
+                        return true;
+                    }
                 }
                 if (condition is UCCTargetMatchEntity targMatch)
                 {
                     if (!dictionary.ContainsKey(targMatch))
                         dictionary.Add(targMatch, new UCCTargetMatchEntityEngine(targMatch));
-                    return true;
+                    else if (dictionary[targMatch] is UCCTargetMatchEntityEngine engine)
+                    {
+                        targMatch.Engine = engine;
+                        return true;
+                    }
                 }
                 if (condition is UCCGameUICheck uiCheck)
                 {
                     if (!dictionary.ContainsKey(uiCheck))
                         dictionary.Add(uiCheck, new UCCGameUICheckEngine(uiCheck));
-                    return true;
+                    else if (dictionary[uiCheck] is UCCGameUICheckEngine engine)
+                    {
+                        uiCheck.Engine = engine;
+                        return true;
+                    }
                 }
             }
             catch { }
@@ -354,9 +417,9 @@ namespace EntityCore
                 object engine = dictionary.ContainsKey(obj) ? dictionary[obj] : null;
                 if (engine is IEntityInfos ettInfos)
                 {
-                    if (ettInfos.EntityDiagnosticString(out string infos))
-                        sb.Append(infos);
-                    else sb.Append("DiagnosticString formating error");
+                    sb.Append(ettInfos.EntityDiagnosticString(out string infos)
+                        ? infos
+                        : "DiagnosticString formatting error");
                 }
                 else if (ReflectionHelper.GetPropertyValue(obj, "EntityID", out object entityId)
                         && ReflectionHelper.GetPropertyValue(obj, "EntityNameType", out object entityNameType)
