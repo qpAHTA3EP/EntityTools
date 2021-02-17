@@ -175,6 +175,7 @@ namespace EntityTools.Enums
     /// <summary>
     /// Переключатель множетв Entity в которых производится поиск
     /// </summary>
+    [Serializable]
     public enum EntitySetType : uint
     {
 #if false

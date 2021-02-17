@@ -398,7 +398,7 @@ namespace EntityTools.Quester.Actions
 
 #if DEVELOPER
         [Category("Interaction")]
-        [Description("Interaction timeout (sec) if InteractitOnce flag is set")]
+        [Description("The distance to the Entity within which the interaction is possible")]
 #else
         [Browsable(false)]
 #endif
@@ -414,7 +414,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal int _interactDistance = 60;
+        internal int _interactDistance = 5;
 
 #if DEVELOPER
         [Description("Answers in dialog while interact with Entity")]
@@ -437,6 +437,24 @@ namespace EntityTools.Quester.Actions
         internal List<string> _dialogs = new List<string>();
 
 #if DEVELOPER
+        [Description("Reset current HotSpot after interaction and move to the closest one")]
+#else
+        [Browsable(false)]
+#endif
+        public bool ResetCurrentHotSpot
+        {
+            get => _resetCurrentHotSpot; set
+            {
+                if (_resetCurrentHotSpot != value)
+                {
+                    _resetCurrentHotSpot = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ResetCurrentHotSpot)));
+                }
+            }
+        }
+        internal bool _resetCurrentHotSpot = false;
+
+#if DEVELOPER
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
         [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
@@ -454,30 +472,30 @@ namespace EntityTools.Quester.Actions
 
 #if CORE_INTERFACES
         [NonSerialized]
-        internal IQuesterActionEngine Engine;
+        internal IQuesterActionEngine ActionEngine;
 #endif
 
         public InteractEntities()
         {
 #if CORE_INTERFACES
-            Engine = new QuesterActionProxy(this);
+            ActionEngine = new QuesterActionProxy(this);
 #endif
         }
         #endregion
 
 #if CORE_INTERFACES
         // Интерфейс Quester.Action через IQuesterActionEngine
-        public override bool NeedToRun => Engine.NeedToRun;
-        public override ActionResult Run() => Engine.Run();
-        public override string ActionLabel => Engine.ActionLabel;
+        public override bool NeedToRun => ActionEngine.NeedToRun;
+        public override ActionResult Run() => ActionEngine.Run();
+        public override string ActionLabel => ActionEngine.ActionLabel;
         public override string InternalDisplayName => string.Empty;
-        public override bool UseHotSpots => Engine.UseHotSpots;
-        protected override Vector3 InternalDestination => Engine.InternalDestination;
-        protected override bool IntenalConditions => Engine.InternalConditions;
-        protected override ActionValidity InternalValidity => Engine.InternalValidity;
-        public override void InternalReset() => Engine.InternalReset();
-        public override void GatherInfos() => Engine.GatherInfos();
-        public override void OnMapDraw(GraphicsNW graph) => Engine.OnMapDraw(graph);
+        public override bool UseHotSpots => ActionEngine.UseHotSpots;
+        protected override Vector3 InternalDestination => ActionEngine.InternalDestination;
+        protected override bool IntenalConditions => ActionEngine.InternalConditions;
+        protected override ActionValidity InternalValidity => ActionEngine.InternalValidity;
+        public override void InternalReset() => ActionEngine.InternalReset();
+        public override void GatherInfos() => ActionEngine.GatherInfos();
+        public override void OnMapDraw(GraphicsNW graph) => ActionEngine.OnMapDraw(graph);
 #endif
     }
 }

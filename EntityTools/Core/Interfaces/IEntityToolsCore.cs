@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using Astral.Classes.ItemFilter;
+﻿using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
 using Astral.Quester.Classes;
 using EntityTools.Enums;
 using MyNW.Classes;
+using System;
+using System.Collections.Generic;
 using Action = Astral.Quester.Classes.Action;
 using UCCConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 
@@ -32,13 +32,12 @@ namespace EntityTools.Core.Interfaces
 
         bool GUIRequest_UCCAction(out UCCAction action);
 
-        string EntityDiagnosticInfos(object obj);
+        string EntityDiagnosticInfos(object obj/*, bool isTarget = false*/);
 #endif
 #if DEBUG
         LinkedList<Entity> FindAllEntity(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete,
                                          bool healthCheck = false, float range = 0, float zRange = 0, bool regionCheck = false, List<CustomRegion> customRegions = null,
                                          Predicate<Entity> specialCheck = null);
 #endif
-
     }
 }

@@ -9,237 +9,594 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>EntityTools</RootNamespace>
     <AssemblyName>EntityTools</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <AssemblyVersion>0.20.1117.1452</AssemblyVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;X64</DefineConstants>
+    <OutputPath>..\References\x64\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE;X64</DefineConstants>
+    <OutputPath>..\References\x64\</OutputPath>
+    <DefineConstants>TRACE;DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;X64</DefineConstants>
+    <OutputPath>..\References\x64\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <Optimize>false</Optimize>
+    <DocumentationFile>
+    </DocumentationFile>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE;X64</DefineConstants>
+    <OutputPath>..\References\x64\</OutputPath>
+    <DefineConstants>TRACE;NOT_DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <DebugSymbols>true</DebugSymbols>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>MichaelProg.pfx</AssemblyOriginatorKeyFile>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\References\Encrypted\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;DEVELOPER, ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\References\Encrypted\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;DEVELOPER, ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Release|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\References\Encrypted\</OutputPath>
+    <DefineConstants>NOT_DEVELOPER, ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Optimize>true</Optimize>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Release|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\References\Encrypted\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NOT_DEVELOPER, ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Astral, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="0Harmony, Version=2.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\x64\Astral.exe</HintPath>
+      <HintPath>..\References\x64\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="AStar">
+      <HintPath>..\References\x64\AStar.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Data.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+    <Reference Include="Astral_patched">
+      <HintPath>..\References\x64\Astral_patched.exe</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Utils.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+    <Reference Include="DevExpress.Data.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Utils.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraBars.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.XtraEditors.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MyNW, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="DevExpress.XtraGrid.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraNavBar.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MyMemory-x64">
+      <HintPath>..\References\x64\MyMemory-x64.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MyNW">
       <HintPath>..\References\x64\MyNW.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data.Linq" />
-    <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression">
+      <HintPath>..\References\x64\System.IO.Compression.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Management" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Actions\ChangeInstanceToLeader.cs" />
-    <Compile Include="Actions\InsertInsignia.cs" />
-    <Compile Include="Actions\InteractEntities.cs" />
-    <Compile Include="Actions\Deprecated\InteractEntity.cs" />
-    <Compile Include="Actions\Deprecated\MoveToSea.cs" />
-    <Compile Include="Actions\MoveToLeader.cs" />
-    <Compile Include="Conditions\CheckCampaignTask.cs" />
-    <Compile Include="Conditions\CheckShard.cs" />
-    <Compile Include="Conditions\EntityPropertyConditions.cs" />
-    <Compile Include="Conditions\Deprecated\EntityDistance.cs" />
-    <Compile Include="Conditions\EntityCountInCustomRegion.cs" />
-    <Compile Include="Conditions\Deprecated\PartyCount.cs" />
-    <Compile Include="Conditions\TeamLeaderMapInstance.cs" />
-    <Compile Include="Conditions\TeamMemberCount.cs" />
-    <Compile Include="Conditions\TeamMemberCountInCustomRegion.cs" />
-    <Compile Include="Editors\CampaignTaskEditor.cs" />
-    <Compile Include="Editors\NodePositionEditor.cs" />
-    <Compile Include="Editors\ParagonListEditor.cs" />
-    <Compile Include="Forms\InsigniaBonusSelectForm.cs">
+    <Compile Include="Editors\CheckedListBoxEditor.cs" />
+    <Compile Include="Editors\Forms\ItemFilterEditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\InsigniaBonusSelectForm.Designer.cs">
-      <DependentUpon>InsigniaBonusSelectForm.cs</DependentUpon>
+    <Compile Include="Editors\Forms\ItemFilterEditorForm.Designer.cs">
+      <DependentUpon>ItemFilterEditorForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\MountBonusPriorityListForm.cs">
+    <Compile Include="Editors\EntityTestEditor.cs" />
+    <Compile Include="Editors\ItemFilterEntryListEditor.cs" />
+    <Compile Include="Editors\VendorInfoEditor.cs" />
+    <Compile Include="Editors\MissionGiverInfoEditor.cs" />
+    <Compile Include="Logger\EntityToolLogger.cs" />
+    <Compile Include="Core\Interfaces\IUCCConditionEngine.cs" />
+    <Compile Include="Core\Interfaces\IUCCActionEngine.cs" />
+    <Compile Include="Core\Proxies\EntityCoreProxy.cs" />
+    <Compile Include="Core\Proxies\QuesterActionProxy.cs" />
+    <Compile Include="Core\Interfaces\IEntityToolsCore.cs" />
+    <Compile Include="Core\Interfaces\IQuesterActionEngine.cs" />
+    <Compile Include="Core\Proxies\QuesterConditionProxy.cs" />
+    <Compile Include="Core\Proxies\UCCActionProxy.cs" />
+    <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
+    <Compile Include="Patches\Logic.Classes.FSM.Navigation\CharacterEx.cs" />
+    <Compile Include="Patches\Logic.Classes.FSM.Navigation\EntityEx.cs" />
+    <Compile Include="Patches\Logic.Classes.FSM.Navigation\Enums.cs" />
+    <Compile Include="Patches\Logic.Classes.FSM.Navigation\MountCostumeDef.cs" />
+    <Compile Include="Patches\Logic.Classes.FSM.Navigation\SlideMonitorSettings.cs" />
+    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_TotalDistance.cs" />
+    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_GetNearestNodeFromPosition.cs" />
+    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_FixPath.cs" />
+    <Compile Include="Patches\Logic.General\Astral_Logic_General_GetNearestIndexInPositionList.cs" />
+    <Compile Include="Patches\Mapper\MapperDrawingTools.cs" />
+    <Compile Include="Patches\Mapper\MapperGraphics.cs" />
+    <Compile Include="Patches\Mapper\MapperHelper.cs" />
+    <Compile Include="Editors\Forms\ObjectInfoForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\MountBonusPriorityListForm.Designer.cs">
-      <DependentUpon>MountBonusPriorityListForm.cs</DependentUpon>
+    <Compile Include="Editors\Forms\ObjectInfoForm.Designer.cs">
+      <DependentUpon>ObjectInfoForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\MultiSelectForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\MultiSelectForm.Designer.cs">
-      <DependentUpon>MultiSelectForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\NodeSelectForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\NodeSelectForm.Designer.cs">
-      <DependentUpon>NodeSelectForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\UIViewer.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\UIViewer.Designer.cs">
-      <DependentUpon>UIViewer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="States\SlideMonitor.cs" />
-    <Compile Include="States\SlideMonitorSettings.cs" />
-    <Compile Include="States\SpellStuckMonitor.cs" />
-    <Compile Include="Tools\EnchantHelper.cs" />
-    <Compile Include="Tools\FileTools.cs" />
-    <Compile Include="Tools\Auras.cs" />
-    <Compile Include="Tools\CommonTools.cs" />
-    <Compile Include="Tools\EntityInteractionTools.cs" />
-    <Compile Include="Tools\EntitySelectionTools.cs" />
-    <Compile Include="EntityPlugin.cs" />
-    <Compile Include="Forms\EntitySelectForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\EntitySelectForm.Designer.cs">
-      <DependentUpon>EntitySelectForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\MainPanel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Forms\MainPanel.Designer.cs">
-      <DependentUpon>MainPanel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Actions\MoveToEntity.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Patches\Mapper\Patch_Astral_Quester_Forms_Mapper.cs" />
+    <Compile Include="Patches\Mapper\PointHelper.cs" />
+    <Compile Include="Patches\Mapper\Tools\EditCustomRegionTool.cs" />
+    <Compile Include="Patches\Mapper\Tools\AddCustomRegionTool.cs" />
+    <Compile Include="Patches\Mapper\Tools\ObjectInfoTool.cs" />
+    <Compile Include="Patches\Mapper\Tools\MapperMouseEventArgs.cs" />
+    <Compile Include="Patches\Mapper\Tools\MappingTool.cs" />
+    <Compile Include="Patches\Mapper\Tools\DistanceMeasurementTool.cs" />
+    <Compile Include="Patches\Mapper\Tools\NodeSelectTool.cs" />
+    <Compile Include="Patches\Mapper\Tools\IMapperTool.cs" />
+    <Compile Include="Patches\Mapper\Tools\RelocateNodesTool.cs" />
+    <Compile Include="Patches\Mapper\Tools\EditEdgeTool.cs" />
+    <Compile Include="Patches\Mapper\Tools\RemoveNodesTool.cs" />
+    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_DrawHotSpots.cs" />
+    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_GetPath.cs" />
+    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_GenerateRoad.cs" />
+    <Compile Include="Patches\Patch_Astral_Quester_Core_Save.cs" />
+    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_DrawRoad.cs" />
+    <Compile Include="Patches\Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes.cs" />
+    <Compile Include="Patches\Patch_VIP_SealTraderEntity.cs" />
+    <Compile Include="Patches\Patch_VIP_ProfessionVendorEntity.cs" />
+    <Compile Include="Patches\Logic.Classes.FSM.Navigation\HarmonyPatch_Astral_Logic_Classes_FSM_Navigation_ChangeWPDist.cs" />
+    <Compile Include="Patches\Quester.Controllers.Road\Patch_Quester_Controllers_Road_PathDistance.cs" />
+    <Compile Include="Patches\Quester.Controllers.Road\Patch_Quester_Controllers_Road_GenerateRoadFromPlayer.cs" />
+    <Compile Include="Patches\UCC\Patch_ActionsPlayer_CheckAlly.cs" />
+    <Compile Include="Patches\UCC\Patch_Logic_UCC_Forms_AddClass_Show.cs" />
+    <Compile Include="Patches\PatchesSettings.cs" />
+    <Compile Include="Patches\XmlSerializer\HarmonyPatch_XmlSerializer_GetExtraTypes.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Quester\Actions\BuySellItemsExt.cs" />
+    <Compile Include="Quester\Actions\ChangeInstanceToLeader.cs" />
+    <Compile Include="Quester\Actions\Enums.cs" />
+    <Compile Include="Quester\Actions\InsertInsignia.cs" />
+    <Compile Include="Quester\Actions\Deprecated\InteractEntity.cs" />
+    <Compile Include="Quester\Actions\InteractEntities.cs" />
+    <Compile Include="Quester\Actions\ChangePluginSettings.cs" />
+    <Compile Include="Quester\Actions\MoveToLeader.cs" />
+    <Compile Include="Quester\Actions\PickUpMissionExt.cs" />
+    <Compile Include="Core\Interfaces\IQuesterConditionEngine.cs" />
+    <Compile Include="Quester\Conditions\Deprecated\CheckCampaignTask.cs" />
+    <Compile Include="Quester\Conditions\CheckGameGUICondition.cs" />
+    <Compile Include="Quester\Conditions\CheckShard.cs" />
+    <Compile Include="Quester\Conditions\Deprecated\EntityDistance.cs" />
+    <Compile Include="Quester\Conditions\EntityProperty.cs" />
+    <Compile Include="Quester\Conditions\EntityCount.cs" />
+    <Compile Include="Quester\Conditions\TeamLeaderMapInstance.cs" />
+    <Compile Include="Quester\Conditions\TeamMemberCount.cs" />
+    <Compile Include="Editors\CampaignTaskEditor.cs" />
+    <Compile Include="Editors\AddTypeCommonEditor.cs" />
+    <Compile Include="Editors\ConditionListEditor.cs" />
+    <Compile Include="Core\MainPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Core\MainPanel.Designer.cs">
+      <DependentUpon>MainPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\NodePositionEditor.cs" />
+    <Compile Include="Editors\AuraIdEditor.cs" />
+    <Compile Include="Editors\UccGenericConditionEditor.cs" />
+    <Compile Include="Editors\UccActionEditor.cs" />
+    <Compile Include="Editors\UiIdEditor.cs" />
+    <Compile Include="Patches\Mapper\Tools\MappingToolHelper.cs" />
+    <Compile Include="Patches\Mapper\Enums.cs" />
+    <Compile Include="Patches\Mapper\MapperFormExt.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Patches\Mapper\MapperFormExt.Designer.cs">
+      <DependentUpon>MapperFormExt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Patches\Mapper\MapperGraphCache.cs" />
+    <Compile Include="Patches\Mapper\Tools\NodeDetail.cs" />
+    <Compile Include="Patches\Patcher.cs" />
+    <Compile Include="Patches\Patch.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Patches\Mapper\MapperSettings.cs" />
+    <Compile Include="Tools\Missions\Enums.cs" />
+    <Compile Include="Tools\Missions\MissionGiverRemote.cs" />
+    <Compile Include="Tools\Missions\MissionGiverNPC.cs" />
+    <Compile Include="Tools\Missions\MissionHelper.cs" />
+    <Compile Include="Settings\EntityCacheSettings.cs" />
+    <Compile Include="Settings\EntityToolsSettings.cs" />
+    <Compile Include="Servises\UnstuckSpell\UnstuckSpells.cs" />
+    <Compile Include="Servises\UnstuckSpell\UnstuckSpellsSettings.cs" />
+    <Compile Include="Logger\EntityToolLoggerSettings.cs" />
+    <Compile Include="Tools\AuraOption.cs" />
+    <Compile Include="Tools\BuySellItems\BagsList.cs" />
+    <Compile Include="Tools\BuySellItems\BuyItemEntry.cs" />
+    <Compile Include="Tools\BuySellItems\Enums.cs" />
+    <Compile Include="Tools\BuySellItems\Extensions.cs" />
+    <Compile Include="Tools\BuySellItems\IndexedBags.cs" />
+    <Compile Include="Tools\BuySellItems\ItemStats.cs" />
+    <Compile Include="Tools\BuySellItems\SlotCache.cs" />
+    <Compile Include="Tools\BuySellItems\VendorInfo.cs" />
+    <Compile Include="Tools\CollectionTypeConverter.cs" />
+    <Compile Include="Servises\EnchantHelper.cs" />
+    <Compile Include="Tools\CryptoHelper.cs" />
+    <Compile Include="Tools\Extensions\Vector3Extentions.cs" />
+    <Compile Include="Tools\Missions\MissionGiverBase.cs" />
+    <Compile Include="Tools\Missions\MissionGiverInfo.cs" />
+    <Compile Include="Tools\Navigation\CustomNavigator.cs" />
+    <Compile Include="Tools\Navigation\NavigationHelper.cs" />
+    <Compile Include="Tools\ReadWriteLocker.cs" />
+    <Compile Include="Tools\StringToPattern.cs" />
+    <Compile Include="Tools\EntityDef.cs" />
+    <Compile Include="Tools\Enums.cs" />
+    <Compile Include="Tools\Export\Enums.cs" />
+    <Compile Include="Tools\Extensions\ArrayExtensions.cs" />
+    <Compile Include="Tools\Extensions\HexConverter.cs" />
+    <Compile Include="Tools\Extensions\FormCollectionExtentions.cs" />
+    <Compile Include="Tools\Extensions\ListTExtentions.cs" />
+    <Compile Include="Tools\Extensions\StringExtentions.cs" />
+    <Compile Include="Tools\FileStreamHelper.cs" />
+    <Compile Include="Tools\FileTools.cs" />
+    <Compile Include="Tools\Export\Auras.cs" />
+    <Compile Include="Tools\CommonTools.cs" />
+    <Compile Include="Core\EntityPlugin.cs" />
+    <Compile Include="Quester\Actions\MoveToEntity.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Editors\EntityIdEditor.cs" />
-    <Compile Include="Editors\MultiCustomRegionSelectEditor.cs" />
+    <Compile Include="Editors\CustomRegionListEditor.cs" />
     <Compile Include="Editors\ShardEditor.cs" />
-    <Compile Include="Tools\Missions.cs" />
-    <Compile Include="Tools\MountInsignias\Enums.cs" />
-    <Compile Include="Tools\MountInsignias\MountBonusesDef.cs" />
-    <Compile Include="Tools\MountInsignias\MountBonusPriorityDef.cs" />
-    <Compile Include="Tools\MountInsignias\ParagonMountBonusPriorityDef.cs" />
-    <Compile Include="Tools\PlayerClassParagon.cs" />
-    <Compile Include="Tools\SettingsTools.cs" />
-    <Compile Include="Tools\Struct.cs" />
-    <Compile Include="Tools\UIInterfacesTools.cs" />
+    <Compile Include="Tools\Export\Missions.cs" />
+    <Compile Include="Tools\ParagonTools.cs" />
+    <Compile Include="Settings\PluginSettingsBase.cs" />
+    <Compile Include="Tools\Classes.cs" />
+    <Compile Include="Tools\Reflection\AstralAccessors.cs" />
+    <Compile Include="Tools\Reflection\CopyHelper.cs" />
+    <Compile Include="Tools\Reflection\InstanceFieldAccessor.cs" />
+    <Compile Include="Tools\Reflection\InstanceAction.cs" />
+    <Compile Include="Tools\Reflection\InstanceFunction.cs" />
+    <Compile Include="Tools\Reflection\PrivateConsructor.cs" />
+    <Compile Include="Tools\Reflection\ReflectionHelper.cs" />
+    <Compile Include="Tools\Reflection\StaticAction.cs" />
+    <Compile Include="Tools\Reflection\StaticFieldAccessor.cs" />
+    <Compile Include="Tools\Reflection\StaticFunction.cs" />
+    <Compile Include="Tools\Reflection\InstancePropertyAccessor.cs" />
+    <Compile Include="Tools\Reflection\StaticPropertyAccessor.cs" />
+    <Compile Include="Tools\SysInformer.cs" />
+    <Compile Include="Tools\XmlColor.cs" />
+    <Compile Include="UCC\Extensions\UCCActionExtention.cs" />
+    <Compile Include="Tools\Export\GameUITools.cs" />
+    <Compile Include="UCC\Conditions\UCCConditionPack.cs" />
+    <Compile Include="UCC\Conditions\ICustomUCCCondition.cs" />
+    <Compile Include="UCC\Conditions\UCCCheckTimer.cs" />
+    <Compile Include="UCC\Conditions\UCCTargetMatchEntity.cs" />
+    <Compile Include="UCC\Conditions\UCCQuesterCheck.cs" />
+    <Compile Include="UCC\Actions\DodgeFromEntity.cs" />
+    <Compile Include="UCC\Actions\ApproachEntity.cs" />
+    <Compile Include="UCC\Conditions\UCCEntityCheck.cs" />
+    <Compile Include="UCC\Conditions\UCCGameUICheck.cs" />
+    <Compile Include="UCC\Actions\ExecuteSpecificPower.cs" />
+    <Compile Include="UCC\Actions\SpecializedUCCAction.cs" />
+    <Compile Include="UCC\Conditions\UCCGenericCondition.cs" />
+    <Compile Include="UCC\UCCTools.cs" />
+    <Compile Include="UCC\Actions\UseItemSpecial.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Forms\EntitySelectForm.resx">
-      <DependentUpon>EntitySelectForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\InsigniaBonusSelectForm.resx">
-      <DependentUpon>InsigniaBonusSelectForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\MainPanel.resx">
+    <EmbeddedResource Include="Core\MainPanel.resx">
       <DependentUpon>MainPanel.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\MountBonusPriorityListForm.resx">
-      <DependentUpon>MountBonusPriorityListForm.cs</DependentUpon>
+    <EmbeddedResource Include="Editors\Forms\ItemFilterEditorForm.resx">
+      <DependentUpon>ItemFilterEditorForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\MultiSelectForm.resx">
-      <DependentUpon>MultiSelectForm.cs</DependentUpon>
+    <EmbeddedResource Include="Patches\Mapper\MapperFormExt.resx">
+      <DependentUpon>MapperFormExt.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\NodeSelectForm.resx">
-      <DependentUpon>NodeSelectForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\UIViewer.resx">
-      <DependentUpon>UIViewer.cs</DependentUpon>
+    <EmbeddedResource Include="Editors\Forms\ObjectInfoForm.resx">
+      <DependentUpon>ObjectInfoForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="UCC\" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Entity_7_40х48.png" />
+    <None Include="Resources\charArrow.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons_Inventory_Enchantments_Insignia_Barbed.png" />
+    <None Include="Resources\miniAdd.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons_Inventory_Enchantments_Insignia_Crescent.png" />
+    <None Include="Resources\miniBiPath.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons_Inventory_Enchantments_Insignia_Regal.png" />
+    <None Include="Resources\miniCancel.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons_Inventory_Enchantments_Insignia_Universal.png" />
+    <None Include="Resources\miniClone.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons_Inventory_Enchantments_Insignia_Enlightened.png" />
+    <None Include="Resources\miniCopy.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Images\Icons_Inventory_Enchantments_Insignia_Illuminated.png" />
+    <None Include="Resources\miniDelete.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="MichaelProg.pfx" />
-    <None Include="Properties\DataSources\MountBonuses.xml" />
+    <None Include="Resources\miniDistance.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniEllipceCR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniExport.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniGear.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniLink.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniLinPath.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniNodeDistance.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniRectCR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniImport.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniStop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniTarget.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniUniPath.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniValid.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniZdiff.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniRefresh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Entity_7_40х48.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniExpand.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniReverse.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniPlayAll.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Tools\ItemFilter\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniSave.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniExpand_2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniSave_1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniPen.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\node_tools.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniNodeMove_1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniNodeMove.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniEditCR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniEditEdge.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\previewchart_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniWizard.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniZoom.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniZoomIn.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniZoomOut.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniAddCR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniAddCR_2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniAddCR_3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\customization_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\select_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\navigationbar_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\info_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\rulervertical_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\rulerhorizontal_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\label_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniRoad.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\charArrow_16x16..png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\show_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\show_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\zoomin_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\zoomin_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\zoomout_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\zoomout_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.IO.Compression.ZipFile">
+      <Version>4.3.0</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
 </Project>

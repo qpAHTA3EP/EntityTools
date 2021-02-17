@@ -86,7 +86,7 @@ namespace EntityTools.Tools
 
             if(character != null && character.IsValid)
             {
-                foreach (AttribModNet def in character.Mods) // х64
+                foreach (var def in character.Mods) // х64
                     if (def.PowerDef.IsValid)
                             Mods.Add(new AuraDef(def.PowerDef));
             }

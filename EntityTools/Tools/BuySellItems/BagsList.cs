@@ -31,6 +31,7 @@ namespace EntityTools.Tools.BuySellItems
         : IXmlSerializable
 #endif
     {
+        #region Предустановленные наборы сумок
         /// <summary>
         /// Только сумки персонажа (без экипированных предметов)
         /// </summary>
@@ -167,7 +168,8 @@ namespace EntityTools.Tools.BuySellItems
                    || id == InvBagIDs.AdventuringSurges
                    || id == InvBagIDs.ArtifactPrimary
                    || id == InvBagIDs.ArtifactSecondary;
-        }
+        } 
+        #endregion
 
         public BagsList()
         {

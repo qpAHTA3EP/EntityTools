@@ -405,7 +405,7 @@ namespace EntityTools.Quester.Actions
                         if (theVendor is null || !theVendor.IsValid)
                         {
                             if (extendedActionDebugInfo)
-                            debug.Value.AddInfo(string.Concat(methodName, ": Summon 'VIPProfessionVendor'"));
+                                debug.Value.AddInfo(string.Concat(methodName, ": Summon 'VIPProfessionVendor'"));
                             VIP.SummonProfessionVendor();
                             Thread.Sleep(3000);
                             theVendor = VIP.ProfessionVendorEntity;
@@ -508,13 +508,13 @@ namespace EntityTools.Quester.Actions
                         // Открыто диалоговое окно
                         screenType = contactDialog.ScreenType;
                         if (screenType == ScreenType.List || screenType == ScreenType.Buttons)
-                            // Открыто диалоговое окно продавца
+                        {   // Открыто диалоговое окно продавца
                             if (@this._vendorMenus.Count > 0)
                                 Interact.DoDialog(_vendorMenus);
+                        }
                         else if (Check_ReadyToTraid(screenType))
-                        // Открыто витрина магазина (список товаров)
-                        // необходимо переключиться на нужную вкладку
-                        {
+                        {   // Открыто витрина магазина (список товаров)
+                            // необходимо переключиться на нужную вкладку
                             if (@this._vendorMenus.Count > 0)
                             {
                                 string key = @this._vendorMenus.Last();

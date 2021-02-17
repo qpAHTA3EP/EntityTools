@@ -17,11 +17,6 @@ namespace EntityTools.Editors
 #if DEVELOPER
     internal class VendorInfoEditor : UITypeEditor
     {
-#if Using_GetAnId_Form
-        static readonly GetAnId vendorTypeSelectForm = null;
-        static readonly InstanceFieldAccessor<GetAnId, System.Action> vendorTypeSelectForm_RefreshList;
-        static readonly InstanceFieldAccessor<GetAnId, ListBoxControl> vendorTypeSelectForm_List; 
-#else
         private static readonly VendorType[] displayedVendors = { //VendorType.Auto,
                                                                           VendorType.Normal,
                                                                           VendorType.ArtifactVendor,
@@ -29,23 +24,8 @@ namespace EntityTools.Editors
                                                                           VendorType.VIPSealTrader,
                                                                           VendorType.VIPProfessionVendor
                                                                         };
-#endif
 
-        static VendorInfoEditor()
-        {
-#if Using_GetAnId_Form
-            vendorTypeSelectForm = Activator<GetAnId>.CreateInstance("Select vendor", ReflectionHelper.DefaultFlags);
-            if (vendorTypeSelectForm != null)
-            {
-                vendorTypeSelectForm_RefreshList = vendorTypeSelectForm.GetInstanceField<GetAnId, System.Action>("refreshList");
-                vendorTypeSelectForm_RefreshList.Value = RefreshVendorList;
-
-                vendorTypeSelectForm_List = vendorTypeSelectForm.GetInstanceField<GetAnId, ListBoxControl>("listBoxControl1");
-            }
-            else throw new NullReferenceException($"Failed to initialize '{nameof(NPCVendorInfosExtEditor)}.{nameof(vendorTypeSelectForm)}'"); 
-#endif
-
-        }
+        static VendorInfoEditor() { }
 
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
@@ -64,11 +44,7 @@ namespace EntityTools.Editors
         public static bool SetInfos(out VendorInfo vendor)
         {
             vendor = null;
-#if Using_GetAnId_Form
-            VendorType vendor = GetVendor();
-#else
             VendorType vndType = VendorType.None;
-#endif
 
             if (EntityTools.Core.GUIRequest_Item(() => displayedVendors, ref vndType))
             {
@@ -134,38 +110,6 @@ namespace EntityTools.Editors
             }
             return false;
         }
-
-#if Using_GetAnId_Form
-        public static VendorType GetVendor()
-        {
-            if (vendorTypeSelectForm.ShowDialog() == System.Windows.Forms.DialogResult.OK
-                && vendorTypeSelectForm_List.Value.SelectedItem is VendorType vendorType)
-            {
-                return vendorType;
-            }
-            return VendorType.None;
-        }
-
-        private static void RefreshVendorList()
-        {
-            if (vendorTypeSelectForm_List != null)
-            {
-#if false
-                vendorTypeSelectForm_List.Value.Items.Clear();
-#if false
-                vendorTypeSelectForm_List.Value.Items.Add("Normal");
-                vendorTypeSelectForm_List.Value.Items.Add("ArtifactVendor");
-                vendorTypeSelectForm_List.Value.Items.Add("RemoteVendor");
-                vendorTypeSelectForm_List.Value.Items.Add("VIPSummonSealTrader");
-                vendorTypeSelectForm_List.Value.Items.Add("VIPProfessionVendor"); 
-#endif
-                vendorTypeSelectForm_List.Value.Items.Add(Enum.GetValues(typeof(VendorType))); 
-#else
-                vendorTypeSelectForm_List.Value.DataSource = Enum.GetValues(typeof(VendorType));
-#endif
-            }
-        } 
-#endif
     }
 #endif
 }

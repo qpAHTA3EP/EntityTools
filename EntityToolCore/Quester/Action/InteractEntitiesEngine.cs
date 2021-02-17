@@ -21,6 +21,7 @@ using static Astral.Quester.Classes.Action;
 using EntityTools;
 using System.Reflection;
 using EntityCore.Forms;
+using EntityTools.Tools.Navigation;
 
 namespace EntityCore.Quester.Action
 {
@@ -45,15 +46,13 @@ namespace EntityCore.Quester.Action
         public InteractEntitiesEngine(InteractEntities ie)
         {
             @this = ie;
-#if CORE_INTERFACES
-            @this.Engine = this;
-#endif
+            @this.ActionEngine = this;
             @this.PropertyChanged += PropertyChanged;
 
             CheckEntity = internal_CheckEntity_Initializer;
             GetCustomRegions = internal_GetCustomRegion_Initializer;
 
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {ActionLabel}");
+            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.ActionID}] initialized: {ActionLabel}");
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -142,17 +141,25 @@ namespace EntityCore.Quester.Action
                 ETLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Approach Entity[{target.ContainerId:X8}] for interaction");
 #endif
                 //TODO: Заменить EntityForInteraction собственной функцией перемещения и взаимодействия
-                if (target?.Location.Distance3DFromPlayer < @this._interactDistance
-                    //|| Approach.EntityForInteraction(target, CheckCombat/*new Func<Approach.BreakInfos>(CheckCombat)*/))
-                    || Approach.EntityByDistance(target, @this._interactDistance, CheckCombat))
+                var interactDistance = Math.Max(@this._interactDistance, 5);
+                if (target?.Location.Distance3DFromPlayer < interactDistance
+#if true
+                    || Approach.EntityForInteraction(target, internal_BreakInteraction))
+#else
+                    || Approach.EntityByDistance(target, @this._interactDistance, CheckCombat))  
+#endif
 
                 {
 #if DEBUG && DEBUG_INTERACTENTITIES
                     ETLogger.WriteLine(LogType.Debug, $"InteractEntitiesEngine::Run: Interact Entity[{target.ContainerId:X8}]");
 #endif
+#if true
+                    target.SmartInteract(interactDistance, @this._interactTime);
+                    //Thread.Sleep(@this._interactTime);
+#else
                     target.Interact();
                     Thread.Sleep(@this._interactTime);
-                    Interact.WaitForInteraction();
+#endif
                     if (@this.Dialogs.Count > 0)
                     {
                         Astral.Classes.Timeout timer = new Astral.Classes.Timeout(5000);
@@ -209,7 +216,8 @@ namespace EntityCore.Quester.Action
 
                     target = new Entity(IntPtr.Zero);
                 }
-                @this.CurrentHotSpotIndex = -1;
+                if(@this._resetCurrentHotSpot)
+                    @this.CurrentHotSpotIndex = -1;
             }
 
         }
@@ -271,6 +279,8 @@ namespace EntityCore.Quester.Action
 
             if (string.IsNullOrEmpty(@this._entityId))
                 EntitySelectForm.GUIRequest(ref @this._entityId, ref @this._entityIdType, ref @this._entityNameType);
+
+            label = string.Empty;
         }
 
         public void OnMapDraw(GraphicsNW graph)
@@ -402,7 +412,11 @@ namespace EntityCore.Quester.Action
             }
         }
 
-        private Approach.BreakInfos CheckCombat()
+        /// <summary>
+        /// Методы, используемый для прерывания взаимодействия с целевой Entity
+        /// </summary>
+        /// <returns></returns>
+        private Approach.BreakInfos internal_BreakInteraction()
         {
             if (Attackers.InCombat)
             {

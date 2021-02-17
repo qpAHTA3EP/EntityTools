@@ -327,10 +327,33 @@ namespace EntityTools.Quester.Actions
         internal bool _attackTargetEntity = true;
 
 #if DEVELOPER
+        [Description("Reset current HotSpot after approaching the target Entity")]
+#else
+        [Browsable(false)]
+#endif
+        public bool ResetCurrentHotSpot
+        {
+            get => _resetCurrentHotSpot; set
+            {
+                if (_resetCurrentHotSpot != value)
+                {
+                    _resetCurrentHotSpot = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ResetCurrentHotSpot)));
+                }
+            }
+        }
+        internal bool _resetCurrentHotSpot = false;
+
+#if DEVELOPER
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
         [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
         public string TestInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>";
+
+        [XmlIgnore]
+        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
+        [Description("Нажми на кнопку '...' чтобы увидеть информацию о текущей цели")]
+        public string TargetInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>";
 #endif
 
         [XmlIgnore]

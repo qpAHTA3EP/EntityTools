@@ -69,7 +69,7 @@ namespace EntityCore.Quester.Action
 #if timeout
             timeout.ChangeTime(0); 
 #endif
-            @this.Engine = this;
+            @this.ActionEngine = this;
             ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} initialized"); 
 #else
             InternalRebase(m2e);
@@ -176,7 +176,7 @@ namespace EntityCore.Quester.Action
                     if (entity != null)
                     {
                         closestEntity = entity;
-                        bool closestIsTarget = target != null && target.ContainerId != closestEntity.ContainerId;
+                        bool closestIsTarget = target != null && target.ContainerId == closestEntity.ContainerId;
 
                         if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
                             ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": Found ", Get_DebugStringOfEntity(closestEntity, "ClosestEntity", EntityDetail.Pointer),
@@ -191,7 +191,7 @@ namespace EntityCore.Quester.Action
                             }
                             target = closestEntity;
                         }
-                        else if (closestIsTarget)
+                        else if (!closestIsTarget)
                         {
                             // target не является ближайшей сущностью
                             if (!@this._holdTargetEntity)
@@ -223,7 +223,10 @@ namespace EntityCore.Quester.Action
                     else if(EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
                         ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": ClosestEntity not found"));
                 }
-                if (@this._ignoreCombat && entityPreprocessingResult != EntityPreprocessingResult.Succeeded)
+
+                bool needToRun = entityPreprocessingResult == EntityPreprocessingResult.Succeeded;
+
+                if (@this._ignoreCombat && !needToRun)
                 {
                     Astral.Quester.API.IgnoreCombat = true;
                     if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
@@ -231,8 +234,9 @@ namespace EntityCore.Quester.Action
                 }
 
                 if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": Result '", entityPreprocessingResult == EntityPreprocessingResult.Succeeded, '\''));
-                return entityPreprocessingResult == EntityPreprocessingResult.Succeeded;
+                    ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": Result '", needToRun, '\''));
+
+                return needToRun;
             }
         }
 
@@ -488,7 +492,8 @@ namespace EntityCore.Quester.Action
             if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
                 ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": ActionResult=", actionResult));
 
-            @this.CurrentHotSpotIndex = -1;
+            if(@this._resetCurrentHotSpot)
+                @this.CurrentHotSpotIndex = -1;
             return actionResult;
         }
 
@@ -544,15 +549,20 @@ namespace EntityCore.Quester.Action
             checkEntity = functor_CheckEntity_Initializer;
             getCustomRegions = functor_GetCustomRegion_Initializer;
             label = string.Empty;
+            if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(InternalReset)));
         }
 
         public void GatherInfos()
         {
+            if (string.IsNullOrEmpty(@this._entityId))
+                EntitySelectForm.GUIRequest(ref @this._entityId, ref @this._entityIdType, ref @this._entityNameType);
+
+            // TODO: Нужно проверить корректность загрузки профилей с функцией автодобавления HotSpot'a
             if (@this.HotSpots.Count == 0)
                 @this.HotSpots.Add(EntityManager.LocalPlayer.Location.Clone());
 
-            if (string.IsNullOrEmpty(@this._entityId))
-                EntitySelectForm.GUIRequest(ref @this._entityId, ref @this._entityIdType, ref @this._entityNameType);
+            label = string.Empty;
         }
 
         public void OnMapDraw(GraphicsNW graph)
