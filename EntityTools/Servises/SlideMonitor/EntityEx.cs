@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static EntityTools.Patches.Logic.Classes.FSM.Navigation.MountCostumeDef;
+using static EntityTools.Servises.SlideMonitor.MountCostumeDef;
 
-namespace EntityTools.Patches.Logic.Classes.FSM.Navigation
+namespace EntityTools.Servises.SlideMonitor
 {
     public static class EntityEx
     {

@@ -87,7 +87,7 @@ namespace EntityTools.Settings
             }
         }
         //[NonSerialized]
-        private int infernalMachineFilter = 400;
+        private int infernalMachineFilter = 150;
 
         public override string ToString()
         {

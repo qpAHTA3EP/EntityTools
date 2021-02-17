@@ -6,10 +6,10 @@ using MyNW.Classes;
 using EntityTools.Enums;
 
 #if PATCH_ASTRAL && HARMONY
-using HarmonyLib; 
+using HarmonyLib;
 #endif
 
-namespace EntityTools.Patches.Logic.Classes.FSM.Navigation
+namespace EntityTools.Servises.SlideMonitor
 {
 #if HARMONY
     /// <summary>
@@ -92,7 +92,7 @@ namespace EntityTools.Patches.Logic.Classes.FSM.Navigation
                             var mType = mountDef.Type;
                             switch (mType)
                             {
-                                case MountCostumeDef.MountType.None:
+                                case MountType.None:
 
 #if false
                                     // Скользский грунт
@@ -113,31 +113,31 @@ namespace EntityTools.Patches.Logic.Classes.FSM.Navigation
 #endif
 #endif
                                     break;
-                                case MountCostumeDef.MountType.BoatWhite:
+                                case MountType.BoatWhite:
                                     cachedWPD = filter * 0.75d;
 #if DEBUG && ChangeWPDist_LOG
                                     ETLogger.WriteLine(LogType.Debug, $"Astral_Logic_Classes_FSM_Navigation_ChangeWPDist: ActivateByMountType (BoatWhite) => {cachedWPD}");
 #endif
                                     break;
-                                case MountCostumeDef.MountType.BoatGreen:
+                                case MountType.BoatGreen:
                                     cachedWPD = filter * 1d;
 #if DEBUG && ChangeWPDist_LOG
                                     ETLogger.WriteLine(LogType.Debug, $"Astral_Logic_Classes_FSM_Navigation_ChangeWPDist: ActivateByMountType (BoatGreen) => {cachedWPD}");
 #endif
                                     break;
-                                case MountCostumeDef.MountType.BoatPurple:
+                                case MountType.BoatPurple:
                                     cachedWPD = filter * 1.5d;
 #if DEBUG && ChangeWPDist_LOG
                                     ETLogger.WriteLine(LogType.Debug, $"Astral_Logic_Classes_FSM_Navigation_ChangeWPDist: ActivateByMountType (BoatPurple) => {cachedWPD}");
 #endif
                                     break;
-                                case MountCostumeDef.MountType.InfernalCar:
+                                case MountType.InfernalCar:
                                     cachedWPD = EntityTools.Config.SlideMonitor.InfernalMachineFilter;
 #if DEBUG && ChangeWPDist_LOG
                                     ETLogger.WriteLine(LogType.Debug, $"Astral_Logic_Classes_FSM_Navigation_ChangeWPDist: ActivateByMountType (InfernalCar) => {cachedWPD}");
 #endif
                                     break;
-                                case MountCostumeDef.MountType.Mount:
+                                case MountType.Mount:
                                     cachedWPD = Astral.API.CurrentSettings.MountedChangeWPDist;
 #if DEBUG && ChangeWPDist_LOG
                                     ETLogger.WriteLine(LogType.Debug, $"Astral_Logic_Classes_FSM_Navigation_ChangeWPDist: ActivateByMountType (Mount) => {cachedWPD}");
@@ -338,7 +338,8 @@ namespace EntityTools.Patches.Logic.Classes.FSM.Navigation
         // в "Сошенстар": я = -289
         private const string BOAT_AURA = "M10_Becritter_Boat";
         private const string SLIPPERY_AURA = "Volume_Ground_Slippery";
-        private const string INFERNAL_MACHINE_AURA = "M19_Becritter_Infernal_Machine";
+        // Аура 'M19_Becritter_Infernal_Machine_Apply' - активна на всей карте Авернуса и не связана с перемещением "в машине"
+        private const string INFERNAL_MACHINE_AURA = "M19_Becritter_Infernal_Machine_Val";
         private const string CAR_AURA = "Vol_Car";
 
         private static AttribModNet slipperyAura; 

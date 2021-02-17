@@ -6,4 +6,14 @@
         ActivateByAura,
         ActivateByMountType
     }
+
+    public enum MountType
+    {
+        None,
+        Mount,
+        BoatWhite,
+        BoatGreen,
+        BoatPurple,
+        InfernalCar
+    }
 }

@@ -1,9 +1,10 @@
 ﻿using System;
+using EntityTools.Enums;
 using MyNW;
 using MyNW.Classes;
 using MyNW.Internals;
 
-namespace EntityTools.Patches.Logic.Classes.FSM.Navigation
+namespace EntityTools.Servises.SlideMonitor
 {
     public class MountCostumeDef : NativeObject
     {
@@ -33,42 +34,32 @@ namespace EntityTools.Patches.Logic.Classes.FSM.Navigation
                 {
                     if (EntityManager.LocalPlayer.CostumeRef.CostumeName == "Infernal_Machine_Car_Becritter_01")
                     {
-                        return MountType.InfernalCar;
+                        return EntityTools.Servises.SlideMonitor.MountCostumeDef.MountType.InfernalCar;
                     }
-                    return MountType.None;
+                    return EntityTools.Servises.SlideMonitor.MountCostumeDef.MountType.None;
                 }
                 else
                 {
                     if (Category != "Nw_Boat_Mount")
                     {
-                        return MountType.Mount;
+                        return EntityTools.Servises.SlideMonitor.MountCostumeDef.MountType.Mount;
                     }
                     string internalName = InternalName;
                     if (internalName == "M_Boat_Test_03")
                     {
-                        return MountType.BoatPurple;
+                        return EntityTools.Servises.SlideMonitor.MountCostumeDef.MountType.BoatPurple;
                     }
                     if (internalName == "M_Boat_Test_02")
                     {
-                        return MountType.BoatGreen;
+                        return EntityTools.Servises.SlideMonitor.MountCostumeDef.MountType.BoatGreen;
                     }
                     if (!(internalName == "M_Boat_Test_01"))
                     {
-                        return MountType.None;
+                        return EntityTools.Servises.SlideMonitor.MountCostumeDef.MountType.None;
                     }
-                    return MountType.BoatWhite;
+                    return EntityTools.Servises.SlideMonitor.MountCostumeDef.MountType.BoatWhite;
                 }
             }
-        }
-
-        public enum MountType
-        {
-            None,
-            Mount,
-            BoatWhite,
-            BoatGreen,
-            BoatPurple,
-            InfernalCar
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using MyNW.Classes;
 
-namespace EntityTools.Patches.Logic.Classes.FSM.Navigation
+namespace EntityTools.Servises.SlideMonitor
 {
     public static class CharacterEx
     {
