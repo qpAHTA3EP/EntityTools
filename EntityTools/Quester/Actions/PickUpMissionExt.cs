@@ -1,22 +1,27 @@
-﻿using System;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Runtime.CompilerServices;
+﻿#define MissionGiverInfo
+
 using Astral.Logic.Classes.Map;
 using Astral.Quester.UIEditors;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
 using MyNW.Classes;
+using System;
+using System.ComponentModel;
+using System.Drawing.Design;
+using System.Runtime.CompilerServices;
+using EntityTools.Editors;
+using EntityTools.Tools;
+using EntityTools.Tools.Missions;
 using Action = Astral.Quester.Classes.Action;
 using NPCInfos = Astral.Quester.Classes.NPCInfos;
+using System.Xml.Serialization;
 
 [assembly: InternalsVisibleTo("EntityCore")]
 
 namespace EntityTools.Quester.Actions
 {
     [Serializable]
-    public class PickUpMissionExt : Action,
-                                    INotifyPropertyChanged
+    public class PickUpMissionExt : Action, INotifyPropertyChanged
     {
         #region Опции команды
 #if DEVELOPER
@@ -59,12 +64,17 @@ namespace EntityTools.Quester.Actions
         internal bool _skipOnFail;
 
 #if DEVELOPER
-        [Editor(typeof(Astral.Quester.UIEditors.NPCInfos), typeof(UITypeEditor))]
+        [Editor(typeof(MissionGiverInfoEditor), typeof(UITypeEditor))]
         [Category("Required")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
 #else
         [Browsable(false)]
 #endif
-        public NPCInfos Giver
+#if MissionGiverInfo
+        public MissionGiverInfo Giver
+#else
+        public NPCInfos Giver 
+#endif
         {
             get => _giver;
             set
@@ -76,7 +86,82 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal NPCInfos _giver = new NPCInfos();
+#if MissionGiverInfo
+        internal MissionGiverInfo _giver = new MissionGiverInfo();
+#else
+        internal NPCInfos _giver = new NPCInfos(); 
+#endif
+
+        [Browsable(false)]
+        public string GiverId
+        {
+#if MissionGiverInfo
+            get => string.Empty;//_giver.Id;
+            set
+            {
+                if(!string.IsNullOrEmpty(value))
+                    _giver.Id = value;
+            } 
+#else
+            get => _giver.CostumeName;
+            set
+            {
+                _giver.CostumeName = value;
+                _giver.DisplayName = value;
+            }
+#endif
+        }
+        [Browsable(false)]
+        public Vector3 GiverPosition
+        {
+            get => null;//_giver.Position;
+            set
+            {
+                if (value != null && value.IsValid)
+                    _giver.Position = value;
+            }
+        }
+        [Browsable(false)]
+        [XmlIgnore]
+        public new bool PlayWhileUnSuccess
+        {
+            get => false;
+        }
+        [Browsable(false)]
+        [XmlIgnore]
+        public new bool PlayWhileConditionsAreOk
+        {
+            get => false;
+        }
+        [Browsable(false)]
+        [XmlIgnore]
+        public new bool Loop
+        {
+            get => false;
+        }
+        [Browsable(false)]
+        [XmlIgnore]
+        public new string AssociateMissionSuccess
+        {
+            get => string.Empty;
+        }
+
+#if !DEVELOPER
+        [Browsable(false)]
+#else
+        [Description("Check if contact have mission")]
+#endif
+        public ContactHaveMissionCheckType ContactHaveMission
+        {
+            get => _contactHaveMission;
+            set
+            {
+                if (_contactHaveMission == value) return;
+                _contactHaveMission = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ContactHaveMission)));
+            }
+        }
+        internal ContactHaveMissionCheckType _contactHaveMission = ContactHaveMissionCheckType.Any;
 
 #if !DEVELOPER
         [Browsable(false)]
@@ -86,11 +171,9 @@ namespace EntityTools.Quester.Actions
             get => _closeContactDialog;
             set
             {
-                if (_closeContactDialog != value)
-                {
-                    _closeContactDialog = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CloseContactDialog)));
-                }
+                if (_closeContactDialog == value) return;
+                _closeContactDialog = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CloseContactDialog)));
             }
         }
         internal bool _closeContactDialog;
@@ -103,11 +186,9 @@ namespace EntityTools.Quester.Actions
             get => _interactDistance;
             set
             {
-                if (_interactDistance != value)
-                {
-                    _interactDistance = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractDistance)));
-                }
+                if (_interactDistance == value) return;
+                _interactDistance = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractDistance)));
             }
         }
         internal float _interactDistance;
@@ -115,16 +196,31 @@ namespace EntityTools.Quester.Actions
 #if !DEVELOPER
         [Browsable(false)]
 #endif
+        public float InteractZDifference
+        {
+            get => _interactZDifference;
+            set
+            {
+                if (_interactZDifference == value) return;
+                _interactDistance = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractZDifference)));
+            }
+        }
+        internal float _interactZDifference = 5;
+
+#if !DEVELOPER
+        [Browsable(false)]
+#else
+        [Browsable(false)]
+#endif
         public bool AutoAcceptOfferedMission
         {
             get => _autoAcceptOfferedMission; set
             {
-                if(_autoAcceptOfferedMission != value)
-                {
-                    _autoAcceptOfferedMission = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AutoAcceptOfferedMission)));
-                }
-                
+                if (_autoAcceptOfferedMission == value) return;
+                _autoAcceptOfferedMission = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AutoAcceptOfferedMission)));
+
             }
         }
         internal bool _autoAcceptOfferedMission = true;
@@ -142,11 +238,9 @@ namespace EntityTools.Quester.Actions
             get => _requiredRewardItem;
             set
             {
-                if (_requiredRewardItem != value)
-                {
-                    _requiredRewardItem = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RequiredRewardItem)));
-                }
+                if (_requiredRewardItem == value) return;
+                _requiredRewardItem = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RequiredRewardItem)));
             }
         }
         internal string _requiredRewardItem = string.Empty;
@@ -155,103 +249,18 @@ namespace EntityTools.Quester.Actions
         #region Взаимодействие с EntityToolsCore
         public event PropertyChangedEventHandler PropertyChanged;
 
-#if CORE_DELEGATES
-        internal Func<ActionResult> coreRun = null;
-        internal Func<bool> coreNeedToRun = null;
-        internal Func<bool> coreValidate = null;
-        internal Action coreReset = null;
-        internal Action coreGatherInfos = null;
-        internal Func<string> coreString = null;
-#endif
-#if CORE_INTERFACES
         [NonSerialized]
         internal IQuesterActionEngine ActionEngine;
-#endif
 
         public PickUpMissionExt()
         {
-#if CORE_DELEGATES
-            coreRun = () => Core.EntityCoreProxy.Initialize(ref coreRun);
-            coreNeedToRun = () => Core.EntityCoreProxy.Initialize(ref coreNeedToRun);
-            coreValidate = () => Core.EntityCoreProxy.Initialize(ref coreValidate);
-            coreReset = () => Core.EntityCoreProxy.Initialize(ref coreReset);
-            coreGatherInfos = () => Core.EntityCoreProxy.Initialize(ref coreGatherInfos);
-            coreString = () => Core.EntityCoreProxy.Initialize(ref coreString);
-#endif
-#if CORE_INTERFACES
             ActionEngine = new QuesterActionProxy(this);
-#endif
-            // EntityTools.Core.Initialize(this);
+            base.PlayWhileConditionsAreOk = false;
+            base.PlayWhileUnSuccess = false;
+            base.Loop = false;
         }
         #endregion
 
-#if CORE_DELEGATES
-        #region Интерфейс Quester.Action
-        public override bool NeedToRun => coreNeedToRun();
-
-        public override ActionResult Run() => coreRun();
-
-        public override void GatherInfos() => coreGatherInfos();
-
-        [Browsable(false)]
-        [XmlIgnore]
-        public new string AssociateMission => string.Empty;
-
-        [Browsable(false)]
-        [XmlIgnore]
-        public new bool PlayWhileConditionsAreOk => false;//true;
-
-        protected override ActionValidity InternalValidity
-        {
-            get
-            {
-                if (Giver == null || !Giver.Position.IsValid)
-                {
-                    return new ActionValidity("Giver position invalid.");
-                }
-                if (this.MissionId.Length == 0)
-                {
-                    return new ActionValidity("Invalid mission id.");
-                }
-                return new ActionValidity();
-            }
-        }
-
-        public override string ActionLabel => coreString();
-
-        protected override bool IntenalConditions => coreValidate();
-
-        protected override Vector3 InternalDestination
-        {
-            get
-            {
-                if (Giver != null && Giver.Position.IsValid)
-                    return Giver.Position.Clone();
-                else return new Vector3();
-            }
-        }
-
-        public override bool UseHotSpots => false;
-
-        public override void OnMapDraw(GraphicsNW graph)
-        {
-            if (Giver != null && Giver.Position.IsValid)
-            {
-                graph.drawFillEllipse(Giver.Position, new Size(10, 10), Brushes.Beige);
-            }
-        }
-
-        public override void InternalReset() => coreReset();
-
-        [XmlIgnore]
-        [Browsable(false)]
-        public override string Category => "Basic";
-
-        public override string InternalDisplayName => string.Empty;
-        #endregion
-#endif
-#if CORE_INTERFACES
-        // Интерфес Quester.Action, реализованный через ActionEngine
         public override bool NeedToRun => ActionEngine.NeedToRun;
         public override ActionResult Run() => ActionEngine.Run();
         public override string ActionLabel => ActionEngine.ActionLabel;
@@ -263,6 +272,5 @@ namespace EntityTools.Quester.Actions
         public override void GatherInfos() => ActionEngine.GatherInfos();
         public override void InternalReset() => ActionEngine.InternalReset();
         public override void OnMapDraw(GraphicsNW graph) => ActionEngine.OnMapDraw(graph);
-#endif
     }
 }
