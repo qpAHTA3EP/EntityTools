@@ -32,7 +32,7 @@ namespace EntityTools.Patches.Navmesh
         public override bool NeedInjecttion => EntityTools.Config.Patches.Navigation;
 
 #if false
-class Astral.Quester.Controllers.Road
+        class Astral.Quester.Controllers.Road
 		internal static double PathDistance(Vector3 pos)
 		{
 			Road road = Road.GenerateRoadFromPlayer(pos);
@@ -46,7 +46,11 @@ class Astral.Quester.Controllers.Road
             {
 #if true
                 var playerLocation = EntityManager.LocalPlayer.Location;
-                var graph = AstralAccessors.Quester.Core.Meshes.Value;
+                var graph = AstralAccessors.Controllers.Roles.CurrentRole.UsedMeshes;
+
+                if (graph is null)
+                    return pos.Distance3D(playerLocation);
+
                 var road = Patch_Astral_Logic_Navmesh_GenerateRoad.GenerateRoad(graph,
                     playerLocation, pos, !Astral.API.CurrentSettings.PFOnlyForApproaches);
 

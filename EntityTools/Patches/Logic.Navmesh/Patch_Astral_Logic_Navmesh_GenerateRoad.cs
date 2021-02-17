@@ -42,7 +42,6 @@ namespace EntityTools.Patches.Navmesh
 
 #if false
 // Astral.Logic.Navmesh
-// Token: 0x060011DA RID: 4570 RVA: 0x0005CF50 File Offset: 0x0005B150
 public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool allowPathFinding)
 {
 	string obj = "AddPointWork";
@@ -138,7 +137,17 @@ public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool al
                 string obj = "AddPointWork";
                 lock (obj)
 #elif true
-                lock(@lock)
+
+                double distanceStart2End = start.Distance3D(end);
+                double distanceStart2StartNode = 0, distanceEnd2EndNode = 0;
+                Node startNode = null, endNode = null;
+
+                bool graphOK = graph?.NodesCount > 0;
+                if(graphOK)
+                    graph.ClosestNodes(start.X, start.Y, start.Z, out distanceStart2StartNode, out startNode,
+                        end.X, end.Y, end.Z, out distanceEnd2EndNode, out endNode);
+
+                lock (@lock)
 #endif
                 {
 #if PATCH_LOG
@@ -146,8 +155,8 @@ public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool al
 #endif
                     if (Astral.Controllers.Settings.Get.UsePathfinding3)
                     {
-                        List<Vector3> waypoints = new List<Vector3>();
-                        if (allowPathFinding || graph.NodesCount == 0)
+                        List<Vector3> waypoints = null;
+                        if (allowPathFinding || !graphOK)
                         {
 #if PATCH_LOG
                             pathFindingOrEmptyGraph_Time = stopwatch.ElapsedTicks; 
@@ -172,20 +181,18 @@ public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool al
                                 waypoints = new List<Vector3>();
 
                             bool tcpClientConnected = AstralAccessors.Controllers.BotComs.BotClient.Client_TcpClient.Connected;
-                            if (graph?.NodesCount > 0 && !tcpClientConnected)
+                            if (graphOK && !tcpClientConnected)
                             {
-                                double dist1 = 0, dist2 = 0;
-                                Node startNode = null, endNode = null;
 #if PATCH_LOG
                                 standardGraphSearching_Time = stopwatch.ElapsedTicks; 
 #endif
-                                using (graph.ReadLock())
+#if false
+                                if (dist1 < 130.0 && !ReferenceEquals(startNode, endNode)) 
+#else
+                                if (distanceStart2End > distanceStart2StartNode + distanceEnd2EndNode && !ReferenceEquals(startNode, endNode))
+#endif
                                 {
-                                    //Vector3 nearestNodePosFromPosition = Navmesh.GetNearestNodePosFromPosition(graph, start);
-                                    graph.ClosestNodes(start.X, start.Y, start.Z, out dist1, out startNode,
-                                        end.X, end.Y, end.Z, out dist2, out endNode);
-
-                                    if (dist1 < 130.0 && !ReferenceEquals(startNode, endNode))
+                                    using (graph.ReadLock())
                                     {
                                         road.Type = Road.RoadGenType.StandardGraph;
                                         Patch_Astral_Logic_Navmesh_GetPath.GetPathAndCorrect(graph, startNode, start, endNode, end, ref waypoints);
@@ -225,8 +232,8 @@ public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool al
                                 var goldGraph = GoldenPath.GetCurrentMapGraphFromCache();
                                 using (goldGraph.ReadLock())
                                 {
-                                    goldGraph.ClosestNodes(start.X, start.Y, start.Z, out double _, out Node startNode,
-                                                           end.X, end.Y, end.Z, out _, out Node endNode);
+                                    goldGraph.ClosestNodes(start.X, start.Y, start.Z, out double _, out startNode,
+                                                           end.X, end.Y, end.Z, out _, out endNode);
                                     Patch_Astral_Logic_Navmesh_GetPath.GetPathAndCorrect(goldGraph, startNode, start, endNode, end, ref waypoints);
                                 }
 #if PATCH_LOG
@@ -277,11 +284,7 @@ public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool al
                             }
                         }
                     }
-                    else if (graph is null)
-                    {
-                        road.Waypoints.Add(end.Clone());
-                    }
-                    else
+                    else if (graphOK)
                     {
 #if PATCH_LOG
                         directPathFinding_Time = stopwatch.ElapsedTicks; 
@@ -295,6 +298,10 @@ public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool al
                         stringBuilder.Append("DirectPathFinding from {").Append(start).Append("} => {").Append(end).AppendLine("}")
                             .Append("\tSearch time ").AppendLine(directPathFinding_Time.ToString()); 
 #endif
+                    }
+                    else
+                    {
+                        road.Waypoints.Add(end.Clone());
                     }
 
 #if PATCH_LOG

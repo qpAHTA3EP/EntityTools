@@ -74,7 +74,7 @@ public static void DrawHotSpots(List<Vector3> hotspots, GraphicsNW graph)
                 Vector3 startPos = new Vector3();
                 foreach (Vector3 vector in hotspots)
                 {
-                    graphicsNW.drawFillEllipse(vector, new Size(12, 12), Brushes.Blue);
+                    graphicsNW.drawFillEllipse(vector, MapperHelper.Size_12x12/*new Size(12, 12)*/, Brushes.Blue);
                     graphicsNW.drawString(vector, hotspots.IndexOf(vector).ToString(), 8, Brushes.Blue, -1, -6);
                 }
             }

@@ -14,17 +14,16 @@ namespace EntityTools.Patches.Navmesh
     {
         internal Patch_Astral_Logic_Navmesh_GetPath()
         {
-            if (NeedInjecttion)
-            {
-                MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("getPath", ReflectionHelper.DefaultFlags);
-                if (mi != null)
-                {
-                    methodToReplace = mi;
-                }
-                else throw new Exception("Patch_Astral_Logic_Navmesh_GetPath: fail to initialize 'methodToReplace'");
+            if (!NeedInjecttion) return;
 
-                methodToInject = GetType().GetMethod(nameof(GetPath), ReflectionHelper.DefaultFlags, null, new Type[] { typeof(Graph), typeof(Vector3), typeof(Vector3) }, null);
+            MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("getPath", ReflectionHelper.DefaultFlags);
+            if (mi != null)
+            {
+                methodToReplace = mi;
             }
+            else throw new Exception("Patch_Astral_Logic_Navmesh_GetPath: fail to initialize 'methodToReplace'");
+
+            methodToInject = GetType().GetMethod(nameof(GetPath), ReflectionHelper.DefaultFlags, null, new Type[] { typeof(Graph), typeof(Vector3), typeof(Vector3) }, null);
         }
 
         public sealed override bool NeedInjecttion => EntityTools.Config.Patches.Navigation;

@@ -64,7 +64,7 @@ namespace EntityTools.Patches.Navmesh
                 Vector3 startPos = new Vector3();
                 foreach (Vector3 endPos in waypoints)
                 {
-                    graphicsNW.drawFillEllipse(endPos, new Size(4, 4), blue);
+                    graphicsNW.drawFillEllipse(endPos, MapperHelper.Size_4x4/*new Size(4, 4)*/, blue);
                     if (startPos.IsValid)
                         graphicsNW.drawLine(startPos, endPos, Pens.Blue);
                     startPos = endPos;

@@ -267,7 +267,5 @@ namespace EntityTools.Patches
                 API.CurrentProfile.Saved = true;
             }
         }
-
-        
     }
 }

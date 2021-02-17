@@ -42,7 +42,7 @@ class Astral.Quester.Controllers.Road
         {
             if (end?.IsValid == true)
             {
-                var graph = AstralAccessors.Quester.Core.Meshes.Value;
+                var graph = AstralAccessors.Controllers.Roles.CurrentRole.UsedMeshes;
                 var playerLocation = EntityManager.LocalPlayer.Location;
                 return Patch_Astral_Logic_Navmesh_GenerateRoad.GenerateRoad(graph,
                     playerLocation, end, !Astral.API.CurrentSettings.PFOnlyForApproaches);
