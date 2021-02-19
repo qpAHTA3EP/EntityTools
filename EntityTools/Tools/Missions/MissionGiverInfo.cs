@@ -21,6 +21,8 @@ namespace EntityTools.Tools.Missions
         public Vector3 Position { get => _position; set => _position = value; }
         private Vector3 _position = new Vector3();
 
+        public double Distance =>  _position.IsValid ? _position.Distance3DFromPlayer : 0;
+
         public string Id
         {
             get => _id; set

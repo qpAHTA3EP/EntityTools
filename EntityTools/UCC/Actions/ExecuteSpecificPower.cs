@@ -23,19 +23,15 @@ namespace EntityTools.UCC.Actions
     public class ExecuteSpecificPower : UCCAction
     {
         #region Взаимодействие с EntityToolsCore
-#if CORE_INTERFACES
         [NonSerialized]
         internal IUCCActionEngine Engine;
-#endif
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public ExecuteSpecificPower()
         {
             Target = Astral.Logic.UCC.Ressources.Enums.Unit.Target;
-#if CORE_INTERFACES
             Engine = new UCCActionProxy(this);
-#endif
-            // EntityTools.Core.Initialize(this);
         }
         #endregion
 

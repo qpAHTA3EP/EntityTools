@@ -38,11 +38,13 @@ namespace EntityTools.Core
             this.fldrBroserDlg = new System.Windows.Forms.FolderBrowserDialog();
             this.tbclMain = new DevExpress.XtraTab.XtraTabControl();
             this.tabUtilities = new DevExpress.XtraTab.XtraTabPage();
+            this.gbxETLog = new System.Windows.Forms.GroupBox();
+            this.ckbETLogger = new System.Windows.Forms.CheckBox();
+            this.bntOpenLogFile = new System.Windows.Forms.Button();
             this.cbEnchantHelperActivator = new System.Windows.Forms.CheckBox();
             this.btnCheckCore = new System.Windows.Forms.Button();
             this.btnUiViewer = new System.Windows.Forms.Button();
             this.btnAuraViewer = new System.Windows.Forms.Button();
-            this.bntOpenLogFile = new System.Windows.Forms.Button();
             this.btnEntities = new System.Windows.Forms.Button();
             this.ckbSpellStuckMonitor = new System.Windows.Forms.CheckBox();
             this.gbxExport = new System.Windows.Forms.GroupBox();
@@ -50,7 +52,6 @@ namespace EntityTools.Core
             this.tbExportFileSelector = new DevExpress.XtraEditors.ButtonEdit();
             this.btnExport = new System.Windows.Forms.Button();
             this.btnDefault = new System.Windows.Forms.Button();
-            this.ckbETLogger = new System.Windows.Forms.CheckBox();
             this.ckbMapperPatch = new System.Windows.Forms.CheckBox();
             this.tabSettings = new DevExpress.XtraTab.XtraTabPage();
             this.pgConfigs = new System.Windows.Forms.PropertyGrid();
@@ -76,16 +77,15 @@ namespace EntityTools.Core
             this.btnTest3 = new System.Windows.Forms.Button();
             this.dlgSaveFile = new System.Windows.Forms.SaveFileDialog();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.gbxETLog = new System.Windows.Forms.GroupBox();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
             this.tbclMain.SuspendLayout();
             this.tabUtilities.SuspendLayout();
+            this.gbxETLog.SuspendLayout();
             this.gbxExport.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tbExportFileSelector.Properties)).BeginInit();
             this.tabSettings.SuspendLayout();
             this.tabRelogger.SuspendLayout();
             this.tabDebug.SuspendLayout();
-            this.gbxETLog.SuspendLayout();
             this.SuspendLayout();
             // 
             // tbclMain
@@ -118,10 +118,44 @@ namespace EntityTools.Core
             this.tabUtilities.Size = new System.Drawing.Size(368, 391);
             this.tabUtilities.Text = "Utilities";
             // 
+            // gbxETLog
+            // 
+            this.gbxETLog.Controls.Add(this.ckbETLogger);
+            this.gbxETLog.Controls.Add(this.bntOpenLogFile);
+            this.gbxETLog.Location = new System.Drawing.Point(9, 91);
+            this.gbxETLog.Name = "gbxETLog";
+            this.gbxETLog.Size = new System.Drawing.Size(350, 49);
+            this.gbxETLog.TabIndex = 13;
+            this.gbxETLog.TabStop = false;
+            this.gbxETLog.Text = "Logger";
+            // 
+            // ckbETLogger
+            // 
+            this.ckbETLogger.AutoSize = true;
+            this.ckbETLogger.Location = new System.Drawing.Point(6, 20);
+            this.ckbETLogger.Name = "ckbETLogger";
+            this.ckbETLogger.Size = new System.Drawing.Size(150, 17);
+            this.ckbETLogger.TabIndex = 3;
+            this.ckbETLogger.Text = "Enable EntityTools Logger";
+            this.ckbETLogger.UseVisualStyleBackColor = true;
+            this.ckbETLogger.CheckedChanged += new System.EventHandler(this.handler_EnableLogger);
+            // 
+            // bntOpenLogFile
+            // 
+            this.bntOpenLogFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bntOpenLogFile.Font = new System.Drawing.Font("Tahoma", 8.25F);
+            this.bntOpenLogFile.Location = new System.Drawing.Point(235, 16);
+            this.bntOpenLogFile.Name = "bntOpenLogFile";
+            this.bntOpenLogFile.Size = new System.Drawing.Size(109, 23);
+            this.bntOpenLogFile.TabIndex = 0;
+            this.bntOpenLogFile.Text = "Open LogFile";
+            this.bntOpenLogFile.UseVisualStyleBackColor = true;
+            this.bntOpenLogFile.Click += new System.EventHandler(this.handler_OpenLogFile);
+            // 
             // cbEnchantHelperActivator
             // 
             this.cbEnchantHelperActivator.AutoSize = true;
-            this.cbEnchantHelperActivator.Location = new System.Drawing.Point(9, 169);
+            this.cbEnchantHelperActivator.Location = new System.Drawing.Point(15, 169);
             this.cbEnchantHelperActivator.Name = "cbEnchantHelperActivator";
             this.cbEnchantHelperActivator.Size = new System.Drawing.Size(131, 17);
             this.cbEnchantHelperActivator.TabIndex = 10;
@@ -169,18 +203,6 @@ namespace EntityTools.Core
             this.btnAuraViewer.UseVisualStyleBackColor = true;
             this.btnAuraViewer.Click += new System.EventHandler(this.handler_OpenAuraViewer);
             // 
-            // bntOpenLogFile
-            // 
-            this.bntOpenLogFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.bntOpenLogFile.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.bntOpenLogFile.Location = new System.Drawing.Point(235, 16);
-            this.bntOpenLogFile.Name = "bntOpenLogFile";
-            this.bntOpenLogFile.Size = new System.Drawing.Size(109, 23);
-            this.bntOpenLogFile.TabIndex = 0;
-            this.bntOpenLogFile.Text = "Open LogFile";
-            this.bntOpenLogFile.UseVisualStyleBackColor = true;
-            this.bntOpenLogFile.Click += new System.EventHandler(this.handler_OpenLogFile);
-            // 
             // btnEntities
             // 
             this.btnEntities.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -199,7 +221,7 @@ namespace EntityTools.Core
             this.ckbSpellStuckMonitor.AutoSize = true;
             this.ckbSpellStuckMonitor.Checked = true;
             this.ckbSpellStuckMonitor.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ckbSpellStuckMonitor.Location = new System.Drawing.Point(9, 146);
+            this.ckbSpellStuckMonitor.Location = new System.Drawing.Point(15, 146);
             this.ckbSpellStuckMonitor.Name = "ckbSpellStuckMonitor";
             this.ckbSpellStuckMonitor.Size = new System.Drawing.Size(145, 17);
             this.ckbSpellStuckMonitor.TabIndex = 1;
@@ -272,21 +294,10 @@ namespace EntityTools.Core
             this.btnDefault.UseVisualStyleBackColor = true;
             this.btnDefault.Click += new System.EventHandler(this.handler_ResetExportSettings);
             // 
-            // ckbETLogger
-            // 
-            this.ckbETLogger.AutoSize = true;
-            this.ckbETLogger.Location = new System.Drawing.Point(6, 20);
-            this.ckbETLogger.Name = "ckbETLogger";
-            this.ckbETLogger.Size = new System.Drawing.Size(150, 17);
-            this.ckbETLogger.TabIndex = 3;
-            this.ckbETLogger.Text = "Enable EntityTools Logger";
-            this.ckbETLogger.UseVisualStyleBackColor = true;
-            this.ckbETLogger.CheckedChanged += new System.EventHandler(this.handler_EnableLogger);
-            // 
             // ckbMapperPatch
             // 
             this.ckbMapperPatch.AutoSize = true;
-            this.ckbMapperPatch.Location = new System.Drawing.Point(9, 192);
+            this.ckbMapperPatch.Location = new System.Drawing.Point(15, 192);
             this.ckbMapperPatch.Name = "ckbMapperPatch";
             this.ckbMapperPatch.Size = new System.Drawing.Size(154, 17);
             this.ckbMapperPatch.TabIndex = 3;
@@ -550,17 +561,6 @@ namespace EntityTools.Core
             this.dlgSaveFile.Filter = "XML|*.xml";
             this.dlgSaveFile.ValidateNames = false;
             // 
-            // gbxETLog
-            // 
-            this.gbxETLog.Controls.Add(this.ckbETLogger);
-            this.gbxETLog.Controls.Add(this.bntOpenLogFile);
-            this.gbxETLog.Location = new System.Drawing.Point(9, 91);
-            this.gbxETLog.Name = "gbxETLog";
-            this.gbxETLog.Size = new System.Drawing.Size(350, 49);
-            this.gbxETLog.TabIndex = 13;
-            this.gbxETLog.TabStop = false;
-            this.gbxETLog.Text = "Logger";
-            // 
             // EntityToolsMainPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -571,6 +571,8 @@ namespace EntityTools.Core
             this.tbclMain.ResumeLayout(false);
             this.tabUtilities.ResumeLayout(false);
             this.tabUtilities.PerformLayout();
+            this.gbxETLog.ResumeLayout(false);
+            this.gbxETLog.PerformLayout();
             this.gbxExport.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.tbExportFileSelector.Properties)).EndInit();
             this.tabSettings.ResumeLayout(false);
@@ -578,8 +580,6 @@ namespace EntityTools.Core
             this.tabRelogger.PerformLayout();
             this.tabDebug.ResumeLayout(false);
             this.tabDebug.PerformLayout();
-            this.gbxETLog.ResumeLayout(false);
-            this.gbxETLog.PerformLayout();
             this.ResumeLayout(false);
 
         }

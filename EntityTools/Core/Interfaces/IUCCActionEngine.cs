@@ -1,4 +1,5 @@
-﻿using MyNW.Classes;
+﻿using Astral.Logic.UCC.Classes;
+using MyNW.Classes;
 
 namespace EntityTools.Core.Interfaces
 {
@@ -8,5 +9,9 @@ namespace EntityTools.Core.Interfaces
         bool Run();
         Entity UnitRef { get; }
         string Label();
+
+#if false
+        bool Rebase(UCCAction action); 
+#endif
     }
 }

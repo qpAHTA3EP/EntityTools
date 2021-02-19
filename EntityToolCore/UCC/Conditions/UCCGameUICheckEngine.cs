@@ -23,9 +23,7 @@ namespace EntityCore.UCC.Conditions
         internal UCCGameUICheckEngine(UCCGameUICheck eck)
         {
             @this = eck;
-#if CORE_INTERFACES
             @this.Engine = this;
-#endif
             @this.PropertyChanged += PropertyChanged;
 
             ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");

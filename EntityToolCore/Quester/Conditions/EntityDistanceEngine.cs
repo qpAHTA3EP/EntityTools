@@ -14,10 +14,7 @@ using EntityTools;
 
 namespace EntityCore.Quester.Conditions
 {
-    internal class EntityDistanceEngine : IEntityInfos
-#if CORE_INTERFACES
-        , IQuesterConditionEngine
-#endif
+    internal class EntityDistanceEngine : IEntityInfos, IQuesterConditionEngine
     {
         #region Данные ядра
         private EntityDistance @this = null;
@@ -28,16 +25,7 @@ namespace EntityCore.Quester.Conditions
         internal EntityDistanceEngine(EntityDistance ettDist)
         {
             @this = ettDist;
-#if CORE_DELEGATES
-            @this.doValidate = Validate;
-            @this.doReset = Reset;
-            @this.getString = GetString;
-            @this.getTestInfos = TestInfos;
-            @this.PropertyChanged += PropertyChanged;
-#endif
-#if CORE_INTERFACES
             @this.Engine = this;
-#endif
             @this.PropertyChanged += PropertyChanged;
 
             ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
@@ -114,7 +102,6 @@ namespace EntityCore.Quester.Conditions
             return true;
         }
 
-#if CORE_INTERFACES
         public bool IsValid
         {
             get
@@ -167,6 +154,5 @@ namespace EntityCore.Quester.Conditions
             else label = $"[Deprecated] {@this.GetType().Name}";
             return label;
         }
-#endif
     }
 }

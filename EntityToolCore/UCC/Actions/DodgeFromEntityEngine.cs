@@ -13,10 +13,7 @@ using System.Text;
 
 namespace EntityCore.UCC.Actions
 {
-    class DodgeFromEntityEngine : IEntityInfos
-#if CORE_INTERFACES
-        , IUCCActionEngine
-#endif
+    class DodgeFromEntityEngine : IEntityInfos, IUCCActionEngine
     {
         #region Данные
         private DodgeFromEntity @this;
@@ -35,9 +32,7 @@ namespace EntityCore.UCC.Actions
         internal DodgeFromEntityEngine(DodgeFromEntity dfe)
         {
             @this = dfe;
-#if CORE_INTERFACES
             @this.Engine = this;
-#endif
             @this.PropertyChanged += PropertyChanged;
 
             checkEntity = internal_CheckEntity_Initializer;

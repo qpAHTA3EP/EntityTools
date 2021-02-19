@@ -18,12 +18,12 @@ namespace EntityTools.Editors
     internal class VendorInfoEditor : UITypeEditor
     {
         private static readonly VendorType[] displayedVendors = { //VendorType.Auto,
-                                                                          VendorType.Normal,
-                                                                          VendorType.ArtifactVendor,
-                                                                          VendorType.RemoteVendor,
-                                                                          VendorType.VIPSealTrader,
-                                                                          VendorType.VIPProfessionVendor
-                                                                        };
+                                                                    VendorType.Normal,
+                                                                    VendorType.ArtifactVendor,
+                                                                    VendorType.RemoteVendor,
+                                                                    VendorType.VIPSealTrader,
+                                                                    VendorType.VIPProfessionVendor
+                                                                };
 
         static VendorInfoEditor() { }
 

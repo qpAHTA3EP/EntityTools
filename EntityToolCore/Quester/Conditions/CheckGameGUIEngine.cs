@@ -24,9 +24,7 @@ namespace EntityCore.Quester.Conditions
         {
             @this = ckUiGen;
 
-#if CORE_INTERFACES
-            @this.ConditionEngine = this;
-#endif
+            @this.Engine = this;
             @this.PropertyChanged += PropertyChanged;
 
             ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");

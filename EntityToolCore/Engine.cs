@@ -37,7 +37,12 @@ namespace EntityCore
     {
         //TODO: Исправить ошибку восстановления статуса после PullProfileFromStack, которая проявилась в Lliiras_Night_DartKotik.amp.zip
 
-        internal static Dictionary<object, object> dictionary = new Dictionary<object, object>();
+        //internal static Dictionary<object, object> dictionary = new Dictionary<object, object>();
+
+        internal static Dictionary<QuesterAction, IQuesterActionEngine> dictQuesterAction = new Dictionary<QuesterAction, IQuesterActionEngine>();
+        internal static Dictionary<QuesterCondition, IQuesterConditionEngine> dictQuesterCondition = new Dictionary<QuesterCondition, IQuesterConditionEngine>();
+        internal static Dictionary<UCCAction, IUCCActionEngine> dictUccAction = new Dictionary<UCCAction, IUCCActionEngine>();
+        internal static Dictionary<UCCCondition, IUCCConditionEngine> dictUccCondition = new Dictionary<UCCCondition, IUCCConditionEngine>();
 
         public Engine()
         {
@@ -72,46 +77,106 @@ namespace EntityCore
             {
                 if (action is MoveToEntity m2e)
                 {
+#if false
                     if (!dictionary.ContainsKey(m2e))
                         dictionary.Add(m2e, new MoveToEntityEngine(m2e));
                     else if (dictionary[m2e] is MoveToEntityEngine m2ee)
                     {
                         m2e.Engine = m2ee;
                         return true;
+                    } 
+#else
+                    if (dictQuesterAction.TryGetValue(m2e, out IQuesterActionEngine engine))
+                    {
+                        if (engine is MoveToEntityEngine m2ee)
+                            m2e.Engine = m2ee;
+                        else
+                        {
+                            ETLogger.WriteLine(string.Concat("Invalid cast type '", engine.GetType().Name, "' to type '" + nameof(MoveToEntityEngine) + '\''));
+                            dictQuesterAction[m2e] = new MoveToEntityEngine(m2e);
+                        }
                     }
+                    else dictQuesterAction.Add(m2e, new MoveToEntityEngine(m2e));
+                    return true;
+#endif
                 }
 
                 if (action is InteractEntities ie)
                 {
+#if false
                     if (!dictionary.ContainsKey(ie))
                         dictionary.Add(ie, new InteractEntitiesEngine(ie));
                     else if (dictionary[ie] is InteractEntitiesEngine iee)
                     {
                         ie.ActionEngine = iee;
                         return true;
+                    } 
+#else
+                    if (dictQuesterAction.TryGetValue(ie, out IQuesterActionEngine engine))
+                    {
+                        if (engine is InteractEntitiesEngine iee)
+                            ie.Engine = iee;
+                        else
+                        {
+                            ETLogger.WriteLine(string.Concat("Invalid cast type '", engine.GetType().Name, "' to type '" + nameof(InteractEntitiesEngine) + '\''));
+                            dictQuesterAction[ie] = new InteractEntitiesEngine(ie);
+                        }
                     }
+                    else dictQuesterAction.Add(ie, new InteractEntitiesEngine(ie));
+                    return true;
+#endif
                 }
 
                 if (action is PickUpMissionExt pum)
                 {
+#if false
                     if (!dictionary.ContainsKey(pum))
                         dictionary.Add(pum, new PickUpMissionEngine(pum));
                     else if (dictionary[pum] is PickUpMissionEngine pume)
                     {
                         pum.ActionEngine = pume;
                         return true;
+                    } 
+#else
+                    if (dictQuesterAction.TryGetValue(pum, out IQuesterActionEngine engine))
+                    {
+                        if (engine is PickUpMissionEngine pume)
+                            pum.Engine = pume;
+                        else
+                        {
+                            ETLogger.WriteLine(string.Concat("Invalid cast type '", engine.GetType().Name, "' to type '" + nameof(PickUpMissionEngine) + '\''));
+                            dictQuesterAction[pum] = new PickUpMissionEngine(pum);
+                        }
                     }
+                    else dictQuesterAction.Add(pum, new PickUpMissionEngine(pum));
+                        return true;
+#endif
                 }
 
                 if (action is InsertInsignia ii)
                 {
+#if false
                     if (!dictionary.ContainsKey(ii))
                         dictionary.Add(ii, new InsertInsigniaEngine(ii));
                     else if (dictionary[ii] is InsertInsigniaEngine iie)
                     {
                         ii.ActionEngine = iie;
                         return true;
+                    } 
+#else
+                    if (dictQuesterAction.TryGetValue(ii, out IQuesterActionEngine engine))
+                    {
+                        if (engine is InsertInsigniaEngine iie)
+                            ii.Engine = iie;
+                        else
+                        {
+                            ETLogger.WriteLine(string.Concat("Invalid cast type '", engine.GetType().Name, "' to type '" + nameof(InsertInsigniaEngine) + '\''));
+                            dictQuesterAction[ii] = new InsertInsigniaEngine(ii);
+                        }
                     }
+                    else dictQuesterAction.Add(ii, new InsertInsigniaEngine(ii));
+                    return true;
+#endif
                 }
             }
             catch (Exception e)
@@ -126,53 +191,128 @@ namespace EntityCore
             {
                 if (condition is EntityCount ettCount)
                 {
+#if false
                     if (!dictionary.ContainsKey(ettCount))
                         dictionary.Add(ettCount, new EntityCountEngine(ettCount));
                     else if (dictionary[ettCount] is EntityCountEngine ettCountEngine)
                     {
                         ettCount.Engine = ettCountEngine;
                         return true;
+                    } 
+#else
+                    if (dictQuesterCondition.TryGetValue(ettCount, out IQuesterConditionEngine engine))
+                    {
+                        if (engine is EntityCountEngine ettCountEngine)
+                            ettCount.Engine = ettCountEngine;
+                        else
+                        {
+                            ETLogger.WriteLine(string.Concat("Invalid cast type '", engine.GetType().Name, "' to type '" + nameof(EntityCountEngine) + '\''));
+                            dictQuesterCondition[ettCount] = new EntityCountEngine(ettCount);
+                        }
                     }
+                    else dictQuesterCondition.Add(ettCount, new EntityCountEngine(ettCount));
+                    return true;
+#endif
                 }
-                if(condition is EntityProperty ettProperty)
+                if (condition is EntityProperty ettProperty)
                 {
+#if false
                     if (!dictionary.ContainsKey(ettProperty))
                         dictionary.Add(ettProperty, new EntityPropertyEngine(ettProperty));
                     else if (dictionary[ettProperty] is EntityPropertyEngine ettPropertyEngine)
                     {
                         ettProperty.Engine = ettPropertyEngine;
                         return true;
+                    } 
+#else
+                    if (dictQuesterCondition.TryGetValue(ettProperty, out IQuesterConditionEngine engine))
+                    {
+                        if (engine is EntityPropertyEngine ettPropertyEngine)
+                            ettProperty.Engine = ettPropertyEngine;
+                        else
+                        {
+                            ETLogger.WriteLine(string.Concat("Invalid cast type '", engine.GetType().Name, "' to type '" + nameof(EntityPropertyEngine) + '\''));
+                            dictQuesterCondition[ettProperty] = new EntityPropertyEngine(ettProperty);
+                        }
                     }
+                    else dictQuesterCondition.Add(ettProperty, new EntityPropertyEngine(ettProperty));
+                    return true;
+#endif
                 }
                 if (condition is TeamMembersCount teamCount)
                 {
+#if false
                     if (!dictionary.ContainsKey(teamCount))
                         dictionary.Add(teamCount, new TeamMembersCountEngine(teamCount));
                     else if (dictionary[teamCount] is TeamMembersCountEngine teamCountEngine)
                     {
                         teamCount.ConditionEngine = teamCountEngine;
                         return true;
+                    } 
+#else
+                    if (dictQuesterCondition.TryGetValue(teamCount, out IQuesterConditionEngine engine))
+                    {
+                        if (engine is EntityPropertyEngine teamCountEngine)
+                            teamCount.Engine = teamCountEngine;
+                        else
+                        {
+                            ETLogger.WriteLine(string.Concat("Invalid cast type '", engine.GetType().Name, "' to type '" + nameof(TeamMembersCountEngine) + '\''));
+                            dictQuesterCondition[teamCount] = new TeamMembersCountEngine(teamCount);
+                        }
                     }
+                    else dictQuesterCondition.Add(teamCount, new TeamMembersCountEngine(teamCount));
+                    return true;
+#endif
                 }
                 if (condition is CheckGameGUI guiCheck)
                 {
+#if false
                     if (!dictionary.ContainsKey(guiCheck))
                         dictionary.Add(guiCheck, new CheckGameGUIEngine(guiCheck));
                     else if (dictionary[guiCheck] is CheckGameGUIEngine guiCheckEngine)
                     {
                         guiCheck.ConditionEngine = guiCheckEngine;
                         return true;
+                    } 
+#else
+                    if (dictQuesterCondition.TryGetValue(guiCheck, out IQuesterConditionEngine engine))
+                    {
+                        if (engine is CheckGameGUIEngine guiCheckEngine)
+                            guiCheck.Engine = guiCheckEngine;
+                        else
+                        {
+                            ETLogger.WriteLine(string.Concat("Invalid cast type '", engine.GetType().Name, "' to type '" + nameof(CheckGameGUIEngine) + '\''));
+                            dictQuesterCondition[guiCheck] = new CheckGameGUIEngine(guiCheck);
+                        }
                     }
+                    else dictQuesterCondition.Add(guiCheck, new CheckGameGUIEngine(guiCheck));
+                    return true;
+#endif
                 }
                 if (condition is EntityDistance ettDist)
                 {
+#if false
                     if (!dictionary.ContainsKey(ettDist))
                         dictionary.Add(ettDist, new EntityDistanceEngine(ettDist));
                     else if (dictionary[ettDist] is EntityDistanceEngine ettDistEngine)
                     {
                         ettDist.Engine = ettDistEngine;
                         return true;
+                    } 
+#else
+                    if (dictQuesterCondition.TryGetValue(ettDist, out IQuesterConditionEngine engine))
+                    {
+                        if (engine is EntityDistanceEngine ettDistEngine)
+                            ettDist.Engine = ettDistEngine;
+                        else
+                        {
+                            ETLogger.WriteLine(string.Concat("Invalid cast type '", engine.GetType().Name, "' to type '" + nameof(EntityDistanceEngine) + '\''));
+                            dictQuesterCondition[ettDist] = new EntityDistanceEngine(ettDist);
+                        }
                     }
+                    else dictQuesterCondition.Add(ettDist, new EntityDistanceEngine(ettDist));
+                    return true;
+#endif
                 }
             }
             catch (Exception e)
@@ -187,43 +327,103 @@ namespace EntityCore
             {
                 if (action is ApproachEntity ettApproach)
                 {
+#if false
                     if (!dictionary.ContainsKey(ettApproach))
                         dictionary.Add(ettApproach, new ApproachEntityEngine(ettApproach));
                     else if (dictionary[ettApproach] is ApproachEntityEngine ettApproachEngine)
                     {
                         ettApproach.Engine = ettApproachEngine;
                         return true;
+                    } 
+#else
+                    if (dictUccAction.TryGetValue(ettApproach, out IUCCActionEngine engine))
+                    {
+                        if (engine is ApproachEntityEngine ettApproachEngine)
+                            ettApproach.Engine = ettApproachEngine;
+                        else
+                        {
+                            ETLogger.WriteLine(string.Concat("Invalid cast type '", engine.GetType().Name, "' to type '" + nameof(ApproachEntityEngine) + '\''));
+                            dictUccAction[ettApproach] = new ApproachEntityEngine(ettApproach);
+                        }
                     }
+                    else dictUccAction.Add(ettApproach, new ApproachEntityEngine(ettApproach));
+                    return true;
+#endif
                 }
                 if (action is DodgeFromEntity ettDodge)
                 {
+#if false
                     if (!dictionary.ContainsKey(ettDodge))
                         dictionary.Add(ettDodge, new DodgeFromEntityEngine(ettDodge));
                     else if (dictionary[ettDodge] is DodgeFromEntityEngine engine)
                     {
                         ettDodge.Engine = engine;
                         return true;
+                    } 
+#else
+                    if (dictUccAction.TryGetValue(ettDodge, out IUCCActionEngine engine))
+                    {
+                        if (engine is DodgeFromEntityEngine ettDodgeEngine)
+                            ettDodge.Engine = ettDodgeEngine;
+                        else
+                        {
+                            ETLogger.WriteLine(string.Concat("Invalid cast type '", engine.GetType().Name, "' to type '" + nameof(DodgeFromEntityEngine) + '\''));
+                            dictUccAction[ettDodge] = new DodgeFromEntityEngine(ettDodge);
+                        }
                     }
+                    else dictUccAction.Add(ettDodge, new DodgeFromEntityEngine(ettDodge));
+                    return true;
+#endif
                 }
                 if (action is ExecuteSpecificPower execPower)
                 {
+#if false
                     if (!dictionary.ContainsKey(execPower))
                         dictionary.Add(execPower, new ExecuteSpecificPowerEngine(execPower));
                     else if (dictionary[execPower] is ExecuteSpecificPowerEngine engine)
                     {
                         execPower.Engine = engine;
                         return true;
+                    } 
+#else
+                    if (dictUccAction.TryGetValue(execPower, out IUCCActionEngine engine))
+                    {
+                        if (engine is ExecuteSpecificPowerEngine execPowerEngine)
+                            execPower.Engine = execPowerEngine;
+                        else
+                        {
+                            ETLogger.WriteLine(string.Concat("Invalid cast type '", engine.GetType().Name, "' to type '" + nameof(ExecuteSpecificPowerEngine) + '\''));
+                            dictUccAction[execPower] = new ExecuteSpecificPowerEngine(execPower);
+                        }
                     }
+                    else dictUccAction.Add(execPower, new ExecuteSpecificPowerEngine(execPower));
+                    return true;
+#endif
                 }
                 if (action is UseItemSpecial useItem)
                 {
+#if false
                     if (!dictionary.ContainsKey(useItem))
                         dictionary.Add(useItem, new UseItemSpecialEngine(useItem));
                     else if (dictionary[useItem] is UseItemSpecialEngine engine)
                     {
                         useItem.Engine = engine;
                         return true;
+                    } 
+#else
+                    if (dictUccAction.TryGetValue(useItem, out IUCCActionEngine engine))
+                    {
+                        if (engine is UseItemSpecialEngine useItemEngine)
+                            useItem.Engine = useItemEngine;
+                        else
+                        {
+                            ETLogger.WriteLine(string.Concat("Invalid cast type '", engine.GetType().Name, "' to type '" + nameof(UseItemSpecialEngine) + '\''));
+                            dictUccAction[useItem] = new UseItemSpecialEngine(useItem);
+                        }
                     }
+                    else dictUccAction.Add(useItem, new UseItemSpecialEngine(useItem));
+                    return true;
+#endif
                 }
             }
             catch (Exception e)
@@ -238,33 +438,78 @@ namespace EntityCore
             { 
                 if (condition is UCCEntityCheck ettCheck)
                 {
+#if false
                     if (!dictionary.ContainsKey(ettCheck))
                         dictionary.Add(ettCheck, new UCCEntityCheckEngine(ettCheck));
                     else if (dictionary[ettCheck] is UCCEntityCheckEngine engine)
                     {
                         ettCheck.Engine = engine;
                         return true;
+                    } 
+#else
+                    if (dictUccCondition.TryGetValue(ettCheck, out IUCCConditionEngine engine))
+                    {
+                        if (engine is UCCEntityCheckEngine ettCheckEngine)
+                            ettCheck.Engine = ettCheckEngine;
+                        else
+                        {
+                            ETLogger.WriteLine(string.Concat("Invalid cast type '", engine.GetType().Name, "' to type '" + nameof(UCCEntityCheckEngine) + '\''));
+                            dictUccCondition[ettCheck] = new UCCEntityCheckEngine(ettCheck);
+                        }
                     }
+                    else dictUccCondition.Add(ettCheck, new UCCEntityCheckEngine(ettCheck));
+                    return true;
+#endif
                 }
                 if (condition is UCCTargetMatchEntity targMatch)
                 {
+#if false
                     if (!dictionary.ContainsKey(targMatch))
                         dictionary.Add(targMatch, new UCCTargetMatchEntityEngine(targMatch));
                     else if (dictionary[targMatch] is UCCTargetMatchEntityEngine engine)
                     {
                         targMatch.Engine = engine;
                         return true;
+                    } 
+#else
+                    if (dictUccCondition.TryGetValue(targMatch, out IUCCConditionEngine engine))
+                    {
+                        if (engine is UCCTargetMatchEntityEngine targMatchEngine)
+                            targMatch.Engine = targMatchEngine;
+                        else
+                        {
+                            ETLogger.WriteLine(string.Concat("Invalid cast type '", engine.GetType().Name, "' to type '" + nameof(UCCTargetMatchEntityEngine) + '\''));
+                            dictUccCondition[targMatch] = new UCCTargetMatchEntityEngine(targMatch);
+                        }
                     }
+                    else dictUccCondition.Add(targMatch, new UCCTargetMatchEntityEngine(targMatch));
+                    return true;
+#endif
                 }
                 if (condition is UCCGameUICheck uiCheck)
                 {
+#if false
                     if (!dictionary.ContainsKey(uiCheck))
                         dictionary.Add(uiCheck, new UCCGameUICheckEngine(uiCheck));
                     else if (dictionary[uiCheck] is UCCGameUICheckEngine engine)
                     {
                         uiCheck.Engine = engine;
                         return true;
+                    } 
+#else
+                    if (dictUccCondition.TryGetValue(uiCheck, out IUCCConditionEngine engine))
+                    {
+                        if (engine is UCCGameUICheckEngine uiCheckEngine)
+                            uiCheck.Engine = uiCheckEngine;
+                        else
+                        {
+                            ETLogger.WriteLine(string.Concat("Invalid cast type '", engine.GetType().Name, "' to type '" + nameof(UCCGameUICheckEngine) + '\''));
+                            dictUccCondition[uiCheck] = new UCCGameUICheckEngine(uiCheck);
+                        }
                     }
+                    else dictUccCondition.Add(uiCheck, new UCCGameUICheckEngine(uiCheck));
+                    return true;
+#endif
                 }
             }
             catch { }
@@ -414,8 +659,22 @@ namespace EntityCore
             {
                 StringBuilder sb = new StringBuilder();
 
-                object engine = dictionary.ContainsKey(obj) ? dictionary[obj] : null;
-                if (engine is IEntityInfos ettInfos)
+                IEntityInfos ettInfos = null;
+
+                if (obj is QuesterAction qa
+                    && dictQuesterAction.TryGetValue(qa, out IQuesterActionEngine qaEngine))
+                        ettInfos = qaEngine as IEntityInfos;
+                else if(obj is QuesterCondition qc
+                    && dictQuesterCondition.TryGetValue(qc, out IQuesterConditionEngine qcEngine))
+                        ettInfos = qcEngine as IEntityInfos;
+                else if (obj is UCCCondition uccCond
+                    && dictUccCondition.TryGetValue(uccCond, out IUCCConditionEngine uccCondEngine))
+                        ettInfos = uccCondEngine as IEntityInfos;
+                else if (obj is UCCAction uccAct
+                    && dictUccAction.TryGetValue(uccAct, out IUCCActionEngine uccActEngine))
+                        ettInfos = uccActEngine as IEntityInfos;
+
+                if (ettInfos != null)
                 {
                     sb.Append(ettInfos.EntityDiagnosticString(out string infos)
                         ? infos

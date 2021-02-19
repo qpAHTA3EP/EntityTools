@@ -34,30 +34,30 @@ namespace EntityTools.Servises.SlideMonitor
                 {
                     if (EntityManager.LocalPlayer.CostumeRef.CostumeName == "Infernal_Machine_Car_Becritter_01")
                     {
-                        return EntityTools.Servises.SlideMonitor.MountCostumeDef.MountType.InfernalCar;
+                        return MountType.InfernalCar;
                     }
-                    return EntityTools.Servises.SlideMonitor.MountCostumeDef.MountType.None;
+                    return MountType.None;
                 }
                 else
                 {
                     if (Category != "Nw_Boat_Mount")
                     {
-                        return EntityTools.Servises.SlideMonitor.MountCostumeDef.MountType.Mount;
+                        return MountType.Mount;
                     }
                     string internalName = InternalName;
                     if (internalName == "M_Boat_Test_03")
                     {
-                        return EntityTools.Servises.SlideMonitor.MountCostumeDef.MountType.BoatPurple;
+                        return MountType.BoatPurple;
                     }
                     if (internalName == "M_Boat_Test_02")
                     {
-                        return EntityTools.Servises.SlideMonitor.MountCostumeDef.MountType.BoatGreen;
+                        return MountType.BoatGreen;
                     }
                     if (!(internalName == "M_Boat_Test_01"))
                     {
-                        return EntityTools.Servises.SlideMonitor.MountCostumeDef.MountType.None;
+                        return MountType.None;
                     }
-                    return EntityTools.Servises.SlideMonitor.MountCostumeDef.MountType.BoatWhite;
+                    return MountType.BoatWhite;
                 }
             }
         }

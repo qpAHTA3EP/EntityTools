@@ -13,17 +13,14 @@ namespace EntityTools.Quester.Conditions
     {
         #region Взаимодействие с ядром EntityTools
         public event PropertyChangedEventHandler PropertyChanged;
-#if CORE_INTERFACES
+
         internal IQuesterConditionEngine Engine;
-#endif
         #endregion
 
         public EntityDistance()
         {
-#if CORE_INTERFACES
             Engine = new QuesterConditionProxy(this);
-#endif
-            // EntityTools.Core.Initialize(this);
+
             Distance = 0;
             Sign = Relation.Superior;
             EntityIdType = ItemFilterStringType.Simple;

@@ -577,6 +577,8 @@ namespace EntityTools.Tools.Navigation
         /// </summary>
         public static bool SmartInteract(this Entity entity, float interactDistance = 5, int interactTime = 2000)
         {
+            //TODO: Разворачивать камеру вместе с персонажем
+
             // Полная остановка навигации
             StopNavigationCompletly();
             

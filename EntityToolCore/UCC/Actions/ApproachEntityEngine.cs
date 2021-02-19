@@ -13,10 +13,7 @@ using System.Text;
 
 namespace EntityCore.UCC.Actions
 {
-    internal class ApproachEntityEngine : IEntityInfos
-#if CORE_INTERFACES
-                 , IUCCActionEngine
-#endif
+    internal class ApproachEntityEngine : IEntityInfos, IUCCActionEngine
     {
         #region Данные
         private ApproachEntity @this;
@@ -30,9 +27,7 @@ namespace EntityCore.UCC.Actions
         internal ApproachEntityEngine(ApproachEntity ae)
         {
             @this = ae;
-#if CORE_INTERFACES
             @this.Engine = this;
-#endif
             @this.PropertyChanged += PropertyChanged;
 
             checkEntity = internal_CheckEntity_Initializer;
@@ -42,7 +37,7 @@ namespace EntityCore.UCC.Actions
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (object.ReferenceEquals(sender, @this))
+            if (ReferenceEquals(sender, @this))
             {
                 switch (e.PropertyName)
                 {

@@ -25,10 +25,7 @@ using Unit = Astral.Logic.UCC.Ressources.Enums.Unit;
 
 namespace EntityCore.UCC.Actions
 {
-    public class ExecuteSpecificPowerEngine : IEntityInfos
-#if CORE_INTERFACES
-                 , IUCCActionEngine
-#endif
+    public class ExecuteSpecificPowerEngine : IEntityInfos, IUCCActionEngine
     {
         #region Данные
         private ExecuteSpecificPower @this;
@@ -53,9 +50,7 @@ namespace EntityCore.UCC.Actions
         internal ExecuteSpecificPowerEngine(ExecuteSpecificPower esp)
         {
             @this = esp;
-#if CORE_INTERFACES
             @this.Engine = this;
-#endif
             @this.PropertyChanged += PropertyChanged;
 
             ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");

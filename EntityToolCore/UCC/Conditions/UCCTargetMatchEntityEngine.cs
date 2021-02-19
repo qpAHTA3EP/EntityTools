@@ -28,9 +28,7 @@ namespace EntityCore.UCC.Conditions
         internal UCCTargetMatchEntityEngine(UCCTargetMatchEntity tarMatch)
         {
             @this = tarMatch;
-#if CORE_INTERFACES
             @this.Engine = this;
-#endif
             @this.PropertyChanged += PropertyChanged;
 
             checkEntity = internal_CheckEntity_Initializer;

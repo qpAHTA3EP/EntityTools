@@ -10,10 +10,12 @@ namespace EntityTools.Enums
         /// Персонаж
         /// </summary>
         NPC,
+#if false
         /// <summary>
         /// Предмет
         /// </summary>
-        Item,
+        Item, 
+#endif
         /// <summary>
         /// Дистанционный 
         /// </summary>

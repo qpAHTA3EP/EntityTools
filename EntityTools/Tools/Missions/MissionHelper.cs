@@ -71,6 +71,7 @@ namespace EntityTools.Tools.Missions
         /// </summary>
         public static bool CheckDialogOptionAndSelect(this ContactDialog contactDialog, Func<ContactDialogOption, bool> optionCheck, Func<bool> waitCheck = null, int time = 2000)
         {
+            //TODO: Научиться отслеживать изменение диалогового окна, происходящие в ответ на активацию пунктов диалога
             bool result = false;
             foreach (var contactDialogOption in contactDialog.Options)
             {
@@ -80,13 +81,14 @@ namespace EntityTools.Tools.Missions
                 if (contactDialogOption.CannotChoose)
                     break;
 
+                var waitTimeout = new Astral.Classes.Timeout(time);
+
                 result = contactDialogOption.Select();
                 Thread.Sleep(500);
 
                 if (waitCheck is null)
                     break;
 
-                var waitTimeout = new Astral.Classes.Timeout(time);
                 while (!waitTimeout.IsTimedOut && waitCheck())
                 {
                     Thread.Sleep(100);

@@ -12,10 +12,7 @@ using static Astral.Quester.Classes.Condition;
 
 namespace EntityCore.Quester.Conditions
 {
-    internal class EntityCountEngine : IEntityInfos
-#if CORE_INTERFACES
-        , IQuesterConditionEngine
-#endif
+    internal class EntityCountEngine : IEntityInfos, IQuesterConditionEngine
     {
         private EntityCount @this = null;
 
@@ -38,10 +35,7 @@ namespace EntityCore.Quester.Conditions
         internal EntityCountEngine(EntityCount ettc)
         {
             @this = ettc;
-
-#if CORE_INTERFACES
             @this.Engine = this;
-#endif
             @this.PropertyChanged += PropertyChanged;
 
             checkEntity = internal_CheckEntity_Initializer;
@@ -77,7 +71,6 @@ namespace EntityCore.Quester.Conditions
             }
         }
 
-#if CORE_INTERFACES
         public bool IsValid
         {
             get
@@ -338,7 +331,6 @@ namespace EntityCore.Quester.Conditions
                 label = $"{@this.GetType().Name} {@this._sign} {@this._value}";
             return label;
         }
-#endif
 
         public bool EntityDiagnosticString(out string infoString)
         {

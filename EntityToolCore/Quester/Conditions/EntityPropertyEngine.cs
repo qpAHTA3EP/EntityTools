@@ -13,10 +13,7 @@ using EntityTools;
 
 namespace EntityCore.Quester.Conditions
 {
-    internal class EntityPropertyEngine : IEntityInfos
-#if CORE_INTERFACES
-        , IQuesterConditionEngine
-#endif
+    internal class EntityPropertyEngine : IEntityInfos, IQuesterConditionEngine
     {
         private EntityProperty @this = null;
 
@@ -35,9 +32,7 @@ namespace EntityCore.Quester.Conditions
         internal EntityPropertyEngine(EntityProperty ettPr)
         {
             @this = ettPr;
-#if CORE_INTERFACES
             @this.Engine = this;
-#endif
             @this.PropertyChanged += PropertyChanged;
 
             checkEntity = internal_CheckEntity_Initializer;
@@ -141,7 +136,6 @@ namespace EntityCore.Quester.Conditions
             return true;
         }
 
-#if CORE_INTERFACES
         public bool IsValid
         {
             get
@@ -273,8 +267,6 @@ namespace EntityCore.Quester.Conditions
                 label = $"Entity [{@this._entityId}] {@this._propertyType} {@this._sign} to {@this._value}";
             return label;
         }
-#endif
-
 
         #region Вспомогательные методы
         internal bool ValidateEntity(Entity e)

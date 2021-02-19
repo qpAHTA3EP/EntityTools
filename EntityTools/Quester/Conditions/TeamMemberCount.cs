@@ -13,15 +13,12 @@ namespace EntityTools.Quester.Conditions
     {
         #region взаимодействие с ядром
         public event PropertyChangedEventHandler PropertyChanged;
-#if CORE_INTERFACES
-        internal IQuesterConditionEngine ConditionEngine;
-#endif
+
+        internal IQuesterConditionEngine Engine;
+
         public TeamMembersCount()
         {
-#if CORE_INTERFACES
-            ConditionEngine = new QuesterConditionProxy(this);
-#endif
-            // EntityTools.Core.Initialize(this);
+            Engine = new QuesterConditionProxy(this);
         }
         #endregion
         #region Опции команды
@@ -162,11 +159,9 @@ namespace EntityTools.Quester.Conditions
         internal int _searchTimeInterval = 500;*/
         #endregion
 
-#if CORE_INTERFACES
-        public override bool IsValid => ConditionEngine.IsValid;
-        public override void Reset() => ConditionEngine.Reset();
-        public override string TestInfos => ConditionEngine.TestInfos;
-        public override string ToString() => ConditionEngine.Label();
-#endif
+        public override bool IsValid => Engine.IsValid;
+        public override void Reset() => Engine.Reset();
+        public override string TestInfos => Engine.TestInfos;
+        public override string ToString() => Engine.Label();
     }
 }

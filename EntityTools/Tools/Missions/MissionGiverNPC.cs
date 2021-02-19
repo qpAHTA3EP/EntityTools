@@ -13,7 +13,7 @@ namespace EntityTools.Tools.Missions
         public override MissionGiverType GiverType => MissionGiverType.NPC; 
 
         public Vector3 Position { get => _position; set => _position = value; }
-        private Vector3 _position = new Vector3();
+        protected Vector3 _position = new Vector3();
 
         public override string Id
         {
@@ -35,7 +35,7 @@ namespace EntityTools.Tools.Missions
                 label = string.Empty;
             }
         }
-        private string _mapName = string.Empty;
+        protected string _mapName = string.Empty;
 
         [Editor(typeof(CurrentRegionEdit), typeof(UITypeEditor))]
         public string RegionName
@@ -47,8 +47,23 @@ namespace EntityTools.Tools.Missions
                 label = string.Empty;
             }
         }
-        private string _regionName = string.Empty;
+        protected string _regionName = string.Empty;
 
+#if DEVELOPER
+        [Description("The allowed deviation of the NPC from the specified Position")]
+#else
+        [Browsable(false)]
+#endif
+        public float GiverTolerance
+        {
+            get => _giverTolerance;
+            set
+            {
+                if (_giverTolerance == value) return;
+                _giverTolerance = value;
+            }
+        }
+        internal float _giverTolerance = 1;
 
         public override bool IsValid
         {

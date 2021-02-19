@@ -13,26 +13,19 @@ namespace EntityTools.Quester.Conditions
     {
         #region Взаимодействие с ядром EntityTools
         public event PropertyChangedEventHandler PropertyChanged;
-#if CORE_INTERFACES
-        internal IQuesterConditionEngine ConditionEngine;
-#endif
+        internal IQuesterConditionEngine Engine;
 
         public CheckGameGUI()
         {
-#if CORE_INTERFACES
-            ConditionEngine = new QuesterConditionProxy(this);
-#endif
-            // EntityTools.Core.Initialize(this);
+            Engine = new QuesterConditionProxy(this);
         }
         #endregion
 
-#if PATCH_ASTRAL
         static CheckGameGUI()
         {
             // Пременение патча на этапе десериализации (до инициализации плагина)
             ETPatcher.Apply();
         }
-#endif
 
         #region Опции команды
 #if DEVELOPER
@@ -154,12 +147,12 @@ namespace EntityTools.Quester.Conditions
         #endregion
 
 
-        public override bool IsValid => ConditionEngine.IsValid;
+        public override bool IsValid => Engine.IsValid;
 
-        public override void Reset() => ConditionEngine.Reset();
+        public override void Reset() => Engine.Reset();
 
-        public override string ToString() => ConditionEngine.Label();
+        public override string ToString() => Engine.Label();
 
-        public override string TestInfos => ConditionEngine.TestInfos;
+        public override string TestInfos => Engine.TestInfos;
     }
 }

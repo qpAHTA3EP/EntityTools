@@ -9,5 +9,9 @@ namespace EntityTools.Core.Interfaces
         string TestInfos(UCCAction refAction);
 
         string Label();
+
+#if false
+        bool Rebase(UCCCondition action); 
+#endif
     }
 }

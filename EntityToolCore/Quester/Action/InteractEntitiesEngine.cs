@@ -46,7 +46,7 @@ namespace EntityCore.Quester.Action
         public InteractEntitiesEngine(InteractEntities ie)
         {
             @this = ie;
-            @this.ActionEngine = this;
+            @this.Engine = this;
             @this.PropertyChanged += PropertyChanged;
 
             CheckEntity = internal_CheckEntity_Initializer;
@@ -160,7 +160,7 @@ namespace EntityCore.Quester.Action
                     target.Interact();
                     Thread.Sleep(@this._interactTime);
 #endif
-                    if (@this.Dialogs.Count > 0)
+                    if (@this._dialogs.Count > 0)
                     {
                         Astral.Classes.Timeout timer = new Astral.Classes.Timeout(5000);
                         while (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options.Count == 0)
@@ -172,7 +172,7 @@ namespace EntityCore.Quester.Action
                             Thread.Sleep(100);
                         }
                         Thread.Sleep(500);
-                        foreach (string key in @this.Dialogs)
+                        foreach (string key in @this._dialogs)
                         {
                             EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.SelectOptionByKey(key, "");
                             Thread.Sleep(1000);

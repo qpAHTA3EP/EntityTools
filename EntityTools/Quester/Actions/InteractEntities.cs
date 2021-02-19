@@ -470,32 +470,26 @@ namespace EntityTools.Quester.Actions
         #region Взаимодействие с EntityToolsCore
         public event PropertyChangedEventHandler PropertyChanged;
 
-#if CORE_INTERFACES
         [NonSerialized]
-        internal IQuesterActionEngine ActionEngine;
-#endif
+        internal IQuesterActionEngine Engine;
 
         public InteractEntities()
         {
-#if CORE_INTERFACES
-            ActionEngine = new QuesterActionProxy(this);
-#endif
+            Engine = new QuesterActionProxy(this);
         }
         #endregion
 
-#if CORE_INTERFACES
         // Интерфейс Quester.Action через IQuesterActionEngine
-        public override bool NeedToRun => ActionEngine.NeedToRun;
-        public override ActionResult Run() => ActionEngine.Run();
-        public override string ActionLabel => ActionEngine.ActionLabel;
+        public override bool NeedToRun => Engine.NeedToRun;
+        public override ActionResult Run() => Engine.Run();
+        public override string ActionLabel => Engine.ActionLabel;
         public override string InternalDisplayName => string.Empty;
-        public override bool UseHotSpots => ActionEngine.UseHotSpots;
-        protected override Vector3 InternalDestination => ActionEngine.InternalDestination;
-        protected override bool IntenalConditions => ActionEngine.InternalConditions;
-        protected override ActionValidity InternalValidity => ActionEngine.InternalValidity;
-        public override void InternalReset() => ActionEngine.InternalReset();
-        public override void GatherInfos() => ActionEngine.GatherInfos();
-        public override void OnMapDraw(GraphicsNW graph) => ActionEngine.OnMapDraw(graph);
-#endif
+        public override bool UseHotSpots => Engine.UseHotSpots;
+        protected override Vector3 InternalDestination => Engine.InternalDestination;
+        protected override bool IntenalConditions => Engine.InternalConditions;
+        protected override ActionValidity InternalValidity => Engine.InternalValidity;
+        public override void InternalReset() => Engine.InternalReset();
+        public override void GatherInfos() => Engine.GatherInfos();
+        public override void OnMapDraw(GraphicsNW graph) => Engine.OnMapDraw(graph);
     }
 }

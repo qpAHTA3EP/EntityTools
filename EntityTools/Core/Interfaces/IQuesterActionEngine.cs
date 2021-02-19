@@ -1,6 +1,7 @@
 ﻿using Astral.Logic.Classes.Map;
 using MyNW.Classes;
 using static Astral.Quester.Classes.Action;
+using QuesterAction = Astral.Quester.Classes.Action;
 
 namespace EntityTools.Core.Interfaces
 {
@@ -20,5 +21,9 @@ namespace EntityTools.Core.Interfaces
         void InternalReset();
         void GatherInfos();
         void OnMapDraw(GraphicsNW graph);
+
+#if false
+        bool Rebase(QuesterAction action); 
+#endif
     }
 }

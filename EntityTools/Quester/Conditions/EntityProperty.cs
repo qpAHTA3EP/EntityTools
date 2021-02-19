@@ -16,23 +16,13 @@ namespace EntityTools.Quester.Conditions
     {
         #region Взаимодействие с ядром EntityTools
         public event PropertyChangedEventHandler PropertyChanged;
-#if CORE_DELEGATES
-        public Func<bool> doValidate = null;
-        public Func<string> getString = null;
-        public Func<string> getTestInfos = null;
-        public System.Action doReset = null;
-#endif
-#if CORE_INTERFACES
+
         internal IQuesterConditionEngine Engine;
-#endif
         #endregion
 
         public EntityProperty()
         {
-#if CORE_INTERFACES
             Engine = new QuesterConditionProxy(this);
-#endif
-            // EntityTools.Core.Initialize(this);
         }
 
         #region Опции команды
@@ -315,46 +305,9 @@ namespace EntityTools.Quester.Conditions
 #endif
         #endregion
 
-#if CORE_DELEGATES
-       public override string ToString()
-        {
-            if (getString == null)
-                EntityTools.Core.Initialize(this);
-            return getString();
-        }
-
-        public override bool IsValid
-        {
-            get
-            {
-                if (doValidate == null)
-                    EntityTools.Core.Initialize(this);
-                return doValidate();
-            }
-        }
-
-        public override string TestInfos
-        {
-            get
-            {
-                if (getTestInfos == null)
-                    EntityTools.Core.Initialize(this);
-                return getTestInfos();
-            }
-        }
-
-        public override void Reset()
-        {
-            if (doReset == null)
-                EntityTools.Core.Initialize(this);
-            doReset();
-        }
-#endif
-#if CORE_INTERFACES
         public override bool IsValid => Engine.IsValid;
         public override void Reset() => Engine.Reset();
         public override string TestInfos => Engine.TestInfos;
         public override string ToString() => Engine.Label();
-#endif
     }
 }

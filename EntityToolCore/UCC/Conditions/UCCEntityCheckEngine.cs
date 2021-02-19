@@ -30,9 +30,7 @@ namespace EntityCore.UCC.Conditions
         internal UCCEntityCheckEngine(UCCEntityCheck eck)
         {
             @this = eck;
-#if CORE_INTERFACES
             @this.Engine = this;
-#endif
             @this.PropertyChanged += PropertyChanged;
 
             checkEntity = internal_CheckEntity_Initializer;

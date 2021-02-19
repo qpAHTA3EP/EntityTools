@@ -8,12 +8,9 @@ namespace EntityTools.Tools.Missions
     {
         public override MissionGiverType GiverType => MissionGiverType.Remote; 
 
-        public override bool IsValid => string.IsNullOrEmpty(_id);
+        public override bool IsValid => !string.IsNullOrEmpty(_id);
 
-        public override bool IsAccessible()
-        {
-            return true;
-        }
+        public override bool IsAccessible() => true;
 
         public override bool IsMatching(Entity entity) => false;
 

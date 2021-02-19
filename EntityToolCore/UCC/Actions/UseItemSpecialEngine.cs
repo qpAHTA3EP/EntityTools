@@ -29,9 +29,7 @@ namespace EntityCore.UCC.Actions
         internal UseItemSpecialEngine(UseItemSpecial uis)
         {
             @this = uis;
-#if CORE_INTERFACES
             @this.Engine = this;
-#endif
             @this.PropertyChanged += PropertyChanged;
 
             ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");

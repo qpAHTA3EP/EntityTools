@@ -20,20 +20,17 @@ namespace EntityTools.UCC.Actions
     {
         #region Взаимодействие с EntityToolsCore
         private Dodge dodge = new Dodge();
-#if CORE_INTERFACES
+
         [NonSerialized]
         internal IUCCActionEngine Engine;
-#endif
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public DodgeFromEntity()
         {
             Target = Unit.Player;
             dodge.Direction = DodgeDirection.DodgeSmart;
-#if CORE_INTERFACES
             Engine = new UCCActionProxy(this);
-#endif
-            // EntityTools.Core.Initialize(this);
         }
         #endregion
 

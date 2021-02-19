@@ -12,10 +12,7 @@ using static Astral.Quester.Classes.Condition;
 
 namespace EntityCore.Quester.Conditions
 {
-    class TeamMembersCountEngine
-#if CORE_INTERFACES
-        : IQuesterConditionEngine
-#endif
+    class TeamMembersCountEngine : IQuesterConditionEngine
     {
         private TeamMembersCount @this = null;
 
@@ -42,9 +39,7 @@ namespace EntityCore.Quester.Conditions
         internal TeamMembersCountEngine(TeamMembersCount tmc)
         {
             @this = tmc;
-#if CORE_INTERFACES
-            @this.ConditionEngine = this;
-#endif
+            @this.Engine = this;
             @this.PropertyChanged += PropertyChanged;
 
             getCustomRegions = internal_GetCustomRegion_Initializer;
@@ -72,7 +67,6 @@ namespace EntityCore.Quester.Conditions
         }
 
 
-#if CORE_INTERFACES
         public bool IsValid
         {
             get
@@ -352,7 +346,6 @@ namespace EntityCore.Quester.Conditions
                 label = $"{@this.GetType().Name} {@this._sign} to {@this._memberCount}";
             return label;
         }
-#endif
 
         private List<CustomRegion> internal_GetCustomRegion_Initializer()
         {

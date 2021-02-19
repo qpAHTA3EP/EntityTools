@@ -17,18 +17,14 @@ namespace EntityTools.UCC.Actions
     public class ApproachEntity : UCCAction, INotifyPropertyChanged
     {
         #region Взаимодействие с EntityToolsCore
-#if CORE_INTERFACES
         [NonSerialized]
         internal IUCCActionEngine Engine;
-#endif
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public ApproachEntity()
         {
-#if CORE_INTERFACES
             Engine = new UCCActionProxy(this);
-#endif
-            // EntityTools.Core.Initialize(this);
         }
         #endregion
 

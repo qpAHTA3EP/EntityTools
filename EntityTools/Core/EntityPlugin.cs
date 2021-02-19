@@ -50,6 +50,9 @@ namespace EntityTools
         private static readonly Action<bool> ToggleRole = typeof(Roles).GetStaticAction<bool>("ToggleRole", BindingFlags.Public);
         public static void StopBot()
         {
+#if DEBUG
+            ETLogger.WriteLine(LogType.Debug, Environment.StackTrace); 
+#endif
             ToggleRole(false);
         }
 

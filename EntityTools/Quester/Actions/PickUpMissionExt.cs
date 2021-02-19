@@ -15,6 +15,7 @@ using EntityTools.Tools.Missions;
 using Action = Astral.Quester.Classes.Action;
 using NPCInfos = Astral.Quester.Classes.NPCInfos;
 using System.Xml.Serialization;
+using System.Collections.Generic;
 
 [assembly: InternalsVisibleTo("EntityCore")]
 
@@ -70,11 +71,7 @@ namespace EntityTools.Quester.Actions
 #else
         [Browsable(false)]
 #endif
-#if MissionGiverInfo
         public MissionGiverInfo Giver
-#else
-        public NPCInfos Giver 
-#endif
         {
             get => _giver;
             set
@@ -86,65 +83,28 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-#if MissionGiverInfo
         internal MissionGiverInfo _giver = new MissionGiverInfo();
-#else
-        internal NPCInfos _giver = new NPCInfos(); 
-#endif
 
-        [Browsable(false)]
-        public string GiverId
-        {
-#if MissionGiverInfo
-            get => string.Empty;//_giver.Id;
-            set
-            {
-                if(!string.IsNullOrEmpty(value))
-                    _giver.Id = value;
-            } 
+#if DEVELOPER
+        [Editor(typeof(MissionGiverInfoExtendedEditor), typeof(UITypeEditor))]
+        [Category("Required")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
 #else
-            get => _giver.CostumeName;
-            set
-            {
-                _giver.CostumeName = value;
-                _giver.DisplayName = value;
-            }
+        [Browsable(false)]
 #endif
-        }
-        [Browsable(false)]
-        public Vector3 GiverPosition
+        public MissionGiverBase NewGiver
         {
-            get => null;//_giver.Position;
+            get => _newGiver;
             set
             {
-                if (value != null && value.IsValid)
-                    _giver.Position = value;
+                if (_newGiver != value)
+                {
+                    _newGiver = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(NewGiver)));
+                }
             }
         }
-        [Browsable(false)]
-        [XmlIgnore]
-        public new bool PlayWhileUnSuccess
-        {
-            get => false;
-        }
-        [Browsable(false)]
-        [XmlIgnore]
-        public new bool PlayWhileConditionsAreOk
-        {
-            get => false;
-        }
-        [Browsable(false)]
-        [XmlIgnore]
-        public new bool Loop
-        {
-            get => false;
-        }
-        [Browsable(false)]
-        [XmlIgnore]
-        public new string AssociateMissionSuccess
-        {
-            get => string.Empty;
-        }
+        internal MissionGiverBase _newGiver = new MissionGiverNPC(); 
 
 #if !DEVELOPER
         [Browsable(false)]
@@ -208,6 +168,7 @@ namespace EntityTools.Quester.Actions
         }
         internal float _interactZDifference = 5;
 
+#if disabled_2021_02_17
 #if !DEVELOPER
         [Browsable(false)]
 #else
@@ -223,7 +184,8 @@ namespace EntityTools.Quester.Actions
 
             }
         }
-        internal bool _autoAcceptOfferedMission = true;
+        internal bool _autoAcceptOfferedMission = true; 
+#endif
 
 #if DEVELOPER
         [Editor(typeof(RewardsEditor), typeof(UITypeEditor))]
@@ -244,33 +206,106 @@ namespace EntityTools.Quester.Actions
             }
         }
         internal string _requiredRewardItem = string.Empty;
+
+#if DEVELOPER
+        [Description("Answers in dialog which have to be performed before mission picking up")]
+        [Editor(typeof(DialogEditor), typeof(UITypeEditor))]
+#else
+        [Browsable(false)]
+#endif
+        public List<string> Dialogs
+        {
+            get => _dialogs; set
+            {
+                if (_dialogs != value)
+                {
+                    _dialogs = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Dialogs)));
+                }
+            }
+        }
+        internal List<string> _dialogs = new List<string>();
+
+        [Browsable(false)]
+        public string GiverId
+        {
+#if MissionGiverInfo
+            get => string.Empty;//_giver.Id;
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                    _giver.Id = value;
+            }
+#else
+            get => _giver.CostumeName;
+            set
+            {
+                _giver.CostumeName = value;
+                _giver.DisplayName = value;
+            }
+#endif
+        }
+        [Browsable(false)]
+        public Vector3 GiverPosition
+        {
+            get => null;//_giver.Position;
+            set
+            {
+                if (value != null && value.IsValid)
+                    _giver.Position = value;
+            }
+        }
+        [Browsable(false)]
+        [XmlIgnore]
+        public new bool PlayWhileUnSuccess
+        {
+            get => false;
+        }
+        [Browsable(false)]
+        [XmlIgnore]
+        public new bool PlayWhileConditionsAreOk
+        {
+            get => false;
+        }
+        [Browsable(false)]
+        [XmlIgnore]
+        public new bool Loop
+        {
+            get => false;
+        }
+        [Browsable(false)]
+        [XmlIgnore]
+        public new string AssociateMissionSuccess
+        {
+            get => string.Empty;
+        }
         #endregion
 
         #region Взаимодействие с EntityToolsCore
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NonSerialized]
-        internal IQuesterActionEngine ActionEngine;
+        internal IQuesterActionEngine Engine;
 
         public PickUpMissionExt()
         {
-            ActionEngine = new QuesterActionProxy(this);
+            Engine = new QuesterActionProxy(this);
             base.PlayWhileConditionsAreOk = false;
             base.PlayWhileUnSuccess = false;
             base.Loop = false;
         }
         #endregion
 
-        public override bool NeedToRun => ActionEngine.NeedToRun;
-        public override ActionResult Run() => ActionEngine.Run();
-        public override string ActionLabel => ActionEngine.ActionLabel;
+        public override bool NeedToRun => Engine.NeedToRun;
+        public override ActionResult Run() => Engine.Run();
+        public override string ActionLabel => Engine.ActionLabel;
         public override string InternalDisplayName => string.Empty;
-        public override bool UseHotSpots => ActionEngine.UseHotSpots;
-        protected override bool IntenalConditions => ActionEngine.InternalConditions;
-        protected override Vector3 InternalDestination => ActionEngine.InternalDestination;
-        protected override ActionValidity InternalValidity => ActionEngine.InternalValidity;
-        public override void GatherInfos() => ActionEngine.GatherInfos();
-        public override void InternalReset() => ActionEngine.InternalReset();
-        public override void OnMapDraw(GraphicsNW graph) => ActionEngine.OnMapDraw(graph);
+        public override bool UseHotSpots => Engine.UseHotSpots;
+        protected override bool IntenalConditions => Engine.InternalConditions;
+        protected override Vector3 InternalDestination => Engine.InternalDestination;
+        protected override ActionValidity InternalValidity => Engine.InternalValidity;
+        public override void GatherInfos() => Engine.GatherInfos();
+        public override void InternalReset() => Engine.InternalReset();
+        public override void OnMapDraw(GraphicsNW graph) => Engine.OnMapDraw(graph);
     }
 }

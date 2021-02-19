@@ -15,19 +15,16 @@ namespace EntityTools.UCC.Conditions
     public class UCCEntityCheck : UCCCondition, ICustomUCCCondition
     {
         #region Взаимодействие с EntityToolsCore
-#if CORE_INTERFACES
         [NonSerialized]
         internal IUCCConditionEngine Engine;
-#endif
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public UCCEntityCheck()
         {
             Sign = Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
-#if CORE_INTERFACES
+
             Engine = new UCCConditionProxy(this);
-#endif
-            // EntityTools.Core.Initialize(this);
         }
         #endregion
 
