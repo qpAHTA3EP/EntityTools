@@ -341,7 +341,7 @@ namespace EntityTools.Quester.Actions
 
         public override ActionResult Run()
         {
-            bool extendedActionDebugInfo  = EntityTools.Config.Logger.ExtendedActionDebugInfo;
+            bool extendedActionDebugInfo  = EntityTools.Config.Logger.DebugMoveToEntity;
             Entity theVendor = null;
             string methodName = MethodBase.GetCurrentMethod().Name;
             if (tryNum > 0)
@@ -472,7 +472,7 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private ActionResult RemouteTraiding(RemoteContact remoteContact)
         {
-            bool extendedActionDebugInfo = EntityTools.Config.Logger.ExtendedActionDebugInfo;
+            bool extendedActionDebugInfo = EntityTools.Config.Logger.DebugMoveToEntity;
             string methodName = MethodBase.GetCurrentMethod().Name;
             if (remoteContact != null)
             {
@@ -554,7 +554,7 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private ActionResult Traiding(Entity vendorEntity)
         {
-            bool extendedActionDebugInfo = EntityTools.Config.Logger.ExtendedActionDebugInfo;
+            bool extendedActionDebugInfo = EntityTools.Config.Logger.DebugMoveToEntity;
             string methodName = MethodBase.GetCurrentMethod().Name;
             if (vendorEntity != null)
             {
@@ -602,7 +602,7 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private bool ApproachAndInteractToVendor(Entity entity)
         {
-            bool extendedActionDebugInfo = EntityTools.Config.Logger.ExtendedActionDebugInfo;
+            bool extendedActionDebugInfo = EntityTools.Config.Logger.DebugMoveToEntity;
             string methodName = MethodBase.GetCurrentMethod().Name;
 
             if (extendedActionDebugInfo)
@@ -706,7 +706,7 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private ActionResult BuyItems()
         {
-            bool extendedActionDebugInfo = EntityTools.Config.Logger.ExtendedActionDebugInfo;
+            bool extendedActionDebugInfo = EntityTools.Config.Logger.DebugMoveToEntity;
             string methodName = MethodBase.GetCurrentMethod().Name;
             if (extendedActionDebugInfo)
                 debug.Value.AddInfo(string.Concat(methodName, ": Begins"));
@@ -846,7 +846,7 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private BuyItemResult BuyAnItem(ItemFilterEntryExt item2buy, ref List<ItemDef> boughtItems)
         {
-            bool extendedActionDebugInfo = EntityTools.Config.Logger.ExtendedActionDebugInfo;
+            bool extendedActionDebugInfo = EntityTools.Config.Logger.DebugMoveToEntity;
             string methodName = MethodBase.GetCurrentMethod().Name;
 
             BuyItemResult result = BuyItemResult.Completed;
@@ -962,7 +962,7 @@ namespace EntityTools.Quester.Actions
         private BuyItemResult BuyAnItem(ItemFilterEntryExt filterEntry, SlotCache slotCache, ref List<ItemDef> boughtItems)
 #endif
         {
-            bool extendedActionDebugInfo = EntityTools.Config.Logger.ExtendedActionDebugInfo;
+            bool extendedActionDebugInfo = EntityTools.Config.Logger.DebugMoveToEntity;
             string methodName = MethodBase.GetCurrentMethod().Name;
 
             BuyItemResult result = BuyItemResult.Completed;

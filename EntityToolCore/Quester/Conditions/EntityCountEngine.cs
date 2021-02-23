@@ -49,7 +49,7 @@ namespace EntityCore.Quester.Conditions
 
         internal void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (object.ReferenceEquals(sender, @this))
+            if (ReferenceEquals(sender, @this))
             {
                 if (e.PropertyName == nameof(@this.Sign) || e.PropertyName == nameof(@this.Value))
                     label = string.Empty;
@@ -76,7 +76,8 @@ namespace EntityCore.Quester.Conditions
             get
             {
                 bool result = false;
-                if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                bool extendedActionDebugInfo = EntityTools.EntityTools.Config.Logger.DebugConditionEntityCount;
+                if (extendedActionDebugInfo)
                 {
 #if timeout
                     string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Begins. Timeout left:", timeout.Left);
@@ -97,7 +98,7 @@ namespace EntityCore.Quester.Conditions
 
                     uint entCount = (entities is null) ? 0u: (uint)entities.Count;
 
-                    if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                    if (extendedActionDebugInfo)
                     {
                         string debugMsg;
                         if (entities?.Count > 0)
@@ -133,7 +134,7 @@ namespace EntityCore.Quester.Conditions
                             break;
                     }
 
-                    if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                    if (extendedActionDebugInfo)
                     {
                         string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Result=", result, " (", entCount, " entities mutched)");
 
@@ -142,100 +143,6 @@ namespace EntityCore.Quester.Conditions
                 }
                 return result;
             }
-#if disabled_20200709_1325
-            get
-            {
-                if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
-                {
-#if timeout
-                    string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Begins. Timeout left:", timeout.Left);
-#else
-                    string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Begins");
-#endif
-                    ETLogger.WriteLine(LogType.Debug, debugMsg);
-                }
-
-                if (!string.IsNullOrEmpty(@this._entityId) || @this._entityNameType == EntityNameType.Empty)
-                {
-#if timeout
-                    if (timeout.IsTimedOut)
-                    { 
-#endif
-                    entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
-                       @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck/*, getCustomRegions()*/);
-                    if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
-                    {
-                        string debugMsg;
-                        if (entities is null || entities.Count == 0)
-                            debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Search Entities (irrespectively CustomRegion). Total found: ", entities.Count);
-                        else debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Search Entities (irrespectively CustomRegion). Nothing found");
-
-                        ETLogger.WriteLine(LogType.Debug, debugMsg);
-                    }
-#if timeout
-                    timeout.ChangeTime(EntityTools.EntityTools.Config.EntityCache.LocalCacheTime);
-                }
-                else if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
-                {
-                    string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Total entities cached (irrespectively CustomRegion): ", entities.Count);
-
-                    ETLogger.WriteLine(LogType.Debug, debugMsg);
-                } 
-#endif
-
-                    uint entCount = 0;
-
-                    if (entities != null && entities.Count > 0)
-                    {
-                        List<CustomRegion> crList = getCustomRegions();
-                        if (crList != null && crList.Count > 0)
-                            foreach (Entity entity in entities)
-                            {
-                                bool match = false;
-                                foreach (CustomRegion cr in crList)
-                                {
-                                    if (entity.Within(cr))
-                                    {
-                                        match = true;
-                                        break;
-                                    }
-                                }
-
-                                if (@this.Tested == Presence.Equal && match)
-                                    entCount++;
-                                if (@this.Tested == Presence.NotEquel && !match)
-                                    entCount++;
-                            }
-                        else entCount = (uint)entities.Count;
-                    }
-
-                    bool result = false;
-                    switch (@this._sign)
-                    {
-                        case Relation.Equal:
-                            result = entCount == @this._value;
-                            break;
-                        case Relation.NotEqual:
-                            result = entCount != @this._value;
-                            break;
-                        case Relation.Inferior:
-                            result = entCount < @this._value;
-                            break;
-                        case Relation.Superior:
-                            result = entCount > @this._value;
-                            break;
-                    }
-
-                    if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
-                    {
-                        string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Result=", result, " (", entCount, " entities mutched)");
-
-                        ETLogger.WriteLine(LogType.Debug, debugMsg);
-                    }
-                }
-                return false;
-            } 
-#endif
         }
 
         public void Reset() => entities?.Clear();
@@ -313,7 +220,7 @@ namespace EntityCore.Quester.Conditions
                     strBldr.Append($"Timeout left: {timeout.Left}"); 
 #endif
 
-                    if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                    if (EntityTools.EntityTools.Config.Logger.DebugConditionEntityCount)
                     {
                         string debugMsg = string.Concat(conditionIDstr, '.', nameof(TestInfos), ':', strBldr.ToString());
 

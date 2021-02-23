@@ -21,7 +21,7 @@ using static Astral.Quester.Classes.Action;
 using EntityTools;
 using System.Reflection;
 using EntityCore.Forms;
-using EntityTools.Tools.Navigation;
+using EntityCore.Tools.Navigation;
 
 namespace EntityCore.Quester.Action
 {

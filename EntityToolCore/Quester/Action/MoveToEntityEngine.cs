@@ -137,7 +137,7 @@ namespace EntityCore.Quester.Action
             get
             {
                 string currentMethodName = nameof(NeedToRun);// MethodBase.GetCurrentMethod().Name;
-                if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                     ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": Begins"));
 
                 // Команда работает с 2 - мя целями:
@@ -146,7 +146,7 @@ namespace EntityCore.Quester.Action
                 // Если HoldTargetEntity ВЫКЛЮЧЕН и обе цели совпадают - это ближайшая цель 
                 EntityPreprocessingResult entityPreprocessingResult = Preprocessing_Entity(target);
 
-                if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                 {
                     string debugMsg;
                     if (target is null)
@@ -178,14 +178,14 @@ namespace EntityCore.Quester.Action
                         closestEntity = entity;
                         bool closestIsTarget = target != null && target.ContainerId == closestEntity.ContainerId;
 
-                        if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                        if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                             ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": Found ", Get_DebugStringOfEntity(closestEntity, "ClosestEntity", EntityDetail.Pointer),
                                 closestIsTarget ? " that equals to Target": string.Empty));
 
                         if (entityPreprocessingResult == EntityPreprocessingResult.Failed)
                         {
                             // сохраняем ближайшую сущность в target
-                            if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                            if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                             {
                                 ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": Change Target[INVALID] to the ", Get_DebugStringOfEntity(closestEntity, "ClosestEntity", EntityDetail.Pointer)));
                             }
@@ -198,7 +198,7 @@ namespace EntityCore.Quester.Action
                             {
                                 // Фиксация на target не требуется
                                 // ближайшую цель можно сохранить в target
-                                if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                                if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                                 {
                                     string debugMsg;
                                     if (target is null)
@@ -212,7 +212,7 @@ namespace EntityCore.Quester.Action
 
                             // обрабатываем ближайшую сущность closestEntity
                             entityPreprocessingResult = Preprocessing_Entity(closestEntity);
-                            if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                            if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                             {
                                 if (closestEntity is null)
                                     ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": ClosestEntity[NULL] processing result: '", entityPreprocessingResult, '\''));
@@ -220,7 +220,7 @@ namespace EntityCore.Quester.Action
                             }
                         }
                     }
-                    else if(EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                    else if(EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                         ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": ClosestEntity not found"));
                 }
 
@@ -228,12 +228,16 @@ namespace EntityCore.Quester.Action
 
                 if (@this._ignoreCombat && !needToRun)
                 {
-                    Astral.Quester.API.IgnoreCombat = true;
-                    if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+#if false
+                    Astral.Quester.API.IgnoreCombat = true; 
+#else
+                    AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true);
+#endif
+                    if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                         ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": Disable combat"));
                 }
 
-                if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                     ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": Result '", needToRun, '\''));
 
                 return needToRun;
@@ -275,7 +279,7 @@ namespace EntityCore.Quester.Action
                 double distance = entity.Location.Distance3DFromPlayer;
                 bool distanceResult = distance <= @this._distance;
 
-                if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                     ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": ", Get_DebugStringOfEntity(entity, "Entity", EntityDetail.Pointer), 
                         " verification=", healthResult && distanceResult, " {Valid; ", (@this._healthCheck) ? (healthResult ? "Alive; " : "Dead; ") : "Skip; ",
                         distanceResult ? "Near (" : "Faraway (", distance.ToString("N2"), ")}"));
@@ -298,7 +302,7 @@ namespace EntityCore.Quester.Action
             }
             else
             {
-                if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                     ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": Entity Verification=False {Invalid}"));
             }
 
@@ -314,7 +318,7 @@ namespace EntityCore.Quester.Action
             string currentMethodName = nameof(Attack_Entity);
             if(entity is null)
             {
-                if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                     ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": Entity is NULL. Break"));
                 return;
             }
@@ -331,7 +335,7 @@ namespace EntityCore.Quester.Action
                     Astral.Logic.NW.Attackers.List.Clear();
                     // entity враждебно и должно быть атаковано
                     string entityStr = string.Empty;
-                    if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                    if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                         entityStr = Get_DebugStringOfEntity(entity, "Entity", EntityDetail.Pointer | EntityDetail.RelationToPlayer);
 
                     //Astral.Logic.NW.Attackers.List.Add(entity);
@@ -345,12 +349,12 @@ namespace EntityCore.Quester.Action
                         {
                             abortCombatTask = new Task(() => MonitorAbortCombatDistance(entity));
 
-                            if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                            if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                                 ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": Attack ", entityStr, " at the distance ", entity.CombatDistance3.ToString("N2"), " and initialize AbortCombatTask#", abortCombatTask.Id));
 
                             abortCombatTask.Start();
                         }
-                        else if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                        else if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                             ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": Attack ", entityStr, " at the distance ", entity.CombatDistance3.ToString("N2"), " and continue AbortCombatTask#", abortCombatTask.Id));
                         
                         Astral.Logic.NW.Combats.CombatUnit(entity, null);
@@ -358,7 +362,7 @@ namespace EntityCore.Quester.Action
                     else
                     {
                         // запускаем бой без прерывания
-                        if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                        if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                             ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": Engage combat and attack ", entityStr, " at the distance ", entity.CombatDistance3.ToString("N2")));
 
                         Astral.Logic.NW.Combats.CombatUnit(entity, null);
@@ -376,18 +380,18 @@ namespace EntityCore.Quester.Action
                     {
                         abortCombatTask = new Task(() => MonitorAbortCombatDistance(entity));
 
-                        if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                        if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                             ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": Engage combat, and initialize AbortCombatTask#", abortCombatTask.Id));
 
                         abortCombatTask.Start();
                     }
                     else
                     {
-                        if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                        if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                             ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": Engage combat and continue AbortCombatTask#", abortCombatTask.Id));
                     } 
                 }
-                else if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                else if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                     ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": Engage combat"));
 
                 Astral.Quester.API.IgnoreCombat = false;
@@ -396,7 +400,6 @@ namespace EntityCore.Quester.Action
 
         #region AbortCombatDistance_by_Task
         Task abortCombatTask;
-        static readonly Action<bool> abortCombat = typeof(Astral.Logic.NW.Combats).GetStaticAction<bool>("AbordCombat");
 
         /// <summary>
         /// Делегат, сравнивающий <see cref="MoveToEntity.AbortCombatDistance"/> с расстоянием между игроком и <paramref name="entity"/>,
@@ -430,40 +433,52 @@ namespace EntityCore.Quester.Action
                             double dist = entity.Location.Distance3DFromPlayer;
                             if (dist >= @this._abortCombatDistance)
                             {
-                                if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                                if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                                     ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(MonitorAbortCombatDistance), ": Player outside ", nameof(@this.AbortCombatDistance), " (", dist.ToString("N2"), " to ", entityStr, "). Break combat"));
-                                Astral.Quester.API.IgnoreCombat = true;
-                                abortCombat(true);
+#if false
+                                Astral.Quester.API.IgnoreCombat = true; 
+#else
+                                AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true, -1, 500);
+#endif
+                                AstralAccessors.Logic.NW.Combats.AbordCombat(true);
                             }
                             else
                             {
-                                if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                                if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                                     ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(MonitorAbortCombatDistance), ": Player withing ", nameof(@this.AbortCombatDistance), " (", dist.ToString("N2"), " to ", entityStr, "). Continue..."));
                                 Astral.Quester.API.IgnoreCombat = false;
                             }
                         }
                         else
                         {
-                            if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                            if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                                 ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(MonitorAbortCombatDistance), ": ", entityStr, " is dead. Break combat. Finish AbortCombatTask#", Task.CurrentId));
-                            Astral.Quester.API.IgnoreCombat = true;
-                            abortCombat(true);
+#if false
+                                Astral.Quester.API.IgnoreCombat = true; 
+#else
+                            AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true, -1, 500);
+#endif
+                            AstralAccessors.Logic.NW.Combats.AbordCombat(true);
                             return;
                         }
                     }
                     else
                     {
-                        if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+                        if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                             ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(MonitorAbortCombatDistance), ": Entity[INVALID]. Break combat. Finish AbortCombatTask#", Task.CurrentId));
-                        Astral.Quester.API.IgnoreCombat = true;
-                        abortCombat(true);
+#if false
+                                Astral.Quester.API.IgnoreCombat = true; 
+#else
+                        AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true, -1, 500);
+#endif
+                        AstralAccessors.Logic.NW.Combats.AbordCombat(true);
                         return;
                     }
                 }
 
                 Thread.Sleep(500);
             }
-            if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+            if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                 ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(MonitorAbortCombatDistance), ": Combat ended. Finish AbortCombatTask#", Task.CurrentId));
             Astral.Quester.API.IgnoreCombat = true;
         }
@@ -474,22 +489,20 @@ namespace EntityCore.Quester.Action
         public ActionResult Run()
         {
             string currentMethodName = nameof(Run);
-            if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+            if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                 ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": Begins"));
 
-#if true//disabled_20200804_2329
             if (ValidateEntity(closestEntity))
                 Attack_Entity(closestEntity);
             else if (ValidateEntity(target))
                 Attack_Entity(target); 
-#endif
 
             ActionResult actionResult;
             if (@this._stopOnApproached)
                 actionResult = ActionResult.Completed;
             else actionResult = ActionResult.Running;
 
-            if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+            if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                 ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', currentMethodName, ": ActionResult=", actionResult));
 
             if(@this._resetCurrentHotSpot)
@@ -549,7 +562,7 @@ namespace EntityCore.Quester.Action
             checkEntity = functor_CheckEntity_Initializer;
             getCustomRegions = functor_GetCustomRegion_Initializer;
             label = string.Empty;
-            if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+            if (EntityTools.EntityTools.Config.Logger.DebugMoveToEntity)
                 ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(InternalReset)));
         }
 
