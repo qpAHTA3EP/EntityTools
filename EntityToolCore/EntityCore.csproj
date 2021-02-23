@@ -104,6 +104,7 @@
     <Compile Include="Entities\SearchCached.cs" />
     <Compile Include="Entities\SearchDirect.cs" />
     <Compile Include="Extensions\CustomRegionExtentions.cs" />
+    <Compile Include="Extensions\EntityExtentions.cs" />
     <Compile Include="Extensions\FormCollectionExtentions.cs" />
     <Compile Include="Extensions\ListBoxItemCollectionExtension.cs" />
     <Compile Include="Extensions\ListTExtentions.cs" />

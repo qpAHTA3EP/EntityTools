@@ -48,24 +48,6 @@ namespace EntityTools.Settings
         private string _logFilePath = string.Concat(Directories.LogsPath.Replace(Directories.AstralStartupPath, "."), Path.DirectorySeparatorChar, nameof(EntityTools), Path.DirectorySeparatorChar);
 
         /// <summary>
-        /// Активания расширенной отладочной информации по MoveToEntity
-        /// </summary>
-        [Bindable(true)]
-        public bool DebugMoveToEntity
-        {
-            get => _debugMoveToEntityo;
-            set
-            {
-                if (_debugMoveToEntityo != value)
-                {
-                    _debugMoveToEntityo = value;
-                    NotifyPropertyChanged(nameof(DebugMoveToEntity));
-                }
-            }
-        }
-        private bool _debugMoveToEntityo;
-
-        /// <summary>
         /// Активания расширенной отладочной информации по инструментам для работы с Mission
         /// </summary>
         [Bindable(true)]
@@ -83,59 +65,88 @@ namespace EntityTools.Settings
         }
         private bool _debugMissionTools;
 
-        /// <summary>
-        /// Активания расширенной отладочной информации по PickUpMissionExt
-        /// </summary>
-        [Bindable(true)]
-        public bool DebugPickUpMissionExt
+        [Serializable]
+        public class QuesterActionLoggerSettings : PluginSettingsBase
         {
-            get => _debugPickUpMissionExt;
-            set
+            /// <summary>
+                        /// Активания расширенной отладочной информации по MoveToEntity
+                        /// </summary>
+            [Bindable(true)]
+            public bool DebugMoveToEntity
             {
-                if (_debugPickUpMissionExt != value)
+                get => _debugMoveToEntityo;
+                set
                 {
-                    _debugPickUpMissionExt = value;
-                    NotifyPropertyChanged(nameof(DebugPickUpMissionExt));
+                    if (_debugMoveToEntityo != value)
+                    {
+                        _debugMoveToEntityo = value;
+                        NotifyPropertyChanged(nameof(DebugMoveToEntity));
+                    }
                 }
             }
-        }
-        private bool _debugPickUpMissionExt;
+            private bool _debugMoveToEntityo;
 
-        /// <summary>
-        /// Активания расширенной отладочной информации по TurnInMissionExt
-        /// </summary>
-        [Bindable(true)]
-        public bool DebugTurnInMissionExt
-        {
-            get => _debugTurnInMissionExt;
-            set
+            /// <summary>
+            /// Активания расширенной отладочной информации по PickUpMissionExt
+            /// </summary>
+            [Bindable(true)]
+            public bool DebugPickUpMissionExt
             {
-                if (_debugTurnInMissionExt != value)
+                get => _debugPickUpMissionExt;
+                set
                 {
-                    _debugTurnInMissionExt = value;
-                    NotifyPropertyChanged(nameof(DebugTurnInMissionExt));
+                    if (_debugPickUpMissionExt != value)
+                    {
+                        _debugPickUpMissionExt = value;
+                        NotifyPropertyChanged(nameof(DebugPickUpMissionExt));
+                    }
                 }
             }
-        }
-        private bool _debugTurnInMissionExt;
+            private bool _debugPickUpMissionExt;
 
-        /// <summary>
-        /// Активания расширенной отладочной информации по условию EntityCount
-        /// </summary>
-        [Bindable(true)]
-        public bool DebugConditionEntityCount
-        {
-            get => _debugConditionEntityCount;
-            set
+            /// <summary>
+            /// Активания расширенной отладочной информации по TurnInMissionExt
+            /// </summary>
+            [Bindable(true)]
+            public bool DebugTurnInMissionExt
             {
-                if (_debugConditionEntityCount != value)
+                get => _debugTurnInMissionExt;
+                set
                 {
-                    _debugConditionEntityCount = value;
-                    NotifyPropertyChanged(nameof(DebugConditionEntityCount));
+                    if (_debugTurnInMissionExt != value)
+                    {
+                        _debugTurnInMissionExt = value;
+                        NotifyPropertyChanged(nameof(DebugTurnInMissionExt));
+                    }
                 }
             }
+            private bool _debugTurnInMissionExt;
         }
-        private bool _debugConditionEntityCount;
+        [Description("Настройки логирования команд квестера")]
+        public QuesterActionLoggerSettings QuesterActions { get; set; } = new QuesterActionLoggerSettings();
+
+        public class QuesterConditionLoggerSettings : PluginSettingsBase
+        {
+            /// <summary>
+                /// Активания расширенной отладочной информации по условию EntityCount
+                /// </summary>
+            [Bindable(true)]
+            public bool DebugConditionEntityCount
+            {
+                get => _debugConditionEntityCount;
+                set
+                {
+                    if (_debugConditionEntityCount != value)
+                    {
+                        _debugConditionEntityCount = value;
+                        NotifyPropertyChanged(nameof(DebugConditionEntityCount));
+                    }
+                }
+            }
+            private bool _debugConditionEntityCount;
+        }
+        [Description("Настройки логирования условий квестера")]
+        public QuesterConditionLoggerSettings QuesterConditions { get; set; } = new QuesterConditionLoggerSettings();
 
         public override string ToString()
         {
