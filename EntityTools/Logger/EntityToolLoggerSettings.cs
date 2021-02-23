@@ -48,22 +48,94 @@ namespace EntityTools.Settings
         private string _logFilePath = string.Concat(Directories.LogsPath.Replace(Directories.AstralStartupPath, "."), Path.DirectorySeparatorChar, nameof(EntityTools), Path.DirectorySeparatorChar);
 
         /// <summary>
-        /// Активания расширенной отладочной информации
+        /// Активания расширенной отладочной информации по MoveToEntity
         /// </summary>
         [Bindable(true)]
-        public bool ExtendedActionDebugInfo
+        public bool DebugMoveToEntity
         {
-            get => _extendedActionDebugInfo;
+            get => _debugMoveToEntityo;
             set
             {
-                if (_extendedActionDebugInfo != value)
+                if (_debugMoveToEntityo != value)
                 {
-                    _extendedActionDebugInfo = value;
-                    NotifyPropertyChanged(nameof(ExtendedActionDebugInfo));
+                    _debugMoveToEntityo = value;
+                    NotifyPropertyChanged(nameof(DebugMoveToEntity));
                 }
             }
         }
-        private bool _extendedActionDebugInfo;
+        private bool _debugMoveToEntityo;
+
+        /// <summary>
+        /// Активания расширенной отладочной информации по инструментам для работы с Mission
+        /// </summary>
+        [Bindable(true)]
+        public bool DebugMissionTools
+        {
+            get => _debugMissionTools;
+            set
+            {
+                if (_debugMissionTools != value)
+                {
+                    _debugMissionTools = value;
+                    NotifyPropertyChanged(nameof(DebugMissionTools));
+                }
+            }
+        }
+        private bool _debugMissionTools;
+
+        /// <summary>
+        /// Активания расширенной отладочной информации по PickUpMissionExt
+        /// </summary>
+        [Bindable(true)]
+        public bool DebugPickUpMissionExt
+        {
+            get => _debugPickUpMissionExt;
+            set
+            {
+                if (_debugPickUpMissionExt != value)
+                {
+                    _debugPickUpMissionExt = value;
+                    NotifyPropertyChanged(nameof(DebugPickUpMissionExt));
+                }
+            }
+        }
+        private bool _debugPickUpMissionExt;
+
+        /// <summary>
+        /// Активания расширенной отладочной информации по TurnInMissionExt
+        /// </summary>
+        [Bindable(true)]
+        public bool DebugTurnInMissionExt
+        {
+            get => _debugTurnInMissionExt;
+            set
+            {
+                if (_debugTurnInMissionExt != value)
+                {
+                    _debugTurnInMissionExt = value;
+                    NotifyPropertyChanged(nameof(DebugTurnInMissionExt));
+                }
+            }
+        }
+        private bool _debugTurnInMissionExt;
+
+        /// <summary>
+        /// Активания расширенной отладочной информации по условию EntityCount
+        /// </summary>
+        [Bindable(true)]
+        public bool DebugConditionEntityCount
+        {
+            get => _debugConditionEntityCount;
+            set
+            {
+                if (_debugConditionEntityCount != value)
+                {
+                    _debugConditionEntityCount = value;
+                    NotifyPropertyChanged(nameof(DebugConditionEntityCount));
+                }
+            }
+        }
+        private bool _debugConditionEntityCount;
 
         public override string ToString()
         {
