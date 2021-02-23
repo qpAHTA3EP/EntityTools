@@ -1,9 +1,16 @@
 ﻿using MyNW.Internals;
+using MyNW.Classes;
+using System;
 
 namespace EntityCore.Tools
 {
     public static class GameHelper
     {
+        /// <summary>
+        /// Пустой предмет MyNW.Classes.Item (заглушка)
+        /// </summary>
+        public static readonly Item EmptyItem = new Item(IntPtr.Zero);
+
         /// <summary>
         /// Закрытие всех специальный диалоговых окон: Аукцион, Почта, Молельня, Награды
         /// </summary>

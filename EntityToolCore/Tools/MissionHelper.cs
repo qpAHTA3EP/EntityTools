@@ -193,8 +193,9 @@ namespace EntityCore.Tools.Missions
                             return true;
             }
 
-            return false;
+            return isRewardItem(GameHelper.EmptyItem);
         }
+
 
         /// <summary>
         /// Оценка расстояния до квестодателя <paramref name="giverEntity"/> и перемещение к нему, в случае необходимости
@@ -228,7 +229,7 @@ namespace EntityCore.Tools.Missions
                 {
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
-#if true
+#if false
                     Approach.EntityByDistance(giverEntity, interactDistance);
 #else
                     Approach.EntityForInteraction(giverEntity);
@@ -249,7 +250,7 @@ namespace EntityCore.Tools.Missions
                 }
                 else
                 {
-#if true
+#if false
                     Approach.EntityByDistance(giverEntity, interactDistance);
 #else
                     Approach.EntityForInteraction(giverEntity);

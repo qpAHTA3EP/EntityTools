@@ -163,7 +163,7 @@ namespace EntityCore.Quester.Action
 
             if (@this._giver.Type == MissionGiverType.NPC)
             {
-                float interactDistance = Math.Max(@this._interactDistance, 5f);
+                float interactDistance = Math.Max(@this._interactDistance, 5.5f);
                 var giverPos = @this._giver.Position;
                 var giverDistance = @this._giver.Distance;
 
@@ -210,7 +210,7 @@ namespace EntityCore.Quester.Action
                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Entity [", entity.InternalName, ", ", entity.CostumeRef.CostumeName, "] match to MissionGiverInfo [", @this._giver, ']'));
 
                     // Перемещаемся к квестодателю (в случае необходимости)
-                    if (!entity.ApproachMissionGiver(@this._interactDistance, @this._interactZDifference))
+                    if (!entity.ApproachMissionGiver(interactDistance, @this._interactZDifference))
                     {
                         if (extendedActionDebugInfo)
                             ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ApproachMissionGiver failed => ActionResult = '", ActionResult.Running, '\''));
@@ -220,7 +220,7 @@ namespace EntityCore.Quester.Action
                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ApproachMissionGiver succeeded"));
 
                     // Взаимодействуем с квестодателем
-                    if (!entity.InteractMissionGiver(@this._interactDistance))
+                    if (!entity.InteractMissionGiver(interactDistance))
                     {
                         if (extendedActionDebugInfo)
                             ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": InteractMissionGiver failed => ActionResult = '", ActionResult.Running, '\''));
@@ -323,10 +323,10 @@ namespace EntityCore.Quester.Action
             get
             {
                 bool isGiverAccessible = @this._giver.IsAccessible;
-                bool isHavingMissionOrCompleted = MissionHelper.CheckHavingMissionOrCompleted(@this._missionId);
-                bool result = isGiverAccessible && !isHavingMissionOrCompleted;
+                bool isMissionSucceded = MissionHelper.HaveMission(@this._missionId, out Mission mission) && mission.State == MissionState.Succeeded;
+                bool result = isGiverAccessible && isMissionSucceded;
                 if (EntityTools.EntityTools.Config.Logger.DebugTurnInMissionExt)
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(InternalConditions), ": GiverAccessible(", isGiverAccessible, ") AND Not(HavingMissionOrCompleted(", !isHavingMissionOrCompleted, ")) => ", result));
+                    ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(InternalConditions), ": GiverAccessible(", isGiverAccessible, ") AND MissionSucceded(", isMissionSucceded, ")) => ", result));
                 return result;
             }
         }
@@ -352,7 +352,7 @@ namespace EntityCore.Quester.Action
                 if (@this._giver.IsAccessible
                     && @this._giver.Distance >= @this._interactDistance)
                         return @this._giver.Position.Clone();
-                return new Vector3();
+                return Vector3.Empty;
             }
         }
 

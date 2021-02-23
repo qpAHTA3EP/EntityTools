@@ -349,7 +349,7 @@ namespace EntityCore.Quester.Action
                 bool isHavingMissionOrCompleted = MissionHelper.CheckHavingMissionOrCompleted(@this._missionId);
                 bool result = isGiverAccessible && !isHavingMissionOrCompleted;
                 if (EntityTools.EntityTools.Config.Logger.DebugPickUpMissionExt)
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(InternalConditions), ": GiverAccessible(", isGiverAccessible, ") AND Not(HavingMissionOrCompleted(", !isHavingMissionOrCompleted, ")) => ", result));
+                    ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(InternalConditions), ": GiverAccessible(", isGiverAccessible, ") AND Not(HavingMissionOrCompleted(", isHavingMissionOrCompleted, ")) => ", result));
                 return result;
             }
         }
@@ -375,7 +375,7 @@ namespace EntityCore.Quester.Action
                 if (@this._giver.IsAccessible
                     && @this._giver.Distance >= @this._interactDistance)
                         return @this._giver.Position.Clone();
-                return new Vector3();
+                return Vector3.Empty;
             }
         }
 
