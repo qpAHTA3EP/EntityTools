@@ -449,14 +449,14 @@ namespace EntityTools
                 return false;
             }
 
-            public bool GUIRequest_NPCInfos(ref NPCInfos npc)
+            public bool GUIRequest_EntityToInteract(ref Entity entity)
             {
                 if (InternalInitialize())
-                    return Core.GUIRequest_NPCInfos(ref npc);
+                    return Core.GUIRequest_EntityToInteract(ref entity);
 
-                XtraMessageBox.Show("EntityToolsCore is invalid!\n\rNPCInfos request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                XtraMessageBox.Show("EntityToolsCore is invalid!\n\rEntityToInteract request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! NPCInfos request denied.", true);
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! EntityToInteract request denied.", true);
 
                 return false;
             }

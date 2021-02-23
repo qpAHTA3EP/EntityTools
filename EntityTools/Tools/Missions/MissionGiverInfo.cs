@@ -6,22 +6,68 @@ using System.Xml.Schema;
 using System.Xml.Serialization;
 using Astral.Quester.Classes;
 using Astral.Quester.UIEditors;
+using EntityTools.Enums;
 using EntityTools.Tools.Extensions;
 using MyNW.Classes;
 using MyNW.Internals;
 
 namespace EntityTools.Tools.Missions
 {
-    /* Реализация с несколькими вариантами квестодателя 
-     * Item, RemoteContact, NPC
-     */
     [Serializable]
     public class MissionGiverInfo : IXmlSerializable
     {
-        public Vector3 Position { get => _position; set => _position = value; }
-        private Vector3 _position = new Vector3();
+        public MissionGiverInfo() { }
+        public MissionGiverInfo(string id, Vector3 position, string map = "", string region = "")
+        {
+            _id = id;
+            _position = position.Clone();
+            _mapName = map;
+            _regionName = region;
+            _type = MissionGiverType.NPC;
+        }
+        public MissionGiverInfo(string id)
+        {
+            _id = id;
+            _type = MissionGiverType.Remote;
+        }
 
-        public double Distance =>  _position.IsValid ? _position.Distance3DFromPlayer : 0;
+        public MissionGiverType Type
+        {
+            get
+            {
+                return _type;
+            }
+            private set
+            {
+                _type = value;
+            }
+        }
+        protected MissionGiverType _type = MissionGiverType.NPC;
+
+        public Vector3 Position
+        {
+            get
+            {
+                return (_type == MissionGiverType.NPC)
+                    ? _position : Vector3.Empty;
+            }
+            set
+            {
+                if(Type == MissionGiverType.NPC)
+                    _position = value;
+            }
+        }
+        protected Vector3 _position = new Vector3();
+
+        public double Distance
+        {
+            get
+            {
+                if (_type == MissionGiverType.NPC)
+                    return _position.IsValid ? _position.Distance3DFromPlayer : 0;
+                else return double.MaxValue;
+            }
+        }
 
         public string Id
         {
@@ -36,7 +82,11 @@ namespace EntityTools.Tools.Missions
         [Editor(typeof(CurrentMapEdit), typeof(UITypeEditor))]
         public string MapName
         {
-            get => _mapName;
+            get
+            {
+                return _type == MissionGiverType.NPC
+                    ? _mapName : string.Empty;
+            }
             set
             {
                 _mapName = value;
@@ -48,13 +98,41 @@ namespace EntityTools.Tools.Missions
         [Editor(typeof(CurrentRegionEdit), typeof(UITypeEditor))]
         public string RegionName
         {
-            get => _regionName; set
+            get
+            {
+                return _type == MissionGiverType.NPC
+                    ? _regionName : string.Empty;
+            }
+            set
             {
                 _regionName = value;
                 _label = string.Empty;
             }
         }
         private string _regionName = string.Empty;
+
+#if DEVELOPER
+        [Description("The allowed deviation of the NPC from the specified Position. The minimum value is 1.")]
+#else
+        [Browsable(false)]
+#endif
+        public uint Tolerance
+        {
+            get
+            {
+                
+                return _type == MissionGiverType.NPC 
+                    ? _tolerance : uint.MaxValue;
+            }
+
+            set
+            {
+                value = Math.Max(value, 1);
+                if (_type != MissionGiverType.NPC || _tolerance == value) return;
+                _tolerance = value;
+            }
+        }
+        internal uint _tolerance = 1;
 
         /// <summary>
         /// <paramref name="entity"/> соответствует патаметрам квестодателя
@@ -63,12 +141,15 @@ namespace EntityTools.Tools.Missions
         /// <returns></returns>
         public bool IsMatching(Entity entity)
         {
+            if (_type != MissionGiverType.NPC)
+                return false;
+
             if (entity is null
                 || !entity.IsValid
                 || string.IsNullOrEmpty(_id))
                 return false;
 
-            if (entity.Location.Distance3D(_position) > 1.0
+            if (entity.Location.Distance3D(_position) > _tolerance
                 || !(entity.CostumeRef.CostumeName.Equals(_id) || entity.InternalName.Equals(_id)))
                 return false;
 
@@ -81,30 +162,27 @@ namespace EntityTools.Tools.Missions
         /// <summary>
         /// Квестодатель задан корректно
         /// </summary>
+        [Browsable(false)]
         public bool IsValid
         {
             get
             {
-#if false
-                var player = EntityManager.LocalPlayer;
-                return _position.IsValid
-                       && !string.IsNullOrEmpty(_id)
-                       && (string.IsNullOrEmpty(_mapName)
-                           || _mapName.Equals(player.MapState.MapName) && _regionName.Equals(player.RegionInternalName)); 
-#else
-                return _position.IsValid
+                return (_type == MissionGiverType.Remote || _type == MissionGiverType.NPC && _position.IsValid)
                        && !string.IsNullOrEmpty(_id);
-#endif
             }
         }
         /// <summary>
         /// Квестодатель зада корректно и к нему можно переместиться для взаимодействия,
         /// то есть персонаж находится на нужной карте и в том же регионе, что и квестодатель
         /// </summary>
+        [Browsable(false)]
         public bool IsAccessible
         {
             get
             {
+                if (_type == MissionGiverType.NPC)
+                    return !string.IsNullOrEmpty(_id);
+
                 var player = EntityManager.LocalPlayer;
                 return _position!= null && _position.IsValid
                        && !string.IsNullOrEmpty(_id)
@@ -115,15 +193,19 @@ namespace EntityTools.Tools.Missions
         string _label = string.Empty;
         public override string ToString()
         {
-            if (string.IsNullOrEmpty(_id)
-                || !Position.IsValid)
-                _label = "Not set";
-            if (string.IsNullOrEmpty(_mapName))
-                _label = _id;
-            else if (string.IsNullOrEmpty(_regionName))
-                _label = string.Concat(_id, " (", _mapName, ")");
-            else _label = string.Concat(_id, " (", _mapName, "/", _regionName, ")");
-
+            if (!string.IsNullOrEmpty(_id))
+            {
+                if (_type == MissionGiverType.Remote)
+                    _label = _id;
+                else if(!Position.IsValid)
+                     _label = "Not set";
+                else if (string.IsNullOrEmpty(_mapName))
+                    _label = _id;
+                else if (string.IsNullOrEmpty(_regionName))
+                    _label = string.Concat(_id, " (", _mapName, ')');
+                else _label = string.Concat(_id, " (", _mapName, '/', _regionName, ')');
+            }
+            else _label = "Not set";
             return _label;
         }
 
@@ -152,6 +234,11 @@ namespace EntityTools.Tools.Missions
 
                     switch (elemName)
                     {
+                        case nameof(Type):
+                            var strGiverType = reader.ReadElementContentAsString(elemName, "");
+                            _type = Enum.TryParse(strGiverType, out MissionGiverType giverType) 
+                                ? giverType : MissionGiverType.NPC;
+                            break;
                         case nameof(Id):
                         case nameof(Astral.Quester.Classes.NPCInfos.CostumeName):
                             _id = reader.ReadElementContentAsString(elemName, "");
@@ -199,16 +286,21 @@ namespace EntityTools.Tools.Missions
 
         public void WriteXml(XmlWriter writer)
         {
+            writer.WriteElementString(nameof(Type), _type.ToString());
             writer.WriteElementString(nameof(Id), _id);
-            if(!string.IsNullOrEmpty(_mapName))
-                writer.WriteElementString(nameof(MapName), _mapName);
-            if (!string.IsNullOrEmpty(_regionName))
-                writer.WriteElementString(nameof(RegionName), _regionName);
-            if (!_position.IsValid) return;
-
-            writer.WriteStartElement(nameof(Position), "");
-            _position.WriteXml(writer);
-            writer.WriteEndElement();
+            if (_type == MissionGiverType.NPC)
+            {
+                if (!string.IsNullOrEmpty(_mapName))
+                    writer.WriteElementString(nameof(MapName), _mapName);
+                if (!string.IsNullOrEmpty(_regionName))
+                    writer.WriteElementString(nameof(RegionName), _regionName);
+                if (_position.IsValid)
+                {
+                    writer.WriteStartElement(nameof(Position), "");
+                    _position.WriteXml(writer);
+                    writer.WriteEndElement();
+                }
+            }
         }
         #endregion
     }

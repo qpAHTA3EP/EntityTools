@@ -6,11 +6,19 @@ namespace EntityTools.Tools.Missions
 {
     public class MissionGiverRemote : MissionGiverBase
     {
-        public override MissionGiverType GiverType => MissionGiverType.Remote; 
+        public override MissionGiverType GiverType => MissionGiverType.Remote;
+
+        public override Vector3 Position
+        {
+            get => Vector3.Empty;
+            set { }
+        }
+
+        public override double Distance => double.MaxValue;
 
         public override bool IsValid => !string.IsNullOrEmpty(_id);
 
-        public override bool IsAccessible() => true;
+        public override bool IsAccessible => true;
 
         public override bool IsMatching(Entity entity) => false;
 

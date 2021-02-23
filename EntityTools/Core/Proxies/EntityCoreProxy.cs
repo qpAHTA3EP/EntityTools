@@ -87,7 +87,7 @@ namespace EntityTools.Core
             throw new NotImplementedException();
         }
 
-        public bool GUIRequest_NPCInfos(ref NPCInfos npc)
+        public bool GUIRequest_EntityToInteract(ref Entity entity)
         {
             throw new NotImplementedException();
         }

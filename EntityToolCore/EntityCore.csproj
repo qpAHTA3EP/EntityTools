@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.21.0218.0607</AssemblyVersion>
+    <AssemblyVersion>0.21.0222.1018</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -62,6 +62,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AStar, Version=2.20.1028.1229, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="Astral_patched, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\References\x64\Astral_patched.exe</HintPath>
@@ -174,6 +175,7 @@
     </Compile>
     <Compile Include="IEntityInfos.cs" />
     <Compile Include="Quester\Action\MoveToEntityEngine.cs" />
+    <Compile Include="Quester\Action\TurnInMissionEngine.cs" />
     <Compile Include="Quester\Conditions\CheckGameGUIEngine.cs" />
     <Compile Include="Quester\Conditions\EntityDistanceEngine.cs" />
     <Compile Include="Quester\Conditions\TeamMembersCountEngine.cs" />
@@ -192,6 +194,11 @@
     <Compile Include="Quester\Action\PickUpMissionEngine.cs" />
     <Compile Include="Quester\Conditions\EntityPropertyEngine.cs" />
     <Compile Include="Quester\Conditions\EntityCountEngine.cs" />
+    <Compile Include="Tools\Enums.cs" />
+    <Compile Include="Tools\GameHelper.cs" />
+    <Compile Include="Tools\MissionHelper.cs" />
+    <Compile Include="Tools\Navigation\CustomNavigator.cs" />
+    <Compile Include="Tools\Navigation\NavigationHelper.cs" />
     <Compile Include="UCC\Actions\ApproachEntityEngine.cs" />
     <Compile Include="UCC\Actions\DodgeFromEntityEngine.cs" />
     <Compile Include="UCC\Actions\ExecuteSpecificPowerEngine.cs" />
@@ -335,7 +342,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Tools\" />
+    <Content Include="Tools\Navigation\MyNW.Internals.Movements.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

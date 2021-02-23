@@ -28,7 +28,7 @@ namespace EntityTools.Core.Interfaces
 
         bool GUIRequest_CustomRegions(ref List<string> crList);
         bool GUIRequest_NodeLocation(ref Vector3 pos, string caption);
-        bool GUIRequest_NPCInfos(ref NPCInfos npc);
+        bool GUIRequest_EntityToInteract(ref Entity entity);
 
         bool GUIRequest_UCCAction(out UCCAction action);
 

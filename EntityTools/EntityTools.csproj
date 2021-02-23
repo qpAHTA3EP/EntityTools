@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.21.0218.0607</AssemblyVersion>
+    <AssemblyVersion>0.21.0222.1018</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -209,6 +209,7 @@
     <Compile Include="Core\Proxies\QuesterConditionProxy.cs" />
     <Compile Include="Core\Proxies\UCCActionProxy.cs" />
     <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
+    <Compile Include="Quester\Actions\TurnInMissionExt.cs" />
     <Compile Include="Servises\SlideMonitor\CharacterEx.cs" />
     <Compile Include="Servises\SlideMonitor\EntityEx.cs" />
     <Compile Include="Servises\SlideMonitor\Enums.cs" />
@@ -313,7 +314,6 @@
     <Compile Include="Tools\Missions\Enums.cs" />
     <Compile Include="Tools\Missions\MissionGiverRemote.cs" />
     <Compile Include="Tools\Missions\MissionGiverNPC.cs" />
-    <Compile Include="Tools\Missions\MissionHelper.cs" />
     <Compile Include="Settings\EntityCacheSettings.cs" />
     <Compile Include="Settings\EntityToolsSettings.cs" />
     <Compile Include="Servises\UnstuckSpell\UnstuckSpells.cs" />
@@ -334,9 +334,8 @@
     <Compile Include="Tools\Extensions\Vector3Extentions.cs" />
     <Compile Include="Tools\Missions\MissionGiverBase.cs" />
     <Compile Include="Tools\Missions\MissionGiverInfo.cs" />
-    <Compile Include="Tools\Navigation\CustomNavigator.cs" />
-    <Compile Include="Tools\Navigation\NavigationHelper.cs" />
     <Compile Include="Tools\ReadWriteLocker.cs" />
+    <Compile Include="Tools\Reflection\Accessors\QuesterAssistantAccessors.cs" />
     <Compile Include="Tools\StringToPattern.cs" />
     <Compile Include="Tools\EntityDef.cs" />
     <Compile Include="Tools\Enums.cs" />
@@ -360,7 +359,7 @@
     <Compile Include="Tools\ParagonTools.cs" />
     <Compile Include="Settings\PluginSettingsBase.cs" />
     <Compile Include="Tools\Classes.cs" />
-    <Compile Include="Tools\Reflection\AstralAccessors.cs" />
+    <Compile Include="Tools\Reflection\Accessors\AstralAccessors.cs" />
     <Compile Include="Tools\Reflection\CopyHelper.cs" />
     <Compile Include="Tools\Reflection\InstanceFieldAccessor.cs" />
     <Compile Include="Tools\Reflection\InstanceAction.cs" />
@@ -598,9 +597,6 @@
     <PackageReference Include="System.IO.Compression.ZipFile">
       <Version>4.3.0</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Tools\Navigation\MyNW.Internals.Movements.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

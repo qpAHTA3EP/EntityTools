@@ -3,6 +3,7 @@ using EntityTools.Enums;
 using EntityTools.Tools.Missions;
 using MyNW.Classes;
 using MyNW.Internals;
+using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 
@@ -10,10 +11,12 @@ namespace EntityTools.Tools.Missions
 {
     public class MissionGiverNPC : MissionGiverBase
     {
-        public override MissionGiverType GiverType => MissionGiverType.NPC; 
+        public override MissionGiverType GiverType => MissionGiverType.NPC;
 
-        public Vector3 Position { get => _position; set => _position = value; }
+        public override Vector3 Position { get => _position; set => _position = value; }
         protected Vector3 _position = new Vector3();
+
+        public override double Distance => _position.IsValid ? _position.Distance3DFromPlayer : 0;
 
         public override string Id
         {
@@ -50,20 +53,21 @@ namespace EntityTools.Tools.Missions
         protected string _regionName = string.Empty;
 
 #if DEVELOPER
-        [Description("The allowed deviation of the NPC from the specified Position")]
+        [Description("The allowed deviation of the NPC from the specified Position. The minimum value is 1.")]
 #else
         [Browsable(false)]
 #endif
-        public float GiverTolerance
+        public uint GiverTolerance
         {
             get => _giverTolerance;
             set
             {
+                value = Math.Max(value, 1);
                 if (_giverTolerance == value) return;
-                _giverTolerance = value;
+                    _giverTolerance = value;
             }
         }
-        internal float _giverTolerance = 1;
+        internal uint _giverTolerance = 1;
 
         public override bool IsValid
         {
@@ -74,28 +78,31 @@ namespace EntityTools.Tools.Missions
                     return false;
 
                 var player = EntityManager.LocalPlayer;
-                if (string.IsNullOrEmpty(MapName)
-                    || MapName.Equals(player.MapState.MapName) && RegionName.Equals(player.RegionInternalName))
-                    return true;
 
-                return false;
+                return string.IsNullOrEmpty(MapName)
+                    || MapName.Equals(player.MapState.MapName) && RegionName.Equals(player.RegionInternalName);
             }
         }
 
-        public override bool IsAccessible()
+        public override bool IsAccessible
         {
-            var player = EntityManager.LocalPlayer;
-            return _position.IsValid
-                   && !string.IsNullOrEmpty(_id)
-                   && (string.IsNullOrEmpty(_mapName) || _mapName.Equals(player.MapState.MapName) && _regionName.Equals(player.RegionInternalName));
+            get
+            {
+                var player = EntityManager.LocalPlayer;
+                return _position.IsValid
+                       && !string.IsNullOrEmpty(_id)
+                       && (string.IsNullOrEmpty(_mapName) || _mapName.Equals(player.MapState.MapName) && _regionName.Equals(player.RegionInternalName));
+            }
         }
 
         public override bool IsMatching(Entity entity)
         {
-            if (!string.IsNullOrEmpty(Id)
+            if (string.IsNullOrEmpty(Id)
+                || entity is null
+                || !entity.IsValid 
                 || entity.CostumeRef.CostumeName != _id)
                 return false;
-            return entity.Location.Distance3D(_position) < 1.0;
+            return entity.Location.Distance3D(_position) <= _giverTolerance;
         }
 
         protected string label = string.Empty;

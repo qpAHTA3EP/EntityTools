@@ -20,14 +20,9 @@ using MyNW.Internals;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using Astral.Logic.NW;
-using Astral.Professions.Classes;
-using EntityTools.Tools.Navigation;
 using API = Astral.Quester.API;
 using Task = System.Threading.Tasks.Task;
 using System.Threading;
@@ -176,49 +171,6 @@ namespace EntityTools.Core
         }
         private void handler_Test_2(object sender, EventArgs e)
         {
-#if MissionGiver
-            TestGiver giverContainer = null;
-            try
-            {
-                if (File.Exists("TestGiver3.xml"))
-                {
-                    XmlSerializer serialiser = new XmlSerializer(typeof(TestGiver));//, new[] { typeof(MissionGiverNPC), typeof(MissionGiverRemote) });
-                    using (StreamReader fileStream = new StreamReader("TestGiver3.xml"))
-                    {
-                        object obj = serialiser.Deserialize(fileStream);
-                        if (obj is TestGiver giver)
-                        {
-                            giverContainer = giver;
-                        }
-                    }
-                }
-            }
-            catch
-            {
-            }
-
-            XtraMessageBox.Show(giverContainer?.ToString() ?? "Nothing"); 
-#endif
-#if false
-            var entity = EntityManager.GetEntities().FirstOrDefault(ent => ent.CostumeRef.CostumeName == "Enclave_Druid_Halfelf_Morningdawn_F_01");
-
-            if (entity is null)
-                return;
-
-            await entity.ApproachAsync();
-
-            var interactOptions = EntityManager.LocalPlayer.Player.InteractStatus.InteractOptions;
-            Logger.WriteLine($"InteractOptions: {interactOptions.Count}");
-
-            foreach (var interactOption in interactOptions)
-            {
-                if (interactOption.EntityRefId == entity.RefId)
-                {
-                    interactOption.Interact();
-                    break;
-                }
-            } 
-#endif
         }
         private void handler_Test_3(object sender, EventArgs e)
         {
@@ -563,9 +515,6 @@ namespace EntityTools.Core
 
         private void handler_Interact(object sender, EventArgs e)
         {
-            var entity = EntityManager.LocalPlayer.Player.InteractStatus.PreferredTargetEntity;
-            if (entity?.IsValid == true)
-                Task.Run(() => entity.SmartInteract());
         }
     }
 }

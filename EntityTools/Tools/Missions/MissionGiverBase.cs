@@ -9,17 +9,19 @@ namespace EntityTools.Tools.Missions
     [Serializable]
     [XmlInclude(typeof(MissionGiverNPC))]
     [XmlInclude(typeof(MissionGiverRemote))]
+    [XmlType()]
     public abstract class MissionGiverBase // : IXmlSerializable
     {
         [Browsable(false)]
         public abstract MissionGiverType GiverType { get; }
-
+#if false
         [Browsable(false)]
         public string CostumeName
         {
             get => string.Empty;
             set => _id = value;
-        }
+        } 
+#endif
         public virtual string Id
         {
             get => _id;
@@ -27,7 +29,11 @@ namespace EntityTools.Tools.Missions
         }
         protected string _id = string.Empty;
 
-        public abstract bool IsAccessible();
+        public abstract Vector3 Position { get; set; }
+
+        public abstract double Distance { get; }
+
+        public abstract bool IsAccessible { get; }
 
         public abstract bool IsMatching(Entity entity);
 
