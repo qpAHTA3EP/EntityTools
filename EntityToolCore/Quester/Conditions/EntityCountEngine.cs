@@ -7,6 +7,7 @@ using EntityTools.Quester.Conditions;
 using MyNW.Classes;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using static Astral.Quester.Classes.Condition;
 
@@ -21,7 +22,7 @@ namespace EntityCore.Quester.Conditions
         private Predicate<Entity> customRegionCheck = null;
 
         private List<CustomRegion> customRegions = null;
-        private LinkedList<Entity> entities = null;
+        private LinkedList<Entity> localEntitiesCache = null;
 #if timeout
         private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0); 
 #endif
@@ -67,7 +68,7 @@ namespace EntityCore.Quester.Conditions
                     customRegionCheck = internal_CustomRegionCheck_Initializer;
                 }
 
-                entities?.Clear();
+                localEntitiesCache?.Clear();
             }
         }
 
@@ -76,13 +77,15 @@ namespace EntityCore.Quester.Conditions
             get
             {
                 bool result = false;
-                bool extendedActionDebugInfo = EntityTools.EntityTools.Config.Logger.DebugConditionEntityCount;
+                bool extendedActionDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterConditions.DebugConditionEntityCount;
+                string currentMethodName = extendedActionDebugInfo ? string.Concat(conditionIDstr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
+
                 if (extendedActionDebugInfo)
                 {
 #if timeout
-                    string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Begins. Timeout left:", timeout.Left);
+                    string debugMsg = string.Concat(currentMethodName, ": Begins. Timeout left:", timeout.Left);
 #else
-                    string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Begins");
+                    string debugMsg = string.Concat(currentMethodName, ": Begins");
 #endif
                     ETLogger.WriteLine(LogType.Debug, debugMsg);
                 }
@@ -93,17 +96,17 @@ namespace EntityCore.Quester.Conditions
                     if (timeout.IsTimedOut)
                     { 
 #endif
-                    entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
+                    localEntitiesCache = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
                        @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, null/*getCustomRegions()*/, customRegionCheck);
 
-                    uint entCount = (entities is null) ? 0u: (uint)entities.Count;
+                    uint entCount = (localEntitiesCache is null) ? 0u: (uint)localEntitiesCache.Count;
 
                     if (extendedActionDebugInfo)
                     {
                         string debugMsg;
-                        if (entities?.Count > 0)
-                            debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Search Entities (irrespectively CustomRegion). Total found: ", entCount);
-                        else debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Search Entities (irrespectively CustomRegion). Nothing found");
+                        if (localEntitiesCache?.Count > 0)
+                            debugMsg = string.Concat(currentMethodName, ": Search Entities (irrespectively CustomRegion). Total found: ", entCount);
+                        else debugMsg = string.Concat(currentMethodName, ": Search Entities (irrespectively CustomRegion). Nothing found");
 
                         ETLogger.WriteLine(LogType.Debug, debugMsg);
                     }
@@ -112,7 +115,7 @@ namespace EntityCore.Quester.Conditions
                 }
                 else if (EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
                 {
-                    string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Total entities cached (irrespectively CustomRegion): ", entities.Count);
+                    string debugMsg = string.Concat(currentMethodName, ": Total entities cached (irrespectively CustomRegion): ", entities.Count);
 
                     ETLogger.WriteLine(LogType.Debug, debugMsg);
                 } 
@@ -136,7 +139,7 @@ namespace EntityCore.Quester.Conditions
 
                     if (extendedActionDebugInfo)
                     {
-                        string debugMsg = string.Concat(conditionIDstr, '.', nameof(IsValid), ": Result=", result, " (", entCount, " entities mutched)");
+                        string debugMsg = string.Concat(currentMethodName, ": Result=", result, " (", entCount, " entities mutched)");
 
                         ETLogger.WriteLine(LogType.Debug, debugMsg);
                     }
@@ -145,7 +148,7 @@ namespace EntityCore.Quester.Conditions
             }
         }
 
-        public void Reset() => entities?.Clear();
+        public void Reset() => localEntitiesCache?.Clear();
 
         public string TestInfos
         {
@@ -159,20 +162,21 @@ namespace EntityCore.Quester.Conditions
                     if (timeout.IsTimedOut)
 #endif
                     {
-                        entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
+                        localEntitiesCache = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, @this._entitySetType,
                                            @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, null /*getCustomRegions()*/, customRegionCheck);
                     }
+
 
                     StringBuilder strBldr = new StringBuilder();
                     uint entCount = 0;
 
-                    if (entities != null && entities.Count > 0)
+                    if (localEntitiesCache != null && localEntitiesCache.Count > 0)
                     {
                         List<CustomRegion> crList = getCustomRegions();
                         if (crList != null && crList.Count > 0)
                         {
                             strBldr.AppendLine();
-                            foreach (Entity entity in entities)
+                            foreach (Entity entity in localEntitiesCache)
                             {
                                 StringBuilder strBldr2 = new StringBuilder();
                                 bool match = false;
@@ -213,14 +217,14 @@ namespace EntityCore.Quester.Conditions
                             if (@this.Tested == Presence.NotEquel)
                                 strBldr.Insert(0, $"Total {entCount} Entities [{@this._entityId}] are detected out of {crList.Count} CustomRegion:");
                         }
-                        else strBldr.AppendLine($"Total {entities.Count} Entities [{@this._entityId}] are detected");
+                        else strBldr.AppendLine($"Total {localEntitiesCache.Count} Entities [{@this._entityId}] are detected");
                     }
                     else strBldr.AppendLine($"No Entity [{@this._entityId}] was found.");
 #if timeout
                     strBldr.Append($"Timeout left: {timeout.Left}"); 
 #endif
 
-                    if (EntityTools.EntityTools.Config.Logger.DebugConditionEntityCount)
+                    if (EntityTools.EntityTools.Config.Logger.QuesterConditions.DebugConditionEntityCount)
                     {
                         string debugMsg = string.Concat(conditionIDstr, '.', nameof(TestInfos), ':', strBldr.ToString());
 

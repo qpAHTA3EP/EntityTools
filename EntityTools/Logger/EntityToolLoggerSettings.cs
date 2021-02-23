@@ -74,17 +74,35 @@ namespace EntityTools.Settings
             [Bindable(true)]
             public bool DebugMoveToEntity
             {
-                get => _debugMoveToEntityo;
+                get => _debugMoveToEntity;
                 set
                 {
-                    if (_debugMoveToEntityo != value)
+                    if (_debugMoveToEntity != value)
                     {
-                        _debugMoveToEntityo = value;
+                        _debugMoveToEntity = value;
                         NotifyPropertyChanged(nameof(DebugMoveToEntity));
                     }
                 }
             }
-            private bool _debugMoveToEntityo;
+            private bool _debugMoveToEntity;
+
+            /// <summary>
+            /// Активания расширенной отладочной информации по BuySellItems
+            /// </summary>
+            [Bindable(true)]
+            public bool DebugBuySellItems
+            {
+                get => _debugBuySellItem;
+                set
+                {
+                    if (_debugBuySellItem != value)
+                    {
+                        _debugBuySellItem = value;
+                        NotifyPropertyChanged(nameof(DebugBuySellItems));
+                    }
+                }
+            }
+            private bool _debugBuySellItem;
 
             /// <summary>
             /// Активания расширенной отладочной информации по PickUpMissionExt

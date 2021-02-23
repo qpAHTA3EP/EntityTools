@@ -70,7 +70,7 @@ namespace EntityCore.Quester.Action
         {
             get
             {
-                bool extendedActionDebugInfo = EntityTools.EntityTools.Config.Logger.DebugTurnInMissionExt;
+                bool extendedActionDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugTurnInMissionExt;
 
                 string currentMethodName = extendedActionDebugInfo
                     ? string.Concat(actionIDstr, '.', MethodBase.GetCurrentMethod().Name)
@@ -132,7 +132,7 @@ namespace EntityCore.Quester.Action
 
         public ActionResult Run()
         {
-            bool extendedActionDebugInfo = EntityTools.EntityTools.Config.Logger.DebugTurnInMissionExt;
+            bool extendedActionDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugTurnInMissionExt;
 
             string currentMethodName = extendedActionDebugInfo
                     ? string.Concat(actionIDstr, '.', MethodBase.GetCurrentMethod().Name)
@@ -325,7 +325,7 @@ namespace EntityCore.Quester.Action
                 bool isGiverAccessible = @this._giver.IsAccessible;
                 bool isMissionSucceded = MissionHelper.HaveMission(@this._missionId, out Mission mission) && mission.State == MissionState.Succeeded;
                 bool result = isGiverAccessible && isMissionSucceded;
-                if (EntityTools.EntityTools.Config.Logger.DebugTurnInMissionExt)
+                if (EntityTools.EntityTools.Config.Logger.QuesterActions.DebugTurnInMissionExt)
                     ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(InternalConditions), ": GiverAccessible(", isGiverAccessible, ") AND MissionSucceded(", isMissionSucceded, ")) => ", result));
                 return result;
             }
