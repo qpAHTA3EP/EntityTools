@@ -45,6 +45,7 @@ namespace EntityTools.Editors
         {
             vendor = null;
             VendorType vndType = VendorType.None;
+            VendorInfo vendorInfo = null;
 
             if (EntityTools.Core.GUIRequest_Item(() => displayedVendors, ref vndType))
             {
@@ -55,35 +56,33 @@ namespace EntityTools.Editors
                     case VendorType.Auto:
                         return false;
                     case VendorType.Normal:
-                        NPCInfos giver = null;
-                        if (EntityTools.Core.GUIRequest_NPCInfos(ref giver))
+                        Entity entity = null;
+                        if (EntityTools.Core.GUIRequest_EntityToInteract(ref entity))
                         {
-                            Entity betterEntityToInteract = Interact.GetBetterEntityToInteract();
-                            if (betterEntityToInteract.IsValid)
+                            vendorInfo = new VendorInfo
                             {
-                                vendor = new VendorInfo
-                                {
-                                    VendorType = vndType,
-                                    CostumeName = betterEntityToInteract.CostumeRef.CostumeName,
-                                    DisplayName = betterEntityToInteract.Name,
-                                    Position = betterEntityToInteract.Location.Clone(),
-                                    MapName = EntityManager.LocalPlayer.MapState.MapName,
-                                    RegionName = EntityManager.LocalPlayer.RegionInternalName
-                                };
-                                return true;
-                            }
+                                VendorType = vndType,
+                                CostumeName = entity.CostumeRef.CostumeName,
+                                DisplayName = entity.Name,
+                                Position = entity.Location.Clone(),
+                                MapName = EntityManager.LocalPlayer.MapState.MapName,
+                                RegionName = EntityManager.LocalPlayer.RegionInternalName
+                            };
+                            vendor = vendorInfo;
+                            return true;
                         }
                         return false;
                     case VendorType.RemoteVendor:
                         string contactName = GetAnId.GetARemoteContact();
                         if (!string.IsNullOrEmpty(contactName))
                         {
-                            vendor = new VendorInfo
+                            vendorInfo = new VendorInfo
                             {
                                 VendorType = vndType,
                                 CostumeName = contactName,
                                 DisplayName = contactName
                             };
+                            vendor = vendorInfo;
                             if ((XtraMessageBox.Show("Call it now ?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes))
                             {
                                 foreach (RemoteContact remoteContact in EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts)
@@ -99,12 +98,13 @@ namespace EntityTools.Editors
                         }
                         return !string.IsNullOrEmpty(contactName);
                     default:
-                        vendor = new VendorInfo
+                        vendorInfo = new VendorInfo
                         {
                             VendorType = vndType,
                             CostumeName = vndType.ToString(),
                             DisplayName = vndType.ToString()
                         };
+                        vendor = vendorInfo;
                         return true;
                 }
             }

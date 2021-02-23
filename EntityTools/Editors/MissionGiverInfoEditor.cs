@@ -23,29 +23,27 @@ namespace EntityTools.Editors
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
 #if false
-            if (SetInfos(out MissionGiverInfo giver))
+            Entity entity = null;
+            if (EntityTools.Core.GUIRequest_EntityToInteract(ref entity))
+            {
+                var player = EntityManager.LocalPlayer;
+                var giver = new MissionGiverInfo
+                {
+                    Id = entity.CostumeRef.CostumeName,
+                    Position = entity.Location.Clone(),
+                    MapName = player.MapState.MapName,
+                    RegionName = player.RegionInternalName
+                };
+                value = giver;
+            }
+#else
+            MissionGiverInfo giver = null;
+            if (SetInfos(ref giver))
             {
                 return giver;
-            } 
-#else
-            NPCInfos npc = null;
-            if (EntityTools.Core.GUIRequest_NPCInfos(ref npc))
-            {
-                Entity betterEntityToInteract = Interact.GetBetterEntityToInteract();
-                if (betterEntityToInteract.IsValid)
-                {
-                    var player = EntityManager.LocalPlayer;
-                    value = new MissionGiverInfo
-                    {
-                        Id = betterEntityToInteract.CostumeRef.CostumeName,
-                        Position = betterEntityToInteract.Location.Clone(),
-                        MapName = player.MapState.MapName,
-                        RegionName = player.RegionInternalName
-                    };
-                }
             }
 #endif
-            return value;
+            return value; 
         }
 
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
@@ -53,79 +51,74 @@ namespace EntityTools.Editors
             return UITypeEditorEditStyle.Modal;
         }
 
-#if false
         public static readonly MissionGiverType[] DisplayedGivers = { MissionGiverType.NPC,
-                                                                      MissionGiverType.Remote,
-                                                                      MissionGiverType.Item }; 
-        public static bool SetInfos(out MissionGiverInfo missionGiver)
+                                                                      MissionGiverType.Remote };
+
+        public static bool SetInfos(ref MissionGiverInfo missionGiver, MissionGiverType giverType = MissionGiverType.None)
         {
-            missionGiver = null;
-            MissionGiverType giverType = MissionGiverType.None;
+            if (giverType == MissionGiverType.None)
+                if (!EntityTools.Core.GUIRequest_Item(() => DisplayedGivers, ref giverType))
+                    return false;
 
-            if (EntityTools.Core.GUIRequest_Item(() => DisplayedGivers, ref giverType))
+            switch (giverType)
             {
-                switch (giverType)
-                {
-                    case MissionGiverType.None:
-                        return false;
-                    case MissionGiverType.NPC:
-                        NPCInfos npc = null;
-                        if (EntityTools.Core.GUIRequest_NPCInfos(ref npc))
+                case MissionGiverType.NPC:
+                    Entity entity = null;
+                    if (EntityTools.Core.GUIRequest_EntityToInteract(ref entity))
+                    {
+                        var player = EntityManager.LocalPlayer;
+#if false
+                        var giver = new MissionGiverInfo
                         {
-                            Entity betterEntityToInteract = Interact.GetBetterEntityToInteract();
-                            if (betterEntityToInteract.IsValid)
-                            {
-                                var player = EntityManager.LocalPlayer;
-                                missionGiver = new MissionGiverInfo
-                                {
-                                    GiverType = giverType,
-                                    Id = betterEntityToInteract.CostumeRef.CostumeName,
-                                    Position = betterEntityToInteract.Location.Clone(),
-                                    MapName = player.MapState.MapName,
-                                    RegionName = player.RegionInternalName
-                                };
-                                return true;
-                            }
-                        }
-                        break;
-                    case MissionGiverType.Remote:
-                        string contactName = GetAnId.GetARemoteContact();
-                        if (!string.IsNullOrEmpty(contactName))
+                            Type = MissionGiverType.NPC,
+                            Id = entity.CostumeRef.CostumeName,
+                            Position = entity.Location.Clone(),
+                            MapName = player.MapState.MapName,
+                            RegionName = player.RegionInternalName
+                        }; 
+                        missionGiver = giver;
+#else
+                        missionGiver = new MissionGiverInfo(entity.CostumeRef.CostumeName,
+                                                            entity.Location,
+                                                            player.MapState.MapName,
+                                                            player.RegionInternalName);
+#endif
+                        return true;
+                    }
+                    break;
+                case MissionGiverType.Remote:
+                    string contactName = GetAnId.GetARemoteContact();
+                    if (!string.IsNullOrEmpty(contactName))
+                    {
+#if false
+                        var giver = new MissionGiverInfo
                         {
-                            missionGiver = new MissionGiverInfo()
+                            Type = MissionGiverType.Remote,
+                            Id = contactName
+                        }; 
+                        missionGiver = giver;
+#else
+                        missionGiver = new MissionGiverInfo(contactName);
+#endif
+#if false
+                        if (XtraMessageBox.Show("Call it now ?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                        {
+                            foreach (RemoteContact remoteContact in EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts)
                             {
-                                GiverType = giverType,
-                                Id = contactName
-                            };
-                            if (XtraMessageBox.Show("Call it now ?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                            {
-                                foreach (RemoteContact remoteContact in EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts)
-                                {
-                                    if (remoteContact.ContactDef != contactName) continue;
+                                if (remoteContact.ContactDef != contactName) continue;
 
-                                    missionGiver.Id = remoteContact.ContactDef;
-                                    remoteContact.Start();
-                                    break;
-                                }
+                                missionGiver.Id = remoteContact.ContactDef;
+                                remoteContact.Start();
+                                break;
                             }
-                        }
-                        break;
-                    case MissionGiverType.Item:
-                        GetAnItem.ListItem listItem = GetAnItem.Show();
-                        if (listItem != null && !string.IsNullOrEmpty(listItem.ItemId))
-                        {
-                            missionGiver = new MissionGiverInfo
-                            {
-                                GiverType = giverType,
-                                Id = listItem.ItemId
-                            };
-                        }
-                        break;
-                }
+                        } 
+#endif
+                        return true;
+                    }
+                    break;
             }
             return false;
         }
-#endif
     }
 #endif
 }

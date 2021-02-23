@@ -23,7 +23,7 @@ namespace EntityTools.Editors
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
 #if true
-            MissionGiverBase giver = value as MissionGiverBase;
+            MissionGiverBase giver = null;
             if (SetInfos(ref giver))
             {
                 return giver;
@@ -58,40 +58,37 @@ namespace EntityTools.Editors
                                                                       MissionGiverType.Remote }; 
         public static bool SetInfos(ref MissionGiverBase missionGiver)
         {
-            missionGiver = null;
             MissionGiverType giverType = MissionGiverType.None;
-
             if (EntityTools.Core.GUIRequest_Item(() => DisplayedGivers, ref giverType))
             {
                 switch (giverType)
                 {
                     case MissionGiverType.NPC:
-                        NPCInfos npc = null;
-                        if (EntityTools.Core.GUIRequest_NPCInfos(ref npc))
+                        Entity entity = null;
+                        if (EntityTools.Core.GUIRequest_EntityToInteract(ref entity))
                         {
-                            Entity betterEntityToInteract = Interact.GetBetterEntityToInteract();
-                            if (betterEntityToInteract.IsValid)
+                            var player = EntityManager.LocalPlayer;
+                            var giver = new MissionGiverNPC
                             {
-                                var player = EntityManager.LocalPlayer;
-                                missionGiver = new MissionGiverNPC
-                                {
-                                    Id = betterEntityToInteract.CostumeRef.CostumeName,
-                                    Position = betterEntityToInteract.Location.Clone(),
-                                    MapName = player.MapState.MapName,
-                                    RegionName = player.RegionInternalName
-                                };
-                                return true;
-                            }
+                                Id = entity.CostumeRef.CostumeName,
+                                Position = entity.Location.Clone(),
+                                MapName = player.MapState.MapName,
+                                RegionName = player.RegionInternalName
+                            };
+                            missionGiver = giver;
+                            return true;
                         }
                         break;
                     case MissionGiverType.Remote:
                         string contactName = GetAnId.GetARemoteContact();
                         if (!string.IsNullOrEmpty(contactName))
                         {
-                            missionGiver = new MissionGiverRemote()
+                            var giver = new MissionGiverRemote
                             {
                                 Id = contactName
                             };
+                            missionGiver = giver;
+#if false
                             if (XtraMessageBox.Show("Call it now ?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                             {
                                 foreach (RemoteContact remoteContact in EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts)
@@ -102,7 +99,8 @@ namespace EntityTools.Editors
                                     remoteContact.Start();
                                     break;
                                 }
-                            }
+                            } 
+#endif
                             return true;
                         }
                         break;
