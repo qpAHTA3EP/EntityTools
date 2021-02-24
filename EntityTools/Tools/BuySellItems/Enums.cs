@@ -22,10 +22,12 @@ namespace EntityTools.Enums
         /// <summary>
         /// Автоматический выбор вендора
         /// </summary>
+#if false
         Auto,
         /// <summary>
         /// Конкретный торговец на карте
-        /// </summary>
+        /// </summary>  
+#endif
         Normal,
         /// <summary>
         /// Призываемый торговец (актефактом Каталог Аврора для всех миров)

@@ -175,9 +175,11 @@ namespace EntityTools.Tools.BuySellItems
                     case VendorType.None:
                         isMatch = false;
                         break;
+#if VendorType_Auto
                     case VendorType.Auto:
                         isMatch = false;
-                        break;
+                        break; 
+#endif
                     case VendorType.Normal:
                         isMatch = !string.IsNullOrEmpty(_costumeName)
                                     && entity.CostumeRef.CostumeName == _costumeName
@@ -238,9 +240,11 @@ namespace EntityTools.Tools.BuySellItems
                             valid = true;
                         }
                         break;
+#if VendorType_Auto
                     case VendorType.Auto:
                         valid = false;
                         break;
+#endif
 #if false
                     case VendorType.ArtifactVendor:
                         valid = SpecialVendor.IsAvailable();
@@ -303,9 +307,11 @@ namespace EntityTools.Tools.BuySellItems
                             available = true;
                         }
                         break;
+#if VendorType_Auto
                     case VendorType.Auto:
                         available = false;
-                        break;
+                        break; 
+#endif
                     case VendorType.ArtifactVendor:
                         // Если торговец уже призван, то IsAvailable() возвращает false
                         available = SpecialVendor.IsAvailable() || SpecialVendor.VendorEntity.IsValid;
@@ -317,13 +323,28 @@ namespace EntityTools.Tools.BuySellItems
                         available = VIP.CanSummonSealTrader;
                         break;
                     case VendorType.Normal:
+                        var player = EntityManager.LocalPlayer;
                         available = !string.IsNullOrEmpty(_costumeName)
-                                    && _mapName == EntityManager.LocalPlayer.MapState.MapName
-                                    && _regionName == EntityManager.LocalPlayer.RegionInternalName;
+                                    && _mapName == player.MapState.MapName
+                                    && _regionName == player.RegionInternalName;
                         break;
                 }
 
                 return available;
+            }
+        }
+
+        public double Distance
+        {
+            get
+            {
+                if (_vendorType == VendorType.Normal)
+                {
+                    if (_position != null && _position.IsValid && IsAvailable)
+                        return _position.Distance3DFromPlayer;
+                    else return double.MaxValue;
+                }
+                else return 0;
             }
         }
 
@@ -364,9 +385,11 @@ namespace EntityTools.Tools.BuySellItems
                         }
                         else label = "Not set";
                         break;
+#if VendorType_Auto
                     case VendorType.Auto:
                         label = "Auto";
-                        break;
+                        break; 
+#endif
                     case VendorType.Normal:
                         if (_mapName.Length > 0)
                         {

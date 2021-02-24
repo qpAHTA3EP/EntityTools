@@ -33,7 +33,7 @@ namespace EntityTools.Quester.Actions
     public class BuySellItemsExt : Action
     {
         internal readonly InstancePropertyAccessor<BuySellItemsExt, ActionDebug> debug;
-
+        string actionIDstr;
         BuySellItemsExt @this => this;
 
         #region Опции команды
@@ -204,6 +204,7 @@ namespace EntityTools.Quester.Actions
         {
             tryNum = _tries;
             debug = this.GetInstanceProperty<BuySellItemsExt, ActionDebug>("Debug");
+            actionIDstr = string.Concat(@this.GetType().Name, '[', @this.ActionID, ']');
         }
 
         /// <summary>
@@ -219,34 +220,8 @@ namespace EntityTools.Quester.Actions
         {
             get
             {
-#if change_on_20200603_0958
-                if (!Validate(@this._vendor))
-                    return false;
-
-                // Функционал перенесен в VendorInfo.IsAvailable
-                switch (@this._vendor.VendorType)
-                {
-                    case VendorType.None:
-                        return false;
-                    case VendorType.Auto:
-                        return false;
-                    case VendorType.ArtifactVendor:
-                        if (!SpecialVendor.IsAvailable())
-                            return false;
-                        break;
-                    case VendorType.VIPSummonSealTrader:
-                        if (!VIP.CanSummonSealTrader)
-                            return false;
-                        break;
-                    case VendorType.VIPProfessionVendor:
-                        if (!VIP.CanSummonProfessionVendor)
-                            return false;
-                        break;
-                } 
-#else
                 if (!@this._vendor.IsAvailable)
                     return false;
-#endif
 
                 if (@this._useGeneralSettingsToSell)
                 {
@@ -337,20 +312,20 @@ namespace EntityTools.Quester.Actions
         }
         #endregion
 
-        public override bool NeedToRun => (!@this._vendor.Position.IsValid || @this._vendor.Position.Distance3DFromPlayer < 25) && @this._vendor.IsAvailable;
+        public override bool NeedToRun => @this._vendor.Distance < 25 && @this._vendor.IsAvailable;
 
         public override ActionResult Run()
         {
-            bool extendedActionDebugInfo  = EntityTools.Config.Logger.DebugMoveToEntity;
+            bool extendedDebugInfo  = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
             Entity theVendor = null;
-            string methodName = MethodBase.GetCurrentMethod().Name;
+            string methodName = extendedDebugInfo ? string.Concat(MethodBase.GetCurrentMethod().Name) : string.Empty;
             if (tryNum > 0)
             {
                 tryNum--;
                 switch (@this._vendor.VendorType)
                 {
                     case VendorType.None:
-                        if (extendedActionDebugInfo)
+                        if (extendedDebugInfo)
                             debug.Value.AddInfo(string.Concat(methodName, ": Vendor not specified. Fail"));
                         return ActionResult.Fail;
                     case VendorType.ArtifactVendor:
@@ -359,12 +334,12 @@ namespace EntityTools.Quester.Actions
                         {
                             if (SpecialVendor.IsAvailable())
                             {
-                                if (extendedActionDebugInfo)
+                                if (extendedDebugInfo)
                                     debug.Value.AddInfo(string.Concat(methodName, ": Summon 'ArtifactVendor'"));
                                 SpecialVendor.UseItem();
                                 Thread.Sleep(3000);
                                 theVendor = SpecialVendor.VendorEntity;
-                                if (extendedActionDebugInfo)
+                                if (extendedDebugInfo)
                                 {
                                     if (theVendor != null)
                                         debug.Value.AddInfo(string.Concat(methodName, ": Vendor '", theVendor.InternalName, "' was successfully summoned"));
@@ -373,50 +348,50 @@ namespace EntityTools.Quester.Actions
                             }
                             else
                             {
-                                if (extendedActionDebugInfo)
+                                if (extendedDebugInfo)
                                     debug.Value.AddInfo(string.Concat(methodName, ": 'ArtifactVendor' does not available. Failed"));
                                 return ActionResult.Fail;
                             }
                         }
-                        else if (extendedActionDebugInfo)
+                        else if (extendedDebugInfo)
                             debug.Value.AddInfo(string.Concat(methodName, ": Vendor '", theVendor.InternalName, "' already summoned"));
                         return Traiding(theVendor);
                     case VendorType.VIPSealTrader:
                         theVendor = VIP.SealTraderEntity;
                         if (theVendor is null || !theVendor.IsValid)
                         {
-                            if (extendedActionDebugInfo)
+                            if (extendedDebugInfo)
                                 debug.Value.AddInfo(string.Concat(methodName, ": Summon 'VIPSealTrader'"));
                             VIP.SummonSealTrader();
                             Thread.Sleep(3000);
                             theVendor = VIP.SealTraderEntity;
-                            if (extendedActionDebugInfo)
+                            if (extendedDebugInfo)
                             {
                                 if (theVendor != null)
                                     debug.Value.AddInfo(string.Concat(methodName, ": Vendor '", theVendor.InternalName, "' was successfully summoned"));
                                 else debug.Value.AddInfo(string.Concat(methodName, ": Summoning failed"));
                             }
                         }
-                        else if (extendedActionDebugInfo)
+                        else if (extendedDebugInfo)
                             debug.Value.AddInfo(string.Concat(methodName, ": Vendor '", theVendor.InternalName, "' already summoned"));
                         return Traiding(theVendor);
                     case VendorType.VIPProfessionVendor:
                         theVendor = VIP.ProfessionVendorEntity;
                         if (theVendor is null || !theVendor.IsValid)
                         {
-                            if (extendedActionDebugInfo)
+                            if (extendedDebugInfo)
                                 debug.Value.AddInfo(string.Concat(methodName, ": Summon 'VIPProfessionVendor'"));
                             VIP.SummonProfessionVendor();
                             Thread.Sleep(3000);
                             theVendor = VIP.ProfessionVendorEntity;
-                            if (extendedActionDebugInfo)
+                            if (extendedDebugInfo)
                             {
                                 if (theVendor != null)
                                     debug.Value.AddInfo(string.Concat(methodName, ": Vendor '", theVendor.InternalName, "' was successfully summoned"));
                                 else debug.Value.AddInfo(string.Concat(methodName, ": Summoning failed"));
                             }
                         }
-                        else if (extendedActionDebugInfo)
+                        else if (extendedDebugInfo)
                             debug.Value.AddInfo(string.Concat(methodName, ": Vendor '", theVendor.InternalName, "' already summoned"));
 #if true
                         return Traiding(theVendor); 
@@ -427,18 +402,18 @@ namespace EntityTools.Quester.Actions
                         else return ActionResult.Running;
 #endif
                     case VendorType.RemoteVendor:
-                        if (extendedActionDebugInfo)
+                        if (extendedDebugInfo)
                             debug.Value.AddInfo(string.Concat(methodName, ": Call 'RemoteVendor'"));
                         RemoteContact remoteContact = EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts.Find(ct => ct.ContactDef == _vendor.CostumeName);
-                        if (extendedActionDebugInfo)
+                        if (extendedDebugInfo)
                         {
                             if (remoteContact != null && remoteContact.IsValid)
                                 debug.Value.AddInfo(string.Concat(methodName, ": Vendor '", remoteContact.ContactDef, "' was called successfully"));
                             else debug.Value.AddInfo(string.Concat(methodName, ": Calling failed"));
                         }
-                        return RemouteTraiding(remoteContact);
+                        return RemoteTraiding(remoteContact);
                     default:
-                        if (extendedActionDebugInfo)
+                        if (extendedDebugInfo)
                             debug.Value.AddInfo(string.Concat(methodName, ": Search '", _vendor.CostumeName, '\''));
                         // ищем ближайший "контакт" совпадающий с Vendor
                         double dist = double.MaxValue;
@@ -452,7 +427,7 @@ namespace EntityTools.Quester.Actions
                                 dist = curDist;
                             }
                         }
-                        if (extendedActionDebugInfo)
+                        if (extendedDebugInfo)
                         {
                             if (contactInfo != null && contactInfo.IsValid)
                                 debug.Value.AddInfo(string.Concat(methodName, ": Vendor '", contactInfo.Entity.Name, '[', contactInfo.Entity.InternalName, "]' was successfully found at the Distance = ", dist));
@@ -470,13 +445,13 @@ namespace EntityTools.Quester.Actions
         /// </summary>
         /// <param name="remoteContact"></param>
         /// <returns></returns>
-        private ActionResult RemouteTraiding(RemoteContact remoteContact)
+        private ActionResult RemoteTraiding(RemoteContact remoteContact)
         {
-            bool extendedActionDebugInfo = EntityTools.Config.Logger.DebugMoveToEntity;
+            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
             string methodName = MethodBase.GetCurrentMethod().Name;
             if (remoteContact != null)
             {
-                if (extendedActionDebugInfo)
+                if (extendedDebugInfo)
                     debug.Value.AddInfo(string.Concat(methodName, ": Begins"));
 
                 remoteContact.Start();
@@ -554,11 +529,11 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private ActionResult Traiding(Entity vendorEntity)
         {
-            bool extendedActionDebugInfo = EntityTools.Config.Logger.DebugMoveToEntity;
+            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
             string methodName = MethodBase.GetCurrentMethod().Name;
             if (vendorEntity != null)
             {
-                if (extendedActionDebugInfo)
+                if (extendedDebugInfo)
                     debug.Value.AddInfo(string.Concat(methodName, ": Begins"));
 
                 // взаимодействие с вендором для открытия окна магазина
@@ -581,7 +556,7 @@ namespace EntityTools.Quester.Actions
                         // Закрытие диалогового окна
                         if (@this._closeContactDialog)
                         {
-                            if (extendedActionDebugInfo)
+                            if (extendedDebugInfo)
                                 debug.Value.AddInfo(string.Concat(methodName, ": CloseContactDialog"));
 
                             EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
@@ -602,17 +577,17 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private bool ApproachAndInteractToVendor(Entity entity)
         {
-            bool extendedActionDebugInfo = EntityTools.Config.Logger.DebugMoveToEntity;
+            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
             string methodName = MethodBase.GetCurrentMethod().Name;
 
-            if (extendedActionDebugInfo)
+            if (extendedDebugInfo)
                 debug.Value.AddInfo(string.Concat(methodName, ": Begins"));
             bool ready = false;
 
             // Проверяем соответствие 
             if (@this._vendor.IsMatch(entity)) 
             {
-                if (extendedActionDebugInfo)
+                if (extendedDebugInfo)
                     debug.Value.AddInfo(string.Concat(methodName, ": VendorEntity is ok"));
 
                 ContactDialog contactDialog = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog;
@@ -620,7 +595,7 @@ namespace EntityTools.Quester.Actions
                 {
                     ScreenType screenType = contactDialog.ScreenType;
 
-                    if (extendedActionDebugInfo)
+                    if (extendedDebugInfo)
                         debug.Value.AddInfo(string.Concat(methodName, ": ContactDialog is valid. ScreenType = ", screenType));
  
                     // Открыто диалоговое окно
@@ -629,12 +604,12 @@ namespace EntityTools.Quester.Actions
                         // Открыто диалоговое окно продавца
                         if (@this._vendorMenus.Count > 0)
                         {
-                            if (extendedActionDebugInfo)
+                            if (extendedDebugInfo)
                                 debug.Value.AddInfo(string.Concat(methodName, ": Call Interact.DoDialog(..)"));
                             Interact.DoDialog(_vendorMenus);
                         }
                         ready = Check_ReadyToTraid(contactDialog.ScreenType);
-                        if (extendedActionDebugInfo)
+                        if (extendedDebugInfo)
                             debug.Value.AddInfo(string.Concat(methodName, ": ReadyToTraid = ", ready));
 
                         return ready;
@@ -649,52 +624,52 @@ namespace EntityTools.Quester.Actions
                             string key = @this._vendorMenus.Last();
                             if (contactDialog.HasOptionByKey(key))
                             {
-                                if (extendedActionDebugInfo)
+                                if (extendedDebugInfo)
                                     debug.Value.AddInfo(string.Concat(methodName, ": Select Shop-Tab"));
 
                                 contactDialog.SelectOptionByKey(key);
                             }
                         }
                         ready = Check_ReadyToTraid(contactDialog.ScreenType);
-                        if (extendedActionDebugInfo)
+                        if (extendedDebugInfo)
                             debug.Value.AddInfo(string.Concat(methodName, ": ReadyToTraid = ", ready));
 
                         return ready;
                     }
                     if (@this._closeContactDialog)
                     {
-                        if (extendedActionDebugInfo)
+                        if (extendedDebugInfo)
                             debug.Value.AddInfo(string.Concat(methodName, ": CloseContactDialog"));
                         contactDialog.Close();
                     }
                 }
-                else if (extendedActionDebugInfo)
+                else if (extendedDebugInfo)
                     debug.Value.AddInfo(string.Concat(methodName, ": ContactDialog is invalid"));
 
                 double dist = entity.Location.Distance3DFromPlayer;
                 if (!contactDialog.IsValid || dist > 10)
                 {
                     // Расстояние до продавца больше 10
-                    if (extendedActionDebugInfo)
+                    if (extendedDebugInfo)
                         debug.Value.AddInfo(string.Concat(methodName, ": Distance to the Vendor = ", dist, ". Call Interact.VendorWithDialogs(..)"));
                         
                     bool interactResult = Interact.VendorWithDialogs(entity, _vendorMenus);
 
                     ready = Check_ReadyToTraid(EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.ScreenType);
-                    if (extendedActionDebugInfo)
+                    if (extendedDebugInfo)
                     {
                         debug.Value.AddInfo(string.Concat(methodName, ": InteractionResult = ", interactResult, ", ReadyToTraid = ", ready));
                     }
                     return interactResult && ready;
                 }
                 ready = Check_ReadyToTraid(contactDialog.ScreenType);
-                if (extendedActionDebugInfo)
+                if (extendedDebugInfo)
                     debug.Value.AddInfo(string.Concat(methodName, ": ReadyToTraid = ", ready));
 
                 return ready;
             }
 
-            if (extendedActionDebugInfo)
+            if (extendedDebugInfo)
                 debug.Value.AddInfo(string.Concat(methodName, ": VendorEntity checks failed"));
 
             return false;
@@ -706,16 +681,16 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private ActionResult BuyItems()
         {
-            bool extendedActionDebugInfo = EntityTools.Config.Logger.DebugMoveToEntity;
+            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
             string methodName = MethodBase.GetCurrentMethod().Name;
-            if (extendedActionDebugInfo)
+            if (extendedDebugInfo)
                 debug.Value.AddInfo(string.Concat(methodName, ": Begins"));
 
             if (!_checkFreeBags || Check_FreeSlots(_buyBags))
             {
                 if (_useGeneralSettingsToBuy)
                 {
-                    if (extendedActionDebugInfo)
+                    if (extendedDebugInfo)
                         debug.Value.AddInfo(string.Concat(methodName, ": Processing GeneralSettingsToBuy"));
 
                     Interact.BuyItems();
@@ -782,7 +757,7 @@ namespace EntityTools.Quester.Actions
 #else
                 if (_buyOptions.Count > 0)
                 {
-                    if (extendedActionDebugInfo)
+                    if (extendedDebugInfo)
                     {
                         debug.Value.AddInfo(string.Concat(methodName, ": Begins the processing of ", nameof(@this.BuyOptions)));
                         debug.Value.AddInfo(string.Concat(methodName, ": Indexing selected Bags"));
@@ -792,14 +767,14 @@ namespace EntityTools.Quester.Actions
 
                     foreach (var filterEntry in indexedBags.Filters)
                     {
-                        if (extendedActionDebugInfo)
+                        if (extendedDebugInfo)
                             debug.Value.AddInfo(string.Concat(methodName, ": Processing FilterEntry: ", filterEntry.ToString()));
 
                         var slotCache = indexedBags[filterEntry];
                         List<ItemDef> boughtItems = null;
                         BuyItemResult buyItemResult = (slotCache is null) ? BuyAnItem(filterEntry, ref boughtItems) : BuyAnItem(filterEntry, slotCache, ref boughtItems);
 
-                        if (extendedActionDebugInfo)
+                        if (extendedDebugInfo)
                             debug.Value.AddInfo(string.Concat(methodName, ": Result: ", buyItemResult));
                         // Обработка результата покупки
                         // Если результат не позволяет продолжать покупку - прерываем выполнение команды
@@ -833,7 +808,7 @@ namespace EntityTools.Quester.Actions
                 return ActionResult.Completed;
             }
 
-            if (extendedActionDebugInfo)
+            if (extendedDebugInfo)
                 debug.Value.AddInfo(string.Concat(methodName, ": Bags is full. Skip"));
 
             return ActionResult.Skip;
@@ -846,7 +821,7 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private BuyItemResult BuyAnItem(ItemFilterEntryExt item2buy, ref List<ItemDef> boughtItems)
         {
-            bool extendedActionDebugInfo = EntityTools.Config.Logger.DebugMoveToEntity;
+            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
             string methodName = MethodBase.GetCurrentMethod().Name;
 
             BuyItemResult result = BuyItemResult.Completed;
@@ -886,7 +861,7 @@ namespace EntityTools.Quester.Actions
                                         {
                                             // Единовременная покупка нужного количества предметов
                                             string str = $"Buy {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] ...";
-                                            if (extendedActionDebugInfo)
+                                            if (extendedDebugInfo)
                                                 debug.Value.AddInfo(string.Concat(methodName, str));
                                             Logger.WriteLine(str);
 
@@ -901,7 +876,7 @@ namespace EntityTools.Quester.Actions
                                             // Покупка предмета в цикле
                                             string str = $"Buy total {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] by one item...";
                                             Logger.WriteLine(str);
-                                            if (extendedActionDebugInfo)
+                                            if (extendedDebugInfo)
                                                 debug.Value.AddInfo(str);
 
                                             uint totalPurchasedNum = 0;
@@ -913,7 +888,7 @@ namespace EntityTools.Quester.Actions
                                                 {
                                                     str = $"Buying time is out. Bought only {totalPurchasedNum} of {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] was bought ...";
                                                     Logger.WriteLine(str);
-                                                    if (extendedActionDebugInfo)
+                                                    if (extendedDebugInfo)
                                                         debug.Value.AddInfo(string.Concat(methodName, str));
                                                     break;
                                                 }
@@ -923,7 +898,7 @@ namespace EntityTools.Quester.Actions
 
                                                     str = $"Bags are full. Bought only {totalPurchasedNum} of {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] ...";
                                                     Logger.WriteLine(str);
-                                                    if (extendedActionDebugInfo)
+                                                    if (extendedDebugInfo)
                                                         debug.Value.AddInfo(string.Concat(methodName, str));
                                                     return result = BuyItemResult.FullBag;
                                                 }
@@ -935,7 +910,7 @@ namespace EntityTools.Quester.Actions
                                 }
                                 else
                                 {
-                                    if (extendedActionDebugInfo)
+                                    if (extendedDebugInfo)
                                         debug.Value.AddInfo("Bags are full, skip ...");
 
                                     Logger.WriteLine("Bags are full, skip ...");
@@ -962,7 +937,7 @@ namespace EntityTools.Quester.Actions
         private BuyItemResult BuyAnItem(ItemFilterEntryExt filterEntry, SlotCache slotCache, ref List<ItemDef> boughtItems)
 #endif
         {
-            bool extendedActionDebugInfo = EntityTools.Config.Logger.DebugMoveToEntity;
+            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
             string methodName = MethodBase.GetCurrentMethod().Name;
 
             BuyItemResult result = BuyItemResult.Completed;
@@ -1002,7 +977,7 @@ namespace EntityTools.Quester.Actions
                                         {
                                             // Покупка предмета в необходимом количество за один раз
                                             string str = $"Buy {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] ...";
-                                            if (extendedActionDebugInfo)
+                                            if (extendedDebugInfo)
                                                 debug.Value.AddInfo(string.Concat(methodName, str));
                                             Logger.WriteLine(str);
 
@@ -1018,7 +993,7 @@ namespace EntityTools.Quester.Actions
                                             // Невозможна единовременная покупка необходимого количества предметов, 
                                             // производим покупку в цикле
                                             string str = $"Buy total {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] by one item...";
-                                            if (extendedActionDebugInfo)
+                                            if (extendedDebugInfo)
                                                 debug.Value.AddInfo(string.Concat(methodName, str));
                                             Logger.WriteLine(str);
 
@@ -1030,7 +1005,7 @@ namespace EntityTools.Quester.Actions
                                                 if (timeout.IsTimedOut)
                                                 {
                                                     str = $"Buying time is out. Bought only {totalPurchasedNum} of {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] was bought ...";
-                                                    if (extendedActionDebugInfo)
+                                                    if (extendedDebugInfo)
                                                         debug.Value.AddInfo(string.Concat(methodName, str));
                                                     Logger.WriteLine(str);
                                                     break;
@@ -1040,7 +1015,7 @@ namespace EntityTools.Quester.Actions
                                                     boughtItems.Add(storeItemInfo.Item.ItemDef);
 
                                                     str = $"Buying is impossible now. Error code '{storeItemInfo.CanBuyError}'. Bought only {totalPurchasedNum} of {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] ...";
-                                                    if (extendedActionDebugInfo)
+                                                    if (extendedDebugInfo)
                                                         debug.Value.AddInfo(string.Concat(methodName, str));
                                                     Logger.WriteLine(str);
 
@@ -1051,7 +1026,7 @@ namespace EntityTools.Quester.Actions
                                                     boughtItems.Add(storeItemInfo.Item.ItemDef);
 
                                                     str = $"Bags are full. Bought only {totalPurchasedNum} of {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] ...";
-                                                    if (extendedActionDebugInfo)
+                                                    if (extendedDebugInfo)
                                                         debug.Value.AddInfo(string.Concat(methodName, str));
                                                     Logger.WriteLine(str);
                                                     return result = BuyItemResult.FullBag;
@@ -1064,7 +1039,7 @@ namespace EntityTools.Quester.Actions
                                 }
                                 else
                                 {
-                                    if (extendedActionDebugInfo)
+                                    if (extendedDebugInfo)
                                         debug.Value.AddInfo(string.Concat(methodName, "Bags are full, skip ..."));
                                     Logger.WriteLine("Bags are full, skip ...");
                                     return result = BuyItemResult.FullBag;

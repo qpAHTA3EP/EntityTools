@@ -53,8 +53,10 @@ namespace EntityTools.Editors
                 {
                     case VendorType.None:
                         return false;
+#if VendorType_Auto
                     case VendorType.Auto:
-                        return false;
+                        return false; 
+#endif
                     case VendorType.Normal:
                         Entity entity = null;
                         if (EntityTools.Core.GUIRequest_EntityToInteract(ref entity))
