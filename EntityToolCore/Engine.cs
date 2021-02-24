@@ -123,7 +123,7 @@ namespace EntityCore
                         return true;
                 }
 
-                if (action is TurnInMissionNew tim)
+                if (action is TurnInMissionExt tim)
                 {
                     if (dictQuesterAction.TryGetValue(tim, out IQuesterActionEngine engine))
                     {

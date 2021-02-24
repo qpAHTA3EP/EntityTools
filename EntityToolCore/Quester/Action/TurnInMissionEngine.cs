@@ -29,7 +29,7 @@ namespace EntityCore.Quester.Action
 {
     public class TurnInMissionEngine : IQuesterActionEngine
     {
-        private TurnInMissionNew @this;
+        private TurnInMissionExt @this;
 
         #region данные ядра
         private const int TIME = 5_000;
@@ -46,7 +46,7 @@ namespace EntityCore.Quester.Action
         private readonly string actionIDstr = string.Empty;
         #endregion
 
-        public TurnInMissionEngine(TurnInMissionNew tim) 
+        public TurnInMissionEngine(TurnInMissionExt tim) 
         {
             @this = tim;
             @this.Engine = this;

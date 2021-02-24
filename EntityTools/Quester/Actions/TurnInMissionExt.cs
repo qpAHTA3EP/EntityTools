@@ -22,7 +22,7 @@ using System.Collections.Generic;
 namespace EntityTools.Quester.Actions
 {
     [Serializable]
-    public class TurnInMissionNew : Action, INotifyPropertyChanged
+    public class TurnInMissionExt : Action, INotifyPropertyChanged
     {
         #region Опции команды
 #if DEVELOPER
@@ -226,7 +226,7 @@ namespace EntityTools.Quester.Actions
         [NonSerialized]
         internal IQuesterActionEngine Engine;
 
-        public TurnInMissionNew()
+        public TurnInMissionExt()
         {
             Engine = new QuesterActionProxy(this);
             base.PlayWhileConditionsAreOk = false;
