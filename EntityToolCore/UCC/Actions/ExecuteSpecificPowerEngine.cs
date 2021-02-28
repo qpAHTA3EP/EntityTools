@@ -18,6 +18,7 @@ using MyNW.Patchables.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Xml.Serialization;
@@ -25,7 +26,7 @@ using Unit = Astral.Logic.UCC.Ressources.Enums.Unit;
 
 namespace EntityCore.UCC.Actions
 {
-    public class ExecuteSpecificPowerEngine : IEntityInfos, IUCCActionEngine
+    public class ExecuteSpecificPowerEngine : IEntityInfos, IUccActionEngine
     {
         #region Данные
         private ExecuteSpecificPower @this;
@@ -34,26 +35,24 @@ namespace EntityCore.UCC.Actions
         private Entity entity = null;
         private bool slotedState = false;
         private string label = string.Empty;
+        private string actionIDstr;
 
         private int attachedGameProcessId = 0;
         private Power power = null;
-#if REFLECTION_ACCESS
-        private static Type movementsType = null;
-#elif SMART_REFLECTION_ACCESS
-        private static readonly StaticPropertyAccessor<Entity> movementSpecificTarget = typeof(Astral.Logic.UCC.Controllers.Movements).GetStaticProperty<Entity>("SpecificTarget");
-        private static readonly StaticPropertyAccessor<int> movementRequireRange = typeof(Astral.Logic.UCC.Controllers.Movements).GetStaticProperty<int>("RequireRange");
-        private static readonly StaticPropertyAccessor<bool> movementRangeIsOk = typeof(Astral.Logic.UCC.Controllers.Movements).GetStaticProperty<bool>("RangeIsOk");
-        #endif
-
         #endregion
 
         internal ExecuteSpecificPowerEngine(ExecuteSpecificPower esp)
         {
+#if false
             @this = esp;
             @this.Engine = this;
             @this.PropertyChanged += PropertyChanged;
 
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
+            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}"); 
+#else
+            InternalRebase(esp); 
+            ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} initialized: {Label()}");
+#endif
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -64,21 +63,21 @@ namespace EntityCore.UCC.Actions
                 {
                     switch (e.PropertyName)
                     {
-                        case "EntityID":
-                            checkEntity = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                        case nameof(@this.EntityID):
+                            checkEntity = initialize_CheckEntity;
                             label = string.Empty;
                             break;
-                        case "EntityIdType":
-                            checkEntity = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                        case nameof(@this.EntityIdType):
+                            checkEntity = initialize_CheckEntity;
                             break;
-                        case "EntityNameType":
-                            checkEntity = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                        case nameof(@this.EntityNameType):
+                            checkEntity = initialize_CheckEntity;
                             break;
-                        case "PowerID":
+                        case nameof(@this.PowerId):
                             power = null;
                             label = string.Empty;
                             break;
-                        case "CheckInTray":
+                        case nameof(@this.CheckInTray):
                             label = string.Empty;
                             break;
                     }
@@ -86,6 +85,49 @@ namespace EntityCore.UCC.Actions
                     power = null;
                 }
             }
+        }
+
+        public bool Rebase(UCCAction action)
+        {
+            if (action is null)
+                return false;
+            if (ReferenceEquals(action, @this))
+                return true;
+            if (action is ExecuteSpecificPower execPower)
+            {
+                if (InternalRebase(execPower))
+                {
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} reinitialized");
+                    return true;
+                }
+                ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} rebase failed");
+                return false;
+            }
+
+            string debugStr = string.Concat("Rebase failed. ", action.GetType().Name, '[', action.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(ExecuteSpecificPower) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
+        }
+
+        private bool InternalRebase(ExecuteSpecificPower execPower)
+        {
+            // Убираем привязку к старому условию
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = new EntityTools.Core.Proxies.UccActionProxy(@this);
+            }
+
+            @this = execPower;
+            @this.PropertyChanged += PropertyChanged;
+
+            checkEntity = initialize_CheckEntity;
+
+            actionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+
+            @this.Engine = this;
+
+            return true;
         }
 
         #region IUCCActionEngine
@@ -106,17 +148,12 @@ namespace EntityCore.UCC.Actions
 #if DEBUG_ExecuteSpecificPower
             ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower::Run() starts");
 #endif
-#if REFLECTION_ACCESS
-            if (movementsType == null)
-                movementsType = typeof(Astral.Logic.UCC.Controllers.Movements);
-#endif
-
             Power currentPower = GetCurrentPower();
 
             if (!ValidatePower(currentPower))
             {
 #if DEBUG_ExecuteSpecificPower
-                ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Fail to get Power '{@this._powerId}' by 'PowerId'");
+                ETLogger.WriteLine(LogType.Debug, $"{actionIDstr}: Fail to get Power '{@this._powerId}' by 'PowerId'");
 #endif
                 return false;
             }
@@ -127,64 +164,17 @@ namespace EntityCore.UCC.Actions
                 switch (@this.Target)
                 {
                     case Unit.MostInjuredAlly:
-#if REFLECTION_ACCESS
-                        if (!ReflectionHelper.SetStaticPropertyValue(movementsType, "SpecificTarget", ActionsPlayer.MostInjuredAlly/*, BindingFlags.Static | BindingFlags.NonPublic*/))
-                        {
-#if DEBUG_ExecuteSpecificPower
-                            EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to set UCC.Controllers.Movements.SpecificTarget to 'MostInjuredAlly'");
-#endif
-                            return false;
-                        }
-#elif SMART_REFLECTION_ACCESS
-                        movementSpecificTarget.Value = ActionsPlayer.MostInjuredAlly;
-#else
-                        Astral.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.MostInjuredAlly;
-#endif
+                        AstralAccessors.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.MostInjuredAlly;
                         break;
                     case Unit.StrongestAdd:
-#if REFLECTION_ACCESS
-                        if (!ReflectionHelper.SetStaticPropertyValue(movementsType, "SpecificTarget", ActionsPlayer.AnAdd/*, BindingFlags.Static | BindingFlags.NonPublic*/))
-                        {
-#if DEBUG_ExecuteSpecificPower
-                            EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to set UCC.Controllers.Movements.SpecificTarget to 'AnAdd'");
-#endif
-                            return false;
-                        }
-#elif SMART_REFLECTION_ACCESS
-                        movementSpecificTarget.Value = ActionsPlayer.AnAdd;
-#else
-                        Astral.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.AnAdd;
-#endif
+                        AstralAccessors.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.AnAdd;
                         break;
                     case Unit.StrongestTeamMember:
-#if REFLECTION_ACCESS
-                        if (!ReflectionHelper.SetStaticPropertyValue(movementsType, "SpecificTarget", ActionsPlayer.StrongestTeamMember/*, BindingFlags.Static | BindingFlags.NonPublic*/))
-                        {
-#if DEBUG
-                            EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to set UCC.Controllers.Movements.SpecificTarget to 'StrongestTeamMember'");
-#endif
-                            return false;
-                        }
-#elif SMART_REFLECTION_ACCESS
-                        movementSpecificTarget.Value = ActionsPlayer.StrongestTeamMember;
-#else
-                        Astral.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.StrongestTeamMember;
-#endif
+                        AstralAccessors.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.StrongestTeamMember;
+
                         break;
                     default:
-#if REFLECTION_ACCESS
-                        if (!ReflectionHelper.SetStaticPropertyValue(movementsType, "SpecificTarget", null/*, BindingFlags.Static | BindingFlags.NonPublic*/))
-                        {
-#if DEBUG_ExecuteSpecificPower
-                            EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to set UCC.Controllers.Movements.SpecificTarget to 'null'");
-#endif
-                            return false;
-                        }
-#elif SMART_REFLECTION_ACCESS
-                        movementSpecificTarget.Value = ActionsPlayer.StrongestTeamMember;
-#else
-                        Astral.Logic.UCC.Controllers.Movements.SpecificTarget = null;
-#endif
+                        AstralAccessors.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.StrongestTeamMember;
                         break;
                 }
                 int effectiveRange = Powers.getEffectiveRange(powerDef);
@@ -198,26 +188,10 @@ namespace EntityCore.UCC.Actions
                     {
                         effectiveRange = 7;
                     }
-#if REFLECTION_ACCESS
-                    if (!ReflectionHelper.SetStaticPropertyValue(movementsType, "RequireRange", effectiveRange - 2/*, BindingFlags.Static | BindingFlags.SetProperty*/))
-                    {
-#if DEBUG_ExecuteSpecificPower
-                        EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to set UCC.Controllers.Movements.RequireRange to '{effectiveRange - 2}'");
-#endif
-                        return false;
-                    }
-#elif SMART_REFLECTION_ACCESS
-                    movementRequireRange.Value = effectiveRange - 2;
-#else
-                    Astral.Logic.UCC.Controllers.Movements.RequireRange = range - 2;
-#endif
-#if REFLECTION_ACCESS
-                    while (ReflectionHelper.GetPropertyValue(movementsType, "RangeIsOk", out object RangeIsOk) && RangeIsOk.Equals(true))
-#elif SMART_REFLECTION_ACCESS
-                    while ((bool)movementRangeIsOk)
-#else
-                    while (Astral.Logic.UCC.Controllers.Movements.RangeIsOk)
-#endif
+
+                    AstralAccessors.Logic.UCC.Controllers.Movements.RequireRange = effectiveRange - 2;
+
+                    while (AstralAccessors.Logic.UCC.Controllers.Movements.RangeIsOk)
                     {
                         if (Astral.Logic.UCC.Core.CurrentTarget.IsDead)
                         {
@@ -478,6 +452,29 @@ namespace EntityCore.UCC.Actions
 
             infoString = sb.ToString();
             return true;
+        }
+
+        /// <summary>
+        /// Метод, инициализирующий функтор <see cref="checkEntity"/>,
+        /// использующийся для проверки сущности <paramref name="e"/> на соответствия идентификатору <see cref="EntityID"/>
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private bool initialize_CheckEntity(Entity e)
+        {
+            Predicate<Entity> predicate = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+            bool extendedDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
+            string currentMethodName = extendedDebugInfo ? string.Concat(actionIDstr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
+            if (predicate != null)
+            {
+                if (extendedDebugInfo)
+                    ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Initialize '" + nameof(checkEntity) + '\''));
+                checkEntity = predicate;
+                return e != null && checkEntity(e);
+            }
+            else if (extendedDebugInfo)
+                ETLogger.WriteLine(LogType.Error, string.Concat(currentMethodName, ": Fail to initialize " + nameof(checkEntity) + '\''));
+            return false;
         }
     }
 }

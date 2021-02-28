@@ -25,13 +25,13 @@ namespace EntityTools.UCC.Actions
 
         #region Взаимодействие с EntityToolsCore
         [NonSerialized]
-        internal IUCCActionEngine Engine;
+        internal IUccActionEngine Engine;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public UseItemSpecial()
         {
-            Engine = new UCCActionProxy(this);
+            Engine = new UccActionProxy(this);
 
             Target = Astral.Logic.UCC.Ressources.Enums.Unit.Player;
             CoolDown = 18000;

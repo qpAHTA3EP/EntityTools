@@ -85,10 +85,7 @@ namespace EntityTools.Reflection
             return false;
         }
 
-        public bool IsValid()
-        {
-            return containerType != null && propertyInfo != null && getter != null;
-        }
+        public bool IsValid => containerType != null && propertyInfo != null && getter != null;
 
         public PropertyType Value
         {
@@ -101,7 +98,7 @@ namespace EntityTools.Reflection
             }
             set
             {
-                if (IsValid() && setter != null)
+                if (IsValid && setter != null)
                 {
                     setter.Invoke(null, new object[] { value });
                 }

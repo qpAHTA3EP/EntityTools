@@ -2,7 +2,7 @@
 
 namespace EntityTools.Core.Interfaces
 {
-    public interface IUCCConditionEngine
+    public interface IUccConditionEngine
     {
         bool IsOK(UCCAction refAction);
 
@@ -10,8 +10,6 @@ namespace EntityTools.Core.Interfaces
 
         string Label();
 
-#if false
-        bool Rebase(UCCCondition action); 
-#endif
+        bool Rebase(UCCCondition refAction);
     }
 }

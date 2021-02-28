@@ -38,13 +38,17 @@ namespace EntityCore.Quester.Conditions
 
         internal TeamMembersCountEngine(TeamMembersCount tmc)
         {
+#if false
             @this = tmc;
             @this.Engine = this;
             @this.PropertyChanged += PropertyChanged;
 
             getCustomRegions = internal_GetCustomRegion_Initializer;
 
-            conditionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+            conditionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']'); 
+#else
+            InternalRebase(tmc);
+#endif
 
             ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} initialized: {Label()}");
         }
@@ -66,6 +70,46 @@ namespace EntityCore.Quester.Conditions
             }
         }
 
+        public bool Rebase(Condition condition)
+        {
+            if (condition is null)
+                return false;
+            if (ReferenceEquals(condition, @this))
+                return true;
+            if (condition is TeamMembersCount tmc)
+            {
+                if (InternalRebase(tmc))
+                {
+                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} reinitialized");
+                    return true;
+                }
+                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} rebase failed");
+                return false;
+            }
+
+            string debugStr = string.Concat("Rebase failed. ", condition.GetType().Name, '[', condition.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(TeamMembersCount) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
+        }
+
+        private bool InternalRebase(TeamMembersCount tmc)
+        {
+            // Убираем привязку к старому условию
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = new EntityTools.Core.Proxies.QuesterConditionProxy(@this);
+            }
+
+            @this = tmc;
+            @this.PropertyChanged += PropertyChanged;
+
+            conditionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+
+            @this.Engine = this;
+
+            return true;
+        }
 
         public bool IsValid
         {

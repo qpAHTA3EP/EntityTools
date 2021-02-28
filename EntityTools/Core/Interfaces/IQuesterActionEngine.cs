@@ -22,8 +22,6 @@ namespace EntityTools.Core.Interfaces
         void GatherInfos();
         void OnMapDraw(GraphicsNW graph);
 
-#if false
         bool Rebase(QuesterAction action); 
-#endif
     }
 }

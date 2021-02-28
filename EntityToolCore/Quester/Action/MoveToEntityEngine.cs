@@ -79,14 +79,42 @@ namespace EntityCore.Quester.Action
 #endif
         }
 
-        public void Rebase(MoveToEntity m2e)
+        public bool Rebase(Astral.Quester.Classes.Action action)
         {
-            InternalRebase(m2e);
-            ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} reinitialized");
+            if (action is null)
+                return false;
+            if (ReferenceEquals(action, @this))
+                return true;
+            if (action is MoveToEntity m2e)
+            {
+                if (InternalRebase(m2e))
+                {
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} reinitialized");
+                    return true;
+                }
+                ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} rebase failed");
+                return false;
+            }
+#if false
+            else ETLogger.WriteLine(LogType.Debug, $"Rebase failed. '{action}' has type '{action.GetType().Name}' which not equals to '{nameof(MoveToEntity)}'");
+            return false; 
+#else
+            string debugStr = string.Concat("Rebase failed. ", action.GetType().Name, '[', action.ActionID, "] can't be casted to '" + nameof(MoveToEntity) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
+#endif
+
         }
 
-        private void InternalRebase(MoveToEntity m2e)
+        private bool InternalRebase(MoveToEntity m2e)
         {
+            // Убираем привязку к старой команде
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = new EntityTools.Core.Proxies.QuesterActionProxy(@this);
+            }
+
             @this = m2e;
             @this.PropertyChanged += PropertyChanged;
 
@@ -96,13 +124,15 @@ namespace EntityCore.Quester.Action
             debug.Value.AddInfo($"{actionIDstr} initialized");
 #endif
 
-            checkEntity = functor_CheckEntity_Initializer;
-            getCustomRegions = functor_GetCustomRegion_Initializer;
+            checkEntity = initializer_CheckEntity;
+            getCustomRegions = initializer_GetCustomRegion;
 
 #if timeout
             timeout.ChangeTime(0);
 #endif
             @this.Engine = this;
+
+            return true;
         }
 
         public void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -111,18 +141,18 @@ namespace EntityCore.Quester.Action
             {
                 switch(e.PropertyName)
                 {
-                    case nameof(MoveToEntity.EntityID):
-                        checkEntity = functor_CheckEntity_Initializer;
+                    case nameof(@this.EntityID):
+                        checkEntity = initializer_CheckEntity;
                         label = string.Empty;
                         break;
-                    case nameof(MoveToEntity.EntityIdType):
-                        checkEntity = functor_CheckEntity_Initializer;
+                    case nameof(@this.EntityIdType):
+                        checkEntity = initializer_CheckEntity;
                         break;
-                    case nameof(MoveToEntity.EntityNameType):
-                        checkEntity = functor_CheckEntity_Initializer;
+                    case nameof(@this.EntityNameType):
+                        checkEntity = initializer_CheckEntity;
                         break;
-                    case nameof(MoveToEntity.CustomRegionNames):
-                        getCustomRegions = functor_GetCustomRegion_Initializer;
+                    case nameof(@this.CustomRegionNames):
+                        getCustomRegions = initializer_GetCustomRegion;
                         break;
                 }
 
@@ -560,8 +590,8 @@ namespace EntityCore.Quester.Action
         {
             target = null;
             closestEntity = null;
-            checkEntity = functor_CheckEntity_Initializer;
-            getCustomRegions = functor_GetCustomRegion_Initializer;
+            checkEntity = initializer_CheckEntity;
+            getCustomRegions = initializer_GetCustomRegion;
             label = string.Empty;
             if (EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity)
                 ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(InternalReset)));
@@ -741,19 +771,26 @@ namespace EntityCore.Quester.Action
         /// <returns></returns>
         internal bool ValidateEntity(Entity e)
         {
-#if DEBUG && ExtendedActionDebugInfo
+#if true
+            bool extendedDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
+            string currentMethodName = extendedDebugInfo ? string.Concat(actionIDstr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
             bool isNull = e is null;
             bool isValid = isNull ? false : e.IsValid;
-            bool critterOk = isNull ? false : e.Critter.IsValid;
-            bool checkOk = isNull ? false : checkEntity(e);
+            bool critterOk = isValid ? false : e.Critter.IsValid;
+            bool characterOk = isValid ? false : e.Character.IsValid;
+            bool playerOk = isValid ? false : e.Player.IsValid;
+            bool checkOk = critterOk || characterOk || playerOk ? false : checkEntity(e);
 
-            bool result = isValid && checkOk;
-            if (!result && EntityTools.EntityTools.Config.Logger.ExtendedActionDebugInfo)
+            bool result = checkOk;
+            if (!result && extendedDebugInfo)
             {
-                string debugMsg = string.Concat(actionIDstr, '.', nameof(ValidateEntity), ": FAIL => ",
-                                                                isNull ? "NULL" : string.Empty,
-                                                                isNull || isValid ? string.Empty : "Invalid ",
-                                                                isNull || checkOk ? string.Empty : (@this._entityNameType == EntityNameType.InternalName ? e.InternalName : e.NameUntranslated));
+                string debugMsg = string.Concat(currentMethodName, ": FAIL => ",
+                                                isNull ? "NULL" : string.Empty,
+                                                isValid ? string.Empty : ", Invalid",
+                                                isValid ? (critterOk ? ", Critter" : ", Not Critter") : string.Empty,
+                                                isValid ? (playerOk ? ", Player" : ", Not Player") : string.Empty,
+                                                isValid ? (characterOk ? ", Character" : ", Not Character") : string.Empty,
+                                                isNull || checkOk ? string.Empty : (@this._entityNameType == EntityNameType.InternalName ? e.InternalName : e.NameUntranslated));
                 ETLogger.WriteLine(LogType.Debug, debugMsg);
             } 
 
@@ -776,20 +813,20 @@ namespace EntityCore.Quester.Action
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
-        private bool functor_CheckEntity_Initializer(Entity e)
+        private bool initializer_CheckEntity(Entity e)
         {
             Predicate<Entity> predicate = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+            bool extendedDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
+            string currentMethodName = extendedDebugInfo ? string.Concat(actionIDstr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
             if (predicate != null)
             {
-#if DEBUG
-                ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(functor_CheckEntity_Initializer), ": Initialize ", nameof(checkEntity)));
-#endif
+                if (extendedDebugInfo)
+                    ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Initialize '" + nameof(checkEntity) + '\''));
                 checkEntity = predicate;
                 return e != null && checkEntity(e);
             }
-#if DEBUG 
-            else ETLogger.WriteLine(LogType.Error, string.Concat(actionIDstr, '.', nameof(functor_CheckEntity_Initializer), "Fail to initialize ", nameof(checkEntity)));
-#endif
+            else if (extendedDebugInfo)
+                ETLogger.WriteLine(LogType.Error, string.Concat(currentMethodName, ": Fail to initialize " + nameof(checkEntity) + '\''));
             return false;
         }
 
@@ -799,7 +836,7 @@ namespace EntityCore.Quester.Action
         /// соответствующих списку их строковых названий <see cref="CustomRegions"/>
         /// </summary>
         /// <returns></returns>
-        private List<CustomRegion> functor_GetCustomRegion_Initializer()
+        private List<CustomRegion> initializer_GetCustomRegion()
         {
             if (customRegions == null && @this._customRegionNames != null)
             {

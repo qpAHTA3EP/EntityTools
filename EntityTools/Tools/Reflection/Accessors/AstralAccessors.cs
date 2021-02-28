@@ -17,6 +17,15 @@ namespace EntityTools.Reflection
     /// </summary>
     public static class AstralAccessors
     {
+        public static class Empty
+        {
+            /// <summary>
+            /// Заглушка для Entity
+            /// </summary>
+            public static readonly Entity Entity = new Entity(IntPtr.Zero);
+        }
+
+
         public static class Addons
         {
             /// <summary>
@@ -114,7 +123,7 @@ namespace EntityTools.Reflection
                 {
                     get
                     {
-                        if (Meshes.IsValid())
+                        if (Meshes.IsValid)
                             return Meshes.Value;
                         return null;
                     }
@@ -454,9 +463,26 @@ namespace EntityTools.Reflection
                 {
                     get
                     {
-                        if(mainEngine.IsValid())
+                        if(mainEngine.IsValid)
                             return mainEngine.Value;
                         return null;
+                    }
+                }
+            }
+
+            public static class Plugins
+            {
+                static Plugins()
+                {
+                    _assemblies = typeof(Astral.Controllers.Plugins).GetStaticProperty<List<Assembly>>(nameof(Assemblies));
+                }
+                static StaticPropertyAccessor<List<Assembly>> _assemblies;
+                static readonly List<Assembly> emptyAssemblyList = new List<Assembly>();
+                public static List<Assembly> Assemblies
+                {
+                    get
+                    {
+                        return _assemblies.IsValid ? _assemblies.Value : emptyAssemblyList;
                     }
                 }
             }
@@ -464,7 +490,7 @@ namespace EntityTools.Reflection
 
         public  static class Logic
         {
-            public  static class NW
+            public static class NW
             {
                 public static class Movements
                 {
@@ -485,6 +511,33 @@ namespace EntityTools.Reflection
                     public static void AbordCombat(bool stopMove)
                     {
                         abortCombat?.Invoke(stopMove);
+                    }
+                }
+            }
+
+            public static class UCC
+            {
+                public static class Controllers
+                {
+                    public static class Movements
+                    {
+                        private static readonly StaticPropertyAccessor<Entity> specificTarget = typeof(Astral.Logic.UCC.Controllers.Movements).GetStaticProperty<Entity>("SpecificTarget");
+                        public static Entity SpecificTarget
+                        {
+                            get => specificTarget.Value ?? Empty.Entity;
+                            set => specificTarget.Value = value;
+                        }
+                        private static readonly StaticPropertyAccessor<int> requireRange = typeof(Astral.Logic.UCC.Controllers.Movements).GetStaticProperty<int>("RequireRange");
+                        public static int RequireRange
+                        {
+                            get => requireRange.Value;
+                            set => requireRange.Value = value;
+                        }
+                        private static readonly StaticPropertyAccessor<bool> rangeIsOk = typeof(Astral.Logic.UCC.Controllers.Movements).GetStaticProperty<bool>("RangeIsOk");
+                        public static bool RangeIsOk
+                        {
+                            get => rangeIsOk.Value;
+                        }
                     }
                 }
             }

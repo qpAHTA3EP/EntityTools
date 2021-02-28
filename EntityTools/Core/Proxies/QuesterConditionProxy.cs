@@ -19,9 +19,11 @@ namespace EntityTools.Core.Proxies
                 if (EntityTools.Core.Initialize(condition))
                     return condition.IsValid;
 
+#if false
                 ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot");
 
-                EntityTools.StopBot();
+                EntityTools.StopBot(); 
+#endif
 
                 return false;
             }
@@ -39,7 +41,7 @@ namespace EntityTools.Core.Proxies
             {
                 if (EntityTools.Core.Initialize(condition))
                     return condition.TestInfos;
-                return $"{condition.GetType().Name}: not initialized!";
+                return $"{condition.GetType().Name} initialization failed";
             }
         }
 
@@ -48,6 +50,11 @@ namespace EntityTools.Core.Proxies
             if (EntityTools.Core.Initialize(condition))
                 return condition.ToString();
             return condition.GetType().Name;
+        }
+
+        public bool Rebase(Condition condition)
+        {
+            return EntityTools.Core.Initialize(condition);
         }
     }
 }

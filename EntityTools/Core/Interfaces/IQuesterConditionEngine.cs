@@ -9,8 +9,6 @@ namespace EntityTools.Quester.Conditions
         string TestInfos { get; }
         string Label();
 
-#if false
         bool Rebase(QuesterCondition condition); 
-#endif
     }
 }

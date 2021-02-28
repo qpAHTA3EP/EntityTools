@@ -35,15 +35,19 @@ namespace EntityCore.Quester.Conditions
 
         internal EntityCountEngine(EntityCount ettc)
         {
+#if false
             @this = ettc;
-            @this.Engine = this;
             @this.PropertyChanged += PropertyChanged;
 
             checkEntity = internal_CheckEntity_Initializer;
-            getCustomRegions = internal_GetCustomRegion_Initializer;
-            customRegionCheck = internal_CustomRegionCheck_Initializer;
+            getCustomRegions = initializer_GetCustomRegion;
+            customRegionCheck = initializer_CustomRegionCheck; 
 
             conditionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+            @this.Engine = this;
+#else
+            InternalRebase(ettc);
+#endif
 
             ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} initialized: {Label()}");
         }
@@ -57,19 +61,64 @@ namespace EntityCore.Quester.Conditions
                 else if (e.PropertyName == nameof(@this.EntityID)
                         || e.PropertyName == nameof(@this.EntityIdType)
                         || e.PropertyName == nameof(@this.EntityNameType))
-                    checkEntity = internal_CheckEntity_Initializer;
+                    checkEntity = initializer_CheckEntity;
                 else if (e.PropertyName == nameof(@this.CustomRegionNames))
                 {
-                    getCustomRegions = internal_GetCustomRegion_Initializer;
-                    customRegionCheck = internal_CustomRegionCheck_Initializer;
+                    getCustomRegions = initializer_GetCustomRegion;
+                    customRegionCheck = initializer_CustomRegionCheck;
                 }
                 else if (e.PropertyName == nameof(@this.Tested))
                 {
-                    customRegionCheck = internal_CustomRegionCheck_Initializer;
+                    customRegionCheck = initializer_CustomRegionCheck;
                 }
 
                 localEntitiesCache?.Clear();
             }
+        }
+
+        public bool Rebase(Condition condition)
+        {
+            if (condition is null)
+                return false;
+            if (ReferenceEquals(condition, @this))
+                return true;
+            if (condition is EntityCount ettCount)
+            {
+                if (InternalRebase(ettCount))
+                {
+                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} reinitialized");
+                    return true;
+                }
+                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} rebase failed");
+                return false;
+            }
+
+            string debugStr = string.Concat("Rebase failed. ", condition.GetType().Name, '[', condition.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(EntityCount) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
+        }
+
+        private bool InternalRebase(EntityCount ettCount)
+        {
+            // Убираем привязку к старому условию
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = new EntityTools.Core.Proxies.QuesterConditionProxy(@this);
+            }
+
+            @this = ettCount;
+            @this.PropertyChanged += PropertyChanged;
+
+            checkEntity = initializer_CheckEntity;
+            getCustomRegions = initializer_GetCustomRegion;
+            customRegionCheck = initializer_CustomRegionCheck;
+
+            conditionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+
+            @this.Engine = this;
+
+            return true;
         }
 
         public bool IsValid
@@ -343,7 +392,7 @@ namespace EntityCore.Quester.Conditions
 #endif
         }
 
-        private bool internal_CheckEntity_Initializer(Entity e)
+        private bool initializer_CheckEntity(Entity e)
         {
             Predicate<Entity> predicate = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
             if (predicate != null)
@@ -360,7 +409,7 @@ namespace EntityCore.Quester.Conditions
             return false;
         }
 
-        private List<CustomRegion> internal_GetCustomRegion_Initializer()
+        private List<CustomRegion> initializer_GetCustomRegion()
         {
             //TODO: Исправить internal_GetCustomRegion_Initializer в других клаcсах, связанных с проверкой CustomRegion (см. MoveToEntityEngine)
             if (@this._customRegionNames?.Count > 0)
@@ -368,15 +417,15 @@ namespace EntityCore.Quester.Conditions
                 customRegions = CustomRegionExtentions.GetCustomRegions(@this._customRegionNames);
 #if DEBUG
                 if (customRegions is null || customRegions.Count == 0)
-                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(internal_GetCustomRegion_Initializer)}: List of {nameof(@this.CustomRegionNames)} is empty");
-                else ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(internal_GetCustomRegion_Initializer)}: Select List of {customRegions.Count} CustomRegions");
+                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(initializer_GetCustomRegion)}: List of {nameof(@this.CustomRegionNames)} is empty");
+                else ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(initializer_GetCustomRegion)}: Select List of {customRegions.Count} CustomRegions");
 #endif
             }
             else
             {
                 customRegions = null;
 #if DEBUG
-                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(internal_GetCustomRegion_Initializer)}: List of {nameof(@this.CustomRegionNames)} is empty");
+                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(initializer_GetCustomRegion)}: List of {nameof(@this.CustomRegionNames)} is empty");
 #endif
             }
 
@@ -389,7 +438,7 @@ namespace EntityCore.Quester.Conditions
             return customRegions;
         }
 
-        private bool internal_CustomRegionCheck_Initializer(Entity e)
+        private bool initializer_CustomRegionCheck(Entity e)
         {
             if (getCustomRegions()?.Count > 0)
             {
@@ -397,14 +446,14 @@ namespace EntityCore.Quester.Conditions
                 {
                     customRegionCheck = internal_CustomRegionCheckWithing;
 #if DEBUG
-                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(internal_CustomRegionCheck_Initializer)}: {nameof(customRegionCheck)} := {nameof(internal_CustomRegionCheckWithing)}");
+                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(initializer_CustomRegionCheck)}: {nameof(customRegionCheck)} := {nameof(internal_CustomRegionCheckWithing)}");
 #endif
                 }
                 else
                 {
                     customRegionCheck = internal_CustomRegionCheckOutsize;
 #if DEBUG
-                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(internal_CustomRegionCheck_Initializer)}: {nameof(customRegionCheck)} := {nameof(internal_CustomRegionCheckOutsize)}");
+                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(initializer_CustomRegionCheck)}: {nameof(customRegionCheck)} := {nameof(internal_CustomRegionCheckOutsize)}");
 #endif
                 }
             }

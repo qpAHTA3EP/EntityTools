@@ -7,13 +7,14 @@ using MyNW.Classes;
 
 namespace EntityTools.Core.Proxies
 {
-    public class UCCActionProxy : IUCCActionEngine
+    public class UccActionProxy : IUccActionEngine
     {
         private UCCAction action;
 
-        internal UCCActionProxy(UCCAction a)
+        internal UccActionProxy(UCCAction a)
         {
             action = a ?? throw new ArgumentNullException();
+            _unitRef = a.GetInstanceProperty<UCCAction, Entity>(nameof(UnitRef));
         }
         public bool NeedToRun
         {
@@ -22,9 +23,11 @@ namespace EntityTools.Core.Proxies
                 if (EntityTools.Core.Initialize(action))
                     return action.NeedToRun;
 
+#if false
                 ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
 
-                EntityTools.StopBot();
+                EntityTools.StopBot(); 
+#endif
 
                 return false;
             }
@@ -35,12 +38,22 @@ namespace EntityTools.Core.Proxies
             get
             {
                 if (EntityTools.Core.Initialize(action))
+#if false
                     if (ReflectionHelper.GetPropertyValue(action, "UnitRef", out object result, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                        && result is Entity entity)
-                        return entity;
-                return new Entity(IntPtr.Zero);
+                                    && result is Entity entity)
+                        return entity; 
+#else
+                {
+                    if (_unitRef.IsValid)
+                        return _unitRef.Value;
+                    ETLogger.WriteLine(LogType.Error, "Invalid 'UnitRef' accessor");
+                    ETLogger.WriteLine(LogType.Error, Environment.StackTrace);
+                }
+#endif
+                return AstralAccessors.Empty.Entity;
             }
         }
+        InstancePropertyAccessor<UCCAction, Entity> _unitRef;
 
         public string Label()
         {
@@ -54,11 +67,18 @@ namespace EntityTools.Core.Proxies
             if (EntityTools.Core.Initialize(action))
                 return action.Run();
 
+#if false
             ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
 
-            EntityTools.StopBot();
+            EntityTools.StopBot(); 
+#endif
 
             return false;
+        }
+
+        public bool Rebase(UCCAction uccAction)
+        {
+            return EntityTools.Core.Initialize(uccAction);
         }
     }
 }

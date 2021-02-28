@@ -24,14 +24,14 @@ namespace EntityTools.UCC.Actions
     {
         #region Взаимодействие с EntityToolsCore
         [NonSerialized]
-        internal IUCCActionEngine Engine;
+        internal IUccActionEngine Engine;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public ExecuteSpecificPower()
         {
             Target = Astral.Logic.UCC.Ressources.Enums.Unit.Target;
-            Engine = new UCCActionProxy(this);
+            Engine = new UccActionProxy(this);
         }
         #endregion
 

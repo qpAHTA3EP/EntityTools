@@ -10,10 +10,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Astral.Logic.UCC.Classes;
 
 namespace EntityCore.UCC.Actions
 {
-    class DodgeFromEntityEngine : IEntityInfos, IUCCActionEngine
+    class DodgeFromEntityEngine : IEntityInfos, IUccActionEngine
     {
         #region Данные
         private DodgeFromEntity @this;
@@ -26,40 +27,89 @@ namespace EntityCore.UCC.Actions
         private Predicate<Entity> checkEntity { get; set; } = null;
         private Entity entity = null;
         private Timeout timeout = new Timeout(0);
-        private string label = string.Empty; 
+        private string label = string.Empty;
+        private string actionIDstr;
         #endregion
 
         internal DodgeFromEntityEngine(DodgeFromEntity dfe)
         {
+#if false
             @this = dfe;
             @this.Engine = this;
             @this.PropertyChanged += PropertyChanged;
 
-            checkEntity = internal_CheckEntity_Initializer;
+            checkEntity = initialize_CheckEntity;
 
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
+            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}"); 
+#else
+            InternalRebase(dfe);
+            ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} initialized: {Label()}");
+#endif
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (object.ReferenceEquals(sender, @this))
+            if (ReferenceEquals(sender, @this))
             {
                 switch (e.PropertyName)
                 {
-                    case "EntityID":
-                        checkEntity = internal_CheckEntity_Initializer; //EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                    case nameof(DodgeFromEntity.EntityID):
+                        checkEntity = initialize_CheckEntity;
                         label = string.Empty;
                         break;
-                    case "EntityIdType":
-                        checkEntity = internal_CheckEntity_Initializer; //EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                    case nameof(DodgeFromEntity.EntityIdType):
+                        checkEntity = initialize_CheckEntity;
                         break;
-                    case "EntityNameType":
-                        checkEntity = internal_CheckEntity_Initializer; //EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                    case nameof(DodgeFromEntity.EntityNameType):
+                        checkEntity = initialize_CheckEntity;
                         break;
                 }
                 entity = null;
                 timeout.ChangeTime(0);
             }
+        }
+
+        public bool Rebase(UCCAction action)
+        {
+            if (action is null)
+                return false;
+            if (ReferenceEquals(action, @this))
+                return true;
+            if (action is DodgeFromEntity ettApproach)
+            {
+                if (InternalRebase(ettApproach))
+                {
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} reinitialized");
+                    return true;
+                }
+                ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} rebase failed");
+                return false;
+            }
+
+            string debugStr = string.Concat("Rebase failed. ", action.GetType().Name, '[', action.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(DodgeFromEntity) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
+        }
+
+        private bool InternalRebase(DodgeFromEntity dfe)
+        {
+            // Убираем привязку к старому условию
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = new EntityTools.Core.Proxies.UccActionProxy(@this);
+            }
+
+            @this = dfe;
+            @this.PropertyChanged += PropertyChanged;
+
+            checkEntity = initialize_CheckEntity;
+
+            actionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+
+            @this.Engine = this;
+
+            return true;
         }
 
         #region IUCCActionEngine
@@ -245,7 +295,7 @@ namespace EntityCore.UCC.Actions
 #endif
         }
 
-        private bool internal_CheckEntity_Initializer(Entity e)
+        private bool initialize_CheckEntity(Entity e)
         {
             Predicate<Entity> predicate = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
             if (predicate != null)

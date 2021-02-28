@@ -15,7 +15,7 @@ using EntityTools;
 
 namespace EntityCore.UCC.Conditions
 {
-    public class UCCTargetMatchEntityEngine : IUCCConditionEngine
+    public class UccTargetMatchEntityEngine : IUccConditionEngine
     {
         #region Данные
         private UCCTargetMatchEntity @this;
@@ -23,37 +23,86 @@ namespace EntityCore.UCC.Conditions
         private Predicate<Entity> checkEntity = null;
 
         private string label = string.Empty;
+        private string conditionIDstr;
         #endregion
 
-        internal UCCTargetMatchEntityEngine(UCCTargetMatchEntity tarMatch)
+        internal UccTargetMatchEntityEngine(UCCTargetMatchEntity tarMatch)
         {
+#if false
             @this = tarMatch;
             @this.Engine = this;
             @this.PropertyChanged += PropertyChanged;
 
-            checkEntity = internal_CheckEntity_Initializer;
+            checkEntity = initialize_CheckEntity;
 
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
+            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}"); 
+#else
+            InternalRebase(tarMatch);
+            ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} initialized: {Label()}");
+#endif
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (object.ReferenceEquals(sender, @this))
+            if (ReferenceEquals(sender, @this))
             {
                 switch (e.PropertyName)
                 {
-                    case "EntityID":
-                        checkEntity = internal_CheckEntity_Initializer; //EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                    case nameof(@this.EntityID):
+                        checkEntity = initialize_CheckEntity;
                         label = string.Empty;
                         break;
-                    case "EntityIdType":
-                        checkEntity = internal_CheckEntity_Initializer; //EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                    case nameof(@this.EntityIdType):
+                        checkEntity = initialize_CheckEntity;
                         break;
-                    case "EntityNameType":
-                        checkEntity = internal_CheckEntity_Initializer; //EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                    case nameof(@this.EntityNameType):
+                        checkEntity = initialize_CheckEntity;
                         break;
                 }
             }
+        }
+
+        public bool Rebase(UCCCondition condition)
+        {
+            if (condition is null)
+                return false;
+            if (ReferenceEquals(condition, @this))
+                return true;
+            if (condition is UCCTargetMatchEntity tarMatch)
+            {
+                if (InternalRebase(tarMatch))
+                {
+                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} reinitialized");
+                    return true;
+                }
+                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} rebase failed");
+                return false;
+            }
+
+            string debugStr = string.Concat("Rebase failed. ", condition.GetType().Name, '[', condition.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(UCCTargetMatchEntity) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
+        }
+
+        private bool InternalRebase(UCCTargetMatchEntity tarMatch)
+        {
+            // Убираем привязку к старому условию
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = new EntityTools.Core.Proxies.UccConditionProxy(@this);
+            }
+
+            @this = tarMatch;
+            @this.PropertyChanged += PropertyChanged;
+
+            checkEntity = initialize_CheckEntity;
+
+            conditionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+
+            @this.Engine = this;
+
+            return true;
         }
 
         #region MyRegion
@@ -106,7 +155,7 @@ namespace EntityCore.UCC.Conditions
             return e != null && e.IsValid && checkEntity(e);
         }
 
-        private bool internal_CheckEntity_Initializer(Entity e)
+        private bool initialize_CheckEntity(Entity e)
         {
             Predicate<Entity> predicate = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
             if (predicate != null)

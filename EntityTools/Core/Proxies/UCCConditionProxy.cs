@@ -5,11 +5,11 @@ using EntityTools.UCC.Conditions;
 
 namespace EntityTools.Core.Proxies
 {
-    public class UCCConditionProxy : IUCCConditionEngine
+    public class UccConditionProxy : IUccConditionEngine
     {
         private UCCCondition condition;
 
-        public UCCConditionProxy(UCCCondition c)
+        public UccConditionProxy(UCCCondition c)
         {
             condition = c ?? throw new ArgumentNullException();
         }
@@ -19,9 +19,11 @@ namespace EntityTools.Core.Proxies
             if (EntityTools.Core.Initialize(condition))
                 return condition.IsOK(refAction);
 
+#if false
             ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
 
-            EntityTools.StopBot();
+            EntityTools.StopBot(); 
+#endif
 
             return false;
         }
@@ -43,6 +45,11 @@ namespace EntityTools.Core.Proxies
             }
 
             return $"{condition.GetType().Name}: not initialized!";
+        }
+
+        public bool Rebase(UCCCondition uccCondition)
+        {
+            return EntityTools.Core.Initialize(uccCondition);
         }
     }
 }

@@ -3,15 +3,13 @@ using MyNW.Classes;
 
 namespace EntityTools.Core.Interfaces
 {
-    public interface IUCCActionEngine
+    public interface IUccActionEngine
     {
         bool NeedToRun { get; }
         bool Run();
         Entity UnitRef { get; }
         string Label();
 
-#if false
-        bool Rebase(UCCAction action); 
-#endif
+        bool Rebase(UCCAction action);
     }
 }

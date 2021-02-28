@@ -13,31 +13,76 @@ using EntityTools;
 
 namespace EntityCore.Quester.Conditions
 {
-    public class CheckGameGUIEngine : IQuesterConditionEngine
+    public class CheckGameGuiEngine : IQuesterConditionEngine
     {
         CheckGameGUI @this = null;
 
         private UIGen uiGen = null;
         private string label = string.Empty;
+        private string actionIDstr;
 
-        internal CheckGameGUIEngine(CheckGameGUI ckUiGen)
+        internal CheckGameGuiEngine(CheckGameGUI ckUiGen)
         {
+#if false
             @this = ckUiGen;
 
             @this.Engine = this;
-            @this.PropertyChanged += PropertyChanged;
-
+            @this.PropertyChanged += PropertyChanged; 
+#else
+            InternalRebase(ckUiGen);
+#endif
             ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
         }
 
         internal void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (object.ReferenceEquals(sender, @this))
+            if (ReferenceEquals(sender, @this))
             {
                 if (e.PropertyName == nameof(@this.UiGenID))
                     label = string.Empty;
                 uiGen = null;
             }
+        }
+
+        public bool Rebase(Astral.Quester.Classes.Condition condition)
+        {
+            if (condition is null)
+                return false;
+            if (ReferenceEquals(condition, @this))
+                return true;
+            if (condition is CheckGameGUI ckUiGen)
+            {
+                if (InternalRebase(ckUiGen))
+                {
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} reinitialized");
+                    return true;
+                }
+                ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} rebase failed");
+                return false;
+            }
+
+            string debugStr = string.Concat("Rebase failed. ", condition.GetType().Name, '[', condition.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(CheckGameGUI) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
+        }
+
+        private bool InternalRebase(CheckGameGUI ckUiGen)
+        {
+            // Убираем привязку к старой команде
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = new EntityTools.Core.Proxies.QuesterConditionProxy(@this);
+            }
+
+            @this = ckUiGen;
+            @this.PropertyChanged += PropertyChanged;
+
+            actionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+
+            @this.Engine = this;
+
+            return true;
         }
 
         public bool IsValid

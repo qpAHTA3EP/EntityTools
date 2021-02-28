@@ -8,34 +8,44 @@ namespace EntityTools.Reflection
     {
         public static class Classes
         {
-            public static class Pause
+            public static class Monitoring
             {
-                static Pause()
+                public static class Frames
                 {
-                    foreach (var assambly in AppDomain.CurrentDomain.GetAssemblies())
+                    static Frames()
                     {
-                        if(assambly.GetName().Name.StartsWith("QuesterAssistant"))
+#if false
+                        foreach (var assambly in AppDomain.CurrentDomain.GetAssemblies()) 
+#else
+                        foreach (var assambly in AstralAccessors.Controllers.Plugins.Assemblies)
+#endif
                         {
-                            Type pause = assambly.GetType("Pause");
-                            if(pause != null)
+                            if (assambly.GetName().Name.StartsWith("QuesterAssistant"))
                             {
-                                sleep = pause.GetStaticAction<int>(nameof(Sleep));
-                                randomSleep = pause.GetStaticAction<int, int>(nameof(RandomSleep));
+                                Type frames = assambly.GetType("QuesterAssistant.Classes.Monitoring.Frames");
+                                if (frames != null)
+                                {
+                                    _sleep = frames.GetStaticAction<int>(nameof(Sleep));
+                                    _sleepLeft = frames.GetStaticProperty<int>(nameof(SleepLeft));
+                                }
+                                break;
                             }
-                            break;
                         }
                     }
-                }
 
-                static Action<int> sleep;
-                public static void Sleep(int time)
-                {
-                    sleep?.Invoke(time);
-                }
-                static Action<int, int> randomSleep;
-                public static void RandomSleep(int min, int max)
-                {
-                    randomSleep?.Invoke(min, max);
+                    static Action<int> _sleep;
+                    public static void Sleep(int time)
+                    {
+                        _sleep?.Invoke(time);
+                    }
+                    static StaticPropertyAccessor<int> _sleepLeft;
+                    public static int SleepLeft
+                    {
+                        get
+                        {
+                            return _sleepLeft?.Value ?? 0;
+                        }
+                    }
                 }
             }
         }

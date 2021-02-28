@@ -19,21 +19,25 @@ namespace EntityCore.Quester.Conditions
         #region Данные ядра
         private EntityDistance @this = null;
 
-        private string label = string.Empty; 
+        private string label = string.Empty;
+        private string conditionIDstr;
         #endregion
 
         internal EntityDistanceEngine(EntityDistance ettDist)
         {
+#if false
             @this = ettDist;
             @this.Engine = this;
-            @this.PropertyChanged += PropertyChanged;
-
+            @this.PropertyChanged += PropertyChanged; 
+#else
+            InternalRebase(ettDist);
+#endif
             ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (object.ReferenceEquals(sender, @this))
+            if (ReferenceEquals(sender, @this))
             {
                 if (e.PropertyName == nameof(@this.EntityID) 
                     || e.PropertyName == nameof(@this.Sign) 
@@ -41,6 +45,47 @@ namespace EntityCore.Quester.Conditions
 
                     label = string.Empty;
             }
+        }
+
+        public bool Rebase(Condition condition)
+        {
+            if (condition is null)
+                return false;
+            if (ReferenceEquals(condition, @this))
+                return true;
+            if (condition is EntityDistance ettDist)
+            {
+                if (InternalRebase(ettDist))
+                {
+                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} reinitialized");
+                    return true;
+                }
+                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} rebase failed");
+                return false;
+            }
+
+            string debugStr = string.Concat("Rebase failed. ", condition.GetType().Name, '[', condition.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(EntityDistance) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
+        }
+
+        private bool InternalRebase(EntityDistance ettDist)
+        {
+            // Убираем привязку к старому условию
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = new EntityTools.Core.Proxies.QuesterConditionProxy(@this);
+            }
+
+            @this = ettDist;
+            @this.PropertyChanged += PropertyChanged;
+
+            conditionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+
+            @this.Engine = this;
+
+            return true;
         }
 
         public bool EntityDiagnosticString(out string infoString)

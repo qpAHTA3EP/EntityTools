@@ -40,19 +40,72 @@ namespace EntityCore.Quester.Action
         private Vector3 initialPos = new Vector3();
         private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
         private List<CustomRegion> customRegions;
-        private string label = string.Empty; 
+        private string label = string.Empty;
+        private string actionIDstr = string.Empty;
         #endregion
 
         public InteractEntitiesEngine(InteractEntities ie)
         {
+#if false
             @this = ie;
             @this.Engine = this;
             @this.PropertyChanged += PropertyChanged;
 
-            CheckEntity = internal_CheckEntity_Initializer;
-            GetCustomRegions = internal_GetCustomRegion_Initializer;
+            CheckEntity = initializer_CheckEntity;
+            GetCustomRegions = initializer_GetCustomRegion;
+            actionIDstr = string.Concat(@this.GetType().Name, '[', @this.ActionID, ']'); 
+#else
+            InternalRebase(ie);
+#endif
+            ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} initialized: {ActionLabel}");
+        }
 
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.ActionID}] initialized: {ActionLabel}");
+        public bool Rebase(Astral.Quester.Classes.Action action)
+        {
+            if (action is null)
+                return false;
+            if (ReferenceEquals(action, @this))
+                return true;
+            if (action is InteractEntities ie)
+            {
+                if (InternalRebase(ie))
+                {
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} reinitialized");
+                    return true;
+                }
+                ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} rebase failed");
+                return false;
+            }
+#if false
+            else ETLogger.WriteLine(LogType.Debug, $"Rebase failed. '{action}' has type '{action.GetType().Name}' which not equals to '{nameof(InteractEntities)}'");
+            return false; 
+#else
+            string debugStr = string.Concat("Rebase failed. ", action.GetType().Name, '[', action.ActionID, "] can't be casted to '" + nameof(InteractEntities) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
+#endif
+
+        }
+
+        private bool InternalRebase(InteractEntities ie)
+        {
+            // Убираем привязку к старой команде
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = new EntityTools.Core.Proxies.QuesterActionProxy(@this);
+            }
+
+            @this = ie;
+            @this.PropertyChanged += PropertyChanged;
+
+            CheckEntity = initialize_CheckEntity;
+            GetCustomRegions = initialize_GetCustomRegion;
+            actionIDstr = string.Concat(@this.GetType().Name, '[', @this.ActionID, ']');
+
+            @this.Engine = this;
+
+            return true;
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -60,18 +113,18 @@ namespace EntityCore.Quester.Action
             if (!ReferenceEquals(sender, @this)) return;
             switch (e.PropertyName)
             {
-                case "EntityID":
-                    CheckEntity = internal_CheckEntity_Initializer;//EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                case nameof(@this.EntityID):
+                    CheckEntity = initialize_CheckEntity;
                     label = string.Empty;
                     break;
-                case "EntityIdType":
-                    CheckEntity = internal_CheckEntity_Initializer; //EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                case nameof(@this.EntityIdType):
+                    CheckEntity = initialize_CheckEntity;
                     break;
-                case "EntityNameType":
-                    CheckEntity = internal_CheckEntity_Initializer; //EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                case nameof(@this.EntityNameType):
+                    CheckEntity = initialize_CheckEntity; 
                     break;
-                case "CustomRegionNames":
-                    GetCustomRegions = internal_GetCustomRegion_Initializer; //CustomRegionExtentions.GetCustomRegions(@this._customRegionNames);
+                case nameof(@this.CustomRegionNames):
+                    GetCustomRegions = initialize_GetCustomRegion;
                     break;
             }
 
@@ -268,7 +321,7 @@ namespace EntityCore.Quester.Action
         {
             target = null;
             CheckEntity = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
-            GetCustomRegions = internal_GetCustomRegion_Initializer;
+            GetCustomRegions = initialize_GetCustomRegion;
             label = string.Empty;
         }
 
@@ -377,8 +430,7 @@ namespace EntityCore.Quester.Action
 #endif
         }
 
-
-        private bool internal_CheckEntity_Initializer(Entity e)
+        private bool initialize_CheckEntity(Entity e)
         {
             Predicate<Entity> predicate = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
             if (predicate != null)
@@ -394,7 +446,6 @@ namespace EntityCore.Quester.Action
 #endif
             return false;
         }
-
 
         private bool IsNotInBlackList(Entity ent)
         {
@@ -431,7 +482,7 @@ namespace EntityCore.Quester.Action
             return Approach.BreakInfos.Continue;
         }
 
-        internal List<CustomRegion> internal_GetCustomRegion_Initializer()
+        internal List<CustomRegion> initialize_GetCustomRegion()
         {
             if (customRegions == null && @this._customRegionNames != null)
             {

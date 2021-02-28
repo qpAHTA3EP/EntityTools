@@ -22,7 +22,7 @@ namespace EntityTools.UCC.Actions
         private Dodge dodge = new Dodge();
 
         [NonSerialized]
-        internal IUCCActionEngine Engine;
+        internal IUccActionEngine Engine;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -30,7 +30,7 @@ namespace EntityTools.UCC.Actions
         {
             Target = Unit.Player;
             dodge.Direction = DodgeDirection.DodgeSmart;
-            Engine = new UCCActionProxy(this);
+            Engine = new UccActionProxy(this);
         }
         #endregion
 

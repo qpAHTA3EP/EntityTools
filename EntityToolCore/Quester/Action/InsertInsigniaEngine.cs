@@ -20,6 +20,7 @@ namespace EntityCore.Quester.Action
     {
         private InsertInsignia @this = null;
         private string label;
+        private string actionIDstr;
 
         internal InsertInsigniaEngine(InsertInsignia ii)
         {
@@ -28,9 +29,54 @@ namespace EntityCore.Quester.Action
             @this.Engine = this;
             @this.PropertyChanged += PropertyChanged;
 
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {ActionLabel}");
+            ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} initialized: {ActionLabel}");
         }
 
+        public bool Rebase(Astral.Quester.Classes.Action action)
+        {
+            if (action is null)
+                return false;
+            if (ReferenceEquals(action, @this))
+                return true;
+            if (action is InsertInsignia ii)
+            {
+                if (InternalRebase(ii))
+                {
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} reinitialized");
+                    return true;
+                }
+                ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} rebase failed");
+                return false;
+            }
+#if false
+            else ETLogger.WriteLine(LogType.Debug, $"Rebase failed. '{action}' has type '{action.GetType().Name}' which not equals to '{nameof(PickUpMissionExt)}'");
+            return false; 
+#else
+            string debugStr = string.Concat("Rebase failed. ", action.GetType().Name, '[', action.ActionID, "] can't be casted to '" + nameof(PickUpMissionExt) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
+#endif
+
+        }
+
+        private bool InternalRebase(InsertInsignia ii)
+        {
+            // Убираем привязку к старой команде
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = new EntityTools.Core.Proxies.QuesterActionProxy(@this);
+            }
+
+            @this = ii;
+            @this.PropertyChanged += PropertyChanged;
+
+            actionIDstr = string.Concat(@this.GetType().Name, '[', @this.ActionID, ']');
+
+            @this.Engine = this;
+
+            return true;
+        }
         private void PropertyChanged(object sender, PropertyChangedEventArgs e) { }
 
         public bool NeedToRun => true;

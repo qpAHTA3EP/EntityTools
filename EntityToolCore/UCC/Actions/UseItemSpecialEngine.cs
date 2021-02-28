@@ -18,30 +18,36 @@ using EntityTools.Tools.BuySellItems;
 
 namespace EntityCore.UCC.Actions
 {
-    public class UseItemSpecialEngine : IUCCActionEngine
+    public class UseItemSpecialEngine : IUccActionEngine
     {
         #region Данные
         private UseItemSpecial @this;
 
         private string label = string.Empty;
+        private string actionIDstr;
         #endregion
 
         internal UseItemSpecialEngine(UseItemSpecial uis)
         {
+#if false
             @this = uis;
             @this.Engine = this;
             @this.PropertyChanged += PropertyChanged;
 
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
+            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}"); 
+#else
+            InternalRebase(uis);
+            ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} initialized: {Label()}");
+#endif
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (object.ReferenceEquals(sender, @this))
+            if (ReferenceEquals(sender, @this))
             {
                 switch (e.PropertyName)
                 {
-                    case "ItemId":
+                    case nameof(@this.ItemId):
                         if (@this._itemIdType == ItemFilterStringType.Simple)
                         {
                             // определяем местоположение простого шаблона ItemId в идентификаторе предмета
@@ -51,6 +57,47 @@ namespace EntityCore.UCC.Actions
                         break;
                 }
             }
+        }
+
+        public bool Rebase(UCCAction action)
+        {
+            if (action is null)
+                return false;
+            if (ReferenceEquals(action, @this))
+                return true;
+            if (action is UseItemSpecial execPower)
+            {
+                if (InternalRebase(execPower))
+                {
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} reinitialized");
+                    return true;
+                }
+                ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} rebase failed");
+                return false;
+            }
+
+            string debugStr = string.Concat("Rebase failed. ", action.GetType().Name, '[', action.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(UseItemSpecial) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
+        }
+
+        private bool InternalRebase(UseItemSpecial execPower)
+        {
+            // Убираем привязку к старому условию
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = new EntityTools.Core.Proxies.UccActionProxy(@this);
+            }
+
+            @this = execPower;
+            @this.PropertyChanged += PropertyChanged;
+
+            actionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+
+            @this.Engine = this;
+
+            return true;
         }
 
         public bool NeedToRun
@@ -86,8 +133,6 @@ namespace EntityCore.UCC.Actions
             if (itemSlot != null && itemSlot.IsValid && itemSlot.Item.Count > 0)
             {
                 itemSlot.Exec();
-                //Thread.Sleep(500);
-
                 return true;
             }
             return false;

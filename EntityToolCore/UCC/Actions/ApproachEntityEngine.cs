@@ -10,10 +10,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Astral.Logic.UCC.Classes;
 
 namespace EntityCore.UCC.Actions
 {
-    internal class ApproachEntityEngine : IEntityInfos, IUCCActionEngine
+    internal class ApproachEntityEngine : IEntityInfos, IUccActionEngine
     {
         #region Данные
         private ApproachEntity @this;
@@ -22,17 +23,22 @@ namespace EntityCore.UCC.Actions
         private Entity entity = null;
         private Timeout timeout = new Timeout(0);
         private string label = string.Empty;
+        private string actionIDstr;
         #endregion
-        
-        internal ApproachEntityEngine(ApproachEntity ae)
+
+        internal ApproachEntityEngine(ApproachEntity ettApproach)
         {
+#if false
             @this = ae;
             @this.Engine = this;
             @this.PropertyChanged += PropertyChanged;
 
-            checkEntity = internal_CheckEntity_Initializer;
-
+            checkEntity = initializer_CheckEntity; 
             ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
+#else
+            InternalRebase(ettApproach);
+            ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} initialized: {Label()}");
+#endif
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -41,20 +47,63 @@ namespace EntityCore.UCC.Actions
             {
                 switch (e.PropertyName)
                 {
-                    case "EntityID":
-                        checkEntity = internal_CheckEntity_Initializer;//EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                    case nameof(ApproachEntity.EntityID):
+                        checkEntity = initialize_CheckEntity;
                         label = string.Empty;
                         break;
-                    case "EntityIdType":
-                        checkEntity = internal_CheckEntity_Initializer;//EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                    case nameof(ApproachEntity.EntityIdType):
+                        checkEntity = initialize_CheckEntity;
                         break;
-                    case "EntityNameType":
-                        checkEntity = internal_CheckEntity_Initializer;//EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                    case nameof(ApproachEntity.EntityNameType):
+                        checkEntity = initialize_CheckEntity;
                         break;
                 }
                 entity = null;
                 timeout.ChangeTime(0);
             }
+        }
+
+        public bool Rebase(UCCAction action)
+        {
+            if (action is null)
+                return false;
+            if (ReferenceEquals(action, @this))
+                return true;
+            if (action is ApproachEntity ettApproach)
+            {
+                if (InternalRebase(ettApproach))
+                {
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} reinitialized");
+                    return true;
+                }
+                ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} rebase failed");
+                return false;
+            }
+
+            string debugStr = string.Concat("Rebase failed. ", action.GetType().Name, '[', action.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(ApproachEntity) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
+        }
+
+        private bool InternalRebase(ApproachEntity ettApproach)
+        {
+            // Убираем привязку к старому условию
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = new EntityTools.Core.Proxies.UccActionProxy(@this);
+            }
+
+            @this = ettApproach;
+            @this.PropertyChanged += PropertyChanged;
+
+            checkEntity = initialize_CheckEntity;
+
+            actionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+
+            @this.Engine = this;
+
+            return true;
         }
 
         #region IUCCActionEngine
@@ -127,19 +176,19 @@ namespace EntityCore.UCC.Actions
 #endif
         }
 
-        private bool internal_CheckEntity_Initializer(Entity e)
+        private bool initialize_CheckEntity(Entity e)
         {
             Predicate<Entity> predicate = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
             if (predicate != null)
             {
 #if DEBUG
-                ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Comparer does not defined. Initialize.");
+                ETLogger.WriteLine(LogType.Debug, $"{actionIDstr}: Comparer does not defined. Initialize.");
 #endif
                 checkEntity = predicate;
                 return e != null && checkEntity(e);
             }
 #if DEBUG
-            else ETLogger.WriteLine(LogType.Error, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Fail to initialize the Comparer.");
+            else ETLogger.WriteLine(LogType.Error, $"{actionIDstr}: Fail to initialize the Comparer.");
 #endif
             return false;
         }

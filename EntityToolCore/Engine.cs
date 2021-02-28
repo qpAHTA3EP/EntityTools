@@ -37,12 +37,10 @@ namespace EntityCore
     {
         //TODO: Исправить ошибку восстановления статуса после PullProfileFromStack, которая проявилась в Lliiras_Night_DartKotik.amp.zip
 
-        //internal static Dictionary<object, object> dictionary = new Dictionary<object, object>();
-
         internal static Dictionary<QuesterAction, IQuesterActionEngine> dictQuesterAction = new Dictionary<QuesterAction, IQuesterActionEngine>();
         internal static Dictionary<QuesterCondition, IQuesterConditionEngine> dictQuesterCondition = new Dictionary<QuesterCondition, IQuesterConditionEngine>();
-        internal static Dictionary<UCCAction, IUCCActionEngine> dictUccAction = new Dictionary<UCCAction, IUCCActionEngine>();
-        internal static Dictionary<UCCCondition, IUCCConditionEngine> dictUccCondition = new Dictionary<UCCCondition, IUCCConditionEngine>();
+        internal static Dictionary<UCCAction, IUccActionEngine> dictUccAction = new Dictionary<UCCAction, IUccActionEngine>();
+        internal static Dictionary<UCCCondition, IUccConditionEngine> dictUccCondition = new Dictionary<UCCCondition, IUccConditionEngine>();
 
         public Engine()
         {
@@ -75,12 +73,13 @@ namespace EntityCore
         {
             try
             {
+#if false
                 if (action is MoveToEntity m2e)
                 {
                     if (dictQuesterAction.TryGetValue(m2e, out IQuesterActionEngine engine))
                     {
-                        if (engine is MoveToEntityEngine m2ee)
-                            m2e.Engine = m2ee;
+                        if (engine is MoveToEntityEngine m2eEndg)
+                            m2e.Engine = m2eEndg;
                         else
                         {
                             ETLogger.WriteLine(string.Concat("Invalid cast type '", engine.GetType().Name, "' to type '" + nameof(MoveToEntityEngine) + '\''));
@@ -95,8 +94,8 @@ namespace EntityCore
                 {
                     if (dictQuesterAction.TryGetValue(ie, out IQuesterActionEngine engine))
                     {
-                        if (engine is InteractEntitiesEngine iee)
-                            ie.Engine = iee;
+                        if (engine is InteractEntitiesEngine ieEndg)
+                            ie.Engine = ieEndg;
                         else
                         {
                             ETLogger.WriteLine(string.Concat("Invalid cast type '", engine.GetType().Name, "' to type '" + nameof(InteractEntitiesEngine) + '\''));
@@ -111,8 +110,8 @@ namespace EntityCore
                 {
                     if (dictQuesterAction.TryGetValue(pum, out IQuesterActionEngine engine))
                     {
-                        if (engine is PickUpMissionEngine pume)
-                            pum.Engine = pume;
+                        if (engine is PickUpMissionEngine pumEndg)
+                            pum.Engine = pumEndg;
                         else
                         {
                             ETLogger.WriteLine(string.Concat("Invalid cast type '", engine.GetType().Name, "' to type '" + nameof(PickUpMissionEngine) + '\''));
@@ -120,15 +119,15 @@ namespace EntityCore
                         }
                     }
                     else dictQuesterAction.Add(pum, new PickUpMissionEngine(pum));
-                        return true;
+                    return true;
                 }
 
                 if (action is TurnInMissionExt tim)
                 {
                     if (dictQuesterAction.TryGetValue(tim, out IQuesterActionEngine engine))
                     {
-                        if (engine is TurnInMissionEngine time)
-                            tim.Engine = time;
+                        if (engine is TurnInMissionEngine timEndg)
+                            tim.Engine = timEndg;
                         else
                         {
                             ETLogger.WriteLine(string.Concat("Invalid cast type '", engine.GetType().Name, "' to type '" + nameof(TurnInMissionEngine) + '\''));
@@ -153,7 +152,39 @@ namespace EntityCore
                     }
                     else dictQuesterAction.Add(ii, new InsertInsigniaEngine(ii));
                     return true;
+                } 
+#else
+                if (dictQuesterAction.TryGetValue(action, out IQuesterActionEngine engine))
+                    return engine.Rebase(action);
+                else
+                {
+                    if (action is MoveToEntity m2e)
+                    {
+                        dictQuesterAction.Add(m2e, new MoveToEntityEngine(m2e));
+                        return true;
+                    }
+                    else if (action is InteractEntities ie)
+                    {
+                        dictQuesterAction.Add(ie, new InteractEntitiesEngine(ie));
+                        return true;
+                    }
+                    else if (action is PickUpMissionExt pum)
+                    {
+                        dictQuesterAction.Add(pum, new PickUpMissionEngine(pum));
+                        return true;
+                    }
+                    else if (action is TurnInMissionExt tim)
+                    {
+                        dictQuesterAction.Add(tim, new TurnInMissionEngine(tim));
+                        return true;
+                    }
+                    else if (action is InsertInsignia ii)
+                    {
+                        dictQuesterAction.Add(ii, new InsertInsigniaEngine(ii));
+                        return true;
+                    }
                 }
+#endif
             }
             catch (Exception e)
             {
@@ -165,6 +196,7 @@ namespace EntityCore
         {
             try
             {
+#if false
                 if (condition is EntityCount ettCount)
                 {
                     if (dictQuesterCondition.TryGetValue(ettCount, out IQuesterConditionEngine engine))
@@ -239,7 +271,39 @@ namespace EntityCore
                     }
                     else dictQuesterCondition.Add(ettDist, new EntityDistanceEngine(ettDist));
                     return true;
+                } 
+#else
+                if (dictQuesterCondition.TryGetValue(condition, out IQuesterConditionEngine engine))
+                    return engine.Rebase(condition);
+                else
+                {
+                    if (condition is EntityCount ettCount)
+                    {
+                        dictQuesterCondition.Add(ettCount, new EntityCountEngine(ettCount));
+                        return true;
+                    }
+                    if (condition is EntityProperty ettProperty)
+                    {
+                        dictQuesterCondition.Add(ettProperty, new EntityPropertyEngine(ettProperty));
+                        return true;
+                    }
+                    if (condition is TeamMembersCount teamCount)
+                    {
+                        dictQuesterCondition.Add(teamCount, new TeamMembersCountEngine(teamCount));
+                        return true;
+                    }
+                    if (condition is CheckGameGUI guiCheck)
+                    {
+                        dictQuesterCondition.Add(guiCheck, new CheckGameGuiEngine(guiCheck));
+                        return true;
+                    }
+                    if (condition is EntityDistance ettDist)
+                    {
+                        dictQuesterCondition.Add(ettDist, new EntityDistanceEngine(ettDist));
+                        return true;
+                    }
                 }
+#endif
             }
             catch (Exception e)
             {
@@ -247,10 +311,12 @@ namespace EntityCore
             }
             return false;
         }
+
         public bool Initialize(UCCAction action)
         {
             try
             {
+#if false
                 if (action is ApproachEntity ettApproach)
                 {
                     if (dictUccAction.TryGetValue(ettApproach, out IUCCActionEngine engine))
@@ -310,7 +376,34 @@ namespace EntityCore
                     }
                     else dictUccAction.Add(useItem, new UseItemSpecialEngine(useItem));
                     return true;
+                } 
+#else
+                if (dictUccAction.TryGetValue(action, out IUccActionEngine engine))
+                    return engine.Rebase(action);
+                else
+                {
+                    if (action is ApproachEntity ettApproach)
+                    {
+                        dictUccAction.Add(ettApproach, new ApproachEntityEngine(ettApproach));
+                        return true;
+                    }
+                    if (action is DodgeFromEntity ettDodge)
+                    {
+                        dictUccAction.Add(ettDodge, new DodgeFromEntityEngine(ettDodge));
+                        return true;
+                    }
+                    if (action is ExecuteSpecificPower execPower)
+                    {
+                        dictUccAction.Add(execPower, new ExecuteSpecificPowerEngine(execPower));
+                        return true;
+                    }
+                    if (action is UseItemSpecial useItem)
+                    {
+                        dictUccAction.Add(useItem, new UseItemSpecialEngine(useItem));
+                        return true;
+                    }
                 }
+#endif
             }
             catch (Exception e)
             {
@@ -321,7 +414,8 @@ namespace EntityCore
         public bool Initialize(UCCCondition condition)
         {
             try
-            { 
+            {
+#if false
                 if (condition is UCCEntityCheck ettCheck)
                 {
                     if (dictUccCondition.TryGetValue(ettCheck, out IUCCConditionEngine engine))
@@ -366,9 +460,33 @@ namespace EntityCore
                     }
                     else dictUccCondition.Add(uiCheck, new UCCGameUICheckEngine(uiCheck));
                     return true;
+                } 
+#else
+                if (dictUccCondition.TryGetValue(condition, out IUccConditionEngine engine))
+                    return engine.Rebase(condition);
+                {
+                    if (condition is UCCEntityCheck ettCheck)
+                    {
+                        dictUccCondition.Add(ettCheck, new UccEntityCheckEngine(ettCheck));
+                        return true;
+                    }
+                    if (condition is UCCTargetMatchEntity targMatch)
+                    {
+                        dictUccCondition.Add(targMatch, new UccTargetMatchEntityEngine(targMatch));
+                        return true;
+                    }
+                    if (condition is UCCGameUICheck uiCheck)
+                    {
+                        dictUccCondition.Add(uiCheck, new UccGameUiCheckEngine(uiCheck));
+                        return true;
+                    }
                 }
+#endif
             }
-            catch { }
+            catch (Exception e)
+            {
+                ETLogger.WriteLine(LogType.Error, e.ToString());
+            }
             return false;
         }
         #endregion
@@ -527,10 +645,10 @@ namespace EntityCore
                     && dictQuesterCondition.TryGetValue(qc, out IQuesterConditionEngine qcEngine))
                         ettInfos = qcEngine as IEntityInfos;
                 else if (obj is UCCCondition uccCond
-                    && dictUccCondition.TryGetValue(uccCond, out IUCCConditionEngine uccCondEngine))
+                    && dictUccCondition.TryGetValue(uccCond, out IUccConditionEngine uccCondEngine))
                         ettInfos = uccCondEngine as IEntityInfos;
                 else if (obj is UCCAction uccAct
-                    && dictUccAction.TryGetValue(uccAct, out IUCCActionEngine uccActEngine))
+                    && dictUccAction.TryGetValue(uccAct, out IUccActionEngine uccActEngine))
                         ettInfos = uccActEngine as IEntityInfos;
 
                 if (ettInfos != null)

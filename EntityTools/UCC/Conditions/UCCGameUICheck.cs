@@ -16,14 +16,14 @@ namespace EntityTools.UCC.Conditions
     {
         #region Взаимодействие с EntityToolsCore
         [NonSerialized]
-        internal IUCCConditionEngine Engine;
+        internal IUccConditionEngine Engine;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public UCCGameUICheck()
         {
             Sign = Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
-            Engine = new UCCConditionProxy(this);
+            Engine = new UccConditionProxy(this);
         }
         #endregion
 

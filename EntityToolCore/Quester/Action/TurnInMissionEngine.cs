@@ -43,27 +43,78 @@ namespace EntityCore.Quester.Action
         private Predicate<Item> isRewardItem;
 #endif
         private string label = string.Empty;
-        private readonly string actionIDstr = string.Empty;
+        private string actionIDstr = string.Empty;
         #endregion
 
         public TurnInMissionEngine(TurnInMissionExt tim) 
         {
+#if false
             @this = tim;
             @this.Engine = this;
             @this.PropertyChanged += PropertyChanged;
             isRewardItem = internal_IsRewardItem_Initializer;
 
             actionIDstr = string.Concat(@this.GetType().Name, '[', @this.ActionID, ']');
-
+#else
+            InternalRebase(tim);
+#endif
             ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, "initialized: ", ActionLabel));
+        }
+
+        public bool Rebase(Astral.Quester.Classes.Action action)
+        {
+            if (action is null)
+                return false;
+            if (ReferenceEquals(action, @this))
+                return true;
+            if (action is TurnInMissionExt tim)
+            {
+                if (InternalRebase(tim))
+                {
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} reinitialized");
+                    return true;
+                }
+                ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} rebase failed");
+                return false;
+            }
+#if false
+            else ETLogger.WriteLine(LogType.Debug, $"Rebase failed. '{action}' has type '{action.GetType().Name}' which not equals to '{nameof(TurnInMissionExt)}'");
+            return false; 
+#else
+            string debugStr = string.Concat("Rebase failed. ", action.GetType().Name, '[', action.ActionID, "] can't be casted to '" + nameof(TurnInMissionExt) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
+#endif
+
+        }
+
+        private bool InternalRebase(TurnInMissionExt tim)
+        {
+            // Убираем привязку к старой команде
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = new EntityTools.Core.Proxies.QuesterActionProxy(@this);
+            }
+
+            @this = tim;
+            @this.PropertyChanged += PropertyChanged;
+
+            isRewardItem = initialize_IsRewardItem;
+
+            actionIDstr = string.Concat(@this.GetType().Name, '[', @this.ActionID, ']');
+
+            @this.Engine = this;
+
+            return true;
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (!ReferenceEquals(sender, @this)) return;
-            if (e.PropertyName == "RequiredRewardItem")
-                isRewardItem = internal_IsRewardItem_Initializer;
-            else if (e.PropertyName == "MissionId") label = string.Empty;
+            if (e.PropertyName == nameof(@this.RequiredRewardItem))
+                isRewardItem = initialize_IsRewardItem;
+            else if (e.PropertyName == nameof(@this.MissionId)) label = string.Empty;
         }
 
         public bool NeedToRun
@@ -280,7 +331,7 @@ namespace EntityCore.Quester.Action
                         GameHelper.CloseAllFrames();
                         Thread.Sleep(2000);
                     }
-                    //else QuesterAssistantAccessors.Classes.Pause.Sleep(5000);
+                    else QuesterAssistantAccessors.Classes.Monitoring.Frames.Sleep(2000);
                     return ActionResult.Completed;
                 case MissionProcessingResult.MissionRequiredRewardNotFound:
                     ETLogger.WriteLine(string.Concat(currentMethodName, ": Required mission reward not found..."), true);
@@ -289,7 +340,7 @@ namespace EntityCore.Quester.Action
                         GameHelper.CloseAllFrames();
                         Thread.Sleep(2000);
                     }
-                    //else QuesterAssistantAccessors.Classes.Pause.Sleep(5000);
+                    else QuesterAssistantAccessors.Classes.Monitoring.Frames.Sleep(2000);
                     return ActionResult.Skip;
                 default:
                     GameHelper.CloseAllFrames();
@@ -760,7 +811,7 @@ namespace EntityCore.Quester.Action
             return isRewardItem(str);
         } 
 #else
-        private bool internal_IsRewardItem_Initializer(Item item)
+        private bool initialize_IsRewardItem(Item item)
         {
             if (string.IsNullOrEmpty(@this._requiredRewardItem))
             {

@@ -27,23 +27,29 @@ namespace EntityCore.Quester.Conditions
         private List<CustomRegion> customRegions = null;
 
         private string label = string.Empty; 
+        private string conditionIDstr;
         #endregion
 
-        internal EntityPropertyEngine(EntityProperty ettPr)
+        internal EntityPropertyEngine(EntityProperty ettProp)
         {
+#if false
             @this = ettPr;
-            @this.Engine = this;
             @this.PropertyChanged += PropertyChanged;
 
-            checkEntity = internal_CheckEntity_Initializer;
-            getCustomRegions = internal_GetCustomRegion_Initializer;
+            checkEntity = initializer_CheckEntity;
+            getCustomRegions = initializer_GetCustomRegion;
+
+            @this.Engine = this; 
+#else
+            InternalRebase(ettProp);
+#endif
 
             ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (object.ReferenceEquals(sender, @this))
+            if (ReferenceEquals(sender, @this))
             {
                 if (e.PropertyName == nameof(@this.EntityID)
                     || e.PropertyName == nameof(@this.PropertyType)
@@ -55,14 +61,58 @@ namespace EntityCore.Quester.Conditions
                         || e.PropertyName == nameof(@this.EntityNameType))
                 {
                     label = string.Empty;
-                    checkEntity = internal_CheckEntity_Initializer;
+                    checkEntity = initializer_CheckEntity;
                 }
                 else if (e.PropertyName == nameof(@this.CustomRegionNames))
-                    getCustomRegions = internal_GetCustomRegion_Initializer;
+                    getCustomRegions = initializer_GetCustomRegion;
 
                 entity = null;
                 timeout.ChangeTime(0);
             }
+        }
+
+        public bool Rebase(Condition condition)
+        {
+            if (condition is null)
+                return false;
+            if (ReferenceEquals(condition, @this))
+                return true;
+            if (condition is EntityProperty ettProp)
+            {
+                if (InternalRebase(ettProp))
+                {
+                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} reinitialized");
+                    return true;
+                }
+                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} rebase failed");
+                return false;
+            }
+
+            string debugStr = string.Concat("Rebase failed. ", condition.GetType().Name, '[', condition.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(EntityProperty) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
+        }
+
+        private bool InternalRebase(EntityProperty ettProp)
+        {
+            // Убираем привязку к старому условию
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = new EntityTools.Core.Proxies.QuesterConditionProxy(@this);
+            }
+
+            @this = ettProp;
+            @this.PropertyChanged += PropertyChanged;
+
+            conditionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+
+            checkEntity = initializer_CheckEntity;
+            getCustomRegions = initializer_GetCustomRegion;
+
+            @this.Engine = this;
+
+            return true;
         }
 
         public bool EntityDiagnosticString(out string infoString)
@@ -282,7 +332,7 @@ namespace EntityCore.Quester.Conditions
 #endif
         }
 
-        private bool internal_CheckEntity_Initializer(Entity e)
+        private bool initializer_CheckEntity(Entity e)
         {
             Predicate<Entity> predicate = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
             if (predicate != null)
@@ -299,7 +349,7 @@ namespace EntityCore.Quester.Conditions
             return false;
         }
 
-        private List<CustomRegion> internal_GetCustomRegion_Initializer()
+        private List<CustomRegion> initializer_GetCustomRegion()
         {
             if (customRegions == null && @this._customRegionNames != null)
             {

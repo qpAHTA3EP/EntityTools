@@ -94,10 +94,7 @@ namespace EntityTools.Reflection
             return false;
         }
 
-        public bool IsValid()
-        {
-            return instance != null && instanceType != null && propertyInfo != null && getter != null;
-        }
+        public bool IsValid => instance != null && instanceType != null && propertyInfo != null && getter != null;
 
         public PropertyType Value
         {
@@ -110,7 +107,7 @@ namespace EntityTools.Reflection
             }
             set
             {
-                if (IsValid() && setter != null)
+                if (IsValid&& setter != null)
                 {
                     setter.Invoke(instance, new object[] { value });
                 }

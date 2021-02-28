@@ -8,35 +8,83 @@ using System.Text.RegularExpressions;
 using EntityTools.Extensions;
 using static Astral.Quester.Classes.Condition;
 using EntityTools;
+using System;
 
 namespace EntityCore.UCC.Conditions
 {
-    public class UCCGameUICheckEngine : IUCCConditionEngine
+    public class UccGameUiCheckEngine : IUccConditionEngine
     {
         #region Данные
         private UCCGameUICheck @this;
 
         private UIGen uiGen;
         private string label = string.Empty;
+        private string conditionIDstr;
         #endregion
 
-        internal UCCGameUICheckEngine(UCCGameUICheck eck)
+        internal UccGameUiCheckEngine(UCCGameUICheck uiGenCheck)
         {
+#if false
             @this = eck;
             @this.Engine = this;
             @this.PropertyChanged += PropertyChanged;
 
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
+            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}"); 
+#else
+            InternalRebase(uiGenCheck);
+            ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} initialized: {Label()}");
+#endif
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (object.ReferenceEquals(sender, @this))
+            if (ReferenceEquals(sender, @this))
             {
                 if (e.PropertyName == nameof(@this.UiGenID))
                     label = string.Empty;
                 uiGen = null;
             }
+        }
+
+        public bool Rebase(UCCCondition condition)
+        {
+            if (condition is null)
+                return false;
+            if (ReferenceEquals(condition, @this))
+                return true;
+            if (condition is UCCGameUICheck uiGenCheck)
+            {
+                if (InternalRebase(uiGenCheck))
+                {
+                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} reinitialized");
+                    return true;
+                }
+                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} rebase failed");
+                return false;
+            }
+
+            string debugStr = string.Concat("Rebase failed. ", condition.GetType().Name, '[', condition.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(UCCGameUICheck) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
+        }
+
+        private bool InternalRebase(UCCGameUICheck execPower)
+        {
+            // Убираем привязку к старому условию
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = new EntityTools.Core.Proxies.UccConditionProxy(@this);
+            }
+
+            @this = execPower;
+            @this.PropertyChanged += PropertyChanged;
+
+            conditionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+
+            @this.Engine = this;
+
+            return true;
         }
 
         public bool IsOK(UCCAction refAction)
