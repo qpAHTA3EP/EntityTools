@@ -1029,7 +1029,7 @@ namespace EntityTools.Patches.Mapper
                         {
                             foreach (AOECheck.AOE aoe in AstralAccessors.Controllers.AOECheck.GetAOEList<AOECheck.AOE>())
                             {
-                                Vector3 vector = new Vector3();
+                                Vector3 vector = Vector3.Empty;
                                 if (aoe.Location != null)
                                 {
                                     vector = aoe.Location();

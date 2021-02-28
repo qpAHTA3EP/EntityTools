@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.IO;
 using Astral.Controllers;
+using EntityTools.Reflection;
 
 namespace EntityTools.Settings
 {
@@ -139,8 +140,23 @@ namespace EntityTools.Settings
                 }
             }
             private bool _debugTurnInMissionExt;
+
+            public override string ToString()
+            {
+                int total = 0;
+                int active = 0;
+                foreach(var field in this.GetType().GetFields(ReflectionHelper.DefaultFlags))
+                {
+                    total++;
+                    if (field.GetValue(this).Equals(true))
+                        active++;
+                }
+
+                return $"Active {active} of {total}";
+            }
         }
         [Description("Настройки логирования команд квестера")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
         public QuesterActionLoggerSettings QuesterActions { get; set; } = new QuesterActionLoggerSettings();
 
         public class QuesterConditionLoggerSettings : PluginSettingsBase
@@ -162,8 +178,23 @@ namespace EntityTools.Settings
                 }
             }
             private bool _debugConditionEntityCount;
+
+            public override string ToString()
+            {
+                int total = 0;
+                int active = 0;
+                foreach (var field in GetType().GetFields(ReflectionHelper.DefaultFlags))
+                {
+                    total++;
+                    if (field.GetValue(this).Equals(true))
+                        active++;
+                }
+
+                return $"Active {active} of {total}";
+            }
         }
         [Description("Настройки логирования условий квестера")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
         public QuesterConditionLoggerSettings QuesterConditions { get; set; } = new QuesterConditionLoggerSettings();
 
         public override string ToString()

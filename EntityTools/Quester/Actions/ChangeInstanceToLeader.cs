@@ -34,7 +34,7 @@ namespace EntityTools.Quester.Actions
 
         protected override bool IntenalConditions => true;
 
-        protected override Vector3 InternalDestination => new Vector3();
+        protected override Vector3 InternalDestination => Vector3.Empty;
 
         protected override ActionValidity InternalValidity => new ActionValidity();
 

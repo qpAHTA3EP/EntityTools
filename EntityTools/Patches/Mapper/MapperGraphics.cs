@@ -298,7 +298,7 @@ namespace EntityTools.Patches.Mapper
 			Point point = imgPoint;
 			point.X = boxWidth - point.X;
 			point.Y = boxHeight - point.Y;
-			Vector3 vector = new Vector3();
+			Vector3 vector = Vector3.Empty;
 			int num = Convert.ToInt32((double)boxWidth + 0.5);
 			int num2 = Convert.ToInt32((double)boxHeight + 0.5);
 			Point point2 = new Point(Convert.ToInt32((double)num / 2.0 + 0.5), Convert.ToInt32((double)num2 / 2.0 + 0.5));

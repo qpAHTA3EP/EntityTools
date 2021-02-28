@@ -619,7 +619,10 @@ namespace EntityCore.Tools.Navigation
             Interact.ForContactDialog(entity);
 #endif
 
-            if (entity.Location.Distance3DFromPlayer > interactDistance)
+            //TODO: Попробовать отключить, т.к. находясь вплотную к NPC персонаж часто не может с ним взаимодействовать (нужно покрутить камеру)
+#if false
+            if (entity.Location.Distance3DFromPlayer > interactDistance) 
+#endif
             {
                 // Изменение угла камеры к горизонту и попытка взаимодействия
                 GfxCameraController.SetPitch(-0.66f);
@@ -658,7 +661,7 @@ namespace EntityCore.Tools.Navigation
 
                 // Два шага влево и попытка взаимодействия
                 MyNW.Internals.Movements.SetMovementType(MyNW.Internals.Movements.MovementsType.StrafeLeft);
-                Thread.Sleep(400);
+                Thread.Sleep(200);
                 MyNW.Internals.Movements.UnsetMovementType(MyNW.Internals.Movements.MovementsType.StrafeLeft);
                 interactOption = player.InteractStatus.InteractOptions.FirstOrDefault(o => o.EntityRefId == refId);
                 if (interactOption != null && interactOption.CanInteract()//isValid
@@ -677,7 +680,7 @@ namespace EntityCore.Tools.Navigation
                 // Ориентация на целб шаг назад и попытка взаимодействия
                 Thread.Sleep(250);
                 MyNW.Internals.Movements.SetMovementType(MyNW.Internals.Movements.MovementsType.MoveBackward);
-                Thread.Sleep(400);
+                Thread.Sleep(200);
                 entity.Location.FaceYaw();
                 MyNW.Internals.Movements.UnsetMovementType(MyNW.Internals.Movements.MovementsType.MoveBackward);
                 interactOption = player.InteractStatus.InteractOptions.FirstOrDefault(o => o.EntityRefId == refId);
@@ -696,7 +699,7 @@ namespace EntityCore.Tools.Navigation
 
                 // Два шага вперед и попытка взаимодействия
                 MyNW.Internals.Movements.SetMovementType(MyNW.Internals.Movements.MovementsType.MoveForward);
-                Thread.Sleep(800);
+                Thread.Sleep(400);
                 MyNW.Internals.Movements.UnsetMovementType(MyNW.Internals.Movements.MovementsType.MoveForward);
                 entity.Location.FaceYaw();
                 interactOption = player.InteractStatus.InteractOptions.FirstOrDefault(o => o.EntityRefId == refId);

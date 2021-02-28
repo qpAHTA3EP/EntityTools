@@ -32,9 +32,36 @@ namespace EntityCore.Tools
             {
                 Game.CloseInvocationResultsFrame();
             }
-
-            // Кнопка закрытия окна "детали эвента"
-            // Eventdetails_Cancelbutton
+            foreach (var uiGen in UIManager.AllUIGen)
+            {
+                if(uiGen.IsVisible)
+                {
+                    if (uiGen.Type == MyNW.Patchables.Enums.UIGenType.Button)
+                    {
+                        switch (uiGen.Name)
+                        {
+                            case "Gamemenu_Return": // Кнопка возврата из "игрового меню"
+                                GameCommands.Execute("GenButtonClick Gamemenu_Return");
+                                break;
+                            case "Eventdetails_Cancelbutton": // Кнопка закрытия окна "детали эвента"
+                                GameCommands.Execute("GenButtonClick Eventdetails_Cancelbutton");
+                                break;
+                        } 
+                    }
+                    else if(uiGen.Type == MyNW.Patchables.Enums.UIGenType.MovableBox)
+                    {
+                        switch(uiGen.Name)
+                        {
+                            case "Invocationresults_Root": // Окно награды за молитву
+                                GameCommands.Execute("GenSendMessage Invocationresults_Root Close");
+                                break;
+                            case "Store_Invocation":    // Окно Молельни, где можно потратить монеты
+                                GameCommands.Execute("GenSendMessage Store_Invocation Close");
+                                break;
+                        }
+                    }
+                }
+            }
 
         }
         public static void CloseAllFrames()
@@ -45,6 +72,8 @@ namespace EntityCore.Tools
             {
                 contactDialog.Close();
             }
+            GameCommands.Execute("ContactDialogEnd");
+
             Game.ToggleCursorMode(false);
         }
     }

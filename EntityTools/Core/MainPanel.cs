@@ -171,6 +171,7 @@ namespace EntityTools.Core
         }
         private void handler_Test_2(object sender, EventArgs e)
         {
+            QuesterAssistantAccessors.Classes.Monitoring.Frames.Sleep(1000);
         }
         private void handler_Test_3(object sender, EventArgs e)
         {

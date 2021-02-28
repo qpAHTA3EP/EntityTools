@@ -43,7 +43,7 @@ namespace EntityTools.Tools.BuySellItems
                         _costumeName = str;
                         _mapName = string.Empty;
                         _regionName = string.Empty;
-                        _position = new Vector3();
+                        _position = Vector3.Empty;
                     }
                     else if (_vendorType != VendorType.Normal)
                     {
@@ -51,7 +51,7 @@ namespace EntityTools.Tools.BuySellItems
                         _costumeName = string.Empty;
                         _mapName = string.Empty;
                         _regionName = string.Empty;
-                        _position = new Vector3();
+                        _position = Vector3.Empty;
                     }
                     label = string.Empty;
                 }
@@ -87,7 +87,7 @@ namespace EntityTools.Tools.BuySellItems
                 }
             }
         }
-        private Vector3 _position = new Vector3();
+        private Vector3 _position = Vector3.Empty;
 
         /// <summary>
         /// Внутриигровой "костюм" торговца

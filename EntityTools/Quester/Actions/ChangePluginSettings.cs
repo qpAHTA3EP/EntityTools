@@ -20,16 +20,21 @@ namespace EntityTools.Quester.Actions
         {
             if (!string.IsNullOrEmpty(Value))
             {
+                bool boolResult;
                 switch (Command)
                 {
                     case PluginSettingsCommand.DisableSlideMonitor:
-                        if (bool.TryParse(Value, out bool result))
+#if true
+                        if (Enum.TryParse(Value, out SlideMonitorState slideState))
                         {
-                            //SlideMonitor.Activate = !result;
-                            Logger.WriteLine(Logger.LogType.Debug, "SlideMonitor was removed. This command is deprecated");
-                            return ActionResult.Skip;
+                            EntityTools.Config.SlideMonitor.State = slideState;
+                            return ActionResult.Completed;
                         }
                         else return ActionResult.Fail;
+#else
+                            Logger.WriteLine(Logger.LogType.Debug, "SlideMonitor was removed. This command is deprecated");
+                            return ActionResult.Skip; 
+#endif
                     //case PluginSettingsCommand.DisableSpellStuckMonitor:
                     //    if (bool.TryParse(Value, out result))
                     //    {
@@ -38,9 +43,9 @@ namespace EntityTools.Quester.Actions
                     //    }
                     //    else return ActionResult.Fail;
                     case PluginSettingsCommand.DisableUnstuckSpell:
-                        if (bool.TryParse(Value, out result))
+                        if (bool.TryParse(Value, out boolResult))
                         {
-                            EntityTools.Config.UnstuckSpells.Active = !result;
+                            EntityTools.Config.UnstuckSpells.Active = !boolResult;
                             return ActionResult.Completed;
                         }
                         else return ActionResult.Fail;
@@ -71,39 +76,42 @@ namespace EntityTools.Quester.Actions
         public override void InternalReset() { }
         public override string InternalDisplayName => string.Empty;
         public override bool UseHotSpots => false;
-        protected override Vector3 InternalDestination => new Vector3();
+        protected override Vector3 InternalDestination => Vector3.Empty;
         protected override ActionValidity InternalValidity
         {
             get
             {
                 if (string.IsNullOrEmpty(Value))
                     return new ActionValidity("Value does not set!");
-
+                int intResult = -1;
                 switch (Command)
                 {
                     case PluginSettingsCommand.DisableSlideMonitor:
-                        /*if (!bool.TryParse(Value, out bool result))
+#if true                        
+                        if (!Enum.TryParse(Value, out SlideMonitorState slideState))
                             return new ActionValidity("Value is incorrect!\n" +
                                 "The boolean is required.");
-                        break;*/
-                        return new ActionValidity("SlideMonitor was removed. This command is deprecated");
+                        break;
+#else
+                        return new ActionValidity("SlideMonitor was removed. This command is deprecated"); 
+#endif
                     //case PluginSettingsCommand.DisableSpellStuckMonitor:
                     //    if (!bool.TryParse(Value, out result))
                     //        return new ActionValidity("Value is incorrect!\n" +
                     //            "The boolean is required.");
                     //    break;
                     case PluginSettingsCommand.DisableUnstuckSpell:
-                        if (!bool.TryParse(Value, out bool result))
+                        if (!bool.TryParse(Value, out _))
                             return new ActionValidity("Value is incorrect!\n" +
                                 "The boolean is required.");
                         break;
                     case PluginSettingsCommand.EntityCacheTime:
-                        if (!int.TryParse(Value, out int timer) || timer < 1)
+                        if (!int.TryParse(Value, out intResult) || intResult < 1)
                             return new ActionValidity("Value is incorrect!\n" +
                                 "The positive integer greter 1 is required.");
                         break;
                     case PluginSettingsCommand.EntityCacheCombatTime:
-                        if (!int.TryParse(Value, out timer))
+                        if (!int.TryParse(Value, out intResult) || intResult < 1)
                             return new ActionValidity("Value is incorrect!\n" +
                                 "The positive integer greter 1 is required.");
                         break;

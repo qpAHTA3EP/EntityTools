@@ -1,4 +1,5 @@
 ﻿using System;
+using EntityTools.Reflection;
 using MyNW.Classes;
 
 namespace EntityTools.Tools
@@ -8,7 +9,7 @@ namespace EntityTools.Tools
     /// </summary>
     public class EntityDef
     {
-        public Entity entity = new Entity(IntPtr.Zero);
+        public Entity entity = AstralAccessors.Empty.Entity;
         public string Name = string.Empty;
         public string NameUntranslated = string.Empty;
         public string InternalName = string.Empty;

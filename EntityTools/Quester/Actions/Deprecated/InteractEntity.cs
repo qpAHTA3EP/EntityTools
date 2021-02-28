@@ -111,7 +111,7 @@ namespace EntityTools.Quester.Actions.Deprecated
             return ActionResult.Completed;
         }
 
-        protected override Vector3 InternalDestination => new Vector3();
+        protected override Vector3 InternalDestination => Vector3.Empty;
 
         public override bool UseHotSpots => false;
 

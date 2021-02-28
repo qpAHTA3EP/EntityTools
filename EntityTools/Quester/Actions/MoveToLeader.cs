@@ -36,7 +36,7 @@ namespace EntityTools.Quester.Actions
         //public bool PartyCheck { get; set; }
 
         [Editor(typeof(PositionEditor), typeof(UITypeEditor))]
-        public Vector3 Position { get; set; } = new Vector3(); 
+        public Vector3 Position { get; set; } = Vector3.Empty; 
         #endregion
 
         public override string ActionLabel

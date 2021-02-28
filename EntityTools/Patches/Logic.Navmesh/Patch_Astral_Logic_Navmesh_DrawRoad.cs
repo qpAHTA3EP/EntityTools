@@ -36,7 +36,7 @@ namespace EntityTools.Patches.Navmesh
     Astral.Logic.Navmesh
     	public static void DrawRoad(List<Vector3> waypoints, GraphicsNW graph)
 		{
-			Vector3 vector = new Vector3();
+			Vector3 vector = Vector3.Empty;
 			foreach (Vector3 vector2 in waypoints)
 			{
 				Brush blue = Brushes.Blue;
@@ -61,7 +61,7 @@ namespace EntityTools.Patches.Navmesh
             else
             {
                 Brush blue = Brushes.Blue;
-                Vector3 startPos = new Vector3();
+                Vector3 startPos = Vector3.Empty;
                 foreach (Vector3 endPos in waypoints)
                 {
                     graphicsNW.drawFillEllipse(endPos, MapperHelper.Size_4x4/*new Size(4, 4)*/, blue);

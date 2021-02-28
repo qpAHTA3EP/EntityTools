@@ -85,7 +85,7 @@ public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool al
 				}
 				if (list2.Count > 0)
 				{
-					Vector3 vector = new Vector3();
+					Vector3 vector = Vector3.Empty;
 					if (PathFinding.CheckDirection(Start, list2[0], ref vector))
 					{
 						List<Vector3> path = PathFinding.GetPathAndCorrect(Start, list2[0], true);
@@ -248,7 +248,7 @@ public static Road GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool al
 #if PATCH_LOG
                                 partialPathSearch_Time = stopwatch.ElapsedTicks; 
 #endif
-                                Vector3 vector = new Vector3();
+                                Vector3 vector = Vector3.Empty;
                                 if (PathFinding.CheckDirection(start, waypoints[0], ref vector))
                                 {
                                     List<Vector3> path = PathFinding.GetPath(start, waypoints[0], true);
