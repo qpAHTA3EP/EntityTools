@@ -14,179 +14,10 @@ using System.Diagnostics;
 
 namespace EntityCore.Entities
 {
-    public class CacheRecordKey
-    {
-        public CacheRecordKey()
-        {
-            Comparer = EntityToPatternComparer.Get(Pattern, MatchType, NameType);
-        }
-        public CacheRecordKey(string p, ItemFilterStringType mp = ItemFilterStringType.Simple, EntityNameType nt = EntityNameType.NameUntranslated, EntitySetType est = EntitySetType.Complete)
-        {
-            Pattern = p;
-            MatchType = mp;
-            NameType = nt;
-            EntitySetType = est;
-            Comparer = EntityToPatternComparer.Get(Pattern, MatchType, NameType);
-        }
-
-
-        public readonly string Pattern = string.Empty;
-        public readonly ItemFilterStringType MatchType = ItemFilterStringType.Simple;
-        public readonly EntityNameType NameType = EntityNameType.NameUntranslated;
-        public readonly EntitySetType EntitySetType = EntitySetType.Complete;
-        public readonly Predicate<Entity> Comparer = null;
-
-        public override bool Equals(object otherObj)
-        {
-            if (ReferenceEquals(this, otherObj))
-                return true;
-            else if(otherObj is CacheRecordKey other)
-                return Equals(other);
-            return false;
-        }
-
-        public bool Equals(CacheRecordKey other)
-        {
-            return ReferenceEquals(this, other)
-                || (Pattern == other.Pattern
-                    && MatchType == other.MatchType
-                    && NameType == other.NameType
-                    && EntitySetType == other.EntitySetType);
-        }
-
-        public override int GetHashCode()
-        {
-            return Pattern.GetHashCode();
-        }
-    }
-
-    /// <summary>
-    /// Запись Кэша
-    /// </summary>
-    public class EntityCacheRecord
-    {
-#if DEBUG && PROFILING
-        private static int RegenCount = 0;
-        private static int EntitiesCount = 0;
-        public static void ResetWatch()
-        {
-            RegenCount = 0;
-            EntitiesCount = 0;
-            ETLogger.WriteLine(LogType.Debug, $"EntityCacheRecord::ResetWatch()");
-        }
-
-        public static void LogWatch()
-        {
-            ETLogger.WriteLine(LogType.Debug, $"EntityCacheRecord: RegenCount: {RegenCount}");
-        }
-#endif
-        public EntityCacheRecord() { }
-        public EntityCacheRecord(string p, ItemFilterStringType mp = ItemFilterStringType.Simple, EntityNameType nt = EntityNameType.NameUntranslated, EntitySetType est = EntitySetType.Complete)
-        {
-            Key = new CacheRecordKey(p, mp, nt, est);
-        }
-
-        public CacheRecordKey Key { get; }
-
-        public Timeout Timer { get; private set; } = new Timeout(0);
-
-        private LinkedList<Entity> entities = new LinkedList<Entity>();
-        public LinkedList<Entity> Entities
-        {
-            get
-            {
-                if (Timer.IsTimedOut)
-                    Regen();
-                return entities;
-            }
-        }
-
-        /// <summary>
-        /// Обновление кэша
-        /// </summary>
-        public void Regen()
-        {
-#if DEBUG && PROFILING
-            RegenCount++;
-#endif
-            LinkedList<Entity> entts;
-            if (Key.EntitySetType == EntitySetType.Contacts)
-                entts = SearchDirect.GetContactEntities(Key); 
-            else entts = SearchDirect.GetEntities(Key);
-
-            if (entts != null)
-                entities = entts;
-            else entities.Clear();
-#if DEBUG && PROFILING
-            EntitiesCount += entities.Count;
-#endif
-            if (EntityManager.LocalPlayer.InCombat
-                && !Astral.Quester.API.IgnoreCombat)
-                    Timer = new Timeout(EntityTools.EntityTools.Config.EntityCache.GlobalCacheTime);
-            else Timer = new Timeout(EntityTools.EntityTools.Config.EntityCache.CombatCacheTime);
-        }
-        public void Regen(Action<Entity> action)
-        {
-#if DEBUG && PROFILING
-            RegenCount++;
-#endif
-            LinkedList<Entity> entts;
-            if (Key.EntitySetType == EntitySetType.Contacts)
-                entts = SearchDirect.GetContactEntities(Key, action);
-            else entts = SearchDirect.GetEntities(Key, action);
-
-            if (entts != null)
-                entities = entts;
-            else entities.Clear();
-#if DEBUG && PROFILING
-            EntitiesCount += entities.Count;
-#endif
-            if (EntityManager.LocalPlayer.InCombat
-                && !Astral.Quester.API.IgnoreCombat)
-                    Timer = new Timeout(EntityTools.EntityTools.Config.EntityCache.GlobalCacheTime);
-            else Timer = new Timeout(EntityTools.EntityTools.Config.EntityCache.CombatCacheTime);
-        }
-
-        /// <summary>
-        /// Обработка (сканирование) Entities
-        /// </summary>
-        /// <param name="action"></param>
-        public void Processing(Action<Entity> action)
-        {
-            if (Timer.IsTimedOut)
-                Regen(action);
-            else if (entities != null && entities.Count > 0)
-            {
-                // Если Entity валидна - оно передается для обработки в action
-                // в противном случае - удаляется из коллекции                
-                LinkedListNode<Entity> eNode = entities.First;
-
-                do
-                {
-                    if (Key.Comparer(eNode.Value))
-                        action(eNode.Value);
-                    else entities.Remove(eNode);
-
-                    eNode = eNode.Next;
-                } while (eNode != null) ;
-            }
-        }
-
-        public bool Equals(EntityCacheRecord other)
-        {
-            return ReferenceEquals(this, other) || Key.Equals(other.Key);
-        }
-
-        public override int GetHashCode()
-        {
-            return Key.Pattern.GetHashCode();
-        }
-    }
-
     /// <summary>
     /// Колекция кэшированных Entity
     /// </summary>
-    public class EntityCache : KeyedCollection<CacheRecordKey, EntityCacheRecord>
+    public class EntityCache : KeyedCollection<EntityCacheRecordKey, EntityCacheRecord>
     {
 #if DEBUG && PROFILING
         private static int matchCount = 0;
@@ -204,19 +35,7 @@ namespace EntityCore.Entities
             ETLogger.WriteLine(LogType.Debug, $"EntityCache: matchCount: {matchCount}, mismatchCount: {mismatchCount}");
         }
 #endif
-#if false
-        /// <summary>
-        /// Интервал времени между обновлениями кэша
-        /// </summary>
-        public static int ChacheTime { get; set; } = 500;
-
-        /// <summary>
-        /// Интервал времени между обновлениями кэша во время боя
-        /// </summary>
-        public static int CombatChacheTime { get; set; } = 200; 
-#endif
-
-        protected override CacheRecordKey GetKeyForItem(EntityCacheRecord item)
+        protected override EntityCacheRecordKey GetKeyForItem(EntityCacheRecord item)
         {
             return item.Key;
         }
@@ -224,7 +43,7 @@ namespace EntityCore.Entities
         public bool TryGetValue(out EntityCacheRecord record, string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.InternalName, EntitySetType setType = EntitySetType.Complete)
         {
             record = null;
-            CacheRecordKey key = new CacheRecordKey(pattern, matchType, nameType, setType);
+            EntityCacheRecordKey key = new EntityCacheRecordKey(pattern, matchType, nameType, setType);
             if (base.Contains(key))
             {
 #if DEBUG && PROFILING
@@ -248,7 +67,7 @@ namespace EntityCore.Entities
 
         public bool Contains(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.InternalName, EntitySetType setType = EntitySetType.Complete)
         {
-            CacheRecordKey key = new CacheRecordKey(pattern, matchType, nameType, setType);
+            EntityCacheRecordKey key = new EntityCacheRecordKey(pattern, matchType, nameType, setType);
             return base.Contains(key);
         }
     }

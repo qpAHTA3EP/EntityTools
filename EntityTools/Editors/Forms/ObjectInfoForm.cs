@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using DevExpress.XtraEditors;
 
-namespace EntityTools.Editors.Forms
+namespace EntityTools.Forms
 {
     public partial class ObjectInfoForm : XtraForm
     {

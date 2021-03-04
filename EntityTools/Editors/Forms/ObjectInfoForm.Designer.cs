@@ -1,4 +1,4 @@
-﻿namespace EntityTools.Editors.Forms
+﻿namespace EntityTools.Forms
 {
     partial class ObjectInfoForm
     {

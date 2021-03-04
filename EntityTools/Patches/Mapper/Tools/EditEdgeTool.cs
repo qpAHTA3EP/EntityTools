@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using AStar;
+using EntityTools.Tools.Extensions;
 
 namespace EntityTools.Patches.Mapper.Tools
 {

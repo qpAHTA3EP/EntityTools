@@ -3,17 +3,46 @@ using MyNW.Classes;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace EntityCore.Extensions
+namespace EntityTools.Extensions
 {
     public static class CustomRegionExtentions
     {
         /// <summary>
-        /// Проверка нахождения объекта entity в границах региона region
+        /// Проверка нахождения объекта <paramref name="position"/> в границах региона <paramref name="region"/>
         /// </summary>
-        /// <param name="entity">Объект Entity, местонахождение которого проверяется</param>
-        /// <param name="region">CustomRegion </param>
-        /// <returns></returns>
-        public static bool IsInCustomRegion(Entity entity, CustomRegion region)
+        public static bool Within(this Vector3 position, CustomRegion region)
+        {
+            float x = position.X;
+            float y = position.Y;
+            float x1 = region.Position.X;
+            float y1 = region.Position.Y;
+            float width = region.Width;
+            float height = region.Height;
+            if (region.Eliptic)
+            {
+                float dx = 2f * (x - x1) / width - 1f;
+                float dy = 2f * (y - y1) / height - 1f;
+                return dx * dx + dy * dy <= 1f;
+            }
+            else
+            {
+                float x2 = x1;
+                float y2 = y1;
+                if (width < 0)
+                    x1 += width;
+                else x2 = x1 + width;
+                if (height < 0)
+                    y1 += height;
+                else y2 = y1 + height;
+
+                return x > x1 && x < x2 && y > y1 && y < y2;
+            }
+        }
+        
+        /// <summary>
+        /// Проверка нахождения объекта <paramref name="entity"/> в границах региона <paramref name="region"/>
+        /// </summary>
+        public static bool Within(this Entity entity, CustomRegion region)
         {
 #if false
             if (region.Eliptic)
@@ -44,7 +73,7 @@ namespace EntityCore.Extensions
 
                 return location.X > vector.X && location.X < vector2.X && location.Y > vector.Y && location.Y < vector2.Y;
             } 
-#else
+#elif false
             float x = entity.X;
             float y = entity.Y;
             var regPos = region.Position;
@@ -52,10 +81,6 @@ namespace EntityCore.Extensions
             float y1 = regPos.Y;
             float width = region.Width;
             float height = region.Height;
-
-            if (width == 0 || height == 0)
-                return false;
-
             if (region.Eliptic)
             {
                 float dx = 2f * (x - x1) / width - 1f;
@@ -75,25 +100,14 @@ namespace EntityCore.Extensions
 
                 return x > x1 && x < x2 && y > y1 && y < y2;
             }
+#else
+            return entity.Location.Within(region);
 #endif
         }
 
         /// <summary>
-        /// Проверка нахождения объекта entity в границах региона customRegionName
+        /// Преобразование списка <paramref name="names"/>, содержащего названия <seealso cref="CustomRegion"/> в список <seealso cref="CustomRegion"/>
         /// </summary>
-        /// <param name="entity">Объект Entity, местонахождение которого проверяется</param>
-        /// <param name="customRegionName">Наименование CustomRegion</param>
-        /// <returns></returns>
-        public static bool IsInCustomRegion(Entity entity, string customRegionName)
-        {
-            if (string.IsNullOrEmpty(customRegionName))
-                return false;
-
-            CustomRegion cReg = Astral.Quester.API.CurrentProfile.CustomRegions.Find(cr => cr.Name == customRegionName);
-
-            return cReg != null || IsInCustomRegion(entity, cReg);
-        }
-
         public static List<CustomRegion> GetCustomRegions(List<string> names)
         {
             if(names != null && names.Count > 0)
@@ -103,19 +117,16 @@ namespace EntityCore.Extensions
         }
 
         /// <summary>
-        /// Методы расширения
+        /// Проверка нахождения <paramref name="entity"/> внутри <paramref name="customRegionName"/>
         /// </summary>
         public static bool Within(this Entity entity, string customRegionName)
         {
-            return IsInCustomRegion(entity, customRegionName);
-        }
-        public static bool Within(this Entity entity, CustomRegion customRegion)
-        {
-            return IsInCustomRegion(entity, customRegion);
-        }
-        public static bool Within(this CustomRegion customRegion, Entity entity)
-        {
-            return IsInCustomRegion(entity, customRegion);
+            if (string.IsNullOrEmpty(customRegionName))
+                return false;
+
+            CustomRegion cReg = Astral.Quester.API.CurrentProfile.CustomRegions.Find(cr => cr.Name == customRegionName);
+
+            return cReg != null || entity.Within(cReg);
         }
 
 #if false
@@ -161,6 +172,7 @@ namespace EntityCore.Extensions
                     regions.Add(row.Cells[indItems].Value.ToString());
                 }
             }
+        } 
 #endif
     }
 }

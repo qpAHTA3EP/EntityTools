@@ -143,7 +143,7 @@ namespace EntityCore.Entities
         /// <param name="key"></param>
         /// <param name="action">Функтор действия, которое нужно выполнить над Entity, удовлетворяющем условиям</param>
         /// <returns></returns>
-        public static LinkedList<Entity> GetEntities(CacheRecordKey key, Action<Entity> action = null)
+        public static LinkedList<Entity> GetEntities(EntityCacheRecordKey key, Action<Entity> action = null)
         {
             if (key == null)
                 return null;
@@ -277,7 +277,7 @@ namespace EntityCore.Entities
         /// <param name="key"></param>
         /// <param name="action">Функтор действия, которое нужно выполнить над Entity, удовлетворяющем условиям</param>
         /// <returns></returns>
-        public static LinkedList<Entity> GetContactEntities(CacheRecordKey key, Action<Entity> action = null)
+        public static LinkedList<Entity> GetContactEntities(EntityCacheRecordKey key, Action<Entity> action = null)
         {
             if (key == null)
                 return null;

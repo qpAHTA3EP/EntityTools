@@ -765,45 +765,52 @@ namespace EntityCore.Quester.Action
 
         #region Вспомогательные методы
         /// <summary>
-        /// Поверка валидности сущности <paramref name="e"/> и её соответствия идентификатору <see cref="EntityID"/>
+        /// Поверка валидности сущности <paramref name="entity"/> и её соответствия идентификатору <see cref="EntityID"/>
         /// </summary>
-        /// <param name="e"></param>
-        /// <returns></returns>
-        internal bool ValidateEntity(Entity e)
+        internal bool ValidateEntity(Entity entity)
         {
 #if true
             bool extendedDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
-            string currentMethodName = extendedDebugInfo ? string.Concat(actionIDstr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
-            bool isNull = e is null;
-            bool isValid = isNull ? false : e.IsValid;
-            bool critterOk = isValid ? false : e.Critter.IsValid;
-            bool characterOk = isValid ? false : e.Character.IsValid;
-            bool playerOk = isValid ? false : e.Player.IsValid;
-            bool checkOk = critterOk || characterOk || playerOk ? false : checkEntity(e);
-
-            bool result = checkOk;
-            if (!result && extendedDebugInfo)
+            bool result = false;
+            if (extendedDebugInfo)
             {
-                string debugMsg = string.Concat(currentMethodName, ": FAIL => ",
-                                                isNull ? "NULL" : string.Empty,
-                                                isValid ? string.Empty : ", Invalid",
-                                                isValid ? (critterOk ? ", Critter" : ", Not Critter") : string.Empty,
-                                                isValid ? (playerOk ? ", Player" : ", Not Player") : string.Empty,
-                                                isValid ? (characterOk ? ", Character" : ", Not Character") : string.Empty,
-                                                isNull || checkOk ? string.Empty : (@this._entityNameType == EntityNameType.InternalName ? e.InternalName : e.NameUntranslated));
-                ETLogger.WriteLine(LogType.Debug, debugMsg);
-            } 
+                string currentMethodName = extendedDebugInfo ? string.Concat(actionIDstr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
+                bool isNull = entity is null;
+                bool isValid = isNull ? false : entity.IsValid;
+                bool critterOk = isValid ? entity.Critter.IsValid : false;
+                bool characterOk = isValid ? entity.Character.IsValid : false;
+                bool playerOk = isValid ? entity.Player.IsValid : false;
+                bool checkOk = critterOk || characterOk || playerOk ? checkEntity(entity) : false;
+
+                result = checkOk;
+                if (!result && extendedDebugInfo)
+                {
+                    string debugMsg = string.Concat(currentMethodName, ": FAIL => ",
+                                                    isNull ? "NULL" : string.Empty,
+                                                    isValid ? string.Empty : ", Invalid",
+                                                    isValid ? (critterOk ? ", Critter" : ", Not Critter") : string.Empty,
+                                                    isValid ? (playerOk ? ", Player" : ", Not Player") : string.Empty,
+                                                    isValid ? (characterOk ? ", Character" : ", Not Character") : string.Empty,
+                                                    checkOk ? (@this._entityNameType == EntityNameType.InternalName
+                                                                    ? entity.InternalName
+                                                                    : entity.NameUntranslated) : string.Empty);
+                    ETLogger.WriteLine(LogType.Debug, debugMsg);
+                }
+            }
+            else result = entity != null && entity.IsValid
+                            && (entity.Character.IsValid || entity.Critter.IsValid || entity.Player.IsValid)
+                            && checkEntity(entity);
 
             return result;
 #elif false
-            return e != null && e.IsValid 
-                //&& e.Critter.IsValid <- Некоторые Entity, например игроки, имеют априори невалидный Critter
-                //&& !e.DoNotDraw
-                && checkEntity(e);
+            return entity != null && entity.IsValid 
+                //&& entity.Critter.IsValid <- Некоторые Entity, например игроки, имеют априори невалидный Critter
+                //&& !entity.DoNotDraw
+                && checkEntity(entity);
 #else
-            return e != null && e.IsValid
-                && (e.Character.IsValid || e.Critter.IsValid || e.Player.IsValid)
-                && checkEntity(e);
+            return entity != null && entity.IsValid
+                && (entity.Character.IsValid || entity.Critter.IsValid || entity.Player.IsValid)
+                && checkEntity(entity);
 #endif
         }
 

@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.21.0226.1443</AssemblyVersion>
+    <AssemblyVersion>0.21.0304.1012</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -98,7 +98,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Engine.cs" />
+    <Compile Include="Entities\EntityCacheRecordKey.cs" />
     <Compile Include="Entities\EntityCache.cs" />
+    <Compile Include="Entities\EntityCacheRecord.cs" />
     <Compile Include="Entities\EntityComparerToPattern.cs" />
     <Compile Include="Entities\EntitySelectionTools.cs" />
     <Compile Include="Entities\SearchCached.cs" />

@@ -5,7 +5,7 @@ using System.Text;
 using System.Windows.Forms;
 using AStar;
 using DevExpress.XtraEditors;
-using EntityTools.Editors.Forms;
+using EntityTools.Forms;
 
 namespace EntityTools.Patches.Mapper.Tools
 {

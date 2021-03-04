@@ -27,6 +27,7 @@ using static Astral.Quester.Classes.Action;
 
 namespace EntityCore.Quester.Action
 {
+    //TODO: Исправить работу PickUpMissionExt TurnInMissionExt на Stokely Silverstone в Кер-Кенниге (М3)
     public class TurnInMissionEngine : IQuesterActionEngine
     {
         private TurnInMissionExt @this;

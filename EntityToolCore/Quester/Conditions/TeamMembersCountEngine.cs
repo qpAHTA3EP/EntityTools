@@ -61,7 +61,7 @@ namespace EntityCore.Quester.Conditions
                     || e.PropertyName == nameof(@this.MemberCount))
                     label = string.Empty;
                 else if (e.PropertyName == nameof(@this.CustomRegionNames))
-                    getCustomRegions = internal_GetCustomRegion_Initializer;
+                    getCustomRegions = initialize_GetCustomRegion;
 
                 membersCount = 0;
 #if timeout
@@ -104,6 +104,8 @@ namespace EntityCore.Quester.Conditions
             @this = tmc;
             @this.PropertyChanged += PropertyChanged;
 
+            getCustomRegions = initialize_GetCustomRegion;
+
             conditionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
 
             @this.Engine = this;
@@ -115,66 +117,84 @@ namespace EntityCore.Quester.Conditions
         {
             get
             {
-                if (EntityManager.LocalPlayer.PlayerTeam?.IsInTeam == true
-                    && EntityManager.LocalPlayer.PlayerTeam?.Team?.MembersCount > 1)
+                var playerTeam = EntityManager.LocalPlayer.PlayerTeam;
+                if (playerTeam != null && playerTeam.IsInTeam && playerTeam.Team.MembersCount > 1)
                 {
 #if timeout
                     if (timeout.IsTimedOut)
                     { 
 #endif
+                        var containerId = EntityManager.LocalPlayer.ContainerId;
+                        var regionInternalName = EntityManager.LocalPlayer.RegionInternalName;
                         membersCount = 0;
 
+                        // Проверка:
+                        //      member.InternalName != EntityManager.LocalPlayer.InternalName
+                        // эквивалентна проверке: 
+                        //      memberEntity.ContainerId != containerId
                         List<CustomRegion> crList = getCustomRegions();
                         if (crList != null && crList.Count > 0)
                         {
                             switch (@this._distanceSign)
                             {
                                 case Relation.Inferior:
+                                {
+                                    membersCount = playerTeam.Team.Members.Count( member =>
                                     {
-                                        membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.Count((TeamMember member) =>
-                                                        (/* member.InternalName != EntityManager.LocalPlayer.InternalName
-                                                      * Эквивалентно строке: */
-                                                            member.Entity.ContainerId != EntityManager.LocalPlayer.ContainerId
-                                                            && (!@this._regionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                                            && member.Entity.Location.Distance3DFromPlayer < @this._distance
-                                                            && (crList.Find((CustomRegion cr) => member.Entity.Within(cr)) != null) ? @this._customRegionCheck == Presence.Equal : @this._customRegionCheck == Presence.NotEquel));
+                                        var memberEntity = member.Entity;
+                                        return memberEntity.ContainerId != containerId
+                                                && (!@this._regionCheck || memberEntity.RegionInternalName == regionInternalName)
+                                                && memberEntity.Location.Distance3DFromPlayer < @this._distance
+                                                && (crList.Find(cr => memberEntity.Within(cr)) != null)
+                                                    ? @this._customRegionCheck == Presence.Equal
+                                                    : @this._customRegionCheck == Presence.NotEquel;
+                                    });
 
-                                        break;
-                                    }
+                                    break;
+                                }
                                 case Relation.Superior:
+                                {
+                                    membersCount = playerTeam.Team.Members.Count( member =>
                                     {
-                                        membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.Count((TeamMember member) =>
-                                                        (/* member.InternalName != EntityManager.LocalPlayer.InternalName
-                                                      * Эквивалентно строке: */
-                                                            member.Entity.ContainerId != EntityManager.LocalPlayer.ContainerId
-                                                            && (!@this._regionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                                            && member.Entity.Location.Distance3DFromPlayer > @this._distance
-                                                            && (crList.Find((CustomRegion cr) => member.Entity.Within(cr)) != null) ? @this._customRegionCheck == Presence.Equal : @this._customRegionCheck == Presence.NotEquel));
-                                        break;
-                                    }
+                                        var memberEntity = member.Entity;
+                                        return memberEntity.ContainerId != containerId
+                                                            && (!@this._regionCheck || memberEntity.RegionInternalName == regionInternalName)
+                                                            && memberEntity.Location.Distance3DFromPlayer > @this._distance
+                                                            && (crList.Find(cr => memberEntity.Within(cr)) != null) 
+                                                                ? @this._customRegionCheck == Presence.Equal 
+                                                                : @this._customRegionCheck == Presence.NotEquel;
+                                    });
+                                    break; 
+                                }
                                 case Relation.Equal:
+                                {
+                                    membersCount = playerTeam.Team.Members.Count( member =>
                                     {
-                                        membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.Count((TeamMember member) =>
-                                                        (/* member.InternalName != EntityManager.LocalPlayer.InternalName
-                                                      * Эквивалентно строке: */
-                                                            member.Entity.ContainerId != EntityManager.LocalPlayer.ContainerId
-                                                            && (!@this._regionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                                            && member.Entity.Location.Distance3DFromPlayer == @this._distance
-                                                            && (crList.Find((CustomRegion cr) => member.Entity.Within(cr)) != null) ? @this._customRegionCheck == Presence.Equal : @this._customRegionCheck == Presence.NotEquel)
-                                                        );
-                                        break;
-                                    }
+                                        var memberEntity = member.Entity;
+                                        return memberEntity.ContainerId != containerId
+                                                && (!@this._regionCheck || memberEntity.RegionInternalName == regionInternalName)
+                                                && memberEntity.Location.Distance3DFromPlayer == @this._distance
+                                                && (crList.Find((CustomRegion cr) => memberEntity.Within(cr)) != null) 
+                                                    ? @this._customRegionCheck == Presence.Equal 
+                                                    : @this._customRegionCheck == Presence.NotEquel;
+
+                                    });
+                                    break;
+                                }
                                 case Relation.NotEqual:
+                                {
+                                    membersCount = playerTeam.Team.Members.Count( member =>
                                     {
-                                        membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.Count((TeamMember member) =>
-                                                        (/* member.InternalName != EntityManager.LocalPlayer.InternalName
-                                                          * Эквивалентно строке: */
-                                                            member.Entity.ContainerId != EntityManager.LocalPlayer.ContainerId
-                                                            && (!@this._regionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                                            && member.Entity.Location.Distance3DFromPlayer != @this._distance
-                                                            && (crList.Find((CustomRegion cr) => member.Entity.Within(cr)) != null) ? @this._customRegionCheck == Presence.Equal : @this._customRegionCheck == Presence.NotEquel));
-                                        break;
-                                    }
+                                        var memberEntity = member.Entity;
+                                        return memberEntity.ContainerId != containerId
+                                                && (!@this._regionCheck || memberEntity.RegionInternalName == regionInternalName)
+                                                && memberEntity.Location.Distance3DFromPlayer != @this._distance
+                                                && (crList.Find((CustomRegion cr) => memberEntity.Within(cr)) != null)
+                                                    ? @this._customRegionCheck == Presence.Equal
+                                                    : @this._customRegionCheck == Presence.NotEquel;
+                                    });
+                                    break;
+                                }
                             }
                         }
                         else
@@ -182,50 +202,49 @@ namespace EntityCore.Quester.Conditions
                             switch (@this._distanceSign)
                             {
                                 case Relation.Inferior:
+                                {
+                                    membersCount = playerTeam.Team.Members.FindAll( member =>
                                     {
-                                        membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.FindAll((TeamMember member) =>
-                                                        (/* member.InternalName != EntityManager.LocalPlayer.InternalName
-                                                      * Эквивалентно строке: */
-                                                            member.Entity.ContainerId != EntityManager.LocalPlayer.ContainerId
-                                                            && (!@this._regionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                                            && member.Entity.Location.Distance3DFromPlayer < @this._distance)
-                                                        ).Count;
-
-                                        break;
-                                    }
+                                        var memberEntity = member.Entity;
+                                        return memberEntity.ContainerId != containerId
+                                                && (!@this._regionCheck || memberEntity.RegionInternalName == regionInternalName)
+                                                && memberEntity.Location.Distance3DFromPlayer < @this._distance;
+                                    }).Count;
+                                    break;
+                                }
                                 case Relation.Superior:
+                                {
+                                    membersCount = playerTeam.Team.Members.FindAll( member =>
                                     {
-                                        membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.FindAll((TeamMember member) =>
-                                                        (/* member.InternalName != EntityManager.LocalPlayer.InternalName
-                                                      * Эквивалентно строке: */
-                                                            member.Entity.ContainerId != EntityManager.LocalPlayer.ContainerId
-                                                            && (!@this._regionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                                            && member.Entity.Location.Distance3DFromPlayer > @this._distance)
-                                                        ).Count;
-                                        break;
-                                    }
+                                        var memberEntity = member.Entity;
+                                        return member.Entity.ContainerId != containerId
+                                                && (!@this._regionCheck || member.Entity.RegionInternalName == regionInternalName)
+                                                && member.Entity.Location.Distance3DFromPlayer > @this._distance;
+                                    }).Count;
+                                    break;
+                                }
                                 case Relation.Equal:
+                                {
+                                    membersCount = playerTeam.Team.Members.FindAll(member =>
                                     {
-                                        membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.FindAll((TeamMember member) =>
-                                                        (/* member.InternalName != EntityManager.LocalPlayer.InternalName
-                                                      * Эквивалентно строке: */
-                                                            member.Entity.ContainerId != EntityManager.LocalPlayer.ContainerId
-                                                            && (!@this._regionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                                            && member.Entity.Location.Distance3DFromPlayer == @this._distance)
-                                                        ).Count;
-                                        break;
-                                    }
+                                        var memberEntity = member.Entity;
+                                        return memberEntity.ContainerId != containerId
+                                                && (!@this._regionCheck || memberEntity.RegionInternalName == regionInternalName)
+                                                && memberEntity.Location.Distance3DFromPlayer == @this._distance;
+                                    }).Count;
+                                    break;
+                                }
                                 case Relation.NotEqual:
+                                {
+                                    membersCount = playerTeam.Team.Members.FindAll((TeamMember member) =>
                                     {
-                                        membersCount = EntityManager.LocalPlayer.PlayerTeam.Team.Members.FindAll((TeamMember member) =>
-                                                        (/* member.InternalName != EntityManager.LocalPlayer.InternalName
-                                                      * Эквивалентно строке: */
-                                                            member.Entity.ContainerId != EntityManager.LocalPlayer.ContainerId
-                                                            && (!@this._regionCheck || member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                                            && member.Entity.Location.Distance3DFromPlayer != @this._distance)
-                                                        ).Count;
-                                        break;
-                                    }
+                                        var memberEntity = member.Entity;
+                                        return memberEntity.ContainerId != containerId
+                                                && (!@this._regionCheck || memberEntity.RegionInternalName == regionInternalName)
+                                                && memberEntity.Location.Distance3DFromPlayer != @this._distance;
+                                    }).Count;
+                                    break;
+                                }
                             }
                         }
 #if timeout
@@ -260,7 +279,7 @@ namespace EntityCore.Quester.Conditions
 
         public void Reset()
         {
-            getCustomRegions = internal_GetCustomRegion_Initializer;
+            getCustomRegions = initialize_GetCustomRegion;
             membersCount = 0;
             label = string.Empty;
         }
@@ -277,19 +296,26 @@ namespace EntityCore.Quester.Conditions
                     StringBuilder strBldr2 = new StringBuilder();
                     strBldr.AppendLine();
 
+                    var regionInternalName = EntityManager.LocalPlayer.RegionInternalName;
+                    var containerId = EntityManager.LocalPlayer.ContainerId;
+
                     foreach (TeamMember member in EntityManager.LocalPlayer.PlayerTeam.Team.Members)
                     {
+                        var memberEntity = member.Entity;
+                        var memberDistance = memberEntity.Location.Distance3DFromPlayer;
+                        var memberRegion = memberEntity.RegionInternalName;
+
                         /* if (member.InternalName != EntityManager.LocalPlayer.InternalName)
                          * Эквивалентно следующей строке: */
-                        if (member.Entity.ContainerId != EntityManager.LocalPlayer.ContainerId)
+                        if (memberEntity.ContainerId != containerId)
                         {
                             strBldr.AppendLine(member.InternalName);
-                            strBldr.AppendFormat("\tDistance: {0:0.##}", member.Entity.Location.Distance3DFromPlayer).AppendLine();
+                            strBldr.AppendFormat("\tDistance: {0:0.##}", memberDistance).AppendLine();
 
                             if (@this._regionCheck)
                             {
-                                strBldr.Append($"\tRegionCheck[").Append(member.Entity.RegionInternalName).Append("]: ");
-                                if (member.Entity.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
+                                strBldr.Append($"\tRegionCheck[").Append(memberRegion).Append("]: ");
+                                if (memberRegion == regionInternalName)
                                     strBldr.AppendLine("succeeded");
                                 else strBldr.AppendLine("fail");
                             }
@@ -301,7 +327,7 @@ namespace EntityCore.Quester.Conditions
                             if (crList != null && crList.Count > 0)
                             {
                                 foreach (CustomRegion cr in crList)
-                                    if (member.Entity.Within(cr))
+                                    if (memberEntity.Within(cr))
                                     {
                                         match = true;
                                         if (strBldr2.Length > 0)
@@ -313,7 +339,7 @@ namespace EntityCore.Quester.Conditions
                                 switch (@this._distanceSign)
                                 {
                                     case Relation.Inferior:
-                                        if (member.Entity.Location.Distance3DFromPlayer < @this._distance)
+                                        if (memberDistance < @this._distance)
                                         {
                                             if (@this._customRegionCheck == Presence.Equal && match)
                                                 memsCount++;
@@ -322,7 +348,7 @@ namespace EntityCore.Quester.Conditions
                                         }
                                         break;
                                     case Relation.Superior:
-                                        if (member.Entity.Location.Distance3DFromPlayer > @this._distance)
+                                        if (memberDistance > @this._distance)
                                         {
                                             if (@this._customRegionCheck == Presence.Equal && match)
                                                 memsCount++;
@@ -331,7 +357,7 @@ namespace EntityCore.Quester.Conditions
                                         }
                                         break;
                                     case Relation.Equal:
-                                        if (member.Entity.Location.Distance3DFromPlayer == @this._distance)
+                                        if (memberDistance == @this._distance)
                                         {
                                             if (@this._customRegionCheck == Presence.Equal && match)
                                                 memsCount++;
@@ -340,7 +366,7 @@ namespace EntityCore.Quester.Conditions
                                         }
                                         break;
                                     case Relation.NotEqual:
-                                        if (member.Entity.Location.Distance3DFromPlayer != @this._distance)
+                                        if (memberDistance != @this._distance)
                                         {
                                             if (@this._customRegionCheck == Presence.Equal && match)
                                                 memsCount++;
@@ -355,19 +381,19 @@ namespace EntityCore.Quester.Conditions
                                 switch (@this._distanceSign)
                                 {
                                     case Relation.Inferior:
-                                        if (member.Entity.Location.Distance3DFromPlayer < @this._distance)
+                                        if (memberDistance < @this._distance)
                                             memsCount++;
                                         break;
                                     case Relation.Superior:
-                                        if (member.Entity.Location.Distance3DFromPlayer > @this._distance)
+                                        if (memberDistance > @this._distance)
                                             memsCount++;
                                         break;
                                     case Relation.Equal:
-                                        if (member.Entity.Location.Distance3DFromPlayer == @this._distance)
+                                        if (memberDistance == @this._distance)
                                             memsCount++;
                                         break;
                                     case Relation.NotEqual:
-                                        if (member.Entity.Location.Distance3DFromPlayer != @this._distance)
+                                        if (memberDistance != @this._distance)
                                             memsCount++;
                                         break;
                                 }
@@ -391,22 +417,22 @@ namespace EntityCore.Quester.Conditions
             return label;
         }
 
-        private List<CustomRegion> internal_GetCustomRegion_Initializer()
+        private List<CustomRegion> initialize_GetCustomRegion()
         {
             if (@this._customRegionNames?.Count > 0)
             {
                 customRegions = CustomRegionExtentions.GetCustomRegions(@this._customRegionNames);
 #if DEBUG
                 if (customRegions is null || customRegions.Count == 0)
-                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(internal_GetCustomRegion_Initializer)}: List of {nameof(@this.CustomRegionNames)} is empty");
-                else ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(internal_GetCustomRegion_Initializer)}: Select List of {customRegions.Count} CustomRegions");
+                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(initialize_GetCustomRegion)}: List of {nameof(@this.CustomRegionNames)} is empty");
+                else ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(initialize_GetCustomRegion)}: Select List of {customRegions.Count} CustomRegions");
 #endif
             }
             else
             {
                 customRegions = null;
 #if DEBUG
-                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(internal_GetCustomRegion_Initializer)}: List of {nameof(@this.CustomRegionNames)} is empty");
+                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(initialize_GetCustomRegion)}: List of {nameof(@this.CustomRegionNames)} is empty");
 #endif
             }
 
