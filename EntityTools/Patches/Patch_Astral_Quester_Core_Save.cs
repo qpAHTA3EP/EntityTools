@@ -33,9 +33,8 @@ namespace EntityTools.Patches
 
         public sealed override bool NeedInjecttion => EntityTools.Config.Patches.SaveQuesterProfile;
 
-#if false
-    Astral.Quester.Core
-    	public static void Save(bool saveas = false)
+#if false // void Astral.Quester.Core.Save(bool saveas = false)
+    	public static void Astral.Quester.Core.Save(bool saveas = false)
 		{
 			string text = Settings.Get.LastQuesterProfile;
 			bool flag = true;
@@ -113,28 +112,52 @@ namespace EntityTools.Patches
         /// </summary>
         public static void Save(bool saveAs = false)
         {
-            string profileName = Astral.Controllers.Settings.Get.LastQuesterProfile;
+            string fullProfileName = Astral.Controllers.Settings.Get.LastQuesterProfile;
+            string profileName = string.IsNullOrEmpty(Astral.Controllers.Settings.Get.LastQuesterProfile) 
+                ? EntityManager.LocalPlayer.MapState.MapName
+                : Path.GetFileNameWithoutExtension(Astral.Controllers.Settings.Get.LastQuesterProfile);
             var currentProfile  = API.CurrentProfile;
-            bool useExternalMeshes = currentProfile.UseExternalMeshFile && currentProfile.ExternalMeshFileName.Length >= 10;
+            bool useExternalMeshes = currentProfile.UseExternalMeshFile && currentProfile.ExternalMeshFileName.Length >= ".meshes.bin".Length + 1;
+#if false   // string Quester.Core.CurrentProfileZipMeshFile
+        public static string CurrentProfileZipMeshFile
+		{
+			get
+			{
+				if (Class1.CurrentSettings.LastQuesterProfile.Length > 0 && Core.Profile.Saved)
+				{
+					string text = Class1.CurrentSettings.LastQuesterProfile;
+					if (Core.Profile.UseExternalMeshFile && Core.Profile.ExternalMeshFileName.Length >= 10)
+					{
+						text = new FileInfo(text).DirectoryName + "\\" + Core.Profile.ExternalMeshFileName;
+					}
+					if (File.Exists(text))
+					{
+						return text;
+					}
+				}
+				return string.Empty;
+			}
+		}
+#endif
             string externalMeshFileName = string.Empty;
             bool needLoadAllMeshes = false;
 
-            if (!API.CurrentProfile.Saved || saveAs)
+            if (!currentProfile.Saved || saveAs)
             {
                 SaveFileDialog saveFileDialog = new SaveFileDialog();
                 saveFileDialog.InitialDirectory = Directories.ProfilesPath;
                 saveFileDialog.DefaultExt = "amp.zip";
                 saveFileDialog.Filter = @"Astral mission profil (*.amp.zip)|*.amp.zip";
-                saveFileDialog.FileName = string.IsNullOrEmpty(profileName) ? EntityManager.LocalPlayer.MapState.MapName : profileName;
+                saveFileDialog.FileName = string.IsNullOrEmpty(fullProfileName) ? EntityManager.LocalPlayer.MapState.MapName : fullProfileName;
                 if (saveFileDialog.ShowDialog() != DialogResult.OK)
                 {
                     return;
                 }
-                profileName = saveFileDialog.FileName;
+                fullProfileName = saveFileDialog.FileName;
                 needLoadAllMeshes = true;
             }
             if(useExternalMeshes)
-                externalMeshFileName = Path.Combine(Path.GetDirectoryName(profileName)?? string.Empty, currentProfile.ExternalMeshFileName);
+                externalMeshFileName = Path.Combine(Path.GetDirectoryName(fullProfileName)?? string.Empty, currentProfile.ExternalMeshFileName);
 
             if (needLoadAllMeshes && !useExternalMeshes)
                 AstralAccessors.Quester.Core.LoadAllMeshes();
@@ -146,13 +169,13 @@ namespace EntityTools.Patches
             {
 
                 // Открываем архивный файл профиля
-                zipFile = ZipFile.Open(profileName, File.Exists(profileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create);
+                zipFile = ZipFile.Open(fullProfileName, File.Exists(fullProfileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create);
 
                 // Сохраняем в архив файл профиля "profile.xml"
                 lock (currentProfile)
                 {
-                    SaveProfile(zipFile);
-                    currentProfile.Saved = true; 
+                    if(SaveProfile(zipFile))
+                        currentProfile.Saved = true; 
                 }
 
                 // Сохраняем файлы мешей
@@ -189,14 +212,14 @@ namespace EntityTools.Patches
                     } 
                 }
 
-                Astral.Controllers.Settings.Get.LastQuesterProfile = profileName;
+                Astral.Controllers.Settings.Get.LastQuesterProfile = fullProfileName;
 
-                Astral.Logger.Notify(string.Concat("Profile '", profileName, "' saved"));
+                Astral.Logger.Notify(string.Concat("Profile '", fullProfileName, "' saved"));
             }
             catch (Exception exc)
             {
                 ETLogger.WriteLine(LogType.Error, exc.ToString(), true);
-                Astral.Logger.Notify(string.Concat("Profile '", profileName, "' saved"), true);
+                Astral.Logger.Notify(string.Concat("Profile '", fullProfileName, "' saved"), true);
             }
             finally
             {
@@ -220,6 +243,7 @@ namespace EntityTools.Patches
             if (binaryFormatter is null)
                 binaryFormatter = new BinaryFormatter();
 
+#if false
             ZipArchiveEntry zipMeshEntry;
             if (zipFile.Mode == ZipArchiveMode.Update)
             {
@@ -242,30 +266,91 @@ namespace EntityTools.Patches
 
                     return true;
                 }
+            } 
+#else
+            try
+            {
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    binaryFormatter.Serialize(memoryStream, mesh);
+
+                    ZipArchiveEntry zipMeshEntry;
+                    if (zipFile.Mode == ZipArchiveMode.Update)
+                    {
+                        zipMeshEntry = zipFile.GetEntry(meshName);
+                        if (zipMeshEntry != null)
+                            zipMeshEntry.Delete();
+                    }
+                    zipMeshEntry = zipFile.CreateEntry(meshName);
+
+                    using (var zipMeshStream = zipMeshEntry.Open())
+                    {
+                        memoryStream.WriteTo(zipMeshStream);
+                        return true;
+                    }
+                }
             }
+            catch (Exception e)
+            {
+                ETLogger.WriteLine(LogType.Error, e.ToString(), true);
+            }
+#endif
+            return false;
         }
 
         /// <summary>
         /// Сохранение профиля в архивный файл <paramref name="zipFile"/>
         /// </summary>
-        public static void SaveProfile(ZipArchive zipFile)
+        public static bool SaveProfile(ZipArchive zipFile)
         {
             //TODO: Безопасное сохранение профиля, чтобы при возникновении ошибки старое содержимое не удалялось
+            HarmonyPatch_XmlSerializer_GetExtraTypes.GetExtraTypes(out List<Type> types, 2);
+            XmlSerializer serializer = new XmlSerializer(API.CurrentProfile.GetType(), types.ToArray());
+#if false
             ZipArchiveEntry zipProfileEntry;
             if (zipFile.Mode == ZipArchiveMode.Update)
             {
                 zipProfileEntry = zipFile.GetEntry("profile.xml");
                 zipProfileEntry?.Delete();
-            } 
+            }
             zipProfileEntry = zipFile.CreateEntry("profile.xml");
-
-            HarmonyPatch_XmlSerializer_GetExtraTypes.GetExtraTypes(out List<Type> types, 2);
-            XmlSerializer serializer = new XmlSerializer(API.CurrentProfile.GetType(), types.ToArray());
             using (var zipProfileStream = zipProfileEntry.Open())
             {
-                serializer.Serialize(zipProfileStream, API.CurrentProfile);
                 API.CurrentProfile.Saved = true;
+                serializer.Serialize(zipProfileStream, API.CurrentProfile);
+            return true;
+            } 
+#else
+            var currentProfile = API.CurrentProfile;
+            bool saved = currentProfile.Saved;
+            using (var memStream = new MemoryStream())
+            {
+                try
+                {
+                    currentProfile.Saved = true;
+                    serializer.Serialize(memStream, API.CurrentProfile);
+
+                    ZipArchiveEntry zipProfileEntry;
+                    if (zipFile.Mode == ZipArchiveMode.Update)
+                    {
+                        zipProfileEntry = zipFile.GetEntry("profile.xml");
+                        zipProfileEntry?.Delete();
+                    }
+                    zipProfileEntry = zipFile.CreateEntry("profile.xml");
+                    using (var zipProfileStream = zipProfileEntry.Open())
+                    {
+                        memStream.WriteTo(zipProfileStream);
+                        return true;
+                    }
+                }
+                catch (Exception e)
+                {
+                    currentProfile.Saved = false;
+                    ETLogger.WriteLine(LogType.Error, e.ToString(), true);
+                }
             }
+#endif
+            return false;
         }
     }
 }
