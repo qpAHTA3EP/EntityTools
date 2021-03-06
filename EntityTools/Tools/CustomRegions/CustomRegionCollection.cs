@@ -413,12 +413,21 @@ namespace EntityTools.Tools.CustomRegions
                         }
                         continue;
                     }
-                    else if(elemName == nameof(InclusionType.Union))
+                    else if (elemName == nameof(InclusionType.Union))
+                    {
                         ReadXmlAsList(reader, InclusionType.Union);
+                        continue;
+                    }
                     else if (elemName == nameof(InclusionType.Intersection))
+                    {
                         ReadXmlAsList(reader, InclusionType.Intersection);
+                        continue;
+                    }
                     else if (elemName == nameof(InclusionType.Exclusion))
+                    {
                         ReadXmlAsList(reader, InclusionType.Exclusion);
+                        continue;
+                    }
                 }
                 else if (reader.NodeType == XmlNodeType.EndElement
                 && elemName == startElemName)
