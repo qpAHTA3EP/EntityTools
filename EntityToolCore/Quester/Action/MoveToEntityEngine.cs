@@ -124,8 +124,8 @@ namespace EntityCore.Quester.Action
             debug.Value.AddInfo($"{actionIDstr} initialized");
 #endif
 
-            checkEntity = initializer_CheckEntity;
-            getCustomRegions = initializer_GetCustomRegion;
+            checkEntity = initialize_CheckEntity;
+            getCustomRegions = initialize_GetCustomRegion;
 
 #if timeout
             timeout.ChangeTime(0);
@@ -142,17 +142,17 @@ namespace EntityCore.Quester.Action
                 switch(e.PropertyName)
                 {
                     case nameof(@this.EntityID):
-                        checkEntity = initializer_CheckEntity;
+                        checkEntity = initialize_CheckEntity;
                         label = string.Empty;
                         break;
                     case nameof(@this.EntityIdType):
-                        checkEntity = initializer_CheckEntity;
+                        checkEntity = initialize_CheckEntity;
                         break;
                     case nameof(@this.EntityNameType):
-                        checkEntity = initializer_CheckEntity;
+                        checkEntity = initialize_CheckEntity;
                         break;
                     case nameof(@this.CustomRegionNames):
-                        getCustomRegions = initializer_GetCustomRegion;
+                        getCustomRegions = initialize_GetCustomRegion;
                         break;
                 }
 
@@ -590,8 +590,8 @@ namespace EntityCore.Quester.Action
         {
             target = null;
             closestEntity = null;
-            checkEntity = initializer_CheckEntity;
-            getCustomRegions = initializer_GetCustomRegion;
+            checkEntity = initialize_CheckEntity;
+            getCustomRegions = initialize_GetCustomRegion;
             label = string.Empty;
             if (EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity)
                 ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(InternalReset)));
@@ -820,7 +820,7 @@ namespace EntityCore.Quester.Action
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
-        private bool initializer_CheckEntity(Entity e)
+        private bool initialize_CheckEntity(Entity e)
         {
             Predicate<Entity> predicate = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
             bool extendedDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
@@ -843,7 +843,7 @@ namespace EntityCore.Quester.Action
         /// соответствующих списку их строковых названий <see cref="CustomRegions"/>
         /// </summary>
         /// <returns></returns>
-        private List<CustomRegion> initializer_GetCustomRegion()
+        private List<CustomRegion> initialize_GetCustomRegion()
         {
             if (customRegions == null && @this._customRegionNames != null)
             {
