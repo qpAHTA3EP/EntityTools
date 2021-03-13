@@ -374,7 +374,6 @@ namespace EntityCore.Quester.Action
         {
             get
             {
-                //TODO : Добавить проверку BagsFreeSlots > 0
                 bool isGiverAccessible = @this._giver.IsAccessible;
                 uint bagsFreeSlots = EntityManager.LocalPlayer.BagsFreeSlots;
                 bool isMissionSucceded = MissionHelper.HaveMission(@this._missionId, out Mission mission) && mission.State == MissionState.Succeeded;

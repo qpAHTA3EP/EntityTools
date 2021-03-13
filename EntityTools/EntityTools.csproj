@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.21.0304.1012</AssemblyVersion>
+    <AssemblyVersion>0.21.0307.1309</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -178,6 +178,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression">
       <HintPath>..\References\x64\System.IO.Compression.dll</HintPath>
@@ -189,27 +190,29 @@
   <ItemGroup>
     <Compile Include="Editors\CheckedListBoxEditor.cs" />
     <Compile Include="Editors\CustomRegionCollectionEditor.cs" />
-    <Compile Include="Editors\Forms\CustomRegionCollectionEditorForm.cs">
+    <Compile Include="Editors\Forms\ItemListEditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Editors\Forms\CustomRegionCollectionEditorForm.Designer.cs">
-      <DependentUpon>CustomRegionCollectionEditorForm.cs</DependentUpon>
+    <Compile Include="Editors\Forms\ItemListEditorForm.Designer.cs">
+      <DependentUpon>ItemListEditorForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editors\TestEditors\IgnoredFoesTestEditor.cs" />
     <Compile Include="Editors\Forms\ItemFilterEditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Editors\Forms\ItemFilterEditorForm.Designer.cs">
       <DependentUpon>ItemFilterEditorForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editors\EntityTestEditor.cs" />
-    <Compile Include="Editors\Forms\CustomRegionCollectionEditorForm_Plus.cs">
+    <Compile Include="Editors\TestEditors\EntityTestEditor.cs" />
+    <Compile Include="Editors\Forms\CustomRegionCollectionEditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Editors\Forms\CustomRegionCollectionEditorForm_Plus.Designer.cs">
-      <DependentUpon>CustomRegionCollectionEditorForm_Plus.cs</DependentUpon>
+    <Compile Include="Editors\Forms\CustomRegionCollectionEditorForm.Designer.cs">
+      <DependentUpon>CustomRegionCollectionEditorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Editors\ItemFilterEntryListEditor.cs" />
     <Compile Include="Editors\MissionGiverInfoExtendedEditor.cs" />
+    <Compile Include="Editors\FoeListEditor.cs" />
     <Compile Include="Editors\VendorInfoEditor.cs" />
     <Compile Include="Editors\MissionGiverInfoEditor.cs" />
     <Compile Include="Logger\EntityToolLogger.cs" />
@@ -222,6 +225,8 @@
     <Compile Include="Core\Proxies\QuesterConditionProxy.cs" />
     <Compile Include="Core\Proxies\UCCActionProxy.cs" />
     <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
+    <Compile Include="Quester\Actions\RemoveIgnoredFoes.cs" />
+    <Compile Include="Quester\Actions\AddIgnoredFoes.cs" />
     <Compile Include="Quester\Actions\TurnInMissionExt.cs" />
     <Compile Include="Quester\Conditions\IsInCustomRegionSet.cs" />
     <Compile Include="Servises\SlideMonitor\CharacterEx.cs" />
@@ -325,11 +330,15 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Patches\Mapper\MapperSettings.cs" />
+    <Compile Include="Tools\Combats\IgnoredFoe\IgnoredFoesContainer.cs" />
+    <Compile Include="Tools\Combats\IgnoredFoe\IgnoredFoesCore.cs" />
+    <Compile Include="Tools\Combats\IgnoredFoe\IgnoredFoesEntry.cs" />
     <Compile Include="Tools\CustomRegions\CustomRegionEntry.cs" />
     <Compile Include="Tools\CustomRegions\CustomRegionExtentions.cs" />
     <Compile Include="Tools\CustomRegions\CustomRegionCollection.cs" />
     <Compile Include="Tools\CustomRegions\Enums.cs" />
     <Compile Include="Tools\Extensions\CollectionTExtentions.cs" />
+    <Compile Include="Tools\Extensions\StringBuilderExtentions.cs" />
     <Compile Include="Tools\Missions\Enums.cs" />
     <Compile Include="Tools\Missions\MissionGiverRemote.cs" />
     <Compile Include="Tools\Missions\MissionGiverNPC.cs" />
@@ -354,6 +363,12 @@
     <Compile Include="Tools\Missions\MissionGiverBase.cs" />
     <Compile Include="Tools\Missions\MissionGiverInfo.cs" />
     <Compile Include="Tools\ReadWriteLocker.cs" />
+    <Compile Include="Tools\Reflection\Accessors\AstralAccessors.Addons.cs" />
+    <Compile Include="Tools\Reflection\Accessors\AstralAccessors.Controllers.cs" />
+    <Compile Include="Tools\Reflection\Accessors\AstralAccessors.Empty.cs" />
+    <Compile Include="Tools\Reflection\Accessors\AstralAccessors.Logic.Nw.cs" />
+    <Compile Include="Tools\Reflection\Accessors\AstralAccessors.Logic.UCC.cs" />
+    <Compile Include="Tools\Reflection\Accessors\AstralAccessors.Quester.cs" />
     <Compile Include="Tools\Reflection\Accessors\QuesterAssistantAccessors.cs" />
     <Compile Include="Tools\StringToPattern.cs" />
     <Compile Include="Tools\EntityDef.cs" />
@@ -413,14 +428,14 @@
     <EmbeddedResource Include="Core\MainPanel.resx">
       <DependentUpon>MainPanel.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Editors\Forms\CustomRegionCollectionEditorForm.resx">
-      <DependentUpon>CustomRegionCollectionEditorForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Editors\Forms\ItemFilterEditorForm.resx">
       <DependentUpon>ItemFilterEditorForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Editors\Forms\CustomRegionCollectionEditorForm_Plus.resx">
-      <DependentUpon>CustomRegionCollectionEditorForm_Plus.cs</DependentUpon>
+    <EmbeddedResource Include="Editors\Forms\CustomRegionCollectionEditorForm.resx">
+      <DependentUpon>CustomRegionCollectionEditorForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\Forms\ItemListEditorForm.resx">
+      <DependentUpon>ItemListEditorForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Patches\Mapper\MapperFormExt.resx">
       <DependentUpon>MapperFormExt.cs</DependentUpon>
@@ -440,6 +455,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Compile Include="Tools\Reflection\Accessors\AstralAccessors.Grinder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\charArrow.png" />
@@ -617,6 +633,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\zoomout_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\previous_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\next_16x16.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.IO.Compression.ZipFile">

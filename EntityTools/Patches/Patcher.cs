@@ -20,6 +20,10 @@ namespace EntityTools.Patches
     /// </summary>
     internal static class ETPatcher
     {
+#if HARMONY
+        internal static readonly Harmony Harmony = new Harmony(nameof(ETPatcher)); 
+#endif
+
         /// <summary>
         /// Подмена штатного окна Mapper'a
         /// </summary>
@@ -105,8 +109,7 @@ namespace EntityTools.Patches
 #if HARMONY
                 try
                 {
-                    var harmony = new Harmony(nameof(ETPatcher));
-                    harmony.PatchAll();
+                    Harmony.PatchAll();
                 }
                 catch
                 {

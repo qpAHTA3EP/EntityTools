@@ -601,8 +601,7 @@ namespace EntityTools.Patches.Mapper
             // 
             this.btnObjectInfo.Caption = "ObjectInfo";
             this.btnObjectInfo.Id = 134;
-            this.btnObjectInfo.ImageOptions.Image = global::EntityTools.Properties.Resources.show_16x16;
-            this.btnObjectInfo.ImageOptions.LargeImage = global::EntityTools.Properties.Resources.show_32x32;
+            this.btnObjectInfo.ImageOptions.Image = global::EntityTools.Properties.Resources.miniShow;
             this.btnObjectInfo.Name = "btnObjectInfo";
             this.btnObjectInfo.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ObjectInfo);
             // 
@@ -804,7 +803,7 @@ namespace EntityTools.Patches.Mapper
             this.btnZoomIn.Caption = "ZoomIn";
             this.btnZoomIn.Id = 119;
             this.btnZoomIn.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
-            this.btnZoomIn.ImageOptions.Image = global::EntityTools.Properties.Resources.zoomin_16x16;
+            this.btnZoomIn.ImageOptions.Image = global::EntityTools.Properties.Resources.Zoomin_16x16;
             this.btnZoomIn.Name = "btnZoomIn";
             this.btnZoomIn.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ZoomIn);
             // 
@@ -821,7 +820,7 @@ namespace EntityTools.Patches.Mapper
             this.btnZoomOut.Caption = "ZoomOut";
             this.btnZoomOut.Id = 120;
             this.btnZoomOut.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
-            this.btnZoomOut.ImageOptions.Image = global::EntityTools.Properties.Resources.zoomout_16x16;
+            this.btnZoomOut.ImageOptions.Image = global::EntityTools.Properties.Resources.Zoomout_16x16;
             this.btnZoomOut.Name = "btnZoomOut";
             this.btnZoomOut.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ZoomOut);
             // 

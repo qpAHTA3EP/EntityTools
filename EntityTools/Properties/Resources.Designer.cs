@@ -333,6 +333,16 @@ namespace EntityTools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap miniNext {
+            get {
+                object obj = ResourceManager.GetObject("miniNext", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap miniNodeDistance {
             get {
                 object obj = ResourceManager.GetObject("miniNodeDistance", resourceCulture);
@@ -366,6 +376,16 @@ namespace EntityTools.Properties {
         internal static System.Drawing.Bitmap miniPlayAll {
             get {
                 object obj = ResourceManager.GetObject("miniPlayAll", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap miniPrevious {
+            get {
+                object obj = ResourceManager.GetObject("miniPrevious", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -416,6 +436,16 @@ namespace EntityTools.Properties {
         internal static System.Drawing.Bitmap miniSave {
             get {
                 object obj = ResourceManager.GetObject("miniSave", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap miniShow {
+            get {
+                object obj = ResourceManager.GetObject("miniShow", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -493,9 +523,9 @@ namespace EntityTools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap miniZoomIn {
+        internal static System.Drawing.Bitmap Zoomin_16x16 {
             get {
-                object obj = ResourceManager.GetObject("miniZoomIn", resourceCulture);
+                object obj = ResourceManager.GetObject("Zoomin_16x16", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -503,69 +533,9 @@ namespace EntityTools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap miniZoomOut {
+        internal static System.Drawing.Bitmap Zoomout_16x16 {
             get {
-                object obj = ResourceManager.GetObject("miniZoomOut", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap show_16x16 {
-            get {
-                object obj = ResourceManager.GetObject("show_16x16", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap show_32x32 {
-            get {
-                object obj = ResourceManager.GetObject("show_32x32", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap zoomin_16x16 {
-            get {
-                object obj = ResourceManager.GetObject("zoomin_16x16", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap zoomin_32x32 {
-            get {
-                object obj = ResourceManager.GetObject("zoomin_32x32", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap zoomout_16x16 {
-            get {
-                object obj = ResourceManager.GetObject("zoomout_16x16", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap zoomout_32x32 {
-            get {
-                object obj = ResourceManager.GetObject("zoomout_32x32", resourceCulture);
+                object obj = ResourceManager.GetObject("Zoomout_16x16", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
