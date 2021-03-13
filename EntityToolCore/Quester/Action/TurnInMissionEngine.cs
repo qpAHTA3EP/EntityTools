@@ -374,11 +374,13 @@ namespace EntityCore.Quester.Action
         {
             get
             {
+                //TODO : Добавить проверку BagsFreeSlots > 0
                 bool isGiverAccessible = @this._giver.IsAccessible;
+                uint bagsFreeSlots = EntityManager.LocalPlayer.BagsFreeSlots;
                 bool isMissionSucceded = MissionHelper.HaveMission(@this._missionId, out Mission mission) && mission.State == MissionState.Succeeded;
-                bool result = isGiverAccessible && isMissionSucceded;
+                bool result = isGiverAccessible && bagsFreeSlots > 0 && isMissionSucceded;
                 if (EntityTools.EntityTools.Config.Logger.QuesterActions.DebugTurnInMissionExt)
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(InternalConditions), ": GiverAccessible(", isGiverAccessible, ") AND MissionSucceded(", isMissionSucceded, ")) => ", result));
+                    ETLogger.WriteLine(LogType.Debug, string.Concat(actionIDstr, '.', nameof(InternalConditions), ": GiverAccessible(", isGiverAccessible, ") AND BagsFreeSlots(", bagsFreeSlots, ") MissionSucceded(", isMissionSucceded, ")) => ", result));
                 return result;
             }
         }
