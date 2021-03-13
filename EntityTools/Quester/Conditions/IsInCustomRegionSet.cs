@@ -35,12 +35,24 @@ namespace EntityTools.Quester.Conditions
             set
             {
                 _customRegions = value;
-                label = string.Empty;
+                _label = string.Empty;
             }
         }
         private CustomRegionCollection _customRegions = new CustomRegionCollection();
 
-        public string Description {get; set;}
+        public string Description
+        {
+            get
+            {
+                return _description;
+            }
+            set
+            {
+                _description = value;
+                _label = string.Empty;
+            }
+        }
+        string _description;
 
         [Description("Check the Player is ouside the area defined by the CustomRegion set")]
         public bool Outside
@@ -49,7 +61,7 @@ namespace EntityTools.Quester.Conditions
             set
             {
                 _outside = value;
-                label = string.Empty;
+                _label = string.Empty;
             }
         }
         private bool _outside;
@@ -65,21 +77,36 @@ namespace EntityTools.Quester.Conditions
             }
         }
 
-        public override void Reset() => label = string.Empty;
+        public override void Reset() => _label = string.Empty;
 
         public override string ToString()
         {
-            if (string.IsNullOrEmpty(label))
+            if (string.IsNullOrEmpty(_label))
             {
-                if (_customRegions.Count > 0)
-                    label = string.Concat("Check Player ", 
-                        _outside ? "outside " : "within "
-                        , _customRegions.Count, " selected CustomRegion");
-                else label = GetType().Name;
+                if(_customRegions.Count > 0)
+                {
+                    var sb = new StringBuilder("Check Player ");
+                    if (_outside)
+                        sb.Append("outside ");
+                    else sb.Append("within ");
+
+                    if (!string.IsNullOrEmpty(_description))
+                        sb.Append('\'').Append(_description).Append("' =>");
+                    if (_customRegions.Union.Count > 0)
+                        sb.Append(" \x22c3 (").Append(_customRegions.Union.Count).Append(')');
+                    if (_customRegions.Intersection.Count > 0)
+                        sb.Append(" \x22c2 (").Append(_customRegions.Intersection.Count).Append(')');
+                    if (_customRegions.Exclusion.Count > 0)
+                        //sb.Append(" \x00ac(").Append(_customRegions.Intersection.Count).Append(')');
+                        sb.Append(" \\ (").Append(_customRegions.Exclusion.Count).Append(')');
+
+                    _label = sb.ToString();
+                }
+                else _label = GetType().Name;
             }
-            return label;
+            return _label;
         }
-        string label;
+        string _label;
 
         public override string TestInfos
         {

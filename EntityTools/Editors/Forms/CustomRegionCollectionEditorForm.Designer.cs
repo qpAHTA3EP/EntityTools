@@ -1,19 +1,11 @@
-﻿using System.ComponentModel;
-using DevExpress.XtraBars;
-using DevExpress.XtraEditors;
-using DevExpress.XtraEditors.Repository;
-using DevExpress.XtraGrid;
-using DevExpress.XtraGrid.Columns;
-using DevExpress.XtraGrid.Views.Grid;
-
-namespace EntityTools.Forms
+﻿namespace EntityTools.Forms
 {
     partial class CustomRegionCollectionEditorForm
     {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private IContainer components = null;
+        private System.ComponentModel.IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -36,271 +28,219 @@ namespace EntityTools.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            DevExpress.Utils.SuperToolTip superToolTip1 = new DevExpress.Utils.SuperToolTip();
-            DevExpress.Utils.ToolTipItem toolTipItem1 = new DevExpress.Utils.ToolTipItem();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CustomRegionCollectionEditorForm));
-            DevExpress.Utils.ToolTipSeparatorItem toolTipSeparatorItem1 = new DevExpress.Utils.ToolTipSeparatorItem();
-            DevExpress.Utils.ToolTipItem toolTipItem2 = new DevExpress.Utils.ToolTipItem();
-            this.gridCustomRegions = new DevExpress.XtraGrid.GridControl();
-            this.gridView = new DevExpress.XtraGrid.Views.Grid.GridView();
-            this.colInclusion = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.colName = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.barManager = new DevExpress.XtraBars.BarManager(this.components);
-            this.barDockControl_0 = new DevExpress.XtraBars.BarDockControl();
-            this.barDockControl_1 = new DevExpress.XtraBars.BarDockControl();
-            this.barDockControl_2 = new DevExpress.XtraBars.BarDockControl();
-            this.barDockControl_3 = new DevExpress.XtraBars.BarDockControl();
-            this.btnTest = new DevExpress.XtraEditors.SimpleButton();
-            this.btnExport = new DevExpress.XtraEditors.SimpleButton();
-            this.btnCancel = new DevExpress.XtraEditors.SimpleButton();
             this.btnSelect = new DevExpress.XtraEditors.SimpleButton();
             this.btnReload = new DevExpress.XtraEditors.SimpleButton();
-            this.btnImport = new DevExpress.XtraEditors.SimpleButton();
-            ((System.ComponentModel.ISupportInitialize)(this.gridCustomRegions)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.gridView)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.barManager)).BeginInit();
+            this.crList = new DevExpress.XtraEditors.CheckedListBoxControl();
+            this.spliter = new System.Windows.Forms.SplitContainer();
+            this.tabPane = new DevExpress.XtraBars.Navigation.TabPane();
+            this.tabUnion = new DevExpress.XtraBars.Navigation.TabNavigationPage();
+            this.textUnion = new DevExpress.XtraEditors.LabelControl();
+            this.tabIntersection = new DevExpress.XtraBars.Navigation.TabNavigationPage();
+            this.textIntersection = new DevExpress.XtraEditors.LabelControl();
+            this.tabExclusion = new DevExpress.XtraBars.Navigation.TabNavigationPage();
+            this.textExclusion = new DevExpress.XtraEditors.LabelControl();
+            ((System.ComponentModel.ISupportInitialize)(this.crList)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.spliter)).BeginInit();
+            this.spliter.Panel1.SuspendLayout();
+            this.spliter.Panel2.SuspendLayout();
+            this.spliter.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tabPane)).BeginInit();
+            this.tabPane.SuspendLayout();
+            this.tabUnion.SuspendLayout();
+            this.tabIntersection.SuspendLayout();
+            this.tabExclusion.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // gridCustomRegions
-            // 
-            this.gridCustomRegions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.gridCustomRegions.Cursor = System.Windows.Forms.Cursors.Default;
-            this.gridCustomRegions.EmbeddedNavigator.AllowHtmlTextInToolTip = DevExpress.Utils.DefaultBoolean.True;
-            toolTipItem1.AllowHtmlText = DevExpress.Utils.DefaultBoolean.True;
-            toolTipItem1.Text = resources.GetString("toolTipItem1.Text");
-            toolTipItem2.AllowHtmlText = DevExpress.Utils.DefaultBoolean.True;
-            toolTipItem2.Text = resources.GetString("toolTipItem2.Text");
-            superToolTip1.Items.Add(toolTipItem1);
-            superToolTip1.Items.Add(toolTipSeparatorItem1);
-            superToolTip1.Items.Add(toolTipItem2);
-            this.gridCustomRegions.EmbeddedNavigator.SuperTip = superToolTip1;
-            this.gridCustomRegions.Location = new System.Drawing.Point(12, 12);
-            this.gridCustomRegions.MainView = this.gridView;
-            this.gridCustomRegions.Name = "gridCustomRegions";
-            this.gridCustomRegions.Size = new System.Drawing.Size(406, 233);
-            this.gridCustomRegions.TabIndex = 6;
-            this.gridCustomRegions.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
-            this.gridView});
-            // 
-            // gridView
-            // 
-            this.gridView.Appearance.EvenRow.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.gridView.Appearance.EvenRow.Options.UseBackColor = true;
-            this.gridView.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
-            this.colInclusion,
-            this.colName});
-            this.gridView.GridControl = this.gridCustomRegions;
-            this.gridView.Name = "gridView";
-            this.gridView.OptionsBehavior.AllowAddRows = DevExpress.Utils.DefaultBoolean.False;
-            this.gridView.OptionsBehavior.AllowDeleteRows = DevExpress.Utils.DefaultBoolean.False;
-            this.gridView.OptionsView.EnableAppearanceEvenRow = true;
-            this.gridView.OptionsView.EnableAppearanceOddRow = true;
-            this.gridView.OptionsView.ShowGroupExpandCollapseButtons = false;
-            this.gridView.OptionsView.ShowGroupPanel = false;
-            this.gridView.OptionsView.ShowIndicator = false;
-            this.gridView.SortInfo.AddRange(new DevExpress.XtraGrid.Columns.GridColumnSortInfo[] {
-            new DevExpress.XtraGrid.Columns.GridColumnSortInfo(this.colName, DevExpress.Data.ColumnSortOrder.Ascending)});
-            // 
-            // colInclusion
-            // 
-            this.colInclusion.Caption = "Inclusion";
-            this.colInclusion.FieldName = "Inclusion";
-            this.colInclusion.MaxWidth = 120;
-            this.colInclusion.MinWidth = 60;
-            this.colInclusion.Name = "colInclusion";
-            this.colInclusion.Visible = true;
-            this.colInclusion.VisibleIndex = 0;
-            this.colInclusion.Width = 60;
-            // 
-            // colName
-            // 
-            this.colName.Caption = "Name";
-            this.colName.FieldName = "Name";
-            this.colName.Name = "colName";
-            this.colName.OptionsColumn.ReadOnly = true;
-            this.colName.Visible = true;
-            this.colName.VisibleIndex = 1;
-            this.colName.Width = 230;
-            // 
-            // barManager
-            // 
-            this.barManager.DockControls.Add(this.barDockControl_0);
-            this.barManager.DockControls.Add(this.barDockControl_1);
-            this.barManager.DockControls.Add(this.barDockControl_2);
-            this.barManager.DockControls.Add(this.barDockControl_3);
-            this.barManager.Form = this;
-            this.barManager.MaxItemId = 4;
-            // 
-            // barDockControl_0
-            // 
-            this.barDockControl_0.CausesValidation = false;
-            this.barDockControl_0.Dock = System.Windows.Forms.DockStyle.Top;
-            this.barDockControl_0.Location = new System.Drawing.Point(0, 0);
-            this.barDockControl_0.Manager = this.barManager;
-            this.barDockControl_0.Size = new System.Drawing.Size(430, 0);
-            // 
-            // barDockControl_1
-            // 
-            this.barDockControl_1.CausesValidation = false;
-            this.barDockControl_1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.barDockControl_1.Location = new System.Drawing.Point(0, 286);
-            this.barDockControl_1.Manager = this.barManager;
-            this.barDockControl_1.Size = new System.Drawing.Size(430, 0);
-            // 
-            // barDockControl_2
-            // 
-            this.barDockControl_2.CausesValidation = false;
-            this.barDockControl_2.Dock = System.Windows.Forms.DockStyle.Left;
-            this.barDockControl_2.Location = new System.Drawing.Point(0, 0);
-            this.barDockControl_2.Manager = this.barManager;
-            this.barDockControl_2.Size = new System.Drawing.Size(0, 286);
-            // 
-            // barDockControl_3
-            // 
-            this.barDockControl_3.CausesValidation = false;
-            this.barDockControl_3.Dock = System.Windows.Forms.DockStyle.Right;
-            this.barDockControl_3.Location = new System.Drawing.Point(430, 0);
-            this.barDockControl_3.Manager = this.barManager;
-            this.barDockControl_3.Size = new System.Drawing.Size(0, 286);
-            // 
-            // btnTest
-            // 
-            this.btnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnTest.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
-            this.btnTest.ImageOptions.Image = global::EntityTools.Properties.Resources.miniPlayAll;
-            this.btnTest.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnTest.Location = new System.Drawing.Point(218, 251);
-            this.btnTest.Name = "btnTest";
-            this.btnTest.Size = new System.Drawing.Size(62, 23);
-            this.btnTest.TabIndex = 19;
-            this.btnTest.Text = "Test";
-            this.btnTest.Visible = false;
-            this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
-            // 
-            // btnExport
-            // 
-            this.btnExport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnExport.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
-            this.btnExport.ImageOptions.Image = global::EntityTools.Properties.Resources.miniExport;
-            this.btnExport.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnExport.Location = new System.Drawing.Point(150, 251);
-            this.btnExport.Name = "btnExport";
-            this.btnExport.Size = new System.Drawing.Size(62, 23);
-            this.btnExport.TabIndex = 29;
-            this.btnExport.Text = "Export";
-            this.btnExport.ToolTip = "Export Filter list to the File";
-            this.btnExport.Visible = false;
-            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
-            // 
-            // btnCancel
-            // 
-            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancel.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
-            this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCancel;
-            this.btnCancel.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnCancel.Location = new System.Drawing.Point(356, 251);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(62, 23);
-            this.btnCancel.TabIndex = 8;
-            this.btnCancel.Text = "Cancel";
-            this.btnCancel.Click += new System.EventHandler(this.handler_Cancel);
             // 
             // btnSelect
             // 
-            this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSelect.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.btnSelect.ImageOptions.Image = global::EntityTools.Properties.Resources.miniValid;
             this.btnSelect.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnSelect.Location = new System.Drawing.Point(288, 251);
+            this.btnSelect.Location = new System.Drawing.Point(12, 367);
             this.btnSelect.Name = "btnSelect";
-            this.btnSelect.Size = new System.Drawing.Size(62, 23);
-            this.btnSelect.TabIndex = 8;
+            this.btnSelect.Size = new System.Drawing.Size(271, 23);
+            this.btnSelect.TabIndex = 0;
             this.btnSelect.Text = "Select";
             this.btnSelect.Click += new System.EventHandler(this.handler_Select);
             // 
             // btnReload
             // 
-            this.btnReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnReload.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.btnReload.ImageOptions.Image = global::EntityTools.Properties.Resources.miniRefresh;
-            this.btnReload.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnReload.Location = new System.Drawing.Point(12, 251);
+            this.btnReload.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
+            this.btnReload.Location = new System.Drawing.Point(289, 367);
             this.btnReload.Name = "btnReload";
-            this.btnReload.Size = new System.Drawing.Size(64, 23);
-            this.btnReload.TabIndex = 24;
-            this.btnReload.Text = "Reload";
-            this.btnReload.ToolTip = "Reload edited filter list from the source";
-            this.btnReload.Visible = false;
-            this.btnReload.Click += new System.EventHandler(this.btnReload_Click);
+            this.btnReload.Size = new System.Drawing.Size(23, 23);
+            this.btnReload.TabIndex = 1;
+            this.btnReload.ToolTip = "Reload";
+            this.btnReload.Click += new System.EventHandler(this.handler_Reload);
             // 
-            // btnImport
+            // crList
             // 
-            this.btnImport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnImport.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
-            this.btnImport.ImageOptions.Image = global::EntityTools.Properties.Resources.miniImport;
-            this.btnImport.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnImport.Location = new System.Drawing.Point(82, 251);
-            this.btnImport.Name = "btnImport";
-            this.btnImport.Size = new System.Drawing.Size(62, 23);
-            this.btnImport.TabIndex = 30;
-            this.btnImport.Text = "Import";
-            this.btnImport.ToolTip = "Import Filter list from the File";
-            this.btnImport.Visible = false;
-            this.btnImport.Click += new System.EventHandler(this.btnImport_Click);
+            this.crList.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
+            this.crList.CheckOnClick = true;
+            this.crList.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.crList.Location = new System.Drawing.Point(0, 0);
+            this.crList.MultiColumn = true;
+            this.crList.Name = "crList";
+            this.crList.Size = new System.Drawing.Size(300, 247);
+            this.crList.SortOrder = System.Windows.Forms.SortOrder.Ascending;
+            this.crList.TabIndex = 5;
             // 
-            // CustomRegionCollectionEditorForm
+            // spliter
+            // 
+            this.spliter.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.spliter.Location = new System.Drawing.Point(12, 12);
+            this.spliter.Name = "spliter";
+            this.spliter.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // spliter.Panel1
+            // 
+            this.spliter.Panel1.Controls.Add(this.tabPane);
+            // 
+            // spliter.Panel2
+            // 
+            this.spliter.Panel2.Controls.Add(this.crList);
+            this.spliter.Size = new System.Drawing.Size(300, 349);
+            this.spliter.SplitterDistance = 98;
+            this.spliter.TabIndex = 8;
+            // 
+            // tabPane
+            // 
+            this.tabPane.Appearance.BackColor = System.Drawing.SystemColors.Window;
+            this.tabPane.Appearance.Options.UseBackColor = true;
+            this.tabPane.Controls.Add(this.tabUnion);
+            this.tabPane.Controls.Add(this.tabIntersection);
+            this.tabPane.Controls.Add(this.tabExclusion);
+            this.tabPane.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabPane.Location = new System.Drawing.Point(0, 0);
+            this.tabPane.LookAndFeel.SkinName = "Office 2013 Light Gray";
+            this.tabPane.LookAndFeel.UseDefaultLookAndFeel = false;
+            this.tabPane.Name = "tabPane";
+            this.tabPane.Pages.AddRange(new DevExpress.XtraBars.Navigation.NavigationPageBase[] {
+            this.tabUnion,
+            this.tabIntersection,
+            this.tabExclusion});
+            this.tabPane.RegularSize = new System.Drawing.Size(300, 98);
+            this.tabPane.SelectedPage = this.tabUnion;
+            this.tabPane.Size = new System.Drawing.Size(300, 98);
+            this.tabPane.TabAlignment = DevExpress.XtraEditors.Alignment.Center;
+            this.tabPane.TabIndex = 8;
+            this.tabPane.Text = "tabPane";
+            this.tabPane.SelectedPageChanging += new DevExpress.XtraBars.Navigation.SelectedPageChangingEventHandler(this.handler_SelectedPageChanging);
+            // 
+            // tabUnion
+            // 
+            this.tabUnion.Caption = "UNION";
+            this.tabUnion.Controls.Add(this.textUnion);
+            this.tabUnion.Name = "tabUnion";
+            this.tabUnion.Size = new System.Drawing.Size(300, 71);
+            // 
+            // textUnion
+            // 
+            this.textUnion.Appearance.Options.UseTextOptions = true;
+            this.textUnion.Appearance.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Top;
+            this.textUnion.Appearance.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
+            this.textUnion.AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.None;
+            this.textUnion.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textUnion.Location = new System.Drawing.Point(0, 0);
+            this.textUnion.Name = "textUnion";
+            this.textUnion.Size = new System.Drawing.Size(300, 71);
+            this.textUnion.TabIndex = 8;
+            this.textUnion.Text = resources.GetString("textUnion.Text");
+            // 
+            // tabIntersection
+            // 
+            this.tabIntersection.Caption = "INTERSECTION";
+            this.tabIntersection.Controls.Add(this.textIntersection);
+            this.tabIntersection.Name = "tabIntersection";
+            this.tabIntersection.Size = new System.Drawing.Size(300, 71);
+            // 
+            // textIntersection
+            // 
+            this.textIntersection.Appearance.Options.UseTextOptions = true;
+            this.textIntersection.Appearance.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Top;
+            this.textIntersection.Appearance.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
+            this.textIntersection.AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.None;
+            this.textIntersection.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textIntersection.Location = new System.Drawing.Point(0, 0);
+            this.textIntersection.Name = "textIntersection";
+            this.textIntersection.Size = new System.Drawing.Size(300, 71);
+            this.textIntersection.TabIndex = 7;
+            this.textIntersection.Text = resources.GetString("textIntersection.Text");
+            // 
+            // tabExclusion
+            // 
+            this.tabExclusion.Caption = "EXCLUSION";
+            this.tabExclusion.Controls.Add(this.textExclusion);
+            this.tabExclusion.Name = "tabExclusion";
+            this.tabExclusion.Size = new System.Drawing.Size(300, 71);
+            // 
+            // textExclusion
+            // 
+            this.textExclusion.Appearance.Options.UseTextOptions = true;
+            this.textExclusion.Appearance.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Top;
+            this.textExclusion.Appearance.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
+            this.textExclusion.AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.None;
+            this.textExclusion.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textExclusion.Location = new System.Drawing.Point(0, 0);
+            this.textExclusion.Name = "textExclusion";
+            this.textExclusion.Size = new System.Drawing.Size(300, 71);
+            this.textExclusion.TabIndex = 6;
+            this.textExclusion.Text = "Отметьте несколько регионов, которые будут ИСКЛЮЧЕНЫ из итоговой области. Персона" +
+    "жу запрещено находиться в любом из отмеченных регионов.";
+            // 
+            // CustomRegionCollectionEditorForm_Plus
             // 
             this.AcceptButton = this.btnSelect;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(430, 286);
-            this.Controls.Add(this.btnImport);
-            this.Controls.Add(this.btnExport);
+            this.ClientSize = new System.Drawing.Size(324, 402);
+            this.Controls.Add(this.spliter);
             this.Controls.Add(this.btnReload);
-            this.Controls.Add(this.btnTest);
             this.Controls.Add(this.btnSelect);
-            this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.gridCustomRegions);
-            this.Controls.Add(this.barDockControl_2);
-            this.Controls.Add(this.barDockControl_3);
-            this.Controls.Add(this.barDockControl_1);
-            this.Controls.Add(this.barDockControl_0);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.IconOptions.ShowIcon = false;
-            this.MinimumSize = new System.Drawing.Size(432, 200);
-            this.Name = "CustomRegionCollectionEditorForm";
+            this.LookAndFeel.SkinName = "Office 2013 Light Gray";
+            this.LookAndFeel.UseDefaultLookAndFeel = false;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(332, 426);
+            this.Name = "CustomRegionCollectionEditorForm_Plus";
             this.ShowInTaskbar = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "CustomRegions";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Shown += new System.EventHandler(this.handler_FormShown);
-            ((System.ComponentModel.ISupportInitialize)(this.gridCustomRegions)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.gridView)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.barManager)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.crList)).EndInit();
+            this.spliter.Panel1.ResumeLayout(false);
+            this.spliter.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.spliter)).EndInit();
+            this.spliter.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.tabPane)).EndInit();
+            this.tabPane.ResumeLayout(false);
+            this.tabUnion.ResumeLayout(false);
+            this.tabIntersection.ResumeLayout(false);
+            this.tabExclusion.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
-        #endregion
 
-        private GridControl gridCustomRegions;
-        private GridView gridView;
-        private GridColumn colInclusion;
-        private GridColumn colName;
-        private BarManager barManager;
-        private BarDockControl barDockControl_0;
-        private BarDockControl barDockControl_1;
-        private BarDockControl barDockControl_2;
-        private BarDockControl barDockControl_3;
-        private SimpleButton btnTest;
-        private SimpleButton btnExport;
-        private SimpleButton btnSelect;
-        private SimpleButton btnCancel;
-        private SimpleButton btnReload;
-        private SimpleButton btnImport;
+        #endregion
+        internal DevExpress.XtraEditors.SimpleButton btnSelect;
+        internal DevExpress.XtraEditors.SimpleButton btnReload;
+        private DevExpress.XtraEditors.CheckedListBoxControl crList;
+        private System.Windows.Forms.SplitContainer spliter;
+        private DevExpress.XtraBars.Navigation.TabPane tabPane;
+        private DevExpress.XtraBars.Navigation.TabNavigationPage tabUnion;
+        private DevExpress.XtraBars.Navigation.TabNavigationPage tabIntersection;
+        private DevExpress.XtraBars.Navigation.TabNavigationPage tabExclusion;
+        private DevExpress.XtraEditors.LabelControl textUnion;
+        private DevExpress.XtraEditors.LabelControl textIntersection;
+        private DevExpress.XtraEditors.LabelControl textExclusion;
     }
 }

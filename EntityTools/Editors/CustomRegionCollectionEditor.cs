@@ -12,7 +12,7 @@ namespace EntityTools.Editors
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
             var crCollection = value as CustomRegionCollection;
-            if (CustomRegionCollectionEditorForm_Plus.GUIRequiest(ref crCollection))
+            if (CustomRegionCollectionEditorForm.GUIRequiest(ref crCollection))
             {
                 return crCollection;
             }
