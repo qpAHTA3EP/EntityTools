@@ -181,7 +181,7 @@ namespace EntityCore.UCC.Actions
                         while (this.pathtToLocIsInAOE(EntityManager.LocalPlayer.Location, Astral.Logic.UCC.Core.CurrentTarget.Location))
                         {
                             Vector3 location2 = EntityManager.LocalPlayer.Location;
-                            Vector3 vector = new Vector3();
+                            Vector3 vector = Vector3.Empty;
                             Thread.Sleep(150);
                             if (Combats.ShouldDodge(true))
                             {
@@ -321,7 +321,7 @@ namespace EntityCore.UCC.Actions
         //private bool pathtToLocIsInAOE(Vector3 start, Vector3 loc)
         //{
 
-        //    Vector3 vector3_ = new Vector3();
+        //    Vector3 vector3_ = Vector3.Empty;
         //    foreach (AOECheck.AOE aoe in AOECheck.List)
         //    {
         //        if (aoe.IsIn(loc))
@@ -386,7 +386,7 @@ namespace EntityCore.UCC.Actions
         //    list = (from i in list
         //            orderby Guid.NewGuid()
         //            select i).ToList<Vector3>();
-        //    Vector3 vector = new Vector3();
+        //    Vector3 vector = Vector3.Empty;
         //    List<Astral.Logic.NW.Movements.DodgeLosTestResult> list2 = new List<Astral.Logic.NW.Movements.DodgeLosTestResult>();
         //    if (EntityManager.CurrentSettings.UsePathfinding3)
         //    {
@@ -395,7 +395,7 @@ namespace EntityCore.UCC.Actions
         //            while (enumerator.MoveNext())
         //            {
         //                Vector3 vector2 = enumerator.Current;
-        //                Vector3 collidePos = new Vector3();
+        //                Vector3 collidePos = Vector3.Empty;
         //                bool collided = PathFinding.CheckDirection(playerPos, vector2, ref collidePos);
         //                list2.Add(new Astral.Logic.NW.Movements.DodgeLosTestResult(vector2, collided, collidePos));
         //            }

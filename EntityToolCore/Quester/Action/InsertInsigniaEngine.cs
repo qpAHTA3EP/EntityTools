@@ -178,7 +178,7 @@ namespace EntityCore.Quester.Action
 
         public bool UseHotSpots => false;
 
-        public Vector3 InternalDestination => new Vector3();
+        public Vector3 InternalDestination => Vector3.Empty;
 
         public void InternalReset() { }
 

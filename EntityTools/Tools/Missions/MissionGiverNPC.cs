@@ -14,7 +14,7 @@ namespace EntityTools.Tools.Missions
         public override MissionGiverType GiverType => MissionGiverType.NPC;
 
         public override Vector3 Position { get => _position; set => _position = value; }
-        protected Vector3 _position = new Vector3();
+        protected Vector3 _position = Vector3.Empty;
 
         public override double Distance => _position.IsValid ? _position.Distance3DFromPlayer : 0;
 
@@ -166,7 +166,7 @@ namespace EntityTools.Tools.Missions
                         try
                         {
                             if (_position is null)
-                                _position = new Vector3();
+                                _position = Vector3.Empty;
                             using (XmlReader subtreeReader = reader.ReadSubtree())
                             {
                                 _position.ReadXml(subtreeReader);
@@ -215,6 +215,5 @@ namespace EntityTools.Tools.Missions
         } 
 #endif
         #endregion
-
     }
 }

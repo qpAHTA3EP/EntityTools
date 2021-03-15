@@ -365,7 +365,7 @@
     <Compile Include="Tools\ReadWriteLocker.cs" />
     <Compile Include="Tools\Reflection\Accessors\AstralAccessors.Addons.cs" />
     <Compile Include="Tools\Reflection\Accessors\AstralAccessors.Controllers.cs" />
-    <Compile Include="Tools\Reflection\Accessors\AstralAccessors.Empty.cs" />
+    <Compile Include="Tools\Reflection\Accessors\Empty.cs" />
     <Compile Include="Tools\Reflection\Accessors\AstralAccessors.Logic.Nw.cs" />
     <Compile Include="Tools\Reflection\Accessors\AstralAccessors.Logic.UCC.cs" />
     <Compile Include="Tools\Reflection\Accessors\AstralAccessors.Quester.cs" />

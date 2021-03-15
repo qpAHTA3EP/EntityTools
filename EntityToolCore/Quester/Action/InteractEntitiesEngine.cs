@@ -37,7 +37,7 @@ namespace EntityCore.Quester.Action
         private bool combat;
         private bool moved;
         private Entity target;
-        private Vector3 initialPos = new Vector3();
+        private Vector3 initialPos = Vector3.Empty;
         private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
         private List<CustomRegion> customRegions;
         private string label = string.Empty;
@@ -313,7 +313,7 @@ namespace EntityCore.Quester.Action
                         return target.Location.Clone();
                     return EntityManager.LocalPlayer.Location.Clone();
                 }
-                return new Vector3();
+                return Vector3.Empty;
             }
         }
 

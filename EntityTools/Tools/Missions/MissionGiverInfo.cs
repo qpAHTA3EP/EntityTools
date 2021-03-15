@@ -253,7 +253,7 @@ namespace EntityTools.Tools.Missions
                             try
                             {
                                 if (_position is null)
-                                    _position = new Vector3();
+                                    _position = Vector3.Empty;
                                 using (XmlReader subtreeReader = reader.ReadSubtree())
                                     _position.ReadXml(subtreeReader);
 
@@ -263,9 +263,7 @@ namespace EntityTools.Tools.Missions
                             }
                             catch (XmlException except)
                             {
-                                _position.X = 0;
-                                _position.Y = 0;
-                                _position.Z = 0;
+                                _position = Vector3.Empty;
                                 ETLogger.WriteLine(LogType.Error, except.Message, true);
                             }
                             break;

@@ -50,7 +50,7 @@ namespace EntityTools.Core.Proxies
                     ETLogger.WriteLine(LogType.Error, Environment.StackTrace);
                 }
 #endif
-                return AstralAccessors.Empty.Entity;
+                return Empty.Entity;
             }
         }
         InstancePropertyAccessor<UCCAction, Entity> _unitRef;

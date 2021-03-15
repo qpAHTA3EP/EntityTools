@@ -84,7 +84,7 @@ namespace EntityTools.Quester.Actions
         public override bool UseHotSpots => false;
         protected override bool IntenalConditions => _foes.Count > 0;
         protected override Vector3 InternalDestination => Vector3.Empty;
-        protected override ActionValidity InternalValidity => AstralAccessors.Empty.ActionValidity;
+        protected override ActionValidity InternalValidity => Empty.ActionValidity;
         public override void GatherInfos() { }
         public override void InternalReset() { }
         public override void OnMapDraw(GraphicsNW graph) { }

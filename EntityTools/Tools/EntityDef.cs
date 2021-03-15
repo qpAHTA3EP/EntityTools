@@ -9,7 +9,7 @@ namespace EntityTools.Tools
     /// </summary>
     public class EntityDef
     {
-        public Entity entity = AstralAccessors.Empty.Entity;
+        public Entity entity = Empty.Entity;
         public string Name = string.Empty;
         public string NameUntranslated = string.Empty;
         public string InternalName = string.Empty;

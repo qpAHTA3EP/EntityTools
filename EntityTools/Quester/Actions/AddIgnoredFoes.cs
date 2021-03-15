@@ -107,7 +107,7 @@ namespace EntityTools.Quester.Actions
             get
             {
                 if (_foes.Count > 0)
-                    return AstralAccessors.Empty.ActionValidity;
+                    return Empty.ActionValidity;
                 else return new ActionValidity($"{nameof(Foes)} list is empty");
             }
         }
