@@ -159,7 +159,7 @@ namespace EntityTools.Quester.Actions
             {
                 value = Math.Max(value, 1);
                 if (_interactZDifference == value) return;
-                    _interactDistance = value;
+                _interactZDifference = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractZDifference)));
             }
         }

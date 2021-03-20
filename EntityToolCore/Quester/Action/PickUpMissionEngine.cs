@@ -27,7 +27,6 @@ using static Astral.Quester.Classes.Action;
 
 namespace EntityCore.Quester.Action
 {
-    //TODO: Исправить работу PickUpMissionExt TurnInMissionExt на Stokely Silverstone в Кер-Кенниге (М3)
     public class PickUpMissionEngine : IQuesterActionEngine
     {
         private PickUpMissionExt @this;
@@ -463,7 +462,7 @@ namespace EntityCore.Quester.Action
                     if (remoteContact is null || !remoteContact.IsValid) return;
                 }
                 else return;
-
+                //TODO: Проверять иконку на квестодателе, и если она отличается деактивировать опцию ContactHaveMission
                 Interact.WaitForInteraction();
 
                 var interactInfo = EntityManager.LocalPlayer.Player.InteractInfo;
