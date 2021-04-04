@@ -96,18 +96,22 @@ namespace EntityTools.Core
         {
             throw new NotImplementedException();
         }
-#endif
-
 #if DEBUG
         public LinkedList<Entity> FindAllEntity(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete, bool healthCheck = false, float range = 0, float zRange = 0, bool regionCheck = false, List<CustomRegion> customRegions = null, Predicate<Entity> specialCheck = null)
         {
             throw new NotImplementedException();
         } 
 #endif
+#endif
+
         public bool CheckCore()
         {
             throw new NotImplementedException();
         }
 
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

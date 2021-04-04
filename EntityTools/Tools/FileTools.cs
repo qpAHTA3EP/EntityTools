@@ -28,24 +28,6 @@ namespace EntityTools.Tools
         public static readonly string defaultExportFileName = "%character%_%account%_%dateTime%.xml";
 
         public static readonly string SettingsFile = Path.Combine(Directories.SettingsPath, nameof(EntityTools), nameof(EntityTools) + ".xml");
-        //public static bool ReplaceMask(ref string str)
-        //{
-        //    if (!string.IsNullOrEmpty(str))
-        //    {
-        //        string result = str.Replace(MaskAccount, EntityManager.LocalPlayer?.AccountLoginUsername);
-        //        result = result.Replace(MaskCharacter, EntityManager.LocalPlayer?.Name);
-        //        result = result.Replace(MaskDateTime, DateTime.Now.ToString());
-        //        result = result.Replace(MaskAD, EntityManager.LocalPlayer.Inventory.AstralDiamonds.ToString());
-        //        result = result.Replace(MaskRAD, EntityManager.LocalPlayer.Inventory.AstralDiamondsRough.ToString());
-
-        //        if (str != result)
-        //        {
-        //            str = result;
-        //            return true;
-        //        }
-        //    }
-        //    return false;
-        //}
 
         public static string ReplaceMask(string str)
         {

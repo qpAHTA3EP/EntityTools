@@ -2,34 +2,26 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Threading;
 using Astral.Quester.Classes;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
+using EntityTools.Tools.CustomRegions;
 
 namespace EntityTools.Quester.Conditions
 {
     [Serializable]
     public class TeamMembersCount : Condition, INotifyPropertyChanged
     {
-        #region взаимодействие с ядром
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        internal IQuesterConditionEngine Engine;
-
-        public TeamMembersCount()
-        {
-            Engine = new QuesterConditionProxy(this);
-        }
-        #endregion
         #region Опции команды
 #if DEVELOPER
         [Description("CustomRegion names collection")]
-        [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
+        [Editor(typeof(CustomRegionCollectionEditor), typeof(UITypeEditor))]
         [Category("Location")]
 #else
         [Browsable(false)]
 #endif
-        public List<string> CustomRegionNames
+        public CustomRegionCollection CustomRegionNames
         {
             get => _customRegionNames;
             set
@@ -37,11 +29,15 @@ namespace EntityTools.Quester.Conditions
                 if (_customRegionNames != value)
                 {
                     _customRegionNames = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionCheck)));
+#if true
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionNames))); 
+#else
+                    Engine.OnPropertyChanged(this, nameof(CustomRegionNames));
+#endif
                 }
             }
         }
-        internal List<string> _customRegionNames;
+        internal CustomRegionCollection _customRegionNames = new CustomRegionCollection();
 
 #if DEVELOPER
         [Description("The Check of the Team member's location relative to the custom regions\n" +
@@ -129,7 +125,7 @@ namespace EntityTools.Quester.Conditions
         [Description("The Check of the Team member's Region (not CustomRegion)):\n" +
             "True: Count Team member if it is located in the same Region as Player\n" +
             "False: Does not consider the region when counting Team members")]
-        [Category("Members")]
+        [Category("Optional")]
 #else
         [Browsable(false)]
 #endif
@@ -142,26 +138,26 @@ namespace EntityTools.Quester.Conditions
             }
         }
         internal bool _regionCheck;
-
-/*#if DEVELOPER
-        [Description("Time between searches of the TeamMembers (ms)")]
-#else
-        [Browsable(false)]
-#endif
-        public int SearchTimeInterval
-        {
-            get => _searchTimeInterval; set
-            {
-                _searchTimeInterval = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionCheck)));
-            }
-        }
-        internal int _searchTimeInterval = 500;*/
         #endregion
 
-        public override bool IsValid => Engine.IsValid;
-        public override void Reset() => Engine.Reset();
-        public override string TestInfos => Engine.TestInfos;
-        public override string ToString() => Engine.Label();
+        #region взаимодействие с ядром
+        internal IQuesterConditionEngine Engine;
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public TeamMembersCount()
+        {
+            Engine = new QuesterConditionProxy(this);
+        }
+
+        private IQuesterConditionEngine MakeProxie()
+        {
+            return new QuesterConditionProxy(this);
+        }
+        #endregion
+
+        public override bool IsValid => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).IsValid;
+        public override void Reset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Reset();
+        public override string TestInfos => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).TestInfos;
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Label();
     }
 }

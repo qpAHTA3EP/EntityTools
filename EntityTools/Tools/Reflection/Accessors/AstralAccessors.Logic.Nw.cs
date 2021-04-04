@@ -37,68 +37,22 @@ namespace EntityTools.Reflection
                         abortCombat?.Invoke(stopMove);
                     }
 
-#if false
                     /// <summary>
-                    /// Таймер до сброса <see cref="abortCombatCondition"/>
+                    /// Механизм доступа к функтору <seealso cref="Astral.Logic.NW.Combats.BLAttackersList"/>,
+                    /// который передает в боевую подсистему список игнорируемых врагов
                     /// </summary>
-                    private static Timeout abortCombatResetTimeout = new Timeout(0);
-                    private static int resetTime = 5_000;
-
-                    public static void SetAbortCombatCondition(Func<Entity, bool> cond, int time = 5_000)
+                    public static Func<List<string>> BLAttackersList
                     {
-                        abortCombatCondition = cond;
-                        if (abortCombatCondition is null)
-                            abortCombatResetTimeout.ChangeTime(0);
-                        else
+                        get => blAttackersList.Value;
+                        set
                         {
-                            if (time > 0)
-                                resetTime = time;
-                            else resetTime = 5_000;
-                            abortCombatResetTimeout.ChangeTime(int.MaxValue);
+                            if (value is null)
+                                blAttackersList.Value = () => Astral.Quester.API.CurrentProfile.BlackList;
+                            else blAttackersList.Value = value;
                         }
                     }
-                    public static void RemoveAbortCombatCondition(Func<Entity, bool> cond)
-                    {
-                        if (cond is null)
-                            return;
+                    static Traverse<Func<List<string>>> blAttackersList = null;
 
-                        if (ReferenceEquals(abortCombatCondition, cond))
-                        {
-                            abortCombatCondition = null;
-                            resetTime = 0;
-                            abortCombatResetTimeout.ChangeTime(0);
-                        }
-                    }
-                    private static bool prefixCombatUnit(ref bool __result, ref Entity target, ref Func<bool> breakCond)
-                    {
-                        bool needCallCombatUnit = true;
-                        if (abortCombatResetTimeout.IsTimedOut)
-                            abortCombatCondition = null;
-                        else if (abortCombatCondition != null)
-                        {
-                            needCallCombatUnit = !abortCombatCondition(target);
-                            if (needCallCombatUnit && target != null)
-                            {
-                                var trg = new Entity(target.Pointer);
-                                breakCond = () => abortCombatCondition(trg);
-                            }
-                        }
-                        return needCallCombatUnit;
-                    }
-                    private static void postfixCombatUnit(bool __result, Entity target, Func<bool> breakCond)
-                    {
-                        if (abortCombatCondition != null && resetTime > 0)
-                        {
-                            bool abortCombat = abortCombatCondition(target);
-                            if (abortCombat)
-                                //AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true, -1, 500);
-                                AbordCombat();
-
-                            abortCombatResetTimeout.ChangeTime(resetTime);
-                            resetTime = 0;
-                        }
-                    } 
-#else
                     public static void SetAbortCombatCondition(Func<Entity, bool> cond, Func<bool> removeCond)
                     {
                         abortCombatCondition = cond;
@@ -134,7 +88,7 @@ namespace EntityTools.Reflection
                             }
                         }
                     }
-#endif
+
                     /// <summary>
                     /// Уловие прерывания боя
                     /// </summary>
@@ -143,14 +97,10 @@ namespace EntityTools.Reflection
 
                     static Combats()
                     {
-#if false
-                        var originalCombatUnit = typeof(Astral.Logic.NW.Combats).GetMethod(nameof(Astral.Logic.NW.Combats.CombatUnit));
-                        var prefixCombatUnit = typeof(Combats).GetMethod(nameof(Combats.prefixCombatUnit)); 
-#else
                         var originalCombatUnit = AccessTools.Method(typeof(Astral.Logic.NW.Combats), nameof(Astral.Logic.NW.Combats.CombatUnit));
                         var prefixCombatUnit = AccessTools.Method(typeof(Combats), nameof(Combats.prefixCombatUnit));
                         var postfixCombatUnit = AccessTools.Method(typeof(Combats), nameof(Combats.postfixCombatUnit));
-#endif
+
                         if (originalCombatUnit != null)
                             ETPatcher.Harmony.Patch(originalCombatUnit, new HarmonyMethod(prefixCombatUnit), new HarmonyMethod(postfixCombatUnit));
                     }

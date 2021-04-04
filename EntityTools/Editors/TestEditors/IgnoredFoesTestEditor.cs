@@ -1,5 +1,6 @@
 ﻿using DevExpress.XtraEditors;
 using EntityTools.Quester.Actions;
+using EntityTools.Reflection;
 using EntityTools.Tools.Combats.IgnoredFoes;
 using EntityTools.Tools.Extensions;
 using System;
@@ -20,10 +21,10 @@ namespace EntityTools.Editors
                 var blackList = Astral.Quester.API.CurrentProfile.BlackList;
                 sb.Append(blackList, "Profile BlackList :", "Profile BlackList is empty");
 
-                IgnoredFoesCore.Remove();
+                IgnoredFoesCore.Remove();// addIgnFoes.Foes);
                 addIgnFoes.Run();
 
-                var tempBlackList = IgnoredFoesCore.ActualIgnoredFoes;
+                var tempBlackList = AstralAccessors.Logic.NW.Combats.BLAttackersList();//IgnoredFoesCore.ActualIgnoredFoes;
 #if true
                 sb.Append(tempBlackList, "Actual ignored foe list :", "Actual ignored foe list is empty");
                 sb.AppendLine();
@@ -50,11 +51,11 @@ namespace EntityTools.Editors
             }
             else if(context.Instance is RemoveIgnoredFoes removeIgnFoes)
             {
-                var tempBlackList = IgnoredFoesCore.ActualIgnoredFoes;
+                var tempBlackList = AstralAccessors.Logic.NW.Combats.BLAttackersList(); //IgnoredFoesCore.ActualIgnoredFoes;
                 sb.Append(tempBlackList, "Ignored foe list before removing :", "Actual ignored foe list is empty");
 
                 removeIgnFoes.Run();
-                tempBlackList = IgnoredFoesCore.ActualIgnoredFoes;
+                tempBlackList = AstralAccessors.Logic.NW.Combats.BLAttackersList(); //IgnoredFoesCore.ActualIgnoredFoes;
                 sb.Append(tempBlackList, "Actual ignored foe list (after removing):", "Actual ignored foe list is empty");
             }
 

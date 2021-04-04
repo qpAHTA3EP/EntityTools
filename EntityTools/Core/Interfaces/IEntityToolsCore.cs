@@ -10,7 +10,7 @@ using UCCConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classe
 
 namespace EntityTools.Core.Interfaces
 {
-    public interface IEntityToolsCore
+    public interface IEntityToolsCore : IDisposable
     {
         bool CheckCore();
 
@@ -32,7 +32,7 @@ namespace EntityTools.Core.Interfaces
 
         bool GUIRequest_UCCAction(out UCCAction action);
 
-        string EntityDiagnosticInfos(object obj/*, bool isTarget = false*/);
+        string EntityDiagnosticInfos(object obj);
 #endif
 #if DEBUG
         LinkedList<Entity> FindAllEntity(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete,

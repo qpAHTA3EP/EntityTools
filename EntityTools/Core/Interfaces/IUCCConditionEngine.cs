@@ -1,8 +1,9 @@
 ﻿using Astral.Logic.UCC.Classes;
+using System;
 
 namespace EntityTools.Core.Interfaces
 {
-    public interface IUccConditionEngine
+    public interface IUccConditionEngine : IDisposable
     {
         bool IsOK(UCCAction refAction);
 

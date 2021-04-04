@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Threading;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
@@ -13,21 +14,6 @@ namespace EntityTools.UCC.Conditions
 {
     public class UCCTargetMatchEntity : UCCCondition, ICustomUCCCondition
     {
-        #region Взаимодействие с EntityToolsCore
-        [NonSerialized]
-        internal IUccConditionEngine Engine;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public UCCTargetMatchEntity()
-        {
-            Sign = Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
-
-            Engine = new UccConditionProxy(this);
-        }
-        #endregion
-
-
         #region Опции команды
 #if DEVELOPER
         [Description("The ID of the entity that the Target of the ucc-action should match.\n" +
@@ -142,15 +128,33 @@ namespace EntityTools.UCC.Conditions
         #endregion
         #endregion
 
+        #region Взаимодействие с EntityToolsCore
+        [NonSerialized]
+        internal IUccConditionEngine Engine;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public UCCTargetMatchEntity()
+        {
+            Sign = Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
+
+            Engine = new UccConditionProxy(this);
+        }
+        private IUccConditionEngine MakeProxie()
+        {
+            return new UccConditionProxy(this);
+        }
+        #endregion
 
         #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/) => Engine.IsOK(refAction);
+        bool ICustomUCCCondition.IsOK(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).IsOK(refAction);
 
         bool ICustomUCCCondition.Loked { get => Locked; set => Locked = value; }
 
-        string ICustomUCCCondition.TestInfos(UCCAction refAction) => Engine.TestInfos(refAction);
+        string ICustomUCCCondition.TestInfos(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).TestInfos(refAction);
         #endregion
 
-        public override string ToString() => Engine.Label();
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Label();
+
     }
 }

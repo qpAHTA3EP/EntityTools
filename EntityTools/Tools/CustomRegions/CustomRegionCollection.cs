@@ -109,22 +109,41 @@ namespace EntityTools.Tools.CustomRegions
 
         #region Within
         /// <summary>
-        /// Проверка нахождения <paramref name="entity"/> в области заданной <seealso cref="CustomRegionCollection"/>
+        /// Проверка нахождения <paramref name="entity"/> в области, заданной, <seealso cref="CustomRegionCollection"/>
         /// </summary>
         public bool Within(Entity entity)
         {
-            if (entity is null)
+            if (entity is null || !entity.IsValid)
                 return false;
+            if (version != version_within)
+                within = initialize_withing;
             return within(entity.Location);
         }
         /// <summary>
-        /// Проверка нахождения <paramref name="position"/> в области заданной <seealso cref="CustomRegionCollection"/>
+        /// Проверка нахождения <paramref name="position"/> за пределами области, заданной <seealso cref="CustomRegionCollection"/>
         /// </summary>
         public bool Within(Vector3 position)
         {
             if (version != version_within)
                 within = initialize_withing;
             return within(position);
+        }
+        public bool Outside(Entity entity)
+        {
+            if (entity is null || !entity.IsValid)
+                return false;
+            if (version != version_within)
+                within = initialize_withing;
+            return !within(entity.Location);
+        }
+        /// <summary>
+        /// Проверка нахождения <paramref name="position"/> за пределами области, заданной <seealso cref="CustomRegionCollection"/>
+        /// </summary>
+        public bool Outside(Vector3 position)
+        {
+            if (version != version_within)
+                within = initialize_withing;
+            return !within(position);
         }
 
         /// <summary>
@@ -238,7 +257,7 @@ namespace EntityTools.Tools.CustomRegions
                         {
                             if (_union.Count > 0)
                                 predicate = check_union_exclude;
-                            else predicate = check_false;
+                            else predicate = check_exclude;
                         }
                     }
                     else
@@ -294,6 +313,10 @@ namespace EntityTools.Tools.CustomRegions
             return (_exclusion.Count == 0 || _exclusion.TrueForAll(cr => !position.Within(cr)))
                 && (_intersection.Count == 0 || _intersection.TrueForAll(cr => position.Within(cr)));
         }
+        protected bool check_exclude(Vector3 position)
+        {
+            return _exclusion.Count > 0 && !_exclusion.Any(cr => !position.Within(cr));
+        }
         protected bool check_false(Vector3 position) => false;
         protected bool check_true(Vector3 position) => true; 
         #endregion
@@ -302,8 +325,22 @@ namespace EntityTools.Tools.CustomRegions
         {
             if (string.IsNullOrEmpty(label))
             {
-                if (base.Count > 0)
-                    label = string.Concat(GetType().Name, '[', base.Count, ']');
+                if (Count > 0)
+#if false
+                    label = string.Concat(GetType().Name, '[', Count, ']'); 
+#else
+                {
+                    int unionCount = _union.Count,
+                        intersectionCount = _intersection.Count,
+                        exclusionCount = _exclusion.Count;
+                    label = string.Concat(GetType().Name, '[',
+                                          unionCount > 0 ? $" \x22c3 ({unionCount})" : string.Empty,
+                                          intersectionCount > 0 ? $" \x22c2 ({intersectionCount})" : string.Empty,
+                                          //exclusionCount > 0 ? $" \x00ac ({exclusionCount})" : string.Empty,
+                                          exclusionCount > 0 ? $" \\ ({exclusionCount})" : string.Empty,
+                                          ']');
+                }
+#endif
                 else label = "Empty";
             }
             return label;
@@ -391,6 +428,11 @@ namespace EntityTools.Tools.CustomRegions
             if (reader.ReadState == ReadState.Initial)
                 reader.Read();
             string startElemName = reader.Name;
+            if (reader.ReadState == ReadState.Interactive && reader.IsEmptyElement)
+            {
+                reader.ReadStartElement(startElemName);
+                return;
+            }
 
             while (reader.ReadState == ReadState.Interactive)
             {

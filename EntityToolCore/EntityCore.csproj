@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.21.0307.1309</AssemblyVersion>
+    <AssemblyVersion>0.21.0402.1421</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -26,6 +26,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <LangVersion>7.3</LangVersion>
     <Prefer32Bit>false</Prefer32Bit>
+    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -62,6 +63,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Harmony, Version=2.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\x64\0Harmony.dll</HintPath>
+    </Reference>
     <Reference Include="AStar, Version=2.20.1028.1229, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="Astral_patched, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
@@ -101,11 +106,12 @@
     <Compile Include="Entities\EntityCacheRecordKey.cs" />
     <Compile Include="Entities\EntityCache.cs" />
     <Compile Include="Entities\EntityCacheRecord.cs" />
-    <Compile Include="Entities\EntityComparerToPattern.cs" />
-    <Compile Include="Entities\EntitySelectionTools.cs" />
+    <Compile Include="Entities\EntityComparer.cs" />
+    <Compile Include="Entities\EntityDiagnosticTools.cs" />
+    <Compile Include="Entities\Enums.cs" />
     <Compile Include="Entities\SearchCached.cs" />
     <Compile Include="Entities\SearchDirect.cs" />
-    <Compile Include="Extensions\CustomRegionExtentions.cs" />
+    <Compile Include="Entities\SearchHelper.cs" />
     <Compile Include="Extensions\EntityExtentions.cs" />
     <Compile Include="Extensions\FormCollectionExtentions.cs" />
     <Compile Include="Extensions\ListBoxItemCollectionExtension.cs" />

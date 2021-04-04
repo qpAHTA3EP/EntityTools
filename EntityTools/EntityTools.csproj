@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.21.0307.1309</AssemblyVersion>
+    <AssemblyVersion>0.21.0402.1421</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -188,6 +188,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Interfaces\IEntityIdentifier.cs" />
+    <Compile Include="Core\Interfaces\IEntityDescriptor.cs" />
     <Compile Include="Editors\CheckedListBoxEditor.cs" />
     <Compile Include="Editors\CustomRegionCollectionEditor.cs" />
     <Compile Include="Editors\Forms\ItemListEditorForm.cs">
@@ -371,7 +373,7 @@
     <Compile Include="Tools\Reflection\Accessors\AstralAccessors.Quester.cs" />
     <Compile Include="Tools\Reflection\Accessors\QuesterAssistantAccessors.cs" />
     <Compile Include="Tools\StringToPattern.cs" />
-    <Compile Include="Tools\EntityDef.cs" />
+    <Compile Include="Tools\Export\EntityExportInfo.cs" />
     <Compile Include="Tools\Enums.cs" />
     <Compile Include="Tools\Export\Enums.cs" />
     <Compile Include="Tools\Extensions\ArrayExtensions.cs" />
@@ -381,7 +383,7 @@
     <Compile Include="Tools\Extensions\StringExtentions.cs" />
     <Compile Include="Tools\FileStreamHelper.cs" />
     <Compile Include="Tools\FileTools.cs" />
-    <Compile Include="Tools\Export\Auras.cs" />
+    <Compile Include="Tools\Export\AurasExportInfo.cs" />
     <Compile Include="Tools\CommonTools.cs" />
     <Compile Include="Core\EntityPlugin.cs" />
     <Compile Include="Quester\Actions\MoveToEntity.cs" />
@@ -389,7 +391,7 @@
     <Compile Include="Editors\EntityIdEditor.cs" />
     <Compile Include="Editors\CustomRegionListEditor.cs" />
     <Compile Include="Editors\ShardEditor.cs" />
-    <Compile Include="Tools\Export\Missions.cs" />
+    <Compile Include="Tools\Export\MissionsExportInfo.cs" />
     <Compile Include="Tools\ParagonTools.cs" />
     <Compile Include="Settings\PluginSettingsBase.cs" />
     <Compile Include="Tools\Classes.cs" />
@@ -408,7 +410,7 @@
     <Compile Include="Tools\SysInformer.cs" />
     <Compile Include="Tools\XmlColor.cs" />
     <Compile Include="UCC\Extensions\UCCActionExtention.cs" />
-    <Compile Include="Tools\Export\GameUITools.cs" />
+    <Compile Include="Tools\Export\UiExportInfo.cs" />
     <Compile Include="UCC\Conditions\UCCConditionPack.cs" />
     <Compile Include="UCC\Conditions\ICustomUCCCondition.cs" />
     <Compile Include="UCC\Conditions\UCCCheckTimer.cs" />
@@ -536,6 +538,7 @@
     <None Include="Resources\miniPlayAll.png" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Tools\Entity\" />
     <Folder Include="Tools\ItemFilter\" />
   </ItemGroup>
   <ItemGroup>

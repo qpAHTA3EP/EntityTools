@@ -6,20 +6,20 @@ using MyNW.Classes;
 namespace EntityTools.Tools
 {
     [Serializable]
-    public class AuraDef : IComparable, IEquatable<AuraDef>
+    public class AuraInfo : IComparable, IEquatable<AuraInfo>
     {
         public string InternalName;
         public string DisplayName;
         public string Description;
 
-        public AuraDef()
+        public AuraInfo()
         {
             InternalName = string.Empty;
             DisplayName = string.Empty;
             Description = string.Empty;
         }
 
-        public AuraDef(PowerDef def)
+        public AuraInfo(PowerDef def)
         {
             if(def != null && def.IsValid)
             {
@@ -40,7 +40,7 @@ namespace EntityTools.Tools
             return $"{DisplayName} [{InternalName}]";
         }
 
-        public bool Equals(AuraDef aura)
+        public bool Equals(AuraInfo aura)
         {
             return InternalName == aura.InternalName;
         }
@@ -51,7 +51,7 @@ namespace EntityTools.Tools
 
         public override bool Equals(object obj)
         {
-            if (obj is AuraDef aura)
+            if (obj is AuraInfo aura)
                 return Equals(aura);
             if (obj is AttribModNet mod)
                 return Equals(mod);
@@ -60,7 +60,7 @@ namespace EntityTools.Tools
 
         public int CompareTo(object obj)
         {
-            if(obj is AuraDef aura)
+            if(obj is AuraInfo aura)
             {
                 return InternalName.CompareTo(aura.InternalName);
             }
@@ -76,19 +76,19 @@ namespace EntityTools.Tools
     [Serializable]
     public class AurasWrapper
     {
-        public List<AuraDef> Mods = new List<AuraDef>();
+        public List<AuraInfo> Mods = new List<AuraInfo>();
 
         public AurasWrapper() { }
 
         public AurasWrapper(Character character)
         {
-            Mods = new List<AuraDef>();
+            Mods = new List<AuraInfo>();
 
             if(character != null && character.IsValid)
             {
                 foreach (var def in character.Mods) // х64
                     if (def.PowerDef.IsValid)
-                            Mods.Add(new AuraDef(def.PowerDef));
+                            Mods.Add(new AuraInfo(def.PowerDef));
             }
         }
     }

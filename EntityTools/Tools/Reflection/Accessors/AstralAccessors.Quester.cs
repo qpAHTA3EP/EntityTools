@@ -7,6 +7,7 @@ using Astral.Classes;
 using Astral.Classes.ItemFilter;
 using Astral.Grinder.Classes;
 using Astral.Logic.Classes.Map;
+using EntityTools.Patches;
 using HarmonyLib;
 using MyNW.Classes;
 using static Astral.Quester.Classes.Action;
@@ -79,14 +80,13 @@ namespace EntityTools.Reflection
                 /// <summary>
                 /// Функтор доступа к графу путей (карте) текущего профиля
                 /// </summary>
-                public static readonly StaticPropertyAccessor<Graph> Meshes = typeof(Astral.Quester.Core).GetStaticProperty<Graph>("Meshes");
-
-                public static Graph UsedMeshes
+                private static readonly StaticPropertyAccessor<Graph> _meshes = typeof(Astral.Quester.Core).GetStaticProperty<Graph>("Meshes");
+                public static Graph Meshes
                 {
                     get
                     {
-                        if (Meshes.IsValid)
-                            return Meshes.Value;
+                        if (_meshes.IsValid)
+                            return _meshes.Value;
                         return null;
                     }
                 }
@@ -95,7 +95,16 @@ namespace EntityTools.Reflection
                 /// Функтор доступа к коллекции графов путей (карт) текущего профиля
                 /// Astral.Quester.Core.MapsMeshes
                 /// </summary>
-                public static readonly StaticPropertyAccessor<Dictionary<string, Graph>> MapsMeshes = typeof(Astral.Quester.Core).GetStaticProperty<Dictionary<string, Graph>>("MapsMeshes");
+                private static readonly StaticPropertyAccessor<Dictionary<string, Graph>> _mapsMeshes = typeof(Astral.Quester.Core).GetStaticProperty<Dictionary<string, Graph>>("MapsMeshes");
+                public static Dictionary<string, Graph> MapsMeshes
+                {
+                    get
+                    {
+                        if (_mapsMeshes.IsValid)
+                            return _mapsMeshes.Value;
+                        return null;
+                    }
+                }
 
                 /// <summary>
                 /// Функтор доступа к списку названий карт в файле текущего профиля
@@ -109,13 +118,81 @@ namespace EntityTools.Reflection
                 /// </summary>
                 public static readonly Func<int> LoadAllMeshes = typeof(Astral.Quester.Core).GetStaticFunction<int>("LoadAllMeshes");
 
+#if disabled_20210321
                 /// <summary>
-                /// Доступ к методу удаления вершин крафаг путей в области, заданной центром окружности и её радиусом
+                /// Доступ к методу удаления вершин графа путей в области, заданной центром окружности и её радиусом
                 /// Astral.Quester.Core.RemoveNodesFrom2DPostion(worldPos, Astral.Controllers.Settings.Get.DeleteNodeRadius);
                 /// </summary>                
-                public static readonly Action<Vector3, double> RemoveNodesFrom2DPosition = typeof(Astral.Quester.Core).GetStaticAction<Vector3, double>("RemoveNodesFrom2DPostion");
+                public static readonly Action<Vector3, double> RemoveNodesFrom2DPosition = typeof(Astral.Quester.Core).GetStaticAction<Vector3, double>("RemoveNodesFrom2DPostion"); 
+#endif
+
+                #region Events
+                /// <summary>
+                /// Делегат, вызываемый перед вызовом <seealso cref="Astral.Quester.Core.Load(string Path, bool savePath = true)"/>,
+                /// то есть перед загрузкой Quester-профиля
+                /// </summary>
+                public delegate void BeforeLoadEvent(ref string Path);
+                public static event BeforeLoadEvent BeforeLoad;
+                private static bool prefixLoad(ref string Path, bool savePath)
+                {
+                    BeforeLoad?.Invoke(ref Path);
+                    return true;
+                }
+
+                /// <summary>
+                /// Делегат, вызываемый после вызова <seealso cref="Astral.Quester.Core.Load(string Path, bool savePath = true)"/>,
+                /// то есть после загрузки Quester-профиля
+                /// </summary>
+                public delegate void AfterLoadEvent(string path);
+                public static event AfterLoadEvent AfterLoad;
+                private static void postfixLoad(string Path, bool savePath)
+                {
+                    AfterLoad?.Invoke(Path);
+                }
+
+                /// <summary>
+                /// Делегат, вызываемый перед вызовом <seealso cref="Astral.Quester.Core.New()"/>,
+                /// то есть перед созданием нового Quester-профиля
+                /// </summary>
+                public delegate void BeforeNewEvent();
+                public static event BeforeNewEvent BeforeNew;
+                private static bool prefixNew()
+                {
+                    BeforeNew?.Invoke();
+                    return true;
+                }
+
+                /// <summary>
+                /// Делегат, вызываемый после вызова <seealso cref="Astral.Quester.Core.New()"/>,
+                /// то есть после создания нового Quester-профиля
+                /// </summary>
+                public delegate void AfterNewEvent();
+                public static event AfterNewEvent AfterNew;
+                private static void postfixNew()
+                {
+                    AfterNew?.Invoke();
+                }
+                #endregion
+
+                static Core()
+                {
+                    var originalLoad = AccessTools.Method(typeof(Astral.Quester.Core), nameof(Astral.Quester.Core.Load));//typeof(Astral.Quester.Core).GetMethod(nameof(Astral.Quester.Core.Load));
+                    var prefixLoad = AccessTools.Method(typeof(Core), nameof(Core.prefixLoad));// typeof(Core).GetMethod(nameof(Core.prefixLoad));
+                    var postfixLoad = AccessTools.Method(typeof(Core), nameof(Core.postfixLoad));//typeof(Core).GetMethod(nameof(Core.postfixLoad));
+
+                    if (originalLoad != null)
+                        ETPatcher.Harmony.Patch(originalLoad, new HarmonyMethod(prefixLoad), new HarmonyMethod(postfixLoad));
+
+                    var originalNew = AccessTools.Method(typeof(Astral.Quester.Core), nameof(Astral.Quester.Core.New));//typeof(Astral.Quester.Core).GetMethod(nameof(Astral.Quester.Core.New));
+                    var prefixNew = AccessTools.Method(typeof(Core), nameof(Core.prefixNew));//typeof(Core).GetMethod(nameof(Core.prefixNew));
+                    var postfixNew = AccessTools.Method(typeof(Core), nameof(Core.postfixNew));//typeof(Core).GetMethod(nameof(Core.postfixNew));
+
+                    if (originalNew != null)
+                        ETPatcher.Harmony.Patch(originalLoad, new HarmonyMethod(prefixNew), new HarmonyMethod(postfixNew));
+                }
             }
 
+#if false
             public static class Entrypoint
             {
                 public static readonly Func<object, Action> OnLoad = typeof(Astral.Quester.Entrypoint).GetAction("OnLoad");
@@ -124,7 +201,8 @@ namespace EntityTools.Reflection
                 public static readonly Func<object, Action<bool>> Start = typeof(Astral.Quester.Entrypoint).GetAction<bool>("Start");
                 public static readonly Func<object, Action> Stop = typeof(Astral.Quester.Entrypoint).GetAction("Stop");
                 public static readonly Func<object, Action> TooMuchStuckReaction = typeof(Astral.Quester.Entrypoint).GetAction("TooMuchStuckReaction");
-            }
+            } 
+#endif
 
             public static class Forms
             {

@@ -88,7 +88,7 @@ namespace EntityCore.Entities
             {
 #endif
                 LinkedList<Entity> entities = new LinkedList<Entity>();
-                Predicate<Entity> comparer = EntityToPatternComparer.Get(entPattern, strMatchType, nameType);
+                Predicate<Entity> comparer = EntityComparer.Get(entPattern, strMatchType, nameType);
 
                 if (action != null)
                 {
@@ -159,7 +159,7 @@ namespace EntityCore.Entities
             {
                 foreach (Entity e in EntityManager.GetEntities())
                 {
-                    if (key.Comparer(e))
+                    if (key.IsMatch(e))
                     {
                         action(e);
                         entities.AddLast(e);
@@ -179,7 +179,7 @@ namespace EntityCore.Entities
             {
                 //return EntityManager.GetEntities()?.FindAll(key.Comparer.Check);
                 foreach (Entity e in EntityManager.GetEntities())
-                    if (key.Comparer(e))
+                    if (key.IsMatch(e))
                         entities.AddLast(e);
             }
             return entities;
@@ -202,7 +202,99 @@ namespace EntityCore.Entities
         }
 
         /// <summary>
-        /// Формирование списка Entities, способных к взаимодействию и соответствующих шаблону
+        /// Формирование списка <seealso cref="Entity"/>, соответствующих <paramref name="key"/>.
+        /// К каждому из отобранных <seealso cref="Entity"/> применяется <paramref name="processor"/>, а результат обработки возврадается в виде <paramref name="agregator"/>
+        /// </summary>
+        public static LinkedList<Entity> GetEntities<TAgregator>(EntityCacheRecordKey key, Func<TAgregator, Entity, TAgregator> processor, ref TAgregator agregator)
+        {
+            if (key == null)
+                return null;
+#if DEBUG && PROFILING
+            Count++;
+            TimeSpan StartTime = stopwatch.Elapsed;
+            stopwatch.Start();
+            try
+            {
+#endif
+            LinkedList<Entity> entities = new LinkedList<Entity>();
+            if (processor != null)
+            {
+                foreach (Entity e in EntityManager.GetEntities())
+                {
+                    if (key.IsMatch(e))
+                    {
+                        if (e.IsValid && key.IsMatch(e))
+                        {
+                            agregator = processor(agregator, e);
+                            entities.AddFirst(e);
+                        }
+                        entities.AddLast(e);
+                    }
+                }
+            }
+            else
+            {
+                foreach (Entity e in EntityManager.GetEntities())
+                    if (key.IsMatch(e))
+                        entities.AddLast(e);
+            }
+            return entities;
+#if DEBUG && PROFILING
+            }
+            finally
+            {
+                stopwatch.Stop();
+                TimeSpan time = stopwatch.Elapsed.Subtract(StartTime);
+                if (time > MaxTime)
+                {
+                    MaxTime = time;
+                    WorseTryNumber = Count;
+                }
+                else if (time < MinTime)
+                    MinTime = time;
+
+            }
+#endif
+        }
+
+        /// <summary>
+        /// Формирование списка <seealso cref="Entity"/>, соответствующих <paramref name="key"/>.
+        /// К каждому из отобранных <seealso cref="Entity"/> применяется <paramref name="processor"/>, а результат обработки возврадается в виде <paramref name="agregator"/>
+        /// </summary>
+        public static void AgregateEntities<TAgregator>(Func<TAgregator, Entity, TAgregator> processor, ref TAgregator agregator)
+        {
+#if DEBUG && PROFILING
+            Count++;
+            TimeSpan StartTime = stopwatch.Elapsed;
+            stopwatch.Start();
+            try
+            {
+#endif
+            if (processor is null) return;
+            
+            foreach (Entity e in EntityManager.GetEntities())
+                agregator = processor(agregator, e);
+#if DEBUG && PROFILING
+            }
+            finally
+            {
+                stopwatch.Stop();
+                TimeSpan time = stopwatch.Elapsed.Subtract(StartTime);
+                if (time > MaxTime)
+                {
+                    MaxTime = time;
+                    WorseTryNumber = Count;
+                }
+                else if (time < MinTime)
+                    MinTime = time;
+
+            }
+#endif
+        }
+
+        /// <summary>
+        /// Формирование списка <seealso cref="Entity"/>, способных к взаимодействию и соответствующих шаблону <paramref name="entPattern"/>
+        /// К каждому из отобранных <seealso cref="Entity"/> применяется <paramref name="action"/>
         /// </summary>
         /// <param name="entPattern">Шаблон, которому должен соответствовать идентификатор (имя) Entity, заданные параметном </param>
         /// <param name="strMatchType">Способ сопоставления шаблона: Regex (регулярное выражение) или Simple (простой текст)</param>
@@ -219,7 +311,7 @@ namespace EntityCore.Entities
             {
 #endif
                 LinkedList<Entity> entities = new LinkedList<Entity>();
-                Predicate<Entity> comparer = EntityToPatternComparer.Get(entPattern, strMatchType, nameType);
+                Predicate<Entity> comparer = EntityComparer.Get(entPattern, strMatchType, nameType);
 
                 if (action != null)
                 {
@@ -272,11 +364,9 @@ namespace EntityCore.Entities
         }
 
         /// <summary>
-        /// Формирование списка Entities, способных к взаимодействию и соответствующих ключу
+        /// Формирование списка <seealso cref="Entity"/>, способных к взаимодействию и соответствующих <paramref name="key"/>.
+        /// К каждому из отобранных <seealso cref="Entity"/> применяется <paramref name="action"/>
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="action">Функтор действия, которое нужно выполнить над Entity, удовлетворяющем условиям</param>
-        /// <returns></returns>
         public static LinkedList<Entity> GetContactEntities(EntityCacheRecordKey key, Action<Entity> action = null)
         {
             if (key == null)
@@ -294,7 +384,7 @@ namespace EntityCore.Entities
                 {
                     foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts)
                     {
-                        if (contact.Entity.IsValid && key.Comparer(contact.Entity))
+                        if (contact.Entity.IsValid && key.IsMatch(contact.Entity))
                         {
                             action(contact.Entity);
                             entities.AddFirst(contact.Entity);
@@ -302,7 +392,7 @@ namespace EntityCore.Entities
                     }
                     foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyInteractCritterEnts)
                     {
-                        if (contact.Entity.IsValid && key.Comparer(contact.Entity))
+                        if (contact.Entity.IsValid && key.IsMatch(contact.Entity))
                         {
                             action(contact.Entity);
                             entities.AddFirst(contact.Entity);
@@ -313,12 +403,12 @@ namespace EntityCore.Entities
                 {
                     foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts)
                     {
-                        if (contact.Entity.IsValid && key.Comparer(contact.Entity))
+                        if (contact.Entity.IsValid && key.IsMatch(contact.Entity))
                             entities.AddFirst(contact.Entity);
                     }
                     foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyInteractCritterEnts)
                     {
-                        if (contact.Entity.IsValid && key.Comparer(contact.Entity))
+                        if (contact.Entity.IsValid && key.IsMatch(contact.Entity))
                             entities.AddFirst(contact.Entity);
                     }
                 }
@@ -341,9 +431,111 @@ namespace EntityCore.Entities
         }
 
         /// <summary>
-        /// Ближайший противник
+        /// Формирование списка <seealso cref="Entity"/>, спосо,ных к взаимодействию и соответствующих <paramref name="key"/>.
+        /// К каждому из отобранных <seealso cref="Entity"/> применяется <paramref name="proseccor"/>, а результат обработки возврадается в виде <paramref name="agregator"/>
         /// </summary>
-        /// <returns></returns>
+        public static LinkedList<Entity> GetContactEntities<TAgregator>(EntityCacheRecordKey key, Func<TAgregator, Entity, TAgregator> proseccor, ref TAgregator agregator)
+        {
+            if (key == null)
+                return null;
+#if DEBUG && PROFILING
+            ContactCount++;
+            TimeSpan StartTime = cntStopwatch.Elapsed;
+            cntStopwatch.Start();
+            try
+            {
+#endif
+            LinkedList<Entity> entities = new LinkedList<Entity>();
+
+            if (proseccor != null)
+            {
+                foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts)
+                {
+                    var ett = contact.Entity;
+                    if (ett.IsValid && key.IsMatch(ett))
+                    {
+                        agregator = proseccor(agregator, ett);
+                        entities.AddLast(ett);
+                    }
+                }
+                foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyInteractCritterEnts)
+                {
+                    var ett = contact.Entity;
+                    if (ett.IsValid && key.IsMatch(ett))
+                    {
+                        agregator = proseccor(agregator, ett);
+                        entities.AddLast(ett);
+                    }
+                }
+            }
+            else
+            {
+                foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts)
+                {
+                    var ett = contact.Entity;
+                    if (ett.IsValid && key.IsMatch(ett))
+                        entities.AddFirst(ett);
+                }
+                foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyInteractCritterEnts)
+                {
+                    var ett = contact.Entity;
+                    if (ett.IsValid && key.IsMatch(ett))
+                        entities.AddFirst(ett);
+                }
+            }
+            return entities;
+#if DEBUG && PROFILING
+            }
+            finally
+            {
+                cntStopwatch.Stop();
+                TimeSpan time = cntStopwatch.Elapsed.Subtract(StartTime);
+                if (time > ContactMaxTime)
+                {
+                    ContactMaxTime = time;
+                    ContactWorseTryNumber = ContactCount;
+                }
+                else if (time < ContactMinTime)
+                    ContactMinTime = time;
+            }
+#endif
+        }
+        public static void AgregateContactEntities<TAgregator>(Func<TAgregator, Entity, TAgregator> proseccor, ref TAgregator agregator)
+        {
+#if DEBUG && PROFILING
+            ContactCount++;
+            TimeSpan StartTime = cntStopwatch.Elapsed;
+            cntStopwatch.Start();
+            try
+            {
+#endif
+            if (proseccor is null) return;
+            
+            foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts)
+                agregator = proseccor(agregator, contact.Entity);
+            foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyInteractCritterEnts)
+                agregator = proseccor(agregator, contact.Entity);
+#if DEBUG && PROFILING
+            }
+            finally
+            {
+                cntStopwatch.Stop();
+                TimeSpan time = cntStopwatch.Elapsed.Subtract(StartTime);
+                if (time > ContactMaxTime)
+                {
+                    ContactMaxTime = time;
+                    ContactWorseTryNumber = ContactCount;
+                }
+                else if (time < ContactMinTime)
+                    ContactMinTime = time;
+            }
+#endif
+        }
+
+#if disabled_2021_03_26
+        /// <summary>
+        /// Поиск ближайшего противника
+        /// </summary>
         public static Entity ClosestEnemy(Predicate<Entity> predicate = null)
         {
             Vector3 playerPos = EntityManager.LocalPlayer.Location;
@@ -370,7 +562,7 @@ namespace EntityCore.Entities
                         minDist = currDist;
                         result = entity;
                     }
-                } 
+                }
             }
 
             return result ?? new Entity(IntPtr.Zero);
@@ -379,6 +571,7 @@ namespace EntityCore.Entities
         public static bool IsValidEnemy(Entity entity)
         {
             return entity.IsValid && !entity.IsDead && entity.InCombat && entity.RelationToPlayer == EntityRelation.Foe && !entity.IsUnselectable && !entity.IsUntargetable && !entity.DoNotDraw && entity.Character.AttackPlayer;// && entity.Location.Distance3D(playerPos) < 60.0;
-        }
+        } 
+#endif
     }
 }

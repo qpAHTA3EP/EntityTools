@@ -21,38 +21,45 @@ namespace EntityCore.UCC.Conditions
         #region Данные
         private UCCEntityCheck @this;
 
-        private Predicate<Entity> checkEntity { get; set; } = null;
+#if false
+        private Predicate<Entity> checkEntity { get; set; } = null; 
+#endif
         private Entity entity = null;
         private Timeout timeout = new Timeout(0);
-        private string label = string.Empty;
-        private string conditionIDstr;
+        private string _label = string.Empty;
+        private string _idStr;
         #endregion
 
         internal UccEntityCheckEngine(UCCEntityCheck ettCheck)
         {
-#if false
-            @this = eck;
-            @this.Engine = this;
-            @this.PropertyChanged += PropertyChanged;
-
-            checkEntity = initialize_CheckEntity;
-
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}"); 
-#else
             InternalRebase(ettCheck);
-            ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} initialized: {Label()}");
-#endif
+            ETLogger.WriteLine(LogType.Debug, $"{_idStr} initialized: {Label()}");
+        }
+        ~UccEntityCheckEngine()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = null;
+                @this = null;
+            }
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (ReferenceEquals(sender, @this))
             {
+#if false
                 switch (e.PropertyName)
                 {
                     case nameof(@this.EntityID):
                         checkEntity = initialize_CheckEntity;
-                        label = string.Empty;
+                        _label = string.Empty;
                         break;
                     case nameof(@this.EntityIdType):
                         checkEntity = initialize_CheckEntity;
@@ -60,7 +67,12 @@ namespace EntityCore.UCC.Conditions
                     case nameof(@this.EntityNameType):
                         checkEntity = initialize_CheckEntity;
                         break;
-                }
+                } 
+#else
+                _key = null;
+                _specialCheck = null;
+                _label = string.Empty;
+#endif
                 entity = null;
             }
         }
@@ -75,10 +87,10 @@ namespace EntityCore.UCC.Conditions
             {
                 if (InternalRebase(execPower))
                 {
-                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} reinitialized");
+                    ETLogger.WriteLine(LogType.Debug, $"{_idStr} reinitialized");
                     return true;
                 }
-                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} rebase failed");
+                ETLogger.WriteLine(LogType.Debug, $"{_idStr} rebase failed");
                 return false;
             }
 
@@ -93,15 +105,17 @@ namespace EntityCore.UCC.Conditions
             if (@this != null)
             {
                 @this.PropertyChanged -= PropertyChanged;
-                @this.Engine = new EntityTools.Core.Proxies.UccConditionProxy(@this);
+                @this.Engine = null;
             }
 
             @this = execPower;
             @this.PropertyChanged += PropertyChanged;
 
-            checkEntity = initialize_CheckEntity;
+            _key = null;
+            _specialCheck = null;
+            _label = string.Empty;
 
-            conditionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+            _idStr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
 
             @this.Engine = this;
 
@@ -113,19 +127,19 @@ namespace EntityCore.UCC.Conditions
         {
             Entity targetEntity = refAction?.GetTarget();
 
-            if (ValidateEntity(targetEntity))
+            var entityKey = EntityKey;
+
+            if (entityKey.Validate(targetEntity))
                 entity = targetEntity;
             else if (timeout.IsTimedOut)
             {
-                entity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                        @this._healthCheck, @this._reactionRange,
-                                                        (@this._reactionZRange > 0) ? @this._reactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference,
-                                                        @this._regionCheck, null, @this._aura.Checker);
+                entity = SearchCached.FindClosestEntity(entityKey, SpecialCheck);
+                timeout.ChangeTime(EntityTools.EntityTools.Config.EntityCache.CombatCacheTime/2);
             }
 
 
             bool result = false;
-            if (ValidateEntity(entity))
+            if (entityKey.Validate(entity))
             {
                 switch (@this._propertyType)
                 {
@@ -180,11 +194,12 @@ namespace EntityCore.UCC.Conditions
         {
             Entity closestEntity = refAction?.GetTarget();
 
-            if (!ValidateEntity(closestEntity))
-                closestEntity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                               @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, null, @this._aura.Checker);
+            var entityKey = EntityKey;
 
-            if (ValidateEntity(closestEntity))
+            if (!entityKey.Validate(closestEntity))
+                closestEntity = SearchCached.FindClosestEntity(entityKey, SpecialCheck);
+
+            if (entityKey.Validate(closestEntity))
             {
                 StringBuilder sb = new StringBuilder("Found closect Entity");
                 sb.Append(" [").Append(closestEntity.NameUntranslated).Append(']').Append(" which ").Append(@this._propertyType).Append(" = ");
@@ -215,16 +230,53 @@ namespace EntityCore.UCC.Conditions
 
         public string Label()
         {
-            if (string.IsNullOrEmpty(label))
+            if (string.IsNullOrEmpty(_label))
             {
-                label = $"{@this.GetType().Name} [{@this._entityId}]";
+                _label = $"{@this.GetType().Name} [{@this._entityId}]";
             }
-            else label = @this.GetType().Name;
+            else _label = @this.GetType().Name;
 
-            return label;
+            return _label;
         }
         #endregion
 
+#if true
+        #region Вспомогательные инструменты
+        /// <summary>
+        /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
+        /// </summary>
+        public EntityCacheRecordKey EntityKey
+        {
+            get
+            {
+                if (_key is null)
+                    _key = new EntityCacheRecordKey(@this._entityId, @this._entityIdType, @this._entityNameType);
+                return _key;
+            }
+        }
+        private EntityCacheRecordKey _key;
+
+        /// <summary>
+        /// Функтор дополнительной проверки <seealso cref="Entity"/> 
+        /// на предмет нахождения в пределах области, заданной <see cref="InteractEntities.CustomRegionNames"/>
+        /// Использовать самомодифицирующийся предиката, т.к. предикат передается в <seealso cref="SearchCached.FindClosestEntity(EntityCacheRecordKey, Predicate{Entity})"/>
+        /// </summary>        
+        private Predicate<Entity> SpecialCheck
+        {
+            get
+            {
+                if (_specialCheck is null)
+                    _specialCheck = SearchHelper.Construct_EntityAttributePredicate(@this._healthCheck,
+                                                            @this._reactionRange,
+                                                            @this._reactionZRange,
+                                                            @this._regionCheck,
+                                                            @this._aura.IsMatch);
+                return _specialCheck;
+            }
+        }
+        private Predicate<Entity> _specialCheck;
+        #endregion
+#else
         private bool ValidateEntity(Entity e)
         {
 #if false
@@ -238,19 +290,20 @@ namespace EntityCore.UCC.Conditions
 
         private bool initialize_CheckEntity(Entity e)
         {
-            Predicate<Entity> predicate = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+            Predicate<Entity> predicate = EntityComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
             if (predicate != null)
             {
 #if DEBUG
-                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}: Comparer does not defined. Initialize.");
+                ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Comparer does not defined. Initialize.");
 #endif
                 checkEntity = predicate;
                 return checkEntity(e);
             }
 #if DEBUG
-            else ETLogger.WriteLine(LogType.Error, $"{conditionIDstr}: Fail to initialize the Comparer.");
+            else ETLogger.WriteLine(LogType.Error, $"{_idStr}: Fail to initialize the Comparer.");
 #endif
             return false;
-        }
+        } 
+#endif
     }
 }

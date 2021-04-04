@@ -1,5 +1,6 @@
 ﻿using Astral.Quester.Classes;
 using EntityTools.Enums;
+using MyNW.Classes;
 using System;
 using System.ComponentModel;
 using System.Linq;
@@ -23,7 +24,6 @@ namespace EntityTools.Tools.CustomRegions
             _inclusion = inclusion;
             _customRegion = cr;
         }
-
 
         #region Данные
         public string Name

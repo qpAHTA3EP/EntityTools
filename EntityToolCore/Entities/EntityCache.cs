@@ -1,16 +1,10 @@
-﻿#define PROFILING
+﻿//#define PROFILING
 
-using Astral;
-using Astral.Classes;
 using Astral.Classes.ItemFilter;
 using EntityTools;
 using EntityTools.Enums;
-using MyNW.Classes;
-using MyNW.Internals;
-using System;
-using System.Collections.Generic;
+using EntityTools.Reflection;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 
 namespace EntityCore.Entities
 {
@@ -19,6 +13,32 @@ namespace EntityCore.Entities
     /// </summary>
     public class EntityCache : KeyedCollection<EntityCacheRecordKey, EntityCacheRecord>
     {
+        public EntityCache()
+        {
+            AstralAccessors.Quester.Core.AfterLoad += Core_AfterLoad;
+            AstralAccessors.Quester.Core.AfterNew += Core_AfterNew;
+        }
+
+        private void Core_AfterNew()
+        {
+            lock (this)
+            {
+                Clear(); 
+            }
+        }
+        private void Core_AfterLoad(string path)
+        {
+            lock (this)
+            {
+                Clear(); 
+            }
+        }
+        ~EntityCache()
+        {
+            AstralAccessors.Quester.Core.AfterLoad -= Core_AfterLoad;
+            AstralAccessors.Quester.Core.AfterNew -= Core_AfterNew;
+        }
+
 #if DEBUG && PROFILING
         private static int matchCount = 0;
         private static int mismatchCount = 0;
@@ -44,7 +64,7 @@ namespace EntityCore.Entities
         {
             record = null;
             EntityCacheRecordKey key = new EntityCacheRecordKey(pattern, matchType, nameType, setType);
-            if (base.Contains(key))
+            if (Contains(key))
             {
 #if DEBUG && PROFILING
                 matchCount++;
@@ -61,14 +81,19 @@ namespace EntityCore.Entities
         public EntityCacheRecord MakeCache(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.InternalName, EntitySetType setType = EntitySetType.Complete)
         {
             EntityCacheRecord record = new EntityCacheRecord(pattern, matchType, nameType, setType);
-            base.Add(record);
+            Add(record);
             return record;
         }
-
+        public EntityCacheRecord MakeCache(EntityCacheRecordKey key)
+        {
+            EntityCacheRecord record = new EntityCacheRecord(key);
+            Add(record);
+            return record;
+        }
         public bool Contains(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.InternalName, EntitySetType setType = EntitySetType.Complete)
         {
             EntityCacheRecordKey key = new EntityCacheRecordKey(pattern, matchType, nameType, setType);
-            return base.Contains(key);
+            return Contains(key);
         }
     }
 }

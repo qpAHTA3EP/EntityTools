@@ -22,7 +22,7 @@ namespace EntityTools.Patches.Mapper
             EntityTools.Config.Mapper.MapperForm.PropertyChanged += handler_PropertyChanged;
             GetWorldPosition(0, 0, out double left, out double top);
             GetWorldPosition(width, height, out double right, out double down);
-            _cache = new MapperGraphCache(() => AstralAccessors.Quester.Core.UsedMeshes, EntityTools.Config.Mapper.CacheActive);
+            _cache = new MapperGraphCache(() => AstralAccessors.Quester.Core.Meshes, EntityTools.Config.Mapper.CacheActive);
             _cache.SetCacheArea(left, top, right, down);
         }
 

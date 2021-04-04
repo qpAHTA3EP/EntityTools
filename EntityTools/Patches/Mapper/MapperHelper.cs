@@ -570,7 +570,7 @@ namespace EntityTools.Patches.Mapper
                 distance = double.MaxValue;
 
             if (graph is null)
-                graph = AstralAccessors.Quester.Core.UsedMeshes;
+                graph = AstralAccessors.Quester.Core.Meshes;
 
             Node node = graph?.ClosestNodeOxyProjection(worldX, worldY, distance);
             if (node != null)

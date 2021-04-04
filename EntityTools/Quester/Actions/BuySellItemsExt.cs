@@ -32,8 +32,8 @@ namespace EntityTools.Quester.Actions
     [Serializable]
     public class BuySellItemsExt : Action
     {
-        internal readonly InstancePropertyAccessor<BuySellItemsExt, ActionDebug> debug;
-        string actionIDstr;
+        internal readonly InstancePropertyAccessor<ActionDebug> debug;
+        string _idStr;
         BuySellItemsExt @this => this;
 
         #region Опции команды
@@ -203,8 +203,8 @@ namespace EntityTools.Quester.Actions
         public BuySellItemsExt()
         {
             tryNum = _tries;
-            debug = this.GetInstanceProperty<BuySellItemsExt, ActionDebug>("Debug");
-            actionIDstr = string.Concat(@this.GetType().Name, '[', @this.ActionID, ']');
+            debug = this.GetProperty<ActionDebug>("Debug");
+            _idStr = string.Concat(@this.GetType().Name, '[', @this.ActionID, ']');
         }
 
         /// <summary>
@@ -1054,12 +1054,12 @@ namespace EntityTools.Quester.Actions
                         }
                     }
 #if false
-                    else if (extendedActionDebugInfo)
+                    else if (debugInfoEnabled)
                         debug.Value.AddInfo(string.Concat(methodName, ); 
 #endif
                 }
 #if false
-                else if (extendedActionDebugInfo)
+                else if (debugInfoEnabled)
                     debug.Value.AddInfo(string.Concat(methodName, "Buying failed. ErrorCode = ", storeItemInfo.CanBuyError)); 
 #endif
             }

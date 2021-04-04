@@ -202,9 +202,9 @@ namespace EntityCore.Tools.Missions
         /// </summary>
         public static bool ApproachMissionGiver(this Entity giverEntity, float interactDistance = 5.5f, float maxZDifference = 5)
         {
-            bool extendedActionDebugInfo = EntityTools.EntityTools.Config.Logger.DebugMissionTools;
+            bool debugInfoEnabled = EntityTools.EntityTools.Config.Logger.DebugMissionTools;
 
-            string currentMethodName = extendedActionDebugInfo
+            string currentMethodName = debugInfoEnabled
                     ? string.Concat(MethodBase.GetCurrentMethod().Name)
                     : string.Empty;
 
@@ -216,7 +216,7 @@ namespace EntityCore.Tools.Missions
             bool isInteractzDifferenceConstraint = maxZDifference <= 0;
             float zDifference = isInteractzDifferenceConstraint ? 0 : Math.Abs(giverLocation.Z - playerLocation.Z);
             bool withingInteractZDifference = isInteractzDifferenceConstraint || zDifference <= maxZDifference;
-            if (extendedActionDebugInfo)
+            if (debugInfoEnabled)
                 ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Begins (",
                     "CalculatedInteractDistance = ", interactDistance.ToString("N1"),
                     "; Distance = ", distance.ToString("N1"), withingInteractDistance ? "(withing)" : "(out)",
@@ -225,7 +225,7 @@ namespace EntityCore.Tools.Missions
             if (!(withingInteractDistance && withingInteractZDifference))
             {
                 // Случается, что Approach.EntityByDistance() возвращает True, даже если расстояние превышает заданное
-                if (extendedActionDebugInfo)
+                if (debugInfoEnabled)
                 {
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
@@ -258,7 +258,7 @@ namespace EntityCore.Tools.Missions
                     return giverLocation.Distance3D(playerLocation) <= interactDistance && (isInteractzDifferenceConstraint || Math.Abs(giverLocation.Z - playerLocation.Z) <= maxZDifference);
                 }
             }
-            else if (extendedActionDebugInfo)
+            else if (debugInfoEnabled)
             {
                 ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": " + nameof(Approach.EntityByDistance) + "Skiped"));
             }
@@ -270,9 +270,9 @@ namespace EntityCore.Tools.Missions
         /// </summary>
         public static bool InteractMissionGiver(this Entity giverEntity, float interactDistance = 5.5f)
         {
-            bool extendedActionDebugInfo = EntityTools.EntityTools.Config.Logger.DebugMissionTools;
+            bool debugInfoEnabled = EntityTools.EntityTools.Config.Logger.DebugMissionTools;
 
-            string currentMethodName = extendedActionDebugInfo
+            string currentMethodName = debugInfoEnabled
                     ? string.Concat(MethodBase.GetCurrentMethod().Name)
                     : string.Empty;
 
@@ -280,7 +280,7 @@ namespace EntityCore.Tools.Missions
 
             var contactDialog = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog;
 
-            if (extendedActionDebugInfo)
+            if (debugInfoEnabled)
                 ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Begins (ContactDialog = ",
                     contactDialog.IsValid ? "Valid; " : "Invalid; ",
                     "ScreenType = ", contactDialog.ScreenType, ')'));
@@ -289,7 +289,7 @@ namespace EntityCore.Tools.Missions
 #if true
             if (!contactDialog.IsValid || contactDialog.ScreenType == ScreenType.None)
             {
-                if (extendedActionDebugInfo)
+                if (debugInfoEnabled)
                 {
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
@@ -307,13 +307,13 @@ namespace EntityCore.Tools.Missions
             {
                 contactDialog = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog;
                 result = contactDialog.IsValid;
-                if (extendedActionDebugInfo)
+                if (debugInfoEnabled)
                     ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ", nameof(NavigationHelper.SmartInteract), " Skiped"));
             }
 #else
             if (!contactDialog.IsValid || contactDialog.ScreenType == ScreenType.None)
             {
-                if (extendedActionDebugInfo)
+                if (debugInfoEnabled)
                 {
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
@@ -331,7 +331,7 @@ namespace EntityCore.Tools.Missions
             {
                 contactDialog = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog;
                 result = contactDialog.IsValid;
-                if (extendedActionDebugInfo)
+                if (debugInfoEnabled)
                     ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ", nameof(Interact.ForContactDialog), " Skiped"));
             }
 #endif
@@ -343,13 +343,13 @@ namespace EntityCore.Tools.Missions
         /// </summary>
         public static MissionProcessingResult ProccessingMissionDialog(string missionId, bool turnInMission = false, IList<string> optionalDialog = null, Predicate<Item> isRewardItem = null, int timeout = 5000)
         {
-            bool extendedActionDebugInfo = EntityTools.EntityTools.Config.Logger.DebugMissionTools;
+            bool debugInfoEnabled = EntityTools.EntityTools.Config.Logger.DebugMissionTools;
 
-            string currentMethodName = extendedActionDebugInfo
+            string currentMethodName = debugInfoEnabled
                     ? MethodBase.GetCurrentMethod().Name
                     : string.Empty;
 
-            if (extendedActionDebugInfo)
+            if (debugInfoEnabled)
                 ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Begin"));
 
             Interact.WaitForInteraction();
@@ -397,7 +397,7 @@ namespace EntityCore.Tools.Missions
                                 Thread.Sleep(250);
                             }
 
-                            if (extendedActionDebugInfo)
+                            if (debugInfoEnabled)
                                 ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
                                     "\n\t\tScreenType = ", screenType,
                                     "\n\t\tCheckRequeredRewardItem = True" +
@@ -413,7 +413,7 @@ namespace EntityCore.Tools.Missions
                         () => contactDialog.ScreenType == ScreenType.MissionOffer))
                     {
                         result = MissionProcessingResult.MissionRequiredRewardNotFound;
-                        if (extendedActionDebugInfo)
+                        if (debugInfoEnabled)
                             ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
                                 "\n\t\tScreenType = ", screenType,
                                 "\n\t\tCheckRequeredRewardItem = False" +
@@ -424,7 +424,7 @@ namespace EntityCore.Tools.Missions
                     }
 #endif
                     result = MissionProcessingResult.Error;
-                    if (extendedActionDebugInfo)
+                    if (debugInfoEnabled)
                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
                             "\n\t\tScreenType = ", screenType,
                             "\n\t\tCheckRequeredRewardItem = False" +
@@ -456,7 +456,7 @@ namespace EntityCore.Tools.Missions
                                 Thread.Sleep(250);
                             }
 
-                            if (extendedActionDebugInfo)
+                            if (debugInfoEnabled)
                                 ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
                                     "\n\t\tScreenType = ", screenType,
                                     "\n\t\tCheckRequeredRewardItem = True" +
@@ -472,7 +472,7 @@ namespace EntityCore.Tools.Missions
                         () => contactDialog.ScreenType == ScreenType.MissionOffer))
                     {
                         result = MissionProcessingResult.MissionRequiredRewardNotFound;
-                        if (extendedActionDebugInfo)
+                        if (debugInfoEnabled)
                             ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
                                 "\n\t\tScreenType = ", screenType,
                                 "\n\t\tCheckRequeredRewardItem = False" +
@@ -483,7 +483,7 @@ namespace EntityCore.Tools.Missions
                     }
 #endif
                     result = MissionProcessingResult.Error;
-                    if (extendedActionDebugInfo)
+                    if (debugInfoEnabled)
                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
                             "\n\t\tScreenType = ", screenType,
                             "\n\t\tCheckRequeredRewardItem = False" +
@@ -523,7 +523,7 @@ namespace EntityCore.Tools.Missions
                                     result = haveMission ? MissionPickUpResult.MissionAccepted 
                                                          : MissionPickUpResult.Error;
 
-                                    if (extendedActionDebugInfo)
+                                    if (debugInfoEnabled)
                                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
                                             "\n\t\tScreenType = ", screenType,
                                             "\n\t\tSelect '", @this._missionId, "' = True" +
@@ -536,7 +536,7 @@ namespace EntityCore.Tools.Missions
                                 else
                                 {
                                     result = MissionPickUpResult.Error;
-                                    if (extendedActionDebugInfo)
+                                    if (debugInfoEnabled)
                                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
                                             "\n\t\tScreenType = ", screenType,
                                             "\n\t\tSelect '", @this._missionId, "' = True" +
@@ -549,7 +549,7 @@ namespace EntityCore.Tools.Missions
                             else
                             {
                                 result = MissionPickUpResult.MissionRequiredRewardNotFound;
-                                if (extendedActionDebugInfo)
+                                if (debugInfoEnabled)
                                     ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
                                         "\n\t\tScreenType = ", screenType,
                                         "\n\t\tSelect '", @this._missionId, "' = True" +
@@ -559,14 +559,14 @@ namespace EntityCore.Tools.Missions
                             }
                         } 
 #else
-                        if (extendedActionDebugInfo)
+                        if (debugInfoEnabled)
                             ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Select the option '", missionId, "' on '", screenType, "' screen. Continue..."));
 #endif
                     }
                     else
                     {
                         result = MissionProcessingResult.MissionNotFound;
-                        if (extendedActionDebugInfo)
+                        if (debugInfoEnabled)
                             ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
                                 "\n\t\tScreenType = ", screenType,
                                 "\n\t\tSelect '", missionId, "' = False" +
@@ -592,15 +592,15 @@ namespace EntityCore.Tools.Missions
 #endif
                     {
                         bool selectResult = lastOption.Select();
-                        if (extendedActionDebugInfo)
+                        if (debugInfoEnabled)
                             ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Selection of '", lastOption.Key, "' on ScreenType(", screenType, ") succedded. Continue..."));
                     }
                     else
                     {
-                        if (extendedActionDebugInfo)
+                        if (debugInfoEnabled)
                         {
                             result = MissionProcessingResult.Error;
-                            if (extendedActionDebugInfo)
+                            if (debugInfoEnabled)
                                 ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
                                     "\n\t\tScreenType = ", screenType,
                                     "\n\t\tLast item in ContactDialog.Options inaccessible" +
@@ -612,7 +612,7 @@ namespace EntityCore.Tools.Missions
                 else
                 {
                     result = MissionProcessingResult.Error;
-                    if (extendedActionDebugInfo)
+                    if (debugInfoEnabled)
                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
                             "\n\t\tScreenType = ", screenType,
                             "\n\t" + nameof(ProccessingMissionDialog) + " => ", result));
@@ -626,7 +626,7 @@ namespace EntityCore.Tools.Missions
 
 
             result = MissionProcessingResult.Error;
-            if (extendedActionDebugInfo)
+            if (debugInfoEnabled)
                 ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Time is out => ", result));
             return result;
         }
@@ -638,9 +638,9 @@ namespace EntityCore.Tools.Missions
         {
             if (dialogs?.Count > 0)
             {
-                bool extendedActionDebugInfo = EntityTools.EntityTools.Config.Logger.DebugMissionTools;
+                bool debugInfoEnabled = EntityTools.EntityTools.Config.Logger.DebugMissionTools;
 
-                string currentMethodName = extendedActionDebugInfo
+                string currentMethodName = debugInfoEnabled
                     ? MethodBase.GetCurrentMethod().Name
                     : string.Empty;
 
@@ -654,7 +654,7 @@ namespace EntityCore.Tools.Missions
                     if (screenType == ScreenType.MissionOffer
                         || screenType == ScreenType.MissionTurnIn)
                     {
-                        if (extendedActionDebugInfo)
+                        if (debugInfoEnabled)
                             ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": '", screenType, "' screen is opened. Break"));
                         break;
                     }
@@ -664,7 +664,7 @@ namespace EntityCore.Tools.Missions
 #else
                     contactDialog.CheckDialogOptionAndSelect(d => d.Key.Contains(key));
 #endif
-                    if (extendedActionDebugInfo)
+                    if (debugInfoEnabled)
                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Dialog option '", key, "' selected on ", screenType, " screen"));
                 }
             }

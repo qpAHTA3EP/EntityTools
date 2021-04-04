@@ -33,6 +33,20 @@ namespace EntityCore.Quester.Conditions
 #endif
             ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
         }
+        ~CheckGameGuiEngine()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = null;
+                @this = null;
+            }
+        }
 
         internal void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -72,7 +86,7 @@ namespace EntityCore.Quester.Conditions
             if (@this != null)
             {
                 @this.PropertyChanged -= PropertyChanged;
-                @this.Engine = new EntityTools.Core.Proxies.QuesterConditionProxy(@this);
+                @this.Engine = null;
             }
 
             @this = ckUiGen;

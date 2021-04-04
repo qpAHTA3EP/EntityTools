@@ -1,9 +1,10 @@
 ﻿using Astral.Logic.UCC.Classes;
 using MyNW.Classes;
+using System;
 
 namespace EntityTools.Core.Interfaces
 {
-    public interface IUccActionEngine
+    public interface IUccActionEngine : IDisposable
     {
         bool NeedToRun { get; }
         bool Run();

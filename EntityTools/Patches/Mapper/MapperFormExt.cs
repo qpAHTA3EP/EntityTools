@@ -104,7 +104,7 @@ namespace EntityTools.Patches.Mapper
 
             BindingControls();
 
-            _mappingTool = new MappingTool(() => AstralAccessors.Quester.Core.UsedMeshes) {
+            _mappingTool = new MappingTool(() => AstralAccessors.Quester.Core.Meshes) {
                 Linear = EntityTools.Config.Mapper.LinearPath,
                 ForceLink = EntityTools.Config.Mapper.ForceLinkingWaypoint
             };
@@ -528,7 +528,7 @@ namespace EntityTools.Patches.Mapper
 #endif
                         zoomStr = string.Concat(Zoom * 100, '%');
 
-                        int hash = AstralAccessors.Quester.Core.UsedMeshes?.GetHashCode() ?? 0;
+                        int hash = AstralAccessors.Quester.Core.Meshes?.GetHashCode() ?? 0;
                         if (_currentMapHash != hash)
                         {
                             var currentMapInfo = player.CurrentZoneMapInfo;
@@ -1058,13 +1058,13 @@ namespace EntityTools.Patches.Mapper
                             if (!AstralAccessors.Controllers.Roles.CurrentRole.OnMapDraw(_graphics))
                                 //lock (AstralAccessors.Quester.Core.Meshes.Value.SyncRoot) <- Блокировка графа есть в DrawMeshes(..)
                                 Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes.DrawMeshes(_graphics,
-                                    AstralAccessors.Quester.Core.UsedMeshes);
+                                    AstralAccessors.Quester.Core.Meshes);
                         }
                         catch (Exception ex)
                         {
                             ETLogger.WriteLine(LogType.Error, string.Concat(nameof(DrawMapper), ": Перехвачено исключение \n\r", ex), true);
                             Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes.DrawMeshes(_graphics,
-                                    AstralAccessors.Quester.Core.UsedMeshes);
+                                    AstralAccessors.Quester.Core.Meshes);
                         }
                         #endregion
 
@@ -1571,7 +1571,7 @@ namespace EntityTools.Patches.Mapper
             var currentProfile = Astral.Quester.API.CurrentProfile;
             bool useExternalMeshFile = currentProfile.UseExternalMeshFile && currentProfile.ExternalMeshFileName.Length >= 10;
             string externalMeshFileName = useExternalMeshFile ? Path.Combine(Path.GetDirectoryName(profileName), currentProfile.ExternalMeshFileName) : string.Empty;
-            Graph mesh = AstralAccessors.Quester.Core.UsedMeshes;
+            Graph mesh = AstralAccessors.Quester.Core.Meshes;
 
 #if true
             if (File.Exists(profileName))
@@ -1745,7 +1745,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         private void handler_ImportCurrentMapMeshesFromGame(object sender, ItemClickEventArgs e)
         {
-            Graph graph = AstralAccessors.Quester.Core.UsedMeshes;
+            Graph graph = AstralAccessors.Quester.Core.Meshes;
             if (graph != null
                 && (graph.NodesCount == 0
                     || XtraMessageBox.Show(this, "Are you sure to import game nodes ? All actual nodes must be delete !", "", 
@@ -1794,7 +1794,7 @@ namespace EntityTools.Patches.Mapper
                             XtraMessageBox.Show("This profile doesn't contain current map !");
                             return;
                         }
-                        var mapsMeshes = AstralAccessors.Quester.Core.MapsMeshes.Value;
+                        var mapsMeshes = AstralAccessors.Quester.Core.MapsMeshes;
 
                         DialogResult dialogResult = XtraMessageBox.Show("Import current map only ?\n\rElse import all.", "Map import", MessageBoxButtons.YesNoCancel);
                         if (dialogResult == DialogResult.Yes)
@@ -1907,7 +1907,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         private void handler_ClearCurrentMapMeshes(object sender, ItemClickEventArgs e)
         {
-            var graph = AstralAccessors.Quester.Core.UsedMeshes;
+            var graph = AstralAccessors.Quester.Core.Meshes;
             if (graph?.NodesCount > 0 && XtraMessageBox.Show(this, "Are you sure to delete all map nodes ?", "", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 handler_Mapping_Stop();
@@ -1923,7 +1923,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         private void handler_MeshesInfo(object sender, ItemClickEventArgs e)
         {
-            var graph = AstralAccessors.Quester.Core.UsedMeshes;
+            var graph = AstralAccessors.Quester.Core.Meshes;
             if (graph?.NodesCount > 0)
             {
                 int correctNodeNum = 0;
@@ -1971,7 +1971,7 @@ namespace EntityTools.Patches.Mapper
         {
             handler_Mapping_Stop();
             ResetToolState();
-            var graph = AstralAccessors.Quester.Core.UsedMeshes;
+            var graph = AstralAccessors.Quester.Core.Meshes;
 
             if (graph?.NodesCount > 0)
             {

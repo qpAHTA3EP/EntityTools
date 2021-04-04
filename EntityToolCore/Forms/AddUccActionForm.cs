@@ -17,7 +17,7 @@ namespace EntityCore.Forms
     {
         // Редактор UCC
         private readonly UCCEditor editor = null;
-        private readonly InstancePropertyAccessor<UCCEditor, UCCAction> currentUccAction = null;
+        private readonly InstancePropertyAccessor<UCCAction> currentUccAction = null;
 
         private static readonly List<Type> uccActionTypes = new List<Type>();
         private static Dictionary<Type, UCCAction> uccActions = new Dictionary<Type, UCCAction>();
@@ -40,7 +40,7 @@ namespace EntityCore.Forms
 
             editor = Application.OpenForms.Find<UCCEditor>();
             if(editor != null)
-                currentUccAction = editor.GetInstanceProperty<UCCEditor, UCCAction>("CurrentAction");
+                currentUccAction = editor.GetProperty<UCCAction>("CurrentAction");
 
             listOfActionTypes.DataSource = uccActionTypes;
             listOfActionTypes.DisplayMember = "Name";

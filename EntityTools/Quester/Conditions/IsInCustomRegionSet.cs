@@ -85,6 +85,7 @@ namespace EntityTools.Quester.Conditions
             {
                 if(_customRegions.Count > 0)
                 {
+#if false
                     var sb = new StringBuilder("Check Player ");
                     if (_outside)
                         sb.Append("outside ");
@@ -97,10 +98,21 @@ namespace EntityTools.Quester.Conditions
                     if (_customRegions.Intersection.Count > 0)
                         sb.Append(" \x22c2 (").Append(_customRegions.Intersection.Count).Append(')');
                     if (_customRegions.Exclusion.Count > 0)
-                        //sb.Append(" \x00ac(").Append(_customRegions.Intersection.Count).Append(')');
+                        //sb.Append(" \x00ac(").Append(_customRegions.Exclusion.Count).Append(')');
                         sb.Append(" \\ (").Append(_customRegions.Exclusion.Count).Append(')');
 
-                    _label = sb.ToString();
+                    _label = sb.ToString(); 
+#else
+                    int unionCount = _customRegions.Union.Count,
+                        intersectionCount = _customRegions.Intersection.Count,
+                        exclusionCount = _customRegions.Exclusion.Count;
+                    _label = string.Concat("Check Player ",
+                                           _outside ? "outside " : "within ",
+                                           !string.IsNullOrEmpty(_description) ? $"'{_description}' =>" : string.Empty,
+                                           unionCount > 0 ? $" \x22c3 ({unionCount})" : string.Empty,
+                                           intersectionCount > 0 ? $" \x22c2 ({intersectionCount})" : string.Empty,
+                                           exclusionCount > 0 ? $" \x00ac ({exclusionCount})" : string.Empty);
+#endif
                 }
                 else _label = GetType().Name;
             }

@@ -14,7 +14,7 @@ namespace EntityTools.Core.Proxies
         internal UccActionProxy(UCCAction a)
         {
             action = a ?? throw new ArgumentNullException();
-            _unitRef = a.GetInstanceProperty<UCCAction, Entity>(nameof(UnitRef));
+            _unitRef = a.GetProperty<Entity>(nameof(UnitRef));
         }
         public bool NeedToRun
         {
@@ -22,12 +22,6 @@ namespace EntityTools.Core.Proxies
             {
                 if (EntityTools.Core.Initialize(action))
                     return action.NeedToRun;
-
-#if false
-                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
-
-                EntityTools.StopBot(); 
-#endif
 
                 return false;
             }
@@ -38,22 +32,16 @@ namespace EntityTools.Core.Proxies
             get
             {
                 if (EntityTools.Core.Initialize(action))
-#if false
-                    if (ReflectionHelper.GetPropertyValue(action, "UnitRef", out object result, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                                    && result is Entity entity)
-                        return entity; 
-#else
                 {
                     if (_unitRef.IsValid)
                         return _unitRef.Value;
                     ETLogger.WriteLine(LogType.Error, "Invalid 'UnitRef' accessor");
                     ETLogger.WriteLine(LogType.Error, Environment.StackTrace);
                 }
-#endif
                 return Empty.Entity;
             }
         }
-        InstancePropertyAccessor<UCCAction, Entity> _unitRef;
+        InstancePropertyAccessor<Entity> _unitRef;
 
         public string Label()
         {
@@ -67,18 +55,21 @@ namespace EntityTools.Core.Proxies
             if (EntityTools.Core.Initialize(action))
                 return action.Run();
 
-#if false
-            ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
-
-            EntityTools.StopBot(); 
-#endif
-
             return false;
         }
 
         public bool Rebase(UCCAction uccAction)
         {
             return EntityTools.Core.Initialize(uccAction);
+        }
+
+        public void Dispose()
+        {
+            if (action != null)
+            {
+                ReflectionHelper.SetFieldValue(action, "Engine", null);
+                action = null;
+            }
         }
     }
 }

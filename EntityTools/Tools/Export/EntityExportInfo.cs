@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Serialization;
 using EntityTools.Reflection;
 using MyNW.Classes;
 
@@ -7,7 +8,7 @@ namespace EntityTools.Tools
     /// <summary>
     /// краткое описание объекта Entity
     /// </summary>
-    public class EntityDef
+    public class EntityInfo
     {
         public Entity entity = Empty.Entity;
         public string Name = string.Empty;

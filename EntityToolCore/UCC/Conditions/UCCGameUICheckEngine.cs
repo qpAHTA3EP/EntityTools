@@ -19,7 +19,7 @@ namespace EntityCore.UCC.Conditions
 
         private UIGen uiGen;
         private string label = string.Empty;
-        private string conditionIDstr;
+        private string _idStr;
         #endregion
 
         internal UccGameUiCheckEngine(UCCGameUICheck uiGenCheck)
@@ -32,8 +32,22 @@ namespace EntityCore.UCC.Conditions
             ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}"); 
 #else
             InternalRebase(uiGenCheck);
-            ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} initialized: {Label()}");
+            ETLogger.WriteLine(LogType.Debug, $"{_idStr} initialized: {Label()}");
 #endif
+        }
+        ~UccGameUiCheckEngine()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = null;
+                @this = null;
+            }
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -56,10 +70,10 @@ namespace EntityCore.UCC.Conditions
             {
                 if (InternalRebase(uiGenCheck))
                 {
-                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} reinitialized");
+                    ETLogger.WriteLine(LogType.Debug, $"{_idStr} reinitialized");
                     return true;
                 }
-                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} rebase failed");
+                ETLogger.WriteLine(LogType.Debug, $"{_idStr} rebase failed");
                 return false;
             }
 
@@ -74,13 +88,13 @@ namespace EntityCore.UCC.Conditions
             if (@this != null)
             {
                 @this.PropertyChanged -= PropertyChanged;
-                @this.Engine = new EntityTools.Core.Proxies.UccConditionProxy(@this);
+                @this.Engine = null;
             }
 
             @this = execPower;
             @this.PropertyChanged += PropertyChanged;
 
-            conditionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+            _idStr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
 
             @this.Engine = this;
 

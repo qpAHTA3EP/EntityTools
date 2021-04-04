@@ -15,7 +15,7 @@ namespace EntityTools.Tools
         /// <param name="pattern"></param>
         /// <param name="strMatchType"></param>
         /// <returns></returns>
-        public static Predicate<string> Get(string pattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple)
+        public static Predicate<string> GetComparer(this string pattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple)
         {
             Predicate<string> predicate = null;
 
@@ -80,9 +80,9 @@ namespace EntityTools.Tools
         /// <param name="strMatchType"></param>
         /// <param name="selector"></param>
         /// <returns></returns>
-        public static Predicate<T> Get<T>(string pattern, ItemFilterStringType strMatchType, Func<T, string> selector) where T : class
+        public static Predicate<T> GetComparer<T>(this string pattern, ItemFilterStringType strMatchType, Func<T, string> selector) where T : class
         {
-            Predicate<string> predicate = Get(pattern, strMatchType);
+            Predicate<string> predicate = GetComparer(pattern, strMatchType);
 
             return obj => predicate(selector(obj)); 
         }

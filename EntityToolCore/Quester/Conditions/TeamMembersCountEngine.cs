@@ -1,6 +1,7 @@
 ﻿using Astral.Quester.Classes;
 using EntityCore.Extensions;
 using EntityTools;
+using EntityTools.Extensions;
 using EntityTools.Quester.Conditions;
 using MyNW.Classes;
 using MyNW.Internals;
@@ -17,56 +18,49 @@ namespace EntityCore.Quester.Conditions
         private TeamMembersCount @this = null;
 
         #region данные ядра
-        private Func<List<CustomRegion>> getCustomRegions = null;
-
-        private List<CustomRegion> customRegions = null;
-#if timeout
-        private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0); 
-#endif
         /// <summary>
         /// Кэшированное число членов группы, удовлетворяющих критериям
         /// </summary>
         private int membersCount = 0;
-        private string label = string.Empty;
+        private string _label = string.Empty;
 
         /// <summary>
         /// Префикс, идентифицирующий принадлежность отладочной информации, выводимой в Лог
         /// </summary>
-        private string conditionIDstr = string.Empty;
+        private string _idStr = string.Empty;
 
         #endregion
 
         internal TeamMembersCountEngine(TeamMembersCount tmc)
         {
-#if false
-            @this = tmc;
-            @this.Engine = this;
-            @this.PropertyChanged += PropertyChanged;
-
-            getCustomRegions = internal_GetCustomRegion_Initializer;
-
-            conditionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']'); 
-#else
             InternalRebase(tmc);
-#endif
 
-            ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} initialized: {Label()}");
+            ETLogger.WriteLine(LogType.Debug, $"{_idStr} initialized: {Label()}");
+        }
+        ~TeamMembersCountEngine()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = null;
+                @this = null;
+            }
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (ReferenceEquals(sender, @this))
             {
-                if (e.PropertyName == nameof(@this.Sign)
-                    || e.PropertyName == nameof(@this.MemberCount))
-                    label = string.Empty;
-                else if (e.PropertyName == nameof(@this.CustomRegionNames))
-                    getCustomRegions = initialize_GetCustomRegion;
+                _label = string.Empty;
+                memberCountChecker = Initicalize_MemberCountChecker;
+                counter = Initialize_Counter;
 
                 membersCount = 0;
-#if timeout
-                timeout.ChangeTime(0); 
-#endif
             }
         }
 
@@ -80,10 +74,10 @@ namespace EntityCore.Quester.Conditions
             {
                 if (InternalRebase(tmc))
                 {
-                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} reinitialized");
+                    ETLogger.WriteLine(LogType.Debug, $"{_idStr} reinitialized");
                     return true;
                 }
-                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} rebase failed");
+                ETLogger.WriteLine(LogType.Debug, $"{_idStr} rebase failed");
                 return false;
             }
 
@@ -98,15 +92,17 @@ namespace EntityCore.Quester.Conditions
             if (@this != null)
             {
                 @this.PropertyChanged -= PropertyChanged;
-                @this.Engine = new EntityTools.Core.Proxies.QuesterConditionProxy(@this);
+                @this.Engine = null;//new EntityTools.Core.Proxies.QuesterConditionProxy(@this);
             }
 
             @this = tmc;
             @this.PropertyChanged += PropertyChanged;
 
-            getCustomRegions = initialize_GetCustomRegion;
+            _idStr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
 
-            conditionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+            _label = string.Empty;
+            memberCountChecker = Initicalize_MemberCountChecker;
+            counter = Initialize_Counter;
 
             @this.Engine = this;
 
@@ -117,171 +113,14 @@ namespace EntityCore.Quester.Conditions
         {
             get
             {
-                var playerTeam = EntityManager.LocalPlayer.PlayerTeam;
-                if (playerTeam != null && playerTeam.IsInTeam && playerTeam.Team.MembersCount > 1)
-                {
-#if timeout
-                    if (timeout.IsTimedOut)
-                    { 
-#endif
-                        var containerId = EntityManager.LocalPlayer.ContainerId;
-                        var regionInternalName = EntityManager.LocalPlayer.RegionInternalName;
-                        membersCount = 0;
-
-                        // Проверка:
-                        //      member.InternalName != EntityManager.LocalPlayer.InternalName
-                        // эквивалентна проверке: 
-                        //      memberEntity.ContainerId != containerId
-                        List<CustomRegion> crList = getCustomRegions();
-                        if (crList != null && crList.Count > 0)
-                        {
-                            switch (@this._distanceSign)
-                            {
-                                case Relation.Inferior:
-                                {
-                                    membersCount = playerTeam.Team.Members.Count( member =>
-                                    {
-                                        var memberEntity = member.Entity;
-                                        return memberEntity.ContainerId != containerId
-                                                && (!@this._regionCheck || memberEntity.RegionInternalName == regionInternalName)
-                                                && memberEntity.Location.Distance3DFromPlayer < @this._distance
-                                                && (crList.Find(cr => memberEntity.Within(cr)) != null)
-                                                    ? @this._customRegionCheck == Presence.Equal
-                                                    : @this._customRegionCheck == Presence.NotEquel;
-                                    });
-
-                                    break;
-                                }
-                                case Relation.Superior:
-                                {
-                                    membersCount = playerTeam.Team.Members.Count( member =>
-                                    {
-                                        var memberEntity = member.Entity;
-                                        return memberEntity.ContainerId != containerId
-                                                            && (!@this._regionCheck || memberEntity.RegionInternalName == regionInternalName)
-                                                            && memberEntity.Location.Distance3DFromPlayer > @this._distance
-                                                            && (crList.Find(cr => memberEntity.Within(cr)) != null) 
-                                                                ? @this._customRegionCheck == Presence.Equal 
-                                                                : @this._customRegionCheck == Presence.NotEquel;
-                                    });
-                                    break; 
-                                }
-                                case Relation.Equal:
-                                {
-                                    membersCount = playerTeam.Team.Members.Count( member =>
-                                    {
-                                        var memberEntity = member.Entity;
-                                        return memberEntity.ContainerId != containerId
-                                                && (!@this._regionCheck || memberEntity.RegionInternalName == regionInternalName)
-                                                && memberEntity.Location.Distance3DFromPlayer == @this._distance
-                                                && (crList.Find((CustomRegion cr) => memberEntity.Within(cr)) != null) 
-                                                    ? @this._customRegionCheck == Presence.Equal 
-                                                    : @this._customRegionCheck == Presence.NotEquel;
-
-                                    });
-                                    break;
-                                }
-                                case Relation.NotEqual:
-                                {
-                                    membersCount = playerTeam.Team.Members.Count( member =>
-                                    {
-                                        var memberEntity = member.Entity;
-                                        return memberEntity.ContainerId != containerId
-                                                && (!@this._regionCheck || memberEntity.RegionInternalName == regionInternalName)
-                                                && memberEntity.Location.Distance3DFromPlayer != @this._distance
-                                                && (crList.Find((CustomRegion cr) => memberEntity.Within(cr)) != null)
-                                                    ? @this._customRegionCheck == Presence.Equal
-                                                    : @this._customRegionCheck == Presence.NotEquel;
-                                    });
-                                    break;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            switch (@this._distanceSign)
-                            {
-                                case Relation.Inferior:
-                                {
-                                    membersCount = playerTeam.Team.Members.FindAll( member =>
-                                    {
-                                        var memberEntity = member.Entity;
-                                        return memberEntity.ContainerId != containerId
-                                                && (!@this._regionCheck || memberEntity.RegionInternalName == regionInternalName)
-                                                && memberEntity.Location.Distance3DFromPlayer < @this._distance;
-                                    }).Count;
-                                    break;
-                                }
-                                case Relation.Superior:
-                                {
-                                    membersCount = playerTeam.Team.Members.FindAll( member =>
-                                    {
-                                        var memberEntity = member.Entity;
-                                        return member.Entity.ContainerId != containerId
-                                                && (!@this._regionCheck || member.Entity.RegionInternalName == regionInternalName)
-                                                && member.Entity.Location.Distance3DFromPlayer > @this._distance;
-                                    }).Count;
-                                    break;
-                                }
-                                case Relation.Equal:
-                                {
-                                    membersCount = playerTeam.Team.Members.FindAll(member =>
-                                    {
-                                        var memberEntity = member.Entity;
-                                        return memberEntity.ContainerId != containerId
-                                                && (!@this._regionCheck || memberEntity.RegionInternalName == regionInternalName)
-                                                && memberEntity.Location.Distance3DFromPlayer == @this._distance;
-                                    }).Count;
-                                    break;
-                                }
-                                case Relation.NotEqual:
-                                {
-                                    membersCount = playerTeam.Team.Members.FindAll((TeamMember member) =>
-                                    {
-                                        var memberEntity = member.Entity;
-                                        return memberEntity.ContainerId != containerId
-                                                && (!@this._regionCheck || memberEntity.RegionInternalName == regionInternalName)
-                                                && memberEntity.Location.Distance3DFromPlayer != @this._distance;
-                                    }).Count;
-                                    break;
-                                }
-                            }
-                        }
-#if timeout
-                        timeout.ChangeTime(EntityTools.EntityTools.Config.EntityCache.LocalCacheTime);
-                    } 
-#endif
-
-                    bool result;
-                    switch (@this._sign)
-                    {
-                        case Condition.Relation.Equal:
-                            result = membersCount == @this._memberCount;
-                            break;
-                        case Condition.Relation.NotEqual:
-                            result = membersCount != @this._memberCount;
-                            break;
-                        case Condition.Relation.Inferior:
-                            result = membersCount < @this._memberCount;
-                            break;
-                        case Condition.Relation.Superior:
-                            result = membersCount > @this._memberCount;
-                            break;
-                        default:
-                            result = false;
-                            break;
-                    }
-                    return result;
-                }
-                else return false;
+                return memberCountChecker(counter());
             }
         }
 
         public void Reset()
         {
-            getCustomRegions = initialize_GetCustomRegion;
             membersCount = 0;
-            label = string.Empty;
+            _label = string.Empty;
         }
 
         public string TestInfos
@@ -305,8 +144,8 @@ namespace EntityCore.Quester.Conditions
                         var memberDistance = memberEntity.Location.Distance3DFromPlayer;
                         var memberRegion = memberEntity.RegionInternalName;
 
-                        /* if (member.InternalName != EntityManager.LocalPlayer.InternalName)
-                         * Эквивалентно следующей строке: */
+                        // if (member.InternalName != EntityManager.LocalPlayer.InternalName)
+                        // Эквивалентно следующей строке:
                         if (memberEntity.ContainerId != containerId)
                         {
                             strBldr.AppendLine(member.InternalName);
@@ -323,16 +162,15 @@ namespace EntityCore.Quester.Conditions
                             strBldr2.Clear();
                             bool match = false;
 
-                            var crList = getCustomRegions();
-                            if (crList != null && crList.Count > 0)
+                            if (@this._customRegionNames.Count > 0)
                             {
-                                foreach (CustomRegion cr in crList)
-                                    if (memberEntity.Within(cr))
+                                foreach (var crEntry in @this._customRegionNames)
+                                    if (memberEntity.Within(crEntry))
                                     {
                                         match = true;
                                         if (strBldr2.Length > 0)
                                             strBldr2.Append(", ");
-                                        strBldr2.Append($"[{cr.Name}]");
+                                        strBldr2.Append($"[{crEntry.Name}]");
                                     }
                                 strBldr.Append("\tCustomRegions: ").Append(strBldr2).AppendLine();
 
@@ -409,41 +247,1853 @@ namespace EntityCore.Quester.Conditions
                 }
             }
         }
+
         public string Label()
         {
-            // ТОDO: исправить обновление метки в списке условий, после изменения параметров условия
-            if(string.IsNullOrEmpty(label))
-                label = $"{@this.GetType().Name} {@this._sign} to {@this._memberCount}";
-            return label;
+            if(string.IsNullOrEmpty(_label))
+                _label = $"{@this.GetType().Name} {@this._sign} to {@this._memberCount}";
+            return _label;
+        }
+        
+        #region TeamMemberCheckers
+        private bool DistanceInferior_RegionCheck_WithinCustomRegion(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) < @this._distance
+                    && memberEntity.RegionInternalName == player.RegionInternalName
+                    && @this._customRegionNames.Within(memberEntity);
+        }
+        private bool DistanceInferior_RegionCheck_OutsideCustomRegion(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) < @this._distance
+                    && memberEntity.RegionInternalName == player.RegionInternalName
+                    && @this._customRegionNames.Outside(memberEntity);
+        }
+        private bool DistanceInferior_WithinCustomRegion(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) < @this._distance
+                    && @this._customRegionNames.Within(memberEntity);
+        }
+        private bool DistanceInferior_OutsideCustomRegion(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) < @this._distance
+                    && @this._customRegionNames.Outside(memberEntity);
+        }
+        private bool DistanceInferior_RegionCheck(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) < @this._distance
+                    && memberEntity.RegionInternalName == player.RegionInternalName;
+        }
+        private bool DistanceInferior(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) < @this._distance;
         }
 
-        private List<CustomRegion> initialize_GetCustomRegion()
+        private bool DistanceSuperior_RegionCheck_WithinCustomRegion(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) > @this._distance
+                    && memberEntity.RegionInternalName == player.RegionInternalName
+                    && @this._customRegionNames.Within(memberEntity);
+        }
+        private bool DistanceSuperior_RegionCheck_OutsideCustomRegion(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) > @this._distance
+                    && memberEntity.RegionInternalName == player.RegionInternalName
+                    && @this._customRegionNames.Outside(memberEntity);
+        }
+        private bool DistanceSuperior_WithinCustomRegion(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) > @this._distance
+                    && @this._customRegionNames.Within(memberEntity);
+        }
+        private bool DistanceSuperior_OutsideCustomRegion(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) > @this._distance
+                    && @this._customRegionNames.Outside(memberEntity);
+        }
+        private bool DistanceSuperior_RegionCheck(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) > @this._distance
+                    && memberEntity.RegionInternalName == player.RegionInternalName;
+        }
+        private bool DistanceSuperior(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) > @this._distance;
+        }
+
+        private bool DistanceEqual_RegionCheck_WithinCustomRegion(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) == @this._distance
+                    && memberEntity.RegionInternalName == player.RegionInternalName
+                    && @this._customRegionNames.Within(memberEntity);
+        }
+        private bool DistanceEqual_RegionCheck_OutsideCustomRegion(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) == @this._distance
+                    && memberEntity.RegionInternalName == player.RegionInternalName
+                    && @this._customRegionNames.Outside(memberEntity);
+        }
+        private bool DistanceEqual_WithinCustomRegion(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) == @this._distance
+                    && @this._customRegionNames.Within(memberEntity);
+        }
+        private bool DistanceEqual_OutsideCustomRegion(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) == @this._distance
+                    && @this._customRegionNames.Outside(memberEntity);
+        }
+        private bool DistanceEqual_RegionCheck(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) == @this._distance
+                    && memberEntity.RegionInternalName == player.RegionInternalName;
+        }
+        private bool DistanceEqual(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) == @this._distance;
+        }
+
+        private bool DistanceNotEqual_RegionCheck_WithinCustomRegion(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) != @this._distance
+                    && memberEntity.RegionInternalName == player.RegionInternalName
+                    && @this._customRegionNames.Within(memberEntity);
+        }
+        private bool DistanceNotEqual_RegionCheck_OutsideCustomRegion(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) != @this._distance
+                    && memberEntity.RegionInternalName == player.RegionInternalName
+                    && @this._customRegionNames.Outside(memberEntity);
+        }
+        private bool DistanceNotEqual_WithinCustomRegion(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) != @this._distance
+                    && @this._customRegionNames.Within(memberEntity);
+        }
+        private bool DistanceNotEqual_OutsideCustomRegion(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) != @this._distance
+                    && @this._customRegionNames.Outside(memberEntity);
+        }
+        private bool DistanceNotEqual_RegionCheck(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) != @this._distance
+                    && memberEntity.RegionInternalName == player.RegionInternalName;
+        }
+        private bool DistanceNotEqual(TeamMember member)
+        {
+            var player = EntityManager.LocalPlayer;
+            var memberEntity = member.Entity;
+
+            return memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3D(player.Location) != @this._distance;
+        }
+        #endregion
+
+        #region MemberCounters
+        /// <summary>
+        /// Cчетчик <seealso cref="TeamMember"/>, удовлетворяющих условиям команды <seealso cref="TeamMembersCount"/>
+        /// </summary>
+        Func<int> counter;
+#if false
+        Func<int> Counter
+        {
+            get
+            {
+                if (counter is null)
+                {
+                    if (@this._customRegionNames?.Count > 0)
+                    {
+                        switch (@this._distanceSign)
+                        {
+                            case Relation.Inferior:
+                                if (@this._regionCheck)
+                                    if (@this._customRegionCheck == Presence.Equal)
+                                        counter = CountMembers_UnderConditions_DistanceInferior_RegionCheck_WithinCustomRegion;
+                                    else counter = CountMembers_UnderConditions_DistanceInferior_RegionCheck_OutsideCustomRegion;
+                                else if (@this._customRegionCheck == Presence.Equal)
+                                    counter = CountMembers_UnderConditions_DistanceInferior_WithinCustomRegion;
+                                else counter = CountMembers_UnderConditions_DistanceInferior_OutsideCustomRegion;
+                                break;
+                            case Relation.Superior:
+                                if (@this._regionCheck)
+                                    if (@this._customRegionCheck == Presence.Equal)
+                                        counter = CountMembers_UnderConditions_DistanceSuperior_RegionCheck_WithinCustomRegion;
+                                    else counter = CountMembers_UnderConditions_DistanceSuperior_RegionCheck_OutsideCustomRegion;
+                                else if (@this._customRegionCheck == Presence.Equal)
+                                    counter = CountMembers_UnderConditions_DistanceSuperior_WithinCustomRegion;
+                                else counter = CountMembers_UnderConditions_DistanceSuperior_OutsideCustomRegion;
+                                break;
+                            case Relation.Equal:
+                                if (@this._regionCheck)
+                                    if (@this._customRegionCheck == Presence.Equal)
+                                        counter = CountMembers_UnderConditions_DistanceEqual_RegionCheck_WithinCustomRegion;
+                                    else counter = CountMembers_UnderConditions_DistanceEqual_RegionCheck_OutsideCustomRegion;
+                                else if (@this._customRegionCheck == Presence.Equal)
+                                    counter = CountMembers_UnderConditions_DistanceEqual_WithinCustomRegion;
+                                else counter = CountMembers_UnderConditions_DistanceEqual_OutsideCustomRegion;
+                                break;
+                            case Relation.NotEqual:
+                                if (@this._regionCheck)
+                                    if (@this._customRegionCheck == Presence.Equal)
+                                        counter = CountMembers_UnderConditions_DistanceNotEqual_RegionCheck_WithinCustomRegion;
+                                    else counter = CountMembers_UnderConditions_DistanceNotEqual_RegionCheck_OutsideCustomRegion;
+                                else if (@this._customRegionCheck == Presence.Equal)
+                                    counter = CountMembers_UnderConditions_DistanceNotEqual_WithinCustomRegion;
+                                else counter = CountMembers_UnderConditions_DistanceNotEqual_OutsideCustomRegion;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (@this._distanceSign)
+                        {
+                            case Relation.Inferior:
+                                if (@this._regionCheck)
+                                    counter = CountMembers_UnderConditions_DistanceInferior_RegionCheck;
+                                else counter = CountMembers_UnderConditions_DistanceInferior;
+                                break;
+                            case Relation.Superior:
+                                if (@this._regionCheck)
+                                    counter = CountMembers_UnderConditions_DistanceSuperior_RegionCheck;
+                                else counter = CountMembers_UnderConditions_DistanceSuperior;
+                                break;
+                            case Relation.Equal:
+                                if (@this._regionCheck)
+                                    counter = CountMembers_UnderConditions_DistanceEqual_RegionCheck;
+                                else counter = CountMembers_UnderConditions_DistanceEqual;
+                                break;
+                            case Relation.NotEqual:
+                                if (@this._regionCheck)
+                                    counter = CountMembers_UnderConditions_DistanceNotEqual_RegionCheck;
+                                else counter = CountMembers_UnderConditions_DistanceNotEqual;
+                                break;
+                        }
+                    }
+                }
+                return counter;
+            }
+        } 
+#endif
+
+        private int Initialize_Counter()
         {
             if (@this._customRegionNames?.Count > 0)
             {
-                customRegions = CustomRegionExtentions.GetCustomRegions(@this._customRegionNames);
-#if DEBUG
-                if (customRegions is null || customRegions.Count == 0)
-                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(initialize_GetCustomRegion)}: List of {nameof(@this.CustomRegionNames)} is empty");
-                else ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(initialize_GetCustomRegion)}: Select List of {customRegions.Count} CustomRegions");
-#endif
+                switch (@this._distanceSign)
+                {
+                    case Relation.Inferior:
+                        if (@this._regionCheck)
+                            if (@this._customRegionCheck == Presence.Equal)
+                                counter = CountMembers_UnderConditions_DistanceInferior_RegionCheck_WithinCustomRegion;
+                            else counter = CountMembers_UnderConditions_DistanceInferior_RegionCheck_OutsideCustomRegion;
+                        else if (@this._customRegionCheck == Presence.Equal)
+                            counter = CountMembers_UnderConditions_DistanceInferior_WithinCustomRegion;
+                        else counter = CountMembers_UnderConditions_DistanceInferior_OutsideCustomRegion;
+                        break;
+                    case Relation.Superior:
+                        if (@this._regionCheck)
+                            if (@this._customRegionCheck == Presence.Equal)
+                                counter = CountMembers_UnderConditions_DistanceSuperior_RegionCheck_WithinCustomRegion;
+                            else counter = CountMembers_UnderConditions_DistanceSuperior_RegionCheck_OutsideCustomRegion;
+                        else if (@this._customRegionCheck == Presence.Equal)
+                            counter = CountMembers_UnderConditions_DistanceSuperior_WithinCustomRegion;
+                        else counter = CountMembers_UnderConditions_DistanceSuperior_OutsideCustomRegion;
+                        break;
+                    case Relation.Equal:
+                        if (@this._regionCheck)
+                            if (@this._customRegionCheck == Presence.Equal)
+                                counter = CountMembers_UnderConditions_DistanceEqual_RegionCheck_WithinCustomRegion;
+                            else counter = CountMembers_UnderConditions_DistanceEqual_RegionCheck_OutsideCustomRegion;
+                        else if (@this._customRegionCheck == Presence.Equal)
+                            counter = CountMembers_UnderConditions_DistanceEqual_WithinCustomRegion;
+                        else counter = CountMembers_UnderConditions_DistanceEqual_OutsideCustomRegion;
+                        break;
+                    case Relation.NotEqual:
+                        if (@this._regionCheck)
+                            if (@this._customRegionCheck == Presence.Equal)
+                                counter = CountMembers_UnderConditions_DistanceNotEqual_RegionCheck_WithinCustomRegion;
+                            else counter = CountMembers_UnderConditions_DistanceNotEqual_RegionCheck_OutsideCustomRegion;
+                        else if (@this._customRegionCheck == Presence.Equal)
+                            counter = CountMembers_UnderConditions_DistanceNotEqual_WithinCustomRegion;
+                        else counter = CountMembers_UnderConditions_DistanceNotEqual_OutsideCustomRegion;
+                        break;
+                }
             }
             else
             {
-                customRegions = null;
-#if DEBUG
-                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr}.{nameof(initialize_GetCustomRegion)}: List of {nameof(@this.CustomRegionNames)} is empty");
-#endif
+                switch (@this._distanceSign)
+                {
+                    case Relation.Inferior:
+                        if (@this._regionCheck)
+                            counter = CountMembers_UnderConditions_DistanceInferior_RegionCheck;
+                        else counter = CountMembers_UnderConditions_DistanceInferior;
+                        break;
+                    case Relation.Superior:
+                        if (@this._regionCheck)
+                            counter = CountMembers_UnderConditions_DistanceSuperior_RegionCheck;
+                        else counter = CountMembers_UnderConditions_DistanceSuperior;
+                        break;
+                    case Relation.Equal:
+                        if (@this._regionCheck)
+                            counter = CountMembers_UnderConditions_DistanceEqual_RegionCheck;
+                        else counter = CountMembers_UnderConditions_DistanceEqual;
+                        break;
+                    case Relation.NotEqual:
+                        if (@this._regionCheck)
+                            counter = CountMembers_UnderConditions_DistanceNotEqual_RegionCheck;
+                        else counter = CountMembers_UnderConditions_DistanceNotEqual;
+                        break;
+                }
             }
-
-            getCustomRegions = internal_GetCustomRegion_Getter;
-
-            return customRegions;
+            return counter();
         }
 
-        private List<CustomRegion> internal_GetCustomRegion_Getter()
+        private int CountMembers_UnderConditions_DistanceInferior_RegionCheck_WithinCustomRegion()
         {
-            return customRegions;
+            int counter = 0;
+            foreach (var member in EntityManager.LocalPlayer.PlayerTeam.Team.Members)
+                if (DistanceInferior_RegionCheck_WithinCustomRegion(member))
+                    counter++;
+            return counter;
         }
+        private int CountMembers_UnderConditions_DistanceInferior_RegionCheck_OutsideCustomRegion()
+        {
+            int counter = 0;
+            foreach (var member in EntityManager.LocalPlayer.PlayerTeam.Team.Members)
+                if (DistanceInferior_RegionCheck_OutsideCustomRegion(member))
+                    counter++;
+            return counter;
+        }
+        private int CountMembers_UnderConditions_DistanceInferior_WithinCustomRegion()
+        {
+            int counter = 0;
+            foreach (var member in EntityManager.LocalPlayer.PlayerTeam.Team.Members)
+                if (DistanceInferior_WithinCustomRegion(member))
+                    counter++;
+            return counter;
+        }
+        private int CountMembers_UnderConditions_DistanceInferior_OutsideCustomRegion()
+        {
+            int counter = 0;
+            foreach (var member in EntityManager.LocalPlayer.PlayerTeam.Team.Members)
+                if (DistanceInferior_OutsideCustomRegion(member))
+                    counter++;
+            return counter;
+        }
+        private int CountMembers_UnderConditions_DistanceInferior_RegionCheck()
+        {
+            int counter = 0;
+            foreach (var member in EntityManager.LocalPlayer.PlayerTeam.Team.Members)
+                if (DistanceInferior_RegionCheck(member))
+                    counter++;
+            return counter;
+        }
+        private int CountMembers_UnderConditions_DistanceInferior()
+        {
+            int counter = 0;
+            foreach (var member in EntityManager.LocalPlayer.PlayerTeam.Team.Members)
+                if (DistanceInferior(member))
+                    counter++;
+            return counter;
+        }
+
+        private int CountMembers_UnderConditions_DistanceSuperior_RegionCheck_WithinCustomRegion()
+        {
+            int counter = 0;
+            foreach (var member in EntityManager.LocalPlayer.PlayerTeam.Team.Members)
+                if (DistanceSuperior_RegionCheck_WithinCustomRegion(member))
+                    counter++;
+            return counter;
+        }
+        private int CountMembers_UnderConditions_DistanceSuperior_RegionCheck_OutsideCustomRegion()
+        {
+            int counter = 0;
+            foreach (var member in EntityManager.LocalPlayer.PlayerTeam.Team.Members)
+                if (DistanceSuperior_RegionCheck_OutsideCustomRegion(member))
+                    counter++;
+            return counter;
+        }
+        private int CountMembers_UnderConditions_DistanceSuperior_WithinCustomRegion()
+        {
+            int counter = 0;
+            foreach (var member in EntityManager.LocalPlayer.PlayerTeam.Team.Members)
+                if (DistanceSuperior_WithinCustomRegion(member))
+                    counter++;
+            return counter;
+        }
+        private int CountMembers_UnderConditions_DistanceSuperior_OutsideCustomRegion()
+        {
+            int counter = 0;
+            foreach (var member in EntityManager.LocalPlayer.PlayerTeam.Team.Members)
+                if (DistanceSuperior_OutsideCustomRegion(member))
+                    counter++;
+            return counter;
+        }
+        private int CountMembers_UnderConditions_DistanceSuperior_RegionCheck()
+        {
+            int counter = 0;
+            foreach (var member in EntityManager.LocalPlayer.PlayerTeam.Team.Members)
+                if (DistanceSuperior_RegionCheck(member))
+                    counter++;
+            return counter;
+        }
+        private int CountMembers_UnderConditions_DistanceSuperior()
+        {
+            int counter = 0;
+            foreach (var member in EntityManager.LocalPlayer.PlayerTeam.Team.Members)
+                if (DistanceSuperior(member))
+                    counter++;
+            return counter;
+        }
+
+        private int CountMembers_UnderConditions_DistanceEqual_RegionCheck_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_RegionCheck_WithinCustomRegion(member))
+                    counter++;
+            return counter;
+        }
+        private int CountMembers_UnderConditions_DistanceEqual_RegionCheck_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_RegionCheck_OutsideCustomRegion(member))
+                    counter++;
+            return counter;
+        }
+        private int CountMembers_UnderConditions_DistanceEqual_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_WithinCustomRegion(member))
+                    counter++;
+            return counter;
+        }
+        private int CountMembers_UnderConditions_DistanceEqual_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_OutsideCustomRegion(member))
+                    counter++;
+            return counter;
+        }
+        private int CountMembers_UnderConditions_DistanceEqual_RegionCheck()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_RegionCheck(member))
+                    counter++;
+            return counter;
+        }
+        private int CountMembers_UnderConditions_DistanceEqual()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+            {
+                var memberEntity = member.Entity;
+
+                if (memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3DFromPlayer == @this._distance)
+                    counter++;
+            }
+            return counter;
+        }
+
+        private int CountMembers_UnderConditions_DistanceNotEqual_RegionCheck_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_RegionCheck_WithinCustomRegion(member))
+                    counter++;
+            return counter;
+        }
+        private int CountMembers_UnderConditions_DistanceNotEqual_RegionCheck_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_RegionCheck_OutsideCustomRegion(member))
+                    counter++;
+            return counter;
+        }
+        private int CountMembers_UnderConditions_DistanceNotEqual_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_WithinCustomRegion(member))
+                    counter++;
+            return counter;
+        }
+        private int CountMembers_UnderConditions_DistanceNotEqual_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_OutsideCustomRegion(member))
+                    counter++;
+            return counter;
+        }
+        private int CountMembers_UnderConditions_DistanceNotEqual_RegionCheck()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_RegionCheck(member))
+                    counter++;
+            return counter;
+        }
+        private int CountMembers_UnderConditions_DistanceNotEqual()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual(member))
+                    counter++;
+            return counter;
+        }
+        #endregion
+
+#if true
+        /// <summary>
+        /// Предикат, проверяющий истинность соотношения <seealso cref="TeamMembersCount.Sign"/> 
+        /// между подсчитанным количеством <seealso cref="TeamMember"/>, удовлетворяющих улосвиям <seealso cref="TeamMembersCount"/>
+        /// и заданным значеним <seealso cref="TeamMembersCount.MemberCount"/>
+        /// </summary>
+        Predicate<int> memberCountChecker;
+        
+        private bool Initicalize_MemberCountChecker(int count)
+        { 
+            switch (@this._sign)
+            {
+                case Relation.Inferior:
+                    memberCountChecker = Inferior_Than_MemberCount;
+                    break;
+                case Relation.Superior:
+                    memberCountChecker = Superior_Than_MemberCount;
+                    break;
+                case Relation.Equal:
+                    memberCountChecker = Equal_To_MemberCount;
+                    break;
+                case Relation.NotEqual:
+                    memberCountChecker = NotEqual_To_MemberCount;
+                    break;
+            }
+            return memberCountChecker(count);
+        }
+        private bool Inferior_Than_MemberCount(int count)
+        {
+            return count < @this._memberCount;
+        }
+        private bool Superior_Than_MemberCount(int count)
+        {
+            return count > @this._memberCount;
+        }
+        private bool Equal_To_MemberCount(int count)
+        {
+            return count == @this._memberCount;
+        }
+        private bool NotEqual_To_MemberCount(int count)
+        {
+            return count != @this._memberCount;
+        }
+#else
+        /// <summary>
+        /// Конструирование предиката, выполняющего подсчет <seealso cref="TeamMember"/>, удовлетворяющих условиям команды <seealso cref="TeamMembersCount"/>,
+        /// и проверяющего истинность соотношения <seealso cref="TeamMembersCount.Sign"/> между подсчитанным значением и <seealso cref="TeamMembersCount.MemberCount"/>
+        /// </summary>
+        Func<bool> MemberCountChecker
+        {
+            get
+            {
+                if (_memberCountCheck is null)
+                {
+                    if (@this._customRegionNames?.Count > 0)
+                    {
+                        switch (@this._sign)
+                        {
+                            case Relation.Inferior:
+                                switch (@this._distanceSign)
+                                {
+                                    case Relation.Inferior:
+                                        if (@this._regionCheck)
+                                            if (@this._customRegionCheck == Presence.Equal)
+                                                _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck_WithinCustomRegion;
+                                            else _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck_OutsideCustomRegion;
+                                        else if (@this._customRegionCheck == Presence.Equal)
+                                            _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_WithinCustomRegion;
+                                        else _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_OutsideCustomRegion;
+                                        break;
+                                    case Relation.Superior:
+                                        if (@this._regionCheck)
+                                            if (@this._customRegionCheck == Presence.Equal)
+                                                _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck_WithinCustomRegion;
+                                            else _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck_OutsideCustomRegion;
+                                        else if (@this._customRegionCheck == Presence.Equal)
+                                            _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_WithinCustomRegion;
+                                        else _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_OutsideCustomRegion;
+                                        break;
+                                    case Relation.Equal:
+                                        if (@this._regionCheck)
+                                            if (@this._customRegionCheck == Presence.Equal)
+                                                _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck_WithinCustomRegion;
+                                            else _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck_OutsideCustomRegion;
+                                        else if (@this._customRegionCheck == Presence.Equal)
+                                            _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_WithinCustomRegion;
+                                        else _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_OutsideCustomRegion;
+                                        break;
+                                    case Relation.NotEqual:
+                                        if (@this._regionCheck)
+                                            if (@this._customRegionCheck == Presence.Equal)
+                                                _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck_WithinCustomRegion;
+                                            else _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck_OutsideCustomRegion;
+                                        else if (@this._customRegionCheck == Presence.Equal)
+                                            _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_WithinCustomRegion;
+                                        else _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_OutsideCustomRegion;
+                                        break;
+                                }
+                                break;
+                            case Relation.Superior:
+                                switch (@this._distanceSign)
+                                {
+                                    case Relation.Inferior:
+                                        if (@this._regionCheck)
+                                            if (@this._customRegionCheck == Presence.Equal)
+                                                _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck_WithinCustomRegion;
+                                            else _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck_OutsideCustomRegion;
+                                        else if (@this._customRegionCheck == Presence.Equal)
+                                            _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_WithinCustomRegion;
+                                        else _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_OutsideCustomRegion;
+                                        break;
+                                    case Relation.Superior:
+                                        if (@this._regionCheck)
+                                            if (@this._customRegionCheck == Presence.Equal)
+                                                _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck_WithinCustomRegion;
+                                            else _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck_OutsideCustomRegion;
+                                        else if (@this._customRegionCheck == Presence.Equal)
+                                            _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_WithinCustomRegion;
+                                        else _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_OutsideCustomRegion;
+                                        break;
+                                    case Relation.Equal:
+                                        if (@this._regionCheck)
+                                            if (@this._customRegionCheck == Presence.Equal)
+                                                _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck_WithinCustomRegion;
+                                            else _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck_OutsideCustomRegion;
+                                        else if (@this._customRegionCheck == Presence.Equal)
+                                            _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_WithinCustomRegion;
+                                        else _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_OutsideCustomRegion;
+                                        break;
+                                    case Relation.NotEqual:
+                                        if (@this._regionCheck)
+                                            if (@this._customRegionCheck == Presence.Equal)
+                                                _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck_WithinCustomRegion;
+                                            else _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck_OutsideCustomRegion;
+                                        else if (@this._customRegionCheck == Presence.Equal)
+                                            _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_WithinCustomRegion;
+                                        else _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_OutsideCustomRegion;
+                                        break;
+                                }
+                                break;
+                            case Relation.Equal:
+                                switch (@this._distanceSign)
+                                {
+                                    case Relation.Inferior:
+                                        if (@this._regionCheck)
+                                            if (@this._customRegionCheck == Presence.Equal)
+                                                _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck_WithinCustomRegion;
+                                            else _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck_OutsideCustomRegion;
+                                        else if (@this._customRegionCheck == Presence.Equal)
+                                            _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_WithinCustomRegion;
+                                        else _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_OutsideCustomRegion;
+                                        break;
+                                    case Relation.Superior:
+                                        if (@this._regionCheck)
+                                            if (@this._customRegionCheck == Presence.Equal)
+                                                _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck_WithinCustomRegion;
+                                            else _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck_OutsideCustomRegion;
+                                        else if (@this._customRegionCheck == Presence.Equal)
+                                            _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_WithinCustomRegion;
+                                        else _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_OutsideCustomRegion;
+                                        break;
+                                    case Relation.Equal:
+                                        if (@this._regionCheck)
+                                            if (@this._customRegionCheck == Presence.Equal)
+                                                _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck_WithinCustomRegion;
+                                            else _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck_OutsideCustomRegion;
+                                        else if (@this._customRegionCheck == Presence.Equal)
+                                            _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_WithinCustomRegion;
+                                        else _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_OutsideCustomRegion;
+                                        break;
+                                    case Relation.NotEqual:
+                                        if (@this._regionCheck)
+                                            if (@this._customRegionCheck == Presence.Equal)
+                                                _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck_WithinCustomRegion;
+                                            else _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck_OutsideCustomRegion;
+                                        else if (@this._customRegionCheck == Presence.Equal)
+                                            _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_WithinCustomRegion;
+                                        else _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_OutsideCustomRegion;
+                                        break;
+                                }
+                                break;
+                            case Relation.NotEqual:
+                                switch (@this._distanceSign)
+                                {
+                                    case Relation.Inferior:
+                                        if (@this._regionCheck)
+                                            if (@this._customRegionCheck == Presence.Equal)
+                                                _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck_WithinCustomRegion;
+                                            else _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck_OutsideCustomRegion;
+                                        else if (@this._customRegionCheck == Presence.Equal)
+                                            _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_WithinCustomRegion;
+                                        else _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_OutsideCustomRegion;
+                                        break;
+                                    case Relation.Superior:
+                                        if (@this._regionCheck)
+                                            if (@this._customRegionCheck == Presence.Equal)
+                                                _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck_WithinCustomRegion;
+                                            else _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck_OutsideCustomRegion;
+                                        else if (@this._customRegionCheck == Presence.Equal)
+                                            _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_WithinCustomRegion;
+                                        else _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_OutsideCustomRegion;
+                                        break;
+                                    case Relation.Equal:
+                                        if (@this._regionCheck)
+                                            if (@this._customRegionCheck == Presence.Equal)
+                                                _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck_WithinCustomRegion;
+                                            else _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck_OutsideCustomRegion;
+                                        else if (@this._customRegionCheck == Presence.Equal)
+                                            _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_WithinCustomRegion;
+                                        else _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_OutsideCustomRegion;
+                                        break;
+                                    case Relation.NotEqual:
+                                        if (@this._regionCheck)
+                                            if (@this._customRegionCheck == Presence.Equal)
+                                                _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck_WithinCustomRegion;
+                                            else _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck_OutsideCustomRegion;
+                                        else if (@this._customRegionCheck == Presence.Equal)
+                                            _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_WithinCustomRegion;
+                                        else _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_OutsideCustomRegion;
+                                        break;
+                                }
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (@this._sign)
+                        {
+                            case Relation.Inferior:
+                                switch (@this._distanceSign)
+                                {
+                                    case Relation.Inferior:
+                                        if (@this._regionCheck)
+                                            _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck;
+                                        else _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior;
+                                        break;
+                                    case Relation.Superior:
+                                        if (@this._regionCheck)
+                                            _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck;
+                                        else _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior;
+                                        break;
+                                    case Relation.Equal:
+                                        if (@this._regionCheck)
+                                            _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck;
+                                        else _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual;
+                                        break;
+                                    case Relation.NotEqual:
+                                        if (@this._regionCheck)
+                                            _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck;
+                                        else _memberCountCheck = InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual;
+                                        break;
+                                }
+                                break;
+                            case Relation.Superior:
+                                switch (@this._distanceSign)
+                                {
+                                    case Relation.Inferior:
+                                        if (@this._regionCheck)
+                                            _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck;
+                                        else _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior;
+                                        break;
+                                    case Relation.Superior:
+                                        if (@this._regionCheck)
+                                            _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck;
+                                        else _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior;
+                                        break;
+                                    case Relation.Equal:
+                                        if (@this._regionCheck)
+                                            _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck;
+                                        else _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual;
+                                        break;
+                                    case Relation.NotEqual:
+                                        if (@this._regionCheck)
+                                            _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck;
+                                        else _memberCountCheck = SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual;
+                                        break;
+                                }
+                                break;
+                            case Relation.Equal:
+                                switch (@this._distanceSign)
+                                {
+                                    case Relation.Inferior:
+                                        if (@this._regionCheck)
+                                            _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck;
+                                        else _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior;
+                                        break;
+                                    case Relation.Superior:
+                                        if (@this._regionCheck)
+                                            _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck;
+                                        else _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior;
+                                        break;
+                                    case Relation.Equal:
+                                        if (@this._regionCheck)
+                                            _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck;
+                                        else _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual;
+                                        break;
+                                    case Relation.NotEqual:
+                                        if (@this._regionCheck)
+                                            _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck;
+                                        else _memberCountCheck = EqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual;
+                                        break;
+                                }
+                                break;
+                            case Relation.NotEqual:
+                                switch (@this._distanceSign)
+                                {
+                                    case Relation.Inferior:
+                                        if (@this._regionCheck)
+                                            _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck;
+                                        else _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior;
+                                        break;
+                                    case Relation.Superior:
+                                        if (@this._regionCheck)
+                                            _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck;
+                                        else _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior;
+                                        break;
+                                    case Relation.Equal:
+                                        if (@this._regionCheck)
+                                            _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck;
+                                        else _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual;
+                                        break;
+                                    case Relation.NotEqual:
+                                        if (@this._regionCheck)
+                                            _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck;
+                                        else _memberCountCheck = NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual;
+                                        break;
+                                }
+                                break;
+                        }
+                    }
+                }
+                return _memberCountCheck;
+            }
+        }
+        Func<bool> _memberCountCheck;
+
+        #region InferiorComparison
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior_RegionCheck_WithinCustomRegion(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior_RegionCheck_OutsideCustomRegion(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior_WithinCustomRegion(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior_OutsideCustomRegion(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior_RegionCheck(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior_RegionCheck_WithinCustomRegion(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior_RegionCheck_OutsideCustomRegion(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior_WithinCustomRegion(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior_OutsideCustomRegion(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior_RegionCheck(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_RegionCheck_WithinCustomRegion(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_RegionCheck_OutsideCustomRegion(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_WithinCustomRegion(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_OutsideCustomRegion(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_RegionCheck(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+            {
+                var memberEntity = member.Entity;
+
+                if (memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3DFromPlayer == @this._distance)
+                    counter++;
+            }
+            return counter < @this._memberCount;
+        }
+
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_RegionCheck_WithinCustomRegion(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_RegionCheck_OutsideCustomRegion(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_WithinCustomRegion(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_OutsideCustomRegion(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_RegionCheck(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        private bool InferiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual(member))
+                    counter++;
+            return counter < @this._memberCount;
+        }
+        #endregion
+        #region SuperiorComparison
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior_RegionCheck_WithinCustomRegion(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior_RegionCheck_OutsideCustomRegion(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior_WithinCustomRegion(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior_OutsideCustomRegion(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior_RegionCheck(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceInferior()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior_RegionCheck_WithinCustomRegion(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior_RegionCheck_OutsideCustomRegion(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior_WithinCustomRegion(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior_OutsideCustomRegion(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior_RegionCheck(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_RegionCheck_WithinCustomRegion(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_RegionCheck_OutsideCustomRegion(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_WithinCustomRegion(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_OutsideCustomRegion(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_RegionCheck(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceEqual()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+            {
+                var memberEntity = member.Entity;
+
+                if (memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3DFromPlayer == @this._distance)
+                    counter++;
+            }
+            return counter > @this._memberCount;
+        }
+
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_RegionCheck_WithinCustomRegion(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_RegionCheck_OutsideCustomRegion(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_WithinCustomRegion(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_OutsideCustomRegion(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_RegionCheck(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        private bool SuperiorComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual(member))
+                    counter++;
+            return counter > @this._memberCount;
+        }
+        #endregion
+        #region EqualComparison
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior_RegionCheck_WithinCustomRegion(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior_RegionCheck_OutsideCustomRegion(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior_WithinCustomRegion(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior_OutsideCustomRegion(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior_RegionCheck(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior_RegionCheck_WithinCustomRegion(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior_RegionCheck_OutsideCustomRegion(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior_WithinCustomRegion(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior_OutsideCustomRegion(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior_RegionCheck(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_RegionCheck_WithinCustomRegion(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_RegionCheck_OutsideCustomRegion(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_WithinCustomRegion(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_OutsideCustomRegion(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_RegionCheck(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+            {
+                var memberEntity = member.Entity;
+
+                if (memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3DFromPlayer == @this._distance)
+                    counter++;
+            }
+            return counter == @this._memberCount;
+        }
+
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_RegionCheck_WithinCustomRegion(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_RegionCheck_OutsideCustomRegion(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_WithinCustomRegion(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_OutsideCustomRegion(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_RegionCheck(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        private bool EqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual(member))
+                    counter++;
+            return counter == @this._memberCount;
+        }
+        #endregion
+        #region NotEqualComparison
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior_RegionCheck_WithinCustomRegion(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior_RegionCheck_OutsideCustomRegion(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior_WithinCustomRegion(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior_OutsideCustomRegion(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior_RegionCheck()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior_RegionCheck(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceInferior()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceInferior(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior_RegionCheck_WithinCustomRegion(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior_RegionCheck_OutsideCustomRegion(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior_WithinCustomRegion(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior_OutsideCustomRegion(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior_RegionCheck()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior_RegionCheck(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceSuperior()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceSuperior(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_RegionCheck_WithinCustomRegion(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_RegionCheck_OutsideCustomRegion(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_WithinCustomRegion(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_OutsideCustomRegion(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual_RegionCheck()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceEqual_RegionCheck(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceEqual()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+            {
+                var memberEntity = member.Entity;
+
+                if (memberEntity.ContainerId != player.ContainerId
+                    && memberEntity.Location.Distance3DFromPlayer == @this._distance)
+                    counter++;
+            }
+            return counter != @this._memberCount;
+        }
+
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_RegionCheck_WithinCustomRegion(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_RegionCheck_OutsideCustomRegion(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_WithinCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_WithinCustomRegion(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_OutsideCustomRegion()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_OutsideCustomRegion(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual_RegionCheck()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual_RegionCheck(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        private bool NotEqualComparison__MemberCount__And__CountedUnderConditions_DistanceNotEqual()
+        {
+            var player = EntityManager.LocalPlayer;
+            int counter = 0;
+            foreach (var member in player.PlayerTeam.Team.Members)
+                if (DistanceNotEqual(member))
+                    counter++;
+            return counter != @this._memberCount;
+        }
+        #endregion  
+#endif
     }
 }

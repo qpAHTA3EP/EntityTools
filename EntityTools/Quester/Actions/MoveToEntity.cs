@@ -10,32 +10,15 @@ using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
+using EntityTools.Tools.CustomRegions;
 using MyNW.Classes;
 using Action = Astral.Quester.Classes.Action;
 
 namespace EntityTools.Quester.Actions
 {
     [Serializable]
-    public class MoveToEntity : Action, INotifyPropertyChanged
+    public class MoveToEntity : Action, INotifyPropertyChanged, IEntityDescriptor
     {
-        #region Взаимодействие с ядром EntityToolsCore
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        [XmlIgnore]
-        [NonSerialized]
-        internal IQuesterActionEngine Engine;
-
-        public MoveToEntity()
-        {
-            Engine = new QuesterActionProxy(this);
-        }
-
-        private IQuesterActionEngine internal_GetProxie()
-        {
-            return new QuesterActionProxy(this);
-        }
-        #endregion
-
         #region Опции команды
 #if DEVELOPER
         [Description("ID of the Entity for the search")]
@@ -52,7 +35,11 @@ namespace EntityTools.Quester.Actions
                 if (_entityId != value)
                 {
                     _entityId = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityID)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityID))); 
+#else
+                    Engine.OnPropertyChanged(this, nameof(EntityID));
+#endif
                 }
             }
         }
@@ -74,7 +61,11 @@ namespace EntityTools.Quester.Actions
                 if (_entityIdType != value)
                 {
                     _entityIdType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityIdType)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityIdType))); 
+#else
+                    Engine.OnPropertyChanged(this, nameof(EntityIdType));
+#endif
                 }
             }
         }
@@ -94,7 +85,11 @@ namespace EntityTools.Quester.Actions
                 if (_entityNameType != value)
                 {
                     _entityNameType = value;
-                    //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityNameType)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityNameType))); 
+#else
+                    Engine.OnPropertyChanged(this, nameof(EntityNameType));
+#endif
                 }
             }
         }
@@ -115,7 +110,11 @@ namespace EntityTools.Quester.Actions
                 if (_regionCheck != value)
                 {
                     _regionCheck = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RegionCheck)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RegionCheck))); 
+#else
+                    Engine.OnPropertyChanged(this, nameof(RegionCheck));
+#endif
                 }
             }
         }
@@ -136,14 +135,18 @@ namespace EntityTools.Quester.Actions
                 if (_healthCheck = value)
                 {
                     _healthCheck = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HealthCheck)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HealthCheck))); 
+#else
+                    Engine.OnPropertyChanged(this, nameof(HealthCheck));
+#endif
                 }
             }
         }
         internal bool _healthCheck = true;
 
 #if DEVELOPER
-        [Description("True: Do not change the target Entity while it is alive or until the Bot within 'Distance' of it\n" +
+        [Description("True: Do not change the target Entity while it is alive or until the Bot within '"+nameof(Distance)+"' of it\n" +
                      "False: Constantly scan an area and target the nearest Entity")]
         [Category("Optional")]
 #else
@@ -156,7 +159,11 @@ namespace EntityTools.Quester.Actions
                 if (_holdTargetEntity != value)
                 {
                     _holdTargetEntity = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HoldTargetEntity)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HoldTargetEntity))); 
+#else
+                    Engine.OnPropertyChanged(this, nameof(HoldTargetEntity));
+#endif
                 }
             }
         }
@@ -176,7 +183,11 @@ namespace EntityTools.Quester.Actions
                 if (_reactionRange != value)
                 {
                     _reactionRange = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionRange)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionRange))); 
+#else
+                    Engine.OnPropertyChanged(this, nameof(ReactionRange));
+#endif
                 }
             }
         }
@@ -196,7 +207,11 @@ namespace EntityTools.Quester.Actions
                 if (_reactionZRange != value)
                 {
                     _reactionZRange = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionZRange)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionZRange))); 
+#else
+                    Engine.OnPropertyChanged(this, nameof(ReactionZRange));
+#endif
                 }
             }
         }
@@ -204,12 +219,13 @@ namespace EntityTools.Quester.Actions
 
 #if DEVELOPER
         [Description("CustomRegion names collection")]
-        [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
+        [Editor(typeof(CustomRegionCollectionEditor), typeof(UITypeEditor))]
         [Category("Optional")]
 #else
         [Browsable(false)]
 #endif
-        public List<string> CustomRegionNames
+        [XmlElement("CustomRegionNames")]
+        public CustomRegionCollection CustomRegionNames
         {
             get => _customRegionNames;
             set
@@ -217,11 +233,15 @@ namespace EntityTools.Quester.Actions
                 if (_customRegionNames != value)
                 {
                     _customRegionNames = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionNames)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionNames))); 
+#else
+                    Engine.OnPropertyChanged(this, nameof(CustomRegionNames));
+#endif
                 }
             }
         }
-        internal List<string> _customRegionNames = new List<string>();
+        internal CustomRegionCollection _customRegionNames = new CustomRegionCollection();
 
 
 #if DEVELOPER
@@ -237,14 +257,18 @@ namespace EntityTools.Quester.Actions
                 if (_distance != value)
                 {
                     _distance = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Distance)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Distance))); 
+#else
+                    Engine.OnPropertyChanged(this, nameof(Distance));
+#endif
                 }
             }
         }
         internal float _distance = 30;
 
 #if DEVELOPER
-        [Description("Enable 'IgnoreCombat' profile value while playing action")]
+        [Description("Enable '"+nameof(IgnoreCombat)+"' profile value while playing action")]
         [Category("Interruptions")]
 #else
         [Browsable(false)]
@@ -256,23 +280,24 @@ namespace EntityTools.Quester.Actions
                 if (_ignoreCombat != value)
                 {
                     _ignoreCombat = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IgnoreCombat)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IgnoreCombat))); 
+#else
+                    Engine.OnPropertyChanged(this, nameof(IgnoreCombat));
+#endif
                 }
             }
         }
         internal bool _ignoreCombat = true;
 
 #if DEVELOPER
-        //[Description("Check the distance to Target entity during the battle and abort combat if it becomes greater the 'MaintainCombatDistance'\n" +
-        //             "However the distance checking is not performed if the value less than 'Distance'")]
-        [Description("The battle is aborted outside 'AbortCombatDistance' radius from the target entity.\n" +
-                     "The combat is restored within the 'Distance' radius.\n" +
-                     "However, this is not performed if the value less than 'Distance' or 'IgnoreCombat' is False.")]
+        [Description("The battle is aborted outside '"+nameof(AbortCombatDistance) +"' radius from the target entity.\n" +
+                     "The combat is restored within the '"+nameof(Distance)+"' radius.\n" +
+                     "However, this is not performed if the value less than '"+ nameof(Distance) +"' or '"+nameof(IgnoreCombat)+"' is False.")]
         [Category("Interruptions")]
 #else
         [Browsable(false)]
 #endif
-        //[XmlElement("AbortCombatDistance")]
         public uint AbortCombatDistance
         {
             get => _abortCombatDistance; set
@@ -280,7 +305,11 @@ namespace EntityTools.Quester.Actions
                 if (_abortCombatDistance != value)
                 {
                     _abortCombatDistance = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AbortCombatDistance)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AbortCombatDistance))); 
+#else
+                    Engine.OnPropertyChanged(this, nameof(AbortCombatDistance));
+#endif
                 }
             }
         }
@@ -300,7 +329,11 @@ namespace EntityTools.Quester.Actions
                 if (_stopOnApproached != value)
                 {
                     _stopOnApproached = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StopOnApproached)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StopOnApproached))); 
+#else
+                    Engine.OnPropertyChanged(this, nameof(StopOnApproached));
+#endif
                 }
             }
         }
@@ -320,7 +353,11 @@ namespace EntityTools.Quester.Actions
                 if (_attackTargetEntity = value)
                 {
                     _attackTargetEntity = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AttackTargetEntity)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AttackTargetEntity))); 
+#else
+                    Engine.OnPropertyChanged(this, nameof(AttackTargetEntity));
+#endif
                 }
             }
         }
@@ -338,7 +375,11 @@ namespace EntityTools.Quester.Actions
                 if (_resetCurrentHotSpot != value)
                 {
                     _resetCurrentHotSpot = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ResetCurrentHotSpot)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ResetCurrentHotSpot))); 
+#else
+                    Engine.OnPropertyChanged(this, nameof(ResetCurrentHotSpot));
+#endif
                 }
             }
         }
@@ -350,10 +391,12 @@ namespace EntityTools.Quester.Actions
         [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
         public string TestInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>";
 
+#if false
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
         [Description("Нажми на кнопку '...' чтобы увидеть информацию о текущей цели")]
-        public string TargetInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>";
+        public string TargetInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>"; 
+#endif
 #endif
 
         [XmlIgnore]
@@ -361,17 +404,40 @@ namespace EntityTools.Quester.Actions
         public override string Category => "Basic";
         #endregion
 
+        #region Взаимодействие с ядром EntityToolsCore
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [XmlIgnore]
+        [NonSerialized]
+        private IQuesterActionEngine Engine;
+
+        public MoveToEntity()
+        {
+            Engine = new QuesterActionProxy(this);
+        }
+
+        public void Bind(IQuesterActionEngine engine)
+        {
+            Engine = engine;
+        }
+        public void Unbind()
+        {
+            Engine = new QuesterActionProxy(this);
+            PropertyChanged = null;
+        }
+        #endregion
+
         // Интерфес Quester.Action, реализованный через ActionEngine
-        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).NeedToRun;
-        public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).Run();
-        public override string ActionLabel => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).ActionLabel;
+        public override bool NeedToRun => Engine.NeedToRun;
+        public override ActionResult Run() => Engine.Run();
+        public override string ActionLabel => Engine.ActionLabel;
         public override string InternalDisplayName => string.Empty;
-        public override bool UseHotSpots => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).UseHotSpots;
-        protected override bool IntenalConditions => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).InternalConditions;
-        protected override Vector3 InternalDestination => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).InternalDestination;
-        protected override ActionValidity InternalValidity => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).InternalValidity;
-        public override void GatherInfos() => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).GatherInfos();
-        public override void InternalReset() => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).InternalReset();
-        public override void OnMapDraw(GraphicsNW graph) => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).OnMapDraw(graph);
+        public override bool UseHotSpots => Engine.UseHotSpots;
+        protected override bool IntenalConditions => Engine.InternalConditions;
+        protected override Vector3 InternalDestination => Engine.InternalDestination;
+        protected override ActionValidity InternalValidity => Engine.InternalValidity;
+        public override void GatherInfos() => Engine.GatherInfos();
+        public override void InternalReset() => Engine.InternalReset();
+        public override void OnMapDraw(GraphicsNW graph) => Engine.OnMapDraw(graph);
     }
 }

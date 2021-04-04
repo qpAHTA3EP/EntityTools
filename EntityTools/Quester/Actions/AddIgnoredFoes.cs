@@ -32,7 +32,7 @@ namespace EntityTools.Quester.Actions
 #endif
         public AddIgnoredFoes() { }
 
-        private IQuesterActionEngine internal_GetProxie()
+        private IQuesterActionEngine MakeProxie()
         {
             return new QuesterActionProxy(this);
         }
@@ -79,17 +79,17 @@ namespace EntityTools.Quester.Actions
 
         // Интерфес Quester.Action, реализованный через ActionEngine
 #if false
-        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).NeedToRun;
-        public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).Run();
-        public override string ActionLabel => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).ActionLabel;
+        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).NeedToRun;
+        public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Run();
+        public override string ActionLabel => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).ActionLabel;
         public override string InternalDisplayName => string.Empty;
-        public override bool UseHotSpots => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).UseHotSpots;
-        protected override bool IntenalConditions => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).InternalConditions;
-        protected override Vector3 InternalDestination => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).InternalDestination;
-        protected override ActionValidity InternalValidity => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).InternalValidity;
-        public override void GatherInfos() => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).GatherInfos();
-        public override void InternalReset() => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).InternalReset();
-        public override void OnMapDraw(GraphicsNW graph) => LazyInitializer.EnsureInitialized(ref Engine, internal_GetProxie).OnMapDraw(graph); 
+        public override bool UseHotSpots => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).UseHotSpots;
+        protected override bool IntenalConditions => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalConditions;
+        protected override Vector3 InternalDestination => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalDestination;
+        protected override ActionValidity InternalValidity => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalValidity;
+        public override void GatherInfos() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).GatherInfos();
+        public override void InternalReset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalReset();
+        public override void OnMapDraw(GraphicsNW graph) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).OnMapDraw(graph); 
 #else
         public override bool NeedToRun => true;
         public override ActionResult Run()

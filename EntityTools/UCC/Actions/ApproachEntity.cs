@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Threading;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
@@ -14,20 +15,8 @@ using MyNW.Classes;
 namespace EntityTools.UCC.Actions
 {
     [Serializable]
-    public class ApproachEntity : UCCAction, INotifyPropertyChanged
+    public class ApproachEntity : UCCAction, INotifyPropertyChanged, IEntityDescriptor
     {
-        #region Взаимодействие с EntityToolsCore
-        [NonSerialized]
-        internal IUccActionEngine Engine;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public ApproachEntity()
-        {
-            Engine = new UccActionProxy(this);
-        }
-        #endregion
-
         #region Опции команды
 #if DEVELOPER
         [Description("ID of the Entity for the search")]
@@ -164,7 +153,8 @@ namespace EntityTools.UCC.Actions
 #endif
         public AuraOption Aura
         {
-            get => _aura; set
+            get => _aura;
+            set
             {
                 if (_aura != value)
                 {
@@ -241,13 +231,29 @@ namespace EntityTools.UCC.Actions
 
         #endregion
 
+        #region Взаимодействие с EntityToolsCore
+        [NonSerialized]
+        internal IUccActionEngine Engine;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public ApproachEntity()
+        {
+            Engine = new UccActionProxy(this);
+        }
+        private IUccActionEngine MakeProxie()
+        {
+            return new UccActionProxy(this);
+        }
+        #endregion
+
         #region Интерфейс команды
-        public override bool NeedToRun => Engine.NeedToRun;
-        public override bool Run() => Engine.Run();
+        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).NeedToRun;
+        public override bool Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Run();
         [XmlIgnore]
         [Browsable(false)]
-        public Entity UnitRef => Engine.UnitRef;
-        public override string ToString() => Engine.Label();
+        public Entity UnitRef => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).UnitRef;
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Label();
         #endregion
 
         public override UCCAction Clone()

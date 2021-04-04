@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Threading;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
@@ -10,9 +11,10 @@ using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 #if true
 using EntityTools.Tools.BuySellItems;
+using MyNW.Classes;
 #else
 using EntityTools.Tools.ItemFilter;
-# endif
+#endif
 
 namespace EntityTools.UCC.Actions
 {
@@ -23,24 +25,8 @@ namespace EntityTools.UCC.Actions
         internal class InventoryBagsCheckedListBoxEditor : CheckedListBoxCommonEditor<InvBagIDs> { }
 #endif
 
-        #region Взаимодействие с EntityToolsCore
-        [NonSerialized]
-        internal IUccActionEngine Engine;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public UseItemSpecial()
-        {
-            Engine = new UccActionProxy(this);
-
-            Target = Astral.Logic.UCC.Ressources.Enums.Unit.Player;
-            CoolDown = 18000;
-        }
-        #endregion
-
 
         #region Опции команды
-
 #if DEVELOPER
         [Editor(typeof(ItemIdEditor), typeof(UITypeEditor))]
         [Category("Item")]
@@ -211,12 +197,33 @@ namespace EntityTools.UCC.Actions
         #endregion
         #endregion
 
+        #region Взаимодействие с EntityToolsCore
+        [NonSerialized]
+        internal IUccActionEngine Engine;
 
-        public override bool NeedToRun => Engine.NeedToRun;
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        public override bool Run() => Engine.Run();
+        public UseItemSpecial()
+        {
+            Engine = new UccActionProxy(this);
 
-        public override string ToString() => Engine.Label();
+            Target = Astral.Logic.UCC.Ressources.Enums.Unit.Player;
+            CoolDown = 18000;
+        }
+        private IUccActionEngine MakeProxie()
+        {
+            return new UccActionProxy(this);
+        }
+        #endregion
+
+        #region Интерфейс команды
+        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).NeedToRun;
+        public override bool Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Run();
+        [XmlIgnore]
+        [Browsable(false)]
+        public Entity UnitRef => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).UnitRef;
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Label();
+        #endregion
 
         public override UCCAction Clone()
         {

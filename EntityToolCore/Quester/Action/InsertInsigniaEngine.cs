@@ -26,10 +26,23 @@ namespace EntityCore.Quester.Action
         {
             @this = ii;
 
-            @this.Engine = this;
-            @this.PropertyChanged += PropertyChanged;
+            @this.Bind(this);
+            @this.PropertyChanged += OnPropertyChanged;
 
             ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} initialized: {ActionLabel}");
+        }
+        ~InsertInsigniaEngine()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (@this != null)
+            {
+                @this.Unbind();
+                @this = null;
+            }
         }
 
         public bool Rebase(Astral.Quester.Classes.Action action)
@@ -62,22 +75,19 @@ namespace EntityCore.Quester.Action
         private bool InternalRebase(InsertInsignia ii)
         {
             // Убираем привязку к старой команде
-            if (@this != null)
-            {
-                @this.PropertyChanged -= PropertyChanged;
-                @this.Engine = new EntityTools.Core.Proxies.QuesterActionProxy(@this);
-            }
+            @this?.Unbind();
 
             @this = ii;
-            @this.PropertyChanged += PropertyChanged;
+            @this.PropertyChanged += OnPropertyChanged;
 
             actionIDstr = string.Concat(@this.GetType().Name, '[', @this.ActionID, ']');
 
-            @this.Engine = this;
+            @this.Bind(this);
 
             return true;
         }
-        private void PropertyChanged(object sender, PropertyChangedEventArgs e) { }
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) { }
+        public void OnPropertyChanged(Astral.Quester.Classes.Action sender, string propertyName) { }
 
         public bool NeedToRun => true;
 
@@ -184,7 +194,7 @@ namespace EntityCore.Quester.Action
 
         public void GatherInfos() { }
 
-        public void OnMapDraw(GraphicsNW graph) { }
+        public void OnMapDraw(GraphicsNW graphics) { }
 
         #region Вспомогательные функции
         /// <summary>

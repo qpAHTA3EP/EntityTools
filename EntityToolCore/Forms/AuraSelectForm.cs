@@ -100,7 +100,7 @@ namespace EntityCore.Forms
             @this.InternalNameFilter.Text = string.Empty;
 
             if (@this.ShowDialog() == DialogResult.OK)
-                if (@this.Auras.SelectedItem is AuraDef aura)
+                if (@this.Auras.SelectedItem is AuraInfo aura)
                     return aura.InternalName;
             
             return string.Empty;
@@ -127,7 +127,7 @@ namespace EntityCore.Forms
 
                 foreach (AttribModNet def in character.Mods)
                     if (predicate(def))
-                        Auras.Items.Add(new AuraDef(def.PowerDef));
+                        Auras.Items.Add(new AuraInfo(def.PowerDef));
             }
         }
 
@@ -139,10 +139,10 @@ namespace EntityCore.Forms
 
 
                 // Список обработанных аур
-                List<AuraDef> auraList = new List<AuraDef>();
+                List<AuraInfo> auraList = new List<AuraInfo>();
 
                 foreach(AttribModNet def in character.Mods)
-                    auraList.Add(new AuraDef(def.PowerDef));
+                    auraList.Add(new AuraInfo(def.PowerDef));
 
                 while(!token.IsCancellationRequested)
                 {
@@ -151,7 +151,7 @@ namespace EntityCore.Forms
 
                     foreach (AttribModNet def in character.Mods)
                     {
-                        AuraDef auraDef = new AuraDef(def.PowerDef);
+                        AuraInfo auraDef = new AuraInfo(def.PowerDef);
                         if (!auraList.Contains(auraDef))
                         {
                             auraList.Add(auraDef);
@@ -245,7 +245,7 @@ namespace EntityCore.Forms
 
         private void lbAuras_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(Auras.SelectedItem is AuraDef aura)
+            if(Auras.SelectedItem is AuraInfo aura)
             {
                 Description.Text = aura.Description;
                 //webDescription.Document.OpenNew(true);

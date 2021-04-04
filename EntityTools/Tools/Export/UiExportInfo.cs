@@ -8,17 +8,17 @@ namespace EntityTools.Tools
     [Serializable]
     public class InterfaceWrapper
     {
-        public List<UIInterfaceDef> Interfaces { get; set; } = new List<UIInterfaceDef>();
+        public List<UiElementInfo> Interfaces { get; set; } = new List<UiElementInfo>();
 
         public InterfaceWrapper()
         {
             foreach (UIGen uiGen in UIManager.AllUIGen)
-                Interfaces.Add(new UIInterfaceDef(uiGen));
+                Interfaces.Add(new UiElementInfo(uiGen));
         }
     }
 
     [Serializable]
-    public class UIInterfaceDef
+    public class UiElementInfo
     {
         public string Name { get; set; }
         public string ParentName { get; set; }
@@ -27,14 +27,14 @@ namespace EntityTools.Tools
         public bool IsVisible { get; set; }
         public List<UIVarDef> uiVars { get; set; } = new List<UIVarDef>();
 
-        public UIInterfaceDef()
+        public UiElementInfo()
         {
             Name = string.Empty;
             ParentName = string.Empty;
             Type = string.Empty; //MyNW.Patchables.Enums.UIGenType.Box;
             IsVisible = false;
         }
-        public UIInterfaceDef(UIGen uiGen)
+        public UiElementInfo(UIGen uiGen)
         {
             Name = uiGen.Name;
             ParentName = uiGen.Parent?.Name ?? string.Empty;

@@ -7,7 +7,7 @@ using MyNW.Patchables.Enums;
 namespace EntityTools.Tools
 {
     [Serializable]
-    public class MissionNode
+    public class MissionInfo
     {
         [XmlAttribute]
         public string Name;
@@ -17,9 +17,9 @@ namespace EntityTools.Tools
         public MissionState State;
         public uint MissionType;
         public bool CanRepeat;
-        public List<MissionNode> SubMissions;
+        public List<MissionInfo> SubMissions;
 
-        public MissionNode()
+        public MissionInfo()
         {
             Name = string.Empty;
             State = MissionState.Dropped;
@@ -28,10 +28,10 @@ namespace EntityTools.Tools
             UIStringMsg = string.Empty;
             MissionType = 0;
             CanRepeat = false;
-            SubMissions = new List<MissionNode>();
+            SubMissions = new List<MissionInfo>();
         }
 
-        public MissionNode(Mission mission)
+        public MissionInfo(Mission mission)
         {
             if(mission != null && mission.IsValid)
             {
@@ -54,16 +54,16 @@ namespace EntityTools.Tools
                     CanRepeat = false;
                 }
 
-                SubMissions = new List<MissionNode>();
+                SubMissions = new List<MissionInfo>();
                 foreach(Mission subMission in mission.Childrens)
                 {
-                    SubMissions.Add(new MissionNode(subMission));
+                    SubMissions.Add(new MissionInfo(subMission));
                 }
             }
         }
 
 
-        public MissionNode(CompletedMission mission)
+        public MissionInfo(CompletedMission mission)
         {
             if (mission != null && mission.IsValid)
             {
@@ -87,17 +87,17 @@ namespace EntityTools.Tools
                     CanRepeat = false;
                 }
 
-                SubMissions = new List<MissionNode>();
+                SubMissions = new List<MissionInfo>();
                 foreach (MissionDef subMission in mission.MissionDef.SubMissions)
                 {
-                    SubMissions.Add(new MissionNode(subMission, MissionState.TurnedIn));
+                    SubMissions.Add(new MissionInfo(subMission, MissionState.TurnedIn));
                 }
             }
         }
 
-        public MissionNode(MissionDef mission, MissionState state = MissionState.Dropped)
+        public MissionInfo(MissionDef mission, MissionState state = MissionState.Dropped)
         {
-            SubMissions = new List<MissionNode>();
+            SubMissions = new List<MissionInfo>();
 
             if (mission != null && mission.IsValid)
             {
@@ -110,7 +110,7 @@ namespace EntityTools.Tools
                 
                 foreach (MissionDef subMission in mission.SubMissions)
                 {
-                    SubMissions.Add(new MissionNode(subMission, MissionState.TurnedIn));
+                    SubMissions.Add(new MissionInfo(subMission, MissionState.TurnedIn));
                 }
             }
             else
@@ -128,50 +128,50 @@ namespace EntityTools.Tools
     [Serializable]
     public class MissionsWrapper
     {
-        public List<MissionNode> Missions;
-        public List<MissionNode> OpenMissions;
-        public List<MissionNode> CompletedMissions;
+        public List<MissionInfo> Missions;
+        public List<MissionInfo> OpenMissions;
+        public List<MissionInfo> CompletedMissions;
 
         public MissionsWrapper()
         {
-            Missions = new List<MissionNode>();
-            OpenMissions = new List<MissionNode>();
-            CompletedMissions = new List<MissionNode>();
+            Missions = new List<MissionInfo>();
+            OpenMissions = new List<MissionInfo>();
+            CompletedMissions = new List<MissionInfo>();
         }
 
-        public MissionsWrapper(MissionInfo missionsInfo)
+        public MissionsWrapper(MyNW.Classes.MissionInfo missionsInfo)
         {
-            Missions = new List<MissionNode>();
-            OpenMissions = new List<MissionNode>();
-            CompletedMissions = new List<MissionNode>();
+            Missions = new List<MissionInfo>();
+            OpenMissions = new List<MissionInfo>();
+            CompletedMissions = new List<MissionInfo>();
 
             if(missionsInfo != null && missionsInfo.IsValid)
             {
                 foreach(Mission mission in missionsInfo.Missions)
-                    Missions.Add(new MissionNode(mission));
+                    Missions.Add(new MissionInfo(mission));
 
                 foreach (CompletedMission mission in missionsInfo.CompletedMissions)
-                    CompletedMissions.Add(new MissionNode(mission));
+                    CompletedMissions.Add(new MissionInfo(mission));
             }
         }
 
         public MissionsWrapper(LocalPlayerEntity player)
         {
-            Missions = new List<MissionNode>();
-            OpenMissions = new List<MissionNode>();
-            CompletedMissions = new List<MissionNode>();
+            Missions = new List<MissionInfo>();
+            OpenMissions = new List<MissionInfo>();
+            CompletedMissions = new List<MissionInfo>();
 
             if (player != null && player.IsValid)
             {
                 foreach (Mission mission in player.Player?.MissionInfo?.Missions)
-                    Missions.Add(new MissionNode(mission));
+                    Missions.Add(new MissionInfo(mission));
 
                 foreach (CompletedMission mission in player.Player?.MissionInfo?.CompletedMissions)
-                    CompletedMissions.Add(new MissionNode(mission));
+                    CompletedMissions.Add(new MissionInfo(mission));
 
                 foreach (OpenMission mission in player?.MapState?.OpenMissions)
                     if(mission.Mission.IsValid)
-                        OpenMissions.Add(new MissionNode(mission.Mission));
+                        OpenMissions.Add(new MissionInfo(mission.Mission));
             }
         }
     }

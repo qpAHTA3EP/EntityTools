@@ -22,9 +22,9 @@ namespace EntityTools.Core.Proxies
         internal QuesterActionProxy(Action a)
         {
             action = a ?? throw new ArgumentNullException();
-            _internalConditions = action.GetInstanceProperty<Action, bool>(nameof(InternalConditions));
-            _internalValidity = action.GetInstanceProperty<Action, ActionValidity>(nameof(InternalValidity));
-            _internalDestination = action.GetInstanceProperty<Action, Vector3>(nameof(InternalDestination));
+            _internalConditions = action.GetProperty<bool>(nameof(InternalConditions));
+            _internalValidity = action.GetProperty<ActionValidity>(nameof(InternalValidity));
+            _internalDestination = action.GetProperty<Vector3>(nameof(InternalDestination));
         }
 
         public bool NeedToRun
@@ -33,12 +33,6 @@ namespace EntityTools.Core.Proxies
             {
                 if (EntityTools.Core.Initialize(action))
                     return action.NeedToRun;
-
-#if false
-                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
-
-                EntityTools.StopBot(); 
-#endif
 
                 return false;
             }
@@ -60,24 +54,15 @@ namespace EntityTools.Core.Proxies
             {
                 if (EntityTools.Core.Initialize(action))
                 {
-#if false
-                    if (ReflectionHelper.GetPropertyValue(action, "InternalConditions", out object result))
-                        return result.Equals(true); 
-#else
                     if (_internalConditions.IsValid)
                         return _internalConditions.Value;
                     ETLogger.WriteLine(LogType.Error, $"Invalid 'InternalConditions' accessor in Action {action.GetType().Name}[{action.ActionID}]", false);
                     ETLogger.WriteLine(LogType.Error, Environment.StackTrace, false);
-#endif
                 }
-#if false
-                else ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
-                EntityTools.StopBot(); 
-#endif
                 return false;
             }
         }
-        InstancePropertyAccessor<Action, bool> _internalConditions;
+        InstancePropertyAccessor<bool> _internalConditions;
 
         public ActionValidity InternalValidity
         {
@@ -85,24 +70,15 @@ namespace EntityTools.Core.Proxies
             {
                 if (EntityTools.Core.Initialize(action))
                 {
-#if false
-                    if (ReflectionHelper.GetPropertyValue(action, "InternalValidity", out object result))
-                        return result as ActionValidity; 
-#else
                     if (_internalValidity.IsValid)
                         return _internalValidity.Value;
                     ETLogger.WriteLine(LogType.Error, $"Invalid 'InternalValidity' accessor in Action {action.GetType().Name}[{action.ActionID}]", false);
                     ETLogger.WriteLine(LogType.Error, Environment.StackTrace, false);
-#endif
                 }
-#if false
-                else ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true); 
-#endif
-
                 return new ActionValidity($"{action.GetType().Name} initialization failed");
             }
         }
-        InstancePropertyAccessor<Action, ActionValidity> _internalValidity;
+        InstancePropertyAccessor<ActionValidity> _internalValidity;
 
         public Vector3 InternalDestination
         {
@@ -110,27 +86,16 @@ namespace EntityTools.Core.Proxies
             {
                 if (EntityTools.Core.Initialize(action))
                 {
-#if false
-                    if (ReflectionHelper.GetPropertyValue(action, "InternalDestination", out object result))
-                        return result as Vector3; 
-#else
                     if (_internalDestination.IsValid)
                         return _internalDestination.Value;
                     ETLogger.WriteLine(LogType.Error, $"Invalid 'InternalDestination' accessor in Action {action.GetType().Name}[{action.ActionID}]", false);
                     ETLogger.WriteLine(LogType.Error, Environment.StackTrace, false);
-
-#endif
                 }
-#if false
-                else ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
-
-                EntityTools.StopBot(); 
-#endif
 
                 return Vector3.Empty;
             }
         }
-        InstancePropertyAccessor<Action, Vector3> _internalDestination;
+        InstancePropertyAccessor<Vector3> _internalDestination;
 
         public bool UseHotSpots
         {
@@ -164,11 +129,7 @@ namespace EntityTools.Core.Proxies
         {
             if (EntityTools.Core.Initialize(action))
                 return action.Run();
-#if false
-            ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
 
-            EntityTools.StopBot(); 
-#endif
             return ActionResult.Fail;
         }
 
@@ -176,5 +137,16 @@ namespace EntityTools.Core.Proxies
         {
             return EntityTools.Core.Initialize(action);
         }
+
+        public void Dispose()
+        {
+            if (action != null)
+            {
+                ReflectionHelper.SetFieldValue(action, "Engine", null);
+                action = null;
+            }
+        }
+
+        public void OnPropertyChanged(Action sender, string propertyName) { }
     }
 }

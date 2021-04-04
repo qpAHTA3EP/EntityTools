@@ -183,7 +183,7 @@ namespace EntityTools.Patches.Mapper.Tools
                             if (userAnswer != DialogResult.Cancel)
                             {
                                 bool pathfinding = userAnswer == DialogResult.Yes;
-                                var fullGraph = AstralAccessors.Quester.Core.UsedMeshes;
+                                var fullGraph = AstralAccessors.Quester.Core.Meshes;
                                 road = Patch_Astral_Logic_Navmesh_GenerateRoad.GenerateRoad(fullGraph, new Vector3((float)startX, (float)startY, (float)startZ), new Vector3((float)endX, (float)endY, (float)endZ), pathfinding);
                                 if (road?.Waypoints.Count > 0)
                                     pathLen = Patch_Astral_Logic_Navmesh_TotalDistance.TotalDistance(road.Waypoints);

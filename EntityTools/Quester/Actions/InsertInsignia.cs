@@ -2,6 +2,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Threading;
 using Astral.Logic.Classes.Map;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
@@ -17,29 +18,37 @@ namespace EntityTools.Quester.Actions
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NonSerialized]
-        internal IQuesterActionEngine Engine;
+        private IQuesterActionEngine Engine;
 
         public InsertInsignia()
         {
             Engine = new QuesterActionProxy(this);
         }
+        public void Bind(IQuesterActionEngine engine)
+        {
+            Engine = engine;
+        }
+        public void Unbind()
+        {
+            Engine = new QuesterActionProxy(this);
+            PropertyChanged = null;
+        }
+        private IQuesterActionEngine MakeProxie()
+        {
+            return new QuesterActionProxy(this);
+        }
         #endregion
 
-        //[Description("Not used yet")]
-        //[Editor(typeof(ItemIdFilterEditor), typeof(UITypeEditor))]
-        //public ItemFilterCore Mounts { get; set; }
-
-        // Интерфес Quester.Action, реализованный через ActionEngine
-        public override bool NeedToRun => Engine.NeedToRun;
-        public override ActionResult Run() => Engine.Run();
-        public override string ActionLabel => Engine.ActionLabel;
+        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).NeedToRun;
+        public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Run();
+        public override string ActionLabel => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).ActionLabel;
         public override string InternalDisplayName => string.Empty;
-        public override bool UseHotSpots => Engine.UseHotSpots;
-        protected override bool IntenalConditions => Engine.InternalConditions;
-        protected override Vector3 InternalDestination => Engine.InternalDestination;
-        protected override ActionValidity InternalValidity => Engine.InternalValidity;
-        public override void GatherInfos() => Engine.GatherInfos();
-        public override void InternalReset() => Engine.InternalReset();
-        public override void OnMapDraw(GraphicsNW graph) => Engine.OnMapDraw(graph);
+        public override bool UseHotSpots => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).UseHotSpots;
+        protected override bool IntenalConditions => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalConditions;
+        protected override Vector3 InternalDestination => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalDestination;
+        protected override ActionValidity InternalValidity => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalValidity;
+        public override void GatherInfos() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).GatherInfos();
+        public override void InternalReset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalReset();
+        public override void OnMapDraw(GraphicsNW graph) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).OnMapDraw(graph);
     }
 }

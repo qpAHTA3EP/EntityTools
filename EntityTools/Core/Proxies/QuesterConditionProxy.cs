@@ -1,6 +1,7 @@
 ﻿using System;
 using Astral.Quester.Classes;
 using EntityTools.Quester.Conditions;
+using EntityTools.Reflection;
 
 namespace EntityTools.Core.Proxies
 {
@@ -10,7 +11,6 @@ namespace EntityTools.Core.Proxies
         internal QuesterConditionProxy(Condition c)
         {
             condition = c ?? throw new ArgumentNullException();
-
         }
         public bool IsValid
         {
@@ -18,12 +18,6 @@ namespace EntityTools.Core.Proxies
             {
                 if (EntityTools.Core.Initialize(condition))
                     return condition.IsValid;
-
-#if false
-                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot");
-
-                EntityTools.StopBot(); 
-#endif
 
                 return false;
             }
@@ -55,6 +49,15 @@ namespace EntityTools.Core.Proxies
         public bool Rebase(Condition condition)
         {
             return EntityTools.Core.Initialize(condition);
+        }
+
+        public void Dispose()
+        {
+            if (condition != null)
+            {
+                ReflectionHelper.SetFieldValue(condition, "Engine", null);
+                condition = null;
+            }
         }
     }
 }

@@ -20,7 +20,7 @@ namespace EntityCore.Forms
         private int AllowConditionsItemChechedChangeInd = -1;
         // Редактор UCC
         private readonly UCCEditor editor = null;
-        private readonly InstancePropertyAccessor<UCCEditor, UCCAction> currentUccAction = null;
+        private readonly InstancePropertyAccessor<UCCAction> currentUccAction = null;
 
         public ConditionListForm()
         {
@@ -28,7 +28,7 @@ namespace EntityCore.Forms
 
             editor = Application.OpenForms.Find<UCCEditor>();
             if(editor != null)
-                currentUccAction = editor.GetInstanceProperty<UCCEditor, UCCAction>("CurrentAction");
+                currentUccAction = editor.GetProperty<UCCAction>("CurrentAction");
             if(currentUccAction == null)
             {
                 // Отключение кнопок тестирования, если окно редактора не нейдено

@@ -66,12 +66,30 @@ namespace EntityTools.Settings
         }
         private bool _debugMissionTools;
 
+        /// <summary>
+        /// Активания расширенной отладочной информации по инструментам для работы с Entity
+        /// </summary>
+        [Bindable(true)]
+        public bool DebugEntityTools
+        {
+            get => _debugEntityTools;
+            set
+            {
+                if (_debugEntityTools != value)
+                {
+                    _debugEntityTools = value;
+                    NotifyPropertyChanged(nameof(DebugEntityTools));
+                }
+            }
+        }
+        private bool _debugEntityTools;
+
         [Serializable]
         public class QuesterActionLoggerSettings : PluginSettingsBase
         {
             /// <summary>
-                        /// Активания расширенной отладочной информации по MoveToEntity
-                        /// </summary>
+            /// Активания расширенной отладочной информации по MoveToEntity
+            /// </summary>
             [Bindable(true)]
             public bool DebugMoveToEntity
             {
@@ -86,6 +104,24 @@ namespace EntityTools.Settings
                 }
             }
             private bool _debugMoveToEntity;
+
+            /// <summary>
+            /// Активания расширенной отладочной информации по InteractEntities
+            /// </summary>
+            [Bindable(true)]
+            public bool DebugInteractEntities
+            {
+                get => _debugInteractEntities;
+                set
+                {
+                    if (_debugInteractEntities != value)
+                    {
+                        _debugInteractEntities = value;
+                        NotifyPropertyChanged(nameof(DebugInteractEntities));
+                    }
+                }
+            }
+            private bool _debugInteractEntities;
 
             /// <summary>
             /// Активания расширенной отладочной информации по BuySellItems

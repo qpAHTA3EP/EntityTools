@@ -70,8 +70,9 @@ namespace EntityTools.Forms
                                 checkState = CheckState.Indeterminate;
                             @this.crList.Items.Add(crEntry.Clone(), checkState);
                         }
-
-                        else @this.crList.Items.Add(new CustomRegionEntry(cr.Name, InclusionType.Ignore), CheckState.Unchecked);
+                        // Удаление дубликатов из списка отображаемы CustomRegion'ов
+                        else if(@this.crList.Items.FirstOrDefault(item => ((CustomRegionEntry)item.Value).Name == cr.Name) is null)
+                            @this.crList.Items.Add(new CustomRegionEntry(cr.Name, InclusionType.Ignore), CheckState.Unchecked);
                     }
                 };
             else @this.fillList = () =>
@@ -117,8 +118,12 @@ namespace EntityTools.Forms
 #endif
                         }
 
-                        if (crEntry.Inclusion != InclusionType.Ignore)
+                        if (crEntry.Inclusion != InclusionType.Ignore
+                            // Удаление дубликатов из списка добавляемых CustomRegion'ов
+                            && !newCrCollection.Contains(crEntry))
+                        {
                             newCrCollection.Add(crEntry);
+                        }
                     }
                 } 
 

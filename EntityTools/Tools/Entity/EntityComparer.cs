@@ -1,19 +1,17 @@
 ﻿using Astral.Classes.ItemFilter;
-using EntityTools;
 using EntityTools.Enums;
 using EntityTools.Extensions;
 using MyNW.Classes;
 using System;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
-namespace EntityCore.Entities
+namespace EntityTools.Tools.Entities
 {
     /// <summary>
     /// Класс, инкапсулирующие все базовые проверки Entity на соответствие шаблону
     /// </summary>
-    public static class EntityToPatternComparer
+    public static class EntityComparer
     {
         public static Predicate<Entity> Get(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated)
         {
@@ -37,7 +35,7 @@ namespace EntityCore.Entities
                             return (Entity e) => CompareInternal2SimpleEnd(e, pattern);
                         default:
 #if DEBUG
-                            ETLogger.WriteLine(LogType.Error, $"{nameof(EntityToPatternComparer)}::{MethodBase.GetCurrentMethod().Name}: Simple pattern is invalid {{{entPattern}, {strMatchType}, {nameType}}}");
+                            ETLogger.WriteLine(LogType.Error, $"{nameof(EntityComparer)}::{MethodBase.GetCurrentMethod().Name}: Simple pattern is invalid {{{entPattern}, {strMatchType}, {nameType}}}");
 #endif
                             return null;
                     }
@@ -54,7 +52,7 @@ namespace EntityCore.Entities
                             return (Entity e) => CompareUntranslated2SimpleEnd(e, pattern);
                         default:
 #if DEBUG
-                            ETLogger.WriteLine(LogType.Error, $"{nameof(EntityToPatternComparer)}::{MethodBase.GetCurrentMethod().Name}: Simple pattern is invalid {{{entPattern}, {strMatchType}, {nameType}}}");
+                            ETLogger.WriteLine(LogType.Error, $"{nameof(EntityComparer)}::{MethodBase.GetCurrentMethod().Name}: Simple pattern is invalid {{{entPattern}, {strMatchType}, {nameType}}}");
 #endif
                             return null;
                     }

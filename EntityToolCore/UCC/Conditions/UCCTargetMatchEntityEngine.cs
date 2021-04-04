@@ -20,32 +20,39 @@ namespace EntityCore.UCC.Conditions
         #region Данные
         private UCCTargetMatchEntity @this;
 
-        private Predicate<Entity> checkEntity = null;
+#if false
+        private Predicate<Entity> checkEntity = null; 
+#endif
 
         private string label = string.Empty;
-        private string conditionIDstr;
+        private string _idStr;
         #endregion
 
         internal UccTargetMatchEntityEngine(UCCTargetMatchEntity tarMatch)
         {
-#if false
-            @this = tarMatch;
-            @this.Engine = this;
-            @this.PropertyChanged += PropertyChanged;
-
-            checkEntity = initialize_CheckEntity;
-
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}"); 
-#else
             InternalRebase(tarMatch);
-            ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} initialized: {Label()}");
-#endif
+            ETLogger.WriteLine(LogType.Debug, $"{_idStr} initialized: {Label()}");
+        }
+        ~UccTargetMatchEntityEngine()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = null;
+                @this = null;
+            }
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (ReferenceEquals(sender, @this))
             {
+#if false
                 switch (e.PropertyName)
                 {
                     case nameof(@this.EntityID):
@@ -58,7 +65,10 @@ namespace EntityCore.UCC.Conditions
                     case nameof(@this.EntityNameType):
                         checkEntity = initialize_CheckEntity;
                         break;
-                }
+                } 
+#else
+                _key = null;
+#endif
             }
         }
 
@@ -72,10 +82,10 @@ namespace EntityCore.UCC.Conditions
             {
                 if (InternalRebase(tarMatch))
                 {
-                    ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} reinitialized");
+                    ETLogger.WriteLine(LogType.Debug, $"{_idStr} reinitialized");
                     return true;
                 }
-                ETLogger.WriteLine(LogType.Debug, $"{conditionIDstr} rebase failed");
+                ETLogger.WriteLine(LogType.Debug, $"{_idStr} rebase failed");
                 return false;
             }
 
@@ -90,34 +100,41 @@ namespace EntityCore.UCC.Conditions
             if (@this != null)
             {
                 @this.PropertyChanged -= PropertyChanged;
-                @this.Engine = new EntityTools.Core.Proxies.UccConditionProxy(@this);
+                @this.Engine = null;//new EntityTools.Core.Proxies.UccConditionProxy(@this);
             }
 
             @this = tarMatch;
             @this.PropertyChanged += PropertyChanged;
 
-            checkEntity = initialize_CheckEntity;
+            _key = null;
 
-            conditionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+            _idStr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
 
             @this.Engine = this;
 
             return true;
         }
 
-        #region MyRegion
+        #region Вспомогательные методы
         public bool IsOK(UCCAction refAction)
         {
             Entity target = refAction?.GetTarget();
 
+#if false
             switch (@this._match)
             {
                 case MatchType.Match:
                     return ValidateEntity(target);
                 case MatchType.Mismatch:
                     return !ValidateEntity(target);
-            }
+            } 
             return false;
+#else
+            bool match = EntityKey.IsMatch(target);
+            if (@this._match == MatchType.Match)
+                return match;
+            else return !match;
+#endif
         }
 
         public string TestInfos(UCCAction refAction)
@@ -130,7 +147,7 @@ namespace EntityCore.UCC.Conditions
                 if (@this._entityNameType == EntityNameType.InternalName)
                     sb.Append('[').Append(target.InternalName).Append(']');
                 else sb.Append('[').Append(target.NameUntranslated).Append(']');
-                if (ValidateEntity(target))
+                if (EntityKey.IsMatch(target))
                     sb.Append(" match");
                 else sb.Append(" does not match");
                 sb.Append(" EntityID [").Append(@this._entityId).Append(']');
@@ -150,6 +167,23 @@ namespace EntityCore.UCC.Conditions
         }
         #endregion
 
+#if true
+        #region Вспомогательные инструменты
+        /// <summary>
+        /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
+        /// </summary>
+        public EntityCacheRecordKey EntityKey
+        {
+            get
+            {
+                if (_key is null)
+                    _key = new EntityCacheRecordKey(@this._entityId, @this._entityIdType, @this._entityNameType);
+                return _key;
+            }
+        }
+        private EntityCacheRecordKey _key;
+        #endregion
+#else
         private bool ValidateEntity(Entity e)
         {
             return e != null && e.IsValid && checkEntity(e);
@@ -157,7 +191,7 @@ namespace EntityCore.UCC.Conditions
 
         private bool initialize_CheckEntity(Entity e)
         {
-            Predicate<Entity> predicate = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+            Predicate<Entity> predicate = EntityComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
             if (predicate != null)
             {
 #if DEBUG
@@ -170,6 +204,7 @@ namespace EntityCore.UCC.Conditions
             else ETLogger.WriteLine(LogType.Error, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Fail to initialize the Comparer.");
 #endif
             return false;
-        }
+        } 
+#endif
     }
 }

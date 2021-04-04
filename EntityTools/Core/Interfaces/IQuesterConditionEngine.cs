@@ -1,8 +1,9 @@
-﻿using QuesterCondition = Astral.Quester.Classes.Condition;
+﻿using System;
+using QuesterCondition = Astral.Quester.Classes.Condition;
 
 namespace EntityTools.Quester.Conditions
 {
-    public interface IQuesterConditionEngine
+    public interface IQuesterConditionEngine : IDisposable
     {
         bool IsValid { get; }
         void Reset();

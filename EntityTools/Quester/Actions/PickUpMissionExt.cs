@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Xml.Serialization;
 using Action = Astral.Quester.Classes.Action;
 
@@ -35,7 +36,11 @@ namespace EntityTools.Quester.Actions
                 if (_missionId != value)
                 {
                     _missionId = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MissionId)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MissionId))); 
+#else
+                    Engine.OnPropertyChanged(this, nameof(MissionId));
+#endif
                 }
             }
         }
@@ -54,7 +59,11 @@ namespace EntityTools.Quester.Actions
                 if (_skipOnFail != value)
                 {
                     _skipOnFail = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SkipOnFail)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SkipOnFail))); 
+#else
+                    Engine.OnPropertyChanged(this, nameof(SkipOnFail));
+#endif
                 }
 
             }
@@ -76,7 +85,11 @@ namespace EntityTools.Quester.Actions
                 if (_giver != value)
                 {
                     _giver = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Giver)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Giver))); 
+#else
+                    Engine.OnPropertyChanged(this, nameof(Giver));
+#endif
                 }
             }
         }
@@ -94,7 +107,11 @@ namespace EntityTools.Quester.Actions
             {
                 if (_contactHaveMission == value) return;
                 _contactHaveMission = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ContactHaveMission)));
+#if false
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ContactHaveMission))); 
+#else
+                Engine.OnPropertyChanged(this, nameof(ContactHaveMission));
+#endif
             }
         }
         internal ContactHaveMissionCheckType _contactHaveMission = ContactHaveMissionCheckType.Any;
@@ -109,7 +126,11 @@ namespace EntityTools.Quester.Actions
             {
                 if (_closeContactDialog == value) return;
                 _closeContactDialog = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CloseContactDialog)));
+#if false
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CloseContactDialog))); 
+#else
+                Engine.OnPropertyChanged(this, nameof(CloseContactDialog));
+#endif
             }
         }
         internal bool _closeContactDialog;
@@ -124,7 +145,11 @@ namespace EntityTools.Quester.Actions
             {
                 if (_ignoreCombat == value) return;
                 _ignoreCombat = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IgnoreCombat)));
+#if false
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IgnoreCombat))); 
+#else
+                Engine.OnPropertyChanged(this, nameof(IgnoreCombat));
+#endif
             }
         }
         internal bool _ignoreCombat = false;
@@ -142,7 +167,11 @@ namespace EntityTools.Quester.Actions
                 value = Math.Max(value, 5);
                 if (_interactDistance == value) return;
                 _interactDistance = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractDistance)));
+#if false
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractDistance))); 
+#else
+                Engine.OnPropertyChanged(this, nameof(InteractDistance));
+#endif
             }
         }
         internal float _interactDistance = 5;
@@ -160,7 +189,11 @@ namespace EntityTools.Quester.Actions
                 value = Math.Max(value, 1);
                 if (_interactZDifference == value) return;
                 _interactZDifference = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractZDifference)));
+#if false
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractZDifference))); 
+#else
+                Engine.OnPropertyChanged(this, nameof(InteractZDifference));
+#endif
             }
         }
         internal float _interactZDifference = 5;
@@ -180,7 +213,11 @@ namespace EntityTools.Quester.Actions
             {
                 if (_requiredRewardItem == value) return;
                 _requiredRewardItem = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RequiredRewardItem)));
+#if false
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RequiredRewardItem))); 
+#else
+                Engine.OnPropertyChanged(this, nameof(RequiredRewardItem));
+#endif
             }
         }
         internal string _requiredRewardItem = string.Empty;
@@ -198,7 +235,11 @@ namespace EntityTools.Quester.Actions
                 if (_dialogs != value)
                 {
                     _dialogs = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Dialogs)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Dialogs))); 
+#else
+                    Engine.OnPropertyChanged(this, nameof(Dialogs));
+#endif
                 }
             }
         }
@@ -256,27 +297,42 @@ namespace EntityTools.Quester.Actions
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NonSerialized]
-        internal IQuesterActionEngine Engine;
+        private IQuesterActionEngine Engine;
 
         public PickUpMissionExt()
         {
-            Engine = new QuesterActionProxy(this);
+            Engine = MakeProxie();
             base.PlayWhileConditionsAreOk = false;
             base.PlayWhileUnSuccess = false;
             base.Loop = false;
         }
+
+        public void Bind(IQuesterActionEngine engine)
+        {
+            Engine = engine;
+        }
+        public void Unbind()
+        {
+            Engine = MakeProxie();
+            PropertyChanged = null;
+        }
+
+        private IQuesterActionEngine MakeProxie()
+        {
+            return new QuesterActionProxy(this);
+        }
         #endregion
 
-        public override bool NeedToRun => Engine.NeedToRun;
-        public override ActionResult Run() => Engine.Run();
-        public override string ActionLabel => Engine.ActionLabel;
+        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).NeedToRun;
+        public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Run();
+        public override string ActionLabel => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).ActionLabel;
         public override string InternalDisplayName => string.Empty;
-        public override bool UseHotSpots => Engine.UseHotSpots;
-        protected override bool IntenalConditions => Engine.InternalConditions;
-        protected override Vector3 InternalDestination => Engine.InternalDestination;
-        protected override ActionValidity InternalValidity => Engine.InternalValidity;
-        public override void GatherInfos() => Engine.GatherInfos();
-        public override void InternalReset() => Engine.InternalReset();
-        public override void OnMapDraw(GraphicsNW graph) => Engine.OnMapDraw(graph);
+        public override bool UseHotSpots => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).UseHotSpots;
+        protected override bool IntenalConditions => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalConditions;
+        protected override Vector3 InternalDestination => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalDestination;
+        protected override ActionValidity InternalValidity => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalValidity;
+        public override void GatherInfos() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).GatherInfos();
+        public override void InternalReset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalReset();
+        public override void OnMapDraw(GraphicsNW graph) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).OnMapDraw(graph);
     }
 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.Classes.Map;
@@ -14,6 +15,7 @@ using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
+using EntityTools.Tools.CustomRegions;
 using MyNW.Classes;
 using Action = Astral.Quester.Classes.Action;
 
@@ -22,8 +24,7 @@ using Action = Astral.Quester.Classes.Action;
 namespace EntityTools.Quester.Actions
 {
     [Serializable]
-    public class InteractEntities : Action,
-                                    INotifyPropertyChanged
+    public class InteractEntities : Action, INotifyPropertyChanged, IEntityDescriptor
     {
 #if DEBUG && PROFILING
         public static int RunCount = 0;
@@ -229,12 +230,12 @@ namespace EntityTools.Quester.Actions
 
 #if DEVELOPER
         [Description("CustomRegion names collection")]
-        [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
+        [Editor(typeof(CustomRegionCollectionEditor), typeof(UITypeEditor))]
         [Category("Optional")]
 #else
         [Browsable(false)]
 #endif
-        public List<string> CustomRegionNames
+        public CustomRegionCollection CustomRegionNames
         {
             get => _customRegionNames;
             set
@@ -242,11 +243,11 @@ namespace EntityTools.Quester.Actions
                 if (_customRegionNames != value)
                 {
                     _customRegionNames = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityNameType)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionNames)));
                 }
             }
         }
-        internal List<string> _customRegionNames = new List<string>();
+        internal CustomRegionCollection _customRegionNames = new CustomRegionCollection();
 
 #if DEVELOPER
         [Description("A subset of entities that are searched for a target\n" +
@@ -271,33 +272,10 @@ namespace EntityTools.Quester.Actions
         }
         internal EntitySetType _entitySetType = EntitySetType.Contacts;
 
-#if disabled_at_20200506_1318
-        // Более не используется, т.к. реализована единая настройка:
-        // EntityTools.Config.EntityCache.LocalCacheTime
 #if DEVELOPER
-        [Description("Time between searches of the Entity (ms)")]
-        [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
-        public int SearchTimeInterval
-        {
-            get => _searchTimeInterval; set
-            {
-                if (_searchTimeInterval != value)
-                {
-                    _searchTimeInterval = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SearchTimeInterval)));
-                }
-            }
-        }
-        internal int _searchTimeInterval = 100; 
-#endif
-
-#if DEVELOPER
+        [Category("Interruptions")]
         [Description("Distance to the Entity by which it is necessary to approach to disable 'IgnoreCombat' mode\n" +
             "Ignored if 'IgnoreCombat' does not True")]
-        [Category("Interruptions")]
 #else
         [Browsable(false)]
 #endif
@@ -315,8 +293,8 @@ namespace EntityTools.Quester.Actions
         internal float _combatDistance = 30;
 
 #if DEVELOPER
-        [Description("Enable IgnoreCombat mode while distance to the closest Entity greater then 'CombatDistance'")]
         [Category("Interruptions")]
+        [Description("Enable IgnoreCombat mode while distance to the closest Entity greater then 'CombatDistance'")]
 #else
         [Browsable(false)]
 #endif
@@ -377,8 +355,8 @@ namespace EntityTools.Quester.Actions
         internal int _interactingTimeout = 60;
 
 #if DEVELOPER
-        [Description("Time to interact (ms)")]
         [Category("Interaction")]
+        [Description("Time to interact (ms)")]
 #else
         [Browsable(false)]
 #endif
@@ -417,9 +395,9 @@ namespace EntityTools.Quester.Actions
         internal int _interactDistance = 5;
 
 #if DEVELOPER
+        [Category("Interaction")]
         [Description("Answers in dialog while interact with Entity")]
         [Editor(typeof(DialogEditor), typeof(UITypeEditor))]
-        [Category("Interaction")]
 #else
         [Browsable(false)]
 #endif
@@ -471,25 +449,40 @@ namespace EntityTools.Quester.Actions
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NonSerialized]
-        internal IQuesterActionEngine Engine;
+        private IQuesterActionEngine Engine;
 
         public InteractEntities()
         {
-            Engine = new QuesterActionProxy(this);
+            Engine = MakeProxie();
+        }
+
+        public void Bind(IQuesterActionEngine engine)
+        {
+            Engine = engine;
+        }
+        public void Unbind()
+        {
+            Engine = MakeProxie();
+            PropertyChanged = null;
+        }
+
+        private IQuesterActionEngine MakeProxie()
+        {
+            return new QuesterActionProxy(this);
         }
         #endregion
 
         // Интерфейс Quester.Action через IQuesterActionEngine
-        public override bool NeedToRun => Engine.NeedToRun;
-        public override ActionResult Run() => Engine.Run();
-        public override string ActionLabel => Engine.ActionLabel;
+        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).NeedToRun;
+        public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Run();
+        public override string ActionLabel => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).ActionLabel;
         public override string InternalDisplayName => string.Empty;
-        public override bool UseHotSpots => Engine.UseHotSpots;
-        protected override Vector3 InternalDestination => Engine.InternalDestination;
-        protected override bool IntenalConditions => Engine.InternalConditions;
-        protected override ActionValidity InternalValidity => Engine.InternalValidity;
-        public override void InternalReset() => Engine.InternalReset();
-        public override void GatherInfos() => Engine.GatherInfos();
-        public override void OnMapDraw(GraphicsNW graph) => Engine.OnMapDraw(graph);
+        public override bool UseHotSpots => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).UseHotSpots;
+        protected override bool IntenalConditions => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalConditions;
+        protected override Vector3 InternalDestination => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalDestination;
+        protected override ActionValidity InternalValidity => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalValidity;
+        public override void GatherInfos() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).GatherInfos();
+        public override void InternalReset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalReset();
+        public override void OnMapDraw(GraphicsNW graph) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).OnMapDraw(graph);
     }
 }

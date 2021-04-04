@@ -29,16 +29,22 @@ namespace EntityCore.UCC.Actions
 
         internal UseItemSpecialEngine(UseItemSpecial uis)
         {
-#if false
-            @this = uis;
-            @this.Engine = this;
-            @this.PropertyChanged += PropertyChanged;
-
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}"); 
-#else
             InternalRebase(uis);
             ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} initialized: {Label()}");
-#endif
+        }
+        ~UseItemSpecialEngine()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = null;
+                @this = null;
+            }
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -87,7 +93,7 @@ namespace EntityCore.UCC.Actions
             if (@this != null)
             {
                 @this.PropertyChanged -= PropertyChanged;
-                @this.Engine = new EntityTools.Core.Proxies.UccActionProxy(@this);
+                @this.Engine = null;
             }
 
             @this = execPower;

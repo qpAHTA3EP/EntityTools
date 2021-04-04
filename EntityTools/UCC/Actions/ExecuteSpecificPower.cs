@@ -6,6 +6,7 @@
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Threading;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
@@ -22,19 +23,6 @@ namespace EntityTools.UCC.Actions
     [Serializable]
     public class ExecuteSpecificPower : UCCAction
     {
-        #region Взаимодействие с EntityToolsCore
-        [NonSerialized]
-        internal IUccActionEngine Engine;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public ExecuteSpecificPower()
-        {
-            Target = Astral.Logic.UCC.Ressources.Enums.Unit.Target;
-            Engine = new UccActionProxy(this);
-        }
-        #endregion
-
         #region Опции команды
 #if DEVELOPER
         [Editor(typeof(PowerAllIdEditor), typeof(UITypeEditor))]
@@ -319,11 +307,31 @@ namespace EntityTools.UCC.Actions
         #endregion
         #endregion
 
+        #region Взаимодействие с EntityToolsCore
+        [NonSerialized]
+        internal IUccActionEngine Engine;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public ExecuteSpecificPower()
+        {
+            Target = Astral.Logic.UCC.Ressources.Enums.Unit.Target;
+            Engine = new UccActionProxy(this);
+        }
+        private IUccActionEngine MakeProxie()
+        {
+            return new UccActionProxy(this);
+        }
+        #endregion
+
+        #region Интерфейс команды
+        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).NeedToRun;
+        public override bool Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Run();
         [XmlIgnore]
         [Browsable(false)]
-        public override bool NeedToRun => Engine.NeedToRun;
-
-        public override bool Run() => Engine.Run();
+        public Entity UnitRef => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).UnitRef;
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Label();
+        #endregion
 
         public override UCCAction Clone()
         {
@@ -348,11 +356,5 @@ namespace EntityTools.UCC.Actions
                 }
             });
         }
-
-        public override string ToString() => Engine.Label();
-
-        [XmlIgnore]
-        [Browsable(false)]
-        public Entity UnitRef => Engine.UnitRef;
     }
 }

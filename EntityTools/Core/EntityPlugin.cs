@@ -31,7 +31,7 @@ using Action = Astral.Quester.Classes.Action;
 
 [assembly: InternalsVisibleTo("EntityCore")]
 #if !ENCRYPTED_CORE
-[assembly: SuppressIldasmAttribute()] 
+[assembly: SuppressIldasm()] 
 #endif
 
 namespace EntityTools
@@ -44,6 +44,14 @@ namespace EntityTools
         private static bool assemblyResolve_Deletage_Binded;
         private static readonly string assemblyResolve_Name = $"^{Assembly.GetExecutingAssembly().GetName().Name},";
 
+        public override string Name => "Entity Tools";
+        public override string Author => "MichaelProg";
+        public override Image Icon => Resources.EntityIcon;
+        public override BasePanel Settings => _panel ?? (_panel = new EntityToolsMainPanel());
+        private BasePanel _panel;
+
+        public static EntityToolsSettings Config { get; set; } = new EntityToolsSettings();
+
         /// <summary>
         /// Управление выбранной ролью (запуск/остановка)
         /// </summary>
@@ -55,14 +63,6 @@ namespace EntityTools
 #endif
             ToggleRole(false);
         }
-
-        public override string Name => "Entity Tools";
-        public override string Author => "MichaelProg";
-        public override Image Icon => Resources.EntityIcon;
-        public override BasePanel Settings => _panel ?? (_panel = new EntityToolsMainPanel());
-        private BasePanel _panel;
-
-        public static EntityToolsSettings Config { get; set; } = new EntityToolsSettings();
 
         public override void OnBotStart()
         {
@@ -188,8 +188,6 @@ namespace EntityTools
         /// <summary>
         /// Сохранение свойств
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         public void SaveSettings(object sender = null, EventArgs e = null)
         {
             try
@@ -294,16 +292,6 @@ namespace EntityTools
         //        while (mainPanel != null);
         //    }
         //}
-
-        #region Новый обработчика кнопки вызова редактора UCC
-        private void ucc_Editor_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("ucc_Editor_Click(...)");
-
-            Editor uccEditor = new Editor(Astral.Logic.UCC.Core.Get.mProfil);
-            uccEditor.ShowDialog();
-        }
-        #endregion
         #endregion
 
 
@@ -319,8 +307,7 @@ namespace EntityTools
         /// </summary>
         internal class EntityCoreProxy : IEntityToolsCore
         {
-            static Func<bool> InternalInitialize = internal_LoadCore;
-
+            static Func<bool> InternalInitialize = LoadCore;
 
 #if DEVELOPER
             public string EntityDiagnosticInfos(object obj)
@@ -328,7 +315,6 @@ namespace EntityTools
                 if (InternalInitialize())
                     return Core.EntityDiagnosticInfos(obj);
                 ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing '{obj.GetType().Name}'. Stop bot", true);
-                //ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
                 StopBot();
                 return string.Empty;
             }
@@ -338,7 +324,6 @@ namespace EntityTools
                 if (InternalInitialize())
                     return Core.Initialize(obj);
                 ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing '{obj.GetType().Name}'. Stop bot");
-                //ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
                 StopBot();
                 return false;
             }
@@ -348,7 +333,6 @@ namespace EntityTools
                 if (InternalInitialize())
                     return Core.Initialize(action);
                 ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing in quester action '{action.GetType().Name}'[{action.ActionID}]. Stop bot", true);
-                //ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
                 StopBot();
                 return false;
             }
@@ -357,8 +341,7 @@ namespace EntityTools
             {
                 if (InternalInitialize())
                     return Core.Initialize(condition);
-                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing in quester condition '{condition.GetType().Name}'[{condition.GetHashCode():X2}]({condition}). Stop bot", true);
-                //ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
+                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing in quester condition '{condition.GetType().Name}'[{condition.GetHashCode():X2}]. Stop bot", true);
                 StopBot();
                 return false;
             }
@@ -367,8 +350,7 @@ namespace EntityTools
             {
                 if (InternalInitialize())
                     return Core.Initialize(action);
-                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing in ucc action '{action.GetType().Name}'[{action.GetHashCode():X2}]({action}). Stop bot", true);
-                //ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
+                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing in ucc action '{action.GetType().Name}'[{action.GetHashCode():X2}]. Stop bot", true);
                 StopBot();
                 return false;
             }
@@ -377,8 +359,7 @@ namespace EntityTools
             {
                 if (InternalInitialize())
                     return Core.Initialize(condition);
-                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing in ucc condition '{condition.GetType().Name}'[{condition.GetHashCode():X2}]({condition}). Stop bot", true);
-                //ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
+                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing in ucc condition '{condition.GetType().Name}'[{condition.GetHashCode():X2}]. Stop bot", true);
                 StopBot();
                 return false;
             }
@@ -499,7 +480,6 @@ namespace EntityTools
                 if (InternalInitialize())
                     return Core.FindAllEntity(pattern, matchType, nameType, setType, healthCheck, range, zRange, regionCheck, customRegions, specialCheck);
 
-                //Astral.Controllers.Roles.ToggleRole(false);
                 ToggleRole(false);
 
                 ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! Entities search aborted. Stop bot.", true);
@@ -518,7 +498,7 @@ namespace EntityTools
             /// Загрузка сборки, содержащей реализацию ядра из альтернативного файлового потока
             /// </summary>
             /// <returns></returns>
-            private static bool internal_LoadCore()
+            private static bool LoadCore()
             {
                 if (!assemblyResolve_Deletage_Binded)
                 {
@@ -527,10 +507,25 @@ namespace EntityTools
                 }
                 if (assemblyResolve_Deletage_Binded)
                 {
+
+
                     // Попытка загрузки ядра производится только после привязки делегата CurrentDomain_AssemblyResolve
                     try
                     {
-                        using (FileStream file = FileStreamHelper.OpenWithStream(Assembly.GetExecutingAssembly().Location, "Core", FileMode.Open, FileAccess.Read))
+                        var executingAssembly = Assembly.GetExecutingAssembly();
+                        var ETfilename = executingAssembly.GetName().Name + ".dll";
+                        var wrongETLocation = Path.Combine(Astral.Controllers.Directories.AstralStartupPath, ETfilename);
+                        if (File.Exists(wrongETLocation))
+                        {
+                            var msg = string.Concat("The file ", ETfilename, " save location is incorrect.\n" +
+                                "You should replace it from the folder: ", Astral.Controllers.Directories.AstralStartupPath,
+                                "\nto the folder: ", Astral.Controllers.Directories.PluginsPath);
+
+                            ETLogger.WriteLine(LogType.Error, msg, true);
+                            return false;
+                        }
+
+                        using (FileStream file = FileStreamHelper.OpenWithStream(executingAssembly.Location, "Core", FileMode.Open, FileAccess.Read))
                         {
                             byte[] coreBytes = new byte[file.Length];
                             if (file.Read(coreBytes, 0, (int)file.Length) > 0)
@@ -555,13 +550,14 @@ namespace EntityTools
                                         Assembly assembly = Assembly.Load(coreBytes);
                                         CoreHash = CryptoHelper.MD5_HashString(coreBytes);
 #endif
+                                        Type coreType = typeof(IEntityToolsCore);
                                         if (assembly != null)
                                             foreach (Type type in assembly.GetTypes())
                                             {
 #if false
                                                 if (type.GetInterface(nameof(IEntityToolsCore)) != null) 
 #else
-                                                if (type.GetInterfaces().Contains(typeof(IEntityToolsCore)))
+                                                if (type.GetInterfaces().Contains(coreType))
 #endif
                                                 {
                                                     if (Activator.CreateInstance(type) is IEntityToolsCore core)
@@ -598,14 +594,20 @@ namespace EntityTools
                     }
                     finally
                     {
-                        InternalInitialize = internal_DoNothing;
+                        InternalInitialize = DoNothing;
                     }
                 }
                 return false;
             }
-            private static bool internal_DoNothing()
+            private static bool DoNothing()
             {
                 return false;
+            }
+
+
+            public void Dispose()
+            {
+                InternalInitialize = null;
             }
         }
     }

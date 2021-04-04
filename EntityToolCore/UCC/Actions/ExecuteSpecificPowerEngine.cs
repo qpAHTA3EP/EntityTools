@@ -26,16 +26,18 @@ using Unit = Astral.Logic.UCC.Ressources.Enums.Unit;
 
 namespace EntityCore.UCC.Actions
 {
-    public class ExecuteSpecificPowerEngine : IEntityInfos, IUccActionEngine
+    public class ExecuteSpecificPowerEngine : IUccActionEngine
+#if IEntityDescriptor
+        , IEntityInfos  
+#endif
     {
         #region Данные
         private ExecuteSpecificPower @this;
 
-        private Predicate<Entity> checkEntity { get; set; } = null;
         private Entity entity = null;
         private bool slotedState = false;
         private string label = string.Empty;
-        private string actionIDstr;
+        private string _idStr;
 
         private int attachedGameProcessId = 0;
         private Power power = null;
@@ -43,16 +45,22 @@ namespace EntityCore.UCC.Actions
 
         internal ExecuteSpecificPowerEngine(ExecuteSpecificPower esp)
         {
-#if false
-            @this = esp;
-            @this.Engine = this;
-            @this.PropertyChanged += PropertyChanged;
-
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}"); 
-#else
             InternalRebase(esp); 
-            ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} initialized: {Label()}");
-#endif
+            ETLogger.WriteLine(LogType.Debug, $"{_idStr} initialized: {Label()}");
+        }
+        ~ExecuteSpecificPowerEngine()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = null;
+                @this = null;
+            }
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -61,6 +69,7 @@ namespace EntityCore.UCC.Actions
             {
                 if (ReferenceEquals(sender, @this))
                 {
+#if false
                     switch (e.PropertyName)
                     {
                         case nameof(@this.EntityID):
@@ -80,7 +89,17 @@ namespace EntityCore.UCC.Actions
                         case nameof(@this.CheckInTray):
                             label = string.Empty;
                             break;
+                    } 
+#else
+                    string prName = e.PropertyName;
+                    if (prName == nameof(@this.EntityID) || prName == nameof(@this.EntityIdType) || prName == nameof(@this.EntityNameType))
+                        _key = null;
+                    else if (prName == nameof(@this.PowerId) || prName == nameof(@this.CheckInTray))
+                    {
+                        power = null;
+                        label = string.Empty;
                     }
+#endif
                     entity = null;
                     power = null;
                 }
@@ -97,10 +116,10 @@ namespace EntityCore.UCC.Actions
             {
                 if (InternalRebase(execPower))
                 {
-                    ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} reinitialized");
+                    ETLogger.WriteLine(LogType.Debug, $"{_idStr} reinitialized");
                     return true;
                 }
-                ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} rebase failed");
+                ETLogger.WriteLine(LogType.Debug, $"{_idStr} rebase failed");
                 return false;
             }
 
@@ -115,15 +134,19 @@ namespace EntityCore.UCC.Actions
             if (@this != null)
             {
                 @this.PropertyChanged -= PropertyChanged;
-                @this.Engine = new EntityTools.Core.Proxies.UccActionProxy(@this);
+                @this.Engine = null;//new EntityTools.Core.Proxies.UccActionProxy(@this);
             }
 
             @this = execPower;
             @this.PropertyChanged += PropertyChanged;
 
-            checkEntity = initialize_CheckEntity;
+#if false
+            checkEntity = initialize_CheckEntity; 
+#else
+            _key = null;
+#endif
 
-            actionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+            _idStr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
 
             @this.Engine = this;
 
@@ -135,7 +158,7 @@ namespace EntityCore.UCC.Actions
         {
             get
             {
-                Power p = GetCurrentPower();
+                var p = GetCurrentPower();
 
                 return ValidatePower(p)
                         && (!@this._checkPowerCooldown || !p.IsOnCooldown())
@@ -153,7 +176,7 @@ namespace EntityCore.UCC.Actions
             if (!ValidatePower(currentPower))
             {
 #if DEBUG_ExecuteSpecificPower
-                ETLogger.WriteLine(LogType.Debug, $"{actionIDstr}: Fail to get Power '{@this._powerId}' by 'PowerId'");
+                ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Fail to get Power '{@this._powerId}' by 'PowerId'");
 #endif
                 return false;
             }
@@ -171,7 +194,6 @@ namespace EntityCore.UCC.Actions
                         break;
                     case Unit.StrongestTeamMember:
                         AstralAccessors.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.StrongestTeamMember;
-
                         break;
                     default:
                         AstralAccessors.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.StrongestTeamMember;
@@ -226,7 +248,7 @@ namespace EntityCore.UCC.Actions
                 }
                 Thread.Sleep(100);
             }
-            double effectiveTimeActivate = (double)Powers.getEffectiveTimeActivate(powerDef) * 1.5;
+            double effectiveTimeActivate = Powers.getEffectiveTimeActivate(powerDef) * 1.5;
             Astral.Classes.Timeout castingTimeout = new Astral.Classes.Timeout(castingTime);
 
             try
@@ -300,17 +322,16 @@ namespace EntityCore.UCC.Actions
             {
                 if (!string.IsNullOrEmpty(@this._entityId))
                 {
-                    if (checkEntity == null)
-                        checkEntity = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
-                    if (ValidateEntity(entity))
+                    var entityKey = EntityKey;
+                    if (entityKey.Validate(entity))
                         return entity;
-                    else entity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                                 @this._healthCheck, @this._reactionRange,
-                                                                 (@this._reactionZRange > 0) ? @this._reactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference,
-                                                                 @this._regionCheck, null, @this._aura.Checker);
+                    else
+                    {
+                        entity = SearchCached.FindClosestEntity(entityKey, null);
 
-                    if (ValidateEntity(entity))
-                        return entity;
+                        if (entity != null)
+                            return entity;
+                    }
                 }
                 switch (@this.Target)
                 {
@@ -368,10 +389,6 @@ namespace EntityCore.UCC.Actions
                 && (p.PowerDef.InternalName == @this._powerId 
                     || p.EffectivePowerDef().InternalName == @this._powerId);
         }
-        private bool ValidateEntity(Entity e)
-        {
-            return e != null && e.IsValid && checkEntity?.Invoke(e) == true;
-        }
         private Power GetCurrentPower()
         {
             if (!ValidatePower(power))
@@ -384,6 +401,7 @@ namespace EntityCore.UCC.Actions
         #endregion
 
 
+#if IEntityDescriptor
         public bool EntityDiagnosticString(out string infoString)
         {
             StringBuilder sb = new StringBuilder();
@@ -391,26 +409,21 @@ namespace EntityCore.UCC.Actions
             sb.Append("EntityID: ").AppendLine(@this._entityId);
             sb.Append("EntityIdType: ").AppendLine(@this._entityIdType.ToString());
             sb.Append("EntityNameType: ").AppendLine(@this._entityNameType.ToString());
-            //sb.Append("EntitySetType: ").AppendLine(@this._entitySetType.ToString());
             sb.Append("HealthCheck: ").AppendLine(@this._healthCheck.ToString());
             sb.Append("ReactionRange: ").AppendLine(@this._reactionRange.ToString());
             sb.Append("ReactionZRange: ").AppendLine(@this._reactionZRange.ToString());
             sb.Append("RegionCheck: ").AppendLine(@this._regionCheck.ToString());
             sb.Append("Aura: ").AppendLine(@this._aura.ToString());
-            //if (@this._customRegionNames != null && @this._customRegionNames.Count > 0)
-            //{
-            //    sb.Append("RegionCheck: {").Append(@this._customRegionNames[0]);
-            //    for (int i = 1; i < @this._customRegionNames.Count; i++)
-            //        sb.Append(", ").Append(@this._customRegionNames[i]);
-            //    sb.AppendLine("}");
-            //}
             sb.AppendLine();
-            //sb.Append("NeedToRun: ").AppendLine(NeedToRun.ToString());
-            //sb.AppendLine();
 
             // список всех Entity, удовлетворяющих условиям
+#if false
             LinkedList<Entity> entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                                     @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck);
+                                                                         @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck); 
+#else
+            var entityKey = EntityKey;
+            LinkedList<Entity> entities = SearchCached.FindAllEntity(entityKey);
+#endif
 
 
             // Количество Entity, удовлетворяющих условиям
@@ -420,8 +433,12 @@ namespace EntityCore.UCC.Actions
             sb.AppendLine();
 
             // Ближайшее Entity (найдено при вызове ie.NeedToRun, поэтому строка ниже закомментирована)
+#if false
             entity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                    @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck);
+                                                        @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck); 
+#else
+            entity = SearchCached.FindClosestEntity(entityKey, null);
+#endif
             if (entity != null)
             {
                 bool distOk = entity.Location.Distance3DFromPlayer < @this._reactionRange;
@@ -452,8 +469,29 @@ namespace EntityCore.UCC.Actions
 
             infoString = sb.ToString();
             return true;
-        }
+        } 
+#endif
 
+#if true
+        /// <summary>
+        /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
+        /// </summary>
+        public EntityCacheRecordKey EntityKey
+        {
+            get
+            {
+                if (_key is null)// && (@this._entityNameType == EntityNameType.Empty || !string.IsNullOrEmpty(@this._entityId)))
+                    _key = new EntityCacheRecordKey(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete);
+                return _key;
+            }
+        }
+        private EntityCacheRecordKey _key;
+#else
+        private Predicate<Entity> checkEntity { get; set; } = null;
+        private bool ValidateEntity(Entity e)
+        {
+            return e != null && e.IsValid && checkEntity?.Invoke(e) == true;
+        }
         /// <summary>
         /// Метод, инициализирующий функтор <see cref="checkEntity"/>,
         /// использующийся для проверки сущности <paramref name="e"/> на соответствия идентификатору <see cref="EntityID"/>
@@ -462,7 +500,8 @@ namespace EntityCore.UCC.Actions
         /// <returns></returns>
         private bool initialize_CheckEntity(Entity e)
         {
-            Predicate<Entity> predicate = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+            Predicate<Entity> predicate = EntityComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+
             bool extendedDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
             string currentMethodName = extendedDebugInfo ? string.Concat(actionIDstr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
             if (predicate != null)
@@ -475,6 +514,7 @@ namespace EntityCore.UCC.Actions
             else if (extendedDebugInfo)
                 ETLogger.WriteLine(LogType.Error, string.Concat(currentMethodName, ": Fail to initialize " + nameof(checkEntity) + '\''));
             return false;
-        }
+        } 
+#endif
     }
 }

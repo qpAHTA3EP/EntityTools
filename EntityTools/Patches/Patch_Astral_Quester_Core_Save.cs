@@ -162,7 +162,7 @@ namespace EntityTools.Patches
             if (needLoadAllMeshes && !useExternalMeshes)
                 AstralAccessors.Quester.Core.LoadAllMeshes();
 
-            var mapsMeshes = AstralAccessors.Quester.Core.MapsMeshes.Value;
+            var mapsMeshes = AstralAccessors.Quester.Core.MapsMeshes;
 
             ZipArchive zipFile = null;
             try
@@ -237,6 +237,7 @@ namespace EntityTools.Patches
         public static bool SaveMesh(ZipArchive zipFile, string meshName, Graph mesh, BinaryFormatter binaryFormatter = null)
         {
             //TODO: Безопасное сохранение mesh'а, чтобы при возникновении ошибки старое содержимое не удалялось
+            //TODO: Исправиль сохранение внешних мешей
             if (zipFile is null)
                 return false;
 

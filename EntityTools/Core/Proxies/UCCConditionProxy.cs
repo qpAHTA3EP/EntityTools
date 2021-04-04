@@ -1,6 +1,7 @@
 ﻿using System;
 using Astral.Logic.UCC.Classes;
 using EntityTools.Core.Interfaces;
+using EntityTools.Reflection;
 using EntityTools.UCC.Conditions;
 
 namespace EntityTools.Core.Proxies
@@ -50,6 +51,15 @@ namespace EntityTools.Core.Proxies
         public bool Rebase(UCCCondition uccCondition)
         {
             return EntityTools.Core.Initialize(uccCondition);
+        }
+
+        public void Dispose()
+        {
+            if (condition != null)
+            {
+                ReflectionHelper.SetFieldValue(condition, "Engine", null);
+                condition = null;
+            }
         }
     }
 }

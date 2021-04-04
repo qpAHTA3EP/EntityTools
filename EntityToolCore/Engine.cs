@@ -30,22 +30,51 @@ using QuesterCondition = Astral.Quester.Classes.Condition;
 using EntityTools;
 using Astral.Logic.NW;
 using System.Linq;
+using EntityTools.Tools.Extensions;
 
 namespace EntityCore
 {
     public class Engine : IEntityToolsCore
     {
         //TODO: Исправить ошибку восстановления статуса после PullProfileFromStack, которая проявилась в Lliiras_Night_DartKotik.amp.zip
+        //TODO: Очищать словари при загрузке нового Quester- и UCC-профилей
 
         internal static Dictionary<QuesterAction, IQuesterActionEngine> dictQuesterAction = new Dictionary<QuesterAction, IQuesterActionEngine>();
         internal static Dictionary<QuesterCondition, IQuesterConditionEngine> dictQuesterCondition = new Dictionary<QuesterCondition, IQuesterConditionEngine>();
         internal static Dictionary<UCCAction, IUccActionEngine> dictUccAction = new Dictionary<UCCAction, IUccActionEngine>();
         internal static Dictionary<UCCCondition, IUccConditionEngine> dictUccCondition = new Dictionary<UCCCondition, IUccConditionEngine>();
 
+#if false
         public Engine()
         {
             ETLogger.WriteLine("EntityToolsCore loaded");
         }
+#else
+        public Engine()
+        {
+            AstralAccessors.Quester.Core.AfterLoad += ResetQuesterCache;
+            AstralAccessors.Quester.Core.AfterNew += ResetQuesterCache;
+            ETLogger.WriteLine("EntityToolsCore loaded");
+        }
+        ~Engine()
+        {
+            AstralAccessors.Quester.Core.AfterLoad -= ResetQuesterCache;
+            AstralAccessors.Quester.Core.AfterNew -= ResetQuesterCache;
+        }
+
+        private void ResetQuesterCache()
+        {
+            dictQuesterAction.ForEach(a => a.Value.Dispose());
+            dictQuesterAction.Clear();
+            dictQuesterCondition.ForEach(a => a.Value.Dispose());
+            dictQuesterCondition.Clear();
+        }
+
+        private void ResetQuesterCache(string path)
+        {
+            ResetQuesterCache();
+        } 
+#endif
 
         public bool CheckCore()
         {
@@ -630,6 +659,7 @@ namespace EntityCore
         }
         #endregion
 
+#if false
         public string EntityDiagnosticInfos(object obj)
         {
             if (obj != null)
@@ -640,16 +670,16 @@ namespace EntityCore
 
                 if (obj is QuesterAction qa
                     && dictQuesterAction.TryGetValue(qa, out IQuesterActionEngine qaEngine))
-                        ettInfos = qaEngine as IEntityInfos;
-                else if(obj is QuesterCondition qc
+                    ettInfos = qaEngine as IEntityInfos;
+                else if (obj is QuesterCondition qc
                     && dictQuesterCondition.TryGetValue(qc, out IQuesterConditionEngine qcEngine))
-                        ettInfos = qcEngine as IEntityInfos;
+                    ettInfos = qcEngine as IEntityInfos;
                 else if (obj is UCCCondition uccCond
                     && dictUccCondition.TryGetValue(uccCond, out IUccConditionEngine uccCondEngine))
-                        ettInfos = uccCondEngine as IEntityInfos;
+                    ettInfos = uccCondEngine as IEntityInfos;
                 else if (obj is UCCAction uccAct
                     && dictUccAction.TryGetValue(uccAct, out IUccActionEngine uccActEngine))
-                        ettInfos = uccActEngine as IEntityInfos;
+                    ettInfos = uccActEngine as IEntityInfos;
 
                 if (ettInfos != null)
                 {
@@ -689,7 +719,7 @@ namespace EntityCore
 
                     sb.AppendLine();
                     LinkedList<Entity> entities = SearchCached.FindAllEntity(entityId.ToString(), (ItemFilterStringType)entityIdType, (EntityNameType)entityNameType, entitySet,
-                        healthCheck, reactionRange, reactionZRange, regionCheck, customRegions, auraOption.Checker);
+                        healthCheck, reactionRange, reactionZRange, regionCheck, customRegions, auraOption.IsMatch);
 
                     // Количество Entity, удовлетворяющих условиям
                     if (entities != null)
@@ -746,7 +776,21 @@ namespace EntityCore
             }
 
             return string.Empty;
+        } 
+#else
+        public string EntityDiagnosticInfos(object obj)
+        {
+            if (obj != null)
+            {
+                if (obj is IEntityDescriptor entityDescriptor)
+                    return EntityDiagnosticTools.Construct(entityDescriptor);
+                else if(obj is IEntityIdentifier entityIdentifier)
+                    return EntityDiagnosticTools.Construct(entityIdentifier);
+            }
+
+            return "Unable recognize test context!";
         }
+#endif
 #endif
 #if DEBUG
         public LinkedList<Entity> FindAllEntity(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete,
@@ -755,6 +799,14 @@ namespace EntityCore
         {
             return Entities.SearchCached.FindAllEntity(pattern, matchType, nameType, setType, healthCheck, range, zRange, regionCheck, customRegions, specialCheck);
         }
+
 #endif
+        public void Dispose()
+        {
+            dictQuesterAction.ForEach(a => a.Value.Dispose());
+            dictQuesterCondition.ForEach(a => a.Value.Dispose());
+            dictUccAction.ForEach(a => a.Value.Dispose());
+            dictUccCondition.ForEach(a => a.Value.Dispose());
+        }
     }
 }

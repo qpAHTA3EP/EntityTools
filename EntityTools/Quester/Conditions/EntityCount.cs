@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Threading;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
+using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
+using EntityTools.Tools.CustomRegions;
 
 namespace EntityTools.Quester.Conditions
 {
@@ -16,26 +19,8 @@ namespace EntityTools.Quester.Conditions
     /// в регионе CustomRegion, заданным в CustomRegionNames
     /// </summary>
     [Serializable]
-    public class EntityCount : Condition, INotifyPropertyChanged
+    public class EntityCount : Condition, INotifyPropertyChanged, IEntityDescriptor
     {
-        internal IQuesterConditionEngine Engine;
-
-        public EntityCount()
-        {
-            Engine = new QuesterConditionProxy(this);
-        }
-
-        #region Взаимодействие с ядром EntityTools
-        public event PropertyChangedEventHandler PropertyChanged;
-#if CORE_DELEGATES
-        public Func<bool> doValidate = null;
-        public Func<string> getString = null;
-        public Func<string> getTestInfos = null;
-        public System.Action doReset = null;
-#endif
-        #endregion
-
-
         #region Опции команды
 #if DEVELOPER
         [Description("ID of the Entity for the search")]
@@ -52,7 +37,7 @@ namespace EntityTools.Quester.Conditions
                 if (_entityId != value)
                 {
                     _entityId = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityID)));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityID))); 
                 }
             }
         }
@@ -271,12 +256,12 @@ namespace EntityTools.Quester.Conditions
 
 #if DEVELOPER
         [Description("The list of the CustomRegions where Entities is counted")]
-        [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
+        [Editor(typeof(CustomRegionCollectionEditor), typeof(UITypeEditor))]
         [Category("Location")]
 #else
         [Browsable(false)]
 #endif
-        public List<string> CustomRegionNames
+        public CustomRegionCollection CustomRegionNames
         {
             get => _customRegionNames;
             set
@@ -288,7 +273,8 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal List<string> _customRegionNames = new List<string>();
+        internal CustomRegionCollection _customRegionNames = new CustomRegionCollection();
+
 
 #if DEVELOPER
         [Category("Location")]
@@ -296,19 +282,20 @@ namespace EntityTools.Quester.Conditions
 #else
         [Browsable(false)]
 #endif
-        public Presence Tested
+        [XmlElement("Tested")]
+        public Presence CustomRegionCheck
         {
-            get => _tested;
+            get => _customRegionCheck;
             set
             {
-                if (_tested != value)
+                if (_customRegionCheck != value)
                 {
-                    _tested = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Tested)));
+                    _customRegionCheck = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionCheck)));
                 }
             }
         }
-        internal Presence _tested = Presence.Equal;
+        internal Presence _customRegionCheck = Presence.Equal;
 
 
 #if DEVELOPER
@@ -319,9 +306,33 @@ namespace EntityTools.Quester.Conditions
 #endif
         #endregion
 
-        public override bool IsValid => Engine.IsValid;
-        public override void Reset() => Engine.Reset();
-        public override string TestInfos => Engine.TestInfos;
-        public override string ToString() => Engine.Label();
+        #region Взаимодействие с ядром EntityTools
+        private IQuesterConditionEngine Engine;
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public EntityCount()
+        {
+            Engine = new QuesterConditionProxy(this);
+        }
+
+        public void Bind(IQuesterConditionEngine engine)
+        {
+            Engine = engine;
+        }
+        public void Unbind()
+        {
+            Engine = MakeProxie();
+            PropertyChanged = null;
+        }
+        private IQuesterConditionEngine MakeProxie()
+        {
+            return new QuesterConditionProxy(this);
+        }
+        #endregion
+
+        public override bool IsValid => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).IsValid;
+        public override void Reset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Reset();
+        public override string TestInfos => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).TestInfos;
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Label();
     }
 }

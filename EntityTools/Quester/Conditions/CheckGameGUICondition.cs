@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Drawing.Design;
+using System.Threading;
 using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
 using EntityTools.Core.Proxies;
@@ -11,23 +12,7 @@ namespace EntityTools.Quester.Conditions
 {
     public class CheckGameGUI : Condition
     {
-        #region Взаимодействие с ядром EntityTools
-        public event PropertyChangedEventHandler PropertyChanged;
-        internal IQuesterConditionEngine Engine;
-
-        public CheckGameGUI()
-        {
-            Engine = new QuesterConditionProxy(this);
-        }
-        #endregion
-
-        static CheckGameGUI()
-        {
-            // Пременение патча на этапе десериализации (до инициализации плагина)
-            ETPatcher.Apply();
-        }
-
-        #region Опции команды
+         #region Опции команды
 #if DEVELOPER
         [Description("The Identifier of the Ingame user interface element")]
         [Editor(typeof(UiIdEditor), typeof(UITypeEditor))]
@@ -146,13 +131,24 @@ namespace EntityTools.Quester.Conditions
         internal Presence _propertySign = Presence.Equal;
         #endregion
 
+        #region Взаимодействие с ядром EntityTools
+        internal IQuesterConditionEngine Engine;
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        public override bool IsValid => Engine.IsValid;
+        public CheckGameGUI()
+        {
+            Engine = new QuesterConditionProxy(this);
+        }
 
-        public override void Reset() => Engine.Reset();
+        private IQuesterConditionEngine MakeProxie()
+        {
+            return new QuesterConditionProxy(this);
+        }
+        #endregion
 
-        public override string ToString() => Engine.Label();
-
-        public override string TestInfos => Engine.TestInfos;
+        public override bool IsValid => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).IsValid;
+        public override void Reset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Reset();
+        public override string TestInfos => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).TestInfos;
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Label();
     }
 }

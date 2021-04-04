@@ -2,29 +2,21 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Threading;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
+using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
+using EntityTools.Tools.CustomRegions;
 
 namespace EntityTools.Quester.Conditions
 {
     [Serializable]
-    public class EntityProperty : Condition, INotifyPropertyChanged
+    public class EntityProperty : Condition, INotifyPropertyChanged, IEntityDescriptor
     {
-        #region Взаимодействие с ядром EntityTools
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        internal IQuesterConditionEngine Engine;
-        #endregion
-
-        public EntityProperty()
-        {
-            Engine = new QuesterConditionProxy(this);
-        }
-
         #region Опции команды
 #if DEVELOPER
         [Description("ID of the Entity for the search")]
@@ -199,12 +191,12 @@ namespace EntityTools.Quester.Conditions
 
 #if DEVELOPER
         [Description("CustomRegion names collection")]
-        [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
+        [Editor(typeof(CustomRegionCollectionEditor), typeof(UITypeEditor))]
         [Category("Optional")]
 #else
         [Browsable(false)]
 #endif
-        public List<string> CustomRegionNames
+        public CustomRegionCollection CustomRegionNames
         {
             get => _customRegionNames;
             set
@@ -216,7 +208,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal List<string> _customRegionNames = new List<string>();
+        internal CustomRegionCollection _customRegionNames = new CustomRegionCollection();
 
 #if DEVELOPER
         [Category("Tested")]
@@ -305,9 +297,36 @@ namespace EntityTools.Quester.Conditions
 #endif
         #endregion
 
-        public override bool IsValid => Engine.IsValid;
-        public override void Reset() => Engine.Reset();
-        public override string TestInfos => Engine.TestInfos;
-        public override string ToString() => Engine.Label();
+
+        #region Взаимодействие с ядром EntityTools
+        private IQuesterConditionEngine Engine;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public EntityProperty()
+        {
+            Engine = MakeProxie();
+        }
+
+        public void Bind(IQuesterConditionEngine engine)
+        {
+            Engine = engine;
+        }
+        public void Unbind()
+        {
+            Engine = MakeProxie();
+            PropertyChanged = null;
+        }
+
+        private IQuesterConditionEngine MakeProxie()
+        {
+            return new QuesterConditionProxy(this);
+        }
+        #endregion
+
+        public override bool IsValid => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).IsValid;
+        public override void Reset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Reset();
+        public override string TestInfos => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).TestInfos;
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Label();
     }
 }
