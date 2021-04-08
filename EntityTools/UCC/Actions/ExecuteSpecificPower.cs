@@ -21,7 +21,7 @@ using MyNW.Classes;
 namespace EntityTools.UCC.Actions
 {
     [Serializable]
-    public class ExecuteSpecificPower : UCCAction
+    public class ExecuteSpecificPower : UCCAction, IEntityIdentifier
     {
         #region Опции команды
 #if DEVELOPER
@@ -183,7 +183,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal EntityNameType _entityNameType = EntityNameType.NameUntranslated;
+        internal EntityNameType _entityNameType = EntityNameType.InternalName;
 
 #if DEVELOPER
         [Description("Check Entity's Ingame Region (Not CustomRegion):\n" +
