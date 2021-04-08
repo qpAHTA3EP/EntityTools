@@ -330,9 +330,9 @@ namespace EntityTools.Tools.CustomRegions
                     label = string.Concat(GetType().Name, '[', Count, ']'); 
 #else
                 {
-                    int unionCount = _union.Count,
-                        intersectionCount = _intersection.Count,
-                        exclusionCount = _exclusion.Count;
+                    int unionCount = Union.Count,
+                        intersectionCount = Intersection.Count,
+                        exclusionCount = Exclusion.Count;
                     label = string.Concat(GetType().Name, '[',
                                           unionCount > 0 ? $" \x22c3 ({unionCount})" : string.Empty,
                                           intersectionCount > 0 ? $" \x22c2 ({intersectionCount})" : string.Empty,
