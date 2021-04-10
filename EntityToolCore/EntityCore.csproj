@@ -63,10 +63,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\x64\0Harmony.dll</HintPath>
-    </Reference>
     <Reference Include="AStar, Version=2.20.1028.1229, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="Astral_patched, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
@@ -344,6 +340,10 @@
     <EmbeddedResource Include="Resources\Icons_Inventory_Enchantments_Insignia_Universal.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AMClient\AMClient.csproj">
+      <Project>{FD0C9E2A-5D26-43AA-A227-BDDAF9C30705}</Project>
+      <Name>AMClient</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EntityTools\EntityTools.csproj">
       <Project>{df7f797e-db7e-44f9-a96a-020cfdb3c51e}</Project>
       <Name>EntityTools</Name>

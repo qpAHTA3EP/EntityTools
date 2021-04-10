@@ -1,6 +1,4 @@
-﻿using Astral.Classes.ItemFilter;
-using Astral.Quester.Classes;
-using DevExpress.XtraEditors;
+﻿using Astral.Quester.Classes;
 using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
 using EntityTools.Reflection;
@@ -9,10 +7,7 @@ using EntityTools.Tools.CustomRegions;
 using HarmonyLib;
 using MyNW.Classes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace EntityCore.Entities
 {

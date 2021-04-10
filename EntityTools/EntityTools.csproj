@@ -128,13 +128,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="AStar, Version=2.20.1028.1229, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\x64\0Harmony.dll</HintPath>
-    </Reference>
-    <Reference Include="AStar">
       <HintPath>..\References\x64\AStar.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="Astral_patched">
       <HintPath>..\References\x64\Astral_patched.exe</HintPath>
@@ -647,6 +643,12 @@
     <PackageReference Include="System.IO.Compression.ZipFile">
       <Version>4.3.0</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AMClient\AMClient.csproj">
+      <Project>{FD0C9E2A-5D26-43AA-A227-BDDAF9C30705}</Project>
+      <Name>AMClient</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
