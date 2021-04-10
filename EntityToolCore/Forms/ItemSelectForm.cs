@@ -2,17 +2,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Linq;
 using System.Windows.Forms;
+using AcTp0Tools.Reflection;
 using DevExpress.XtraEditors;
-using Astral.Controllers;
-using System.Reflection;
-using EntityTools.Reflection;
-using Astral.Logic.UCC.Classes;
 
 namespace EntityCore.Forms
 {
@@ -105,7 +97,6 @@ namespace EntityCore.Forms
             return null;
         }
         #endregion
-
 
         #region GetAnItem
         /// <summary>

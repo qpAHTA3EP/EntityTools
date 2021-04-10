@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Reflection;
+using AcTp0Tools.Reflection;
 using Astral.Logic.Classes.Map;
-using Astral.Quester.Classes;
 using EntityTools.Core.Interfaces;
-using EntityTools.Reflection;
 using MyNW.Classes;
 using static Astral.Quester.Classes.Action;
 using Action = Astral.Quester.Classes.Action;
+
 
 namespace EntityTools.Core.Proxies
 {
@@ -62,7 +61,7 @@ namespace EntityTools.Core.Proxies
                 return false;
             }
         }
-        InstancePropertyAccessor<bool> _internalConditions;
+        Property<bool> _internalConditions;
 
         public ActionValidity InternalValidity
         {
@@ -78,7 +77,7 @@ namespace EntityTools.Core.Proxies
                 return new ActionValidity($"{action.GetType().Name} initialization failed");
             }
         }
-        InstancePropertyAccessor<ActionValidity> _internalValidity;
+        Property<ActionValidity> _internalValidity;
 
         public Vector3 InternalDestination
         {
@@ -95,7 +94,7 @@ namespace EntityTools.Core.Proxies
                 return Vector3.Empty;
             }
         }
-        InstancePropertyAccessor<Vector3> _internalDestination;
+        Property<Vector3> _internalDestination;
 
         public bool UseHotSpots
         {

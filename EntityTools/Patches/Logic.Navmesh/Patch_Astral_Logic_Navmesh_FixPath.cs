@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using AStar;
 using DevExpress.XtraNavBar.ViewInfo;
-using EntityTools.Reflection;
+using AcTp0Tools.Reflection;
 using MyNW.Classes;
 using MyNW.Internals;
 

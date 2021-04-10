@@ -9,7 +9,7 @@ using Astral.Logic.UCC.Classes;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Extensions;
-using EntityTools.Reflection;
+using AcTp0Tools.Reflection;
 using EntityTools.Tools;
 using EntityTools.UCC.Conditions;
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using Astral.Logic.UCC.Classes;
 using Astral.Logic.UCC.Forms;
-using EntityTools.Reflection;
+using AcTp0Tools.Reflection;
 
 namespace EntityTools.Patches.UCC
 {

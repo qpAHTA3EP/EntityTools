@@ -4,7 +4,7 @@ using System.Reflection;
 using AStar;
 using Astral.Logic.Classes.Map;
 using Astral.Logic.Classes.Map.Functions;
-using EntityTools.Reflection;
+using AcTp0Tools.Reflection;
 using MyNW.Classes;
 
 namespace EntityTools.Patches.Mapper

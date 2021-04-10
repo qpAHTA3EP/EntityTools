@@ -3,10 +3,9 @@ using System.Drawing;
 using System.Threading;
 using AStar.Tools;
 using Astral.Logic.Classes.Map;
-using EntityTools.Reflection;
+using AcTp0Tools.Reflection;
 using EntityTools.Settings;
 using MyNW.Classes;
-using static EntityTools.Reflection.InstanceFieldAccessorFactory;
 
 namespace EntityTools.Patches.Mapper
 {
@@ -22,7 +21,7 @@ namespace EntityTools.Patches.Mapper
             EntityTools.Config.Mapper.MapperForm.PropertyChanged += handler_PropertyChanged;
             GetWorldPosition(0, 0, out double left, out double top);
             GetWorldPosition(width, height, out double right, out double down);
-            _cache = new MapperGraphCache(() => AstralAccessors.Quester.Core.Meshes, EntityTools.Config.Mapper.CacheActive);
+            _cache = new MapperGraphCache(() => AcTp0Tools.AstralAccessors.Quester.Core.Meshes, EntityTools.Config.Mapper.CacheActive);
             _cache.SetCacheArea(left, top, right, down);
         }
 
@@ -40,13 +39,13 @@ namespace EntityTools.Patches.Mapper
         /// Получение к приватному члену <seealso cref="GraphicsNW.g"/> типа Graphics
         /// </summary>
         private Graphics graphics => getGraphicsFrom(this);
-        private static readonly Func<GraphicsNW, Graphics> getGraphicsFrom = GetInstanceFieldAccessor<GraphicsNW, Graphics>("g");
+        private static readonly Func<GraphicsNW, Graphics> getGraphicsFrom = InstanceFieldAccessorFactory.GetInstanceFieldAccessor<GraphicsNW, Graphics>("g");
 
         /// <summary>
         /// Получение к приватному члену <seealso cref="GraphicsNW.g"/> типа Graphics
         /// </summary>
         private Image image => getImageFrom(this);
-        private static readonly Func<GraphicsNW, Image> getImageFrom = GetInstanceFieldAccessor<GraphicsNW, Image>("img");
+        private static readonly Func<GraphicsNW, Image> getImageFrom = InstanceFieldAccessorFactory.GetInstanceFieldAccessor<GraphicsNW, Image>("img");
 
         public new int ImageHeight
         {

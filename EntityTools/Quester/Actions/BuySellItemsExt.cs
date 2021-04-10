@@ -18,7 +18,7 @@ using DevExpress.XtraEditors;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Extensions;
-using EntityTools.Reflection;
+using AcTp0Tools.Reflection;
 using EntityTools.Tools.BuySellItems;
 using MyNW.Classes;
 using MyNW.Internals;
@@ -32,7 +32,7 @@ namespace EntityTools.Quester.Actions
     [Serializable]
     public class BuySellItemsExt : Action
     {
-        internal readonly InstancePropertyAccessor<ActionDebug> debug;
+        internal readonly Property<ActionDebug> debug;
         string _idStr;
         BuySellItemsExt @this => this;
 

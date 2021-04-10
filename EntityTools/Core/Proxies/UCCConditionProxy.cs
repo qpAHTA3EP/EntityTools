@@ -1,7 +1,7 @@
 ﻿using System;
 using Astral.Logic.UCC.Classes;
 using EntityTools.Core.Interfaces;
-using EntityTools.Reflection;
+using AcTp0Tools.Reflection;
 using EntityTools.UCC.Conditions;
 
 namespace EntityTools.Core.Proxies

@@ -4,7 +4,7 @@ using System.Reflection;
 using EntityTools.Patches.Mapper;
 using EntityTools.Patches.Navmesh;
 using EntityTools.Patches.UCC;
-using EntityTools.Reflection;
+using AcTp0Tools.Reflection;
 #if PATCH_ASTRAL && HARMONY
 using EntityTools.Patches.Logic.General;
 using HarmonyLib; 

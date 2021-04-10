@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.IO;
 using Astral.Controllers;
-using EntityTools.Reflection;
+using AcTp0Tools.Reflection;
 
 namespace EntityTools.Settings
 {

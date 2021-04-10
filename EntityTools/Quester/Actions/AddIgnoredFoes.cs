@@ -10,7 +10,7 @@ using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
-using EntityTools.Reflection;
+using AcTp0Tools.Reflection;
 using EntityTools.Tools.Combats.IgnoredFoes;
 using MyNW.Classes;
 using Action = Astral.Quester.Classes.Action;

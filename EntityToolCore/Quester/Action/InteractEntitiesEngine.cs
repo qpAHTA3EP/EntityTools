@@ -1,15 +1,10 @@
 ﻿//#define DEBUG_INTERACTENTITIES
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
-using Astral;
 using Astral.Classes;
 using Astral.Logic.NW;
-using Astral.Quester.Classes;
 using EntityCore.Entities;
-using EntityCore.Extensions;
 using EntityTools.Enums;
 using EntityTools.Quester.Actions;
 using MyNW.Classes;
@@ -19,11 +14,8 @@ using Astral.Logic.Classes.Map;
 using System.Drawing;
 using static Astral.Quester.Classes.Action;
 using EntityTools;
-using System.Reflection;
 using EntityCore.Forms;
 using EntityCore.Tools.Navigation;
-using EntityTools.Reflection;
-using EntityCore.Enums;
 using System.ComponentModel;
 
 namespace EntityCore.Quester.Action

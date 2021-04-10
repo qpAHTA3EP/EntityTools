@@ -6,13 +6,13 @@ using EntityTools.UCC.Conditions;
 using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 using Astral.Logic.UCC.Classes;
 using EntityTools.Extensions;
-using EntityTools.Reflection;
 using UCCEditor = Astral.Logic.UCC.Forms.Editor;
 using EntityTools.UCC.Actions;
+using AcTp0Tools.Reflection;
 
 namespace EntityCore.Forms
 {
-    public partial class ConditionListForm : XtraForm //*/Form
+    public partial class ConditionListForm : XtraForm
     {
         private static UCCCondition conditionCopy;
         // Индекс элемента списка условий Conditions.Items
@@ -20,7 +20,7 @@ namespace EntityCore.Forms
         private int AllowConditionsItemChechedChangeInd = -1;
         // Редактор UCC
         private readonly UCCEditor editor = null;
-        private readonly InstancePropertyAccessor<UCCAction> currentUccAction = null;
+        private readonly Property<UCCAction> currentUccAction = null;
 
         public ConditionListForm()
         {

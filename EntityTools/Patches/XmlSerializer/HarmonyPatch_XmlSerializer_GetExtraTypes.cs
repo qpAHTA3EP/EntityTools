@@ -7,7 +7,7 @@ using Astral.Controllers;
 using Astral.Logic.UCC.Classes;
 using Astral.MultiTasks.Classes;
 using Astral.Quester.Classes;
-using EntityTools.Reflection;
+using AcTp0Tools.Reflection;
 using Action = Astral.Quester.Classes.Action;
 
 #if PATCH_ASTRAL && HARMONY

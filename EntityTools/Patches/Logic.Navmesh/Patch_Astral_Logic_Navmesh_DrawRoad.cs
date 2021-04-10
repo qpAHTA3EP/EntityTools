@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Reflection;
 using Astral.Logic.Classes.Map;
 using EntityTools.Patches.Mapper;
-using EntityTools.Reflection;
+using AcTp0Tools.Reflection;
 using MyNW.Classes;
 
 namespace EntityTools.Patches.Navmesh

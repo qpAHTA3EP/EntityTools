@@ -22,13 +22,13 @@ using DevExpress.XtraBars;
 using DevExpress.XtraEditors;
 using EntityTools.Patches.Mapper.Tools;
 using EntityTools.Properties;
-using EntityTools.Reflection;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
 using Action = System.Action;
 using GoldenPath = Astral.Logic.NW.GoldenPath;
 using MinimapWaypoint = MyNW.Classes.MinimapWaypoint;
 using Timeout = Astral.Classes.Timeout;
+using AcTp0Tools;
 #if PATCH_ASTRAL
 using Astral.Logic.NW;
 using Astral.Quester.Classes;
@@ -1391,7 +1391,7 @@ namespace EntityTools.Patches.Mapper
                         сurrentProfileNeedSave = true;
 
                         //Обновление списка CustomRegion'ов в Quester-редакторе
-                        AstralAccessors.Quester.Forms.Editor.RefreshRegions();
+                        AstralAccessors.Quester.Forms.Editor.EditorForm.RefreshRegions();
 
                         CurrentTool = new EditCustomRegionTool(cr);
                     }
@@ -1445,7 +1445,7 @@ namespace EntityTools.Patches.Mapper
                             сurrentProfileNeedSave = true;
 
                             //Обновление списка CustomRegion'ов в Quester-редакторе
-                            AstralAccessors.Quester.Forms.Editor.RefreshRegions();
+                            AstralAccessors.Quester.Forms.Editor.EditorForm.RefreshRegions();
 
                             //_undoStack.Push(addCRtool); <- вызывается в CurrentTool.set
                             CurrentTool = null;
@@ -1465,7 +1465,7 @@ namespace EntityTools.Patches.Mapper
                 сurrentProfileNeedSave = true;
 
                 //Обновление списка CustomRegion'ов в Quester-редакторе
-                AstralAccessors.Quester.Forms.Editor.RefreshRegions();
+                AstralAccessors.Quester.Forms.Editor.EditorForm.RefreshRegions();
 
                 editCRName.EditValue = string.Empty;
                 editCRName.Visibility = BarItemVisibility.Never;

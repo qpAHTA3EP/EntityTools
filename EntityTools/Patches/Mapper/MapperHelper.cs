@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Drawing;
 using AStar;
-using Astral.Logic.Classes.Map;
-using EntityTools.Reflection;
+using AcTp0Tools.Reflection;
 using MyNW.Classes;
 using MyNW.Internals;
-using static EntityTools.Reflection.InstanceFieldAccessorFactory;
 
 namespace EntityTools.Patches.Mapper
 {
@@ -570,7 +568,7 @@ namespace EntityTools.Patches.Mapper
                 distance = double.MaxValue;
 
             if (graph is null)
-                graph = AstralAccessors.Quester.Core.Meshes;
+                graph = AcTp0Tools.AstralAccessors.Quester.Core.Meshes;
 
             Node node = graph?.ClosestNodeOxyProjection(worldX, worldY, distance);
             if (node != null)

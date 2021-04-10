@@ -8,13 +8,13 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using AcTp0Tools.Reflection;
 using Astral.Addons;
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;
 using Astral.Forms;
 using Astral.Logic.UCC;
 using Astral.Logic.UCC.Classes;
-using Astral.Logic.UCC.Forms;
 using Astral.Quester.Classes;
 using DevExpress.XtraEditors;
 using EntityTools.Core;
@@ -23,7 +23,6 @@ using EntityTools.Enums;
 using EntityTools.Patches;
 using EntityTools.Patches.Mapper;
 using EntityTools.Properties;
-using EntityTools.Reflection;
 using EntityTools.Services;
 using EntityTools.Tools;
 using MyNW.Classes;
@@ -31,7 +30,7 @@ using Action = Astral.Quester.Classes.Action;
 
 [assembly: InternalsVisibleTo("EntityCore")]
 #if !ENCRYPTED_CORE
-[assembly: SuppressIldasm()] 
+[assembly: SuppressIldasm()]
 #endif
 
 namespace EntityTools

@@ -360,14 +360,6 @@
     <Compile Include="Tools\Extensions\Vector3Extentions.cs" />
     <Compile Include="Tools\Missions\MissionGiverBase.cs" />
     <Compile Include="Tools\Missions\MissionGiverInfo.cs" />
-    <Compile Include="Tools\ReadWriteLocker.cs" />
-    <Compile Include="Tools\Reflection\Accessors\AstralAccessors.Addons.cs" />
-    <Compile Include="Tools\Reflection\Accessors\AstralAccessors.Controllers.cs" />
-    <Compile Include="Tools\Reflection\Accessors\Empty.cs" />
-    <Compile Include="Tools\Reflection\Accessors\AstralAccessors.Logic.Nw.cs" />
-    <Compile Include="Tools\Reflection\Accessors\AstralAccessors.Logic.UCC.cs" />
-    <Compile Include="Tools\Reflection\Accessors\AstralAccessors.Quester.cs" />
-    <Compile Include="Tools\Reflection\Accessors\QuesterAssistantAccessors.cs" />
     <Compile Include="Tools\StringToPattern.cs" />
     <Compile Include="Tools\Export\EntityExportInfo.cs" />
     <Compile Include="Tools\Enums.cs" />
@@ -391,18 +383,6 @@
     <Compile Include="Tools\ParagonTools.cs" />
     <Compile Include="Settings\PluginSettingsBase.cs" />
     <Compile Include="Tools\Classes.cs" />
-    <Compile Include="Tools\Reflection\Accessors\AstralAccessors.cs" />
-    <Compile Include="Tools\Reflection\CopyHelper.cs" />
-    <Compile Include="Tools\Reflection\InstanceFieldAccessor.cs" />
-    <Compile Include="Tools\Reflection\InstanceAction.cs" />
-    <Compile Include="Tools\Reflection\InstanceFunction.cs" />
-    <Compile Include="Tools\Reflection\PrivateConsructor.cs" />
-    <Compile Include="Tools\Reflection\ReflectionHelper.cs" />
-    <Compile Include="Tools\Reflection\StaticAction.cs" />
-    <Compile Include="Tools\Reflection\StaticFieldAccessor.cs" />
-    <Compile Include="Tools\Reflection\StaticFunction.cs" />
-    <Compile Include="Tools\Reflection\InstancePropertyAccessor.cs" />
-    <Compile Include="Tools\Reflection\StaticPropertyAccessor.cs" />
     <Compile Include="Tools\SysInformer.cs" />
     <Compile Include="Tools\XmlColor.cs" />
     <Compile Include="UCC\Extensions\UCCActionExtention.cs" />
@@ -453,7 +433,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Compile Include="Tools\Reflection\Accessors\AstralAccessors.Grinder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\charArrow.png" />

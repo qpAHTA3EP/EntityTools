@@ -11,7 +11,6 @@ using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Controls;
 using EntityTools.Enums;
 using EntityTools.Patches.UCC;
-using EntityTools.Reflection;
 using EntityTools.Services;
 using EntityTools.Tools;
 using MyNW;
@@ -26,6 +25,8 @@ using System.Xml.Serialization;
 using API = Astral.Quester.API;
 using Task = System.Threading.Tasks.Task;
 using System.Threading;
+using AcTp0Tools.Reflection;
+using AcTp0Tools;
 
 namespace EntityTools.Core
 {

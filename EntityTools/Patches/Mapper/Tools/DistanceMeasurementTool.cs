@@ -5,9 +5,10 @@ using AStar;
 using Astral.Logic.Classes.FSM;
 using DevExpress.XtraEditors;
 using EntityTools.Patches.Navmesh;
-using EntityTools.Reflection;
+using AcTp0Tools.Reflection;
 using MyNW.Classes;
 using MyNW.Internals;
+using AcTp0Tools;
 
 namespace EntityTools.Patches.Mapper.Tools
 {

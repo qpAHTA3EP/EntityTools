@@ -4,22 +4,19 @@
 //#define REFLECTION_ACCESS
 #define SMART_REFLECTION_ACCESS
 
+using AcTp0Tools;
 using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
 using EntityCore.Entities;
 using EntityTools;
 using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
-using EntityTools.Reflection;
 using EntityTools.UCC.Actions;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Xml.Serialization;
 using Unit = Astral.Logic.UCC.Ressources.Enums.Unit;

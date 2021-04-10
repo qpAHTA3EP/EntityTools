@@ -1,9 +1,8 @@
 ﻿//#define PROFILING
 
+using AcTp0Tools;
 using Astral.Classes.ItemFilter;
-using EntityTools;
 using EntityTools.Enums;
-using EntityTools.Reflection;
 using System.Collections.ObjectModel;
 
 namespace EntityCore.Entities

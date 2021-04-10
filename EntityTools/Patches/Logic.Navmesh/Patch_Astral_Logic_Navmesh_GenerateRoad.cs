@@ -7,8 +7,9 @@ using AStar;
 using Astral.Logic.Classes.FSM;
 using Astral.Logic.NW;
 using EntityTools.Patches.Mapper;
-using EntityTools.Reflection;
+using AcTp0Tools.Reflection;
 using MyNW.Classes;
+using AcTp0Tools;
 
 namespace EntityTools.Patches.Navmesh
 {

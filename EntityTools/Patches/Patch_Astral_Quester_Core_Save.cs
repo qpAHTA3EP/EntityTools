@@ -9,8 +9,9 @@ using System.Xml.Serialization;
 using AStar;
 using Astral.Controllers;
 using Astral.Quester;
-using EntityTools.Reflection;
+using AcTp0Tools.Reflection;
 using MyNW.Internals;
+using AcTp0Tools;
 
 namespace EntityTools.Patches
 {

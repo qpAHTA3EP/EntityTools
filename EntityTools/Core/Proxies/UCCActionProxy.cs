@@ -2,7 +2,7 @@
 using System.Reflection;
 using Astral.Logic.UCC.Classes;
 using EntityTools.Core.Interfaces;
-using EntityTools.Reflection;
+using AcTp0Tools.Reflection;
 using MyNW.Classes;
 
 namespace EntityTools.Core.Proxies
@@ -41,7 +41,7 @@ namespace EntityTools.Core.Proxies
                 return Empty.Entity;
             }
         }
-        InstancePropertyAccessor<Entity> _unitRef;
+        Property<Entity> _unitRef;
 
         public string Label()
         {

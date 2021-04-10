@@ -1,15 +1,11 @@
 ﻿using DevExpress.XtraEditors;
 using System;
-using System.Text;
 using System.Windows.Forms;
-using EntityTools.UCC.Conditions;
-using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 using Astral.Logic.UCC.Classes;
 using EntityTools.Extensions;
-using EntityTools.Reflection;
 using UCCEditor = Astral.Logic.UCC.Forms.Editor;
-using EntityTools.UCC.Actions;
 using System.Collections.Generic;
+using AcTp0Tools.Reflection;
 
 namespace EntityCore.Forms
 {
@@ -17,7 +13,7 @@ namespace EntityCore.Forms
     {
         // Редактор UCC
         private readonly UCCEditor editor = null;
-        private readonly InstancePropertyAccessor<UCCAction> currentUccAction = null;
+        private readonly Property<UCCAction> currentUccAction = null;
 
         private static readonly List<Type> uccActionTypes = new List<Type>();
         private static Dictionary<Type, UCCAction> uccActions = new Dictionary<Type, UCCAction>();

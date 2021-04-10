@@ -10,7 +10,7 @@ using System.Reflection;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-using EntityTools.Reflection;
+using AcTp0Tools.Reflection;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
