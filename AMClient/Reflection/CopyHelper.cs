@@ -80,9 +80,6 @@ namespace AcTp0Tools.Reflection
             return copy;
         }
 
-        /// <summary>
-        /// Создание полной копии объекта через Reflection
-        /// </summary>
         public static T CreateDeepCopy<T>(T o)
         {
 #if PROFILING

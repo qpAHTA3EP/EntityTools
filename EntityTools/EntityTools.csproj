@@ -32,7 +32,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\References\x64\</OutputPath>
+    <OutputPath>..\References\x64\Plugins\</OutputPath>
     <DefineConstants>TRACE;DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -131,6 +131,7 @@
     <Reference Include="AStar, Version=2.20.1028.1229, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\x64\AStar.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Astral_patched">
       <HintPath>..\References\x64\Astral_patched.exe</HintPath>
@@ -178,6 +179,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression">
       <HintPath>..\References\x64\System.IO.Compression.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System.Management" />
     <Reference Include="System.Windows.Forms" />
@@ -627,6 +629,7 @@
     <ProjectReference Include="..\AMClient\AMClient.csproj">
       <Project>{FD0C9E2A-5D26-43AA-A227-BDDAF9C30705}</Project>
       <Name>AMClient</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

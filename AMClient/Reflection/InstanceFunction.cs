@@ -1,5 +1,4 @@
-﻿using Astral;
-using System;
+﻿using System;
 using System.Reflection;
 
 namespace AcTp0Tools.Reflection
@@ -762,11 +761,6 @@ namespace AcTp0Tools.Reflection
 
             private ReturnT internalDummyMethod()
             {
-#if false
-                ETLogger.WriteLine(LogType.Error, message, true); 
-#else
-                Logger.WriteLine(Logger.LogType.Debug, message);
-#endif
                 return default;
             }
             private ReturnT internalDummyMethod<ArgumentT1>(ArgumentT1 a1)

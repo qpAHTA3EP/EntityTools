@@ -10,13 +10,8 @@ namespace AcTp0Tools.Reflection
     /// Andrey Fedorov
     /// http://www.bizkit.ru/2018/05/30/14102/
     /// </summary>
-    public static partial class ReflectionHelper
+    public static class ReflectionHelper
     {
-        //TODO: Переминовать все Factory в "partial class ReflectionHelper"
-
-        /// <summary>
-        /// Shortcut for <see cref="BindingFlags"/> to simplify the use of reflections and make it work for any access level
-        /// </summary>
         public static readonly BindingFlags DefaultFlags = BindingFlags.Instance
                                                            | BindingFlags.Static
                                                            | BindingFlags.Public
@@ -26,23 +21,8 @@ namespace AcTp0Tools.Reflection
                                                            | BindingFlags.GetProperty
                                                            | BindingFlags.SetProperty;
 
-
         public static readonly object[] EmptyObjectArray = new object[0];
         public static readonly Type[]   EmptyTypeArray =   new Type[0];
-
-#if false
-        /// <summary>
-        /// Shortcut for <see cref="BindingFlags"/> to simplify the use of reflections and make it work for any access level
-        /// </summary>
-        public static readonly BindingFlags AllFlags = BindingFlags.Public
-                                                       | BindingFlags.NonPublic
-                                                       | BindingFlags.Instance
-                                                       | BindingFlags.Static
-                                                       | BindingFlags.GetField
-                                                       | BindingFlags.SetField
-                                                       | BindingFlags.GetProperty
-                                                       | BindingFlags.SetProperty; 
-#endif
 
         /// <summary>
         /// Получение списка методов объекта <see cref="obj">

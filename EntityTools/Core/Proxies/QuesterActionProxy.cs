@@ -21,7 +21,7 @@ namespace EntityTools.Core.Proxies
         internal QuesterActionProxy(Action a)
         {
             action = a ?? throw new ArgumentNullException();
-            _internalConditions = action.GetProperty<bool>(nameof(InternalConditions));
+            _internalConditions = action.GetProperty<bool>("IntenalConditions");
             _internalValidity = action.GetProperty<ActionValidity>(nameof(InternalValidity));
             _internalDestination = action.GetProperty<Vector3>(nameof(InternalDestination));
         }

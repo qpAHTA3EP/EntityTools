@@ -225,7 +225,7 @@ namespace AcTp0Tools.Reflection
         public static implicit operator PropertyType(InstancePropertyAccessor<PropertyType> accessor) => accessor.Value;
     } 
 #else
-    public static partial class ReflectionHelper
+    public static class InstancePropertyAccessorFactory
     {
 #if false
         /// <summary>
@@ -325,6 +325,14 @@ namespace AcTp0Tools.Reflection
         private MethodInfo _getter;
         private MethodInfo _setter;
 
+        public ContainerType Instance => _instance;
+        private ContainerType _instance;
+
+        public PropertyInfo PropertyInfo => _propertyInfo;
+        private PropertyInfo _propertyInfo;
+
+        public bool IsValid => _propertyInfo != null;
+
         public Property(Type instanceType, string propName, BindingFlags flags = BindingFlags.Default)
         {
             if (instanceType is null)
@@ -392,14 +400,6 @@ namespace AcTp0Tools.Reflection
                 throw new TargetException($"Property '{propertyInfo.Name}' does not present in '{instance.GetType().FullName}'");
         }
 
-        public ContainerType Instance => _instance;
-        private ContainerType _instance;
-
-        public PropertyInfo PropertyInfo => _propertyInfo;
-        private PropertyInfo _propertyInfo;
-
-        public bool IsValid => _propertyInfo != null;
-
         /// <summary>
         /// Инициализация полей, необходимых для работы со свойством
         /// </summary>
@@ -408,21 +408,18 @@ namespace AcTp0Tools.Reflection
             if (containerType is null)
                 return false;
 
-#if false
-            PropertyInfo pi = containerType.GetProperty(propName, flags, null, propertyType, ReflectionHelper.EmptyTypeArray, null); 
+#if true
+            PropertyInfo propertyInfo = containerType.GetProperty(propName, flags, null, propertyType, ReflectionHelper.EmptyTypeArray, null); 
 #elif false
-            PropertyInfo pi = containerType.GetProperty(propName, flags, null, propertyType, new Type[0], null);
+            PropertyInfo propertyInfo = containerType.GetProperty(propName, flags, null, propertyType, new Type[0], null);
 #else
-            PropertyInfo pi = containerType.GetProperty(propName, flags);
+            PropertyInfo propertyInfo = containerType.GetProperty(propName, flags);
 #endif
-            if (Initialize(pi, propertyType))
+            if (Initialize(propertyInfo, propertyType))
                 return true;
             return Initialize(containerType.BaseType, propName, propertyType, flags);
         }
 
-        /// <summary>
-        /// Инициализация полей, необходимых для работы со свойством
-        /// </summary>
         private bool Initialize(PropertyInfo propertyInfo, Type propertyType)
         {
             if (propertyInfo?.PropertyType == propertyType)
@@ -497,6 +494,14 @@ namespace AcTp0Tools.Reflection
         private MethodInfo _getter;
         private MethodInfo _setter;
 
+        public object Instance => _instance;
+        private object _instance;
+
+        public PropertyInfo PropertyInfo => _propertyInfo;
+        private PropertyInfo _propertyInfo;
+
+        public bool IsValid => _propertyInfo != null;
+
         public Property(Type instanceType, string propName, BindingFlags flags = BindingFlags.Default)
         {
             if (instanceType is null)
@@ -562,14 +567,6 @@ namespace AcTp0Tools.Reflection
                 throw new TargetException($"Property '{propertyInfo.Name}' does not present in '{instance.GetType().FullName}'");
         }
 
-        public object Instance => _instance;
-        private object _instance;
-
-        public PropertyInfo PropertyInfo => _propertyInfo;
-        private PropertyInfo _propertyInfo;
-
-        public bool IsValid => _propertyInfo != null;
-
         /// <summary>
         /// Инициализация полей, необходимых для работы со свойством
         /// </summary>
@@ -578,21 +575,18 @@ namespace AcTp0Tools.Reflection
             if (containerType is null)
                 return false;
 
-#if false
-            PropertyInfo pi = containerType.GetProperty(propName, flags, null, propertyType, ReflectionHelper.EmptyTypeArray, null); 
+#if true
+            PropertyInfo propertyInfo = containerType.GetProperty(propName, flags, null, propertyType, ReflectionHelper.EmptyTypeArray, null); 
 #elif false
-            PropertyInfo pi = containerType.GetProperty(propName, flags, null, propertyType, new Type[0], null);
+            PropertyInfo propertyInfo = containerType.GetProperty(propName, flags, null, propertyType, new Type[0], null);
 #else
-            PropertyInfo pi = containerType.GetProperty(propName, flags);
+            PropertyInfo propertyInfo = containerType.GetProperty(propName, flags);
 #endif
-            if (Initialize(pi, propertyType))
+            if (Initialize(propertyInfo, propertyType))
                 return true;
             return Initialize(containerType.BaseType, propName, propertyType, flags);
         }
 
-        /// <summary>
-        /// Инициализация полей, необходимых для работы со свойством
-        /// </summary>
         private bool Initialize(PropertyInfo propertyInfo, Type propertyType)
         {
             if (propertyInfo?.PropertyType == propertyType)
