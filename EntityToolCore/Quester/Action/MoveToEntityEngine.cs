@@ -38,6 +38,7 @@ namespace EntityCore.Quester.Action
         private string _label = string.Empty;
         private Entity target = null;
         private Entity closestEntity = null;
+        private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
         #endregion
 
         internal MoveToEntityEngine(MoveToEntity m2e)
@@ -153,7 +154,7 @@ namespace EntityCore.Quester.Action
                     target = null;
                 }
 
-                if (entityPreprocessingResult != EntityPreprocessingResult.Succeeded)
+                if (entityPreprocessingResult != EntityPreprocessingResult.Succeeded && !timeout.IsTimedOut)
                 {
                     // target не был обработан
                     Entity entity = SearchCached.FindClosestEntity(EntityKey, SpecialCheck);
@@ -207,6 +208,8 @@ namespace EntityCore.Quester.Action
                     }
                     else if(extedndedDebugInfo)
                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ClosestEntity not found"));
+
+                    timeout.ChangeTime(EntityTools.EntityTools.Config.EntityCache.LocalCacheTime);
                 }
 
                 bool needToRun = entityPreprocessingResult == EntityPreprocessingResult.Succeeded;
