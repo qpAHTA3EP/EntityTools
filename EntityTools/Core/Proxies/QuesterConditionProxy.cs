@@ -7,17 +7,17 @@ namespace EntityTools.Core.Proxies
 {
     internal class QuesterConditionProxy : IQuesterConditionEngine
     {
-        Condition condition;
-        internal QuesterConditionProxy(Condition c)
+        Condition _condition;
+        internal QuesterConditionProxy(Condition condition)
         {
-            condition = c ?? throw new ArgumentNullException();
+            _condition = condition ?? throw new ArgumentNullException(nameof(condition));
         }
         public bool IsValid
         {
             get
             {
-                if (EntityTools.Core.Initialize(condition))
-                    return condition.IsValid;
+                if (EntityTools.Core.Initialize(_condition))
+                    return _condition.IsValid;
 
                 return false;
             }
@@ -25,26 +25,31 @@ namespace EntityTools.Core.Proxies
 
         public void Reset()
         {
-            if (EntityTools.Core.Initialize(condition))
-                condition.Reset();
+            if (EntityTools.Core.Initialize(_condition))
+                _condition.Reset();
         }
 
         public string TestInfos
         {
             get
             {
-                if (EntityTools.Core.Initialize(condition))
-                    return condition.TestInfos;
-                return $"{condition.GetType().Name} initialization failed";
+                if (EntityTools.Core.Initialize(_condition))
+                    return _condition.TestInfos;
+                return $"{_condition.GetType().Name} initialization failed";
             }
         }
 
         public string Label()
         {
-            if (EntityTools.Core.Initialize(condition))
-                return condition.ToString();
-            return condition.GetType().Name;
+            if (string.IsNullOrEmpty(_label))
+            {
+                if (EntityTools.Core.Initialize(_condition))
+                    _label = _condition.ToString();
+                else _label = $"{_condition.GetType().Name} [uninitialized]";
+            }
+            return _label;
         }
+        string _label;
 
         public bool Rebase(Condition condition)
         {
@@ -53,10 +58,10 @@ namespace EntityTools.Core.Proxies
 
         public void Dispose()
         {
-            if (condition != null)
+            if (_condition != null)
             {
-                ReflectionHelper.SetFieldValue(condition, "Engine", null);
-                condition = null;
+                ReflectionHelper.SetFieldValue(_condition, "Engine", null);
+                _condition = null;
             }
         }
     }

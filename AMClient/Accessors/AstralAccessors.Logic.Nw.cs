@@ -54,38 +54,47 @@ namespace AcTp0Tools
                     }
                     static Traverse<Func<List<string>>> blAttackersList = null;
 
-                    public static void SetAbortCombatCondition(Func<Entity, bool> cond, Func<bool> removeCond)
+                    public static void SetAbortCombatCondition(Func<Entity, bool> cond, Func<bool> removeCond, int resetTime = 0)
                     {
                         abortCombatCondition = cond;
                         shouldRemoveAbortCombatCondition = removeCond;
+                        if (resetTime > 0)
+                            AbortCombatConditionResetTime = resetTime;
+                        abortCombatConditionResetTimeout.ChangeTime(AbortCombatConditionResetTime);
                     }
                     public static void RemoveAbortCombatCondition()
                     {
                         abortCombatCondition = null;
                         shouldRemoveAbortCombatCondition = null;
+                        abortCombatConditionResetTimeout.ChangeTime(0);
                     }
                     private static bool prefixCombatUnit(ref bool __result, ref Entity target, ref Func<bool> breakCond)
                     {
-                        bool needCallCombatUnit = true;
                         if (abortCombatCondition != null)
                         {
-                            needCallCombatUnit = !abortCombatCondition(target);
-                            if (needCallCombatUnit && target != null)
+                            if (abortCombatCondition(target))
+                            {
+                                Quester.FSM.States.Combat.SetIgnoreCombat(true);
+                                return false;
+                            }
+                            else if (target != null)
                             {
                                 var trg = new Entity(target.Pointer);
-                                breakCond = () => abortCombatCondition(trg);
+                                breakCond += () => abortCombatCondition(trg);
                             }
                         }
-                        return needCallCombatUnit;
+                        return true;
                     }
                     private static void postfixCombatUnit(bool __result, Entity target, Func<bool> breakCond)
                     {
-                        if (shouldRemoveAbortCombatCondition != null)
+                        if (abortCombatCondition != null)
                         {
-                            if (shouldRemoveAbortCombatCondition())
+                            if (abortCombatConditionResetTimeout.IsTimedOut 
+                                || (shouldRemoveAbortCombatCondition != null && shouldRemoveAbortCombatCondition()))
                             {
                                 abortCombatCondition = null;
                                 shouldRemoveAbortCombatCondition = null;
+                                abortCombatConditionResetTimeout.ChangeTime(0);
                             }
                         }
                     }
@@ -95,6 +104,36 @@ namespace AcTp0Tools
                     /// </summary>
                     private static Func<Entity, bool> abortCombatCondition;
                     private static Func<bool> shouldRemoveAbortCombatCondition;
+
+                    /// <summary>
+                    /// Время до сброса <see cref="abortCombatCondition"/>
+                    /// Таймер обнавляется каждый раз при вызове <see cref="SetAbortCombatCondition"/>
+                    /// </summary>
+                    public static int AbortCombatConditionResetTime { get; set; } = 30_000;
+                    private static Timeout abortCombatConditionResetTimeout = new Timeout(0);
+
+                    public static string AbortCombatCondition_DebugInfo()
+                    {
+                        if (abortCombatCondition is null)
+                            return "Not set";
+                        var subscriber = abortCombatCondition.Target;
+                        var currentTarget = Astral.Logic.UCC.Core.CurrentTarget;
+                        string abortCombatConditionStr = string.Concat("AbortCombatCondition: ", Environment.NewLine, 
+                                             '\t', subscriber.GetType().FullName, '.', abortCombatCondition.Method.Name, Environment.NewLine,
+                                             "\t\t(", subscriber.ToString(), ") ", Environment.NewLine,
+                                             "\tResult = ", abortCombatCondition(currentTarget));
+                        string shouldRemoveAbortCombatConditionStr;
+                        if (shouldRemoveAbortCombatCondition != null)
+                        {
+                            subscriber = shouldRemoveAbortCombatCondition.Target;
+                            shouldRemoveAbortCombatConditionStr = string.Concat(Environment.NewLine, "ShouldRemoveAbortCombatCondition: ", Environment.NewLine,
+                                                                              '\t', subscriber.GetType().FullName, '.', shouldRemoveAbortCombatCondition.Method.Name, Environment.NewLine,
+                                                                              "\t\t(", subscriber.ToString(), ") ", Environment.NewLine,
+                                                                              "\tResult = ", shouldRemoveAbortCombatCondition());
+                        }
+                        else shouldRemoveAbortCombatConditionStr = "\n\rShouldRemoveAbortCombatCondition: not set";
+                        return abortCombatConditionStr + shouldRemoveAbortCombatConditionStr;
+                    }
 
                     static Combats()
                     {

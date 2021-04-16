@@ -32,7 +32,7 @@ namespace EntityTools.Quester.Actions
     [Serializable]
     public class BuySellItemsExt : Action
     {
-        internal readonly Property<ActionDebug> debug;
+        internal readonly PropertyAccessor<ActionDebug> debug;
         string _idStr;
         BuySellItemsExt @this => this;
 

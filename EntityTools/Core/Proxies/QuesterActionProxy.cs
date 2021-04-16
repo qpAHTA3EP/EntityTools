@@ -14,24 +14,26 @@ namespace EntityTools.Core.Proxies
     /// </summary>
     internal sealed class QuesterActionProxy : IQuesterActionEngine
     {
-        private Action action;
+        private Action _action;
 
-        private QuesterActionProxy() { }
-
-        internal QuesterActionProxy(Action a)
+        private QuesterActionProxy()
         {
-            action = a ?? throw new ArgumentNullException();
-            _internalConditions = action.GetProperty<bool>("IntenalConditions");
-            _internalValidity = action.GetProperty<ActionValidity>(nameof(InternalValidity));
-            _internalDestination = action.GetProperty<Vector3>(nameof(InternalDestination));
+        }
+
+        internal QuesterActionProxy(Action action)
+        {
+            _action = action ?? throw new ArgumentNullException(nameof(action));
+            _internalConditions = _action.GetProperty<bool>("IntenalConditions");
+            _internalValidity = _action.GetProperty<ActionValidity>(nameof(InternalValidity));
+            _internalDestination = _action.GetProperty<Vector3>(nameof(InternalDestination));
         }
 
         public bool NeedToRun
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
-                    return action.NeedToRun;
+                if (EntityTools.Core.Initialize(_action))
+                    return _action.NeedToRun;
 
                 return false;
             }
@@ -41,93 +43,98 @@ namespace EntityTools.Core.Proxies
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
-                    return action.ActionLabel;
-                return action.GetType().Name;
+                if (string.IsNullOrEmpty(_label))
+                {
+                    if (EntityTools.Core.Initialize(_action))
+                        _label = _action.ActionLabel;
+                    else _label = $"{_action.GetType().Name} [uninitialized]";
+                }
+                return _label;
             }
         }
+        string _label;
 
         public bool InternalConditions
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
+                if (EntityTools.Core.Initialize(_action))
                 {
                     if (_internalConditions.IsValid)
                         return _internalConditions.Value;
-                    ETLogger.WriteLine(LogType.Error, $"Invalid 'InternalConditions' accessor in Action {action.GetType().Name}[{action.ActionID}]", false);
+                    ETLogger.WriteLine(LogType.Error, $"Invalid 'InternalConditions' accessor in Action {_action.GetType().Name}[{_action.ActionID}]", false);
                     ETLogger.WriteLine(LogType.Error, Environment.StackTrace, false);
                 }
                 return false;
             }
         }
-        Property<bool> _internalConditions;
+        PropertyAccessor<bool> _internalConditions;
 
         public ActionValidity InternalValidity
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
+                if (EntityTools.Core.Initialize(_action))
                 {
                     if (_internalValidity.IsValid)
                         return _internalValidity.Value;
-                    ETLogger.WriteLine(LogType.Error, $"Invalid 'InternalValidity' accessor in Action {action.GetType().Name}[{action.ActionID}]", false);
+                    ETLogger.WriteLine(LogType.Error, $"Invalid 'InternalValidity' accessor in Action {_action.GetType().Name}[{_action.ActionID}]", false);
                     ETLogger.WriteLine(LogType.Error, Environment.StackTrace, false);
                 }
-                return new ActionValidity($"{action.GetType().Name} initialization failed");
+                return new ActionValidity($"{_action.GetType().Name} initialization failed");
             }
         }
-        Property<ActionValidity> _internalValidity;
+        PropertyAccessor<ActionValidity> _internalValidity;
 
         public Vector3 InternalDestination
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
+                if (EntityTools.Core.Initialize(_action))
                 {
                     if (_internalDestination.IsValid)
                         return _internalDestination.Value;
-                    ETLogger.WriteLine(LogType.Error, $"Invalid 'InternalDestination' accessor in Action {action.GetType().Name}[{action.ActionID}]", false);
+                    ETLogger.WriteLine(LogType.Error, $"Invalid 'InternalDestination' accessor in Action {_action.GetType().Name}[{_action.ActionID}]", false);
                     ETLogger.WriteLine(LogType.Error, Environment.StackTrace, false);
                 }
 
                 return Vector3.Empty;
             }
         }
-        Property<Vector3> _internalDestination;
+        PropertyAccessor<Vector3> _internalDestination;
 
         public bool UseHotSpots
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
-                    return action.UseHotSpots;
+                if (EntityTools.Core.Initialize(_action))
+                    return _action.UseHotSpots;
                 return false;
             }
         }
 
         public void GatherInfos()
         {
-            if (EntityTools.Core.Initialize(action))
-                action.GatherInfos();
+            if (EntityTools.Core.Initialize(_action))
+                _action.GatherInfos();
         }
 
         public void InternalReset()
         {
-            if (EntityTools.Core.Initialize(action))
-                action.InternalReset();
+            if (EntityTools.Core.Initialize(_action))
+                _action.InternalReset();
         }
 
         public void OnMapDraw(GraphicsNW graph)
         {
-            if (EntityTools.Core.Initialize(action))
-                action.OnMapDraw(graph);
+            if (EntityTools.Core.Initialize(_action))
+                _action.OnMapDraw(graph);
         }
 
         public ActionResult Run()
         {
-            if (EntityTools.Core.Initialize(action))
-                return action.Run();
+            if (EntityTools.Core.Initialize(_action))
+                return _action.Run();
 
             return ActionResult.Fail;
         }
@@ -139,10 +146,10 @@ namespace EntityTools.Core.Proxies
 
         public void Dispose()
         {
-            if (action != null)
+            if (_action != null)
             {
-                ReflectionHelper.SetFieldValue(action, "Engine", null);
-                action = null;
+                ReflectionHelper.SetFieldValue(_action, "Engine", null);
+                _action = null;
             }
         }
 

@@ -13,7 +13,7 @@ namespace EntityCore.Forms
     {
         // Редактор UCC
         private readonly UCCEditor editor = null;
-        private readonly Property<UCCAction> currentUccAction = null;
+        private readonly PropertyAccessor<UCCAction> currentUccAction = null;
 
         private static readonly List<Type> uccActionTypes = new List<Type>();
         private static Dictionary<Type, UCCAction> uccActions = new Dictionary<Type, UCCAction>();

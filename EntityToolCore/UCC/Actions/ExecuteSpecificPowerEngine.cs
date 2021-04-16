@@ -36,7 +36,9 @@ namespace EntityCore.UCC.Actions
         private string label = string.Empty;
         private string _idStr;
 
-        private int attachedGameProcessId = 0;
+        private int   attachedGameProcessId = 0;
+        private uint  characterContainerId = 0;
+        private uint  powerId = 0;
         private Power power = null;
         #endregion
 
@@ -382,8 +384,10 @@ namespace EntityCore.UCC.Actions
         private bool ValidatePower(Power p)
         {
             return attachedGameProcessId == Astral.API.AttachedGameProcess.Id
+                && characterContainerId == EntityManager.LocalPlayer.ContainerId
                 && p != null 
-                && (p.PowerDef.InternalName == @this._powerId 
+                && (p.PowerId == powerId
+                    || p.PowerDef.InternalName == @this._powerId 
                     || p.EffectivePowerDef().InternalName == @this._powerId);
         }
         private Power GetCurrentPower()
@@ -391,7 +395,9 @@ namespace EntityCore.UCC.Actions
             if (!ValidatePower(power))
             {
                 attachedGameProcessId = Astral.API.AttachedGameProcess.Id;
+                characterContainerId = EntityManager.LocalPlayer.ContainerId;
                 power = Powers.GetPowerByInternalName(@this._powerId);
+                powerId = power?.PowerId ?? 0;
             }
             return power;
         }

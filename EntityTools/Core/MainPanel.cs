@@ -27,11 +27,13 @@ using Task = System.Threading.Tasks.Task;
 using System.Threading;
 using AcTp0Tools.Reflection;
 using AcTp0Tools;
+using System.Collections.Generic;
 
 namespace EntityTools.Core
 {
     public partial class EntityToolsMainPanel : /* UserControl //*/ BasePanel
     {
+        //TODO: Отображать метрики EntityCache и AStar
         public EntityToolsMainPanel() : base("Entity Tools")
         {
             InitializeComponent();
@@ -170,9 +172,17 @@ namespace EntityTools.Core
             bool result = await NavigationHelper.ApproachAsync(pos); 
 #endif
         }
+
+
         private void handler_Test_2(object sender, EventArgs e)
         {
-            QuesterAssistantAccessors.Classes.Monitoring.Frames.Sleep(1000);
+#if false
+            QuesterAssistantAccessors.Classes.Monitoring.Frames.Sleep(1000); 
+#else
+            var info = AstralAccessors.Logic.NW.Combats.AbortCombatCondition_DebugInfo();
+            XtraMessageBox.Show(info);
+#endif
+
         }
         private void handler_Test_3(object sender, EventArgs e)
         {

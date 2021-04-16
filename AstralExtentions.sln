@@ -4,9 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.28010.2046
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityTools", "EntityTools\EntityTools.csproj", "{DF7F797E-DB7E-44F9-A96A-020CFDB3C51E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{FD0C9E2A-5D26-43AA-A227-BDDAF9C30705} = {FD0C9E2A-5D26-43AA-A227-BDDAF9C30705}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mount_Tutorial", "Mount_Tutorial\Mount_Tutorial.csproj", "{451B1F7E-CC3C-4DD4-B03F-4FFD55BA7319}"
 EndProject
@@ -19,9 +16,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Encryptor", "Encrypter\Encryptor.csproj", "{F557CCF3-CFC5-4A2E-92FF-B029B266ED6D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityCore", "EntityToolCore\EntityCore.csproj", "{BD4ED31E-FDA2-4B75-A5FF-AC385A9B20DF}"
-	ProjectSection(ProjectDependencies) = postProject
-		{FD0C9E2A-5D26-43AA-A227-BDDAF9C30705} = {FD0C9E2A-5D26-43AA-A227-BDDAF9C30705}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mount_Tutorial_Core", "Mount_Tutorial_Core\Mount_Tutorial_Core.csproj", "{609FAC8F-0B91-4B0F-9A0D-0E6D38E3FF7B}"
 	ProjectSection(ProjectDependencies) = postProject

@@ -36,16 +36,16 @@ namespace EntityTools.Patches.Mapper
 
         #region Reflection
         /// <summary>
-        /// Получение к приватному члену <seealso cref="GraphicsNW.g"/> типа Graphics
+        /// Получение доступа к приватному члену <seealso cref="GraphicsNW.g"/> типа Graphics
         /// </summary>
-        private Graphics graphics => getGraphicsFrom(this);
-        private static readonly Func<GraphicsNW, Graphics> getGraphicsFrom = InstanceFieldAccessorFactory.GetInstanceFieldAccessor<GraphicsNW, Graphics>("g");
+        private Graphics graphics => _graphicsAcessor[this];
+        private static readonly FieldAccessor<Graphics> _graphicsAcessor = typeof(GraphicsNW).GetField<Graphics>("g");
 
         /// <summary>
-        /// Получение к приватному члену <seealso cref="GraphicsNW.g"/> типа Graphics
+        /// Получение доступа к приватному члену <seealso cref="GraphicsNW.g"/> типа Graphics
         /// </summary>
-        private Image image => getImageFrom(this);
-        private static readonly Func<GraphicsNW, Image> getImageFrom = InstanceFieldAccessorFactory.GetInstanceFieldAccessor<GraphicsNW, Image>("img");
+        private Image image => _imageAcessor[this];
+        private static readonly FieldAccessor<Image> _imageAcessor = typeof(GraphicsNW).GetField<Image>("img");
 
         public new int ImageHeight
         {

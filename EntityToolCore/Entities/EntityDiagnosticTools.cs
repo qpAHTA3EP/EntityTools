@@ -257,7 +257,7 @@ namespace EntityCore.Entities
             {
                 StringBuilder sb = new StringBuilder();
 
-                var @object = Traverse.Create(entityDescriptor);
+                //var @object = Traverse.Create(entityDescriptor);
 
                 if (entityDescriptor.EntityNameType == EntityNameType.Empty || !string.IsNullOrEmpty(entityDescriptor.EntityID))
                 {

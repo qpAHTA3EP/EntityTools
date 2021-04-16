@@ -154,7 +154,7 @@ namespace EntityCore.Quester.Action
                     target = null;
                 }
 
-                if (entityPreprocessingResult != EntityPreprocessingResult.Succeeded && !timeout.IsTimedOut)
+                if (entityPreprocessingResult != EntityPreprocessingResult.Succeeded && timeout.IsTimedOut)
                 {
                     // target не был обработан
                     Entity entity = SearchCached.FindClosestEntity(EntityKey, SpecialCheck);
@@ -367,57 +367,73 @@ namespace EntityCore.Quester.Action
         private bool AbortCombatCondition(Entity combat_target)
         {
             bool extedndedDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
-            string currentMethodName = extedndedDebugInfo ? string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
-
-            // Бой может быть прерван, если  HP > IgnoreCombatMinHP
-            if (EntityManager.LocalPlayer.Character.AttribsBasic.HealthPercent > AstralAccessors.Quester.FSM.States.Combat.IgnoreCombatMinHP)
+            if (extedndedDebugInfo)
             {
-                var entity = closestEntity ?? target;
-                bool anchorEntityValid = EntityKey.Validate(entity);
+                string currentMethodName = string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name);
 
-                if (anchorEntityValid)
+                // Бой может быть прерван, если  HP > IgnoreCombatMinHP
+                if (EntityManager.LocalPlayer.Character.AttribsBasic.HealthPercent > AstralAccessors.Quester.FSM.States.Combat.IgnoreCombatMinHP)
                 {
-                    if (entity.ContainerId == combat_target.ContainerId)
-                        return false;
+                    var entity = closestEntity ?? target;
+                    bool anchorEntityValid = EntityKey.Validate(entity);
 
-                    string entityStr = extedndedDebugInfo ? entity.GetDebugString(@this._entityNameType, "Entity", EntityDetail.Pointer) : string.Empty;
-                    if (!@this._healthCheck || !entity.IsDead)
+                    if (anchorEntityValid)
                     {
-                        double dist = entity.Location.Distance3DFromPlayer;
-                        if (dist >= @this._abortCombatDistance)
+                        if (entity.ContainerId == combat_target.ContainerId)
+                            return false;
+
+                        string entityStr = extedndedDebugInfo ? entity.GetDebugString(@this._entityNameType, "Entity", EntityDetail.Pointer) : string.Empty;
+                        if (!@this._healthCheck || !entity.IsDead)
                         {
-                            if (extedndedDebugInfo)
+                            double dist = entity.Location.Distance3DFromPlayer;
+                            if (dist >= @this._abortCombatDistance)
+                            {
                                 ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Player outside ", nameof(@this.AbortCombatDistance), " (", dist.ToString("N2"), " to ", entityStr, "). Combat have to be aborted"));
-                            return true;
+                                return true;
+                            }
+                            else ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Player withing ", nameof(@this.AbortCombatDistance), " (", dist.ToString("N2"), " to ", entityStr, "). Continue..."));
                         }
                         else
                         {
-                            if (extedndedDebugInfo)
-                                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Player withing ", nameof(@this.AbortCombatDistance), " (", dist.ToString("N2"), " to ", entityStr, "). Continue..."));
+                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ", entityStr, " is dead. Combat have to be aborted"));
+                            return true;
                         }
                     }
                     else
                     {
-                        if (extedndedDebugInfo)
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ", entityStr, " is dead. Combat have to be aborted"));
-                        
+                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Entity[INVALID]. Combat have to be aborted"));
                         return true;
                     }
-                }
-                else
+                } 
+            }
+            else
+            {
+                if (EntityManager.LocalPlayer.Character.AttribsBasic.HealthPercent > AstralAccessors.Quester.FSM.States.Combat.IgnoreCombatMinHP)
                 {
-                    if (extedndedDebugInfo)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Entity[INVALID]. Combat have to be aborted"));
+                    var entity = closestEntity ?? target;
+                    bool anchorEntityValid = EntityKey.Validate(entity);
 
-                    return true;
+                    if (anchorEntityValid)
+                    {
+                        if (entity.ContainerId == combat_target.ContainerId)
+                            return false;
+
+                        if (!@this._healthCheck || !entity.IsDead)
+                        {
+                            double dist = entity.Location.Distance3DFromPlayer;
+                            if (dist >= @this._abortCombatDistance)
+                                return true;
+                        }
+                        else return true;
+                    }
+                    else return true;
                 }
             }
             return false;
         }
         private bool ShouldRemoveAbortCombatCondition()
         {
-            var entity = closestEntity ?? target;
-            return @this.Completed || !EntityKey.Validate(entity);
+            return @this.Completed;
         }
         #endregion
         #endregion

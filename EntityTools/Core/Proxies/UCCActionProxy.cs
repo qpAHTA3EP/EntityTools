@@ -9,19 +9,19 @@ namespace EntityTools.Core.Proxies
 {
     public class UccActionProxy : IUccActionEngine
     {
-        private UCCAction action;
+        private UCCAction _action;
 
-        internal UccActionProxy(UCCAction a)
+        internal UccActionProxy(UCCAction uccAction)
         {
-            action = a ?? throw new ArgumentNullException();
-            _unitRef = a.GetProperty<Entity>(nameof(UnitRef));
+            _action = uccAction ?? throw new ArgumentNullException(nameof(uccAction));
+            _unitRef = uccAction.GetProperty<Entity>(nameof(UnitRef));
         }
         public bool NeedToRun
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
-                    return action.NeedToRun;
+                if (EntityTools.Core.Initialize(_action))
+                    return _action.NeedToRun;
 
                 return false;
             }
@@ -31,7 +31,7 @@ namespace EntityTools.Core.Proxies
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
+                if (EntityTools.Core.Initialize(_action))
                 {
                     if (_unitRef.IsValid)
                         return _unitRef.Value;
@@ -41,19 +41,24 @@ namespace EntityTools.Core.Proxies
                 return Empty.Entity;
             }
         }
-        Property<Entity> _unitRef;
+        PropertyAccessor<Entity> _unitRef;
 
         public string Label()
         {
-            if (EntityTools.Core.Initialize(action))
-                return action.ToString();
-            return action.GetType().Name;
+            if (string.IsNullOrEmpty(_label))
+            {
+                if (EntityTools.Core.Initialize(_action))
+                    _label = _action.ToString();
+                else _label = $"{_action.GetType().Name} [uninitialized]"; 
+            }
+            return _label;
         }
+        string _label;
 
         public bool Run()
         {
-            if (EntityTools.Core.Initialize(action))
-                return action.Run();
+            if (EntityTools.Core.Initialize(_action))
+                return _action.Run();
 
             return false;
         }
@@ -65,10 +70,10 @@ namespace EntityTools.Core.Proxies
 
         public void Dispose()
         {
-            if (action != null)
+            if (_action != null)
             {
-                ReflectionHelper.SetFieldValue(action, "Engine", null);
-                action = null;
+                ReflectionHelper.SetFieldValue(_action, "Engine", null);
+                _action = null;
             }
         }
     }

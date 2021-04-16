@@ -20,7 +20,7 @@ namespace EntityCore.Forms
         private int AllowConditionsItemChechedChangeInd = -1;
         // Редактор UCC
         private readonly UCCEditor editor = null;
-        private readonly Property<UCCAction> currentUccAction = null;
+        private readonly PropertyAccessor<UCCAction> currentUccAction = null;
 
         public ConditionListForm()
         {

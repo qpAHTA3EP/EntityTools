@@ -12,6 +12,9 @@ namespace EntityTools.Forms
 {
     public partial class CustomRegionCollectionEditorForm : XtraForm
     {
+        //TODO: Если снять отметки со всех регионов, то возвращается старая коллекция
+        //TODO: Добавить кнопки: отмет все, снять все отметки, отметить все свободные, снять все отмеченные
+
         private static CustomRegionCollectionEditorForm @this = null;
 
 #if DataSource

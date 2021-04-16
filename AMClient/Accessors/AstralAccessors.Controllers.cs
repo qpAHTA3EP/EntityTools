@@ -248,15 +248,20 @@ namespace AcTp0Tools
             {
                 public static class BotClient
                 {
-                    public static readonly StaticPropertyAccessor<Astral.Functions.TCP.Client.Client> Client =
+                    public static Astral.Functions.TCP.Client.Client Client { get => _client.Value; }
+
+                    private static readonly StaticPropertyAccessor<Astral.Functions.TCP.Client.Client> _client =
                         typeof(Astral.Controllers.BotComs.BotClient)
                             .GetStaticProperty<Astral.Functions.TCP.Client.Client>("Client");
 
-                    private static readonly Func<Astral.Functions.TCP.Client.Client, System.Net.Sockets.TcpClient>
-                        _tcpClientAccessor = InstanceFieldAccessorFactory
-                            .GetInstanceFieldAccessor<Astral.Functions.TCP.Client.Client, System.Net.Sockets.TcpClient>("\u0002");
-
-                    public static TcpClient Client_TcpClient => _tcpClientAccessor(Client);
+#if false
+                    private static readonly Field<Astral.Functions.TCP.Client.Client, System.Net.Sockets.TcpClient>
+                _tcpClientAccessor = typeof(Astral.Functions.TCP.Client.Client).GetField<Astral.Functions.TCP.Client.Client, System.Net.Sockets.TcpClient>("\u0002");
+#else
+                    private static readonly FieldAccessor<System.Net.Sockets.TcpClient> _tcpClientAccessor 
+                        = typeof(Astral.Functions.TCP.Client.Client).GetField<System.Net.Sockets.TcpClient>("\u0002");
+#endif
+                    public static TcpClient Client_TcpClient => _tcpClientAccessor[_client.Value];
                 }
             }
 

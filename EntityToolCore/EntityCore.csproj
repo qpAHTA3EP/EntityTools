@@ -12,14 +12,14 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.21.0402.1421</AssemblyVersion>
+    <AssemblyVersion>0.21.0413.1346</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\References\x64\</OutputPath>
+    <OutputPath>..\References\x64\Plugins\</OutputPath>
     <DefineConstants>TRACE;DEBUG;DEVELOPER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -63,10 +63,13 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AStar, Version=2.20.1028.1229, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="AStar, Version=2.20.1028.1229, Culture=neutral, PublicKeyToken=null">
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Astral_patched, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\References\x64\Astral_patched.exe</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="DevExpress.Data.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>False</Private>
@@ -343,11 +346,12 @@
     <ProjectReference Include="..\AMClient\AMClient.csproj">
       <Project>{FD0C9E2A-5D26-43AA-A227-BDDAF9C30705}</Project>
       <Name>AMClient</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\EntityTools\EntityTools.csproj">
       <Project>{df7f797e-db7e-44f9-a96a-020cfdb3c51e}</Project>
       <Name>EntityTools</Name>
-      <Private>False</Private>
+      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
