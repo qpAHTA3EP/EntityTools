@@ -225,40 +225,8 @@ namespace AcTp0Tools.Reflection
         public static implicit operator PropertyType(InstancePropertyAccessor<PropertyType> accessor) => accessor.Value;
     } 
 #else
-    public static class InstancePropertyAccessorFactory
+    public static partial class ReflectionHelper
     {
-#if false
-        /// <summary>
-        /// Конструирование функтора
-        /// </summary>
-        public static Func<object, Property<PropertyType>> GetInstancePropertyAccessor<PropertyType>(this Type containerType, string propertyName, BindingFlags flags = BindingFlags.Default)
-        {
-            if (string.IsNullOrEmpty(propertyName))
-                throw new ArgumentNullException(nameof(propertyName));
-
-            if (containerType is null)
-                throw new ArgumentNullException(nameof(containerType));
-
-            if (flags == BindingFlags.Default)
-                flags = ReflectionHelper.DefaultFlags;
-
-            PropertyInfo propInfo = containerType.GetProperty(propertyName, flags | BindingFlags.Instance | BindingFlags.NonPublic);
-            if (propInfo != null)
-            {
-                if (propInfo.PropertyType.Equals(typeof(PropertyType)))
-                {
-                    return (object instance) =>
-                    {
-                        if (instance.GetType().Equals(containerType))
-                            return new PropertyAccessor<PropertyType>(instance, propInfo);
-                        return new PropertyAccessor<PropertyType>();
-                    };
-                }
-            }
-            return null;
-        }
-#endif
-
         /// <summary>
         /// Доступ к свойству <paramref name="propertyName"/> экземпляра объекта <paramref name="instance"/>
         /// </summary>
@@ -291,7 +259,7 @@ namespace AcTp0Tools.Reflection
 
             var type = instance.GetType();
             var propType = typeof(PropertyType);
-            foreach (var propInfo in type.GetProperties(flags))
+            foreach (var propInfo in type.GetProperties(flags | BindingFlags.Instance | BindingFlags.NonPublic))
             {
                 if (propInfo.PropertyType == propType)
                     yield return new Property<PropertyType>(instance, propInfo);
@@ -307,7 +275,7 @@ namespace AcTp0Tools.Reflection
                 flags = ReflectionHelper.DefaultFlags;
 
             var propType = typeof(PropertyType);
-            foreach (var propInfo in instanceType.GetProperties(flags))
+            foreach (var propInfo in instanceType.GetProperties(flags | BindingFlags.Instance | BindingFlags.NonPublic))
             {
                 if (propInfo.PropertyType == propType)
                     yield return new Property<PropertyType>(instanceType, propInfo);
@@ -347,7 +315,7 @@ namespace AcTp0Tools.Reflection
             var propertyType = typeof(PropertyType);
 
             if (!Initialize(instanceType, propName, propertyType, flags | BindingFlags.Instance | BindingFlags.NonPublic))
-                throw new TargetException($"Property '{propName}' does not found in '{_instance.GetType().FullName}'");
+                throw new TargetException($"Property '{propName}' does not found in '{instanceType.FullName}'");
         }
 
         public Property(ContainerType instance, string propName, BindingFlags flags = BindingFlags.Default)
@@ -370,6 +338,7 @@ namespace AcTp0Tools.Reflection
                 throw new TargetException($"Property '{propName}' does not found in '{instance.GetType().FullName}'");
         }
 
+#if false
         public Property(Type instanceType, PropertyInfo propertyInfo)
         {
             if (instanceType is null)
@@ -378,26 +347,43 @@ namespace AcTp0Tools.Reflection
             if (propertyInfo is null)
                 throw new ArgumentNullException(nameof(propertyInfo));
 
-            var propertyType = typeof(PropertyType);
+            //var propertyType = typeof(PropertyType);
 
-            if (!Initialize(propertyInfo, propertyType))
+            if (!Initialize(propertyInfo))
 
-                throw new TargetException($"Property '{propertyInfo.Name}' does not present in '{_instance.GetType().FullName}'");
+                throw new TargetException($"Property '{propertyInfo.Name}' does not present in '{instanceType.FullName}'");
+        } 
+#else
+        public Property(PropertyInfo propertyInfo)
+        {
+            if (propertyInfo is null)
+                throw new ArgumentNullException(nameof(propertyInfo));
+
+            var containerType = typeof(ContainerType);
+            if (propertyInfo.ReflectedType != containerType)
+                throw new ArgumentException($"ReflectedType of the '{propertyInfo.Name}' is '{propertyInfo.ReflectedType.FullName}' does not equal to parameter ContainerType '{containerType.FullName}'", nameof(propertyInfo));
+
+            if (!Initialize(propertyInfo))
+                throw new TargetException($"Property '{propertyInfo.Name}' does not present in '{containerType.FullName}'");
         }
+#endif
 
         public Property(ContainerType instance, PropertyInfo propertyInfo)
         {
             if (instance != null)
                 throw new ArgumentNullException(nameof(instance));
-            _instance = instance;
 
             if (propertyInfo is null)
                 throw new ArgumentNullException(nameof(propertyInfo));
 
-            var propertyType = typeof(PropertyType);
+            var containerType = instance.GetType();
+            if (propertyInfo.ReflectedType != containerType)
+                throw new ArgumentException($"ReflectedType of the '{propertyInfo.Name}' is '{propertyInfo.ReflectedType.FullName}' does not equal to parameter ContainerType '{containerType.FullName}'", nameof(propertyInfo));
 
-            if (!Initialize(propertyInfo, propertyType))
-                throw new TargetException($"Property '{propertyInfo.Name}' does not present in '{instance.GetType().FullName}'");
+            if (!Initialize(propertyInfo))
+                throw new TargetException($"Property '{propertyInfo.Name}' does not present in '{containerType.FullName}'");
+
+            _instance = instance;
         }
 
         /// <summary>
@@ -408,33 +394,23 @@ namespace AcTp0Tools.Reflection
             if (containerType is null)
                 return false;
 
-#if true
             PropertyInfo propertyInfo = containerType.GetProperty(propName, flags, null, propertyType, ReflectionHelper.EmptyTypeArray, null); 
-#elif false
-            PropertyInfo propertyInfo = containerType.GetProperty(propName, flags, null, propertyType, new Type[0], null);
-#else
-            PropertyInfo propertyInfo = containerType.GetProperty(propName, flags);
-#endif
-            if (Initialize(propertyInfo, propertyType))
+            if (Initialize(propertyInfo))
                 return true;
             return Initialize(containerType.BaseType, propName, propertyType, flags);
         }
 
-        private bool Initialize(PropertyInfo propertyInfo, Type propertyType)
+        private bool Initialize(PropertyInfo propertyInfo)
         {
-            if (propertyInfo?.PropertyType == propertyType)
+            MethodInfo[] accessors = propertyInfo.GetAccessors(true);
+            if (accessors?.Length > 0)
             {
-                MethodInfo[] accessors = propertyInfo.GetAccessors(true);
-                if (accessors?.Length > 0)
-                {
-                    _getter = accessors[0];
-                    if (accessors.Length > 1)
-                        _setter = accessors[1];
-                    _propertyInfo = propertyInfo;
-                }
-                return _propertyInfo != null;
+                _getter = accessors[0];
+                if (accessors.Length > 1)
+                    _setter = accessors[1];
+                _propertyInfo = propertyInfo;
             }
-            return false;
+            return _propertyInfo != null;
         }
 
         /// <summary>
@@ -444,16 +420,13 @@ namespace AcTp0Tools.Reflection
         {
             get
             {
-                {
-                    object result = _getter.Invoke(instance, ReflectionHelper.EmptyObjectArray);
-                    if (result != null)
-                        return (PropertyType)result;
-                }
+                if (_getter.Invoke(instance, ReflectionHelper.EmptyObjectArray) is PropertyType result)
+                    return result;
                 return default;
             }
             set
             {
-                if (_setter != null)
+                //if (_setter != null)
                 {
                     _setterParameters[0] = value;
                     _setter.Invoke(instance, _setterParameters);
@@ -466,14 +439,13 @@ namespace AcTp0Tools.Reflection
         {
             get
             {
-                object result = _getter.Invoke(_instance, new object[] { });
-                if (result != null)
-                    return (PropertyType)result;
+                if(_getter.Invoke(_instance, ReflectionHelper.EmptyObjectArray) is PropertyType result)
+                    return result;
                 return default;
             }
             set
             {
-                if (_setter != null)
+                //if (_setter != null)
                 {
                     _setterParameters[0] = value;
                     _setter.Invoke(_instance, _setterParameters);
@@ -516,7 +488,7 @@ namespace AcTp0Tools.Reflection
             var propertyType = typeof(PropertyType);
 
             if (!Initialize(instanceType, propName, propertyType, flags | BindingFlags.Instance | BindingFlags.NonPublic))
-                throw new TargetException($"Property '{propName}' does not found in '{_instance.GetType().FullName}'");
+                throw new TargetException($"Property '{propName}' does not found in '{instanceType.FullName}'");
         }
 
         public Property(object instance, string propName, BindingFlags flags = BindingFlags.Default)
@@ -538,6 +510,7 @@ namespace AcTp0Tools.Reflection
                 throw new TargetException($"Property '{propName}' does not found in '{instance.GetType().FullName}'");
         }
 
+#if false
         public Property(Type instanceType, PropertyInfo propertyInfo)
         {
             if (instanceType is null)
@@ -546,12 +519,21 @@ namespace AcTp0Tools.Reflection
             if (propertyInfo is null)
                 throw new ArgumentNullException(nameof(propertyInfo));
 
-            var propertyType = typeof(PropertyType);
+            if (!Initialize(propertyInfo))
+                throw new TargetException($"Property '{propertyInfo.Name}' does not present in '{instanceType.FullName}'");
+        }
+#else
+        public Property(PropertyInfo propertyInfo)
+        {
+            if (propertyInfo is null)
+                throw new ArgumentNullException(nameof(propertyInfo));
+            _propertyInfo = propertyInfo;
 
-            if (!Initialize(propertyInfo, propertyType))
-                throw new TargetException($"Property '{propertyInfo.Name}' does not present in '{_instance.GetType().FullName}'");
+            if (!Initialize(propertyInfo))
+                throw new TargetException($"Property '{propertyInfo.Name}' does not present in '{propertyInfo.ReflectedType.FullName}'");
         }
 
+#endif
         public Property(object instance, PropertyInfo propertyInfo)
         {
             if (instance is null)
@@ -561,10 +543,12 @@ namespace AcTp0Tools.Reflection
             if (propertyInfo is null)
                 throw new ArgumentNullException(nameof(propertyInfo));
 
-            var propertyType = typeof(PropertyType);
+            var containerType = instance.GetType();
+            if (propertyInfo.ReflectedType != containerType)
+                throw new ArgumentException($"ReflectedType of the '{propertyInfo.Name}' is '{propertyInfo.ReflectedType.FullName}' does not equal to parameter ContainerType '{containerType.FullName}'", nameof(propertyInfo));
 
-            if (!Initialize(propertyInfo, propertyType))
-                throw new TargetException($"Property '{propertyInfo.Name}' does not present in '{instance.GetType().FullName}'");
+            if (!Initialize(propertyInfo))
+                throw new TargetException($"Property '{propertyInfo.Name}' does not present in '{containerType.FullName}'");
         }
 
         /// <summary>
@@ -575,33 +559,24 @@ namespace AcTp0Tools.Reflection
             if (containerType is null)
                 return false;
 
-#if true
-            PropertyInfo propertyInfo = containerType.GetProperty(propName, flags, null, propertyType, ReflectionHelper.EmptyTypeArray, null); 
-#elif false
-            PropertyInfo propertyInfo = containerType.GetProperty(propName, flags, null, propertyType, new Type[0], null);
-#else
-            PropertyInfo propertyInfo = containerType.GetProperty(propName, flags);
-#endif
-            if (Initialize(propertyInfo, propertyType))
+            PropertyInfo propertyInfo = containerType.GetProperty(propName, flags, null, propertyType, ReflectionHelper.EmptyTypeArray, null);
+
+            if (Initialize(propertyInfo))
                 return true;
             return Initialize(containerType.BaseType, propName, propertyType, flags);
         }
 
-        private bool Initialize(PropertyInfo propertyInfo, Type propertyType)
+        private bool Initialize(PropertyInfo propertyInfo)
         {
-            if (propertyInfo?.PropertyType == propertyType)
+            MethodInfo[] accessors = propertyInfo.GetAccessors(true);
+            if (accessors?.Length > 0)
             {
-                MethodInfo[] accessors = propertyInfo.GetAccessors(true);
-                if (accessors?.Length > 0)
-                {
-                    _getter = accessors[0];
-                    if (accessors.Length > 1)
-                        _setter = accessors[1];
-                    _propertyInfo = propertyInfo;
-                }
-                return _propertyInfo != null;
+                _getter = accessors[0];
+                if (accessors.Length > 1)
+                    _setter = accessors[1];
+                _propertyInfo = propertyInfo;
             }
-            return false;
+            return _propertyInfo != null;
         }
 
         /// <summary>

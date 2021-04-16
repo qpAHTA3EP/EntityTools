@@ -10,7 +10,7 @@ namespace AcTp0Tools.Reflection
     /// Andrey Fedorov
     /// http://www.bizkit.ru/2018/05/30/14102/
     /// </summary>
-    public static class ReflectionHelper
+    public static partial class ReflectionHelper
     {
         public static readonly BindingFlags DefaultFlags = BindingFlags.Instance
                                                            | BindingFlags.Static
