@@ -28,6 +28,7 @@ using static Astral.Quester.Classes.Action;
 
 namespace EntityCore.Quester.Action
 {
+    //TODO: Добавить предобработку MissionId (деление на подзадачи по знаку '\')
     public class PickUpMissionEngine : IQuesterActionEngine
     {
         private PickUpMissionExt @this;
@@ -37,11 +38,6 @@ namespace EntityCore.Quester.Action
 
         private ContactInfo giverContactInfo;
         private int tries;
-#if false
-        private Predicate<string> isRewardItem; 
-#else
-        private Predicate<Item> isRewardItem;
-#endif
         private string label = string.Empty;
         private string _idStr = string.Empty;
         #endregion
@@ -109,7 +105,8 @@ namespace EntityCore.Quester.Action
 
             @this = pum;
 
-            isRewardItem = initializer_IsRewardItem;
+            //isRewardItem = initializer_IsRewardItem;
+            _rewardItemCheck = null;
 
             _idStr = string.Concat(@this.GetType().Name, '[', @this.ActionID, ']');
 
@@ -127,7 +124,8 @@ namespace EntityCore.Quester.Action
         {
             if (!ReferenceEquals(sender, @this)) return;
             if (propertyName == nameof(@this.RequiredRewardItem))
-                isRewardItem = initializer_IsRewardItem;
+                //isRewardItem = initializer_IsRewardItem;
+                _rewardItemCheck = null;
             else if (propertyName == nameof(@this.MissionId)) label = string.Empty;
         }
 
@@ -344,7 +342,7 @@ namespace EntityCore.Quester.Action
 #if false
             MissionProcessingResult processingResult = ProccessingDialog(); 
 #else
-            MissionProcessingResult processingResult = MissionHelper.ProccessingMissionDialog(@this._missionId, false, @this._dialogs, isRewardItem, TIME);
+            MissionProcessingResult processingResult = MissionHelper.ProccessingMissionDialog(@this._missionId, false, @this._dialogs, RewardItemCheck, TIME);
 #endif
             tries++;
 
@@ -843,7 +841,8 @@ namespace EntityCore.Quester.Action
             isRewardItem = pred;
             return isRewardItem(str);
         } 
-#else
+#elif false
+        private Predicate<Item> isRewardItem;
         private bool initializer_IsRewardItem(Item item)
         {
             if (string.IsNullOrEmpty(@this._requiredRewardItem))
@@ -863,6 +862,25 @@ namespace EntityCore.Quester.Action
             return isRewardItem(item);
         }
         private bool internal_IsRewardItem_True(Item item) => true;
+#else
+        private Predicate<Item> RewardItemCheck
+        {
+            get
+            {
+                if (_rewardItemCheck is null)
+                {
+                    if (!string.IsNullOrEmpty(@this._requiredRewardItem))
+                    {
+                        var strPred = StringToPatternComparer.GetComparer(@this._requiredRewardItem);
+                        if (strPred != null)
+                            return _rewardItemCheck = (Item itm) => strPred(itm.ItemDef.InternalName);
+                    }
+                    _rewardItemCheck = (Item itm) => true;
+                }
+                return _rewardItemCheck;
+            }
+        }
+        Predicate<Item> _rewardItemCheck;
 #endif
         #endregion
     }

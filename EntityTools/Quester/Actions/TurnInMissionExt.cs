@@ -27,6 +27,8 @@ namespace EntityTools.Quester.Actions
     {
         #region Опции команды
 #if DEVELOPER
+        [Description("Identifier of the Mission.\n\r" +
+            "Allows simple mask (*) at the begin and at the end")]
         [Editor(typeof(MainMissionEditor), typeof(UITypeEditor))]
         [Category("Required")]
 #else

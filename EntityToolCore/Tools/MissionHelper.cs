@@ -182,8 +182,10 @@ namespace EntityCore.Tools.Missions
                 return true;
 
             var contactDialog = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog;
+            var screenType = contactDialog.ScreenType;
             // Проверяем тип активного экрана диалогового окна
-            if (contactDialog.ScreenType == ScreenType.MissionOffer)
+            if (screenType == ScreenType.MissionOffer
+                || screenType == ScreenType.MissionTurnIn)
             {
                 // Открыт экран получения квеста
                 // Проверяем наличие в сумках с наградой заданного итема
