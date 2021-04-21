@@ -5,5 +5,10 @@ namespace AcTp0Tools.Patches
     public static class AcTp0Patcher
     {
         public static Harmony Harmony { get; } = new Harmony(nameof(AcTp0Tools));
+
+        public static void Apply()
+        {
+            Harmony.PatchAll();
+        }
     }
 }

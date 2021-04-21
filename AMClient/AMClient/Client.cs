@@ -1,7 +1,14 @@
-﻿namespace AMClient
+﻿using AcTp0Tools.Patches;
+
+namespace AMClient
 {
 	public class Client
 	{
+        static Client()
+        {
+            AcTp0Patcher.Apply();
+        }
+
 		public Client(string PrivateKey)
 		{
             this.PrivateKey = PrivateKey;
