@@ -311,7 +311,8 @@ namespace EntityCore.UCC.Actions
                 if (_specialCheck is null)
                     _specialCheck = SearchHelper.Construct_EntityAttributePredicate(@this._healthCheck,
                                                             @this._reactionRange,
-                                                            @this._reactionZRange,
+                                                            //@this._reactionZRange,
+                                                            @this._reactionZRange > 0 ? @this._reactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference,
                                                             @this._regionCheck,
                                                             @this._aura.IsMatch);
                 return _specialCheck;

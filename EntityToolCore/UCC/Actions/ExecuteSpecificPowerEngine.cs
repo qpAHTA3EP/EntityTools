@@ -286,12 +286,12 @@ namespace EntityCore.UCC.Actions
                     Thread.Sleep(20);
                 }
             }
+#if DEBUG_ExecuteSpecificPower
             catch (Exception e)
             {
-#if DEBUG_ExecuteSpecificPower
                 ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Catch an exception trying activate power '{currentPower.PowerDef.InternalName}' \n\r{e.Message}");
-#endif
             }
+#endif
             finally
             {
 #if DEBUG_ExecuteSpecificPower
