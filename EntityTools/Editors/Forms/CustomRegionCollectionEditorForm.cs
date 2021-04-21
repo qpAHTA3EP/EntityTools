@@ -132,8 +132,7 @@ namespace EntityTools.Forms
 
                 @this.crList.Items.Clear();
                 crCollection = newCrCollection;
-
-                return crCollection.Count > 0;
+                return true;
             }
             return false;
         }
