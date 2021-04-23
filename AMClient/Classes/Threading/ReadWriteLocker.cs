@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace AcTp0Tools.Classes
+namespace AcTp0Tools.Classes.Threading
 {
     public class RWLocker : IDisposable
     {

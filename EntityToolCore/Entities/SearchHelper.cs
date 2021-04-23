@@ -23,8 +23,10 @@ namespace EntityCore.Entities
                                                                            bool regionCheck = false,
                                                                            Predicate<Entity> specialCheck = null)
         {
+#if false
             if (zRange <= 0)
-                zRange = float.MaxValue;// Astral.Controllers.Settings.Get.MaxElevationDifference;
+                zRange = Astral.Controllers.Settings.Get.MaxElevationDifference;  
+#endif
             Predicate<Entity> predicate;
             if (specialCheck is null)
             {
@@ -134,8 +136,10 @@ namespace EntityCore.Entities
                                                                            List<CustomRegion> customRegions = null,
                                                                            Predicate<Entity> specialCheck = null)
         {
+#if false
             if (zRange <= 0)
-                zRange = float.MaxValue;// Astral.Controllers.Settings.Get.MaxElevationDifference;
+                zRange = Astral.Controllers.Settings.Get.MaxElevationDifference;  
+#endif
 
             Predicate<Entity> predicate;
             if (customRegions?.Count > 0)
@@ -354,8 +358,10 @@ namespace EntityCore.Entities
                                                                            bool outsideCustomRegions = false,
                                                                            Predicate<Entity> specialCheck = null)
         {
+#if false
             if (zRange <= 0)
-                zRange = float.MaxValue;// Astral.Controllers.Settings.Get.MaxElevationDifference;
+                zRange = Astral.Controllers.Settings.Get.MaxElevationDifference; 
+#endif
 
             Predicate<Entity> predicate;
             if (customRegions?.Count > 0)

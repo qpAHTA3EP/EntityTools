@@ -1,6 +1,6 @@
 ﻿namespace EntityTools.Forms
 {
-    partial class MissionMonitorForm
+    partial class MissionMonitorForm2
     {
         /// <summary>
         /// Required designer variable.
@@ -32,21 +32,25 @@
             this.btnExpand = new DevExpress.XtraEditors.SimpleButton();
             this.simpleButton1 = new DevExpress.XtraEditors.SimpleButton();
             this.splitContainer = new DevExpress.XtraEditors.SplitContainerControl();
-            this.treeViewMissions = new System.Windows.Forms.TreeView();
+            this.listMissions = new DevExpress.XtraTreeList.TreeList();
             this.splitContainerDetail = new DevExpress.XtraEditors.SplitContainerControl();
-            this.pgDetail = new DevExpress.XtraVerticalGrid.PropertyGridControl();
+            this.listMissionDef = new DevExpress.XtraTreeList.TreeList();
+            this.clmnMissionName = new DevExpress.XtraTreeList.Columns.TreeListColumn();
+            this.clmnMissionNameOverride = new DevExpress.XtraTreeList.Columns.TreeListColumn();
+            this.clmnState = new DevExpress.XtraTreeList.Columns.TreeListColumn();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer.Panel1)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer.Panel2)).BeginInit();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.listMissions)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerDetail)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerDetail.Panel1)).BeginInit();
             this.splitContainerDetail.Panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerDetail.Panel2)).BeginInit();
             this.splitContainerDetail.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pgDetail)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.listMissionDef)).BeginInit();
             this.SuspendLayout();
             // 
             // btnSelectMission
@@ -89,12 +93,13 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.splitContainer.FixedPanel = DevExpress.XtraEditors.SplitFixedPanel.None;
+            this.splitContainer.Horizontal = false;
             this.splitContainer.Location = new System.Drawing.Point(12, 12);
             this.splitContainer.Name = "splitContainer";
             // 
             // splitContainer.Panel1
             // 
-            this.splitContainer.Panel1.Controls.Add(this.treeViewMissions);
+            this.splitContainer.Panel1.Controls.Add(this.listMissions);
             this.splitContainer.Panel1.Text = "Panel1";
             // 
             // splitContainer.Panel2
@@ -102,20 +107,26 @@
             this.splitContainer.Panel2.Controls.Add(this.splitContainerDetail);
             this.splitContainer.Panel2.Text = "Panel2";
             this.splitContainer.Size = new System.Drawing.Size(574, 309);
-            this.splitContainer.SplitterPosition = 281;
+            this.splitContainer.SplitterPosition = 130;
             this.splitContainer.TabIndex = 3;
             // 
-            // treeViewMissions
+            // listMissions
             // 
-            this.treeViewMissions.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.treeViewMissions.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.treeViewMissions.HideSelection = false;
-            this.treeViewMissions.Location = new System.Drawing.Point(0, 0);
-            this.treeViewMissions.Name = "treeViewMissions";
-            this.treeViewMissions.Size = new System.Drawing.Size(281, 309);
-            this.treeViewMissions.TabIndex = 0;
-            this.treeViewMissions.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.handler_ExpandNode);
-            this.treeViewMissions.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.handler_SelectNode);
+            this.listMissions.ChildListFieldName = "Childrens";
+            this.listMissions.Columns.AddRange(new DevExpress.XtraTreeList.Columns.TreeListColumn[] {
+            this.clmnMissionName,
+            this.clmnMissionNameOverride,
+            this.clmnState});
+            this.listMissions.CustomizationFormBounds = new System.Drawing.Rectangle(382, 26, 252, 266);
+            this.listMissions.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listMissions.KeyFieldName = "MissionName";
+            this.listMissions.Location = new System.Drawing.Point(0, 0);
+            this.listMissions.Name = "listMissions";
+            this.listMissions.ParentFieldName = "MainMissionName";
+            this.listMissions.PreviewFieldName = "MissionName";
+            this.listMissions.Size = new System.Drawing.Size(574, 130);
+            this.listMissions.TabIndex = 4;
+            this.listMissions.TreeViewFieldName = "MissionName";
             // 
             // splitContainerDetail
             // 
@@ -126,26 +137,59 @@
             // 
             // splitContainerDetail.Panel1
             // 
-            this.splitContainerDetail.Panel1.Controls.Add(this.pgDetail);
+            this.splitContainerDetail.Panel1.Controls.Add(this.listMissionDef);
             this.splitContainerDetail.Panel1.Text = "Panel1";
             // 
             // splitContainerDetail.Panel2
             // 
             this.splitContainerDetail.Panel2.Text = "Panel2";
-            this.splitContainerDetail.Size = new System.Drawing.Size(283, 309);
-            this.splitContainerDetail.SplitterPosition = 165;
+            this.splitContainerDetail.Size = new System.Drawing.Size(574, 169);
+            this.splitContainerDetail.SplitterPosition = 101;
             this.splitContainerDetail.TabIndex = 0;
             // 
-            // pgDetail
+            // listMissionDef
             // 
-            this.pgDetail.Cursor = System.Windows.Forms.Cursors.Default;
-            this.pgDetail.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pgDetail.Location = new System.Drawing.Point(0, 0);
-            this.pgDetail.Name = "pgDetail";
-            this.pgDetail.Size = new System.Drawing.Size(283, 165);
-            this.pgDetail.TabIndex = 0;
+            this.listMissionDef.ChildListFieldName = "SubMissions";
+            this.listMissionDef.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listMissionDef.KeyFieldName = "Name";
+            this.listMissionDef.Location = new System.Drawing.Point(0, 0);
+            this.listMissionDef.Name = "listMissionDef";
+            this.listMissionDef.ParentFieldName = "MainName";
+            this.listMissionDef.PreviewFieldName = "Name";
+            this.listMissionDef.Size = new System.Drawing.Size(574, 101);
+            this.listMissionDef.TabIndex = 0;
             // 
-            // MissionMonitorForm
+            // clmnMissionName
+            // 
+            this.clmnMissionName.Caption = "MissionName";
+            this.clmnMissionName.FieldName = "MissionName";
+            this.clmnMissionName.Name = "clmnMissionName";
+            this.clmnMissionName.OptionsColumn.AllowEdit = false;
+            this.clmnMissionName.UnboundType = DevExpress.XtraTreeList.Data.UnboundColumnType.String;
+            this.clmnMissionName.Visible = true;
+            this.clmnMissionName.VisibleIndex = 0;
+            // 
+            // clmnMissionNameOverride
+            // 
+            this.clmnMissionNameOverride.Caption = "MissionNameOverride";
+            this.clmnMissionNameOverride.FieldName = "MissionNameOverride";
+            this.clmnMissionNameOverride.Name = "clmnMissionNameOverride";
+            this.clmnMissionNameOverride.OptionsColumn.AllowEdit = false;
+            this.clmnMissionNameOverride.UnboundType = DevExpress.XtraTreeList.Data.UnboundColumnType.String;
+            this.clmnMissionNameOverride.Visible = true;
+            this.clmnMissionNameOverride.VisibleIndex = 1;
+            // 
+            // clmnState
+            // 
+            this.clmnState.Caption = "State";
+            this.clmnState.FieldName = "State";
+            this.clmnState.Name = "clmnState";
+            this.clmnState.OptionsColumn.AllowEdit = false;
+            this.clmnState.UnboundType = DevExpress.XtraTreeList.Data.UnboundColumnType.Object;
+            this.clmnState.Visible = true;
+            this.clmnState.VisibleIndex = 2;
+            // 
+            // MissionMonitorForm2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -156,7 +200,7 @@
             this.Controls.Add(this.btnSelectMission);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.MinimumSize = new System.Drawing.Size(400, 300);
-            this.Name = "MissionMonitorForm";
+            this.Name = "MissionMonitorForm2";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "MissionMonitorForm";
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer.Panel1)).EndInit();
@@ -165,12 +209,13 @@
             this.splitContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).EndInit();
             this.splitContainer.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.listMissions)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerDetail.Panel1)).EndInit();
             this.splitContainerDetail.Panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerDetail.Panel2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerDetail)).EndInit();
             this.splitContainerDetail.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pgDetail)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.listMissionDef)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -180,8 +225,11 @@
         private DevExpress.XtraEditors.SimpleButton btnExpand;
         private DevExpress.XtraEditors.SimpleButton simpleButton1;
         private DevExpress.XtraEditors.SplitContainerControl splitContainer;
-        private System.Windows.Forms.TreeView treeViewMissions;
         private DevExpress.XtraEditors.SplitContainerControl splitContainerDetail;
-        private DevExpress.XtraVerticalGrid.PropertyGridControl pgDetail;
+        private DevExpress.XtraTreeList.TreeList listMissions;
+        private DevExpress.XtraTreeList.TreeList listMissionDef;
+        private DevExpress.XtraTreeList.Columns.TreeListColumn clmnMissionName;
+        private DevExpress.XtraTreeList.Columns.TreeListColumn clmnMissionNameOverride;
+        private DevExpress.XtraTreeList.Columns.TreeListColumn clmnState;
     }
 }

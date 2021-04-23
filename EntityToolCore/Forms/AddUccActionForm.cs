@@ -21,7 +21,7 @@ namespace EntityCore.Forms
         static AddUccActionForm()
         {
             // Формируем список типов uccAction;
-            EntityTools.Patches.HarmonyPatch_XmlSerializer_GetExtraTypes.GetExtraTypes(out List<Type> uccTypes, 1);
+            AcTp0Tools.Patches.Astral_Functions_XmlSerializer_GetExtraTypes.GetExtraTypes(out List<Type> uccTypes, 1);
             if(uccTypes != null && uccTypes.Count > 0)
             {
                 foreach (Type t in uccTypes)

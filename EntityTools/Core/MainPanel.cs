@@ -28,6 +28,7 @@ using System.Threading;
 using AcTp0Tools.Reflection;
 using AcTp0Tools;
 using System.Collections.Generic;
+using EntityTools.Forms;
 
 namespace EntityTools.Core
 {
@@ -186,10 +187,11 @@ namespace EntityTools.Core
         }
         private void handler_Test_3(object sender, EventArgs e)
         {
-            if(string.IsNullOrEmpty(tbText.Text))
-                return; 
+#if false
+            if (string.IsNullOrEmpty(tbText.Text))
+                return;
 
-            if(!int.TryParse(tbText.Text, out int iPtr))
+            if (!int.TryParse(tbText.Text, out int iPtr))
                 return;
 
             IntPtr ptr = new IntPtr(iPtr);
@@ -215,7 +217,8 @@ namespace EntityTools.Core
                     sb.Append(i).AppendLine(": ERROR");
                 }
             }
-            ETLogger.WriteLine(LogType.Debug, sb.ToString(), true);
+            ETLogger.WriteLine(LogType.Debug, sb.ToString(), true); 
+#endif
 
         }
 
@@ -250,6 +253,14 @@ namespace EntityTools.Core
             EntityTools.Core.GUIRequest_EntityId(ref pattern, ref strMatch, ref nameType);
             if (!string.IsNullOrEmpty(pattern))
                 Clipboard.SetText(pattern);
+#endif
+        }
+
+        private void handler_OpenMissionMonitor(object sender, EventArgs e)
+        {
+#if DEVELOPER
+            var missMonitor = new MissionMonitorForm2();
+            missMonitor.Show(); 
 #endif
         }
 
@@ -408,7 +419,7 @@ namespace EntityTools.Core
                 Process.Start(ETLogger.LogFilePath);
         }
 
-        private void handler_CheckCore(object sender, EventArgs e)
+        private void handler_Validate(object sender, EventArgs e)
         {
             if (EntityTools.Core.CheckCore())
             {
@@ -429,8 +440,8 @@ namespace EntityTools.Core
 #if DEVELOPER
 #if true
             if (ckbDebugMonitor.Checked)
-                Patch_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = ShowMostInjuredAlly;
-            else Patch_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = null; 
+                Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = ShowMostInjuredAlly;
+            else Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = null; 
 #else
 
 #endif

@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.21.0413.1346</AssemblyVersion>
+    <AssemblyVersion>0.21.0422.0634</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -205,7 +205,6 @@
     <Compile Include="Tools\Enums.cs" />
     <Compile Include="Tools\GameHelper.cs" />
     <Compile Include="Tools\MissionHelper.cs" />
-    <Compile Include="Tools\Navigation\CustomNavigator.cs" />
     <Compile Include="Tools\Navigation\NavigationHelper.cs" />
     <Compile Include="UCC\Actions\ApproachEntityEngine.cs" />
     <Compile Include="UCC\Actions\DodgeFromEntityEngine.cs" />
@@ -353,9 +352,6 @@
       <Name>EntityTools</Name>
       <Private>True</Private>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Tools\Navigation\MyNW.Internals.Movements.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

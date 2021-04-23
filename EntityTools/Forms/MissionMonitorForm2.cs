@@ -13,11 +13,11 @@ using EntityTools.Tools.Missions.Monitor;
 
 namespace EntityTools.Forms
 {
-    public partial class MissionMonitorForm : DevExpress.XtraEditors.XtraForm
+    public partial class MissionMonitorForm2 : DevExpress.XtraEditors.XtraForm
     {
-        MissionMonitor missionMonitor;
+        MissionMonitor2 missionMonitor;
 
-        public MissionMonitorForm()
+        public MissionMonitorForm2()
         {
             InitializeComponent();
         }
@@ -31,19 +31,24 @@ namespace EntityTools.Forms
 
                 if (mission != null)
                 {
-                    missionMonitor = new MissionMonitor(mission, -1, true);
-                    treeViewMissions.Nodes.Clear();
+                    missionMonitor = new MissionMonitor2(mission, "", -1, true);
+                    listMissions.Nodes.Clear();
+                    listMissionDef.Nodes.Clear();
+                    listMissions.DataSource = missionMonitor;// new List<>(missionMonitor);
+#if false
                     var children = new TreeNode[2];
                     children[0] = new TreeNode(nameof(missionMonitor.MissionDef) + ": " + missionMonitor.MissionDef) { Tag = missionMonitor.MissionDef };
                     children[1] = new TreeNode(nameof(missionMonitor.Childrens) + " [" + missionMonitor.Childrens.Count + "]") { Tag = missionMonitor.MissionDef };
-                    TreeNode tn = new TreeNode(missionMonitor.ToString(), children) { Tag = missionMonitor };
-                    treeViewMissions.Nodes.Add(tn);
+                    TreeNode tn = new TreeNode(missionMonitor.ToString(), children) { Tag = missionMonitor }; 
+#endif
+
                 }
             }
             else
             {
                 missionMonitor = null;
-                treeViewMissions.Nodes.Clear();
+                listMissions.Nodes.Clear();
+                listMissionDef.Nodes.Clear();
             }
         }
 
@@ -55,7 +60,7 @@ namespace EntityTools.Forms
         private void handler_SelectNode(object sender, TreeViewEventArgs e)
         {
             var selection = e.Node.Tag;
-            pgDetail.SelectedObject = selection;
+            //pgDetail.SelectedObject = selection;
         }
     }
 }

@@ -12,8 +12,23 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.21.0413.1346</AssemblyVersion>
+    <AssemblyVersion>0.21.0423.1129</AssemblyVersion>
     <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -145,6 +160,8 @@
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
+    <Reference Include="DevExpress.Printing.v20.2.Core, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.SpellChecker.v20.2.Core, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
     <Reference Include="DevExpress.Utils.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
@@ -161,10 +178,19 @@
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
+    <Reference Include="DevExpress.XtraLayout.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
     <Reference Include="DevExpress.XtraNavBar.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
+    <Reference Include="DevExpress.XtraPrinting.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraScheduler.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraScheduler.v20.2.Core, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraScheduler.v20.2.Core.Desktop, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraScheduler.v20.2.Extensions, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraSpellChecker.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraTreeList.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraVerticalGrid.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="MyMemory-x64">
       <HintPath>..\References\x64\MyMemory-x64.dll</HintPath>
       <Private>False</Private>
@@ -174,6 +200,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -190,24 +217,36 @@
     <Compile Include="Core\Interfaces\IEntityDescriptor.cs" />
     <Compile Include="Editors\CheckedListBoxEditor.cs" />
     <Compile Include="Editors\CustomRegionCollectionEditor.cs" />
-    <Compile Include="Editors\Forms\ItemListEditorForm.cs">
+    <Compile Include="Forms\ItemListEditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Editors\Forms\ItemListEditorForm.Designer.cs">
+    <Compile Include="Forms\ItemListEditorForm.Designer.cs">
       <DependentUpon>ItemListEditorForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editors\TestEditors\IgnoredFoesTestEditor.cs" />
-    <Compile Include="Editors\Forms\ItemFilterEditorForm.cs">
+    <Compile Include="Forms\MissionMonitorForm2.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Editors\Forms\ItemFilterEditorForm.Designer.cs">
+    <Compile Include="Forms\MissionMonitorForm2.Designer.cs">
+      <DependentUpon>MissionMonitorForm2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\MissionMonitorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\MissionMonitorForm.Designer.cs">
+      <DependentUpon>MissionMonitorForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\TestEditors\IgnoredFoesTestEditor.cs" />
+    <Compile Include="Forms\ItemFilterEditorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ItemFilterEditorForm.Designer.cs">
       <DependentUpon>ItemFilterEditorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Editors\TestEditors\EntityTestEditor.cs" />
-    <Compile Include="Editors\Forms\CustomRegionCollectionEditorForm.cs">
+    <Compile Include="Forms\CustomRegionCollectionEditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Editors\Forms\CustomRegionCollectionEditorForm.Designer.cs">
+    <Compile Include="Forms\CustomRegionCollectionEditorForm.Designer.cs">
       <DependentUpon>CustomRegionCollectionEditorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Editors\ItemFilterEntryListEditor.cs" />
@@ -225,6 +264,7 @@
     <Compile Include="Core\Proxies\QuesterConditionProxy.cs" />
     <Compile Include="Core\Proxies\UCCActionProxy.cs" />
     <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
+    <Compile Include="Patches\Quester\Actions\Patch_Quester_Classes_Actions_AddUCCAction.cs" />
     <Compile Include="Quester\Actions\RemoveIgnoredFoes.cs" />
     <Compile Include="Quester\Actions\AddIgnoredFoes.cs" />
     <Compile Include="Quester\Actions\TurnInMissionExt.cs" />
@@ -241,10 +281,10 @@
     <Compile Include="Patches\Mapper\MapperDrawingTools.cs" />
     <Compile Include="Patches\Mapper\MapperGraphics.cs" />
     <Compile Include="Patches\Mapper\MapperHelper.cs" />
-    <Compile Include="Editors\Forms\ObjectInfoForm.cs">
+    <Compile Include="Forms\ObjectInfoForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Editors\Forms\ObjectInfoForm.Designer.cs">
+    <Compile Include="Forms\ObjectInfoForm.Designer.cs">
       <DependentUpon>ObjectInfoForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Patches\Mapper\Patch_Astral_Quester_Forms_Mapper.cs" />
@@ -263,18 +303,17 @@
     <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_DrawHotSpots.cs" />
     <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_GetPath.cs" />
     <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_GenerateRoad.cs" />
-    <Compile Include="Patches\Patch_Astral_Quester_Core_Save.cs" />
+    <Compile Include="Patches\Quester\Patch_Astral_Quester_Core_Save.cs" />
     <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_DrawRoad.cs" />
     <Compile Include="Patches\Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes.cs" />
     <Compile Include="Patches\Patch_VIP_SealTraderEntity.cs" />
     <Compile Include="Patches\Patch_VIP_ProfessionVendorEntity.cs" />
     <Compile Include="Servises\SlideMonitor\HarmonyPatch_Astral_Logic_Classes_FSM_Navigation_ChangeWPDist.cs" />
-    <Compile Include="Patches\Quester.Controllers.Road\Patch_Quester_Controllers_Road_PathDistance.cs" />
-    <Compile Include="Patches\Quester.Controllers.Road\Patch_Quester_Controllers_Road_GenerateRoadFromPlayer.cs" />
+    <Compile Include="Patches\Quester\Controllers.Road\Patch_Quester_Controllers_Road_PathDistance.cs" />
+    <Compile Include="Patches\Quester\Controllers.Road\Patch_Quester_Controllers_Road_GenerateRoadFromPlayer.cs" />
     <Compile Include="Patches\UCC\Patch_ActionsPlayer_CheckAlly.cs" />
     <Compile Include="Patches\UCC\Patch_Logic_UCC_Forms_AddClass_Show.cs" />
     <Compile Include="Patches\PatchesSettings.cs" />
-    <Compile Include="Patches\XmlSerializer\HarmonyPatch_XmlSerializer_GetExtraTypes.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -362,6 +401,12 @@
     <Compile Include="Tools\Extensions\Vector3Extentions.cs" />
     <Compile Include="Tools\Missions\MissionGiverBase.cs" />
     <Compile Include="Tools\Missions\MissionGiverInfo.cs" />
+    <Compile Include="Tools\Missions\MissionIdNode.cs" />
+    <Compile Include="Tools\Missions\Monitor\MissionDefMonitor2.cs" />
+    <Compile Include="Tools\Missions\Monitor\MissionDefMonitor.cs" />
+    <Compile Include="Tools\Missions\Monitor\MissionMonitor2.cs" />
+    <Compile Include="Tools\Missions\Monitor\MissionMonitor.cs" />
+    <Compile Include="Tools\Missions\Monitor\MissionMonitorTreeNode.cs" />
     <Compile Include="Tools\StringToPattern.cs" />
     <Compile Include="Tools\Export\EntityExportInfo.cs" />
     <Compile Include="Tools\Enums.cs" />
@@ -408,19 +453,25 @@
     <EmbeddedResource Include="Core\MainPanel.resx">
       <DependentUpon>MainPanel.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Editors\Forms\ItemFilterEditorForm.resx">
+    <EmbeddedResource Include="Forms\ItemFilterEditorForm.resx">
       <DependentUpon>ItemFilterEditorForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Editors\Forms\CustomRegionCollectionEditorForm.resx">
+    <EmbeddedResource Include="Forms\CustomRegionCollectionEditorForm.resx">
       <DependentUpon>CustomRegionCollectionEditorForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Editors\Forms\ItemListEditorForm.resx">
+    <EmbeddedResource Include="Forms\ItemListEditorForm.resx">
       <DependentUpon>ItemListEditorForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\MissionMonitorForm2.resx">
+      <DependentUpon>MissionMonitorForm2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\MissionMonitorForm.resx">
+      <DependentUpon>MissionMonitorForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Patches\Mapper\MapperFormExt.resx">
       <DependentUpon>MapperFormExt.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Editors\Forms\ObjectInfoForm.resx">
+    <EmbeddedResource Include="Forms\ObjectInfoForm.resx">
       <DependentUpon>ObjectInfoForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
@@ -515,8 +566,16 @@
     <None Include="Resources\miniPlayAll.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Tools\Entity\" />
-    <Folder Include="Tools\ItemFilter\" />
+    <BootstrapperPackage Include=".NETFramework,Version=v4.6">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.6 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\miniSave.png" />

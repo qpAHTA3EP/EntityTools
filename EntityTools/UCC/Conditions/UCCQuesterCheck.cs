@@ -10,8 +10,7 @@ namespace EntityTools.UCC.Conditions
     public class UCCQuesterCheck : UCCCondition, ICustomUCCCondition
     {
 #if DEVELOPER
-        internal class QuesterConditionEditor : AddTypeCommonEditor<QuesterCondition>
-        { }
+        internal class QuesterConditionEditor : AddTypeCommonEditor<QuesterCondition> { }
 
         [Editor(typeof(QuesterConditionEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(ExpandableObjectConverter))]
@@ -39,7 +38,10 @@ namespace EntityTools.UCC.Conditions
 
         public override string ToString()
         {
-            return GetType().Name;
+            var cond = Condition;
+            if(cond is null)
+                return GetType().Name;
+            return cond.ToString();
         }
 
 #region Hide Inherited Properties

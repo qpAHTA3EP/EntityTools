@@ -42,9 +42,10 @@ namespace EntityTools.Core
             this.ckbETLogger = new System.Windows.Forms.CheckBox();
             this.bntOpenLogFile = new System.Windows.Forms.Button();
             this.cbEnchantHelperActivator = new System.Windows.Forms.CheckBox();
-            this.btnCheckCore = new System.Windows.Forms.Button();
+            this.btnValidate = new System.Windows.Forms.Button();
             this.btnUiViewer = new System.Windows.Forms.Button();
             this.btnAuraViewer = new System.Windows.Forms.Button();
+            this.btnMissionMonitor = new System.Windows.Forms.Button();
             this.btnEntities = new System.Windows.Forms.Button();
             this.ckbSpellStuckMonitor = new System.Windows.Forms.CheckBox();
             this.gbxExport = new System.Windows.Forms.GroupBox();
@@ -106,9 +107,10 @@ namespace EntityTools.Core
             // 
             this.tabUtilities.Controls.Add(this.gbxETLog);
             this.tabUtilities.Controls.Add(this.cbEnchantHelperActivator);
-            this.tabUtilities.Controls.Add(this.btnCheckCore);
+            this.tabUtilities.Controls.Add(this.btnValidate);
             this.tabUtilities.Controls.Add(this.btnUiViewer);
             this.tabUtilities.Controls.Add(this.btnAuraViewer);
+            this.tabUtilities.Controls.Add(this.btnMissionMonitor);
             this.tabUtilities.Controls.Add(this.btnEntities);
             this.tabUtilities.Controls.Add(this.ckbSpellStuckMonitor);
             this.tabUtilities.Controls.Add(this.gbxExport);
@@ -163,28 +165,28 @@ namespace EntityTools.Core
             this.cbEnchantHelperActivator.UseVisualStyleBackColor = true;
             this.cbEnchantHelperActivator.CheckedChanged += new System.EventHandler(this.handler_EnchantHelperActivation);
             // 
-            // btnCheckCore
+            // btnValidate
             // 
-            this.btnCheckCore.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.btnValidate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCheckCore.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCheckCore.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnCheckCore.Location = new System.Drawing.Point(189, 339);
-            this.btnCheckCore.Name = "btnCheckCore";
-            this.btnCheckCore.Size = new System.Drawing.Size(170, 40);
-            this.btnCheckCore.TabIndex = 0;
-            this.btnCheckCore.Text = "Check";
-            this.btnCheckCore.UseVisualStyleBackColor = true;
-            this.btnCheckCore.Click += new System.EventHandler(this.handler_CheckCore);
+            this.btnValidate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnValidate.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnValidate.Location = new System.Drawing.Point(125, 339);
+            this.btnValidate.Name = "btnValidate";
+            this.btnValidate.Size = new System.Drawing.Size(111, 40);
+            this.btnValidate.TabIndex = 0;
+            this.btnValidate.Text = "Validate";
+            this.btnValidate.UseVisualStyleBackColor = true;
+            this.btnValidate.Click += new System.EventHandler(this.handler_Validate);
             // 
             // btnUiViewer
             // 
             this.btnUiViewer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnUiViewer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUiViewer.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnUiViewer.Location = new System.Drawing.Point(189, 293);
+            this.btnUiViewer.Location = new System.Drawing.Point(244, 293);
             this.btnUiViewer.Name = "btnUiViewer";
-            this.btnUiViewer.Size = new System.Drawing.Size(170, 40);
+            this.btnUiViewer.Size = new System.Drawing.Size(115, 40);
             this.btnUiViewer.TabIndex = 0;
             this.btnUiViewer.Text = "UI Viewer";
             this.btnUiViewer.UseVisualStyleBackColor = true;
@@ -197,11 +199,24 @@ namespace EntityTools.Core
             this.btnAuraViewer.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.btnAuraViewer.Location = new System.Drawing.Point(9, 339);
             this.btnAuraViewer.Name = "btnAuraViewer";
-            this.btnAuraViewer.Size = new System.Drawing.Size(170, 40);
+            this.btnAuraViewer.Size = new System.Drawing.Size(108, 40);
             this.btnAuraViewer.TabIndex = 0;
             this.btnAuraViewer.Text = "Auras";
             this.btnAuraViewer.UseVisualStyleBackColor = true;
             this.btnAuraViewer.Click += new System.EventHandler(this.handler_OpenAuraViewer);
+            // 
+            // btnMissionMonitor
+            // 
+            this.btnMissionMonitor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnMissionMonitor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMissionMonitor.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnMissionMonitor.Location = new System.Drawing.Point(244, 339);
+            this.btnMissionMonitor.Name = "btnMissionMonitor";
+            this.btnMissionMonitor.Size = new System.Drawing.Size(115, 40);
+            this.btnMissionMonitor.TabIndex = 0;
+            this.btnMissionMonitor.Text = "Mission";
+            this.btnMissionMonitor.UseVisualStyleBackColor = true;
+            this.btnMissionMonitor.Click += new System.EventHandler(this.handler_OpenMissionMonitor);
             // 
             // btnEntities
             // 
@@ -210,7 +225,7 @@ namespace EntityTools.Core
             this.btnEntities.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.btnEntities.Location = new System.Drawing.Point(9, 293);
             this.btnEntities.Name = "btnEntities";
-            this.btnEntities.Size = new System.Drawing.Size(170, 40);
+            this.btnEntities.Size = new System.Drawing.Size(108, 40);
             this.btnEntities.TabIndex = 0;
             this.btnEntities.Text = "Entities";
             this.btnEntities.UseVisualStyleBackColor = true;
@@ -608,7 +623,7 @@ namespace EntityTools.Core
         private Button btnDefault;
         private CheckBox ckbMapperPatch;
         private ToolTip toolTip;
-        private Button btnCheckCore;
+        private Button btnValidate;
         private XtraTabPage tabDebug;
         private TextBox tbDebugMonitorInfo;
         private CheckBox ckbDebugMonitor;
@@ -627,5 +642,6 @@ namespace EntityTools.Core
         private Button bntInteract;
         private Button bntOpenLogFile;
         private GroupBox gbxETLog;
+        private Button btnMissionMonitor;
     }
 }

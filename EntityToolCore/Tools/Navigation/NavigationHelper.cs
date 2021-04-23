@@ -12,6 +12,7 @@ namespace EntityCore.Tools.Navigation
 {
     public static class NavigationHelper
     {
+#if disabled_2021_04_19
         public static int REGENERATE_PATH_TIME = 3000;
         public static int TARGET_DISTANCE_MEASURE_TIME = 500;
 
@@ -569,7 +570,10 @@ namespace EntityCore.Tools.Navigation
                 dz = wp1.Z - wp2.Z,
                 sqrtDist = dx * dx + dy * dy + dz * dz;
             return sqrtDist;
-        }
+        } 
+#endif
+
+
 
         /// <summary>
         /// Взаимодействие с <paramref name="entity"/> предусматривающее, в случае необходимости ориентацию в направлении <paramref name="entity"/>
