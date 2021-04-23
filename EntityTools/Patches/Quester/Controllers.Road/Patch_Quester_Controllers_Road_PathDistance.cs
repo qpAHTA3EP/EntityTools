@@ -5,13 +5,13 @@ using System.Reflection;
 using AStar;
 using Astral.Logic.Classes.FSM;
 using Astral.Logic.NW;
-using EntityTools.Patches.Mapper;
+using EntityTools.Patches.Navmesh;
 using AcTp0Tools.Reflection;
 using MyNW.Classes;
 using MyNW.Internals;
 using AcTp0Tools;
 
-namespace EntityTools.Patches.Navmesh
+namespace EntityTools.Patches.Quester.Controllers.Road
 {
     internal class Patch_Quester_Controllers_Road_PathDistance : Patch
     {

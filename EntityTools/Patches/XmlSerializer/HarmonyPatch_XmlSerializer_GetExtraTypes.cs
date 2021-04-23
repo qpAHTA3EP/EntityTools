@@ -16,6 +16,10 @@ using HarmonyLib;
 
 namespace EntityTools.Patches
 {
+    /// <summary>
+    /// Патч метода Astral.Functions.XmlSerializer.GetExtraTypes()
+    /// перенесен в AMClient
+    /// </summary>
 #if PATCH_ASTRAL && HARMONY
     /// <summary>
     /// Патч метода Astral.Functions.XmlSerializer.GetExtraTypes()

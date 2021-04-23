@@ -13,7 +13,7 @@ using AcTp0Tools.Reflection;
 using MyNW.Internals;
 using AcTp0Tools;
 
-namespace EntityTools.Patches
+namespace EntityTools.Patches.Quester
 {
     internal class Patch_Astral_Quester_Core_Save : Patch
     {
@@ -306,7 +306,7 @@ namespace EntityTools.Patches
         public static bool SaveProfile(ZipArchive zipFile)
         {
             //TODO: Безопасное сохранение профиля, чтобы при возникновении ошибки старое содержимое не удалялось
-            HarmonyPatch_XmlSerializer_GetExtraTypes.GetExtraTypes(out List<Type> types, 2);
+            AcTp0Tools.Patches.Astral_Functions_XmlSerializer_GetExtraTypes.GetExtraTypes(out List<Type> types, 2);
             XmlSerializer serializer = new XmlSerializer(API.CurrentProfile.GetType(), types.ToArray());
 #if false
             ZipArchiveEntry zipProfileEntry;

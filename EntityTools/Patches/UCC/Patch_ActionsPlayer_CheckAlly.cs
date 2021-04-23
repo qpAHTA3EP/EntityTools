@@ -9,7 +9,7 @@ namespace EntityTools.Patches.UCC
 {
 #if PATCH_ASTRAL
     ///
-    internal class Patch_ActionsPlayer_CheckAlly : Patch
+    internal class Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly : Patch
     {
         /// <summary>
         /// Подписка на событие изменения MostInjuredAlly
@@ -22,12 +22,12 @@ namespace EntityTools.Patches.UCC
         /// </summary>
         static readonly StaticFieldAccessor<Entity> mostInjuredAlly = typeof(ActionsPlayer).GetStaticField<Entity>("mostInjuredAlly");
 
-        internal Patch_ActionsPlayer_CheckAlly()
+        internal Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly()
         {
             if (NeedInjecttion)
             {
                 methodToReplace = typeof(ActionsPlayer).GetMethod("CheckAlly", ReflectionHelper.DefaultFlags);
-                methodToInject = typeof(Patch_ActionsPlayer_CheckAlly).GetMethod(nameof(CheckAlly), ReflectionHelper.DefaultFlags);
+                methodToInject = typeof(Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly).GetMethod(nameof(CheckAlly), ReflectionHelper.DefaultFlags);
             }
         }
 

@@ -28,6 +28,7 @@ using Action = System.Action;
 using GoldenPath = Astral.Logic.NW.GoldenPath;
 using MinimapWaypoint = MyNW.Classes.MinimapWaypoint;
 using Timeout = Astral.Classes.Timeout;
+using EntityTools.Patches.Quester;
 using AcTp0Tools;
 #if PATCH_ASTRAL
 using Astral.Logic.NW;

@@ -5,13 +5,13 @@ using System.Reflection;
 using AStar;
 using Astral.Logic.Classes.FSM;
 using Astral.Logic.NW;
-using EntityTools.Patches.Mapper;
+using EntityTools.Patches.Navmesh;
 using AcTp0Tools.Reflection;
 using MyNW.Classes;
 using MyNW.Internals;
 using AcTp0Tools;
 
-namespace EntityTools.Patches.Navmesh
+namespace EntityTools.Patches.Quester.Controllers.Road
 {
     internal class Patch_Quester_Controllers_Road_GenerateRoadFromPlayer : Patch
     {
@@ -39,7 +39,7 @@ class Astral.Quester.Controllers.Road
 			return Navmesh.GenerateRoadFromPlayer(Core.Meshes, end, !\u0001.CurrentSettings.PFOnlyForApproaches);
 		}
 #endif
-        internal static Road GenerateRoadFromPlayer(Vector3 end)
+        internal static Astral.Logic.Classes.FSM.Road GenerateRoadFromPlayer(Vector3 end)
         {
             if (end?.IsValid == true)
             {
@@ -49,7 +49,7 @@ class Astral.Quester.Controllers.Road
                     playerLocation, end, !Astral.API.CurrentSettings.PFOnlyForApproaches);
 
             }
-            return new Road();
+            return new Astral.Logic.Classes.FSM.Road();
         }
     }
 }

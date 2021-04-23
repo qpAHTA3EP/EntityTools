@@ -1,10 +1,11 @@
-﻿//#define HARMONY
-
-using System.Reflection;
+﻿using System.Reflection;
 using EntityTools.Patches.Mapper;
 using EntityTools.Patches.Navmesh;
+using EntityTools.Patches.Quester.Controllers.Road;
+using EntityTools.Patches.Quester;
 using EntityTools.Patches.UCC;
 using AcTp0Tools.Reflection;
+using EntityTools.Patches.Quester.Actions;
 #if PATCH_ASTRAL && HARMONY
 using EntityTools.Patches.Logic.General;
 using HarmonyLib; 
@@ -56,7 +57,7 @@ namespace EntityTools.Patches
         /// <summary>
         /// Подмена ActionsPlayer.CheckAlly(..)
         /// </summary>
-        private static readonly Patch_ActionsPlayer_CheckAlly Patch_ActionsPlayer_CheckAlly = new Patch_ActionsPlayer_CheckAlly();
+        private static readonly Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly Patch_ActionsPlayer_CheckAlly = new Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly();
 
         private static readonly Patch_Logic_UCC_Forms_AddClass_Show Patch_Logic_UCC_Forms_AddClass_Show = new Patch_Logic_UCC_Forms_AddClass_Show();
 
@@ -110,6 +111,7 @@ namespace EntityTools.Patches
                 try
                 {
                     Harmony.PatchAll();
+                    Patch_Quester_UccEditing.Patch();
                 }
                 catch
                 {
