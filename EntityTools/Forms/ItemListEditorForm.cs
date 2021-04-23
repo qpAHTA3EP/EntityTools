@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace EntityTools.Editors.Forms
+namespace EntityTools.Forms
 {
     public partial class ItemListEditorForm<T> : XtraForm //Form
     {

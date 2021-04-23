@@ -40,6 +40,7 @@
             this.textIntersection = new DevExpress.XtraEditors.LabelControl();
             this.tabExclusion = new DevExpress.XtraBars.Navigation.TabNavigationPage();
             this.textExclusion = new DevExpress.XtraEditors.LabelControl();
+            this.btnItemSelection = new DevExpress.XtraEditors.DropDownButton();
             ((System.ComponentModel.ISupportInitialize)(this.crList)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.spliter)).BeginInit();
             this.spliter.Panel1.SuspendLayout();
@@ -54,11 +55,11 @@
             // 
             // btnSelect
             // 
-            this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSelect.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.btnSelect.ImageOptions.Image = global::EntityTools.Properties.Resources.miniValid;
             this.btnSelect.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
+            this.btnSelect.ImageOptions.ImageToTextIndent = 6;
             this.btnSelect.Location = new System.Drawing.Point(12, 367);
             this.btnSelect.Name = "btnSelect";
             this.btnSelect.Size = new System.Drawing.Size(271, 23);
@@ -196,12 +197,28 @@
             this.textExclusion.Text = "Отметьте несколько регионов, которые будут ИСКЛЮЧЕНЫ из итоговой области. Персона" +
     "жу запрещено находиться в любом из отмеченных регионов.";
             // 
-            // CustomRegionCollectionEditorForm_Plus
+            // btnItemSelection
+            // 
+            this.btnItemSelection.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnItemSelection.DropDownArrowStyle = DevExpress.XtraEditors.DropDownArrowStyle.Show;
+            this.btnItemSelection.Enabled = false;
+            this.btnItemSelection.ImageOptions.Image = global::EntityTools.Properties.Resources.miniGear;
+            this.btnItemSelection.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
+            this.btnItemSelection.ImageOptions.ImageToTextIndent = 6;
+            this.btnItemSelection.Location = new System.Drawing.Point(12, 367);
+            this.btnItemSelection.Name = "btnItemSelection";
+            this.btnItemSelection.Size = new System.Drawing.Size(149, 23);
+            this.btnItemSelection.TabIndex = 9;
+            this.btnItemSelection.Text = "Selection...";
+            this.btnItemSelection.Visible = false;
+            // 
+            // CustomRegionCollectionEditorForm
             // 
             this.AcceptButton = this.btnSelect;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(324, 402);
+            this.Controls.Add(this.btnItemSelection);
             this.Controls.Add(this.spliter);
             this.Controls.Add(this.btnReload);
             this.Controls.Add(this.btnSelect);
@@ -212,7 +229,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(332, 426);
-            this.Name = "CustomRegionCollectionEditorForm_Plus";
+            this.Name = "CustomRegionCollectionEditorForm";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Shown += new System.EventHandler(this.handler_FormShown);
@@ -242,5 +259,6 @@
         private DevExpress.XtraEditors.LabelControl textUnion;
         private DevExpress.XtraEditors.LabelControl textIntersection;
         private DevExpress.XtraEditors.LabelControl textExclusion;
+        private DevExpress.XtraEditors.DropDownButton btnItemSelection;
     }
 }

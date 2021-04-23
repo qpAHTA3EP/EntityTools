@@ -6,7 +6,7 @@ using System.Windows.Forms;
 using Astral.Quester.Forms;
 using DevExpress.XtraEditors;
 
-namespace EntityTools.Editors.Forms
+namespace EntityTools.Forms
 {
     partial class ItemListEditorForm<T>
     {
