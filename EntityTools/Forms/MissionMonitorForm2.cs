@@ -1,21 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using DevExpress.XtraEditors;
-using EntityTools.Tools.Missions;
 using EntityTools.Tools.Missions.Monitor;
 
 namespace EntityTools.Forms
 {
     public partial class MissionMonitorForm2 : DevExpress.XtraEditors.XtraForm
     {
-        MissionMonitor2 missionMonitor;
+        //MissionMonitor2 missionMonitor;
 
         public MissionMonitorForm2()
         {
@@ -31,10 +23,10 @@ namespace EntityTools.Forms
 
                 if (mission != null)
                 {
-                    missionMonitor = new MissionMonitor2(mission, "", -1, true);
+                    var missionMonitor = new MissionMonitor2(mission, -1, true);
                     listMissions.Nodes.Clear();
                     listMissionDef.Nodes.Clear();
-                    listMissions.DataSource = missionMonitor;// new List<>(missionMonitor);
+                    listMissions.DataSource = new List<MissionMonitor2>() { missionMonitor };
 #if false
                     var children = new TreeNode[2];
                     children[0] = new TreeNode(nameof(missionMonitor.MissionDef) + ": " + missionMonitor.MissionDef) { Tag = missionMonitor.MissionDef };
@@ -46,21 +38,16 @@ namespace EntityTools.Forms
             }
             else
             {
-                missionMonitor = null;
+                //missionMonitor = null;
                 listMissions.Nodes.Clear();
                 listMissionDef.Nodes.Clear();
             }
         }
 
-        private void handler_ExpandNode(object sender, TreeViewCancelEventArgs e)
+        private void handler_AfterFocusNode(object sender, DevExpress.XtraTreeList.NodeEventArgs e)
         {
-
-        }
-
-        private void handler_SelectNode(object sender, TreeViewEventArgs e)
-        {
-            var selection = e.Node.Tag;
-            //pgDetail.SelectedObject = selection;
+            var selected = e.Node.GetValue(clmnMissionDef);
+            listMissionDef.DataSource = new List<object>() { selected };
         }
     }
 }

@@ -3,29 +3,27 @@ using MyNW.Patchables.Enums;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace EntityTools.Tools.Missions.Monitor
 {
     public class MissionMonitor2
     {
-        protected readonly Mission _mission;
+        private readonly Mission _mission;
 
-        public MissionMonitor2(Mission mission, string mainMission = "", int timeStamp = -1, bool expandProperties = true)
+        public MissionMonitor2(Mission mission, int timeStamp = -1, bool expandProperties = true)
         {
             if (mission is null)
                 throw new ArgumentNullException(nameof(mission));
 
             _mission = mission;
             _missionName = _mission.MissionName;
-            _mainMissionName = mainMission;
-            _missionDef = new MissionDefMonitor(_mission.MissionDef, _timeStamp, _expandProperties);
+            _missionDef = new MissionDefMonitor2(_mission.MissionDef, _timeStamp, _expandProperties);
 
             Update(timeStamp, expandProperties);
         }
 
+        [Browsable(false)]
         public int TimeStamp
         {
             get => _timeStamp;
@@ -34,7 +32,10 @@ namespace EntityTools.Tools.Missions.Monitor
                 _timeStamp = value;
                 _missionDef.TimeStamp = value;
                 foreach (var child in _childrens)
+                {
                     child.TimeStamp = value;
+                }
+
                 Update(_timeStamp);
             }
         }
@@ -43,19 +44,16 @@ namespace EntityTools.Tools.Missions.Monitor
         public string MissionName => _missionName;
         readonly string _missionName;
 
-        public string MainMissionName => _mainMissionName;
-        readonly string _mainMissionName;
-
-        public MissionDefMonitor MissionDef => _missionDef;
-        readonly MissionDefMonitor _missionDef;
-        //LinkedList<Tuple<int, MissionDefMonitor>> _missionDefHistory = new LinkedList<Tuple<int, MissionDefMonitor>>();
+        public MissionDefMonitor2 MissionDef => _missionDef;
+        readonly MissionDefMonitor2 _missionDef;
+        //LinkedList<Tuple<int, MissionDefMonitor2>> _missionDefHistory = new LinkedList<Tuple<int, MissionDefMonitor2>>();
 
         public string UIStringMsg => _uiStringMsg;
         string _uiStringMsg;
         LinkedList<Tuple<int, string>> _uiStringMsgHistory = new LinkedList<Tuple<int, string>>();
 
-        public bool Hiden => _hidden;
-        bool _hidden;
+        public bool Hiden => _hiden;
+        bool _hiden;
         readonly LinkedList<Tuple<int, bool>> _hidenHistory = new LinkedList<Tuple<int, bool>>();
 
         public uint MissionNameOverride => _missionNameOverride;
@@ -74,6 +72,10 @@ namespace EntityTools.Tools.Missions.Monitor
         int _expirationTime;
         readonly LinkedList<Tuple<int, int>> _expirationTimeHistory = new LinkedList<Tuple<int, int>>();
 
+        public MissionState State => _state;
+        MissionState _state;
+        readonly LinkedList<Tuple<int, MissionState>> _stateHistory = new LinkedList<Tuple<int, MissionState>>();
+
         public ICollection<MissionMonitor2> Childrens => _childrens;
         readonly MissionMonitorCollection2 _childrens = new MissionMonitorCollection2();
 
@@ -89,21 +91,17 @@ namespace EntityTools.Tools.Missions.Monitor
         }
         string _label;
 
-        public MissionState State => _state;
-        MissionState _state;
-        readonly LinkedList<Tuple<int, MissionState>> _stateHistory = new LinkedList<Tuple<int, MissionState>>();
-
+        [Browsable(false)]
         public bool ExpandProperties
         {
             get => _expandProperties;
             set
             {
-                if (value && !_expandProperties)
-                {
-                    _expandProperties = value;
-                    _timeStamp = Environment.TickCount;
-                    Update(_timeStamp);
-                }
+                if (!value || _expandProperties) return;
+
+                _expandProperties = true;
+                _timeStamp = Environment.TickCount;
+                Update(_timeStamp);
             }
         }
         bool _expandProperties;
@@ -126,9 +124,9 @@ namespace EntityTools.Tools.Missions.Monitor
                 if (_uiStringMsgHistory.Last?.Value.Item2 != _uiStringMsg)
                     _uiStringMsgHistory.AddLast(Tuple.Create(_timeStamp, _uiStringMsg));
 
-                _hidden = _mission.Hiden;
-                if (_hidenHistory.Last?.Value.Item2 != _hidden)
-                    _hidenHistory.AddLast(Tuple.Create(_timeStamp, _hidden));
+                _hiden = _mission.Hiden;
+                if (_hidenHistory.Last?.Value.Item2 != _hiden)
+                    _hidenHistory.AddLast(Tuple.Create(_timeStamp, _hiden));
 
                 _missionNameOverride = _mission.MissionNameOverride;
                 if (_missionNameOverrideHistory.Last?.Value.Item2 != _missionNameOverride)
@@ -165,7 +163,7 @@ namespace EntityTools.Tools.Missions.Monitor
             foreach (var child in _mission.Childrens)
                 if (_childrens.Contains(child))
                     _childrens[child].Update(timeStamp, expandProperties);
-                else _childrens.Add(new MissionMonitor2(child, _missionName, timeStamp, expandProperties));
+                else _childrens.Add(new MissionMonitor2(child, timeStamp, expandProperties));
         }
 
         class MissionMonitorCollection2 : KeyedCollection<Mission, MissionMonitor2>

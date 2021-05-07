@@ -2,9 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EntityTools.Tools.Missions.Monitor
 {
@@ -12,11 +9,10 @@ namespace EntityTools.Tools.Missions.Monitor
     {
         MissionDef _missionDef;
 
-        public MissionDefMonitor2(MissionDef missionDef, string mainMissionDefName = "", int timeStamp = -1, bool expandProperties = true)
+        public MissionDefMonitor2(MissionDef missionDef, int timeStamp = -1, bool expandProperties = true)
         {
             _missionDef = missionDef;
             _name = _missionDef.Name;
-            _mainName = mainMissionDefName;
             Update(timeStamp, expandProperties);
         }
 
@@ -29,7 +25,7 @@ namespace EntityTools.Tools.Missions.Monitor
                 if (_expandProperties)
                 {
                     foreach (var subMiss in _subMissions)
-                        subMiss.TimeStamp = value; 
+                        subMiss.TimeStamp = value;
                 }
                 Update(_timeStamp);
             }
@@ -89,7 +85,7 @@ namespace EntityTools.Tools.Missions.Monitor
                 if (_canRepeatHistory.Last?.Value.Item2 != _canRepeat)
                     _canRepeatHistory.AddLast(Tuple.Create(_timeStamp, _canRepeat));
 
-
+                UpdateSubmission(_timeStamp, _expandProperties);
             }
         }
 
@@ -98,12 +94,12 @@ namespace EntityTools.Tools.Missions.Monitor
             foreach (var subMiss in _missionDef.SubMissions)
                 if (_subMissions.Contains(subMiss))
                     _subMissions[subMiss].TimeStamp = timeStamp;
-                else _subMissions.Add(new MissionDefMonitor2(subMiss, _name, timeStamp, true));
+                else _subMissions.Add(new MissionDefMonitor2(subMiss, timeStamp, true));
         }
 
         public override string ToString()
         {
-            if(string.IsNullOrEmpty(_label))
+            if (string.IsNullOrEmpty(_label))
             {
                 if (_expandProperties)
                     _label = _displayName;
@@ -117,10 +113,6 @@ namespace EntityTools.Tools.Missions.Monitor
         readonly string _name;
         //LinkedList<Tuple<int, string>> _nameHistory = new LinkedList<Tuple<int, string>>();
 
-        public string MainName => _mainName;
-        readonly string _mainName;
-
- 
         public string DisplayName => _displayName;
         string _displayName;
         readonly LinkedList<Tuple<int, string>> _displayNameHistory = new LinkedList<Tuple<int, string>>();
