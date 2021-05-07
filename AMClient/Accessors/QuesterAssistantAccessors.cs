@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using AcTp0Tools.Reflection;
 
@@ -14,38 +15,27 @@ namespace AcTp0Tools
                 {
                     static Frames()
                     {
-#if false
-                        foreach (var assambly in AppDomain.CurrentDomain.GetAssemblies()) 
-#else
-                        foreach (var assambly in AstralAccessors.Controllers.Plugins.Assemblies)
-#endif
+                        foreach (var frames in from assembly in AstralAccessors.Controllers.Plugins.Assemblies 
+                            where assembly.GetName().Name.StartsWith("QuesterAssistant") 
+                            select assembly.GetType("QuesterAssistant.Classes.Monitoring.Frames"))
                         {
-                            if (assambly.GetName().Name.StartsWith("QuesterAssistant"))
+                            if (frames != null)
                             {
-                                Type frames = assambly.GetType("QuesterAssistant.Classes.Monitoring.Frames");
-                                if (frames != null)
-                                {
-                                    _sleep = frames.GetStaticAction<int>(nameof(Sleep));
-                                    _sleepLeft = frames.GetStaticProperty<int>(nameof(SleepLeft));
-                                }
-                                break;
+                                sleep = frames.GetStaticAction<int>(nameof(Sleep));
+                                sleepLeft = frames.GetStaticProperty<int>(nameof(SleepLeft));
                             }
+                            break;
                         }
                     }
 
-                    static Action<int> _sleep;
+                    private static readonly Action<int> sleep;
                     public static void Sleep(int time)
                     {
-                        _sleep?.Invoke(time);
+                        sleep?.Invoke(time);
                     }
-                    static StaticPropertyAccessor<int> _sleepLeft;
-                    public static int SleepLeft
-                    {
-                        get
-                        {
-                            return _sleepLeft?.Value ?? 0;
-                        }
-                    }
+
+                    private static readonly StaticPropertyAccessor<int> sleepLeft;
+                    public static int SleepLeft => sleepLeft?.Value ?? 0;
                 }
             }
         }
