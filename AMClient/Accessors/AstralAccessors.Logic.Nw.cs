@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using AcTp0Tools.Reflection;
 
+// ReSharper disable CheckNamespace
+
 namespace AcTp0Tools
 {
     /// <summary>
@@ -27,13 +29,13 @@ namespace AcTp0Tools
 
                 public static class Combats
                 {
-                    static readonly Action<bool> abortCombat = typeof(Astral.Logic.NW.Combats).GetStaticAction<bool>(nameof(AbordCombat));
+                    static readonly Action<bool> abortCombat = typeof(Astral.Logic.NW.Combats).GetStaticAction<bool>(nameof(AbortCombat));
 
                     /// <summary>
                     /// Прерывание потока, управляющего персонажем в режиме боя
                     /// </summary>
                     /// <param name="stopMove"></param>
-                    public static void AbordCombat(bool stopMove = false)
+                    public static void AbortCombat(bool stopMove = false)
                     {
                         abortCombat?.Invoke(stopMove);
                     }
@@ -45,14 +47,9 @@ namespace AcTp0Tools
                     public static Func<List<string>> BLAttackersList
                     {
                         get => blAttackersList.Value;
-                        set
-                        {
-                            if (value is null)
-                                blAttackersList.Value = () => Astral.Quester.API.CurrentProfile.BlackList;
-                            else blAttackersList.Value = value;
-                        }
+                        set { blAttackersList.Value = value ?? (() => Astral.Quester.API.CurrentProfile.BlackList); }
                     }
-                    static Traverse<Func<List<string>>> blAttackersList = null;
+                    private static readonly StaticFieldAccessor<Func<List<string>>> blAttackersList;
 
                     public static void SetAbortCombatCondition(Func<Entity, bool> cond, Func<bool> removeCond, int resetTime = 0)
                     {
@@ -68,49 +65,49 @@ namespace AcTp0Tools
                         shouldRemoveAbortCombatCondition = null;
                         abortCombatConditionResetTimeout.ChangeTime(0);
                     }
-                    private static bool prefixCombatUnit(ref bool __result, ref Entity target, ref Func<bool> breakCond)
+                    private static bool PrefixCombatUnit(ref bool __result, ref Entity target, ref Func<bool> breakCond)
                     {
-                        if (abortCombatCondition != null)
+                        __result = false;
+
+                        if (abortCombatCondition == null) return true;
+
+                        if (abortCombatCondition(target))
                         {
-                            if (abortCombatCondition(target))
-                            {
-                                Quester.FSM.States.Combat.SetIgnoreCombat(true);
-                                return false;
-                            }
-                            else if (target != null)
-                            {
-                                var trg = new Entity(target.Pointer);
-                                breakCond += () => abortCombatCondition(trg);
-                            }
+                            Quester.FSM.States.Combat.SetIgnoreCombat(true);
+                            return false;
+                        }
+                        if (target != null)
+                        {
+                            var trg = new Entity(target.Pointer);
+                            breakCond += () => abortCombatCondition(trg);
                         }
                         return true;
                     }
-                    private static void postfixCombatUnit(bool __result, Entity target, Func<bool> breakCond)
+                    private static void PostfixCombatUnit(bool __result, Entity target, Func<bool> breakCond)
                     {
-                        if (abortCombatCondition != null)
+                        if (abortCombatCondition == null) return;
+
+                        if (abortCombatConditionResetTimeout.IsTimedOut 
+                            || (shouldRemoveAbortCombatCondition != null && shouldRemoveAbortCombatCondition()))
                         {
-                            if (abortCombatConditionResetTimeout.IsTimedOut 
-                                || (shouldRemoveAbortCombatCondition != null && shouldRemoveAbortCombatCondition()))
-                            {
-                                abortCombatCondition = null;
-                                shouldRemoveAbortCombatCondition = null;
-                                abortCombatConditionResetTimeout.ChangeTime(0);
-                            }
+                            abortCombatCondition = null;
+                            shouldRemoveAbortCombatCondition = null;
+                            abortCombatConditionResetTimeout.ChangeTime(0);
                         }
                     }
 
                     /// <summary>
-                    /// Уловие прерывания боя
+                    /// Условие прерывания боя
                     /// </summary>
                     private static Func<Entity, bool> abortCombatCondition;
                     private static Func<bool> shouldRemoveAbortCombatCondition;
 
                     /// <summary>
                     /// Время до сброса <see cref="abortCombatCondition"/>
-                    /// Таймер обнавляется каждый раз при вызове <see cref="SetAbortCombatCondition"/>
+                    /// Таймер обновляется каждый раз при вызове <see cref="SetAbortCombatCondition"/>
                     /// </summary>
                     public static int AbortCombatConditionResetTime { get; set; } = 30_000;
-                    private static Timeout abortCombatConditionResetTimeout = new Timeout(0);
+                    private static readonly Timeout abortCombatConditionResetTimeout = new Timeout(0);
 
                     public static string AbortCombatCondition_DebugInfo()
                     {
@@ -137,9 +134,14 @@ namespace AcTp0Tools
 
                     static Combats()
                     {
-                        var originalCombatUnit = AccessTools.Method(typeof(Astral.Logic.NW.Combats), nameof(Astral.Logic.NW.Combats.CombatUnit));
-                        var prefixCombatUnit = AccessTools.Method(typeof(Combats), nameof(Combats.prefixCombatUnit));
-                        var postfixCombatUnit = AccessTools.Method(typeof(Combats), nameof(Combats.postfixCombatUnit));
+                        var tAstralCombats = typeof(Astral.Logic.NW.Combats);
+                        var tPatch = typeof(Combats);
+
+                        var originalCombatUnit = AccessTools.Method(tAstralCombats, nameof(Astral.Logic.NW.Combats.CombatUnit));
+                        var prefixCombatUnit = AccessTools.Method(tPatch, nameof(Combats.PrefixCombatUnit));
+                        var postfixCombatUnit = AccessTools.Method(tPatch, nameof(Combats.PostfixCombatUnit));
+
+                        blAttackersList = tAstralCombats.GetStaticField<Func<List<string>>>("BLAttackersList");
 
                         if (originalCombatUnit != null)
                             AcTp0Patcher.Harmony.Patch(originalCombatUnit, new HarmonyMethod(prefixCombatUnit), new HarmonyMethod(postfixCombatUnit));

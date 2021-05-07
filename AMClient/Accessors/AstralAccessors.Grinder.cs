@@ -15,8 +15,8 @@ namespace AcTp0Tools
         {
             public static class Core
             {
-                static readonly StaticPropertyAccessor<GrinderProfile> profile = typeof(Astral.Grinder.Core).GetStaticProperty<GrinderProfile>("Profile");
-                public static GrinderProfile Profile => profile.Value;
+                private static readonly StaticPropertyAccessor<GrinderProfile> profile = typeof(Astral.Grinder.Core).GetStaticProperty<GrinderProfile>("Profile");
+                public static GrinderProfile Profile => profile;
             }
         }
     }

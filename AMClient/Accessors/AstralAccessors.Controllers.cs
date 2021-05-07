@@ -14,6 +14,8 @@ namespace AcTp0Tools
     /// </summary>
     public static partial class AstralAccessors
     {
+        // TODO : Заменить Traverse на собственные объекты, т.к. они быстрее на ~30%
+
         /// <summary>
         /// Доступ к закрытым членам Astral.Controllers
         /// </summary>
@@ -35,7 +37,7 @@ namespace AcTp0Tools
                 /// <summary>
                 /// Объект, соответствующий текущей роли Астрала
                 /// </summary>
-                private static Traverse _currentRole;
+                private static readonly Traverse currentRole;
                 private static object _currentRoleObject;
 
 #if false
@@ -102,7 +104,7 @@ namespace AcTp0Tools
                     {
                         get
                         {
-                            object role = _currentRole.GetValue();
+                            object role = currentRole.GetValue();
                             if (role is null)
                             {
                                 ResetTraverses();
@@ -125,7 +127,7 @@ namespace AcTp0Tools
                     /// <param name="graphicsNW"></param>
                     public static bool OnMapDraw(GraphicsNW graphicsNW)
                     {
-                        object role = _currentRole.GetValue();
+                        object role = currentRole.GetValue();
                         if (role is null)
                         {
                             ResetTraverses();
@@ -134,19 +136,19 @@ namespace AcTp0Tools
                         if (role != _currentRoleObject)
                         {
                             _currentRoleObject = role;
-                            _OnMapDraw = Traverse.Create(_currentRoleObject).Method("OnMapDraw", graphicsNW);
+                            _onMapDraw = Traverse.Create(_currentRoleObject).Method("OnMapDraw", graphicsNW);
                         }
-                        if (_currentRoleObject != null && _OnMapDraw is null)
-                            _OnMapDraw = Traverse.Create(_currentRoleObject).Method("OnMapDraw", graphicsNW);
+                        if (_currentRoleObject != null && _onMapDraw is null)
+                            _onMapDraw = Traverse.Create(_currentRoleObject).Method("OnMapDraw", graphicsNW);
 
-                        if (_OnMapDraw != null)
+                        if (_onMapDraw != null)
                         {
-                            _OnMapDraw.GetValue(graphicsNW);
+                            _onMapDraw.GetValue(graphicsNW);
                             return true;
                         }
                         return false;
                     }
-                    private static Traverse _OnMapDraw;
+                    private static Traverse _onMapDraw;
 
                     /// <summary>
                     /// Чтение имени роли, выполняемой Астралом
@@ -155,7 +157,7 @@ namespace AcTp0Tools
                     {
                         get
                         {
-                            object role = _currentRole.GetValue();
+                            object role = currentRole.GetValue();
                             if (role is null)
                             {
                                 ResetTraverses();
@@ -175,7 +177,7 @@ namespace AcTp0Tools
 
                     static CurrentRole()
                     {
-                        _currentRoleObject = _currentRole.GetValue();
+                        _currentRoleObject = currentRole.GetValue();
                         if (_currentRoleObject != null)
                         {
                             _name = Traverse.Create(_currentRoleObject).Property<string>("Name");
@@ -186,7 +188,7 @@ namespace AcTp0Tools
                     {
                         _currentRoleObject = null;
                         _usedMeshes = null;
-                        _OnMapDraw = null;
+                        _onMapDraw = null;
                         _name = null;
                     }
                 }
@@ -196,8 +198,8 @@ namespace AcTp0Tools
                     Type type = Assembly.GetEntryAssembly()?.GetType("Astral.Controllers.Roles");
                     if (type != null)
                     {
-                        _currentRole = Traverse.Create(type).Property("CurrentRole");
-                        _currentRoleObject = _currentRole.GetValue();
+                        currentRole = Traverse.Create(type).Property("CurrentRole");
+                        _currentRoleObject = currentRole.GetValue();
                     }
                 }
             }
@@ -208,15 +210,15 @@ namespace AcTp0Tools
 #if false
                 public static readonly StaticPropertyAccessor<List<Astral.Controllers.AOECheck.AOE>> List = typeof(Astral.Controllers.Roles).GetStaticProperty<List<Astral.Controllers.AOECheck.AOE>>("List"); 
 #endif
-                public static object List => _AOElist.GetValue();
-                private static readonly Traverse _AOElist;
+                public static object List => aoeList.GetValue();
+                private static readonly Traverse aoeList;
                 public static IEnumerable<object> GetAOEList()
                 {
 
-                    object list = _AOElist.PropertyExists() ? _AOElist.GetValue() : null;
+                    object list = aoeList.PropertyExists() ? aoeList.GetValue() : null;
                     if (list != null)
-                        _AOElist_Enumerator = Traverse.Create(list).Method("GetEnumerator");
-                    var enumeratorObj = _AOElist_Enumerator.GetValue();
+                        _aoeList_Enumerator = Traverse.Create(list).Method("GetEnumerator");
+                    var enumeratorObj = _aoeList_Enumerator.GetValue();
                     if (enumeratorObj != null && enumeratorObj is IDisposable disposable)
                     {
                         Traverse enumeratorMoveToNext = Traverse.Create(enumeratorObj).Method("MoveToNext");
@@ -234,13 +236,13 @@ namespace AcTp0Tools
                         }
                     }
                 }
-                private static Traverse _AOElist_Enumerator;
+                private static Traverse _aoeList_Enumerator;
 
                 static AOECheck()
                 {
                     Type type = Assembly.GetEntryAssembly()?.GetType("Astral.Controllers.Roles");
                     if (type != null)
-                        _AOElist = Traverse.Create(type).Property("List");
+                        aoeList = Traverse.Create(type).Property("List");
                 }
             }
 
@@ -248,54 +250,37 @@ namespace AcTp0Tools
             {
                 public static class BotClient
                 {
-                    public static Astral.Functions.TCP.Client.Client Client { get => _client.Value; }
+                    public static Astral.Functions.TCP.Client.Client Client => client.Value;
 
-                    private static readonly StaticPropertyAccessor<Astral.Functions.TCP.Client.Client> _client =
+                    private static readonly StaticPropertyAccessor<Astral.Functions.TCP.Client.Client> client =
                         typeof(Astral.Controllers.BotComs.BotClient)
                             .GetStaticProperty<Astral.Functions.TCP.Client.Client>("Client");
 
-#if false
-                    private static readonly Field<Astral.Functions.TCP.Client.Client, System.Net.Sockets.TcpClient>
-                _tcpClientAccessor = typeof(Astral.Functions.TCP.Client.Client).GetField<Astral.Functions.TCP.Client.Client, System.Net.Sockets.TcpClient>("\u0002");
-#else
-                    private static readonly FieldAccessor<System.Net.Sockets.TcpClient> _tcpClientAccessor 
+
+                    private static readonly FieldAccessor<System.Net.Sockets.TcpClient> tcpClientAccessor 
                         = typeof(Astral.Functions.TCP.Client.Client).GetField<System.Net.Sockets.TcpClient>("\u0002");
-#endif
-                    public static TcpClient Client_TcpClient => _tcpClientAccessor[_client.Value];
+
+                    public static TcpClient Client_TcpClient => tcpClientAccessor[client.Value];
                 }
             }
 
             public static class Engine
             {
-                private static StaticPropertyAccessor<Astral.Logic.Classes.FSM.Engine> mainEngine =
+                private static readonly StaticPropertyAccessor<Astral.Logic.Classes.FSM.Engine> mainEngine =
                     typeof(Astral.Controllers.Engine).GetStaticProperty<Astral.Logic.Classes.FSM.Engine>("MainEngine");
 
-                public static Astral.Logic.Classes.FSM.Engine MainEngine
-                {
-                    get
-                    {
-                        if (mainEngine.IsValid)
-                            return mainEngine.Value;
-                        return null;
-                    }
-                }
+                public static Astral.Logic.Classes.FSM.Engine MainEngine => mainEngine.IsValid ? mainEngine.Value : null;
             }
 
             public static class Plugins
             {
                 static Plugins()
                 {
-                    _assemblies = typeof(Astral.Controllers.Plugins).GetStaticProperty<List<Assembly>>(nameof(Assemblies));
+                    assemblies = typeof(Astral.Controllers.Plugins).GetStaticProperty<List<Assembly>>(nameof(Assemblies));
                 }
-                static StaticPropertyAccessor<List<Assembly>> _assemblies;
+                static readonly StaticPropertyAccessor<List<Assembly>> assemblies;
                 static readonly List<Assembly> emptyAssemblyList = new List<Assembly>();
-                public static List<Assembly> Assemblies
-                {
-                    get
-                    {
-                        return _assemblies.IsValid ? _assemblies.Value : emptyAssemblyList;
-                    }
-                }
+                public static List<Assembly> Assemblies => assemblies.IsValid ? assemblies.Value : emptyAssemblyList;
             }
         }
 
