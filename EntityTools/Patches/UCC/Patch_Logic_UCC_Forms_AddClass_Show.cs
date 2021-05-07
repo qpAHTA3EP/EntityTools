@@ -10,7 +10,7 @@ namespace EntityTools.Patches.UCC
     {
         internal Patch_Logic_UCC_Forms_AddClass_Show()
         {
-            if (NeedInjecttion)
+            if (NeedInjection)
             {
                 methodToReplace = typeof(AddClass).GetMethod(nameof(AddClass.Show), ReflectionHelper.DefaultFlags, null,
                     new[] {typeof(Type)},
@@ -20,7 +20,7 @@ namespace EntityTools.Patches.UCC
             }
         }
 
-        public sealed override bool NeedInjecttion => true;
+        public sealed override bool NeedInjection => true;
 
         internal static object Show(Type type)
         {

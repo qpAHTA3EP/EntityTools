@@ -17,7 +17,7 @@ namespace EntityTools.Patches.Quester.Controllers.Road
     {
         internal Patch_Quester_Controllers_Road_GenerateRoadFromPlayer()
         {
-            if (NeedInjecttion)
+            if (NeedInjection)
             {
                 MethodInfo mi = typeof(Astral.Quester.Controllers.Road).GetMethod("GenerateRoadFromPlayer", ReflectionHelper.DefaultFlags);
                 if (mi != null)
@@ -30,7 +30,7 @@ namespace EntityTools.Patches.Quester.Controllers.Road
             }
         }
 
-        public override bool NeedInjecttion => EntityTools.Config.Patches.Navigation;
+        public override bool NeedInjection => EntityTools.Config.Patches.Navigation;
 
 #if false
 class Astral.Quester.Controllers.Road

@@ -71,7 +71,9 @@ namespace EntityTools.Patches.Mapper.Tools
         /// <summary>
         /// Воведенные данные корректны
         /// </summary>
-        public bool IsCorrect => customRegion!= null && !(startX == 0 && startY == 0) && !(endX == 0 && endY == 0) && Math.Abs(startX - endX) >= 1 && Math.Abs(startY - endY) >= 1;
+        public bool IsCorrect => customRegion != null
+            && !(startX == 0 && startY == 0) && !(endX == 0 && endY == 0) 
+            && Math.Abs(startX - endX) >= 1 && Math.Abs(startY - endY) >= 1;
 
         /// <summary>
         /// Использование механизма выделения вершин
@@ -93,7 +95,7 @@ namespace EntityTools.Patches.Mapper.Tools
             {
                 if (!(endX == 0 && endY == 0))
                 {
-                    if (transformMode == RegionTransformMode.None && transformMode == RegionTransformMode.Disabled)
+                    if (transformMode == RegionTransformMode.None || transformMode == RegionTransformMode.Disabled)
                     {
                         // Отрисовываем регион в зафиксированном состоянии
                         graphics.DrawCustomRegion(startX, startY, endX, endY, IsElliptical);
@@ -138,7 +140,7 @@ namespace EntityTools.Patches.Mapper.Tools
             undo = null;
             if (e.KeyCode == Keys.Escape)
             {
-                if (transformMode == RegionTransformMode.None && transformMode == RegionTransformMode.Disabled)
+                if (transformMode != RegionTransformMode.None && transformMode != RegionTransformMode.Disabled)
                     // Сбрасываем режим трансформации
                     transformMode = RegionTransformMode.None;
                 else
@@ -179,7 +181,7 @@ namespace EntityTools.Patches.Mapper.Tools
                 }
                 else  
 #endif
-                if(transformMode == RegionTransformMode.None && transformMode != RegionTransformMode.Disabled)
+                if(transformMode != RegionTransformMode.None && transformMode != RegionTransformMode.Disabled)
                 {
                     // проверяем выбор якоря и режима трансформации
                     double width = Math.Abs(endX - startX),
@@ -207,7 +209,7 @@ namespace EntityTools.Patches.Mapper.Tools
                 MapperHelper.FixRange(startX, endX, out double x1, out double x2);
                 MapperHelper.FixRange(startY, endY, out double y2, out double y1);
                 return customRegion != null
-                    && (crX != (float) x1 || crY != (float) y1
+                    && (crX != (float)x1 || crY != (float)y1
                          || crElliptic != IsElliptical
                          || crWidth != (x2 - x1) || crHeight != (y2 - y1)
                          || Name != crName);

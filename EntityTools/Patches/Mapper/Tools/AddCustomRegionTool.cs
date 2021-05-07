@@ -66,7 +66,7 @@ namespace EntityTools.Patches.Mapper.Tools
             {
                 if (!(endX == 0 && endY == 0))
                 {
-                    if (transformMode == RegionTransformMode.None && transformMode == RegionTransformMode.Disabled)
+                    if (transformMode == RegionTransformMode.None || transformMode == RegionTransformMode.Disabled)
                     {
                         // Отрисовываем регион в зафиксированном состоянии
                         graphics.DrawCustomRegion(startX, startY, endX, endY, IsElliptical);
@@ -112,7 +112,7 @@ namespace EntityTools.Patches.Mapper.Tools
             undo = null;
             if (e.KeyCode == Keys.Escape)
             {
-                if (transformMode == RegionTransformMode.None && transformMode == RegionTransformMode.Disabled)
+                if (transformMode != RegionTransformMode.None && transformMode != RegionTransformMode.Disabled)
                     // Сбрасываем режим трансформации
                     transformMode = RegionTransformMode.None;
                 else
@@ -149,7 +149,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     MapperHelper.FixRange(startY, Math.Round(e.Y), out startY, out endY);
                     transformMode = RegionTransformMode.None;
                 }
-                else if(transformMode == RegionTransformMode.None && transformMode != RegionTransformMode.Disabled)
+                else if (transformMode == RegionTransformMode.None)// && transformMode != RegionTransformMode.Disabled)
                 {
                     // проверяем выбор якоря и режима трансформации
                     double width = Math.Abs(endX - startX),

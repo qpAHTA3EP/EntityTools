@@ -1,4 +1,10 @@
-﻿using System;
+﻿using AcTp0Tools;
+using AcTp0Tools.Reflection;
+using AStar;
+using Astral.Controllers;
+using Astral.Quester;
+using MyNW.Internals;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -6,12 +12,6 @@ using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using AStar;
-using Astral.Controllers;
-using Astral.Quester;
-using AcTp0Tools.Reflection;
-using MyNW.Internals;
-using AcTp0Tools;
 
 namespace EntityTools.Patches.Quester
 {
@@ -19,7 +19,7 @@ namespace EntityTools.Patches.Quester
     {
         internal Patch_Astral_Quester_Core_Save()
         {
-            if (NeedInjecttion)
+            if (NeedInjection)
             {
                 MethodInfo mi = typeof(Astral.Quester.Core).GetMethod("Save", ReflectionHelper.DefaultFlags);
                 if (mi != null)
@@ -32,7 +32,7 @@ namespace EntityTools.Patches.Quester
             }
         }
 
-        public sealed override bool NeedInjecttion => EntityTools.Config.Patches.SaveQuesterProfile;
+        public sealed override bool NeedInjection => EntityTools.Config.Patches.SaveQuesterProfile;
 
 #if false // void Astral.Quester.Core.Save(bool saveas = false)
     	public static void Astral.Quester.Core.Save(bool saveas = false)
@@ -238,7 +238,7 @@ namespace EntityTools.Patches.Quester
         public static bool SaveMesh(ZipArchive zipFile, string meshName, Graph mesh, BinaryFormatter binaryFormatter = null)
         {
             //TODO: Безопасное сохранение mesh'а, чтобы при возникновении ошибки старое содержимое не удалялось
-            //TODO: Исправиль сохранение внешних мешей
+            //TODO: Исправить сохранение внешних мешей
             if (zipFile is null)
                 return false;
 

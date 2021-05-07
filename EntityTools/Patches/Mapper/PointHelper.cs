@@ -2,7 +2,6 @@
 using System.Drawing;
 using AStar;
 using EntityTools.Patches.Mapper.Tools;
-using EntityTools.Settings;
 using MyNW.Classes;
 
 namespace EntityTools.Patches.Mapper

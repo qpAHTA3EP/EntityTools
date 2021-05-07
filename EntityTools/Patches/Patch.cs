@@ -21,11 +21,11 @@ namespace EntityTools.Patches
             this.methodToInject = methodToInject;
         }
 
-        public abstract bool NeedInjecttion { get; }
+        public abstract bool NeedInjection { get; }
 
         public void Inject()
         {
-            if (NeedInjecttion)
+            if (NeedInjection)
             {
                 if (methodToReplace != null
                   && methodToInject != null)

@@ -13,7 +13,7 @@ namespace EntityTools.Patches
 
         internal Patch_VIP_SealTraderEntity()
         {
-            if (NeedInjecttion)
+            if (NeedInjection)
             {
                 PropertyInfo pi = typeof(VIP).GetProperty("SealTraderEntity", ReflectionHelper.DefaultFlags);
                 if (pi != null)
@@ -32,7 +32,7 @@ namespace EntityTools.Patches
             }
         }
 
-        public sealed override bool NeedInjecttion => EntityTools.Config.Patches.VipSealTraderEntity;
+        public sealed override bool NeedInjection => EntityTools.Config.Patches.VipSealTraderEntity;
 
         internal static Entity get_SealTraderEntity()
         {

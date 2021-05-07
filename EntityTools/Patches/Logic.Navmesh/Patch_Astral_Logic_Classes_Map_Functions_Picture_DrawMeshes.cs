@@ -17,7 +17,7 @@ namespace EntityTools.Patches.Mapper
     {
         internal Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes()
         {
-            if (NeedInjecttion)
+            if (NeedInjection)
             {
                 MethodInfo mi = typeof(Picture).GetMethod("DrawMeshes", ReflectionHelper.DefaultFlags);
                 if (mi != null)
@@ -30,7 +30,7 @@ namespace EntityTools.Patches.Mapper
             }
         }
 
-        public sealed override bool NeedInjecttion => EntityTools.Config.Mapper.Patch;
+        public sealed override bool NeedInjection => EntityTools.Config.Mapper.Patch;
 
         /// <summary>
         /// Отрисовка графа путей <paramref name="meshes"/> на <paramref name="graphicsNW"/>

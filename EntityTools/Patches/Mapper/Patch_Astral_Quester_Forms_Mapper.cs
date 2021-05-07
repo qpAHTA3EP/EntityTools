@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using AStar;
-using EntityTools.Patches.Mapper;
 using AcTp0Tools.Reflection;
-using MyNW.Classes;
-using MyNW.Internals;
 
 namespace EntityTools.Patches.Mapper
 {
@@ -16,7 +10,7 @@ namespace EntityTools.Patches.Mapper
 
         internal Patch_Astral_Quester_Forms_Mapper()
         {
-            if (NeedInjecttion)
+            if (NeedInjection)
             {
                 MethodInfo mi = typeof(Astral.Quester.Forms.MapperForm).GetMethod("Open", ReflectionHelper.DefaultFlags);
                 if (mi != null)
@@ -29,7 +23,7 @@ namespace EntityTools.Patches.Mapper
             }
         }
 
-        public override bool NeedInjecttion => EntityTools.Config.Patches.Navigation;
+        public override bool NeedInjection => EntityTools.Config.Patches.Navigation;
 
 #if false
     Astral.Logic.Navmesh

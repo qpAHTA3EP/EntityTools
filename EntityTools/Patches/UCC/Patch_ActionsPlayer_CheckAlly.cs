@@ -24,14 +24,14 @@ namespace EntityTools.Patches.UCC
 
         internal Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly()
         {
-            if (NeedInjecttion)
+            if (NeedInjection)
             {
                 methodToReplace = typeof(ActionsPlayer).GetMethod("CheckAlly", ReflectionHelper.DefaultFlags);
                 methodToInject = typeof(Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly).GetMethod(nameof(CheckAlly), ReflectionHelper.DefaultFlags);
             }
         }
 
-        public override bool NeedInjecttion => true;
+        public override bool NeedInjection => true;
 
         /// <summary>
         /// Astral.Logic.UCC.Classes.ActionsPlayer.CheckAlly(List<Entity> entities)

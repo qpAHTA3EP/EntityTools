@@ -111,22 +111,16 @@ namespace EntityTools.Patches.Mapper
             this.btnShowStatBar = new System.Windows.Forms.Button();
             this.MapPicture = new System.Windows.Forms.PictureBox();
             this.panelSettings = new DevExpress.XtraEditors.PanelControl();
-            this.tabPaneSettings = new DevExpress.XtraBars.Navigation.TabPane();
-            this.tabGeneral = new DevExpress.XtraBars.Navigation.TabNavigationPage();
-            this.lblLayerDepth = new System.Windows.Forms.Label();
-            this.editLayerDepth = new DevExpress.XtraEditors.SpinEdit();
-            this.ckbChacheEnable = new DevExpress.XtraEditors.CheckEdit();
-            this.tabCustomization = new DevExpress.XtraBars.Navigation.TabNavigationPage();
             this.navBarCustomization = new DevExpress.XtraNavBar.NavBarControl();
             this.navGroupMeshes = new DevExpress.XtraNavBar.NavBarGroup();
-            this.navGroupMeshesControlContainer = new DevExpress.XtraNavBar.NavBarGroupControlContainer();
+            this.containerMeshes = new DevExpress.XtraNavBar.NavBarGroupControlContainer();
             this.lblBackground = new System.Windows.Forms.Label();
             this.lblUnidirPath = new System.Windows.Forms.Label();
             this.lblBidirPath = new System.Windows.Forms.Label();
             this.colorEditBidirPath = new DevExpress.XtraEditors.ColorEdit();
             this.colorBackground = new DevExpress.XtraEditors.ColorEdit();
             this.colorEditUnidirPath = new DevExpress.XtraEditors.ColorEdit();
-            this.navGroupObjectsControlContainer = new DevExpress.XtraNavBar.NavBarGroupControlContainer();
+            this.containerObjects = new DevExpress.XtraNavBar.NavBarGroupControlContainer();
             this.grpNodeCustomization = new DevExpress.XtraEditors.GroupControl();
             this.ckbNodes = new DevExpress.XtraEditors.CheckEdit();
             this.colorNodes = new DevExpress.XtraEditors.ColorEdit();
@@ -141,7 +135,12 @@ namespace EntityTools.Patches.Mapper
             this.colorPlayers = new DevExpress.XtraEditors.ColorEdit();
             this.colorOtherNPC = new DevExpress.XtraEditors.ColorEdit();
             this.ckbFriends = new DevExpress.XtraEditors.CheckEdit();
+            this.containerGeneral = new DevExpress.XtraNavBar.NavBarGroupControlContainer();
+            this.lblLayerDepth = new System.Windows.Forms.Label();
+            this.editLayerDepth = new DevExpress.XtraEditors.SpinEdit();
+            this.ckbChacheEnable = new DevExpress.XtraEditors.CheckEdit();
             this.navGroupObjects = new DevExpress.XtraNavBar.NavBarGroup();
+            this.navGroupGeneral = new DevExpress.XtraNavBar.NavBarGroup();
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.popMenuOptions)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seWaypointDistance)).BeginInit();
@@ -155,19 +154,13 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.MapPicture)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelSettings)).BeginInit();
             this.panelSettings.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tabPaneSettings)).BeginInit();
-            this.tabPaneSettings.SuspendLayout();
-            this.tabGeneral.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.editLayerDepth.Properties)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ckbChacheEnable.Properties)).BeginInit();
-            this.tabCustomization.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.navBarCustomization)).BeginInit();
             this.navBarCustomization.SuspendLayout();
-            this.navGroupMeshesControlContainer.SuspendLayout();
+            this.containerMeshes.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.colorEditBidirPath.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.colorBackground.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.colorEditUnidirPath.Properties)).BeginInit();
-            this.navGroupObjectsControlContainer.SuspendLayout();
+            this.containerObjects.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.grpNodeCustomization)).BeginInit();
             this.grpNodeCustomization.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ckbNodes.Properties)).BeginInit();
@@ -184,6 +177,9 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.colorPlayers.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.colorOtherNPC.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ckbFriends.Properties)).BeginInit();
+            this.containerGeneral.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.editLayerDepth.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ckbChacheEnable.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // backgroundWorker
@@ -1021,107 +1017,28 @@ namespace EntityTools.Patches.Mapper
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.panelSettings.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
-            this.panelSettings.Controls.Add(this.tabPaneSettings);
+            this.panelSettings.Controls.Add(this.navBarCustomization);
             this.panelSettings.Location = new System.Drawing.Point(0, 0);
             this.panelSettings.Name = "panelSettings";
             this.panelSettings.Size = new System.Drawing.Size(401, 364);
             this.panelSettings.TabIndex = 14;
             this.panelSettings.Visible = false;
             // 
-            // tabPaneSettings
-            // 
-            this.tabPaneSettings.Controls.Add(this.tabGeneral);
-            this.tabPaneSettings.Controls.Add(this.tabCustomization);
-            this.tabPaneSettings.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabPaneSettings.Location = new System.Drawing.Point(0, 0);
-            this.tabPaneSettings.Name = "tabPaneSettings";
-            this.tabPaneSettings.Pages.AddRange(new DevExpress.XtraBars.Navigation.NavigationPageBase[] {
-            this.tabGeneral,
-            this.tabCustomization});
-            this.tabPaneSettings.RegularSize = new System.Drawing.Size(401, 364);
-            this.tabPaneSettings.SelectedPage = this.tabCustomization;
-            this.tabPaneSettings.Size = new System.Drawing.Size(401, 364);
-            this.tabPaneSettings.TabIndex = 0;
-            this.tabPaneSettings.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
-            // 
-            // tabGeneral
-            // 
-            this.tabGeneral.Caption = "General";
-            this.tabGeneral.Controls.Add(this.lblLayerDepth);
-            this.tabGeneral.Controls.Add(this.editLayerDepth);
-            this.tabGeneral.Controls.Add(this.ckbChacheEnable);
-            this.tabGeneral.Name = "tabGeneral";
-            this.tabGeneral.Size = new System.Drawing.Size(415, 344);
-            this.tabGeneral.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
-            // 
-            // lblLayerDepth
-            // 
-            this.lblLayerDepth.AutoSize = true;
-            this.lblLayerDepth.Location = new System.Drawing.Point(12, 37);
-            this.lblLayerDepth.Name = "lblLayerDepth";
-            this.lblLayerDepth.Size = new System.Drawing.Size(238, 13);
-            this.lblLayerDepth.TabIndex = 3;
-            this.lblLayerDepth.Text = "The limit of the layer\'s depth drawing on Mapper";
-            this.lblLayerDepth.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
-            // 
-            // editLayerDepth
-            // 
-            this.editLayerDepth.EditValue = new decimal(new int[] {
-            0,
-            0,
-            0,
-            0});
-            this.editLayerDepth.Location = new System.Drawing.Point(256, 34);
-            this.editLayerDepth.MenuManager = this.barManager;
-            this.editLayerDepth.Name = "editLayerDepth";
-            this.editLayerDepth.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.editLayerDepth.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
-            this.editLayerDepth.Properties.Increment = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.editLayerDepth.Properties.MaxValue = new decimal(new int[] {
-            1000000,
-            0,
-            0,
-            0});
-            this.editLayerDepth.Size = new System.Drawing.Size(120, 20);
-            this.editLayerDepth.TabIndex = 2;
-            this.editLayerDepth.EditValueChanged += new System.EventHandler(this.handler_LayerDepth_Changed);
-            this.editLayerDepth.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
-            // 
-            // ckbChacheEnable
-            // 
-            this.ckbChacheEnable.Location = new System.Drawing.Point(12, 10);
-            this.ckbChacheEnable.MenuManager = this.barManager;
-            this.ckbChacheEnable.Name = "ckbChacheEnable";
-            this.ckbChacheEnable.Properties.Caption = "Caching of the visible meshes (will take effect in a new Mapper window)";
-            this.ckbChacheEnable.Size = new System.Drawing.Size(374, 19);
-            this.ckbChacheEnable.TabIndex = 0;
-            this.ckbChacheEnable.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
-            // 
-            // tabCustomization
-            // 
-            this.tabCustomization.Caption = "Customization";
-            this.tabCustomization.Controls.Add(this.navBarCustomization);
-            this.tabCustomization.Name = "tabCustomization";
-            this.tabCustomization.Size = new System.Drawing.Size(401, 337);
-            // 
             // navBarCustomization
             // 
             this.navBarCustomization.ActiveGroup = this.navGroupMeshes;
-            this.navBarCustomization.Controls.Add(this.navGroupMeshesControlContainer);
-            this.navBarCustomization.Controls.Add(this.navGroupObjectsControlContainer);
+            this.navBarCustomization.Controls.Add(this.containerMeshes);
+            this.navBarCustomization.Controls.Add(this.containerObjects);
+            this.navBarCustomization.Controls.Add(this.containerGeneral);
             this.navBarCustomization.Dock = System.Windows.Forms.DockStyle.Fill;
             this.navBarCustomization.Groups.AddRange(new DevExpress.XtraNavBar.NavBarGroup[] {
+            this.navGroupGeneral,
             this.navGroupMeshes,
             this.navGroupObjects});
             this.navBarCustomization.Location = new System.Drawing.Point(0, 0);
             this.navBarCustomization.Name = "navBarCustomization";
             this.navBarCustomization.OptionsNavPane.ExpandedWidth = 401;
-            this.navBarCustomization.Size = new System.Drawing.Size(401, 337);
+            this.navBarCustomization.Size = new System.Drawing.Size(401, 364);
             this.navBarCustomization.TabIndex = 2;
             this.navBarCustomization.Text = "Customization";
             this.navBarCustomization.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
@@ -1129,25 +1046,25 @@ namespace EntityTools.Patches.Mapper
             // navGroupMeshes
             // 
             this.navGroupMeshes.Caption = "Meshes";
-            this.navGroupMeshes.ControlContainer = this.navGroupMeshesControlContainer;
+            this.navGroupMeshes.ControlContainer = this.containerMeshes;
             this.navGroupMeshes.GroupClientHeight = 95;
             this.navGroupMeshes.GroupStyle = DevExpress.XtraNavBar.NavBarGroupStyle.ControlContainer;
             this.navGroupMeshes.Name = "navGroupMeshes";
             // 
-            // navGroupMeshesControlContainer
+            // containerMeshes
             // 
-            this.navGroupMeshesControlContainer.Appearance.BackColor = System.Drawing.SystemColors.Control;
-            this.navGroupMeshesControlContainer.Appearance.Options.UseBackColor = true;
-            this.navGroupMeshesControlContainer.Controls.Add(this.lblBackground);
-            this.navGroupMeshesControlContainer.Controls.Add(this.lblUnidirPath);
-            this.navGroupMeshesControlContainer.Controls.Add(this.lblBidirPath);
-            this.navGroupMeshesControlContainer.Controls.Add(this.colorEditBidirPath);
-            this.navGroupMeshesControlContainer.Controls.Add(this.colorBackground);
-            this.navGroupMeshesControlContainer.Controls.Add(this.colorEditUnidirPath);
-            this.navGroupMeshesControlContainer.Name = "navGroupMeshesControlContainer";
-            this.navGroupMeshesControlContainer.Size = new System.Drawing.Size(390, 88);
-            this.navGroupMeshesControlContainer.TabIndex = 0;
-            this.navGroupMeshesControlContainer.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            this.containerMeshes.Appearance.BackColor = System.Drawing.SystemColors.Control;
+            this.containerMeshes.Appearance.Options.UseBackColor = true;
+            this.containerMeshes.Controls.Add(this.lblBackground);
+            this.containerMeshes.Controls.Add(this.lblUnidirPath);
+            this.containerMeshes.Controls.Add(this.lblBidirPath);
+            this.containerMeshes.Controls.Add(this.colorEditBidirPath);
+            this.containerMeshes.Controls.Add(this.colorBackground);
+            this.containerMeshes.Controls.Add(this.colorEditUnidirPath);
+            this.containerMeshes.Name = "containerMeshes";
+            this.containerMeshes.Size = new System.Drawing.Size(393, 88);
+            this.containerMeshes.TabIndex = 0;
+            this.containerMeshes.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
             // lblBackground
             // 
@@ -1218,16 +1135,16 @@ namespace EntityTools.Patches.Mapper
             this.colorEditUnidirPath.TabIndex = 0;
             this.colorEditUnidirPath.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
-            // navGroupObjectsControlContainer
+            // containerObjects
             // 
-            this.navGroupObjectsControlContainer.Appearance.BackColor = System.Drawing.SystemColors.Control;
-            this.navGroupObjectsControlContainer.Appearance.Options.UseBackColor = true;
-            this.navGroupObjectsControlContainer.Controls.Add(this.grpNodeCustomization);
-            this.navGroupObjectsControlContainer.Controls.Add(this.grpEntityCustomization);
-            this.navGroupObjectsControlContainer.Name = "navGroupObjectsControlContainer";
-            this.navGroupObjectsControlContainer.Size = new System.Drawing.Size(390, 175);
-            this.navGroupObjectsControlContainer.TabIndex = 1;
-            this.navGroupObjectsControlContainer.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            this.containerObjects.Appearance.BackColor = System.Drawing.SystemColors.Control;
+            this.containerObjects.Appearance.Options.UseBackColor = true;
+            this.containerObjects.Controls.Add(this.grpNodeCustomization);
+            this.containerObjects.Controls.Add(this.grpEntityCustomization);
+            this.containerObjects.Name = "containerObjects";
+            this.containerObjects.Size = new System.Drawing.Size(393, 175);
+            this.containerObjects.TabIndex = 1;
+            this.containerObjects.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
             // grpNodeCustomization
             // 
@@ -1241,7 +1158,7 @@ namespace EntityTools.Patches.Mapper
             this.grpNodeCustomization.GroupStyle = DevExpress.Utils.GroupStyle.Card;
             this.grpNodeCustomization.Location = new System.Drawing.Point(3, 116);
             this.grpNodeCustomization.Name = "grpNodeCustomization";
-            this.grpNodeCustomization.Size = new System.Drawing.Size(384, 55);
+            this.grpNodeCustomization.Size = new System.Drawing.Size(387, 55);
             this.grpNodeCustomization.TabIndex = 2;
             this.grpNodeCustomization.Text = "Nodes";
             this.grpNodeCustomization.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
@@ -1306,7 +1223,7 @@ namespace EntityTools.Patches.Mapper
             this.grpEntityCustomization.GroupStyle = DevExpress.Utils.GroupStyle.Card;
             this.grpEntityCustomization.Location = new System.Drawing.Point(3, 3);
             this.grpEntityCustomization.Name = "grpEntityCustomization";
-            this.grpEntityCustomization.Size = new System.Drawing.Size(384, 107);
+            this.grpEntityCustomization.Size = new System.Drawing.Size(387, 107);
             this.grpEntityCustomization.TabIndex = 1;
             this.grpEntityCustomization.Text = "Draw Entities";
             this.grpEntityCustomization.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
@@ -1400,13 +1317,80 @@ namespace EntityTools.Patches.Mapper
             this.ckbFriends.TabIndex = 0;
             this.ckbFriends.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
+            // containerGeneral
+            // 
+            this.containerGeneral.Appearance.BackColor = System.Drawing.SystemColors.Control;
+            this.containerGeneral.Appearance.Options.UseBackColor = true;
+            this.containerGeneral.Controls.Add(this.lblLayerDepth);
+            this.containerGeneral.Controls.Add(this.editLayerDepth);
+            this.containerGeneral.Controls.Add(this.ckbChacheEnable);
+            this.containerGeneral.Name = "containerGeneral";
+            this.containerGeneral.Size = new System.Drawing.Size(393, 63);
+            this.containerGeneral.TabIndex = 2;
+            // 
+            // lblLayerDepth
+            // 
+            this.lblLayerDepth.AutoSize = true;
+            this.lblLayerDepth.Location = new System.Drawing.Point(12, 37);
+            this.lblLayerDepth.Name = "lblLayerDepth";
+            this.lblLayerDepth.Size = new System.Drawing.Size(238, 13);
+            this.lblLayerDepth.TabIndex = 3;
+            this.lblLayerDepth.Text = "The limit of the layer\'s depth drawing on Mapper";
+            this.lblLayerDepth.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            // 
+            // editLayerDepth
+            // 
+            this.editLayerDepth.EditValue = new decimal(new int[] {
+            0,
+            0,
+            0,
+            0});
+            this.editLayerDepth.Location = new System.Drawing.Point(256, 34);
+            this.editLayerDepth.MenuManager = this.barManager;
+            this.editLayerDepth.Name = "editLayerDepth";
+            this.editLayerDepth.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.editLayerDepth.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.editLayerDepth.Properties.Increment = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.editLayerDepth.Properties.MaxValue = new decimal(new int[] {
+            1000000,
+            0,
+            0,
+            0});
+            this.editLayerDepth.Size = new System.Drawing.Size(120, 20);
+            this.editLayerDepth.TabIndex = 2;
+            this.editLayerDepth.EditValueChanged += new System.EventHandler(this.handler_LayerDepth_Changed);
+            this.editLayerDepth.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            // 
+            // ckbChacheEnable
+            // 
+            this.ckbChacheEnable.Location = new System.Drawing.Point(12, 10);
+            this.ckbChacheEnable.MenuManager = this.barManager;
+            this.ckbChacheEnable.Name = "ckbChacheEnable";
+            this.ckbChacheEnable.Properties.Caption = "Caching of the visible meshes (will take effect in a new Mapper window)";
+            this.ckbChacheEnable.Size = new System.Drawing.Size(374, 19);
+            this.ckbChacheEnable.TabIndex = 0;
+            this.ckbChacheEnable.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            // 
             // navGroupObjects
             // 
             this.navGroupObjects.Caption = "Objects";
-            this.navGroupObjects.ControlContainer = this.navGroupObjectsControlContainer;
+            this.navGroupObjects.ControlContainer = this.containerObjects;
             this.navGroupObjects.GroupClientHeight = 182;
             this.navGroupObjects.GroupStyle = DevExpress.XtraNavBar.NavBarGroupStyle.ControlContainer;
             this.navGroupObjects.Name = "navGroupObjects";
+            // 
+            // navGroupGeneral
+            // 
+            this.navGroupGeneral.Caption = "General";
+            this.navGroupGeneral.ControlContainer = this.containerGeneral;
+            this.navGroupGeneral.GroupClientHeight = 70;
+            this.navGroupGeneral.GroupStyle = DevExpress.XtraNavBar.NavBarGroupStyle.ControlContainer;
+            this.navGroupGeneral.Name = "navGroupGeneral";
             // 
             // MapperFormExt
             // 
@@ -1445,20 +1429,13 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.MapPicture)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.panelSettings)).EndInit();
             this.panelSettings.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.tabPaneSettings)).EndInit();
-            this.tabPaneSettings.ResumeLayout(false);
-            this.tabGeneral.ResumeLayout(false);
-            this.tabGeneral.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.editLayerDepth.Properties)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.ckbChacheEnable.Properties)).EndInit();
-            this.tabCustomization.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.navBarCustomization)).EndInit();
             this.navBarCustomization.ResumeLayout(false);
-            this.navGroupMeshesControlContainer.ResumeLayout(false);
+            this.containerMeshes.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.colorEditBidirPath.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.colorBackground.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.colorEditUnidirPath.Properties)).EndInit();
-            this.navGroupObjectsControlContainer.ResumeLayout(false);
+            this.containerObjects.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.grpNodeCustomization)).EndInit();
             this.grpNodeCustomization.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.ckbNodes.Properties)).EndInit();
@@ -1475,6 +1452,10 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.colorPlayers.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.colorOtherNPC.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ckbFriends.Properties)).EndInit();
+            this.containerGeneral.ResumeLayout(false);
+            this.containerGeneral.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.editLayerDepth.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ckbChacheEnable.Properties)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1551,9 +1532,6 @@ namespace EntityTools.Patches.Mapper
         private BarEditItem editUnidirPathColor;
         private BarButtonItem btnLockOnSpecialObject;
         private DevExpress.XtraEditors.PanelControl panelSettings;
-        private DevExpress.XtraBars.Navigation.TabPane tabPaneSettings;
-        private DevExpress.XtraBars.Navigation.TabNavigationPage tabGeneral;
-        private DevExpress.XtraBars.Navigation.TabNavigationPage tabCustomization;
         private DevExpress.XtraEditors.ColorEdit colorEditUnidirPath;
         private DevExpress.XtraEditors.ColorEdit colorEditBidirPath;
         private BarCheckItem btnSettings;
@@ -1562,9 +1540,11 @@ namespace EntityTools.Patches.Mapper
         private BarCheckItem btnDistanceMeasurement;
         private DevExpress.XtraNavBar.NavBarControl navBarCustomization;
         private DevExpress.XtraNavBar.NavBarGroup navGroupMeshes;
-        private DevExpress.XtraNavBar.NavBarGroupControlContainer navGroupMeshesControlContainer;
-        private DevExpress.XtraNavBar.NavBarGroupControlContainer navGroupObjectsControlContainer;
+        private DevExpress.XtraNavBar.NavBarGroup navGroupGeneral;
         private DevExpress.XtraNavBar.NavBarGroup navGroupObjects;
+        private DevExpress.XtraNavBar.NavBarGroupControlContainer containerMeshes;
+        private DevExpress.XtraNavBar.NavBarGroupControlContainer containerObjects;
+        private DevExpress.XtraNavBar.NavBarGroupControlContainer containerGeneral;
         private DevExpress.XtraEditors.CheckEdit ckbNodes;
         private DevExpress.XtraEditors.CheckEdit ckbFriends;
         private DevExpress.XtraEditors.CheckEdit ckbEnemies;

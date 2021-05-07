@@ -13,7 +13,7 @@ namespace EntityTools.Patches
 
         internal Patch_VIP_ProfessionVendorEntity()
         {
-            if (NeedInjecttion)
+            if (NeedInjection)
             {
                 PropertyInfo pi = typeof(VIP).GetProperty("ProfessionVendorEntity", ReflectionHelper.DefaultFlags);
                 if (pi != null)
@@ -32,7 +32,7 @@ namespace EntityTools.Patches
             }
         }
 
-        public sealed override bool NeedInjecttion => EntityTools.Config.Patches.VipProfessionVendorEntity;
+        public sealed override bool NeedInjection => EntityTools.Config.Patches.VipProfessionVendorEntity;
 
         internal static Entity get_ProfessionVendorEntity()
         {

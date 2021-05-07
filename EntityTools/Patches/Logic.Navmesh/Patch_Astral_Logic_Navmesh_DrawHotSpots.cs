@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
+using AcTp0Tools.Reflection;
 using Astral.Logic.Classes.Map;
 using EntityTools.Patches.Mapper;
-using AcTp0Tools.Reflection;
 using MyNW.Classes;
-#if PATCH_ASTRAL && HARMONY
+// ReSharper disable InconsistentNaming
 
-# endif
-
-namespace EntityTools.Patches.Navmesh
+namespace EntityTools.Patches.Logic.Navmesh
 {
     internal class Patch_Astral_Logic_Navmesh_DrawHotSpots : Patch
     {
@@ -18,7 +16,7 @@ namespace EntityTools.Patches.Navmesh
 
         internal Patch_Astral_Logic_Navmesh_DrawHotSpots()
         {
-            if (NeedInjecttion)
+            if (NeedInjection)
             {
                 MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("DrawHotSpots", ReflectionHelper.DefaultFlags);
                 if (mi != null)
@@ -31,10 +29,10 @@ namespace EntityTools.Patches.Navmesh
             }
         }
 
-        public sealed override bool NeedInjecttion => EntityTools.Config.Mapper.Patch;
+        public sealed override bool NeedInjection => EntityTools.Config.Mapper.Patch;
 
 #if false
-public static void DrawHotSpots(List<Vector3> hotspots, GraphicsNW graph)
+public static void Astral.Logic.Navmesh.DrawHotSpots(List<Vector3> hotspots, GraphicsNW graph)
 {
 	foreach (Vector3 vector in hotspots)
 	{
@@ -45,7 +43,7 @@ public static void DrawHotSpots(List<Vector3> hotspots, GraphicsNW graph)
 }
 #endif
         /// <summary>
-        /// Отрисовка пути <paramref name="waypoints"/> на <paramref name="graphicsNW"/>
+        /// Отрисовка пути <paramref name="hotspots"/> на <paramref name="graphicsNW"/>
         /// </summary>
         public static void DrawHotSpots(List<Vector3> hotspots, GraphicsNW graphicsNW)
         {
@@ -71,11 +69,11 @@ public static void DrawHotSpots(List<Vector3> hotspots, GraphicsNW graph)
             }
             else
             {
-                Vector3 startPos = Vector3.Empty;
-                foreach (Vector3 vector in hotspots)
+                for (var index = 0; index < hotspots.Count; index++)
                 {
-                    graphicsNW.drawFillEllipse(vector, MapperHelper.Size_12x12/*new Size(12, 12)*/, Brushes.Blue);
-                    graphicsNW.drawString(vector, hotspots.IndexOf(vector).ToString(), 8, Brushes.Blue, -1, -6);
+                    Vector3 vector = hotspots[index];
+                    graphicsNW.drawFillEllipse(vector, MapperHelper.Size_12x12, Brushes.Blue);
+                    graphicsNW.drawString(vector, index.ToString(), 8, Brushes.Blue, -1, -6);
                 }
             }
         }

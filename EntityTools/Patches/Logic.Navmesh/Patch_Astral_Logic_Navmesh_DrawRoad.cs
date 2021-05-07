@@ -17,7 +17,7 @@ namespace EntityTools.Patches.Navmesh
 
         internal Patch_Astral_Logic_Navmesh_DrawRoad()
         {
-            if (NeedInjecttion)
+            if (NeedInjection)
             {
                 MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("DrawRoad", ReflectionHelper.DefaultFlags);
                 if (mi != null)
@@ -30,24 +30,23 @@ namespace EntityTools.Patches.Navmesh
             }
         }
 
-        public sealed override bool NeedInjecttion => EntityTools.Config.Mapper.Patch;
+        public sealed override bool NeedInjection => EntityTools.Config.Mapper.Patch;
 
 #if false
-    Astral.Logic.Navmesh
-    	public static void DrawRoad(List<Vector3> waypoints, GraphicsNW graph)
+public static void Astral.Logic.Navmesh.DrawRoad(List<Vector3> waypoints, GraphicsNW graph)
+{
+	Vector3 vector = Vector3.Empty;
+	foreach (Vector3 vector2 in waypoints)
+	{
+		Brush blue = Brushes.Blue;
+		graph.drawFillEllipse(vector2, new Size(4, 4), blue);
+		if (vector.IsValid)
 		{
-			Vector3 vector = Vector3.Empty;
-			foreach (Vector3 vector2 in waypoints)
-			{
-				Brush blue = Brushes.Blue;
-				graph.drawFillEllipse(vector2, new Size(4, 4), blue);
-				if (vector.IsValid)
-				{
-					graph.drawLine(vector, vector2, Pens.Blue);
-				}
-				vector = vector2;
-			}
+			graph.drawLine(vector, vector2, Pens.Blue);
 		}
+		vector = vector2;
+	}
+}
 #endif
         /// <summary>
         /// Отрисовка пути <paramref name="waypoints"/> на <paramref name="graphicsNW"/>

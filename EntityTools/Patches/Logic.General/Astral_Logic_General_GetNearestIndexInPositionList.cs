@@ -1,35 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using AStar;
-using AcTp0Tools.Reflection;
+﻿using AcTp0Tools.Reflection;
 using MyNW.Classes;
-using MyNW.Internals;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace EntityTools.Patches.Logic.General
 {
     /// <summary>
-    /// Патч метода Astral.Logic.General.GetNearestIndexInPositionList(List<Vector3> waypoints, Vector3 pos)
+    /// Патч метода <see cref="Astral.Logic.General.GetNearestIndexInPositionList(List{Vector3}, Vector3)"/>
     /// </summary>
+    // ReSharper disable once InconsistentNaming
     internal class Astral_Logic_General_GetNearestIndexInPositionList : Patch
     {
         internal Astral_Logic_General_GetNearestIndexInPositionList()
         {
-            if (NeedInjecttion)
+            if (NeedInjection)
             {
                 MethodInfo mi = typeof(Astral.Logic.General).GetMethod("GetNearestIndexInPositionList", ReflectionHelper.DefaultFlags);
-                if (mi != null)
-                {
-                    methodToReplace = mi;
-                }
-                else throw new Exception("Astral_Logic_General_GetNearestIndexInPositionList: fail to initialize 'methodToReplace'");
+                methodToReplace = mi != null
+                    ? mi
+                    : throw new Exception(
+                        "Astral_Logic_General_GetNearestIndexInPositionList: fail to initialize 'methodToReplace'");
 
                 methodToInject = GetType().GetMethod(nameof(GetNearestIndexInPositionList), ReflectionHelper.DefaultFlags);
             }
         }
 
-        public sealed override bool NeedInjecttion => EntityTools.Config.Patches.GetNearestIndexInPositionList;
+        public sealed override bool NeedInjection => EntityTools.Config.Patches.GetNearestIndexInPositionList;
 
 #if false
 // Astral.Logic.General

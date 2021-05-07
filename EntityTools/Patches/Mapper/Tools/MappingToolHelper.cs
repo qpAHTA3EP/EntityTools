@@ -1417,11 +1417,11 @@ namespace EntityTools.Patches.Mapper.Tools
                         }
                     }
 
-                    // Добавляем связь от узла equivalentNodeDetail 
+                    // Добавляем связь от узла newNode 
                     // к узлам front, left, right
                     if (frontND != null)
                     {
-                        frontND.Rebase(equivalentND.Node);
+                        frontND.Rebase(newNode);
                         if (uniDirection)
                         {
                             using (graph.WriteLock())

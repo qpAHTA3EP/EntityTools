@@ -17,7 +17,6 @@ using System.Windows.Forms;
 using AStar;
 using Astral;
 using Astral.Controllers;
-using Astral.Quester.Forms;
 using DevExpress.XtraBars;
 using DevExpress.XtraEditors;
 using EntityTools.Patches.Mapper.Tools;
@@ -379,7 +378,7 @@ namespace EntityTools.Patches.Mapper
 #endif
             });
 
-
+            //TODO Заменить Environment.TickCount на DateTime.Now.Ticks 
 #if DrawMapper_Measuring
             Timeout timeout = new Timeout(0);
             const int SPEED_MEASURES_NUM = 10;
@@ -533,7 +532,7 @@ namespace EntityTools.Patches.Mapper
                         if (_currentMapHash != hash)
                         {
                             var currentMapInfo = player.CurrentZoneMapInfo;
-                            formCaption = formCaption = string.Concat(currentMapInfo.DisplayName, '[', currentMapInfo.MapName, ']');
+                            formCaption = string.Concat(currentMapInfo.DisplayName, '[', currentMapInfo.MapName, ']');
                             _currentMapHash = hash;
 
                             // Карта изменилась - сбрасываем состояние инструментов
@@ -885,14 +884,10 @@ namespace EntityTools.Patches.Mapper
             {
                 if (LockOnPlayer)
                 {
-                    if (mouseWeelTimeout.IsTimedOut)
-                    {
-                        if (e.Delta > 0)
-                            handler_ZoomIn(sender);
-                        else if (e.Delta < 0)
-                            handler_ZoomOut(sender);
-                        mouseWeelTimeout.ChangeTime(100);
-                    }
+                    if (e.Delta > 0)
+                        handler_ZoomIn(sender);
+                    else if (e.Delta < 0)
+                        handler_ZoomOut(sender);
                 }
                 else
                 {
@@ -1058,13 +1053,13 @@ namespace EntityTools.Patches.Mapper
                         {
                             if (!AstralAccessors.Controllers.Roles.CurrentRole.OnMapDraw(_graphics))
                                 //lock (AstralAccessors.Quester.Core.Meshes.Value.SyncRoot) <- Блокировка графа есть в DrawMeshes(..)
-                                Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes.DrawMeshes(_graphics,
+                                ComplexPatch_Mapper.DrawMeshes(_graphics,
                                     AstralAccessors.Quester.Core.Meshes);
                         }
                         catch (Exception ex)
                         {
                             ETLogger.WriteLine(LogType.Error, string.Concat(nameof(DrawMapper), ": Перехвачено исключение \n\r", ex), true);
-                            Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes.DrawMeshes(_graphics,
+                            ComplexPatch_Mapper.DrawMeshes(_graphics,
                                     AstralAccessors.Quester.Core.Meshes);
                         }
                         #endregion

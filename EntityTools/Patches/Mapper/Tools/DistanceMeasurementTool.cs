@@ -1,14 +1,11 @@
-﻿using System;
-using System.Drawing;
-using System.Windows.Forms;
+﻿using AcTp0Tools;
 using AStar;
 using Astral.Logic.Classes.FSM;
 using DevExpress.XtraEditors;
-using EntityTools.Patches.Navmesh;
-using AcTp0Tools.Reflection;
 using MyNW.Classes;
-using MyNW.Internals;
-using AcTp0Tools;
+using System;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace EntityTools.Patches.Mapper.Tools
 {
@@ -109,7 +106,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     y = endY;
 
                     if (road?.Waypoints.Count > 0)
-                        Patch_Astral_Logic_Navmesh_DrawRoad.DrawRoad(road.Waypoints, graphics, Pens.RoyalBlue, Brushes.RoyalBlue);
+                        ComplexPatch_Mapper.DrawRoad(road.Waypoints, graphics, Pens.RoyalBlue, Brushes.RoyalBlue);
 
                     graphics.FillCircleCentered(Brushes.RoyalBlue, endX, endY, 8);
                     graphics.DrawText(endLable, endX, endY, endAlignment, Control.DefaultFont, Brushes.RoyalBlue);
@@ -185,9 +182,9 @@ namespace EntityTools.Patches.Mapper.Tools
                             {
                                 bool pathfinding = userAnswer == DialogResult.Yes;
                                 var fullGraph = AstralAccessors.Quester.Core.Meshes;
-                                road = Patch_Astral_Logic_Navmesh_GenerateRoad.GenerateRoad(fullGraph, new Vector3((float)startX, (float)startY, (float)startZ), new Vector3((float)endX, (float)endY, (float)endZ), pathfinding);
+                                road = ComplexPatch_Navigation.GenerateRoad(fullGraph, new Vector3((float)startX, (float)startY, (float)startZ), new Vector3((float)endX, (float)endY, (float)endZ), pathfinding);
                                 if (road?.Waypoints.Count > 0)
-                                    pathLen = Patch_Astral_Logic_Navmesh_TotalDistance.TotalDistance(road.Waypoints);
+                                    pathLen = ComplexPatch_Navigation.TotalDistance(road.Waypoints);
                             }
                             if (pathLen > 0)
                                 endLable = string.Concat("(x)", endX.ToString("N1"), "; (y)", endY.ToString("N1"), "; (z)", endZ.ToString("N1"), Environment.NewLine,

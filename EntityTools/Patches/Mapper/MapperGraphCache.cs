@@ -5,7 +5,6 @@ using AStar.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using Timeout = Astral.Classes.Timeout;
@@ -753,7 +752,7 @@ namespace EntityTools.Patches.Mapper
                     cacheX_0_75 = double.MaxValue;
                     centerX = 0;
                 }
-                if (z1 != 0 && z2 != 0)
+                if (y1 != 0 && y2 != 0)
                 {
                     MapperHelper.FixRange(y1, y2, out minY, out maxY);
                     cacheY = (maxY - minY) / 2;
