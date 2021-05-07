@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using AStar;
-using DevExpress.XtraNavBar.ViewInfo;
 using AcTp0Tools.Reflection;
 using MyNW.Classes;
-using MyNW.Internals;
 
 namespace EntityTools.Patches.Navmesh
 {
@@ -14,7 +10,7 @@ namespace EntityTools.Patches.Navmesh
     {
         internal Patch_Astral_Logic_Navmesh_FixPath()
         {
-            if (NeedInjecttion)
+            if (NeedInjection)
             {
                 MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("fixPath", ReflectionHelper.DefaultFlags);
                 if (mi != null)
@@ -27,7 +23,7 @@ namespace EntityTools.Patches.Navmesh
             }
         }
 
-        public sealed override bool NeedInjecttion => EntityTools.Config.Patches.Navigation;
+        public sealed override bool NeedInjection => EntityTools.Config.Patches.Navigation;
 
 #if false
     Astral.Logic.Navmesh

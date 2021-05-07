@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
-using System.Text;
 using AStar;
 using Astral.Logic.Classes.FSM;
 using Astral.Logic.NW;
-using EntityTools.Patches.Mapper;
 using AcTp0Tools.Reflection;
 using MyNW.Classes;
 using AcTp0Tools;
@@ -17,7 +14,7 @@ namespace EntityTools.Patches.Navmesh
     {
         internal Patch_Astral_Logic_Navmesh_GenerateRoad()
         {
-            if (NeedInjecttion)
+            if (NeedInjection)
             {
                 MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("GenerateRoad", ReflectionHelper.DefaultFlags);
                 if (mi != null)
@@ -30,7 +27,7 @@ namespace EntityTools.Patches.Navmesh
             }
         }
 
-        public sealed override bool NeedInjecttion => EntityTools.Config.Patches.Navigation;
+        public sealed override bool NeedInjection => EntityTools.Config.Patches.Navigation;
 
 #if PATCH_LOG
         private static StringBuilder stringBuilder = new StringBuilder();

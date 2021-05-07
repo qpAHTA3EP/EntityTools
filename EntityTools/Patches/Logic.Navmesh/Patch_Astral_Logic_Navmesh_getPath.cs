@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using AStar;
 using AcTp0Tools.Reflection;
 using MyNW.Classes;
@@ -14,7 +11,7 @@ namespace EntityTools.Patches.Navmesh
     {
         internal Patch_Astral_Logic_Navmesh_GetPath()
         {
-            if (!NeedInjecttion) return;
+            if (!NeedInjection) return;
 
             MethodInfo mi = typeof(Astral.Logic.Navmesh).GetMethod("getPath", ReflectionHelper.DefaultFlags);
             if (mi != null)
@@ -26,7 +23,7 @@ namespace EntityTools.Patches.Navmesh
             methodToInject = GetType().GetMethod(nameof(GetPath), ReflectionHelper.DefaultFlags, null, new Type[] { typeof(Graph), typeof(Vector3), typeof(Vector3) }, null);
         }
 
-        public sealed override bool NeedInjecttion => EntityTools.Config.Patches.Navigation;
+        public sealed override bool NeedInjection => EntityTools.Config.Patches.Navigation;
 
 #if PATCH_LOG
         private static StringBuilder stringBuilder = new StringBuilder();
