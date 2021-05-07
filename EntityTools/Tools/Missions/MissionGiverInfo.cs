@@ -4,7 +4,6 @@ using System.Drawing.Design;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-using Astral.Quester.Classes;
 using Astral.Quester.UIEditors;
 using EntityTools.Enums;
 using EntityTools.Tools.Extensions;
@@ -42,7 +41,8 @@ namespace EntityTools.Tools.Missions
                 _type = value;
             }
         }
-        protected MissionGiverType _type = MissionGiverType.NPC;
+
+        private MissionGiverType _type = MissionGiverType.NPC;
 
         public Vector3 Position
         {
@@ -57,7 +57,8 @@ namespace EntityTools.Tools.Missions
                     _position = value;
             }
         }
-        protected Vector3 _position = Vector3.Empty;
+
+        private Vector3 _position = Vector3.Empty;
 
         public double Distance
         {
@@ -132,7 +133,8 @@ namespace EntityTools.Tools.Missions
                 _tolerance = value;
             }
         }
-        internal uint _tolerance = 1;
+
+        private uint _tolerance = 1;
 
         /// <summary>
         /// <paramref name="entity"/> соответствует патаметрам квестодателя
@@ -167,7 +169,8 @@ namespace EntityTools.Tools.Missions
         {
             get
             {
-                return (_type == MissionGiverType.Remote || _type == MissionGiverType.NPC && _position.IsValid)
+                return (_type == MissionGiverType.Remote 
+                            || (_type == MissionGiverType.NPC && _position.IsValid))
                        && !string.IsNullOrEmpty(_id);
             }
         }

@@ -1,32 +1,27 @@
-﻿//#define AbortCombatDistance_by_Task
-
+﻿using AcTp0Tools;
+using Astral.Logic.Classes.Map;
 using EntityCore.Entities;
+using EntityCore.Enums;
 using EntityCore.Extensions;
+using EntityCore.Forms;
+using EntityTools;
+using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
+using EntityTools.Patches.Mapper;
 using EntityTools.Quester.Actions;
 using MyNW.Classes;
+using MyNW.Internals;
 using MyNW.Patchables.Enums;
 using System;
 using System.Collections.Generic;
-using EntityTools.Core.Interfaces;
-using Astral.Logic.Classes.Map;
-using MyNW.Internals;
-using System.Drawing;
-using static Astral.Quester.Classes.Action;
-using EntityTools;
-using EntityCore.Forms;
-using EntityTools.Patches.Mapper;
-using System.Reflection;
-using EntityCore.Enums;
 using System.ComponentModel;
-using AcTp0Tools;
+using System.Drawing;
+using System.Reflection;
+using static Astral.Quester.Classes.Action;
 
 namespace EntityCore.Quester.Action
 {
     public class MoveToEntityEngine : IQuesterActionEngine
-#if IEntityDescriptor
-        , IEntityInfos 
-#endif
     {
         /// <summary>
         /// ссылка на команду, для которой предоставляется функционал ядра
@@ -36,8 +31,8 @@ namespace EntityCore.Quester.Action
         #region Данные 
         private string _idStr = string.Empty;
         private string _label = string.Empty;
-        private Entity target = null;
-        private Entity closestEntity = null;
+        private Entity targetEntity;
+        private Entity closestEntity;
         private Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
         #endregion
 
@@ -83,7 +78,7 @@ namespace EntityCore.Quester.Action
 
         private bool InternalRebase(MoveToEntity m2e)
         {
-            target = null;
+            targetEntity = null;
             closestEntity = null;
 
             // Убираем привязку к старой команде
@@ -118,7 +113,7 @@ namespace EntityCore.Quester.Action
                 }
                 else _specialCheck = null;
 
-                target = null;
+                targetEntity = null;
                 closestEntity = null;
             }
         }
@@ -127,78 +122,81 @@ namespace EntityCore.Quester.Action
         {
             get
             {
-                bool extedndedDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
-                string currentMethodName = extedndedDebugInfo ? string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
+                bool extendedDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
+                string currentMethodName = extendedDebugInfo ? string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
 
-                if (extedndedDebugInfo)
+                if (extendedDebugInfo)
                     ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Begins"));
 
                 // Команда работает с 2 - мя целями:
-                //   1-я цель (target) определяет навигацию. Если она зафиксированная(HoldTargetEntity), то не сбрасывается пока жива и не достигнута
+                //   1-я цель (targetEntity) определяет навигацию. Если она зафиксированная(HoldTargetEntity), то не сбрасывается пока жива и не достигнута
                 //   2-я ближайшая цель (closest) управляет флагом IgnoreCombat
                 // Если HoldTargetEntity ВЫКЛЮЧЕН и обе цели совпадают - это ближайшая цель 
-                EntityPreprocessingResult entityPreprocessingResult = Preprocessing_Entity(target);
+                EntityPreprocessingResult entityPreprocessingResult = Preprocessing_Entity(targetEntity);
 
-                if (extedndedDebugInfo)
+                if (extendedDebugInfo)
                 {
-                    string debugMsg;
-                    if (target is null)
-                        debugMsg = string.Concat(currentMethodName, ": Target[NULL] processing result: '", entityPreprocessingResult, '\'');
-                    else debugMsg = string.Concat(currentMethodName, ": ", target.GetDebugString(@this._entityNameType, "Target", EntityDetail.Pointer), " processing result: '", entityPreprocessingResult, '\'');
+                    string debugMsg = targetEntity is null ? string.Concat(currentMethodName, ": Target[NULL] processing result: '", entityPreprocessingResult, '\'') 
+                        : string.Concat(currentMethodName, ": ", targetEntity.GetDebugString(@this._entityNameType, "Target", EntityDetail.Pointer), " processing result: '", entityPreprocessingResult, '\'');
                     ETLogger.WriteLine(LogType.Debug, debugMsg);
                 }
 
                 if (entityPreprocessingResult == EntityPreprocessingResult.Failed)
                 {
-                    // target не валидный - сбрасываем
-                    target = null;
+                    // targetEntity не валидный - сбрасываем
+                    targetEntity = null;
                 }
 
                 if (entityPreprocessingResult != EntityPreprocessingResult.Succeeded && timeout.IsTimedOut)
                 {
-                    // target не был обработан
+                    // targetEntity не был обработан
                     Entity entity = SearchCached.FindClosestEntity(EntityKey, SpecialCheck);
 
                     if (entity != null)
                     {
                         closestEntity = entity;
-                        bool closestIsTarget = target != null && target.ContainerId == closestEntity.ContainerId;
+                        bool closestIsTarget = targetEntity != null && targetEntity.ContainerId == closestEntity.ContainerId;
 
-                        if (extedndedDebugInfo)
+                        if (extendedDebugInfo)
                             ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Found ", closestEntity.GetDebugString(@this._entityNameType, "ClosestEntity", EntityDetail.Pointer),
                                 closestIsTarget ? " that equals to Target": string.Empty));
 
                         if (entityPreprocessingResult == EntityPreprocessingResult.Failed)
                         {
-                            // сохраняем ближайшую сущность в target
-                            if (extedndedDebugInfo)
+                            // сохраняем ближайшую сущность в targetEntity
+                            if (extendedDebugInfo)
                             {
                                 ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Change Target[INVALID] to the ", closestEntity.GetDebugString(@this._entityNameType, "ClosestEntity", EntityDetail.Pointer)));
                             }
-                            target = closestEntity;
+                            targetEntity = closestEntity;
                         }
                         else if (!closestIsTarget)
                         {
-                            // target не является ближайшей сущностью
+                            // targetEntity не является ближайшей сущностью
                             if (!@this._holdTargetEntity)
                             {
-                                // Фиксация на target не требуется
-                                // ближайшую цель можно сохранить в target
-                                if (extedndedDebugInfo)
+                                // Фиксация на targetEntity не требуется
+                                // ближайшую цель можно сохранить в targetEntity
+                                if (extendedDebugInfo)
                                 {
-                                    string debugMsg;
-                                    if (target is null)
-                                        debugMsg = string.Concat(currentMethodName, ": Change Target[NULL] to the ", closestEntity.GetDebugString(@this._entityNameType, "ClosestEntity", EntityDetail.Pointer));
-                                    else debugMsg = string.Concat(currentMethodName, ": Change ", target.GetDebugString(@this._entityNameType, "Target", EntityDetail.Pointer),
-                                            " to the ", closestEntity.GetDebugString(@this._entityNameType, "ClosestEntity", EntityDetail.Pointer));
+                                    string debugMsg = targetEntity is null
+                                        ? string.Concat(currentMethodName, ": Change Target[NULL] to the ",
+                                            closestEntity.GetDebugString(@this._entityNameType, "ClosestEntity",
+                                                EntityDetail.Pointer))
+                                        : string.Concat(currentMethodName, ": Change ",
+                                            targetEntity.GetDebugString(@this._entityNameType, "Target",
+                                                EntityDetail.Pointer),
+                                            " to the ",
+                                            closestEntity.GetDebugString(@this._entityNameType, "ClosestEntity",
+                                                EntityDetail.Pointer));
                                     ETLogger.WriteLine(LogType.Debug, debugMsg);
                                 }
-                                target = closestEntity;
+                                targetEntity = closestEntity;
                             }
 
                             // обрабатываем ближайшую сущность closestEntity
                             entityPreprocessingResult = Preprocessing_Entity(closestEntity);
-                            if (extedndedDebugInfo)
+                            if (extendedDebugInfo)
                             {
                                 if (closestEntity is null)
                                     ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ClosestEntity[NULL] processing result: '", entityPreprocessingResult, '\''));
@@ -206,7 +204,7 @@ namespace EntityCore.Quester.Action
                             }
                         }
                     }
-                    else if(extedndedDebugInfo)
+                    else if(extendedDebugInfo)
                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ClosestEntity not found"));
 
                     timeout.ChangeTime(EntityTools.EntityTools.Config.EntityCache.LocalCacheTime);
@@ -217,11 +215,17 @@ namespace EntityCore.Quester.Action
                 if (@this._ignoreCombat && !needToRun)
                 {
                     AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true);
-                    if (extedndedDebugInfo)
+                    if (@this._abortCombatDistance > @this._distance)
+                    {
+                        AstralAccessors.Logic.NW.Combats.SetAbortCombatCondition(CombatShouldBeAborted, ShouldRemoveAbortCombatCondition);
+                        if (extendedDebugInfo)
+                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Disable combat and set abort combat condition"));
+                    }
+                    else if (extendedDebugInfo)
                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Disable combat"));
                 }
 
-                if (extedndedDebugInfo)
+                if (extendedDebugInfo)
                     ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Result '", needToRun, '\''));
 
                 return needToRun;
@@ -230,25 +234,24 @@ namespace EntityCore.Quester.Action
 
         public ActionResult Run()
         {
-            bool extedndedDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
-            string currentMethodName = extedndedDebugInfo ? string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
+            bool extendedDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
+            string currentMethodName = extendedDebugInfo ? string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
 
-            if (extedndedDebugInfo)
+            if (extendedDebugInfo)
                 ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Begins"));
 
             var entityKey = EntityKey;
 
             if (entityKey.Validate(closestEntity))
                 Attack_Entity(closestEntity);
-            else if (entityKey.Validate(target))
-                Attack_Entity(target);
+            else if (entityKey.Validate(targetEntity))
+                Attack_Entity(targetEntity);
 
-            ActionResult actionResult;
-            if (@this._stopOnApproached)
-                actionResult = ActionResult.Completed;
-            else actionResult = ActionResult.Running;
+            ActionResult actionResult = @this._stopOnApproached 
+                ? ActionResult.Completed 
+                : ActionResult.Running;
 
-            if (extedndedDebugInfo)
+            if (extendedDebugInfo)
                 ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ActionResult=", actionResult));
 
             if (@this._resetCurrentHotSpot)
@@ -262,10 +265,8 @@ namespace EntityCore.Quester.Action
         /// </summary>
         private EntityPreprocessingResult Preprocessing_Entity(Entity entity)
         {
-            bool extedndedDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
-            string currentMethodName = extedndedDebugInfo ? nameof(Preprocessing_Entity) : string.Empty;
-
-            EntityPreprocessingResult result = EntityPreprocessingResult.Failed;
+            bool extendedDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
+            string currentMethodName = extendedDebugInfo ? string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
 
             bool validationResult = EntityKey.Validate(entity);
 
@@ -276,29 +277,24 @@ namespace EntityCore.Quester.Action
                 double distance = entity.Location.Distance3DFromPlayer;
                 bool distanceResult = distance <= @this._distance;
 
-                if (extedndedDebugInfo)
+                if (extendedDebugInfo)
                     ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ", entity.GetDebugString(@this._entityNameType, "Entity", EntityDetail.Pointer), 
                         " verification=", healthResult && distanceResult, " {Valid; ", (@this._healthCheck) ? (healthResult ? "Alive; " : "Dead; ") : "Skip; ",
                         distanceResult ? "Near (" : "Faraway (", distance.ToString("N2"), ")}"));
 
-                if (healthResult)
+                if (!healthResult) return EntityPreprocessingResult.Failed;
+                
+                if (distanceResult)
                 {
-                    if (distanceResult)
-                    {
-                        // entity в пределах заданного расстояния
-                        result = EntityPreprocessingResult.Succeeded;
-                    }
-                    else result = EntityPreprocessingResult.Faraway;
+                    // entity в пределах заданного расстояния
+                    return EntityPreprocessingResult.Succeeded;
                 }
-                else result = EntityPreprocessingResult.Failed;
+                return EntityPreprocessingResult.Faraway;
             }
-            else
-            {
-                if (extedndedDebugInfo)
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Entity Verification=False {Invalid}"));
-            }
+            if (extendedDebugInfo)
+                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Entity Verification=False {Invalid}"));
 
-            return result;
+            return EntityPreprocessingResult.Failed;
         }
 
         #region обработка AbortCombatDistance
@@ -307,12 +303,12 @@ namespace EntityCore.Quester.Action
         /// </summary>
         private void Attack_Entity(Entity entity)
         {
-            bool extedndedDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
-            string currentMethodName = extedndedDebugInfo ? string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
+            bool extendedDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
+            string currentMethodName = extendedDebugInfo ? string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
 
-            if(entity is null)
+            if (entity is null)
             {
-                if (extedndedDebugInfo)
+                if (extendedDebugInfo)
                     ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Entity is NULL. Break"));
                 return;
             }
@@ -326,23 +322,26 @@ namespace EntityCore.Quester.Action
                     && !entity.IsUntargetable)
                 {
                     Astral.Logic.NW.Attackers.List.Clear();
+
                     // entity враждебно и должно быть атаковано
                     string entityStr = string.Empty;
-                    if (extedndedDebugInfo)
+                    if (extendedDebugInfo)
                         entityStr = entity.GetDebugString(@this._entityNameType, "Entity", EntityDetail.Pointer | EntityDetail.RelationToPlayer);
 
                     Astral.Quester.API.IgnoreCombat = false;
 
                     if (@this._abortCombatDistance > @this._distance)
-                        AstralAccessors.Logic.NW.Combats.SetAbortCombatCondition(AbortCombatCondition, ShouldRemoveAbortCombatCondition);
-                    else 
                     {
-                        // запускаем бой без прерывания
-                        if (extedndedDebugInfo)
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Engage combat and attack ", entityStr, " at the distance ", entity.CombatDistance3.ToString("N2")));
-
-                        Astral.Logic.NW.Combats.CombatUnit(entity, null);
+                        // устанавливаем прерывание боя
+                        AstralAccessors.Logic.NW.Combats.SetAbortCombatCondition(CombatShouldBeAborted, ShouldRemoveAbortCombatCondition);
+                        if (extendedDebugInfo)
+                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Set abort combat condition, engage combat and attack ", entityStr, " at the distance ", entity.CombatDistance3.ToString("N2")));
                     }
+                    else if (extendedDebugInfo)
+                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Engage combat and attack ", entityStr, " at the distance ", entity.CombatDistance3.ToString("N2")));
+
+                    // атакуем entity
+                    Astral.Logic.NW.Combats.CombatUnit(entity);
                     return;
                 }
             }
@@ -351,9 +350,12 @@ namespace EntityCore.Quester.Action
                 // entity в пределах досягаемости, но не может быть атакована (entity.RelationToPlayer != EntityRelation.Foe) 
                 // или не должна быть атакована принудительно (!@this._attackTargetEntity)
                 if (@this._abortCombatDistance > @this._distance)
-                    AstralAccessors.Logic.NW.Combats.SetAbortCombatCondition(AbortCombatCondition, ShouldRemoveAbortCombatCondition);
-                else  
-                if (extedndedDebugInfo)
+                {
+                    AstralAccessors.Logic.NW.Combats.SetAbortCombatCondition(CombatShouldBeAborted, ShouldRemoveAbortCombatCondition);
+                    if (extendedDebugInfo) 
+                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": SetAbortCombatCondition"));
+                }
+                else if (extendedDebugInfo)
                     ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Engage combat"));
 
                 Astral.Quester.API.IgnoreCombat = false;
@@ -361,75 +363,129 @@ namespace EntityCore.Quester.Action
         }
 
         /// <summary>
-        /// Делегат, сравнивающий <see cref="MoveToEntity.AbortCombatDistance"/> с расстоянием между игроком и <see cref="closestEntity"/> или <see cref="target"/>,
-        /// и прерывающий бой, при удалении персонажа от <paramref name="entity"/>
+        /// Делегат, сравнивающий <see cref="MoveToEntity.AbortCombatDistance"/> с расстоянием между игроком и <see cref="closestEntity"/> или <see cref="targetEntity"/>,
+        /// и прерывающий бой, при удалении персонажа от <paramref name="combatTarget"/>
         /// </summary>
-        private bool AbortCombatCondition(Entity combat_target)
+        /// <returns>true, если нужно прервать бой</returns>
+        private bool CombatShouldBeAborted(Entity combatTarget)
         {
-            bool extedndedDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
-            if (extedndedDebugInfo)
+            bool extendedDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
+            if (extendedDebugInfo)
             {
                 string currentMethodName = string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name);
 
-                // Бой может быть прерван, если  HP > IgnoreCombatMinHP
-                if (EntityManager.LocalPlayer.Character.AttribsBasic.HealthPercent > AstralAccessors.Quester.FSM.States.Combat.IgnoreCombatMinHP)
+                // Бой не должен прерываться, если  HP < IgnoreCombatMinHP
+                var healthPercent = EntityManager.LocalPlayer.Character.AttribsBasic.HealthPercent;
+                var ignoreCombatMinHP = AstralAccessors.Quester.FSM.States.Combat.IgnoreCombatMinHP;
+                if (!(healthPercent < ignoreCombatMinHP))
                 {
-                    var entity = closestEntity ?? target;
-                    bool anchorEntityValid = EntityKey.Validate(entity);
+                    ETLogger.WriteLine(LogType.Debug,
+                        string.Concat(currentMethodName, ": Player health (", healthPercent, "%) below IgnoreCombatMinHP (", ignoreCombatMinHP, "%). Continue...")); 
+                    return false;
+                }
 
-                    if (anchorEntityValid)
+                if (EntityKey.Validate(closestEntity))
+                {
+                    // Если атакуемая цель combatTarget является closestEntity => продолжаем бой
+                    if (closestEntity.ContainerId == combatTarget.ContainerId)
+                        return false;
+
+                    string entityStr = closestEntity.GetDebugString(@this._entityNameType, "ClosestEntity", EntityDetail.Pointer);
+                    if (!@this._healthCheck || !closestEntity.IsDead)
                     {
-                        if (entity.ContainerId == combat_target.ContainerId)
+                        // closestEntity является живым или проверка healthCheck не требуется
+                        double dist = closestEntity.Location.Distance3DFromPlayer;
+                        if (dist <= @this._abortCombatDistance)
+                        {
+                            // расстояние до closestEntity меньше дистанции прерывания боя => продолжаем бой 
+                            ETLogger.WriteLine(LogType.Debug,
+                                string.Concat(currentMethodName, ": Player withing ", nameof(@this.AbortCombatDistance),
+                                    " (", dist.ToString("N2"), " to ", entityStr, "). Continue..."));
                             return false;
-
-                        string entityStr = extedndedDebugInfo ? entity.GetDebugString(@this._entityNameType, "Entity", EntityDetail.Pointer) : string.Empty;
-                        if (!@this._healthCheck || !entity.IsDead)
-                        {
-                            double dist = entity.Location.Distance3DFromPlayer;
-                            if (dist >= @this._abortCombatDistance)
-                            {
-                                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Player outside ", nameof(@this.AbortCombatDistance), " (", dist.ToString("N2"), " to ", entityStr, "). Combat have to be aborted"));
-                                return true;
-                            }
-                            else ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Player withing ", nameof(@this.AbortCombatDistance), " (", dist.ToString("N2"), " to ", entityStr, "). Continue..."));
                         }
-                        else
-                        {
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ", entityStr, " is dead. Combat have to be aborted"));
-                            return true;
-                        }
+                        //else
+                        //{
+                        //    // расстояние до closestEntity больше дистанции прерывания боя => можно прервать бой, но лучше проверим targetEntity  
+                        //    ETLogger.WriteLine(LogType.Debug,
+                        //        string.Concat(currentMethodName, ": Player outside ", nameof(@this.AbortCombatDistance),
+                        //            " (", dist.ToString("N2"), " to ", entityStr, "). Combat have to be aborted"));
+                        //    return true;
+                        //}
                     }
-                    else
+
+                    // ClosestEntity мертво или далеко => можно прервать бой, но лучше проверим targetEntity
+                    //ETLogger.WriteLine(LogType.Debug,
+                    //    string.Concat(currentMethodName, ": ", entityStr, " is dead. Combat have to be aborted"));
+                    //return true;
+                }
+
+                if (EntityKey.Validate(targetEntity))
+                {
+                    // Если атакуемая цель combatTarget является targetEntity => продолжаем бой
+                    if (targetEntity.ContainerId == combatTarget.ContainerId)
+                        return false;
+
+                    string entityStr = targetEntity.GetDebugString(@this._entityNameType, "Entity", EntityDetail.Pointer);
+                    if (@this._healthCheck && targetEntity.IsDead)
                     {
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Entity[INVALID]. Combat have to be aborted"));
+                        // targetEntity мертво => прерываем бой
+                        ETLogger.WriteLine(LogType.Debug,
+                            string.Concat(currentMethodName, ": ", entityStr, " is dead. Combat have to be aborted"));
                         return true;
                     }
-                } 
+
+                    double dist = targetEntity.Location.Distance3DFromPlayer;
+                    if (dist >= @this._abortCombatDistance)
+                    {
+                        // расстояние до targetEntity больше дистанции прерывания боя => прерываем бой
+                        ETLogger.WriteLine(LogType.Debug,
+                            string.Concat(currentMethodName, ": Player outside ", nameof(@this.AbortCombatDistance),
+                                " (", dist.ToString("N2"), " to ", entityStr, "). Combat have to be aborted"));
+                        return true;
+                    }
+
+                    // targetEntity - живое и расстояние до него меньше дистанции прерывания боя => ghjljk;ftv ,jq
+                    ETLogger.WriteLine(LogType.Debug,
+                        string.Concat(currentMethodName, ": Player withing ", nameof(@this.AbortCombatDistance),
+                            " (", dist.ToString("N2"), " to ", entityStr, "). Continue..."));
+                    return false;
+                }
+
+                // targetEntity и closestEntity невалидны => прерываем бой
+                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Entity[INVALID]. Combat have to be aborted"));
+                return true;
             }
             else
             {
-                if (EntityManager.LocalPlayer.Character.AttribsBasic.HealthPercent > AstralAccessors.Quester.FSM.States.Combat.IgnoreCombatMinHP)
+                // проверка необходимости перерывания боя без вывода отладочной информации
+                if (!(EntityManager.LocalPlayer.Character.AttribsBasic.HealthPercent <
+                      AstralAccessors.Quester.FSM.States.Combat.IgnoreCombatMinHP)) return false;
+
+                if (EntityKey.Validate(closestEntity))
                 {
-                    var entity = closestEntity ?? target;
-                    bool anchorEntityValid = EntityKey.Validate(entity);
+                    if (closestEntity.ContainerId == combatTarget.ContainerId)
+                        return false;
 
-                    if (anchorEntityValid)
-                    {
-                        if (entity.ContainerId == combat_target.ContainerId)
-                            return false;
+                    if (@this._healthCheck && closestEntity.IsDead) return true;
 
-                        if (!@this._healthCheck || !entity.IsDead)
-                        {
-                            double dist = entity.Location.Distance3DFromPlayer;
-                            if (dist >= @this._abortCombatDistance)
-                                return true;
-                        }
-                        else return true;
-                    }
-                    else return true;
+                    if (closestEntity.Location.Distance3DFromPlayer <= @this._abortCombatDistance)
+                        return false;
                 }
+
+                if (EntityKey.Validate(targetEntity))
+                {
+                    if (targetEntity.ContainerId == combatTarget.ContainerId)
+                        return false;
+
+                    if (@this._healthCheck && targetEntity.IsDead) return true;
+
+                    if (targetEntity.Location.Distance3DFromPlayer >= @this._abortCombatDistance)
+                        return true;
+
+                    return false;
+                }
+                return true;
             }
-            return false;
         }
         private bool ShouldRemoveAbortCombatCondition()
         {
@@ -473,10 +529,10 @@ namespace EntityCore.Quester.Action
         {
             get
             {
-                if (EntityKey.Validate(target))
+                if (EntityKey.Validate(targetEntity))
                 {
-                    if (target.Location.Distance3DFromPlayer > @this._distance)
-                        return target.Location.Clone();
+                    if (targetEntity.Location.Distance3DFromPlayer > @this._distance)
+                        return targetEntity.Location.Clone();
                     return EntityManager.LocalPlayer.Location.Clone();
                 }
                 return Vector3.Empty;
@@ -485,7 +541,7 @@ namespace EntityCore.Quester.Action
 
         public void InternalReset()
         {
-            target = null;
+            targetEntity = null;
             closestEntity = null;
 
             AstralAccessors.Logic.NW.Combats.RemoveAbortCombatCondition();
@@ -508,16 +564,16 @@ namespace EntityCore.Quester.Action
         public void OnMapDraw(GraphicsNW graphics)
         {
             var entityKey = EntityKey;
-            if (entityKey.Validate(target))
+            if (entityKey.Validate(targetEntity))
             {
                 if (graphics is MapperGraphics mapGraphics)
                 {
-                    float x = target.Location.X,
-                        y = target.Location.Y,
+                    float x = targetEntity.Location.X,
+                        y = targetEntity.Location.Y,
                         diaD = @this._distance * 2,
                         diaACD = @this._abortCombatDistance * 2;
 
-                    mapGraphics.FillRhombCentered(Brushes.Yellow, target.Location, 16, 16);
+                    mapGraphics.FillRhombCentered(Brushes.Yellow, targetEntity.Location, 16, 16);
                     if (@this._distance > 11)
                     {
                         mapGraphics.DrawCircleCentered(Pens.Yellow, x, y, diaD, true);
@@ -525,14 +581,14 @@ namespace EntityCore.Quester.Action
                             mapGraphics.DrawCircleCentered(Pens.Yellow, x, y, diaACD, true);
                     }
                     
-                    if (entityKey.Validate(closestEntity) && target.ContainerId != closestEntity.ContainerId)
+                    if (entityKey.Validate(closestEntity) && targetEntity.ContainerId != closestEntity.ContainerId)
                     {
                         x = closestEntity.Location.X;
                         y = closestEntity.Location.Y;
 
                         mapGraphics.FillRhombCentered(Brushes.White, closestEntity.Location, 16, 16);
 
-                        if (@this._distance > 11)
+                        if (@this._distance > 5)
                         {
                             mapGraphics.DrawCircleCentered(Pens.White, x, y, diaD, true);
                             if (@this._abortCombatDistance > @this._distance)
@@ -542,8 +598,8 @@ namespace EntityCore.Quester.Action
                 }
                 else
                 {
-                    float x = target.Location.X,
-                                  y = target.Location.Y;
+                    float x = targetEntity.Location.X,
+                                  y = targetEntity.Location.Y;
                     List<Vector3> coords = new List<Vector3>() {
                         new Vector3(x, y - 5, 0),
                         new Vector3(x - 4.33f, y + 2.5f, 0),
@@ -553,17 +609,17 @@ namespace EntityCore.Quester.Action
 
                     int diaD = (int)(@this._distance * 2.0f * graphics.Zoom);
                     int diaACD = (int)(@this._abortCombatDistance * 2.0f * graphics.Zoom);
-                    if (@this._distance > 11)
+                    if (@this._distance > 5)
                     {
-                        graphics.drawEllipse(target.Location, new Size(diaD, diaD), Pens.Yellow);
+                        graphics.drawEllipse(targetEntity.Location, new Size(diaD, diaD), Pens.Yellow);
 
                         if (@this._abortCombatDistance > @this._distance)
                         {
-                            graphics.drawEllipse(target.Location, new Size(diaACD, diaACD), Pens.Orange);
+                            graphics.drawEllipse(targetEntity.Location, new Size(diaACD, diaACD), Pens.Orange);
                         }
                     }
 
-                    if (entityKey.Validate(closestEntity) && target.ContainerId != closestEntity.ContainerId)
+                    if (entityKey.Validate(closestEntity) && targetEntity.ContainerId != closestEntity.ContainerId)
                     {
                         x = closestEntity.Location.X;
                         y = closestEntity.Location.Y;
@@ -573,7 +629,7 @@ namespace EntityCore.Quester.Action
                         coords[2].X = x + 4.33f; coords[2].Y = y + 2.5f;
                         graphics.drawFillPolygon(coords, Brushes.LightYellow);
 
-                        if (@this._distance > 11)
+                        if (@this._distance > 5)
                         {
                             graphics.drawEllipse(closestEntity.Location, new Size(diaD, diaD), Pens.Yellow);
                             if (@this._abortCombatDistance > @this._distance)
@@ -616,31 +672,31 @@ namespace EntityCore.Quester.Action
             else sb.Append("Found Entities which matched to ID '" + nameof(@this.EntityID) + "': 0");
             sb.AppendLine();
 
-            target = SearchCached.FindClosestEntity(entityKey, entityCheck);
-            closestEntity = target;
+            targetEntity = SearchCached.FindClosestEntity(entityKey, entityCheck);
+            closestEntity = targetEntity;
 
-            if (entityKey.Validate(target))
+            if (entityKey.Validate(targetEntity))
             {
-                bool distOk = @this._reactionRange <= 0 || target.Location.Distance3DFromPlayer < @this._reactionRange;
-                bool zOk = @this._reactionZRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(target.Location) < @this._reactionZRange;
-                bool alive = !@this._healthCheck || !target.IsDead;
-                sb.Append("ClosestEntity: ").Append(target.ToString());
+                bool distOk = @this._reactionRange <= 0 || targetEntity.Location.Distance3DFromPlayer < @this._reactionRange;
+                bool zOk = @this._reactionZRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(targetEntity.Location) < @this._reactionZRange;
+                bool alive = !@this._healthCheck || !targetEntity.IsDead;
+                sb.Append("ClosestEntity: ").Append(targetEntity.ToString());
                 if (distOk && zOk && alive)
                     sb.AppendLine(" [MATCH]");
                 else sb.AppendLine(" [MISMATCH]");
-                sb.Append("\tName: ").AppendLine(target.Name);
-                sb.Append("\tInternalName: ").AppendLine(target.InternalName);
-                sb.Append("\tNameUntranslated: ").AppendLine(target.NameUntranslated);
-                sb.Append("\tIsDead: ").Append(target.IsDead.ToString());
+                sb.Append("\tName: ").AppendLine(targetEntity.Name);
+                sb.Append("\tInternalName: ").AppendLine(targetEntity.InternalName);
+                sb.Append("\tNameUntranslated: ").AppendLine(targetEntity.NameUntranslated);
+                sb.Append("\tIsDead: ").Append(targetEntity.IsDead.ToString());
                 if (alive)
                     sb.AppendLine(" [OK]");
-                else sb.AppendLine(" [FAIL]"); sb.Append("\tRegion: '").Append(target.RegionInternalName).AppendLine("'");
-                sb.Append("\tLocation: ").AppendLine(target.Location.ToString());
-                sb.Append("\tDistance: ").Append(target.Location.Distance3DFromPlayer.ToString());
+                else sb.AppendLine(" [FAIL]"); sb.Append("\tRegion: '").Append(targetEntity.RegionInternalName).AppendLine("'");
+                sb.Append("\tLocation: ").AppendLine(targetEntity.Location.ToString());
+                sb.Append("\tDistance: ").Append(targetEntity.Location.Distance3DFromPlayer.ToString());
                 if (distOk)
                     sb.AppendLine(" [OK]");
                 else sb.AppendLine(" [FAIL]");
-                sb.Append("\tZAxisDiff: ").Append(Astral.Logic.General.ZAxisDiffFromPlayer(target.Location).ToString());
+                sb.Append("\tZAxisDiff: ").Append(Astral.Logic.General.ZAxisDiffFromPlayer(targetEntity.Location).ToString());
                 if (zOk)
                     sb.AppendLine(" [OK]");
                 else sb.AppendLine(" [FAIL]");
@@ -661,7 +717,7 @@ namespace EntityCore.Quester.Action
             get
             {
                 if (_key is null)
-                    _key = new EntityCacheRecordKey(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete);
+                    _key = new EntityCacheRecordKey(@this._entityId, @this._entityIdType, @this._entityNameType);
                 return _key;
             }
         } 

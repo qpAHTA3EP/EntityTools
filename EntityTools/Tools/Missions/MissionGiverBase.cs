@@ -27,6 +27,8 @@ namespace EntityTools.Tools.Missions
             get => _id;
             set => _id = value;
         }
+
+        // ReSharper disable once InconsistentNaming
         protected string _id = string.Empty;
 
         public abstract Vector3 Position { get; set; }

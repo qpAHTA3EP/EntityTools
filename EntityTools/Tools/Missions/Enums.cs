@@ -1,5 +1,6 @@
 ﻿using System;
 
+// ReSharper disable once CheckNamespace
 namespace EntityTools.Enums
 { 
     [Serializable]
@@ -9,6 +10,7 @@ namespace EntityTools.Enums
         /// <summary>
         /// Персонаж
         /// </summary>
+        // ReSharper disable once InconsistentNaming
         NPC,
 #if false
         /// <summary>

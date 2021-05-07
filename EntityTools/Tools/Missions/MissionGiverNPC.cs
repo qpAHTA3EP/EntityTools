@@ -1,6 +1,5 @@
 ﻿using Astral.Quester.UIEditors;
 using EntityTools.Enums;
-using EntityTools.Tools.Missions;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
@@ -14,7 +13,7 @@ namespace EntityTools.Tools.Missions
         public override MissionGiverType GiverType => MissionGiverType.NPC;
 
         public override Vector3 Position { get => _position; set => _position = value; }
-        protected Vector3 _position = Vector3.Empty;
+        private Vector3 _position = Vector3.Empty;
 
         public override double Distance => _position.IsValid ? _position.Distance3DFromPlayer : 0;
 
@@ -24,7 +23,7 @@ namespace EntityTools.Tools.Missions
             set
             {
                 _id = value;
-                label = string.Empty;
+                _label = string.Empty;
             }
         }
 
@@ -35,10 +34,11 @@ namespace EntityTools.Tools.Missions
             set
             {
                 _mapName = value;
-                label = string.Empty;
+                _label = string.Empty;
             }
         }
-        protected string _mapName = string.Empty;
+
+        private string _mapName = string.Empty;
 
         [Editor(typeof(CurrentRegionEdit), typeof(UITypeEditor))]
         public string RegionName
@@ -47,10 +47,11 @@ namespace EntityTools.Tools.Missions
             set
             {
                 _regionName = value;
-                label = string.Empty;
+                _label = string.Empty;
             }
         }
-        protected string _regionName = string.Empty;
+
+        private string _regionName = string.Empty;
 
 #if DEVELOPER
         [Description("The allowed deviation of the NPC from the specified Position. The minimum value is 1.")]
@@ -63,11 +64,11 @@ namespace EntityTools.Tools.Missions
             set
             {
                 value = Math.Max(value, 1);
-                if (_giverTolerance == value) return;
-                    _giverTolerance = value;
+                _giverTolerance = value;
             }
         }
-        internal uint _giverTolerance = 1;
+
+        private uint _giverTolerance = 1;
 
         public override bool IsValid
         {
@@ -105,22 +106,25 @@ namespace EntityTools.Tools.Missions
             return entity.Location.Distance3D(_position) <= _giverTolerance;
         }
 
-        protected string label = string.Empty;
+        private string _label = string.Empty;
         public override string ToString()
         {
-            if (string.IsNullOrEmpty(_id))
-                label = "Not set";
-
-            if (_position.IsValid)
+            if (string.IsNullOrEmpty(_label))
             {
-                if (string.IsNullOrEmpty(_mapName))
-                    label = _id;
-                else if (string.IsNullOrEmpty(_regionName))
-                    label = string.Concat(_id, " (", _mapName, ")");
-                else label = string.Concat(_id, " (", _mapName, "/", _regionName, ")");
+                if (string.IsNullOrEmpty(_id))
+                    _label = "Not set";
+
+                if (_position.IsValid)
+                {
+                    if (string.IsNullOrEmpty(_mapName))
+                        _label = _id;
+                    else if (string.IsNullOrEmpty(_regionName))
+                        _label = string.Concat(_id, " (", _mapName, ")");
+                    else _label = string.Concat(_id, " (", _mapName, "/", _regionName, ")");
+                } 
             }
 
-            return label;
+            return _label;
         }
         
         #region IXmlSerializable

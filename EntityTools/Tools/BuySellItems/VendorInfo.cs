@@ -260,7 +260,6 @@ namespace EntityTools.Tools.BuySellItems
                         valid = !(string.IsNullOrEmpty(_costumeName)
                                     || string.IsNullOrEmpty(_mapName)
                                   //|| string.IsNullOrEmpty(_regionName) <- может быть пустым
-                                    || string.IsNullOrEmpty(_costumeName)
                                     || !_position.IsValid);
                         break;
                 }

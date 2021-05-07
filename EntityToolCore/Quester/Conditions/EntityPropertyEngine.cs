@@ -70,13 +70,9 @@ namespace EntityCore.Quester.Conditions
                 return true;
             if (condition is EntityProperty ettProp)
             {
-                if (InternalRebase(ettProp))
-                {
-                    ETLogger.WriteLine(LogType.Debug, $"{_idStr} reinitialized");
-                    return true;
-                }
-                ETLogger.WriteLine(LogType.Debug, $"{_idStr} rebase failed");
-                return false;
+                InternalRebase(ettProp);
+                ETLogger.WriteLine(LogType.Debug, $"{_idStr} reinitialized");
+                return true;
             }
 
             string debugStr = string.Concat("Rebase failed. ", condition.GetType().Name, '[', condition.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(EntityProperty) + '\'');

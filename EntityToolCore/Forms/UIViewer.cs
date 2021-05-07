@@ -227,9 +227,9 @@ namespace EntityCore.Forms
             stopwatch.Start();
 #endif
             // создание копии списка элементов UIGen
-            List<UIGen> uiGenList = MyNW.Internals.UIManager.AllUIGen.FindAll(ui => (!filterVisibleOnly.Checked || ui.IsValid && ui.IsVisible)
-                                                                              && (string.IsNullOrEmpty(filterName.Text) || ui.Name.IndexOf(filterName.Text, StringComparison.OrdinalIgnoreCase) >= 0)
-                                                                              && !string.IsNullOrEmpty(ui.Name));
+            List<UIGen> uiGenList = MyNW.Internals.UIManager.AllUIGen.FindAll(ui => ui.IsValid && (!filterVisibleOnly.Checked || ui.IsVisible)
+                                                                              && !string.IsNullOrEmpty(ui.Name)
+                                                                              && (string.IsNullOrEmpty(filterName.Text) || ui.Name.IndexOf(filterName.Text, StringComparison.OrdinalIgnoreCase) >= 0));
 
             //string misc = "<Miscelaneouse>";
             //TreeNode miscSubgroup = new TreeNode(misc);

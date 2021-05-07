@@ -51,6 +51,13 @@ namespace EntityTools
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public PatchesSettings Patches { get; set; } = new PatchesSettings();
 
+        /// <summary>
+        /// Настройки монитора <seealso cref="Forms.MissionMonitorForm"/>
+        /// </summary>
+        [Description("Настройки монитора миссий")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public MissionMonitorSettings MissionMonitor { get; set; } = new MissionMonitorSettings();
+
 #if false
         #region Сериализация/десериализация статических полей класса статического класса
         /// <summary>
@@ -62,7 +69,8 @@ namespace EntityTools
         {
             try
             {
-                FieldInfo[] fields = typeof(EntityToolsSettings).GetFields(BindingFlags.Static | BindingFlags.NonPublic);
+                FieldInfo[] fields =
+ typeof(EntityToolsSettings).GetFields(BindingFlags.Static | BindingFlags.NonPublic);
 
                 object[,] a = new object[fields.Length, 2];
                 int i = 0;
@@ -90,7 +98,8 @@ namespace EntityTools
         {
             try
             {
-                FieldInfo[] fields = typeof(EntityToolsSettings).GetFields(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+                FieldInfo[] fields =
+ typeof(EntityToolsSettings).GetFields(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
                 object[,] a;
                 Stream f = File.Open(filename, FileMode.Open);
                 SoapFormatter formatter = new SoapFormatter();
@@ -191,7 +200,6 @@ namespace EntityTools
         }
         #endregion
 
-        // 
         #region Запись/чтение элементов коллекции в XML (реализация IXmlSerializable)
         //public XmlSchema GetSchema()
         //{
@@ -265,7 +273,6 @@ namespace EntityTools
             writer.WriteElementString(nameof(ScopeQualifier), qualifier);
         }
         #endregion
-
 #endif
     }
 }

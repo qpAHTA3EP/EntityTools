@@ -1,13 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
 using EntityTools.Editors;
-using EntityTools.Enums;
-using EntityTools.Extensions;
 using MyNW.Classes;
 using AstralSign = Astral.Logic.UCC.Ressources.Enums.Sign;
 
@@ -177,7 +173,7 @@ namespace EntityTools.Tools
             {
                 if (string.IsNullOrEmpty(_auraId))
                     _label = "Empty";
-                _label = $"{_auraId} {_sign} {_stacks}"; 
+                else _label = $"{_auraId} {_sign} {_stacks}"; 
             }
             return _label;
         }

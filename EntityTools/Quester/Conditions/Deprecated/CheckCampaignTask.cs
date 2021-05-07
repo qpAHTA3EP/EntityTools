@@ -77,18 +77,10 @@ namespace EntityTools.Quester.Conditions
                                                             prSlot.ProjectDef.Name == Task.GroupProject);
                 if (groupProjectState != null && groupProjectState.IsValid)
                 {
-                    //DonationTaskSlot donationTaskSlot = groupProjectState.TaskSlots.Find(taskSlot => taskSlot.TaskDef.Name == Task.TaskName);
-                    //if (donationTaskSlot != null && donationTaskSlot.IsValid)
-                    //    return $"Task {{[{Task.GroupProject}] {Task.TaskName}}} state is '{donationTaskSlot.State}'";
-
-                    if (groupProjectState != null && groupProjectState.IsValid)
-                    {
-                        DonationTaskDefRefContainer taskDef = groupProjectState.CompletedTasks.Find(task => task.TaskDef.Name == Task.TaskName);
-                        if(taskDef != null && taskDef.IsValid)
-                            return $"Task [{Task.TaskName}] completed";
-                            //return $"Task {{[{Task.GroupProject}] {Task.TaskName}}} completed";
-                        return $"Task [{Task.TaskName}] NOT completed";
-                    }
+                    DonationTaskDefRefContainer taskDef = groupProjectState.CompletedTasks.Find(task => task.TaskDef.Name == Task.TaskName);
+                    if(taskDef != null && taskDef.IsValid)
+                        return $"Task [{Task.TaskName}] completed";
+                    return $"Task [{Task.TaskName}] NOT completed";
                 }
 
                 return $"Do not found task [{Task.TaskName}]";

@@ -148,14 +148,14 @@ namespace EntityTools
 
         public override void OnUnload()
         {
-            Patch_Astral_Quester_Forms_Mapper.CloseMapper();
+            ComplexPatch_Mapper.CloseMapper();
             SaveSettings();
         }
 
         /// <summary>
         /// Загрузка настроек из файла
         /// </summary>
-        private void LoadSettings()
+        public static void LoadSettings()
         {
             try
             {
@@ -167,12 +167,12 @@ namespace EntityTools
                         if (serialiser.Deserialize(fileStream) is EntityToolsSettings settings)
                         {
                             Config = settings;
-                            ETLogger.WriteLine($"{GetType().Name}: Load settings from {Path.GetFileName(FileTools.SettingsFile)}", true);
+                            ETLogger.WriteLine($"{nameof(EntityTools)}: Load settings from {Path.GetFileName(FileTools.SettingsFile)}", true);
                         }
                         else
                         {
                             Config = new EntityToolsSettings();
-                            ETLogger.WriteLine($"{GetType().Name}: Settings file not found. Use default", true);
+                            ETLogger.WriteLine($"{nameof(EntityTools)}: Settings file not found. Use default", true);
                         }
                     }
                 }
@@ -180,14 +180,14 @@ namespace EntityTools
             catch
             {
                 Config = new EntityToolsSettings();
-                ETLogger.WriteLine(LogType.Error, $"{GetType().Name}: Error load settings file {Path.GetFileName(FileTools.SettingsFile)}. Use default", true);
+                ETLogger.WriteLine(LogType.Error, $"{nameof(EntityTools)}: Error load settings file {Path.GetFileName(FileTools.SettingsFile)}. Use default", true);
             }
         }
 
         /// <summary>
         /// Сохранение свойств
         /// </summary>
-        public void SaveSettings(object sender = null, EventArgs e = null)
+        public static void SaveSettings()
         {
             try
             {
@@ -202,7 +202,7 @@ namespace EntityTools
             }
             catch (Exception exp)
             {
-                ETLogger.WriteLine(LogType.Error, $"{GetType().Name}: Error to save settings file {Path.GetFileName(FileTools.SettingsFile)}", true);
+                ETLogger.WriteLine(LogType.Error, $"{nameof(EntityTools)}: Error to save settings file {Path.GetFileName(FileTools.SettingsFile)}", true);
                 ETLogger.WriteLine(LogType.Error, exp.ToString(), true);
             }
         }
@@ -504,98 +504,95 @@ namespace EntityTools
                     AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
                     assemblyResolve_Deletage_Binded = true;
                 }
-                if (assemblyResolve_Deletage_Binded)
+                
+                // Попытка загрузки ядра производится только после привязки делегата CurrentDomain_AssemblyResolve
+                try
                 {
-
-
-                    // Попытка загрузки ядра производится только после привязки делегата CurrentDomain_AssemblyResolve
-                    try
+                    var executingAssembly = Assembly.GetExecutingAssembly();
+                    var ETfilename = executingAssembly.GetName().Name + ".dll";
+                    var wrongETLocation = Path.Combine(Astral.Controllers.Directories.AstralStartupPath, ETfilename);
+                    if (File.Exists(wrongETLocation))
                     {
-                        var executingAssembly = Assembly.GetExecutingAssembly();
-                        var ETfilename = executingAssembly.GetName().Name + ".dll";
-                        var wrongETLocation = Path.Combine(Astral.Controllers.Directories.AstralStartupPath, ETfilename);
-                        if (File.Exists(wrongETLocation))
-                        {
-                            var msg = string.Concat("The file ", ETfilename, " save location is incorrect.\n" +
-                                "You should replace it from the folder: ", Astral.Controllers.Directories.AstralStartupPath,
-                                "\nto the folder: ", Astral.Controllers.Directories.PluginsPath);
+                        var msg = string.Concat("The file ", ETfilename, " save location is incorrect.\n" +
+                            "You should replace it from the folder: ", Astral.Controllers.Directories.AstralStartupPath,
+                            "\nto the folder: ", Astral.Controllers.Directories.PluginsPath);
 
-                            ETLogger.WriteLine(LogType.Error, msg, true);
-                            return false;
-                        }
+                        ETLogger.WriteLine(LogType.Error, msg, true);
+                        return false;
+                    }
 
-                        using (FileStream file = FileStreamHelper.OpenWithStream(executingAssembly.Location, "Core", FileMode.Open, FileAccess.Read))
+                    using (FileStream file = FileStreamHelper.OpenWithStream(executingAssembly.Location, "Core", FileMode.Open, FileAccess.Read))
+                    {
+                        byte[] coreBytes = new byte[file.Length];
+                        if (file.Read(coreBytes, 0, (int)file.Length) > 0)
                         {
-                            byte[] coreBytes = new byte[file.Length];
-                            if (file.Read(coreBytes, 0, (int)file.Length) > 0)
-                            {
 #if ENCRYPTED_CORE
-                                byte[] key = SysInfo.SysInformer.GetMashineID(false).TextToBytes();
-                                if (CryptoHelper.DecryptFile_Rijndael(coreBytes, key, out byte[] decryptedCoreBytes))
-                                {
+                            byte[] key = SysInfo.SysInformer.GetMashineID(false).TextToBytes();
+                            if (CryptoHelper.DecryptFile_Rijndael(coreBytes, key, out byte[] decryptedCoreBytes))
+                            {
 #if DEBUG
-                                    File.WriteAllText("EntityCore_key", key.ToHexString());
-                                    File.WriteAllBytes("EntityCore_encrypt", coreBytes);
-                                    File.WriteAllBytes("EntityCore_decrypt", decryptedCoreBytes);
-                                    File.WriteAllText("EntityCore_decrypt.md5", CryptoHelper.MD5_HashString(decryptedCoreBytes));
+                                File.WriteAllText("EntityCore_key", key.ToHexString());
+                                File.WriteAllBytes("EntityCore_encrypt", coreBytes);
+                                File.WriteAllBytes("EntityCore_decrypt", decryptedCoreBytes);
+                                File.WriteAllText("EntityCore_decrypt.md5", CryptoHelper.MD5_HashString(decryptedCoreBytes));
 #endif
-                                    try
-                                    {
-                                        Assembly assembly = Assembly.Load(decryptedCoreBytes);
-                                        CoreHash = CryptoHelper.MD5_HashString(decryptedCoreBytes);
+                                try
+                                {
+                                    Assembly assembly = Assembly.Load(decryptedCoreBytes);
+                                    CoreHash = CryptoHelper.MD5_HashString(decryptedCoreBytes);
 #else
-                                    try
-                                    {
-                                        Assembly assembly = Assembly.Load(coreBytes);
-                                        CoreHash = CryptoHelper.MD5_HashString(coreBytes);
+                                try
+                                {
+                                    Assembly assembly = Assembly.Load(coreBytes);
+                                    CoreHash = CryptoHelper.MD5_HashString(coreBytes);
 #endif
-                                        Type coreType = typeof(IEntityToolsCore);
-                                        if (assembly != null)
-                                            foreach (Type type in assembly.GetTypes())
-                                            {
+                                    Type coreType = typeof(IEntityToolsCore);
+                                    if (assembly != null)
+                                        foreach (Type type in assembly.GetTypes())
+                                        {
 #if false
-                                                if (type.GetInterface(nameof(IEntityToolsCore)) != null) 
+                                            if (type.GetInterface(nameof(IEntityToolsCore)) != null) 
 #else
-                                                if (type.GetInterfaces().Contains(coreType))
+                                            if (type.GetInterfaces().Contains(coreType))
 #endif
+                                            {
+                                                if (Activator.CreateInstance(type) is IEntityToolsCore core)
                                                 {
-                                                    if (Activator.CreateInstance(type) is IEntityToolsCore core)
-                                                    {
-                                                        Core = core;
-                                                        return true;
-                                                    }
+                                                    Core = core;
+                                                    return true;
                                                 }
                                             }
-                                    }
-#if !ENCRYPTED_CORE
-                                    catch { }
-#else
-                                    catch (Exception e)
-                                    {
-                                        string msg = "Fail to load decrypted EntityToolCore\r\n" + e.Message;
-                                        ETLogger.WriteLine(LogType.Error, msg);
-                                        Astral.Logger.WriteLine(msg);
-                                    }
+                                        }
                                 }
-                                else
+#if !ENCRYPTED_CORE
+                                catch { }
+#else
+                                catch (Exception e)
                                 {
-                                    string msg = "Fail to decrypt EntityToolCore";
+                                    string msg = "Fail to load decrypted EntityToolCore\r\n" + e.Message;
                                     ETLogger.WriteLine(LogType.Error, msg);
                                     Astral.Logger.WriteLine(msg);
                                 }
-#endif
                             }
+                            else
+                            {
+                                string msg = "Fail to decrypt EntityToolCore";
+                                ETLogger.WriteLine(LogType.Error, msg);
+                                Astral.Logger.WriteLine(msg);
+                            }
+#endif
                         }
                     }
-                    catch (Exception e)
-                    {
-                        ETLogger.WriteLine(LogType.Debug, e.ToString(), true);
-                    }
-                    finally
-                    {
-                        InternalInitialize = DoNothing;
-                    }
                 }
+                catch (Exception e)
+                {
+                    ETLogger.WriteLine(LogType.Debug, e.ToString(), true);
+                }
+                finally
+                {
+                    InternalInitialize = DoNothing;
+                }
+                
                 return false;
             }
             private static bool DoNothing()

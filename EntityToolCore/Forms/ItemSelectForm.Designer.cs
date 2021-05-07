@@ -104,7 +104,7 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SelectForm";
-            this.Shown += new System.EventHandler(this.Form_Shown);
+            this.Shown += new System.EventHandler(this.btnReload_Click);
             this.ResumeLayout(false);
             this.PerformLayout();
 

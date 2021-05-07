@@ -55,7 +55,6 @@ namespace EntityTools.Core
             this.btnDefault = new System.Windows.Forms.Button();
             this.ckbMapperPatch = new System.Windows.Forms.CheckBox();
             this.tabSettings = new DevExpress.XtraTab.XtraTabPage();
-            this.pgConfigs = new System.Windows.Forms.PropertyGrid();
             this.tabRelogger = new DevExpress.XtraTab.XtraTabPage();
             this.lblMachinId = new System.Windows.Forms.Label();
             this.lblAccount = new System.Windows.Forms.Label();
@@ -78,6 +77,8 @@ namespace EntityTools.Core
             this.btnTest3 = new System.Windows.Forms.Button();
             this.dlgSaveFile = new System.Windows.Forms.SaveFileDialog();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.btnSave = new DevExpress.XtraEditors.SimpleButton();
+            this.pgConfigs = new System.Windows.Forms.PropertyGrid();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
             this.tbclMain.SuspendLayout();
             this.tabUtilities.SuspendLayout();
@@ -171,9 +172,9 @@ namespace EntityTools.Core
             | System.Windows.Forms.AnchorStyles.Right)));
             this.btnValidate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnValidate.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnValidate.Location = new System.Drawing.Point(125, 339);
+            this.btnValidate.Location = new System.Drawing.Point(127, 339);
             this.btnValidate.Name = "btnValidate";
-            this.btnValidate.Size = new System.Drawing.Size(111, 40);
+            this.btnValidate.Size = new System.Drawing.Size(113, 40);
             this.btnValidate.TabIndex = 0;
             this.btnValidate.Text = "Validate";
             this.btnValidate.UseVisualStyleBackColor = true;
@@ -184,9 +185,9 @@ namespace EntityTools.Core
             this.btnUiViewer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnUiViewer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUiViewer.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnUiViewer.Location = new System.Drawing.Point(244, 293);
+            this.btnUiViewer.Location = new System.Drawing.Point(245, 293);
             this.btnUiViewer.Name = "btnUiViewer";
-            this.btnUiViewer.Size = new System.Drawing.Size(115, 40);
+            this.btnUiViewer.Size = new System.Drawing.Size(113, 40);
             this.btnUiViewer.TabIndex = 0;
             this.btnUiViewer.Text = "UI Viewer";
             this.btnUiViewer.UseVisualStyleBackColor = true;
@@ -199,7 +200,7 @@ namespace EntityTools.Core
             this.btnAuraViewer.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.btnAuraViewer.Location = new System.Drawing.Point(9, 339);
             this.btnAuraViewer.Name = "btnAuraViewer";
-            this.btnAuraViewer.Size = new System.Drawing.Size(108, 40);
+            this.btnAuraViewer.Size = new System.Drawing.Size(113, 40);
             this.btnAuraViewer.TabIndex = 0;
             this.btnAuraViewer.Text = "Auras";
             this.btnAuraViewer.UseVisualStyleBackColor = true;
@@ -210,9 +211,9 @@ namespace EntityTools.Core
             this.btnMissionMonitor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnMissionMonitor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnMissionMonitor.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnMissionMonitor.Location = new System.Drawing.Point(244, 339);
+            this.btnMissionMonitor.Location = new System.Drawing.Point(245, 339);
             this.btnMissionMonitor.Name = "btnMissionMonitor";
-            this.btnMissionMonitor.Size = new System.Drawing.Size(115, 40);
+            this.btnMissionMonitor.Size = new System.Drawing.Size(113, 40);
             this.btnMissionMonitor.TabIndex = 0;
             this.btnMissionMonitor.Text = "Mission";
             this.btnMissionMonitor.UseVisualStyleBackColor = true;
@@ -225,7 +226,7 @@ namespace EntityTools.Core
             this.btnEntities.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.btnEntities.Location = new System.Drawing.Point(9, 293);
             this.btnEntities.Name = "btnEntities";
-            this.btnEntities.Size = new System.Drawing.Size(108, 40);
+            this.btnEntities.Size = new System.Drawing.Size(113, 40);
             this.btnEntities.TabIndex = 0;
             this.btnEntities.Text = "Entities";
             this.btnEntities.UseVisualStyleBackColor = true;
@@ -321,23 +322,12 @@ namespace EntityTools.Core
             // 
             // tabSettings
             // 
+            this.tabSettings.Controls.Add(this.btnSave);
             this.tabSettings.Controls.Add(this.pgConfigs);
             this.tabSettings.Name = "tabSettings";
             this.tabSettings.Padding = new System.Windows.Forms.Padding(6);
             this.tabSettings.Size = new System.Drawing.Size(368, 391);
             this.tabSettings.Text = "Settings";
-            // 
-            // pgConfigs
-            // 
-            this.pgConfigs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pgConfigs.HelpBackColor = System.Drawing.SystemColors.Window;
-            this.pgConfigs.Location = new System.Drawing.Point(9, 9);
-            this.pgConfigs.Name = "pgConfigs";
-            this.pgConfigs.Size = new System.Drawing.Size(346, 370);
-            this.pgConfigs.TabIndex = 6;
-            this.pgConfigs.ToolbarVisible = false;
             // 
             // tabRelogger
             // 
@@ -576,6 +566,28 @@ namespace EntityTools.Core
             this.dlgSaveFile.Filter = "XML|*.xml";
             this.dlgSaveFile.ValidateNames = false;
             // 
+            // btnSave
+            // 
+            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSave.Location = new System.Drawing.Point(284, 359);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(75, 23);
+            this.btnSave.TabIndex = 7;
+            this.btnSave.Text = "Save";
+            this.btnSave.Click += new System.EventHandler(this.handler_SaveSettings);
+            // 
+            // pgConfigs
+            // 
+            this.pgConfigs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pgConfigs.HelpBackColor = System.Drawing.SystemColors.Window;
+            this.pgConfigs.Location = new System.Drawing.Point(9, 9);
+            this.pgConfigs.Name = "pgConfigs";
+            this.pgConfigs.Size = new System.Drawing.Size(350, 344);
+            this.pgConfigs.TabIndex = 6;
+            this.pgConfigs.ToolbarVisible = false;
+            // 
             // EntityToolsMainPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -629,7 +641,6 @@ namespace EntityTools.Core
         private CheckBox ckbDebugMonitor;
         private Button btnTest1;
         private Button bntTest2;
-        private PropertyGrid pgConfigs;
         private XtraTabPage tabSettings;
         private CheckBox ckbETLogger;
         private TextBox tbText;
@@ -643,5 +654,7 @@ namespace EntityTools.Core
         private Button bntOpenLogFile;
         private GroupBox gbxETLog;
         private Button btnMissionMonitor;
+        private SimpleButton btnSave;
+        private PropertyGrid pgConfigs;
     }
 }

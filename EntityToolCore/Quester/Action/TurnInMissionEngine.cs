@@ -79,13 +79,9 @@ namespace EntityCore.Quester.Action
                 return true;
             if (action is TurnInMissionExt tim)
             {
-                if (InternalRebase(tim))
-                {
-                    ETLogger.WriteLine(LogType.Debug, $"{_idStr} reinitialized");
-                    return true;
-                }
-                ETLogger.WriteLine(LogType.Debug, $"{_idStr} rebase failed");
-                return false;
+                InternalRebase(tim);
+                ETLogger.WriteLine(LogType.Debug, $"{_idStr} reinitialized");
+                return true;
             }
 #if false
             else ETLogger.WriteLine(LogType.Debug, $"Rebase failed. '{action}' has type '{action.GetType().Name}' which not equals to '{nameof(TurnInMissionExt)}'");
@@ -268,7 +264,7 @@ namespace EntityCore.Quester.Action
 
                 if (giverContactInfo != null)
                 {
-                    Entity entity = giverContactInfo?.Entity;
+                    Entity entity = giverContactInfo.Entity;
                     if (debugInfoEnabled)
                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Entity [", entity.InternalName, ", ", entity.CostumeRef.CostumeName, "] match to MissionGiverInfo [", @this._giver, ']'));
 
@@ -473,7 +469,7 @@ namespace EntityCore.Quester.Action
                                 ? aDialogKey.LastIndexOf('_')
                                 : aDialogKey.Length - 1;
 
-                            if (startInd >= 0 && startInd + "CompleteMission.".Length < aDialogKey.Length)
+                            if (startInd + "CompleteMission.".Length < aDialogKey.Length)
                             {
                                 missionId = aDialogKey.Substring(startInd + "CompleteMission.".Length, lastInd - startInd - "CompleteMission.".Length);
 

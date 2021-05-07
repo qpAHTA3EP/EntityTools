@@ -66,13 +66,9 @@ namespace EntityCore.Quester.Conditions
                 return true;
             if (condition is CheckGameGUI ckUiGen)
             {
-                if (InternalRebase(ckUiGen))
-                {
-                    ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} reinitialized");
-                    return true;
-                }
-                ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} rebase failed");
-                return false;
+                InternalRebase(ckUiGen);
+                ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} reinitialized");
+                return true;
             }
 
             string debugStr = string.Concat("Rebase failed. ", condition.GetType().Name, '[', condition.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(CheckGameGUI) + '\'');

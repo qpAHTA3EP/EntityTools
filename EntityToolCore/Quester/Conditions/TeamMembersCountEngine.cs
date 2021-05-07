@@ -72,13 +72,9 @@ namespace EntityCore.Quester.Conditions
                 return true;
             if (condition is TeamMembersCount tmc)
             {
-                if (InternalRebase(tmc))
-                {
-                    ETLogger.WriteLine(LogType.Debug, $"{_idStr} reinitialized");
-                    return true;
-                }
-                ETLogger.WriteLine(LogType.Debug, $"{_idStr} rebase failed");
-                return false;
+                InternalRebase(tmc);
+                ETLogger.WriteLine(LogType.Debug, $"{_idStr} reinitialized");
+                return true;
             }
 
             string debugStr = string.Concat("Rebase failed. ", condition.GetType().Name, '[', condition.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(TeamMembersCount) + '\'');
@@ -127,8 +123,9 @@ namespace EntityCore.Quester.Conditions
         {
             get
             {
-                if (EntityManager.LocalPlayer.PlayerTeam?.IsInTeam == true
-                    && EntityManager.LocalPlayer.PlayerTeam?.Team?.MembersCount > 1)
+                var playerTeam = EntityManager.LocalPlayer.PlayerTeam;
+                if (playerTeam.IsInTeam
+                    && playerTeam.Team.MembersCount > 1)
                 {
                     int memsCount = 0;
                     StringBuilder strBldr = new StringBuilder();

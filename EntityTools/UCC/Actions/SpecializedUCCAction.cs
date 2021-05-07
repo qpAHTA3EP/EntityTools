@@ -294,6 +294,7 @@ namespace EntityTools.UCC.Actions
             bool result = ManagedAction?.Run() == true;
             if(result && !string.IsNullOrEmpty(TimerName) && Timeout > 0)
             {
+                //TODO Заменить Environment.TickCount на DateTime.Ticks 
                 // Запуск таймера
                 if (UCCTools.SpecialTimers.ContainsKey(TimerName))
                     UCCTools.SpecialTimers[TimerName] = new Pair<int, int>(Environment.TickCount, Environment.TickCount + Timeout);

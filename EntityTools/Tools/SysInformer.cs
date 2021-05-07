@@ -8,20 +8,22 @@ using EntityTools.Tools;
 using System.Management;
 using System.Text;
 
+// ReSharper disable once CheckNamespace
 namespace SysInfo
 {
     internal static class SysInformer
     {
-        public static readonly string publicKey = "fs5er4z6#'f1dsg3regjuty6k@(";
+        private static readonly string publicKey = "fs5er4z6#'f1dsg3regjuty6k@(";
 
-        internal static string GetMashineID(bool encrypt)
+        internal static string GetMachineId(bool encrypt)
         {
 
-            StringBuilder idBuilder = new StringBuilder();
-            ManagementClass mc = new ManagementClass("Win32_Processor");
-            foreach (ManagementObject processor in mc.GetInstances())
+            var idBuilder = new StringBuilder();
+            var mc = new ManagementClass("Win32_Processor");
+            foreach (var o in mc.GetInstances())
             {
-                string val = processor.GetPropertyValue("UniqueId")?.ToString();
+                var processor = (ManagementObject) o;
+                var val = processor.GetPropertyValue("UniqueId")?.ToString();
                 if (!string.IsNullOrEmpty(val))
                 {
                     if (idBuilder.Length > 0)
@@ -65,26 +67,29 @@ namespace SysInfo
             ProcessorId = processor.Properties["ProcessorId"].Value?.ToString();//*/
 
             mc = new ManagementClass("Win32_BaseBoard");
-            foreach (ManagementObject babeBoard in mc.GetInstances())
+            foreach (var o in mc.GetInstances())
             {
-                string val = babeBoard.GetPropertyValue("SerialNumber")?.ToString();
+                var babeBoard = (ManagementObject) o;
+                var val = babeBoard.GetPropertyValue("SerialNumber")?.ToString();
                 if (!string.IsNullOrEmpty(val))
                     idBuilder.Append('_').Append(val);
             }
 
             mc = new ManagementClass("Win32_BIOS");
-            foreach (ManagementObject bios in mc.GetInstances())
+            foreach (var o in mc.GetInstances())
             {
-                string val = bios.GetPropertyValue("Version")?.ToString();
+                var bios = (ManagementObject) o;
+                var val = bios.GetPropertyValue("Version")?.ToString();
                 if (!string.IsNullOrEmpty(val))
                     idBuilder.Append('_').Append(val);
             }
 
             mc = new ManagementClass("Win32_DiskDrive");
-            foreach (ManagementObject disk in mc.GetInstances())
+            foreach (var o in mc.GetInstances())
             {
-                string diskInfo = string.Empty;
-                string val = disk.GetPropertyValue("Model")?.ToString();
+                var disk = (ManagementObject) o;
+                var diskInfo = string.Empty;
+                var val = disk.GetPropertyValue("Model")?.ToString();
                 if (!string.IsNullOrEmpty(val))
                     diskInfo = '_' + val;
                 val = disk.GetPropertyValue("FirmwareRevision")?.ToString();
@@ -95,9 +100,10 @@ namespace SysInfo
             }
 
             mc = new ManagementClass("Win32_NetworkAdapterConfiguration");
-            foreach (ManagementObject networkAdaptr in mc.GetInstances())
+            foreach (var o in mc.GetInstances())
             {
-                string val = networkAdaptr.GetPropertyValue("MACAddress")?.ToString();
+                var networkAdapter = (ManagementObject) o;
+                var val = networkAdapter.GetPropertyValue("MACAddress")?.ToString();
                 if (!string.IsNullOrEmpty(val))
                     idBuilder.Append('_').Append(val);
             }
@@ -106,7 +112,7 @@ namespace SysInfo
             {
                 if (encrypt)
                 {
-                    if (CryptoHelper.Encrypt_Astral(idBuilder.ToString().TextToBytes(), publicKey, out byte[] bytes))
+                    if (CryptoHelper.Encrypt_Astral(idBuilder.ToString().TextToBytes(), publicKey, out var bytes))
                     {
                         return bytes.ToHexString();
                     }

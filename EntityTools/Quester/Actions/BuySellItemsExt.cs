@@ -427,13 +427,14 @@ namespace EntityTools.Quester.Actions
                                 dist = curDist;
                             }
                         }
-                        if (extendedDebugInfo)
+                        if (contactInfo != null && contactInfo.IsValid)
                         {
-                            if (contactInfo != null && contactInfo.IsValid)
+                            if (extendedDebugInfo)
                                 debug.Value.AddInfo(string.Concat(methodName, ": Vendor '", contactInfo.Entity.Name, '[', contactInfo.Entity.InternalName, "]' was successfully found at the Distance = ", dist));
-                            else debug.Value.AddInfo(string.Concat(methodName, ": Search failed"));
+                            return Traiding(contactInfo.Entity);
                         }
-                        return Traiding(contactInfo.Entity);
+                        else debug.Value.AddInfo(string.Concat(methodName, ": Search failed"));
+                        break;
                 }
             }
 
@@ -484,18 +485,14 @@ namespace EntityTools.Quester.Actions
                         screenType = contactDialog.ScreenType;
                         if (screenType == ScreenType.List || screenType == ScreenType.Buttons)
                         {   // Открыто диалоговое окно продавца
-                            if (@this._vendorMenus.Count > 0)
-                                Interact.DoDialog(_vendorMenus);
+                            Interact.DoDialog(_vendorMenus);
                         }
                         else if (Check_ReadyToTraid(screenType))
                         {   // Открыто витрина магазина (список товаров)
                             // необходимо переключиться на нужную вкладку
-                            if (@this._vendorMenus.Count > 0)
-                            {
-                                string key = @this._vendorMenus.Last();
-                                if (contactDialog.HasOptionByKey(key))
-                                    contactDialog.SelectOptionByKey(key);
-                            }
+                            string key = @this._vendorMenus.Last();
+                            if (contactDialog.HasOptionByKey(key))
+                                contactDialog.SelectOptionByKey(key);
                         }
                         if (@this._closeContactDialog)
                             contactDialog.Close();

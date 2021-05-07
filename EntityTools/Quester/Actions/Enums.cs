@@ -1,4 +1,4 @@
-﻿namespace EntityTools
+﻿namespace EntityTools.Enums
 {
     public enum ContactHaveMissionCheckType
     {

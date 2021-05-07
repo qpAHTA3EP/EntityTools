@@ -16,6 +16,9 @@ namespace EntityTools.Editors
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
+            if (context is null)
+                return value;
+
             var sb = new StringBuilder();
             if(context.Instance is AddIgnoredFoes addIgnFoes)
             {

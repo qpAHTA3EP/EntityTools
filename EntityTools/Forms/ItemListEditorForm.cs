@@ -19,10 +19,12 @@ namespace EntityTools.Forms
         {
             if (@this is null || @this.IsDisposed)
                 @this = new ItemListEditorForm<T>();
+            if (items is null)
+                items = new List<T>();
 
             @this.Text = caption;
             @this.itemList.Items.Clear();
-            if (items?.Count > 0)
+            if (items.Count > 0)
             {
                 foreach (var item in items)
                     @this.itemList.Items.Add(item);

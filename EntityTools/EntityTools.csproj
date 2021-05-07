@@ -145,69 +145,61 @@
   <ItemGroup>
     <Reference Include="AStar, Version=2.20.1028.1229, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\x64\AStar.dll</HintPath>
+      <HintPath>..\..\..\References\x64\AStar.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Astral_patched">
-      <HintPath>..\References\x64\Astral_patched.exe</HintPath>
+    <Reference Include="Astral_patched, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\References\x64\Astral_patched.exe</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Data.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Data.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Data.Desktop.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Data.Desktop.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Printing.v20.2.Core, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.SpellChecker.v20.2.Core, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
-    <Reference Include="DevExpress.Utils.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Utils.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraBars.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraBars.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraEditors.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraEditors.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraGrid.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraGrid.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraLayout.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
-    <Reference Include="DevExpress.XtraNavBar.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraNavBar.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraPrinting.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
-    <Reference Include="DevExpress.XtraScheduler.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
-    <Reference Include="DevExpress.XtraScheduler.v20.2.Core, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
-    <Reference Include="DevExpress.XtraScheduler.v20.2.Core.Desktop, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
-    <Reference Include="DevExpress.XtraScheduler.v20.2.Extensions, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.XtraSpellChecker.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
-    <Reference Include="DevExpress.XtraTreeList.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.XtraVerticalGrid.v20.2, Version=20.2.5.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraVerticalGrid.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
     <Reference Include="MyMemory-x64">
-      <HintPath>..\References\x64\MyMemory-x64.dll</HintPath>
+      <HintPath>..\..\..\References\x64\MyMemory-x64.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MyNW">
-      <HintPath>..\References\x64\MyNW.dll</HintPath>
+      <HintPath>..\..\..\References\x64\MyNW.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression">
       <HintPath>..\References\x64\System.IO.Compression.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Management" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -222,12 +214,6 @@
     </Compile>
     <Compile Include="Forms\ItemListEditorForm.Designer.cs">
       <DependentUpon>ItemListEditorForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\MissionMonitorForm2.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\MissionMonitorForm2.Designer.cs">
-      <DependentUpon>MissionMonitorForm2.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\MissionMonitorForm.cs">
       <SubType>Form</SubType>
@@ -264,7 +250,9 @@
     <Compile Include="Core\Proxies\QuesterConditionProxy.cs" />
     <Compile Include="Core\Proxies\UCCActionProxy.cs" />
     <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
-    <Compile Include="Patches\Quester\Actions\Patch_Quester_Classes_Actions_AddUCCAction.cs" />
+    <Compile Include="Patches\ComplexPatch_Navigation.cs" />
+    <Compile Include="Patches\Mapper\ComplexPatch_Mapper.cs" />
+    <Compile Include="Patches\Quester\ComplexPatch_Quester_UccEditing.cs" />
     <Compile Include="Quester\Actions\RemoveIgnoredFoes.cs" />
     <Compile Include="Quester\Actions\AddIgnoredFoes.cs" />
     <Compile Include="Quester\Actions\TurnInMissionExt.cs" />
@@ -274,9 +262,6 @@
     <Compile Include="Servises\SlideMonitor\Enums.cs" />
     <Compile Include="Servises\SlideMonitor\MountCostumeDef.cs" />
     <Compile Include="Servises\SlideMonitor\SlideMonitorSettings.cs" />
-    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_TotalDistance.cs" />
-    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_GetNearestNodeFromPosition.cs" />
-    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_FixPath.cs" />
     <Compile Include="Patches\Logic.General\Astral_Logic_General_GetNearestIndexInPositionList.cs" />
     <Compile Include="Patches\Mapper\MapperDrawingTools.cs" />
     <Compile Include="Patches\Mapper\MapperGraphics.cs" />
@@ -287,7 +272,6 @@
     <Compile Include="Forms\ObjectInfoForm.Designer.cs">
       <DependentUpon>ObjectInfoForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Patches\Mapper\Patch_Astral_Quester_Forms_Mapper.cs" />
     <Compile Include="Patches\Mapper\PointHelper.cs" />
     <Compile Include="Patches\Mapper\Tools\EditCustomRegionTool.cs" />
     <Compile Include="Patches\Mapper\Tools\AddCustomRegionTool.cs" />
@@ -300,17 +284,10 @@
     <Compile Include="Patches\Mapper\Tools\RelocateNodesTool.cs" />
     <Compile Include="Patches\Mapper\Tools\EditEdgeTool.cs" />
     <Compile Include="Patches\Mapper\Tools\RemoveNodesTool.cs" />
-    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_DrawHotSpots.cs" />
-    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_GetPath.cs" />
-    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_GenerateRoad.cs" />
     <Compile Include="Patches\Quester\Patch_Astral_Quester_Core_Save.cs" />
-    <Compile Include="Patches\Logic.Navmesh\Patch_Astral_Logic_Navmesh_DrawRoad.cs" />
-    <Compile Include="Patches\Patch_Astral_Logic_Classes_Map_Functions_Picture_DrawMeshes.cs" />
     <Compile Include="Patches\Patch_VIP_SealTraderEntity.cs" />
     <Compile Include="Patches\Patch_VIP_ProfessionVendorEntity.cs" />
     <Compile Include="Servises\SlideMonitor\HarmonyPatch_Astral_Logic_Classes_FSM_Navigation_ChangeWPDist.cs" />
-    <Compile Include="Patches\Quester\Controllers.Road\Patch_Quester_Controllers_Road_PathDistance.cs" />
-    <Compile Include="Patches\Quester\Controllers.Road\Patch_Quester_Controllers_Road_GenerateRoadFromPlayer.cs" />
     <Compile Include="Patches\UCC\Patch_ActionsPlayer_CheckAlly.cs" />
     <Compile Include="Patches\UCC\Patch_Logic_UCC_Forms_AddClass_Show.cs" />
     <Compile Include="Patches\PatchesSettings.cs" />
@@ -402,11 +379,14 @@
     <Compile Include="Tools\Missions\MissionGiverBase.cs" />
     <Compile Include="Tools\Missions\MissionGiverInfo.cs" />
     <Compile Include="Tools\Missions\MissionIdNode.cs" />
-    <Compile Include="Tools\Missions\Monitor\MissionDefMonitor2.cs" />
-    <Compile Include="Tools\Missions\Monitor\MissionDefMonitor.cs" />
-    <Compile Include="Tools\Missions\Monitor\MissionMonitor2.cs" />
-    <Compile Include="Tools\Missions\Monitor\MissionMonitor.cs" />
-    <Compile Include="Tools\Missions\Monitor\MissionMonitorTreeNode.cs" />
+    <Compile Include="Tools\Missions\Monitor\MainMissionTreeNode.cs" />
+    <Compile Include="Tools\Missions\Monitor\MissionDefTreeNode.cs" />
+    <Compile Include="Tools\Missions\Monitor\MissionDefTreeNodeSettings.cs" />
+    <Compile Include="Tools\Missions\Monitor\MissionLogRecord.cs" />
+    <Compile Include="Tools\Missions\Monitor\MissionMonitorHelper.cs" />
+    <Compile Include="Tools\Missions\Monitor\MissionMonitorSettings.cs" />
+    <Compile Include="Tools\Missions\Monitor\MissionTreeNode.cs" />
+    <Compile Include="Tools\Missions\Monitor\MissionTreeNodeSettings.cs" />
     <Compile Include="Tools\StringToPattern.cs" />
     <Compile Include="Tools\Export\EntityExportInfo.cs" />
     <Compile Include="Tools\Enums.cs" />
@@ -462,9 +442,6 @@
     <EmbeddedResource Include="Forms\ItemListEditorForm.resx">
       <DependentUpon>ItemListEditorForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\MissionMonitorForm2.resx">
-      <DependentUpon>MissionMonitorForm2.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\MissionMonitorForm.resx">
       <DependentUpon>MissionMonitorForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -482,6 +459,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\.editorconfig">
+      <Link>.editorconfig</Link>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -678,11 +658,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\next_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.IO.Compression.ZipFile">
-      <Version>4.3.0</Version>
-    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AMClient\AMClient.csproj">

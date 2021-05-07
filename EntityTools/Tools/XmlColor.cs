@@ -1,33 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace EntityTools.Tools
 {
     /// <summary>
-    /// Всмомогательный класс для сериализации <seealso cref="System.Drawings.Color"/>
+    /// Вспомогательный класс для сериализации <seealso cref="System.Drawing.Color"/>
     /// https://stackoverflow.com/questions/3280362/most-elegant-xml-serialization-of-color-structure
     /// </summary>
     public class XmlColor
     {
-        private Color color_ = Color.Black;
+        private Color _color = Color.Black;
 
         public XmlColor() { }
-        public XmlColor(Color c) { color_ = c; }
+        public XmlColor(Color c) { _color = c; }
 
 
         public Color ToColor()
         {
-            return color_;
+            return _color;
         }
 
         public void FromColor(Color c)
         {
-            color_ = c;
+            _color = c;
         }
 
         public static implicit operator Color(XmlColor x)
@@ -43,19 +39,19 @@ namespace EntityTools.Tools
         [XmlAttribute]
         public string Web
         {
-            get { return ColorTranslator.ToHtml(color_); }
+            get { return ColorTranslator.ToHtml(_color); }
             set
             {
                 try
                 {
                     if (Alpha == 0xFF) // preserve named color value if possible
-                        color_ = ColorTranslator.FromHtml(value);
+                        _color = ColorTranslator.FromHtml(value);
                     else
-                        color_ = Color.FromArgb(Alpha, ColorTranslator.FromHtml(value));
+                        _color = Color.FromArgb(Alpha, ColorTranslator.FromHtml(value));
                 }
                 catch (Exception)
                 {
-                    color_ = Color.Black;
+                    _color = Color.Black;
                 }
             }
         }
@@ -63,11 +59,11 @@ namespace EntityTools.Tools
         [XmlAttribute]
         public byte Alpha
         {
-            get { return color_.A; }
+            get { return _color.A; }
             set
             {
-                if (value != color_.A) // avoid hammering named color if no alpha change
-                    color_ = Color.FromArgb(value, color_);
+                if (value != _color.A) // avoid hammering named color if no alpha change
+                    _color = Color.FromArgb(value, _color);
             }
         }
 

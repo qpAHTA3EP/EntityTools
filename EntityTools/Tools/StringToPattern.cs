@@ -17,9 +17,9 @@ namespace EntityTools.Tools
         /// <returns></returns>
         public static Predicate<string> GetComparer(this string pattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple)
         {
-            Predicate<string> predicate = null;
+            Predicate<string> predicate;
 
-            string matchText = string.Empty;
+            string matchText;
 
             if (!string.IsNullOrEmpty(pattern))
             {

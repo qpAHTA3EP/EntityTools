@@ -71,7 +71,7 @@ namespace EntityCore.Forms
             return itemList.Items.Count;
         }
         /// <summary>
-        /// Добавление в списко и базового и производных типов
+        /// Добавление в список и базового и производных типов
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="itemList"></param>
@@ -80,8 +80,7 @@ namespace EntityCore.Forms
         {
             FillDerivedItems<T>(itemList);
             itemList.Items.Add(typeof(T));
-            if (itemList.Items.Count > 0)
-                itemList.DisplayMember = "Name";
+            itemList.DisplayMember = "Name";
             return itemList.Items.Count;
         }
 
@@ -164,11 +163,6 @@ namespace EntityCore.Forms
         }
 
         private void btnReload_Click(object sender, EventArgs e)
-        {
-            fillListAction?.Invoke();
-        }
-
-            private void Form_Shown(object sender, EventArgs e)
         {
             fillListAction?.Invoke();
         }

@@ -39,11 +39,11 @@ namespace Mount_Tutorial_Core
             {
                 if (obj is QuesterAction qAction)
                     return Initialize(qAction);
-                else if (obj is QuesterCondition qCondition)
+                if (obj is QuesterCondition qCondition)
                     return Initialize(qCondition);
                 if (obj is UCCAction uccAction)
                     return Initialize(uccAction);
-                else if (obj is UCCCondition uccCondition)
+                if (obj is UCCCondition uccCondition)
                     return Initialize(uccCondition);
             }
             catch { }

@@ -245,11 +245,13 @@ namespace EntityTools.Quester.Actions
 
 
 #if DEVELOPER
-        [Description("Distance to the Entity by which it is necessary to approach")]
+        [Description("Distance to the Entity by which it is necessary to approach.\n" +
+                     "Keep in mind that the distance below 5 is too small to display on the Mapper")]
         [Category("Interruptions")]
 #else
         [Browsable(false)]
 #endif
+
         public float Distance
         {
             get => _distance; set

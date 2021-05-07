@@ -68,6 +68,7 @@ namespace EntityTools.Tools
             if (mission != null && mission.IsValid)
             {
                 State = MissionState.TurnedIn;
+                SubMissions = new List<MissionInfo>();
                 if (mission.MissionDef != null && mission.MissionDef.IsValid)
                 {
                     Name = mission.MissionDef.Name;
@@ -76,6 +77,8 @@ namespace EntityTools.Tools
                     UIStringMsg = mission.MissionDef.UIStringMsg;
                     MissionType = mission.MissionDef.MissionType;
                     CanRepeat = mission.MissionDef.CanRepeat;
+                    foreach (MissionDef subMission in mission.MissionDef.SubMissions)
+                        SubMissions.Add(new MissionInfo(subMission));
                 }
                 else
                 {
@@ -87,15 +90,10 @@ namespace EntityTools.Tools
                     CanRepeat = false;
                 }
 
-                SubMissions = new List<MissionInfo>();
-                foreach (MissionDef subMission in mission.MissionDef.SubMissions)
-                {
-                    SubMissions.Add(new MissionInfo(subMission, MissionState.TurnedIn));
-                }
             }
         }
 
-        public MissionInfo(MissionDef mission, MissionState state = MissionState.Dropped)
+        public MissionInfo(MissionDef mission)
         {
             SubMissions = new List<MissionInfo>();
 
@@ -110,7 +108,7 @@ namespace EntityTools.Tools
                 
                 foreach (MissionDef subMission in mission.SubMissions)
                 {
-                    SubMissions.Add(new MissionInfo(subMission, MissionState.TurnedIn));
+                    SubMissions.Add(new MissionInfo(subMission));
                 }
             }
             else
@@ -163,13 +161,13 @@ namespace EntityTools.Tools
 
             if (player != null && player.IsValid)
             {
-                foreach (Mission mission in player.Player?.MissionInfo?.Missions)
+                foreach (Mission mission in player.Player.MissionInfo.Missions)
                     Missions.Add(new MissionInfo(mission));
 
-                foreach (CompletedMission mission in player.Player?.MissionInfo?.CompletedMissions)
+                foreach (CompletedMission mission in player.Player.MissionInfo.CompletedMissions)
                     CompletedMissions.Add(new MissionInfo(mission));
 
-                foreach (OpenMission mission in player?.MapState?.OpenMissions)
+                foreach (OpenMission mission in player.MapState.OpenMissions)
                     if(mission.Mission.IsValid)
                         OpenMissions.Add(new MissionInfo(mission.Mission));
             }

@@ -37,7 +37,7 @@ namespace EntityTools.Tools.Combats.IgnoredFoes
             var Quester_Core_Load_Postfix = typeof(IgnoredFoesCore).GetMethod(nameof(SetExtendedFoeBlackList));
 
             if (Quester_Core_Load != null && Quester_Core_Load_Postfix != null)
-                ETPatcher.Harmony.Patch(Quester_Core_Load, null, new HarmonyMethod(Quester_Core_Load_Postfix));
+                AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(Quester_Core_Load, null, new HarmonyMethod(Quester_Core_Load_Postfix));
         }
 
         /// <summary>

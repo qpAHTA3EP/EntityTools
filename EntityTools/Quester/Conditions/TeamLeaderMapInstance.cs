@@ -27,9 +27,10 @@ namespace EntityTools.Quester.Conditions
             get
             {
                 bool mapInstanceEquals = false;
-
-                if (EntityManager.LocalPlayer.PlayerTeam?.IsInTeam == true
-                    && EntityManager.LocalPlayer.PlayerTeam?.Team?.MembersCount > 1)
+                var playerTeam = EntityManager.LocalPlayer.PlayerTeam;
+                if (playerTeam != null 
+                    && playerTeam.IsInTeam
+                    && playerTeam.Team.MembersCount > 1)
                 {
                     if (EntityManager.LocalPlayer.PlayerTeam.IsLeader)
                         mapInstanceEquals = true;

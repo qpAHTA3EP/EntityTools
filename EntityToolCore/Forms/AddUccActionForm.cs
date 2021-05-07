@@ -46,11 +46,6 @@ namespace EntityCore.Forms
         {
             AddUccActionForm @this = new AddUccActionForm();
 
-#if disabled_20200527_1929
-            if (action != null)
-                @this.listOfActionTypes.SelectedItem = action.GetType();
-
-#endif
             if (@this.ShowDialog() == DialogResult.OK
                 && @this.listOfActionTypes.SelectedIndex >= 0)
             {
@@ -59,7 +54,7 @@ namespace EntityCore.Forms
                 {
                     action = newAction.Clone();
                     action.Target = newAction.Target;
-                    return action != null;
+                    return true;
                 }
             }
             action = null;

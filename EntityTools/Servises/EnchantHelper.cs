@@ -81,7 +81,7 @@ namespace EntityTools.Services
                 // Активация пункта контекстного меню "Извлечь целым" в окне "Наложение чар"
                 if (Enchantmenu_Itemremoveintact == null || !Enchantmenu_Itemremoveintact.IsValid)
                     Enchantmenu_Itemremoveintact = UIManager.GetUIGenByName("Enchantmenu_Itemremoveintact");
-                if (Enchantmenu_Itemremoveintact != null && Enchantmenu_Itemremoveintact.IsValid && Enchantmenu_Itemremoveintact.IsValid)
+                if (Enchantmenu_Itemremoveintact != null && Enchantmenu_Itemremoveintact.IsValid)
                 {
                     GameCommands.Execute("GenButtonClick Enchantmenu_Itemremoveintact");
                     Thread.Sleep(100);

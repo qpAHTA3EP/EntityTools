@@ -1,11 +1,6 @@
 ﻿using MyNW;
 using MyNW.Classes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static EntityTools.Servises.SlideMonitor.MountCostumeDef;
 
 namespace EntityTools.Servises.SlideMonitor
 {

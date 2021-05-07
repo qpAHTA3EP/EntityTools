@@ -35,7 +35,8 @@ namespace EntityTools.UCC.Conditions
         #region ICustomUCCCondition
         bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
         {
-            if(!string.IsNullOrEmpty(TimerName) && UCCTools.SpecialTimers.ContainsKey(TimerName))
+            //TODO Заменить Environment.TickCount на DateTime.Ticks 
+            if (!string.IsNullOrEmpty(TimerName) && UCCTools.SpecialTimers.ContainsKey(TimerName))
             {
                 switch (TestTimer)
                 {

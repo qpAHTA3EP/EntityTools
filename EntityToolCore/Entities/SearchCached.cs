@@ -868,7 +868,7 @@ namespace EntityCore.Entities
             try
             {
 #endif
-            if (key is null && !key.IsValid)
+            if (key is null || !key.IsValid)
                 return null;
 
             // конструируем функтор для дополнительных проверок Entity и поиска ближайшего

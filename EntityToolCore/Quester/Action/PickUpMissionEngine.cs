@@ -31,6 +31,11 @@ namespace EntityCore.Quester.Action
     //TODO: Добавить предобработку MissionId (деление на подзадачи по знаку '\')
     public class PickUpMissionEngine : IQuesterActionEngine
     {
+        /// <summary>
+        /// Константа длины строки "MissionOffer." 
+        /// </summary>
+        static readonly int MissionOffer_Length = "MissionOffer.".Length;
+
         private PickUpMissionExt @this;
 
         #region данные ядра
@@ -79,13 +84,9 @@ namespace EntityCore.Quester.Action
                 return true;
             if (action is PickUpMissionExt pum)
             {
-                if (InternalRebase(pum))
-                {
-                    ETLogger.WriteLine(LogType.Debug, $"{_idStr} reinitialized");
-                    return true;
-                }
-                ETLogger.WriteLine(LogType.Debug, $"{_idStr} rebase failed");
-                return false;
+                InternalRebase(pum);
+                ETLogger.WriteLine(LogType.Debug, $"{_idStr} reinitialized");
+                return true;
             }
 #if false
             else ETLogger.WriteLine(LogType.Debug, $"Rebase failed. '{action}' has type '{action.GetType().Name}' which not equals to '{nameof(PickUpMissionExt)}'");
@@ -267,7 +268,7 @@ namespace EntityCore.Quester.Action
 
                 if (giverContactInfo != null)
                 {
-                    Entity entity = giverContactInfo?.Entity;
+                    Entity entity = giverContactInfo.Entity;
                     if (debugInfoEnabled)
                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Entity [", entity.InternalName, ", ", entity.CostumeRef.CostumeName, "] match to MissionGiverInfo [", @this._giver, ']'));
 
@@ -384,7 +385,7 @@ namespace EntityCore.Quester.Action
                     break;
             }
 
-            Results:
+        Results:
             ActionResult result = (@this._skipOnFail && tries < 3)
                 ? ActionResult.Running
                 : ActionResult.Fail;
@@ -505,9 +506,9 @@ namespace EntityCore.Quester.Action
                                 ? aDialogKey.LastIndexOf('_')
                                 : aDialogKey.Length - 1;
 
-                            if (startInd >= 0 && startInd + "MissionOffer.".Length < aDialogKey.Length)
+                            if (startInd + MissionOffer_Length < aDialogKey.Length)
                             {
-                                mission_id = aDialogKey.Substring(startInd + "MissionOffer.".Length, lastInd - startInd - "MissionOffer.".Length);
+                                mission_id = aDialogKey.Substring(startInd + MissionOffer_Length, lastInd - startInd - MissionOffer_Length);
 
                                 if (!string.IsNullOrEmpty(mission_id))
                                 {

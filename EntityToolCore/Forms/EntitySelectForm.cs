@@ -61,20 +61,18 @@ namespace EntityCore.Forms
             @this.FillEntitiesDgv(EntityComparer.Get(entPattern, strMatchType, nameType)); 
 #endif
 
-            if (@this.ShowDialog() == DialogResult.OK
-                && (!@this.dgvEntities.CurrentRow.IsNewRow
-                && @this.dgvEntities.CurrentRow != null 
-                || !string.IsNullOrEmpty(@this.tbPattern.Text)))
+            if (@this.ShowDialog() == DialogResult.OK)
             {
                 if (string.IsNullOrEmpty(@this.tbPattern.Text))
                 {
+                    var currentRow = @this.dgvEntities.CurrentRow;
                     switch (@this.cbNameType.SelectedItem)
                     {
                         case EntityNameType.InternalName:
-                            entPattern = @this.dgvEntities.CurrentRow.Cells[@this.clmnInternalNameInd].Value.ToString();
+                            entPattern = currentRow.Cells[@this.clmnInternalNameInd].Value.ToString();
                             break;
                         case EntityNameType.NameUntranslated:
-                            entPattern = @this.dgvEntities.CurrentRow.Cells[@this.clmnNameUntranslatedInd].Value.ToString();
+                            entPattern = currentRow.Cells[@this.clmnNameUntranslatedInd].Value.ToString();
                             break;
                         case EntityNameType.Empty:
                             entPattern = string.Empty;
@@ -86,7 +84,7 @@ namespace EntityCore.Forms
                 strMatchType = (ItemFilterStringType)@this.cbStrMatch.SelectedItem;
                 nameType = (EntityNameType)@this.cbNameType.SelectedItem;
 
-                return @this.dgvEntities.CurrentRow.Tag as Entity;
+                return @this.dgvEntities.CurrentRow.Tag as Entity; 
             }
             return null;
         }

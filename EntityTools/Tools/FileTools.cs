@@ -17,15 +17,15 @@ namespace EntityTools.Tools
         public static readonly string MaskAD = "%AD%";
         public static readonly string MaskRAD = "%rAD%";
 
-        public static readonly string defaultExportFolderStates = Path.Combine(Directories.LogsPath, "States");
-        public static readonly string defaultExportFolderInterfaces = Path.Combine(Directories.LogsPath, "Interfaces");
-        public static readonly string defaultExportFolderAuras = Path.Combine(Directories.LogsPath, "Auras");
-        public static readonly string defaultExportFolderMissions = Path.Combine(Directories.LogsPath, "Missions");
-        public static readonly string defaultFileStates = "States.txt";
-        public static readonly string defaultFileInterfaces = "Interfaces.xml";
-        public static readonly string defaultFileAuras = "Auras.xml";
-        public static readonly string defaultFileMissions = "Missions.xml";
-        public static readonly string defaultExportFileName = "%character%_%account%_%dateTime%.xml";
+        public static readonly string DefaultExportFolderStates = Path.Combine(Directories.LogsPath, "States");
+        public static readonly string DefaultExportFolderInterfaces = Path.Combine(Directories.LogsPath, "Interfaces");
+        public static readonly string DefaultExportFolderAuras = Path.Combine(Directories.LogsPath, "Auras");
+        public static readonly string DefaultExportFolderMissions = Path.Combine(Directories.LogsPath, "Missions");
+        public static readonly string DefaultFileStates = "States.txt";
+        public static readonly string DefaultFileInterfaces = "Interfaces.xml";
+        public static readonly string DefaultFileAuras = "Auras.xml";
+        public static readonly string DefaultFileMissions = "Missions.xml";
+        public static readonly string DefaultExportFileName = "%character%_%account%_%dateTime%.xml";
 
         public static readonly string SettingsFile = Path.Combine(Directories.SettingsPath, nameof(EntityTools), nameof(EntityTools) + ".xml");
 

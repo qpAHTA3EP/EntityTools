@@ -4,7 +4,7 @@ using MyNW.Internals;
 
 namespace EntityTools.Tools
 {
-    public class ParagonTools
+    public static class ParagonTools
     {
         public static readonly string idWizard = "Player_Controller";
         public static readonly string idWizard_Arcanist = "Player_Secondary_Spellstormmage";

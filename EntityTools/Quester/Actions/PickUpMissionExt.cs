@@ -12,6 +12,7 @@ using System.Drawing.Design;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Xml.Serialization;
+using EntityTools.Enums;
 using Action = Astral.Quester.Classes.Action;
 
 [assembly: InternalsVisibleTo("EntityCore")]

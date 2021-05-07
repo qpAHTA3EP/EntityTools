@@ -1,34 +1,31 @@
 ﻿//#define Test_EntitySelectForm
 //#define DUMP_TEST
 
+using AcTp0Tools;
 using Astral;
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;
 using Astral.Forms;
 using Astral.Logic.Classes.FSM;
-using Astral.Quester.Forms;
 using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Controls;
 using EntityTools.Enums;
+using EntityTools.Forms;
 using EntityTools.Patches.UCC;
 using EntityTools.Services;
 using EntityTools.Tools;
-using MyNW;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using API = Astral.Quester.API;
+using Memory = MyNW.Memory;
 using Task = System.Threading.Tasks.Task;
-using System.Threading;
-using AcTp0Tools.Reflection;
-using AcTp0Tools;
-using System.Collections.Generic;
-using EntityTools.Forms;
 
 namespace EntityTools.Core
 {
@@ -147,33 +144,34 @@ namespace EntityTools.Core
 
         private void handler_Test_1(object sender, EventArgs e)
         {
-#if MissionGiver
-            var giver = new MissionGiverNPC { Id = "Test1", Position = new Vector3(1, 1, 1), MapName = "AAAA" };
-            var giverContainer = new TestGiver { Giver = giver };
-            XmlSerializer serialiser = new XmlSerializer(giverContainer.GetType());//, new[]{ typeof(MissionGiverNPC), typeof(MissionGiverRemote) });
-            using (TextWriter FileStream = new StreamWriter("TestGiver1.xml", false))
-            {
-                serialiser.Serialize(FileStream, giverContainer);
-            }
-            giverContainer.Giver = new MissionGiverRemote { Id = "Test2" };
-            using (TextWriter FileStream = new StreamWriter("TestGiver2.xml", false))
-            {
-                serialiser.Serialize(FileStream, giverContainer);
-            }
-            TestGiver2 giverContainer2 = new TestGiver2 { Giver = new NPCInfos { CostumeName = "Test3", Position = new Vector3(2, 2, 2), MapName = "BBBB" } };
-            serialiser = new XmlSerializer(giverContainer2.GetType());
-            using (TextWriter FileStream = new StreamWriter("TestGiver3.xml", false))
-            {
-                serialiser.Serialize(FileStream, giverContainer2);
-            } 
-#endif
 #if false
-            var pos = new Vector3(833, 517, 32);
+            var tester = new SimplePropertyAccessTester();
+            var result = tester.Test();
 
-            bool result = await NavigationHelper.ApproachAsync(pos); 
+            XtraMessageBox.Show(result);  
+#endif
+            var sw = new Stopwatch();
+            sw.Start();
+            for (int i = 0; i < 1_000_000; i++)
+            {
+                var g = AstralAccessors.Quester.Core.Meshes;
+            }
+            sw.Stop();
+
+#if false
+            XtraMessageBox.Show(
+                    $"1'000'000 reads of the property 'Astral.Quester.Core.Meshes'\n" +
+                        $"at the map '{EntityManager.LocalPlayer.MapAndRegion}'\n" +
+                        $"using StaticPropertyAccessor<Graph>:\n" +
+                        $"{sw.ElapsedMilliseconds,8} ms {sw.ElapsedTicks,10} ticks"); 
+#else
+            XtraMessageBox.Show(
+                $"1'000'000 reads of the property 'Astral.Quester.Core.Meshes'\n" +
+                $"at the map '{EntityManager.LocalPlayer.MapAndRegion}'\n" +
+                $"using Harmony patches:\n" +
+                $"{sw.ElapsedMilliseconds,8} ms {sw.ElapsedTicks,10} ticks");
 #endif
         }
-
 
         private void handler_Test_2(object sender, EventArgs e)
         {
@@ -188,38 +186,10 @@ namespace EntityTools.Core
         private void handler_Test_3(object sender, EventArgs e)
         {
 #if false
-            if (string.IsNullOrEmpty(tbText.Text))
-                return;
-
-            if (!int.TryParse(tbText.Text, out int iPtr))
-                return;
-
-            IntPtr ptr = new IntPtr(iPtr);
-
-            StringBuilder sb = new StringBuilder($"Read pointer {iPtr}");
-            sb.AppendLine();
-            for (int i = 0; i < 100; i++)
-            {
-                try
-                {
-                    IntPtr ptr_i = Memory.MMemory.Read<IntPtr>(ptr + i);
-                    string str = Memory.MMemory.ReadString(ptr_i);
-                    sb.Append(i).Append(":\t[").Append(ptr_i).Append("] ").AppendLine(str);
-                    for (int j = 0; j < 100; j++)
-                    {
-                        IntPtr ptr_j = Memory.MMemory.Read<IntPtr>(ptr_i + j);
-                        string str_j = Memory.MMemory.ReadString(ptr_j);
-                        sb.Append(i).Append('+').Append(j).Append(":\t[").Append(ptr_j).Append("] ").AppendLine(str_j);
-                    }
-                }
-                catch
-                {
-                    sb.Append(i).AppendLine(": ERROR");
-                }
-            }
-            ETLogger.WriteLine(LogType.Debug, sb.ToString(), true); 
+            var tester = new StaticMethodPatchTester();
+            var result = tester.Test();
+            XtraMessageBox.Show(result); 
 #endif
-
         }
 
         private void handler_SpellStuckMonitorActivation(object sender, EventArgs e)
@@ -259,8 +229,13 @@ namespace EntityTools.Core
         private void handler_OpenMissionMonitor(object sender, EventArgs e)
         {
 #if DEVELOPER
+#if false
             var missMonitor = new MissionMonitorForm2();
-            missMonitor.Show(); 
+            missMonitor.Show();  
+#else
+            var missMonitor = new MissionMonitorForm();
+            missMonitor.Show();
+#endif
 #endif
         }
 
@@ -277,7 +252,7 @@ namespace EntityTools.Core
         private void handler_GetMachineId(object sender, EventArgs e)
         {
             var machineid = Memory.MMemory.ReadString(Memory.BaseAdress + 0x2640BD0, Encoding.UTF8, 64);
-            lblAccount.Text = $"Account:   @{EntityManager.LocalPlayer.AccountLoginUsername}";
+            lblAccount.Text = $@"Account:   @{EntityManager.LocalPlayer.AccountLoginUsername}";
             tbMashingId.Text = machineid;
         }
 
@@ -288,8 +263,8 @@ namespace EntityTools.Core
                 string fileName;
                 if (string.IsNullOrEmpty(tbExportFileSelector.Text))
                 {
-                    fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.defaultExportFileName);
-                    fileName.Replace(Directories.AstralStartupPath, @".\");
+                    fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.DefaultExportFileName);
+                    fileName = fileName.Replace(Directories.AstralStartupPath, @".\");
                 }
                 else fileName = tbExportFileSelector.Text;
 
@@ -309,8 +284,8 @@ namespace EntityTools.Core
             if (cbxExportSelector.SelectedItem is ExportTypes expType)
             {
                 string fileName;
-                fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.defaultExportFileName);
-                fileName.Replace(Directories.AstralStartupPath, @".\");
+                fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.DefaultExportFileName);
+                fileName = fileName.Replace(Directories.AstralStartupPath, @".\");
                 tbExportFileSelector.Text = fileName;
             }
         }
@@ -320,8 +295,8 @@ namespace EntityTools.Core
             if (cbxExportSelector.SelectedItem is ExportTypes expType)
             {
 
-                string fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.defaultExportFileName);
-                fileName.Replace(Directories.AstralStartupPath, @".\");
+                string fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.DefaultExportFileName);
+                fileName = fileName.Replace(Directories.AstralStartupPath, @".\");
                 tbExportFileSelector.Text = fileName;
             }
         }
@@ -334,7 +309,7 @@ namespace EntityTools.Core
 
                 if (string.IsNullOrEmpty(fullFileName) || fullFileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
                 {
-                    fullFileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.ReplaceMask(FileTools.defaultExportFileName));
+                    fullFileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.ReplaceMask(FileTools.DefaultExportFileName));
                     MessageBox.Show("The specified filename is incorrect.\n" +
                                     $"{expType} will be saved in the file:\n" +
                                     fullFileName, "Caution!", MessageBoxButtons.OK);
@@ -395,22 +370,11 @@ namespace EntityTools.Core
             }
         }
 
-        private void handler_ShowMapper(object sender, EventArgs e)
-        {
-            MapperForm.Open();
-        }
-
         private void handler_EnableLogger(object sender, EventArgs e)
         {
             if (ckbETLogger.Checked)
                 ETLogger.Start();
             else ETLogger.Stop();
-        }
-
-        private void handler_OpenEntityViewer(object sender, EventArgs e)
-        {
-            if(File.Exists(ETLogger.LogFilePath))
-                Process.Start(ETLogger.LogFilePath);
         }
 
         private void handler_OpenLogFile(object sender, EventArgs e)
@@ -460,16 +424,6 @@ namespace EntityTools.Core
                     '\t', nameof(entity.Character.AttribsBasic.HealthPercent), '=', entity.Character.AttribsBasic.HealthPercent);
             }
             tbDebugMonitorInfo.Text = info;
-        }
-
-        private void handler_MapperTest(object sender, EventArgs e)
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (AOECheck.AOE aoe in AstralAccessors.Controllers.AOECheck.GetAOEList())
-            {
-                sb.AppendLine($"{aoe.Location}\t\t{aoe.ID}");
-            }
-            XtraMessageBox.Show(sb.ToString());
         }
 
         private void handler_Up(object sender, EventArgs e)
@@ -538,6 +492,11 @@ namespace EntityTools.Core
 
         private void handler_Interact(object sender, EventArgs e)
         {
+        }
+
+        private void handler_SaveSettings(object sender, EventArgs e)
+        {
+            EntityTools.SaveSettings();
         }
     }
 }
