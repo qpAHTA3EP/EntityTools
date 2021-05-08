@@ -377,7 +377,7 @@ namespace EntityCore.Quester.Action
                 // Бой не должен прерываться, если  HP < IgnoreCombatMinHP
                 var healthPercent = EntityManager.LocalPlayer.Character.AttribsBasic.HealthPercent;
                 var ignoreCombatMinHP = AstralAccessors.Quester.FSM.States.Combat.IgnoreCombatMinHP;
-                if (!(healthPercent < ignoreCombatMinHP))
+                if (healthPercent < ignoreCombatMinHP)
                 {
                     ETLogger.WriteLine(LogType.Debug,
                         string.Concat(currentMethodName, ": Player health (", healthPercent, "%) below IgnoreCombatMinHP (", ignoreCombatMinHP, "%). Continue...")); 
@@ -458,8 +458,8 @@ namespace EntityCore.Quester.Action
             else
             {
                 // проверка необходимости перерывания боя без вывода отладочной информации
-                if (!(EntityManager.LocalPlayer.Character.AttribsBasic.HealthPercent <
-                      AstralAccessors.Quester.FSM.States.Combat.IgnoreCombatMinHP)) return false;
+                if (EntityManager.LocalPlayer.Character.AttribsBasic.HealthPercent <
+                      AstralAccessors.Quester.FSM.States.Combat.IgnoreCombatMinHP) return false;
 
                 if (EntityKey.Validate(closestEntity))
                 {
