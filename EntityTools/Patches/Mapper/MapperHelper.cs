@@ -33,7 +33,7 @@ namespace EntityTools.Patches.Mapper
         {
             if (image == null)
             {
-                throw new ArgumentNullException("image");
+                throw new ArgumentNullException(nameof(image));
             }
             float w = image.Width;
             float h = image.Height;
@@ -109,7 +109,7 @@ namespace EntityTools.Patches.Mapper
         }
 
         /// <summary>
-        /// Из двух числе <paramref name="num1"/> и <paramref name="num2"/> определяе минимальное <paramref name="min"/> и максимальное <paramref name="max"/>
+        /// Из двух числе <paramref name="num1"/> и <paramref name="num2"/> определяем минимальное <paramref name="min"/> и максимальное <paramref name="max"/>
         /// </summary>
         public static void FixRange(double num1, double num2, out double min, out double max)
         {
@@ -126,7 +126,7 @@ namespace EntityTools.Patches.Mapper
         }
 
         /// <summary>
-        /// Вычисление мещения текстовой метки относительно пары точек с координатами <paramref name="x1"/>, <paramref name="y1"/> и <paramref name="x2"/>, <paramref name="y2"/>
+        /// Вычисление смещения текстовой метки относительно пары точек с координатами <paramref name="x1"/>, <paramref name="y1"/> и <paramref name="x2"/>, <paramref name="y2"/>
         /// </summary>
         public static void GetLabelAlignment(double x1, double y1, double x2, double y2, out Alignment alignment1, out Alignment alignment2)
         {

@@ -64,9 +64,9 @@ namespace EntityTools.Patches.Mapper.Tools
             NodeDetail leftND = null; // слева    
             NodeDetail rightND = null; // справа
             NodeDetail backND = null; 
-            // Косое произведение веторов A и B
+            // Косое произведение векторов A и B
             // D = Ax * By - Bx * Ay
-            // Если D == 0 - вектора коллиниарны
+            // Если D == 0 - вектора коллинеарны
             // Если D > 0 - точка B в верхней полуплоскости
             // Если D < 0 - точка B в нижней полуплоскости
 
