@@ -1,15 +1,13 @@
 ﻿using AcTp0Tools;
 using AStar;
 using Astral.Logic.Classes.FSM;
-using Astral.Logic.Classes.Map;
 using Astral.Logic.NW;
-using EntityTools.Patches.Mapper;
+using EntityTools.Tools.Navigation;
 using HarmonyLib;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Reflection;
 
 // ReSharper disable InconsistentNaming
@@ -396,85 +394,108 @@ private static List<Vector3> Astral.Logic.Navmesh.getPath(Graph graph, Vector3 S
                 || (endX == 0 && endY == 0 && endZ == 0))
                 return false;
 
-            if (waypoints is null)
-                waypoints = new List<Vector3>();
+            // для краткости 'start' будем называть точку с координатами (startX, startY, startZ), не принадлежащую графу
+            //               'end' - точку с координатами (endX, endY, endZ), не принадлежащую графу
 
             // Поиск вершин графа, наиболее близких к координатам (startX, startY, startZ) и (endX, endY, endZ)
             graph.ClosestNodes(startX, startY, startZ, out double distanceStart2StartNode, out Node startNode,
                 endX, endY, endZ, out double distanceEnd2EndNode, out Node endNode);
 
-            double dx = startX - endX,
-                   dy = startY - endY,
-                   dz = startZ - endZ;
+            if (startNode is null || endNode is null)
+                return false;
 
-            var distanceStart2End = Math.Sqrt(dx * dx + dy * dy + dz * dz);
-
+            double /*x0, y0, z0, x1, y1, z1,*/ distance0, distance1, cos;
 
             if (ReferenceEquals(startNode, endNode))
             {
-                // startNode и endNode совпадают, то есть
-                // вблизи точек с координатами (startX, startY, startZ) и (endX, endY, endZ) находится одна точка
+                // startNode и endNode совпадают, 
+                // то есть вблизи точек start и end находится только одна точка
+                var pos0 = endNode.Position;
 
-                // Проверяем возможность продвинуться напрямую от (startX, startY, startZ) к (endX, endY, endZ)
-                double  x0 = startX - endNode.X,
-                        y0 = startY - endNode.Y,
-                        z0 = startZ - endNode.Z,
-                        x1 = endX - endNode.X,
-                        y1 = endY - endNode.Y,
-                        z1 = endZ - endNode.Z,
-                        d0 = x0 * x0 + y0 * y0 + z0 * z0,
-                        d1 = x1 * x1 + y1 * y1 + z1 * z1;
+                // Проверяем возможность продвинуться напрямую от start к end
+                // pos0 - вершина угла, величину которого оцениваем
+#if false
+                x0 = startX - pos0.X;
+                y0 = startY - pos0.Y;
+                z0 = startZ - pos0.Z;
+                x1 = endX - pos0.X;
+                y1 = endY - pos0.Y;
+                z1 = endZ - pos0.Z;
+#if false
+                d0 = x0 * x0 + y0 * y0 + z0 * z0; // равно distanceStart2StartNode^2
+                d1 = x1 * x1 + y1 * y1 + z1 * z1; // равно distanceEnd2EndNode^2
 
-                double cos = (x0 * x1 + y0 * y1 + z0 * z1) / Math.Sqrt(d0 * d1);
+                cos = (x0 * x1 + y0 * y1 + z0 * z1) / Math.Sqrt(d0 * d1); 
+#else
+                cos = (x0 * x1 + y0 * y1 + z0 * z1) / distanceStart2StartNode * distanceEnd2EndNode;
+#endif 
+#else
+                cos = NavigationHelper.Cosine(pos0.X, pos0.Y, pos0.Z, startX, startY, startZ, endX, endY, endZ, out distance0, out distance1);
+#endif
+
+                if (waypoints is null)
+                    waypoints = new List<Vector3>(2);
 
                 if (cos < 0 
                     && distanceStart2StartNode > 5
                     && distanceEnd2EndNode > 5)
-                    waypoints.Add(endNode.Position);
+                    waypoints.Add(pos0);
 
                 waypoints.Add(new Vector3((float)endX, (float)endY, (float)endZ));
                 return true;
             }
 
-            var aStar = new AStar.AStar(graph);
+            var pathFinder = new AStar.AStar(graph);
 
 #if PATCH_LOG
                 stopwatch.Restart(); 
 #endif
-            bool searchResult = aStar.SearchPath(startNode, endNode);
+            bool searchResult = pathFinder.SearchPath(startNode, endNode);
 #if PATCH_LOG
                 stopwatch.Stop(); 
 #endif
 
-            if (!searchResult || !aStar.PathFound) return false;
+            if (!searchResult || !pathFinder.PathFound) return false;
 
-            using (var wpe = aStar.PathNodes.GetEnumerator())
+            var nodesCount = pathFinder.PathNodesCount;
+
+            if (waypoints is null)
+                waypoints = new List<Vector3>(nodesCount + 1);
+
+            using (var enumerator = pathFinder.PathNodes.GetEnumerator())
             {
-                if (wpe.MoveNext())
+                if (enumerator.MoveNext())
                 {
-                    var wp0 = wpe.Current;// ?? throw new NullReferenceException();
-                    if (wpe.MoveNext())
+                    var wp0 = enumerator.Current;// ?? throw new NullReferenceException();
+                    if (enumerator.MoveNext())
                     {
-                        var wp1 = wpe.Current;
+                        // Найденный путь содержит не менее 2 вершин
+                        var wp1 = enumerator.Current;
 
                         var pos0 = wp0.Position;
                         var pos1 = wp1.Position;
 
-                        // Найденный путь содержит не менее 2 вершин
-                        // Проверяем положение стартовой точки start относительно первых двух точек пути (pos0 и pos1 соответственно)
-                        double x0 = startX - pos0.X,
-                               y0 = startY - pos0.Y,
-                               z0 = startZ - pos0.Z,
-                               x1 = pos1.X - pos0.X,
-                               y1 = pos1.Y - pos0.Y,
-                               z1 = pos1.Z - pos0.Z,
-                               d0 = x0 * x0 + y0 * y0 + z0 * z0,
-                               d1 = x1 * x1 + y1 * y1 + z1 * z1;
+                        // Проверяем положение стартовой точки start относительно первых двух точек пути(pos0 и pos1 соответственно)
+#if false
+                        // pos0 - вершина угла, величину которого оцениваем
+                        x0 = startX - pos0.X;
+                        y0 = startY - pos0.Y;
+                        z0 = startZ - pos0.Z;
+                        x1 = pos1.X - pos0.X;
+                        y1 = pos1.Y - pos0.Y;
+                        z1 = pos1.Z - pos0.Z;
+                        d0 = x0 * x0 + y0 * y0 + z0 * z0;
+                        d1 = x1 * x1 + y1 * y1 + z1 * z1;
 
                         // Вычисляем косинус угла между векторами (pos0 -> start) и (pos0 -> pos1)
                         // из формулы скалярного произведения векторов
-                        double cos = (x0 * x1 + y0 * y1 + z0 * z1) / Math.Sqrt(d0 * d1);
-
+                        cos = (x0 * x1 + y0 * y1 + z0 * z1) / Math.Sqrt(d0 * d1); 
+#else
+                        cos = NavigationHelper.Cosine(pos0.X, pos0.Y, pos0.Z,
+                                                    startX, startY, startZ, 
+                                                    pos1.X, pos1.Y, pos1.Z, 
+                                                    out _, out _);
+#endif
                         // cos(165) = -0,9659258262890682867497431997289
                         // cos(105) = -0,25881904510252076234889883762405
                         // cos(75)  =  0,25881904510252076234889883762405
@@ -487,7 +508,7 @@ private static List<Vector3> Astral.Logic.Navmesh.getPath(Graph graph, Vector3 S
                         {
                             // угол между векторами (wp0 -> start) и (wp0 -> wp1) больше 90 градусов,
                             // путь должен проходить через wp0 и wp1
-                            waypoints.Add(wp0.Position);
+                            waypoints.Add(pos0);
                         }
                         else
                         {
@@ -495,21 +516,105 @@ private static List<Vector3> Astral.Logic.Navmesh.getPath(Graph graph, Vector3 S
                             // то есть wp0 находится "позади" и её добавлять не нужно
                             // путь должен проходить только через wp1
                         }
+#if false
                         waypoints.Add(wp1.Position);
 
-                        while (wpe.MoveNext())
+                        while (enumerator.MoveNext())
                         {
-                            waypoints.Add(wpe.Current.Position);
+                            waypoints.Add(enumerator.Current.Position);
+                        } 
+#else
+                        if (nodesCount > 2)
+                        {
+                            waypoints.Add(wp1.Position);
+                            
+                            // уменьшаем nodesCount на количество обработанных (скопированных) переменных
+                            nodesCount -= 2;
+
+                            // копируем все точки пути, за исключением последней
+                            while (nodesCount > 1 && enumerator.MoveNext())
+                            {
+                                wp0 = enumerator.Current;
+                                waypoints.Add(wp0.Position);
+                                --nodesCount;
+                            }
+
+                            wp1 = enumerator.MoveNext() ? enumerator.Current : null;
                         }
+
+                        // проводим такую же оценку взаимного положения двух последних точек пути wp0, wp1 и end
+                        // wp0 - указывает на предпоследнюю точку найденного пути, и последнюю добавленную в waypoints
+                        // wp1 - указывает на последнюю точку найденного пути, еще не добавленную в waypoints
+
+                        if (wp1 != null)
+                        {
+                            pos0 = wp0.Position;
+                            pos1 = wp1.Position;
+
+                            // Проверяем положение конечной точки end относительно последних двух точек пути (pos0 и pos1 соответственно)
+                            // pos1 - вершина угла, величину которого оцениваем
+#if false
+                            x0 = endX - pos1.X;
+                            y0 = endY - pos1.Y;
+                            z0 = endZ - pos1.Z;
+                            x1 = pos0.X - pos1.X;
+                            y1 = pos0.Y - pos1.Y;
+                            z1 = pos0.Z - pos1.Z;
+                            d0 = x0 * x0 + y0 * y0 + z0 * z0;
+                            d1 = x1 * x1 + y1 * y1 + z1 * z1;
+
+                            // Вычисляем косинус угла между векторами (pos1 -> pos0) и (pos1 -> end)
+                            // из формулы скалярного произведения векторов
+                            cos = (x0 * x1 + y0 * y1 + z0 * z1) / Math.Sqrt(d0 * d1); 
+#else
+                            cos = NavigationHelper.Cosine(pos1.X, pos1.Y, pos1.Z,
+                                endX, endY, endZ,
+                                pos0.X, pos0.Y, pos0.Z,
+                                out _, out _);
+#endif
+
+                            if (cos > 0)
+                                waypoints.Add(pos1);
+                        }
+#endif
                     }
                     else
                     {
                         // Путь содержит только одну точку
-                        waypoints.Add(wp0.Position);
+                        //waypoints.Add(wp0.Position);
+                        var pos0 = wp0.Position;
+
+                        // Проверяем возможность продвинуться напрямую от start к end
+                        // pos0 - вершина угла, величину которого оцениваем 
+#if false
+                        x0 = startX - pos0.X;
+                        y0 = startY - pos0.Y;
+                        z0 = startZ - pos0.Z;
+                        x1 = endX - pos0.X;
+                        y1 = endY - pos0.Y;
+                        z1 = endZ - pos0.Z;
+                        d0 = x0 * x0 + y0 * y0 + z0 * z0; // квадрат расстояния (pw0 -> start)
+                        d1 = x1 * x1 + y1 * y1 + z1 * z1; // квадрат расстояния (pw0 -> end)
+
+                        cos = (x0 * x1 + y0 * y1 + z0 * z1) / Math.Sqrt(d0 * d1); 
+#else
+                        cos = NavigationHelper.Cosine(pos0.X, pos0.Y, pos0.Z,
+                                                    startX, startY, startZ,
+                                                    endX, endY, endZ, out distance0, out distance1);
+#endif
+
+                        // Добавляем wp0 лишь в том случае,
+                        // если стартовая точка находится в задней полуплоскости относительно вектора (wp0 -> end),
+                        // то есть угол между векторами (pw0 -> start) и (pw0 -> end) больше 90 градусов (при этом cos отрицательный)
+                        if (cos < 0
+                            && distance0 > 25
+                            && distance1 > 25)
+                            waypoints.Add(pos0);
                     }
                 }
-                waypoints.Add(new Vector3((float)endX, (float)endY, (float)endZ));
-            }
+            } 
+            
+            waypoints.Add(new Vector3((float)endX, (float)endY, (float)endZ));
 #if PATCH_LOG
                     if (waypoints.Count == 0)
                     {
@@ -522,7 +627,7 @@ private static List<Vector3> Astral.Logic.Navmesh.getPath(Graph graph, Vector3 S
                         ETLogger.WriteLine(LogType.Debug, stringBuilder.ToString());
                     } 
 #endif
-            return waypoints.Count > 1;
+            return true;//waypoints.Count > 1;
         }
         #endregion
 
@@ -877,8 +982,9 @@ private static void Astral.Logic.Navmesh.FixPath(List<Vector3> waypoints, Vector
 	}
 }
 #endif
-        // ReSharper disable once UnusedParameter.Local
+        // ReSharper disable UnusedParameter.Local
         private static void PrefixFixPath(List<Vector3> waypoints, Vector3 from) { }
+        // ReSharper restore UnusedParameter.Local
         #endregion
 
         #region TotalDistance

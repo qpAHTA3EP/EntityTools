@@ -72,14 +72,14 @@ namespace EntityTools.Patches.Mapper
             this.btnObjectInfo = new DevExpress.XtraBars.BarCheckItem();
             this.barCustomRegions = new DevExpress.XtraBars.Bar();
             this.btnAddCR = new DevExpress.XtraBars.BarButtonItem();
-            this.btnEditCR = new DevExpress.XtraBars.BarCheckItem();
+            this.btnEditCR = new DevExpress.XtraBars.BarButtonItem();
             this.barEditCustomRegion = new DevExpress.XtraBars.Bar();
             this.btnCRTypeSelector = new DevExpress.XtraBars.BarCheckItem();
+            this.btnCRRename = new DevExpress.XtraBars.BarCheckItem();
             this.editCRSelector = new DevExpress.XtraBars.BarEditItem();
             this.itemEditCRList = new DevExpress.XtraEditors.Repository.RepositoryItemLookUpEdit();
             this.editCRName = new DevExpress.XtraBars.BarEditItem();
             this.itemEditCRName = new DevExpress.XtraEditors.Repository.RepositoryItemTextEdit();
-            this.btnCRRename = new DevExpress.XtraBars.BarCheckItem();
             this.btnCRAdditionAccept = new DevExpress.XtraBars.BarButtonItem();
             this.btnCREditionAccept = new DevExpress.XtraBars.BarButtonItem();
             this.btnCRCancel = new DevExpress.XtraBars.BarButtonItem();
@@ -139,8 +139,8 @@ namespace EntityTools.Patches.Mapper
             this.lblLayerDepth = new System.Windows.Forms.Label();
             this.editLayerDepth = new DevExpress.XtraEditors.SpinEdit();
             this.ckbChacheEnable = new DevExpress.XtraEditors.CheckEdit();
-            this.navGroupObjects = new DevExpress.XtraNavBar.NavBarGroup();
             this.navGroupGeneral = new DevExpress.XtraNavBar.NavBarGroup();
+            this.navGroupObjects = new DevExpress.XtraNavBar.NavBarGroup();
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.popMenuOptions)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seWaypointDistance)).BeginInit();
@@ -623,7 +623,7 @@ namespace EntityTools.Patches.Mapper
             this.btnAddCR.Id = 48;
             this.btnAddCR.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnAddCR.ImageOptions.Image")));
             this.btnAddCR.Name = "btnAddCR";
-            this.btnAddCR.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AddCustomRegion);
+            this.btnAddCR.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_StartAddingCustomRegion);
             // 
             // btnEditCR
             // 
@@ -631,7 +631,7 @@ namespace EntityTools.Patches.Mapper
             this.btnEditCR.Id = 102;
             this.btnEditCR.ImageOptions.Image = global::EntityTools.Properties.Resources.miniEditCR;
             this.btnEditCR.Name = "btnEditCR";
-            this.btnEditCR.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_EditCustomRegion);
+            this.btnEditCR.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_StartEditingCustomRegion);
             // 
             // barEditCustomRegion
             // 
@@ -641,13 +641,13 @@ namespace EntityTools.Patches.Mapper
             | DevExpress.XtraBars.BarCanDockStyle.Standalone)));
             this.barEditCustomRegion.DockCol = 0;
             this.barEditCustomRegion.DockRow = 0;
-            this.barEditCustomRegion.FloatLocation = new System.Drawing.Point(33, 557);
+            this.barEditCustomRegion.FloatLocation = new System.Drawing.Point(49, 545);
             this.barEditCustomRegion.FloatSize = new System.Drawing.Size(397, 88);
             this.barEditCustomRegion.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
             new DevExpress.XtraBars.LinkPersistInfo(this.btnCRTypeSelector),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnCRRename),
             new DevExpress.XtraBars.LinkPersistInfo(DevExpress.XtraBars.BarLinkUserDefines.Width, this.editCRSelector, "", false, true, true, 231),
             new DevExpress.XtraBars.LinkPersistInfo(DevExpress.XtraBars.BarLinkUserDefines.Width, this.editCRName, "", false, true, true, 216),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnCRRename),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnCRAdditionAccept),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnCREditionAccept),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnCRCancel)});
@@ -665,6 +665,15 @@ namespace EntityTools.Patches.Mapper
             this.btnCRTypeSelector.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCRRectang;
             this.btnCRTypeSelector.Name = "btnCRTypeSelector";
             this.btnCRTypeSelector.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ChangeCustomRegionType);
+            // 
+            // btnCRRename
+            // 
+            this.btnCRRename.Caption = "Edit the Name of the selected CustomRegion";
+            this.btnCRRename.Id = 115;
+            this.btnCRRename.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnCRRename.ImageOptions.Image")));
+            this.btnCRRename.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnCRRename.ImageOptions.LargeImage")));
+            this.btnCRRename.Name = "btnCRRename";
+            this.btnCRRename.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ChangedRenameCRMode);
             // 
             // editCRSelector
             // 
@@ -698,15 +707,6 @@ namespace EntityTools.Patches.Mapper
             // 
             this.itemEditCRName.AutoHeight = false;
             this.itemEditCRName.Name = "itemEditCRName";
-            // 
-            // btnCRRename
-            // 
-            this.btnCRRename.Caption = "Edit CRName";
-            this.btnCRRename.Id = 115;
-            this.btnCRRename.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnCRRename.ImageOptions.Image")));
-            this.btnCRRename.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnCRRename.ImageOptions.LargeImage")));
-            this.btnCRRename.Name = "btnCRRename";
-            this.btnCRRename.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ChangedRenameCRMode);
             // 
             // btnCRAdditionAccept
             // 
@@ -1376,14 +1376,6 @@ namespace EntityTools.Patches.Mapper
             this.ckbChacheEnable.TabIndex = 0;
             this.ckbChacheEnable.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
-            // navGroupObjects
-            // 
-            this.navGroupObjects.Caption = "Objects";
-            this.navGroupObjects.ControlContainer = this.containerObjects;
-            this.navGroupObjects.GroupClientHeight = 182;
-            this.navGroupObjects.GroupStyle = DevExpress.XtraNavBar.NavBarGroupStyle.ControlContainer;
-            this.navGroupObjects.Name = "navGroupObjects";
-            // 
             // navGroupGeneral
             // 
             this.navGroupGeneral.Caption = "General";
@@ -1391,6 +1383,14 @@ namespace EntityTools.Patches.Mapper
             this.navGroupGeneral.GroupClientHeight = 70;
             this.navGroupGeneral.GroupStyle = DevExpress.XtraNavBar.NavBarGroupStyle.ControlContainer;
             this.navGroupGeneral.Name = "navGroupGeneral";
+            // 
+            // navGroupObjects
+            // 
+            this.navGroupObjects.Caption = "Objects";
+            this.navGroupObjects.ControlContainer = this.containerObjects;
+            this.navGroupObjects.GroupClientHeight = 182;
+            this.navGroupObjects.GroupStyle = DevExpress.XtraNavBar.NavBarGroupStyle.ControlContainer;
+            this.navGroupObjects.Name = "navGroupObjects";
             // 
             // MapperFormExt
             // 
@@ -1509,7 +1509,7 @@ namespace EntityTools.Patches.Mapper
         private BarCheckItem btnEditEdges;
         private BarButtonGroup groupEditMeshes;
         private BarButtonItem btnUndo;
-        private BarCheckItem btnEditCR;
+        private BarButtonItem btnEditCR;
         private BarButtonItem btnMeshesInfo;
         private BarButtonItem btnCompression;
         private Bar barEditCustomRegion;

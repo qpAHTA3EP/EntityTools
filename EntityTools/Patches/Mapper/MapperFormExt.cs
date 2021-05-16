@@ -33,6 +33,7 @@ using AcTp0Tools;
 using Astral.Logic.NW;
 using Astral.Quester.Classes;
 using MyNW.Classes;
+// ReSharper disable UnusedVariable
 #endif
 
 namespace EntityTools.Patches.Mapper
@@ -42,7 +43,6 @@ namespace EntityTools.Patches.Mapper
     {
         /// <summary>
         /// Флаг удержания персонажа в центре карты
-        /// 
         /// </summary>
         private bool LockOnPlayer
         {
@@ -64,14 +64,13 @@ namespace EntityTools.Patches.Mapper
             }
             set
             {
-                if (value != null && value.IsValid)
+                if (value == null || !value.IsValid) return;
+
+                using (_graphics.WriteLock())
                 {
-                    using (_graphics.WriteLock())
-                    {
-                        _graphics.CenterPosition = value.Clone();
-                    }
-                    LockOnPlayer = false;
+                    _graphics.CenterPosition = value.Clone();
                 }
+                LockOnPlayer = false;
             }
         }
 
@@ -279,26 +278,6 @@ namespace EntityTools.Patches.Mapper
 #endif
         }
 
-#if false
-        /// <summary>
-        /// Открытие формы
-        /// </summary>
-        public static void Open()
-        {
-            if (EntityTools.Config.Mapper.Patch)
-            {
-                if (@this != null && !@this.IsDisposed)
-                    @this.Focus();
-                else
-                {
-                    @this = new MapperFormExt();
-                    @this.Show();
-                }
-            }
-            else MapperForm.Open();
-        } 
-#endif
-
         /// <summary>
         /// Событие при загрузке формы
         /// </summary>
@@ -361,7 +340,6 @@ namespace EntityTools.Patches.Mapper
                    mousePosStr = string.Empty,
                    zoomStr = string.Empty;
             Image img = null;
-            //Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
 
             var updateFormStatus = new Action(() =>
             {
@@ -371,11 +349,6 @@ namespace EntityTools.Patches.Mapper
                 lblDrawInfo.Caption = statusStr;
                 lblZoom.Caption = zoomStr;
                 MapPicture.Image = img;
-#if false
-                if (SpecialObject?.IsValid == true)
-                    btnLockOnSpecialObject.Visibility = BarItemVisibility.Always;
-                else btnLockOnSpecialObject.Visibility = BarItemVisibility.Never; 
-#endif
             });
 
             //TODO Заменить Environment.TickCount на DateTime.Now.Ticks 
@@ -386,13 +359,8 @@ namespace EntityTools.Patches.Mapper
             Stopwatch sw = new Stopwatch();
 
             long[] drawMapperMeasures = new long[MAPPER_MEASURES_NUM];
-#if false
-            // Tuple<PlayerLocation, TickCount, Ticks from last, Distance, Speed>
-            Tuple<Vector3, int, int, double, double>[] speedMeasures = new Tuple<Vector3, int, int, double, double>[SPEED_MEASURES_NUM];
-#else
-            // Tuple<PlayerLocation, TickCount, Speed>
+
             Tuple<Vector3, int, double>[] speedMeasures = new Tuple<Vector3, int, double>[SPEED_MEASURES_NUM];
-#endif
             Vector3 lastPlayerPos = null;
             int lastTickCount = Environment.TickCount;
             int movingTime = 0;
@@ -411,16 +379,6 @@ namespace EntityTools.Patches.Mapper
                 while (!IsDisposed
                         && !backgroundWorker.CancellationPending)
                 {
-#if false
-                if (editMode == MapperEditMode.None)
-                    formCaption = string.Concat(EntityManager.LocalPlayer.CurrentZoneMapInfo.DisplayName,
-                        " [", EntityManager.LocalPlayer.CurrentZoneMapInfo.MapName, ']');
-                else formCaption = string.Concat(editMode, " | ",
-                    EntityManager.LocalPlayer.CurrentZoneMapInfo.DisplayName,
-                    " [", EntityManager.LocalPlayer.CurrentZoneMapInfo.MapName, ']'); 
-#endif
-
-
                     var player = EntityManager.LocalPlayer;
                     bool isLoading = player.IsLoading || !player.MapState.IsValid;
                     if (isLoading)
@@ -447,51 +405,26 @@ namespace EntityTools.Patches.Mapper
                             int tickCount = Environment.TickCount;
                             int ticks = tickCount - prevMeasure.Item2;
                             double distance = prevMeasure.Item1.Distance3DFromPlayer;
-#if false
-                            speedMeasures[currMeasureInd] = Tuple.Create(playerPos, tickCount, ticks, distance, ticks > 0 ? distance / ticks : 0d); //new Tuple<Vector3, int, double>(playerPos, ticks, distance);
-#else
                             speedMeasures[currMeasureInd] = Tuple.Create(playerPos, tickCount, ticks > 0 ? distance / ticks * 1000d : 0d);
-#endif
                         }
                         else
                         {
-#if false
-                            speedMeasures[currMeasureInd] = Tuple.Create(playerPos, Environment.TickCount, 0, 0d, 0d); //new Tuple<Vector3, int, double>(playerPos, ticks, distance);  
-#else
                             speedMeasures[currMeasureInd] = Tuple.Create(playerPos, Environment.TickCount, 0d);
-#endif
                         }
-#if false
-                        int totalTicks = 0;
-                        double totalDistance = 0; 
-#endif
                         double speed = 0;
                         int num = 0;
                         for (currMeasureInd = 0; currMeasureInd < SPEED_MEASURES_NUM; currMeasureInd++)
                         {
                             var measure = speedMeasures[currMeasureInd];
-#if false
-                            if (measure != null && measure.Item4 > 0)
-                            {
-                                totalTicks += measure.Item3;
-                                totalDistance += measure.Item4;
-                                speed1 += measure.Item5;
-                                num++;
-                            } 
-#else
                             if (measure != null && measure.Item3 > 0)
                             {
                                 speed += measure.Item3;
                                 num++;
                             }
-#endif
                         }
                         if (num > 0)
                             speed /= num;
-#if false
-                        double speed2 = totalTicks > 0 ? totalDistance / totalTicks * 1000d : 0d;
-#endif
-#if false               // Вывод в лог слокости и статистики перемещения
+#if false               // Вывод в лог скорости и статистики перемещения
                         if (timeout.IsTimedOut)
                         {
                             ETLogger.WriteLine(LogType.Debug, $"{speed1:N3} ({num}) | {speed2:N3} ({totalDistance:N2}/{totalTicks/1000d:N2})");
@@ -565,7 +498,6 @@ namespace EntityTools.Patches.Mapper
                         //statusStr = string.Concat(speed1.ToString("N3"), "f/ms (", num, ") | ",speed2.ToString("N3"), "f/s (", totalDistance.ToString("N2"), '/', (totalTicks / 1000d).ToString("N2"), ")");
 
                         _graphics.GetWorldPosition(RelativeMousePosition, out double mouseX, out double mouseY);
-
 
                         mousePosStr = string.Concat(mouseX.ToString("N1"), " | ", mouseY.ToString("N1"));
 
@@ -723,14 +655,10 @@ namespace EntityTools.Patches.Mapper
                 else
                 {
                     _selectedNodes.Clear();
-#if true
-                    MapperEditMode mode = MapperEditMode.None;
-                    if (_mappingTool.MappingMode != MappingMode.Stoped)
-                        mode = MapperEditMode.Mapping;
+                    MapperEditMode mode = _mappingTool.MappingMode != MappingMode.Stoped 
+                        ? MapperEditMode.Mapping 
+                        : MapperEditMode.None;
                     InterruptAllModifications(mode); 
-#else
-                    InterruptAllModifications();
-#endif
                 }
             }
         }
@@ -783,15 +711,14 @@ namespace EntityTools.Patches.Mapper
             if (SpecialObject?.IsValid == true)
                 CenterOfMap = SpecialObject;
         }
-
-                        #endregion
+        #endregion
 
         /// <summary>
         /// Прерывание всех операций по изменению графа путей (мешей)
         /// </summary>
         private void InterruptAllModifications(MapperEditMode mode = MapperEditMode.None)
         {
-            if (/*mode != MapperEditMode.Mapping && */_mappingTool?.MappingMode == MappingMode.Stoped)
+            if (mode != MapperEditMode.Mapping && _mappingTool?.MappingMode == MappingMode.Stoped)
             {
                 btnMappingStop.Checked = true;
             }
@@ -807,23 +734,15 @@ namespace EntityTools.Patches.Mapper
             {
                 btnRemoveNodes.Checked = false;
             }
-
-            if (mode != MapperEditMode.AddCustomRegion)
+            if (mode != MapperEditMode.AddCustomRegion
+                && mode != MapperEditMode.EditCustomRegion)
             {
                 barEditCustomRegion.Visible = false;
             }
-
-            if (mode != MapperEditMode.EditCustomRegion)
-            {
-                btnEditCR.Checked = false;
-                barEditCustomRegion.Visible = false;
-            }
-
             if(mode != MapperEditMode.DistanceMeasurement)
             {
                 btnDistanceMeasurement.Checked = false;
             }
-
             if (mode != MapperEditMode.Information)
             {
                 btnObjectInfo.Checked = false;
@@ -909,7 +828,7 @@ namespace EntityTools.Patches.Mapper
                 mouseWeelTimeout.ChangeTime(100);
             }
         } 
-                        #endregion
+        #endregion
 
         #region Drawings
         private readonly MapperGraphics _graphics = new MapperGraphics(360, 360);
@@ -920,93 +839,68 @@ namespace EntityTools.Patches.Mapper
         private void DrawMapper()
         {
             Timeout timeout = new Timeout(0);
-#if Not_MonoMapper
-            while (!IsDisposed && Visible && !token.IsCancellationRequested) 
-#else
-            if (!IsDisposed && Visible
-                 && MapPicture.Visible && MapPicture.Width > 0 && MapPicture.Height > 0)
-#endif
+
+            if (IsDisposed || !Visible || !MapPicture.Visible || MapPicture.Width <= 0 ||
+                MapPicture.Height <= 0) return;
+
+            try
             {
-                try
+                using (_graphics.WriteLock())
                 {
-                    using (_graphics.WriteLock())
+                    int imgWidth = MapPicture.Width;
+                    int imgHeight = MapPicture.Height;
+
+                    double leftBorder, topBorder, rightBorder, downBorder;
+
+                    // Вычисляем координаты границ изображения
+                    if (LockOnPlayer)
+                        _graphics.Reinitialize(EntityManager.LocalPlayer.Location, imgWidth, imgHeight, Zoom, out leftBorder, out topBorder, out rightBorder, out downBorder);
+                    else _graphics.Reinitialize(imgWidth, imgHeight, Zoom, out leftBorder, out topBorder, out rightBorder, out downBorder);
+
+                    Vector3 location = null;
+                    float x, y;
+
+                    #region Отрисовка нодов
+                    bool drawNode = EntityTools.Config.Mapper.MapperForm.DrawNodes;
+                    bool drawSkillNode = EntityTools.Config.Mapper.MapperForm.DrawSkillNodes;
+                    if (drawNode || drawSkillNode)
                     {
-                        int imgWidth = MapPicture.Width;
-                        int imgHeight = MapPicture.Height;
-
-#if false
-                        if (LockOnPlayer)
-                            _graphics.CenterPosition = EntityManager.LocalPlayer.Location;
-
-                        // Вычисляем координаты границ изображения
-                        _graphics.GetWorldPosition(0, 0, out double leftBorder, out double topBorder);
-                        _graphics.GetWorldPosition(imgWidth, imgHeight, out double rightBorder, out double downBorder);
-
-                        _graphics.ImageWidth = imgWidth;
-                        _graphics.ImageHeight = imgHeight;
-                        _graphics.Zoom = Zoom;
-                        _graphics.resetImage(); 
-#else
-                        double leftBorder, topBorder, rightBorder, downBorder;
-
-                        if (LockOnPlayer)
-                            _graphics.Reinitialize(EntityManager.LocalPlayer.Location, imgWidth, imgHeight, Zoom, out leftBorder, out topBorder, out rightBorder, out downBorder);
-                        else _graphics.Reinitialize(imgWidth, imgHeight, Zoom, out leftBorder, out topBorder, out rightBorder, out downBorder);
-
-#endif
-                        // Вычисляем координаты границ изображения
-                        _graphics.GetWorldPosition(0, 0, out double leftBorder1, out double topBorder1);
-                        _graphics.GetWorldPosition(imgWidth, imgHeight, out double rightBorder1, out double downBorder1);
-
-#if false
-                        // Центр кэша графа
-                        _graphics.FillCircleCentered(Brushes.Yellow, _graphics.GraphCache.CenterPosition, 8, true); 
-#endif
-
-                        Vector3 location = null;
-                        float x, y;
-
-                        #region Отрисовка нодов
-                        bool drawNode = EntityTools.Config.Mapper.MapperForm.DrawNodes;
-                        bool drawSkillNode = EntityTools.Config.Mapper.MapperForm.DrawSkillNodes;
-                        if (drawNode || drawSkillNode)
+                        var lootBrush = _graphics.DrawingTools.SkillnodeBrush;
+                        var brush = _graphics.DrawingTools.NodeBrush;
+                        foreach (TargetableNode targetableNode in EntityManager.LocalPlayer.Player.InteractStatus.TargetableNodes)
                         {
-                            var lootBrush = _graphics.DrawingTools.SkillnodeBrush;
-                            var brush = _graphics.DrawingTools.NodeBrush;
-                            foreach (TargetableNode targetableNode in EntityManager.LocalPlayer.Player.InteractStatus.TargetableNodes)
-                            {
-                                location = targetableNode.WorldInteractionNode.Location;
-                                x = location.X;
-                                y = location.Y;
-                                if (leftBorder <= x && x <= rightBorder && downBorder <= y && y <= topBorder)
-                                {
-                                    if (targetableNode.Categories.Contains("Loot"))
-                                    {
-                                        if (drawNode)
-                                            _graphics.FillCircleCentered(lootBrush, x, y, 6);
-                                    }
-                                    else if (drawSkillNode)
-                                        _graphics.FillSquareCentered(brush, x, y, 6);
-                                }
-                            }
-                        }
-                        #endregion
-
-                        #region Отрисовка костров
-                        foreach (MinimapWaypoint minimapWaypoint in EntityManager.LocalPlayer.Player.MissionInfo.Waypoints)
-                        {
-                            location = minimapWaypoint.Position;
+                            location = targetableNode.WorldInteractionNode.Location;
                             x = location.X;
                             y = location.Y;
-                            if (leftBorder <= x && x <= rightBorder && downBorder <= y && y <= topBorder
-                                && minimapWaypoint.IsCampFire)
+                            if (leftBorder <= x && x <= rightBorder && downBorder <= y && y <= topBorder)
                             {
-                                _graphics.FillSquareCentered(Brushes.DarkOrange, x, y, 12);
+                                if (targetableNode.Categories.Contains("Loot"))
+                                {
+                                    if (drawNode)
+                                        _graphics.FillCircleCentered(lootBrush, x, y, 6);
+                                }
+                                else if (drawSkillNode)
+                                    _graphics.FillSquareCentered(brush, x, y, 6);
                             }
                         }
-                        #endregion
+                    }
+                    #endregion
 
-                        #region Отрисовка специального объекта, заданного методом showObjectOnMap
+                    #region Отрисовка костров
+                    foreach (MinimapWaypoint minimapWaypoint in EntityManager.LocalPlayer.Player.MissionInfo.Waypoints)
+                    {
+                        location = minimapWaypoint.Position;
+                        x = location.X;
+                        y = location.Y;
+                        if (leftBorder <= x && x <= rightBorder && downBorder <= y && y <= topBorder
+                            && minimapWaypoint.IsCampFire)
+                        {
+                            _graphics.FillSquareCentered(Brushes.DarkOrange, x, y, 12);
+                        }
+                    }
+                    #endregion
+
+                    #region Отрисовка специального объекта, заданного методом showObjectOnMap
 #if false
                         var objectPosition = SpecialObject;
                         if (objectPosition != null && objectPosition.IsValid)
@@ -1016,9 +910,9 @@ namespace EntityTools.Patches.Mapper
                         }
 
 #endif
-                        #endregion
+                    #endregion
 
-                        #region Отрисовка АОЕ
+                    #region Отрисовка АОЕ
 #if false
                         //foreach (AOECheck.AOE aoe in AOECheck.List)
                         if (AstralAccessors.Controllers.AOECheck.List != null)
@@ -1046,146 +940,146 @@ namespace EntityTools.Patches.Mapper
                             }
                         }
 #endif
-                        #endregion
+                    #endregion
 
-                        #region Отрисовка графики, связанной с выполняемой ролью 
-                        try
-                        {
-                            if (!AstralAccessors.Controllers.Roles.CurrentRole.OnMapDraw(_graphics))
-                                //lock (AstralAccessors.Quester.Core.Meshes.Value.SyncRoot) <- Блокировка графа есть в DrawMeshes(..)
-                                ComplexPatch_Mapper.DrawMeshes(_graphics,
-                                    AstralAccessors.Quester.Core.Meshes);
-                        }
-                        catch (Exception ex)
-                        {
-                            ETLogger.WriteLine(LogType.Error, string.Concat(nameof(DrawMapper), ": Перехвачено исключение \n\r", ex), true);
+                    #region Отрисовка графики, связанной с выполняемой ролью 
+                    try
+                    {
+                        if (!AstralAccessors.Controllers.Roles.CurrentRole.OnMapDraw(_graphics))
+                            //lock (AstralAccessors.Quester.Core.Meshes.Value.SyncRoot) <- Блокировка графа есть в DrawMeshes(..)
                             ComplexPatch_Mapper.DrawMeshes(_graphics,
-                                    AstralAccessors.Quester.Core.Meshes);
-                        }
-                        #endregion
+                                AstralAccessors.Quester.Core.Meshes);
+                    }
+                    catch (Exception ex)
+                    {
+                        ETLogger.WriteLine(LogType.Error, string.Concat(nameof(DrawMapper), ": Перехвачено исключение \n\r", ex), true);
+                        ComplexPatch_Mapper.DrawMeshes(_graphics,
+                            AstralAccessors.Quester.Core.Meshes);
+                    }
+                    #endregion
 
-                        #region Отрисовка игроков и НПС
-                        bool drawEnemies = EntityTools.Config.Mapper.MapperForm.DrawEnemies;
-                        bool drawFriends = EntityTools.Config.Mapper.MapperForm.DrawFriends;
-                        bool drawPlayers = EntityTools.Config.Mapper.MapperForm.DrawPlayers;
-                        bool drawOtherNpc = EntityTools.Config.Mapper.MapperForm.DrawOtherNPC;
-                        if (drawEnemies || drawFriends || drawPlayers || drawOtherNpc)
+                    #region Отрисовка игроков и НПС
+                    bool drawEnemies = EntityTools.Config.Mapper.MapperForm.DrawEnemies;
+                    bool drawFriends = EntityTools.Config.Mapper.MapperForm.DrawFriends;
+                    bool drawPlayers = EntityTools.Config.Mapper.MapperForm.DrawPlayers;
+                    bool drawOtherNpc = EntityTools.Config.Mapper.MapperForm.DrawOtherNPC;
+                    if (drawEnemies || drawFriends || drawPlayers || drawOtherNpc)
+                    {
+                        var enemyBrush = _graphics.DrawingTools.EnemyBrush;
+                        var friendBrush = _graphics.DrawingTools.FriendBrush;
+                        var playerBrush = _graphics.DrawingTools.PlayerBrush;
+                        var otherBrush = _graphics.DrawingTools.OtherNPCBrush;
+                        uint playerContainerId = EntityManager.LocalPlayer.ContainerId;
+                        foreach (Entity entity in EntityManager.GetEntities())
                         {
-                            var enemyBrush = _graphics.DrawingTools.EnemyBrush;
-                            var friendBrush = _graphics.DrawingTools.FriendBrush;
-                            var playerBrush = _graphics.DrawingTools.PlayerBrush;
-                            var otherBrush = _graphics.DrawingTools.OtherNPCBrush;
-                            uint playerContainerId = EntityManager.LocalPlayer.ContainerId;
-                            foreach (Entity entity in EntityManager.GetEntities())
+                            location = entity.Location;
+                            x = location.X;
+                            y = location.Y;
+                            if (entity.ContainerId != playerContainerId
+                                && leftBorder <= x && x <= rightBorder && downBorder <= y && y <= topBorder)
                             {
-                                location = entity.Location;
-                                x = location.X;
-                                y = location.Y;
-                                if (entity.ContainerId != playerContainerId
-                                    && leftBorder <= x && x <= rightBorder && downBorder <= y && y <= topBorder)
+                                if (entity.IsPlayer)
                                 {
-                                    if (entity.IsPlayer)
-                                    {
-                                        if (drawPlayers)
-                                            _graphics.FillRhombCentered(playerBrush, location, 10, 17);
-                                    }
-                                    else if (!entity.IsDead && !entity.Critter.IsLootable)
-                                    {
-                                        var relationToPlayer = entity.RelationToPlayer;
-                                        if (relationToPlayer == EntityRelation.Foe)
-                                        {
-                                            if (drawEnemies)
-                                                _graphics.FillRhombCentered(enemyBrush, location, 10, 10);
-                                        }
-                                        else if (relationToPlayer == EntityRelation.Friend)
-                                        {
-                                            if(drawFriends)
-                                                _graphics.FillRhombCentered(friendBrush, location, 6, 6);
-                                        }
-                                        else if(drawOtherNpc)
-                                            _graphics.FillRhombCentered(otherBrush, location, 6, 6);
-                                    }
+                                    if (drawPlayers)
+                                        _graphics.FillRhombCentered(playerBrush, location, 10, 17);
                                 }
-                            } 
-                        }
-                        #endregion
-
-                        #region Отрисовка специальной графики и указателя мыши
-                        // Отрисовка активного инструмента редактирования
-                        try
-                        {
-                            _graphics.GetWorldPosition(RelativeMousePosition, out double mouseX, out double mouseY);
-                            var tool = CurrentTool;
-                            bool customMouseCursor = false;
-                            string mcText = string.Empty;
-                            Alignment mcAlign = Alignment.None;
-                            Font mcFont = DefaultFont;
-                            Brush mcBrush = Brushes.Gray;
-
-                            if (tool != null)
-                            {
-                                customMouseCursor = tool.CustomMouseCusor(mouseX, mouseY, out mcText, out mcAlign, out mcFont, out mcBrush);
-
-                                if (tool.AllowNodeSelection || tool.HandleCustomDraw)
+                                else if (!entity.IsDead && !entity.Critter.IsLootable)
                                 {
-                                    //_graphics.GetWorldPosition(RelativeMousePosition, out double mouseX, out double mouseY);
-                                    if (tool.AllowNodeSelection)
+                                    var relationToPlayer = entity.RelationToPlayer;
+                                    if (relationToPlayer == EntityRelation.Foe)
                                     {
-                                        using (_selectedNodes.ReadLock())
-                                        {
-                                            _selectedNodes.OnCustomDraw(_graphics, mouseX, mouseY);
-
-                                            if (tool.HandleCustomDraw)
-                                                tool.OnCustomDraw(_graphics, _selectedNodes, mouseX, mouseY);
-                                        }
+                                        if (drawEnemies)
+                                            _graphics.FillRhombCentered(enemyBrush, location, 10, 10);
                                     }
-                                    else if (tool.HandleCustomDraw)
-                                        tool.OnCustomDraw(_graphics, null, mouseX, mouseY);
+                                    else if (relationToPlayer == EntityRelation.Friend)
+                                    {
+                                        if(drawFriends)
+                                            _graphics.FillRhombCentered(friendBrush, location, 6, 6);
+                                    }
+                                    else if(drawOtherNpc)
+                                        _graphics.FillRhombCentered(otherBrush, location, 6, 6);
                                 }
                             }
-                            _graphics.DrawLine(Pens.Gray, mouseX, topBorder, mouseX, downBorder);
-                            _graphics.DrawLine(Pens.Gray, leftBorder, mouseY, rightBorder, mouseY);
+                        } 
+                    }
+                    #endregion
 
-                            if(customMouseCursor)
-                            {
-                                _graphics.DrawText(mcText, mouseX, mouseY, mcAlign, mcFont, mcBrush);
-                            }
-                            else
-                            {
-                                _graphics.DrawText(string.Concat("(x)", mouseX.ToString("N2")), mouseX, mouseY, Alignment.BottomLeft, mcFont, mcBrush);
-                                _graphics.DrawText(string.Concat("(y)", mouseY.ToString("N2")), mouseX, mouseY, Alignment.TopLeft, mcFont, mcBrush);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            InterruptAllModifications();
-                            if (timeout.IsTimedOut)
-                            {
-                                ETLogger.WriteLine(LogType.Error,
-                                    string.Concat(nameof(DrawMapper), ": Перехвачено исключение \n\r", ex), true);
-                                timeout.ChangeTime(2000);
-                            }
-                        }
+                    #region Отрисовка специальной графики и указателя мыши
+                    // Отрисовка активного инструмента редактирования
+                    try
+                    {
+                        _graphics.GetWorldPosition(RelativeMousePosition, out double mouseX, out double mouseY);
+                        var tool = CurrentTool;
+                        bool customMouseCursor = false;
+                        string mcText = string.Empty;
+                        Alignment mcAlign = Alignment.None;
+                        Font mcFont = DefaultFont;
+                        Brush mcBrush = Brushes.Gray;
 
-                        // Отрисовка инструмента прокладывания пути
-                        try
+                        if (tool != null)
                         {
-                            if (_mappingTool.MappingMode != MappingMode.Stoped)
-                                _mappingTool.OnCustomDraw(_graphics);
-                        }
-                        catch (Exception ex)
-                        {
-                            InterruptAllModifications();
-                            if (timeout.IsTimedOut)
+                            customMouseCursor = tool.CustomMouseCusor(mouseX, mouseY, out mcText, out mcAlign, out mcFont, out mcBrush);
+
+                            if (tool.AllowNodeSelection || tool.HandleCustomDraw)
                             {
-                                ETLogger.WriteLine(LogType.Error,
-                                    string.Concat(nameof(DrawMapper), ": Перехвачено исключение \n\r", ex), true);
-                                timeout.ChangeTime(2000);
+                                //_graphics.GetWorldPosition(RelativeMousePosition, out double mouseX, out double mouseY);
+                                if (tool.AllowNodeSelection)
+                                {
+                                    using (_selectedNodes.ReadLock())
+                                    {
+                                        _selectedNodes.OnCustomDraw(_graphics, mouseX, mouseY);
+
+                                        if (tool.HandleCustomDraw)
+                                            tool.OnCustomDraw(_graphics, _selectedNodes, mouseX, mouseY);
+                                    }
+                                }
+                                else if (tool.HandleCustomDraw)
+                                    tool.OnCustomDraw(_graphics, null, mouseX, mouseY);
                             }
                         }
-                        #endregion
+                        _graphics.DrawLine(Pens.Gray, mouseX, topBorder, mouseX, downBorder);
+                        _graphics.DrawLine(Pens.Gray, leftBorder, mouseY, rightBorder, mouseY);
 
-                        #region Отрисовка области уклонения от АОЕ
+                        if(customMouseCursor)
+                        {
+                            _graphics.DrawText(mcText, mouseX, mouseY, mcAlign, mcFont, mcBrush);
+                        }
+                        else
+                        {
+                            _graphics.DrawText(string.Concat("(x)", mouseX.ToString("N2")), mouseX, mouseY, Alignment.BottomLeft, mcFont, mcBrush);
+                            _graphics.DrawText(string.Concat("(y)", mouseY.ToString("N2")), mouseX, mouseY, Alignment.TopLeft, mcFont, mcBrush);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        InterruptAllModifications();
+                        if (timeout.IsTimedOut)
+                        {
+                            ETLogger.WriteLine(LogType.Error,
+                                string.Concat(nameof(DrawMapper), ": Перехвачено исключение \n\r", ex), true);
+                            timeout.ChangeTime(2000);
+                        }
+                    }
+
+                    // Отрисовка инструмента прокладывания пути
+                    try
+                    {
+                        if (_mappingTool.MappingMode != MappingMode.Stoped)
+                            _mappingTool.OnCustomDraw(_graphics);
+                    }
+                    catch (Exception ex)
+                    {
+                        InterruptAllModifications();
+                        if (timeout.IsTimedOut)
+                        {
+                            ETLogger.WriteLine(LogType.Error,
+                                string.Concat(nameof(DrawMapper), ": Перехвачено исключение \n\r", ex), true);
+                            timeout.ChangeTime(2000);
+                        }
+                    }
+                    #endregion
+
+                    #region Отрисовка области уклонения от АОЕ
 #if false
                         //if (Astral.Logic.NW.Movements.LastValidPoses != null && !Astral.Logic.NW.Movements.lastvlidposto.IsTimedOut)
                         if (AstralAccessors.Logic.NW.Movements.LastValidPoses.IsValid()
@@ -1205,62 +1099,61 @@ namespace EntityTools.Patches.Mapper
                             }
                         }
 #endif
-                        #endregion
+                    #endregion
 
-                        #region Отрисовка точки назначения
-                        location = Navigator.GetDestination;
-                        x = location.X;
-                        y = location.Y;
-                        if (leftBorder <= x && x <= rightBorder && downBorder <= y && y <= topBorder)
-                            _graphics.DrawCircleCentered(Pens.Red, x, y, 14);
-                        #endregion
+                    #region Отрисовка точки назначения
+                    location = Navigator.GetDestination;
+                    x = location.X;
+                    y = location.Y;
+                    if (leftBorder <= x && x <= rightBorder && downBorder <= y && y <= topBorder)
+                        _graphics.DrawCircleCentered(Pens.Red, x, y, 14);
+                    #endregion
 
-                        #region Отрисовка персонажа
-                        location = EntityManager.LocalPlayer.Location;
-                        x = location.X;
-                        y = location.Y;
-                        if (leftBorder <= x && x <= rightBorder && downBorder <= y && y <= topBorder)
-                        {
-                            double angle = EntityManager.LocalPlayer.Yaw * 180 / Math.PI;
+                    #region Отрисовка персонажа
+                    location = EntityManager.LocalPlayer.Location;
+                    x = location.X;
+                    y = location.Y;
+                    if (leftBorder <= x && x <= rightBorder && downBorder <= y && y <= topBorder)
+                    {
+                        double angle = EntityManager.LocalPlayer.Yaw * 180 / Math.PI;
 #if true
-                            Bitmap image = MapperHelper.RotateImage(Resources.charArrow, (float)angle);
-                            //_graphics.FillCircleCentered(Brushes.DarkGoldenrod, EntityManager.LocalPlayer.Location, 15);
-                            _graphics.drawImage(location, image);
+                        Bitmap image = MapperHelper.RotateImage(Resources.charArrow, (float)angle);
+                        //_graphics.FillCircleCentered(Brushes.DarkGoldenrod, EntityManager.LocalPlayer.Location, 15);
+                        _graphics.drawImage(location, image);
 #else
                         _graphics.FillCircleCentered(Brushes.DarkGoldenrod, EntityManager.LocalPlayer.Location, 15);
                         _graphics.DrawImageCentered(EntityManager.LocalPlayer.Location, Properties.Resources.charArrow, angle);
 #endif
-                        }
-                        #endregion
                     }
+                    #endregion
                 }
-                catch (ObjectDisposedException ex)
+            }
+            catch (ObjectDisposedException ex)
+            {
+                Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex);
+                throw;
+            }
+            catch (InvalidOperationException ex)
+            {
+                Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex);
+                throw;
+            }
+            catch (ThreadAbortException ex)
+            {
+                Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                if (timeout.IsTimedOut)
                 {
-                    Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex);
-                    throw;
-                }
-                catch (InvalidOperationException ex)
-                {
-                    Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex);
-                    throw;
-                }
-                catch (ThreadAbortException ex)
-                {
-                    Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex);
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    if (timeout.IsTimedOut)
-                    {
-                        ETLogger.WriteLine(LogType.Error,
-                            string.Concat(nameof(DrawMapper), ": Перехвачено исключение \n\r", ex), true);
-                        timeout.ChangeTime(2000);
-                    }
+                    ETLogger.WriteLine(LogType.Error,
+                        string.Concat(nameof(DrawMapper), ": Перехвачено исключение \n\r", ex), true);
+                    timeout.ChangeTime(2000);
                 }
             }
         }
-                        #endregion
+        #endregion
 
         #region Добавление и изменение CustomRegion'ов
         /// <summary>
@@ -1270,21 +1163,21 @@ namespace EntityTools.Patches.Mapper
         {
             get
             {
-                return !string.IsNullOrEmpty(editedQuesterProfileName) && Astral.Controllers.Settings.Get.LastQuesterProfile == editedQuesterProfileName;
+                return !string.IsNullOrEmpty(currentProfileName) && Astral.Controllers.Settings.Get.LastQuesterProfile == currentProfileName;
             }
             set
             {
                 if (value)
-                    editedQuesterProfileName = Astral.Controllers.Settings.Get.LastQuesterProfile;
-                else editedQuesterProfileName = string.Empty;
+                    currentProfileName = Astral.Controllers.Settings.Get.LastQuesterProfile;
+                else currentProfileName = string.Empty;
             }
         }
-        string editedQuesterProfileName = string.Empty;
+        string currentProfileName = string.Empty;
 
         /// <summary>
         /// Запуск процедуры добавления CustomRegion'а
         /// </summary>
-        private void handler_AddCustomRegion(object sender, ItemClickEventArgs e)
+        private void handler_StartAddingCustomRegion(object sender, ItemClickEventArgs e)
         {
             AddCustomRegionTool addCRTool = CurrentTool as AddCustomRegionTool;
             if (addCRTool is null)
@@ -1299,71 +1192,78 @@ namespace EntityTools.Patches.Mapper
                 + (barMapping.Visible && barMapping.DockStyle == BarDockStyle.Top ? barMapping.Size.Height : 0)
                 + (barMeshes.Visible && barMeshes.DockStyle == BarDockStyle.Top ? barMeshes.Size.Height : 0));
             //barEditCustomRegion.FloatSize = new Size(Math.Max(100, MapPicture.Width - 40), 0);
+            
+            editCRName.Visibility = BarItemVisibility.Always;
             editCRName.EditWidth = Math.Max(300, Width - 40);
+            
+            editCRSelector.Visibility = BarItemVisibility.Never;
             editCRSelector.EditWidth = Math.Max(300, Width - 40);
 
             btnCRTypeSelector.Visibility = BarItemVisibility.Always;
-            editCRSelector.Visibility = BarItemVisibility.Never;
-            editCRName.Visibility = BarItemVisibility.Always;
+            
             btnCRRename.Visibility = BarItemVisibility.Never;
+            btnCRRename.Checked = false;
+            
             btnCRAdditionAccept.Visibility = BarItemVisibility.Always;
             btnCREditionAccept.Visibility = BarItemVisibility.Never;
-
+            
             barEditCustomRegion.Visible = true;
         }
 
         /// <summary>
         /// Выбор и редактирование существующего CustomRegion'а
         /// </summary>
-        private void handler_EditCustomRegion(object sender, ItemClickEventArgs e)
+        private void handler_StartEditingCustomRegion(object sender, ItemClickEventArgs e)
         {
             var customRegions = Astral.Quester.API.CurrentProfile.CustomRegions;
             if (customRegions.Count == 0)
             {
                 XtraMessageBox.Show("No CustomRegions available to change");
-                btnEditCR.Checked = false;
                 return;
             }
 
             EditCustomRegionTool editCRTool = CurrentTool as EditCustomRegionTool;
-            if (btnEditCR.Checked)
+            if (editCRTool is null)
+                CurrentTool = new EditCustomRegionTool();
+
+            btnLockMapOnPlayer.Checked = false;
+
+            barEditCustomRegion.Text = "Edit CustomRegion";
+            barEditCustomRegion.DockStyle = BarDockStyle.None;
+            barEditCustomRegion.FloatLocation = new Point(Location.X + MapPicture.Location.X + 20,
+                Location.Y + MapPicture.Location.Y + 20
+                + (barMapping.Visible && barMapping.DockStyle == BarDockStyle.Top
+                    ? barMapping.Size.Height
+                    : 0)
+                + (barMeshes.Visible && barMeshes.DockStyle == BarDockStyle.Top
+                    ? barMeshes.Size.Height
+                    : 0));
+
+            editCRName.Visibility = BarItemVisibility.Never;
+            editCRName.EditValue = string.Empty;
+            editCRName.EditWidth = Math.Max(300, Width - 40);
+
+            btnCRTypeSelector.Visibility = BarItemVisibility.Always;
+
+            editCRSelector.Visibility = BarItemVisibility.Always;
+            editCRSelector.EditWidth = Math.Max(300, Width - 40);
+
+            btnCRRename.Visibility = BarItemVisibility.Always;
+            btnCRRename.Checked = false;
+
+            btnCRAdditionAccept.Visibility = BarItemVisibility.Never;
+            btnCREditionAccept.Visibility = BarItemVisibility.Always;
+
+            // Привязываем список CustomRegion'ов
+            if (!ReferenceEquals(itemEditCRList.DataSource, customRegions))
             {
-                btnLockMapOnPlayer.Checked = false;
-
-                barEditCustomRegion.Text = "Edit CustomRegion";
-                barEditCustomRegion.DockStyle = BarDockStyle.None;
-                barEditCustomRegion.FloatLocation = new Point(Location.X + MapPicture.Location.X + 20,
-                    Location.Y + MapPicture.Location.Y + 20
-                    + (barMapping.Visible && barMapping.DockStyle == BarDockStyle.Top
-                        ? barMapping.Size.Height
-                        : 0)
-                    + (barMeshes.Visible && barMeshes.DockStyle == BarDockStyle.Top
-                        ? barMeshes.Size.Height
-                        : 0));
-                //barEditCustomRegion.FloatSize = new Size(Math.Max(100, MapPicture.Width - 40), 0);
-                editCRName.EditWidth = Math.Max(300, Width - 40);
-                editCRSelector.EditWidth = Math.Max(300, Width - 40);
-
-                btnCRTypeSelector.Visibility = BarItemVisibility.Always;
-                editCRSelector.Visibility = BarItemVisibility.Always;
-                editCRName.Visibility = BarItemVisibility.Never;
-                btnCRRename.Visibility = BarItemVisibility.Always;
-                btnCRAdditionAccept.Visibility = BarItemVisibility.Never;
-                btnCREditionAccept.Visibility = BarItemVisibility.Always;
-
-                // Привязываем список CustomRegion'ов
-                if (!ReferenceEquals(itemEditCRList.DataSource, customRegions))
-                {
-                    itemEditCRList.DataSource = customRegions;
-                    itemEditCRList.DisplayMember = "Name";
-                    editCRSelector.EditValue = customRegions.First();//null; 
-                }
-                else handler_ChangeSelectedCustomRegion(sender);
-
-                barEditCustomRegion.Visible = true;
+                itemEditCRList.DataSource = customRegions;
+                itemEditCRList.DisplayMember = "Name";
+                editCRSelector.EditValue = customRegions.First();
             }
-            else if (editCRTool != null)
-                CurrentTool = null;
+            else handler_ChangeSelectedCustomRegion(sender);
+
+            barEditCustomRegion.Visible = true;
         }
 
         /// <summary>
@@ -1387,20 +1287,16 @@ namespace EntityTools.Patches.Mapper
                         сurrentProfileNeedSave = true;
 
                         //Обновление списка CustomRegion'ов в Quester-редакторе
-                        AstralAccessors.Quester.Forms.Editor.EditorForm.RefreshRegions();
+                        AstralAccessors.Quester.Forms.Editor.EditorForm?.RefreshRegions();
 
                         CurrentTool = new EditCustomRegionTool(cr);
                     }
                     else editCRTool.AttachTo(cr);
                 }
-#if false
-                CenterOfMap = cr.Position; 
-#else
+
                 var crPos = cr.Position.Clone();
                 crPos.Z = CenterOfMap.Z;
                 CenterOfMap = crPos;
-#endif
-
 
                 btnCRTypeSelector.Checked = cr.Eliptic;
             }
@@ -1423,7 +1319,7 @@ namespace EntityTools.Patches.Mapper
                     return;
                 }
 
-                string crName = editCRName.EditValue.ToString()?.Trim();
+                string crName = editCRName.EditValue.ToString().Trim();
                 if (string.IsNullOrEmpty(crName))
                     XtraMessageBox.Show("The Name of the CustomRegion is not valid !");
                 else 
@@ -1441,7 +1337,7 @@ namespace EntityTools.Patches.Mapper
                             сurrentProfileNeedSave = true;
 
                             //Обновление списка CustomRegion'ов в Quester-редакторе
-                            AstralAccessors.Quester.Forms.Editor.EditorForm.RefreshRegions();
+                            AstralAccessors.Quester.Forms.Editor.EditorForm?.RefreshRegions();
 
                             //_undoStack.Push(addCRtool); <- вызывается в CurrentTool.set
                             CurrentTool = null;
@@ -1455,17 +1351,30 @@ namespace EntityTools.Patches.Mapper
 
         private void handler_AcceptCREdition(object sender, ItemClickEventArgs e)
         {
-            if (CurrentTool is EditCustomRegionTool editCRTool && editCRTool.Modified)
+            if (CurrentTool is EditCustomRegionTool editCRTool)
             {
-                editCRTool.Apply(Convert.ToString(editCRName.EditValue));
-                сurrentProfileNeedSave = true;
+                var newName = editCRName.EditValue.ToString();
+                bool nameChanged = btnCRRename.Checked && !string.IsNullOrEmpty(newName) && !editCRTool.Name.Equals(newName);
 
-                //Обновление списка CustomRegion'ов в Quester-редакторе
-                AstralAccessors.Quester.Forms.Editor.EditorForm.RefreshRegions();
+                if (editCRTool.Modified || nameChanged)
+                {
+                    var editedCR = editCRTool.Apply(newName);
 
-                editCRName.EditValue = string.Empty;
-                editCRName.Visibility = BarItemVisibility.Never;
-                editCRSelector.Visibility = BarItemVisibility.Always;
+                    сurrentProfileNeedSave = true;
+
+                    //Обновление списка CustomRegion'ов в Quester-редакторе
+                    AstralAccessors.Quester.Forms.Editor.EditorForm?.RefreshRegions();
+
+                    editCRName.Visibility = BarItemVisibility.Never;
+                    editCRName.EditValue = string.Empty;
+
+                    btnCRRename.Checked = false;
+
+                    editCRSelector.Visibility = BarItemVisibility.Always;
+                    editCRSelector.Refresh();
+
+                    CurrentTool = new EditCustomRegionTool(editedCR);
+                }
             }
         }
 
@@ -1475,11 +1384,10 @@ namespace EntityTools.Patches.Mapper
         private void handler_CancelCRManipulation(object sender, ItemClickEventArgs e)
         {
             var tool = CurrentTool;
-            if (tool is AddCustomRegionTool addCRtool
-                || tool is EditCustomRegionTool editCRtool)
+            if (tool is AddCustomRegionTool
+                || tool is EditCustomRegionTool)
                 CurrentTool = null;
             barEditCustomRegion.Visible = false;
-            btnEditCR.Checked = false;
         }
 
         /// <summary>
@@ -1517,13 +1425,9 @@ namespace EntityTools.Patches.Mapper
                 editCRName.Visibility = BarItemVisibility.Never;
             }
         }
-                        #endregion
+        #endregion
 
         #region Изменение настроек
-        private void handler_DeleteRadiusChanged(object sender, EventArgs e)
-        {
-            API.CurrentSettings.DeleteNodeRadius = Convert.ToInt32(editDeleteRadius.EditValue);
-        }
         private void handler_WaypointDistanceChanged(object sender, EventArgs e)
         {
             int value = Convert.ToInt32(editWaypointDistance.EditValue);
@@ -1562,6 +1466,8 @@ namespace EntityTools.Patches.Mapper
             // Штатное сохранение профиля реализовано в
             // Astral.Quester.Core.Save(false)
 
+            //TODO переделать с использованием Core.CurrentProfileZipMeshFile и внешних мешей
+
             string meshName = EntityManager.LocalPlayer.MapState.MapName + ".bin";
             string profileName = Astral.Controllers.Settings.Get.LastQuesterProfile;
             var currentProfile = Astral.Quester.API.CurrentProfile;
@@ -1569,7 +1475,6 @@ namespace EntityTools.Patches.Mapper
             string externalMeshFileName = useExternalMeshFile ? Path.Combine(Path.GetDirectoryName(profileName), currentProfile.ExternalMeshFileName) : string.Empty;
             Graph mesh = AstralAccessors.Quester.Core.Meshes;
 
-#if true
             if (File.Exists(profileName))
             {
                 ZipArchive zipFile = null;
@@ -1617,123 +1522,22 @@ namespace EntityTools.Patches.Mapper
                         } 
                     }
 
-#if false
                     if (succeeded)
-                        XtraMessageBox.Show(string.Concat("The profile '", Path.GetFileName(profileName), "' updated:\n\r\t",
+                        Logger.Notify(string.Concat("The profile '", Path.GetFileName(profileName), "' updated:\n\r\t",
                                                         useExternalMeshFile ? externalMeshFileName + '\\' : string.Empty, meshName,
                                                         profileUpdated ? "\n\r\tprofile.xml" : string.Empty));
-                    else XtraMessageBox.Show(string.Concat("Fail to save changes to the profile '", Path.GetFileName(profileName), '\''), "Failed !", MessageBoxButtons.OK, MessageBoxIcon.Warning); 
-#else
-                    if (succeeded)
-                        Astral.Logger.Notify(string.Concat("The profile '", Path.GetFileName(profileName), "' updated:\n\r\t",
-                                                        useExternalMeshFile ? externalMeshFileName + '\\' : string.Empty, meshName,
-                                                        profileUpdated ? "\n\r\tprofile.xml" : string.Empty));
-                    else Astral.Logger.Notify(string.Concat("Fail to save changes to the profile '", Path.GetFileName(profileName), '\''), true);
-#endif
+                    else Logger.Notify(string.Concat("Fail to save changes to the profile '", Path.GetFileName(profileName), '\''), true);
                 }
                 catch (Exception exc)
                 {
                     Logger.WriteLine(exc.ToString());
-#if false
-                    XtraMessageBox.Show(exc.ToString()); 
-#else
-                    Astral.Logger.Notify(exc.ToString(), true);
-#endif
+                    Logger.Notify(exc.ToString(), true);
                 }
                 finally
                 {
                     zipFile?.Dispose();
                 }
             }
-#else
-            if (Astral.Quester.API.CurrentProfile.UseExternalMeshFile)
-            {
-                // Профиль использует "внешние" меши
-                XtraMessageBox.Show($"The '{nameof(MapperFormExt)}' doesn't support external Meshes");
-            }
-            else
-            {
-                // Сохранение графа путей (карты) в файл текущего профиля
-                if (File.Exists(profileName))
-                {
-                    try
-                    {
-                        // удаляем мусор (скрытые вершины)
-                        AstralAccessors.Quester.Core.Meshes.Value.RemoveUnpassable();
-
-                        bool profileUpdated = false;
-                        using (ZipArchive zipFile = ZipFile.Open(fileName, ZipArchiveMode.Update))
-                        {
-                            ZipArchiveEntry zipMeshEntry = zipFile.GetEntry(meshName);
-
-#if false
-                            // Проверяем наличие меша карты в zip-файле
-                            foreach (ZipArchiveEntry entry in zipFile.Entries)
-                            {
-                                if (entry.Name.Equals(meshName, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    zipMeshEntry = entry;
-                                    break;
-                                }
-                            } 
-#endif
-
-                            if (zipMeshEntry != null)
-                                // Меш карты найден. Удаляем старый и создаем новый
-                                zipMeshEntry.Delete();
-                            zipMeshEntry = zipFile.CreateEntry(meshName);
-
-                            // Сохранение графа путей (мешей) активной карты
-                            using (MemoryStream memoryStream = new MemoryStream())
-                            {
-                                BinaryFormatter binaryFormatter = new BinaryFormatter();
-                                binaryFormatter.Serialize(memoryStream, AstralAccessors.Quester.Core.Meshes.Value);
-
-                                using (var zipMeshStream = zipMeshEntry.Open())
-                                {
-                                    byte[] meshBytes = memoryStream.ToArray();
-
-                                    zipMeshStream.Write(meshBytes, 0, meshBytes.Length);
-                                }
-                            }
-
-                            // Сохранение регионов
-                            if (CurrentProfileNeedSave)
-                            {
-                                ZipArchiveEntry zipProfileEntry = zipFile.GetEntry("profile.xml");
-
-                                if (zipProfileEntry is null)
-                                    zipProfileEntry = zipFile.CreateEntry("profile.xml");
-                                else
-                                {
-                                    zipProfileEntry.Delete();
-                                    zipProfileEntry = zipFile.CreateEntry("profile.xml");
-                                }
-
-                                XmlSerializer serializer = new XmlSerializer(Astral.Quester.API.CurrentProfile.GetType(), Patch_XmlSerializer_GetExtraTypes.QuesterTypes.ToArray());
-                                using (var zipProfileStream = zipProfileEntry.Open())
-                                {
-                                    serializer.Serialize(zipProfileStream, Astral.Quester.API.CurrentProfile);
-                                    Astral.Quester.API.CurrentProfile.Saved = true;
-                                    profileUpdated = true;
-                                }
-
-                                CurrentProfileNeedSave = false;
-                            }
-                        }
-
-                        XtraMessageBox.Show(string.Concat("The profile '", Path.GetFileName(fileName), "' updated:\n\r\t",
-                                                            meshName,
-                                                            profileUpdated ? "profile.xml" : string.Empty));
-                    }
-                    catch (Exception exc)
-                    {
-                        Logger.WriteLine(exc.ToString());
-                        XtraMessageBox.Show(exc.ToString());
-                    }
-                }
-            } 
-#endif
         }
 
         /// <summary>
@@ -1741,20 +1545,21 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         private void handler_ImportCurrentMapMeshesFromGame(object sender, ItemClickEventArgs e)
         {
+            handler_Mapping_Stop();
+            ResetToolState();
+
             Graph graph = AstralAccessors.Quester.Core.Meshes;
-            if (graph != null
-                && (graph.NodesCount == 0
-                    || XtraMessageBox.Show(this, "Are you sure to import game nodes ? All actual nodes must be delete !", "", 
-                        MessageBoxButtons.YesNo) == DialogResult.Yes))
+            if (graph == null || graph.NodesCount == 0)
+                return;
+
+            if(XtraMessageBox.Show(this,
+                "Are you sure to import game nodes?\n" +
+                "All nodes of the current map would be deleted!", "",
+                MessageBoxButtons.YesNo) != DialogResult.Yes) return;
+            using (graph.WriteLock())
             {
-                handler_Mapping_Stop();
-                ResetToolState();
-                lock (graph)
-                {
-                    graph.Clear();
-                    GoldenPath.GetCurrentMapGraph(graph);
-                    //graphCache?.RegenCache(null);
-                }
+                graph.Clear();
+                GoldenPath.GetCurrentMapGraph(graph);
             }
         }
 
@@ -1763,105 +1568,107 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         private void handler_ImportMapMeshesFromFile(object sender, ItemClickEventArgs e)
         {
+            handler_Mapping_Stop();
+            ResetToolState();
+
             string currentMapName = EntityManager.LocalPlayer.MapState.MapName;
             if (string.IsNullOrEmpty(currentMapName))
             {
                 XtraMessageBox.Show("Impossible to get current map name !");
                 return;
             }
+            
             string currentMapMeshesName = currentMapName + ".bin";
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
                 InitialDirectory = Directories.ProfilesPath,
                 DefaultExt = "amp.zip",
-                Filter = @"Astral mission profil (*.amp.zip)|*.amp.zip|(*.mesh.zip)|*.mesh.zip"
+                Filter = @"Astral mission profile (*.amp.zip)|*.amp.zip|(*.mesh.zip)|*.mesh.zip"
             };
-            if (openFileDialog.ShowDialog() == DialogResult.OK && File.Exists(openFileDialog.FileName))
+            
+            if (openFileDialog.ShowDialog() != DialogResult.OK 
+                || !File.Exists(openFileDialog.FileName)) 
+                return;
+
+            try
             {
-                handler_Mapping_Stop();
-                ResetToolState();
-                try
+                using (ZipArchive profile = ZipFile.Open(openFileDialog.FileName, ZipArchiveMode.Read))
                 {
-                    using (ZipArchive profile = ZipFile.Open(openFileDialog.FileName, ZipArchiveMode.Read))
+                    ZipArchiveEntry currentMapEntry = profile.GetEntry(currentMapMeshesName);
+                    if(currentMapEntry is null)
                     {
-                        ZipArchiveEntry currentMapEntry = profile.GetEntry(currentMapMeshesName);
-                        if(currentMapEntry is null)
-                        {
-                            XtraMessageBox.Show("This profile doesn't contain current map !");
-                            return;
-                        }
-                        var mapsMeshes = AstralAccessors.Quester.Core.MapsMeshes;
+                        XtraMessageBox.Show("Selected file doesn't contain current map meshes!");
+                        return;
+                    }
+                    var mapsMeshes = AstralAccessors.Quester.Core.MapsMeshes;
 
-                        DialogResult dialogResult = XtraMessageBox.Show("Import current map only ?\n\rElse import all.", "Map import", MessageBoxButtons.YesNoCancel);
-                        if (dialogResult == DialogResult.Yes)
-                        {
-                            // Экспорт одной "текуще" карты
-                            using (Stream stream = currentMapEntry.Open())
-                            {       
-                                BinaryFormatter binaryFormatter = new BinaryFormatter();
-                                Graph currentMapMeshes = binaryFormatter.Deserialize(stream) as Graph;
-                                if(currentMapMeshes != null)
+                    DialogResult dialogResult = XtraMessageBox.Show("Import current map only ?\n\rElse import all.", "Map import", MessageBoxButtons.YesNoCancel);
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        // Экспорт одной "текущей" карты
+                        using (Stream stream = currentMapEntry.Open())
+                        {       
+                            BinaryFormatter binaryFormatter = new BinaryFormatter();
+                            Graph currentMapMeshes = binaryFormatter.Deserialize(stream) as Graph;
+                            if(currentMapMeshes != null)
+                            {
+                                ResetToolState();
+
+                                lock (mapsMeshes)
                                 {
-                                    ResetToolState();
-
-                                    lock (mapsMeshes)
-                                    {
-                                        if (mapsMeshes.ContainsKey(currentMapName))
-                                            mapsMeshes[currentMapName] = currentMapMeshes;
-                                        else mapsMeshes.Add(currentMapName, currentMapMeshes);
-                                    }
-                                    Logger.WriteLine($"Import '{currentMapMeshesName}' from {openFileDialog.FileName}");
-                                    return;
+                                    if (mapsMeshes.ContainsKey(currentMapName))
+                                        mapsMeshes[currentMapName] = currentMapMeshes;
+                                    else mapsMeshes.Add(currentMapName, currentMapMeshes);
                                 }
-
-                                string msg = $"Failed to import '{currentMapMeshesName}' from {openFileDialog.FileName}";
-                                Logger.WriteLine(msg);
-                                XtraMessageBox.Show(msg);
+                                Logger.WriteLine($"Import '{currentMapMeshesName}' from {openFileDialog.FileName}");
                                 return;
                             }
 
-                        }
-                        if (dialogResult == DialogResult.No)
-                        {
-                            // Экспорт всех карт, содержащихся в заданном профиле
-                            BinaryFormatter binaryFormatter = new BinaryFormatter();
-                            StringBuilder sb = new StringBuilder();
-                            sb.Append("Import maps meshes from  '").Append(openFileDialog.FileName).AppendLine("':");
-                            foreach (ZipArchiveEntry entry in profile.Entries)
-                            {
-                                if (entry.Name.EndsWith(".bin", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    string entryMapName = entry.Name.Substring(0, entry.Name.Length - 4);
-                                    Graph entryMapMeshes;
-                                    using (Stream stream = entry.Open())
-                                    {
-                                        entryMapMeshes = binaryFormatter.Deserialize(stream) as Graph;
-                                    }
-                                    if (entryMapMeshes != null)
-                                    {
-                                        ResetToolState();
-
-                                        lock (mapsMeshes)
-                                        {
-                                            if (mapsMeshes.ContainsKey(entryMapName))
-                                                mapsMeshes[entryMapName] = entryMapMeshes;
-                                            else mapsMeshes.Add(entryMapName, entryMapMeshes); 
-                                        }
-                                        sb.Append("\t'").Append(currentMapMeshesName).AppendLine("' - succeeded");
-                                    }
-                                    else sb.Append("\t'").Append(currentMapMeshesName).AppendLine("' - failed");
-                                }
-                            } 
-                            Logger.WriteLine(sb.ToString());
+                            string msg = $"Failed to import '{currentMapMeshesName}' from {openFileDialog.FileName}";
+                            Logger.WriteLine(msg);
+                            XtraMessageBox.Show(msg);
+                            return;
                         }
 
                     }
+                    if (dialogResult == DialogResult.No)
+                    {
+                        // Экспорт всех карт, содержащихся в заданном профиле
+                        BinaryFormatter binaryFormatter = new BinaryFormatter();
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append("Import maps meshes from  '").Append(openFileDialog.FileName).AppendLine("':");
+                        foreach (ZipArchiveEntry entry in profile.Entries)
+                        {
+                            if (entry.Name.EndsWith(".bin", StringComparison.OrdinalIgnoreCase))
+                            {
+                                string entryMapName = entry.Name.Substring(0, entry.Name.Length - 4);
+                                Graph entryMapMeshes;
+                                using (Stream stream = entry.Open())
+                                {
+                                    entryMapMeshes = binaryFormatter.Deserialize(stream) as Graph;
+                                }
+                                if (entryMapMeshes != null)
+                                {
+                                    lock (mapsMeshes)
+                                    {
+                                        if (mapsMeshes.ContainsKey(entryMapName))
+                                            mapsMeshes[entryMapName] = entryMapMeshes;
+                                        else mapsMeshes.Add(entryMapName, entryMapMeshes); 
+                                    }
+                                    sb.Append("\t'").Append(entryMapName).AppendLine("' - succeeded");
+                                }
+                                else sb.Append("\t'").Append(entryMapName).AppendLine("' - failed");
+                            }
+                        } 
+                        Logger.WriteLine(sb.ToString());
+                    }
+
                 }
-                catch (Exception exc)
-                {
-                    Logger.WriteLine(exc.ToString());
-                    XtraMessageBox.Show(exc.ToString());
-                }
+            }
+            catch (Exception exc)
+            {
+                Logger.WriteLine(exc.ToString());
+                XtraMessageBox.Show(exc.ToString());
             }
         }
 

@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.31025.194
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityTools", "EntityTools\EntityTools.csproj", "{DF7F797E-DB7E-44F9-A96A-020CFDB3C51E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FD0C9E2A-5D26-43AA-A227-BDDAF9C30705} = {FD0C9E2A-5D26-43AA-A227-BDDAF9C30705}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mount_Tutorial", "Mount_Tutorial\Mount_Tutorial.csproj", "{451B1F7E-CC3C-4DD4-B03F-4FFD55BA7319}"
 EndProject
@@ -22,12 +25,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mount_Tutorial_Core", "Moun
 		{146DCE3C-04EE-4D10-A692-09670A31A357} = {146DCE3C-04EE-4D10-A692-09670A31A357}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AMClient", "AMClient\AMClient.csproj", "{FD0C9E2A-5D26-43AA-A227-BDDAF9C30705}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BA2653F2-9153-456D-8234-BA9E8D35306A}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AMClient", "AMClient\AMClient.csproj", "{FD0C9E2A-5D26-43AA-A227-BDDAF9C30705}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

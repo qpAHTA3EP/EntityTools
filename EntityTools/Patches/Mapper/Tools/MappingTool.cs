@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using AStar;
+using MyNW.Internals;
+using System;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using AStar;
-using MyNW.Internals;
 
 namespace EntityTools.Patches.Mapper.Tools
 {
     public class MappingTool
     {
-        public MappingTool(Func<IGraph> getGraph, MappingMode mode = Mapper.MappingMode.Stoped)
+        public MappingTool(Func<IGraph> getGraph, MappingMode mode = MappingMode.Stoped)
         {
-            this.getGraph = getGraph;
-            _mappingCache = new MapperGraphCache(getGraph, true, true)
+            _mappingCache = new MapperGraphCache(getGraph)
             { 
                 CacheDistanceX = EntityTools.Config.Mapper.CacheRadius,
                 CacheDistanceY = EntityTools.Config.Mapper.CacheRadius,
@@ -33,14 +29,12 @@ namespace EntityTools.Patches.Mapper.Tools
         /// <summary>
         /// Токен отмены MappingTask
         /// </summary>
-        private CancellationTokenSource _mappingCanceler = null;
+        private CancellationTokenSource _mappingCanceler;
 
         /// <summary>
         /// Кэш вершин графа путей
         /// </summary>
         private readonly MapperGraphCache _mappingCache;
-
-        private Func<IGraph> getGraph;
 
         /// <summary>
         /// Последняя добавленная вершина
@@ -50,9 +44,7 @@ namespace EntityTools.Patches.Mapper.Tools
         /// <summary>
         /// Название карты и региона, на которой активировано прокладывание пути
         /// </summary>
-        private string _mapAndRegion_whereMapping = null;
-
-        private int _mapHash = 0;
+        private string _mapAndRegion_whereMapping;
 
         /// <summary>
         /// Тип пути
@@ -138,8 +130,11 @@ namespace EntityTools.Patches.Mapper.Tools
         /// </summary>
         private void StartMapping()
         {
-            if (_mappingTask != null && !_mappingTask.IsCanceled && !_mappingTask.IsCompleted &&
-                !_mappingTask.IsFaulted) return;
+            if (_mappingTask != null 
+                && !_mappingTask.IsCanceled 
+                && !_mappingTask.IsCompleted 
+                && !_mappingTask.IsFaulted) 
+                return;
 
             _mapAndRegion_whereMapping = EntityManager.LocalPlayer.MapAndRegion;
             _mappingCanceler = new CancellationTokenSource();
@@ -175,6 +170,7 @@ namespace EntityTools.Patches.Mapper.Tools
                 }
 
                 while (_mode != MappingMode.Stoped
+                       && _mapAndRegion_whereMapping.Equals(EntityManager.LocalPlayer.MapAndRegion)
                        && !token.IsCancellationRequested)
                 {
                     // Проверяем расстояние только до предыдущего узла

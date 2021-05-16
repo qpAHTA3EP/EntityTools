@@ -1,13 +1,10 @@
 ﻿//#define PROFILING
 #define LOG
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using AStar;
 using MyNW.Classes;
-
-//using NodeDistPair = EntityTools.Tools.Pair<AStar.Node, double>;
+using System;
+using System.Threading;
 
 namespace EntityTools.Patches.Mapper.Tools
 {
@@ -78,103 +75,63 @@ namespace EntityTools.Patches.Mapper.Tools
                 {
                     foreach (Node currentNode in graph.NodesCollection)
                     {
+                        if (!currentNode.Passable)
+                            continue;
+
                         if (NodesEquals(lastND.Node, currentNode))
                             continue;
 
                         //Проверяем разницу высот
                         NodeDetail currentND = new NodeDetail(currentNode, newNode);
-                        if (Math.Abs(currentND.Z) < maxZDifference)
+                        if (!(Math.Abs(currentND.Z) < maxZDifference)) 
+                            continue;
+
+                        // Разница высот в пределах допустимой величины,
+                        // проверяем расстояние от добавляемой точки до текущей
+                        if (currentND.Distance < equivalenceDistance)
                         {
-                            // Разница высот в пределах допустимой величины,
-                            // проверяем расстояние от добавляемой точки до текущей
-                            if (currentND.Distance < equivalenceDistance)
+                            // Запоминаем существующий узел, эквивалентный "новому узлу"
+                            if (equivalentND is null || currentND.Distance < equivalentND.Distance)
+                                equivalentND = currentND;
+                        }
+                        else if (currentND.Distance <= maxDistance)
+                        {
+                            // вычисляем косинус угла меду векторами для определения четверти (впереди, сзади, слева, справа)
+                            // в которой находится curNode
+                            double cos = CosineOxy(lastND, currentND);
+
+                            if (cos < -0.7071d)
                             {
-#if SWAP_NEW2EQUIVALENT
-                                // В графе есть точка, расстояние до которой меньше equivalenceDistance
-                                // подменяем newNode на currentNode
-                                newNode = currentNode;
-
-                                isEquivalent = true;
-                                minNodeDistance = double.MaxValue;
-                                closestNodeInd = -1;
-
-#if LINK_EQUIVALENT_ToALL
-                                // Вариант, при котором эквивалентный узел связывается с другими "близкими" узлами
-                                // пересчитываем расстояния для узлов, добавленных в список nearestNodeList
-                                // одновременно с этим производит повторный поиск ближайшего узла к newNode = currentNode;
-                                for ( int ind = 0; ind < nearestNodeList.Count; ind++)
-                                {
-                                    nearestNodeList[ind].Rebase(newNode);
-                                    if(nearestNodeList[ind].Distance < minNodeDistance)
-                                    {
-                                        minNodeDistance = nearestNodeList[ind].Distance;
-                                        closestNodeInd = ind;
-                                    }
-                                }
-#else
-                                // Вариант при котором эквивалентный узел связывается ТОЛЬКО с lastNode
-                                // Очищаем список ближайших узлов
-                                nearestNodeList.Clear();
-                                // прерываем поиск
-                                break;
-#endif
-#else
-                                // Запоминаем существующий узел, эквивалентный "новому узлу"
-                                if (equivalentND is null || currentND.Distance < equivalentND.Distance)
-                                    equivalentND = currentND;
-#endif
+                                // Угол между векторами больше 135 градусов
+                                // Значит точка находится впереди
+                                if (frontND is null
+                                    || frontND.Distance > currentND.Distance)
+                                    frontND = currentND;
                             }
-                            else if (currentND.Distance <= maxDistance)
+                            else if (cos < 0.7071d)
                             {
-                                // вычисляем косинус угла меду векторами для определения четверти (впереди, сзади, слева, справа)
-                                // в которой находится curNode
-                                double cos = CosineOxy(lastND, currentND);
+                                // Угол между векторами в диапазоне 45~125 градусов
 
-                                if (cos < -0.7071d)
+                                // Вычисляем в какой полуплоскости находится currentND
+                                // относительно вектора на lastND
+                                // который направлен от newNode к lastND
+                                double D = lastND.X * currentND.Y - currentND.X * lastND.Y;
+
+                                if (D > 0)
                                 {
-                                    // Угол между векторами больше 135 градусов
-                                    // Значит точка находится впереди
-                                    if (frontND is null
-                                        || frontND.Distance > currentND.Distance)
-                                        frontND = currentND;
+                                    if (rightND is null
+                                        || rightND.Distance > currentND.Distance)
+                                        rightND = currentND;
                                 }
-                                else if (cos < 0.7071d)
-                                {
-                                    // Угол между векторами в диапазоне 45~125 градусов
-
-                                    // Вычисляем в какой полуплоскости находится currentND
-                                    // относительно вектора на lastND
-                                    // который направлен от newNode к lastND
-                                    double D = lastND.X * currentND.Y - currentND.X * lastND.Y;
-
-                                    if (D > 0)
-                                    {
-                                        if (rightND is null
-                                            || rightND.Distance > currentND.Distance)
-                                            rightND = currentND;
-                                    }
-                                    else
-                                    {
-                                        if (leftND is null
-                                            || leftND.Distance > currentND.Distance)
-                                            leftND = currentND;
-                                    }
-                                }
-#if false
-                                // проверка (lastND is null) уже была выполнена в самом начале метода
-                                else if (lastND is null)
-                                {
-                                    if (backND == null
-                                        || backND.Distance > currentND.Distance)
-                                        backND = currentND;
-                                } 
-#else
-                                // узлом в задней четверти является lastND
-                                else if (backND is null 
-                                    || backND.Distance > currentND.Distance)
-                                    backND = currentND;
-#endif
+                                else if (leftND is null
+                                        || leftND.Distance > currentND.Distance)
+                                        leftND = currentND;
                             }
+
+                            // узлом в задней четверти является lastND
+                            else if (backND is null 
+                                     || backND.Distance > currentND.Distance)
+                                backND = currentND;
                         }
                     }
                 }
@@ -381,7 +338,6 @@ namespace EntityTools.Patches.Mapper.Tools
             if (graph is null || pos is null || !pos.IsValid)
                 return null;
 
-            //TODO: добавить связывание с несколькими ближайшими вершинами (по сторонам света)
             if (lastND is null)
                 return LinkNearest_3_Side(pos, graph, null, uniDirection); 
 
@@ -404,9 +360,9 @@ namespace EntityTools.Patches.Mapper.Tools
             NodeDetail rightND = null; // справа -(75~105)
             NodeDetail rightBackND = null; // справа-сзади -(105~165)
             NodeDetail backND = null; //сзади
-            // Косое произведение веторов A и B
+            // Косое произведение векторов A и B
             // D = Ax * By - Bx * Ay
-            // Если D == 0 - вектора коллиниарны
+            // Если D == 0 - вектора коллинеарны
             // Если D > 0 - точка B в верхней полуплоскости
             // Если D < 0 - точка B в нижней полуплоскости
 
@@ -418,144 +374,115 @@ namespace EntityTools.Patches.Mapper.Tools
                 {
                     foreach (Node currentNode in graph.NodesCollection)
                     {
+                        if (!currentNode.Passable)
+                            continue;
+                        
                         if (NodesEquals(lastND.Node, currentNode))
                             continue;
 
                         //Проверяем разницу высот
                         NodeDetail currentND = new NodeDetail(currentNode, newNode);
-                        if (Math.Abs(currentND.Z) < maxZDifference)
+                        if (!(Math.Abs(currentND.Z) < maxZDifference)) 
+                            continue;
+
+                        // Разница высот в пределах допустимой величины,
+                        // проверяем расстояние от добавляемой точки до текущей
+                        if (currentND.Distance < equivalenceDistance)
                         {
-                            // Разница высот в пределах допустимой величины,
-                            // проверяем расстояние от добавляемой точки до текущей
-                            if (currentND.Distance < equivalenceDistance)
+                            // Запоминаем существующий узел, эквивалентный "новому узлу"
+                            if (equivalentND is null || currentND.Distance < equivalentND.Distance)
+                                equivalentND = currentND;
+                        }
+                        else if (currentND.Distance <= maxDistance)
+                        {
+                            // вычисляем косинус угла меду векторами для определения четверти (впереди, сзади, слева, справа)
+                            // в которой находится curNode
+                            double cos = CosineOxy(lastND, currentND);
+                            // cos(165) = -0.9659258262890682867497431997289
+                            // cos(105) = -0.25881904510252076234889883762405
+                            // cos(75) = 0.25881904510252076234889883762405
+                            // cos(15) = 0.9659258262890682867497431997289
+                            if (cos < -0.9659258262890682867497431997289) // угол больше 165
                             {
-#if SWAP_NEW2EQUIVALENT
-                                // В графе есть точка, расстояние до которой меньше equivalenceDistance
-                                // подменяем newNode на currentNode
-                                newNode = currentNode;
-
-                                isEquivalent = true;
-                                minNodeDistance = double.MaxValue;
-                                closestNodeInd = -1;
-
-#if LINK_EQUIVALENT_ToALL
-                                // Вариант, при котором эквивалентный узел связывается с другими "близкими" узлами
-                                // пересчитываем расстояния для узлов, добавленных в список nearestNodeList
-                                // одновременно с этим производит повторный поиск ближайшего узла к newNode = currentNode;
-                                for ( int ind = 0; ind < nearestNodeList.Count; ind++)
-                                {
-                                    nearestNodeList[ind].Rebase(newNode);
-                                    if(nearestNodeList[ind].Distance < minNodeDistance)
-                                    {
-                                        minNodeDistance = nearestNodeList[ind].Distance;
-                                        closestNodeInd = ind;
-                                    }
-                                }
-#else
-                                // Вариант при котором эквивалентный узел связывается ТОЛЬКО с lastNode
-                                // Очищаем список ближайших узлов
-                                nearestNodeList.Clear();
-                                // прерываем поиск
-                                break;
-#endif
-#else
-                                // Запоминаем существующий узел, эквивалентный "новому узлу"
-                                if (equivalentND is null || currentND.Distance < equivalentND.Distance)
-                                    equivalentND = currentND;
-#endif
+                                // Угол между векторами больше 165 градусов
+                                // Значит точка находится впереди
+                                if (frontND is null
+                                    || frontND.Distance > currentND.Distance)
+                                    frontND = currentND;
                             }
-                            else if (currentND.Distance <= maxDistance)
+                            else 
                             {
-                                // вычисляем косинус угла меду векторами для определения четверти (впереди, сзади, слева, справа)
-                                // в которой находится curNode
-                                double cos = CosineOxy(lastND, currentND);
-                                // cos(165) = -0.9659258262890682867497431997289
-                                // cos(105) = -0.25881904510252076234889883762405
-                                // cos(75) = 0.25881904510252076234889883762405
-                                // cos(15) = 0.9659258262890682867497431997289
-                                if (cos < -0.9659258262890682867497431997289) // угол больше 165
-                                {
-                                    // Угол между векторами больше 165 градусов
-                                    // Значит точка находится впереди
-                                    if (frontND is null
-                                        || frontND.Distance > currentND.Distance)
-                                        frontND = currentND;
-                                }
-                                else 
-                                {
-                                    // Вычисляем в какой полуплоскости находится currentND
-                                    // относительно вектора,
-                                    // который направлен от newNode к lastND
-                                    double D = lastND.X * currentND.Y - currentND.X * lastND.Y;
+                                // Вычисляем в какой полуплоскости находится currentND
+                                // относительно вектора,
+                                // который направлен от newNode к lastND
+                                double D = lastND.X * currentND.Y - currentND.X * lastND.Y;
 
-                                    if(cos < -0.25881904510252076234889883762405) // угол (105~165)
+                                if(cos < -0.25881904510252076234889883762405) // угол (105~165)
+                                {
+                                    // Угол между векторами (105~165) градусов
+                                    // Значит точка находится впереди-слева или впереди-справа
+                                    if (D > 0)
                                     {
-                                        // Угол между векторами (105~165) градусов
-                                        // Значит точка находится впереди-слева или впереди-справа
-                                        if (D > 0)
-                                        {
-                                            if (frontRightND is null
-                                                || frontRightND.Distance > currentND.Distance)
-                                                frontRightND = currentND;
-                                        }
-                                        else
-                                        {
-                                            if (frontLeftND is null
-                                                || frontLeftND.Distance > currentND.Distance)
-                                                frontLeftND = currentND;
-                                        }
+                                        if (frontRightND is null
+                                            || frontRightND.Distance > currentND.Distance)
+                                            frontRightND = currentND;
                                     }
-                                    else if (cos < 0.25881904510252076234889883762405) // угол (75~105)
+                                    else
                                     {
-                                        // Угол между векторами (75~105) градусов
-                                        // Значит точка находится впереди-слева или впереди-справа
-                                        if (D > 0)
-                                        {
-                                            if (rightND is null
-                                                || rightND.Distance > currentND.Distance)
-                                                rightND = currentND;
-                                        }
-                                        else
-                                        {
-                                            if (leftND is null
-                                                || leftND.Distance > currentND.Distance)
-                                                leftND = currentND;
-                                        }
+                                        if (frontLeftND is null
+                                            || frontLeftND.Distance > currentND.Distance)
+                                            frontLeftND = currentND;
                                     }
-                                    else if (cos < 0.9659258262890682867497431997289) // угол (15~75)
-                                    {
-                                        // Угол между векторами (15~75) градусов
-                                        // Значит точка находится впереди-слева или впереди-справа
-                                        if (D > 0)
-                                        {
-                                            if (rightBackND is null
-                                                || rightBackND.Distance > currentND.Distance)
-                                                rightBackND = currentND;
-                                        }
-                                        else
-                                        {
-                                            if (leftBackND is null
-                                                || leftBackND.Distance > currentND.Distance)
-                                                leftBackND = currentND;
-                                        }
-                                    }
-                                    else if (backND is null
-                                             || backND.Distance > currentND.Distance)  // угол +/-15
-                                        backND = currentND;
                                 }
+                                else if (cos < 0.25881904510252076234889883762405) // угол (75~105)
+                                {
+                                    // Угол между векторами (75~105) градусов
+                                    // Значит точка находится впереди-слева или впереди-справа
+                                    if (D > 0)
+                                    {
+                                        if (rightND is null
+                                            || rightND.Distance > currentND.Distance)
+                                            rightND = currentND;
+                                    }
+                                    else
+                                    {
+                                        if (leftND is null
+                                            || leftND.Distance > currentND.Distance)
+                                            leftND = currentND;
+                                    }
+                                }
+                                else if (cos < 0.9659258262890682867497431997289) // угол (15~75)
+                                {
+                                    // Угол между векторами (15~75) градусов
+                                    // Значит точка находится впереди-слева или впереди-справа
+                                    if (D > 0)
+                                    {
+                                        if (rightBackND is null
+                                            || rightBackND.Distance > currentND.Distance)
+                                            rightBackND = currentND;
+                                    }
+                                    else
+                                    {
+                                        if (leftBackND is null
+                                            || leftBackND.Distance > currentND.Distance)
+                                            leftBackND = currentND;
+                                    }
+                                }
+                                else if (backND is null || backND.Distance > currentND.Distance)  // угол +/-15
+                                    backND = currentND;
                             }
                         }
                     }
                 }
 
                 // Формирование функтора добавление граней, в зависимости от типа пути (одно- или двунаправленный)
-                Action<Node, Node> AddArcFunc;
+                Action<Node, Node> addArcFunc;
                 if (uniDirection)
-                    AddArcFunc = (n1, n2) => {
+                    addArcFunc = (n1, n2) => {
                         using (graph.WriteLock())
                             graph.AddArc(n1, n2);
                     };
-                else AddArcFunc = (n1, n2) => {
+                else addArcFunc = (n1, n2) => {
                     using (graph.WriteLock())
                         graph.Add2Arcs(n1, n2);
                 };
@@ -570,7 +497,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     if (frontND != null)
                     {
                         frontND.Rebase(equivalentND.Node);
-                        AddArcFunc(equivalentND.Node, frontND.Node);
+                        addArcFunc(equivalentND.Node, frontND.Node);
 #if DEBUG && LOG
                         ETLogger.WriteLine(LogType.Debug,
                             uniDirection
@@ -581,7 +508,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     if (frontLeftND != null)
                     {
                         frontLeftND.Rebase(equivalentND.Node);
-                        AddArcFunc(frontLeftND.Node, equivalentND.Node);
+                        addArcFunc(frontLeftND.Node, equivalentND.Node);
 #if DEBUG && LOG
                         ETLogger.WriteLine(LogType.Debug,
                             uniDirection
@@ -592,7 +519,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     if (frontRightND != null)
                     {
                         frontRightND.Rebase(equivalentND.Node);
-                        AddArcFunc(frontRightND.Node, equivalentND.Node);
+                        addArcFunc(frontRightND.Node, equivalentND.Node);
 #if DEBUG && LOG
                         ETLogger.WriteLine(LogType.Debug,
                             uniDirection
@@ -603,7 +530,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     if (leftND != null)
                     {
                         leftND.Rebase(equivalentND.Node);
-                        AddArcFunc(leftND.Node, equivalentND.Node);
+                        addArcFunc(leftND.Node, equivalentND.Node);
 #if DEBUG && LOG
                         ETLogger.WriteLine(LogType.Debug,
                             uniDirection
@@ -614,7 +541,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     if (rightND != null)
                     {
                         rightND.Rebase(equivalentND.Node);
-                        AddArcFunc(rightND.Node, equivalentND.Node);
+                        addArcFunc(rightND.Node, equivalentND.Node);
 #if DEBUG && LOG
                         ETLogger.WriteLine(LogType.Debug,
                             uniDirection
@@ -625,7 +552,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     if (leftBackND != null)
                     {
                         leftBackND.Rebase(equivalentND.Node);
-                        AddArcFunc(leftBackND.Node, equivalentND.Node);
+                        addArcFunc(leftBackND.Node, equivalentND.Node);
 #if DEBUG && LOG
                         ETLogger.WriteLine(LogType.Debug,
                             uniDirection
@@ -636,7 +563,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     if (rightBackND != null)
                     {
                         rightBackND.Rebase(equivalentND.Node);
-                        AddArcFunc(rightBackND.Node, equivalentND.Node);
+                        addArcFunc(rightBackND.Node, equivalentND.Node);
 #if DEBUG && LOG
                         ETLogger.WriteLine(LogType.Debug,
                             uniDirection
@@ -648,14 +575,14 @@ namespace EntityTools.Patches.Mapper.Tools
                         && backND.Distance < lastND.Distance)
                     {
                         backND.Rebase(equivalentND.Node);
-                        AddArcFunc(backND.Node, equivalentND.Node);
+                        addArcFunc(backND.Node, equivalentND.Node);
 #if DEBUG && LOG && false
                         ETLogger.WriteLine(LogType.Debug,
                             uniDirection
                                 ? $"LinkNearest8Side: UniLink {{back -> equivalent}} <{backND.Node.X:N3};{backND.Node.Y:N3};{backND.Node.Z:N3}>"
                                 : $"LinkNearest8Side: BiLink {{back <-> equivalent}} <{backND.Node.X:N3};{backND.Node.Y:N3};{backND.Node.Z:N3}>");
 #endif
-                        AddArcFunc(lastND.Node, backND.Node);
+                        addArcFunc(lastND.Node, backND.Node);
 #if DEBUG && LOG
                         ETLogger.WriteLine(LogType.Debug,
                             uniDirection
@@ -671,7 +598,7 @@ namespace EntityTools.Patches.Mapper.Tools
 #endif
                     {
                         lastND.Rebase(equivalentND.Node);
-                        AddArcFunc(lastND.Node, equivalentND.Node);
+                        addArcFunc(lastND.Node, equivalentND.Node);
 #if DEBUG && LOG
                         ETLogger.WriteLine(LogType.Debug,
                             uniDirection
@@ -697,7 +624,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     // к узлам front, left, right
                     if (frontND != null)
                     {
-                        AddArcFunc(newNode, frontND.Node);
+                        addArcFunc(newNode, frontND.Node);
 #if DEBUG && LOG
                         ETLogger.WriteLine(LogType.Debug,
                             uniDirection
@@ -707,7 +634,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     }
                     if (frontLeftND != null)
                     {
-                        AddArcFunc(newNode, frontLeftND.Node);
+                        addArcFunc(newNode, frontLeftND.Node);
 #if DEBUG && LOG
                         ETLogger.WriteLine(LogType.Debug,
                             uniDirection
@@ -717,7 +644,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     }
                     if (frontRightND != null)
                     {
-                        AddArcFunc(newNode, frontRightND.Node);
+                        addArcFunc(newNode, frontRightND.Node);
 #if DEBUG && LOG
                         ETLogger.WriteLine(LogType.Debug,
                             uniDirection
@@ -727,7 +654,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     }
                     if (leftND != null)
                     {
-                        AddArcFunc(leftND.Node, newNode);
+                        addArcFunc(leftND.Node, newNode);
 #if DEBUG && LOG
                         ETLogger.WriteLine(LogType.Debug,
                             uniDirection
@@ -737,7 +664,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     }
                     if (rightND != null)
                     {
-                        AddArcFunc(rightND.Node, newNode);
+                        addArcFunc(rightND.Node, newNode);
 #if DEBUG && LOG
                         ETLogger.WriteLine(LogType.Debug,
                             uniDirection
@@ -747,7 +674,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     }
                     if (leftBackND != null)
                     {
-                        AddArcFunc(leftBackND.Node, newNode);
+                        addArcFunc(leftBackND.Node, newNode);
 #if DEBUG && LOG
                         ETLogger.WriteLine(LogType.Debug,
                             uniDirection
@@ -757,7 +684,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     }
                     if (rightBackND != null)
                     {
-                        AddArcFunc(rightBackND.Node, newNode);
+                        addArcFunc(rightBackND.Node, newNode);
 #if DEBUG && LOG
                         ETLogger.WriteLine(LogType.Debug,
                             uniDirection
@@ -770,14 +697,14 @@ namespace EntityTools.Patches.Mapper.Tools
                         && backND.Distance < lastND.Distance)
                     {
                         backND.Rebase(newNode);
-                        AddArcFunc(backND.Node, newNode);
+                        addArcFunc(backND.Node, newNode);
 #if DEBUG && LOG && false
                         ETLogger.WriteLine(LogType.Debug,
                             uniDirection
                                 ? $"LinkNearest8Side: UniLink {{back -> new}} <{backND.Node.X:N3};{backND.Node.Y:N3};{backND.Node.Z:N3}>"
                                 : $"LinkNearest8Side: BiLink {{back <-> new}} <{backND.Node.X:N3};{backND.Node.Y:N3};{backND.Node.Z:N3}>");
 #endif
-                        AddArcFunc(lastND.Node, backND.Node);
+                        addArcFunc(lastND.Node, backND.Node);
 #if DEBUG && LOG
                         ETLogger.WriteLine(LogType.Debug,
                             uniDirection
@@ -792,7 +719,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     if (lastND != null) 
 #endif
                     {
-                        AddArcFunc(lastND.Node, newNode);
+                        addArcFunc(lastND.Node, newNode);
 #if DEBUG && LOG
                         ETLogger.WriteLine(LogType.Debug,
                             uniDirection
@@ -855,10 +782,6 @@ namespace EntityTools.Patches.Mapper.Tools
 #if PROFILING && DEBUG
             stopwatch.Restart();
 #endif
-#if false
-            double minNodeDistance = EntityTools.Config.Mapper.WaypointDistance;
-            double maxDistance = Math.Max(10d, EntityTools.Config.Mapper.WaypointDistance * 1.25d);
-#endif
             double maxZDifference = EntityTools.Config.Mapper.MaxElevationDifference;
             double equivalenceDistance = EntityTools.Config.Mapper.WaypointEquivalenceDistance;
 
@@ -872,26 +795,28 @@ namespace EntityTools.Patches.Mapper.Tools
                 using (graph.ReadLock())
                     foreach (Node node in graph.NodesCollection)
                     {
+                        if (!node.Passable)
+                            continue;
+
                         //Проверяем разницу высот
                         NodeDetail currentND = new NodeDetail(node, newNode);
-                        if (Math.Abs(currentND.Z) < maxZDifference)
+                        if (!(Math.Abs(currentND.Z) < maxZDifference)) continue;
+
+                        // Разница высот в пределах допустимой величины,
+                        // проверяем расстояние от добавляемой точки до текущей
+                        if (currentND.Distance < equivalenceDistance)
                         {
-                            // Разница высот в пределах допустимой величины,
-                            // проверяем расстояние от добавляемой точки до текущей
-                            if (currentND.Distance < equivalenceDistance)
-                            {
-                                // NewNode CurNode в пределах equivalenceDistance
-                                if (equivalentND is null
-                                    || equivalentND.Distance > currentND.Distance)
-                                    equivalentND = currentND;
-                            }
-                            /*else if (currentND.Distance <= minNodeDistance
+                            // NewNode CurNode в пределах equivalenceDistance
+                            if (equivalentND is null
+                                || equivalentND.Distance > currentND.Distance)
+                                equivalentND = currentND;
+                        }
+                        /*else if (currentND.Distance <= minNodeDistance
                                         && (nearestND == null || currentND.Distance < nearestND.Distance))
                             {
                                 // currentND - ближайший существующий узел к newNode
                                 nearestND = currentND;
                             }*/
-                        }
                     }
 
                 if (equivalentND != null)
@@ -919,14 +844,14 @@ namespace EntityTools.Patches.Mapper.Tools
 #endif
                         }
                     }
+#if DEBUG && LOG
                     else
                     {
                         // предыдущий узел "отсутствует"
                         // связывать не с чем
-#if DEBUG && LOG
                         ETLogger.WriteLine(LogType.Debug, $"LinkLast: Nothing to link to detected 'EQUIVALENT' Node <{equivalentND.Node.X:N3};{equivalentND.Node.Y:N3};{equivalentND.Node.Z:N3}>");
-#endif
                     }
+#endif
                     return equivalentND;
                 }
 
@@ -1045,26 +970,28 @@ namespace EntityTools.Patches.Mapper.Tools
                 using (graph.ReadLock())
                     foreach (Node node in graph.NodesCollection)
                     {
+                        if (!node.Passable)
+                            continue;
+
                         //Проверяем разницу высот
                         NodeDetail currentND = new NodeDetail(node, newNode);
-                        if (Math.Abs(currentND.Z) < maxZDifference)
+                        if (!(Math.Abs(currentND.Z) < maxZDifference)) continue;
+
+                        // Разница высот в пределах допустимой величины,
+                        // проверяем расстояние от добавляемой точки до текущей
+                        if (currentND.Distance < equivalenceDistance)
                         {
-                            // Разница высот в пределах допустимой величины,
-                            // проверяем расстояние от добавляемой точки до текущей
-                            if (currentND.Distance < equivalenceDistance)
-                            {
-                                // currentND в пределах equivalenceDistance от newNode
-                                if (equivalentND is null
-                                    || equivalentND.Distance > currentND.Distance)
-                                    // currentND ближе к newNod, чем ранее найденная equivalentND
-                                    equivalentND = currentND;
-                            }
-                            else if (currentND.Distance <= maxDistance
-                                     && (nearestND is null || currentND.Distance < nearestND.Distance))
-                            {
-                                // currentND - ближайший существующий узел к newNode
-                                nearestND = currentND;
-                            }
+                            // currentND в пределах equivalenceDistance от newNode
+                            if (equivalentND is null
+                                || equivalentND.Distance > currentND.Distance)
+                                // currentND ближе к newNod, чем ранее найденная equivalentND
+                                equivalentND = currentND;
+                        }
+                        else if (currentND.Distance <= maxDistance
+                                 && (nearestND is null || currentND.Distance < nearestND.Distance))
+                        {
+                            // currentND - ближайший существующий узел к newNode
+                            nearestND = currentND;
                         }
                     }
 
@@ -1248,9 +1175,7 @@ namespace EntityTools.Patches.Mapper.Tools
             double maxDistance = Math.Max(10d, EntityTools.Config.Mapper.WaypointDistance * 1.25d);
             double maxZDifference = EntityTools.Config.Mapper.MaxElevationDifference;
             double equivalenceDistance = EntityTools.Config.Mapper.WaypointEquivalenceDistance;
-#if false
-            NodeDetail nearestND = null; // ближайший узел  
-#endif
+
             NodeDetail frontND = null; // впереди 
             NodeDetail equivalentND = null;// узел, считающийся "эквивалентным" newNode, в результате чего newNode не добавляется к графу
 
@@ -1260,41 +1185,36 @@ namespace EntityTools.Patches.Mapper.Tools
                 using (graph.ReadLock())
                     foreach (Node node in graph.NodesCollection)
                     {
+                        if (!node.Passable)
+                            continue;
+                        
                         //Проверяем разницу высот
                         NodeDetail currentND = new NodeDetail(node, newNode);
-                        if (Math.Abs(currentND.Z) < maxZDifference)
-                        {
-                            // Разница высот в пределах допустимой величины,
-                            // проверяем расстояние от добавляемой точки до текущей
-                            if (currentND.Distance < equivalenceDistance)
-                            {
-                                // currentND в пределах equivalenceDistance от newNode
-                                if (equivalentND is null
-                                    || equivalentND.Distance > currentND.Distance)
-                                    // currentND ближе к newNod, чем ранее найденная equivalentND
-                                    equivalentND = currentND;
-                            }
-                            else if (currentND.Distance <= maxDistance)
-                            {
-                                // вычисляем косинус угла меду векторами для определения четверти (впереди, сзади, слева, справа)
-                                // в которой находится curNode
-                                double cos = CosineOxy(lastND, currentND);
+                        if (!(Math.Abs(currentND.Z) < maxZDifference)) continue;
 
-                                if (cos < -0.7071d)
-                                {
-                                    // Угол между векторами больше 135 градусов
-                                    // Значит точка находится впереди
-                                    if (frontND is null
-                                        || frontND.Distance > currentND.Distance)
-                                        frontND = currentND;
-                                }
-#if false
-                                else if (nearestND is null || currentND.Distance < nearestND.Distance)
-                                {
-                                    // currentND - ближайший существующий узел к newNode
-                                    nearestND = currentND;
-                                } 
-#endif
+                        // Разница высот в пределах допустимой величины,
+                        // проверяем расстояние от добавляемой точки до текущей
+                        if (currentND.Distance < equivalenceDistance)
+                        {
+                            // currentND в пределах equivalenceDistance от newNode
+                            if (equivalentND is null
+                                || equivalentND.Distance > currentND.Distance)
+                                // currentND ближе к newNod, чем ранее найденная equivalentND
+                                equivalentND = currentND;
+                        }
+                        else if (currentND.Distance <= maxDistance)
+                        {
+                            // вычисляем косинус угла меду векторами для определения четверти (впереди, сзади, слева, справа)
+                            // в которой находится curNode
+                            double cos = CosineOxy(lastND, currentND);
+
+                            if (cos < -0.7071d)
+                            {
+                                // Угол между векторами больше 135 градусов
+                                // Значит точка находится впереди
+                                if (frontND is null
+                                    || frontND.Distance > currentND.Distance)
+                                    frontND = currentND;
                             }
                         }
                     }
@@ -1569,7 +1489,7 @@ namespace EntityTools.Patches.Mapper.Tools
             return nodeDet1.Node.Position.Equals(nodeDet2.Node.Position);
         }
 
-    #region Методы фильтрации (проверка связей и расстояний) или без таковых и добавления узлов в список ближайших
+    #if false //Методы фильтрации (проверка связей и расстояний) или без таковых и добавления узлов в список ближайших
         /// <summary>
         /// Добавление узла в список без проверки
         /// </summary>
@@ -1694,7 +1614,7 @@ namespace EntityTools.Patches.Mapper.Tools
             listNodes.Add(nodeDet);
             return listNodes.Count - 1;
         }
-    #endregion
+    #endif
     } 
 #endif
 }

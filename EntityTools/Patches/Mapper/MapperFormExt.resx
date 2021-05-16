@@ -123,9 +123,6 @@
   <metadata name="barManager.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>323, 17</value>
   </metadata>
-  <metadata name="popMenuOptions.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>441, 17</value>
-  </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="btnCRRename.ImageOptions.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -153,14 +150,6 @@
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>64</value>
   </metadata>
-  <data name="btnShowStatBar.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAAAFQAAABUAaOtxBUAAACCSURBVDhPpZINCsAgCEY7RHSWXT4Idq7Rvm8oWbixSnig
-        L5X2ExB1E1fO4MoZuiJSSBSgnrkGe+xMKxCsEzjVGeiS9FjfCjnMYFzyDIP8uQDotbnkAJfAnM72KF1h
-        4aCXj7iSLC3Ye4TtlyiH658RRDZIk71qMf79R1rElTO48ieh3gHB/uWWlZaiAAAAAElFTkSuQmCC
-</value>
-  </data>
   <data name="btnAddCR.ImageOptions.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
@@ -173,6 +162,9 @@
         RU5ErkJggg==
 </value>
   </data>
+  <metadata name="popMenuOptions.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>441, 17</value>
+  </metadata>
   <data name="btnMoveNodes.ImageOptions.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
@@ -213,7 +205,18 @@
         3ef4GoTJTMJkJmEykzCZSZjMY1x8A9FLRywjv8DyAAAAAElFTkSuQmCC
 </value>
   </data>
+  <metadata name="popMenuOptions.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>441, 17</value>
+  </metadata>
   <metadata name="bsrcAstralSettings.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <data name="btnShowStatBar.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAAAFQAAABUAaOtxBUAAACCSURBVDhPpZINCsAgCEY7RHSWXT4Idq7Rvm8oWbixSnig
+        L5X2ExB1E1fO4MoZuiJSSBSgnrkGe+xMKxCsEzjVGeiS9FjfCjnMYFzyDIP8uQDotbnkAJfAnM72KF1h
+        4aCXj7iSLC3Ye4TtlyiH658RRDZIk71qMf79R1rElTO48ieh3gHB/uWWlZaiAAAAAElFTkSuQmCC
+</value>
+  </data>
 </root>

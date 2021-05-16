@@ -108,29 +108,9 @@ namespace EntityTools.Patches.Mapper.Tools
                 if (Control.ModifierKeys == Keys.Shift)
                 {
                     // Получаем игровые координаты, соответствующие положению курсора мыши
-#if true
                     graphics.DrawRectangle(Pens.Gainsboro, selectAreaStartX, selectAreaStartY, worldMouseX, worldMouseY);
-#else
-                    graphics.GetWorldPosition(form.RelativeMousePosition, out double worldX, out double worldY); 
-                    graphics.DrawRectangle(Pens.Gainsboro, selectAreaStartX, selectAreaStartY, worldX, worldY);
-#endif
                 }
-#if false
-                else
-                {
-                    selectAreaStartX = 0;
-                    selectAreaStartY = 0;
-                } 
-#endif
             }
-
-#if false
-            if (selectedNodes.Count > 0)
-            {
-                foreach (Node node in selectedNodes)
-                    graphics.FillCircleCentered(Brushes.Yellow, node);
-            } 
-#endif
         }
 
         /// <summary>
@@ -138,54 +118,45 @@ namespace EntityTools.Patches.Mapper.Tools
         /// </summary>
         public void OnMouseClick(IGraph graph, MapperMouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right)
+            if (e.Button != MouseButtons.Right) return;
+
+            // Получаем игровые координаты, соответствующие координатам клика
+            double mouseX = e.X;
+            double mouseY = e.Y;
+
+            switch (Control.ModifierKeys)
             {
-                // Получаем игровые координаты, соответствующие координатам клика
-
-#if true
-                double mouseX = e.X;
-                double mouseY = e.Y;
-#else
-                double mouseX, mouseY;
-                using (graphics.ReadLock())
-                    graphics.GetWorldPosition(e.Location, out mouseX, out mouseY);
-
-#endif
-                if (Control.ModifierKeys == Keys.Shift)
+                // Нажата клавиша Shift - выделяем область
+                case Keys.Shift when selectAreaStartX == 0 && selectAreaStartY == 0:
+                    // Задаем начальную точку области выделения
+                    selectAreaStartX = mouseX;
+                    selectAreaStartY = mouseY;
+                    break;
+                case Keys.Shift:
                 {
-                    // Нажата клавиша Shift - выделяем область
-                    if (selectAreaStartX == 0 && selectAreaStartY == 0)
+                    MapperHelper.FixRange(selectAreaStartX, mouseX, out double left, out double right);
+                    MapperHelper.FixRange(selectAreaStartY, mouseY, out double down, out double top);
+
+                    // Выделяем все вершины, охваченные областью выделения и добавляем в группу 
+                    int hash = graph.GetHashCode();
+                    if(graphHash != hash)
+                        selectedNodes.Clear();
+                    foreach (Node nd in graph.NodesCollection)
                     {
-                        // Задаем начальную точку области выделения
-                        selectAreaStartX = mouseX;
-                        selectAreaStartY = mouseY;
-                    }
-                    else
-                    { 
-                        MapperHelper.FixRange(selectAreaStartX, mouseX, out double left, out double right);
-                        MapperHelper.FixRange(selectAreaStartY, mouseY, out double down, out double top);
-
-                        // Выделяем все вершины, охваченные областью выделения и добавляем в группу 
-                        int hash = graph.GetHashCode();
-                        if(graphHash != hash)
-                            selectedNodes.Clear();
-                        foreach (Node nd in graph.NodesCollection)
-                        {
-                            if (nd.Passable
-                                && left <= nd.X && nd.X <= right
-                                && down <= nd.Y && nd.Y <= top)
-                                selectedNodes.AddLast(nd);
-                        }
-
-                        graphHash = hash;
-
-                        // Сбрасываем
-                        selectAreaStartX = 0;
-                        selectAreaStartY = 0;
+                        if (nd.Passable
+                            && left <= nd.X && nd.X <= right
+                            && down <= nd.Y && nd.Y <= top)
+                            selectedNodes.AddLast(nd);
                     }
 
+                    graphHash = hash;
+
+                    // Сбрасываем
+                    selectAreaStartX = 0;
+                    selectAreaStartY = 0;
+                    break;
                 }
-                else 
+                default:
                 {
                     double minDistance = EntityTools.Config.Mapper.WaypointEquivalenceDistance;
                     graph.ClosestNodeOxyProjection(mouseX, mouseY, out Node node, out int hash, minDistance);
@@ -218,6 +189,7 @@ namespace EntityTools.Patches.Mapper.Tools
                         graphHash = 0;
                     } 
 #endif
+                    break;
                 }
             }
         }
