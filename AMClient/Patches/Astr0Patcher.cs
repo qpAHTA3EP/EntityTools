@@ -9,6 +9,9 @@ namespace AcTp0Tools.Patches
         public static void Apply()
         {
             Harmony.PatchAll();
+
+            //TODO заменить на алгоритм перебора вложенных типов
+            AstralAccessors.Quester.Core.ApplyPatches();
         }
     }
 }

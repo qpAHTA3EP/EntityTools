@@ -2,6 +2,7 @@
 using Astral.Classes.ItemFilter;
 using MyNW.Classes;
 using System;
+using HarmonyLib;
 
 namespace AcTp0Tools
 {
@@ -31,5 +32,6 @@ namespace AcTp0Tools
         {
             public static readonly Func<ItemFilterCore, Func<Item, bool>> IsMatch = InstanceAccessor<ItemFilterCore>.GetFunction<Item, bool>("\u0001");
         }
+
     }
 }

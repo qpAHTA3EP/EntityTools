@@ -19,7 +19,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\References\x64\Plugins\</OutputPath>
+    <OutputPath>..\References\x64\</OutputPath>
     <DefineConstants>TRACE;DEBUG;DEVELOPER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -31,7 +31,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\References\x64\Plugins\</OutputPath>
+    <OutputPath>..\References\x64\</OutputPath>
     <DefineConstants>TRACE;DEVELOPER, CORE_INTERFACES</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -41,7 +41,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\References\Encrypted\</OutputPath>
+    <OutputPath>..\References\x64\</OutputPath>
     <DefineConstants>TRACE;DEBUG;DEVELOPER, CORE_INTERFACES</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
@@ -52,7 +52,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Release|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\References\Encrypted\</OutputPath>
+    <OutputPath>..\References\x64\</OutputPath>
     <DefineConstants>DEVELOPER, CORE_INTERFACES</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
@@ -338,14 +338,13 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AMClient\AMClient.csproj">
-      <Project>{FD0C9E2A-5D26-43AA-A227-BDDAF9C30705}</Project>
+      <Project>{fd0c9e2a-5d26-43aa-a227-bddaf9c30705}</Project>
       <Name>AMClient</Name>
-      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\EntityTools\EntityTools.csproj">
       <Project>{df7f797e-db7e-44f9-a96a-020cfdb3c51e}</Project>
       <Name>EntityTools</Name>
-      <Private>True</Private>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

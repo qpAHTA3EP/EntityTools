@@ -48,14 +48,20 @@ namespace EntityCore
 #else
         public Engine()
         {
+#if false
             AstralAccessors.Quester.Core.AfterLoad += ResetQuesterCache;
-            AstralAccessors.Quester.Core.AfterNew += ResetQuesterCache;
+            AstralAccessors.Quester.Core.AfterNew += ResetQuesterCache; 
+#endif
+            AstralAccessors.Quester.Core.OnProfileChanged += ResetQuesterCache;
             ETLogger.WriteLine("EntityToolsCore loaded");
         }
         ~Engine()
         {
+#if false
             AstralAccessors.Quester.Core.AfterLoad -= ResetQuesterCache;
-            AstralAccessors.Quester.Core.AfterNew -= ResetQuesterCache;
+            AstralAccessors.Quester.Core.AfterNew -= ResetQuesterCache; 
+#endif
+            AstralAccessors.Quester.Core.OnProfileChanged -= ResetQuesterCache;
         }
 
         private void ResetQuesterCache()

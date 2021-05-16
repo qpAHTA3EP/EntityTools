@@ -276,9 +276,9 @@ namespace AcTp0Tools
             {
                 static Plugins()
                 {
-                    assemblies = typeof(Astral.Controllers.Plugins).GetStaticProperty<List<Assembly>>(nameof(Assemblies));
                 }
-                static readonly StaticPropertyAccessor<List<Assembly>> assemblies;
+                private static readonly StaticPropertyAccessor<List<Assembly>> assemblies = 
+                    typeof(Astral.Controllers.Plugins).GetStaticProperty<List<Assembly>>(nameof(Assemblies));
                 static readonly List<Assembly> emptyAssemblyList = new List<Assembly>();
                 public static List<Assembly> Assemblies => assemblies.IsValid ? assemblies.Value : emptyAssemblyList;
             }

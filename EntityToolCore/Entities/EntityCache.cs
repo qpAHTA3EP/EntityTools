@@ -14,28 +14,29 @@ namespace EntityCore.Entities
     {
         public EntityCache()
         {
-            AstralAccessors.Quester.Core.AfterLoad += Core_AfterLoad;
-            AstralAccessors.Quester.Core.AfterNew += Core_AfterNew;
+#if false
+            AstralAccessors.Quester.Core.AfterLoad += ResetCache;
+            AstralAccessors.Quester.Core.AfterNew += ResetCache; 
+#endif
+            AstralAccessors.Quester.Core.OnProfileChanged += ResetCache;
         }
 
-        private void Core_AfterNew()
+        private void ResetCache()
         {
             lock (this)
             {
                 Clear(); 
             }
         }
-        private void Core_AfterLoad(string path)
-        {
-            lock (this)
-            {
-                Clear(); 
-            }
-        }
+
         ~EntityCache()
         {
-            AstralAccessors.Quester.Core.AfterLoad -= Core_AfterLoad;
-            AstralAccessors.Quester.Core.AfterNew -= Core_AfterNew;
+#if false
+            AstralAccessors.Quester.Core.AfterLoad -= ResetCache;
+            AstralAccessors.Quester.Core.AfterNew -= ResetCache; 
+
+#endif
+            AstralAccessors.Quester.Core.OnProfileChanged += ResetCache;
         }
 
 #if DEBUG && PROFILING

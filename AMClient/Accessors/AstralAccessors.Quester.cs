@@ -1,13 +1,13 @@
-﻿using System;
+﻿using AcTp0Tools.Patches;
+using AcTp0Tools.Reflection;
+using AStar;
+using HarmonyLib;
+using MyNW.Internals;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Runtime.Serialization.Formatters.Binary;
-using AStar;
-using HarmonyLib;
-using AcTp0Tools.Patches;
-using AcTp0Tools.Reflection;
-using MyNW.Internals;
 
 namespace AcTp0Tools
 {
@@ -69,7 +69,6 @@ namespace AcTp0Tools
 
             public static class Core
             {
-                //TODO: заменить StaticPropertyAccessor на патчи для getter и setter
 #if StaticPropertyAccessor_Meshes
                 /// <summary>
                 /// Функтор доступа к графу путей (карте) текущего профиля
@@ -277,18 +276,74 @@ namespace AcTp0Tools
                     }
                 }
 #endif
+#if false
                 /// <summary>
                 /// Функтор доступа к списку названий карт в файле текущего профиля
                 /// Astral.Quester.Core.AvailableMeshesFromFile(openFileDialog.FileName)
                 /// </summary>
                 public static readonly Func<string, List<string>> AvailableMeshesFromFile = typeof(Astral.Quester.Core).GetStaticFunction<string, List<string>>("AvailableMeshesFromFile");
+
                 /// <summary>
                 /// Доступ к методу 
                 /// Astral.Quester.Core.LoadAllMeshes();
                 /// </summary>
-                public static readonly Func<int> LoadAllMeshes = typeof(Astral.Quester.Core).GetStaticFunction<int>("LoadAllMeshes");
+                public static readonly Func<int> LoadAllMeshes = typeof(Astral.Quester.Core).GetStaticFunction<int>("LoadAllMeshes"); 
+#else
+                /// <summary>
+                /// Дозагрузка из файла текущего профиля недостающих карт MapsMeshes
+                /// </summary>
+                /// <returns></returns>
+                public static int LoadAllMeshes()
+                {
+                    var zipFileName = CurrentProfileZipMeshFile;
 
-#region Events
+                    if (!File.Exists(zipFileName)) return 0;
+
+                    int loadedMaps = 0;
+                    try
+                    {
+                        using (var zipFile = ZipFile.Open(zipFileName, ZipArchiveMode.Read))
+                        {
+                            Dictionary<string, Graph> mapsMeshes = _mapsMeshes;
+                            lock (mapsMeshes)
+                            {
+                                var binaryFormatter = new BinaryFormatter();
+                                foreach (var zipEntry in zipFile.Entries)
+                                {
+                                    var zipEntryName = zipEntry.FullName;
+
+                                    if (!zipEntryName.EndsWith(".bin")) 
+                                        continue;
+
+                                    var mapName = zipEntryName.Substring(0, zipEntryName.Length - 4);
+                                    if (mapsMeshes.ContainsKey(mapName))
+                                        continue;
+
+                                    using (Stream stream = zipEntry.Open())
+                                    {
+                                        if (binaryFormatter.Deserialize(stream) is Graph meshesFromFile)
+                                        {
+                                            mapsMeshes.Add(mapName, meshesFromFile);
+                                            loadedMaps++;
+                                        }
+                                    }
+                                } 
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        throw;
+                    }
+
+                    return loadedMaps;
+                }
+#endif
+
+                #region Events
+
+#if ProfileNewLoadEvents
                 /// <summary>
                 /// Делегат, вызываемый перед вызовом <seealso cref="Astral.Quester.Core.Load(string Path, bool savePath = true)"/>,
                 /// то есть перед загрузкой Quester-профиля
@@ -309,6 +364,7 @@ namespace AcTp0Tools
                 public static event AfterLoadEvent AfterLoad;
                 private static void PostfixLoad(string Path, bool savePath)
                 {
+                    _mapsMeshes.Clear();
                     AfterLoad?.Invoke(Path);
                 }
 
@@ -332,14 +388,30 @@ namespace AcTp0Tools
                 public static event AfterNewEvent AfterNew;
                 private static void PostfixNew()
                 {
+                    _mapsMeshes.Clear();
                     AfterNew?.Invoke();
                 }
-#endregion
+#endif
+                public delegate void ProfileChangedEvent();
+                /// <summary>
+                /// Событие, происходящее после изменение <seealso cref="Astral.Quester.Core.Profile"/>
+                /// </summary>
+                public static event ProfileChangedEvent OnProfileChanged;
+
+                private static void PostfixSetProfile(Astral.Quester.Classes.Profile value)
+                {
+                    _mapsMeshes.Clear();
+                    OnProfileChanged?.Invoke();
+                }
+                #endregion
+
+                internal static void ApplyPatches() { }
 
                 static Core()
                 {
                     var tCore = typeof(Astral.Quester.Core);
                     var tPatch = typeof(Core);
+#if ProfileNewLoadEvents
                     var originalLoad = AccessTools.Method(tCore, nameof(Astral.Quester.Core.Load));
                     var prefixLoad = AccessTools.Method(tPatch, nameof(PrefixLoad));
                     var postfixLoad = AccessTools.Method(tPatch, nameof(PostfixLoad));
@@ -358,6 +430,17 @@ namespace AcTp0Tools
                         && postfixNew != null)
                     {
                         AcTp0Patcher.Harmony.Patch(originalLoad, new HarmonyMethod(prefixNew), new HarmonyMethod(postfixNew));
+                    } 
+#endif
+
+                    var propProfile = AccessTools.Property(tCore, nameof(Astral.Quester.Core.Profile));
+                    var originalSetProfile = propProfile.GetSetMethod(true);
+                    var postfixSetProfile = AccessTools.Method(tPatch, nameof(PostfixSetProfile));
+
+                    if (originalSetProfile != null
+                        && postfixSetProfile != null)
+                    {
+                        AcTp0Patcher.Harmony.Patch(originalSetProfile, null, new HarmonyMethod(postfixSetProfile));
                     }
 
                     var propMeshes = AccessTools.Property(tCore, nameof(Astral.Quester.Core.Meshes));

@@ -20,7 +20,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\References\x64\AMClient\</OutputPath>
+    <OutputPath>..\References\x64\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -31,7 +31,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\References\x64\AMClient\Release\</OutputPath>
+    <OutputPath>..\References\x64\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -46,6 +46,7 @@
     </Reference>
     <Reference Include="AStar">
       <HintPath>..\References\x64\AStar.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Astral_patched">
       <HintPath>..\References\x64\Astral_patched.exe</HintPath>
@@ -78,6 +79,7 @@
     </Reference>
     <Reference Include="MyNW">
       <HintPath>..\References\x64\MyNW.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.IO.Compression, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
