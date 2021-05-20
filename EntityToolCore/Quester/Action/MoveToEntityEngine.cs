@@ -369,6 +369,8 @@ namespace EntityCore.Quester.Action
         /// <returns>true, если нужно прервать бой</returns>
         private bool CombatShouldBeAborted(Entity combatTarget)
         {
+            var combatTargetContainerId = combatTarget?.ContainerId ?? uint.MaxValue;
+
             bool extendedDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
             if (extendedDebugInfo)
             {
@@ -387,7 +389,7 @@ namespace EntityCore.Quester.Action
                 if (EntityKey.Validate(closestEntity))
                 {
                     // Если атакуемая цель combatTarget является closestEntity => продолжаем бой
-                    if (closestEntity.ContainerId == combatTarget.ContainerId)
+                    if (closestEntity.ContainerId == combatTargetContainerId)
                         return false;
 
                     string entityStr = closestEntity.GetDebugString(@this._entityNameType, "ClosestEntity", EntityDetail.Pointer);
@@ -422,7 +424,7 @@ namespace EntityCore.Quester.Action
                 if (EntityKey.Validate(targetEntity))
                 {
                     // Если атакуемая цель combatTarget является targetEntity => продолжаем бой
-                    if (targetEntity.ContainerId == combatTarget.ContainerId)
+                    if (targetEntity.ContainerId == combatTargetContainerId)
                         return false;
 
                     string entityStr = targetEntity.GetDebugString(@this._entityNameType, "Entity", EntityDetail.Pointer);
@@ -463,7 +465,7 @@ namespace EntityCore.Quester.Action
 
                 if (EntityKey.Validate(closestEntity))
                 {
-                    if (closestEntity.ContainerId == combatTarget.ContainerId)
+                    if (closestEntity.ContainerId == combatTargetContainerId)
                         return false;
 
                     if (@this._healthCheck && closestEntity.IsDead) return true;
@@ -474,7 +476,7 @@ namespace EntityCore.Quester.Action
 
                 if (EntityKey.Validate(targetEntity))
                 {
-                    if (targetEntity.ContainerId == combatTarget.ContainerId)
+                    if (targetEntity.ContainerId == combatTargetContainerId)
                         return false;
 
                     if (@this._healthCheck && targetEntity.IsDead) return true;

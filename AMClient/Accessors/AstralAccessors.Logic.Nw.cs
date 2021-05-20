@@ -55,9 +55,9 @@ namespace AcTp0Tools
                     {
                         abortCombatCondition = cond;
                         shouldRemoveAbortCombatCondition = removeCond;
-                        if (resetTime > 0)
-                            AbortCombatConditionResetTime = resetTime;
-                        abortCombatConditionResetTimeout.ChangeTime(AbortCombatConditionResetTime);
+                        if (resetTime <= 0)
+                            resetTime = AbortCombatConditionResetTime;
+                        abortCombatConditionResetTimeout.ChangeTime(resetTime);
                     }
                     public static void RemoveAbortCombatCondition()
                     {
@@ -69,7 +69,7 @@ namespace AcTp0Tools
                     {
                         __result = false;
 
-                        if (abortCombatCondition == null) return true;
+                        if (abortCombatCondition is null) return true;
 
                         if (abortCombatCondition(target))
                         {
@@ -106,7 +106,7 @@ namespace AcTp0Tools
                     /// Время до сброса <see cref="abortCombatCondition"/>
                     /// Таймер обновляется каждый раз при вызове <see cref="SetAbortCombatCondition"/>
                     /// </summary>
-                    public static int AbortCombatConditionResetTime { get; set; } = 30_000;
+                    public static int AbortCombatConditionResetTime { get; set; } = 300_000;
                     private static readonly Timeout abortCombatConditionResetTimeout = new Timeout(0);
 
                     public static string AbortCombatCondition_DebugInfo()
