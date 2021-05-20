@@ -14,6 +14,11 @@ namespace EntityTools.Patches.Mapper
 #if PATCH_ASTRAL
     public class MapperGraphCache :IGraph
     {
+        public MapperGraphCache()
+        {
+            getGraph = () => AcTp0Tools.AstralAccessors.Quester.Core.Meshes;
+            _active = EntityTools.Config.Mapper.CacheActive;
+        }
         public MapperGraphCache(Func<IGraph> getGraph, bool activate = true, bool hold = true)
         {
             this.getGraph = getGraph;

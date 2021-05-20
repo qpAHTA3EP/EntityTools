@@ -21,7 +21,9 @@ namespace EntityTools.Patches.Mapper
             EntityTools.Config.Mapper.MapperForm.PropertyChanged += handler_PropertyChanged;
             GetWorldPosition(0, 0, out double left, out double top);
             GetWorldPosition(width, height, out double right, out double down);
-            _cache = new MapperGraphCache(() => AcTp0Tools.AstralAccessors.Quester.Core.Meshes, EntityTools.Config.Mapper.CacheActive);
+            if(_cache is null)
+                _cache = new MapperGraphCache(() => AcTp0Tools.AstralAccessors.Quester.Core.Meshes, 
+                    EntityTools.Config.Mapper.CacheActive);
             _cache.SetCacheArea(left, top, right, down);
         }
 
@@ -41,16 +43,24 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Получение доступа к приватному члену <seealso cref="GraphicsNW.g"/> типа Graphics
         /// </summary>
+#if when__g__is_private
         private Graphics Graphics => graphicsAccessor[this];
-        private static readonly FieldAccessor<Graphics> graphicsAccessor = typeof(GraphicsNW).GetField<Graphics>("g");
+        private static readonly FieldAccessor<Graphics> graphicsAccessor = typeof(GraphicsNW).GetField<Graphics>("g"); 
+#endif
 
         /// <summary>
         /// Получение доступа к приватному члену <seealso cref="GraphicsNW.g"/> типа Graphics
         /// </summary>
+#if shen__img__is_private
         private Image Image => imageAccessor[this];
-        private static readonly FieldAccessor<Image> imageAccessor = typeof(GraphicsNW).GetField<Image>("img");
+        private static readonly FieldAccessor<Image> imageAccessor = typeof(GraphicsNW).GetField<Image>("img"); 
+#endif
 
-        public new int ImageHeight
+#if false
+        public new int ImageHeight 
+#else
+        public override int ImageHeight
+#endif
         {
             get => base.ImageHeight;
             set
@@ -59,7 +69,11 @@ namespace EntityTools.Patches.Mapper
                 _cache.CacheDistanceY = value / 1.8d / Zoom;
             }
         }
-        public new int ImageWidth
+#if false
+        public new int ImageWidth 
+#else
+        public override int ImageWidth
+#endif
         {
             get => base.ImageWidth;
             set
@@ -69,7 +83,11 @@ namespace EntityTools.Patches.Mapper
             }
         }
 
-        public new double Zoom
+#if false
+        public new double Zoom 
+#else
+        public override double Zoom
+#endif
         {
             get => base.Zoom;
             set
@@ -84,7 +102,11 @@ namespace EntityTools.Patches.Mapper
             }
         }
 
-        public new Vector3 CenterPosition
+#if false
+        public new Vector3 CenterPosition 
+#else
+        public override Vector3 CenterPosition
+#endif
         {
             get => base.CenterPosition.Clone();
             set
@@ -226,7 +248,7 @@ namespace EntityTools.Patches.Mapper
         /// Отображаемый подграф (часть карты путей, на которой находится персонаж)
         /// </summary>
         public MapperGraphCache GraphCache => _cache;
-        private readonly MapperGraphCache _cache;
+        private readonly MapperGraphCache _cache = new MapperGraphCache();
 
         public MapperDrawingTools DrawingTools { get; } = new MapperDrawingTools();
 
@@ -356,7 +378,7 @@ namespace EntityTools.Patches.Mapper
                 diameter *= Zoom;
 
             double radius = diameter / 2;
-            Graphics.FillEllipse(brush, (float)(x - radius), (float)(y - radius), (float)diameter, (float)diameter);
+            g.FillEllipse(brush, (float)(x - radius), (float)(y - radius), (float)diameter, (float)diameter);
 
         }
         /// <summary>
@@ -377,7 +399,7 @@ namespace EntityTools.Patches.Mapper
                 diameter *= Zoom;
 
             double radius = diameter / 2;
-            Graphics.DrawEllipse(pen, (float)(x - radius), (float)(y - radius), (float)diameter, (float)diameter);
+            g.DrawEllipse(pen, (float)(x - radius), (float)(y - radius), (float)diameter, (float)diameter);
         }
 
         /// <summary>
@@ -394,7 +416,7 @@ namespace EntityTools.Patches.Mapper
                 height *= scale;
             }
 
-            Graphics.FillEllipse(brush, (float)x, (float)y, (float)width, (float)height);
+            g.FillEllipse(brush, (float)x, (float)y, (float)width, (float)height);
         }
 
         /// <summary>
@@ -411,7 +433,7 @@ namespace EntityTools.Patches.Mapper
                 height *= scale;
             }
 
-            Graphics.DrawEllipse(pen, (float)x, (float)y, (float)width, (float)height);
+            g.DrawEllipse(pen, (float)x, (float)y, (float)width, (float)height);
         }
 
         /// <summary>
@@ -435,7 +457,7 @@ namespace EntityTools.Patches.Mapper
                 width *= scale;
                 height *= scale;
             }
-            Graphics.FillRectangle(brush, (float)x, (float)y, (float)width, (float)height);
+            g.FillRectangle(brush, (float)x, (float)y, (float)width, (float)height);
         }
         /// <summary>
         /// Нарисовать закрашенный прямоугольник
@@ -462,7 +484,7 @@ namespace EntityTools.Patches.Mapper
             }
             else height = (float)(y2 - y1);
 
-            Graphics.FillRectangle(brush, (float)x1, (float)y1, width, height);
+            g.FillRectangle(brush, (float)x1, (float)y1, width, height);
         }
         /// <summary>
         /// Нарисовать прямоугольник со сторонами <paramref name="width"/> и <paramref name="height"/>, 
@@ -491,7 +513,7 @@ namespace EntityTools.Patches.Mapper
                 width *= scale;
                 height *= scale;
             }
-            Graphics.DrawRectangle(pen, (float)x, (float)y, (float)width, (float)height);
+            g.DrawRectangle(pen, (float)x, (float)y, (float)width, (float)height);
         }
         /// <summary>
         /// Нарисовать прямоугольник со сторонами,
@@ -519,7 +541,7 @@ namespace EntityTools.Patches.Mapper
             }
             else height = (float)(y2 - y1);
 
-            Graphics.DrawRectangle(pen, (float)x1, (float)y1, width, height);
+            g.DrawRectangle(pen, (float)x1, (float)y1, width, height);
         }
 
         /// <summary>
@@ -540,7 +562,7 @@ namespace EntityTools.Patches.Mapper
                     new PointF((float)x - dx, (float)y + dy),
                     new PointF((float)x + dx, (float)y + dy)
                 };
-            Graphics.FillPolygon(brush, points);
+            g.FillPolygon(brush, points);
         }
         /// <summary>
         /// Отрисовка перевернутого заполненного равностороннего треугольника с основанием <paramref name="edge"/> вверху
@@ -560,7 +582,7 @@ namespace EntityTools.Patches.Mapper
                     new PointF((float)x - dx, (float)y - dy),
                     new PointF((float)x + dx, (float)y - dy)
                 };
-            Graphics.FillPolygon(brush, points);
+            g.FillPolygon(brush, points);
         }
         /// <summary>
         /// Отрисовка заполненного квадрата со стороной <paramref name="edge"/>
@@ -592,7 +614,7 @@ namespace EntityTools.Patches.Mapper
                     new PointF(x2, y2),
                     new PointF(x2, y1)
                 };
-            Graphics.FillPolygon(brush, points);
+            g.FillPolygon(brush, points);
         }
         /// <summary>
         /// Отрисовка заполненого ромба с диагоналями <paramref name="width"/> и <paramref name="height"/>
@@ -616,7 +638,7 @@ namespace EntityTools.Patches.Mapper
                     new PointF((float)x - dx, (float)y),
                     new PointF((float)x,      (float)y - dy)
                 };
-            Graphics.FillPolygon(brush, points);
+            g.FillPolygon(brush, points);
         }
 #if false
         /// <summary>
@@ -649,7 +671,7 @@ namespace EntityTools.Patches.Mapper
         {
             GetImagePosition(p1, out double x1, out double y1);
             GetImagePosition(p2, out double x2, out double y2);
-            Graphics.DrawLine(pen, (float)x1, (float)y1, (float)x2, (float)y2);
+            g.DrawLine(pen, (float)x1, (float)y1, (float)x2, (float)y2);
         }
         /// <summary>
         /// Отрисовка линии из точки c координатами <paramref name="worldX1"/>, <paramref name="worldY1"/> 
@@ -659,7 +681,7 @@ namespace EntityTools.Patches.Mapper
         {
             GetImagePosition(worldX1, worldY1, out double x1, out double y1);
             GetImagePosition(worldX2, worldY2, out double x2, out double y2);
-            Graphics.DrawLine(pen, (float)x1, (float)y1, (float)x2, (float)y2);
+            g.DrawLine(pen, (float)x1, (float)y1, (float)x2, (float)y2);
         }
 
         /// <summary>
@@ -683,7 +705,7 @@ namespace EntityTools.Patches.Mapper
                 brush = Brushes.Black;
             if (align != Alignment.None)
             {
-                var size = Graphics.MeasureString(text, font);
+                var size = g.MeasureString(text, font);
 
                 GetImagePosition(worldX, worldY, out double x, out double y);
 
@@ -727,7 +749,7 @@ namespace EntityTools.Patches.Mapper
                         break;
                 }
 
-                Graphics.DrawString(text, font, brush, (float)x, (float)y);
+                g.DrawString(text, font, brush, (float)x, (float)y);
             }
         }
     }
