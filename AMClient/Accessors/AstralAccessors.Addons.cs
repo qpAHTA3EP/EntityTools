@@ -9,11 +9,11 @@ namespace AcTp0Tools
     /// </summary>
     public static partial class AstralAccessors
     {
+#if false
         public static class Addons
         {
             /// <summary>
-            /// доступ к членам и методам класса 
-            /// Astral.Addons.Role
+            /// доступ к членам и методам класса <seealso cref="Astral.Addons.Role"/>
             /// </summary>
             public static class Role
             {
@@ -24,6 +24,7 @@ namespace AcTp0Tools
                 public static readonly Func<object, Action> Stop = typeof(Astral.Addons.Role).GetAction("Stop");
                 public static readonly Func<object, Action> TooMuchStuckReaction = typeof(Astral.Addons.Role).GetAction("TooMuchStuckReaction");
             }
-        }
+        } 
+#endif
     }
 }

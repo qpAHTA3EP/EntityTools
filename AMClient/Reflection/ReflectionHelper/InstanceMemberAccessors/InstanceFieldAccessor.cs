@@ -6,34 +6,9 @@ namespace AcTp0Tools.Reflection
 {
     public static partial class ReflectionHelper
     {
-#if false
-        public static Func<ContainerType, FieldType> GetInstanceFieldAccessor<ContainerType, FieldType>(string fieldName, BindingFlags flags = BindingFlags.Default)
-        {
-            if (string.IsNullOrEmpty(fieldName))
-                throw new ArgumentException("Field name is invalid");
+        //TODO Добавить нетипизированную перегрузку  FieldAccessor<object> GetField(this object instance, string propertyName, BindingFlags flags = BindingFlags.Default)
+        //TODO Добавить нетипизированную перегрузку  FieldAccessor<object> GetField(this Type containerType, string propertyName, BindingFlags flags = BindingFlags.Default)
 
-            if (flags == BindingFlags.Default)
-                flags = ReflectionHelper.DefaultFlags;
-
-            Type type = typeof(ContainerType);
-            if (type is null)
-                throw new ArgumentException("'ContainerType' template parameter is invalid");
-
-            FieldInfo fi = type.GetField(fieldName, flags | BindingFlags.Instance | BindingFlags.NonPublic);
-            if (fi != null)
-            {
-                if (fi.FieldType.Equals(typeof(FieldType)))
-                {
-                    return instance =>
-                    {
-                        object result = fi.GetValue(instance);
-                        return (FieldType)result;
-                    };
-                }
-            }
-            return null;
-        } 
-#endif
         public static FieldAccessor<ContainerType, FieldType> GetField<ContainerType, FieldType>(this ContainerType instance, string fieldName, BindingFlags flags = BindingFlags.Default)
         {
             return new FieldAccessor<ContainerType, FieldType>(instance, fieldName, flags);
@@ -186,7 +161,7 @@ namespace AcTp0Tools.Reflection
 
             var containerType = instance.GetType();
             if (fieldInfo.ReflectedType != containerType)
-                throw new ArgumentException($"ReflectedType of the '{fieldInfo.Name}' is '{fieldInfo.ReflectedType.FullName}' does not equal to parameter ContainerType '{containerType.FullName}'", nameof(fieldInfo));
+                throw new ArgumentException($"ReflectedType of the '{fieldInfo.Name}' is '{fieldInfo.ReflectedType?.FullName}' does not equal to parameter ContainerType '{containerType.FullName}'", nameof(fieldInfo));
 
 #if false
             if (!Initialize(fieldInfo))
@@ -216,7 +191,13 @@ namespace AcTp0Tools.Reflection
         {
             if (fieldInfo != null)
             {
-                if (fieldInfo.FieldType.Equals(typeof(FieldType)))
+#if false
+                if (fieldInfo.FieldType.Equals(typeof(FieldType))) 
+#else
+                var fieldType = typeof(FieldType);
+                if (fieldInfo.FieldType == fieldType
+                    || fieldType.IsAssignableFrom(fieldInfo.FieldType))
+#endif
                 {
                     _fieldInfo = fieldInfo;
                     return true;

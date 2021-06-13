@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Reflection;
+using AcTp0Tools.Patches;
 using AcTp0Tools.Reflection;
 
 namespace AcTp0Tools
@@ -33,7 +34,6 @@ namespace AcTp0Tools
                         CurrentRole = type.GetStaticProperty<Astral.Addons.Role>("CurrentRole");
                 } 
 #endif
-
                 /// <summary>
                 /// Объект, соответствующий текущей роли Астрала
                 /// </summary>
@@ -262,6 +262,26 @@ namespace AcTp0Tools
 
                     public static TcpClient Client_TcpClient => tcpClientAccessor[client.Value];
                 }
+
+                public static class BotServer
+                {
+                    public static Astral.Functions.TCP.Server.Server Server
+                    {
+                        get => _server.Value;
+                        set => _server.Value = value;
+                    }
+                    private static StaticPropertyAccessor<Astral.Functions.TCP.Server.Server> _server;
+
+                    public static readonly Action SendQuesterProfileInfos;
+
+                    static BotServer()
+                    {
+                        var tBotServer = typeof(Astral.Controllers.BotComs.BotServer);
+
+                        _server = tBotServer.GetStaticProperty<Astral.Functions.TCP.Server.Server>(nameof(Astral.Controllers.BotComs.BotServer.Server));
+                        SendQuesterProfileInfos = tBotServer.GetStaticAction(nameof(Astral.Controllers.BotComs.BotServer.SendQuesterProfileInfos));
+                    }
+                }
             }
 
             public static class Engine
@@ -279,8 +299,21 @@ namespace AcTp0Tools
                 }
                 private static readonly StaticPropertyAccessor<List<Assembly>> assemblies = 
                     typeof(Astral.Controllers.Plugins).GetStaticProperty<List<Assembly>>(nameof(Assemblies));
-                static readonly List<Assembly> emptyAssemblyList = new List<Assembly>();
-                public static List<Assembly> Assemblies => assemblies.IsValid ? assemblies.Value : emptyAssemblyList;
+                private static readonly List<Assembly> emptyAssemblyList = new List<Assembly>();
+                public static List<Assembly> Assemblies
+                {
+                    get 
+                    { 
+                        if(assemblies.IsValid) return assemblies.Value;
+                        
+                        emptyAssemblyList.Clear();
+                        return emptyAssemblyList;
+                        
+                    }
+                }
+
+                public static IEnumerable<Type> UccTargetSelectors =>
+                    Astral_Functions_XmlSerializer_GetExtraTypes.UccTargetSelectorTypes;
             }
         }
 

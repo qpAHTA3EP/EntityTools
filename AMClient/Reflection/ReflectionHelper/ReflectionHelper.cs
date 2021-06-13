@@ -25,12 +25,8 @@ namespace AcTp0Tools.Reflection
         public static readonly Type[]   EmptyTypeArray =   new Type[0];
 
         /// <summary>
-        /// Получение списка методов объекта <see cref="obj">
+        /// Получение списка методов объекта <param name="obj"/>
         /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="flags"></param>
-        /// <param name="BaseType"></param>
-        /// <returns></returns>
         public static MethodInfo[] GetListOfMethods(object obj, BindingFlags flags = BindingFlags.Default, bool BaseType = false)
         {
             if (obj == null)
@@ -48,11 +44,8 @@ namespace AcTp0Tools.Reflection
         }
 
         /// <summary>
-        /// Получение списка методов типа <see cref="type">
+        /// Получение списка методов типа <param name="type"/>
         /// </summary>
-        /// <param name="type"></param>
-        /// <param name="flags"></param>
-        /// <returns></returns>
         public static MethodInfo[] GetListOfMethods(Type type, BindingFlags flags = BindingFlags.Default)
         {
             if (flags == BindingFlags.Default)
@@ -65,34 +58,24 @@ namespace AcTp0Tools.Reflection
         }
 
         /// <summary>
-        /// Получение списка полей объекта <see cref="obj">
+        /// Получение списка полей объекта <param name="obj"/>
         /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="flags"></param>
-        /// <param name="BaseType"></param>
-        /// <returns></returns>
-        public static FieldInfo[] GetListOfFields(object obj, BindingFlags flags = BindingFlags.Default, bool BaseType = false)
+        public static FieldInfo[] GetListOfFields(object obj, BindingFlags flags = BindingFlags.Default, bool baseType = false)
         {
             if (obj == null)
                 return null;
             Type type = obj.GetType();
 
-            FieldInfo[] fields = null;
-
             if (flags == BindingFlags.Default)
                 flags = DefaultFlags;
 
-            if (BaseType)
-            {
+            if (baseType)
                 type = type.BaseType;
-            }
-            fields = type.GetFields(flags);
-
-            return fields;
+            return type?.GetFields(flags);
         }
 
         /// <summary>
-        /// Получить FildInfo, описывающий приватное поле <see cref="fieldName"> типа <see cref="type">
+        /// Получить <seealso cref="FieldInfo"/>, описывающий приватное поле <param name="fieldName"/> типа <param name="type"/>
         /// </summary>
         /// <param name="type">The Type that has the private field</param>
         /// <param name="fieldName">The name of the private field</param>
@@ -103,11 +86,11 @@ namespace AcTp0Tools.Reflection
                 flags = DefaultFlags;
 
             FieldInfo[] fields = type.GetFields(flags);
-            if (fields != null)
+            if (fields.Length > 0)
             {
                 foreach (FieldInfo fi in fields) //fields.FirstOrDefault(feildInfo => feildInfo.Name == fieldName);
                 {
-                    if (fi.Name.ToLower() == fieldName.ToLower())
+                    if (string.Equals(fi.Name, fieldName, StringComparison.CurrentCultureIgnoreCase))
                         return fi;
                 }
             }
@@ -115,35 +98,23 @@ namespace AcTp0Tools.Reflection
         }
 
         /// <summary>
-        /// Поиск типа по имени <see cref="typeName">
+        /// Поиск типа по имени <param name="typeName"/>
         /// </summary>
-        /// <param name="typeName"></param>
-        /// <returns></returns>
         public static Type GetTypeByName(string typeName, bool fullTypeName = false)
         {
-            if (!string.IsNullOrEmpty(typeName))
-            {
-                foreach (var assambly in AppDomain.CurrentDomain.GetAssemblies())
-                {
-                    if (fullTypeName)
-                        return assambly.GetTypes().FirstOrDefault(t => t.FullName == typeName);
-                    return assambly.GetTypes().FirstOrDefault(t => t.Name == typeName);
-                }
-            }
-            return null;
+            if (string.IsNullOrEmpty(typeName)) return null;
+            if (fullTypeName)
+                return AppDomain.CurrentDomain.GetAssemblies()
+                    .Select(assembly => assembly.GetType(typeName))
+                    .FirstOrDefault(type => type != null);
+            return AppDomain.CurrentDomain.GetAssemblies()
+                .Select(assembly => assembly.GetTypes().FirstOrDefault(t => t.Name == typeName))
+                .FirstOrDefault(type => type != null);
         }
 
-
-
         /// <summary>
-        /// Задать значение <see cref="value"> совойству <see cref="propName"> объекта <see cref="obj">.
+        /// Задать значение <param name="value"/> совойству <param name="propName"/> объекта <param name="obj"/>.
         /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="propName"></param>
-        /// <param name="value"></param>
-        /// <param name="flags"></param>
-        /// <param name="searchBaseRecursive"></param>
-        /// <returns></returns>
         public static bool SetPropertyValue(object obj, string propName, object value, BindingFlags flags = BindingFlags.Default, bool searchBaseRecursive = false)
         {
             if (obj == null)
@@ -192,16 +163,16 @@ namespace AcTp0Tools.Reflection
         }
 
         /// <summary>
-        /// Задать значение <see cref="value"> статическому совойству <see cref="propName">, объявленному в типе <see cref="type">.
+        /// Задать значение <param name="value"/> статическому совойству <param name="propName"/>, объявленному в типе <param name="type"/>.
         /// </summary>
         /// <returns>The value of the property boxed as an object.</returns>
         public static bool SetStaticPropertyValue(Type type, string propName, object value, BindingFlags flags = BindingFlags.Default, bool searchBaseRecursive = false)
         {
             //if (flags == BindingFlags.Default)
             //    flags = DefaultFlags;
-            //if (BaseType)
+            //if (baseType)
             //{
-            //    type = type.BaseType;
+            //    type = type.baseType;
             //}
             //object[] arg = new object[] { value };
             //return ExecStaticMethod(type, "set_" + propName, ref arg, out object result, flags | BindingFlags.Static | BindingFlags.InvokeMethod, false);
@@ -227,7 +198,7 @@ namespace AcTp0Tools.Reflection
         }
 
         /// <summary>
-        /// Получить значение свойства <see cref="propName"> объекта <see cref="obj">
+        /// Получить значение свойства <param name="propName"/> объекта <param name="obj"/>
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="propName"></param>
@@ -293,7 +264,7 @@ namespace AcTp0Tools.Reflection
         }
 
         /// <summary>
-        /// Получить значение статического свойства <see cref="propName"> типа <see cref="type">
+        /// Получить значение статического свойства <param name="propName"/> типа <param name="type"/>
         /// </summary>
         /// <returns>The value of the property boxed as an object.</returns>
         public static bool GetStaticPropertyValue(Type type, string propName, out object result, BindingFlags flags = BindingFlags.Default, bool searchBaseRecursive = false)
@@ -322,7 +293,7 @@ namespace AcTp0Tools.Reflection
 
 
         /// <summary>
-        /// Задать значение <see cref="value"> поля <see cref="fieldName"> объекта <see cref="obj">.
+        /// Задать значение <param name="value"/> поля <param name="fieldName"/> объекта <param name="obj"/>.
         /// </summary>
         /// <param name="obj">The instance contains private filed</param>
         /// <param name="fieldName">The name of the private field</param>
@@ -354,7 +325,7 @@ namespace AcTp0Tools.Reflection
         }
 
         /// <summary>
-        /// Задать значение <see cref="value"> статического поля <see cref="fieldName"> типа <see cref="type">.
+        /// Задать значение <param name="value"/> статического поля <param name="fieldName"/> типа <param name="type"/>.
         /// </summary>
         /// <param name="type">The type that contains static filed</param>
         /// <param name="fieldName">The name of the private field</param>
@@ -382,7 +353,7 @@ namespace AcTp0Tools.Reflection
         }
 
         /// <summary>
-        /// Получить значение приватного поля <see cref="fieldName"> объекта <see cref="type">
+        /// Получить значение приватного поля <param name="fieldName"/> объекта <param name="type"/>
         /// </summary>
         /// <param name="obj">The instance from which to read the private value.</param>
         /// <param name="fieldName">The name of the private field</param>
@@ -414,22 +385,20 @@ namespace AcTp0Tools.Reflection
         }
 
         /// <summary>
-        /// Получить значение статического поля <see cref="fieldName"> типа <see cref="type">
+        /// Получить значение статического поля <param name="fieldName"/> типа <param name="type"/>
         /// </summary>
         /// <param name="type">The Type that has the private field</param>
         /// <param name="fieldName">The name of the private field</param>
         /// <returns>The value of the property boxed as an object.</returns>
-        public static bool GetStaticFieldValue(Type type, string fieldName, out object result, BindingFlags flags = BindingFlags.Default, bool BaseType = false)
+        public static bool GetStaticFieldValue(Type type, string fieldName, out object result, BindingFlags flags = BindingFlags.Default, bool baseType = false)
         {
             result = null;
+            if (type is null)
+                return false;
 
             if (flags == BindingFlags.Default)
                 flags = DefaultFlags;
 
-            if (BaseType)
-            {
-                type = type.BaseType;
-            }
 
             FieldInfo fi = type.GetField(fieldName, flags | BindingFlags.Static);
             if (fi != null)
@@ -438,81 +407,89 @@ namespace AcTp0Tools.Reflection
                 return true;
             }
 
+            if (baseType && (type = type.BaseType) != null)
+                return GetStaticFieldValue(type, fieldName, out result, flags, baseType);
             return false;
         }
 
 
         /// <summary>
-        /// Вызов метода <see cref="methodName"> объекта <see cref="obj">
+        /// Вызов метода <param name="methodName"/> объекта <param name="obj"/>
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="methodName"></param>
         /// <param name="arguments">Массив с аргументами вызываемого метода. Если аргумент ссылочный вида ref или out, то после вызова invoke массив <see cref="arguments"> будет изменен</param>
         /// <param name="flags"></param>
-        /// <param name="BaseType"></param>
+        /// <param name="baseType"></param>
         /// <returns></returns>
-        public static bool ExecMethod(object obj, string methodName, object[] arguments, out object result, BindingFlags flags = BindingFlags.Default, bool BaseType = false)
+        public static bool ExecMethod(object obj, string methodName, object[] arguments, out object result, BindingFlags flags = BindingFlags.Default, bool baseType = false)
         {
             result = null;
 
             if (obj == null)
                 return false;
+
             Type type = obj.GetType();
 
             if (flags == BindingFlags.Default)
                 flags = DefaultFlags;
 
-            if (BaseType)
+            if (baseType)
             {
                 type = type.BaseType;
             }
 
-            MethodInfo m = type.GetMethod(methodName, flags);
+            MethodInfo m = type?.GetMethod(methodName, flags);
             if (m != null)
             {
                 result = m.Invoke(obj, arguments);
                 return true;
             }
+
             return false;
         }
 
         /// <summary>
-        /// Вызов статического метода <see cref="methodName"> типа <see cref="type">
+        /// Вызов статического метода <param name="methodName"/> типа <param name="type"/>
         /// </summary>
         /// <param name="type"></param>
-        /// <param name="MethodName"></param>
-        /// <param name="arguments">Массив с аргументами вызываемого метода. Если аргумент ссылочный вида ref или out, то после вызова invoke массив <see cref="arguments"> будет изменен</param>
+        /// <param name="methodName"></param>
+        /// <param name="arguments">Массив с аргументами вызываемого метода. Если аргумент ссылочный вида ref или out, то после вызова invoke массив <param name="arguments"/> будет изменен</param>
         /// <param name="flags"></param>
-        /// <param name="BaseType"></param>
+        /// <param name="baseType"></param>
         /// <returns></returns>
-        public static bool ExecStaticMethod(Type type, string MethodName, object[] arguments, out object result, BindingFlags flags = BindingFlags.Default, bool BaseType = false)
+        public static bool ExecStaticMethod(Type type, string methodName, object[] arguments, out object result, BindingFlags flags = BindingFlags.Default, bool baseType = false)
         {
             result = null;
+
+            if (type is null)
+                return false;
 
             if (flags == BindingFlags.Default)
                 flags = DefaultFlags;
 
-            if (BaseType)
-                type = type.BaseType;
-
-            MethodInfo methodInfo = type.GetMethod(MethodName, flags | BindingFlags.Static);
+            MethodInfo methodInfo = type.GetMethod(methodName, flags | BindingFlags.Static);
             if (methodInfo != null)
             {
                 result = methodInfo.Invoke(null, arguments);
                 return true;
             }
+
+            if (baseType && (type = type.BaseType) != null)
+                return ExecStaticMethod(type, methodName, arguments, out result, flags);
+
             return false;
         }
-        public static bool ExecStaticMethodByArgs(Type type, string MethodName, object[] arguments, out object result, BindingFlags flags = BindingFlags.Default, bool BaseType = false)
+        public static bool ExecStaticMethodByArgs(Type type, string methodName, object[] arguments, out object result, BindingFlags flags = BindingFlags.Default, bool baseType = false)
         {
             result = null;
+
+            if (type is null)
+                return false;
 
             if (flags == BindingFlags.Default)
                 flags = DefaultFlags;
 
-            if (BaseType)
-                type = type.BaseType;
-            
             Type[] types;
             if (arguments != null && arguments.Length > 0)
             {
@@ -522,16 +499,18 @@ namespace AcTp0Tools.Reflection
             }
             else types = new Type[] { };
 
-            MethodInfo methodInfo = type.GetMethod(MethodName, flags | BindingFlags.Static, null, types, null);
+            MethodInfo methodInfo = type.GetMethod(methodName, flags | BindingFlags.Static, null, types, null);
             if (methodInfo != null)
             {
                 result = methodInfo.Invoke(null, arguments);
                 return true;
             }
+
+            if (baseType && (type = type.BaseType) != null)
+                return ExecStaticMethodByArgs(type, methodName, arguments, out result, flags);
+
             return false;
         }
-
-
 
         /// <summary>
         /// Подписка на событие
@@ -544,7 +523,7 @@ namespace AcTp0Tools.Reflection
         /// <param name="sourceFlags"></param>
         /// <param name="targetFlags"></param>
         /// <returns></returns>
-        public static bool SubscribeEvent(Object source, string eventName, Object target, string methodName, bool searchBase = false, BindingFlags sourceFlags = BindingFlags.Default, BindingFlags targetFlags = BindingFlags.Default)
+        public static bool SubscribeEvent(object source, string eventName, object target, string methodName, bool searchBase = false, BindingFlags sourceFlags = BindingFlags.Default, BindingFlags targetFlags = BindingFlags.Default)
         {
             if (source != null && !string.IsNullOrEmpty(eventName)
                 && target != null && !string.IsNullOrEmpty(methodName))
@@ -572,7 +551,7 @@ namespace AcTp0Tools.Reflection
             }
             return false;
         }
-        public static bool SubscribeEventStatic(Object source, string eventName, Type target, string methodName, bool searchBase = false, BindingFlags sourceFlags = BindingFlags.Default, BindingFlags targetFlags = BindingFlags.Default)
+        public static bool SubscribeEventStatic(object source, string eventName, Type target, string methodName, bool searchBase = false, BindingFlags sourceFlags = BindingFlags.Default, BindingFlags targetFlags = BindingFlags.Default)
         {
             if (source != null && !string.IsNullOrEmpty(eventName)
                 && target != null && !string.IsNullOrEmpty(methodName))
@@ -612,7 +591,7 @@ namespace AcTp0Tools.Reflection
         /// <param name="sourceFlags"></param>
         /// <param name="targetFlags"></param>
         /// <returns></returns>
-        public static bool UnsubscribeEvent(Object source, string eventName, Object target, string methodName, bool searchBase = false, BindingFlags sourceFlags = BindingFlags.Default, BindingFlags targetFlags = BindingFlags.Default)
+        public static bool UnsubscribeEvent(object source, string eventName, object target, string methodName, bool searchBase = false, BindingFlags sourceFlags = BindingFlags.Default, BindingFlags targetFlags = BindingFlags.Default)
         {
             if (source != null && !string.IsNullOrEmpty(eventName)
                 && target != null && !string.IsNullOrEmpty(methodName))
@@ -640,7 +619,7 @@ namespace AcTp0Tools.Reflection
             }
             return false;
         }
-        public static bool UnsubscribeEventStatic(Object source, string eventName, Type target, string methodName, bool searchBase = false, BindingFlags sourceFlags = BindingFlags.Default, BindingFlags targetFlags = BindingFlags.Default)
+        public static bool UnsubscribeEventStatic(object source, string eventName, Type target, string methodName, bool searchBase = false, BindingFlags sourceFlags = BindingFlags.Default, BindingFlags targetFlags = BindingFlags.Default)
         {
             if (source != null && !string.IsNullOrEmpty(eventName)
                 && target != null && !string.IsNullOrEmpty(methodName))

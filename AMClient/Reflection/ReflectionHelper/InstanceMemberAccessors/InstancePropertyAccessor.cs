@@ -227,6 +227,8 @@ namespace AcTp0Tools.Reflection
 #else
     public static partial class ReflectionHelper
     {
+        //TODO Добавить нетипизированную перегрузку PropertyAccessor<object> GetProperty(this object instance, string propertyName, Type propertyType, BindingFlags flags = BindingFlags.Default)
+        //TODO Добавить нетипизированную перегрузку PropertyAccessor<object> GetProperty(this Type containerType, string propertyName, BindingFlags flags = BindingFlags.Default)
         /// <summary>
         /// Доступ к свойству <paramref name="propertyName"/> экземпляра объекта <paramref name="instance"/>
         /// </summary>
@@ -287,7 +289,6 @@ namespace AcTp0Tools.Reflection
     /// Класс доступа к свойству тип <typeparamref name="PropertyType"/>
     /// инкапсулированного в экземпляре объекта типа <typeparamref name="ContainerType"/>
     /// </summary>
-    /// <typeparam name="PropertyType"></typeparam>
     public class PropertyAccessor<ContainerType, PropertyType> : IInstanceMemberAccessor<ContainerType, PropertyType>
     {
         private MethodInfo _getter;

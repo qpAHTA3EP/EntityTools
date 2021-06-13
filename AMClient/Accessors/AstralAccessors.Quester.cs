@@ -1,13 +1,21 @@
 ﻿using AcTp0Tools.Patches;
 using AcTp0Tools.Reflection;
 using AStar;
+using Astral.Controllers;
+using Astral.Quester.Classes;
 using HarmonyLib;
 using MyNW.Internals;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading;
+using System.Windows.Forms;
+using System.Xml.Serialization;
+using Astral;
+using DevExpress.XtraEditors;
 
 namespace AcTp0Tools
 {
@@ -69,6 +77,7 @@ namespace AcTp0Tools
 
             public static class Core
             {
+                #region Meshes
 #if StaticPropertyAccessor_Meshes
                 /// <summary>
                 /// Функтор доступа к графу путей (карте) текущего профиля
@@ -193,7 +202,7 @@ namespace AcTp0Tools
                         {
                             var meshEntry = zipFile.GetEntry(mapName + ".bin");
                             if (meshEntry is null) return false;
-                            
+
                             using (Stream stream = meshEntry.Open())
                             {
                                 var binaryFormatter = new BinaryFormatter();
@@ -259,7 +268,7 @@ namespace AcTp0Tools
                     {
                         var lastQuesterProfileFileName = Astral.API.CurrentSettings.LastQuesterProfile;
                         var currentProfile = Astral.Quester.API.CurrentProfile;
-                        if (lastQuesterProfileFileName.Length > 0 
+                        if (lastQuesterProfileFileName.Length > 0
                             && currentProfile.Saved)
                         {
                             string meshesFile;
@@ -312,7 +321,7 @@ namespace AcTp0Tools
                                 {
                                     var zipEntryName = zipEntry.FullName;
 
-                                    if (!zipEntryName.EndsWith(".bin")) 
+                                    if (!zipEntryName.EndsWith(".bin"))
                                         continue;
 
                                     var mapName = zipEntryName.Substring(0, zipEntryName.Length - 4);
@@ -327,7 +336,7 @@ namespace AcTp0Tools
                                             loadedMaps++;
                                         }
                                     }
-                                } 
+                                }
                             }
                         }
                     }
@@ -340,9 +349,323 @@ namespace AcTp0Tools
                     return loadedMaps;
                 }
 #endif
+                #endregion
+
+                #region Profile
+
+                private static readonly PropertyInfo propProfile;
+                private static readonly MethodInfo originalSetProfile;
+                private static readonly MethodInfo postfixSetProfile;
+                public static Astral.Quester.Classes.Profile Profile
+                {
+                    get => Astral.Quester.API.CurrentProfile;
+                    set
+                    {
+                        if (value is null)
+                            throw new ArgumentNullException(nameof(value));
+                        originalSetProfile?.Invoke(null, new object[] { value } );
+                    }
+                }
+
+                /// <summary>
+                /// препатч <seealso cref="Astral.Quester.Core.Load(string, bool)"/>
+                /// </summary>
+                private static bool PrefixLoad(string Path, bool savePath = true)
+                {
+                    Load(Path);
+                    return false;
+                }
+
+                /// <summary>
+                /// Загрузка Quester-профиля, заданного <param name="profilePath"/>
+                /// Аналог <seealso cref="Astral.Quester.Core.Load(string, bool)"/>
+                /// </summary>
+                public static void Load(string profilePath)
+                {
+                    if (string.IsNullOrEmpty(profilePath))
+                    {
+                        OpenFileDialog openFileDialog = new OpenFileDialog
+                        {
+                            InitialDirectory = Directories.ProfilesPath,
+                            DefaultExt = "amp.zip",
+                            Filter = @"Astral mission profile (*.amp.zip)|*.amp.zip"
+                        };
+
+                        if (openFileDialog.ShowDialog() != DialogResult.OK)
+                            return;
+
+                        profilePath = openFileDialog.FileName;
+                    }
+
+                    using (var zipFile = ZipFile.Open(profilePath, ZipArchiveMode.Read))
+                    {
+                        try
+                        {
+                            ZipArchiveEntry zipProfileEntry = zipFile.GetEntry("profile.xml");
+                            if (zipProfileEntry is null)
+                            {
+                                Astral.Logger.Notify($"File '{Path.GetFileName(profilePath)}' does not contain 'profile.xml'");
+                                return;
+                            }
+
+                            Profile profile;
+                            using (var stream = zipProfileEntry.Open())
+                            {
+                                Astral_Functions_XmlSerializer_GetExtraTypes.GetExtraTypes(out List<Type> types, 2);
+                                XmlSerializer serializer = new XmlSerializer(typeof(Profile), types.ToArray());
+                                profile = serializer.Deserialize(stream) as Profile;
+
+                                if (profile is null)
+                                {
+                                    Astral.Logger.Notify($"Unable to load {profilePath}'. Deserialization of 'profile.xml' failed", true);
+                                    //Astral.Logger.WriteLine("Unable to load " + profilePath);
+                                    return;
+                                }
+                            }
+
+                            var mapName = EntityManager.LocalPlayer.MapState.MapName;
+                            if (string.IsNullOrEmpty(mapName))
+                                return;
+                            var mapMeshesName = mapName + ".bin";
+                            Graph meshes = null;
+
+                            ZipArchiveEntry zipMeshEntry = zipFile.GetEntry(mapMeshesName);
+                            if (zipMeshEntry != null)
+                            {
+                                using (var stream = zipMeshEntry.Open())
+                                {
+                                    BinaryFormatter binaryFormatter = new BinaryFormatter();
+                                    if (binaryFormatter.Deserialize(stream) is Graph meshesFromFile)
+                                        meshes = meshesFromFile;
+                                }
+                            }
+                            //else Astral.Logger.Notify($"File '{Path.GetFileName(profilePath)}' does not contain '{mapMeshesName}'");
+
+                            Profile.ResetCompleted();
+                            Profile = profile;
+                            Astral.API.CurrentSettings.LastQuesterProfile = profilePath;
+                            AstralAccessors.Logic.NW.Combats.BLAttackersList = null;
+
+                            var allProfileMeshes = _mapsMeshes;
+                            lock (allProfileMeshes)
+                            {
+                                allProfileMeshes.Clear();
+                                if (meshes != null)
+                                    allProfileMeshes.Add(mapName, meshes);
+                            }
+
+                            if (AstralAccessors.Controllers.BotComs.BotServer.Server.IsRunning)
+                            {
+                                AstralAccessors.Controllers.BotComs.BotServer.SendQuesterProfileInfos();
+                            }
+                        }
+                        catch (ThreadAbortException)
+                        {
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Notify(ex.ToString(), true);
+                            //XtraMessageBox.Show(ex.ToString());
+                        }
+                    }
+                }
+
+                private static bool PrefixSave(bool saveas = false)
+                {
+                    Save(saveas);
+                    return false;
+                }
+
+                /// <summary>
+                /// Сохранение quester-профиля
+                /// Аналог <seealso cref="Astral.Quester.Core.Save(bool)"/>
+                /// </summary>
+                public static void Save(bool saveAs = false)
+                {
+                    string fullProfileName = Astral.API.CurrentSettings.LastQuesterProfile;
+                    string profileName = string.IsNullOrEmpty(Astral.API.CurrentSettings.LastQuesterProfile)
+                        ? EntityManager.LocalPlayer.MapState.MapName
+                        : Path.GetFileNameWithoutExtension(Astral.API.CurrentSettings.LastQuesterProfile);
+                    string dirName = Path.GetDirectoryName(fullProfileName);
+                    if (string.IsNullOrEmpty(dirName))
+                        dirName = Directories.ProfilesPath;
+                    var currentProfile = Profile;
+
+                    bool useExternalMeshes = currentProfile.UseExternalMeshFile && currentProfile.ExternalMeshFileName.Length >= ".meshes.bin".Length + 1;
+
+                    string externalMeshFileName = string.Empty;
+                    bool needLoadAllMeshes = false;
+
+                    if (!currentProfile.Saved || saveAs)
+                    {
+                        SaveFileDialog saveFileDialog = new SaveFileDialog
+                        {
+                            InitialDirectory = dirName,
+                            DefaultExt = "amp.zip",
+                            Filter = @"Astral mission profile (*.amp.zip)|*.amp.zip",
+                            FileName = string.IsNullOrEmpty(profileName)
+                                ? EntityManager.LocalPlayer.MapState.MapName
+                                : profileName
+                        };
+                        if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                            return;
+                        fullProfileName = saveFileDialog.FileName;
+                        needLoadAllMeshes = true;
+                    }
+                    if (useExternalMeshes)
+                        externalMeshFileName = Path.Combine(Path.GetDirectoryName(fullProfileName) ?? string.Empty, currentProfile.ExternalMeshFileName);
+
+                    if (needLoadAllMeshes && !useExternalMeshes)
+                        AstralAccessors.Quester.Core.LoadAllMeshes();
+
+                    ZipArchive zipFile = null;
+                    try
+                    {
+
+                        // Открываем архивный файл профиля
+                        zipFile = ZipFile.Open(fullProfileName, File.Exists(fullProfileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create);
+
+                        // Сохраняем в архив файл профиля "profile.xml"
+                        lock (currentProfile)
+                        {
+                            if (SaveProfile(zipFile))
+                                currentProfile.Saved = true;
+                        }
+
+                        // Сохраняем файлы мешей
+                        if (useExternalMeshes)
+                        {
+                            // Если используется внешние меши
+                            // в файле профиля нужно удалить все "лишние" файлы
+                            if (zipFile.Mode == ZipArchiveMode.Update)
+                                foreach (var entry in zipFile.Entries)
+                                {
+                                    if (!entry.Name.Equals("profile.xml", StringComparison.OrdinalIgnoreCase))
+                                        entry.Delete();
+                                }
+                            // закрываем архив профиля
+                            zipFile.Dispose();
+
+                            // открываем архив с внешними мешами
+                            zipFile = ZipFile.Open(externalMeshFileName,
+                                File.Exists(externalMeshFileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create);
+                        }
+
+                        // сохраняем меши в архивный файл
+                        lock (_mapsMeshes)
+                        {
+                            BinaryFormatter binaryFormatter = new BinaryFormatter();
+                            foreach (var mesh in _mapsMeshes)
+                            {
+                                // удаляем мусор (скрытые вершины и ребра)
+                                mesh.Value.RemoveUnpassable();
+
+                                string meshName = mesh.Key + ".bin";
+
+                                SaveMesh(zipFile, meshName, mesh.Value, binaryFormatter);
+                            }
+                        }
+
+                        Astral.API.CurrentSettings.LastQuesterProfile = fullProfileName;
+
+                        Astral.Logger.Notify(string.Concat("Profile '", fullProfileName, "' saved"));
+                    }
+                    catch (Exception exc)
+                    {
+                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, exc.ToString());
+                        Astral.Logger.Notify(string.Concat("Profile '", fullProfileName, "' saved"), true);
+                    }
+                    finally
+                    {
+                        zipFile?.Dispose();
+                    }
+                }
+
+                /// <summary>
+                /// Сохранение мешей <paramref name="mesh"/> в архивный файл <paramref name="zipFile"/> под именем <paramref name="meshName"/>
+                /// </summary>
+                public static bool SaveMesh(ZipArchive zipFile, string meshName, Graph mesh, BinaryFormatter binaryFormatter = null)
+                {
+                    //TODO: Безопасное сохранение mesh'а, чтобы при возникновении ошибки старое содержимое не удалялось
+                    //TODO: Исправить сохранение внешних мешей
+                    if (zipFile is null)
+                        return false;
+
+                    if (binaryFormatter is null)
+                        binaryFormatter = new BinaryFormatter();
+
+                    try
+                    {
+                        using (MemoryStream memoryStream = new MemoryStream())
+                        {
+                            binaryFormatter.Serialize(memoryStream, mesh);
+
+                            ZipArchiveEntry zipMeshEntry;
+                            if (zipFile.Mode == ZipArchiveMode.Update)
+                            {
+                                zipMeshEntry = zipFile.GetEntry(meshName);
+                                if (zipMeshEntry != null)
+                                    zipMeshEntry.Delete();
+                            }
+                            zipMeshEntry = zipFile.CreateEntry(meshName);
+
+                            using (var zipMeshStream = zipMeshEntry.Open())
+                            {
+                                memoryStream.WriteTo(zipMeshStream);
+                                return true;
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, e.ToString());
+                    }
+
+                    return false;
+                }
+
+                /// <summary>
+                /// Сохранение профиля в архивный файл <paramref name="zipFile"/>
+                /// </summary>
+                public static bool SaveProfile(ZipArchive zipFile)
+                {
+                    //TODO: Безопасное сохранение профиля, чтобы при возникновении ошибки старое содержимое не удалялось
+                    var currentProfile = Profile;
+
+                    Astral_Functions_XmlSerializer_GetExtraTypes.GetExtraTypes(out List<Type> types, 2);
+                    XmlSerializer serializer = new XmlSerializer(currentProfile.GetType(), types.ToArray());
+
+                    using (var memStream = new MemoryStream())
+                    {
+                        try
+                        {
+                            currentProfile.Saved = true;
+                            serializer.Serialize(memStream, currentProfile);
+
+                            ZipArchiveEntry zipProfileEntry;
+                            if (zipFile.Mode == ZipArchiveMode.Update)
+                            {
+                                zipProfileEntry = zipFile.GetEntry("profile.xml");
+                                zipProfileEntry?.Delete();
+                            }
+                            zipProfileEntry = zipFile.CreateEntry("profile.xml");
+                            using (var zipProfileStream = zipProfileEntry.Open())
+                            {
+                                memStream.WriteTo(zipProfileStream);
+                                return true;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            currentProfile.Saved = false;
+                            Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, e.ToString());
+                        }
+                    }
+                    return false;
+                }
+                #endregion
 
                 #region Events
-
 #if ProfileNewLoadEvents
                 /// <summary>
                 /// Делегат, вызываемый перед вызовом <seealso cref="Astral.Quester.Core.Load(string Path, bool savePath = true)"/>,
@@ -398,7 +721,7 @@ namespace AcTp0Tools
                 /// </summary>
                 public static event ProfileChangedEvent OnProfileChanged;
 
-                private static void PostfixSetProfile(Astral.Quester.Classes.Profile value)
+                private static void PostfixSetProfile(Profile value)
                 {
                     _mapsMeshes.Clear();
                     OnProfileChanged?.Invoke();
@@ -432,10 +755,9 @@ namespace AcTp0Tools
                         AcTp0Patcher.Harmony.Patch(originalLoad, new HarmonyMethod(prefixNew), new HarmonyMethod(postfixNew));
                     } 
 #endif
-
-                    var propProfile = AccessTools.Property(tCore, nameof(Astral.Quester.Core.Profile));
-                    var originalSetProfile = propProfile.GetSetMethod(true);
-                    var postfixSetProfile = AccessTools.Method(tPatch, nameof(PostfixSetProfile));
+                    propProfile = AccessTools.Property(tCore, nameof(Astral.Quester.Core.Profile));
+                    originalSetProfile = propProfile.GetSetMethod(true);
+                    postfixSetProfile = AccessTools.Method(tPatch, nameof(PostfixSetProfile));
 
                     if (originalSetProfile != null
                         && postfixSetProfile != null)
@@ -454,11 +776,10 @@ namespace AcTp0Tools
                     }
 
                     var propMapsMeshes = AccessTools.Property(tCore, nameof(Astral.Quester.Core.MapsMeshes));
-                    var originalGetMapsMeshes = propMeshes.GetGetMethod(true);
-                    var originalSetMapsMeshes = propMeshes.GetSetMethod(true);
+                    var originalGetMapsMeshes = propMapsMeshes.GetGetMethod(true);
+                    var originalSetMapsMeshes = propMapsMeshes.GetSetMethod(true);
                     var prefixGetMapsMeshes = AccessTools.Method(tPatch, nameof(PrefixGetMapsMeshes));
                     var prefixSetMapsMeshes = AccessTools.Method(tPatch, nameof(PrefixSetMapsMeshes));
-
                     if (originalGetMapsMeshes != null
                         && prefixGetMapsMeshes != null
                         && originalSetMapsMeshes != null
@@ -466,6 +787,22 @@ namespace AcTp0Tools
                     {
                         AcTp0Patcher.Harmony.Patch(originalGetMapsMeshes, new HarmonyMethod(prefixGetMapsMeshes));
                         AcTp0Patcher.Harmony.Patch(originalSetMapsMeshes, new HarmonyMethod(prefixSetMapsMeshes));
+                    }
+
+                    var originalLoad = AccessTools.Method(tCore, nameof(Astral.Quester.Core.Load));
+                    var prefixLoad = AccessTools.Method(tPatch, nameof(PrefixLoad));
+                    if (originalLoad != null &&
+                        prefixLoad != null)
+                    {
+                        AcTp0Patcher.Harmony.Patch(originalLoad, new HarmonyMethod(prefixLoad));
+                    }
+
+                    var originalSave = AccessTools.Method(tCore, nameof(Astral.Quester.Core.Save));
+                    var prefixSave = AccessTools.Method(tPatch, nameof(PrefixSave));
+                    if (originalSave != null &&
+                        prefixSave != null)
+                    {
+                        AcTp0Patcher.Harmony.Patch(originalSave, new HarmonyMethod(prefixSave));
                     }
                 }
             }
@@ -492,29 +829,8 @@ namespace AcTp0Tools
                     static readonly StaticFieldAccessor<Astral.Quester.Forms.Editor> editorForm = typeof(Astral.Quester.Forms.Main).GetStaticField<Astral.Quester.Forms.Editor>("editorForm");
                     public static Astral.Quester.Forms.Editor EditorForm => editorForm.Value;
 
-#if false // Метод Astral.Quester.Forms.Editor.RefreshRegions() является публичным
-                    /// <summary>
-                    /// Функтор обновления списка CustomRegion'ов в окне Квестер-редактора
-                    /// </summary>
-                    private static Func<Astral.Quester.Forms.Editor, System.Action> QuesterEditor_RefreshRegions = null;
-                    public static void RefreshRegions()
-                    {
-                        //TODO: Разобраться почему не видит метод Disposed
-#if false
-                        if (editorForm.Value is Astral.Quester.Forms.Editor editor && !editor.IsDisposed) 
-#else
-                        if (editorForm.Value is Astral.Quester.Forms.Editor editor)
-#endif
-                        {
-                            if (QuesterEditor_RefreshRegions == null)
-                            {
-                                if ((QuesterEditor_RefreshRegions = typeof(Astral.Quester.Forms.Editor).GetAction("RefreshRegions")) != null)
-                                    QuesterEditor_RefreshRegions(editor)();
-                            }
-                            else QuesterEditor_RefreshRegions(editor)();
-                        }
-                    } 
-#endif
+                    // Метод Astral.Quester.Forms.Editor.RefreshRegions() является публичным
+                    //public void RefreshRegions() => editorForm.Value?.RefreshRegions();
                 }
             }
         }

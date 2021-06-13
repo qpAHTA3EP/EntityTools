@@ -145,7 +145,13 @@ namespace AcTp0Tools.Reflection
         {
             if (fieldInfo != null)
             {
-                if (fieldInfo.FieldType.Equals(typeof(FieldType)))
+#if false
+                if (fieldInfo.FieldType.Equals(typeof(FieldType))) 
+#else
+                var fieldType = typeof(FieldType);
+                if (fieldInfo.FieldType == fieldType
+                    || fieldType.IsAssignableFrom(fieldInfo.FieldType))
+#endif
                 {
                     _fieldInfo = fieldInfo;
                     return true;

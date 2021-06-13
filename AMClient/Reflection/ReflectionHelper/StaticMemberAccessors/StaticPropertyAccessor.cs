@@ -81,7 +81,7 @@ namespace AcTp0Tools.Reflection
             if (propertyInfo != null)
             {
                 MethodInfo[] accessors = propertyInfo.GetAccessors(true);
-                if (accessors?.Length > 0)
+                if (accessors.Length > 0)
                 {
                     _getter = accessors[0];
                     if (accessors.Length > 1)
