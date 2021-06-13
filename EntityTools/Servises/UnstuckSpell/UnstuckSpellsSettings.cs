@@ -22,7 +22,7 @@ namespace EntityTools.Settings
                 if (active != value)
                 {
                     active = value;
-                    NotifyPropertyChanged(nameof(Active));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -41,7 +41,7 @@ namespace EntityTools.Settings
                 if (checkInterval != value)
                 {
                     checkInterval = Math.Max(value, 500);
-                    NotifyPropertyChanged(nameof(CheckInterval));
+                    NotifyPropertyChanged();
                 }
             }
         }

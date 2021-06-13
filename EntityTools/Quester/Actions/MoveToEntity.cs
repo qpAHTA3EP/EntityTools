@@ -391,7 +391,7 @@ namespace EntityTools.Quester.Actions
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
         [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
-        public string TestInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>";
+        public string TestInfo { get; } = @"Нажми на кнопку '...' чтобы увидеть больше =>";
 
 #if false
         [XmlIgnore]

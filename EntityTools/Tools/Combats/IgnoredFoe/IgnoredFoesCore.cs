@@ -1,12 +1,8 @@
-﻿using EntityTools.Patches;
-using AcTp0Tools.Reflection;
-using HarmonyLib;
+﻿using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AcTp0Tools.Reflection;
 
 namespace EntityTools.Tools.Combats.IgnoredFoes
 {
@@ -16,22 +12,22 @@ namespace EntityTools.Tools.Combats.IgnoredFoes
         /// <summary>
         /// Коллекция списков игнорируемых врагов, ассоциированных с квестер-профилем
         /// </summary>
-        private static IgnoredFoesContainer _blContainer = new IgnoredFoesContainer();
+        private static readonly IgnoredFoesContainer BlContainer = new IgnoredFoesContainer();
 
 
-#if false
-        static Func<List<string>> BLAttackersList = null;
-        static StaticFieldAccessor<Func<List<string>>> Combats_BLAttackersList = typeof(Astral.Logic.NW.Combats).GetStaticField<Func<List<string>>>("BLAttackersList"); 
-#else
+
+#if Traverse_BLAttackersList
         /// <summary>
         /// Механизм доступа к функтору Astral.Logic.NW.Combats.BLAttackersList,
         /// который передает в боевую подсистему список игнорируемых врагов
         /// </summary>
-        static Traverse<Func<List<string>>> BLAttackersList = null;
+        private static readonly Traverse<Func<List<string>>> BLAttackersList = Traverse.Create(typeof(Astral.Logic.NW.Combats)).Field<Func<List<string>>>("BLAttackersList");
+#else
+        private static readonly StaticFieldAccessor<Func<List<string>>> BLAttackersList = typeof(Astral.Logic.NW.Combats).GetStaticField<Func<List<string>>>("BLAttackersList");
 #endif
         static IgnoredFoesCore()
         {
-            BLAttackersList = Traverse.Create(typeof(Astral.Logic.NW.Combats)).Field<Func<List<string>>>("BLAttackersList");
+            //TODO Вместо патча Astral.Quester.Core.Load() использовать подписку на событие AstralAccessors.Quester.Core.OnProfileChanged
 
             var Quester_Core_Load = typeof(Astral.Quester.Core).GetMethod(nameof(Astral.Quester.Core.Load));
             var Quester_Core_Load_Postfix = typeof(IgnoredFoesCore).GetMethod(nameof(SetExtendedFoeBlackList));
@@ -48,21 +44,22 @@ namespace EntityTools.Tools.Combats.IgnoredFoes
         static void SetExtendedFoeBlackList()
         {
             var profName = Path.GetFullPath(Astral.API.CurrentSettings.LastQuesterProfile);
-            if(_blContainer.Contains(profName))
-            {
-                // Подменяем BLAttackersList
-                var blEntry = _blContainer[profName];
-                if (blEntry.Timeout.IsTimedOut)
-                    _blContainer.Remove(blEntry);
-                else BLAttackersList.Value = () => blEntry.Foes;
-            }
+
+            if (!BlContainer.Contains(profName)) return;
+
+            // Подменяем BLAttackersList
+            var blEntry = BlContainer[profName];
+            if (blEntry.Timeout.IsTimedOut)
+                BlContainer.Remove(blEntry);
+            else BLAttackersList.Value = () => blEntry.Foes;
         }
+
         /// <summary>
         /// Установка стандартного функтора, передающего в боевую подсистему список игнорируемых врагов из Profile.BlackList.
         /// </summary>
         static void SetDefaultFoeBlackList()
         {
-            BLAttackersList.Value = () => Astral.Quester.API.CurrentProfile.BlackList;
+            BLAttackersList.Value = () => Astral.Quester.API.CurrentProfile.BlackList; 
         }
 
         /// <summary>
@@ -75,9 +72,9 @@ namespace EntityTools.Tools.Combats.IgnoredFoes
             var profBlackList = Astral.Quester.API.CurrentProfile.BlackList;
 
             IgnoredFoes blEntry = null;
-            if (_blContainer.Contains(profName))
+            if (BlContainer.Contains(profName))
             {
-                blEntry = _blContainer[profName];
+                blEntry = BlContainer[profName];
                 if (blEntry.Timeout.IsTimedOut)
                     blEntry.Clear();
                 blEntry.AddRange(foes);
@@ -86,7 +83,7 @@ namespace EntityTools.Tools.Combats.IgnoredFoes
             else
             {
                 blEntry = new IgnoredFoes(profName, profBlackList, foes, time);
-                _blContainer.Add(blEntry);
+                BlContainer.Add(blEntry);
             }
 
             if (blEntry.Foes.Count > 0)
@@ -100,23 +97,19 @@ namespace EntityTools.Tools.Combats.IgnoredFoes
         public static void Remove(IEnumerable<string> foes = null)
         {
             var profName = Path.GetFullPath(Astral.API.CurrentSettings.LastQuesterProfile);
-            var profBlackList = Astral.Quester.API.CurrentProfile.BlackList;
 
-            IgnoredFoes blEntry = null;
-            if (_blContainer.Contains(profName))
+            if (BlContainer.Contains(profName))
             {
-                blEntry = _blContainer[profName];
+                IgnoredFoes blEntry = BlContainer[profName];
 
                 if (foes is null || blEntry.Timeout.IsTimedOut)
                 {
-                    _blContainer.Remove(blEntry);
-                    blEntry = null;
+                    BlContainer.Remove(blEntry);
                     SetDefaultFoeBlackList();
                 }
                 else
                 {
                     blEntry.RemoveRange(foes);
-                    //SetExtendedFoeBlackList();
                 }
             }
         }
@@ -129,10 +122,9 @@ namespace EntityTools.Tools.Combats.IgnoredFoes
             get
             {
                 var profName = Path.GetFullPath(Astral.API.CurrentSettings.LastQuesterProfile);
-                IgnoredFoes blEntry = null;
-                if (_blContainer.Contains(profName))
+                if (BlContainer.Contains(profName))
                 {
-                    blEntry = _blContainer[profName];
+                    var blEntry = BlContainer[profName];
                     return blEntry.Foes;
                 }
                 return Astral.Quester.API.CurrentProfile.BlackList;

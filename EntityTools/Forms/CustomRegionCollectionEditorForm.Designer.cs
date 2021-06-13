@@ -41,6 +41,7 @@
             this.tabExclusion = new DevExpress.XtraBars.Navigation.TabNavigationPage();
             this.textExclusion = new DevExpress.XtraEditors.LabelControl();
             this.btnItemSelection = new DevExpress.XtraEditors.DropDownButton();
+            this.btnOpenMapper = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.crList)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.spliter)).BeginInit();
             this.spliter.Panel1.SuspendLayout();
@@ -56,39 +57,39 @@
             // btnSelect
             // 
             this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelect.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.btnSelect.ImageOptions.Image = global::EntityTools.Properties.Resources.miniValid;
             this.btnSelect.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnSelect.ImageOptions.ImageToTextIndent = 6;
-            this.btnSelect.Location = new System.Drawing.Point(12, 367);
+            this.btnSelect.Location = new System.Drawing.Point(256, 374);
             this.btnSelect.Name = "btnSelect";
-            this.btnSelect.Size = new System.Drawing.Size(271, 23);
+            this.btnSelect.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
+            this.btnSelect.Size = new System.Drawing.Size(70, 23);
             this.btnSelect.TabIndex = 0;
             this.btnSelect.Text = "Select";
             this.btnSelect.Click += new System.EventHandler(this.handler_Select);
             // 
             // btnReload
             // 
-            this.btnReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnReload.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
+            this.btnReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnReload.ImageOptions.Image = global::EntityTools.Properties.Resources.miniRefresh;
-            this.btnReload.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
-            this.btnReload.Location = new System.Drawing.Point(289, 367);
+            this.btnReload.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
+            this.btnReload.Location = new System.Drawing.Point(88, 374);
             this.btnReload.Name = "btnReload";
-            this.btnReload.Size = new System.Drawing.Size(23, 23);
+            this.btnReload.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
+            this.btnReload.Size = new System.Drawing.Size(70, 23);
             this.btnReload.TabIndex = 1;
+            this.btnReload.Text = "Reload";
             this.btnReload.ToolTip = "Reload";
             this.btnReload.Click += new System.EventHandler(this.handler_Reload);
             // 
             // crList
             // 
-            this.crList.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.crList.CheckOnClick = true;
             this.crList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.crList.Location = new System.Drawing.Point(0, 0);
             this.crList.MultiColumn = true;
             this.crList.Name = "crList";
-            this.crList.Size = new System.Drawing.Size(300, 247);
+            this.crList.Size = new System.Drawing.Size(314, 248);
             this.crList.SortOrder = System.Windows.Forms.SortOrder.Ascending;
             this.crList.TabIndex = 5;
             // 
@@ -108,7 +109,7 @@
             // spliter.Panel2
             // 
             this.spliter.Panel2.Controls.Add(this.crList);
-            this.spliter.Size = new System.Drawing.Size(300, 349);
+            this.spliter.Size = new System.Drawing.Size(314, 350);
             this.spliter.SplitterDistance = 98;
             this.spliter.TabIndex = 8;
             // 
@@ -128,9 +129,9 @@
             this.tabUnion,
             this.tabIntersection,
             this.tabExclusion});
-            this.tabPane.RegularSize = new System.Drawing.Size(300, 98);
+            this.tabPane.RegularSize = new System.Drawing.Size(314, 98);
             this.tabPane.SelectedPage = this.tabUnion;
-            this.tabPane.Size = new System.Drawing.Size(300, 98);
+            this.tabPane.Size = new System.Drawing.Size(314, 98);
             this.tabPane.TabAlignment = DevExpress.XtraEditors.Alignment.Center;
             this.tabPane.TabIndex = 8;
             this.tabPane.Text = "tabPane";
@@ -141,10 +142,12 @@
             this.tabUnion.Caption = "UNION";
             this.tabUnion.Controls.Add(this.textUnion);
             this.tabUnion.Name = "tabUnion";
-            this.tabUnion.Size = new System.Drawing.Size(300, 71);
+            this.tabUnion.Size = new System.Drawing.Size(314, 71);
             // 
             // textUnion
             // 
+            this.textUnion.Appearance.BackColor = System.Drawing.SystemColors.Window;
+            this.textUnion.Appearance.Options.UseBackColor = true;
             this.textUnion.Appearance.Options.UseTextOptions = true;
             this.textUnion.Appearance.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Top;
             this.textUnion.Appearance.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
@@ -152,7 +155,7 @@
             this.textUnion.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textUnion.Location = new System.Drawing.Point(0, 0);
             this.textUnion.Name = "textUnion";
-            this.textUnion.Size = new System.Drawing.Size(300, 71);
+            this.textUnion.Size = new System.Drawing.Size(314, 71);
             this.textUnion.TabIndex = 8;
             this.textUnion.Text = resources.GetString("textUnion.Text");
             // 
@@ -161,7 +164,7 @@
             this.tabIntersection.Caption = "INTERSECTION";
             this.tabIntersection.Controls.Add(this.textIntersection);
             this.tabIntersection.Name = "tabIntersection";
-            this.tabIntersection.Size = new System.Drawing.Size(300, 71);
+            this.tabIntersection.Size = new System.Drawing.Size(314, 72);
             // 
             // textIntersection
             // 
@@ -172,7 +175,7 @@
             this.textIntersection.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textIntersection.Location = new System.Drawing.Point(0, 0);
             this.textIntersection.Name = "textIntersection";
-            this.textIntersection.Size = new System.Drawing.Size(300, 71);
+            this.textIntersection.Size = new System.Drawing.Size(314, 72);
             this.textIntersection.TabIndex = 7;
             this.textIntersection.Text = resources.GetString("textIntersection.Text");
             // 
@@ -181,7 +184,7 @@
             this.tabExclusion.Caption = "EXCLUSION";
             this.tabExclusion.Controls.Add(this.textExclusion);
             this.tabExclusion.Name = "tabExclusion";
-            this.tabExclusion.Size = new System.Drawing.Size(300, 71);
+            this.tabExclusion.Size = new System.Drawing.Size(314, 72);
             // 
             // textExclusion
             // 
@@ -192,7 +195,7 @@
             this.textExclusion.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textExclusion.Location = new System.Drawing.Point(0, 0);
             this.textExclusion.Name = "textExclusion";
-            this.textExclusion.Size = new System.Drawing.Size(300, 71);
+            this.textExclusion.Size = new System.Drawing.Size(314, 72);
             this.textExclusion.TabIndex = 6;
             this.textExclusion.Text = "Отметьте несколько регионов, которые будут ИСКЛЮЧЕНЫ из итоговой области. Персона" +
     "жу запрещено находиться в любом из отмеченных регионов.";
@@ -205,30 +208,45 @@
             this.btnItemSelection.ImageOptions.Image = global::EntityTools.Properties.Resources.miniGear;
             this.btnItemSelection.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnItemSelection.ImageOptions.ImageToTextIndent = 6;
-            this.btnItemSelection.Location = new System.Drawing.Point(12, 367);
+            this.btnItemSelection.Location = new System.Drawing.Point(164, 374);
             this.btnItemSelection.Name = "btnItemSelection";
-            this.btnItemSelection.Size = new System.Drawing.Size(149, 23);
+            this.btnItemSelection.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
+            this.btnItemSelection.Size = new System.Drawing.Size(37, 23);
             this.btnItemSelection.TabIndex = 9;
             this.btnItemSelection.Text = "Selection...";
             this.btnItemSelection.Visible = false;
+            // 
+            // btnOpenMapper
+            // 
+            this.btnOpenMapper.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnOpenMapper.ImageOptions.Image = global::EntityTools.Properties.Resources.miniRoad;
+            this.btnOpenMapper.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
+            this.btnOpenMapper.Location = new System.Drawing.Point(12, 374);
+            this.btnOpenMapper.Name = "btnOpenMapper";
+            this.btnOpenMapper.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
+            this.btnOpenMapper.Size = new System.Drawing.Size(70, 23);
+            this.btnOpenMapper.TabIndex = 1;
+            this.btnOpenMapper.Text = "Mapper";
+            this.btnOpenMapper.ToolTip = "Open Mapper";
+            this.btnOpenMapper.Click += new System.EventHandler(this.handler_Mapper);
             // 
             // CustomRegionCollectionEditorForm
             // 
             this.AcceptButton = this.btnSelect;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(324, 402);
+            this.ClientSize = new System.Drawing.Size(338, 409);
             this.Controls.Add(this.btnItemSelection);
             this.Controls.Add(this.spliter);
+            this.Controls.Add(this.btnOpenMapper);
             this.Controls.Add(this.btnReload);
             this.Controls.Add(this.btnSelect);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.IconOptions.ShowIcon = false;
-            this.LookAndFeel.SkinName = "Office 2013 Light Gray";
             this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(332, 426);
+            this.MinimumSize = new System.Drawing.Size(318, 419);
             this.Name = "CustomRegionCollectionEditorForm";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -260,5 +278,6 @@
         private DevExpress.XtraEditors.LabelControl textIntersection;
         private DevExpress.XtraEditors.LabelControl textExclusion;
         private DevExpress.XtraEditors.DropDownButton btnItemSelection;
+        internal DevExpress.XtraEditors.SimpleButton btnOpenMapper;
     }
 }

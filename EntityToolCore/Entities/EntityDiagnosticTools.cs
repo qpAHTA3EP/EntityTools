@@ -278,17 +278,17 @@ namespace EntityCore.Entities
                     sb.Append("ReactionZRange: ").AppendLine(entityDescriptor.ReactionZRange.ToString());
                     sb.Append("Region: ").AppendLine(entityDescriptor.RegionCheck.ToString());
 
-                    Predicate<Entity> crCheck = null;
+                    //Predicate<Entity> crCheck = null;
                     var customRegions = entityDescriptor.GetProperty<CustomRegionCollection>("CustomRegionNames");
                     var customRegionCheck = entityDescriptor.GetProperty<Astral.Quester.Classes.Condition.Presence>("CustomRegionCheck");
                     if (customRegions.IsValid)
                     {
                         var crCollection = customRegions.Value;
 
-                        if(customRegionCheck.IsValid && customRegionCheck.Value == Condition.Presence.NotEquel)
-                            crCheck = crCollection.Outside;
-                        else crCheck = crCollection.Within;
-                        sb.Append("CustomRegions: ").Append(crCollection.ToString());
+                        //if(customRegionCheck.IsValid && customRegionCheck.Value == Condition.Presence.NotEquel)
+                        //    crCheck = crCollection.Outside;
+                        //else crCheck = crCollection.Within;
+                        sb.Append("CustomRegions: ").Append(crCollection);
                         if (crCollection.Count > 0)
                         {
                             sb.AppendLine(" {");

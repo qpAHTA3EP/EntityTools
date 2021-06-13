@@ -24,7 +24,7 @@ namespace EntityTools.Patches.UCC
 
         internal static object Show(Type type)
         {
-            EntityTools.Core.GUIRequest_UCCAction(out UCCAction action);
+            EntityTools.Core.UserRequest_GetUccAction(out UCCAction action);
             return action;
         }
     }

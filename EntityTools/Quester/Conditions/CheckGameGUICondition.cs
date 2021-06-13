@@ -3,6 +3,7 @@ using System.Drawing.Design;
 using System.Threading;
 using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
+using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
@@ -140,15 +141,15 @@ namespace EntityTools.Quester.Conditions
             Engine = new QuesterConditionProxy(this);
         }
 
-        private IQuesterConditionEngine MakeProxie()
+        private IQuesterConditionEngine MakeProxy()
         {
             return new QuesterConditionProxy(this);
         }
         #endregion
 
-        public override bool IsValid => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).IsValid;
-        public override void Reset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Reset();
-        public override string TestInfos => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).TestInfos;
-        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Label();
+        public override bool IsValid => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).IsValid;
+        public override void Reset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Reset();
+        public override string TestInfos => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).TestInfos;
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
     }
 }

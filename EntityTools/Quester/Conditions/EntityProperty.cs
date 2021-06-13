@@ -128,7 +128,6 @@ namespace EntityTools.Quester.Conditions
         [Description("A subset of entities that are searched for a target\n" +
             "Contacts: Only interactable Entities\n" +
             "Complete: All possible Entities")]
-        [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
         [Category("Optional")]
 #else
         [Browsable(false)]
@@ -305,7 +304,7 @@ namespace EntityTools.Quester.Conditions
 
         public EntityProperty()
         {
-            Engine = MakeProxie();
+            Engine = MakeProxy();
         }
 
         public void Bind(IQuesterConditionEngine engine)
@@ -314,19 +313,19 @@ namespace EntityTools.Quester.Conditions
         }
         public void Unbind()
         {
-            Engine = MakeProxie();
+            Engine = MakeProxy();
             PropertyChanged = null;
         }
 
-        private IQuesterConditionEngine MakeProxie()
+        private IQuesterConditionEngine MakeProxy()
         {
             return new QuesterConditionProxy(this);
         }
         #endregion
 
-        public override bool IsValid => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).IsValid;
-        public override void Reset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Reset();
-        public override string TestInfos => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).TestInfos;
-        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Label();
+        public override bool IsValid => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).IsValid;
+        public override void Reset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Reset();
+        public override string TestInfos => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).TestInfos;
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
     }
 }

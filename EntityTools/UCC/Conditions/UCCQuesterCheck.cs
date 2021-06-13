@@ -26,7 +26,7 @@ namespace EntityTools.UCC.Conditions
             return Condition?.IsValid == true;
         }
 
-        bool ICustomUCCCondition.Loked { get => Locked; set => Locked = value; }
+        bool ICustomUCCCondition.Loсked { get => Locked; set => Locked = value; }
 
         string ICustomUCCCondition.TestInfos(UCCAction refAction)
         {

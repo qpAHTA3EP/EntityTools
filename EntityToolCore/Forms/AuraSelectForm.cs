@@ -226,7 +226,8 @@ namespace EntityCore.Forms
 
         private void AuraSelectForm_Load(object sender, EventArgs e)
         {
-            Selector.DataSource = Enum.GetValues(typeof(SelectedAuraSource));
+            Selector.Properties.Items.Clear();
+            Selector.Properties.Items.AddRange(Enum.GetValues(typeof(SelectedAuraSource)));
         }
 
         private void Selector_SelectedIndexChanged(object sender, EventArgs e)

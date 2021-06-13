@@ -25,7 +25,7 @@ namespace EntityTools.Settings
                 if (patch != value)
                 {
                     patch = value;
-                    NotifyPropertyChanged(nameof(Patch));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -45,7 +45,7 @@ namespace EntityTools.Settings
                 if (waypointDistance != value)
                 {
                     waypointDistance = Math.Max(5, value);
-                    NotifyPropertyChanged(nameof(WaypointDistance));
+                    NotifyPropertyChanged();
                     WaypointEquivalenceDistance = Math.Min(waypointDistance / 2, waypointEquivalenceDistance);
                 }
             }
@@ -66,7 +66,7 @@ namespace EntityTools.Settings
                 if (waypointEquivalenceDistance != value)
                 {
                     waypointEquivalenceDistance = Math.Max(2, Math.Min(value, WaypointDistance / 2)); ;
-                    NotifyPropertyChanged(nameof(WaypointEquivalenceDistance));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -86,7 +86,7 @@ namespace EntityTools.Settings
                 if (maxElevationDifference != value)
                 {
                     maxElevationDifference = Math.Max(2, value);
-                    NotifyPropertyChanged(nameof(MaxElevationDifference));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -106,7 +106,7 @@ namespace EntityTools.Settings
                 if (cacheActive != value)
                 {
                     cacheActive = value;
-                    NotifyPropertyChanged(nameof(CacheActive));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -126,7 +126,7 @@ namespace EntityTools.Settings
                 if (value != cacheRadius)
                 {
                     cacheRadius = Math.Max(value, Math.Max(50, waypointDistance * 3));
-                    NotifyPropertyChanged(nameof(CacheRadius));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -146,7 +146,7 @@ namespace EntityTools.Settings
                 if (value != cacheRegenTimeout)
                 {
                     cacheRegenTimeout = Math.Max(500, value);
-                    NotifyPropertyChanged(nameof(cacheRegenTimeout));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -168,7 +168,7 @@ namespace EntityTools.Settings
                 if (forceLinkingWaypoint != value)
                 {
                     forceLinkingWaypoint = value;
-                    NotifyPropertyChanged(nameof(ForceLinkingWaypoint));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -189,7 +189,7 @@ namespace EntityTools.Settings
                 if (linearPath != value)
                 {
                     linearPath = value;
-                    NotifyPropertyChanged(nameof(LinearPath));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -242,7 +242,7 @@ namespace EntityTools.Settings
                         value.Y = 60;
 
                     _location = value;
-                    NotifyPropertyChanged(nameof(Location));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -279,7 +279,7 @@ namespace EntityTools.Settings
                     else if(value.Height < 200)
                         _size = new Size(value.Width, 200);
                     else _size = value;
-                    NotifyPropertyChanged(nameof(Size));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -299,7 +299,7 @@ namespace EntityTools.Settings
                 if (_mappingBarVisible != value)
                 {
                     _mappingBarVisible = value;
-                    NotifyPropertyChanged(nameof(MappingBarVisible));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -319,7 +319,7 @@ namespace EntityTools.Settings
                 if (_meshesBarVisible != value)
                 {
                     _meshesBarVisible = value;
-                    NotifyPropertyChanged(nameof(MeshesBarVisible));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -339,7 +339,7 @@ namespace EntityTools.Settings
                 if (_nodeToolsBarVisible != value)
                 {
                     _nodeToolsBarVisible = value;
-                    NotifyPropertyChanged(nameof(NodeToolsBarVisible));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -359,7 +359,7 @@ namespace EntityTools.Settings
                 if (_customRegionBarVisible != value)
                 {
                     _customRegionBarVisible = value;
-                    NotifyPropertyChanged(nameof(CustomRegionBarVisible));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -379,7 +379,7 @@ namespace EntityTools.Settings
                 if (_statusBarVisible != value)
                 {
                     _statusBarVisible = value;
-                    NotifyPropertyChanged(nameof(StatusBarVisible));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -399,7 +399,7 @@ namespace EntityTools.Settings
                 if (value != redrawMapperTimeout)
                 {
                     redrawMapperTimeout = Math.Max(100, value);
-                    NotifyPropertyChanged(nameof(RedrawMapperTimeout));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -421,7 +421,7 @@ namespace EntityTools.Settings
                 if (value != layerDepth)
                 {
                     layerDepth = value;
-                    NotifyPropertyChanged(nameof(LayerDepth));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -439,7 +439,7 @@ namespace EntityTools.Settings
                 if (value != biPathColor)
                 {
                     biPathColor = value;
-                    NotifyPropertyChanged(nameof(BidirectionalPathColor));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -457,7 +457,7 @@ namespace EntityTools.Settings
                 if (value != uniPathColor)
                 {
                     uniPathColor = value;
-                    NotifyPropertyChanged(nameof(UnidirectionalPathColor));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -475,7 +475,7 @@ namespace EntityTools.Settings
                 if (value != backgroundColor)
                 {
                     backgroundColor = value;
-                    NotifyPropertyChanged(nameof(BackgroundColor));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -492,7 +492,7 @@ namespace EntityTools.Settings
                 if (_drawEnemies != value)
                 {
                     _drawEnemies = value;
-                    NotifyPropertyChanged(nameof(DrawEnemies));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -510,7 +510,7 @@ namespace EntityTools.Settings
                 if (value != enemiesColor)
                 {
                     enemiesColor = value;
-                    NotifyPropertyChanged(nameof(EnemyColor));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -528,7 +528,7 @@ namespace EntityTools.Settings
                 if (_drawFriends != value)
                 {
                     _drawFriends = value;
-                    NotifyPropertyChanged(nameof(DrawFriends));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -546,7 +546,7 @@ namespace EntityTools.Settings
                 if (value != friendsColor)
                 {
                     friendsColor = value;
-                    NotifyPropertyChanged(nameof(FriendColor));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -563,7 +563,7 @@ namespace EntityTools.Settings
                 if (_drawPlayers != value)
                 {
                     _drawPlayers = value;
-                    NotifyPropertyChanged(nameof(DrawPlayers));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -581,7 +581,7 @@ namespace EntityTools.Settings
                 if (value != playersColor)
                 {
                     playersColor = value;
-                    NotifyPropertyChanged(nameof(PlayerColor));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -598,7 +598,7 @@ namespace EntityTools.Settings
                 if (_drawOtherNpc != value)
                 {
                     _drawOtherNpc = value;
-                    NotifyPropertyChanged(nameof(DrawOtherNPC));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -616,7 +616,7 @@ namespace EntityTools.Settings
                 if (value != npcColor)
                 {
                     npcColor = value;
-                    NotifyPropertyChanged(nameof(OtherNPCColor));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -633,7 +633,7 @@ namespace EntityTools.Settings
                 if (_drawNodes != value)
                 {
                     _drawNodes = value;
-                    NotifyPropertyChanged(nameof(DrawNodes));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -651,7 +651,7 @@ namespace EntityTools.Settings
                 if (value != nodesColor)
                 {
                     nodesColor = value;
-                    NotifyPropertyChanged(nameof(NodeColor));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -668,7 +668,7 @@ namespace EntityTools.Settings
                 if (_drawSkillnodes != value)
                 {
                     _drawSkillnodes = value;
-                    NotifyPropertyChanged(nameof(DrawSkillNodes));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -686,7 +686,7 @@ namespace EntityTools.Settings
                 if (value != skillnodesColor)
                 {
                     skillnodesColor = value;
-                    NotifyPropertyChanged(nameof(SkillNodeColor));
+                    NotifyPropertyChanged();
                 }
             }
         }

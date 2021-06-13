@@ -35,6 +35,16 @@ namespace EntityTools.Core
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            DevExpress.XtraEditors.Controls.EditorButtonImageOptions editorButtonImageOptions1 = new DevExpress.XtraEditors.Controls.EditorButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject1 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject2 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject3 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject4 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraEditors.Controls.EditorButtonImageOptions editorButtonImageOptions2 = new DevExpress.XtraEditors.Controls.EditorButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject5 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject6 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject7 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject8 = new DevExpress.Utils.SerializableAppearanceObject();
             this.fldrBroserDlg = new System.Windows.Forms.FolderBrowserDialog();
             this.tbclMain = new DevExpress.XtraTab.XtraTabControl();
             this.tabUtilities = new DevExpress.XtraTab.XtraTabPage();
@@ -49,18 +59,20 @@ namespace EntityTools.Core
             this.btnEntities = new System.Windows.Forms.Button();
             this.ckbSpellStuckMonitor = new System.Windows.Forms.CheckBox();
             this.gbxExport = new System.Windows.Forms.GroupBox();
-            this.cbxExportSelector = new System.Windows.Forms.ComboBox();
             this.tbExportFileSelector = new DevExpress.XtraEditors.ButtonEdit();
+            this.cbxExportSelector = new DevExpress.XtraEditors.ComboBoxEdit();
             this.btnExport = new System.Windows.Forms.Button();
-            this.btnDefault = new System.Windows.Forms.Button();
             this.ckbMapperPatch = new System.Windows.Forms.CheckBox();
             this.tabSettings = new DevExpress.XtraTab.XtraTabPage();
+            this.btnSave = new DevExpress.XtraEditors.SimpleButton();
+            this.pgConfigs = new System.Windows.Forms.PropertyGrid();
             this.tabRelogger = new DevExpress.XtraTab.XtraTabPage();
             this.lblMachinId = new System.Windows.Forms.Label();
             this.lblAccount = new System.Windows.Forms.Label();
+            this.btnCredentialManager = new DevExpress.XtraEditors.SimpleButton();
             this.btnGetMachineId = new DevExpress.XtraEditors.SimpleButton();
             this.btnSetMachineId = new DevExpress.XtraEditors.SimpleButton();
-            this.tbMashingId = new System.Windows.Forms.TextBox();
+            this.tbMashineId = new System.Windows.Forms.TextBox();
             this.tabDebug = new DevExpress.XtraTab.XtraTabPage();
             this.tbDebugMonitorInfo = new System.Windows.Forms.TextBox();
             this.ckbDebugMonitor = new System.Windows.Forms.CheckBox();
@@ -77,14 +89,13 @@ namespace EntityTools.Core
             this.btnTest3 = new System.Windows.Forms.Button();
             this.dlgSaveFile = new System.Windows.Forms.SaveFileDialog();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.btnSave = new DevExpress.XtraEditors.SimpleButton();
-            this.pgConfigs = new System.Windows.Forms.PropertyGrid();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
             this.tbclMain.SuspendLayout();
             this.tabUtilities.SuspendLayout();
             this.gbxETLog.SuspendLayout();
             this.gbxExport.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tbExportFileSelector.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cbxExportSelector.Properties)).BeginInit();
             this.tabSettings.SuspendLayout();
             this.tabRelogger.SuspendLayout();
             this.tabDebug.SuspendLayout();
@@ -127,6 +138,7 @@ namespace EntityTools.Core
             this.gbxETLog.Controls.Add(this.bntOpenLogFile);
             this.gbxETLog.Location = new System.Drawing.Point(9, 91);
             this.gbxETLog.Name = "gbxETLog";
+            this.gbxETLog.Padding = new System.Windows.Forms.Padding(6);
             this.gbxETLog.Size = new System.Drawing.Size(350, 49);
             this.gbxETLog.TabIndex = 13;
             this.gbxETLog.TabStop = false;
@@ -135,9 +147,10 @@ namespace EntityTools.Core
             // ckbETLogger
             // 
             this.ckbETLogger.AutoSize = true;
-            this.ckbETLogger.Location = new System.Drawing.Point(6, 20);
+            this.ckbETLogger.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ckbETLogger.Location = new System.Drawing.Point(10, 23);
             this.ckbETLogger.Name = "ckbETLogger";
-            this.ckbETLogger.Size = new System.Drawing.Size(150, 17);
+            this.ckbETLogger.Size = new System.Drawing.Size(147, 17);
             this.ckbETLogger.TabIndex = 3;
             this.ckbETLogger.Text = "Enable EntityTools Logger";
             this.ckbETLogger.UseVisualStyleBackColor = true;
@@ -145,22 +158,27 @@ namespace EntityTools.Core
             // 
             // bntOpenLogFile
             // 
+            this.bntOpenLogFile.FlatAppearance.BorderSize = 0;
             this.bntOpenLogFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bntOpenLogFile.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.bntOpenLogFile.Location = new System.Drawing.Point(235, 16);
+            this.bntOpenLogFile.Image = global::EntityTools.Properties.Resources.miniLoad;
+            this.bntOpenLogFile.ImageAlign = System.Drawing.ContentAlignment.BottomLeft;
+            this.bntOpenLogFile.Location = new System.Drawing.Point(246, 17);
             this.bntOpenLogFile.Name = "bntOpenLogFile";
-            this.bntOpenLogFile.Size = new System.Drawing.Size(109, 23);
+            this.bntOpenLogFile.Size = new System.Drawing.Size(95, 23);
             this.bntOpenLogFile.TabIndex = 0;
             this.bntOpenLogFile.Text = "Open LogFile";
+            this.bntOpenLogFile.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.bntOpenLogFile.UseVisualStyleBackColor = true;
             this.bntOpenLogFile.Click += new System.EventHandler(this.handler_OpenLogFile);
             // 
             // cbEnchantHelperActivator
             // 
             this.cbEnchantHelperActivator.AutoSize = true;
-            this.cbEnchantHelperActivator.Location = new System.Drawing.Point(15, 169);
+            this.cbEnchantHelperActivator.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cbEnchantHelperActivator.Location = new System.Drawing.Point(18, 169);
             this.cbEnchantHelperActivator.Name = "cbEnchantHelperActivator";
-            this.cbEnchantHelperActivator.Size = new System.Drawing.Size(131, 17);
+            this.cbEnchantHelperActivator.Size = new System.Drawing.Size(128, 17);
             this.cbEnchantHelperActivator.TabIndex = 10;
             this.cbEnchantHelperActivator.Text = "Enable EnchantHelper";
             this.cbEnchantHelperActivator.UseVisualStyleBackColor = true;
@@ -170,6 +188,7 @@ namespace EntityTools.Core
             // 
             this.btnValidate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnValidate.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnValidate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnValidate.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.btnValidate.Location = new System.Drawing.Point(127, 339);
@@ -183,19 +202,21 @@ namespace EntityTools.Core
             // btnUiViewer
             // 
             this.btnUiViewer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnUiViewer.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnUiViewer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUiViewer.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.btnUiViewer.Location = new System.Drawing.Point(245, 293);
             this.btnUiViewer.Name = "btnUiViewer";
             this.btnUiViewer.Size = new System.Drawing.Size(113, 40);
             this.btnUiViewer.TabIndex = 0;
-            this.btnUiViewer.Text = "UI Viewer";
+            this.btnUiViewer.Text = "Game UI";
             this.btnUiViewer.UseVisualStyleBackColor = true;
             this.btnUiViewer.Click += new System.EventHandler(this.handler_OpenUiViewer);
             // 
             // btnAuraViewer
             // 
             this.btnAuraViewer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnAuraViewer.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnAuraViewer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAuraViewer.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.btnAuraViewer.Location = new System.Drawing.Point(9, 339);
@@ -209,6 +230,7 @@ namespace EntityTools.Core
             // btnMissionMonitor
             // 
             this.btnMissionMonitor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnMissionMonitor.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnMissionMonitor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnMissionMonitor.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.btnMissionMonitor.Location = new System.Drawing.Point(245, 339);
@@ -222,6 +244,7 @@ namespace EntityTools.Core
             // btnEntities
             // 
             this.btnEntities.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnEntities.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnEntities.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnEntities.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.btnEntities.Location = new System.Drawing.Point(9, 293);
@@ -237,9 +260,10 @@ namespace EntityTools.Core
             this.ckbSpellStuckMonitor.AutoSize = true;
             this.ckbSpellStuckMonitor.Checked = true;
             this.ckbSpellStuckMonitor.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ckbSpellStuckMonitor.Location = new System.Drawing.Point(15, 146);
+            this.ckbSpellStuckMonitor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ckbSpellStuckMonitor.Location = new System.Drawing.Point(18, 146);
             this.ckbSpellStuckMonitor.Name = "ckbSpellStuckMonitor";
-            this.ckbSpellStuckMonitor.Size = new System.Drawing.Size(145, 17);
+            this.ckbSpellStuckMonitor.Size = new System.Drawing.Size(142, 17);
             this.ckbSpellStuckMonitor.TabIndex = 1;
             this.ckbSpellStuckMonitor.Text = "Enable SpellStuckMonitor";
             this.ckbSpellStuckMonitor.UseVisualStyleBackColor = true;
@@ -247,75 +271,65 @@ namespace EntityTools.Core
             // 
             // gbxExport
             // 
-            this.gbxExport.Controls.Add(this.cbxExportSelector);
             this.gbxExport.Controls.Add(this.tbExportFileSelector);
+            this.gbxExport.Controls.Add(this.cbxExportSelector);
             this.gbxExport.Controls.Add(this.btnExport);
-            this.gbxExport.Controls.Add(this.btnDefault);
             this.gbxExport.Location = new System.Drawing.Point(9, 3);
             this.gbxExport.Name = "gbxExport";
+            this.gbxExport.Padding = new System.Windows.Forms.Padding(6);
             this.gbxExport.Size = new System.Drawing.Size(350, 82);
             this.gbxExport.TabIndex = 12;
             this.gbxExport.TabStop = false;
             this.gbxExport.Text = "Export";
-            // 
-            // cbxExportSelector
-            // 
-            this.cbxExportSelector.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbxExportSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxExportSelector.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cbxExportSelector.Location = new System.Drawing.Point(6, 20);
-            this.cbxExportSelector.Name = "cbxExportSelector";
-            this.cbxExportSelector.Size = new System.Drawing.Size(223, 21);
-            this.cbxExportSelector.Sorted = true;
-            this.cbxExportSelector.TabIndex = 11;
-            this.cbxExportSelector.SelectedIndexChanged += new System.EventHandler(this.handler_ChangeExportingData);
             // 
             // tbExportFileSelector
             // 
             this.tbExportFileSelector.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbExportFileSelector.EditValue = "";
-            this.tbExportFileSelector.Location = new System.Drawing.Point(6, 49);
+            this.tbExportFileSelector.Location = new System.Drawing.Point(9, 52);
             this.tbExportFileSelector.Name = "tbExportFileSelector";
             this.tbExportFileSelector.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton()});
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Undo, "", -1, true, true, false, editorButtonImageOptions1, new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject1, serializableAppearanceObject2, serializableAppearanceObject3, serializableAppearanceObject4, "Restore defaul export file", null, null, DevExpress.Utils.ToolTipAnchor.Default),
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Ellipsis, "", -1, true, true, false, editorButtonImageOptions2, new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject5, serializableAppearanceObject6, serializableAppearanceObject7, serializableAppearanceObject8, "Set export file location", null, null, DevExpress.Utils.ToolTipAnchor.Default)});
             this.tbExportFileSelector.Properties.HideSelection = false;
             this.tbExportFileSelector.Properties.NullText = "Enter the Filename";
-            this.tbExportFileSelector.Size = new System.Drawing.Size(338, 20);
+            this.tbExportFileSelector.Size = new System.Drawing.Size(332, 20);
             this.tbExportFileSelector.TabIndex = 6;
             this.tbExportFileSelector.ButtonClick += new DevExpress.XtraEditors.Controls.ButtonPressedEventHandler(this.handler_ChangeExportingFileName);
+            // 
+            // cbxExportSelector
+            // 
+            this.cbxExportSelector.Location = new System.Drawing.Point(9, 20);
+            this.cbxExportSelector.Name = "cbxExportSelector";
+            this.cbxExportSelector.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.cbxExportSelector.Properties.Sorted = true;
+            this.cbxExportSelector.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor;
+            this.cbxExportSelector.Size = new System.Drawing.Size(303, 20);
+            this.cbxExportSelector.TabIndex = 14;
+            this.cbxExportSelector.SelectedIndexChanged += new System.EventHandler(this.handler_ChangeExportingData);
             // 
             // btnExport
             // 
             this.btnExport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnExport.FlatAppearance.BorderSize = 0;
             this.btnExport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnExport.Location = new System.Drawing.Point(294, 18);
+            this.btnExport.Image = global::EntityTools.Properties.Resources.miniSave;
+            this.btnExport.Location = new System.Drawing.Point(318, 21);
             this.btnExport.Name = "btnExport";
-            this.btnExport.Size = new System.Drawing.Size(50, 23);
+            this.btnExport.Size = new System.Drawing.Size(23, 23);
             this.btnExport.TabIndex = 2;
-            this.btnExport.Text = "Export";
             this.btnExport.UseVisualStyleBackColor = true;
             this.btnExport.Click += new System.EventHandler(this.handler_Export);
-            // 
-            // btnDefault
-            // 
-            this.btnDefault.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDefault.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnDefault.Location = new System.Drawing.Point(235, 18);
-            this.btnDefault.Name = "btnDefault";
-            this.btnDefault.Size = new System.Drawing.Size(53, 23);
-            this.btnDefault.TabIndex = 2;
-            this.btnDefault.Text = "Default";
-            this.btnDefault.UseVisualStyleBackColor = true;
-            this.btnDefault.Click += new System.EventHandler(this.handler_ResetExportSettings);
             // 
             // ckbMapperPatch
             // 
             this.ckbMapperPatch.AutoSize = true;
-            this.ckbMapperPatch.Location = new System.Drawing.Point(15, 192);
+            this.ckbMapperPatch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ckbMapperPatch.Location = new System.Drawing.Point(18, 192);
             this.ckbMapperPatch.Name = "ckbMapperPatch";
-            this.ckbMapperPatch.Size = new System.Drawing.Size(154, 17);
+            this.ckbMapperPatch.Size = new System.Drawing.Size(151, 17);
             this.ckbMapperPatch.TabIndex = 3;
             this.ckbMapperPatch.Text = "Mapper Patch (need relog)";
             this.ckbMapperPatch.UseVisualStyleBackColor = true;
@@ -329,17 +343,40 @@ namespace EntityTools.Core
             this.tabSettings.Size = new System.Drawing.Size(368, 391);
             this.tabSettings.Text = "Settings";
             // 
+            // btnSave
+            // 
+            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSave.ImageOptions.Image = global::EntityTools.Properties.Resources.miniSave;
+            this.btnSave.Location = new System.Drawing.Point(308, 359);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
+            this.btnSave.Size = new System.Drawing.Size(51, 23);
+            this.btnSave.TabIndex = 7;
+            this.btnSave.Text = "Save";
+            this.btnSave.Click += new System.EventHandler(this.handler_SaveSettings);
+            // 
+            // pgConfigs
+            // 
+            this.pgConfigs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pgConfigs.HelpBackColor = System.Drawing.SystemColors.Window;
+            this.pgConfigs.Location = new System.Drawing.Point(9, 9);
+            this.pgConfigs.Name = "pgConfigs";
+            this.pgConfigs.Size = new System.Drawing.Size(350, 344);
+            this.pgConfigs.TabIndex = 6;
+            this.pgConfigs.ToolbarVisible = false;
+            // 
             // tabRelogger
             // 
             this.tabRelogger.Controls.Add(this.lblMachinId);
             this.tabRelogger.Controls.Add(this.lblAccount);
+            this.tabRelogger.Controls.Add(this.btnCredentialManager);
             this.tabRelogger.Controls.Add(this.btnGetMachineId);
             this.tabRelogger.Controls.Add(this.btnSetMachineId);
-            this.tabRelogger.Controls.Add(this.tbMashingId);
+            this.tabRelogger.Controls.Add(this.tbMashineId);
             this.tabRelogger.Name = "tabRelogger";
             this.tabRelogger.Padding = new System.Windows.Forms.Padding(5);
-            this.tabRelogger.PageEnabled = false;
-            this.tabRelogger.PageVisible = false;
             this.tabRelogger.Size = new System.Drawing.Size(368, 391);
             this.tabRelogger.Text = "Relogger";
             // 
@@ -361,10 +398,24 @@ namespace EntityTools.Core
             this.lblAccount.TabIndex = 2;
             this.lblAccount.Text = "Account: @account";
             // 
+            // btnCredentialManager
+            // 
+            this.btnCredentialManager.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCredentialManager.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCustomization;
+            this.btnCredentialManager.Location = new System.Drawing.Point(199, 11);
+            this.btnCredentialManager.Name = "btnCredentialManager";
+            this.btnCredentialManager.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
+            this.btnCredentialManager.Size = new System.Drawing.Size(157, 23);
+            this.btnCredentialManager.TabIndex = 1;
+            this.btnCredentialManager.Text = "Open CredentialManager";
+            this.btnCredentialManager.Click += new System.EventHandler(this.handler_OpenCredentialManager);
+            // 
             // btnGetMachineId
             // 
+            this.btnGetMachineId.ImageOptions.Image = global::EntityTools.Properties.Resources.miniImport;
             this.btnGetMachineId.Location = new System.Drawing.Point(250, 67);
             this.btnGetMachineId.Name = "btnGetMachineId";
+            this.btnGetMachineId.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
             this.btnGetMachineId.Size = new System.Drawing.Size(50, 23);
             this.btnGetMachineId.TabIndex = 1;
             this.btnGetMachineId.Text = "Get";
@@ -373,20 +424,24 @@ namespace EntityTools.Core
             // btnSetMachineId
             // 
             this.btnSetMachineId.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSetMachineId.ImageOptions.Image = global::EntityTools.Properties.Resources.miniExport;
             this.btnSetMachineId.Location = new System.Drawing.Point(306, 67);
             this.btnSetMachineId.Name = "btnSetMachineId";
+            this.btnSetMachineId.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
             this.btnSetMachineId.Size = new System.Drawing.Size(50, 23);
             this.btnSetMachineId.TabIndex = 1;
             this.btnSetMachineId.Text = "Set";
+            this.btnSetMachineId.Click += new System.EventHandler(this.btnSetMachineId_Click);
             // 
-            // tbMashingId
+            // tbMashineId
             // 
-            this.tbMashingId.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.tbMashineId.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbMashingId.Location = new System.Drawing.Point(68, 40);
-            this.tbMashingId.Name = "tbMashingId";
-            this.tbMashingId.Size = new System.Drawing.Size(288, 21);
-            this.tbMashingId.TabIndex = 0;
+            this.tbMashineId.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tbMashineId.Location = new System.Drawing.Point(68, 40);
+            this.tbMashineId.Name = "tbMashineId";
+            this.tbMashineId.Size = new System.Drawing.Size(288, 21);
+            this.tbMashineId.TabIndex = 0;
             // 
             // tabDebug
             // 
@@ -413,6 +468,8 @@ namespace EntityTools.Core
             this.tbDebugMonitorInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbDebugMonitorInfo.BackColor = System.Drawing.SystemColors.Window;
+            this.tbDebugMonitorInfo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tbDebugMonitorInfo.Location = new System.Drawing.Point(9, 32);
             this.tbDebugMonitorInfo.Multiline = true;
             this.tbDebugMonitorInfo.Name = "tbDebugMonitorInfo";
@@ -423,9 +480,10 @@ namespace EntityTools.Core
             // ckbDebugMonitor
             // 
             this.ckbDebugMonitor.AutoSize = true;
+            this.ckbDebugMonitor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ckbDebugMonitor.Location = new System.Drawing.Point(9, 9);
             this.ckbDebugMonitor.Name = "ckbDebugMonitor";
-            this.ckbDebugMonitor.Size = new System.Drawing.Size(93, 17);
+            this.ckbDebugMonitor.Size = new System.Drawing.Size(90, 17);
             this.ckbDebugMonitor.TabIndex = 8;
             this.ckbDebugMonitor.Text = "DebugMonitor";
             this.ckbDebugMonitor.UseVisualStyleBackColor = true;
@@ -443,6 +501,7 @@ namespace EntityTools.Core
             // btnTest1
             // 
             this.btnTest1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnTest1.FlatAppearance.BorderSize = 0;
             this.btnTest1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnTest1.Location = new System.Drawing.Point(9, 303);
             this.btnTest1.Name = "btnTest1";
@@ -455,6 +514,7 @@ namespace EntityTools.Core
             // bntTest2
             // 
             this.bntTest2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.bntTest2.FlatAppearance.BorderSize = 0;
             this.bntTest2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bntTest2.Location = new System.Drawing.Point(9, 332);
             this.bntTest2.Name = "bntTest2";
@@ -467,6 +527,7 @@ namespace EntityTools.Core
             // bntInteract
             // 
             this.bntInteract.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.bntInteract.FlatAppearance.BorderSize = 0;
             this.bntInteract.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bntInteract.Location = new System.Drawing.Point(173, 361);
             this.bntInteract.Name = "bntInteract";
@@ -479,6 +540,7 @@ namespace EntityTools.Core
             // bntJump
             // 
             this.bntJump.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.bntJump.FlatAppearance.BorderSize = 0;
             this.bntJump.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bntJump.Location = new System.Drawing.Point(301, 361);
             this.bntJump.Name = "bntJump";
@@ -491,6 +553,7 @@ namespace EntityTools.Core
             // btnLeft
             // 
             this.btnLeft.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnLeft.FlatAppearance.BorderSize = 0;
             this.btnLeft.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLeft.Location = new System.Drawing.Point(173, 332);
             this.btnLeft.Name = "btnLeft";
@@ -503,6 +566,7 @@ namespace EntityTools.Core
             // btnRight
             // 
             this.btnRight.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnRight.FlatAppearance.BorderSize = 0;
             this.btnRight.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnRight.Location = new System.Drawing.Point(301, 332);
             this.btnRight.Name = "btnRight";
@@ -515,6 +579,7 @@ namespace EntityTools.Core
             // btnUp
             // 
             this.btnUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnUp.FlatAppearance.BorderSize = 0;
             this.btnUp.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUp.Location = new System.Drawing.Point(237, 303);
             this.btnUp.Name = "btnUp";
@@ -527,6 +592,7 @@ namespace EntityTools.Core
             // btnStop
             // 
             this.btnStop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnStop.FlatAppearance.BorderSize = 0;
             this.btnStop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnStop.Location = new System.Drawing.Point(237, 332);
             this.btnStop.Name = "btnStop";
@@ -539,6 +605,7 @@ namespace EntityTools.Core
             // btnDown
             // 
             this.btnDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDown.FlatAppearance.BorderSize = 0;
             this.btnDown.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDown.Location = new System.Drawing.Point(237, 361);
             this.btnDown.Name = "btnDown";
@@ -551,6 +618,7 @@ namespace EntityTools.Core
             // btnTest3
             // 
             this.btnTest3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnTest3.FlatAppearance.BorderSize = 0;
             this.btnTest3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnTest3.Location = new System.Drawing.Point(9, 361);
             this.btnTest3.Name = "btnTest3";
@@ -566,28 +634,6 @@ namespace EntityTools.Core
             this.dlgSaveFile.Filter = "XML|*.xml";
             this.dlgSaveFile.ValidateNames = false;
             // 
-            // btnSave
-            // 
-            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.Location = new System.Drawing.Point(284, 359);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(75, 23);
-            this.btnSave.TabIndex = 7;
-            this.btnSave.Text = "Save";
-            this.btnSave.Click += new System.EventHandler(this.handler_SaveSettings);
-            // 
-            // pgConfigs
-            // 
-            this.pgConfigs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pgConfigs.HelpBackColor = System.Drawing.SystemColors.Window;
-            this.pgConfigs.Location = new System.Drawing.Point(9, 9);
-            this.pgConfigs.Name = "pgConfigs";
-            this.pgConfigs.Size = new System.Drawing.Size(350, 344);
-            this.pgConfigs.TabIndex = 6;
-            this.pgConfigs.ToolbarVisible = false;
-            // 
             // EntityToolsMainPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -602,6 +648,7 @@ namespace EntityTools.Core
             this.gbxETLog.PerformLayout();
             this.gbxExport.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.tbExportFileSelector.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cbxExportSelector.Properties)).EndInit();
             this.tabSettings.ResumeLayout(false);
             this.tabRelogger.ResumeLayout(false);
             this.tabRelogger.PerformLayout();
@@ -625,14 +672,12 @@ namespace EntityTools.Core
         private Label lblAccount;
         private SimpleButton btnGetMachineId;
         private SimpleButton btnSetMachineId;
-        private TextBox tbMashingId;
+        private TextBox tbMashineId;
         private Button btnAuraViewer;
-        private ComboBox cbxExportSelector;
         private ButtonEdit tbExportFileSelector;
         private SaveFileDialog dlgSaveFile;
         private Button btnExport;
         private GroupBox gbxExport;
-        private Button btnDefault;
         private CheckBox ckbMapperPatch;
         private ToolTip toolTip;
         private Button btnValidate;
@@ -656,5 +701,7 @@ namespace EntityTools.Core
         private Button btnMissionMonitor;
         private SimpleButton btnSave;
         private PropertyGrid pgConfigs;
+        private SimpleButton btnCredentialManager;
+        private ComboBoxEdit cbxExportSelector;
     }
 }

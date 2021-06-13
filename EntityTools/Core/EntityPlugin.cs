@@ -16,6 +16,7 @@ using Astral.Forms;
 using Astral.Logic.UCC;
 using Astral.Logic.UCC.Classes;
 using Astral.Quester.Classes;
+using DevExpress.Utils;
 using DevExpress.XtraEditors;
 using EntityTools.Core;
 using EntityTools.Core.Interfaces;
@@ -25,6 +26,7 @@ using EntityTools.Patches.Mapper;
 using EntityTools.Properties;
 using EntityTools.Services;
 using EntityTools.Tools;
+using EntityTools.UCC.Conditions;
 using MyNW.Classes;
 using Action = Astral.Quester.Classes.Action;
 
@@ -363,10 +365,10 @@ namespace EntityTools
                 return false;
             }
 #if DEVELOPER
-            public bool GUIRequest_Item<T>(Func<IEnumerable<T>> source, ref T selectedValue)
+            public bool UserRequest_SelectItem<T>(Func<IEnumerable<T>> source, ref T selectedValue, string displayName = "")
             {
                 if (InternalInitialize())
-                    return Core.GUIRequest_Item(source, ref selectedValue);
+                    return Core.UserRequest_SelectItem(source, ref selectedValue);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rItem request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
@@ -375,10 +377,34 @@ namespace EntityTools
                 return false;
             }
 
-            public bool GUIRequest_AuraId(ref string id)
+            public bool UserRequest_SelectItemList<T>(Func<IEnumerable<T>> source, ref IList<T> selectedValues, string caption = "")
             {
                 if (InternalInitialize())
-                    return Core.GUIRequest_AuraId(ref id);
+                    return Core.UserRequest_SelectItemList(source, ref selectedValues);
+
+                XtraMessageBox.Show("EntityToolsCore is invalid!\n\rItems request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! UIGen request denied.", true);
+
+                return false;
+            }
+
+            public bool UserRequest_EditValue(ref string value, string message = "", string caption = "", FormatInfo formatInfo = null)
+            {
+                if (InternalInitialize())
+                    return Core.UserRequest_EditValue(ref value, message, caption, formatInfo);
+
+                XtraMessageBox.Show("EntityToolsCore is invalid!\n\rValue edition request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! UIGen request denied.", true);
+
+                return false;
+            }
+
+            public bool UserRequest_SelectAuraId(ref string id)
+            {
+                if (InternalInitialize())
+                    return Core.UserRequest_SelectAuraId(ref id);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rAura request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
@@ -387,10 +413,10 @@ namespace EntityTools
                 return false;
             }
 
-            public bool GUIRequest_UIGenId(ref string id)
+            public bool UserRequest_SelectUIGenId(ref string id)
             {
                 if (InternalInitialize())
-                    return Core.GUIRequest_UIGenId(ref id);
+                    return Core.UserRequest_SelectUIGenId(ref id);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rUIGen request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
@@ -399,10 +425,10 @@ namespace EntityTools
                 return false;
             }
 
-            public bool GUIRequest_EntityId(ref string entPattern, ref ItemFilterStringType strMatchType, ref EntityNameType nameType)
+            public bool UserRequest_EditEntityId(ref string entPattern, ref ItemFilterStringType strMatchType, ref EntityNameType nameType)
             {
                 if (InternalInitialize())
-                    return Core.GUIRequest_EntityId(ref entPattern, ref strMatchType, ref nameType);
+                    return Core.UserRequest_EditEntityId(ref entPattern, ref strMatchType, ref nameType);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rEntityId request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
@@ -411,10 +437,10 @@ namespace EntityTools
                 return false;
             }
 
-            public bool GUIRequest_UCCConditions(ref List<UCCCondition> list)
+            public bool UserRequest_EditUccConditions(ref List<UCCCondition> list)
             {
                 if (InternalInitialize())
-                    return Core.GUIRequest_UCCConditions(ref list);
+                    return Core.UserRequest_EditUccConditions(ref list);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rUCC conditions request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
@@ -423,10 +449,22 @@ namespace EntityTools
                 return false;
             }
 
-            public bool GUIRequest_CustomRegions(ref List<string> crList)
+            public bool UserRequest_EditUccConditions(ref List<UCCCondition> list, ref LogicRule logic, ref bool negation)
             {
                 if (InternalInitialize())
-                    return Core.GUIRequest_CustomRegions(ref crList);
+                    return Core.UserRequest_EditUccConditions(ref list, ref logic, ref negation);
+
+                XtraMessageBox.Show("EntityToolsCore is invalid!\n\rUCC conditions request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! UCC conditions request denied.", true);
+
+                return false;
+            }
+            
+            public bool UserRequest_EditCustomRegionList(ref List<string> crList)
+            {
+                if (InternalInitialize())
+                    return Core.UserRequest_EditCustomRegionList(ref crList);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rCustomRegions request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
@@ -435,10 +473,10 @@ namespace EntityTools
                 return false;
             }
 
-            public bool GUIRequest_NodeLocation(ref Vector3 pos, string caption)
+            public bool UserRequest_GetNodeLocation(ref Vector3 pos, string caption)
             {
                 if (InternalInitialize())
-                    return Core.GUIRequest_NodeLocation(ref pos, caption);
+                    return Core.UserRequest_GetNodeLocation(ref pos, caption);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rNodeLocation request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
@@ -447,10 +485,10 @@ namespace EntityTools
                 return false;
             }
 
-            public bool GUIRequest_EntityToInteract(ref Entity entity)
+            public bool UserRequest_GetEntityToInteract(ref Entity entity)
             {
                 if (InternalInitialize())
-                    return Core.GUIRequest_EntityToInteract(ref entity);
+                    return Core.UserRequest_GetEntityToInteract(ref entity);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rEntityToInteract request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
@@ -459,10 +497,10 @@ namespace EntityTools
                 return false;
             }
 
-            public bool GUIRequest_UCCAction(out UCCAction action)
+            public bool UserRequest_GetUccAction(out UCCAction action)
             {
                 if (InternalInitialize())
-                    return Core.GUIRequest_UCCAction(out action);
+                    return Core.UserRequest_GetUccAction(out action);
                 action = null;
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rUCCAction request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -499,88 +537,98 @@ namespace EntityTools
             /// <returns></returns>
             private static bool LoadCore()
             {
+                // Попытка загрузки ядра производится только после привязки делегата CurrentDomain_AssemblyResolve
                 if (!assemblyResolve_Deletage_Binded)
                 {
                     AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
                     assemblyResolve_Deletage_Binded = true;
                 }
                 
-                // Попытка загрузки ядра производится только после привязки делегата CurrentDomain_AssemblyResolve
                 try
                 {
-                    var executingAssembly = Assembly.GetExecutingAssembly();
-                    var ETfilename = executingAssembly.GetName().Name + ".dll";
-                    var wrongETLocation = Path.Combine(Astral.Controllers.Directories.AstralStartupPath, ETfilename);
-                    if (File.Exists(wrongETLocation))
+                    var @locker = Core;
+                    lock (@locker)
                     {
-                        var msg = string.Concat("The file ", ETfilename, " save location is incorrect.\n" +
-                            "You should replace it from the folder: ", Astral.Controllers.Directories.AstralStartupPath,
-                            "\nto the folder: ", Astral.Controllers.Directories.PluginsPath);
+                        if (@locker != Core)
+                            return Core.CheckCore();
 
-                        ETLogger.WriteLine(LogType.Error, msg, true);
-                        return false;
-                    }
-
-                    using (FileStream file = FileStreamHelper.OpenWithStream(executingAssembly.Location, "Core", FileMode.Open, FileAccess.Read))
-                    {
-                        byte[] coreBytes = new byte[file.Length];
-                        if (file.Read(coreBytes, 0, (int)file.Length) > 0)
+                        var executingAssembly = Assembly.GetExecutingAssembly();
+                        var ETfilename = executingAssembly.GetName().Name + ".dll";
+                        var wrongETLocation = Path.Combine(Directories.AstralStartupPath, ETfilename);
+                        if (File.Exists(wrongETLocation))
                         {
-#if ENCRYPTED_CORE
-                            byte[] key = SysInfo.SysInformer.GetMashineID(false).TextToBytes();
-                            if (CryptoHelper.DecryptFile_Rijndael(coreBytes, key, out byte[] decryptedCoreBytes))
+                            var msg = string.Concat("The file ", ETfilename, " save location is incorrect.\n" +
+                                "You should replace it from the folder: ", Directories.AstralStartupPath,
+                                "\nto the folder: ", Directories.PluginsPath);
+
+                            ETLogger.WriteLine(LogType.Error, msg, true);
+                            return false;
+                        }
+
+                        using (FileStream file = FileStreamHelper.OpenWithStream(executingAssembly.Location, "Core",
+                            FileMode.Open, FileAccess.Read))
+                        {
+                            byte[] coreBytes = new byte[file.Length];
+                            if (file.Read(coreBytes, 0, (int) file.Length) > 0)
                             {
-#if DEBUG
-                                File.WriteAllText("EntityCore_key", key.ToHexString());
-                                File.WriteAllBytes("EntityCore_encrypt", coreBytes);
-                                File.WriteAllBytes("EntityCore_decrypt", decryptedCoreBytes);
-                                File.WriteAllText("EntityCore_decrypt.md5", CryptoHelper.MD5_HashString(decryptedCoreBytes));
-#endif
-                                try
+#if ENCRYPTED_CORE
+                                byte[] key = SysInfo.SysInformer.GetMashineID(false).TextToBytes();
+                                if (CryptoHelper.DecryptFile_Rijndael(coreBytes, key, out byte[] decryptedCoreBytes))
                                 {
-                                    Assembly assembly = Assembly.Load(decryptedCoreBytes);
-                                    CoreHash = CryptoHelper.MD5_HashString(decryptedCoreBytes);
-#else
-                                try
-                                {
-                                    Assembly assembly = Assembly.Load(coreBytes);
-                                    CoreHash = CryptoHelper.MD5_HashString(coreBytes);
-#endif
-                                    Type coreType = typeof(IEntityToolsCore);
-                                    if (assembly != null)
-                                        foreach (Type type in assembly.GetTypes())
+        #if DEBUG
+                                    File.WriteAllText("EntityCore_key", key.ToHexString());
+                                    File.WriteAllBytes("EntityCore_encrypt", coreBytes);
+                                    File.WriteAllBytes("EntityCore_decrypt", decryptedCoreBytes);
+                                    File.WriteAllText("EntityCore_decrypt.md5", CryptoHelper.MD5_HashString(decryptedCoreBytes));
+        #endif
+                                    try
+                                    {
+                                        Assembly assembly = Assembly.Load(decryptedCoreBytes);
+                                        CoreHash = CryptoHelper.MD5_HashString(decryptedCoreBytes);
+        #else
+                                        try
                                         {
-#if false
-                                            if (type.GetInterface(nameof(IEntityToolsCore)) != null) 
-#else
-                                            if (type.GetInterfaces().Contains(coreType))
-#endif
-                                            {
-                                                if (Activator.CreateInstance(type) is IEntityToolsCore core)
+                                            Assembly assembly = Assembly.Load(coreBytes);
+                                            CoreHash = CryptoHelper.MD5_HashString(coreBytes);
+        #endif
+                                            Type coreType = typeof(IEntityToolsCore);
+                                            if (assembly != null)
+                                                foreach (Type type in assembly.GetTypes())
                                                 {
-                                                    Core = core;
-                                                    return true;
+        #if false
+                                                if (type.GetInterface(nameof(IEntityToolsCore)) != null)
+        #else
+                                                    if (type.GetInterfaces().Contains(coreType))
+        #endif
+                                                    {
+                                                        if (Activator.CreateInstance(type) is IEntityToolsCore core)
+                                                        {
+                                                            Core = core;
+                                                            return true;
+                                                        }
+                                                    }
                                                 }
-                                            }
                                         }
+        #if !ENCRYPTED_CORE
+                                        catch
+                                        {
+                                        }
+        #else
+                                    catch (Exception e)
+                                    {
+                                        string msg = "Fail to load decrypted EntityToolCore\r\n" + e.Message;
+                                        ETLogger.WriteLine(LogType.Error, msg);
+                                        Astral.Logger.WriteLine(msg);
+                                    }
                                 }
-#if !ENCRYPTED_CORE
-                                catch { }
-#else
-                                catch (Exception e)
+                                else
                                 {
-                                    string msg = "Fail to load decrypted EntityToolCore\r\n" + e.Message;
+                                    string msg = "Fail to decrypt EntityToolCore";
                                     ETLogger.WriteLine(LogType.Error, msg);
                                     Astral.Logger.WriteLine(msg);
                                 }
-                            }
-                            else
-                            {
-                                string msg = "Fail to decrypt EntityToolCore";
-                                ETLogger.WriteLine(LogType.Error, msg);
-                                Astral.Logger.WriteLine(msg);
-                            }
 #endif
+                            }
                         }
                     }
                 }

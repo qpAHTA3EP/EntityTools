@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using EntityTools.Core.Interfaces;
 using static Astral.Quester.Classes.Condition;
 
 namespace EntityCore.Quester.Conditions
@@ -111,7 +112,7 @@ namespace EntityCore.Quester.Conditions
             get
             {
                 bool result = false;
-                bool debugInfoEnabled = EntityTools.EntityTools.Config.Logger.QuesterConditions.DebugConditionEntityCount;
+                bool debugInfoEnabled = EntityTools.EntityTools.Config.Logger.QuesterConditions.DebugEntityCount;
                 string currentMethodName = debugInfoEnabled ? string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
 
                 if (debugInfoEnabled)
@@ -124,12 +125,14 @@ namespace EntityCore.Quester.Conditions
                 {
                     entities = SearchCached.FindAllEntity(EntityKey, SpecialCheck);
 
-                    uint entCount = (entities is null) ? 0u: (uint)entities.Count;
+                    int entCount = entities is null 
+                        ? 0 
+                        : entities.Count;
 
                     if (debugInfoEnabled)
                     {
                         string debugMsg;
-                        if (entities?.Count > 0)
+                        if (entCount > 0)
                             debugMsg = string.Concat(currentMethodName, ": Search Entities (irrespectively CustomRegion). Total found: ", entCount);
                         else debugMsg = string.Concat(currentMethodName, ": Search Entities (irrespectively CustomRegion). Nothing found");
 
@@ -153,7 +156,7 @@ namespace EntityCore.Quester.Conditions
                             break;
                     } 
 #else
-                    result = countChecker(entities.Count);
+                    result = countChecker(entCount);
 #endif
 
                     if (debugInfoEnabled)
@@ -230,7 +233,7 @@ namespace EntityCore.Quester.Conditions
                     }
                     else strBldr.AppendLine($"No Entity [{@this._entityId}] was found.");
 
-                    if (EntityTools.EntityTools.Config.Logger.QuesterConditions.DebugConditionEntityCount)
+                    if (EntityTools.EntityTools.Config.Logger.QuesterConditions.DebugEntityCount)
                     {
                         string debugMsg = string.Concat(_idStr, '.', nameof(TestInfos), ':', strBldr.ToString());
 

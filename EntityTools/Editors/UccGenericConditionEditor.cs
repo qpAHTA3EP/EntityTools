@@ -11,13 +11,13 @@ namespace EntityTools.Editors
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            if (context.Instance is UCCGenericCondition condition)
+            if (context?.Instance is UCCGenericCondition condition)
             {
-                if(condition.Tested == Astral.Logic.UCC.Ressources.Enums.ActionCond.HasAura
-                    || condition.Tested == Astral.Logic.UCC.Ressources.Enums.ActionCond.AuraStacks)
+                if (condition.Tested == Astral.Logic.UCC.Ressources.Enums.ActionCond.HasAura ||
+                    condition.Tested == Astral.Logic.UCC.Ressources.Enums.ActionCond.AuraStacks)
                 {
                     string newVal = string.Empty;
-                    if (EntityTools.Core.GUIRequest_AuraId(ref newVal))
+                    if (EntityTools.Core.UserRequest_SelectAuraId(ref newVal))
                     {
                         if (condition.Tested == Astral.Logic.UCC.Ressources.Enums.ActionCond.AuraStacks)
                         {
@@ -30,8 +30,8 @@ namespace EntityTools.Editors
                         return newVal;
                     }
                 }
-                else if(condition.Tested == Astral.Logic.UCC.Ressources.Enums.ActionCond.SpellIsActive
-                        || condition.Tested == Astral.Logic.UCC.Ressources.Enums.ActionCond.SpellOnCooldown)
+                else if(condition.Tested == Astral.Logic.UCC.Ressources.Enums.ActionCond.SpellIsActive ||
+                        condition.Tested == Astral.Logic.UCC.Ressources.Enums.ActionCond.SpellOnCooldown)
                 {
                     string power = GetAnId.GetPower(true);
                     if (!string.IsNullOrEmpty(power))

@@ -203,5 +203,10 @@ namespace EntityTools.Forms
         {
             fillList?.Invoke();
         }
+
+        private void handler_Mapper(object sender, EventArgs e)
+        {
+            Astral.Quester.Forms.MapperForm.Open();
+        }
     }
 }

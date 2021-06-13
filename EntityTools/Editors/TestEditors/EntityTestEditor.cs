@@ -10,10 +10,10 @@ namespace EntityTools.Editors
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            string msg = EntityTools.Core.EntityDiagnosticInfos(context.Instance);
+            string msg = EntityTools.Core.EntityDiagnosticInfos(context?.Instance);
             if (!string.IsNullOrEmpty(msg))
                 //Task.Factory.StartNew(() => XtraMessageBox.Show(/*Form.ActiveForm, */sb.ToString(), "Test of '" + obj.ToString() + '\''));
-                XtraMessageBox.Show(msg, string.Concat("Test of '",value,'\''));
+                XtraMessageBox.Show(msg, string.Concat("Test of '", value, '\'')); 
             return value;
         }
 

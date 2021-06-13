@@ -316,7 +316,7 @@ namespace EntityTools.Quester.Actions
 
         public override ActionResult Run()
         {
-            bool extendedDebugInfo  = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
+            bool extendedDebugInfo  = EntityTools.Config.Logger.QuesterActions.DebugBuySellItems;
             Entity theVendor = null;
             string methodName = extendedDebugInfo ? string.Concat(MethodBase.GetCurrentMethod().Name) : string.Empty;
             if (tryNum > 0)
@@ -402,6 +402,7 @@ namespace EntityTools.Quester.Actions
                         else return ActionResult.Running;
 #endif
                     case VendorType.RemoteVendor:
+                        // TODO для вызова RemoteVendor, которые не видные в окне выбора, нужно реализовать торговлю как в QuesterAssistant через Injection.cmdwrapper_contact_StartRemoteContact(this.RemoteContact);
                         if (extendedDebugInfo)
                             debug.Value.AddInfo(string.Concat(methodName, ": Call 'RemoteVendor'"));
                         RemoteContact remoteContact = EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts.Find(ct => ct.ContactDef == _vendor.CostumeName);
@@ -448,7 +449,7 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private ActionResult RemoteTraiding(RemoteContact remoteContact)
         {
-            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
+            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugBuySellItems;
             string methodName = MethodBase.GetCurrentMethod().Name;
             if (remoteContact != null)
             {
@@ -526,7 +527,7 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private ActionResult Traiding(Entity vendorEntity)
         {
-            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
+            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugBuySellItems;
             string methodName = MethodBase.GetCurrentMethod().Name;
             if (vendorEntity != null)
             {
@@ -574,7 +575,7 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private bool ApproachAndInteractToVendor(Entity entity)
         {
-            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
+            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugBuySellItems;
             string methodName = MethodBase.GetCurrentMethod().Name;
 
             if (extendedDebugInfo)
@@ -678,7 +679,7 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private ActionResult BuyItems()
         {
-            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
+            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugBuySellItems;
             string methodName = MethodBase.GetCurrentMethod().Name;
             if (extendedDebugInfo)
                 debug.Value.AddInfo(string.Concat(methodName, ": Begins"));
@@ -818,7 +819,7 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private BuyItemResult BuyAnItem(ItemFilterEntryExt item2buy, ref List<ItemDef> boughtItems)
         {
-            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
+            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugBuySellItems;
             string methodName = MethodBase.GetCurrentMethod().Name;
 
             BuyItemResult result = BuyItemResult.Completed;
@@ -934,7 +935,7 @@ namespace EntityTools.Quester.Actions
         private BuyItemResult BuyAnItem(ItemFilterEntryExt filterEntry, SlotCache slotCache, ref List<ItemDef> boughtItems)
 #endif
         {
-            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
+            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugBuySellItems;
             string methodName = MethodBase.GetCurrentMethod().Name;
 
             BuyItemResult result = BuyItemResult.Completed;

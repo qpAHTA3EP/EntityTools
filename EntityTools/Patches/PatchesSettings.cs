@@ -22,7 +22,7 @@ namespace EntityTools.Settings
                 if (navigation != value)
                 {
                     navigation = value;
-                    NotifyPropertyChanged(nameof(Navigation));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -42,7 +42,7 @@ namespace EntityTools.Settings
                 if (getNearestIndexInPositionList != value)
                 {
                     getNearestIndexInPositionList = value;
-                    NotifyPropertyChanged(nameof(GetNearestIndexInPositionList));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -61,7 +61,7 @@ namespace EntityTools.Settings
                 if (saveQuesterProfile != value)
                 {
                     saveQuesterProfile = value;
-                    NotifyPropertyChanged(nameof(SaveQuesterProfile));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -81,7 +81,7 @@ namespace EntityTools.Settings
                 if (professionVendorEntity != value)
                 {
                     professionVendorEntity = value;
-                    NotifyPropertyChanged(nameof(VipProfessionVendorEntity));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -101,7 +101,7 @@ namespace EntityTools.Settings
                 if (sealTraderEntity != value)
                 {
                     sealTraderEntity = value;
-                    NotifyPropertyChanged(nameof(VipSealTraderEntity));
+                    NotifyPropertyChanged();
                 }
             }
         }

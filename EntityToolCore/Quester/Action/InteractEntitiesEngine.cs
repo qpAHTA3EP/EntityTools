@@ -17,6 +17,7 @@ using EntityTools;
 using EntityCore.Forms;
 using EntityCore.Tools.Navigation;
 using System.ComponentModel;
+using EntityTools.Quester;
 
 namespace EntityCore.Quester.Action
 {

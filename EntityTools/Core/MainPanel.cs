@@ -14,17 +14,22 @@ using EntityTools.Forms;
 using EntityTools.Patches.UCC;
 using EntityTools.Services;
 using EntityTools.Tools;
+using HarmonyLib;
+using Microsoft.Win32;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using AcTp0Tools.Reflection;
+using MyNW.Classes.ItemProgression;
 using API = Astral.Quester.API;
-using Memory = MyNW.Memory;
 using Task = System.Threading.Tasks.Task;
 
 namespace EntityTools.Core
@@ -36,7 +41,8 @@ namespace EntityTools.Core
         {
             InitializeComponent();
 
-            cbxExportSelector.DataSource = Enum.GetValues(typeof(ExportTypes));
+            cbxExportSelector.Properties.Items.AddRange(Enum.GetValues(typeof(ExportTypes)));
+            cbxExportSelector.SelectedIndex = 0;
 
             ckbSpellStuckMonitor.DataBindings.Add(nameof(ckbSpellStuckMonitor.Checked),
                                                 EntityTools.Config.UnstuckSpells,
@@ -144,51 +150,126 @@ namespace EntityTools.Core
 
         private void handler_Test_1(object sender, EventArgs e)
         {
-#if false
-            var tester = new SimplePropertyAccessTester();
-            var result = tester.Test();
-
-            XtraMessageBox.Show(result);  
-#endif
-            var sw = new Stopwatch();
-            sw.Start();
-            for (int i = 0; i < 1_000_000; i++)
-            {
-                var g = AstralAccessors.Quester.Core.Meshes;
-            }
-            sw.Stop();
-
-#if false
-            XtraMessageBox.Show(
-                    $"1'000'000 reads of the property 'Astral.Quester.Core.Meshes'\n" +
-                        $"at the map '{EntityManager.LocalPlayer.MapAndRegion}'\n" +
-                        $"using StaticPropertyAccessor<Graph>:\n" +
-                        $"{sw.ElapsedMilliseconds,8} ms {sw.ElapsedTicks,10} ticks"); 
-#else
-            XtraMessageBox.Show(
-                $"1'000'000 reads of the property 'Astral.Quester.Core.Meshes'\n" +
-                $"at the map '{EntityManager.LocalPlayer.MapAndRegion}'\n" +
-                $"using Harmony patches:\n" +
-                $"{sw.ElapsedMilliseconds,8} ms {sw.ElapsedTicks,10} ticks");
-#endif
         }
 
         private void handler_Test_2(object sender, EventArgs e)
         {
 #if false
-            QuesterAssistantAccessors.Classes.Monitoring.Frames.Sleep(1000); 
-#else
-            var info = AstralAccessors.Logic.NW.Combats.AbortCombatCondition_DebugInfo();
-            XtraMessageBox.Show(info);
-#endif
+            Traverse aoeList = Traverse.Create(typeof(AOECheck)).Property("List");
+            if (!aoeList.PropertyExists())
+            {
+                XtraMessageBox.Show("AOE list does not accessible");
+                return;
+            }
 
+            if (aoeList.GetValue() is IEnumerable<AOECheck.AOE> enumerable)
+            {
+                var sb = new StringBuilder();
+                foreach (var aoe in enumerable)
+                {
+                    sb.AppendLine(aoe.ID);
+                }
+
+                XtraMessageBox.Show(sb.ToString());
+            }
+            else XtraMessageBox.Show(@"Can't enumerate <AOECheck.AOE> in 'aoeList'"); 
+#elif false
+            var type = typeof(AOECheck.AOE);
+            var list = Traverse.Create(typeof(AOECheck)).Property("List");
+            if (list.GetValue() is List<AOECheck.AOE> aoeList)
+            {
+                var sb = new StringBuilder();
+                foreach (var aoe in aoeList)
+                {
+                    sb.AppendLine(aoe.ID);
+                }
+
+                XtraMessageBox.Show(sb.ToString());
+            }
+            XtraMessageBox.Show(type.ToString());
+
+#else
+            var aoeList = Traverse.Create(typeof(AOECheck)).Property("List").GetValue();
+
+            //var iterator = aoeList.GetValue<List<AOECheck.AOE>>().GetEnumerator();
+            //try
+            //{
+            //    while (iterator.MoveNext())
+            //    {
+            //        var item = iterator.Current;
+            //    }
+            //}
+            //finally
+            //{
+            //    iterator.Dispose();
+            //}
+
+            var aoeList_GetEnumerator = Traverse.Create(aoeList).Method("GetEnumerator");
+            var enumeratorObj = aoeList_GetEnumerator.GetValue();
+            var enumerator = Traverse.Create(enumeratorObj);
+            var enumerator_MoveNext = enumerator.Method("MoveNext");
+            var enumerator_Dispose = enumerator.Method("Dispose");
+
+            var aoeType = typeof(AOECheck.AOE);
+            var ID = aoeType.GetProperty<string>(nameof(AOECheck.AOE.ID));
+            try
+            {
+                if (enumerator_MoveNext.MethodExists())
+                {
+                    var enumerator_Current = enumerator.Property("Current");
+                    if (enumerator_Current.PropertyExists())
+                    {
+                        var sb = new StringBuilder();
+                        while (enumerator_MoveNext.GetValue<bool>())
+                        {
+                            var aoe = enumerator_Current.GetValue();
+                            sb.AppendLine(ID[aoe]);
+                        }
+
+                        XtraMessageBox.Show(sb.ToString());
+                    }
+                }
+            }
+            finally
+            {
+                if (enumerator_Dispose.MethodExists())
+                    enumerator_Dispose.GetValue();
+            }
+#endif
         }
+
         private void handler_Test_3(object sender, EventArgs e)
         {
 #if false
-            var tester = new StaticMethodPatchTester();
-            var result = tester.Test();
-            XtraMessageBox.Show(result); 
+            StaticPropertyAccessor<List<AOECheck.AOE>> aoeList =
+                    typeof(AOECheck).GetStaticProperty<List<AOECheck.AOE>>("List");
+            if (!aoeList.IsValid)
+            {
+                XtraMessageBox.Show("AOE list does not accessible");
+                return;
+            }
+
+            var sb = new StringBuilder();
+            foreach (var aoe in aoeList.Value)
+            {
+                sb.AppendLine(aoe.ID);
+            }
+
+            XtraMessageBox.Show(sb.ToString()); 
+#else
+            var aoeType = typeof(AOECheck.AOE);
+            var aoeList = Traverse.Create(typeof(AOECheck)).Property("List");
+            Type aoeListType = aoeList.GetValue()?.GetType();
+            var listType = typeof(List<>);//aoeListType.GetGenericTypeDefinition();
+            var aoeListType1 = listType.MakeGenericType(aoeType);
+
+            bool isEqualType = aoeListType == aoeListType1;
+            
+            XtraMessageBox.Show($"{aoeType}\n" +
+                                $"{aoeListType}\n" +
+                                $"{aoeListType1}\n" +
+                                $"{listType}\n" +
+                                $"{isEqualType}");
 #endif
         }
 
@@ -208,7 +289,7 @@ namespace EntityTools.Core
         {
 #if DEVELOPER
             string uiGenId = string.Empty;
-            EntityTools.Core.GUIRequest_UIGenId(ref uiGenId);
+            EntityTools.Core.UserRequest_SelectUIGenId(ref uiGenId);
             if(!string.IsNullOrEmpty(uiGenId))
                 Clipboard.SetText(uiGenId);
 #endif
@@ -220,7 +301,7 @@ namespace EntityTools.Core
             string pattern = string.Empty;
             EntityNameType nameType = EntityNameType.InternalName;
             ItemFilterStringType strMatch = ItemFilterStringType.Simple;
-            EntityTools.Core.GUIRequest_EntityId(ref pattern, ref strMatch, ref nameType);
+            EntityTools.Core.UserRequest_EditEntityId(ref pattern, ref strMatch, ref nameType);
             if (!string.IsNullOrEmpty(pattern))
                 Clipboard.SetText(pattern);
 #endif
@@ -243,50 +324,59 @@ namespace EntityTools.Core
         {
 #if DEVELOPER
             string auraId = string.Empty;
-            EntityTools.Core.GUIRequest_AuraId(ref auraId);
+            EntityTools.Core.UserRequest_SelectAuraId(ref auraId);
             if (!string.IsNullOrEmpty(auraId))
                 Clipboard.SetText(auraId);
 #endif
-        }
-
-        private void handler_GetMachineId(object sender, EventArgs e)
-        {
-            var machineid = Memory.MMemory.ReadString(Memory.BaseAdress + 0x2640BD0, Encoding.UTF8, 64);
-            lblAccount.Text = $@"Account:   @{EntityManager.LocalPlayer.AccountLoginUsername}";
-            tbMashingId.Text = machineid;
         }
 
         private void handler_ChangeExportingFileName(object sender, ButtonPressedEventArgs e)
         {
             if (cbxExportSelector.SelectedItem is ExportTypes expType)
             {
-                string fileName;
-                if (string.IsNullOrEmpty(tbExportFileSelector.Text))
+                switch (e.Button.Kind)
                 {
-                    fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.DefaultExportFileName);
-                    fileName = fileName.Replace(Directories.AstralStartupPath, @".\");
+                    case ButtonPredefines.Undo:
+                    {
+                        string fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.DefaultExportFileName);
+                        fileName = fileName.Replace(Directories.AstralStartupPath, ".");
+                        tbExportFileSelector.Text = fileName;
+                        break;
+                    }
+                    case ButtonPredefines.Ellipsis:
+                    {
+                        string fileName;
+                        if (string.IsNullOrEmpty(tbExportFileSelector.Text))
+                        {
+                            fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.DefaultExportFileName);
+                            fileName = fileName.Replace(Directories.AstralStartupPath, ".");
+                        }
+                        else fileName = tbExportFileSelector.Text;
+
+                        string directory = Path.GetDirectoryName(fileName);
+                        if (!string.IsNullOrEmpty(directory)
+                            && !Directory.Exists(directory))
+                            Directory.CreateDirectory(directory);
+                        dlgSaveFile.InitialDirectory = directory;
+
+                        dlgSaveFile.FileName = fileName;
+                        if (dlgSaveFile.ShowDialog() == DialogResult.OK)
+                            tbExportFileSelector.Text = dlgSaveFile.FileName;
+                        break;
+                    }
                 }
-                else fileName = tbExportFileSelector.Text;
-
-                string directory = Path.GetDirectoryName(fileName);
-                if (!Directory.Exists(fileName))
-                    Directory.CreateDirectory(directory);
-                dlgSaveFile.InitialDirectory = directory;
-
-                dlgSaveFile.FileName = fileName;
-                if (dlgSaveFile.ShowDialog() == DialogResult.OK)
-                    tbExportFileSelector.Text = dlgSaveFile.FileName;
             }
         }
 
         private void handler_ChangeExportingData(object sender, EventArgs e)
         {
-            if (cbxExportSelector.SelectedItem is ExportTypes expType)
+            if (sender == cbxExportSelector
+                && cbxExportSelector.SelectedItem is ExportTypes expType)
             {
-                string fileName;
-                fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.DefaultExportFileName);
-                fileName = fileName.Replace(Directories.AstralStartupPath, @".\");
+                string fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.DefaultExportFileName);
+                fileName = fileName.Replace(Directories.AstralStartupPath, ".");
                 tbExportFileSelector.Text = fileName;
+                cbxExportSelector.SelectedItem = expType;
             }
         }
 
@@ -296,7 +386,7 @@ namespace EntityTools.Core
             {
 
                 string fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.DefaultExportFileName);
-                fileName = fileName.Replace(Directories.AstralStartupPath, @".\");
+                fileName = fileName.Replace(Directories.AstralStartupPath, ".");
                 tbExportFileSelector.Text = fileName;
             }
         }
@@ -310,9 +400,15 @@ namespace EntityTools.Core
                 if (string.IsNullOrEmpty(fullFileName) || fullFileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
                 {
                     fullFileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.ReplaceMask(FileTools.DefaultExportFileName));
+#if false
                     MessageBox.Show("The specified filename is incorrect.\n" +
-                                    $"{expType} will be saved in the file:\n" +
-                                    fullFileName, "Caution!", MessageBoxButtons.OK);
+                                                $"{expType} will be saved in the file:\n" +
+                                                fullFileName, "Caution!", MessageBoxButtons.OK); 
+#else
+                    XtraMessageBox.Show("The specified filename is incorrect.\n" +
+                                        $"{expType} will be saved in the file:\n" +
+                                        fullFileName, "Caution!", MessageBoxButtons.OK);
+#endif
                 }
 
                 var dirName = Path.GetDirectoryName(fullFileName);
@@ -365,7 +461,13 @@ namespace EntityTools.Core
                         }
                 }
 
-                if (MessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?", $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+#if false
+                if (MessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?",
+                            $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes) 
+#else
+                if (XtraMessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?",
+                    $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+#endif
                     Process.Start(fullFileName);
             }
         }
@@ -497,6 +599,42 @@ namespace EntityTools.Core
         private void handler_SaveSettings(object sender, EventArgs e)
         {
             EntityTools.SaveSettings();
+        }
+
+        private void handler_GetMachineId(object sender, EventArgs e)
+        {
+#if false
+            var machineid = Memory.MMemory.ReadString(Memory.BaseAdress + 0x2640BD0, Encoding.UTF8, 64);
+            lblAccount.Text = $@"Account:   @{EntityManager.LocalPlayer.AccountLoginUsername}";
+            tbMashineId.Text = machineid; 
+#endif
+            using (var crypticCoreKey = Registry.CurrentUser.OpenSubKey(@"Software\Cryptic\Core"))
+            {
+                if (crypticCoreKey != null)
+                {
+                    var machineId = crypticCoreKey.GetValue("machineId");
+                    tbMashineId.Text = machineId.ToString();
+                }
+            }
+            using (var crypticLauncherKey = Registry.CurrentUser.OpenSubKey(@"Software\Cryptic\Cryptic Launcher"))
+            {
+                if (crypticLauncherKey != null)
+                {
+                    var userName = crypticLauncherKey.GetValue("UserName");
+                    lblAccount.Text = userName.ToString();
+                }
+            }
+        }
+
+        private void btnSetMachineId_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void handler_OpenCredentialManager(object sender, EventArgs e)
+        {
+            var form = new CredentialManager();
+            form.Show();
         }
     }
 }

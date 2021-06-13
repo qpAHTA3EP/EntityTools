@@ -1,6 +1,6 @@
 ﻿namespace EntityCore.Forms
 {
-    partial class MultiItemSelectForm
+    partial class MultipleItemSelectForm
     {
         /// <summary>
         /// Required designer variable.
@@ -37,30 +37,31 @@
             // 
             // btnSelect
             // 
-            this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelect.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
+            this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSelect.ImageOptions.Image = global::EntityCore.Properties.Resources.miniValid;
             this.btnSelect.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnSelect.Location = new System.Drawing.Point(12, 367);
+            this.btnSelect.Location = new System.Drawing.Point(251, 374);
             this.btnSelect.Name = "btnSelect";
-            this.btnSelect.Size = new System.Drawing.Size(271, 23);
+            this.btnSelect.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
+            this.btnSelect.Size = new System.Drawing.Size(75, 23);
             this.btnSelect.TabIndex = 0;
             this.btnSelect.Text = "Select";
-            this.btnSelect.Click += new System.EventHandler(this.btnSelect_Click);
+            this.btnSelect.Click += new System.EventHandler(this.handler_Select);
             // 
             // btnReload
             // 
-            this.btnReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnReload.ButtonStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
+            this.btnReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnReload.ImageOptions.Image = global::EntityCore.Properties.Resources.miniRefresh;
+            this.btnReload.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnReload.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
-            this.btnReload.Location = new System.Drawing.Point(289, 367);
+            this.btnReload.Location = new System.Drawing.Point(12, 374);
             this.btnReload.Name = "btnReload";
-            this.btnReload.Size = new System.Drawing.Size(23, 23);
+            this.btnReload.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
+            this.btnReload.Size = new System.Drawing.Size(75, 23);
             this.btnReload.TabIndex = 1;
+            this.btnReload.Text = "Reload";
             this.btnReload.ToolTip = "Reload";
-            this.btnReload.Click += new System.EventHandler(this.btnReload_Click);
+            this.btnReload.Click += new System.EventHandler(this.handler_Reload);
             // 
             // lbl
             // 
@@ -73,13 +74,13 @@
             // 
             // ItemList
             // 
-            this.ItemList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.ItemList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.ItemList.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.ItemList.CheckOnClick = true;
             this.ItemList.Location = new System.Drawing.Point(12, 36);
             this.ItemList.Name = "ItemList";
-            this.ItemList.Size = new System.Drawing.Size(300, 315);
+            this.ItemList.Size = new System.Drawing.Size(314, 325);
             this.ItemList.SortOrder = System.Windows.Forms.SortOrder.Ascending;
             this.ItemList.TabIndex = 5;
             // 
@@ -88,23 +89,22 @@
             this.AcceptButton = this.btnSelect;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(324, 402);
+            this.ClientSize = new System.Drawing.Size(338, 409);
             this.Controls.Add(this.ItemList);
             this.Controls.Add(this.lbl);
             this.Controls.Add(this.btnReload);
             this.Controls.Add(this.btnSelect);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
-            this.LookAndFeel.SkinName = "Office 2013 Light Gray";
+            this.IconOptions.ShowIcon = false;
             this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(332, 426);
+            this.MinimumSize = new System.Drawing.Size(318, 419);
             this.Name = "MultiItemSelectForm";
-            this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "MultiSelectForm";
-            this.Shown += new System.EventHandler(this.MultiSelectForm_Shown);
+            this.Shown += new System.EventHandler(this.handler_FormShown);
             ((System.ComponentModel.ISupportInitialize)(this.ItemList)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

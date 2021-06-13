@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using AcTp0Tools.Annotations;
 using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
 using MyNW.Classes;
@@ -100,301 +101,31 @@ namespace EntityCore.Entities
             // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
             LinkedList<Entity> entities = new LinkedList<Entity>();
             // Конструируем функтор для поиска Entity в соответствии с доп. условиями
-#if true
             var predicate = SearchHelper.Construct_EntityAttributePredicate(healthCheck, 
                                                       range, zRange, 
                                                       regionCheck, 
                                                       customRegions, 
                                                       specialCheck);
-            void processor(Entity entity)
+            void EvaluateAndCollectEntity(Entity entity)
             {
                 if (predicate(entity))
                     entities.AddLast(entity);
             }
-#else
-            Action<Entity> processor;
-            if (customRegions != null && customRegions.Count > 0)
-            {
-                if (specialCheck == null)
-                    evaluateAction = (Entity e) =>
-                    {
-                        if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                            && (!healthCheck || !e.IsDead)
-                            && (range <= 0 || e.Location.Distance3DFromPlayer < range)
-                            && (zRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
-                            && customRegions.Cover(e))
-                            entities.AddLast(e);
-                    };
-                else processor = (Entity e) =>
-                {
-                    if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                        && (!healthCheck || !e.IsDead)
-                        && (range <= 0 || e.Location.Distance3DFromPlayer < range)
-                        && (zRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
-                        && customRegions.Cover(e)
-                        && specialCheck(e))
-                        entities.AddLast(e);
-                };
-            }
-            else
-            {
-                if (specialCheck == null)
-#if DEBUG
-#if false
-                        if (regionCheck)
-                        {
-                            if (healthCheck)
-                            {
-                                if (range > 0)
-                                {
-                                    if (zRange > 0)
-                                    {
-                                        evaluateAction = (Entity e) =>
-                                        {
-                                            if (!e.IsDead && e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName
-                                                && e.Location.Distance3DFromPlayer < range
-                                                && Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
 
-                                                entities.AddLast(e);
-                                        };
-
-                                    }
-                                    else
-                                    {
-                                        evaluateAction = (Entity e) =>
-                                        {
-                                            if (!e.IsDead && e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName
-                                                && e.Location.Distance3DFromPlayer < range)
-
-                                                entities.AddLast(e);
-                                        };
-                                    }
-                                }
-                                else
-                                {
-                                    if (zRange > 0)
-                                    {
-                                        evaluateAction = (Entity e) =>
-                                        {
-                                            if (!e.IsDead && e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName
-                                                && Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
-
-                                                entities.AddLast(e);
-                                        };
-
-                                    }
-                                    else
-                                    {
-                                        evaluateAction = (Entity e) =>
-                                        {
-                                            if (!e.IsDead && e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-
-                                                entities.AddLast(e);
-                                        };
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (range > 0)
-                                {
-                                    if (zRange > 0)
-                                    {
-                                        evaluateAction = (Entity e) =>
-                                        {
-                                            if (e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName
-                                                && e.Location.Distance3DFromPlayer < range
-                                                && Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
-
-                                                entities.AddLast(e);
-                                        };
-
-                                    }
-                                    else
-                                    {
-                                        evaluateAction = (Entity e) =>
-                                        {
-                                            if (e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName
-                                                && e.Location.Distance3DFromPlayer < range)
-
-                                                entities.AddLast(e);
-                                        };
-                                    }
-                                }
-                                else
-                                {
-                                    if (zRange > 0)
-                                    {
-                                        evaluateAction = (Entity e) =>
-                                        {
-                                            if (e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName
-                                                && Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
-
-                                                entities.AddLast(e);
-                                        };
-
-                                    }
-                                    else
-                                    {
-                                        evaluateAction = (Entity e) =>
-                                        {
-                                            if (e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-
-                                                entities.AddLast(e);
-                                        };
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (healthCheck)
-                            {
-                                if (range > 0)
-                                {
-                                    if (zRange > 0)
-                                    {
-                                        evaluateAction = (Entity e) =>
-                                        {
-                                            if (!e.IsDead
-                                                && e.Location.Distance3DFromPlayer < range
-                                                && Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
-
-                                                entities.AddLast(e);
-                                        };
-
-                                    }
-                                    else
-                                    {
-                                        evaluateAction = (Entity e) =>
-                                        {
-                                            if (!e.IsDead
-                                                && e.Location.Distance3DFromPlayer < range)
-
-                                                entities.AddLast(e);
-                                        };
-                                    }
-                                }
-                                else
-                                {
-                                    if (zRange > 0)
-                                    {
-                                        evaluateAction = (Entity e) =>
-                                        {
-                                            if (!e.IsDead
-                                                && Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
-
-                                                entities.AddLast(e);
-                                        };
-
-                                    }
-                                    else
-                                    {
-                                        evaluateAction = (Entity e) =>
-                                        {
-                                            if (!e.IsDead)
-
-                                                entities.AddLast(e);
-                                        };
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (range > 0)
-                                {
-                                    if (zRange > 0)
-                                    {
-                                        evaluateAction = (Entity e) =>
-                                        {
-                                            if (e.Location.Distance3DFromPlayer < range
-                                                && Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
-
-                                                entities.AddLast(e);
-                                        };
-
-                                    }
-                                    else
-                                    {
-                                        evaluateAction = (Entity e) =>
-                                        {
-                                            if (e.Location.Distance3DFromPlayer < range)
-
-                                                entities.AddLast(e);
-                                        };
-                                    }
-                                }
-                                else
-                                {
-                                    if (zRange > 0)
-                                    {
-                                        evaluateAction = (Entity e) =>
-                                        {
-                                            if (Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
-
-                                                entities.AddLast(e);
-                                        };
-
-                                    }
-                                    else
-                                    {
-                                        evaluateAction = (Entity e) => entities.AddLast(e);
-                                    }
-                                }
-                            }
-                        } 
-#endif
-                    processor = (Entity e) =>
-                    {
-                        bool regionFlag = (!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName);
-                        bool healthFlag = (!healthCheck || !e.IsDead);
-                        bool rangeFlag = (range <= 0 || e.Location.Distance3DFromPlayer < range);
-                        bool zRangeFlag = (zRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange);
-
-
-                        if (regionFlag
-                            && healthFlag
-                            && rangeFlag
-                            && zRangeFlag)
-
-                            entities.AddLast(e);
-                    };
-#else
-                        evaluateAction = (Entity e) =>
-                        {
-                            if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                                && (!healthCheck || !e.IsDead)
-                                && (range <= 0 || e.Location.Distance3DFromPlayer < range)
-                                && (zRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange))
-                                entities.AddLast(e);
-                        };
-
-#endif
-                else processor = (Entity e) =>
-                {
-                    if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                            && (!healthCheck || !e.IsDead)
-                            && (range <= 0 || e.Location.Distance3DFromPlayer < range)
-                            && (zRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
-                            && specialCheck(e))
-                        entities.AddLast(e);
-                };
-            } 
-#endif
 
             // Проверяем наличие кэша
             if (EntityCache.TryGetValue(out EntityCacheRecord cachedEntities, pattern, matchType, nameType, setType))
             {
                 // Проверяем Entities применяя функтор ко всем Entity, удовлетворяющим шаблону
-                // Функтор processor заполняет entities
-                cachedEntities.Processing(processor);
+                // Функтор EvaluateAndCollectEntity заполняет entities
+                cachedEntities.Processing(EvaluateAndCollectEntity);
             }
             else
             {
                 // Кэш не обнаружен
-                // Функтор processor заполняет entities
+                // Функтор EvaluateAndCollectEntity заполняет entities
                 cachedEntities = EntityCache.MakeCache(pattern, matchType, nameType, setType);
-                cachedEntities.Processing(processor);
+                cachedEntities.Processing(EvaluateAndCollectEntity);
             }
 
             return entities;
@@ -509,65 +240,34 @@ namespace EntityCore.Entities
             try
             {
 #endif
-            if (key is null && !key.IsValid)
+            if (key is null || !key.IsValid)
                 return null;
 
             // конструируем функтор для дополнительных проверок Entity и заполнения списка
             LinkedList<Entity> entities = new LinkedList<Entity>();
+            
             // Конструируем функтор для поиска Entity в соответствии с доп. условиями
-#if true
-            Action<Entity> action;
+            Action<Entity> evaluateAndCollectEntity;
             if (specialCheck is null)
-                action = (Entity entity) => entities.AddLast(entity);
-            else action = (Entity entity) =>
-            {
-                if (specialCheck(entity))
-                    entities.AddLast(entity);
-            };
+                evaluateAndCollectEntity = (entity) => entities.AddLast(entity);
+            else evaluateAndCollectEntity = (entity) =>
+                    {
+                        if (specialCheck(entity))
+                            entities.AddLast(entity);
+                    };
 
             // Проверяем наличие кэша
             if (EntityCache.Contains(key))
             {
                 // Обнаружена кэшированная запись
                 // Проверяем Entities применяя функтор ко всем Entity, удовлетворяющим шаблону
-                EntityCache[key].Processing(action);
+                EntityCache[key].Processing(evaluateAndCollectEntity);
             }
             else
             {
                 // Кэш не обнаружен
-                EntityCache.MakeCache(key).Processing(action);
+                EntityCache.MakeCache(key).Processing(evaluateAndCollectEntity);
             }
-#else
-            Func<LinkedList<Entity>, Entity, LinkedList<Entity>> processor;
-            if (specialCheck is null)
-                processor = (list, entity) =>
-                {
-                    list.AddLast(entity);
-                    return list;
-                };
-            else processor = (list, entity) =>
-            {
-                if (specialCheck(entity))
-                {
-                    list.AddLast(entity);
-                    return list;
-                }
-                return list;
-            };
-
-            // Проверяем наличие кэша
-            if (EntityCache.Contains(key))
-            {
-                // Обнаружена кэшированная запись
-                // Проверяем Entities применяя функтор ко всем Entity, удовлетворяющим шаблону
-                EntityCache[key].Processing(processor, ref entities);
-            }
-            else
-            {
-                // Кэш не обнаружен
-                EntityCache.MakeCache(key).Processing(processor, ref entities);
-            } 
-#endif
 
             return entities;
 #if DEBUG && PROFILING
@@ -627,81 +327,6 @@ namespace EntityCore.Entities
             Action<Entity> processor;
 
             // Конструируем функтор для поиска Entity в соответствии с доп. условиями
-#if false
-            if (customRegions != null && customRegions.Count > 0)
-            {
-                if (specialCheck == null)
-                    processor = (Entity e) =>
-                    {
-                        if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                            && (!healthCheck || !e.IsDead)
-                            && (range <= 0 || e.Location.Distance3DFromPlayer < range)
-                            && (zRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
-                            && customRegions.Cover(e))
-                        {
-                            float eDistance = e.CombatDistance3;
-                            if (eDistance < closestDistance)
-                            {
-                                closestEntity = e;
-                                closestDistance = eDistance;
-                            }
-                        }
-                    };
-                else processor = (Entity e) =>
-                {
-                    if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                        && (!healthCheck || !e.IsDead)
-                        && (range <= 0 || e.Location.Distance3DFromPlayer < range)
-                        && (zRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
-                        && customRegions.Cover(e)
-                        && specialCheck(e))
-                    {
-                        float eDistance = e.CombatDistance3;
-                        if (eDistance < closestDistance)
-                        {
-                            closestEntity = e;
-                            closestDistance = eDistance;
-                        }
-                    }
-                };
-            }
-            else
-            {
-                if (specialCheck == null)
-                    processor = (Entity e) =>
-                    {
-                        if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                            && (!healthCheck || !e.IsDead)
-                            && (zRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
-                            && (range <= 0 || e.Location.Distance3DFromPlayer < range))
-                        {
-                            float eDistance = e.CombatDistance3;
-                            if (eDistance < closestDistance)
-                            {
-                                closestEntity = e;
-                                closestDistance = eDistance;
-                            }
-                        }
-                    };
-                else processor = (Entity e) =>
-                {
-                    if ((!regionCheck || e.RegionInternalName == EntityManager.LocalPlayer.RegionInternalName)
-                            && (!healthCheck || !e.IsDead)
-                            && (zRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange)
-                            && (range <= 0 || e.Location.Distance3DFromPlayer < range)
-                            && specialCheck(e))
-                    {
-                        float eDistance = e.CombatDistance3;
-                        if (eDistance < closestDistance)
-                        {
-                            closestEntity = e;
-                            closestDistance = eDistance;
-                        }
-                    }
-
-                };
-            } 
-#else
             var predicate = SearchHelper.Construct_EntityAttributePredicate(healthCheck,
                                                       range, zRange,
                                                       regionCheck,
@@ -709,6 +334,8 @@ namespace EntityCore.Entities
                                                       specialCheck);
             processor = (entity) =>
             {
+                if (!predicate(entity)) return;
+
                 float dist = entity.CombatDistance3;
                 if (closestDistance > dist)
                 {
@@ -717,7 +344,6 @@ namespace EntityCore.Entities
                 }
             };
 
-#endif
 
             if (EntityCache.TryGetValue(out EntityCacheRecord cachedEntities, pattern, matchType, nameType, setType))
             {
@@ -873,31 +499,29 @@ namespace EntityCore.Entities
 
             // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
             Entity closestEntity = null;
-#if true
             float closestDistance = float.MaxValue;
             Action<Entity> action;
 
             // Конструируем функтор для поиска Entity, соответствующего specialCheck
             if (specialCheck is null)
-                action = (Entity e) =>
+                action = (entity) =>
                 {
-                    float dist = e.CombatDistance3;
+                    float dist = entity.CombatDistance3;
                     if (closestDistance > dist)
                     {
                         closestDistance = dist;
-                        closestEntity = e;
+                        closestEntity = entity;
                     }
                 };
-            else action = (Entity e) =>
+            else action = (entity) =>
             {
-                if (specialCheck(e))
+                if (!specialCheck(entity)) return;
+
+                float dist = entity.CombatDistance3;
+                if (closestDistance > dist)
                 {
-                    float dist = e.CombatDistance3;
-                    if (closestDistance > dist)
-                    {
-                        closestDistance = dist;
-                        closestEntity = e;
-                    }
+                    closestDistance = dist;
+                    closestEntity = entity;
                 }
             };
             if (EntityCache.Contains(key))
@@ -911,50 +535,6 @@ namespace EntityCore.Entities
                 // Кэш не обнаружен
                 EntityCache.MakeCache(key).Processing(action);
             }
-#else
-            Func<Pair<float, Entity>, Entity, Pair<float, Entity>> processor;
-            if (specialCheck is null)
-                processor = (agregator, entity) =>
-                {
-                    float dist = entity.CombatDistance3;
-                    if (agregator.First > dist)
-                    {
-                        agregator.First = dist;
-                        agregator.Second = entity;
-                    }
-                    return agregator;
-                };
-            else processor = (agregator, entity) =>
-            {
-                if (specialCheck(entity))
-                {
-                    float dist = entity.CombatDistance3;
-                    if (agregator.First > dist)
-                    {
-                        agregator.First = dist;
-                        agregator.Second = entity;
-                    }
-                }
-                return agregator;
-            };
-            if (EntityCache.Contains(key))
-            {
-                // Обнаружена кэшированная запись
-                // Проверяем Entities применяя функтор ко всем Entity, удовлетворяющим шаблону
-                // Обнаружена кэшированная запись
-                // Проверяем Entities применяя функтор ко всем Entity, удовлетворяющим шаблону
-                var agregator = new Pair<float, Entity>(float.MaxValue, null);
-                EntityCache[key].Processing(processor, ref agregator);
-                closestEntity = agregator?.Second; 
-            }
-            else
-            {
-                // Кэш не обнаружен
-                var agregator = new Pair<float, Entity>(float.MaxValue, null);
-                EntityCache.MakeCache(key).Processing(processor, ref agregator);
-                closestEntity = agregator?.Second; 
-            }
-#endif
 
             return closestEntity;
 #if DEBUG && PROFILING

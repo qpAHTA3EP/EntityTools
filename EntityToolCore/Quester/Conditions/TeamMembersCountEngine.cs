@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using EntityTools.Core.Interfaces;
 using static Astral.Quester.Classes.Condition;
 
 namespace EntityCore.Quester.Conditions

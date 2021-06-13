@@ -54,16 +54,17 @@
             // splitContainer.Panel2
             // 
             this.splitContainer.Panel2.Controls.Add(this.actionProperties);
-            this.splitContainer.Size = new System.Drawing.Size(580, 306);
-            this.splitContainer.SplitterDistance = 200;
+            this.splitContainer.Size = new System.Drawing.Size(594, 313);
+            this.splitContainer.SplitterDistance = 204;
             this.splitContainer.TabIndex = 3;
             // 
             // listOfActionTypes
             // 
+            this.listOfActionTypes.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.listOfActionTypes.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listOfActionTypes.Location = new System.Drawing.Point(0, 0);
             this.listOfActionTypes.Name = "listOfActionTypes";
-            this.listOfActionTypes.Size = new System.Drawing.Size(200, 306);
+            this.listOfActionTypes.Size = new System.Drawing.Size(204, 313);
             this.listOfActionTypes.Sorted = true;
             this.listOfActionTypes.TabIndex = 0;
             this.listOfActionTypes.SelectedIndexChanged += new System.EventHandler(this.ActionList_SelectedIndexChanged);
@@ -74,17 +75,19 @@
             this.actionProperties.Dock = System.Windows.Forms.DockStyle.Fill;
             this.actionProperties.Location = new System.Drawing.Point(0, 0);
             this.actionProperties.Name = "actionProperties";
-            this.actionProperties.Size = new System.Drawing.Size(376, 306);
+            this.actionProperties.Size = new System.Drawing.Size(386, 313);
             this.actionProperties.TabIndex = 1;
             // 
             // bntCancel
             // 
             this.bntCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.bntCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.bntCancel.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
+            this.bntCancel.FlatAppearance.BorderSize = 0;
             this.bntCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bntCancel.Image = global::EntityCore.Properties.Resources.miniCancel;
             this.bntCancel.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.bntCancel.Location = new System.Drawing.Point(524, 331);
+            this.bntCancel.Location = new System.Drawing.Point(538, 338);
             this.bntCancel.Name = "bntCancel";
             this.bntCancel.Size = new System.Drawing.Size(68, 23);
             this.bntCancel.TabIndex = 4;
@@ -96,10 +99,12 @@
             // btnSelect
             // 
             this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSelect.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
+            this.btnSelect.FlatAppearance.BorderSize = 0;
             this.btnSelect.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSelect.Image = global::EntityCore.Properties.Resources.miniValid;
             this.btnSelect.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnSelect.Location = new System.Drawing.Point(450, 331);
+            this.btnSelect.Location = new System.Drawing.Point(464, 338);
             this.btnSelect.Name = "btnSelect";
             this.btnSelect.Size = new System.Drawing.Size(68, 23);
             this.btnSelect.TabIndex = 4;
@@ -114,17 +119,15 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.bntCancel;
-            this.ClientSize = new System.Drawing.Size(604, 366);
+            this.ClientSize = new System.Drawing.Size(618, 373);
             this.ControlBox = false;
             this.Controls.Add(this.btnSelect);
             this.Controls.Add(this.bntCancel);
             this.Controls.Add(this.splitContainer);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
-            this.LookAndFeel.SkinName = "Office 2013 Light Gray";
-            this.LookAndFeel.UseDefaultLookAndFeel = false;
-            this.MinimumSize = new System.Drawing.Size(612, 390);
+            this.IconOptions.ShowIcon = false;
+            this.MinimumSize = new System.Drawing.Size(598, 383);
             this.Name = "AddUccActionForm";
-            this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Ucc Actions";

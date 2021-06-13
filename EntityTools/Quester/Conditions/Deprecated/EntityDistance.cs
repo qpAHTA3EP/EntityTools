@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
+using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 

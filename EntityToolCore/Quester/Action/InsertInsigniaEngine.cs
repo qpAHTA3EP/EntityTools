@@ -13,6 +13,7 @@ using Astral.Quester.Classes;
 using System.ComponentModel;
 using EntityTools.Core.Interfaces;
 using EntityTools;
+using EntityTools.Quester;
 
 namespace EntityCore.Quester.Action
 {

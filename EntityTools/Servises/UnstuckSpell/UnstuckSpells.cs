@@ -48,14 +48,14 @@ namespace EntityTools.Services
         {
             if (!afterCallCombatSubcription)
             {
-                API.AfterCallCombat += ArterCallCombat;
+                API.AfterCallCombat += AfterCallCombat;
                 afterCallCombatSubcription = true;
                 ETLogger.WriteLine($"{nameof(UnstuckSpells)} activated", true);
             }
         }
         public static void Stop()
         {
-                API.AfterCallCombat -= ArterCallCombat;
+                API.AfterCallCombat -= AfterCallCombat;
                 afterCallCombatSubcription = false;
                 ETLogger.WriteLine($"{nameof(UnstuckSpells)} deactivated", true);
         }
@@ -64,23 +64,23 @@ namespace EntityTools.Services
         /// Эвент активируется в момент активации UCC в боевом режиме
         /// Запускает монитор "окончания боя"
         /// </summary>
-        private static void ArterCallCombat(object sender, API.AfterCallCombatEventArgs arg)
+        private static void AfterCallCombat(object sender, API.AfterCallCombatEventArgs arg)
         {
             if (EntityTools.Config.UnstuckSpells.Active)
             {
                 afterCallCombatSubcription = true;
                 if (monitor == null || (monitor.Status != TaskStatus.Running))
                 {
-                    monitor = Task.Factory.StartNew(() => Work());
+                    monitor = Task.Factory.StartNew(Work);
 #if DEBUG_SPELLSTUCKMONITOR
-                    EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpells)}::ArterCallCombat: Start Task");
+                    EntityToolsLogger.WriteLine(Logger.LogType.Debug, $"{nameof(UnstuckSpells)}::AfterCallCombat: Start Task");
 #endif
                 }
             }
             else
             {
                 afterCallCombatSubcription = false;
-                API.AfterCallCombat -= ArterCallCombat;
+                API.AfterCallCombat -= AfterCallCombat;
             }
         }
 
@@ -145,7 +145,7 @@ namespace EntityTools.Services
                     return result;
                 }
 
-                API.AfterCallCombat -= ArterCallCombat;
+                API.AfterCallCombat -= AfterCallCombat;
                 return false;
             }
         }

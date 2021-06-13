@@ -2,6 +2,7 @@
 using AcTp0Tools.Reflection;
 using Astral.Logic.Classes.Map;
 using EntityTools.Core.Interfaces;
+using EntityTools.Quester;
 using MyNW.Classes;
 using static Astral.Quester.Classes.Action;
 using Action = Astral.Quester.Classes.Action;

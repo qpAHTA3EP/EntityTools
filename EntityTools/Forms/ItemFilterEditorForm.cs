@@ -295,7 +295,7 @@ namespace EntityTools.Forms
                     {
                         //Выбор категории
                         ItemCategory cat = ItemCategory.None;
-                        if (EntityTools.Core.GUIRequest_Item(() => categories, ref cat))
+                        if (EntityTools.Core.UserRequest_SelectItem(() => categories, ref cat))
                         {
                             gridView.SetFocusedValue(cat.ToString());
                         }
@@ -304,7 +304,7 @@ namespace EntityTools.Forms
                     {
                         //Выбор типа предмета
                         ItemType type = ItemType.None;
-                        if (EntityTools.Core.GUIRequest_Item(() => itemTypes, ref type))
+                        if (EntityTools.Core.UserRequest_SelectItem(() => itemTypes, ref type))
                         {
                             gridView.SetFocusedValue(type.ToString());
                         }

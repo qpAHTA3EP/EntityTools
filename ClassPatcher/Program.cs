@@ -168,12 +168,22 @@ namespace ClassPatcher
                         tDef.Name == "ProcessInfos" ||
                         tDef.Name == "Movements" ||
                         tDef.Name == "NPCInfos" ||
+                        tDef.Name == "ActiveTaskEditor" ||
+                        tDef.Name == "NPCId" ||
+                        tDef.Name == "NPCId2" ||
+                        tDef.Name == "PositionNodeListEditorr" ||
+                        tDef.FullName == "Astral.Quester.UIEditors.SharedBankNumericsEditor" ||
+                        tDef.FullName == "Astral.Professions.Functions.Tasks" ||
+                        tDef.FullName == "Astral.Professions.FSM.States.Main" ||
+
+                        tDef.Name == "TaskEditor" ||
                         tDef.FullName == "Astral.Addons.Role" ||
                         tDef.FullName == "Astral.Controllers.Plugins" ||
                         tDef.FullName == "Astral.Controllers.Relogger" ||
                         tDef.FullName == "Astral.Controllers.CustomClasses" ||
                         tDef.FullName == "Astral.Controllers.AOECheck" ||
                         tDef.FullName == "Astral.Controllers.BotComs.BotClient" ||
+                        tDef.FullName == "Astral.Controllers.BotComs.BotServer" ||
                         tDef.Name == "AOE" || // "Astral.Controllers.AOECheck.AOE"
                         tDef.FullName == "Astral.Controllers.AOECheck.AOE" ||
                         tDef.FullName == "Astral.Logic.Classes.Map.Functions.Picture" ||

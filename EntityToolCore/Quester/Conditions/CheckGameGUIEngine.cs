@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using static Astral.Quester.Classes.Condition;
 using EntityTools;
+using EntityTools.Core.Interfaces;
 
 namespace EntityCore.Quester.Conditions
 {

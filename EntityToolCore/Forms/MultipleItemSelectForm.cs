@@ -11,53 +11,25 @@ using DevExpress.XtraEditors;
 
 namespace EntityCore.Forms
 {
-    public partial class MultiItemSelectForm : XtraForm
+    public partial class MultipleItemSelectForm : XtraForm
     {
-        private static MultiItemSelectForm @this = null;
+        private static MultipleItemSelectForm @this = null;
 
-#if DGV
-        internal int SelectColumnInd { get => clmnSelect.DisplayIndex; }
-        //internal int ItemsNamesColumnInd { get => clmnItemsNames.DisplayIndex; }
-
-        Action<DataGridView> Fill;
-#endif
         Action fillAction;
 
-        public MultiItemSelectForm()
+        public MultipleItemSelectForm()
         {
             InitializeComponent();
         }
 
-#if DGV
-        internal static bool GUIRequest(string caption, Action<DataGridView> fill, Action<DataGridView> select)
-        {
-            bool result = false;
-            if (fill != null && select != null)
-            {
-                if (@this == null)
-                    @this = new MultiSelectForm();
-                @this.Text = caption;
-                @this.Fill = fill;
-
-                if (@this.ShowDialog() == DialogResult.OK)
-                {
-                    select(@this.dgvItems);
-                    result = true;
-                }
-            }
-
-            return result;
-        }
-
-#else
-        internal static bool GUIRequest<T>(string caption, Func<IEnumerable<T>> source, ref List<T> selectedValues)
+        internal static bool GUIRequest<T>(Func<IEnumerable<T>> source, ref List<T> selectedValues, string caption = "")
         {
             bool result = false;
 
             if (source != null)
             {
                 if (@this == null)
-                    @this = new MultiItemSelectForm();
+                    @this = new MultipleItemSelectForm();
                 @this.Text = caption;
                 @this.ItemList.DataSource = null;
                 @this.fillAction = null;
@@ -77,14 +49,13 @@ namespace EntityCore.Forms
                                 else @this.ItemList.Items[i].CheckState = CheckState.Unchecked;
                             }
                         
-#else
+#endif
                         @this.ItemList.Items.Clear();
                         foreach(var item in source())
                         {
-                            bool cheched = values.Contains(item);
-                            @this.ItemList.Items.Add(item, cheched);
+                            bool @checked = values.Contains(item);
+                            @this.ItemList.Items.Add(item, @checked);
                         }
-#endif
                     };
                 }
                 else @this.fillAction = () => @this.ItemList.DataSource = source();
@@ -95,7 +66,7 @@ namespace EntityCore.Forms
                     if (checkList.Count > 0)
                     {
                         if (selectedValues is null)
-                            selectedValues = new List<T>();
+                            selectedValues = new List<T>(checkList.Count);
                         else selectedValues.Clear();
 
                         foreach (var item in checkList)
@@ -110,30 +81,81 @@ namespace EntityCore.Forms
 
             return result;
         }
-#endif
+        internal static bool GUIRequest<T>(Func<IEnumerable<T>> source, ref IList<T> selectedValues, string caption = "")
+        {
+            bool result = false;
 
-        private void btnSelect_Click(object sender, EventArgs e)
+            if (source != null)
+            {
+                if (@this == null)
+                    @this = new MultipleItemSelectForm();
+                @this.Text = caption;
+                @this.ItemList.DataSource = null;
+                @this.fillAction = null;
+
+                if (selectedValues != null && selectedValues.Count > 0)
+                {
+                    var values = selectedValues;
+                    @this.fillAction = () => {
+#if disabled_20200527_1229
+                        // Когда selecteValues не пустой, возникает ошибка
+
+                        @this.Items.DataSource = source(); 
+                        for (int i = 0; i < @this.ItemList.ItemCount; i++)
+                            {
+                                if (values.Contains((T)@this.ItemList.Items[i].Value))
+                                    @this.ItemList.Items[i].CheckState = CheckState.Checked;
+                                else @this.ItemList.Items[i].CheckState = CheckState.Unchecked;
+                            }
+                        
+#endif
+                        @this.ItemList.Items.Clear();
+                        foreach (var item in source())
+                        {
+                            bool cheched = values.Contains(item);
+                            @this.ItemList.Items.Add(item, cheched);
+                        }
+                    };
+                }
+                else @this.fillAction = () => @this.ItemList.DataSource = source();
+
+                if (@this.ShowDialog() == DialogResult.OK)
+                {
+                    var checkList = @this.ItemList.CheckedItems;
+                    if (checkList.Count > 0)
+                    {
+                        if (selectedValues is null)
+                            selectedValues = new List<T>(checkList.Count);
+                        else selectedValues.Clear();
+
+                        foreach (var item in checkList)
+                            selectedValues.Add((T)item);
+                    }
+                    else selectedValues?.Clear();
+                    result = true;
+                }
+                @this.ItemList.DataSource = null;
+                @this.fillAction = null;
+            }
+
+            return result;
+        }
+
+
+        private void handler_Select(object sender, EventArgs e)
         {
             DialogResult = DialogResult.OK;
             Close();
         }
 
-        private void btnReload_Click(object sender, EventArgs e)
+        private void handler_Reload(object sender, EventArgs e)
         {
-#if DGV
-            Fill?.Invoke(dgvItems);
-#else
             fillAction?.Invoke();
-#endif
         }
 
-        private void MultiSelectForm_Shown(object sender, EventArgs e)
+        private void handler_FormShown(object sender, EventArgs e)
         {
-#if DGV
-            Fill?.Invoke(dgvItems);
-#else
             fillAction?.Invoke();
-#endif
         }
     }
 }

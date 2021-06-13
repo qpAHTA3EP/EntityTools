@@ -92,5 +92,26 @@ namespace EntityTools.Tools.Navigation
 
             return (dx0 * dx1 + dy0 * dy1 + dz0 * dz1) / Math.Sqrt(squareDistance0 * squareDistance1);
         }
+
+        /// <summary>
+        /// Вычисление квадрата расстояния между точкой с координатами {<param name="x0"/>, <param name="y0"/>, <param name="z0"/>} и точкой с координатами {<param name="x1"/>, <param name="y1"/>, <param name="z1"/>}
+        /// </summary>
+        public static double SquareDistance3D(double x0, double y0, double z0, double x1, double y1, double z1)
+        {
+            double dx = x0 - x1;
+            double dy = y0 - y1;
+            double dz = z0 - z1;
+
+            return dx * dx + dy * dy + dz * dz;
+        }
+
+        /// <summary>
+        /// Вычисление квадрата расстояния между точками <param name="point0"/> и <param name="point1"/>
+        /// </summary>
+
+        public static double SquareDistance3D(Vector3 point0, Vector3 point1)
+        {
+            return SquareDistance3D(point0.X, point0.Y, point0.Z, point1.X, point1.Y, point1.Z);
+        }
     }
 }

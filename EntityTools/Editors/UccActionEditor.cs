@@ -14,7 +14,7 @@ namespace EntityTools.Editors
             if (UCCEditorExtensions.GetUccAction(out UCCAction uccAction))
                 return uccAction; 
 #else
-            if (EntityTools.Core.GUIRequest_UCCAction(out UCCAction action))
+            if (EntityTools.Core.UserRequest_GetUccAction(out UCCAction action))
                 return action;
 #endif
 

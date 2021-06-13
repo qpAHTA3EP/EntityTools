@@ -290,19 +290,19 @@ namespace EntityTools.UCC.Actions
             dodge.Direction = DodgeDirection.DodgeSmart;
             Engine = new UccActionProxy(this);
         }
-        private IUccActionEngine MakeProxie()
+        private IUccActionEngine MakeProxy()
         {
             return new UccActionProxy(this);
         }
         #endregion
 
         #region Интерфейс команды
-        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).NeedToRun;
-        public override bool Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Run();
+        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).NeedToRun;
+        public override bool Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Run();
         [XmlIgnore]
         [Browsable(false)]
-        public Entity UnitRef => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).UnitRef;
-        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Label();
+        public Entity UnitRef => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).UnitRef;
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
         #endregion
 
         public override UCCAction Clone()

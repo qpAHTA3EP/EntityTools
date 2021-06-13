@@ -1,8 +1,9 @@
-﻿using System;
+﻿using DevExpress.XtraEditors;
+using MyNW.Internals;
+using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Windows.Forms;
-using MyNW.Internals;
 
 namespace EntityTools.Editors
 {
@@ -12,7 +13,12 @@ namespace EntityTools.Editors
         {
             if (Game.CharacterSelectionData.CharacterChoices.IsValid && Game.CharacterSelectionData.CharacterChoices.LastPlayedCharacter.IsValid)
             {
-                DialogResult result = MessageBox.Show("Set to current Shard ?");
+                DialogResult result =
+#if false
+                    MessageBox.Show("Set to current Shard ?"); 
+#else
+                    XtraMessageBox.Show("Set to current Shard ?");
+#endif
                 if (result == DialogResult.OK)
                 {
                     return Game.CharacterSelectionData.CharacterChoices.LastPlayedCharacter.ShardName;

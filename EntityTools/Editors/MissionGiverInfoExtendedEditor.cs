@@ -59,13 +59,13 @@ namespace EntityTools.Editors
         public static bool SetInfos(ref MissionGiverBase missionGiver)
         {
             MissionGiverType giverType = MissionGiverType.None;
-            if (EntityTools.Core.GUIRequest_Item(() => DisplayedGivers, ref giverType))
+            if (EntityTools.Core.UserRequest_SelectItem(() => DisplayedGivers, ref giverType))
             {
                 switch (giverType)
                 {
                     case MissionGiverType.NPC:
                         Entity entity = null;
-                        if (EntityTools.Core.GUIRequest_EntityToInteract(ref entity))
+                        if (EntityTools.Core.UserRequest_GetEntityToInteract(ref entity))
                         {
                             var player = EntityManager.LocalPlayer;
                             var giver = new MissionGiverNPC

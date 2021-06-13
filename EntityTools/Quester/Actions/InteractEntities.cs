@@ -57,7 +57,11 @@ namespace EntityTools.Quester.Actions
                 if (_entityId != value)
                 {
                     _entityId = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityID)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityID))); 
+#else
+                    OnPropertyChanged();
+#endif
                 }
             }
         }
@@ -79,7 +83,11 @@ namespace EntityTools.Quester.Actions
                 if (_entityIdType != value)
                 {
                     _entityIdType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityIdType)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityIdType))); 
+#else
+                    OnPropertyChanged();
+#endif
                 }
             }
         }
@@ -99,7 +107,11 @@ namespace EntityTools.Quester.Actions
                 if (_entityNameType != value)
                 {
                     _entityNameType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityNameType)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityNameType))); 
+#else
+                    OnPropertyChanged();
+#endif
                 }
             }
         }
@@ -120,7 +132,11 @@ namespace EntityTools.Quester.Actions
                 if (_regionCheck != value)
                 {
                     _regionCheck = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RegionCheck)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RegionCheck))); 
+#else
+                    OnPropertyChanged();
+#endif
                 }
             }
         }
@@ -141,7 +157,11 @@ namespace EntityTools.Quester.Actions
                 if (_healthCheck != value)
                 {
                     _healthCheck = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HealthCheck)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HealthCheck))); 
+#else
+                    OnPropertyChanged();
+#endif
                 }
             }
         }
@@ -161,7 +181,11 @@ namespace EntityTools.Quester.Actions
                 if (_holdTargetEntity != value)
                 {
                     _holdTargetEntity = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HoldTargetEntity)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HoldTargetEntity))); 
+#else
+                    OnPropertyChanged();
+#endif
                 }
             }
         }
@@ -182,7 +206,11 @@ namespace EntityTools.Quester.Actions
                 if (_skipMoving != value)
                 {
                     _skipMoving = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SkipMoving)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SkipMoving))); 
+#else
+                    OnPropertyChanged();
+#endif
                 }
             }
         }
@@ -202,7 +230,11 @@ namespace EntityTools.Quester.Actions
                 if (_reactionRange != value)
                 {
                     _reactionRange = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionRange)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionRange))); 
+#else
+                    OnPropertyChanged();
+#endif
                 }
             }
         }
@@ -222,7 +254,11 @@ namespace EntityTools.Quester.Actions
                 if (_reactionZRange != value)
                 {
                     _reactionZRange = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionZRange)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionZRange))); 
+#else
+                    OnPropertyChanged();
+#endif
                 }
             }
         }
@@ -243,7 +279,11 @@ namespace EntityTools.Quester.Actions
                 if (_customRegionNames != value)
                 {
                     _customRegionNames = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionNames)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionNames))); 
+#else
+                    OnPropertyChanged();
+#endif
                 }
             }
         }
@@ -253,7 +293,6 @@ namespace EntityTools.Quester.Actions
         [Description("A subset of entities that are searched for a target\n" +
             "Contacts: Only interactable Entities\n" +
             "Complete: All possible Entities")]
-        [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
         [Category("Optional")]
 #else
         [Browsable(false)]
@@ -265,7 +304,11 @@ namespace EntityTools.Quester.Actions
                 if (_entitySetType != value)
                 {
                     _entitySetType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntitySetType)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntitySetType))); 
+#else
+                    OnPropertyChanged();
+#endif
                 }
             }
             
@@ -286,7 +329,11 @@ namespace EntityTools.Quester.Actions
                 if (_combatDistance != value)
                 {
                     _combatDistance = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CombatDistance)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CombatDistance))); 
+#else
+                    OnPropertyChanged();
+#endif
                 }
             }
         }
@@ -305,7 +352,11 @@ namespace EntityTools.Quester.Actions
                 if (_ignoreCombat != value)
                 {
                     _ignoreCombat = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IgnoreCombat)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IgnoreCombat))); 
+#else
+                    OnPropertyChanged();
+#endif
                 }
             }
         }
@@ -329,7 +380,11 @@ namespace EntityTools.Quester.Actions
                 if (_interactOnce != value)
                 {
                     _interactOnce = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractOnce)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractOnce))); 
+#else
+                    OnPropertyChanged();
+#endif
                 }
             }
         }
@@ -348,7 +403,11 @@ namespace EntityTools.Quester.Actions
                 if (_interactingTimeout != value)
                 {
                     _interactingTimeout = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractingTimeout)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractingTimeout))); 
+#else
+                    OnPropertyChanged();
+#endif
                 }
             }
         }
@@ -368,7 +427,11 @@ namespace EntityTools.Quester.Actions
                 if (_interactTime != value)
                 {
                     _interactTime = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractTime)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractTime))); 
+#else
+                    OnPropertyChanged();
+#endif
                 }
             }
         }
@@ -388,7 +451,11 @@ namespace EntityTools.Quester.Actions
                 if (_interactDistance != value)
                 {
                     _interactDistance = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractDistance)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractDistance))); 
+#else
+                    OnPropertyChanged();
+#endif
                 }
             }
         }
@@ -408,7 +475,11 @@ namespace EntityTools.Quester.Actions
                 if (_dialogs != value)
                 {
                     _dialogs = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Dialogs)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Dialogs))); 
+#else
+                    OnPropertyChanged();
+#endif
                 }
             }
         }
@@ -426,11 +497,15 @@ namespace EntityTools.Quester.Actions
                 if (_resetCurrentHotSpot != value)
                 {
                     _resetCurrentHotSpot = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ResetCurrentHotSpot)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ResetCurrentHotSpot))); 
+#else
+                    OnPropertyChanged();
+#endif
                 }
             }
         }
-        internal bool _resetCurrentHotSpot = false;
+        internal bool _resetCurrentHotSpot;
 
 #if DEVELOPER
         [XmlIgnore]
@@ -448,12 +523,17 @@ namespace EntityTools.Quester.Actions
         #region Взаимодействие с EntityToolsCore
         public event PropertyChangedEventHandler PropertyChanged;
 
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         [NonSerialized]
         private IQuesterActionEngine Engine;
 
         public InteractEntities()
         {
-            Engine = MakeProxie();
+            Engine = MakeProxy();
         }
 
         public void Bind(IQuesterActionEngine engine)
@@ -462,27 +542,27 @@ namespace EntityTools.Quester.Actions
         }
         public void Unbind()
         {
-            Engine = MakeProxie();
+            Engine = MakeProxy();
             PropertyChanged = null;
         }
 
-        private IQuesterActionEngine MakeProxie()
+        private IQuesterActionEngine MakeProxy()
         {
             return new QuesterActionProxy(this);
         }
         #endregion
 
         // Интерфейс Quester.Action через IQuesterActionEngine
-        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).NeedToRun;
-        public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Run();
-        public override string ActionLabel => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).ActionLabel;
+        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).NeedToRun;
+        public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Run();
+        public override string ActionLabel => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).ActionLabel;
         public override string InternalDisplayName => string.Empty;
-        public override bool UseHotSpots => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).UseHotSpots;
-        protected override bool IntenalConditions => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalConditions;
-        protected override Vector3 InternalDestination => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalDestination;
-        protected override ActionValidity InternalValidity => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalValidity;
-        public override void GatherInfos() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).GatherInfos();
-        public override void InternalReset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalReset();
-        public override void OnMapDraw(GraphicsNW graph) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).OnMapDraw(graph);
+        public override bool UseHotSpots => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).UseHotSpots;
+        protected override bool IntenalConditions => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).InternalConditions;
+        protected override Vector3 InternalDestination => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).InternalDestination;
+        protected override ActionValidity InternalValidity => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).InternalValidity;
+        public override void GatherInfos() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).GatherInfos();
+        public override void InternalReset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).InternalReset();
+        public override void OnMapDraw(GraphicsNW graph) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).OnMapDraw(graph);
     }
 }

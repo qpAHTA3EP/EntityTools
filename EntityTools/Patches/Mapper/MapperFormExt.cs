@@ -27,7 +27,6 @@ using Action = System.Action;
 using GoldenPath = Astral.Logic.NW.GoldenPath;
 using MinimapWaypoint = MyNW.Classes.MinimapWaypoint;
 using Timeout = Astral.Classes.Timeout;
-using EntityTools.Patches.Quester;
 using AcTp0Tools;
 #if PATCH_ASTRAL
 using Astral.Logic.NW;
@@ -1489,7 +1488,8 @@ namespace EntityTools.Patches.Mapper
                         // Сохраняем в архив файл профиля "profile.xml"
                         lock (currentProfile)
                         {
-                            Patch_Astral_Quester_Core_Save.SaveProfile(zipFile);
+                            //Patch_Astral_Quester_Core_Save.SaveProfile(zipFile);
+                            AstralAccessors.Quester.Core.SaveProfile(zipFile);
                             currentProfile.Saved = true; 
                         }
 
@@ -1518,7 +1518,8 @@ namespace EntityTools.Patches.Mapper
                             // удаляем мусор (скрытые вершины и ребра)
                             mesh.RemoveUnpassable();
                             // сохраняем меш в архивный файл
-                            succeeded = Patch_Astral_Quester_Core_Save.SaveMesh(zipFile, meshName, mesh);
+                            //succeeded = Patch_Astral_Quester_Core_Save.SaveMesh(zipFile, meshName, mesh);
+                            succeeded = AstralAccessors.Quester.Core.SaveMesh(zipFile, meshName, mesh);
                         } 
                     }
 

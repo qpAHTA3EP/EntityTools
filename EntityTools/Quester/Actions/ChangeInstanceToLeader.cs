@@ -52,6 +52,7 @@ namespace EntityTools.Quester.Actions
 
         public override ActionResult Run()
         {
+            // TODO Оптимизировать
             if (EntityManager.LocalPlayer.PlayerTeam.IsInTeam)
             {
                 if (EntityManager.LocalPlayer.PlayerTeam.IsLeader)

@@ -1,7 +1,7 @@
 ﻿using System;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
-namespace EntityTools.Quester.Conditions
+namespace EntityTools.Core.Interfaces
 {
     public interface IQuesterConditionEngine : IDisposable
     {

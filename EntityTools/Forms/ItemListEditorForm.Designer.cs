@@ -62,6 +62,7 @@ namespace EntityTools.Forms
             this.btnAdd.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnAdd.Location = new System.Drawing.Point(12, 226);
             this.btnAdd.Name = "btnAdd";
+            this.btnAdd.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
             this.btnAdd.Size = new System.Drawing.Size(66, 23);
             this.btnAdd.TabIndex = 1;
             this.btnAdd.Text = "Add";
@@ -75,6 +76,7 @@ namespace EntityTools.Forms
             this.btnRemove.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnRemove.Location = new System.Drawing.Point(84, 226);
             this.btnRemove.Name = "btnRemove";
+            this.btnRemove.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
             this.btnRemove.Size = new System.Drawing.Size(75, 23);
             this.btnRemove.TabIndex = 2;
             this.btnRemove.Text = "Remove";
@@ -88,6 +90,7 @@ namespace EntityTools.Forms
             this.btnDown.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnDown.Location = new System.Drawing.Point(254, 226);
             this.btnDown.Name = "btnDown";
+            this.btnDown.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
             this.btnDown.Size = new System.Drawing.Size(66, 23);
             this.btnDown.TabIndex = 5;
             this.btnDown.Text = "Down";
@@ -101,6 +104,7 @@ namespace EntityTools.Forms
             this.btnUp.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnUp.Location = new System.Drawing.Point(182, 226);
             this.btnUp.Name = "btnUp";
+            this.btnUp.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
             this.btnUp.Size = new System.Drawing.Size(66, 23);
             this.btnUp.TabIndex = 4;
             this.btnUp.Text = "Up";

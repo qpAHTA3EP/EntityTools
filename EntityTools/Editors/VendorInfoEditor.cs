@@ -47,7 +47,7 @@ namespace EntityTools.Editors
             VendorType vndType = VendorType.None;
             VendorInfo vendorInfo = null;
 
-            if (EntityTools.Core.GUIRequest_Item(() => displayedVendors, ref vndType))
+            if (EntityTools.Core.UserRequest_SelectItem(() => displayedVendors, ref vndType))
             {
                 switch (vndType)
                 {
@@ -59,7 +59,7 @@ namespace EntityTools.Editors
 #endif
                     case VendorType.Normal:
                         Entity entity = null;
-                        if (EntityTools.Core.GUIRequest_EntityToInteract(ref entity))
+                        if (EntityTools.Core.UserRequest_GetEntityToInteract(ref entity))
                         {
                             vendorInfo = new VendorInfo
                             {

@@ -160,20 +160,20 @@ namespace EntityTools.UCC.Conditions
             Sign = Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
             Engine = new UccConditionProxy(this);
         }
-        private IUccConditionEngine MakeProxie()
+        private IUccConditionEngine MakeProxy()
         {
             return new UccConditionProxy(this);
         }
         #endregion
 
         #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).IsOK(refAction);
+        bool ICustomUCCCondition.IsOK(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).IsOK(refAction);
 
-        bool ICustomUCCCondition.Loked { get => Locked; set => Locked = value; }
+        bool ICustomUCCCondition.Loсked { get => Locked; set => Locked = value; }
 
-        string ICustomUCCCondition.TestInfos(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).TestInfos(refAction);
+        string ICustomUCCCondition.TestInfos(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).TestInfos(refAction);
         #endregion
 
-        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Label();
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
     }
 }

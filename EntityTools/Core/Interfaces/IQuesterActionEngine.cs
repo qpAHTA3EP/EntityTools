@@ -1,7 +1,6 @@
-﻿using Astral.Logic.Classes.Map;
+﻿using System;
+using Astral.Logic.Classes.Map;
 using MyNW.Classes;
-using System;
-using System.ComponentModel;
 using static Astral.Quester.Classes.Action;
 using QuesterAction = Astral.Quester.Classes.Action;
 

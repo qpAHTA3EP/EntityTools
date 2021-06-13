@@ -157,6 +157,7 @@ namespace EntityCore.UCC.Actions
             return label;
         }
 
+
         #region Вспомогательные данные и методы
         private SimplePatternPos patternPos = SimplePatternPos.None;
         private string itemIdPattern = string.Empty;

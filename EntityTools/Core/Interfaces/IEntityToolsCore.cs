@@ -5,6 +5,8 @@ using EntityTools.Enums;
 using MyNW.Classes;
 using System;
 using System.Collections.Generic;
+using DevExpress.Utils;
+using EntityTools.UCC.Conditions;
 using Action = Astral.Quester.Classes.Action;
 using UCCConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 
@@ -20,17 +22,28 @@ namespace EntityTools.Core.Interfaces
         bool Initialize(UCCAction action);
         bool Initialize(UCCCondition condition);
 #if DEVELOPER
-        bool GUIRequest_Item<T>(Func<IEnumerable<T>> source, ref T selectedValue);
-        bool GUIRequest_AuraId(ref string id);
-        bool GUIRequest_UIGenId(ref string id);
-        bool GUIRequest_EntityId(ref string entPattern, ref ItemFilterStringType strMatchType, ref EntityNameType nameType);
-        bool GUIRequest_UCCConditions(ref UCCConditionList list);
+        bool UserRequest_SelectItem<T>(Func<IEnumerable<T>> source, ref T selectedValue, string displayName = "");
 
-        bool GUIRequest_CustomRegions(ref List<string> crList);
-        bool GUIRequest_NodeLocation(ref Vector3 pos, string caption);
-        bool GUIRequest_EntityToInteract(ref Entity entity);
+        bool UserRequest_SelectItemList<T>(Func<IEnumerable<T>> source, ref IList<T> selectedValues, string caption = "");
 
-        bool GUIRequest_UCCAction(out UCCAction action);
+        bool UserRequest_EditValue(ref string value, string message = "", string caption = "",
+            FormatInfo formatInfo = null);
+
+        bool UserRequest_SelectAuraId(ref string id);
+
+        bool UserRequest_SelectUIGenId(ref string id);
+
+        bool UserRequest_EditEntityId(ref string entPattern, ref ItemFilterStringType strMatchType, ref EntityNameType nameType);
+
+        bool UserRequest_EditUccConditions(ref UCCConditionList list);
+
+        bool UserRequest_EditUccConditions(ref UCCConditionList list, ref LogicRule logic, ref bool negation);
+        
+        bool UserRequest_EditCustomRegionList(ref List<string> crList);
+        bool UserRequest_GetNodeLocation(ref Vector3 pos, string caption);
+        bool UserRequest_GetEntityToInteract(ref Entity entity);
+
+        bool UserRequest_GetUccAction(out UCCAction action);
 
         string EntityDiagnosticInfos(object obj);
 #endif

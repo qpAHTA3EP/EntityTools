@@ -10,6 +10,7 @@ using EntityTools.Quester.Conditions;
 using MyNW.Classes;
 using static Astral.Quester.Classes.Condition;
 using EntityTools;
+using EntityTools.Core.Interfaces;
 
 namespace EntityCore.Quester.Conditions
 {

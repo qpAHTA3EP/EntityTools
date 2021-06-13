@@ -21,10 +21,8 @@ namespace EntityCore.Forms
 
         #region GetAnInstanceOfType
         /// <summary>
-        /// Выбор типа и конструирование обекта выбранного типа
+        /// Выбор типа и конструирование объекта выбранного типа
         /// </summary>
-        /// <typeparam name="T">базовый тип</typeparam>
-        /// <returns></returns>
         public static bool GetAnInstanceOfType<T>(out T selectedValue, bool includeBase = true) where T : class
         {
             ItemSelectForm selectForm = new ItemSelectForm();
@@ -101,10 +99,6 @@ namespace EntityCore.Forms
         /// <summary>
         /// Выбор элемента из списка, формируемого функтором source
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="selectedValue"></param>
-        /// <returns></returns>
         public static bool GetAnItem<T>(Func<IEnumerable<T>> source, ref T selectedValue, string displayMember = "")
         {
             ItemSelectForm selectForm = new ItemSelectForm();

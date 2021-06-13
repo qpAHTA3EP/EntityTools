@@ -21,7 +21,7 @@ namespace EntityTools.Editors
                 ItemFilterStringType strType = ItemFilterStringType.Simple;
                 var nameType = EntityNameType.InternalName;
                 Func<string> getNewItem = () => {
-                    if (EntityTools.Core.GUIRequest_EntityId(ref id, ref strType, ref nameType))
+                    if (EntityTools.Core.UserRequest_EditEntityId(ref id, ref strType, ref nameType))
                         return id;
                     return null;
                 };

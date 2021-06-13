@@ -78,13 +78,13 @@ namespace EntityCore.Entities
         private readonly Predicate<Entity> comparer = null;
         string treatedPattern;
         /// <summary>
-        /// Метод, инициализирующий функтор <see cref="checkEntity"/>,
-        /// использующийся для проверки сущности <paramref name="e"/> на соответствия идентификатору <see cref="EntityID"/>
+        /// Метод, инициализирующий функтор <see cref="comparer"/>,
+        /// использующийся для проверки сущности <seealso cref="Entity"/> на соответствия сочетанию признаков <param name="entityId"/>, <param name="matchType"/>, <param name="entityNameType"/>
         /// </summary>
         private Predicate<Entity> initialize_Comparer(string entityId, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType entityNameType = EntityNameType.NameUntranslated)
         {
-            bool extendedDebugInfo = EntityTools.EntityTools.Config.Logger.DebugEntityTools;
-            string currentMethodName = extendedDebugInfo ? string.Concat(GetType().Name, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
+            //bool extendedDebugInfo = EntityTools.EntityTools.Config.Logger.DebugEntityTools;
+            //string currentMethodName = extendedDebugInfo ? string.Concat(GetType().Name, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
 
             Predicate<Entity> predicate;
             treatedPattern = string.Empty;

@@ -209,6 +209,14 @@
     <Compile Include="Core\Interfaces\IEntityDescriptor.cs" />
     <Compile Include="Editors\CheckedListBoxEditor.cs" />
     <Compile Include="Editors\CustomRegionCollectionEditor.cs" />
+    <Compile Include="Editors\MissionGiverInfoEditor.cs" />
+    <Compile Include="Editors\TestEditors\TargetSelectorTestEditor.cs" />
+    <Compile Include="Forms\CredentialManager2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CredentialManager2.Designer.cs">
+      <DependentUpon>CredentialManager2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\ItemListEditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -239,7 +247,7 @@
     <Compile Include="Editors\MissionGiverInfoExtendedEditor.cs" />
     <Compile Include="Editors\FoeListEditor.cs" />
     <Compile Include="Editors\VendorInfoEditor.cs" />
-    <Compile Include="Editors\MissionGiverInfoEditor.cs" />
+    <Compile Include="Editors\UccTargetSelectorEditor.cs" />
     <Compile Include="Logger\EntityToolLogger.cs" />
     <Compile Include="Core\Interfaces\IUCCConditionEngine.cs" />
     <Compile Include="Core\Interfaces\IUCCActionEngine.cs" />
@@ -284,7 +292,6 @@
     <Compile Include="Patches\Mapper\Tools\RelocateNodesTool.cs" />
     <Compile Include="Patches\Mapper\Tools\EditEdgeTool.cs" />
     <Compile Include="Patches\Mapper\Tools\RemoveNodesTool.cs" />
-    <Compile Include="Patches\Quester\Patch_Astral_Quester_Core_Save.cs" />
     <Compile Include="Patches\Patch_VIP_SealTraderEntity.cs" />
     <Compile Include="Patches\Patch_VIP_ProfessionVendorEntity.cs" />
     <Compile Include="Servises\SlideMonitor\HarmonyPatch_Astral_Logic_Classes_FSM_Navigation_ChangeWPDist.cs" />
@@ -316,7 +323,7 @@
     <Compile Include="Quester\Conditions\TeamMemberCount.cs" />
     <Compile Include="Editors\CampaignTaskEditor.cs" />
     <Compile Include="Editors\AddTypeCommonEditor.cs" />
-    <Compile Include="Editors\ConditionListEditor.cs" />
+    <Compile Include="Editors\UccConditionListEditor.cs" />
     <Compile Include="Core\MainPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -388,6 +395,8 @@
     <Compile Include="Tools\Missions\Monitor\MissionTreeNode.cs" />
     <Compile Include="Tools\Missions\Monitor\MissionTreeNodeSettings.cs" />
     <Compile Include="Tools\Navigation\NavigationHelper.cs" />
+    <Compile Include="Tools\Relogger\ProcessMemoryHelper.cs" />
+    <Compile Include="Tools\Relogger\ReloggerHelper.cs" />
     <Compile Include="Tools\StringToPattern.cs" />
     <Compile Include="Tools\Export\EntityExportInfo.cs" />
     <Compile Include="Tools\Enums.cs" />
@@ -413,6 +422,11 @@
     <Compile Include="Tools\Classes.cs" />
     <Compile Include="Tools\SysInformer.cs" />
     <Compile Include="Tools\XmlColor.cs" />
+    <Compile Include="UCC\Actions\ChangeTarget.cs" />
+    <Compile Include="UCC\Actions\TargetSelectors\Enums.cs" />
+    <Compile Include="UCC\Actions\TargetSelectors\TeammateSupport.cs" />
+    <Compile Include="UCC\IUccConditionPack.cs" />
+    <Compile Include="UCC\Enums.cs" />
     <Compile Include="UCC\Extensions\UCCActionExtention.cs" />
     <Compile Include="Tools\Export\UiExportInfo.cs" />
     <Compile Include="UCC\Conditions\UCCConditionPack.cs" />
@@ -427,12 +441,17 @@
     <Compile Include="UCC\Actions\ExecuteSpecificPower.cs" />
     <Compile Include="UCC\Actions\SpecializedUCCAction.cs" />
     <Compile Include="UCC\Conditions\UCCGenericCondition.cs" />
+    <Compile Include="UCC\Actions\TargetSelectors\EntityTarget.cs" />
     <Compile Include="UCC\UCCTools.cs" />
     <Compile Include="UCC\Actions\UseItemSpecial.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Core\MainPanel.resx">
       <DependentUpon>MainPanel.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CredentialManager2.resx">
+      <DependentUpon>CredentialManager2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ItemFilterEditorForm.resx">
       <DependentUpon>ItemFilterEditorForm.cs</DependentUpon>
@@ -665,6 +684,12 @@
       <Project>{fd0c9e2a-5d26-43aa-a227-bddaf9c30705}</Project>
       <Name>AMClient</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\miniLoad.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="UCC\Classes\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

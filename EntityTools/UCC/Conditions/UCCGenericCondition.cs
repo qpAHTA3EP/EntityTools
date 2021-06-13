@@ -17,7 +17,7 @@ namespace EntityTools.UCC.Conditions
             return false;
         }
 
-        bool ICustomUCCCondition.Loked { get => Locked; set => Locked = value; }
+        bool ICustomUCCCondition.Loсked { get => Locked; set => Locked = value; }
 
 #if !DEVELOPER
         [Browsable(false)]

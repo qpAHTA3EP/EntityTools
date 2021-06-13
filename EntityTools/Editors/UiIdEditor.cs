@@ -10,7 +10,7 @@ namespace EntityTools.Editors
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
             string newValue = value as string;
-            return EntityTools.Core.GUIRequest_UIGenId(ref newValue) ? newValue : value;
+            return EntityTools.Core.UserRequest_SelectUIGenId(ref newValue) ? newValue : value;
         }
 
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)

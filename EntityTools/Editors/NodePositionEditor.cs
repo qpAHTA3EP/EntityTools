@@ -11,7 +11,7 @@ namespace EntityTools.Editors
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
             Vector3 pos = Vector3.Empty;
-            if (EntityTools.Core.GUIRequest_NodeLocation(ref pos, "Target the node and press ok."))
+            if (EntityTools.Core.UserRequest_GetNodeLocation(ref pos, "Target the node and press ok."))
             {
                 return pos.Clone();
             }

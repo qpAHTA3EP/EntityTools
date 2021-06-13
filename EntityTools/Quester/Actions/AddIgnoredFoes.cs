@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Threading;
-using System.Xml.Serialization;
-using Astral.Classes.ItemFilter;
+﻿using AcTp0Tools.Reflection;
 using Astral.Logic.Classes.Map;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
-using EntityTools.Enums;
-using AcTp0Tools.Reflection;
 using EntityTools.Tools.Combats.IgnoredFoes;
 using MyNW.Classes;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing.Design;
+using System.Runtime.CompilerServices;
+using System.Xml.Serialization;
 using Action = Astral.Quester.Classes.Action;
 
 namespace EntityTools.Quester.Actions
@@ -22,6 +20,12 @@ namespace EntityTools.Quester.Actions
     {
         #region Взаимодействие с ядром EntityToolsCore
         public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         private AddIgnoredFoes @this => this;
 
 #if false
@@ -32,7 +36,7 @@ namespace EntityTools.Quester.Actions
 #endif
         public AddIgnoredFoes() { }
 
-        private IQuesterActionEngine MakeProxie()
+        private IQuesterActionEngine MakeProxy()
         {
             return new QuesterActionProxy(this);
         }
@@ -48,7 +52,11 @@ namespace EntityTools.Quester.Actions
             set
             {
                 _foes = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Foes)));
+#if false
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Foes))); 
+#else
+                OnPropertyChanged();
+#endif
             }
         }
         List<string> _foes = new List<string>();
@@ -65,7 +73,11 @@ namespace EntityTools.Quester.Actions
                 if (_timeout != value)
                 {
                     _timeout = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Timeout)));
+#if false
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Timeout))); 
+#else
+                    OnPropertyChanged();
+#endif
                 }
             }
         }
@@ -79,17 +91,17 @@ namespace EntityTools.Quester.Actions
 
         // Интерфес Quester.Action, реализованный через ActionEngine
 #if false
-        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).NeedToRun;
-        public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Run();
-        public override string ActionLabel => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).ActionLabel;
+        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).NeedToRun;
+        public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Run();
+        public override string ActionLabel => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).ActionLabel;
         public override string InternalDisplayName => string.Empty;
-        public override bool UseHotSpots => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).UseHotSpots;
-        protected override bool IntenalConditions => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalConditions;
-        protected override Vector3 InternalDestination => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalDestination;
-        protected override ActionValidity InternalValidity => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalValidity;
-        public override void GatherInfos() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).GatherInfos();
-        public override void InternalReset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalReset();
-        public override void OnMapDraw(GraphicsNW graph) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).OnMapDraw(graph); 
+        public override bool UseHotSpots => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).UseHotSpots;
+        protected override bool IntenalConditions => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).InternalConditions;
+        protected override Vector3 InternalDestination => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).InternalDestination;
+        protected override ActionValidity InternalValidity => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).InternalValidity;
+        public override void GatherInfos() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).GatherInfos();
+        public override void InternalReset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).InternalReset();
+        public override void OnMapDraw(GraphicsNW graph) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).OnMapDraw(graph); 
 #else
         public override bool NeedToRun => true;
         public override ActionResult Run()

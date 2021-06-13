@@ -24,6 +24,7 @@ using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using EntityTools.Quester;
 using static Astral.Quester.Classes.Action;
 
 namespace EntityCore.Quester.Action

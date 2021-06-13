@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Windows.Forms;
 using DevExpress.XtraEditors;
 
@@ -8,6 +9,7 @@ namespace EntityTools.Forms
     public partial class ObjectInfoForm : XtraForm
     {
         readonly List<ObjectInfoForm> childForms = new List<ObjectInfoForm>();
+        private int monitoringRefreshTime = 0;
 
         public ObjectInfoForm(object obj = null)
         {
@@ -19,9 +21,14 @@ namespace EntityTools.Forms
             }
         }
 
-        public void Show(object obj)
+        public void Show(object obj, int monitoringRefreshTime = 0)
         {
             pgObjectInfos.SelectedObject = obj;
+            if (monitoringRefreshTime > 0)
+            {
+                this.monitoringRefreshTime = monitoringRefreshTime;
+                backgroundWorker.RunWorkerAsync();
+            }
 
             Text = obj?.ToString() ?? string.Empty;
             Show();
@@ -38,9 +45,9 @@ namespace EntityTools.Forms
             var obj = pgObjectInfos.SelectedGridItem.Value;
             if (obj != null && obj.GetType().IsClass)
             {
-                var form = new ObjectInfoForm(obj);
+                var form = new ObjectInfoForm();
                 childForms.Add(form);
-                form.Show();
+                form.Show(obj, monitoringRefreshTime);
             }
         }
 
@@ -52,6 +59,16 @@ namespace EntityTools.Forms
         private void handler_FormClosed(object sender, FormClosedEventArgs e)
         {
             childForms.ForEach(f => f.Close());
+            backgroundWorker.CancelAsync();
+        }
+
+        private void Refresh(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            while (!IsDisposed && !backgroundWorker.CancellationPending)
+            {
+                pgObjectInfos.Refresh(); 
+                Thread.Sleep(monitoringRefreshTime);
+            }
         }
     }
 }
