@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
 using Astral.Quester.Classes;
+using DevExpress.Utils;
 using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
+using EntityTools.UCC.Conditions;
 using MyNW.Classes;
 using Action = System.Action;
 
@@ -47,7 +49,17 @@ namespace EntityTools.Core
         }
 
 #if DEVELOPER
-        public bool GUIRequest_Item<T>(Func<IEnumerable<T>> source, ref T selectedValue)
+        public bool UserRequest_SelectItem<T>(Func<IEnumerable<T>> source, ref T selectedValue, string displayName = "")
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UserRequest_SelectItemList<T>(Func<IEnumerable<T>> source, ref IList<T> selectedValue, string caption = "")
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UserRequest_EditValue(ref string value, string message = "", string caption = "", FormatInfo formatInfo = null)
         {
             throw new NotImplementedException();
         }
@@ -57,42 +69,47 @@ namespace EntityTools.Core
             throw new NotImplementedException();
         }
 
-        public bool GUIRequest_AuraId(ref string id)
+        public bool UserRequest_SelectAuraId(ref string id)
         {
             throw new NotImplementedException();
         }
 
-        public bool GUIRequest_CustomRegions(ref List<string> crList)
+        public bool UserRequest_EditCustomRegionList(ref List<string> crList)
         {
             throw new NotImplementedException();
         }
 
-        public bool GUIRequest_EntityId(ref string entPattern, ref ItemFilterStringType strMatchType, ref EntityNameType nameType)
+        public bool UserRequest_EditEntityId(ref string entPattern, ref ItemFilterStringType strMatchType, ref EntityNameType nameType)
         {
             throw new NotImplementedException();
         }
 
-        public bool GUIRequest_NodeLocation(ref Vector3 pos, string caption)
+        public bool UserRequest_GetNodeLocation(ref Vector3 pos, string caption)
         {
             throw new NotImplementedException();
         }
 
-        public bool GUIRequest_UCCConditions(ref List<UCCCondition> list)
+        public bool UserRequest_EditUccConditions(ref List<UCCCondition> list)
         {
             throw new NotImplementedException();
         }
 
-        public bool GUIRequest_UIGenId(ref string id)
+        public bool UserRequest_EditUccConditions(ref List<UCCCondition> list, ref LogicRule logic, ref bool negation)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public bool UserRequest_SelectUIGenId(ref string id)
         {
             throw new NotImplementedException();
         }
 
-        public bool GUIRequest_EntityToInteract(ref Entity entity)
+        public bool UserRequest_GetEntityToInteract(ref Entity entity)
         {
             throw new NotImplementedException();
         }
 
-        public bool GUIRequest_UCCAction(out UCCAction action)
+        public bool UserRequest_GetUccAction(out UCCAction action)
         {
             throw new NotImplementedException();
         }

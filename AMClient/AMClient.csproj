@@ -39,17 +39,16 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AMShare, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\x64\AMShare.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="AStar">
       <HintPath>..\References\x64\AStar.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Astral_patched">
-      <HintPath>..\References\x64\Astral_patched.exe</HintPath>
+    <Reference Include="Astral_patched, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\References\x64\Astral_patched.exe</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraEditors.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Cecil, Version=0.11.3.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
@@ -68,9 +67,6 @@
       <HintPath>..\packages\Mono.Cecil.0.11.3\lib\net40\Mono.Cecil.Rocks.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
-    <Reference Include="MonoMod, Version=21.4.21.3, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MonoMod.21.4.21.3\lib\net40\MonoMod.exe</HintPath>
-    </Reference>
     <Reference Include="MonoMod.RuntimeDetour, Version=21.4.21.3, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MonoMod.RuntimeDetour.21.4.21.3\lib\net40\MonoMod.RuntimeDetour.dll</HintPath>
     </Reference>
@@ -88,13 +84,18 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Accessors\AstralAccessors.General.cs" />
     <Compile Include="AMClient\Client.cs" />
     <Compile Include="Classes\Enums.cs" />
+    <Compile Include="Classes\UCC\UccTargetSelector.cs" />
+    <Compile Include="Classes\UCC\UccTargetProcessor.cs" />
     <Compile Include="Harmony\Extras\DelegateTypeFactory.cs" />
     <Compile Include="Harmony\Extras\FastAccess.cs" />
     <Compile Include="Harmony\Extras\MethodInvoker.cs" />
@@ -118,6 +119,7 @@
     <Compile Include="Patches\Astr0Patcher.cs" />
     <Compile Include="Patches\Astral.Quester.Classes.Conditions.QuestInfo.ToString.cs" />
     <Compile Include="Patches\Astral.Functions.XmlSerializer.GetExtraTypes.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Harmony\Public\Attributes.cs" />
     <Compile Include="Harmony\Public\CodeInstruction.cs" />
