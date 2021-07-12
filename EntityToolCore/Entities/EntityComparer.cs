@@ -1,11 +1,8 @@
 ﻿using Astral.Classes.ItemFilter;
-using EntityTools;
 using EntityTools.Enums;
 using EntityTools.Extensions;
 using MyNW.Classes;
 using System;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace EntityCore.Entities
@@ -28,46 +25,51 @@ namespace EntityCore.Entities
                     switch (pos)
                     {
                         case SimplePatternPos.Full:
-                            return (Entity e) => CompareInternal2SimpleFull(e, pattern);
+                            return e => CompareInternal2SimpleFull(e, pattern);
                         case SimplePatternPos.Start:
-                            return (Entity e) => CompareInternal2SimpleStart(e, pattern);
+                            return e => CompareInternal2SimpleStart(e, pattern);
                         case SimplePatternPos.Middle:
-                            return (Entity e) => CompareInternal2SimpleMiddle(e, pattern);
+                            return e => CompareInternal2SimpleMiddle(e, pattern);
                         case SimplePatternPos.End:
-                            return (Entity e) => CompareInternal2SimpleEnd(e, pattern);
+                            return e => CompareInternal2SimpleEnd(e, pattern);
                         default:
 #if DEBUG
                             ETLogger.WriteLine(LogType.Error, $"{nameof(EntityComparer)}::{MethodBase.GetCurrentMethod().Name}: Simple pattern is invalid {{{entPattern}, {strMatchType}, {nameType}}}");
 #endif
                             return null;
                     }
-                else if (nameType == EntityNameType.NameUntranslated)
+                if (nameType == EntityNameType.NameUntranslated)
                     switch (pos)
                     {
                         case SimplePatternPos.Full:
-                            return (Entity e) => CompareUntranslated2SimpleFull(e, pattern);
+                            return e => CompareUntranslated2SimpleFull(e, pattern);
                         case SimplePatternPos.Start:
-                            return (Entity e) => CompareUntranslated2SimpleStart(e, pattern);
+                            return e => CompareUntranslated2SimpleStart(e, pattern);
                         case SimplePatternPos.Middle:
-                            return (Entity e) => CompareUntranslated2SimpleMiddle(e, pattern);
+                            return e => CompareUntranslated2SimpleMiddle(e, pattern);
                         case SimplePatternPos.End:
-                            return (Entity e) => CompareUntranslated2SimpleEnd(e, pattern);
+                            return e => CompareUntranslated2SimpleEnd(e, pattern);
                         default:
 #if DEBUG
                             ETLogger.WriteLine(LogType.Error, $"{nameof(EntityComparer)}::{MethodBase.GetCurrentMethod().Name}: Simple pattern is invalid {{{entPattern}, {strMatchType}, {nameType}}}");
 #endif
                             return null;
                     }
-                else return CompareEmpty;
+                return CompareEmpty;
             }
-            else
+
+            if (nameType == EntityNameType.InternalName)
             {
-                if (nameType == EntityNameType.InternalName)
-                    return (Entity e) => CompareInternal2Regex(e, entPattern);
-                else if (nameType == EntityNameType.NameUntranslated)
-                    return (Entity e) => CompareUntranslated2Regex(e, entPattern);
-                else return CompareEmpty;
+                //return e => CompareInternal2Regex(e, entPattern);
+                return GetComparer_Internal2CompiledRegex(entPattern);
             }
+
+            if (nameType == EntityNameType.NameUntranslated)
+            {
+                //return e => CompareUntranslated2Regex(e, entPattern);
+                return GetComparer_Untranslated2CompiledRegex(entPattern);
+            }
+            return CompareEmpty;
         }
 
         private static bool CompareInternal2SimpleFull(Entity e, string pattern)
@@ -101,10 +103,12 @@ namespace EntityCore.Entities
         {
             return e.InternalName.EndsWith(pattern);
         }
+
         private static bool CompareUntranslated2SimpleEnd(Entity e, string pattern)
         {
             return e.NameUntranslated.EndsWith(pattern);
         }
+
         private static bool CompareSimpleAny(Entity e) => true;
 
         private static bool CompareInternal2Regex(Entity e, string pattern)
@@ -114,6 +118,17 @@ namespace EntityCore.Entities
         private static bool CompareUntranslated2Regex(Entity e, string pattern)
         {
             return Regex.IsMatch(e.NameUntranslated, pattern);
+        }
+
+        private static Predicate<Entity> GetComparer_Internal2CompiledRegex(string pattern)
+        {
+            var regex = new Regex(pattern, RegexOptions.Compiled | RegexOptions.Singleline);
+            return e => regex.IsMatch(e.InternalName);
+        }
+        private static Predicate<Entity> GetComparer_Untranslated2CompiledRegex(string pattern)
+        {
+            var regex = new Regex(pattern, RegexOptions.Compiled | RegexOptions.Singleline);
+            return e => regex.IsMatch(e.NameUntranslated);
         }
 
         private static bool CompareEmpty(Entity e)
