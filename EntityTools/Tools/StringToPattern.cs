@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Astral.Classes.ItemFilter;
 
@@ -59,7 +60,12 @@ namespace EntityTools.Tools
                 }
                 else
                 {
-                    predicate = str => Regex.IsMatch(str, pattern);
+                    if (!regexCache.TryGetValue(pattern, out Regex regex))
+                    {
+                        regex = new Regex(pattern, RegexOptions.Compiled | RegexOptions.Singleline);
+                        regexCache.Add(pattern, regex);
+                    }
+                    predicate = str => regex.IsMatch(str);
                 }
             }
             else predicate = str =>
@@ -71,6 +77,8 @@ namespace EntityTools.Tools
             };
             return predicate;
         }
+
+        private static readonly Dictionary<string, Regex> regexCache = new Dictionary<string, Regex>();
 
         /// <summary>
         /// Конструирование предиката для сопоставления строки, извлекаемой <paramref name="selector"/> с шаблоном <paramref name="pattern"/> типа <paramref name="strMatchType"/>
