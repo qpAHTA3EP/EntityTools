@@ -4,13 +4,13 @@ using System.Runtime.CompilerServices;
 using AcTp0Tools.Annotations;
 using Astral.Logic.UCC.Classes;
 
-namespace AcTp0Tools.Classes.UCC
+namespace AcTp0Tools.Classes.Targeting
 {
     /// <summary>
     /// Базовый класс для классов, инкапсулирующих настройки выбора цели в UCC
     /// </summary>
     [Serializable]
-    public abstract class UccTargetSelector : INotifyPropertyChanged
+    public abstract class TargetSelector : INotifyPropertyChanged
     {
 #if false
         /// <summary>
@@ -23,10 +23,10 @@ namespace AcTp0Tools.Classes.UCC
         /// и выдающий целеуказание
         /// </summary>
         /// <returns></returns>
-        public virtual UccTargetProcessor GetDefaultProcessor(UCCAction uccAction) => null;
+        public virtual TargetProcessor GetDefaultProcessor(UCCAction uccAction) => null;
 #endif
 
-        public abstract UccTargetSelector Clone();
+        public abstract TargetSelector Clone();
 
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;

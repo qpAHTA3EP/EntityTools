@@ -1,20 +1,20 @@
-﻿using AcTp0Tools.Classes.UCC;
+﻿using System;
+using System.ComponentModel;
+using System.Drawing.Design;
+using AcTp0Tools.Classes.Targeting;
 using Astral.Classes.ItemFilter;
 using EntityTools.Core.Interfaces;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using MyNW.Classes;
-using System;
-using System.ComponentModel;
-using System.Drawing.Design;
 
-namespace EntityTools.UCC.Actions.TargetSelectors
+namespace EntityTools.Tools.Targeting
 {
     /// <summary>
     /// Целеуказатель на <seealso cref="Entity"/>
     /// </summary>
     [Serializable]
-    public class EntityTarget : UccTargetSelector, IEntityIdentifier
+    public class EntityTarget : TargetSelector, IEntityIdentifier
     {
         #region Опции команды
 #if DEVELOPER
@@ -85,7 +85,7 @@ namespace EntityTools.UCC.Actions.TargetSelectors
         internal EntityNameType _entityNameType = EntityNameType.InternalName; 
         #endregion
 
-        public override UccTargetSelector Clone()
+        public override TargetSelector Clone()
         {
             return new EntityTarget
             {

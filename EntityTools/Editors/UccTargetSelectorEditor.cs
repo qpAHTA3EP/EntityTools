@@ -1,10 +1,11 @@
 ﻿using AcTp0Tools;
 using Astral.Classes.ItemFilter;
 using EntityTools.Enums;
-using EntityTools.UCC.Actions.TargetSelectors;
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using EntityTools.Tools.Targeting;
+
 namespace EntityTools.Editors
 {
 #if DEVELOPER

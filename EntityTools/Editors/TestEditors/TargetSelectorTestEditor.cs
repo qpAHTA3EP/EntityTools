@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using EntityTools.Quester.Actions;
 using EntityTools.UCC.Actions;
 
 namespace EntityTools.Editors
@@ -17,8 +18,15 @@ namespace EntityTools.Editors
                 //Task.Factory.StartNew(() => XtraMessageBox.Show(/*Form.ActiveForm, */sb.ToString(), "Test of '" + obj.ToString() + '\''));
                 XtraMessageBox.Show(msg, string.Concat("Test of '", value, '\'')); 
 #else
-            if (context?.Instance is ChangeTarget changeTarget)
-                new ObjectInfoForm().Show(changeTarget.Engine, 500);
+            switch (context?.Instance)
+            {
+                case ChangeTarget changeTarget:
+                    new ObjectInfoForm().Show(changeTarget.Engine, 500);
+                    break;
+                case MoveToTeammate m2t:
+                    new ObjectInfoForm().Show(m2t.Engine, 500);
+                    break;
+            }
 #endif
             return value;
         }

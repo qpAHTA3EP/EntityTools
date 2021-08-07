@@ -1,40 +1,36 @@
 ﻿#define DEBUG_CHANGE_TARGET
 
-using AcTp0Tools.Classes.UCC;
+using AcTp0Tools.Classes.Targeting;
 using EntityCore.Entities;
-using EntityTools.UCC.Actions;
-using EntityTools.UCC.Actions.TargetSelectors;
+using EntityTools.Tools.Targeting;
 using MyNW.Classes;
 using System;
 using System.ComponentModel;
-using MyNW.Patchables.Enums;
 
-namespace EntityCore.UCC.Classes
+namespace EntityCore.Tools.Targeting
 {
     /// <summary>
     /// Класс, реализующий обработку <seealso cref="EntityTarget"/>
     /// </summary>
-    internal class EntityTargetProcessor : UccTargetProcessor
+    internal class EntityTargetProcessor : TargetProcessor
     {
-        private ChangeTarget action;
         private EntityTarget selector;
 
 #if DEBUG_CHANGE_TARGET
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public object TargetCache => new SimpleEntityWrapper(_targetCache);//GetTarget();
+        public object TargetCache => new SimpleEntityWrapper(_targetCache);
 #endif
         private Entity _targetCache;
 
-        public EntityTargetProcessor(ChangeTarget changeTargetAction, EntityTarget target)
+        public EntityTargetProcessor(EntityTarget target, Predicate<Entity> specialCheck = null)
         {
-            action = changeTargetAction ?? throw new ArgumentException(nameof(changeTargetAction));
             selector = target ?? throw new ArgumentException(nameof(target));
-
             selector.PropertyChanged += OnPropertyChanged;
-            action.PropertyChanged += OnPropertyChanged;
+
+            _specialCheck = specialCheck;
         }
 
-        private void OnPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             _key = null;
             _specialCheck = null;
@@ -49,17 +45,12 @@ namespace EntityCore.UCC.Classes
                 selector = null;
             }
 
-            if (action != null)
-            {
-                action.PropertyChanged -= OnPropertyChanged;
-                action = null;
-            }
+            _specialCheck = null;
         }
 
         public override void Reset()
         {
             _key = null;
-            _specialCheck = null;
             _label = string.Empty;
         }
 
@@ -96,8 +87,8 @@ namespace EntityCore.UCC.Classes
             if (string.IsNullOrEmpty(_label))
             {
                 _label = string.IsNullOrEmpty(selector._entityId)
-                    ? action.GetType().Name
-                    : $"{action.GetType().Name} to Entity [{selector._entityId}]";
+                    ? GetType().Name
+                    : $"Target Entity [{selector._entityId}]";
             }
             return _label;
         }
@@ -107,34 +98,22 @@ namespace EntityCore.UCC.Classes
         /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
         /// </summary>
         [Browsable(false)]
-        public EntityCacheRecordKey EntityKey
-        {
-            get
-            {
-                if (_key is null)
-                    _key = new EntityCacheRecordKey(selector._entityId, selector._entityIdType, selector._entityNameType);
-                return _key;
-            }
-        }
+        public EntityCacheRecordKey EntityKey =>
+            _key ?? (_key = new EntityCacheRecordKey(selector._entityId, selector._entityIdType,
+                selector._entityNameType));
+
         private EntityCacheRecordKey _key;
 
         /// <summary>
         /// Функтор дополнительной проверки <seealso cref="Entity"/> 
-        /// Использовать самомодифицирующийся предиката нельзя, т.к. предикат передается в качестве аргумента в <seealso cref="SearchCached.FindClosestEntity(EntityCacheRecordKey, Predicate{Entity})"/>
         /// </summary>        
         [Browsable(false)]
-        private Predicate<Entity> SpecialCheck
+        public override Predicate<Entity> SpecialCheck
         {
-            get
-            {
-                if (_specialCheck is null)
-                    _specialCheck = SearchHelper.Construct_EntityAttributePredicate(true, 
-                        action.Range, Astral.Controllers.Settings.Get.MaxElevationDifference, 
-                        true, null, 
-                        e=> e.RelationToPlayer == EntityRelation.Foe);
-                return _specialCheck;
-            }
+            get => _specialCheck;
+            set { _specialCheck = value ?? (ett => true); }
         }
+
         private Predicate<Entity> _specialCheck;
     }
 

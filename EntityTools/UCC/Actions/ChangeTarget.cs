@@ -11,9 +11,9 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Xml.Serialization;
 using AcTp0Tools.Annotations;
-using AcTp0Tools.Classes.UCC;
+using AcTp0Tools.Classes.Targeting;
 using EntityTools.Editors;
-using EntityTools.UCC.Actions.TargetSelectors;
+using EntityTools.Tools.Targeting;
 using EntityTools.UCC.Conditions;
 
 namespace EntityTools.UCC.Actions
@@ -30,7 +30,7 @@ namespace EntityTools.UCC.Actions
 #else
         [Browsable(false)]
 #endif
-        public UccTargetSelector TargetSelector
+        public TargetSelector TargetSelector
         {
             get => targetSelector;
             set
@@ -42,7 +42,7 @@ namespace EntityTools.UCC.Actions
                 } 
             }
         }
-        internal UccTargetSelector targetSelector = new EntityTarget();
+        internal TargetSelector targetSelector = new EntityTarget();
 
         public new int Range
         {

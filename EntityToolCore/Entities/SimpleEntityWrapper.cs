@@ -1,7 +1,6 @@
 ﻿using MyNW.Classes;
 using System;
 using System.Linq;
-using EntityCore.MountInsignias;
 
 namespace EntityCore.Entities
 {
@@ -10,9 +9,7 @@ namespace EntityCore.Entities
         private Entity entity;
         public SimpleEntityWrapper(Entity entity)
         {
-            this.entity = entity is null
-                ? new Entity(IntPtr.Zero) 
-                : entity;
+            this.entity = entity ?? new Entity(IntPtr.Zero);
         }
         public SimpleEntityWrapper(TeamMember teamMember)
         {
@@ -31,7 +28,7 @@ namespace EntityCore.Entities
             entity.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.DisplayName ?? "Unknown";
 
         public float Health => entity.Character.AttribsBasic.Health;
-
+        public SimpleEntityWrapper CurrentTarget => new SimpleEntityWrapper(entity.IsValid ? entity.Character.CurrentTarget : null);
         public override string ToString()
         {
             if (entity.IsValid)

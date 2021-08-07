@@ -1,1070 +1,672 @@
-﻿using EntityTools.Enums;
-using EntityTools.Tools;
+﻿using Astral.Classes;
+using EntityTools.Enums;
 using EntityTools.Tools.Navigation;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using AcTp0Tools;
+using EntityCore.Entities;
+
+// ReSharper disable CollectionNeverUpdated.Local
+// ReSharper disable InconsistentNaming
 
 namespace EntityCore.Tools
 {
     public static class PlayerTeamHelper
     {
-        //TODO : Развернуть циклы, т.к. известно максимальное число персонажей в группе
-
-        #region GetFellow
-#if false
+        #region Identifiers
         /// <summary>
-        /// Выбор подзащитного
+        /// Внутриигровой идентификатор класса Волшебник
         /// </summary>
-        public static Entity GetComrade(FellowType fellowType, int range)
+        public static readonly string idWizard = "Player_Controller";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Волшебник (Чудотворец)
+        /// </summary>
+        public static readonly string idWizard_Arcanist = "Player_Secondary_Spellstormmage";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Волшебник (Арканист)
+        /// </summary>
+        public static readonly string idWizard_Thaumaturge = "Player_Secondary_MasterofFlame";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Клирик
+        /// </summary>
+        public static readonly string idCleric = "Player_Devoted";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Клирик (Благочестивец)
+        /// </summary>
+        public static readonly string idCleric_Devout = "Player_Secondary_AnointedChampion";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Клирик (Судья)
+        /// </summary>
+        public static readonly string idCleric_Arbiter = "Player_Secondary_DivineOracle";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Воин (бывший Страж)
+        /// </summary>
+        public static readonly string idFighter = "Player_Guardian";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Воин (Авангард)
+        /// </summary>
+        public static readonly string idFighter_Vanguard = "Player_Secondary_Ironvanguard";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Воин (Сорвиголова)
+        /// </summary>
+        public static readonly string idFighter_Dreadnought = "Player_Secondary_Swordmaster_GF";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Следопыт
+        /// </summary>
+        public static readonly string idRanger = "Player_Archer";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Следопыт (Охотник)
+        /// </summary>
+        public static readonly string idRanger_Hunter = "Player_Secondary_Pathfinder";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Следопыт (Хранитель)
+        /// </summary>
+        public static readonly string idRanger_Warden = "Player_Secondary_Stormwarden";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Варвар
+        /// </summary>
+        public static readonly string idBarbarian = "Player_Greatweapon";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Варвар (Страж)
+        /// </summary>
+        public static readonly string idBarbarian_Sentinel = "Player_Secondary_Ironvanguard_GWF";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Варвар (Мастер клинка)
+        /// </summary>
+        public static readonly string idBarbarian_BladeMaster = "Player_Secondary_Swordmaster";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Паладин
+        /// </summary>
+        public static readonly string idPaladin = "Player_Paladin";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Паладин (Клятвохранитель)
+        /// </summary>
+        public static readonly string idPaladin_OathKeeper = "Player_Secondary_OathofDevotion";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Паладин (Юстициар)
+        /// </summary>
+        public static readonly string idPaladin_Justicar = "Player_Secondary_OathofProtection";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Чернокнижник
+        /// </summary>
+        public static readonly string idWarlock = "Player_Scourge";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Чернокнижник (Ткач душ)
+        /// </summary>
+        public static readonly string idWarlock_SoulWeaver = "Player_Secondary_Soulbinder";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Чернокнижник (Вестник ада)
+        /// </summary>
+        public static readonly string idWarlock_HellBringer = "Player_Secondary_Hellbringer";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Плут
+        /// </summary>
+        public static readonly string idRogue = "Player_Trickster";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Плут (Убийца)
+        /// </summary>
+        public static readonly string idRogue_WhisperKnife = "Player_Secondary_Whisperknife";
+
+        /// <summary>
+        /// Внутриигровой идентификатор класса Плут (Шепчущий нож)
+        /// </summary>
+        public static readonly string idRogue_Assassin = "Player_Secondary_MasterInfiltrator";
+
+        /// <summary>
+        /// Отображение текстового идентификатора парагона класса <param name="id"/> в соответствующий <seealso cref="PlayerParagonType"/>
+        /// </summary>
+        public static PlayerParagonType GetParagonType(string id)
         {
-            var player = EntityManager.LocalPlayer;
-            var team = player.PlayerTeam;
+            if (!string.IsNullOrEmpty(id) &&
+                id2type.TryGetValue(id, out PlayerParagonType type))
+                return type;
+            return PlayerParagonType.Unknown;
+        }
+        /// <summary>
+        /// Определение <seealso cref="PlayerParagonType"/> для заданного <param name="entity"/>
+        /// </summary>
+        public static PlayerParagonType GetParagonType(this Entity entity)
+        {
+            if (entity is null)
+                return PlayerParagonType.Unknown;
 
-            if (!team.IsInTeam)
-                return null;
+            var character = entity.Character;
+            var id = character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.Name;
+            return GetParagonType(id);
+        }
+        
+        private static readonly Dictionary<string, PlayerParagonType> id2type =
+            new Dictionary<string, PlayerParagonType>(24);
 
-            if (range <= 0)
-                range = int.MaxValue;
-            else range *= range;
-
-            switch (fellowType)
-            {
-                case ComradeType.Leader:
-                    return GetLeader(range);
-                case ComradeType.Tank:
-                    return GetTank(range);
-                case ComradeType.Healer:
-                    return GetHealer(range);
-                case ComradeType.Sturdiest:
-                    return GetSturdiest(range);
-                case ComradeType.SturdiestDD:
-                    return GetSturdiestDamageDealer(range);
-                case ComradeType.Weakest:
-                    return GetWeakest(range);
-                case ComradeType.WeakestDD:
-                    return GetWeakestDamageDealer(range);
-            }
-
-            return null;
+        /// <summary>
+        /// Отображение типа парагона <seealso cref="PlayerParagonType"/> в соответствующий текстовый идентификатор
+        /// </summary>
+        public static string GetParagonId(PlayerParagonType type)
+        {
+            return type2id.TryGetValue(type, out string id) 
+                ? id 
+                : string.Empty;
+        }
+        /// <summary>
+        /// Определение текстового идентификатора парагона класса для заданного <param name="entity"/>
+        /// </summary>
+        public static string GetParagonId(this Entity entity)
+        {
+            return entity.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.Name;
         }
 
+        private static readonly Dictionary<PlayerParagonType, string> type2id =
+            new Dictionary<PlayerParagonType, string>(24);
+
+        /// <summary>
+        /// Определение групповой роли <seealso cref="TeamRoles"/> по текстовому идентификатору парагона класса <param name="id"/>
+        /// </summary>
+        public static TeamRoles GetTeamRole(string id)
+        {
+            var type = GetParagonType(id);
+            if (type == PlayerParagonType.Unknown)
+                return TeamRoles.Unknown;
+            if (((uint)TeamRoles.DD & (uint)type) > 0)
+                return TeamRoles.DD;
+            if (((uint)TeamRoles.Tank & (uint)type) > 0)
+                return TeamRoles.Tank;
+            if (((uint)TeamRoles.Healer & (uint)type) > 0)
+                return TeamRoles.Healer;
+            return TeamRoles.Unknown;
+        }
+
+        /// <summary>
+        /// Определение групповой роли <seealso cref="TeamRoles"/> по текстовому идентификатору парагона класса <param name="type"/>
+        /// </summary>
+        public static TeamRoles GetTeamRole(PlayerParagonType type)
+        {
+            if (((uint)TeamRoles.DD & (uint)type) > 0)
+                return TeamRoles.DD;
+            if (((uint)TeamRoles.Tank & (uint)type) > 0)
+                return TeamRoles.Tank;
+            if (((uint)TeamRoles.Healer & (uint)type) > 0)
+                return TeamRoles.Healer;
+            return TeamRoles.Unknown;
+        }
+
+        /// <summary>
+        /// Определение групповой роли <seealso cref="TeamRoles"/> для заданного <param name="entity"/>
+        /// </summary>
+        public static TeamRoles GetTeamRole(this Entity entity)
+        {
+            var id = GetParagonId(entity);
+
+            return GetTeamRole(id);
+        }
+        static PlayerTeamHelper()
+        {
+            id2type.Add(idWizard, PlayerParagonType.Wizard);
+            id2type.Add(idWizard_Arcanist, PlayerParagonType.Wizard_Arcanist);
+            id2type.Add(idWizard_Thaumaturge, PlayerParagonType.Wizard_Thaumaturge);
+
+            id2type.Add(idCleric, PlayerParagonType.Cleric);
+            id2type.Add(idCleric_Devout, PlayerParagonType.Cleric_Devout);
+            id2type.Add(idCleric_Arbiter, PlayerParagonType.Cleric_Arbiter);
+
+            id2type.Add(idFighter, PlayerParagonType.Fighter);
+            id2type.Add(idFighter_Vanguard, PlayerParagonType.Fighter_Vanguard);
+            id2type.Add(idFighter_Dreadnought, PlayerParagonType.Fighter_Dreadnought);
+
+            id2type.Add(idRanger, PlayerParagonType.Ranger);
+            id2type.Add(idRanger_Hunter, PlayerParagonType.Ranger_Hunter);
+            id2type.Add(idRanger_Warden, PlayerParagonType.Ranger_Warden);
+
+            id2type.Add(idBarbarian, PlayerParagonType.Barbarian);
+            id2type.Add(idBarbarian_Sentinel, PlayerParagonType.Barbarian_Sentinel);
+            id2type.Add(idBarbarian_BladeMaster, PlayerParagonType.Barbarian_BladeMaster);
+
+            id2type.Add(idPaladin, PlayerParagonType.Paladin);
+            id2type.Add(idPaladin_OathKeeper, PlayerParagonType.Paladin_OathKeeper);
+            id2type.Add(idPaladin_Justicar, PlayerParagonType.Paladin_Justicar);
+
+            id2type.Add(idWarlock, PlayerParagonType.Warlock);
+            id2type.Add(idWarlock_SoulWeaver, PlayerParagonType.Warlock_SoulWeaver);
+            id2type.Add(idWarlock_HellBringer, PlayerParagonType.Warlock_HellBringer);
+
+            id2type.Add(idRogue, PlayerParagonType.Rogue);
+            id2type.Add(idRogue_WhisperKnife, PlayerParagonType.Rogue_WhisperKnife);
+            id2type.Add(idRogue_Assassin, PlayerParagonType.Rogue_Assassin);
+
+
+
+            type2id.Add(PlayerParagonType.Wizard, idWizard);
+            type2id.Add(PlayerParagonType.Wizard_Arcanist, idWizard_Arcanist);
+            type2id.Add(PlayerParagonType.Wizard_Thaumaturge, idWizard_Thaumaturge);
+
+            type2id.Add(PlayerParagonType.Cleric, idCleric);
+            type2id.Add(PlayerParagonType.Cleric_Devout, idCleric_Devout);
+            type2id.Add(PlayerParagonType.Cleric_Arbiter, idCleric_Arbiter);
+
+            type2id.Add(PlayerParagonType.Fighter, idFighter);
+            type2id.Add(PlayerParagonType.Fighter_Vanguard, idFighter_Vanguard);
+            type2id.Add(PlayerParagonType.Fighter_Dreadnought, idFighter_Dreadnought);
+
+            type2id.Add(PlayerParagonType.Ranger, idRanger);
+            type2id.Add(PlayerParagonType.Ranger_Hunter, idRanger_Hunter);
+            type2id.Add(PlayerParagonType.Ranger_Warden, idRanger_Warden);
+
+            type2id.Add(PlayerParagonType.Barbarian, idBarbarian);
+            type2id.Add(PlayerParagonType.Barbarian_Sentinel, idBarbarian_Sentinel);
+            type2id.Add(PlayerParagonType.Barbarian_BladeMaster, idBarbarian_BladeMaster);
+
+            type2id.Add(PlayerParagonType.Paladin, idPaladin);
+            type2id.Add(PlayerParagonType.Paladin_OathKeeper, idPaladin_OathKeeper);
+            type2id.Add(PlayerParagonType.Paladin_Justicar, idPaladin_Justicar);
+
+            type2id.Add(PlayerParagonType.Warlock, idWarlock);
+            type2id.Add(PlayerParagonType.Warlock_SoulWeaver, idWarlock_SoulWeaver);
+            type2id.Add(PlayerParagonType.Warlock_HellBringer, idWarlock_HellBringer);
+
+            type2id.Add(PlayerParagonType.Rogue, idRogue);
+            type2id.Add(PlayerParagonType.Rogue_WhisperKnife, idRogue_WhisperKnife);
+            type2id.Add(PlayerParagonType.Rogue_Assassin, idRogue_Assassin);
+        }
+
+        #endregion
+
+
+        #region Teammate selection
         /// <summary>
         /// Поиск лидера группы
         /// </summary>
-        /// <param name="squareRange">Квадрат радиуса, в пределах которого производится поиск</param>
-        public static Entity GetLeader(float squareRange)
+        public static TeamMember GetLeader()
         {
-            var player = EntityManager.LocalPlayer;
-            var team = player.PlayerTeam;
-
-            if (team.IsLeader)
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
                 return null;
 
-            var leader = team.Team.Leader;
-            var leaderEntity = leader.Entity;
-
-            if (!leaderEntity.IsValid)
-                return null;
-
-            if (NavigationHelper.SquareDistance3D(player.Location, leaderEntity.Location) < squareRange &&
-                player.MapState.MapName == leader.MapName &&
-                player.RegionInternalName == leaderEntity.RegionInternalName)
-            {
-                return leaderEntity;
-            }
-
+            if (CheckTeammate(Leader))
+                return Leader;
             return null;
         }
-        /// <summary>
-        /// Поиск Танка среди членов группы без учета расстояния до него
-        /// </summary>
-        public static Entity GetLeader()
-        {
-            var player = EntityManager.LocalPlayer;
-            var team = player.PlayerTeam;
-
-            if (team.IsLeader)
-                return null;
-
-            var leader = team.Team.Leader;
-            var leaderEntity = leader.Entity;
-
-            if (!leaderEntity.IsValid)
-                return null;
-
-            if (player.MapState.MapName == leader.MapName &&
-                player.RegionInternalName == leaderEntity.RegionInternalName)
-            {
-                return leaderEntity;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Поиск Танка среди членов группы 
-        /// </summary>
-        /// <param name="squareRange">Квадрат радиуса, в пределах которого производится поиск</param>
-        public static Entity GetTank(float squareRange)
-        {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var playerPos = player.Location;
-            var selfId = player.ContainerId;
-
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
-
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-
-                if (NavigationHelper.SquareDistance3D(playerPos, tmEntity.Location) < squareRange)
-                {
-                    var role = tmEntity.GetTeamRole();
-                    if (role == TeamRoles.Tank)
-                        return tmEntity;
-                }
-            }
-
-            return null;
-        }
-        /// <summary>
-        /// Поиск Танка среди членов группы без учета расстояния до него
-        /// </summary>
-        public static Entity GetTank()
-        {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var selfId = player.ContainerId;
-
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
-
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-
-                var role = tmEntity.GetTeamRole();
-                if (role == TeamRoles.Tank)
-                    return tmEntity;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Поиск Целителя среди членов группы 
-        /// </summary>
-        /// <param name="squareRange">Квадрат радиуса, в пределах которого производится поиск</param>
-        public static Entity GetHealer(float squareRange)
-        {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var playerPos = player.Location;
-            var selfId = player.ContainerId;
-
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
-
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-
-                if (NavigationHelper.SquareDistance3D(playerPos, tmEntity.Location) < squareRange)
-                {
-                    var role = tmEntity.GetTeamRole();
-                    if (role == TeamRoles.Healer)
-                        return tmEntity;
-                }
-            }
-
-            return null;
-        }
-        /// <summary>
-        /// Поиск Целителя среди членов группы без учета расстояния до него
-        /// </summary>
-        public static Entity GetHealer()
-        {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var selfId = player.ContainerId;
-
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
-
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-
-                var role = tmEntity.GetTeamRole();
-                if (role == TeamRoles.Healer)
-                    return tmEntity;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Поиск самого живучего члена группы (с наибольшим максимальным HP)
-        /// </summary>
-        /// <param name="squareRange">Квадрат радиуса, в пределах которого производится поиск</param>
-        public static Entity GetSturdiest(float squareRange)
-        {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var playerPos = player.Location;
-            var selfId = player.ContainerId;
-            float maxHealth = 0;
-            Entity hardiest = null;
-
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
-
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-                var curMaxHealth = tmEntity.Character.AttribsBasic.MaxHealth;
-                if (curMaxHealth > maxHealth)
-                {
-                    if (NavigationHelper.SquareDistance3D(playerPos, tmEntity.Location) < squareRange)
-                    {
-                        maxHealth = curMaxHealth;
-                        hardiest = tmEntity;
-                    }
-                }
-            }
-
-            return hardiest;
-        }
-        /// <summary>
-        /// Поиск самого живучего члена группы (с наибольшим максимальным HP) без учета расстояния до него
-        /// </summary>
-        public static Entity GetSturdiest()
-        {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var selfId = player.ContainerId;
-            float maxHealth = 0;
-            Entity hardiest = null;
-
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
-
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-                var curMaxHealth = tmEntity.Character.AttribsBasic.MaxHealth;
-                if (curMaxHealth > maxHealth)
-                {
-                    maxHealth = curMaxHealth;
-                    hardiest = tmEntity;
-                }
-            }
-
-            return hardiest;
-        }
-
-        /// <summary>
-        /// Поиск самого живучего дамагера среди членов группы (с наибольшим максимальным HP)
-        /// </summary>
-        /// <param name="squareRange">Квадрат радиуса, в пределах которого производится поиск</param>
-        public static Entity GetSturdiestDamageDealer(float squareRange)
-        {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var playerPos = player.Location;
-            var selfId = player.ContainerId;
-            float maxHealth = 0;
-            Entity hardiest = null;
-
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
-
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-                var curMaxHealth = tmEntity.Character.AttribsBasic.MaxHealth;
-                if (curMaxHealth > maxHealth)
-                {
-                    if (NavigationHelper.SquareDistance3D(playerPos, tmEntity.Location) < squareRange)
-                    {
-                        var role = tmEntity.GetTeamRole();
-                        if (role != TeamRoles.DD)
-                            continue;
-
-                        maxHealth = curMaxHealth;
-                        hardiest = tmEntity;
-                    }
-                }
-            }
-
-            return hardiest;
-        }
-        /// <summary>
-        /// Поиск самого живучего дамагера среди членов группы (с наибольшим максимальным HP) без учета расстояния до него
-        /// </summary>
-        public static Entity GetSturdiestDamageDealer()
-        {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var selfId = player.ContainerId;
-            float maxHealth = 0;
-            Entity hardiest = null;
-
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
-
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-                var curMaxHealth = tmEntity.Character.AttribsBasic.MaxHealth;
-                if (curMaxHealth > maxHealth)
-                {
-                    var role = tmEntity.GetTeamRole();
-                    if (role != TeamRoles.DD)
-                        continue;
-
-                    maxHealth = curMaxHealth;
-                    hardiest = tmEntity;
-                }
-            }
-
-            return hardiest;
-        }
-
-        /// <summary>
-        /// Поиск наименее живучего члена группы (с наибольшим максимальным HP)
-        /// </summary>
-        /// <param name="squareRange">Квадрат радиуса, в пределах которого производится поиск</param>
-        public static Entity GetWeakest(float squareRange)
-        {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var playerPos = player.Location;
-            var selfId = player.ContainerId;
-            float maxHealth = float.MaxValue;
-            Entity hardiest = null;
-
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
-
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-                var curMaxHealth = tmEntity.Character.AttribsBasic.MaxHealth;
-                if (curMaxHealth < maxHealth)
-                {
-                    if (NavigationHelper.SquareDistance3D(playerPos, tmEntity.Location) < squareRange)
-                    {
-                        maxHealth = curMaxHealth;
-                        hardiest = tmEntity;
-                    }
-                }
-            }
-
-            return hardiest;
-        }
-        /// <summary>
-        /// Поиск наименее живучело члена группы (с наибольшим максимальным HP) без учета расстояния до него
-        /// </summary>
-        public static Entity GetWeakest()
-        {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var selfId = player.ContainerId;
-            float maxHealth = float.MaxValue;
-            Entity hardiest = null;
-
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
-
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-                var curMaxHealth = tmEntity.Character.AttribsBasic.MaxHealth;
-                if (curMaxHealth < maxHealth)
-                {
-                    maxHealth = curMaxHealth;
-                    hardiest = tmEntity;
-                }
-            }
-
-            return hardiest;
-        }
-
-        /// <summary>
-        /// Поиск наименее живучего дамагера среди членов группы (с наибольшим максимальным HP)
-        /// </summary>
-        /// <param name="squareRange">Квадрат радиуса, в пределах которого производится поиск</param>
-        public static Entity GetWeakestDamageDealer(float squareRange)
-        {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var playerPos = player.Location;
-            var selfId = player.ContainerId;
-            float maxHealth = float.MaxValue;
-            Entity hardiest = null;
-
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
-
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-                var curMaxHealth = tmEntity.Character.AttribsBasic.MaxHealth;
-                if (curMaxHealth < maxHealth)
-                {
-                    if (NavigationHelper.SquareDistance3D(playerPos, tmEntity.Location) < squareRange)
-                    {
-                        var role = tmEntity.GetTeamRole();
-                        if (role != TeamRoles.DD)
-                            continue;
-
-                        maxHealth = curMaxHealth;
-                        hardiest = tmEntity;
-                    }
-                }
-            }
-
-            return hardiest;
-        }
-        /// <summary>
-        /// Поиск наименее живучело дамагера среди членов группы (с наибольшим максимальным HP) без учета расстояния до него
-        /// </summary>
-        public static Entity GetWeakestDamageDealer()
-        {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var selfId = player.ContainerId;
-            float maxHealth = float.MaxValue;
-            Entity hardiest = null;
-
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
-
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-                var curMaxHealth = tmEntity.Character.AttribsBasic.MaxHealth;
-                if (curMaxHealth < maxHealth)
-                {
-                    var role = tmEntity.GetTeamRole();
-                    if (role != TeamRoles.DD)
-                        continue;
-
-                    maxHealth = curMaxHealth;
-                    hardiest = tmEntity;
-                }
-            }
-
-            return hardiest;
-        } 
-#else
-        /// <summary>
-        /// Выбор подзащитного
-        /// </summary>
-        public static TeamMember GetComrade(Teammates teammates, int range)
-        {
-            var player = EntityManager.LocalPlayer;
-            var team = player.PlayerTeam;
-
-            if (!team.IsInTeam)
-                return null;
-
-            if (range <= 0)
-                range = int.MaxValue;
-            else range *= range;
-
-            switch (teammates)
-            {
-                case Teammates.Leader:
-                    return GetLeader(range);
-                case Teammates.Tank:
-                    return GetTank(range);
-                case Teammates.Healer:
-                    return GetHealer(range);
-                case Teammates.Sturdiest:
-                    return GetSturdiest(range);
-                case Teammates.SturdiestDD:
-                    return GetSturdiestDamageDealer(range);
-                case Teammates.Weakest:
-                    return GetWeakest(range);
-                case Teammates.WeakestDD:
-                    return GetWeakestDamageDealer(range);
-            }
-
-            return null;
-        }
-
         /// <summary>
         /// Поиск лидера группы
         /// </summary>
         /// <param name="squareRange">Квадрат радиуса, в пределах которого производится поиск</param>
         public static TeamMember GetLeader(float squareRange)
         {
-            var player = EntityManager.LocalPlayer;
-            var team = player.PlayerTeam;
-
-            if (team.IsLeader)
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
                 return null;
 
-#if false
-            var leader = team.Team.Leader;
-            var leaderEntity = leader.Entity;
-
-            if (!leaderEntity.IsValid)
-                return null;
-
-            // EntityManager.LocalPlayer.PlayerTeam.Team.Leader не содержит достоверной информации кроме EntityId
-            // поэтому следующие проверки всегда ложные
-            // player.MapState.MapName == leader.MapName
-            // && player.RegionInternalName == leaderEntity.RegionInternalName
-            if (NavigationHelper.SquareDistance3D(player.Location, leaderEntity.Location) < squareRange &&
-                    player.MapState.MapName == leader.MapName &&
-                    player.RegionInternalName == leaderEntity.RegionInternalName)
-            {
-                return leader;
-            } 
-#endif
-            var leaderId = team.Team.Leader.EntityId;
-            var leaderTeamMember = team.Team.Members.Find((tm) => tm.EntityId == leaderId);
-            if (leaderTeamMember != null)
-            {
-                var leaderEntity = leaderTeamMember.Entity;
-                // EntityManager.LocalPlayer.PlayerTeam.Team.Leader не содержит достоверной информации кроме EntityId,
-                // поэтому следующая проверка всегда ложная
-                // player.MapState.MapName == leader.MapName
-                // Проверку карты и региона нужно выполнять по TeamMember
-                if (NavigationHelper.SquareDistance3D(player.Location, leaderEntity.Location) < squareRange
-                    && player.MapState.MapName == leaderTeamMember.MapName
-                    && player.RegionInternalName == leaderEntity.RegionInternalName)
-                {
-                    return leaderTeamMember;
-                }
-            }
+            if (CheckTeammate(Leader)
+                && NavigationHelper.SquareDistance3D(EntityManager.LocalPlayer.Location, Leader.Entity.Location) < squareRange)
+                return Leader;
 
             return null;
         }
         /// <summary>
-        /// Поиск Танка среди членов группы без учета расстояния до него
+        /// Поиск лидера группы c дополнительной проверкой <param name="specialCheck"/>
         /// </summary>
-        public static TeamMember GetLeader()
+        public static TeamMember GetLeader(Predicate<Entity> specialCheck)
         {
-            var player = EntityManager.LocalPlayer;
-            var team = player.PlayerTeam;
-
-            if (team.IsLeader)
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
                 return null;
 
-#if fale
-            var leader = team.Team.Leader;
-            var leaderEntity = leader.Entity;
-
-            if (!leaderEntity.IsValid)
-                return null;
-
-            // EntityManager.LocalPlayer.PlayerTeam.Team.Leader не содержит достоверной информации кроме EntityId
-            // поэтому следующие проверки всегда ложные
-            // player.MapState.MapName == leader.MapName
-            // && player.RegionInternalName == leaderEntity.RegionInternalName
-            if (player.MapState.MapName == leader.MapName
-                && player.RegionInternalName == leaderEntity.RegionInternalName)
-            {
-                return leader;
-            }
-#endif
-            var leaderId = team.Team.Leader.EntityId;
-            var leaderTeamMember = team.Team.Members.Find((tm) => tm.EntityId == leaderId);
-            if (leaderTeamMember != null)
-            {
-                var leaderEntity = leaderTeamMember.Entity;
-                // EntityManager.LocalPlayer.PlayerTeam.Team.Leader не содержит достоверной информации кроме EntityId,
-                // поэтому следующая проверка всегда ложная
-                // player.MapState.MapName == leader.MapName
-                // Проверку карты и региона нужно выполнять по TeamMember
-                if (player.MapState.MapName == leaderTeamMember.MapName
-                    && player.RegionInternalName == leaderEntity.RegionInternalName)
-                {
-                    return leaderTeamMember;
-                }
-            }
+            if (CheckTeammate(Leader)
+                && specialCheck(Leader.Entity))
+                return Leader;
 
             return null;
         }
 
+
+        /// <summary>
+        /// Поиск Танка среди членов группы без учета расстояния до него
+        /// </summary>
+        public static TeamMember GetTank()
+        {
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
+
+            if (CheckTeammate(Tank))
+                return Tank;
+
+            return null;
+        }
         /// <summary>
         /// Поиск Танка среди членов группы 
         /// </summary>
         /// <param name="squareRange">Квадрат радиуса, в пределах которого производится поиск</param>
         public static TeamMember GetTank(float squareRange)
         {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var playerPos = player.Location;
-            var selfId = player.ContainerId;
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
 
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
-
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-
-                if (NavigationHelper.SquareDistance3D(playerPos, tmEntity.Location) < squareRange)
-                {
-                    var role = tmEntity.GetTeamRole();
-                    if (role == TeamRoles.Tank)
-                        return tm;
-                }
-            }
+            if (CheckTeammate(Tank)
+                && NavigationHelper.SquareDistance3D(EntityManager.LocalPlayer.Location, Tank.Entity.Location) < squareRange)
+                return Tank;
 
             return null;
         }
         /// <summary>
-        /// Поиск Танка среди членов группы без учета расстояния до него
+        /// Поиск Танка среди членов группы 
         /// </summary>
-        public static TeamMember GetTank()
+        public static TeamMember GetTank(Predicate<Entity> specialCheck)
         {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var selfId = player.ContainerId;
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
 
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
-
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-
-                var role = tmEntity.GetTeamRole();
-                if (role == TeamRoles.Tank)
-                    return tm;
-            }
+            if (CheckTeammate(Tank)
+                && specialCheck(Tank.Entity))
+                return Tank;
 
             return null;
         }
 
+
+        /// <summary>
+        /// Поиск Целителя среди членов группы без учета расстояния до него
+        /// </summary>
+        public static TeamMember GetHealer()
+        {
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
+
+            if (CheckTeammate(Healer))
+                return Healer;
+
+            return null;
+        }
         /// <summary>
         /// Поиск Целителя среди членов группы 
         /// </summary>
         /// <param name="squareRange">Квадрат радиуса, в пределах которого производится поиск</param>
         public static TeamMember GetHealer(float squareRange)
         {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var playerPos = player.Location;
-            var selfId = player.ContainerId;
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
 
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
-
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-
-                if (NavigationHelper.SquareDistance3D(playerPos, tmEntity.Location) < squareRange)
-                {
-                    var role = tmEntity.GetTeamRole();
-                    if (role == TeamRoles.Healer)
-                        return tm;
-                }
-            }
+            if (CheckTeammate(Healer)
+                && NavigationHelper.SquareDistance3D(EntityManager.LocalPlayer.Location, Healer.Entity.Location) < squareRange)
+                return Healer;
 
             return null;
         }
         /// <summary>
-        /// Поиск Целителя среди членов группы без учета расстояния до него
+        /// Поиск Целителя среди членов группы 
         /// </summary>
-        public static TeamMember GetHealer()
+        public static TeamMember GetHealer(Predicate<Entity> specialCheck)
         {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var selfId = player.ContainerId;
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
 
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
-
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-
-                var role = tmEntity.GetTeamRole();
-                if (role == TeamRoles.Healer)
-                    return tm;
-            }
+            if (CheckTeammate(Healer)
+                && specialCheck(Healer.Entity))
+                return Healer;
 
             return null;
         }
 
+        /// <summary>
+        /// Поиск самого живучего члена группы (с наибольшим максимальным HP) без учета расстояния до него
+        /// </summary>
+        public static TeamMember GetSturdiest()
+        {
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
+
+            if (CheckTeammate(Sturdiest))
+                return Sturdiest;
+
+            return null;
+        }
         /// <summary>
         /// Поиск самого живучего члена группы (с наибольшим максимальным HP)
         /// </summary>
         /// <param name="squareRange">Квадрат радиуса, в пределах которого производится поиск</param>
         public static TeamMember GetSturdiest(float squareRange)
         {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var playerPos = player.Location;
-            var selfId = player.ContainerId;
-            float maxHealth = 0;
-            TeamMember hardiest = null;
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
 
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
+            if (CheckTeammate(Sturdiest)
+                && NavigationHelper.SquareDistance3D(EntityManager.LocalPlayer.Location, Sturdiest.Entity.Location) < squareRange)
+                return Sturdiest;
 
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-                var curMaxHealth = tmEntity.Character.AttribsBasic.MaxHealth;
-                if (curMaxHealth > maxHealth)
-                {
-                    if (NavigationHelper.SquareDistance3D(playerPos, tmEntity.Location) < squareRange)
-                    {
-                        maxHealth = curMaxHealth;
-                        hardiest = tm;
-                    }
-                }
-            }
-
-            return hardiest;
+            return null;
         }
         /// <summary>
-        /// Поиск самого живучего члена группы (с наибольшим максимальным HP) без учета расстояния до него
+        /// Поиск самого живучего члена группы (с наибольшим максимальным HP)
         /// </summary>
-        public static TeamMember GetSturdiest()
+        public static TeamMember GetSturdiest(Predicate<Entity> specialCheck)
         {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var selfId = player.ContainerId;
-            float maxHealth = 0;
-            TeamMember hardiest = null;
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
 
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
+            if (CheckTeammate(Sturdiest)
+                && specialCheck(Sturdiest.Entity))
+                return Sturdiest;
 
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-                var curMaxHealth = tmEntity.Character.AttribsBasic.MaxHealth;
-                if (curMaxHealth > maxHealth)
-                {
-                    maxHealth = curMaxHealth;
-                    hardiest = tm;
-                }
-            }
-
-            return hardiest;
+            return null;
         }
 
+        /// <summary>
+        /// Поиск самого живучего дамагера среди членов группы (с наибольшим максимальным HP) без учета расстояния до него
+        /// </summary>
+        public static TeamMember GetSturdiestDamageDealer()
+        {
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
+
+            if (CheckTeammate(SturdiestDD))
+                return SturdiestDD;
+
+            return null;
+        }
         /// <summary>
         /// Поиск самого живучего дамагера среди членов группы (с наибольшим максимальным HP)
         /// </summary>
         /// <param name="squareRange">Квадрат радиуса, в пределах которого производится поиск</param>
         public static TeamMember GetSturdiestDamageDealer(float squareRange)
         {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var playerPos = player.Location;
-            var selfId = player.ContainerId;
-            float maxHealth = 0;
-            TeamMember hardiest = null;
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
 
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
+            if (CheckTeammate(SturdiestDD)
+                && NavigationHelper.SquareDistance3D(EntityManager.LocalPlayer.Location, SturdiestDD.Entity.Location) < squareRange)
+                return SturdiestDD;
 
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-                var curMaxHealth = tmEntity.Character.AttribsBasic.MaxHealth;
-                if (curMaxHealth > maxHealth)
-                {
-                    if (NavigationHelper.SquareDistance3D(playerPos, tmEntity.Location) < squareRange)
-                    {
-                        var role = tmEntity.GetTeamRole();
-                        if (role != TeamRoles.DD)
-                            continue;
-
-                        maxHealth = curMaxHealth;
-                        hardiest = tm;
-                    }
-                }
-            }
-
-            return hardiest;
+            return null;
         }
         /// <summary>
-        /// Поиск самого живучего дамагера среди членов группы (с наибольшим максимальным HP) без учета расстояния до него
+        /// Поиск самого живучего дамагера среди членов группы (с наибольшим максимальным HP)
         /// </summary>
-        public static TeamMember GetSturdiestDamageDealer()
+        public static TeamMember GetSturdiestDamageDealer(Predicate<Entity> specialCheck)
         {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var selfId = player.ContainerId;
-            float maxHealth = 0;
-            TeamMember hardiest = null;
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
 
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
+            if (CheckTeammate(SturdiestDD)
+                && specialCheck(SturdiestDD.Entity))
+                return SturdiestDD;
 
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-                var curMaxHealth = tmEntity.Character.AttribsBasic.MaxHealth;
-                if (curMaxHealth > maxHealth)
-                {
-                    var role = tmEntity.GetTeamRole();
-                    if (role != TeamRoles.DD)
-                        continue;
-
-                    maxHealth = curMaxHealth;
-                    hardiest = tm;
-                }
-            }
-
-            return hardiest;
+            return null;
         }
 
+        /// <summary>
+        /// Поиск наименее живучело члена группы (с наибольшим максимальным HP) без учета расстояния до него
+        /// </summary>
+        public static TeamMember GetWeakest()
+        {
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
+
+            if (CheckTeammate(Weakest))
+                return Weakest;
+
+            return null;
+        }
         /// <summary>
         /// Поиск наименее живучего члена группы (с наибольшим максимальным HP)
         /// </summary>
         /// <param name="squareRange">Квадрат радиуса, в пределах которого производится поиск</param>
         public static TeamMember GetWeakest(float squareRange)
         {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var playerPos = player.Location;
-            var selfId = player.ContainerId;
-            float maxHealth = float.MaxValue;
-            TeamMember hardiest = null;
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
 
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
+            if (CheckTeammate(Weakest)
+                && NavigationHelper.SquareDistance3D(EntityManager.LocalPlayer.Location, Weakest.Entity.Location) < squareRange)
+                return Weakest;
 
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-                var curMaxHealth = tmEntity.Character.AttribsBasic.MaxHealth;
-                if (curMaxHealth < maxHealth)
-                {
-                    if (NavigationHelper.SquareDistance3D(playerPos, tmEntity.Location) < squareRange)
-                    {
-                        maxHealth = curMaxHealth;
-                        hardiest = tm;
-                    }
-                }
-            }
-
-            return hardiest;
+            return null;
         }
         /// <summary>
-        /// Поиск наименее живучело члена группы (с наибольшим максимальным HP) без учета расстояния до него
+        /// Поиск наименее живучего члена группы (с наибольшим максимальным HP)
         /// </summary>
-        public static TeamMember GetWeakest()
+        public static TeamMember GetWeakest(Predicate<Entity> specialCheck)
         {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var selfId = player.ContainerId;
-            float maxHealth = float.MaxValue;
-            TeamMember hardiest = null;
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
 
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
+            if (CheckTeammate(Weakest)
+                && specialCheck(Weakest.Entity))
+                return Weakest;
 
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-                var curMaxHealth = tmEntity.Character.AttribsBasic.MaxHealth;
-                if (curMaxHealth < maxHealth)
-                {
-                    maxHealth = curMaxHealth;
-                    hardiest = tm;
-                }
-            }
-
-            return hardiest;
+            return null;
         }
 
+        /// <summary>
+        /// Поиск наименее живучело дамагера среди членов группы (с наибольшим максимальным HP) без учета расстояния до него
+        /// </summary>
+        public static TeamMember GetWeakestDamageDealer()
+        {
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
+
+            if (CheckTeammate(WeakestDD))
+                return WeakestDD;
+
+            return null;
+        }
         /// <summary>
         /// Поиск наименее живучего дамагера среди членов группы (с наибольшим максимальным HP)
         /// </summary>
         /// <param name="squareRange">Квадрат радиуса, в пределах которого производится поиск</param>
         public static TeamMember GetWeakestDamageDealer(float squareRange)
         {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var playerPos = player.Location;
-            var selfId = player.ContainerId;
-            float maxHealth = float.MaxValue;
-            TeamMember hardiest = null;
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
 
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
+            if (CheckTeammate(WeakestDD)
+                && NavigationHelper.SquareDistance3D(EntityManager.LocalPlayer.Location, WeakestDD.Entity.Location) < squareRange)
+                return WeakestDD;
 
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-                var curMaxHealth = tmEntity.Character.AttribsBasic.MaxHealth;
-                if (curMaxHealth < maxHealth)
-                {
-                    if (NavigationHelper.SquareDistance3D(playerPos, tmEntity.Location) < squareRange)
-                    {
-                        var role = tmEntity.GetTeamRole();
-                        if (role != TeamRoles.DD)
-                            continue;
-
-                        maxHealth = curMaxHealth;
-                        hardiest = tm;
-                    }
-                }
-            }
-
-            return hardiest;
+            return null;
         }
         /// <summary>
-        /// Поиск наименее живучело дамагера среди членов группы (с наибольшим максимальным HP) без учета расстояния до него
+        /// Поиск наименее живучего дамагера среди членов группы (с наибольшим максимальным HP)
         /// </summary>
-        public static TeamMember GetWeakestDamageDealer()
+        public static TeamMember GetWeakestDamageDealer(Predicate<Entity> specialCheck)
+        {
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
+
+            if (CheckTeammate(WeakestDD)
+                && specialCheck(WeakestDD.Entity))
+                return WeakestDD;
+
+            return null;
+        }
+
+        /// <summary>
+        /// Поиск наиболее израненного члена группы (с наименьшим HP)
+        /// </summary>
+        public static TeamMember GetMostInjured()
         {
             var player = EntityManager.LocalPlayer;
             var playerRegion = player.RegionInternalName;
@@ -1084,13 +686,9 @@ namespace EntityCore.Tools
                 if (playerMap != tm.MapName ||
                     playerRegion != tmEntity.RegionInternalName)
                     continue;
-                var curMaxHealth = tmEntity.Character.AttribsBasic.MaxHealth;
+                var curMaxHealth = tmEntity.Character.AttribsBasic.Health;
                 if (curMaxHealth < maxHealth)
                 {
-                    var role = tmEntity.GetTeamRole();
-                    if (role != TeamRoles.DD)
-                        continue;
-
                     maxHealth = curMaxHealth;
                     hardiest = tm;
                 }
@@ -1098,7 +696,6 @@ namespace EntityCore.Tools
 
             return hardiest;
         }
-
         /// <summary>
         /// Поиск наиболее израненного члена члена группы (с наименьшим HP)
         /// </summary>
@@ -1138,9 +735,9 @@ namespace EntityCore.Tools
             return hardiest;
         }
         /// <summary>
-        /// Поиск наиболее израненного члена группы (с наименьшим HP)
+        /// Поиск наиболее израненного члена члена группы (с наименьшим HP)
         /// </summary>
-        public static TeamMember GetMostInjured()
+        public static TeamMember GetMostInjured(Predicate<Entity> specialCheck)
         {
             var player = EntityManager.LocalPlayer;
             var playerRegion = player.RegionInternalName;
@@ -1163,48 +760,8 @@ namespace EntityCore.Tools
                 var curMaxHealth = tmEntity.Character.AttribsBasic.Health;
                 if (curMaxHealth < maxHealth)
                 {
-                    maxHealth = curMaxHealth;
-                    hardiest = tm;
-                }
-            }
-
-            return hardiest;
-        }
-
-        /// <summary>
-        /// Поиск наиболее израненного члена дамагера (с наименьшим HP)
-        /// </summary>
-        /// <param name="squareRange">Квадрат радиуса, в пределах которого производится поиск</param>
-        public static TeamMember GetMostInjuredDamageDealer(float squareRange)
-        {
-            var player = EntityManager.LocalPlayer;
-            var playerRegion = player.RegionInternalName;
-            var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var playerPos = player.Location;
-            var selfId = player.ContainerId;
-            float maxHealth = float.MaxValue;
-            TeamMember hardiest = null;
-
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
-
-                var tmEntity = tm.Entity;
-
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-                var curMaxHealth = tmEntity.Character.AttribsBasic.Health;
-                if (curMaxHealth < maxHealth)
-                {
-                    if (NavigationHelper.SquareDistance3D(playerPos, tmEntity.Location) < squareRange)
+                    if (specialCheck(tmEntity))
                     {
-                        var role = tmEntity.GetTeamRole();
-                        if (role != TeamRoles.DD)
-                            continue;
-
                         maxHealth = curMaxHealth;
                         hardiest = tm;
                     }
@@ -1213,19 +770,308 @@ namespace EntityCore.Tools
 
             return hardiest;
         }
+
         /// <summary>
         /// Поиск наиболее израненного дамагера (с наименьшим HP)
         /// </summary>
         public static TeamMember GetMostInjuredDamageDealer()
         {
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
+
             var player = EntityManager.LocalPlayer;
+            var playerInst = Player.MapInstanceNumber;
             var playerRegion = player.RegionInternalName;
             var playerMap = player.MapState.MapName;
-            var team = player.PlayerTeam;
-            var selfId = player.ContainerId;
-            float maxHealth = float.MaxValue;
-            TeamMember hardiest = null;
 
+            float minHealth = float.MaxValue;
+            TeamMember mostInjured = null;
+
+            for (int i = 0; i < DDsNum; i++)
+            {
+                var tm = DDs[i];
+                var tmEntity = tm.Entity;
+
+                var health = tmEntity.Character.AttribsBasic.Health;
+                if (health < minHealth)
+                {
+                    if (playerInst != tm.MapInstanceNumber
+                        || playerMap != tm.MapName
+                        || playerRegion != tmEntity.RegionInternalName)
+                        continue;
+
+                    mostInjured = tm;
+                    minHealth = health;
+                }
+            }
+
+            return mostInjured;
+        }
+        /// <summary>
+        /// Поиск наиболее израненного члена дамагера (с наименьшим HP)
+        /// </summary>
+        /// <param name="squareRange">Квадрат радиуса, в пределах которого производится поиск</param>
+        public static TeamMember GetMostInjuredDamageDealer(float squareRange)
+        {
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
+
+            var player = EntityManager.LocalPlayer;
+            var playerInst = Player.MapInstanceNumber;
+            var playerRegion = player.RegionInternalName;
+            var playerMap = player.MapState.MapName;
+            var playerPos = player.Location;
+
+            float minHealth = float.MaxValue;
+            TeamMember mostInjured = null;
+
+            for (int i = 0; i < DDsNum; i++)
+            {
+                var tm = DDs[i];
+                var tmEntity = tm.Entity;
+
+                var health = tmEntity.Character.AttribsBasic.Health;
+                if (health < minHealth)
+                {
+                    if (NavigationHelper.SquareDistance3D(playerPos, tmEntity.Location) < squareRange)
+                    {
+                        if (playerInst != tm.MapInstanceNumber
+                            || playerMap != tm.MapName 
+                            || playerRegion != tmEntity.RegionInternalName)
+                            continue;
+
+                        minHealth = health;
+                        mostInjured = tm;
+                    }
+                }
+            }
+            return mostInjured;
+        }
+        /// <summary>
+        /// Поиск наиболее израненного члена дамагера (с наименьшим HP)
+        /// </summary>
+        public static TeamMember GetMostInjuredDamageDealer(Predicate<Entity> specialCheck)
+        {
+
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
+
+            var player = EntityManager.LocalPlayer;
+            var playerInst = Player.MapInstanceNumber;
+            var playerRegion = player.RegionInternalName;
+            var playerMap = player.MapState.MapName;
+
+            float minHealth = float.MaxValue;
+            TeamMember mostInjured = null;
+
+            for (int i = 0; i < DDsNum; i++)
+            {
+                var tm = DDs[i];
+                var tmEntity = tm.Entity;
+
+                var health = tmEntity.Character.AttribsBasic.Health;
+                if (health < minHealth)
+                {
+                    if (specialCheck(tmEntity))
+                    {
+                        if (playerInst != tm.MapInstanceNumber
+                            || playerMap != tm.MapName
+                            || playerRegion != tmEntity.RegionInternalName)
+                            continue;
+
+                        minHealth = health;
+                        mostInjured = tm;
+                    }
+                }
+            }
+            return mostInjured;
+        }
+
+        private static TeamMember GetMostInjuredTeamMember(TeamMember[] members, uint memberNum, Predicate<Entity> specialCheck)
+        {
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
+
+            var player = EntityManager.LocalPlayer;
+            var playerInst = Player.MapInstanceNumber;
+            var playerRegion = player.RegionInternalName;
+            var playerMap = player.MapState.MapName;
+
+            float minHealth = float.MaxValue;
+            TeamMember mostInjured = null;
+
+            for (int i = 0; i < memberNum; i++)
+            {
+                var tm = members[i];
+                var tmEntity = tm.Entity;
+
+                var health = tmEntity.Character.AttribsBasic.Health;
+                if (health < minHealth)
+                {
+                    if (specialCheck(tmEntity))
+                    {
+                        if (playerInst != tm.MapInstanceNumber
+                            || playerMap != tm.MapName
+                            || playerRegion != tmEntity.RegionInternalName)
+                            continue;
+
+                        minHealth = health;
+                        mostInjured = tm;
+                    }
+                }
+            }
+            return mostInjured;
+        }
+        
+        private static TeamMember GetWeakestTeamMember(TeamMember[] members, uint memberNum, Predicate<Entity> specialCheck)
+        {
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
+
+            var player = EntityManager.LocalPlayer;
+            var playerInst = Player.MapInstanceNumber;
+            var playerRegion = player.RegionInternalName;
+            var playerMap = player.MapState.MapName;
+
+            float minHealth = float.MaxValue;
+            TeamMember weakest = null;
+
+            for (int i = 0; i < memberNum; i++)
+            {
+                var tm = members[i];
+                var tmEntity = tm.Entity;
+
+                var health = tmEntity.Character.AttribsBasic.MaxHealth;
+                if (health < minHealth)
+                {
+                    if (specialCheck(tmEntity))
+                    {
+                        if (playerInst != tm.MapInstanceNumber
+                            || playerMap != tm.MapName
+                            || playerRegion != tmEntity.RegionInternalName)
+                            continue;
+
+                        minHealth = health;
+                        weakest = tm;
+                    }
+                }
+            }
+            return weakest;
+        }
+        
+        private static TeamMember GetSturdiestTeamMember(TeamMember[] members, uint memberNum, Predicate<Entity> specialCheck)
+        {
+
+            if (cacheTimeout.IsTimedOut
+                && RegenerateCache() == 0)
+                return null;
+            if (!CacheIsValid())
+                return null;
+
+            var player = EntityManager.LocalPlayer;
+            var playerInst = Player.MapInstanceNumber;
+            var playerRegion = player.RegionInternalName;
+            var playerMap = player.MapState.MapName;
+
+            float maxHealth = 0;
+            TeamMember sturdiest = null;
+
+            for (int i = 0; i < memberNum; i++)
+            {
+                var tm = members[i];
+                var tmEntity = tm.Entity;
+
+                var tmMaxHealth = tmEntity.Character.AttribsBasic.MaxHealth;
+                if (tmMaxHealth > maxHealth)
+                {
+                    if (specialCheck(tmEntity))
+                    {
+                        if (playerInst != tm.MapInstanceNumber
+                            || playerMap != tm.MapName
+                            || playerRegion != tmEntity.RegionInternalName)
+                            continue;
+
+                        maxHealth = tmMaxHealth;
+                        sturdiest = tm;
+                    }
+                }
+            }
+            return sturdiest;
+        }
+
+        private static uint CachedTeamId;
+        private static TeamMember Leader;
+        private static int TanksNum;
+        private static TeamMember Tank;
+        private static readonly TeamMember[] Tanks = new TeamMember[4];
+        private static int HealersNum;
+        private static TeamMember Healer;
+        private static readonly TeamMember[] Healers = new TeamMember[4];
+
+        private static int DDsNum;
+        private static readonly TeamMember[] DDs = new TeamMember[4];
+        private static TeamMember Sturdiest;
+        private static TeamMember SturdiestDD;
+        private static TeamMember Weakest;
+        private static TeamMember WeakestDD;
+        private static TeamMember Player;
+        private static readonly Timeout cacheTimeout = new Timeout(0);
+
+
+        /// <summary>
+        /// Проверка и классификация всех членов группы с распределением по группам
+        /// </summary>
+        private static uint RegenerateCache()
+        {
+            Sturdiest = null;
+            SturdiestDD = null;
+            Weakest = null;
+            WeakestDD = null;
+
+            Tank = null;
+            Healer = null;
+            Player = null;
+            
+            TanksNum = 0;
+            HealersNum = 0;
+            DDsNum = 0;
+            CachedTeamId = 0;
+
+            var player = EntityManager.LocalPlayer;
+            var team = player.PlayerTeam;
+
+            if (!team.IsInTeam)
+                return 0;
+
+            var selfId = player.ContainerId;
+
+            if (team.IsLeader)
+                Leader = null;
+
+            var leaderId = team.Team.Leader.EntityId;
+            float minHealth = float.MaxValue;
+            float minDdHealth = float.MaxValue;
+            float maxHealth = 0;
+            float maxDdHealth = 0;
+            float maxTankHealth = 0;
+            float maxHealerHealth = 0;
+
+#if false
             foreach (var tm in team.Team.Members)
             {
                 if (tm.EntityId == selfId)
@@ -1233,24 +1079,802 @@ namespace EntityCore.Tools
 
                 var tmEntity = tm.Entity;
 
-                if (playerMap != tm.MapName ||
-                    playerRegion != tmEntity.RegionInternalName)
-                    continue;
-                var curMaxHealth = tmEntity.Character.AttribsBasic.Health;
-                if (curMaxHealth < maxHealth)
-                {
-                    var role = tmEntity.GetTeamRole();
-                    if (role != TeamRoles.DD)
-                        continue;
+                var health = tmEntity.Character.AttribsBasic.MaxHealth;
 
-                    maxHealth = curMaxHealth;
-                    hardiest = tm;
+                if (health > maxHealth)
+                {
+                    maxHealth = health;
+                    Sturdiest = tm;
+                }
+                else if (health < minHealth)
+                {
+                    minHealth = health;
+                    Weakest = tm;
+                }
+
+                if (tm.EntityId == leaderId)
+                {
+                    Leader = tm;
+                }
+
+                var role = tmEntity.GetTeamRole();
+                switch (role)
+                {
+                    case TeamRoles.Tank:
+                        Tanks[TanksNum] = tm;
+                        TanksNum++;
+                        continue;
+                    case TeamRoles.Healer:
+                        Healers[HealersNum] = tm;
+                        HealersNum++;
+                        continue;
+                    case TeamRoles.DD:
+                        DDs[DDsNum] = tm;
+                        DDsNum++;
+                        if (health > maxDdHealth)
+                        {
+                            maxDdHealth = health;
+                            SturdiestDD = tm;
+                        }
+                        else if (health < minDdHealth)
+                        {
+                            minDdHealth = health;
+                            WeakestDD = tm;
+                        }
+                        continue;
+                }
+            } 
+#elif false
+            // Разворачиваем циклы
+            var members = team.Team.Members;
+            var teamCount = members.Count;
+            
+            if(teamCount == 0)
+                return 0;
+
+            var teamMember = members[0];
+
+            if (teamMember.EntityId == selfId)
+            {
+                Player = teamMember;
+            }
+            else
+            {
+                var tmEntity = teamMember.Entity;
+
+                var health = tmEntity.Character.AttribsBasic.MaxHealth;
+
+                if (health > maxHealth)
+                {
+                    maxHealth = health;
+                    Sturdiest = teamMember;
+                }
+                else if (health < minHealth)
+                {
+                    minHealth = health;
+                    Weakest = teamMember;
+                }
+
+                if (teamMember.EntityId == leaderId)
+                {
+                    Leader = teamMember;
+                }
+
+                var role = tmEntity.GetTeamRole();
+                switch (role)
+                {
+                    case TeamRoles.Tank:
+                        Tanks[TanksNum] = teamMember;
+                        TanksNum++; 
+                        if (health > maxTankHealth)
+                        {
+                            Tank = teamMember;
+                            maxTankHealth = health;
+                        }
+                        break;
+                    case TeamRoles.Healer:
+                        Healers[HealersNum] = teamMember;
+                        HealersNum++; 
+                        if (health > maxHealerHealth)
+                        {
+                            Healer = teamMember;
+                            maxHealerHealth = health;
+                        }
+                        break;
+                    case TeamRoles.DD:
+                        DDs[DDsNum] = teamMember;
+                        DDsNum++;
+                        if (health > maxDdHealth)
+                        {
+                            SturdiestDD = teamMember;
+                            maxDdHealth = health;
+                        }
+                        else if (health < minDdHealth)
+                        {
+                            WeakestDD = teamMember;
+                            minDdHealth = health;
+                        }
+                        break;
                 }
             }
 
-            return hardiest;
-        }
+            if (teamCount == 1)
+                goto RegenerateCacheFinish;
+
+            teamMember = members[1];
+            if (teamMember.EntityId == selfId)
+            {
+                Player = teamMember;
+            }
+            else
+            {
+                var tmEntity = teamMember.Entity;
+
+                var health = tmEntity.Character.AttribsBasic.MaxHealth;
+
+                if (health > maxHealth)
+                {
+                    maxHealth = health;
+                    Sturdiest = teamMember;
+                }
+                else if (health < minHealth)
+                {
+                    minHealth = health;
+                    Weakest = teamMember;
+                }
+
+                if (teamMember.EntityId == leaderId)
+                {
+                    Leader = teamMember;
+                }
+
+                var role = tmEntity.GetTeamRole();
+                switch (role)
+                {
+                    case TeamRoles.Tank:
+                        Tanks[TanksNum] = teamMember;
+                        TanksNum++; 
+                        if (health > maxTankHealth)
+                        {
+                            Tank = teamMember;
+                            maxTankHealth = health;
+                        }
+                        break;
+                    case TeamRoles.Healer:
+                        Healers[HealersNum] = teamMember;
+                        HealersNum++; 
+                        if (health > maxHealerHealth)
+                        {
+                            Healer = teamMember;
+                            maxHealerHealth = health;
+                        }
+                        break;
+                    case TeamRoles.DD:
+                        DDs[DDsNum] = teamMember;
+                        DDsNum++;
+                        if (health > maxDdHealth)
+                        {
+                            maxDdHealth = health;
+                            SturdiestDD = teamMember;
+                        }
+                        else if (health < minDdHealth)
+                        {
+                            minDdHealth = health;
+                            WeakestDD = teamMember;
+                        }
+                        break;
+                }
+            }
+
+            if (teamCount == 2)
+                goto RegenerateCacheFinish;
+
+            teamMember = members[2];
+            if (teamMember.EntityId == selfId)
+            {
+                Player = teamMember;
+            }
+            else
+            {
+                var tmEntity = teamMember.Entity;
+
+                var health = tmEntity.Character.AttribsBasic.MaxHealth;
+
+                if (health > maxHealth)
+                {
+                    maxHealth = health;
+                    Sturdiest = teamMember;
+                }
+                else if (health < minHealth)
+                {
+                    minHealth = health;
+                    Weakest = teamMember;
+                }
+
+                if (teamMember.EntityId == leaderId)
+                {
+                    Leader = teamMember;
+                }
+
+                var role = tmEntity.GetTeamRole();
+                switch (role)
+                {
+                    case TeamRoles.Tank:
+                        Tanks[TanksNum] = teamMember;
+                        TanksNum++; 
+                        if (health > maxTankHealth)
+                        {
+                            Tank = teamMember;
+                            maxTankHealth = health;
+                        }
+                        break;
+                    case TeamRoles.Healer:
+                        Healers[HealersNum] = teamMember;
+                        HealersNum++; 
+                        if (health > maxHealerHealth)
+                        {
+                            Healer = teamMember;
+                            maxHealerHealth = health;
+                        }
+                        break;
+                    case TeamRoles.DD:
+                        DDs[DDsNum] = teamMember;
+                        DDsNum++;
+                        if (health > maxDdHealth)
+                        {
+                            maxDdHealth = health;
+                            SturdiestDD = teamMember;
+                        }
+                        else if (health < minDdHealth)
+                        {
+                            minDdHealth = health;
+                            WeakestDD = teamMember;
+                        }
+                        break;
+                }
+            }
+
+            if (teamCount == 3)
+                goto RegenerateCacheFinish;
+
+            teamMember = members[3];
+            if (teamMember.EntityId == selfId)
+            {
+                Player = teamMember;
+            }
+            else
+            {
+                var tmEntity = teamMember.Entity;
+
+                var health = tmEntity.Character.AttribsBasic.MaxHealth;
+
+                if (health > maxHealth)
+                {
+                    maxHealth = health;
+                    Sturdiest = teamMember;
+                }
+                else if (health < minHealth)
+                {
+                    minHealth = health;
+                    Weakest = teamMember;
+                }
+
+                if (teamMember.EntityId == leaderId)
+                {
+                    Leader = teamMember;
+                }
+
+                var role = tmEntity.GetTeamRole();
+                switch (role)
+                {
+                    case TeamRoles.Tank:
+                        Tanks[TanksNum] = teamMember;
+                        TanksNum++; 
+                        if (health > maxTankHealth)
+                        {
+                            Tank = teamMember;
+                            maxTankHealth = health;
+                        }
+                        break;
+                    case TeamRoles.Healer:
+                        Healers[HealersNum] = teamMember;
+                        HealersNum++; 
+                        if (health > maxHealerHealth)
+                        {
+                            Healer = teamMember;
+                            maxHealerHealth = health;
+                        }
+                        break;
+                    case TeamRoles.DD:
+                        DDs[DDsNum] = teamMember;
+                        DDsNum++;
+                        if (health > maxDdHealth)
+                        {
+                            maxDdHealth = health;
+                            SturdiestDD = teamMember;
+                        }
+                        else if (health < minDdHealth)
+                        {
+                            minDdHealth = health;
+                            WeakestDD = teamMember;
+                        }
+                        break;
+                }
+            }
+
+            if (teamCount == 4)
+                goto RegenerateCacheFinish;
+
+            teamMember = members[4];
+            if (teamMember.EntityId == selfId)
+            {
+                Player = teamMember;
+            }
+            else
+            {
+                var tmEntity = teamMember.Entity;
+
+                var health = tmEntity.Character.AttribsBasic.MaxHealth;
+
+                if (health > maxHealth)
+                {
+                    //maxHealth = health;
+                    Sturdiest = teamMember;
+                }
+                else if (health < minHealth)
+                {
+                    //minHealth = health;
+                    Weakest = teamMember;
+                }
+
+                if (teamMember.EntityId == leaderId)
+                {
+                    Leader = teamMember;
+                }
+
+                var role = tmEntity.GetTeamRole();
+                switch (role)
+                {
+                    case TeamRoles.Tank:
+                        Tanks[TanksNum] = teamMember;
+                        TanksNum++; 
+                        if (health > maxTankHealth)
+                        {
+                            Tank = teamMember;
+                            //maxTankHealth = health;
+                        }
+                        break;
+                    case TeamRoles.Healer:
+                        Healers[HealersNum] = teamMember;
+                        HealersNum++; 
+                        if (health > maxHealerHealth)
+                        {
+                            Healer = teamMember;
+                            maxHealerHealth = health;
+                        }
+                        break;
+                    case TeamRoles.DD:
+                        DDs[DDsNum] = teamMember;
+                        DDsNum++;
+                        if (health > maxDdHealth)
+                        {
+                            //maxDdHealth = health;
+                            SturdiestDD = teamMember;
+                        }
+                        else if (health < minDdHealth)
+                        {
+                            //minDdHealth = health;
+                            WeakestDD = teamMember;
+                        }
+                        break;
+                }
+            }
+
+
+            RegenerateCacheFinish:
+            cacheTimeout.ChangeTime(player.InCombat 
+                ? EntityTools.EntityTools.Config.EntityCache.CombatCacheTime
+                : EntityTools.EntityTools.Config.EntityCache.GlobalCacheTime);
+            return CachedTeamId = team.TeamId;
+#else
+            // Разворачиваем цикл в обратном порядке
+            var members = team.Team.Members;
+            var teamCount = members.Count;
+
+            switch (teamCount)
+            {
+                case 5: goto TeamMember_4;
+                case 4: goto TeamMember_3;
+                case 3: goto TeamMember_2;
+                case 2: goto TeamMember_1;
+                case 1: goto TeamMember_0;
+                default: goto RegenerateCacheFinish;
+            }
+
+            TeamMember_4:
+            var teamMember = members[4];
+            if (teamMember.EntityId == selfId)
+            {
+                Player = teamMember;
+            }
+            else
+            {
+                var tmEntity = teamMember.Entity;
+
+                var health = tmEntity.Character.AttribsBasic.MaxHealth;
+
+                if (health > maxHealth)
+                {
+                    maxHealth = health;
+                    Sturdiest = teamMember;
+                }
+                else if (health < minHealth)
+                {
+                    minHealth = health;
+                    Weakest = teamMember;
+                }
+
+                if (teamMember.EntityId == leaderId)
+                {
+                    Leader = teamMember;
+                }
+
+                var role = tmEntity.GetTeamRole();
+                switch (role)
+                {
+                    case TeamRoles.Tank:
+                        Tanks[TanksNum] = teamMember;
+                        TanksNum++;
+                        if (health > maxTankHealth)
+                        {
+                            Tank = teamMember;
+                            maxTankHealth = health;
+                        }
+                        break;
+                    case TeamRoles.Healer:
+                        Healers[HealersNum] = teamMember;
+                        HealersNum++;
+                        if (health > maxHealerHealth)
+                        {
+                            Healer = teamMember;
+                            maxHealerHealth = health;
+                        }
+                        break;
+                    //case TeamRoles.DD:
+                    //case TeamRoles.Unknown:
+                    default:
+                        DDs[DDsNum] = teamMember;
+                        DDsNum++;
+                        if (health > maxDdHealth)
+                        {
+                            maxDdHealth = health;
+                            SturdiestDD = teamMember;
+                        }
+                        else if (health < minDdHealth)
+                        {
+                            minDdHealth = health;
+                            WeakestDD = teamMember;
+                        }
+                        break;
+                }
+            }
+
+            TeamMember_3:
+            teamMember = members[3];
+            if (teamMember.EntityId == selfId)
+            {
+                Player = teamMember;
+            }
+            else
+            {
+                var tmEntity = teamMember.Entity;
+
+                var health = tmEntity.Character.AttribsBasic.MaxHealth;
+
+                if (health > maxHealth)
+                {
+                    maxHealth = health;
+                    Sturdiest = teamMember;
+                }
+                else if (health < minHealth)
+                {
+                    minHealth = health;
+                    Weakest = teamMember;
+                }
+
+                if (teamMember.EntityId == leaderId)
+                {
+                    Leader = teamMember;
+                }
+
+                var role = tmEntity.GetTeamRole();
+                switch (role)
+                {
+                    case TeamRoles.Tank:
+                        Tanks[TanksNum] = teamMember;
+                        TanksNum++;
+                        if (health > maxTankHealth)
+                        {
+                            Tank = teamMember;
+                            maxTankHealth = health;
+                        }
+                        break;
+                    case TeamRoles.Healer:
+                        Healers[HealersNum] = teamMember;
+                        HealersNum++;
+                        if (health > maxHealerHealth)
+                        {
+                            Healer = teamMember;
+                            maxHealerHealth = health;
+                        }
+                        break;
+                    //case TeamRoles.DD:
+                    //case TeamRoles.Unknown:
+                    default:
+                        DDs[DDsNum] = teamMember;
+                        DDsNum++;
+                        if (health > maxDdHealth)
+                        {
+                            maxDdHealth = health;
+                            SturdiestDD = teamMember;
+                        }
+                        else if (health < minDdHealth)
+                        {
+                            minDdHealth = health;
+                            WeakestDD = teamMember;
+                        }
+                        break;
+                }
+            }
+
+            TeamMember_2:
+            teamMember = members[2];
+            if (teamMember.EntityId == selfId)
+            {
+                Player = teamMember;
+            }
+            else
+            {
+                var tmEntity = teamMember.Entity;
+
+                var health = tmEntity.Character.AttribsBasic.MaxHealth;
+
+                if (health > maxHealth)
+                {
+                    maxHealth = health;
+                    Sturdiest = teamMember;
+                }
+                else if (health < minHealth)
+                {
+                    minHealth = health;
+                    Weakest = teamMember;
+                }
+
+                if (teamMember.EntityId == leaderId)
+                {
+                    Leader = teamMember;
+                }
+
+                var role = tmEntity.GetTeamRole();
+                switch (role)
+                {
+                    case TeamRoles.Tank:
+                        Tanks[TanksNum] = teamMember;
+                        TanksNum++;
+                        if (health > maxTankHealth)
+                        {
+                            Tank = teamMember;
+                            maxTankHealth = health;
+                        }
+                        break;
+                    case TeamRoles.Healer:
+                        Healers[HealersNum] = teamMember;
+                        HealersNum++;
+                        if (health > maxHealerHealth)
+                        {
+                            Healer = teamMember;
+                            maxHealerHealth = health;
+                        }
+                        break;
+                    //case TeamRoles.DD:
+                    //case TeamRoles.Unknown:
+                    default:
+                        DDs[DDsNum] = teamMember;
+                        DDsNum++;
+                        if (health > maxDdHealth)
+                        {
+                            maxDdHealth = health;
+                            SturdiestDD = teamMember;
+                        }
+                        else if (health < minDdHealth)
+                        {
+                            minDdHealth = health;
+                            WeakestDD = teamMember;
+                        }
+                        break;
+                }
+            }
+
+            TeamMember_1:
+            teamMember = members[1];
+            if (teamMember.EntityId == selfId)
+            {
+                Player = teamMember;
+            }
+            else
+            {
+                var tmEntity = teamMember.Entity;
+
+                var health = tmEntity.Character.AttribsBasic.MaxHealth;
+
+                if (health > maxHealth)
+                {
+                    maxHealth = health;
+                    Sturdiest = teamMember;
+                }
+                else if (health < minHealth)
+                {
+                    minHealth = health;
+                    Weakest = teamMember;
+                }
+
+                if (teamMember.EntityId == leaderId)
+                {
+                    Leader = teamMember;
+                }
+
+                var role = tmEntity.GetTeamRole();
+                switch (role)
+                {
+                    case TeamRoles.Tank:
+                        Tanks[TanksNum] = teamMember;
+                        TanksNum++;
+                        if (health > maxTankHealth)
+                        {
+                            Tank = teamMember;
+                            maxTankHealth = health;
+                        }
+                        break;
+                    case TeamRoles.Healer:
+                        Healers[HealersNum] = teamMember;
+                        HealersNum++;
+                        if (health > maxHealerHealth)
+                        {
+                            Healer = teamMember;
+                            maxHealerHealth = health;
+                        }
+                        break;
+                    //case TeamRoles.DD:
+                    //case TeamRoles.Unknown:
+                    default:
+                        DDs[DDsNum] = teamMember;
+                        DDsNum++;
+                        if (health > maxDdHealth)
+                        {
+                            maxDdHealth = health;
+                            SturdiestDD = teamMember;
+                        }
+                        else if (health < minDdHealth)
+                        {
+                            minDdHealth = health;
+                            WeakestDD = teamMember;
+                        }
+                        break;
+                }
+            }
+            
+            TeamMember_0:
+            teamMember = members[0];
+            if (teamMember.EntityId == selfId)
+            {
+                Player = teamMember;
+            }
+            else
+            {
+                var tmEntity = teamMember.Entity;
+
+                var health = tmEntity.Character.AttribsBasic.MaxHealth;
+
+                if (health > maxHealth)
+                {
+                    //maxHealth = health;
+                    Sturdiest = teamMember;
+                }
+                else if (health < minHealth)
+                {
+                    //minHealth = health;
+                    Weakest = teamMember;
+                }
+
+                if (teamMember.EntityId == leaderId)
+                {
+                    Leader = teamMember;
+                }
+
+                var role = tmEntity.GetTeamRole();
+                switch (role)
+                {
+                    case TeamRoles.Tank:
+                        Tanks[TanksNum] = teamMember;
+                        TanksNum++;
+                        if (health > maxTankHealth)
+                        {
+                            Tank = teamMember;
+                            //maxTankHealth = health;
+                        }
+                        break;
+                    case TeamRoles.Healer:
+                        Healers[HealersNum] = teamMember;
+                        HealersNum++;
+                        if (health > maxHealerHealth)
+                        {
+                            Healer = teamMember;
+                            //maxHealerHealth = health;
+                        }
+                        break;
+                    //case TeamRoles.DD:
+                    //case TeamRoles.Unknown:
+                    default:
+                        DDs[DDsNum] = teamMember;
+                        DDsNum++;
+                        if (health > maxDdHealth)
+                        {
+                            SturdiestDD = teamMember;
+                            //maxDdHealth = health;
+                        }
+                        else if (health < minDdHealth)
+                        {
+                            WeakestDD = teamMember;
+                            //minDdHealth = health;
+                        }
+                        break;
+                }
+            }
+
+            RegenerateCacheFinish:
+            cacheTimeout.ChangeTime(player.InCombat
+                ? EntityTools.EntityTools.Config.EntityCache.CombatCacheTime
+                : EntityTools.EntityTools.Config.EntityCache.GlobalCacheTime);
+            return CachedTeamId = team.TeamId;
 #endif
+        }
+
+        /// <summary>
+        /// Проверка валидности кэша по идентификатору группы
+        /// </summary>
+        /// <returns></returns>
+        private static bool CacheIsValid()
+        {
+            if (Player is null || CachedTeamId == 0)
+                return false;
+
+            var player = EntityManager.LocalPlayer;
+            var team = player.PlayerTeam;
+
+            if (!team.IsInTeam)
+                return false;
+
+            if (CachedTeamId != team.TeamId)
+                return false;
+
+            return true;
+        }
+
+        private static bool CheckTeammate(TeamMember teammate)
+        {
+            if (teammate == null || !teammate.IsValid)
+                return false;
+
+            if (Player is null || CachedTeamId == 0)
+                return false;
+
+            if (Player.EntityId != EntityManager.LocalPlayer.ContainerId)
+                return false;
+
+            return Player.MapInstanceNumber == teammate.MapInstanceNumber
+                   && Player.MapName == teammate.MapName
+                   && Player.Entity.RegionInternalName == teammate.Entity.RegionInternalName;
+        }
         #endregion
 
 
@@ -1397,5 +2021,152 @@ namespace EntityCore.Tools
             return target;
         }
         #endregion
+
+        /// <summary>
+        /// Вспомогательный класс для отслеживания внутреннего состояния <seealso cref="PlayerTeamHelper"/>
+        /// </summary>
+        public class Monitor
+        {
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            public object PlayerTarget => new SimpleEntityWrapper(AstralAccessors.Logic.UCC.Core.CurrentTarget);
+
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            [Category("Roles")]
+            public object Tank => new SimpleEntityWrapper(GetTank());
+
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            [Category("Roles")]
+            public object Healer => new SimpleEntityWrapper(GetHealer());
+
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            [Category("Endurance")]
+            public object Sturdiest => new SimpleEntityWrapper(GetSturdiest());
+
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            [Category("Endurance")]
+            public object SturdiestDD => new SimpleEntityWrapper(GetSturdiestDamageDealer());
+
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            [Category("Endurance")]
+            public object Weakest => new SimpleEntityWrapper(GetWeakest());
+
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            [Category("Endurance")]
+            public object WeakestDD => new SimpleEntityWrapper(GetWeakestDamageDealer());
+
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            [Category("Endurance")]
+            public object MostInjured => new SimpleEntityWrapper(GetMostInjured());
+
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            [Category("Endurance")]
+            public object MostInjuredDD => new SimpleEntityWrapper(GetMostInjuredDamageDealer());
+
+            [Category("Team")]
+            public object TeamId => CachedTeamId;
+
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            [Category("Team")]
+            public object Leader => new SimpleEntityWrapper(GetLeader());
+            
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            [Category("Team")]
+            public object Teammate_0
+            {
+                get
+                {
+                    var team = EntityManager.LocalPlayer.PlayerTeam.Team;
+                    return new SimpleEntityWrapper(team.MembersCount > 0 ? team.Members[0] : null);
+                }
+            }
+
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            [Category("Team")]
+            public object Teammate_1
+            {
+                get
+                {
+                    var team = EntityManager.LocalPlayer.PlayerTeam.Team;
+                    return new SimpleEntityWrapper(team.MembersCount > 1 ? team.Members[1] : null);
+                }
+            }
+
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            [Category("Team")]
+            public object Teammate_2
+            {
+                get
+                {
+                    var team = EntityManager.LocalPlayer.PlayerTeam.Team;
+                    return new SimpleEntityWrapper(team.MembersCount > 2 ? team.Members[2] : null);
+                }
+            }
+
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            [Category("Team")]
+            public object Teammate_3
+            {
+                get
+                {
+                    var team = EntityManager.LocalPlayer.PlayerTeam.Team;
+                    return new SimpleEntityWrapper(team.MembersCount > 3 ? team.Members[3] : null);
+                }
+            }
+
+            [TypeConverter(typeof(ExpandableObjectConverter))]
+            [Category("Team")]
+            public object Teammate_4
+            {
+                get
+                {
+                    var team = EntityManager.LocalPlayer.PlayerTeam.Team;
+                    return new SimpleEntityWrapper(team.MembersCount > 4 ? team.Members[4] : null);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Роль персонажей в группе
+    /// </summary>
+    public enum TeamRoles : uint
+    {
+        /// <summary>
+        /// Неизвестный тип
+        /// </summary>
+        Unknown = 0,
+
+        /// <summary>
+        /// Танк
+        /// </summary>
+        Tank = PlayerParagonType.Barbarian_Sentinel |
+               PlayerParagonType.Fighter_Vanguard |
+               PlayerParagonType.Paladin_Justicar,
+
+        /// <summary>
+        /// Целитель
+        /// </summary>
+        Healer = PlayerParagonType.Cleric_Devout |
+                 PlayerParagonType.Warlock_SoulWeaver |
+                 PlayerParagonType.Paladin_OathKeeper |
+                 PlayerParagonType.Bard_Healer,
+
+        /// <summary>
+        /// Дамагер
+        /// </summary>
+        DD = PlayerParagonType.Ranger_Hunter |
+             PlayerParagonType.Ranger_Warden |
+             PlayerParagonType.Ranger |
+             PlayerParagonType.Wizard_Arcanist |
+             PlayerParagonType.Wizard_Thaumaturge |
+             PlayerParagonType.Wizard |
+             PlayerParagonType.Cleric_Arbiter |
+             PlayerParagonType.Barbarian_BladeMaster |
+             PlayerParagonType.Fighter_Dreadnought |
+             PlayerParagonType.Warlock_HellBringer |
+             PlayerParagonType.Rogue_Assassin |
+             PlayerParagonType.Rogue_WhisperKnife |
+             PlayerParagonType.Rogue |
+             PlayerParagonType.Bard_DD
     }
 }

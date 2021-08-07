@@ -94,8 +94,8 @@
     <Compile Include="Accessors\AstralAccessors.General.cs" />
     <Compile Include="AMClient\Client.cs" />
     <Compile Include="Classes\Enums.cs" />
-    <Compile Include="Classes\UCC\UccTargetSelector.cs" />
-    <Compile Include="Classes\UCC\UccTargetProcessor.cs" />
+    <Compile Include="Classes\Targeting\TargetSelector.cs" />
+    <Compile Include="Classes\Targeting\TargetProcessor.cs" />
     <Compile Include="Harmony\Extras\DelegateTypeFactory.cs" />
     <Compile Include="Harmony\Extras\FastAccess.cs" />
     <Compile Include="Harmony\Extras\MethodInvoker.cs" />

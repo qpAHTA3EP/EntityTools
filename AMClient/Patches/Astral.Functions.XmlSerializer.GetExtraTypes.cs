@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using AcTp0Tools.Classes.UCC;
+using AcTp0Tools.Classes.Targeting;
 using Astral.Classes.SkillTrain;
 using Astral.Controllers;
 using Astral.Logic.UCC.Classes;
@@ -96,8 +96,8 @@ namespace AcTp0Tools.Patches
         
         static readonly Type tUccAction = typeof(UCCAction);
         static readonly Type tUccCondition = typeof(UCCCondition);
-        static readonly Type tUccTargetSelector = typeof(UccTargetSelector);
-        static readonly Type tUccTargetProcessor = typeof(UccTargetProcessor);
+        static readonly Type tUccTargetSelector = typeof(TargetSelector);
+        static readonly Type tUccTargetProcessor = typeof(TargetProcessor);
         static readonly Type tTargetPriorityEntry = typeof(TargetPriorityEntry);
 
 
