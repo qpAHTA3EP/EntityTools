@@ -16,6 +16,7 @@ using System.Windows.Forms;
 using System.Xml.Serialization;
 using Astral;
 using DevExpress.XtraEditors;
+using Action = System.Action;
 
 namespace AcTp0Tools
 {
@@ -806,16 +807,63 @@ namespace AcTp0Tools
                     }
                 }
             }
+
 #if false
             public static class Entrypoint
             {
+#if false
                 public static readonly Func<object, Action> OnLoad = typeof(Astral.Quester.Entrypoint).GetAction("OnLoad");
                 public static readonly Func<object, Action> OnUnload = typeof(Astral.Quester.Entrypoint).GetAction("OnUnload");
                 public static readonly Func<object, Action<GraphicsNW>> OnMapDraw = typeof(Astral.Quester.Entrypoint).GetAction<GraphicsNW>("OnMapDraw");
                 public static readonly Func<object, Action<bool>> Start = typeof(Astral.Quester.Entrypoint).GetAction<bool>("Start");
                 public static readonly Func<object, Action> Stop = typeof(Astral.Quester.Entrypoint).GetAction("Stop");
-                public static readonly Func<object, Action> TooMuchStuckReaction = typeof(Astral.Quester.Entrypoint).GetAction("TooMuchStuckReaction");
-            } 
+                public static readonly Func<object, Action> TooMuchStuckReaction = typeof(Astral.Quester.Entrypoint).GetAction("TooMuchStuckReaction"); 
+#endif
+                public delegate void LoadRoleEvent(Astral.Quester.Entrypoint entrypoint);
+
+                private static MethodInfo originalOnLoadMethod;
+                private static MethodInfo prefixOnLoadMethod;
+                private static MethodInfo postfixOnLoadMethod;
+
+                /// <summary>
+                /// Событие, вызываемое перед загрузкой квестера
+                /// </summary>
+                public static event LoadRoleEvent BeforeLoadRole;
+
+                private static bool prefixOnLoad(Astral.Quester.Entrypoint __instance)
+                {
+                    BeforeLoadRole?.Invoke(__instance);
+                    return true;
+                }
+
+                /// <summary>
+                /// Событие, вызываемое после загрузки квестера
+                /// </summary>
+                public static event LoadRoleEvent AfterLoadRole;
+
+                private static bool postfixOnLoad(Astral.Quester.Entrypoint __instance)
+                {
+                    AfterLoadRole?.Invoke(__instance);
+                    return true;
+                }
+
+                static Entrypoint()
+                {
+                    var tEntrypoint = typeof(Astral.Quester.Entrypoint);
+                    var tPatch = typeof(Entrypoint);
+
+                    originalOnLoadMethod = AccessTools.Method(tEntrypoint, "OnLoad");
+                    prefixOnLoadMethod = AccessTools.Method(tEntrypoint, nameof(prefixOnLoad));
+                    postfixOnLoadMethod = AccessTools.Method(tEntrypoint, nameof(postfixOnLoad));
+
+                    if (originalOnLoadMethod != null
+                        && prefixOnLoadMethod != null
+                        && postfixOnLoadMethod != null)
+                    {
+                        AcTp0Patcher.Harmony.Patch(originalOnLoadMethod, new HarmonyMethod(prefixOnLoadMethod), new HarmonyMethod(postfixOnLoadMethod));
+                    }
+                }
+            }  
 #endif
 
             public static class Forms

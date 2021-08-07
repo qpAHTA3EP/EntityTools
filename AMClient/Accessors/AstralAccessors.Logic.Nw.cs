@@ -31,6 +31,8 @@ namespace AcTp0Tools
                 {
                     static readonly Action<bool> abortCombat = typeof(Astral.Logic.NW.Combats).GetStaticAction<bool>(nameof(AbortCombat));
 
+                    public delegate bool AbortCombatConditionDelegate(ref Entity entity);
+
                     /// <summary>
                     /// Прерывание потока, управляющего персонажем в режиме боя
                     /// </summary>
@@ -51,7 +53,7 @@ namespace AcTp0Tools
                     }
                     private static readonly StaticFieldAccessor<Func<List<string>>> blAttackersList;
 
-                    public static void SetAbortCombatCondition(Func<Entity, bool> cond, Func<bool> removeCond, int resetTime = 0)
+                    public static void SetAbortCombatCondition(AbortCombatConditionDelegate cond, Func<bool> removeCond, int resetTime = 0)
                     {
                         abortCombatCondition = cond;
                         shouldRemoveAbortCombatCondition = removeCond;
@@ -71,7 +73,7 @@ namespace AcTp0Tools
 
                         if (abortCombatCondition is null) return true;
 
-                        if (abortCombatCondition(target))
+                        if (abortCombatCondition(ref target))
                         {
                             Quester.FSM.States.Combat.SetIgnoreCombat(true);
                             return false;
@@ -79,7 +81,7 @@ namespace AcTp0Tools
                         if (target != null)
                         {
                             var trg = new Entity(target.Pointer);
-                            breakCond += () => abortCombatCondition(trg);
+                            breakCond += () => abortCombatCondition(ref trg);
                         }
                         return true;
                     }
@@ -99,7 +101,7 @@ namespace AcTp0Tools
                     /// <summary>
                     /// Условие прерывания боя
                     /// </summary>
-                    private static Func<Entity, bool> abortCombatCondition;
+                    private static AbortCombatConditionDelegate abortCombatCondition;
                     private static Func<bool> shouldRemoveAbortCombatCondition;
 
                     /// <summary>
@@ -118,7 +120,7 @@ namespace AcTp0Tools
                         string abortCombatConditionStr = string.Concat("AbortCombatCondition: ", Environment.NewLine, 
                                              '\t', subscriber.GetType().FullName, '.', abortCombatCondition.Method.Name, Environment.NewLine,
                                              "\t\t(", subscriber.ToString(), ") ", Environment.NewLine,
-                                             "\tResult = ", abortCombatCondition(currentTarget));
+                                             "\tResult = ", abortCombatCondition(ref currentTarget));
                         string shouldRemoveAbortCombatConditionStr;
                         if (shouldRemoveAbortCombatCondition != null)
                         {
