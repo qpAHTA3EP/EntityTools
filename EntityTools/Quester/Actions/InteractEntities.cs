@@ -271,6 +271,7 @@ namespace EntityTools.Quester.Actions
 #else
         [Browsable(false)]
 #endif
+        [NotifyParentProperty(true)]
         public CustomRegionCollection CustomRegionNames
         {
             get => _customRegionNames;
@@ -511,7 +512,7 @@ namespace EntityTools.Quester.Actions
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
         [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
-        public string TestInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>";
+        public string TestInfo => "Нажми на кнопку '...' чтобы увидеть больше =>";
 #endif
 
 

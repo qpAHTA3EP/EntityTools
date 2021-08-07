@@ -236,6 +236,7 @@ namespace EntityCore.UCC.Actions
         }
         internal bool itemIdRegexComparer(InventorySlot iSlot)
         {
+            //TODO Использовать предкомпилированный Regex
             return Regex.IsMatch(iSlot.Item.ItemDef.InternalName, @this._itemId);
         }
         #endregion

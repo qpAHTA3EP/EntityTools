@@ -261,6 +261,7 @@
     <Compile Include="Patches\ComplexPatch_Navigation.cs" />
     <Compile Include="Patches\Mapper\ComplexPatch_Mapper.cs" />
     <Compile Include="Patches\Quester\ComplexPatch_Quester_UccEditing.cs" />
+    <Compile Include="Quester\Actions\MoveToTeammate.cs" />
     <Compile Include="Quester\Actions\RemoveIgnoredFoes.cs" />
     <Compile Include="Quester\Actions\AddIgnoredFoes.cs" />
     <Compile Include="Quester\Actions\TurnInMissionExt.cs" />
@@ -310,7 +311,7 @@
     <Compile Include="Quester\Actions\Deprecated\InteractEntity.cs" />
     <Compile Include="Quester\Actions\InteractEntities.cs" />
     <Compile Include="Quester\Actions\ChangePluginSettings.cs" />
-    <Compile Include="Quester\Actions\MoveToLeader.cs" />
+    <Compile Include="Quester\Actions\Deprecated\MoveToLeader.cs" />
     <Compile Include="Quester\Actions\PickUpMissionExt.cs" />
     <Compile Include="Core\Interfaces\IQuesterConditionEngine.cs" />
     <Compile Include="Quester\Conditions\Deprecated\CheckCampaignTask.cs" />
@@ -353,9 +354,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Patches\Mapper\MapperSettings.cs" />
-    <Compile Include="Tools\Combats\IgnoredFoe\IgnoredFoesContainer.cs" />
-    <Compile Include="Tools\Combats\IgnoredFoe\IgnoredFoesCore.cs" />
-    <Compile Include="Tools\Combats\IgnoredFoe\IgnoredFoesEntry.cs" />
+    <Compile Include="Tools\Combats\IgnoredFoes\IgnoredFoesContainer.cs" />
+    <Compile Include="Tools\Combats\IgnoredFoes\IgnoredFoesCore.cs" />
+    <Compile Include="Tools\Combats\IgnoredFoes\IgnoredFoesEntry.cs" />
     <Compile Include="Tools\CustomRegions\CustomRegionEntry.cs" />
     <Compile Include="Tools\CustomRegions\CustomRegionExtentions.cs" />
     <Compile Include="Tools\CustomRegions\CustomRegionCollection.cs" />
@@ -417,14 +418,14 @@
     <Compile Include="Editors\CustomRegionListEditor.cs" />
     <Compile Include="Editors\ShardEditor.cs" />
     <Compile Include="Tools\Export\MissionsExportInfo.cs" />
-    <Compile Include="Tools\ParagonTools.cs" />
     <Compile Include="Settings\PluginSettingsBase.cs" />
     <Compile Include="Tools\Classes.cs" />
     <Compile Include="Tools\SysInformer.cs" />
+    <Compile Include="Tools\Targeting\PlayerTeamMonitor.cs" />
     <Compile Include="Tools\XmlColor.cs" />
     <Compile Include="UCC\Actions\ChangeTarget.cs" />
-    <Compile Include="UCC\Actions\TargetSelectors\Enums.cs" />
-    <Compile Include="UCC\Actions\TargetSelectors\TeammateSupport.cs" />
+    <Compile Include="Tools\Targeting\Enums.cs" />
+    <Compile Include="Tools\Targeting\TeammateSupport.cs" />
     <Compile Include="UCC\IUccConditionPack.cs" />
     <Compile Include="UCC\Enums.cs" />
     <Compile Include="UCC\Extensions\UCCActionExtention.cs" />
@@ -441,7 +442,7 @@
     <Compile Include="UCC\Actions\ExecuteSpecificPower.cs" />
     <Compile Include="UCC\Actions\SpecializedUCCAction.cs" />
     <Compile Include="UCC\Conditions\UCCGenericCondition.cs" />
-    <Compile Include="UCC\Actions\TargetSelectors\EntityTarget.cs" />
+    <Compile Include="Tools\Targeting\EntityTarget.cs" />
     <Compile Include="UCC\UCCTools.cs" />
     <Compile Include="UCC\Actions\UseItemSpecial.cs" />
   </ItemGroup>

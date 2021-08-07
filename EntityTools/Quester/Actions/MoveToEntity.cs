@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Threading;
-using System.Xml.Serialization;
-using Astral.Classes.ItemFilter;
+﻿using Astral.Classes.ItemFilter;
 using Astral.Logic.Classes.Map;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
@@ -12,6 +6,11 @@ using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Tools.CustomRegions;
 using MyNW.Classes;
+using System;
+using System.ComponentModel;
+using System.Drawing.Design;
+using System.Runtime.CompilerServices;
+using System.Xml.Serialization;
 using Action = Astral.Quester.Classes.Action;
 
 namespace EntityTools.Quester.Actions
@@ -35,11 +34,7 @@ namespace EntityTools.Quester.Actions
                 if (_entityId != value)
                 {
                     _entityId = value;
-#if false
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityID))); 
-#else
-                    Engine.OnPropertyChanged(this, nameof(EntityID));
-#endif
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -61,11 +56,7 @@ namespace EntityTools.Quester.Actions
                 if (_entityIdType != value)
                 {
                     _entityIdType = value;
-#if false
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityIdType))); 
-#else
-                    Engine.OnPropertyChanged(this, nameof(EntityIdType));
-#endif
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -85,11 +76,7 @@ namespace EntityTools.Quester.Actions
                 if (_entityNameType != value)
                 {
                     _entityNameType = value;
-#if false
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityNameType))); 
-#else
-                    Engine.OnPropertyChanged(this, nameof(EntityNameType));
-#endif
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -110,11 +97,7 @@ namespace EntityTools.Quester.Actions
                 if (_regionCheck != value)
                 {
                     _regionCheck = value;
-#if false
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RegionCheck))); 
-#else
-                    Engine.OnPropertyChanged(this, nameof(RegionCheck));
-#endif
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -132,14 +115,10 @@ namespace EntityTools.Quester.Actions
         {
             get => _healthCheck; set
             {
-                if (_healthCheck = value)
+                if (_healthCheck != value)
                 {
                     _healthCheck = value;
-#if false
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HealthCheck))); 
-#else
-                    Engine.OnPropertyChanged(this, nameof(HealthCheck));
-#endif
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -159,11 +138,7 @@ namespace EntityTools.Quester.Actions
                 if (_holdTargetEntity != value)
                 {
                     _holdTargetEntity = value;
-#if false
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HoldTargetEntity))); 
-#else
-                    Engine.OnPropertyChanged(this, nameof(HoldTargetEntity));
-#endif
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -180,14 +155,10 @@ namespace EntityTools.Quester.Actions
         {
             get => _reactionRange; set
             {
-                if (_reactionRange != value)
+                if (Math.Abs(_reactionRange - value) > 0.1f)
                 {
                     _reactionRange = value;
-#if false
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionRange))); 
-#else
-                    Engine.OnPropertyChanged(this, nameof(ReactionRange));
-#endif
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -204,14 +175,10 @@ namespace EntityTools.Quester.Actions
         {
             get => _reactionZRange; set
             {
-                if (_reactionZRange != value)
+                if (Math.Abs(_reactionZRange - value) > 0.1f)
                 {
                     _reactionZRange = value;
-#if false
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionZRange))); 
-#else
-                    Engine.OnPropertyChanged(this, nameof(ReactionZRange));
-#endif
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -225,6 +192,7 @@ namespace EntityTools.Quester.Actions
         [Browsable(false)]
 #endif
         [XmlElement("CustomRegionNames")]
+        [NotifyParentProperty(true)]
         public CustomRegionCollection CustomRegionNames
         {
             get => _customRegionNames;
@@ -233,11 +201,7 @@ namespace EntityTools.Quester.Actions
                 if (_customRegionNames != value)
                 {
                     _customRegionNames = value;
-#if false
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionNames))); 
-#else
-                    Engine.OnPropertyChanged(this, nameof(CustomRegionNames));
-#endif
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -256,14 +220,10 @@ namespace EntityTools.Quester.Actions
         {
             get => _distance; set
             {
-                if (_distance != value)
+                if (Math.Abs(_distance - value) > 0.1f)
                 {
                     _distance = value;
-#if false
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Distance))); 
-#else
-                    Engine.OnPropertyChanged(this, nameof(Distance));
-#endif
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -282,11 +242,7 @@ namespace EntityTools.Quester.Actions
                 if (_ignoreCombat != value)
                 {
                     _ignoreCombat = value;
-#if false
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IgnoreCombat))); 
-#else
-                    Engine.OnPropertyChanged(this, nameof(IgnoreCombat));
-#endif
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -307,11 +263,7 @@ namespace EntityTools.Quester.Actions
                 if (_abortCombatDistance != value)
                 {
                     _abortCombatDistance = value;
-#if false
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AbortCombatDistance))); 
-#else
-                    Engine.OnPropertyChanged(this, nameof(AbortCombatDistance));
-#endif
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -331,15 +283,33 @@ namespace EntityTools.Quester.Actions
                 if (_stopOnApproached != value)
                 {
                     _stopOnApproached = value;
-#if false
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StopOnApproached))); 
-#else
-                    Engine.OnPropertyChanged(this, nameof(StopOnApproached));
-#endif
+                    NotifyPropertyChanged();
                 }
             }
         }
         internal bool _stopOnApproached;
+
+#if false
+#if DEVELOPER
+        [Description("True: Complete an action when the Entity is closer than 'Distance'\n" +
+                     "False: Follow an Entity regardless of its distance")]
+        [Category("Interruptions")]
+#else
+        [Browsable(false)]
+#endif
+        public bool StopOnEntityAbsent
+        {
+            get => _stopOnEntityAbsent; set
+            {
+                if (_stopOnEntityAbsent != value)
+                {
+                    _stopOnEntityAbsent = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        internal bool _stopOnEntityAbsent; 
+#endif
 
 #if DEVELOPER
         [Description("True: Clear the list of attackers and attack the target Entity when it is approached\n" +
@@ -352,18 +322,16 @@ namespace EntityTools.Quester.Actions
         {
             get => _attackTargetEntity; set
             {
-                if (_attackTargetEntity = value)
+                if (_attackTargetEntity != value)
                 {
                     _attackTargetEntity = value;
-#if false
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AttackTargetEntity))); 
-#else
-                    Engine.OnPropertyChanged(this, nameof(AttackTargetEntity));
-#endif
+                    NotifyPropertyChanged();
                 }
             }
         }
         internal bool _attackTargetEntity = true;
+
+        //TODO Добавить опции IgnoreCombatMinHP, EntitySearchTime
 
 #if DEVELOPER
         [Description("Reset current HotSpot after approaching the target Entity")]
@@ -377,11 +345,7 @@ namespace EntityTools.Quester.Actions
                 if (_resetCurrentHotSpot != value)
                 {
                     _resetCurrentHotSpot = value;
-#if false
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ResetCurrentHotSpot))); 
-#else
-                    Engine.OnPropertyChanged(this, nameof(ResetCurrentHotSpot));
-#endif
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -391,7 +355,7 @@ namespace EntityTools.Quester.Actions
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
         [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
-        public string TestInfo { get; } = @"Нажми на кнопку '...' чтобы увидеть больше =>";
+        public string TestInfo => @"Нажми на кнопку '...' чтобы увидеть больше =>";
 
 #if false
         [XmlIgnore]
@@ -408,6 +372,11 @@ namespace EntityTools.Quester.Actions
 
         #region Взаимодействие с ядром EntityToolsCore
         public event PropertyChangedEventHandler PropertyChanged;
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            Engine.OnPropertyChanged(this, propertyName);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         [XmlIgnore]
         [NonSerialized]

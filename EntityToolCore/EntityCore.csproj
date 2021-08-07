@@ -189,6 +189,7 @@
       <DependentUpon>UIViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="IEntityInfos.cs" />
+    <Compile Include="Quester\Action\MoveToTeammateEngine.cs" />
     <Compile Include="Quester\Action\MoveToEntityEngine.cs" />
     <Compile Include="Quester\Action\TurnInMissionEngine.cs" />
     <Compile Include="Quester\Conditions\CheckGameGUIEngine.cs" />
@@ -219,8 +220,8 @@
     <Compile Include="UCC\Actions\DodgeFromEntityEngine.cs" />
     <Compile Include="UCC\Actions\ExecuteSpecificPowerEngine.cs" />
     <Compile Include="UCC\Actions\UseItemSpecialEngine.cs" />
-    <Compile Include="UCC\Classes\TeammateSupportTargetProcessor.cs" />
-    <Compile Include="UCC\Classes\EntityTargetProcessor.cs" />
+    <Compile Include="Tools\Targeting\TeammateSupportTargetProcessor.cs" />
+    <Compile Include="Tools\Targeting\EntityTargetProcessor.cs" />
     <Compile Include="UCC\Conditions\UCCGameUICheckEngine.cs" />
     <Compile Include="UCC\Conditions\UCCTargetMatchEntityEngine.cs" />
     <Compile Include="UCC\Conditions\UCCEntityCheckEngine.cs" />

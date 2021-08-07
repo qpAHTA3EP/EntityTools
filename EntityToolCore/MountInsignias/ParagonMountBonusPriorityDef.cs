@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
+using EntityTools.Enums;
 
 namespace EntityCore.MountInsignias
 {

@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using EntityTools.Enums;
 
 namespace EntityCore.Forms
 {

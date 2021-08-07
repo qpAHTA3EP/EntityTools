@@ -82,7 +82,7 @@ namespace EntityTools.Quester.Actions
         public override string ActionLabel => string.Concat(GetType().Name, " : ", _foes.Count > 0 ? _foes.Count.ToString() : "All");
         public override string InternalDisplayName => string.Empty;
         public override bool UseHotSpots => false;
-        protected override bool IntenalConditions => _foes.Count > 0;
+        protected override bool IntenalConditions => true;
         protected override Vector3 InternalDestination => Vector3.Empty;
         protected override ActionValidity InternalValidity => Empty.ActionValidity;
         public override void GatherInfos() { }

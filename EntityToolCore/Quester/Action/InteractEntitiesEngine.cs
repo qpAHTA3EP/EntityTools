@@ -1,30 +1,24 @@
-﻿//#define DEBUG_INTERACTENTITIES
-
-using System;
-using System.Threading;
-using Astral.Classes;
+﻿using Astral.Classes;
+using Astral.Logic.Classes.Map;
 using Astral.Logic.NW;
 using EntityCore.Entities;
+using EntityCore.Forms;
+using EntityCore.Tools.Navigation;
+using EntityTools;
+using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
 using EntityTools.Quester.Actions;
 using MyNW.Classes;
 using MyNW.Internals;
-using EntityTools.Core.Interfaces;
-using Astral.Logic.Classes.Map;
-using System.Drawing;
-using static Astral.Quester.Classes.Action;
-using EntityTools;
-using EntityCore.Forms;
-using EntityCore.Tools.Navigation;
+using System;
 using System.ComponentModel;
-using EntityTools.Quester;
+using System.Drawing;
+using System.Threading;
+using static Astral.Quester.Classes.Action;
 
 namespace EntityCore.Quester.Action
 {
     public class InteractEntitiesEngine :  IQuesterActionEngine
-#if IEntityDescriptor
-        , IEntityInfos 
-#endif
     {
         InteractEntities @this;
 
@@ -656,6 +650,18 @@ namespace EntityCore.Quester.Action
 
         #region Вспомогательный инструменты
         /// <summary>
+        /// Флаг настроек вывода расширенной отлаточной информации
+        /// </summary>
+        private bool ExtendedDebugInfo
+        {
+            get
+            {
+                var logConf = EntityTools.EntityTools.Config.Logger;
+                return logConf.QuesterActions.DebugInteractEntities && logConf.Active;
+            }
+        }
+
+        /// <summary>
         /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
         /// </summary>
         public EntityCacheRecordKey EntityKey
@@ -736,74 +742,5 @@ namespace EntityCore.Quester.Action
         private bool _combat;
         private bool _moved;
         #endregion
-
-#if IEntityDescriptor
-        public bool EntityDiagnosticString(out string infoString)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            InternalReset();
-            sb.Append("EntityID: ").AppendLine(@this._entityId);
-            sb.Append("EntityIdType: ").AppendLine(@this._entityIdType.ToString());
-            sb.Append("EntityNameType: ").AppendLine(@this._entityNameType.ToString());
-            sb.Append("EntitySetType: ").AppendLine(@this._entitySetType.ToString());
-            sb.Append("HealthCheck: ").AppendLine(@this._healthCheck.ToString());
-            sb.Append("ReactionRange: ").AppendLine(@this._reactionRange.ToString());
-            sb.Append("ReactionZRange: ").AppendLine(@this._reactionZRange.ToString());
-            sb.Append("RegionCheck: ").AppendLine(@this._regionCheck.ToString());
-            if (@this._customRegionNames != null && @this._customRegionNames.Count > 0)
-            {
-                sb.Append("RegionCheck: {").Append(@this._customRegionNames[0]);
-                for (int i = 1; i < @this._customRegionNames.Count; i++)
-                    sb.Append(", ").Append(@this._customRegionNames[i]);
-                sb.AppendLine("}");
-            }
-            sb.AppendLine();
-
-            var entityKey = EntityKey;
-            var entityCheck = SpecialCheckSelector;
-            // список всех Entity, удовлетворяющих условиям
-            var entities = SearchCached.FindAllEntity(entityKey, entityCheck);
-
-            // Количество Entity, удовлетворяющих условиям
-            if (entities?.Count > 0)
-                sb.Append("Found Entities which matched to ID '" + nameof(@this.EntityID) + '\'').AppendLine(entities.Count.ToString());
-            else sb.Append("Found Entities which matched to ID '" + nameof(@this.EntityID) + "': 0");
-            sb.AppendLine();
-
-            target = SearchCached.FindClosestEntity(entityKey, entityCheck);
-
-            if (target != null && target.IsValid)
-            {
-                bool distOk = @this._reactionRange <= 0 || target.Location.Distance3DFromPlayer < @this._reactionRange;
-                bool zOk = @this._reactionZRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(target.Location) < @this._reactionZRange;
-                bool alive = !@this._healthCheck || !target.IsDead;
-                sb.Append("ClosestEntity: ").Append(target.ToString());
-                if (distOk && zOk && alive)
-                    sb.AppendLine(" [MATCH]");
-                else sb.AppendLine(" [MISMATCH]");
-                sb.Append("\tName: ").AppendLine(target.Name);
-                sb.Append("\tInternalName: ").AppendLine(target.InternalName);
-                sb.Append("\tNameUntranslated: ").AppendLine(target.NameUntranslated);
-                sb.Append("\tIsDead: ").Append(target.IsDead.ToString());
-                if (alive)
-                    sb.AppendLine(" [OK]");
-                else sb.AppendLine(" [FAIL]"); sb.Append("\tRegion: '").Append(target.RegionInternalName).AppendLine("'");
-                sb.Append("\tLocation: ").AppendLine(target.Location.ToString());
-                sb.Append("\tDistance: ").Append(target.Location.Distance3DFromPlayer.ToString());
-                if (distOk)
-                    sb.AppendLine(" [OK]");
-                else sb.AppendLine(" [FAIL]");
-                sb.Append("\tZAxisDiff: ").Append(Astral.Logic.General.ZAxisDiffFromPlayer(target.Location).ToString());
-                if (zOk)
-                    sb.AppendLine(" [OK]");
-                else sb.AppendLine(" [FAIL]");
-            }
-            else sb.AppendLine("Closest Entity not found!");
-
-            infoString = sb.ToString();
-            return true;
-        } 
-#endif
     }
 }

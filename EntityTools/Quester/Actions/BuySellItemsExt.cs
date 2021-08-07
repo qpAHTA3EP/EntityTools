@@ -316,7 +316,7 @@ namespace EntityTools.Quester.Actions
 
         public override ActionResult Run()
         {
-            bool extendedDebugInfo  = EntityTools.Config.Logger.QuesterActions.DebugBuySellItems;
+            bool extendedDebugInfo  = ExtendedDebugInfo;
             Entity theVendor = null;
             string methodName = extendedDebugInfo ? string.Concat(MethodBase.GetCurrentMethod().Name) : string.Empty;
             if (tryNum > 0)
@@ -449,7 +449,7 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private ActionResult RemoteTraiding(RemoteContact remoteContact)
         {
-            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugBuySellItems;
+            bool extendedDebugInfo = ExtendedDebugInfo;
             string methodName = MethodBase.GetCurrentMethod().Name;
             if (remoteContact != null)
             {
@@ -527,7 +527,7 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private ActionResult Traiding(Entity vendorEntity)
         {
-            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugBuySellItems;
+            bool extendedDebugInfo = ExtendedDebugInfo;
             string methodName = MethodBase.GetCurrentMethod().Name;
             if (vendorEntity != null)
             {
@@ -575,12 +575,11 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private bool ApproachAndInteractToVendor(Entity entity)
         {
-            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugBuySellItems;
+            bool extendedDebugInfo = ExtendedDebugInfo;
             string methodName = MethodBase.GetCurrentMethod().Name;
 
             if (extendedDebugInfo)
                 debug.Value.AddInfo(string.Concat(methodName, ": Begins"));
-            bool ready = false;
 
             // Проверяем соответствие 
             if (@this._vendor.IsMatch(entity)) 
@@ -589,6 +588,7 @@ namespace EntityTools.Quester.Actions
                     debug.Value.AddInfo(string.Concat(methodName, ": VendorEntity is ok"));
 
                 ContactDialog contactDialog = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog;
+                bool ready;
                 if (contactDialog.IsValid)
                 {
                     ScreenType screenType = contactDialog.ScreenType;
@@ -679,7 +679,7 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private ActionResult BuyItems()
         {
-            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugBuySellItems;
+            bool extendedDebugInfo = ExtendedDebugInfo;
             string methodName = MethodBase.GetCurrentMethod().Name;
             if (extendedDebugInfo)
                 debug.Value.AddInfo(string.Concat(methodName, ": Begins"));
@@ -819,7 +819,7 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private BuyItemResult BuyAnItem(ItemFilterEntryExt item2buy, ref List<ItemDef> boughtItems)
         {
-            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugBuySellItems;
+            bool extendedDebugInfo = ExtendedDebugInfo;
             string methodName = MethodBase.GetCurrentMethod().Name;
 
             BuyItemResult result = BuyItemResult.Completed;
@@ -935,7 +935,7 @@ namespace EntityTools.Quester.Actions
         private BuyItemResult BuyAnItem(ItemFilterEntryExt filterEntry, SlotCache slotCache, ref List<ItemDef> boughtItems)
 #endif
         {
-            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugBuySellItems;
+            bool extendedDebugInfo = ExtendedDebugInfo;
             string methodName = MethodBase.GetCurrentMethod().Name;
 
             BuyItemResult result = BuyItemResult.Completed;
@@ -1180,5 +1180,18 @@ namespace EntityTools.Quester.Actions
         {
             return screenType == ScreenType.Store || screenType == ScreenType.StoreCollection;
         }
+
+        /// <summary>
+        /// Флаг настроек вывода расширенной отлаточной информации
+        /// </summary>
+        private bool ExtendedDebugInfo
+        {
+            get
+            {
+                var logConf = EntityTools.Config.Logger;
+                return logConf.QuesterActions.DebugBuySellItems && logConf.Active;
+            }
+        }
+
     }
 }

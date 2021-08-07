@@ -113,6 +113,11 @@ namespace EntityTools.Core
         {
             throw new NotImplementedException();
         }
+
+        public void Monitor(object monitor)
+        {
+            throw new NotImplementedException();
+        }
 #if DEBUG
         public LinkedList<Entity> FindAllEntity(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete, bool healthCheck = false, float range = 0, float zRange = 0, bool regionCheck = false, List<CustomRegion> customRegions = null, Predicate<Entity> specialCheck = null)
         {

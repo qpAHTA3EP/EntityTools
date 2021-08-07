@@ -136,9 +136,9 @@ namespace EntityCore.UCC.Conditions
 
         public string Label()
         {
-            if (string.IsNullOrEmpty(label))
-                label = $"{@this.GetType().Name} [{@this._uiGenID}]";
-            else label = @this.GetType().Name;
+            label = string.IsNullOrEmpty(label) 
+                ? $"{@this.GetType().Name} [{@this._uiGenID}]" 
+                : @this.GetType().Name;
 
             return label;
         }
@@ -194,6 +194,7 @@ namespace EntityCore.UCC.Conditions
                     result = uiVar.Value.CompareToSimplePattern(@this._uiGenPropertyValue);
                     break;
                 case ItemFilterStringType.Regex:
+                    //TODO Использовать предкомпилированный Regex
                     result = Regex.IsMatch(uiVar.Value, @this._uiGenPropertyValue);
                     break;
             }

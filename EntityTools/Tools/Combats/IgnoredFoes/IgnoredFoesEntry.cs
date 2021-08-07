@@ -1,25 +1,19 @@
-﻿using AStar;
-using Astral.Classes;
-using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Astral.Classes;
 
 namespace EntityTools.Tools.Combats.IgnoredFoes
 {
     /// <summary>
     /// Экземпляр списка врагов, ассоциированного с профилем <see cref="Profile"/>
     /// </summary>
-    public class IgnoredFoes : IEnumerable<string>
+    public class IgnoredFoesEntry : IEnumerable<string>
     {
         /// <summary>
         /// Полный набор игнорируемых врагов, включающий как временных, так и постоянных врагов из Profile.BlackList
         /// </summary>
         private HashSet<string> _foes = new HashSet<string>();
-        long version = 0;
+        long version;
         /// <summary>
         /// Список игнорируемых врагов из Profile.BlackList
         /// </summary>
@@ -27,7 +21,7 @@ namespace EntityTools.Tools.Combats.IgnoredFoes
         /// <summary>
         /// Кэш списка врагов, передаваемых в боевую подсистему
         /// </summary>
-        private List<string> _foeList = new List<string>();
+        private List<string> _foesListCache = new List<string>();
         long version_list = -1;
 
         /// <summary>
@@ -38,7 +32,7 @@ namespace EntityTools.Tools.Combats.IgnoredFoes
             get => _profile;
             protected set => _profile = value;
         }
-        string _profile = string.Empty;
+        string _profile;
 
         /// <summary>
         /// Таймер до удаления временно игнорируемых врагов из списка
@@ -48,7 +42,7 @@ namespace EntityTools.Tools.Combats.IgnoredFoes
             get => _timeout;
             protected set => _timeout = value;
         }
-        Timeout _timeout = new Timeout(0);
+        Timeout _timeout;
 
         /// <summary>
         /// Список врагов, включающий идентификаторы из BlackList профиля, и идентификторы временных врагов
@@ -58,15 +52,19 @@ namespace EntityTools.Tools.Combats.IgnoredFoes
         {
             get
             {
-                if(version_list < version)
+                if(_timeout.IsTimedOut)
                 {
-                    _foeList.Clear();
-                    if (_timeout.IsTimedOut)
-                        _foeList.AddRange(_profileBlackList);
-                    else _foeList.AddRange(_foes);
+                    _foesListCache.Clear();
+                    _foesListCache.AddRange(_profileBlackList);
                     version_list = version;
                 }
-                return _foeList;
+                else if (version_list < version)
+                {
+                    _foesListCache.Clear();
+                    _foesListCache.AddRange(_foes);
+                    version_list = version;
+                }
+                return _foesListCache;
             }
         }
         /// <summary>
@@ -76,16 +74,14 @@ namespace EntityTools.Tools.Combats.IgnoredFoes
         /// <param name="foes">Список постоянно игнорируемых врагов из Profile.BlackList</param>
         /// <param name="tempFoes">Список временно игнорируемых врагов</param>
         /// <param name="time">Период времени (мс) в течении которого игнорируются <paramref name="tempFoes"/></param>
-        public IgnoredFoes(string profileName, IEnumerable<string> foes, IEnumerable<string> tempFoes = null, int time = -1)
+        public IgnoredFoesEntry(string profileName, IEnumerable<string> foes, IEnumerable<string> tempFoes = null, int time = -1)
         {
             _profile = profileName;
             _timeout = new Timeout(time > 0 ? time : int.MaxValue);
             _profileBlackList.AddRange(foes);
+            _foes.UnionWith(_profileBlackList);
             if (tempFoes != null)
-            {
-                _foes.UnionWith(foes);
                 _foes.UnionWith(tempFoes);
-            }
             version++;
         }
 
@@ -112,20 +108,26 @@ namespace EntityTools.Tools.Combats.IgnoredFoes
         /// </summary>
         public void Clear()
         {
-            _foes.Clear();
+            _foes.RemoveWhere(foe => !_profileBlackList.Contains(foe));
             _timeout.ChangeTime(0);
             version++;
         }
 
         public void Remove(string foe)
         {
-            if(_foes.Remove(foe))
+            if(!_profileBlackList.Contains(foe) 
+               && _foes.Remove(foe))
                 version++;
         }
         public void RemoveRange(IEnumerable<string> foes)
         {
             int oldCount = _foes.Count;
-            _foes.ExceptWith(foes);
+            foreach (var foe in foes)
+            {
+                if (!_profileBlackList.Contains(foe))
+                    _foes.Remove(foe);
+            }
+            
             if(oldCount < _foes.Count)
                 version++;
         }

@@ -195,13 +195,14 @@ namespace EntityCore.Quester.Conditions
                     result = uiVar.Value.CompareToSimplePattern(@this._uiGenPropertyValue);
                     break;
                 case ItemFilterStringType.Regex:
+                    //TODO Использовать предкомпилированный Regex
                     result = Regex.IsMatch(uiVar.Value, @this._uiGenPropertyValue);
                     break;
             }
 
             if (@this._propertySign == Presence.Equal)
                 return result;
-            else return !result;
+            return !result;
         }
     }
 }

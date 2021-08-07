@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using Astral.Controllers;
 using AcTp0Tools.Reflection;
+using EntityTools.Quester.Actions;
 
 namespace EntityTools.Settings
 {
@@ -95,10 +96,10 @@ namespace EntityTools.Settings
             /// Активация расширенной отладочной информации по <seealso cref="Quester.Actions.MoveToEntity"/>
             /// </summary>
             [Bindable(true)]
-            [Description("Активация расширенной отладочной информации по команде MoveToEntity")]
+            [Description("Активация расширенной отладочной информации по команде " + nameof(MoveToEntity))]
             public bool DebugMoveToEntity
             {
-                get => _debugMoveToEntity;
+                get => _debugMoveToEntity && EntityTools.Config.Logger.Active;
                 set
                 {
                     if (_debugMoveToEntity != value)
@@ -109,6 +110,25 @@ namespace EntityTools.Settings
                 }
             }
             private bool _debugMoveToEntity;
+
+            /// <summary>
+            /// Активация расширенной отладочной информации по <seealso cref="Quester.Actions.MoveToTeammate"/>
+            /// </summary>
+            [Bindable(true)]
+            [Description("Активация расширенной отладочной информации по команде " + nameof(MoveToTeammate))]
+            public bool DebugMoveToTeammate
+            {
+                get => _debugMoveToTeammate && EntityTools.Config.Logger.Active;
+                set
+                {
+                    if (_debugMoveToTeammate != value)
+                    {
+                        _debugMoveToTeammate = value;
+                        NotifyPropertyChanged();
+                    }
+                }
+            }
+            private bool _debugMoveToTeammate;
 
             /// <summary>
             /// Активация расширенной отладочной информации по <seealso cref="Quester.Actions.InteractEntities"/>

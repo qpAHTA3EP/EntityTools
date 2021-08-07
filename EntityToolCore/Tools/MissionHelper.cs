@@ -157,27 +157,33 @@ namespace EntityCore.Tools.Missions
         }
 
         /// <summary>
-        /// Проверка наличия у Квестгивера <paramref name="contactInfo"/> миссии типа <paramref name="checkType"/>
+        /// Проверка наличия у Квестодателя <paramref name="contactInfo"/> миссии типа <paramref name="checkType"/>
         /// </summary>
         public static bool ContactHaveMission(this ContactInfo contactInfo, ContactHaveMissionCheckType checkType = ContactHaveMissionCheckType.Any)
         {
             var indicator = contactInfo.Indicator;
-            if (checkType == ContactHaveMissionCheckType.Any)
-                return indicator == IndicatorType.MissionAvailable
-                    || indicator == IndicatorType.MissionRepeatableAvailable
-                    || indicator == IndicatorType.MissionRepeatableAvailableOverride;
-            if (checkType == ContactHaveMissionCheckType.RepeatablesOnly)
-                return indicator == IndicatorType.MissionRepeatableAvailable
-                    || indicator == IndicatorType.MissionRepeatableAvailableOverride;
-
-            return true;
+            switch (checkType)
+            {
+                case ContactHaveMissionCheckType.Any:
+                    return indicator == IndicatorType.MissionAvailable
+                           || indicator == IndicatorType.MissionRepeatableAvailable
+                           || indicator == IndicatorType.MissionRepeatableAvailableOverride
+                           || indicator == IndicatorType.Main_Available;
+                case ContactHaveMissionCheckType.RepeatablesOnly:
+                    return indicator == IndicatorType.MissionRepeatableAvailable
+                           || indicator == IndicatorType.MissionRepeatableAvailableOverride;
+                case ContactHaveMissionCheckType.Main:
+                    return indicator == IndicatorType.Main_Available;
+                default:
+                    return true;
+            }
         }
 
         /// <summary>
         /// Проверка наличия в наградах предмета, соответствующего критерию <paramref name="isRewardItem"/>
         /// </summary>
         /// <returns></returns>
-        public static bool CheckRequeredRewardItem(Predicate<Item> isRewardItem)
+        public static bool CheckRequiredRewardItem(Predicate<Item> isRewardItem)
         {
             if (isRewardItem is null)
                 return true;
@@ -204,6 +210,7 @@ namespace EntityCore.Tools.Missions
         /// Оценка расстояния до квестодателя <paramref name="giverEntity"/> и перемещение к нему, в случае необходимости
         /// </summary>
         public static bool ApproachMissionGiver(this Entity giverEntity, float interactDistance = 5.5f, float maxZDifference = 5)
+#if false
         {
             bool debugInfoEnabled = EntityTools.EntityTools.Config.Logger.DebugMissionTools;
 
@@ -266,7 +273,85 @@ namespace EntityCore.Tools.Missions
                 ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": " + nameof(Approach.EntityByDistance) + "Skiped"));
             }
             return true;
+        } 
+#else
+        {
+            if (EntityTools.EntityTools.Config.Logger.DebugMissionTools)
+            {
+                string currentMethodName = MethodBase.GetCurrentMethod().Name;
+
+                // Проверяем расстояние до квестодателя и перемещаемся к нему 
+                var giverLocation = giverEntity.Location;
+                var playerLocation = EntityManager.LocalPlayer.Location;
+                double distance = giverLocation.Distance3D(playerLocation);
+                bool withingInteractDistance = distance <= interactDistance;
+                bool isInteractZDifferenceConstraint = maxZDifference <= 0;
+                float zDifference = isInteractZDifferenceConstraint ? 0 : Math.Abs(giverLocation.Z - playerLocation.Z);
+                bool withingInteractZDifference = isInteractZDifferenceConstraint || zDifference <= maxZDifference;
+                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Begins (",
+                    "CalculatedInteractDistance = ", interactDistance.ToString("N1"),
+                    "; Distance = ", distance.ToString("N1"), withingInteractDistance ? "(withing)" : "(out)",
+                    "; zDifference = ", zDifference.ToString("N1"), isInteractZDifferenceConstraint ? (withingInteractZDifference ? " (withing))" : " (out))") : " (unlimited))"));
+
+                if (!(withingInteractDistance && withingInteractZDifference))
+                {
+                    // Случается, что Approach.EntityByDistance() возвращает True, даже если расстояние превышает заданное
+
+                    Stopwatch sw = new Stopwatch();
+                    sw.Start();
+#if false
+                    Approach.EntityByDistance(giverEntity, interactDistance);
+#else
+                    Approach.EntityForInteraction(giverEntity);
+#endif
+                    sw.Stop();
+                    playerLocation = EntityManager.LocalPlayer.Location;
+                    distance = giverLocation.Distance3D(playerLocation);
+                    withingInteractDistance = distance <= interactDistance;
+                    zDifference = isInteractZDifferenceConstraint ? 0 : Math.Abs(giverLocation.Z - playerLocation.Z);
+                    withingInteractZDifference = isInteractZDifferenceConstraint || zDifference <= maxZDifference;
+                    bool result = withingInteractDistance && withingInteractZDifference;
+                    ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Approach time = ", sw.ElapsedMilliseconds.ToString("N2"), " (", sw.ElapsedTicks, ')',
+                        "\n\t\tCalculatedInteractDistance = ", interactDistance.ToString("N1"),
+                        "\n\t\tDistance = ", distance.ToString("N1"), withingInteractDistance ? "(withing)" : "(out)",
+                        "\n\t\tzDifference = ", zDifference.ToString("N1"), isInteractZDifferenceConstraint ? (withingInteractZDifference ? " (withing)" : " (out)") : " (unlimited)",
+                        "\n\t" + nameof(Approach.EntityByDistance) + " => ", result));
+                    return result;
+                }
+                
+                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": " + nameof(Approach.EntityByDistance) + "Skipped"));
+            }
+            else
+            {
+                // Проверяем расстояние до квестодателя и перемещаемся к нему 
+                var giverLocation = giverEntity.Location;
+                var playerLocation = EntityManager.LocalPlayer.Location;
+                double distance = giverLocation.Distance3D(playerLocation);
+                bool withingInteractDistance = distance <= interactDistance;
+                bool isInteractZDifferenceConstraint = maxZDifference <= 0;
+                float zDifference = isInteractZDifferenceConstraint ? 0 : Math.Abs(giverLocation.Z - playerLocation.Z);
+                bool withingInteractZDifference = isInteractZDifferenceConstraint || zDifference <= maxZDifference;
+
+                if (!(withingInteractDistance && withingInteractZDifference))
+                {
+                    // Случается, что Approach.EntityByDistance() возвращает True, даже если расстояние превышает заданное
+#if false
+                    Approach.EntityByDistance(giverEntity, interactDistance);
+#else
+                    Approach.EntityForInteraction(giverEntity);
+#endif
+                    playerLocation = EntityManager.LocalPlayer.Location;
+                    distance = giverLocation.Distance3D(playerLocation);
+                    withingInteractDistance = distance <= interactDistance;
+                    zDifference = isInteractZDifferenceConstraint ? 0 : Math.Abs(giverLocation.Z - playerLocation.Z);
+                    withingInteractZDifference = isInteractZDifferenceConstraint || zDifference <= maxZDifference;
+                    bool result = withingInteractDistance && withingInteractZDifference;
+                    return result;
+                }
+            }
+            return true;
         }
+#endif
 
         /// <summary>
         /// Взаимодействие с квестодателем <paramref name="giverEntity"/> (открытитие диалогового окна) 
@@ -382,7 +467,7 @@ namespace EntityCore.Tools.Missions
                     // Открыт экран принятия миссии
                     // На экране принятия миссии узнать из АПИ, к какой миссии он относится, - нельзя
                     // Проверяем наличие обязательных наград в окне миссии
-                    if (CheckRequeredRewardItem(isRewardItem))
+                    if (CheckRequiredRewardItem(isRewardItem))
                     {
                         // Принимаем миссию
                         if (contactDialog.CheckDialogOptionAndSelect(d => d.Key.Equals("ViewOfferedMission.Accept"),
@@ -441,7 +526,7 @@ namespace EntityCore.Tools.Missions
                     // Открыт экран принятия миссии
                     // На экране принятия миссии узнать из АПИ, к какой миссии он относится, - нельзя
                     // Проверяем наличие обязательных наград в окне миссии
-                    if (CheckRequeredRewardItem(isRewardItem))
+                    if (CheckRequiredRewardItem(isRewardItem))
                     {
                         // Сдаем миссию
                         if (contactDialog.CheckDialogOptionAndSelect(d => d.Key.Equals("ViewCompleteMission.Continue"),
@@ -516,7 +601,7 @@ namespace EntityCore.Tools.Missions
                         if (screenType == ScreenType.MissionOffer)
                         {
                             // 2. Проверяем 
-                            if (CheckRequeredRewardItem())
+                            if (CheckRequiredRewardItem())
                             {
                                 // 3. Принимаем задачу путем активации соответствующего пункта диалога
                                 bool haveMission = false;

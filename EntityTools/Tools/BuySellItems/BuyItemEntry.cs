@@ -430,6 +430,7 @@ namespace EntityTools.Tools.BuySellItems
                     // Regex
                     foreach (var ctg in Enum.GetValues(typeof(ItemCategory)))
                     {
+                        //TODO Использовать предкомпилированный Regex
                         if (Regex.IsMatch(ctg.ToString(), Identifier))
                             categories[(int)ctg] = true;
                         else categories[(int)ctg] = false;
@@ -505,6 +506,7 @@ namespace EntityTools.Tools.BuySellItems
                     // Regex
                     foreach (var type in Enum.GetValues(typeof(ItemType)))
                     {
+                        //TODO Использовать предкомпилированный Regex
                         if (Regex.IsMatch(type.ToString(), Identifier))
                             itemTypes[(int)type] = true;
                         else itemTypes[(int)type] = false;
@@ -562,6 +564,7 @@ namespace EntityTools.Tools.BuySellItems
         /// <returns></returns>
         private bool IsMatch_Regex_Id(Item item)
         {
+            //TODO Использовать предкомпилированный Regex
             return Regex.IsMatch(item.ItemDef.InternalName, pattern);
         }
         #endregion

@@ -30,6 +30,7 @@ namespace EntityTools.Tools.Missions
             _type = MissionGiverType.Remote;
         }
 
+        [NotifyParentProperty(true)]
         public MissionGiverType Type
         {
             get
@@ -44,12 +45,14 @@ namespace EntityTools.Tools.Missions
 
         private MissionGiverType _type = MissionGiverType.NPC;
 
+        [NotifyParentProperty(true)]
         public Vector3 Position
         {
             get
             {
-                return (_type == MissionGiverType.NPC)
-                    ? _position : Vector3.Empty;
+                return _type == MissionGiverType.NPC
+                    ? _position 
+                    : Vector3.Empty;
             }
             set
             {
@@ -60,16 +63,18 @@ namespace EntityTools.Tools.Missions
 
         private Vector3 _position = Vector3.Empty;
 
+        [NotifyParentProperty(true)]
         public double Distance
         {
             get
             {
                 if (_type == MissionGiverType.NPC)
                     return _position.IsValid ? _position.Distance3DFromPlayer : 0;
-                else return double.MaxValue;
+                return double.MaxValue;
             }
         }
 
+        [NotifyParentProperty(true)]
         public string Id
         {
             get => _id; set
@@ -81,6 +86,7 @@ namespace EntityTools.Tools.Missions
         private string _id = string.Empty;
 
         [Editor(typeof(CurrentMapEdit), typeof(UITypeEditor))]
+        [NotifyParentProperty(true)]
         public string MapName
         {
             get
@@ -97,6 +103,7 @@ namespace EntityTools.Tools.Missions
         private string _mapName = string.Empty;
 
         [Editor(typeof(CurrentRegionEdit), typeof(UITypeEditor))]
+        [NotifyParentProperty(true)]
         public string RegionName
         {
             get
@@ -117,6 +124,7 @@ namespace EntityTools.Tools.Missions
 #else
         [Browsable(false)]
 #endif
+        [NotifyParentProperty(true)]
         public uint Tolerance
         {
             get

@@ -116,7 +116,7 @@ namespace EntityTools.Forms
 #if true
             var ingameCharacters 
                         = from character in Game.CharacterSelectionData.CharacterChoices.Characters
-                          where !character.UGCEditAllowed
+                          //where !character.UGCEditAllowed
                           select character.CharacterName;
 
             List<string> characters = new List<string>(ingameCharacters);

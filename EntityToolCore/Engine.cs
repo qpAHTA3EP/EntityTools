@@ -28,7 +28,10 @@ using System.Linq;
 using EntityTools.Tools.Extensions;
 using AcTp0Tools;
 using DevExpress.Utils;
+using EntityCore.Tools;
+using EntityTools.Forms;
 using EntityTools.Quester;
+using EntityTools.Tools.Targeting;
 
 namespace EntityCore
 {
@@ -109,6 +112,9 @@ namespace EntityCore
                         return true;
                     case InsertInsignia ii:
                         DictQuesterAction.Add(ii, new InsertInsigniaEngine(ii));
+                        return true;
+                    case MoveToTeammate m2t:
+                        DictQuesterAction.Add(m2t, new MoveToTeammateEngine(m2t));
                         return true;
                 }
             }
@@ -274,9 +280,7 @@ namespace EntityCore
 
         public bool UserRequest_EditUccConditions(ref UCCConditionList list, ref LogicRule logic, ref bool negation)
         {
-            if (Forms.ConditionListForm.UserRequest(ref list, ref logic, ref negation))
-                return true;
-            return false;
+            return Forms.ConditionListForm.UserRequest(ref list, ref logic, ref negation);
         }
 
         public bool UserRequest_EditEntityId(ref string entPattern, ref ItemFilterStringType strMatchType, ref EntityNameType nameType)
@@ -374,6 +378,20 @@ namespace EntityCore
             }
 
             return "Unable recognize test context!";
+        }
+
+        public void Monitor(object monitor)
+        {
+            switch (monitor)
+            {
+                case PlayerTeamMonitor team:
+                    new ObjectInfoForm().Show(new PlayerTeamHelper.Monitor(), 500);
+                    break;
+                default:
+                    new ObjectInfoForm().Show(monitor, 500);
+                    break;
+            }
+            
         }
 #endif
 #if DEBUG

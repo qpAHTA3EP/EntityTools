@@ -28,6 +28,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using AcTp0Tools.Reflection;
+using EntityTools.Tools.Targeting;
 using MyNW.Classes.ItemProgression;
 using API = Astral.Quester.API;
 using Task = System.Threading.Tasks.Task;
@@ -45,16 +46,16 @@ namespace EntityTools.Core
             cbxExportSelector.SelectedIndex = 0;
 
             ckbSpellStuckMonitor.DataBindings.Add(nameof(ckbSpellStuckMonitor.Checked),
-                                                EntityTools.Config.UnstuckSpells,
-                                                nameof(EntityTools.Config.UnstuckSpells.Active),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
+                EntityTools.Config.UnstuckSpells,
+                nameof(EntityTools.Config.UnstuckSpells.Active),
+                false, DataSourceUpdateMode.OnPropertyChanged);
 
 #if DEVELOPER
             // Настройки Mapper'a
             ckbMapperPatch.DataBindings.Add(nameof(ckbMapperPatch.Checked),
-                                                EntityTools.Config.Mapper,
-                                                nameof(EntityTools.Config.Mapper.Patch),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
+                EntityTools.Config.Mapper,
+                nameof(EntityTools.Config.Mapper.Patch),
+                false, DataSourceUpdateMode.OnPropertyChanged);
 
 #if false
             seMapperWaipointDistance.DataBindings.Add(nameof(seMapperWaipointDistance.Value),
@@ -77,7 +78,7 @@ namespace EntityTools.Core
             ckbMapperLinearPath.DataBindings.Add(nameof(ckbMapperLinearPath.Checked),
                                                 EntityTools.Config.Mapper,
                                                 nameof(EntityTools.Config.Mapper.LinearPath),
-                                                false, DataSourceUpdateMode.OnPropertyChanged); 
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
 #endif
 
 #if false
@@ -92,9 +93,9 @@ namespace EntityTools.Core
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
 #else
             ckbETLogger.DataBindings.Add(nameof(ckbETLogger.Checked),
-                                            EntityTools.Config.Logger,
-                                            nameof(EntityTools.Config.Logger.Active),
-                                            false, DataSourceUpdateMode.OnPropertyChanged);
+                EntityTools.Config.Logger,
+                nameof(EntityTools.Config.Logger.Active),
+                false, DataSourceUpdateMode.OnPropertyChanged);
 #endif
 
 
@@ -130,7 +131,7 @@ namespace EntityTools.Core
             editSlideFilter.DataBindings.Add(nameof(editSlideFilter.Value),
                                                 EntityTools.Config.SlideMonitor,
                                                 nameof(EntityTools.Config.SlideMonitor.BoatFilter),
-                                                false, DataSourceUpdateMode.OnPropertyChanged); 
+                                                false, DataSourceUpdateMode.OnPropertyChanged);
 #endif
 
 
@@ -172,7 +173,7 @@ namespace EntityTools.Core
 
                 XtraMessageBox.Show(sb.ToString());
             }
-            else XtraMessageBox.Show(@"Can't enumerate <AOECheck.AOE> in 'aoeList'"); 
+            else XtraMessageBox.Show(@"Can't enumerate <AOECheck.AOE> in 'aoeList'");
 #elif false
             var type = typeof(AOECheck.AOE);
             var list = Traverse.Create(typeof(AOECheck)).Property("List");
@@ -255,22 +256,27 @@ namespace EntityTools.Core
                 sb.AppendLine(aoe.ID);
             }
 
-            XtraMessageBox.Show(sb.ToString()); 
+            XtraMessageBox.Show(sb.ToString());
 #else
             var aoeType = typeof(AOECheck.AOE);
             var aoeList = Traverse.Create(typeof(AOECheck)).Property("List");
             Type aoeListType = aoeList.GetValue()?.GetType();
-            var listType = typeof(List<>);//aoeListType.GetGenericTypeDefinition();
+            var listType = typeof(List<>); //aoeListType.GetGenericTypeDefinition();
             var aoeListType1 = listType.MakeGenericType(aoeType);
 
             bool isEqualType = aoeListType == aoeListType1;
-            
+
             XtraMessageBox.Show($"{aoeType}\n" +
                                 $"{aoeListType}\n" +
                                 $"{aoeListType1}\n" +
                                 $"{listType}\n" +
                                 $"{isEqualType}");
 #endif
+        }
+
+        private void handler_Test_4(object sender, EventArgs e)
+        {
+            int hash = "str".GetHashCode();
         }
 
         private void handler_SpellStuckMonitorActivation(object sender, EventArgs e)
@@ -503,16 +509,11 @@ namespace EntityTools.Core
 
         private void handler_DebugMonitorActivate(object sender, EventArgs e)
         {
-#if DEVELOPER
-#if true
-            if (ckbDebugMonitor.Checked)
-                Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = ShowMostInjuredAlly;
-            else Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = null; 
-#else
-
-#endif
-#endif
+            if(ckbDebugMonitor.Checked && BLAttackersList != null)
+                backgroundWorker.RunWorkerAsync();
+            else backgroundWorker.CancelAsync();
         }
+        StaticFieldAccessor<Func<List<string>>> BLAttackersList = typeof(Astral.Logic.NW.Combats).GetStaticField<Func<List<string>>>("BLAttackersList");
 
         private void ShowMostInjuredAlly(Entity entity)
         {
@@ -526,6 +527,22 @@ namespace EntityTools.Core
                     '\t', nameof(entity.Character.AttribsBasic.HealthPercent), '=', entity.Character.AttribsBasic.HealthPercent);
             }
             tbDebugMonitorInfo.Text = info;
+        }
+
+        private void work_BlackList(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            if (!BLAttackersList.IsValid
+                || BLAttackersList.Value is null)
+                return;
+            
+            while (!backgroundWorker.CancellationPending)
+            {
+                var list = BLAttackersList.Value();
+                if (list?.Count > 0)
+                    tbDebugMonitorInfo.Lines = list.ToArray();
+                else tbDebugMonitorInfo.Text = "FoeBlackList is empty";
+                Thread.Sleep(500);
+            }
         }
 
         private void handler_Up(object sender, EventArgs e)
@@ -635,6 +652,12 @@ namespace EntityTools.Core
         {
             var form = new CredentialManager();
             form.Show();
+        }
+
+        private void handler_TeamMonitor(object sender, EventArgs e)
+        {
+            //new ObjectInfoForm().Show(new PlayerTeamMonitor(), 500);
+            EntityTools.Core.Monitor(new PlayerTeamMonitor());
         }
     }
 }

@@ -26,15 +26,12 @@ namespace EntityTools.Quester.Actions
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private AddIgnoredFoes @this => this;
-
 #if false
         [XmlIgnore]
         [NonSerialized]
         internal IQuesterActionEngine Engine;
 
 #endif
-        public AddIgnoredFoes() { }
 
         private IQuesterActionEngine MakeProxy()
         {
@@ -52,11 +49,7 @@ namespace EntityTools.Quester.Actions
             set
             {
                 _foes = value;
-#if false
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Foes))); 
-#else
                 OnPropertyChanged();
-#endif
             }
         }
         List<string> _foes = new List<string>();
@@ -73,11 +66,7 @@ namespace EntityTools.Quester.Actions
                 if (_timeout != value)
                 {
                     _timeout = value;
-#if false
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Timeout))); 
-#else
                     OnPropertyChanged();
-#endif
                 }
             }
         }
@@ -86,11 +75,11 @@ namespace EntityTools.Quester.Actions
         [XmlIgnore]
         [Editor(typeof(IgnoredFoesTestEditor), typeof(UITypeEditor))]
         [Description("Нажми на кнопку '...', чтобы увидеть отладочную информацию")]
-        public string TestInfo { get; } = "Нажми на кнопку '...' =>";
+        public string TestInfo => "Нажми на кнопку '...' =>";
         #endregion
 
-        // Интерфес Quester.Action, реализованный через ActionEngine
-#if false
+        
+#if false // Интерфес Quester.Action, реализованный через ActionEngine
         public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).NeedToRun;
         public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Run();
         public override string ActionLabel => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).ActionLabel;
@@ -120,7 +109,7 @@ namespace EntityTools.Quester.Actions
             {
                 if (_foes.Count > 0)
                     return Empty.ActionValidity;
-                else return new ActionValidity($"{nameof(Foes)} list is empty");
+                return new ActionValidity($"{nameof(Foes)} list is empty");
             }
         }
         public override void GatherInfos() { }

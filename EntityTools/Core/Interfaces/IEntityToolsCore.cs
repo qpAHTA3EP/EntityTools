@@ -1,13 +1,12 @@
 ﻿using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
 using Astral.Quester.Classes;
+using DevExpress.Utils;
 using EntityTools.Enums;
 using MyNW.Classes;
 using System;
 using System.Collections.Generic;
-using DevExpress.Utils;
-using EntityTools.UCC.Conditions;
-using Action = Astral.Quester.Classes.Action;
+using QuesterAction = Astral.Quester.Classes.Action;
 using UCCConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 
 namespace EntityTools.Core.Interfaces
@@ -17,7 +16,7 @@ namespace EntityTools.Core.Interfaces
         bool CheckCore();
 
         bool Initialize(object obj);
-        bool Initialize(Action action);
+        bool Initialize(QuesterAction action);
         bool Initialize(Condition condition);
         bool Initialize(UCCAction action);
         bool Initialize(UCCCondition condition);
@@ -46,10 +45,15 @@ namespace EntityTools.Core.Interfaces
         bool UserRequest_GetUccAction(out UCCAction action);
 
         string EntityDiagnosticInfos(object obj);
+
+        void Monitor(object monitor);
 #endif
 #if DEBUG
-        LinkedList<Entity> FindAllEntity(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete,
-                                         bool healthCheck = false, float range = 0, float zRange = 0, bool regionCheck = false, List<CustomRegion> customRegions = null,
+        LinkedList<Entity> FindAllEntity(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, 
+                                         EntityNameType nameType = EntityNameType.NameUntranslated, 
+                                         EntitySetType setType =  EntitySetType.Complete,
+                                         bool healthCheck = false, float range = 0, float zRange = 0, bool regionCheck = false, 
+                                         List<CustomRegion> customRegions = null,
                                          Predicate<Entity> specialCheck = null);
 #endif
     }

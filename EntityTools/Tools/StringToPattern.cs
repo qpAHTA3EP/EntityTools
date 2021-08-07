@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using Astral.Classes.ItemFilter;
 
@@ -10,6 +11,7 @@ namespace EntityTools.Tools
     /// </summary>
     public static class StringToPatternComparer
     {
+        public static readonly CompareInfo InvariantCultureCompareInfo = CultureInfo.InvariantCulture.CompareInfo;
         /// <summary>
         /// Конструирование предиката для сопоставления строки с шаблоном <paramref name="pattern"/> типа <paramref name="strMatchType"/>
         /// </summary>
@@ -36,12 +38,22 @@ namespace EntityTools.Tools
                         if (pattern[pattern.Length - 1] == '*')
                         {
                             matchText = pattern.Trim('*');
-                            predicate = str => str.Contains(matchText);
+                            predicate = str =>
+                            {
+#if false
+                                return str.Contains(matchText); 
+#else
+                                // String.Contains() реализовано через String.IndexOf() >= 0
+                                // Поэтому вызываем поиска подстроки без дополнительных проверок
+                                // https://github.com/dotnet/coreclr/blob/bc146608854d1db9cdbcc0b08029a87754e12b49/src/mscorlib/src/System/String.cs#L2338
+                                return InvariantCultureCompareInfo.IndexOf(str, matchText, 0, str.Length, CompareOptions.Ordinal) >= 0;
+#endif
+                            };
                         }
                         else
                         {
                             matchText = pattern.TrimStart('*');
-                            predicate = str => str.EndsWith(matchText);
+                            predicate = str => str.EndsWith(matchText, StringComparison.Ordinal);
                         }
                     }
                     else
@@ -49,12 +61,12 @@ namespace EntityTools.Tools
                         if (pattern[pattern.Length - 1] == '*')
                         {
                             matchText = pattern.TrimEnd('*');
-                            predicate = str => str.StartsWith(matchText);
+                            predicate = str => str.StartsWith(matchText, StringComparison.Ordinal);
                         }
                         else
                         {
                             matchText = pattern;
-                            predicate = str => str.Equals(matchText);
+                            predicate = str => str.Equals(matchText, StringComparison.Ordinal);
                         }
                     }
                 }
@@ -71,7 +83,7 @@ namespace EntityTools.Tools
             else predicate = str =>
             {
 #if DEBUG
-                ETLogger.WriteLine($"Invalid prediate to compare string to '{pattern}'[{strMatchType}]");
+                ETLogger.WriteLine($"Invalid predicate to compare string to '{pattern}'[{strMatchType}]");
 #endif
                 return false;
             };

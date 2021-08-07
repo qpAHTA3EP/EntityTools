@@ -7,6 +7,10 @@
         /// </summary>
         Disabled,
         /// <summary>
+        /// Проверять только главные миссии
+        /// </summary>
+        Main,
+        /// <summary>
         /// Проверять наличие повторяемых миссий
         /// </summary>
         RepeatablesOnly,

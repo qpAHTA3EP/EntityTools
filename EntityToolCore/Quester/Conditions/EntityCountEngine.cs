@@ -112,7 +112,7 @@ namespace EntityCore.Quester.Conditions
             get
             {
                 bool result = false;
-                bool debugInfoEnabled = EntityTools.EntityTools.Config.Logger.QuesterConditions.DebugEntityCount;
+                bool debugInfoEnabled = ExtendedDebugInfo;
                 string currentMethodName = debugInfoEnabled ? string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
 
                 if (debugInfoEnabled)
@@ -233,7 +233,7 @@ namespace EntityCore.Quester.Conditions
                     }
                     else strBldr.AppendLine($"No Entity [{@this._entityId}] was found.");
 
-                    if (EntityTools.EntityTools.Config.Logger.QuesterConditions.DebugEntityCount)
+                    if (ExtendedDebugInfo)
                     {
                         string debugMsg = string.Concat(_idStr, '.', nameof(TestInfos), ':', strBldr.ToString());
 
@@ -334,102 +334,16 @@ namespace EntityCore.Quester.Conditions
         }
         #endregion
 
-#if IEntityDescriptor
-        public bool EntityDiagnosticString(out string infoString)
+        /// <summary>
+        /// Флаг настроек вывода расширенной отлаточной информации
+        /// </summary>
+        private bool ExtendedDebugInfo
         {
-            StringBuilder sb = new StringBuilder();
-
-            try
+            get
             {
-                sb.Append("EntityID: ").AppendLine(@this._entityId);
-                sb.Append("EntityIdType: ").AppendLine(@this._entityIdType.ToString());
-                sb.Append("EntityNameType: ").AppendLine(@this._entityNameType.ToString());
-                sb.Append("HealthCheck: ").AppendLine(@this._healthCheck.ToString());
-                sb.Append("ReactionRange: ").AppendLine(@this._reactionRange.ToString());
-                sb.Append("ReactionZRange: ").AppendLine(@this._reactionZRange.ToString());
-                sb.Append("RegionCheck: ").AppendLine(@this._regionCheck.ToString());
-                if (@this._customRegionNames?.Count > 0)
-                {
-                    sb.Append("RegionCheck: {").Append(@this._customRegionNames[0]);
-                    for (int i = 1; i < @this._customRegionNames.Count; i++)
-                        sb.Append(", ").Append(@this._customRegionNames[i]);
-                    sb.AppendLine("}");
-                }
-
-                sb.AppendLine();
-
-                var entityKey = EntityKey;
-                var entityCheck = SpecialCheck;
-
-                var entities = SearchCached.FindAllEntity(entityKey, entityCheck);
-
-                // Количество Entity, удовлетворяющих условиям
-                if (entities != null)
-                    sb.Append("Founded Entities: ").AppendLine(entities.Count.ToString());
-                else sb.Append("Founded Entities: 0");
-                sb.AppendLine();
-
-                // Ближайшее Entity
-                Entity closestEntity = SearchCached.FindClosestEntity(entityKey, entityCheck);
-
-                if (closestEntity != null)
-                {
-                    bool distOk = @this._reactionRange <= 0 || closestEntity.Location.Distance3DFromPlayer < @this._reactionRange;
-                    bool zOk = @this._reactionZRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(closestEntity.Location) < @this._reactionZRange;
-                    bool alive = !@this._healthCheck || !closestEntity.IsDead;
-                    bool crOK = SpecialCheck(closestEntity);
-                    sb.Append("ClosestEntity: ").Append(closestEntity.ToString());
-                    if (distOk && zOk && alive && crOK)
-                        sb.AppendLine(" [MATCH]");
-                    else sb.AppendLine(" [MISMATCH]");
-                    sb.Append("\tName: ").AppendLine(closestEntity.Name);
-                    sb.Append("\tInternalName: ").AppendLine(closestEntity.InternalName);
-                    sb.Append("\tNameUntranslated: ").AppendLine(closestEntity.NameUntranslated);
-                    sb.Append("\tIsDead: ").Append(closestEntity.IsDead.ToString());
-                    if (alive)
-                        sb.AppendLine(" [OK]");
-                    else sb.AppendLine(" [FAIL]"); sb.Append("\tRegion: '").Append(closestEntity.RegionInternalName).AppendLine("'");
-                    sb.Append("\tLocation: ").AppendLine(closestEntity.Location.ToString());
-                    sb.Append("\tDistance: ").Append(closestEntity.Location.Distance3DFromPlayer.ToString());
-                    if (distOk)
-                        sb.AppendLine(" [OK]");
-                    else sb.AppendLine(" [FAIL]");
-                    sb.Append("\tZAxisDiff: ").Append(Astral.Logic.General.ZAxisDiffFromPlayer(closestEntity.Location).ToString());
-                    if (zOk)
-                        sb.AppendLine(" [OK]");
-                    else sb.AppendLine(" [FAIL]");
-
-                    var crList = @this._customRegionNames;
-                    if (crList?.Count > 0)
-                    {
-                        int crNum = 0;
-                        sb.Append("\tRegionCheck: {");
-                        foreach (var cr in crList)
-                            if (cr.Cover(closestEntity))
-                            {
-                                if (crNum > 0)
-                                    sb.Append(", ");
-                                sb.Append(cr.Name);
-                            }
-                        sb.Append("}");
-                        if (crOK)
-                            sb.AppendLine(" [OK]");
-                        else sb.AppendLine(" [FAIL]");
-                    }
-
-                }
-                else sb.AppendLine("Closest Entity not found!");
+                var logConf = EntityTools.EntityTools.Config.Logger;
+                return logConf.QuesterConditions.DebugEntityCount && logConf.Active;
             }
-            catch (Exception e)
-            {
-                ETLogger.WriteLine(LogType.Error, e.Message);
-                ETLogger.WriteLine(LogType.Error, sb.ToString());
-                throw;
-            }
-
-            infoString = sb.ToString();
-            return true;
-        } 
-#endif
+        }
     }
 }
