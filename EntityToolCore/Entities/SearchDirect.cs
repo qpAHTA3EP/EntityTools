@@ -1,4 +1,5 @@
 ﻿//#define PROFILING
+
 using Astral.Classes.ItemFilter;
 using EntityTools;
 using EntityTools.Enums;
@@ -15,7 +16,7 @@ namespace EntityCore.Entities
 {
     public static class SearchDirect
     {
-#if DEBUG && PROFILING
+#if PROFILING
         private static Stopwatch stopwatch = new Stopwatch();
         private static Stopwatch cntStopwatch = new Stopwatch();
         private static int Count = 0;
@@ -80,7 +81,7 @@ namespace EntityCore.Entities
         /// <returns></returns>
         public static LinkedList<Entity> GetEntities(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, Action<Entity> action = null)
         {
-#if DEBUG && PROFILING
+#if PROFILING
             Count++;
             TimeSpan StartTime = stopwatch.Elapsed;
             stopwatch.Start();
@@ -119,7 +120,7 @@ namespace EntityCore.Entities
                     //return EntityManager.GetEntities()?.FindAll(comparer.Check);
                 }
                 return entities;
-#if DEBUG && PROFILING
+#if PROFILING
             }
             finally
             {
@@ -147,7 +148,7 @@ namespace EntityCore.Entities
         {
             if (key == null)
                 return null;
-#if DEBUG && PROFILING
+#if PROFILING
             Count++;
             TimeSpan StartTime = stopwatch.Elapsed;
             stopwatch.Start();
@@ -183,7 +184,7 @@ namespace EntityCore.Entities
                         entities.AddLast(e);
             }
             return entities;
-#if DEBUG && PROFILING
+#if PROFILING
             }
             finally
             {
@@ -209,7 +210,7 @@ namespace EntityCore.Entities
         {
             if (key == null)
                 return null;
-#if DEBUG && PROFILING
+#if PROFILING
             Count++;
             TimeSpan StartTime = stopwatch.Elapsed;
             stopwatch.Start();
@@ -239,7 +240,7 @@ namespace EntityCore.Entities
                         entities.AddLast(e);
             }
             return entities;
-#if DEBUG && PROFILING
+#if PROFILING
             }
             finally
             {
@@ -263,7 +264,7 @@ namespace EntityCore.Entities
         /// </summary>
         public static void AgregateEntities<TAgregator>(Func<TAgregator, Entity, TAgregator> processor, ref TAgregator agregator)
         {
-#if DEBUG && PROFILING
+#if PROFILING
             Count++;
             TimeSpan StartTime = stopwatch.Elapsed;
             stopwatch.Start();
@@ -274,7 +275,7 @@ namespace EntityCore.Entities
             
             foreach (Entity e in EntityManager.GetEntities())
                 agregator = processor(agregator, e);
-#if DEBUG && PROFILING
+#if PROFILING
             }
             finally
             {
@@ -303,7 +304,7 @@ namespace EntityCore.Entities
         /// <returns></returns>
         public static LinkedList<Entity> GetContactEntities(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, Action<Entity> action = null)
         {
-#if DEBUG && PROFILING
+#if PROFILING
             ContactCount++;
             TimeSpan StartTime = cntStopwatch.Elapsed;
             cntStopwatch.Start();
@@ -346,7 +347,7 @@ namespace EntityCore.Entities
                     }
                 }
                 return entities;
-#if DEBUG && PROFILING
+#if PROFILING
             }
             finally
             {
@@ -371,7 +372,7 @@ namespace EntityCore.Entities
         {
             if (key == null)
                 return null;
-#if DEBUG && PROFILING
+#if PROFILING
             ContactCount++;
             TimeSpan StartTime = cntStopwatch.Elapsed;
             cntStopwatch.Start();
@@ -413,7 +414,7 @@ namespace EntityCore.Entities
                     }
                 }
                 return entities;
-#if DEBUG && PROFILING
+#if PROFILING
             }
             finally
             {
@@ -438,7 +439,7 @@ namespace EntityCore.Entities
         {
             if (key == null)
                 return null;
-#if DEBUG && PROFILING
+#if PROFILING
             ContactCount++;
             TimeSpan StartTime = cntStopwatch.Elapsed;
             cntStopwatch.Start();
@@ -484,7 +485,7 @@ namespace EntityCore.Entities
                 }
             }
             return entities;
-#if DEBUG && PROFILING
+#if PROFILING
             }
             finally
             {
@@ -502,7 +503,7 @@ namespace EntityCore.Entities
         }
         public static void AgregateContactEntities<TAgregator>(Func<TAgregator, Entity, TAgregator> proseccor, ref TAgregator agregator)
         {
-#if DEBUG && PROFILING
+#if PROFILING
             ContactCount++;
             TimeSpan StartTime = cntStopwatch.Elapsed;
             cntStopwatch.Start();
@@ -515,7 +516,7 @@ namespace EntityCore.Entities
                 agregator = proseccor(agregator, contact.Entity);
             foreach (ContactInfo contact in EntityManager.LocalPlayer.Player.InteractInfo.NearbyInteractCritterEnts)
                 agregator = proseccor(agregator, contact.Entity);
-#if DEBUG && PROFILING
+#if PROFILING
             }
             finally
             {
@@ -531,47 +532,5 @@ namespace EntityCore.Entities
             }
 #endif
         }
-
-#if disabled_2021_03_26
-        /// <summary>
-        /// Поиск ближайшего противника
-        /// </summary>
-        public static Entity ClosestEnemy(Predicate<Entity> predicate = null)
-        {
-            Vector3 playerPos = EntityManager.LocalPlayer.Location;
-            Entity result = null;
-            double minDist = double.MaxValue;
-            double currDist = double.MaxValue;
-            if (predicate is null)
-            {
-                foreach (Entity entity in EntityManager.GetEntities())
-                {
-                    if (IsValidEnemy(entity) && (currDist = entity.Location.Distance3DFromPlayer) < minDist)
-                    {
-                        minDist = currDist;
-                        result = entity;
-                    }
-                }
-            }
-            else
-            {
-                foreach (Entity entity in EntityManager.GetEntities())
-                {
-                    if (IsValidEnemy(entity) && predicate(entity) && (currDist = entity.Location.Distance3DFromPlayer) < minDist)
-                    {
-                        minDist = currDist;
-                        result = entity;
-                    }
-                }
-            }
-
-            return result ?? new Entity(IntPtr.Zero);
-        }
-
-        public static bool IsValidEnemy(Entity entity)
-        {
-            return entity.IsValid && !entity.IsDead && entity.InCombat && entity.RelationToPlayer == EntityRelation.Foe && !entity.IsUnselectable && !entity.IsUntargetable && !entity.DoNotDraw && entity.Character.AttackPlayer;// && entity.Location.Distance3D(playerPos) < 60.0;
-        } 
-#endif
     }
 }

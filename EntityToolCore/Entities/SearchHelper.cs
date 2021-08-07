@@ -348,7 +348,8 @@ namespace EntityCore.Entities
         /// <param name="range">Предельное расстояние поиска, дальше которого <see cref="Entity"/> игнорируются</param>
         /// <param name="zRange">Предельная разница высот относительно персонажа, дальше которого <see cref="Entity"/> игнорируются</param>
         /// <param name="regionCheck">Флаг, указывающий на необходимость выполнять проверку совпадения <seealso cref="Entity.RegionInternalName"/> у игрока и <see cref="Entity"/></param>
-        /// <param name="customRegions">Если задано, то проверяется нахождение в области, заданной сочетанием <seealso cref="CustomRegion"/>'ов</param>
+        /// <param name="customRegions">Сочетание <seealso cref="CustomRegion"/> в пределах которого производится поиск <seealso cref="Entity"/></param>
+        /// <param name="outsideCustomRegions">Если задано, то проверяется нахождение за пределами области, заданной <param name="customRegions"/></param>
         /// <param name="specialCheck">Функтор дополнительной проверки <see cref="Entity"/>, например наличия в черном списке</param>
         /// <returns></returns>
         public static Predicate<Entity> Construct_EntityAttributePredicate(bool healthCheck = false,

@@ -4,6 +4,7 @@ using AcTp0Tools;
 using Astral.Classes.ItemFilter;
 using EntityTools.Enums;
 using System.Collections.ObjectModel;
+using EntityTools;
 
 namespace EntityCore.Entities
 {
@@ -18,7 +19,7 @@ namespace EntityCore.Entities
             AstralAccessors.Quester.Core.AfterLoad += ResetCache;
             AstralAccessors.Quester.Core.AfterNew += ResetCache; 
 #endif
-            AstralAccessors.Quester.Core.OnProfileChanged += ResetCache;
+            //AstralAccessors.Quester.Core.OnProfileChanged += ResetCache;
         }
 
         private void ResetCache()
@@ -39,7 +40,7 @@ namespace EntityCore.Entities
             AstralAccessors.Quester.Core.OnProfileChanged += ResetCache;
         }
 
-#if DEBUG && PROFILING
+#if PROFILING
         private static int matchCount = 0;
         private static int mismatchCount = 0;
 
@@ -66,13 +67,13 @@ namespace EntityCore.Entities
             EntityCacheRecordKey key = new EntityCacheRecordKey(pattern, matchType, nameType, setType);
             if (Contains(key))
             {
-#if DEBUG && PROFILING
+#if PROFILING
                 matchCount++;
 #endif
                 record = this[key];
                 return true;
             }
-#if DEBUG && PROFILING
+#if PROFILING
             mismatchCount++;
 #endif
             return false;

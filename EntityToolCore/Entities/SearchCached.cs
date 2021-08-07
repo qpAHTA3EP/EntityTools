@@ -2,9 +2,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using AcTp0Tools.Annotations;
 using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
+using EntityTools;
 using MyNW.Classes;
 using EntityTools.Enums;
 
@@ -12,7 +15,7 @@ namespace EntityCore.Entities
 {
     public static class SearchCached
     {
-#if DEBUG && PROFILING
+#if PROFILING
         static readonly long interval = 10000;
 
         private static Stopwatch stopwatch = new Stopwatch();
@@ -90,7 +93,7 @@ namespace EntityCore.Entities
                                                        List<CustomRegion> customRegions = null,
                                                        Predicate<Entity> specialCheck = null)
         {
-#if DEBUG && PROFILING
+#if PROFILING
             Count++;
             TimeSpan StartTime = stopwatch.Elapsed;
             stopwatch.Start();
@@ -129,7 +132,7 @@ namespace EntityCore.Entities
             }
 
             return entities;
-#if DEBUG && PROFILING
+#if PROFILING
             }
             finally
             {
@@ -170,7 +173,7 @@ namespace EntityCore.Entities
                                                        bool regionCheck = false,
                                                        Predicate<Entity> specialCheck = null)
         {
-#if DEBUG && PROFILING
+#if PROFILING
             Count++;
             TimeSpan StartTime = stopwatch.Elapsed;
             stopwatch.Start();
@@ -201,7 +204,7 @@ namespace EntityCore.Entities
             }
 
             return entities;
-#if DEBUG && PROFILING
+#if PROFILING
             }
             finally
             {
@@ -233,7 +236,7 @@ namespace EntityCore.Entities
         public static LinkedList<Entity> FindAllEntity(EntityCacheRecordKey key,
                                                        Predicate<Entity> specialCheck = null)
         {
-#if DEBUG && PROFILING
+#if PROFILING
             Count++;
             TimeSpan StartTime = stopwatch.Elapsed;
             stopwatch.Start();
@@ -270,7 +273,7 @@ namespace EntityCore.Entities
             }
 
             return entities;
-#if DEBUG && PROFILING
+#if PROFILING
             }
             finally
             {
@@ -313,7 +316,7 @@ namespace EntityCore.Entities
                                                List<CustomRegion> customRegions = null,
                                                Predicate<Entity> specialCheck = null)
         {
-#if DEBUG && PROFILING
+#if PROFILING
             Count++;
             TimeSpan StartTime = stopwatch.Elapsed;
             stopwatch.Start();
@@ -358,7 +361,7 @@ namespace EntityCore.Entities
                 cachedEntities.Processing(processor);
             }
             return closestEntity;
-#if DEBUG && PROFILING
+#if PROFILING
             }
             finally
             {
@@ -394,7 +397,7 @@ namespace EntityCore.Entities
                                                bool regionCheck = false,
                                                Predicate<Entity> specialCheck = null)
         {
-#if DEBUG && PROFILING
+#if PROFILING
             Count++;
             TimeSpan StartTime = stopwatch.Elapsed;
             stopwatch.Start();
@@ -458,7 +461,7 @@ namespace EntityCore.Entities
                 cachedEntities.Processing(evaluateAction);
             }
             return closestEntity;
-#if DEBUG && PROFILING
+#if PROFILING
             }
             finally
             {
@@ -487,7 +490,7 @@ namespace EntityCore.Entities
         public static Entity FindClosestEntity(EntityCacheRecordKey key,
                                                Predicate<Entity> specialCheck = null)
         {
-#if DEBUG && PROFILING
+#if PROFILING
             Count++;
             TimeSpan StartTime = stopwatch.Elapsed;
             stopwatch.Start();
@@ -537,7 +540,7 @@ namespace EntityCore.Entities
             }
 
             return closestEntity;
-#if DEBUG && PROFILING
+#if PROFILING
             }
             finally
             {

@@ -1,4 +1,6 @@
-﻿using Astral.Classes;
+﻿//#define PROFILING
+
+using Astral.Classes;
 using Astral.Classes.ItemFilter;
 using EntityTools.Enums;
 using MyNW.Classes;
@@ -6,6 +8,7 @@ using MyNW.Internals;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using EntityTools;
 
 namespace EntityCore.Entities
 {
@@ -14,7 +17,7 @@ namespace EntityCore.Entities
     /// </summary>
     public class EntityCacheRecord : IEnumerable<Entity>
     {
-#if DEBUG && PROFILING
+#if PROFILING
         private static int RegenCount = 0;
         private static int EntitiesCount = 0;
         public static void ResetWatch()
@@ -29,7 +32,6 @@ namespace EntityCore.Entities
             ETLogger.WriteLine(LogType.Debug, $"EntityCacheRecord: RegenCount: {RegenCount}");
         }
 #endif
-        public EntityCacheRecord() { }
         public EntityCacheRecord(string p, ItemFilterStringType mp = ItemFilterStringType.Simple, EntityNameType nt = EntityNameType.NameUntranslated, EntitySetType est = EntitySetType.Complete)
         {
             Key = new EntityCacheRecordKey(p, mp, nt, est);
@@ -64,39 +66,37 @@ namespace EntityCore.Entities
         /// </summary>
         public void Regen()
         {
-#if DEBUG && PROFILING
+#if PROFILING
             RegenCount++;
 #endif
-            LinkedList<Entity> entts;
-            if (Key.EntitySetType == EntitySetType.Contacts)
-                entts = SearchDirect.GetContactEntities(Key);
-            else entts = SearchDirect.GetEntities(Key);
+            LinkedList<Entity> entts = Key.EntitySetType == EntitySetType.Contacts 
+                ? SearchDirect.GetContactEntities(Key) 
+                : SearchDirect.GetEntities(Key);
 
             if (entts != null)
                 entities = entts;
             else entities.Clear();
-#if DEBUG && PROFILING
+#if PROFILING
             EntitiesCount += entities.Count;
 #endif
             if (EntityManager.LocalPlayer.InCombat
                 && !Astral.Quester.API.IgnoreCombat)
-                Timer = new Timeout(EntityTools.EntityTools.Config.EntityCache.GlobalCacheTime);
-            else Timer = new Timeout(EntityTools.EntityTools.Config.EntityCache.CombatCacheTime);
+                Timer.ChangeTime(EntityTools.EntityTools.Config.EntityCache.GlobalCacheTime);
+            else Timer.ChangeTime(EntityTools.EntityTools.Config.EntityCache.CombatCacheTime);
         }
         public void Regen(Action<Entity> action)
         {
-#if DEBUG && PROFILING
+#if PROFILING
             RegenCount++;
 #endif
-            LinkedList<Entity> entts;
-            if (Key.EntitySetType == EntitySetType.Contacts)
-                entts = SearchDirect.GetContactEntities(Key, action);
-            else entts = SearchDirect.GetEntities(Key, action);
+            LinkedList<Entity> entts = Key.EntitySetType == EntitySetType.Contacts 
+                ? SearchDirect.GetContactEntities(Key, action) 
+                : SearchDirect.GetEntities(Key, action);
 
             if (entts != null)
                 entities = entts;
             else entities.Clear();
-#if DEBUG && PROFILING
+#if PROFILING
             EntitiesCount += entities.Count;
 #endif
             if (EntityManager.LocalPlayer.InCombat
@@ -134,7 +134,7 @@ namespace EntityCore.Entities
 #if false
         public void Regen<TAgregator>(Func<TAgregator, Entity, TAgregator> proseccor, ref TAgregator agregator)
         {
-#if DEBUG && PROFILING
+#if PROFILING
             RegenCount++;
 #endif
             LinkedList<Entity> entts;
@@ -149,7 +149,7 @@ namespace EntityCore.Entities
                 entities.Clear();
                 agregator = default;
             }
-#if DEBUG && PROFILING
+#if PROFILING
             EntitiesCount += entities.Count;
 #endif
             if (EntityManager.LocalPlayer.InCombat

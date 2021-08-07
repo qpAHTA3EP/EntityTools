@@ -1,9 +1,7 @@
 ﻿using Astral.Classes.ItemFilter;
 using EntityTools.Enums;
-using EntityTools.Extensions;
 using MyNW.Classes;
 using System;
-using System.Text.RegularExpressions;
 
 namespace EntityCore.Entities
 {
@@ -18,13 +16,13 @@ namespace EntityCore.Entities
             comparer = Comparer_Initializer;
         }
 
-
         public readonly string Pattern = string.Empty;
         public readonly ItemFilterStringType MatchType = ItemFilterStringType.Simple;
-        public readonly EntityNameType NameType = EntityNameType.NameUntranslated;
+        public readonly EntityNameType NameType = EntityNameType.InternalName;
         public readonly EntitySetType EntitySetType = EntitySetType.Complete;
 
-        public bool IsValid => NameType == EntityNameType.Empty || !string.IsNullOrEmpty(Pattern);
+        public bool IsValid => NameType == EntityNameType.Empty 
+                               || !string.IsNullOrEmpty(Pattern);
 
         public override bool Equals(object otherObj)
         {
@@ -68,7 +66,9 @@ namespace EntityCore.Entities
         private Predicate<Entity> comparer;
 
         /// <summary>
-        /// Метод ленивой инициализации компаратора <see cref="comparer"/>, который выполняет сопоставление <param name="entity"/> с заданным набором атрибутов <see cref="Pattern"/>, <see cref="MatchType"/> и <see cref="NameType"/>
+        /// Метод ленивой инициализации компаратора <see cref="comparer"/>,
+        /// который выполняет сопоставление <param name="entity"/>
+        /// с заданным набором атрибутов <see cref="Pattern"/>, <see cref="MatchType"/> и <see cref="NameType"/>
         /// </summary>
         private bool Comparer_Initializer(Entity entity)
         {

@@ -3,15 +3,21 @@ using EntityTools.Enums;
 using EntityTools.Extensions;
 using MyNW.Classes;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Reflection;
 using System.Text.RegularExpressions;
+using EntityTools;
 
 namespace EntityCore.Entities
 {
     /// <summary>
-    /// Класс, инкапсулирующие все базовые проверки Entity на соответствие шаблону
+    /// Конструктор предиката, сопоставляющего <seealso cref="Entity"/> с текстовым шаблоном
     /// </summary>
     public static class EntityComparer
     {
+        public static readonly CompareInfo InvariantCultureCompareInfo = CultureInfo.InvariantCulture.CompareInfo;
+
         public static Predicate<Entity> Get(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated)
         {
             if (strMatchType == ItemFilterStringType.Simple)
@@ -74,39 +80,55 @@ namespace EntityCore.Entities
 
         private static bool CompareInternal2SimpleFull(Entity e, string pattern)
         {
-            return e.InternalName.Equals(pattern);
+            return e.InternalName.Equals(pattern, StringComparison.Ordinal);
         }
         private static bool CompareUntranslated2SimpleFull(Entity e, string pattern)
         {
-            return e.NameUntranslated.Equals(pattern);
+            return e.NameUntranslated.Equals(pattern, StringComparison.Ordinal);
         }
 
         private static bool CompareInternal2SimpleStart(Entity e, string pattern)
         {
-            return e.InternalName.StartsWith(pattern);
+            return e.InternalName.StartsWith(pattern, StringComparison.Ordinal);
         }
         private static bool CompareUntranslated2SimpleStart(Entity e, string pattern)
         {
-            return e.NameUntranslated.StartsWith(pattern);
+            return e.NameUntranslated.StartsWith(pattern, StringComparison.Ordinal);
         }
 
         private static bool CompareInternal2SimpleMiddle(Entity e, string pattern)
         {
-            return e.InternalName.Contains(pattern);
+#if false
+            return e.InternalName.Contains(pattern); 
+#else
+            // String.Contains() реализовано через String.IndexOf() >= 0
+            // Поэтому вызываем поиска подстроки без дополнительных проверок
+            // https://github.com/dotnet/coreclr/blob/bc146608854d1db9cdbcc0b08029a87754e12b49/src/mscorlib/src/System/String.cs#L2338
+            var intName = e.InternalName;
+            return InvariantCultureCompareInfo.IndexOf(intName, pattern, 0, intName.Length, CompareOptions.Ordinal) >= 0;
+#endif
         }
         private static bool CompareUntranslated2SimpleMiddle(Entity e, string pattern)
         {
-            return e.NameUntranslated.Contains(pattern);
+#if false
+            return e.NameUntranslated.Contains(pattern); 
+#else
+            // String.Contains() реализовано через String.IndexOf() >= 0
+            // Поэтому вызываем поиска подстроки без дополнительных проверок
+            // https://github.com/dotnet/coreclr/blob/bc146608854d1db9cdbcc0b08029a87754e12b49/src/mscorlib/src/System/String.cs#L2338
+            var unransName = e.NameUntranslated;
+            return InvariantCultureCompareInfo.IndexOf(unransName, pattern, 0, unransName.Length, CompareOptions.Ordinal) >= 0;
+#endif
         }
 
         private static bool CompareInternal2SimpleEnd(Entity e, string pattern)
         {
-            return e.InternalName.EndsWith(pattern);
+            return e.InternalName.EndsWith(pattern, StringComparison.Ordinal);
         }
 
         private static bool CompareUntranslated2SimpleEnd(Entity e, string pattern)
         {
-            return e.NameUntranslated.EndsWith(pattern);
+            return e.NameUntranslated.EndsWith(pattern, StringComparison.Ordinal);
         }
 
         private static bool CompareSimpleAny(Entity e) => true;
@@ -120,14 +142,27 @@ namespace EntityCore.Entities
             return Regex.IsMatch(e.NameUntranslated, pattern);
         }
 
+        /// <summary>
+        /// Кэш cкомпилированных регулярных выражений <seealso cref="Regex"/>
+        /// </summary>
+        private static readonly Dictionary<string, Regex> regexCache = new Dictionary<string, Regex>();
+
         private static Predicate<Entity> GetComparer_Internal2CompiledRegex(string pattern)
         {
-            var regex = new Regex(pattern, RegexOptions.Compiled | RegexOptions.Singleline);
+            if (!regexCache.TryGetValue(pattern, out var regex))
+            {
+                regex = new Regex(pattern, RegexOptions.Compiled | RegexOptions.Singleline);
+                regexCache.Add(pattern, regex);
+            }
             return e => regex.IsMatch(e.InternalName);
         }
         private static Predicate<Entity> GetComparer_Untranslated2CompiledRegex(string pattern)
         {
-            var regex = new Regex(pattern, RegexOptions.Compiled | RegexOptions.Singleline);
+            if (!regexCache.TryGetValue(pattern, out var regex))
+            {
+                regex = new Regex(pattern, RegexOptions.Compiled | RegexOptions.Singleline);
+                regexCache.Add(pattern, regex);
+            }
             return e => regex.IsMatch(e.NameUntranslated);
         }
 
