@@ -160,14 +160,14 @@ namespace EntityTools.Tools.Missions
                 return false;
 
             if (entity.Location.Distance3D(_position) > _tolerance
-                || !(entity.CostumeRef.CostumeName.Equals(_id) || entity.InternalName.Equals(_id)))
+                || !(entity.CostumeRef.CostumeName.Equals(_id, StringComparison.Ordinal) || entity.InternalName.Equals(_id, StringComparison.Ordinal)))
                 return false;
 
             if (string.IsNullOrEmpty(_mapName))
                 return true;
 
             var player = EntityManager.LocalPlayer;
-            return _mapName.Equals(player.MapState.MapName) && _regionName.Equals(player.RegionInternalName);
+            return _mapName.Equals(player.MapState.MapName, StringComparison.Ordinal) && _regionName.Equals(player.RegionInternalName, StringComparison.Ordinal);
         }
         /// <summary>
         /// Квестодатель задан корректно
@@ -191,13 +191,15 @@ namespace EntityTools.Tools.Missions
         {
             get
             {
-                if (_type == MissionGiverType.NPC)
+                if (_type == MissionGiverType.Remote)
                     return !string.IsNullOrEmpty(_id);
 
                 var player = EntityManager.LocalPlayer;
-                return _position!= null && _position.IsValid
+                return _position != null && _position.IsValid
                        && !string.IsNullOrEmpty(_id)
-                       && (string.IsNullOrEmpty(_mapName) || _mapName.Equals(player.MapState.MapName) && _regionName.Equals(player.RegionInternalName));
+                       && (string.IsNullOrEmpty(_mapName) 
+                           || _mapName.Equals(player.MapState.MapName, StringComparison.Ordinal) 
+                               && _regionName.Equals(player.RegionInternalName, StringComparison.Ordinal));
             }
         }
 
