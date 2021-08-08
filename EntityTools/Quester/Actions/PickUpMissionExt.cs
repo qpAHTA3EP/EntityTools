@@ -63,7 +63,7 @@ namespace EntityTools.Quester.Actions
 
             }
         }
-        internal bool _skipOnFail;
+        internal bool _skipOnFail = false;
 
 #if DEVELOPER
         [Editor(typeof(MissionGiverInfoEditor), typeof(UITypeEditor))]
