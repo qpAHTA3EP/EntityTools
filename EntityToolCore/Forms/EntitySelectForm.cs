@@ -55,22 +55,24 @@ namespace EntityCore.Forms
             //@this.Text = $"{@this.GetType().Name} [{strMatchType}; {nameType}]";
             @this.tbPattern.Text = entPattern;
 
-            @this.FillEntitiesDgv(EntityToPatternComparer.Get(entPattern, strMatchType, nameType));
+#if false 
+            @this.FillEntitiesDgv(EntityTools.Tools.Entities.EntityComparer.Get(entPattern, strMatchType, nameType));
+#else
+            @this.FillEntitiesDgv(EntityComparer.Get(entPattern, strMatchType, nameType)); 
+#endif
 
-            if (@this.ShowDialog() == DialogResult.OK
-                && (!@this.dgvEntities.CurrentRow.IsNewRow
-                && @this.dgvEntities.CurrentRow != null 
-                || !string.IsNullOrEmpty(@this.tbPattern.Text)))
+            if (@this.ShowDialog() == DialogResult.OK)
             {
                 if (string.IsNullOrEmpty(@this.tbPattern.Text))
                 {
+                    var currentRow = @this.dgvEntities.CurrentRow;
                     switch (@this.cbNameType.SelectedItem)
                     {
                         case EntityNameType.InternalName:
-                            entPattern = @this.dgvEntities.CurrentRow.Cells[@this.clmnInternalNameInd].Value.ToString();
+                            entPattern = currentRow.Cells[@this.clmnInternalNameInd].Value.ToString();
                             break;
                         case EntityNameType.NameUntranslated:
-                            entPattern = @this.dgvEntities.CurrentRow.Cells[@this.clmnNameUntranslatedInd].Value.ToString();
+                            entPattern = currentRow.Cells[@this.clmnNameUntranslatedInd].Value.ToString();
                             break;
                         case EntityNameType.Empty:
                             entPattern = string.Empty;
@@ -82,7 +84,7 @@ namespace EntityCore.Forms
                 strMatchType = (ItemFilterStringType)@this.cbStrMatch.SelectedItem;
                 nameType = (EntityNameType)@this.cbNameType.SelectedItem;
 
-                return @this.dgvEntities.CurrentRow.Tag as Entity;
+                return @this.dgvEntities.CurrentRow.Tag as Entity; 
             }
             return null;
         }
@@ -324,13 +326,25 @@ namespace EntityCore.Forms
                     switch ((EntityNameType)cbNameType.SelectedItem)
                     {
                         case EntityNameType.InternalName:
-                            test = EntityToPatternComparer.Get(dgvEntities.CurrentRow.Cells[clmnInternalNameInd].Value.ToString(), (ItemFilterStringType)cbStrMatch.SelectedItem, (EntityNameType)cbNameType.SelectedItem);
+#if false 
+                            test = EntityTools.Tools.Entities.EntityComparer.Get(dgvEntities.CurrentRow.Cells[clmnInternalNameInd].Value.ToString(), (ItemFilterStringType)cbStrMatch.SelectedItem, (EntityNameType)cbNameType.SelectedItem);
+#else
+                            test = EntityComparer.Get(dgvEntities.CurrentRow.Cells[clmnInternalNameInd].Value.ToString(), (ItemFilterStringType)cbStrMatch.SelectedItem, (EntityNameType)cbNameType.SelectedItem); 
+#endif
                             break;
                         case EntityNameType.NameUntranslated:
-                            test = EntityToPatternComparer.Get(dgvEntities.CurrentRow.Cells[clmnNameUntranslatedInd].Value.ToString(), (ItemFilterStringType)cbStrMatch.SelectedItem, (EntityNameType)cbNameType.SelectedItem);
+#if false
+                            test = EntityTools.Tools.Entities.EntityComparer.Get(dgvEntities.CurrentRow.Cells[clmnNameUntranslatedInd].Value.ToString(), (ItemFilterStringType)cbStrMatch.SelectedItem, (EntityNameType)cbNameType.SelectedItem);
+#else
+                            test = EntityComparer.Get(dgvEntities.CurrentRow.Cells[clmnNameUntranslatedInd].Value.ToString(), (ItemFilterStringType)cbStrMatch.SelectedItem, (EntityNameType)cbNameType.SelectedItem); 
+#endif
                             break;
                         case EntityNameType.Empty:
-                            test = EntityToPatternComparer.Get(string.Empty, (ItemFilterStringType)cbStrMatch.SelectedItem, (EntityNameType)cbNameType.SelectedItem);
+#if false
+                            test = EntityTools.Tools.Entities.EntityComparer.Get(string.Empty, (ItemFilterStringType)cbStrMatch.SelectedItem, (EntityNameType)cbNameType.SelectedItem);
+#else
+                            test = EntityComparer.Get(string.Empty, (ItemFilterStringType)cbStrMatch.SelectedItem, (EntityNameType)cbNameType.SelectedItem); 
+#endif
                             break;
                     }
                 else
@@ -338,7 +352,11 @@ namespace EntityCore.Forms
                     XtraMessageBox.Show("Select Entity first!");
                     return;
                 }
-            else test = EntityToPatternComparer.Get(tbPattern.Text, (ItemFilterStringType)cbStrMatch.SelectedItem, (EntityNameType)cbNameType.SelectedItem);
+#if false
+            else test = EntityTools.Tools.Entities.EntityComparer.Get(tbPattern.Text, (ItemFilterStringType)cbStrMatch.SelectedItem, (EntityNameType)cbNameType.SelectedItem);
+#else
+            else test = EntityComparer.Get(tbPattern.Text, (ItemFilterStringType)cbStrMatch.SelectedItem, (EntityNameType)cbNameType.SelectedItem); 
+#endif
 
             if (test != null)
             {

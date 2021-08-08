@@ -1,17 +1,11 @@
-﻿//#define HARMONY
-#if PATCH_ASTRAL && HARMONY 
-using HarmonyLib; 
-#else
-//#define Patch_AstralXmlSerializer
-#endif
-
-using EntityTools.Reflection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
+﻿using EntityTools.Patches.Logic.General;
+using EntityTools.Patches.Mapper;
+using EntityTools.Patches.Quester;
 using EntityTools.Patches.UCC;
+using System.Reflection;
+
+// ReSharper disable UnusedMember.Local
+// ReSharper disable InconsistentNaming
 
 namespace EntityTools.Patches
 {
@@ -21,92 +15,56 @@ namespace EntityTools.Patches
     /// </summary>
     internal static class ETPatcher
     {
-        /// <summary>
-        /// Подмена штатного окна Mapper'a
-        /// </summary>
-        private static readonly Patch patchMapper = (EntityTools.PluginSettings.Mapper.Patch) ?
-            new Patch(
-                typeof(Astral.Quester.Forms.MapperForm).GetMethod("Open", ReflectionHelper.DefaultFlags),
-                typeof(Mapper.MapperFormExt).GetMethod(nameof(Mapper.MapperFormExt.Open), ReflectionHelper.DefaultFlags))
-            : null;
+        private static readonly Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly = new Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly();
+        
+        private static readonly Patch_Logic_UCC_Forms_AddClass_Show Patch_Logic_UCC_Forms_AddClass_Show = new Patch_Logic_UCC_Forms_AddClass_Show();
 
-#if Patch_AstralXmlSerializer
-        /// <summary>
-        /// Подмена метода, формирующего список типов для сериализации профилей
-        /// </summary>
-#if false
-		private static Patch patchXmlSerializerGetExtraTypes = new Patch(
-            typeof(Astral.Functions.XmlSerializer).GetMethod("GetExtraTypes",
-                BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic/*, 
-                null, new Type[] { typeof(int) }, null*/),
-            typeof(Patch_XmlSerializer_GetExtraTypes).GetMethod(nameof(Patch_XmlSerializer_GetExtraTypes.GetExtraTypes),
-                BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic));  
-#else
-        private static Patch_XmlSerializer_GetExtraTypes patchXmlSerializerGetExtraTypes = new Patch_XmlSerializer_GetExtraTypes();
-#endif
+        private static readonly Patch_VIP_SealTraderEntity Patch_VIP_SealTraderEntity = new Patch_VIP_SealTraderEntity();
+        private static readonly Patch_VIP_ProfessionVendorEntity Patch_VIP_ProfessionVendorEntity = new Patch_VIP_ProfessionVendorEntity();
 
-#endif
-        /// <summary>
-        /// Подмена ActionsPlayer.CheckAlly(..)
-        /// </summary>
-        private static readonly Patch_ActionsPlayer_CheckAlly patchActionsPlayerCheckAlly = new Patch_ActionsPlayer_CheckAlly();
+        //private static readonly Patch_Astral_Quester_Core_Save Patch_Astral_Quester_Core_Save = new Patch_Astral_Quester_Core_Save();
 
-        private static readonly Patch_AddClass_Show patchAddClassShow = new Patch_AddClass_Show();
 
-        private static readonly Patch_VIP_SealTraderEntity patchVIPSealTraderEntity = new Patch_VIP_SealTraderEntity();
+        // Патч метода выбора текущего индекса
+        private static readonly Astral_Logic_General_GetNearestIndexInPositionList Astral_Logic_General_GetNearestIndexInPositionList = new Astral_Logic_General_GetNearestIndexInPositionList();
 
-        private static readonly Patch_VIP_ProfessionVendorEntity patchVIPProfessionVendorEntity = new Patch_VIP_ProfessionVendorEntity();
 
-        static bool Applied = false;
+        static bool _applied;
         public static void Apply()
         {
-            //TODO: Реализовать механизм отключения патчей (всех)
-            // В первую очерещь эта касается патчей Patch_VIP_SealTraderEntity и Patch_VIP_ProfessionVendorEntity
-
-
-            if (!Applied)
+            if (!_applied)
             {
-#if true
                 foreach (var field in typeof(ETPatcher).GetFields(BindingFlags.NonPublic | BindingFlags.Static))
                 {
-                    if (field.GetValue(null) is Patch patch
-                        && patch != null)
+                    if (field.GetValue(null) is Patch patch)
                     {
                         patch.Inject();
                     }
-#if false
-                    else
-                    {
-                        ETLogger.WriteLine($"Failed to apply patch '{field.FieldType.Name}' named '{field.Name}'");
-                    } 
-#endif
+
                 }
-#else
-
-                patchMapper?.Inject();
-
-                patchActionsPlayerCheckAlly.Inject();
-
-                PatchAddClassShow.Inject();
-#endif
-
-#if Patch_AstralXmlSerializer
-                patchXmlSerializerGetExtraTypes.Inject();
-#endif
+                // Изменение алгоритмов навигации
+                ComplexPatch_Navigation.Apply();
+                // Подмена штатного окна Mapper'a
+                ComplexPatch_Mapper.Apply();
+                // Изменение команды квестера AddUCCAction и сопутствующие патчи
+                ComplexPatch_Quester_UccEditing.Apply();
 #if HARMONY
                 try
                 {
-                    var harmony = new Harmony(nameof(ETPatcher));
-                    harmony.PatchAll();
+#if true
+                    AcTp0Tools.Patches.AcTp0Patcher.Harmony.PatchAll();
+#else
+                    var harmony = new HarmonyLib.Harmony(nameof(EntityTools));
+                    harmony.PatchAll(); 
+#endif
                 }
                 catch
                 {
-                    ETLogger.WriteLine(LogType.Error, "Harmonies patches are failed!",true);
+                    ETLogger.WriteLine(LogType.Error, "Harmony patches are failed!",true);
                 }
 #endif
-                Applied = true;
+                _applied = true;
             }
-
         }
     }
 #endif

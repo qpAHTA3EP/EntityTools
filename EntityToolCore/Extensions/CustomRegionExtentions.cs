@@ -1,4 +1,5 @@
 ﻿using Astral.Quester.Classes;
+using EntityTools.Tools.CustomRegions;
 using MyNW.Classes;
 using System.Collections.Generic;
 using System.Windows.Forms;
@@ -8,13 +9,44 @@ namespace EntityCore.Extensions
     public static class CustomRegionExtentions
     {
         /// <summary>
-        /// Проверка нахождения объекта entity в границах региона region
+        /// Проверка нахождения объекта <paramref name="position"/> в границах региона <paramref name="region"/>
         /// </summary>
-        /// <param name="entity">Объект Entity, местонахождение которого проверяется</param>
-        /// <param name="region">CustomRegion </param>
-        /// <returns></returns>
+        public static bool IsInCustomRegion(Vector3 position, CustomRegion region)
+        {
+            float x = position.X;
+            float y = position.Y;
+            var regPos = region.Position;
+            float x1 = regPos.X;
+            float y1 = regPos.Y;
+            float width = region.Width;
+            float height = region.Height;
+
+            if (width == 0 || height == 0)
+                return false;
+
+            if (region.Eliptic)
+            {
+                float dx = 2f * (x - x1) / width - 1f;
+                float dy = 2f * (y - y1) / height - 1f;
+                return dx * dx + dy * dy <= 1f;
+            }
+            else
+            {
+                float x2 = x1;
+                float y2 = y1;
+                if (width < 0)
+                    x1 += width;
+                else x2 = x1 + width;
+                if (height < 0)
+                    y1 += height;
+                else y2 = y1 + height;
+
+                return x > x1 && x < x2 && y > y1 && y < y2;
+            }
+        }
         public static bool IsInCustomRegion(Entity entity, CustomRegion region)
         {
+#if false
             if (region.Eliptic)
             {
                 float x = region.Position.X;
@@ -42,15 +74,46 @@ namespace EntityCore.Extensions
                 Vector3 location = entity.Location;
 
                 return location.X > vector.X && location.X < vector2.X && location.Y > vector.Y && location.Y < vector2.Y;
+            } 
+#elif false
+            float x = entity.X;
+            float y = entity.Y;
+            var regPos = region.Position;
+            float x1 = regPos.X;
+            float y1 = regPos.Y;
+            float width = region.Width;
+            float height = region.Height;
+
+            if (width == 0 || height == 0)
+                return false;
+
+            if (region.Eliptic)
+            {
+                float dx = 2f * (x - x1) / width - 1f;
+                float dy = 2f * (y - y1) / height - 1f;
+                return dx * dx + dy * dy <= 1f;
             }
+            else
+            {
+                float x2 = x1;
+                float y2 = y1;
+                if (width < 0)
+                    x1 += width;
+                else x2 = x1 + width;
+                if (height < 0)
+                    y1 += height;
+                else y2 = y1 + height;
+
+                return x > x1 && x < x2 && y > y1 && y < y2;
+            }
+#else
+            return IsInCustomRegion(entity.Location, region);
+#endif
         }
 
         /// <summary>
-        /// Проверка нахождения объекта entity в границах региона customRegionName
+        /// Проверка нахождения объекта <paramref name="entity"/> в границах региона <paramref name="customRegionName"/>
         /// </summary>
-        /// <param name="entity">Объект Entity, местонахождение которого проверяется</param>
-        /// <param name="customRegionName">Наименование CustomRegion</param>
-        /// <returns></returns>
         public static bool IsInCustomRegion(Entity entity, string customRegionName)
         {
             if (string.IsNullOrEmpty(customRegionName))
@@ -80,54 +143,18 @@ namespace EntityCore.Extensions
         {
             return IsInCustomRegion(entity, customRegion);
         }
-        public static bool Within(this CustomRegion customRegion, Entity entity)
+        public static bool Cover(this CustomRegion customRegion, Entity entity)
         {
             return IsInCustomRegion(entity, customRegion);
         }
-
-        /// <summary>
-        /// Делегат, заполняющий DataGridView списком итемов
-        /// </summary>
-        /// <param name="dgv"></param>
-        internal static void CustomRegionList2DataGridView(List<string> regions, DataGridView dgv)
+        public static bool Cover(this CustomRegion customRegion, Vector3 position)
         {
-            int indSelect = dgv.Columns.Contains("clmnSelect") ? dgv.Columns["clmnSelect"].DisplayIndex : -1;
-            int indItems = dgv.Columns.Contains("clmnItems") ? dgv.Columns["clmnItems"].DisplayIndex : -1;
-            if (indSelect == -1 || indItems == -1)
-                return;
-
-            dgv.Rows.Clear();
-            foreach (CustomRegion cr in Astral.Quester.API.CurrentProfile.CustomRegions)
-            {
-                DataGridViewRow row = new DataGridViewRow();
-                row.CreateCells(dgv);
-                row.Cells[indItems].Value = cr.Name;
-                row.Cells[indSelect].Value = (regions != null && regions.Contains(cr.Name));
-                dgv.Rows.Add(row);
-            }
+            return IsInCustomRegion(position, customRegion);
         }
-
-        /// <summary>
-        /// Делегат, формирующий список выбранных итемов из DataGridView
-        /// </summary>
-        /// <param name="dgv"></param>
-        internal static void DataGridView2CustomRegionList(DataGridView dgv, ref List<string> regions)
+        public static bool Cover(this CustomRegionEntry crEntry, Vector3 position)
         {
-            int indSelect = dgv.Columns.Contains("clmnSelect") ? dgv.Columns["clmnSelect"].DisplayIndex : -1;
-            int indItems = dgv.Columns.Contains("clmnItems") ? dgv.Columns["clmnItems"].DisplayIndex : -1;
-            if (indSelect == -1 || indItems == -1)
-                return;
-
-            regions = new List<string>(dgv.Rows.Count);
-
-            foreach (DataGridViewRow row in dgv.Rows)
-            {
-                if (row.Cells[indSelect].Value.Equals(true))
-                {
-                    regions.Add(row.Cells[indItems].Value.ToString());
-                }
-            }
+            var cr = crEntry.CustomRegion;
+            return cr is null ? false : IsInCustomRegion(position, cr);
         }
-
     }
 }

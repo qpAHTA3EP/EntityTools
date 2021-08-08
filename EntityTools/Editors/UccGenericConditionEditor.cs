@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using Astral.Quester.Forms;
 using EntityTools.UCC.Conditions;
-using ActionCond = Astral.Logic.UCC.Ressources.Enums.ActionCond;
 
 namespace EntityTools.Editors
 {
@@ -12,26 +11,27 @@ namespace EntityTools.Editors
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            if (context.Instance is UCCGenericCondition condition)
+            if (context?.Instance is UCCGenericCondition condition)
             {
-                if(condition.Tested == ActionCond.HasAura
-                    || condition.Tested == ActionCond.AuraStacks)
+                if (condition.Tested == Astral.Logic.UCC.Ressources.Enums.ActionCond.HasAura ||
+                    condition.Tested == Astral.Logic.UCC.Ressources.Enums.ActionCond.AuraStacks)
                 {
                     string newVal = string.Empty;
-                    if (EntityTools.Core.GUIRequest_AuraId(ref newVal))
+                    if (EntityTools.Core.UserRequest_SelectAuraId(ref newVal))
                     {
-                        if (condition.Tested == ActionCond.AuraStacks)
+                        if (condition.Tested == Astral.Logic.UCC.Ressources.Enums.ActionCond.AuraStacks)
                         {
-                            string[] array = condition.Value.Split(new char[] { ':' });
+                            string[] array = condition.Value.Split(':');
                             if (array.Length > 1)
                                 return string.Concat(array[0], ':', newVal);
-                            else return string.Concat("0:", newVal);
+                            return string.Concat("0:", newVal);
                         }
-                        else return newVal;
+
+                        return newVal;
                     }
                 }
-                else if(condition.Tested == ActionCond.SpellIsActive
-                        || condition.Tested == ActionCond.SpellOnCooldown)
+                else if(condition.Tested == Astral.Logic.UCC.Ressources.Enums.ActionCond.SpellIsActive ||
+                        condition.Tested == Astral.Logic.UCC.Ressources.Enums.ActionCond.SpellOnCooldown)
                 {
                     string power = GetAnId.GetPower(true);
                     if (!string.IsNullOrEmpty(power))

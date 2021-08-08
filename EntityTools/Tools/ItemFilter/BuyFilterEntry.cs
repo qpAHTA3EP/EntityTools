@@ -425,7 +425,7 @@ namespace EntityTools.Tools.ItemFilter
                         _entryType = eType;
                         entryTypeOk = true;
                     }
-                    else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parce '{innerElemName}'", true);
+                    else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parse '{innerElemName}'", true);
                 }
                 else if (innerElemName == nameof(ItemFilterEntry.Type))
                 {
@@ -463,7 +463,7 @@ namespace EntityTools.Tools.ItemFilter
                         }
                         entryTypeOk = true;
                     }
-                    else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parce '{innerElemName}'", true);
+                    else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parse '{innerElemName}'", true);
                 }
                 else if (innerElemName == nameof(StringType))
                 {
@@ -473,7 +473,7 @@ namespace EntityTools.Tools.ItemFilter
                         _stringType = strType;
                         stringTypeOk = true;
                     }
-                    else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parce '{innerElemName}'", true);
+                    else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parse '{innerElemName}'", true);
                 }
                 else if (innerElemName == nameof(Mode))
                 {
@@ -484,7 +484,7 @@ namespace EntityTools.Tools.ItemFilter
                         if (_mode == ItemFilterMode.Exclude)
                             throw new XmlException($"'{ItemFilterMode.Exclude}' value of '{nameof(ItemFilterMode)}' does not suppoted in {nameof(BuyFilterEntry)}");
                     }
-                    else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parce '{innerElemName}'", true);
+                    else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parse '{innerElemName}'", true);
                 }
                 else if (innerElemName == nameof(Pattern) || innerElemName == nameof(ItemFilterEntry.Text) || innerElemName == "Identifier")
                 {
@@ -496,42 +496,42 @@ namespace EntityTools.Tools.ItemFilter
                     string priority_str = reader.ReadElementContentAsString(innerElemName, "");
                     if (uint.TryParse(priority_str, out uint prt))
                         _priority = prt;
-                    else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parce '{innerElemName}'", true);
+                    else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parse '{innerElemName}'", true);
                 }
                 else if (innerElemName == nameof(Count))
                 {
                     string cnt_str = reader.ReadElementContentAsString(innerElemName, "");
                     if (uint.TryParse(cnt_str, out uint cnt))
                         _count = cnt;
-                    else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parce '{innerElemName}'", true);
+                    else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parse '{innerElemName}'", true);
                 }
                 else if (innerElemName == nameof(KeepNumber))
                 {
                     string keep_str = reader.ReadElementContentAsString(innerElemName, "");
                     if (bool.TryParse(keep_str, out bool keep))
                         _keepNumber = keep;
-                    else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parce '{innerElemName}'", true);
+                    else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parse '{innerElemName}'", true);
                 }
                 else if (innerElemName == nameof(CheckEquipmentLevel))
                 {
                     string eqLvl_str = reader.ReadElementContentAsString(innerElemName, "");
                     if (bool.TryParse(eqLvl_str, out bool eqLvl))
                         _checkEquipmentLevel = eqLvl;
-                    else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parce '{innerElemName}'", true);
+                    else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parse '{innerElemName}'", true);
                 }
                 else if (innerElemName == nameof(CheckPlayerLevel))
                 {
                     string plLvl_str = reader.ReadElementContentAsString(innerElemName, "");
                     if (bool.TryParse(plLvl_str, out bool plLvl))
                         _checkPlayerLevel = plLvl;
-                    else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parce '{innerElemName}'", true);
+                    else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parse '{innerElemName}'", true);
                 }
                 else if (innerElemName == nameof(Wear) || innerElemName == "PutOnItem")
                 {
                     string wear_str = reader.ReadElementContentAsString(innerElemName, "");
                     if (bool.TryParse(wear_str, out bool wear))
                         _wear = wear;
-                    else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parce '{innerElemName}'", true);
+                    else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name} failed to parse '{innerElemName}'", true);
                 }
                 else if (innerElemName == elementName && reader.NodeType == XmlNodeType.EndElement)
                     reader.ReadEndElement();

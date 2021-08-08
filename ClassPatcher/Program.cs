@@ -36,7 +36,7 @@ namespace ClassPatcher
                                             foreach (var mDef in tDef.Methods)
                                             {
                                                 dump.WriteLine();
-                                                dump.WriteLine("Method: " + mDef.ToString());
+                                                dump.WriteLine("Method: " + mDef);
                                                 dump.WriteLine();
                                                 dump.WriteLine("Variables:");
                                                 foreach (var varDef in mDef.Body.Variables)
@@ -148,25 +148,50 @@ namespace ClassPatcher
                 {
                     if (tDef.Name == "ItemIdFilterEditor" ||
                         tDef.Name == "ItemIdEditor" ||
-                        tDef.Name == "GetMailItems" ||
-                        tDef.Name == "Roles" ||
-                        tDef.Name == "NPCVendorInfos" ||
                         tDef.Name == "BuyOptionsEditor" ||
                         tDef.Name == "DialogKeyEditor" ||
                         tDef.Name == "DialogEditor" ||
-                        tDef.Name == "Core" ||
-                        tDef.Name == "ProcessInfos" ||
                         tDef.Name == "RemoteContactEditor" ||
-                        tDef.Name == "Movements" ||
                         tDef.Name == "MainMissionEditor" ||
-                        tDef.Name == "AuraEditor" ||
                         tDef.Name == "PowerAllIdEditor" ||
                         tDef.Name == "AuraEditor" ||
+                        tDef.FullName == "Astral.Quester.UIEditors.CurrentMapEdit" ||
+                        tDef.FullName == "Astral.Quester.UIEditors.CurrentRegionEdit" ||
+                        tDef.Name == "GetMailItems" ||
+                        tDef.Name == "Roles" ||
+                        tDef.Name == "Entrypoint" ||
+                        tDef.Name == "Engine" ||
+                        tDef.Name == "Profile" ||
+                        tDef.Name == "Settings" ||
+                        tDef.Name == "NPCVendorInfos" ||
+                        tDef.Name == "Core" ||
+                        tDef.Name == "ProcessInfos" ||
+                        tDef.Name == "Movements" ||
                         tDef.Name == "NPCInfos" ||
+                        tDef.Name == "ActiveTaskEditor" ||
+                        tDef.Name == "NPCId" ||
+                        tDef.Name == "NPCId2" ||
+                        tDef.Name == "PositionNodeListEditorr" ||
+                        tDef.FullName == "Astral.Quester.UIEditors.SharedBankNumericsEditor" ||
+                        tDef.FullName == "Astral.Professions.Functions.Tasks" ||
+                        tDef.FullName == "Astral.Professions.FSM.States.Main" ||
+
+                        tDef.Name == "TaskEditor" ||
+                        tDef.FullName == "Astral.Addons.Role" ||
                         tDef.FullName == "Astral.Controllers.Plugins" ||
-                        tDef.FullName == "Astral.Logic.UCC.Controllers.Movements" ||
                         tDef.FullName == "Astral.Controllers.Relogger" ||
-                        tDef.FullName == "Astral.Controllers.CustomClasses")
+                        tDef.FullName == "Astral.Controllers.CustomClasses" ||
+                        tDef.FullName == "Astral.Controllers.AOECheck" ||
+                        tDef.FullName == "Astral.Controllers.BotComs.BotClient" ||
+                        tDef.FullName == "Astral.Controllers.BotComs.BotServer" ||
+                        tDef.Name == "AOE" || // "Astral.Controllers.AOECheck.AOE"
+                        tDef.FullName == "Astral.Controllers.AOECheck.AOE" ||
+                        tDef.FullName == "Astral.Logic.Classes.Map.Functions.Picture" ||
+                        tDef.FullName == "Astral.Logic.UCC.Controllers.Movements" ||
+                        tDef.Name == "DodgeLosTestResult" || //Astral.Logic.NW.Movements.DodgeLosTestResult
+                        tDef.FullName == "Astral.Quester.FSM.States.Combat" ||
+                        tDef.FullName == "Astral.Quester.Controllers.Road"||
+                        tDef.Name == "Road")
 
                     {
                         tDef.IsPublic = true;

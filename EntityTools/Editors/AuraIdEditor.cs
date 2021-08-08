@@ -10,7 +10,7 @@ namespace EntityTools.Editors
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
             string auraId = value.ToString();
-            if (EntityTools.Core.GUIRequest_AuraId(ref auraId) &&
+            if (EntityTools.Core.UserRequest_SelectAuraId(ref auraId) &&
                 !string.IsNullOrEmpty(auraId))
                 return auraId;
 

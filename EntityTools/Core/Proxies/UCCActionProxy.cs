@@ -1,32 +1,27 @@
-﻿using EntityTools.Core.Interfaces;
-using EntityTools.Reflection;
-using MyNW.Classes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Reflection;
-using System.Text;
+using Astral.Logic.UCC.Classes;
+using EntityTools.Core.Interfaces;
+using AcTp0Tools.Reflection;
+using MyNW.Classes;
 
 namespace EntityTools.Core.Proxies
 {
-    public class UCCActionProxy : IUCCActionEngine
+    public class UccActionProxy : IUccActionEngine
     {
-        private Astral.Logic.UCC.Classes.UCCAction action;
+        private UCCAction _action;
 
-        internal UCCActionProxy(Astral.Logic.UCC.Classes.UCCAction a)
+        internal UccActionProxy(UCCAction uccAction)
         {
-            action = a ?? throw new ArgumentNullException();
+            _action = uccAction ?? throw new ArgumentNullException(nameof(uccAction));
+            _unitRef = uccAction.GetProperty<Entity>(nameof(UnitRef));
         }
         public bool NeedToRun
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
-                    return action.NeedToRun;
-
-                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
-
-                EntityTools.StopBot();
+                if (EntityTools.Core.Initialize(_action))
+                    return _action.NeedToRun;
 
                 return false;
             }
@@ -36,31 +31,50 @@ namespace EntityTools.Core.Proxies
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
-                    if (ReflectionHelper.GetPropertyValue(action, "UnitRef", out object result, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                        && result is Entity entity)
-                        return entity;
-                return new Entity(IntPtr.Zero);
+                if (EntityTools.Core.Initialize(_action))
+                {
+                    if (_unitRef.IsValid)
+                        return _unitRef.Value;
+                    ETLogger.WriteLine(LogType.Error, "Invalid 'UnitRef' accessor");
+                    ETLogger.WriteLine(LogType.Error, Environment.StackTrace);
+                }
+                return Empty.Entity;
             }
         }
+        PropertyAccessor<Entity> _unitRef;
 
         public string Label()
         {
-            if (EntityTools.Core.Initialize(action))
-                return action.ToString();
-            else return action.GetType().Name;
+            if (string.IsNullOrEmpty(_label))
+            {
+                if (EntityTools.Core.Initialize(_action))
+                    _label = _action.ToString();
+                else _label = $"{_action.GetType().Name} [uninitialized]"; 
+            }
+            return _label;
         }
+        string _label;
 
         public bool Run()
         {
-            if (EntityTools.Core.Initialize(action))
-                return action.Run();
-
-            ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
-
-            EntityTools.StopBot();
+            if (EntityTools.Core.Initialize(_action))
+                return _action.Run();
 
             return false;
+        }
+
+        public bool Rebase(UCCAction uccAction)
+        {
+            return EntityTools.Core.Initialize(uccAction);
+        }
+
+        public void Dispose()
+        {
+            if (_action != null)
+            {
+                ReflectionHelper.SetFieldValue(_action, "Engine", null);
+                _action = null;
+            }
         }
     }
 }

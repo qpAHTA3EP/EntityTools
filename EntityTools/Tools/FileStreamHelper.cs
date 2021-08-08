@@ -3,11 +3,11 @@ using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 
-/// <summary>
-/// https://www.cyberforum.ru/post9373739.html
-/// </summary>
 namespace EntityTools.Tools
 {
+    /// <summary>
+    /// https://www.cyberforum.ru/post9373739.html
+    /// </summary>
     public static class FileStreamHelper
     {
         public static FileStream OpenWithStream(string fileName, string streamName, FileMode mode, FileAccess access)

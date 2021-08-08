@@ -1,8 +1,4 @@
 ﻿using EntityTools.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace EntityTools.Extensions
 {
@@ -61,7 +57,7 @@ namespace EntityTools.Extensions
                 if (string.IsNullOrEmpty(pattern))
                     return true;
                 else return false;
-            else if (string.IsNullOrEmpty(pattern))
+            if (string.IsNullOrEmpty(pattern))
                 return false;
 
             switch (patternPos)

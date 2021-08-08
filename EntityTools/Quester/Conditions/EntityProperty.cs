@@ -1,40 +1,22 @@
-﻿using Astral.Classes.ItemFilter;
-using Astral.Quester.Classes;
-using EntityTools.Core.Proxies;
-using EntityTools.Editors;
-using EntityTools.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Threading;
 using System.Xml.Serialization;
+using Astral.Classes.ItemFilter;
+using Astral.Quester.Classes;
+using EntityTools.Core.Interfaces;
+using EntityTools.Core.Proxies;
+using EntityTools.Editors;
+using EntityTools.Enums;
+using EntityTools.Tools.CustomRegions;
 
 namespace EntityTools.Quester.Conditions
 {
     [Serializable]
-    public class EntityProperty : Condition, INotifyPropertyChanged
+    public class EntityProperty : Condition, INotifyPropertyChanged, IEntityDescriptor
     {
-        #region Взаимодействие с ядром EntityTools
-        public event PropertyChangedEventHandler PropertyChanged;
-#if CORE_DELEGATES
-        public Func<bool> doValidate = null;
-        public Func<string> getString = null;
-        public Func<string> getTestInfos = null;
-        public System.Action doReset = null;
-#endif
-#if CORE_INTERFACES
-        internal IQuesterConditionEngine Engine = null;
-#endif
-        #endregion
-
-        public EntityProperty()
-        {
-#if CORE_INTERFACES
-            Engine = new QuesterConditionProxy(this);
-#endif
-            // EntityTools.Core.Initialize(this);
-        }
-
         #region Опции команды
 #if DEVELOPER
         [Description("ID of the Entity for the search")]
@@ -118,7 +100,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal bool _regionCheck = false;
+        internal bool _regionCheck;
 
 #if DEVELOPER
         [Description("Check if Entity's health greater than zero:\n" +
@@ -146,7 +128,6 @@ namespace EntityTools.Quester.Conditions
         [Description("A subset of entities that are searched for a target\n" +
             "Contacts: Only interactable Entities\n" +
             "Complete: All possible Entities")]
-        [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
         [Category("Optional")]
 #else
         [Browsable(false)]
@@ -184,7 +165,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal float _reactionRange = 0;
+        internal float _reactionRange;
 
 #if DEVELOPER
         [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
@@ -205,16 +186,16 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal float _reactionZRange = 0;
+        internal float _reactionZRange;
 
 #if DEVELOPER
         [Description("CustomRegion names collection")]
-        [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
+        [Editor(typeof(CustomRegionCollectionEditor), typeof(UITypeEditor))]
         [Category("Optional")]
 #else
         [Browsable(false)]
 #endif
-        public List<string> CustomRegionNames
+        public CustomRegionCollection CustomRegionNames
         {
             get => _customRegionNames;
             set
@@ -226,7 +207,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal List<string> _customRegionNames = new List<string>();
+        internal CustomRegionCollection _customRegionNames = new CustomRegionCollection();
 
 #if DEVELOPER
         [Category("Tested")]
@@ -263,7 +244,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal float _value = 0;
+        internal float _value;
 
 #if DEVELOPER
         [Description("Value comparison type to the closest Entity")]
@@ -315,46 +296,36 @@ namespace EntityTools.Quester.Conditions
 #endif
         #endregion
 
-#if CORE_DELEGATES
-       public override string ToString()
+
+        #region Взаимодействие с ядром EntityTools
+        private IQuesterConditionEngine Engine;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public EntityProperty()
         {
-            if (getString == null)
-                EntityTools.Core.Initialize(this);
-            return getString();
+            Engine = MakeProxy();
         }
 
-        public override bool IsValid
+        public void Bind(IQuesterConditionEngine engine)
         {
-            get
-            {
-                if (doValidate == null)
-                    EntityTools.Core.Initialize(this);
-                return doValidate();
-            }
+            Engine = engine;
+        }
+        public void Unbind()
+        {
+            Engine = MakeProxy();
+            PropertyChanged = null;
         }
 
-        public override string TestInfos
+        private IQuesterConditionEngine MakeProxy()
         {
-            get
-            {
-                if (getTestInfos == null)
-                    EntityTools.Core.Initialize(this);
-                return getTestInfos();
-            }
+            return new QuesterConditionProxy(this);
         }
+        #endregion
 
-        public override void Reset()
-        {
-            if (doReset == null)
-                EntityTools.Core.Initialize(this);
-            doReset();
-        }
-#endif
-#if CORE_INTERFACES
-        public override bool IsValid => Engine.IsValid;
-        public override void Reset() => Engine.Reset();
-        public override string TestInfos => Engine.TestInfos;
-        public override string ToString() => Engine.Label();
-#endif
+        public override bool IsValid => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).IsValid;
+        public override void Reset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Reset();
+        public override string TestInfos => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).TestInfos;
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
     }
 }

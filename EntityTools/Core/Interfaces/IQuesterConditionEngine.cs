@@ -1,17 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using QuesterCondition = Astral.Quester.Classes.Condition;
 
-namespace EntityTools.Quester.Conditions
+namespace EntityTools.Core.Interfaces
 {
-#if CORE_INTERFACES
-    public interface IQuesterConditionEngine
+    public interface IQuesterConditionEngine : IDisposable
     {
         bool IsValid { get; }
         void Reset();
         string TestInfos { get; }
         string Label();
+
+        bool Rebase(QuesterCondition condition); 
     }
-#endif
 }

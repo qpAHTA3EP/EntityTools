@@ -1,39 +1,20 @@
-﻿using Astral.Classes.ItemFilter;
-using Astral.Logic.UCC.Classes;
-using EntityTools.Editors;
-using EntityTools.Tools;
-using MyNW.Classes;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Threading;
 using System.Xml.Serialization;
-using EntityTools.Enums;
-using System;
-using System.Text;
+using Astral.Classes.ItemFilter;
+using Astral.Logic.UCC.Classes;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
+using EntityTools.Editors;
+using EntityTools.Enums;
+using EntityTools.Tools;
 
 namespace EntityTools.UCC.Conditions
 {
-    public class UCCEntityCheck : UCCCondition, ICustomUCCCondition
+    public class UCCEntityCheck : UCCCondition, ICustomUCCCondition, IEntityDescriptor
     {
-        #region Взаимодействие с EntityToolsCore
-#if CORE_INTERFACES
-        [NonSerialized]
-        internal IUCCConditionEngine Engine;
-#endif
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public UCCEntityCheck()
-        {
-            Sign = Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
-#if CORE_INTERFACES
-            Engine = new UCCConditionProxy(this);
-#endif
-            // EntityTools.Core.Initialize(this);
-        }
-        #endregion
-
-
         #region Опции команды
 #if DEVELOPER
         [Description("ID of the Entity for the search")]
@@ -118,7 +99,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal bool _regionCheck = false;
+        internal bool _regionCheck;
 
 #if DEVELOPER
         [Description("Check if Entity's health greater than zero:\n" +
@@ -161,7 +142,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal float _reactionRange = 0;
+        internal float _reactionRange;
 
 #if DEVELOPER
         [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
@@ -182,7 +163,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal float _reactionZRange = 0;
+        internal float _reactionZRange;
 
 #if DEVELOPER
         [Description("Aura which checked on the Entity")]
@@ -234,7 +215,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal float _propertyValue = 0;
+        internal float _propertyValue;
 
 #if DEVELOPER
         [XmlIgnore]
@@ -261,16 +242,32 @@ namespace EntityTools.UCC.Conditions
         #endregion
         #endregion
 
+        #region Взаимодействие с EntityToolsCore
+        [NonSerialized]
+        internal IUccConditionEngine Engine;
 
-        #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/) => Engine.IsOK(refAction);
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        bool ICustomUCCCondition.Loked { get => base.Locked; set => base.Locked = value; }
+        public UCCEntityCheck()
+        {
+            Sign = Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
 
-        string ICustomUCCCondition.TestInfos(UCCAction refAction) => Engine.TestInfos(refAction);
+            Engine = new UccConditionProxy(this);
+        }
+        private IUccConditionEngine MakeProxy()
+        {
+            return new UccConditionProxy(this);
+        }
         #endregion
 
+        #region ICustomUCCCondition
+        bool ICustomUCCCondition.IsOK(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).IsOK(refAction);
 
-        public override string ToString() => Engine.Label();
+        bool ICustomUCCCondition.Loсked { get => Locked; set => Locked = value; }
+
+        string ICustomUCCCondition.TestInfos(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).TestInfos(refAction);
+        #endregion
+
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
     }
 }

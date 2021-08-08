@@ -1,14 +1,16 @@
 ﻿using Astral.Logic.UCC.Classes;
-using MyNW.Classes;
+using System;
 
 namespace EntityTools.Core.Interfaces
 {
-    public interface IUCCConditionEngine
+    public interface IUccConditionEngine : IDisposable
     {
         bool IsOK(UCCAction refAction);
 
         string TestInfos(UCCAction refAction);
 
         string Label();
+
+        bool Rebase(UCCCondition refAction);
     }
 }

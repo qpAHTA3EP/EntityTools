@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace EntityTools.Reflection
 {
@@ -38,6 +34,9 @@ namespace EntityTools.Reflection
                 return null;
             Type type = obj.GetType();
 
+            if (flags == BindingFlags.Default)
+                flags = DefaultFlags;
+
             if (BaseType)
             {
                 type = type.BaseType;
@@ -53,7 +52,9 @@ namespace EntityTools.Reflection
         /// <returns></returns>
         public static MethodInfo[] GetListOfMethods(Type type, BindingFlags flags = BindingFlags.Default)
         {
-            flags = DefaultFlags | flags;
+            if (flags == BindingFlags.Default)
+                flags = DefaultFlags;
+
             // get all public static methods of MyClass type
             MethodInfo[] methodInfos = type.GetMethods(flags);
 
@@ -75,7 +76,9 @@ namespace EntityTools.Reflection
 
             FieldInfo[] fields = null;
 
-            flags = DefaultFlags | flags;
+            if (flags == BindingFlags.Default)
+                flags = DefaultFlags;
+
             if (BaseType)
             {
                 type = type.BaseType;
@@ -95,6 +98,7 @@ namespace EntityTools.Reflection
         {
             if (flags == BindingFlags.Default)
                 flags = DefaultFlags;
+
             FieldInfo[] fields = type.GetFields(flags);
             if (fields != null)
             {
@@ -120,7 +124,7 @@ namespace EntityTools.Reflection
                 {
                     if (fullTypeName)
                         return assambly.GetTypes().FirstOrDefault(t => t.FullName == typeName);
-                    else return assambly.GetTypes().FirstOrDefault(t => t.Name == typeName);
+                    return assambly.GetTypes().FirstOrDefault(t => t.Name == typeName);
                 }
             }
             return null;
@@ -152,7 +156,7 @@ namespace EntityTools.Reflection
                 MethodInfo[] accessors = pi.GetAccessors((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
                 if (accessors != null && accessors.Length == 2)
                 {
-                    object[] arg = new object[] { value };
+                    object[] arg = { value };
                     accessors[1]?.Invoke(obj, arg);
                     return true;
                 }
@@ -173,16 +177,13 @@ namespace EntityTools.Reflection
             PropertyInfo pi = type.GetProperty(propName, flags | BindingFlags.Instance);//GetPrivateFieldInfo(type, fieldName, flags);
             if (pi == null)
                 return SetBasePropertyValue(type.BaseType, obj, propName, value, flags | BindingFlags.Instance);
-            else
+            MethodInfo[] accessors = pi.GetAccessors((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
+            if (accessors != null && accessors.Length == 2)
             {
-                MethodInfo[] accessors = pi.GetAccessors((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
-                if (accessors != null && accessors.Length == 2)
-                {
-                    object[] arg = new object[] { value };
-                    accessors[1]?.Invoke(obj, arg);
-                    return true;
-                }
-            }            
+                object[] arg = { value };
+                accessors[1]?.Invoke(obj, arg);
+                return true;
+            }
 
             return false;
         }
@@ -211,7 +212,7 @@ namespace EntityTools.Reflection
                 MethodInfo[] accessors = pi.GetAccessors((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
                 if (accessors != null && accessors.Length == 2)
                 {
-                    object[] arg = new object[] { value };
+                    object[] arg = { value };
                     accessors[1]?.Invoke(null, arg);
                     return true;
                 }
@@ -247,7 +248,7 @@ namespace EntityTools.Reflection
                 MethodInfo getter = pi.GetGetMethod((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
                 if(getter != null)
                 {
-                    object[] arg = new object[] { };
+                    object[] arg = { };
                     result = getter.Invoke(obj, arg);
                     return true;
                 }                
@@ -270,23 +271,20 @@ namespace EntityTools.Reflection
             PropertyInfo pi = type.GetProperty(propName, flags);
             if (pi == null)
                 return GetBasePropertyValue(type.BaseType, obj, propName, out result, flags);
-            else
+            MethodInfo[] accessors = pi.GetAccessors((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
+            if (accessors != null && accessors.Length > 0)
             {
-                MethodInfo[] accessors = pi.GetAccessors((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
-                if (accessors != null && accessors.Length > 0)
-                {
-                    object[] arg = new object[] { };
-                    result = accessors[0]?.Invoke(obj, arg);
-                    return true;
-                }
-                //MethodInfo getter = pi.GetGetMethod();
-                //if (getter != null)
-                //{
-                //    object[] arg = new object[] { };
-                //    result = getter.Invoke(obj, arg);
-                //    return true;
-                //}
-            }            
+                object[] arg = { };
+                result = accessors[0]?.Invoke(obj, arg);
+                return true;
+            }
+            //MethodInfo getter = pi.GetGetMethod();
+            //if (getter != null)
+            //{
+            //    object[] arg = new object[] { };
+            //    result = getter.Invoke(obj, arg);
+            //    return true;
+            //}
 
             return false;
         }
@@ -308,7 +306,7 @@ namespace EntityTools.Reflection
                 MethodInfo getter = pi.GetGetMethod((flags & BindingFlags.NonPublic) == BindingFlags.NonPublic);
                 if (getter != null)
                 {
-                    object[] arg = new object[] { };
+                    object[] arg = { };
                     result = getter.Invoke(null, arg);
                     return true;
                 }
@@ -348,7 +346,8 @@ namespace EntityTools.Reflection
                 info.SetValue(obj, value);
                 return true;
             }
-            else return false;
+
+            return false;
         }
 
         /// <summary>
@@ -375,7 +374,8 @@ namespace EntityTools.Reflection
                 info.SetValue(type, value);
                 return true;
             }
-            else return false;
+
+            return false;
         }
 
         /// <summary>
@@ -419,8 +419,10 @@ namespace EntityTools.Reflection
         public static bool GetStaticFieldValue(Type type, string fieldName, out object result, BindingFlags flags = BindingFlags.Default, bool BaseType = false)
         {
             result = null;
+
             if (flags == BindingFlags.Default)
                 flags = DefaultFlags;
+
             if (BaseType)
             {
                 type = type.BaseType;
@@ -488,9 +490,7 @@ namespace EntityTools.Reflection
                 flags = DefaultFlags;
 
             if (BaseType)
-            {
                 type = type.BaseType;
-            }
 
             MethodInfo methodInfo = type.GetMethod(MethodName, flags | BindingFlags.Static);
             if (methodInfo != null)
@@ -508,9 +508,7 @@ namespace EntityTools.Reflection
                 flags = DefaultFlags;
 
             if (BaseType)
-            {
                 type = type.BaseType;
-            }
             
             Type[] types;
             if (arguments != null && arguments.Length > 0)
@@ -548,6 +546,12 @@ namespace EntityTools.Reflection
             if (source != null && !string.IsNullOrEmpty(eventName)
                 && target != null && !string.IsNullOrEmpty(methodName))
             {
+                if (sourceFlags == BindingFlags.Default)
+                    sourceFlags = DefaultFlags;
+
+                if (targetFlags == BindingFlags.Default)
+                    targetFlags = DefaultFlags;
+
                 EventInfo eventInfo = (sourceFlags == BindingFlags.Default) ? source.GetType().GetEvent(eventName)
                                                     : source.GetType().GetEvent(eventName, sourceFlags);
 
@@ -570,6 +574,12 @@ namespace EntityTools.Reflection
             if (source != null && !string.IsNullOrEmpty(eventName)
                 && target != null && !string.IsNullOrEmpty(methodName))
             {
+                if (sourceFlags == BindingFlags.Default)
+                    sourceFlags = DefaultFlags;
+
+                if (targetFlags == BindingFlags.Default)
+                    targetFlags = DefaultFlags;
+
                 EventInfo eventInfo = (sourceFlags == BindingFlags.Default) ? source.GetType().GetEvent(eventName)
                                                     : source.GetType().GetEvent(eventName, sourceFlags);
 
@@ -604,6 +614,12 @@ namespace EntityTools.Reflection
             if (source != null && !string.IsNullOrEmpty(eventName)
                 && target != null && !string.IsNullOrEmpty(methodName))
             {
+                if (sourceFlags == BindingFlags.Default)
+                    sourceFlags = DefaultFlags;
+
+                if (targetFlags == BindingFlags.Default)
+                    targetFlags = DefaultFlags;
+
                 EventInfo eventInfo = (sourceFlags == BindingFlags.Default) ? source.GetType().GetEvent(eventName)
                                                     : source.GetType().GetEvent(eventName, sourceFlags);
 
@@ -626,6 +642,12 @@ namespace EntityTools.Reflection
             if (source != null && !string.IsNullOrEmpty(eventName)
                 && target != null && !string.IsNullOrEmpty(methodName))
             {
+                if (sourceFlags == BindingFlags.Default)
+                    sourceFlags = DefaultFlags;
+
+                if (targetFlags == BindingFlags.Default)
+                    targetFlags = DefaultFlags;
+
                 EventInfo eventInfo = (sourceFlags == BindingFlags.Default) ? source.GetType().GetEvent(eventName)
                                                     : source.GetType().GetEvent(eventName, sourceFlags);
 
@@ -643,47 +665,5 @@ namespace EntityTools.Reflection
             }
             return false;
         }
-
-        //public static void DumpAssembly(string path, string methodName)
-        //{
-        //    System.IO.File.AppendAllText(methodName+".dump", "Dump started... " + Environment.NewLine);
-        //    var assembly = AssemblyDefinition.ReadAssembly(path);
-        //    foreach (var typeDef in assembly.MainModule.Types)
-        //    {
-        //        foreach (var method in typeDef.Methods)
-        //        {
-        //            if (String.IsNullOrEmpty(methodName) || method.Name == methodName)
-        //            {
-        //                System.IO.File.AppendAllText(methodName + ".dump", "Method: " + method.ToString());
-        //                System.IO.File.AppendAllText(methodName + ".dump", Environment.NewLine);
-        //                foreach (var instruction in method.Body.Instructions)
-        //                {
-        //                    System.IO.File.AppendAllText(methodName + ".dump", instruction.ToString() + Environment.NewLine);
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-        //public static bool DumpClassMethod(Type type, string methodName)
-        //{
-        //    if (type == null || string.IsNullOrEmpty(methodName))
-        //        return false;
-
-        //    TypeDefinition typeDef = new TypeDefinition(type.Namespace, type.Name, Mono.Cecil.TypeAttributes.Class | Mono.Cecil.TypeAttributes.Public | Mono.Cecil.TypeAttributes.NotPublic);
-        //    foreach (var method in typeDef.Methods)
-        //    {
-        //        if (string.IsNullOrEmpty(methodName) || method.Name == methodName)
-        //        {
-        //            System.IO.File.AppendAllText(methodName + ".dump", "Method: " + method.FullName);
-        //            System.IO.File.AppendAllText(methodName + ".dump", Environment.NewLine);
-
-        //            foreach (var instruction in method.Body.Instructions)
-        //                System.IO.File.AppendAllText(methodName + ".dump", instruction.ToString() + Environment.NewLine);
-
-        //            break;
-        //        }
-        //    }
-        //    return true;
-        //}
     }
 }

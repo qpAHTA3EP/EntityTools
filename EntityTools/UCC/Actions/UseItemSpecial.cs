@@ -1,22 +1,20 @@
 ﻿using System;
-using System.Linq;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
 using Astral.Quester.UIEditors;
-using EntityTools.Extensions;
-using EntityTools.Editors;
-using EntityTools.Enums;
-using MyNW.Classes;
-using MyNW.Internals;
-using MyNW.Patchables.Enums;
-using EntityTools.Core.Proxies;
 using EntityTools.Core.Interfaces;
+using EntityTools.Core.Proxies;
+using EntityTools.Editors;
+#if true
+using EntityTools.Tools.BuySellItems;
+using MyNW.Classes;
+#else
 using EntityTools.Tools.ItemFilter;
+#endif
 
 namespace EntityTools.UCC.Actions
 {
@@ -27,27 +25,8 @@ namespace EntityTools.UCC.Actions
         internal class InventoryBagsCheckedListBoxEditor : CheckedListBoxCommonEditor<InvBagIDs> { }
 #endif
 
-        #region Взаимодействие с EntityToolsCore
-#if CORE_INTERFACES
-        [NonSerialized]
-        internal IUCCActionEngine Engine;
-#endif
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public UseItemSpecial()
-        {
-#if CORE_INTERFACES
-            Engine = new UCCActionProxy(this);
-#endif
-            // EntityTools.Core.Initialize(this);
-            Target = Astral.Logic.UCC.Ressources.Enums.Unit.Player;
-            CoolDown = 18000;
-        }
-        #endregion
-
 
         #region Опции команды
-
 #if DEVELOPER
         [Editor(typeof(ItemIdEditor), typeof(UITypeEditor))]
         [Category("Item")]
@@ -105,7 +84,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal bool _checkItemCooldown = false;
+        internal bool _checkItemCooldown;
 
 
 #if disabled_20200527_1854
@@ -218,21 +197,42 @@ namespace EntityTools.UCC.Actions
         #endregion
         #endregion
 
+        #region Взаимодействие с EntityToolsCore
+        [NonSerialized]
+        internal IUccActionEngine Engine;
 
-        public override bool NeedToRun => Engine.NeedToRun;
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        public override bool Run() => Engine.Run();
+        public UseItemSpecial()
+        {
+            Engine = new UccActionProxy(this);
 
-        public override string ToString() => Engine.Label();
+            Target = Astral.Logic.UCC.Ressources.Enums.Unit.Player;
+            CoolDown = 18000;
+        }
+        private IUccActionEngine MakeProxy()
+        {
+            return new UccActionProxy(this);
+        }
+        #endregion
+
+        #region Интерфейс команды
+        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).NeedToRun;
+        public override bool Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Run();
+        [XmlIgnore]
+        [Browsable(false)]
+        public Entity UnitRef => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).UnitRef;
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
+        #endregion
 
         public override UCCAction Clone()
         {
-            return base.BaseClone(new UseItemSpecial
+            return BaseClone(new UseItemSpecial
             {
-                _itemId = this._itemId,
-                _itemIdType = this._itemIdType,
-                _checkItemCooldown = this._checkItemCooldown,
-                _bags = this._bags.Clone()
+                _itemId = _itemId,
+                _itemIdType = _itemIdType,
+                _checkItemCooldown = _checkItemCooldown,
+                _bags = _bags.Clone()
             });
         }
     }

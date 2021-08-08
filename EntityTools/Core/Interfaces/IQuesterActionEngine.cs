@@ -1,14 +1,13 @@
-﻿using Astral.Logic.Classes.Map;
+﻿using System;
+using System.Runtime.CompilerServices;
+using Astral.Logic.Classes.Map;
 using MyNW.Classes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using static Astral.Quester.Classes.Action;
+using QuesterAction = Astral.Quester.Classes.Action;
 
 namespace EntityTools.Core.Interfaces
 {
-    public interface IQuesterActionEngine
+    public interface IQuesterActionEngine : IDisposable
     {
         bool NeedToRun { get; }
         ActionResult Run();
@@ -24,5 +23,9 @@ namespace EntityTools.Core.Interfaces
         void InternalReset();
         void GatherInfos();
         void OnMapDraw(GraphicsNW graph);
+
+        void OnPropertyChanged(QuesterAction sender, [CallerMemberName] string propertyName = "");
+
+        bool Rebase(QuesterAction action); 
     }
 }

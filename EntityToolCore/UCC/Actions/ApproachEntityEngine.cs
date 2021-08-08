@@ -10,56 +10,116 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Astral.Logic.UCC.Classes;
 
 namespace EntityCore.UCC.Actions
 {
-    internal class ApproachEntityEngine : IEntityInfos
-#if CORE_INTERFACES
-                 , IUCCActionEngine
+    internal class ApproachEntityEngine : IUccActionEngine
+#if IEntityDescriptor
+        , IEntityInfos  
 #endif
     {
         #region Данные
         private ApproachEntity @this;
 
-        private Predicate<Entity> checkEntity = null;
         private Entity entity = null;
         private Timeout timeout = new Timeout(0);
-        private string label = string.Empty;
+        private string _label = string.Empty;
+        private string _idStr;
         #endregion
-        
-        internal ApproachEntityEngine(ApproachEntity ae)
+
+        internal ApproachEntityEngine(ApproachEntity ettApproach)
         {
-            @this = ae;
-#if CORE_INTERFACES
-            @this.Engine = this;
-#endif
-            @this.PropertyChanged += PropertyChanged;
 
-            checkEntity = internal_CheckEntity_Initializer;
+            InternalRebase(ettApproach);
+            ETLogger.WriteLine(LogType.Debug, $"{_idStr} initialized: {Label()}");
+        }
+        ~ApproachEntityEngine()
+        {
+            Dispose();
+        }
 
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
+        public void Dispose()
+        {
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = null;
+                @this = null;
+            }
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (object.ReferenceEquals(sender, @this))
+            if (ReferenceEquals(sender, @this))
             {
+#if false
                 switch (e.PropertyName)
                 {
-                    case "EntityID":
-                        checkEntity = internal_CheckEntity_Initializer;//EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
-                        label = string.Empty;
+                    case nameof(ApproachEntity.EntityID):
+                        checkEntity = initialize_CheckEntity;
+                        _label = string.Empty;
                         break;
-                    case "EntityIdType":
-                        checkEntity = internal_CheckEntity_Initializer;//EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                    case nameof(ApproachEntity.EntityIdType):
+                        checkEntity = initialize_CheckEntity;
                         break;
-                    case "EntityNameType":
-                        checkEntity = internal_CheckEntity_Initializer;//EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                    case nameof(ApproachEntity.EntityNameType):
+                        checkEntity = initialize_CheckEntity;
                         break;
-                }
+                } 
+#else
+                _key = null;
+                _specialCheck = null;
+                _label = string.Empty;
+#endif
                 entity = null;
                 timeout.ChangeTime(0);
             }
+        }
+
+        public bool Rebase(UCCAction action)
+        {
+            if (action is null)
+                return false;
+            if (ReferenceEquals(action, @this))
+                return true;
+            if (action is ApproachEntity ettApproach)
+            {
+                if (InternalRebase(ettApproach))
+                {
+                    ETLogger.WriteLine(LogType.Debug, $"{_idStr} reinitialized");
+                    return true;
+                }
+                ETLogger.WriteLine(LogType.Debug, $"{_idStr} rebase failed");
+                return false;
+            }
+
+            string debugStr = string.Concat("Rebase failed. ", action.GetType().Name, '[', action.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(ApproachEntity) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
+        }
+
+        private bool InternalRebase(ApproachEntity ettApproach)
+        {
+            // Убираем привязку к старому условию
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = null;
+            }
+
+            @this = ettApproach;
+            @this.PropertyChanged += PropertyChanged;
+
+            _key = null;
+            _specialCheck = null;
+            _label = string.Empty;
+
+            _idStr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+
+            @this.Engine = this;
+
+            return true;
         }
 
         #region IUCCActionEngine
@@ -69,16 +129,21 @@ namespace EntityCore.UCC.Actions
             {
                 if (!string.IsNullOrEmpty(@this._entityId))
                 {
+                    var entityKey = EntityKey;
                     if (timeout.IsTimedOut)
                     {
+#if false
                         entity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                                @this._healthCheck, @this._reactionRange, (@this._reactionZRange > 0) ? @this._reactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference,
-                                                                @this._regionCheck, null, @this._aura.Checker);
+                                                                                @this._healthCheck, @this._reactionRange, @this._reactionZRange,
+                                                                                @this._regionCheck, null, @this._aura.Checker); 
+#else
+                        entity = SearchCached.FindClosestEntity(entityKey, SpecialCheck);
+#endif
 
-                        timeout.ChangeTime(EntityTools.EntityTools.PluginSettings.EntityCache.CombatCacheTime);
+                        timeout.ChangeTime(EntityTools.EntityTools.Config.EntityCache.CombatCacheTime);
                     }
 
-                    return ValidateTarget(entity) && !(@this._healthCheck && entity.IsDead) && entity.CombatDistance > @this._entityRadius;
+                    return entityKey.Validate(entity) && !(@this._healthCheck && entity.IsDead) && entity.CombatDistance > @this._entityRadius;
                 }
                 return false;
             }
@@ -95,16 +160,21 @@ namespace EntityCore.UCC.Actions
         {
             get
             {
-                if (ValidateTarget(entity))
+                var entityKey = EntityKey;
+                if (entityKey.Validate(entity))
                     return entity;
                 else
                 {
                     if (!string.IsNullOrEmpty(@this._entityId))
                     {
+#if false
                         entity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                                @this._healthCheck, @this._reactionRange,
-                                                                (@this._reactionZRange > 0) ? @this._reactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference,
-                                                                @this._regionCheck, null, @this._aura.Checker);
+                                                                                @this._healthCheck, @this._reactionRange,
+                                                                                @this._reactionZRange,
+                                                                                @this._regionCheck, null, @this._aura.Checker); 
+#else
+                        entity = SearchCached.FindClosestEntity(entityKey, SpecialCheck);
+#endif
                         return entity;
                     }
                 }
@@ -114,35 +184,90 @@ namespace EntityCore.UCC.Actions
 
         public string Label()
         {
-            if (string.IsNullOrEmpty(@this._entityId))
-                label = GetType().Name;
-            else label = GetType().Name + " [" + @this._entityId + ']';
-            return label;
+            if (string.IsNullOrEmpty(_label))
+            {
+                if (string.IsNullOrEmpty(@this._entityId))
+                    _label = GetType().Name;
+                else _label = $"{GetType().Name} [{@this._entityId}]"; 
+            }
+            return _label;
         }
         #endregion
 
+#if true
+
+        #region Вспомогательные инструменты
+        /// <summary>
+        /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
+        /// </summary>
+        public EntityCacheRecordKey EntityKey
+        {
+            get
+            {
+                if (_key is null)
+                    _key = new EntityCacheRecordKey(@this._entityId, @this._entityIdType, @this._entityNameType);
+                return _key;
+            }
+        }
+        private EntityCacheRecordKey _key;
+
+        /// <summary>
+        /// Функтор дополнительной проверки <seealso cref="Entity"/> 
+        /// на предмет нахождения в пределах области, заданной <see cref="InteractEntities.CustomRegionNames"/>
+        /// Использовать самомодифицирующийся предиката, т.к. предикат передается в <seealso cref="SearchCached.FindClosestEntity(EntityCacheRecordKey, Predicate{Entity})"/>
+        /// </summary>        
+        private Predicate<Entity> SpecialCheck
+        {
+            get
+            {
+                if (_specialCheck is null)
+                    _specialCheck = SearchHelper.Construct_EntityAttributePredicate(@this._healthCheck,
+                                                            @this._reactionRange,
+                                                            //@this._reactionZRange,
+                                                            @this._reactionZRange > 0 ? @this._reactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference,
+                                                            @this._regionCheck, 
+                                                            @this._aura.IsMatch);
+                return _specialCheck;
+            }
+        }
+        private Predicate<Entity> _specialCheck;
+        #endregion
+
+#else
         private bool ValidateTarget(Entity e)
         {
-            return e != null && e.IsValid && checkEntity(e);
+#if false
+            return e != null && e.IsValid && checkEntity(e); 
+#else
+            return e != null && e.IsValid
+                    && (e.Character.IsValid || e.Critter.IsValid || e.Player.IsValid)
+                    && checkEntity(e);
+#endif
         }
 
-        private bool internal_CheckEntity_Initializer(Entity e)
+        private bool initialize_CheckEntity(Entity e)
         {
-            Predicate<Entity> predicate = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+#if false
+            Predicate<Entity> predicate = EntityTools.Tools.Entities.EntityComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+#else
+            Predicate<Entity> predicate = EntityComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+#endif
             if (predicate != null)
             {
 #if DEBUG
-                ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Comparer does not defined. Initialize.");
+                ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Comparer does not defined. Initialize.");
 #endif
                 checkEntity = predicate;
                 return e != null && checkEntity(e);
             }
 #if DEBUG
-            else ETLogger.WriteLine(LogType.Error, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Fail to initialize the Comparer.");
+            else ETLogger.WriteLine(LogType.Error, $"{_idStr}: Fail to initialize the Comparer.");
 #endif
             return false;
-        }
+        } 
+#endif
 
+#if IEntityDescriptor
         public bool EntityDiagnosticString(out string infoString)
         {
             StringBuilder sb = new StringBuilder();
@@ -156,20 +281,13 @@ namespace EntityCore.UCC.Actions
             sb.Append("ReactionZRange: ").AppendLine(@this._reactionZRange.ToString());
             sb.Append("RegionCheck: ").AppendLine(@this._regionCheck.ToString());
             sb.Append("Aura: ").AppendLine(@this._aura.ToString());
-            //if (@this._customRegionNames != null && @this._customRegionNames.Count > 0)
-            //{
-            //    sb.Append("RegionCheck: {").Append(@this._customRegionNames[0]);
-            //    for (int i = 1; i < @this._customRegionNames.Count; i++)
-            //        sb.Append(", ").Append(@this._customRegionNames[i]);
-            //    sb.AppendLine("}");
-            //}
             sb.AppendLine();
-            //sb.Append("NeedToRun: ").AppendLine(NeedToRun.ToString());
-            //sb.AppendLine();
+
+            var entityKey = EntityKey;
+            var entityCheck = SpecialCheck;
 
             // список всех Entity, удовлетворяющих условиям
-            LinkedList<Entity> entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                                     @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck);
+            var entities = SearchCached.FindAllEntity(entityKey, entityCheck);
 
 
             // Количество Entity, удовлетворяющих условиям
@@ -179,8 +297,7 @@ namespace EntityCore.UCC.Actions
             sb.AppendLine();
 
             // Ближайшее Entity (найдено при вызове ie.NeedToRun, поэтому строка ниже закомментирована)
-            entity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                    @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck);
+            entity = SearchCached.FindClosestEntity(entityKey, entityCheck);
             if (entity != null)
             {
                 bool distOk = @this._reactionRange <= 0 || entity.Location.Distance3DFromPlayer < @this._reactionRange;
@@ -211,6 +328,7 @@ namespace EntityCore.UCC.Actions
 
             infoString = sb.ToString();
             return true;
-        }
+        } 
+#endif
     }
 }

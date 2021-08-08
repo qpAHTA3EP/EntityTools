@@ -2,12 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Windows.Forms;
-using Astral.Quester.Classes;
-using DevExpress.XtraEditors.Controls;
 using EntityTools.Extensions;
-using MyNW.Classes;
-
 
 namespace EntityTools.Editors
 {
@@ -17,7 +12,7 @@ namespace EntityTools.Editors
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
             List<string> list = value as List<string>;
-            if (EntityTools.Core.GUIRequest_CustomRegions(ref list))
+            if (EntityTools.Core.UserRequest_EditCustomRegionList(ref list))
             {
                 return list.Clone();
             }

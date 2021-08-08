@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace EntityTools.Reflection
 {
@@ -39,7 +36,7 @@ namespace EntityTools.Reflection
                                       GetStaticFunction<ArgumentT1, ReturnT>(this Type containerType, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
             return ConstructStaticFunction<Func<ArgumentT1, ReturnT>, ReturnT>(containerType, methodName,
-                                new Type[] { typeof(ArgumentT1) }, flags);
+                                new[] { typeof(ArgumentT1) }, flags);
         }
 
         /// <summary>
@@ -55,7 +52,7 @@ namespace EntityTools.Reflection
                                       GetStaticFunction<ArgumentT1, ArgumentT2, ReturnT>(this Type containerType, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
             return ConstructStaticFunction<Func<ArgumentT1, ArgumentT2, ReturnT>, ReturnT>(containerType, methodName,
-                            new Type[] { typeof(ArgumentT1), typeof(ArgumentT2) }, flags);
+                            new[] { typeof(ArgumentT1), typeof(ArgumentT2) }, flags);
         }
 
         /// <summary>
@@ -71,7 +68,7 @@ namespace EntityTools.Reflection
                                       GetStaticFunction<ArgumentT1, ArgumentT2, ArgumentT3, ReturnT>(this Type containerType, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
             return ConstructStaticFunction<Func<ArgumentT1, ArgumentT2, ArgumentT3, ReturnT>, ReturnT>(containerType, methodName,
-                            new Type[] { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3) },
+                            new[] { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3) },
                             flags);
         }
 
@@ -79,7 +76,7 @@ namespace EntityTools.Reflection
                                       GetStaticFunction<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ReturnT>(this Type containerType, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
             return ConstructStaticFunction<Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ReturnT>, ReturnT>(containerType, methodName,
-                            new Type[] { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4) },
+                            new[] { typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4) },
                             flags);
         }
 
@@ -96,7 +93,7 @@ namespace EntityTools.Reflection
                                       GetStaticFunction<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5, ReturnT>(this Type containerType, string methodName, BindingFlags flags = BindingFlags.Default)
         {
             return ConstructStaticFunction<Func<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5, ReturnT>, ReturnT>(containerType, methodName,
-                         new Type[] { typeof(ArgumentT1), typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4), typeof(ArgumentT5) },
+                         new[] { typeof(ArgumentT1), typeof(ArgumentT1), typeof(ArgumentT2), typeof(ArgumentT3), typeof(ArgumentT4), typeof(ArgumentT5) },
                         flags);
         }
 
@@ -104,6 +101,9 @@ namespace EntityTools.Reflection
         {
             if (containerType is null)
                 return null;
+
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
 
             if (argumentTypes == null)
                 argumentTypes = new Type[] { };
@@ -142,11 +142,8 @@ namespace EntityTools.Reflection
                 {
                     if (method.ReturnType.Equals(returnType))
                         return true;
-                    else
-                    {
-                        method = null;
-                        return false;
-                    }
+                    method = null;
+                    return false;
                 }
                 return FindByNameAndSignature(type.BaseType, methodName, returnType, inputTypes, flags, out method);
             }

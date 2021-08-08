@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace EntityTools.Tools
+﻿namespace EntityTools.Tools
 {
     /// <summar>
     /// Вспомогательная структура "Пара"
@@ -21,10 +16,10 @@ namespace EntityTools.Tools
 
         public Pair<A, B> Clone()
         {
-            return new Pair<A, B>()
+            return new Pair<A, B>
             {
-                First = this.First,
-                Second = this.Second
+                First = First,
+                Second = Second
             };
         }
 
@@ -77,11 +72,11 @@ namespace EntityTools.Tools
         }
         public Triple<A, B, C> Clone()
         {
-            return new Triple<A, B, C>()
+            return new Triple<A, B, C>
             {
-                First = this.First,
-               Second = this.Second,
-                Third = this.Third
+                First = First,
+               Second = Second,
+                Third = Third
             };
         }
     }

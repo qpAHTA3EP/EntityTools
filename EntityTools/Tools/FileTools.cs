@@ -1,8 +1,7 @@
-﻿using Microsoft.Win32.SafeHandles;
-using MyNW.Internals;
-using System;
+﻿using System;
 using System.IO;
-using System.Runtime.InteropServices;
+using Astral.Controllers;
+using MyNW.Internals;
 
 namespace EntityTools.Tools
 {
@@ -18,35 +17,17 @@ namespace EntityTools.Tools
         public static readonly string MaskAD = "%AD%";
         public static readonly string MaskRAD = "%rAD%";
 
-        public static readonly string defaultExportFolderStates = Path.Combine(Astral.Controllers.Directories.LogsPath, "States");
-        public static readonly string defaultExportFolderInterfaces = Path.Combine(Astral.Controllers.Directories.LogsPath, "Interfaces");
-        public static readonly string defaultExportFolderAuras = Path.Combine(Astral.Controllers.Directories.LogsPath, "Auras");
-        public static readonly string defaultExportFolderMissions = Path.Combine(Astral.Controllers.Directories.LogsPath, "Missions");
-        public static readonly string defaultFileStates = "States.txt";
-        public static readonly string defaultFileInterfaces = "Interfaces.xml";
-        public static readonly string defaultFileAuras = "Auras.xml";
-        public static readonly string defaultFileMissions = "Missions.xml";
-        public static readonly string defaultExportFileName = "%character%_%account%_%datetime%.xml";
+        public static readonly string DefaultExportFolderStates = Path.Combine(Directories.LogsPath, "States");
+        public static readonly string DefaultExportFolderInterfaces = Path.Combine(Directories.LogsPath, "Interfaces");
+        public static readonly string DefaultExportFolderAuras = Path.Combine(Directories.LogsPath, "Auras");
+        public static readonly string DefaultExportFolderMissions = Path.Combine(Directories.LogsPath, "Missions");
+        public static readonly string DefaultFileStates = "States.txt";
+        public static readonly string DefaultFileInterfaces = "Interfaces.xml";
+        public static readonly string DefaultFileAuras = "Auras.xml";
+        public static readonly string DefaultFileMissions = "Missions.xml";
+        public static readonly string DefaultExportFileName = "%character%_%account%_%dateTime%.xml";
 
-        public static readonly string SettingsFile = Path.Combine(Astral.Controllers.Directories.SettingsPath, nameof(EntityTools), nameof(EntityTools) + ".xml");
-        //public static bool ReplaceMask(ref string str)
-        //{
-        //    if (!string.IsNullOrEmpty(str))
-        //    {
-        //        string result = str.Replace(MaskAccount, EntityManager.LocalPlayer?.AccountLoginUsername);
-        //        result = result.Replace(MaskCharacter, EntityManager.LocalPlayer?.Name);
-        //        result = result.Replace(MaskDateTime, DateTime.Now.ToString());
-        //        result = result.Replace(MaskAD, EntityManager.LocalPlayer.Inventory.AstralDiamonds.ToString());
-        //        result = result.Replace(MaskRAD, EntityManager.LocalPlayer.Inventory.AstralDiamondsRough.ToString());
-
-        //        if (str != result)
-        //        {
-        //            str = result;
-        //            return true;
-        //        }
-        //    }
-        //    return false;
-        //}
+        public static readonly string SettingsFile = Path.Combine(Directories.SettingsPath, nameof(EntityTools), nameof(EntityTools) + ".xml");
 
         public static string ReplaceMask(string str)
         {
@@ -54,9 +35,9 @@ namespace EntityTools.Tools
             {
                 if (str.IndexOf('%') != -1)
                 {
-                    string result = str.Replace(MaskAccount, EntityManager.LocalPlayer?.AccountLoginUsername);
-                    result = result.Replace(MaskCharacter, EntityManager.LocalPlayer?.Name);
-                    result = result.Replace(MaskDateTime, $"{DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day}_{DateTime.Now.Hour}-{DateTime.Now.Minute}-{DateTime.Now.Second}");
+                    string result = str.Replace(MaskAccount, EntityManager.LocalPlayer.AccountLoginUsername);
+                    result = result.Replace(MaskCharacter, EntityManager.LocalPlayer.Name);
+                    result = result.Replace(MaskDateTime, DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss"));
                     result = result.Replace(MaskAD, EntityManager.LocalPlayer.Inventory.AstralDiamonds.ToString());
                     result = result.Replace(MaskRAD, EntityManager.LocalPlayer.Inventory.AstralDiamondsRough.ToString());
 

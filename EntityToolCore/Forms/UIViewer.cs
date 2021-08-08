@@ -5,12 +5,7 @@ using MyNW.Classes;
 using MyNW.Internals;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace EntityCore.Forms
@@ -91,15 +86,51 @@ namespace EntityCore.Forms
 
             int len;
             string MISC = "<Miscelaneouse>";
+            // Вариант FindAll().GroupBuy() скорее всего медленне чем
+            // вариант Where().GroupBuy() 
+
+#if FindAll_GroupBy
             var visibleUIGens = MyNW.Internals.UIManager.AllUIGen.FindAll(ui => (!filterVisibleOnly.Checked || ui.IsValid && ui.IsVisible)
-                                                                             && (string.IsNullOrEmpty(filterName.Text) || ui.Name.IndexOf(filterName.Text, StringComparison.OrdinalIgnoreCase) >= 0)
-                                                                             && !string.IsNullOrEmpty(ui.Name)
-                                                                         ).GroupBy(uiGen => ((len = uiGen.Name.IndexOf('_')) > 0) ? uiGen.Name.Substring(0, len) : MISC);
+                                                                                 && (string.IsNullOrEmpty(filterName.Text) || ui.Name.IndexOf(filterName.Text, StringComparison.OrdinalIgnoreCase) >= 0)
+                                                                                 && !string.IsNullOrEmpty(ui.Name)
+                                                                             ).GroupBy(uiGen => ((len = uiGen.Name.IndexOf('_')) > 0) ? uiGen.Name.Substring(0, len) : MISC); 
+#else
+            Func<UIGen, bool> predicate;
+            if(filterVisibleOnly.Checked)
+            {
+                if(string.IsNullOrEmpty(filterName.Text))
+                {
+                    predicate = (UIGen ui) => ui.IsValid  && ui.IsVisible
+                                                && !string.IsNullOrEmpty(ui.Name);
+                }
+                else
+                {
+                    predicate = (UIGen ui) => ui.IsValid && ui.IsVisible
+                                                && !string.IsNullOrEmpty(ui.Name) 
+                                                && ui.Name.IndexOf(filterName.Text, StringComparison.OrdinalIgnoreCase) >= 0;
+                }
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(filterName.Text))
+                {
+                    predicate = (UIGen ui) => ui.IsValid && !string.IsNullOrEmpty(ui.Name);
+                }
+                else
+                {
+                    predicate = (UIGen ui) => ui.IsValid && !string.IsNullOrEmpty(ui.Name)
+                                                && ui.Name.IndexOf(filterName.Text, StringComparison.OrdinalIgnoreCase) >= 0;
+                }
+            }
+            var visibleUIGens = MyNW.Internals.UIManager.AllUIGen.Where(predicate)
+                .GroupBy(ui => ((len = ui.Name.IndexOf('_')) > 0) ? ui.Name.Substring(0, len) : MISC);
+#endif
             // Группа элементов интерфейса, представленных в единственном экземпляре и
             // не включенных в другие группы 
             TreeNode miscGroup = new TreeNode(MISC);
 
             // формирование дерева интерфейсов в tvInterfaces
+#if false
             foreach (var uiGenGroup in visibleUIGens)
             {
                 if (uiGenGroup.Count() > 1 && uiGenGroup.Key != MISC)
@@ -107,8 +138,7 @@ namespace EntityCore.Forms
                     TreeNode uiGenGroupNode = new TreeNode(uiGenGroup.Key);
                     foreach (UIGen uiGen in uiGenGroup)
                     {
-                        TreeNode uiGenNode = new TreeNode($"{uiGen.Name} [{uiGen.Type}]");
-                        uiGenNode.Tag = uiGen;
+                        TreeNode uiGenNode = new TreeNode($"{uiGen.Name} [{uiGen.Type}]") { Tag = uiGen };
                         uiGenGroupNode.Nodes.Add(uiGenNode);
                     }
                     tvInterfaces.Nodes.Add(uiGenGroupNode);
@@ -119,21 +149,70 @@ namespace EntityCore.Forms
                     {
                         // Поскольку группа содержит только 1 элемент
                         // добавляем его в узел miscGroup
-                        TreeNode uiGenNode = new TreeNode($"{uiGen.Name} [{uiGen.Type}]");
-                        uiGenNode.Tag = uiGen;
+                        TreeNode uiGenNode = new TreeNode($"{uiGen.Name} [{uiGen.Type}]") { Tag = uiGen };
                         miscGroup.Nodes.Add(uiGenNode);
                     }
                 }
 
                 //FillTreeView(uiGenGroupNode);
+            } 
+#else
+            foreach (var uiGenGroup in visibleUIGens)
+            {
+                using (var uiGenEnumr = uiGenGroup.GetEnumerator())
+                {
+                    if(uiGenEnumr.MoveNext())
+                    {
+                        UIGen uiGenFirst = uiGenEnumr.Current;
+                        if(uiGenEnumr.MoveNext())
+                        {
+                            // В группе uiGenGroup содержится больше одного элемента
+                            // Создаем для группы узел дерева
+                            TreeNode uiGenGroupNode = new TreeNode(uiGenGroup.Key);
+
+                            TreeNode uiGenNode = new TreeNode($"{uiGenFirst.Name} [{uiGenFirst.Type}]") { Tag = uiGenFirst };
+                            uiGenGroupNode.Nodes.Add(uiGenNode);
+
+                            // uiGenEnumr.Current уже указывает на 2 элемент группы
+                            // обрабатываем его и пытаемся выбрать следующий
+                            do
+                            {
+                                UIGen uiGen = uiGenEnumr.Current;
+                                uiGenNode = new TreeNode($"{uiGen.Name} [{uiGen.Type}]") { Tag = uiGen };
+                                uiGenGroupNode.Nodes.Add(uiGenNode);
+                            }
+                            while (uiGenEnumr.MoveNext());
+
+                            // Добавляем узел группы в дерево
+                            tvInterfaces.Nodes.Add(uiGenGroupNode);
+                        }
+                        else
+                        {
+                            // в группе uiGenGroup только один элемент uiGenFirst
+                            // добавляем его в узел miscGroup
+                            TreeNode uiGenNode = new TreeNode($"{uiGenFirst.Name} [{uiGenFirst.Type}]") { Tag = uiGenFirst };
+                            miscGroup.Nodes.Add(uiGenNode);
+                        }
+                    }
+                }
             }
-            // Добавляем узел miscGroup в компонент tvInterfaces
-            if (miscGroup.Nodes.Count > 0)
-                tvInterfaces.Nodes.Add(miscGroup);
+#endif
+
+                // Добавляем узел miscGroup в компонент tvInterfaces
+                if (miscGroup.Nodes.Count > 0)
+                    tvInterfaces.Nodes.Add(miscGroup);
 
             if (cbSort.Checked)
                 tvInterfaces.Sort();
             #endregion
+        }
+        private void AddChieldNodes(TreeNode uiGenGroupNode, IGrouping<string, UIGen> uiGenGroup)
+        {
+            foreach (UIGen uiGen in uiGenGroup)
+            {
+                TreeNode uiGenNode = new TreeNode($"{uiGen.Name} [{uiGen.Type}]") { Tag = uiGen };
+                uiGenGroupNode.Nodes.Add(uiGenNode);
+            }
         }
 
         /// <summary>
@@ -148,9 +227,9 @@ namespace EntityCore.Forms
             stopwatch.Start();
 #endif
             // создание копии списка элементов UIGen
-            List<UIGen> uiGenList = MyNW.Internals.UIManager.AllUIGen.FindAll(ui => (!filterVisibleOnly.Checked || ui.IsValid && ui.IsVisible)
-                                                                              && (string.IsNullOrEmpty(filterName.Text) || ui.Name.IndexOf(filterName.Text, StringComparison.OrdinalIgnoreCase) >= 0)
-                                                                              && !string.IsNullOrEmpty(ui.Name));
+            List<UIGen> uiGenList = MyNW.Internals.UIManager.AllUIGen.FindAll(ui => ui.IsValid && (!filterVisibleOnly.Checked || ui.IsVisible)
+                                                                              && !string.IsNullOrEmpty(ui.Name)
+                                                                              && (string.IsNullOrEmpty(filterName.Text) || ui.Name.IndexOf(filterName.Text, StringComparison.OrdinalIgnoreCase) >= 0));
 
             //string misc = "<Miscelaneouse>";
             //TreeNode miscSubgroup = new TreeNode(misc);

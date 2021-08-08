@@ -1,10 +1,12 @@
-﻿using Astral.Logic.Classes.Map;
+﻿using System;
+using AcTp0Tools.Reflection;
+using Astral.Logic.Classes.Map;
 using EntityTools.Core.Interfaces;
-using EntityTools.Reflection;
-using System.Reflection;
+using EntityTools.Quester;
 using MyNW.Classes;
-using System;
 using static Astral.Quester.Classes.Action;
+using Action = Astral.Quester.Classes.Action;
+
 
 namespace EntityTools.Core.Proxies
 {
@@ -13,25 +15,26 @@ namespace EntityTools.Core.Proxies
     /// </summary>
     internal sealed class QuesterActionProxy : IQuesterActionEngine
     {
-        private Astral.Quester.Classes.Action action;
+        private Action _action;
 
-        private QuesterActionProxy() { }
-
-        internal QuesterActionProxy(Astral.Quester.Classes.Action a)
+        private QuesterActionProxy()
         {
-            action = a ?? throw new ArgumentNullException();
+        }
+
+        internal QuesterActionProxy(Action action)
+        {
+            _action = action ?? throw new ArgumentNullException(nameof(action));
+            _internalConditions = _action.GetProperty<bool>("IntenalConditions");
+            _internalValidity = _action.GetProperty<ActionValidity>(nameof(InternalValidity));
+            _internalDestination = _action.GetProperty<Vector3>(nameof(InternalDestination));
         }
 
         public bool NeedToRun
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
-                    return action.NeedToRun;
-
-                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
-
-                EntityTools.StopBot();
+                if (EntityTools.Core.Initialize(_action))
+                    return _action.NeedToRun;
 
                 return false;
             }
@@ -41,95 +44,116 @@ namespace EntityTools.Core.Proxies
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
-                    return action.ActionLabel;
-                else return action.GetType().Name;
+                if (string.IsNullOrEmpty(_label))
+                {
+                    if (EntityTools.Core.Initialize(_action))
+                        _label = _action.ActionLabel;
+                    else _label = $"{_action.GetType().Name} [uninitialized]";
+                }
+                return _label;
             }
         }
+        string _label;
 
         public bool InternalConditions
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
-                    if (ReflectionHelper.GetPropertyValue(action, "InternalConditions", out object result, BindingFlags.Instance | BindingFlags.NonPublic)
-                        && result != null)
-                        return result.Equals(true);
-
-                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
-
-                EntityTools.StopBot();
-
+                if (EntityTools.Core.Initialize(_action))
+                {
+                    if (_internalConditions.IsValid)
+                        return _internalConditions.Value;
+                    ETLogger.WriteLine(LogType.Error, $"Invalid 'InternalConditions' accessor in Action {_action.GetType().Name}[{_action.ActionID}]", false);
+                    ETLogger.WriteLine(LogType.Error, Environment.StackTrace, false);
+                }
                 return false;
             }
         }
+        PropertyAccessor<bool> _internalConditions;
 
         public ActionValidity InternalValidity
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
-                    if (ReflectionHelper.GetPropertyValue(action, "InternalValidity", out object result, BindingFlags.Instance | BindingFlags.NonPublic)
-                        && result != null)
-                        return result as ActionValidity;
-                return new ActionValidity($"{action.GetType().Name} not valid");
+                if (EntityTools.Core.Initialize(_action))
+                {
+                    if (_internalValidity.IsValid)
+                        return _internalValidity.Value;
+                    ETLogger.WriteLine(LogType.Error, $"Invalid 'InternalValidity' accessor in Action {_action.GetType().Name}[{_action.ActionID}]", false);
+                    ETLogger.WriteLine(LogType.Error, Environment.StackTrace, false);
+                }
+                return new ActionValidity($"{_action.GetType().Name} initialization failed");
             }
         }
+        PropertyAccessor<ActionValidity> _internalValidity;
 
         public Vector3 InternalDestination
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
-                    if (ReflectionHelper.GetPropertyValue(action, "InternalDestination", out object result, BindingFlags.Instance | BindingFlags.NonPublic)
-                        && result != null)
-                        return result as Vector3;
+                if (EntityTools.Core.Initialize(_action))
+                {
+                    if (_internalDestination.IsValid)
+                        return _internalDestination.Value;
+                    ETLogger.WriteLine(LogType.Error, $"Invalid 'InternalDestination' accessor in Action {_action.GetType().Name}[{_action.ActionID}]", false);
+                    ETLogger.WriteLine(LogType.Error, Environment.StackTrace, false);
+                }
 
-                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
-
-                EntityTools.StopBot();
-
-                return new Vector3();
+                return Vector3.Empty;
             }
         }
+        PropertyAccessor<Vector3> _internalDestination;
+
         public bool UseHotSpots
         {
             get
             {
-                if (EntityTools.Core.Initialize(action))
-                    return action.UseHotSpots;
-                else return false;
+                if (EntityTools.Core.Initialize(_action))
+                    return _action.UseHotSpots;
+                return false;
             }
         }
 
         public void GatherInfos()
         {
-            if (EntityTools.Core.Initialize(action))
-                action.GatherInfos();
+            if (EntityTools.Core.Initialize(_action))
+                _action.GatherInfos();
         }
 
         public void InternalReset()
         {
-            if (EntityTools.Core.Initialize(action))
-                action.InternalReset();
+            if (EntityTools.Core.Initialize(_action))
+                _action.InternalReset();
         }
 
         public void OnMapDraw(GraphicsNW graph)
         {
-            if (EntityTools.Core.Initialize(action))
-                action.OnMapDraw(graph);
+            if (EntityTools.Core.Initialize(_action))
+                _action.OnMapDraw(graph);
         }
 
         public ActionResult Run()
         {
-            if (EntityTools.Core.Initialize(action))
-                return action.Run();
-
-            ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
-
-            EntityTools.StopBot();
+            if (EntityTools.Core.Initialize(_action))
+                return _action.Run();
 
             return ActionResult.Fail;
         }
+
+        public bool Rebase(Action action)
+        {
+            return EntityTools.Core.Initialize(action);
+        }
+
+        public void Dispose()
+        {
+            if (_action != null)
+            {
+                ReflectionHelper.SetFieldValue(_action, "Engine", null);
+                _action = null;
+            }
+        }
+
+        public void OnPropertyChanged(Action sender, string propertyName) { }
     }
 }

@@ -10,12 +10,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Astral.Logic.UCC.Classes;
 
 namespace EntityCore.UCC.Actions
 {
-    class DodgeFromEntityEngine : IEntityInfos
-#if CORE_INTERFACES
-        , IUCCActionEngine
+    class DodgeFromEntityEngine : IUccActionEngine
+#if IEntityDescriptor
+        , IEntityInfos  
 #endif
     {
         #region Данные
@@ -26,45 +27,94 @@ namespace EntityCore.UCC.Actions
         /// Функтор, предназначенный для проверки соответствия Entity
         /// основным критериям: EntityID, EntityIdType, EntityNameType
         /// </summary>
-        private Predicate<Entity> checkEntity { get; set; } = null;
+#if false
+        private Predicate<Entity> checkEntity { get; set; } = null; 
+#endif
         private Entity entity = null;
         private Timeout timeout = new Timeout(0);
-        private string label = string.Empty; 
+        private string _label = string.Empty;
+        private string _idStr;
         #endregion
 
         internal DodgeFromEntityEngine(DodgeFromEntity dfe)
         {
-            @this = dfe;
-#if CORE_INTERFACES
-            @this.Engine = this;
-#endif
-            @this.PropertyChanged += PropertyChanged;
+            InternalRebase(dfe);
+            ETLogger.WriteLine(LogType.Debug, $"{_idStr} initialized: {Label()}");
+        }
+        ~DodgeFromEntityEngine()
+        {
+            Dispose();
+        }
 
-            checkEntity = internal_CheckEntity_Initializer;
-
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
+        public void Dispose()
+        {
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = null;
+                @this = null;
+            }
+            _key = null;
+            _specialCheck = null;
+            _label = string.Empty;
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (object.ReferenceEquals(sender, @this))
+            if (ReferenceEquals(sender, @this))
             {
-                switch (e.PropertyName)
-                {
-                    case "EntityID":
-                        checkEntity = internal_CheckEntity_Initializer; //EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
-                        label = string.Empty;
-                        break;
-                    case "EntityIdType":
-                        checkEntity = internal_CheckEntity_Initializer; //EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
-                        break;
-                    case "EntityNameType":
-                        checkEntity = internal_CheckEntity_Initializer; //EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
-                        break;
-                }
+                _key = null;
+                _specialCheck = null;
+                _label = string.Empty;
+
                 entity = null;
                 timeout.ChangeTime(0);
             }
+        }
+
+        public bool Rebase(UCCAction action)
+        {
+            if (action is null)
+                return false;
+            if (ReferenceEquals(action, @this))
+                return true;
+            if (action is DodgeFromEntity ettApproach)
+            {
+                if (InternalRebase(ettApproach))
+                {
+                    ETLogger.WriteLine(LogType.Debug, $"{_idStr} reinitialized");
+                    return true;
+                }
+                ETLogger.WriteLine(LogType.Debug, $"{_idStr} rebase failed");
+                return false;
+            }
+
+            string debugStr = string.Concat("Rebase failed. ", action.GetType().Name, '[', action.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(DodgeFromEntity) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
+        }
+
+        private bool InternalRebase(DodgeFromEntity dfe)
+        {
+            // Убираем привязку к старому условию
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = null;
+            }
+
+            @this = dfe;
+            @this.PropertyChanged += PropertyChanged;
+
+            _key = null;
+            _specialCheck = null;
+            _label = string.Empty;
+
+            _idStr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+
+            @this.Engine = this;
+
+            return true;
         }
 
         #region IUCCActionEngine
@@ -74,14 +124,16 @@ namespace EntityCore.UCC.Actions
             {
                 if (!string.IsNullOrEmpty(@this._entityId))
                 {
+                    var entityKey = EntityKey;
+
                     if (timeout.IsTimedOut)
                     {
-                        entity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                                @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck, null, @this._aura.Checker);
-                        timeout.ChangeTime(EntityTools.EntityTools.PluginSettings.EntityCache.CombatCacheTime);
+                        entity = SearchCached.FindClosestEntity(entityKey, SpecialCheck);
+
+                        timeout.ChangeTime(EntityTools.EntityTools.Config.EntityCache.CombatCacheTime);
                     }
 
-                    return ValidateEntity(entity) && entity.Location.Distance3DFromPlayer <= @this._entityRadius;
+                    return entityKey.Validate(entity) && entity.Location.Distance3DFromPlayer <= @this._entityRadius;
                 }
                 return false;
             }
@@ -136,7 +188,7 @@ namespace EntityCore.UCC.Actions
                         while (this.pathtToLocIsInAOE(EntityManager.LocalPlayer.Location, Astral.Logic.UCC.Core.CurrentTarget.Location))
                         {
                             Vector3 location2 = EntityManager.LocalPlayer.Location;
-                            Vector3 vector = new Vector3();
+                            Vector3 vector = Vector3.Empty;
                             Thread.Sleep(150);
                             if (Combats.ShouldDodge(true))
                             {
@@ -203,16 +255,15 @@ namespace EntityCore.UCC.Actions
         {
             get
             {
-                if (ValidateEntity(entity))
+                var entityKey = EntityKey;
+                if (entityKey.Validate(entity))
                     return entity;
                 else
                 {
                     if (!string.IsNullOrEmpty(@this._entityId))
                     {
-                        entity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                                @this._healthCheck, @this._reactionRange,
-                                                                (@this._reactionZRange > 0) ? @this._reactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference,
-                                                                @this._regionCheck, null, @this._aura.Checker);
+                        entity = SearchCached.FindClosestEntity(entityKey, 
+                                                                SpecialCheck);
                         return entity;
                     }
                 }
@@ -222,44 +273,51 @@ namespace EntityCore.UCC.Actions
 
         public string Label()
         {
-            if (string.IsNullOrEmpty(label))
+            if (string.IsNullOrEmpty(_label))
             {
                 if (string.IsNullOrEmpty(@this._entityId))
-                    label = @this.GetType().Name;
-                else label = $"{@this.GetType().Name} [{@this._entityId}]";
+                    _label = @this.GetType().Name;
+                else _label = $"{@this.GetType().Name} [{@this._entityId}]";
             }
-            return label;
-        } 
+            return _label;
+        }
         #endregion
 
+        #region Вспомогательные инструменты
         /// <summary>
-        /// Проверка валидности цели
-        /// Флаг IsValid не гарантирует, что ранее найденный Entity ссылается на ту же сущность
-        /// поскольку игровой клиент может её подменить
+        /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
         /// </summary>
-        /// <param name="e"></param>
-        /// <returns></returns>
-        private bool ValidateEntity(Entity e)
+        public EntityCacheRecordKey EntityKey
         {
-            return e != null && e.IsValid && checkEntity(e);
-        }
-
-        private bool internal_CheckEntity_Initializer(Entity e)
-        {
-            Predicate<Entity> predicate = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
-            if (predicate != null)
+            get
             {
-#if DEBUG
-                ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Comparer does not defined. Initialize.");
-#endif
-                checkEntity = predicate;
-                return e != null && checkEntity(e);
+                if (_key is null)
+                    _key = new EntityCacheRecordKey(@this._entityId, @this._entityIdType, @this._entityNameType);
+                return _key;
             }
-#if DEBUG
-            else ETLogger.WriteLine(LogType.Error, $"{GetType().Name}[{this.GetHashCode().ToString("X2")}]: Fail to initialize the Comparer.");
-#endif
-            return false;
         }
+        private EntityCacheRecordKey _key;
+
+        /// <summary>
+        /// Функтор дополнительной проверки <seealso cref="Entity"/> 
+        /// на предмет нахождения наличия (отсутствия) ауры <see cref="DodgeFromEntity.Aura"/>
+        /// Использовать самомодифицирующийся предиката, т.к. предикат передается в <seealso cref="SearchCached.FindClosestEntity(EntityCacheRecordKey, Predicate{Entity})"/>
+        /// </summary>        
+        private Predicate<Entity> SpecialCheck
+        {
+            get
+            {
+                if (_specialCheck is null)
+                    _specialCheck = SearchHelper.Construct_EntityAttributePredicate(@this._healthCheck,
+                                                            @this._reactionRange,
+                                                            @this._reactionZRange > 0 ? @this._reactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference,
+                                                            @this._regionCheck,
+                                                            @this._aura.IsMatch);
+                return _specialCheck;
+            }
+        }
+        private Predicate<Entity> _specialCheck;
+        #endregion
 
         #region Копия кода dodge
         //private bool havewaitdel(Func<bool> del)
@@ -270,7 +328,7 @@ namespace EntityCore.UCC.Actions
         //private bool pathtToLocIsInAOE(Vector3 start, Vector3 loc)
         //{
 
-        //    Vector3 vector3_ = new Vector3();
+        //    Vector3 vector3_ = Vector3.Empty;
         //    foreach (AOECheck.AOE aoe in AOECheck.List)
         //    {
         //        if (aoe.IsIn(loc))
@@ -335,7 +393,7 @@ namespace EntityCore.UCC.Actions
         //    list = (from i in list
         //            orderby Guid.NewGuid()
         //            select i).ToList<Vector3>();
-        //    Vector3 vector = new Vector3();
+        //    Vector3 vector = Vector3.Empty;
         //    List<Astral.Logic.NW.Movements.DodgeLosTestResult> list2 = new List<Astral.Logic.NW.Movements.DodgeLosTestResult>();
         //    if (EntityManager.CurrentSettings.UsePathfinding3)
         //    {
@@ -344,7 +402,7 @@ namespace EntityCore.UCC.Actions
         //            while (enumerator.MoveNext())
         //            {
         //                Vector3 vector2 = enumerator.Current;
-        //                Vector3 collidePos = new Vector3();
+        //                Vector3 collidePos = Vector3.Empty;
         //                bool collided = PathFinding.CheckDirection(playerPos, vector2, ref collidePos);
         //                list2.Add(new Astral.Logic.NW.Movements.DodgeLosTestResult(vector2, collided, collidePos));
         //            }
@@ -427,77 +485,5 @@ namespace EntityCore.UCC.Actions
         //    return vector;
         //} 
         #endregion
-
-        public bool EntityDiagnosticString(out string infoString)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            sb.Append("EntityID: ").AppendLine(@this._entityId);
-            sb.Append("EntityIdType: ").AppendLine(@this._entityIdType.ToString());
-            sb.Append("EntityNameType: ").AppendLine(@this._entityNameType.ToString());
-            //sb.Append("EntitySetType: ").AppendLine(@this._entitySetType.ToString());
-            sb.Append("HealthCheck: ").AppendLine(@this._healthCheck.ToString());
-            sb.Append("ReactionRange: ").AppendLine(@this._reactionRange.ToString());
-            sb.Append("ReactionZRange: ").AppendLine(@this._reactionZRange.ToString());
-            sb.Append("RegionCheck: ").AppendLine(@this._regionCheck.ToString());
-            sb.Append("Aura: ").AppendLine(@this._aura.ToString());
-            //if (@this._customRegionNames != null && @this._customRegionNames.Count > 0)
-            //{
-            //    sb.Append("RegionCheck: {").Append(@this._customRegionNames[0]);
-            //    for (int i = 1; i < @this._customRegionNames.Count; i++)
-            //        sb.Append(", ").Append(@this._customRegionNames[i]);
-            //    sb.AppendLine("}");
-            //}
-            sb.AppendLine();
-            //sb.Append("NeedToRun: ").AppendLine(NeedToRun.ToString());
-            //sb.AppendLine();
-
-            // список всех Entity, удовлетворяющих условиям
-            LinkedList<Entity> entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                                     @this._healthCheck, 0, 0,
-                                                                     @this._regionCheck, null, @this._aura.Checker);
-
-
-            // Количество Entity, удовлетворяющих условиям
-            if (entities != null)
-                sb.Append("Founded Entities: ").AppendLine(entities.Count.ToString());
-            else sb.Append("Founded Entities: 0");
-            sb.AppendLine();
-
-            // Ближайшее Entity (найдено при вызове ie.NeedToRun, поэтому строка ниже закомментирована)
-            entity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                    @this._healthCheck, 0, 0, 
-                                                    @this._regionCheck, null, @this._aura.Checker);
-            if (entity != null)
-            {
-                bool distOk = @this._reactionRange <= 0 || entity.Location.Distance3DFromPlayer < @this._reactionRange;
-                bool zOk = @this._reactionZRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(entity.Location) < @this._reactionZRange;
-                bool alive = !@this._healthCheck || !entity.IsDead;
-                sb.Append("ClosestEntity: ").Append(entity.ToString());
-                if (distOk && zOk && alive)
-                    sb.AppendLine(" [MATCH]");
-                else sb.AppendLine(" [MISMATCH]");
-                sb.Append("\tName: ").AppendLine(entity.Name);
-                sb.Append("\tInternalName: ").AppendLine(entity.InternalName);
-                sb.Append("\tNameUntranslated: ").AppendLine(entity.NameUntranslated);
-                sb.Append("\tIsDead: ").Append(entity.IsDead.ToString());
-                if (alive)
-                    sb.AppendLine(" [OK]");
-                else sb.AppendLine(" [FAIL]"); sb.Append("\tRegion: '").Append(entity.RegionInternalName).AppendLine("'");
-                sb.Append("\tLocation: ").AppendLine(entity.Location.ToString());
-                sb.Append("\tDistance: ").Append(entity.Location.Distance3DFromPlayer.ToString());
-                if (distOk)
-                    sb.AppendLine(" [OK]");
-                else sb.AppendLine(" [FAIL]");
-                sb.Append("\tZAxisDiff: ").Append(Astral.Logic.General.ZAxisDiffFromPlayer(entity.Location).ToString());
-                if (zOk)
-                    sb.AppendLine(" [OK]");
-                else sb.AppendLine(" [FAIL]");
-            }
-            else sb.AppendLine("Closest Entity not found!");
-
-            infoString = sb.ToString();
-            return true;
-        }
     }
 }

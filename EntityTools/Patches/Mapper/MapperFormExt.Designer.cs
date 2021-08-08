@@ -1,13 +1,7 @@
-﻿using Astral.Logic.Classes.Map;
-using Astral.Quester.Classes;
-using DevExpress.XtraBars;
-using DevExpress.XtraEditors;
-using DevExpress.XtraEditors.Controls;
-using DevExpress.XtraEditors.Repository;
-using System.ComponentModel;
-using System.Drawing;
-using System.Threading;
+﻿using System.ComponentModel;
 using System.Windows.Forms;
+using DevExpress.XtraBars;
+using DevExpress.XtraEditors.Repository;
 
 namespace EntityTools.Patches.Mapper
 {
@@ -17,7 +11,7 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -41,294 +35,348 @@ namespace EntityTools.Patches.Mapper
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MapperFormExt));
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.barManager = new DevExpress.XtraBars.BarManager(this.components);
-            this.toolbarMainMapper = new DevExpress.XtraBars.Bar();
-            this.toolGroupMapping = new DevExpress.XtraBars.BarButtonGroup();
-            this.menuCheckStopMapping = new DevExpress.XtraBars.BarCheckItem();
-            this.menuBidirectional = new DevExpress.XtraBars.BarCheckItem();
-            this.menuUnidirectional = new DevExpress.XtraBars.BarCheckItem();
-            this.menuLinearPath = new DevExpress.XtraBars.BarCheckItem();
-            this.menuForceLinkLast = new DevExpress.XtraBars.BarCheckItem();
-            this.toolGroupCR = new DevExpress.XtraBars.BarButtonGroup();
-            this.menuRectangularCR = new DevExpress.XtraBars.BarButtonItem();
-            this.menuEllipticalCR = new DevExpress.XtraBars.BarButtonItem();
-            this.toolGroupNodes = new DevExpress.XtraBars.BarButtonGroup();
-            this.menuImportGame = new DevExpress.XtraBars.BarButtonItem();
-            this.menuImportProfile = new DevExpress.XtraBars.BarButtonItem();
-            this.menuExportMesh = new DevExpress.XtraBars.BarButtonItem();
-            this.menuClear = new DevExpress.XtraBars.BarButtonItem();
-            this.menuOptions = new DevExpress.XtraBars.BarButtonItem();
+            this.barMapping = new DevExpress.XtraBars.Bar();
+            this.groupMapping = new DevExpress.XtraBars.BarButtonGroup();
+            this.btnMappingBidirectional = new DevExpress.XtraBars.BarCheckItem();
+            this.btnMappingUnidirectional = new DevExpress.XtraBars.BarCheckItem();
+            this.btnMappingStop = new DevExpress.XtraBars.BarCheckItem();
+            this.btnMappingLinearPath = new DevExpress.XtraBars.BarCheckItem();
+            this.btnMappingForceLink = new DevExpress.XtraBars.BarCheckItem();
+            this.btnOptions = new DevExpress.XtraBars.BarButtonItem();
             this.popMenuOptions = new DevExpress.XtraBars.PopupMenu(this.components);
-            this.menuWaypointDistance = new DevExpress.XtraBars.BarEditItem();
+            this.editWaypointDistance = new DevExpress.XtraBars.BarEditItem();
             this.seWaypointDistance = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
-            this.menuMaxZDifference = new DevExpress.XtraBars.BarEditItem();
+            this.editMaxZDifference = new DevExpress.XtraBars.BarEditItem();
             this.seMaxZDifference = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
-            this.menuEquivalenceDistance = new DevExpress.XtraBars.BarEditItem();
+            this.editEquivalenceDistance = new DevExpress.XtraBars.BarEditItem();
             this.seEquivalenceDistance = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
-            this.menuDeleteRadius = new DevExpress.XtraBars.BarEditItem();
-            this.seDeleteRadius = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
-            this.menuCacheActive = new DevExpress.XtraBars.BarCheckItem();
-            this.toolbarCustomRegion = new DevExpress.XtraBars.Bar();
-            this.menuLableCR = new DevExpress.XtraBars.BarStaticItem();
-            this.menuCRName = new DevExpress.XtraBars.BarEditItem();
-            this.teCRName = new DevExpress.XtraEditors.Repository.RepositoryItemTextEdit();
-            this.menuCRAccept = new DevExpress.XtraBars.BarButtonItem();
-            this.menuCRCancel = new DevExpress.XtraBars.BarButtonItem();
-            this.statusBar = new DevExpress.XtraBars.Bar();
-            this.statCenterPlayer = new DevExpress.XtraBars.BarCheckItem();
-            this.statMousePos = new DevExpress.XtraBars.BarStaticItem();
-            this.statZoom = new DevExpress.XtraBars.BarEditItem();
-            this.zoomer = new DevExpress.XtraEditors.Repository.RepositoryItemZoomTrackBar();
+            this.barNodeTools = new DevExpress.XtraBars.Bar();
+            this.btnUndo = new DevExpress.XtraBars.BarButtonItem();
+            this.groupEditMeshes = new DevExpress.XtraBars.BarButtonGroup();
+            this.btnMoveNodes = new DevExpress.XtraBars.BarCheckItem();
+            this.btnRemoveNodes = new DevExpress.XtraBars.BarCheckItem();
+            this.btnEditEdges = new DevExpress.XtraBars.BarCheckItem();
+            this.barMeshes = new DevExpress.XtraBars.Bar();
+            this.btnSaveMeshes = new DevExpress.XtraBars.BarButtonItem();
+            this.groupImportExportNodes = new DevExpress.XtraBars.BarButtonGroup();
+            this.btnImportMeshesFromGame = new DevExpress.XtraBars.BarButtonItem();
+            this.btnImportMeshesFromProfile = new DevExpress.XtraBars.BarButtonItem();
+            this.btnExportMeshes = new DevExpress.XtraBars.BarButtonItem();
+            this.btnClearMeshes = new DevExpress.XtraBars.BarButtonItem();
+            this.btnMeshesInfo = new DevExpress.XtraBars.BarButtonItem();
+            this.btnCompression = new DevExpress.XtraBars.BarButtonItem();
+            this.btnDistanceMeasurement = new DevExpress.XtraBars.BarCheckItem();
+            this.btnObjectInfo = new DevExpress.XtraBars.BarCheckItem();
+            this.barCustomRegions = new DevExpress.XtraBars.Bar();
+            this.btnAddCR = new DevExpress.XtraBars.BarButtonItem();
+            this.btnEditCR = new DevExpress.XtraBars.BarButtonItem();
+            this.barEditCustomRegion = new DevExpress.XtraBars.Bar();
+            this.btnCRTypeSelector = new DevExpress.XtraBars.BarCheckItem();
+            this.btnCRRename = new DevExpress.XtraBars.BarCheckItem();
+            this.editCRSelector = new DevExpress.XtraBars.BarEditItem();
+            this.itemEditCRList = new DevExpress.XtraEditors.Repository.RepositoryItemLookUpEdit();
+            this.editCRName = new DevExpress.XtraBars.BarEditItem();
+            this.itemEditCRName = new DevExpress.XtraEditors.Repository.RepositoryItemTextEdit();
+            this.btnCRAdditionAccept = new DevExpress.XtraBars.BarButtonItem();
+            this.btnCREditionAccept = new DevExpress.XtraBars.BarButtonItem();
+            this.btnCRCancel = new DevExpress.XtraBars.BarButtonItem();
+            this.barStatus = new DevExpress.XtraBars.Bar();
+            this.btnLockMapOnPlayer = new DevExpress.XtraBars.BarCheckItem();
+            this.btnSettings = new DevExpress.XtraBars.BarCheckItem();
+            this.groupSaveUndo = new DevExpress.XtraBars.BarButtonGroup();
+            this.groupZoom = new DevExpress.XtraBars.BarButtonGroup();
+            this.btnZoomIn = new DevExpress.XtraBars.BarButtonItem();
+            this.lblZoom = new DevExpress.XtraBars.BarStaticItem();
+            this.btnZoomOut = new DevExpress.XtraBars.BarButtonItem();
+            this.lblPlayerPos = new DevExpress.XtraBars.BarStaticItem();
+            this.lblMousePos = new DevExpress.XtraBars.BarStaticItem();
+            this.lblDrawInfo = new DevExpress.XtraBars.BarStaticItem();
             this.barDockControlTop = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlBottom = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlLeft = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlRight = new DevExpress.XtraBars.BarDockControl();
-            this.barMapper = new DevExpress.XtraBars.BarSubItem();
-            this.barCustomRegion = new DevExpress.XtraBars.BarSubItem();
-            this.barNodes = new DevExpress.XtraBars.BarSubItem();
             this.menuImportMesh = new DevExpress.XtraBars.BarButtonItem();
-            this.barOptions = new DevExpress.XtraBars.BarSubItem();
-            this.menuBtnStopMapping = new DevExpress.XtraBars.BarButtonItem();
-            this.statCenterPlayerText = new DevExpress.XtraBars.BarStaticItem();
+            this.editDeleteRadius = new DevExpress.XtraBars.BarEditItem();
+            this.seDeleteRadius = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
+            this.groupCR = new DevExpress.XtraBars.BarButtonGroup();
+            this.editBidirPathColor = new DevExpress.XtraBars.BarEditItem();
+            this.editItemColor = new DevExpress.XtraEditors.Repository.RepositoryItemColorEdit();
+            this.editUnidirPathColor = new DevExpress.XtraBars.BarEditItem();
+            this.btnLockOnSpecialObject = new DevExpress.XtraBars.BarButtonItem();
+            this.btnAddRoad = new DevExpress.XtraBars.BarCheckItem();
             this.bsrcAstralSettings = new System.Windows.Forms.BindingSource(this.components);
-            this.mapBox = new System.Windows.Forms.PictureBox();
+            this.btnShowStatBar = new System.Windows.Forms.Button();
+            this.MapPicture = new System.Windows.Forms.PictureBox();
+            this.panelSettings = new DevExpress.XtraEditors.PanelControl();
+            this.navBarCustomization = new DevExpress.XtraNavBar.NavBarControl();
+            this.navGroupMeshes = new DevExpress.XtraNavBar.NavBarGroup();
+            this.containerMeshes = new DevExpress.XtraNavBar.NavBarGroupControlContainer();
+            this.lblBackground = new System.Windows.Forms.Label();
+            this.lblUnidirPath = new System.Windows.Forms.Label();
+            this.lblBidirPath = new System.Windows.Forms.Label();
+            this.colorEditBidirPath = new DevExpress.XtraEditors.ColorEdit();
+            this.colorBackground = new DevExpress.XtraEditors.ColorEdit();
+            this.colorEditUnidirPath = new DevExpress.XtraEditors.ColorEdit();
+            this.containerObjects = new DevExpress.XtraNavBar.NavBarGroupControlContainer();
+            this.grpNodeCustomization = new DevExpress.XtraEditors.GroupControl();
+            this.ckbNodes = new DevExpress.XtraEditors.CheckEdit();
+            this.colorNodes = new DevExpress.XtraEditors.ColorEdit();
+            this.ckbSkillnodes = new DevExpress.XtraEditors.CheckEdit();
+            this.colorSkillnodes = new DevExpress.XtraEditors.ColorEdit();
+            this.grpEntityCustomization = new DevExpress.XtraEditors.GroupControl();
+            this.ckbEnemies = new DevExpress.XtraEditors.CheckEdit();
+            this.ckbOtherNPC = new DevExpress.XtraEditors.CheckEdit();
+            this.colorEnemies = new DevExpress.XtraEditors.ColorEdit();
+            this.ckbPlayers = new DevExpress.XtraEditors.CheckEdit();
+            this.colorFriends = new DevExpress.XtraEditors.ColorEdit();
+            this.colorPlayers = new DevExpress.XtraEditors.ColorEdit();
+            this.colorOtherNPC = new DevExpress.XtraEditors.ColorEdit();
+            this.ckbFriends = new DevExpress.XtraEditors.CheckEdit();
+            this.containerGeneral = new DevExpress.XtraNavBar.NavBarGroupControlContainer();
+            this.lblLayerDepth = new System.Windows.Forms.Label();
+            this.editLayerDepth = new DevExpress.XtraEditors.SpinEdit();
+            this.ckbChacheEnable = new DevExpress.XtraEditors.CheckEdit();
+            this.navGroupGeneral = new DevExpress.XtraNavBar.NavBarGroup();
+            this.navGroupObjects = new DevExpress.XtraNavBar.NavBarGroup();
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.popMenuOptions)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seWaypointDistance)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seMaxZDifference)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seEquivalenceDistance)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.itemEditCRList)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.itemEditCRName)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seDeleteRadius)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.teCRName)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.zoomer)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.editItemColor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bsrcAstralSettings)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.mapBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MapPicture)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.panelSettings)).BeginInit();
+            this.panelSettings.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.navBarCustomization)).BeginInit();
+            this.navBarCustomization.SuspendLayout();
+            this.containerMeshes.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.colorEditBidirPath.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorBackground.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorEditUnidirPath.Properties)).BeginInit();
+            this.containerObjects.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.grpNodeCustomization)).BeginInit();
+            this.grpNodeCustomization.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ckbNodes.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorNodes.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ckbSkillnodes.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorSkillnodes.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.grpEntityCustomization)).BeginInit();
+            this.grpEntityCustomization.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ckbEnemies.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ckbOtherNPC.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorEnemies.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ckbPlayers.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorFriends.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorPlayers.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorOtherNPC.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ckbFriends.Properties)).BeginInit();
+            this.containerGeneral.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.editLayerDepth.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ckbChacheEnable.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // backgroundWorker
             // 
             this.backgroundWorker.WorkerSupportsCancellation = true;
-            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorkUpdateFormCaption);
+            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.work_MapperFormUpdate);
             // 
             // barManager
             // 
+            this.barManager.AllowCustomization = false;
+            this.barManager.AllowQuickCustomization = false;
             this.barManager.Bars.AddRange(new DevExpress.XtraBars.Bar[] {
-            this.toolbarMainMapper,
-            this.toolbarCustomRegion,
-            this.statusBar});
+            this.barMapping,
+            this.barNodeTools,
+            this.barMeshes,
+            this.barCustomRegions,
+            this.barEditCustomRegion,
+            this.barStatus});
             this.barManager.DockControls.Add(this.barDockControlTop);
             this.barManager.DockControls.Add(this.barDockControlBottom);
             this.barManager.DockControls.Add(this.barDockControlLeft);
             this.barManager.DockControls.Add(this.barDockControlRight);
             this.barManager.Form = this;
             this.barManager.Items.AddRange(new DevExpress.XtraBars.BarItem[] {
-            this.barMapper,
-            this.menuUnidirectional,
-            this.barCustomRegion,
-            this.menuRectangularCR,
-            this.menuEllipticalCR,
-            this.barNodes,
-            this.menuImportGame,
-            this.menuImportProfile,
+            this.btnMappingUnidirectional,
+            this.btnAddCR,
+            this.btnImportMeshesFromGame,
+            this.btnImportMeshesFromProfile,
             this.menuImportMesh,
-            this.menuExportMesh,
-            this.barOptions,
-            this.menuWaypointDistance,
-            this.menuMaxZDifference,
-            this.menuEquivalenceDistance,
-            this.menuDeleteRadius,
-            this.menuClear,
-            this.menuBidirectional,
-            this.menuForceLinkLast,
-            this.menuLinearPath,
-            this.menuCheckStopMapping,
-            this.menuBtnStopMapping,
-            this.toolGroupMapping,
-            this.toolGroupCR,
-            this.toolGroupNodes,
-            this.menuOptions,
-            this.menuLableCR,
-            this.menuCRName,
-            this.menuCRAccept,
-            this.menuCRCancel,
-            this.menuCacheActive,
-            this.statMousePos,
-            this.statZoom,
-            this.statCenterPlayerText,
-            this.statCenterPlayer});
-            this.barManager.MaxItemId = 90;
+            this.btnExportMeshes,
+            this.editWaypointDistance,
+            this.editMaxZDifference,
+            this.editEquivalenceDistance,
+            this.editDeleteRadius,
+            this.btnClearMeshes,
+            this.btnMappingBidirectional,
+            this.btnMappingForceLink,
+            this.btnMappingLinearPath,
+            this.btnMappingStop,
+            this.groupMapping,
+            this.groupCR,
+            this.groupImportExportNodes,
+            this.btnOptions,
+            this.editCRName,
+            this.btnCRAdditionAccept,
+            this.btnCRCancel,
+            this.lblMousePos,
+            this.btnSaveMeshes,
+            this.btnMoveNodes,
+            this.btnRemoveNodes,
+            this.btnEditEdges,
+            this.groupEditMeshes,
+            this.btnUndo,
+            this.btnEditCR,
+            this.btnMeshesInfo,
+            this.btnCompression,
+            this.btnCRTypeSelector,
+            this.btnCREditionAccept,
+            this.editCRSelector,
+            this.btnLockMapOnPlayer,
+            this.btnCRRename,
+            this.groupZoom,
+            this.btnZoomIn,
+            this.btnZoomOut,
+            this.lblZoom,
+            this.groupSaveUndo,
+            this.editBidirPathColor,
+            this.editUnidirPathColor,
+            this.btnLockOnSpecialObject,
+            this.btnSettings,
+            this.lblPlayerPos,
+            this.lblDrawInfo,
+            this.btnDistanceMeasurement,
+            this.btnAddRoad,
+            this.btnObjectInfo});
+            this.barManager.MaxItemId = 135;
+            this.barManager.OptionsLayout.AllowAddNewItems = false;
             this.barManager.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.seDeleteRadius,
             this.seWaypointDistance,
             this.seMaxZDifference,
             this.seEquivalenceDistance,
-            this.teCRName,
-            this.zoomer});
-            this.barManager.StatusBar = this.statusBar;
+            this.itemEditCRName,
+            this.itemEditCRList,
+            this.editItemColor});
+            this.barManager.StatusBar = this.barStatus;
             // 
-            // toolbarMainMapper
+            // barMapping
             // 
-            this.toolbarMainMapper.BarName = "MapperTools";
-            this.toolbarMainMapper.DockCol = 0;
-            this.toolbarMainMapper.DockRow = 0;
-            this.toolbarMainMapper.DockStyle = DevExpress.XtraBars.BarDockStyle.Top;
-            this.toolbarMainMapper.FloatLocation = new System.Drawing.Point(43, 217);
-            this.toolbarMainMapper.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
-            new DevExpress.XtraBars.LinkPersistInfo(this.toolGroupMapping, true),
-            new DevExpress.XtraBars.LinkPersistInfo(this.toolGroupCR, true),
-            new DevExpress.XtraBars.LinkPersistInfo(this.toolGroupNodes, true),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuOptions, true)});
-            this.toolbarMainMapper.Text = "MapperTools";
+            this.barMapping.BarName = "MappingTools";
+            this.barMapping.DockCol = 0;
+            this.barMapping.DockRow = 0;
+            this.barMapping.DockStyle = DevExpress.XtraBars.BarDockStyle.Top;
+            this.barMapping.FloatLocation = new System.Drawing.Point(325, 181);
+            this.barMapping.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
+            new DevExpress.XtraBars.LinkPersistInfo(this.groupMapping, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnOptions, true)});
+            this.barMapping.OptionsBar.AllowQuickCustomization = false;
+            this.barMapping.Text = "Mapping Tools";
+            this.barMapping.Visible = false;
+            this.barMapping.VisibleChanged += new System.EventHandler(this.handler_BarVisibleChanged);
             // 
-            // toolGroupMapping
+            // groupMapping
             // 
-            this.toolGroupMapping.Caption = "Mapping";
-            this.toolGroupMapping.Id = 70;
-            this.toolGroupMapping.ItemLinks.Add(this.menuCheckStopMapping);
-            this.toolGroupMapping.ItemLinks.Add(this.menuBidirectional);
-            this.toolGroupMapping.ItemLinks.Add(this.menuUnidirectional);
-            this.toolGroupMapping.ItemLinks.Add(this.menuLinearPath);
-            this.toolGroupMapping.ItemLinks.Add(this.menuForceLinkLast);
-            this.toolGroupMapping.Name = "toolGroupMapping";
+            this.groupMapping.Caption = "Mapping";
+            this.groupMapping.Id = 70;
+            this.groupMapping.ItemLinks.Add(this.btnMappingBidirectional);
+            this.groupMapping.ItemLinks.Add(this.btnMappingUnidirectional);
+            this.groupMapping.ItemLinks.Add(this.btnMappingStop);
+            this.groupMapping.ItemLinks.Add(this.btnMappingLinearPath, true);
+            this.groupMapping.ItemLinks.Add(this.btnMappingForceLink);
+            this.groupMapping.Name = "groupMapping";
             // 
-            // menuCheckStopMapping
+            // btnMappingBidirectional
             // 
-            this.menuCheckStopMapping.BindableChecked = true;
-            this.menuCheckStopMapping.Caption = "Stop Mapping";
-            this.menuCheckStopMapping.Checked = true;
-            this.menuCheckStopMapping.GroupIndex = 1;
-            this.menuCheckStopMapping.Id = 67;
-            this.menuCheckStopMapping.ImageOptions.Image = global::EntityTools.Properties.Resources.miniStop;
-            this.menuCheckStopMapping.Name = "menuCheckStopMapping";
-            this.menuCheckStopMapping.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventStopMapping);
+            this.btnMappingBidirectional.Caption = "Bidirectional Mapping";
+            this.btnMappingBidirectional.GroupIndex = 1;
+            this.btnMappingBidirectional.Id = 64;
+            this.btnMappingBidirectional.ImageOptions.Image = global::EntityTools.Properties.Resources.miniBiPath;
+            this.btnMappingBidirectional.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+                | System.Windows.Forms.Keys.B));
+            this.btnMappingBidirectional.Name = "btnMappingBidirectional";
+            this.btnMappingBidirectional.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Mapping_BidirectionalPath);
             // 
-            // menuBidirectional
+            // btnMappingUnidirectional
             // 
-            this.menuBidirectional.Caption = "Bidirectional Mapping";
-            this.menuBidirectional.GroupIndex = 1;
-            this.menuBidirectional.Id = 64;
-            this.menuBidirectional.ImageOptions.Image = global::EntityTools.Properties.Resources.miniBiPath;
-            this.menuBidirectional.Name = "menuBidirectional";
-            this.menuBidirectional.DownChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.eventStartMapping);
+            this.btnMappingUnidirectional.Caption = "Unidirectional Mapping";
+            this.btnMappingUnidirectional.GroupIndex = 1;
+            this.btnMappingUnidirectional.Id = 44;
+            this.btnMappingUnidirectional.ImageOptions.Image = global::EntityTools.Properties.Resources.miniUniPath;
+            this.btnMappingUnidirectional.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+                | System.Windows.Forms.Keys.U));
+            this.btnMappingUnidirectional.Name = "btnMappingUnidirectional";
+            this.btnMappingUnidirectional.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Mapping_UnidirectionalPath);
             // 
-            // menuUnidirectional
+            // btnMappingStop
             // 
-            this.menuUnidirectional.Caption = "Unidirectional Mapping";
-            this.menuUnidirectional.GroupIndex = 1;
-            this.menuUnidirectional.Id = 44;
-            this.menuUnidirectional.ImageOptions.Image = global::EntityTools.Properties.Resources.miniUniPath;
-            this.menuUnidirectional.Name = "menuUnidirectional";
-            this.menuUnidirectional.DownChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.eventStartMapping);
+            this.btnMappingStop.BindableChecked = true;
+            this.btnMappingStop.Caption = "Stop Mapping";
+            this.btnMappingStop.Checked = true;
+            this.btnMappingStop.GroupIndex = 1;
+            this.btnMappingStop.Id = 67;
+            this.btnMappingStop.ImageOptions.Image = global::EntityTools.Properties.Resources.miniStop;
+            this.btnMappingStop.ItemShortcut = new DevExpress.XtraBars.BarShortcut((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.End));
+            this.btnMappingStop.Name = "btnMappingStop";
+            this.btnMappingStop.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Mapping_Stop);
             // 
-            // menuLinearPath
+            // btnMappingLinearPath
             // 
-            this.menuLinearPath.Caption = "Linear Path";
-            this.menuLinearPath.Id = 66;
-            this.menuLinearPath.ImageOptions.Image = global::EntityTools.Properties.Resources.miniLinePath;
-            this.menuLinearPath.Name = "menuLinearPath";
+            this.btnMappingLinearPath.Caption = "Linear Path";
+            this.btnMappingLinearPath.Id = 66;
+            this.btnMappingLinearPath.ImageOptions.Image = global::EntityTools.Properties.Resources.miniLinePath;
+            this.btnMappingLinearPath.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+                | System.Windows.Forms.Keys.L));
+            this.btnMappingLinearPath.Name = "btnMappingLinearPath";
+            this.btnMappingLinearPath.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Mapping_LinearPath);
             // 
-            // menuForceLinkLast
+            // btnMappingForceLink
             // 
-            this.menuForceLinkLast.Caption = "Force Linking to Last Node";
-            this.menuForceLinkLast.Id = 65;
-            this.menuForceLinkLast.ImageOptions.Image = global::EntityTools.Properties.Resources.miniHurdLink;
-            this.menuForceLinkLast.Name = "menuForceLinkLast";
+            this.btnMappingForceLink.BindableChecked = true;
+            this.btnMappingForceLink.Caption = "Force Linking to Last Node";
+            this.btnMappingForceLink.Checked = true;
+            this.btnMappingForceLink.Id = 65;
+            this.btnMappingForceLink.ImageOptions.Image = global::EntityTools.Properties.Resources.miniHurdLink;
+            this.btnMappingForceLink.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
+                | System.Windows.Forms.Keys.L));
+            this.btnMappingForceLink.Name = "btnMappingForceLink";
+            this.btnMappingForceLink.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Mapping_ForceLink);
             // 
-            // toolGroupCR
+            // btnOptions
             // 
-            this.toolGroupCR.Caption = "CustomRegion";
-            this.toolGroupCR.Id = 71;
-            this.toolGroupCR.ItemLinks.Add(this.menuRectangularCR);
-            this.toolGroupCR.ItemLinks.Add(this.menuEllipticalCR);
-            this.toolGroupCR.Name = "toolGroupCR";
-            // 
-            // menuRectangularCR
-            // 
-            this.menuRectangularCR.Caption = "Add Rectangular";
-            this.menuRectangularCR.Id = 48;
-            this.menuRectangularCR.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCRRectang;
-            this.menuRectangularCR.Name = "menuRectangularCR";
-            this.menuRectangularCR.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventAddRectangularCR);
-            // 
-            // menuEllipticalCR
-            // 
-            this.menuEllipticalCR.Caption = "Add Elliptical";
-            this.menuEllipticalCR.Id = 49;
-            this.menuEllipticalCR.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCREllipce;
-            this.menuEllipticalCR.Name = "menuEllipticalCR";
-            this.menuEllipticalCR.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventAddElipticalCR);
-            // 
-            // toolGroupNodes
-            // 
-            this.toolGroupNodes.Caption = "Nodes";
-            this.toolGroupNodes.Id = 72;
-            this.toolGroupNodes.ItemLinks.Add(this.menuImportGame);
-            this.toolGroupNodes.ItemLinks.Add(this.menuImportProfile);
-            this.toolGroupNodes.ItemLinks.Add(this.menuExportMesh);
-            this.toolGroupNodes.ItemLinks.Add(this.menuClear);
-            this.toolGroupNodes.Name = "toolGroupNodes";
-            // 
-            // menuImportGame
-            // 
-            this.menuImportGame.Caption = "Import from Game";
-            this.menuImportGame.Id = 51;
-            this.menuImportGame.ImageOptions.Image = global::EntityTools.Properties.Resources.miniClone;
-            this.menuImportGame.Name = "menuImportGame";
-            this.menuImportGame.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventImportNodesFromGame);
-            // 
-            // menuImportProfile
-            // 
-            this.menuImportProfile.Caption = "Import from Profile";
-            this.menuImportProfile.Id = 52;
-            this.menuImportProfile.ImageOptions.Image = global::EntityTools.Properties.Resources.miniImport;
-            this.menuImportProfile.Name = "menuImportProfile";
-            this.menuImportProfile.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventImportNodesFromFile);
-            // 
-            // menuExportMesh
-            // 
-            this.menuExportMesh.Caption = "Export to Mesh";
-            this.menuExportMesh.Id = 55;
-            this.menuExportMesh.ImageOptions.Image = global::EntityTools.Properties.Resources.miniExport;
-            this.menuExportMesh.Name = "menuExportMesh";
-            this.menuExportMesh.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventExportNodes2Mesh);
-            // 
-            // menuClear
-            // 
-            this.menuClear.Caption = "Clear";
-            this.menuClear.Id = 63;
-            this.menuClear.ImageOptions.Image = global::EntityTools.Properties.Resources.miniDelete;
-            this.menuClear.Name = "menuClear";
-            this.menuClear.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventClearNodes);
-            // 
-            // menuOptions
-            // 
-            this.menuOptions.ActAsDropDown = true;
-            this.menuOptions.ButtonStyle = DevExpress.XtraBars.BarButtonStyle.DropDown;
-            this.menuOptions.Caption = "Options";
-            this.menuOptions.DropDownControl = this.popMenuOptions;
-            this.menuOptions.Hint = "Options";
-            this.menuOptions.Id = 74;
-            this.menuOptions.ImageOptions.Image = global::EntityTools.Properties.Resources.miniGear;
-            this.menuOptions.Name = "menuOptions";
+            this.btnOptions.ActAsDropDown = true;
+            this.btnOptions.ButtonStyle = DevExpress.XtraBars.BarButtonStyle.DropDown;
+            this.btnOptions.Caption = "Options";
+            this.btnOptions.DropDownControl = this.popMenuOptions;
+            this.btnOptions.Hint = "Options";
+            this.btnOptions.Id = 74;
+            this.btnOptions.ImageOptions.Image = global::EntityTools.Properties.Resources.miniGear;
+            this.btnOptions.Name = "btnOptions";
             // 
             // popMenuOptions
             // 
             this.popMenuOptions.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuWaypointDistance),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuMaxZDifference),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuEquivalenceDistance),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuDeleteRadius),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuCacheActive)});
+            new DevExpress.XtraBars.LinkPersistInfo(this.editWaypointDistance),
+            new DevExpress.XtraBars.LinkPersistInfo(this.editMaxZDifference),
+            new DevExpress.XtraBars.LinkPersistInfo(this.editEquivalenceDistance)});
             this.popMenuOptions.Manager = this.barManager;
             this.popMenuOptions.Name = "popMenuOptions";
             // 
-            // menuWaypointDistance
+            // editWaypointDistance
             // 
-            this.menuWaypointDistance.Caption = "Waypoint Distance";
-            this.menuWaypointDistance.Edit = this.seWaypointDistance;
-            this.menuWaypointDistance.Id = 58;
-            this.menuWaypointDistance.ImageOptions.Image = global::EntityTools.Properties.Resources.miniNodeDistance;
-            this.menuWaypointDistance.Name = "menuWaypointDistance";
+            this.editWaypointDistance.Caption = "Waypoint Distance";
+            this.editWaypointDistance.Edit = this.seWaypointDistance;
+            this.editWaypointDistance.Id = 58;
+            this.editWaypointDistance.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.editWaypointDistance.ImageOptions.Image = global::EntityTools.Properties.Resources.miniNodeDistance;
+            this.editWaypointDistance.Name = "editWaypointDistance";
             // 
             // seWaypointDistance
             // 
@@ -341,13 +389,14 @@ namespace EntityTools.Patches.Mapper
             this.seWaypointDistance.Mask.EditMask = "N00";
             this.seWaypointDistance.Name = "seWaypointDistance";
             // 
-            // menuMaxZDifference
+            // editMaxZDifference
             // 
-            this.menuMaxZDifference.Caption = "MaxElevationDifference";
-            this.menuMaxZDifference.Edit = this.seMaxZDifference;
-            this.menuMaxZDifference.Id = 59;
-            this.menuMaxZDifference.ImageOptions.Image = global::EntityTools.Properties.Resources.miniZdiff;
-            this.menuMaxZDifference.Name = "menuMaxZDifference";
+            this.editMaxZDifference.Caption = "MaxElevationDifference";
+            this.editMaxZDifference.Edit = this.seMaxZDifference;
+            this.editMaxZDifference.Id = 59;
+            this.editMaxZDifference.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.editMaxZDifference.ImageOptions.Image = global::EntityTools.Properties.Resources.miniZdiff;
+            this.editMaxZDifference.Name = "editMaxZDifference";
             // 
             // seMaxZDifference
             // 
@@ -360,13 +409,14 @@ namespace EntityTools.Patches.Mapper
             this.seMaxZDifference.Mask.EditMask = "N00";
             this.seMaxZDifference.Name = "seMaxZDifference";
             // 
-            // menuEquivalenceDistance
+            // editEquivalenceDistance
             // 
-            this.menuEquivalenceDistance.Caption = "Node Equivalence Distance";
-            this.menuEquivalenceDistance.Edit = this.seEquivalenceDistance;
-            this.menuEquivalenceDistance.Id = 60;
-            this.menuEquivalenceDistance.ImageOptions.Image = global::EntityTools.Properties.Resources.miniDistance;
-            this.menuEquivalenceDistance.Name = "menuEquivalenceDistance";
+            this.editEquivalenceDistance.Caption = "Node Equivalence Distance";
+            this.editEquivalenceDistance.Edit = this.seEquivalenceDistance;
+            this.editEquivalenceDistance.Id = 60;
+            this.editEquivalenceDistance.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.editEquivalenceDistance.ImageOptions.Image = global::EntityTools.Properties.Resources.miniDistance;
+            this.editEquivalenceDistance.Name = "editEquivalenceDistance";
             // 
             // seEquivalenceDistance
             // 
@@ -379,13 +429,483 @@ namespace EntityTools.Patches.Mapper
             this.seEquivalenceDistance.Mask.EditMask = "N00";
             this.seEquivalenceDistance.Name = "seEquivalenceDistance";
             // 
-            // menuDeleteRadius
+            // barNodeTools
             // 
-            this.menuDeleteRadius.Caption = "Node Delete Radius";
-            this.menuDeleteRadius.Edit = this.seDeleteRadius;
-            this.menuDeleteRadius.Id = 61;
-            this.menuDeleteRadius.ImageOptions.Image = global::EntityTools.Properties.Resources.miniTarget;
-            this.menuDeleteRadius.Name = "menuDeleteRadius";
+            this.barNodeTools.BarName = "NodeTools";
+            this.barNodeTools.DockCol = 1;
+            this.barNodeTools.DockRow = 0;
+            this.barNodeTools.DockStyle = DevExpress.XtraBars.BarDockStyle.Top;
+            this.barNodeTools.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnUndo),
+            new DevExpress.XtraBars.LinkPersistInfo(this.groupEditMeshes, true)});
+            this.barNodeTools.Offset = 207;
+            this.barNodeTools.Text = "Node Tools";
+            this.barNodeTools.Visible = false;
+            // 
+            // btnUndo
+            // 
+            this.btnUndo.Caption = "Undo";
+            this.btnUndo.Id = 101;
+            this.btnUndo.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.btnUndo.ImageOptions.AllowStubGlyph = DevExpress.Utils.DefaultBoolean.False;
+            this.btnUndo.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnUndo.ImageOptions.Image")));
+            this.btnUndo.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnUndo.ImageOptions.LargeImage")));
+            this.btnUndo.Name = "btnUndo";
+            this.btnUndo.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Undo);
+            // 
+            // groupEditMeshes
+            // 
+            this.groupEditMeshes.Caption = "EditMeshes";
+            this.groupEditMeshes.Id = 96;
+            this.groupEditMeshes.ItemLinks.Add(this.btnMoveNodes);
+            this.groupEditMeshes.ItemLinks.Add(this.btnRemoveNodes);
+            this.groupEditMeshes.ItemLinks.Add(this.btnEditEdges);
+            this.groupEditMeshes.Name = "groupEditMeshes";
+            // 
+            // btnMoveNodes
+            // 
+            this.btnMoveNodes.Caption = "Relocate Nodes";
+            this.btnMoveNodes.Id = 92;
+            this.btnMoveNodes.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnMoveNodes.ImageOptions.Image")));
+            this.btnMoveNodes.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+                | System.Windows.Forms.Keys.R));
+            this.btnMoveNodes.Name = "btnMoveNodes";
+            this.btnMoveNodes.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_RelocateNodes_ModeChanged);
+            // 
+            // btnRemoveNodes
+            // 
+            this.btnRemoveNodes.Caption = "Delete Nodes";
+            this.btnRemoveNodes.Id = 93;
+            this.btnRemoveNodes.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCancel;
+            this.btnRemoveNodes.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+                | System.Windows.Forms.Keys.D));
+            this.btnRemoveNodes.Name = "btnRemoveNodes";
+            this.btnRemoveNodes.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_DeleteNodes_ModeChanged);
+            // 
+            // btnEditEdges
+            // 
+            this.btnEditEdges.Caption = "Edit Edges";
+            this.btnEditEdges.Id = 94;
+            this.btnEditEdges.ImageOptions.Image = global::EntityTools.Properties.Resources.miniEditEdge;
+            this.btnEditEdges.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+                | System.Windows.Forms.Keys.E));
+            this.btnEditEdges.Name = "btnEditEdges";
+            this.btnEditEdges.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_EditEdges_ModeChanged);
+            // 
+            // barMeshes
+            // 
+            this.barMeshes.BarName = "GraphTools";
+            this.barMeshes.DockCol = 0;
+            this.barMeshes.DockRow = 1;
+            this.barMeshes.DockStyle = DevExpress.XtraBars.BarDockStyle.Top;
+            this.barMeshes.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnUndo),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnSaveMeshes),
+            new DevExpress.XtraBars.LinkPersistInfo(this.groupImportExportNodes, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnMeshesInfo, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnCompression),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnDistanceMeasurement, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnObjectInfo)});
+            this.barMeshes.OptionsBar.AllowQuickCustomization = false;
+            this.barMeshes.Text = "Graph Tools";
+            this.barMeshes.Visible = false;
+            this.barMeshes.VisibleChanged += new System.EventHandler(this.handler_BarVisibleChanged);
+            // 
+            // btnSaveMeshes
+            // 
+            this.btnSaveMeshes.Caption = "Save";
+            this.btnSaveMeshes.Id = 91;
+            this.btnSaveMeshes.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.btnSaveMeshes.ImageOptions.Image = global::EntityTools.Properties.Resources.miniDiskette;
+            this.btnSaveMeshes.ImageOptions.LargeImage = global::EntityTools.Properties.Resources.miniDiskette;
+            this.btnSaveMeshes.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+                | System.Windows.Forms.Keys.S));
+            this.btnSaveMeshes.Name = "btnSaveMeshes";
+            this.btnSaveMeshes.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_SaveChanges2QuesterProfile);
+            // 
+            // groupImportExportNodes
+            // 
+            this.groupImportExportNodes.Caption = "ImportExportNodes";
+            this.groupImportExportNodes.Id = 72;
+            this.groupImportExportNodes.ItemLinks.Add(this.btnImportMeshesFromGame, true);
+            this.groupImportExportNodes.ItemLinks.Add(this.btnImportMeshesFromProfile);
+            this.groupImportExportNodes.ItemLinks.Add(this.btnExportMeshes);
+            this.groupImportExportNodes.ItemLinks.Add(this.btnClearMeshes, true);
+            this.groupImportExportNodes.Name = "groupImportExportNodes";
+            // 
+            // btnImportMeshesFromGame
+            // 
+            this.btnImportMeshesFromGame.Caption = "Import from Game";
+            this.btnImportMeshesFromGame.Id = 51;
+            this.btnImportMeshesFromGame.ImageOptions.Image = global::EntityTools.Properties.Resources.miniClone;
+            this.btnImportMeshesFromGame.Name = "btnImportMeshesFromGame";
+            this.btnImportMeshesFromGame.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ImportCurrentMapMeshesFromGame);
+            // 
+            // btnImportMeshesFromProfile
+            // 
+            this.btnImportMeshesFromProfile.Caption = "Import from Profile";
+            this.btnImportMeshesFromProfile.Id = 52;
+            this.btnImportMeshesFromProfile.ImageOptions.Image = global::EntityTools.Properties.Resources.miniImport;
+            this.btnImportMeshesFromProfile.Name = "btnImportMeshesFromProfile";
+            this.btnImportMeshesFromProfile.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ImportMapMeshesFromFile);
+            // 
+            // btnExportMeshes
+            // 
+            this.btnExportMeshes.Caption = "Export to Mesh";
+            this.btnExportMeshes.Enabled = false;
+            this.btnExportMeshes.Id = 55;
+            this.btnExportMeshes.ImageOptions.Image = global::EntityTools.Properties.Resources.miniExport;
+            this.btnExportMeshes.Name = "btnExportMeshes";
+            this.btnExportMeshes.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
+            this.btnExportMeshes.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ExportCurrentMapMeshes2File);
+            // 
+            // btnClearMeshes
+            // 
+            this.btnClearMeshes.Caption = "Clear";
+            this.btnClearMeshes.Id = 63;
+            this.btnClearMeshes.ImageOptions.Image = global::EntityTools.Properties.Resources.miniDelete;
+            this.btnClearMeshes.Name = "btnClearMeshes";
+            this.btnClearMeshes.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ClearCurrentMapMeshes);
+            // 
+            // btnMeshesInfo
+            // 
+            this.btnMeshesInfo.Caption = "MeshesInfo";
+            this.btnMeshesInfo.Hint = "Meshes information";
+            this.btnMeshesInfo.Id = 103;
+            this.btnMeshesInfo.ImageOptions.Image = global::EntityTools.Properties.Resources.miniAnalize;
+            this.btnMeshesInfo.Name = "btnMeshesInfo";
+            this.btnMeshesInfo.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_MeshesInfo);
+            // 
+            // btnCompression
+            // 
+            this.btnCompression.Caption = "Compression";
+            this.btnCompression.Hint = "Удаление из графа непроходимых(невидимых) вершин и ребер";
+            this.btnCompression.Id = 104;
+            this.btnCompression.ImageOptions.Image = global::EntityTools.Properties.Resources.miniWizard;
+            this.btnCompression.Name = "btnCompression";
+            this.btnCompression.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_MeshesCompression);
+            // 
+            // btnDistanceMeasurement
+            // 
+            this.btnDistanceMeasurement.Caption = "DistanceMeasurement";
+            this.btnDistanceMeasurement.Id = 132;
+            this.btnDistanceMeasurement.ImageOptions.Image = global::EntityTools.Properties.Resources.miniRuler;
+            this.btnDistanceMeasurement.Name = "btnDistanceMeasurement";
+            this.btnDistanceMeasurement.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_DistanceMeasurement_ModeChanged);
+            // 
+            // btnObjectInfo
+            // 
+            this.btnObjectInfo.Caption = "ObjectInfo";
+            this.btnObjectInfo.Id = 134;
+            this.btnObjectInfo.ImageOptions.Image = global::EntityTools.Properties.Resources.miniShow;
+            this.btnObjectInfo.Name = "btnObjectInfo";
+            this.btnObjectInfo.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ObjectInfo);
+            // 
+            // barCustomRegions
+            // 
+            this.barCustomRegions.BarName = "CustomRegionTools";
+            this.barCustomRegions.DockCol = 1;
+            this.barCustomRegions.DockRow = 1;
+            this.barCustomRegions.DockStyle = DevExpress.XtraBars.BarDockStyle.Top;
+            this.barCustomRegions.FloatLocation = new System.Drawing.Point(66, 208);
+            this.barCustomRegions.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnUndo),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnAddCR),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnEditCR)});
+            this.barCustomRegions.Offset = 266;
+            this.barCustomRegions.OptionsBar.AllowQuickCustomization = false;
+            this.barCustomRegions.Text = "CustomRegion Tools";
+            this.barCustomRegions.Visible = false;
+            // 
+            // btnAddCR
+            // 
+            this.btnAddCR.Caption = "Add CustomRegion";
+            this.btnAddCR.Id = 48;
+            this.btnAddCR.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnAddCR.ImageOptions.Image")));
+            this.btnAddCR.Name = "btnAddCR";
+            this.btnAddCR.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_StartAddingCustomRegion);
+            // 
+            // btnEditCR
+            // 
+            this.btnEditCR.Caption = "Edit CustomRegion";
+            this.btnEditCR.Id = 102;
+            this.btnEditCR.ImageOptions.Image = global::EntityTools.Properties.Resources.miniEditCR;
+            this.btnEditCR.Name = "btnEditCR";
+            this.btnEditCR.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_StartEditingCustomRegion);
+            // 
+            // barEditCustomRegion
+            // 
+            this.barEditCustomRegion.BarName = "barEditCustomRegion";
+            this.barEditCustomRegion.CanDockStyle = ((DevExpress.XtraBars.BarCanDockStyle)((((DevExpress.XtraBars.BarCanDockStyle.Floating | DevExpress.XtraBars.BarCanDockStyle.Top) 
+            | DevExpress.XtraBars.BarCanDockStyle.Bottom) 
+            | DevExpress.XtraBars.BarCanDockStyle.Standalone)));
+            this.barEditCustomRegion.DockCol = 0;
+            this.barEditCustomRegion.DockRow = 0;
+            this.barEditCustomRegion.FloatLocation = new System.Drawing.Point(49, 545);
+            this.barEditCustomRegion.FloatSize = new System.Drawing.Size(397, 88);
+            this.barEditCustomRegion.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnCRTypeSelector),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnCRRename),
+            new DevExpress.XtraBars.LinkPersistInfo(DevExpress.XtraBars.BarLinkUserDefines.Width, this.editCRSelector, "", false, true, true, 231),
+            new DevExpress.XtraBars.LinkPersistInfo(DevExpress.XtraBars.BarLinkUserDefines.Width, this.editCRName, "", false, true, true, 216),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnCRAdditionAccept),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnCREditionAccept),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnCRCancel)});
+            this.barEditCustomRegion.Offset = 78;
+            this.barEditCustomRegion.OptionsBar.AllowQuickCustomization = false;
+            this.barEditCustomRegion.OptionsBar.DisableClose = true;
+            this.barEditCustomRegion.Text = "Edit CustomRegion";
+            this.barEditCustomRegion.Visible = false;
+            // 
+            // btnCRTypeSelector
+            // 
+            this.btnCRTypeSelector.Caption = "CustormRegion Type";
+            this.btnCRTypeSelector.Hint = "Change type of the CustomRegion (Rectangular to Elliptical)";
+            this.btnCRTypeSelector.Id = 106;
+            this.btnCRTypeSelector.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCRRectang;
+            this.btnCRTypeSelector.Name = "btnCRTypeSelector";
+            this.btnCRTypeSelector.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ChangeCustomRegionType);
+            // 
+            // btnCRRename
+            // 
+            this.btnCRRename.Caption = "Edit the Name of the selected CustomRegion";
+            this.btnCRRename.Id = 115;
+            this.btnCRRename.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnCRRename.ImageOptions.Image")));
+            this.btnCRRename.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnCRRename.ImageOptions.LargeImage")));
+            this.btnCRRename.Name = "btnCRRename";
+            this.btnCRRename.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ChangedRenameCRMode);
+            // 
+            // editCRSelector
+            // 
+            this.editCRSelector.Edit = this.itemEditCRList;
+            this.editCRSelector.Id = 112;
+            this.editCRSelector.Name = "editCRSelector";
+            this.editCRSelector.EditValueChanged += new System.EventHandler(this.handler_ChangeSelectedCustomRegion);
+            // 
+            // itemEditCRList
+            // 
+            this.itemEditCRList.AcceptEditorTextAsNewValue = DevExpress.Utils.DefaultBoolean.False;
+            this.itemEditCRList.AllowDropDownWhenReadOnly = DevExpress.Utils.DefaultBoolean.True;
+            this.itemEditCRList.AllowNullInput = DevExpress.Utils.DefaultBoolean.False;
+            this.itemEditCRList.AutoHeight = false;
+            this.itemEditCRList.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.itemEditCRList.Columns.AddRange(new DevExpress.XtraEditors.Controls.LookUpColumnInfo[] {
+            new DevExpress.XtraEditors.Controls.LookUpColumnInfo("Name", "", 20, DevExpress.Utils.FormatType.None, "", true, DevExpress.Utils.HorzAlignment.Default, DevExpress.Data.ColumnSortOrder.Ascending, DevExpress.Utils.DefaultBoolean.Default)});
+            this.itemEditCRList.Name = "itemEditCRList";
+            this.itemEditCRList.NullText = "";
+            this.itemEditCRList.ShowFooter = false;
+            // 
+            // editCRName
+            // 
+            this.editCRName.Edit = this.itemEditCRName;
+            this.editCRName.Hint = "Enter name of the CustomRegion";
+            this.editCRName.Id = 78;
+            this.editCRName.Name = "editCRName";
+            // 
+            // itemEditCRName
+            // 
+            this.itemEditCRName.AutoHeight = false;
+            this.itemEditCRName.Name = "itemEditCRName";
+            // 
+            // btnCRAdditionAccept
+            // 
+            this.btnCRAdditionAccept.Caption = "Accept";
+            this.btnCRAdditionAccept.DropDownEnabled = false;
+            this.btnCRAdditionAccept.Id = 79;
+            this.btnCRAdditionAccept.ImageOptions.Image = global::EntityTools.Properties.Resources.miniAdd;
+            this.btnCRAdditionAccept.Name = "btnCRAdditionAccept";
+            this.btnCRAdditionAccept.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AcceptCRAddition);
+            // 
+            // btnCREditionAccept
+            // 
+            this.btnCREditionAccept.Caption = "Accept";
+            this.btnCREditionAccept.Id = 107;
+            this.btnCREditionAccept.ImageOptions.Image = global::EntityTools.Properties.Resources.miniValid;
+            this.btnCREditionAccept.Name = "btnCREditionAccept";
+            this.btnCREditionAccept.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AcceptCREdition);
+            // 
+            // btnCRCancel
+            // 
+            this.btnCRCancel.Caption = "Cancel";
+            this.btnCRCancel.Id = 80;
+            this.btnCRCancel.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCancel;
+            this.btnCRCancel.Name = "btnCRCancel";
+            this.btnCRCancel.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_CancelCRManipulation);
+            // 
+            // barStatus
+            // 
+            this.barStatus.BarName = "statusBar";
+            this.barStatus.CanDockStyle = DevExpress.XtraBars.BarCanDockStyle.Bottom;
+            this.barStatus.DockCol = 0;
+            this.barStatus.DockRow = 0;
+            this.barStatus.DockStyle = DevExpress.XtraBars.BarDockStyle.Bottom;
+            this.barStatus.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnLockMapOnPlayer),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnSettings, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.groupSaveUndo, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.groupZoom, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.lblPlayerPos, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.lblMousePos, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.lblDrawInfo, true)});
+            this.barStatus.OptionsBar.AllowQuickCustomization = false;
+            this.barStatus.OptionsBar.DrawDragBorder = false;
+            this.barStatus.OptionsBar.UseWholeRow = true;
+            this.barStatus.Text = "StatusBar";
+            this.barStatus.VisibleChanged += new System.EventHandler(this.handler_BarVisibleChanged);
+            // 
+            // btnLockMapOnPlayer
+            // 
+            this.btnLockMapOnPlayer.BindableChecked = true;
+            this.btnLockMapOnPlayer.CheckBoxVisibility = DevExpress.XtraBars.CheckBoxVisibility.AfterText;
+            this.btnLockMapOnPlayer.Checked = true;
+            this.btnLockMapOnPlayer.Hint = "Check to hold Player in the center of the Map";
+            this.btnLockMapOnPlayer.Id = 114;
+            this.btnLockMapOnPlayer.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.btnLockMapOnPlayer.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+                | System.Windows.Forms.Keys.P));
+            this.btnLockMapOnPlayer.Name = "btnLockMapOnPlayer";
+            // 
+            // btnSettings
+            // 
+            this.btnSettings.Alignment = DevExpress.XtraBars.BarItemLinkAlignment.Left;
+            this.btnSettings.Caption = "Settings";
+            this.btnSettings.Hint = "Open Mapper settings panel";
+            this.btnSettings.Id = 129;
+            this.btnSettings.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.btnSettings.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCustomization;
+            this.btnSettings.Name = "btnSettings";
+            this.btnSettings.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ShowSettingsTab);
+            // 
+            // groupSaveUndo
+            // 
+            this.groupSaveUndo.Caption = "SaveUndo";
+            this.groupSaveUndo.Id = 125;
+            this.groupSaveUndo.ItemLinks.Add(this.btnUndo);
+            this.groupSaveUndo.ItemLinks.Add(this.btnSaveMeshes);
+            this.groupSaveUndo.Name = "groupSaveUndo";
+            // 
+            // groupZoom
+            // 
+            this.groupZoom.Caption = "Zoom";
+            this.groupZoom.Id = 118;
+            this.groupZoom.ItemLinks.Add(this.btnZoomIn);
+            this.groupZoom.ItemLinks.Add(this.lblZoom);
+            this.groupZoom.ItemLinks.Add(this.btnZoomOut);
+            this.groupZoom.Name = "groupZoom";
+            // 
+            // btnZoomIn
+            // 
+            this.btnZoomIn.Caption = "ZoomIn";
+            this.btnZoomIn.Id = 119;
+            this.btnZoomIn.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.btnZoomIn.ImageOptions.Image = global::EntityTools.Properties.Resources.Zoomin_16x16;
+            this.btnZoomIn.Name = "btnZoomIn";
+            this.btnZoomIn.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ZoomIn);
+            // 
+            // lblZoom
+            // 
+            this.lblZoom.Border = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.lblZoom.Caption = "zoom";
+            this.lblZoom.Id = 122;
+            this.lblZoom.Name = "lblZoom";
+            this.lblZoom.ItemDoubleClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_DoubleClickZoom);
+            // 
+            // btnZoomOut
+            // 
+            this.btnZoomOut.Caption = "ZoomOut";
+            this.btnZoomOut.Id = 120;
+            this.btnZoomOut.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.btnZoomOut.ImageOptions.Image = global::EntityTools.Properties.Resources.Zoomout_16x16;
+            this.btnZoomOut.Name = "btnZoomOut";
+            this.btnZoomOut.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ZoomOut);
+            // 
+            // lblPlayerPos
+            // 
+            this.lblPlayerPos.Alignment = DevExpress.XtraBars.BarItemLinkAlignment.Right;
+            this.lblPlayerPos.Border = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.lblPlayerPos.Caption = "player";
+            this.lblPlayerPos.Hint = "Player coordinates";
+            this.lblPlayerPos.Id = 130;
+            this.lblPlayerPos.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.lblPlayerPos.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCompas;
+            this.lblPlayerPos.Name = "lblPlayerPos";
+            this.lblPlayerPos.PaintStyle = DevExpress.XtraBars.BarItemPaintStyle.CaptionGlyph;
+            // 
+            // lblMousePos
+            // 
+            this.lblMousePos.Alignment = DevExpress.XtraBars.BarItemLinkAlignment.Right;
+            this.lblMousePos.Border = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.lblMousePos.Caption = "mouse";
+            this.lblMousePos.Description = "Mouse position";
+            this.lblMousePos.Hint = "The coordinates of the mouse pointer";
+            this.lblMousePos.Id = 82;
+            this.lblMousePos.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.lblMousePos.ImageOptions.Image = global::EntityTools.Properties.Resources.miniMousePointer;
+            this.lblMousePos.Name = "lblMousePos";
+            this.lblMousePos.PaintStyle = DevExpress.XtraBars.BarItemPaintStyle.CaptionGlyph;
+            // 
+            // lblDrawInfo
+            // 
+            this.lblDrawInfo.Alignment = DevExpress.XtraBars.BarItemLinkAlignment.Right;
+            this.lblDrawInfo.Border = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.lblDrawInfo.Caption = "form";
+            this.lblDrawInfo.Hint = "Windows redraw information";
+            this.lblDrawInfo.Id = 131;
+            this.lblDrawInfo.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.lblDrawInfo.ImageOptions.Image = global::EntityTools.Properties.Resources.miniInfo;
+            this.lblDrawInfo.Name = "lblDrawInfo";
+            this.lblDrawInfo.PaintStyle = DevExpress.XtraBars.BarItemPaintStyle.CaptionGlyph;
+            // 
+            // barDockControlTop
+            // 
+            this.barDockControlTop.CausesValidation = false;
+            this.barDockControlTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.barDockControlTop.Location = new System.Drawing.Point(0, 0);
+            this.barDockControlTop.Manager = this.barManager;
+            this.barDockControlTop.Size = new System.Drawing.Size(415, 49);
+            this.barDockControlTop.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            // 
+            // barDockControlBottom
+            // 
+            this.barDockControlBottom.CausesValidation = false;
+            this.barDockControlBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.barDockControlBottom.Location = new System.Drawing.Point(0, 373);
+            this.barDockControlBottom.Manager = this.barManager;
+            this.barDockControlBottom.Size = new System.Drawing.Size(415, 26);
+            // 
+            // barDockControlLeft
+            // 
+            this.barDockControlLeft.CausesValidation = false;
+            this.barDockControlLeft.Dock = System.Windows.Forms.DockStyle.Left;
+            this.barDockControlLeft.Location = new System.Drawing.Point(0, 49);
+            this.barDockControlLeft.Manager = this.barManager;
+            this.barDockControlLeft.Size = new System.Drawing.Size(0, 324);
+            // 
+            // barDockControlRight
+            // 
+            this.barDockControlRight.CausesValidation = false;
+            this.barDockControlRight.Dock = System.Windows.Forms.DockStyle.Right;
+            this.barDockControlRight.Location = new System.Drawing.Point(415, 49);
+            this.barDockControlRight.Manager = this.barManager;
+            this.barDockControlRight.Size = new System.Drawing.Size(0, 324);
+            // 
+            // menuImportMesh
+            // 
+            this.menuImportMesh.Caption = "Import from Mesh";
+            this.menuImportMesh.Id = 53;
+            this.menuImportMesh.ImageOptions.Image = global::EntityTools.Properties.Resources.miniImport;
+            this.menuImportMesh.Name = "menuImportMesh";
+            // 
+            // editDeleteRadius
+            // 
+            this.editDeleteRadius.Caption = "Node Delete Radius";
+            this.editDeleteRadius.Edit = this.seDeleteRadius;
+            this.editDeleteRadius.Id = 61;
+            this.editDeleteRadius.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.editDeleteRadius.ImageOptions.Image = global::EntityTools.Properties.Resources.miniTarget;
+            this.editDeleteRadius.Name = "editDeleteRadius";
+            this.editDeleteRadius.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
             // 
             // seDeleteRadius
             // 
@@ -407,244 +927,534 @@ namespace EntityTools.Patches.Mapper
             0});
             this.seDeleteRadius.Name = "seDeleteRadius";
             // 
-            // menuCacheActive
+            // groupCR
             // 
-            this.menuCacheActive.Caption = "Use Cache";
-            this.menuCacheActive.Id = 81;
-            this.menuCacheActive.Name = "menuCacheActive";
-            this.menuCacheActive.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
+            this.groupCR.Caption = "CustomRegion";
+            this.groupCR.Id = 71;
+            this.groupCR.ItemLinks.Add(this.btnAddCR);
+            this.groupCR.ItemLinks.Add(this.btnEditCR);
+            this.groupCR.Name = "groupCR";
             // 
-            // toolbarCustomRegion
+            // editBidirPathColor
             // 
-            this.toolbarCustomRegion.BarName = "CustomRegion";
-            this.toolbarCustomRegion.DockCol = 0;
-            this.toolbarCustomRegion.DockRow = 0;
-            this.toolbarCustomRegion.FloatLocation = new System.Drawing.Point(80, 567);
-            this.toolbarCustomRegion.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuLableCR, true),
-            new DevExpress.XtraBars.LinkPersistInfo(DevExpress.XtraBars.BarLinkUserDefines.Width, this.menuCRName, "", false, true, true, 152),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuCRAccept),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuCRCancel)});
-            this.toolbarCustomRegion.OptionsBar.DisableClose = true;
-            this.toolbarCustomRegion.Text = "CustomRegion";
-            this.toolbarCustomRegion.Visible = false;
+            this.editBidirPathColor.Caption = "Bidir Path";
+            this.editBidirPathColor.Edit = this.editItemColor;
+            this.editBidirPathColor.Id = 126;
+            this.editBidirPathColor.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.editBidirPathColor.ImageOptions.Image = global::EntityTools.Properties.Resources.miniBiPath;
+            this.editBidirPathColor.Name = "editBidirPathColor";
             // 
-            // menuLableCR
+            // editItemColor
             // 
-            this.menuLableCR.Caption = "CustomRegion";
-            this.menuLableCR.Id = 77;
-            this.menuLableCR.Name = "menuLableCR";
+            this.editItemColor.AutoHeight = false;
+            this.editItemColor.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.editItemColor.Name = "editItemColor";
             // 
-            // menuCRName
+            // editUnidirPathColor
             // 
-            this.menuCRName.Edit = this.teCRName;
-            this.menuCRName.Id = 78;
-            this.menuCRName.Name = "menuCRName";
+            this.editUnidirPathColor.Caption = "Unid Path";
+            this.editUnidirPathColor.Edit = this.editItemColor;
+            this.editUnidirPathColor.Id = 127;
+            this.editUnidirPathColor.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.editUnidirPathColor.ImageOptions.Image = global::EntityTools.Properties.Resources.miniUniPath;
+            this.editUnidirPathColor.Name = "editUnidirPathColor";
             // 
-            // teCRName
+            // btnLockOnSpecialObject
             // 
-            this.teCRName.AutoHeight = false;
-            this.teCRName.Name = "teCRName";
+            this.btnLockOnSpecialObject.Alignment = DevExpress.XtraBars.BarItemLinkAlignment.Right;
+            this.btnLockOnSpecialObject.Caption = "Lock On SpecialObject";
+            this.btnLockOnSpecialObject.Id = 128;
+            this.btnLockOnSpecialObject.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
+            this.btnLockOnSpecialObject.ImageOptions.Image = global::EntityTools.Properties.Resources.miniTarget;
+            this.btnLockOnSpecialObject.Name = "btnLockOnSpecialObject";
+            this.btnLockOnSpecialObject.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_LockOnSpecialObject);
             // 
-            // menuCRAccept
+            // btnAddRoad
             // 
-            this.menuCRAccept.Caption = "Accept";
-            this.menuCRAccept.DropDownEnabled = false;
-            this.menuCRAccept.Id = 79;
-            this.menuCRAccept.ImageOptions.Image = global::EntityTools.Properties.Resources.miniAdd;
-            this.menuCRAccept.Name = "menuCRAccept";
-            this.menuCRAccept.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventMenuCRAcceptClick);
+            this.btnAddRoad.Caption = "Add Road";
+            this.btnAddRoad.Description = "Добавить путь между двумя точками";
+            this.btnAddRoad.Id = 133;
+            this.btnAddRoad.ImageOptions.Image = global::EntityTools.Properties.Resources.miniRoad;
+            this.btnAddRoad.Name = "btnAddRoad";
             // 
-            // menuCRCancel
+            // btnShowStatBar
             // 
-            this.menuCRCancel.Caption = "Cancel";
-            this.menuCRCancel.Id = 80;
-            this.menuCRCancel.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCancel;
-            this.menuCRCancel.Name = "menuCRCancel";
-            this.menuCRCancel.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventMenuCRCancelClick);
+            this.btnShowStatBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnShowStatBar.BackColor = System.Drawing.Color.Transparent;
+            this.btnShowStatBar.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnShowStatBar.BackgroundImage")));
+            this.btnShowStatBar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.btnShowStatBar.FlatAppearance.BorderSize = 0;
+            this.btnShowStatBar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Transparent;
+            this.btnShowStatBar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
+            this.btnShowStatBar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnShowStatBar.Location = new System.Drawing.Point(398, 382);
+            this.btnShowStatBar.Name = "btnShowStatBar";
+            this.btnShowStatBar.Size = new System.Drawing.Size(16, 16);
+            this.btnShowStatBar.TabIndex = 4;
+            this.btnShowStatBar.UseVisualStyleBackColor = false;
+            this.btnShowStatBar.Visible = false;
+            this.btnShowStatBar.Click += new System.EventHandler(this.handler_ShowStatusBar);
             // 
-            // statusBar
+            // MapPicture
             // 
-            this.statusBar.BarName = "statusBar";
-            this.statusBar.CanDockStyle = DevExpress.XtraBars.BarCanDockStyle.Bottom;
-            this.statusBar.DockCol = 0;
-            this.statusBar.DockRow = 0;
-            this.statusBar.DockStyle = DevExpress.XtraBars.BarDockStyle.Bottom;
-            this.statusBar.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
-            new DevExpress.XtraBars.LinkPersistInfo(this.statCenterPlayer),
-            new DevExpress.XtraBars.LinkPersistInfo(this.statMousePos, true),
-            new DevExpress.XtraBars.LinkPersistInfo(DevExpress.XtraBars.BarLinkUserDefines.Width, this.statZoom, "", false, true, true, 196)});
-            this.statusBar.OptionsBar.AllowQuickCustomization = false;
-            this.statusBar.OptionsBar.DrawDragBorder = false;
-            this.statusBar.OptionsBar.UseWholeRow = true;
-            this.statusBar.Text = "statusBar";
-            this.statusBar.Visible = false;
+            this.MapPicture.BackColor = System.Drawing.Color.Black;
+            this.MapPicture.Cursor = System.Windows.Forms.Cursors.Cross;
+            this.MapPicture.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MapPicture.Location = new System.Drawing.Point(0, 49);
+            this.MapPicture.Name = "MapPicture";
+            this.MapPicture.Size = new System.Drawing.Size(415, 324);
+            this.MapPicture.TabIndex = 9;
+            this.MapPicture.TabStop = false;
+            this.MapPicture.MouseClick += new System.Windows.Forms.MouseEventHandler(this.handler_MouseClick);
+            this.MapPicture.MouseMove += new System.Windows.Forms.MouseEventHandler(this.handler_MouseMove);
+            this.MapPicture.MouseUp += new System.Windows.Forms.MouseEventHandler(this.handler_MouseUp);
+            this.MapPicture.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
-            // statCenterPlayer
+            // panelSettings
             // 
-            this.statCenterPlayer.Id = 89;
-            this.statCenterPlayer.ImageOptions.Image = global::EntityTools.Properties.Resources.miniTarget;
-            this.statCenterPlayer.Name = "statCenterPlayer";
+            this.panelSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelSettings.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.panelSettings.Controls.Add(this.navBarCustomization);
+            this.panelSettings.Location = new System.Drawing.Point(0, 0);
+            this.panelSettings.Name = "panelSettings";
+            this.panelSettings.Size = new System.Drawing.Size(415, 371);
+            this.panelSettings.TabIndex = 14;
+            this.panelSettings.Visible = false;
             // 
-            // statMousePos
+            // navBarCustomization
             // 
-            this.statMousePos.Caption = "mousePos";
-            this.statMousePos.Id = 82;
-            this.statMousePos.Name = "statMousePos";
+            this.navBarCustomization.ActiveGroup = this.navGroupMeshes;
+            this.navBarCustomization.Controls.Add(this.containerMeshes);
+            this.navBarCustomization.Controls.Add(this.containerObjects);
+            this.navBarCustomization.Controls.Add(this.containerGeneral);
+            this.navBarCustomization.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.navBarCustomization.Groups.AddRange(new DevExpress.XtraNavBar.NavBarGroup[] {
+            this.navGroupGeneral,
+            this.navGroupMeshes,
+            this.navGroupObjects});
+            this.navBarCustomization.Location = new System.Drawing.Point(0, 0);
+            this.navBarCustomization.Name = "navBarCustomization";
+            this.navBarCustomization.OptionsNavPane.ExpandedWidth = 415;
+            this.navBarCustomization.Size = new System.Drawing.Size(415, 371);
+            this.navBarCustomization.TabIndex = 2;
+            this.navBarCustomization.Text = "Customization";
+            this.navBarCustomization.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
-            // statZoom
+            // navGroupMeshes
             // 
-            this.statZoom.Caption = "statZoom";
-            this.statZoom.Edit = this.zoomer;
-            this.statZoom.Id = 83;
-            this.statZoom.Name = "statZoom";
+            this.navGroupMeshes.Caption = "Meshes";
+            this.navGroupMeshes.ControlContainer = this.containerMeshes;
+            this.navGroupMeshes.GroupClientHeight = 95;
+            this.navGroupMeshes.GroupStyle = DevExpress.XtraNavBar.NavBarGroupStyle.ControlContainer;
+            this.navGroupMeshes.Name = "navGroupMeshes";
             // 
-            // zoomer
+            // containerMeshes
             // 
-            this.zoomer.Name = "zoomer";
+            this.containerMeshes.Appearance.BackColor = System.Drawing.SystemColors.Control;
+            this.containerMeshes.Appearance.Options.UseBackColor = true;
+            this.containerMeshes.Controls.Add(this.lblBackground);
+            this.containerMeshes.Controls.Add(this.lblUnidirPath);
+            this.containerMeshes.Controls.Add(this.lblBidirPath);
+            this.containerMeshes.Controls.Add(this.colorEditBidirPath);
+            this.containerMeshes.Controls.Add(this.colorBackground);
+            this.containerMeshes.Controls.Add(this.colorEditUnidirPath);
+            this.containerMeshes.Name = "containerMeshes";
+            this.containerMeshes.Size = new System.Drawing.Size(393, 88);
+            this.containerMeshes.TabIndex = 0;
+            this.containerMeshes.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
-            // barDockControlTop
+            // lblBackground
             // 
-            this.barDockControlTop.CausesValidation = false;
-            this.barDockControlTop.Dock = System.Windows.Forms.DockStyle.Top;
-            this.barDockControlTop.Location = new System.Drawing.Point(0, 0);
-            this.barDockControlTop.Manager = this.barManager;
-            this.barDockControlTop.Size = new System.Drawing.Size(390, 31);
+            this.lblBackground.Image = global::EntityTools.Properties.Resources.miniBackground;
+            this.lblBackground.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lblBackground.Location = new System.Drawing.Point(5, 56);
+            this.lblBackground.Name = "lblBackground";
+            this.lblBackground.Size = new System.Drawing.Size(139, 16);
+            this.lblBackground.TabIndex = 2;
+            this.lblBackground.Text = "        Background";
             // 
-            // barDockControlBottom
+            // lblUnidirPath
             // 
-            this.barDockControlBottom.CausesValidation = false;
-            this.barDockControlBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.barDockControlBottom.Location = new System.Drawing.Point(0, 335);
-            this.barDockControlBottom.Manager = this.barManager;
-            this.barDockControlBottom.Size = new System.Drawing.Size(390, 27);
+            this.lblUnidirPath.Image = global::EntityTools.Properties.Resources.miniUniPath;
+            this.lblUnidirPath.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lblUnidirPath.Location = new System.Drawing.Point(5, 30);
+            this.lblUnidirPath.Name = "lblUnidirPath";
+            this.lblUnidirPath.Size = new System.Drawing.Size(139, 16);
+            this.lblUnidirPath.TabIndex = 2;
+            this.lblUnidirPath.Text = "        Unidirectional path color";
             // 
-            // barDockControlLeft
+            // lblBidirPath
             // 
-            this.barDockControlLeft.CausesValidation = false;
-            this.barDockControlLeft.Dock = System.Windows.Forms.DockStyle.Left;
-            this.barDockControlLeft.Location = new System.Drawing.Point(0, 31);
-            this.barDockControlLeft.Manager = this.barManager;
-            this.barDockControlLeft.Size = new System.Drawing.Size(0, 304);
+            this.lblBidirPath.Image = global::EntityTools.Properties.Resources.miniBiPath;
+            this.lblBidirPath.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lblBidirPath.Location = new System.Drawing.Point(5, 4);
+            this.lblBidirPath.Name = "lblBidirPath";
+            this.lblBidirPath.Size = new System.Drawing.Size(139, 16);
+            this.lblBidirPath.TabIndex = 2;
+            this.lblBidirPath.Text = "        Bidirectional path color";
             // 
-            // barDockControlRight
+            // colorEditBidirPath
             // 
-            this.barDockControlRight.CausesValidation = false;
-            this.barDockControlRight.Dock = System.Windows.Forms.DockStyle.Right;
-            this.barDockControlRight.Location = new System.Drawing.Point(390, 31);
-            this.barDockControlRight.Manager = this.barManager;
-            this.barDockControlRight.Size = new System.Drawing.Size(0, 304);
+            this.colorEditBidirPath.EditValue = System.Drawing.Color.Empty;
+            this.colorEditBidirPath.Location = new System.Drawing.Point(150, 1);
+            this.colorEditBidirPath.MaximumSize = new System.Drawing.Size(150, 20);
+            this.colorEditBidirPath.MinimumSize = new System.Drawing.Size(45, 20);
+            this.colorEditBidirPath.Name = "colorEditBidirPath";
+            this.colorEditBidirPath.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.colorEditBidirPath.Size = new System.Drawing.Size(150, 20);
+            this.colorEditBidirPath.TabIndex = 0;
+            this.colorEditBidirPath.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
-            // barMapper
+            // colorBackground
             // 
-            this.barMapper.Caption = "Mapping";
-            this.barMapper.Hint = "Make the Path";
-            this.barMapper.Id = 36;
-            this.barMapper.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuCheckStopMapping),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuBidirectional),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuUnidirectional),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuLinearPath, true),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuForceLinkLast, true)});
-            this.barMapper.Name = "barMapper";
+            this.colorBackground.EditValue = System.Drawing.Color.Empty;
+            this.colorBackground.Location = new System.Drawing.Point(150, 53);
+            this.colorBackground.MaximumSize = new System.Drawing.Size(150, 20);
+            this.colorBackground.MinimumSize = new System.Drawing.Size(45, 20);
+            this.colorBackground.Name = "colorBackground";
+            this.colorBackground.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.colorBackground.Size = new System.Drawing.Size(150, 20);
+            this.colorBackground.TabIndex = 0;
+            this.colorBackground.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
-            // barCustomRegion
+            // colorEditUnidirPath
             // 
-            this.barCustomRegion.Caption = "CustomRegion";
-            this.barCustomRegion.Id = 47;
-            this.barCustomRegion.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuRectangularCR),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuEllipticalCR)});
-            this.barCustomRegion.Name = "barCustomRegion";
+            this.colorEditUnidirPath.EditValue = System.Drawing.Color.Empty;
+            this.colorEditUnidirPath.Location = new System.Drawing.Point(150, 27);
+            this.colorEditUnidirPath.MaximumSize = new System.Drawing.Size(150, 20);
+            this.colorEditUnidirPath.MinimumSize = new System.Drawing.Size(45, 20);
+            this.colorEditUnidirPath.Name = "colorEditUnidirPath";
+            this.colorEditUnidirPath.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.colorEditUnidirPath.Size = new System.Drawing.Size(150, 20);
+            this.colorEditUnidirPath.TabIndex = 0;
+            this.colorEditUnidirPath.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
-            // barNodes
+            // containerObjects
             // 
-            this.barNodes.Caption = "Nodes";
-            this.barNodes.Id = 50;
-            this.barNodes.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuImportGame),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuImportProfile),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuImportMesh),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuExportMesh, true),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuClear, true)});
-            this.barNodes.Name = "barNodes";
+            this.containerObjects.Appearance.BackColor = System.Drawing.SystemColors.Control;
+            this.containerObjects.Appearance.Options.UseBackColor = true;
+            this.containerObjects.Controls.Add(this.grpNodeCustomization);
+            this.containerObjects.Controls.Add(this.grpEntityCustomization);
+            this.containerObjects.Name = "containerObjects";
+            this.containerObjects.Size = new System.Drawing.Size(393, 175);
+            this.containerObjects.TabIndex = 1;
+            this.containerObjects.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
-            // menuImportMesh
+            // grpNodeCustomization
             // 
-            this.menuImportMesh.Caption = "Import from Mesh";
-            this.menuImportMesh.Id = 53;
-            this.menuImportMesh.ImageOptions.Image = global::EntityTools.Properties.Resources.miniImport;
-            this.menuImportMesh.Name = "menuImportMesh";
+            this.grpNodeCustomization.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpNodeCustomization.CaptionLocation = DevExpress.Utils.Locations.Left;
+            this.grpNodeCustomization.Controls.Add(this.ckbNodes);
+            this.grpNodeCustomization.Controls.Add(this.colorNodes);
+            this.grpNodeCustomization.Controls.Add(this.ckbSkillnodes);
+            this.grpNodeCustomization.Controls.Add(this.colorSkillnodes);
+            this.grpNodeCustomization.GroupStyle = DevExpress.Utils.GroupStyle.Card;
+            this.grpNodeCustomization.Location = new System.Drawing.Point(3, 116);
+            this.grpNodeCustomization.Name = "grpNodeCustomization";
+            this.grpNodeCustomization.Size = new System.Drawing.Size(387, 55);
+            this.grpNodeCustomization.TabIndex = 2;
+            this.grpNodeCustomization.Text = "Nodes";
+            this.grpNodeCustomization.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
-            // barOptions
+            // ckbNodes
             // 
-            this.barOptions.Caption = "Option";
-            this.barOptions.Hint = "Option";
-            this.barOptions.Id = 57;
-            this.barOptions.ImageOptions.Image = global::EntityTools.Properties.Resources.miniGear;
-            this.barOptions.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuWaypointDistance),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuMaxZDifference),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuEquivalenceDistance),
-            new DevExpress.XtraBars.LinkPersistInfo(this.menuDeleteRadius)});
-            this.barOptions.MenuAppearance.MenuBar.Image = global::EntityTools.Properties.Resources.miniGear;
-            this.barOptions.MenuAppearance.MenuBar.Options.UseImage = true;
-            this.barOptions.MenuAppearance.MenuCaption.Image = global::EntityTools.Properties.Resources.miniGear;
-            this.barOptions.MenuAppearance.MenuCaption.Options.UseImage = true;
-            this.barOptions.Name = "barOptions";
+            this.ckbNodes.Location = new System.Drawing.Point(25, 4);
+            this.ckbNodes.Name = "ckbNodes";
+            this.ckbNodes.Properties.Caption = "Draw Nodes";
+            this.ckbNodes.Size = new System.Drawing.Size(96, 20);
+            this.ckbNodes.TabIndex = 0;
+            this.ckbNodes.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
-            // menuBtnStopMapping
+            // colorNodes
             // 
-            this.menuBtnStopMapping.Caption = "Stop Mapping";
-            this.menuBtnStopMapping.GroupIndex = 1;
-            this.menuBtnStopMapping.Id = 68;
-            this.menuBtnStopMapping.ImageOptions.Image = global::EntityTools.Properties.Resources.miniStop;
-            this.menuBtnStopMapping.Name = "menuBtnStopMapping";
-            this.menuBtnStopMapping.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.eventStopMapping);
+            this.colorNodes.EditValue = System.Drawing.Color.Empty;
+            this.colorNodes.Location = new System.Drawing.Point(127, 4);
+            this.colorNodes.MaximumSize = new System.Drawing.Size(150, 20);
+            this.colorNodes.MinimumSize = new System.Drawing.Size(45, 20);
+            this.colorNodes.Name = "colorNodes";
+            this.colorNodes.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.colorNodes.Size = new System.Drawing.Size(150, 20);
+            this.colorNodes.TabIndex = 0;
+            this.colorNodes.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
-            // statCenterPlayerText
+            // ckbSkillnodes
             // 
-            this.statCenterPlayerText.Caption = "Center Player";
-            this.statCenterPlayerText.Id = 88;
-            this.statCenterPlayerText.Name = "statCenterPlayerText";
+            this.ckbSkillnodes.Location = new System.Drawing.Point(25, 30);
+            this.ckbSkillnodes.Name = "ckbSkillnodes";
+            this.ckbSkillnodes.Properties.Caption = "Draw Skillnodes";
+            this.ckbSkillnodes.Size = new System.Drawing.Size(96, 20);
+            this.ckbSkillnodes.TabIndex = 0;
+            this.ckbSkillnodes.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
-            // mapBox
+            // colorSkillnodes
             // 
-            this.mapBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.mapBox.Location = new System.Drawing.Point(0, 31);
-            this.mapBox.Name = "mapBox";
-            this.mapBox.Size = new System.Drawing.Size(390, 304);
-            this.mapBox.TabIndex = 4;
-            this.mapBox.TabStop = false;
-            this.mapBox.Visible = false;
+            this.colorSkillnodes.EditValue = System.Drawing.Color.Empty;
+            this.colorSkillnodes.Location = new System.Drawing.Point(127, 30);
+            this.colorSkillnodes.MaximumSize = new System.Drawing.Size(150, 20);
+            this.colorSkillnodes.MinimumSize = new System.Drawing.Size(45, 20);
+            this.colorSkillnodes.Name = "colorSkillnodes";
+            this.colorSkillnodes.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.colorSkillnodes.Size = new System.Drawing.Size(150, 20);
+            this.colorSkillnodes.TabIndex = 0;
+            this.colorSkillnodes.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            // 
+            // grpEntityCustomization
+            // 
+            this.grpEntityCustomization.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpEntityCustomization.CaptionLocation = DevExpress.Utils.Locations.Left;
+            this.grpEntityCustomization.Controls.Add(this.ckbEnemies);
+            this.grpEntityCustomization.Controls.Add(this.ckbOtherNPC);
+            this.grpEntityCustomization.Controls.Add(this.colorEnemies);
+            this.grpEntityCustomization.Controls.Add(this.ckbPlayers);
+            this.grpEntityCustomization.Controls.Add(this.colorFriends);
+            this.grpEntityCustomization.Controls.Add(this.colorPlayers);
+            this.grpEntityCustomization.Controls.Add(this.colorOtherNPC);
+            this.grpEntityCustomization.Controls.Add(this.ckbFriends);
+            this.grpEntityCustomization.GroupStyle = DevExpress.Utils.GroupStyle.Card;
+            this.grpEntityCustomization.Location = new System.Drawing.Point(3, 3);
+            this.grpEntityCustomization.Name = "grpEntityCustomization";
+            this.grpEntityCustomization.Size = new System.Drawing.Size(387, 107);
+            this.grpEntityCustomization.TabIndex = 1;
+            this.grpEntityCustomization.Text = "Draw Entities";
+            this.grpEntityCustomization.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            // 
+            // ckbEnemies
+            // 
+            this.ckbEnemies.Location = new System.Drawing.Point(25, 4);
+            this.ckbEnemies.MenuManager = this.barManager;
+            this.ckbEnemies.Name = "ckbEnemies";
+            this.ckbEnemies.Properties.Caption = "Enemies";
+            this.ckbEnemies.Size = new System.Drawing.Size(62, 20);
+            this.ckbEnemies.TabIndex = 0;
+            this.ckbEnemies.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            // 
+            // ckbOtherNPC
+            // 
+            this.ckbOtherNPC.Location = new System.Drawing.Point(25, 82);
+            this.ckbOtherNPC.Name = "ckbOtherNPC";
+            this.ckbOtherNPC.Properties.Caption = "Other";
+            this.ckbOtherNPC.Size = new System.Drawing.Size(62, 20);
+            this.ckbOtherNPC.TabIndex = 0;
+            this.ckbOtherNPC.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            // 
+            // colorEnemies
+            // 
+            this.colorEnemies.EditValue = System.Drawing.Color.Empty;
+            this.colorEnemies.Location = new System.Drawing.Point(93, 4);
+            this.colorEnemies.MaximumSize = new System.Drawing.Size(150, 20);
+            this.colorEnemies.MinimumSize = new System.Drawing.Size(45, 20);
+            this.colorEnemies.Name = "colorEnemies";
+            this.colorEnemies.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.colorEnemies.Size = new System.Drawing.Size(150, 20);
+            this.colorEnemies.TabIndex = 0;
+            this.colorEnemies.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            // 
+            // ckbPlayers
+            // 
+            this.ckbPlayers.Location = new System.Drawing.Point(25, 56);
+            this.ckbPlayers.Name = "ckbPlayers";
+            this.ckbPlayers.Properties.Caption = "Players";
+            this.ckbPlayers.Size = new System.Drawing.Size(62, 20);
+            this.ckbPlayers.TabIndex = 0;
+            this.ckbPlayers.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            // 
+            // colorFriends
+            // 
+            this.colorFriends.EditValue = System.Drawing.Color.Empty;
+            this.colorFriends.Location = new System.Drawing.Point(93, 30);
+            this.colorFriends.MaximumSize = new System.Drawing.Size(150, 20);
+            this.colorFriends.MinimumSize = new System.Drawing.Size(45, 20);
+            this.colorFriends.Name = "colorFriends";
+            this.colorFriends.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.colorFriends.Size = new System.Drawing.Size(150, 20);
+            this.colorFriends.TabIndex = 0;
+            this.colorFriends.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            // 
+            // colorPlayers
+            // 
+            this.colorPlayers.EditValue = System.Drawing.Color.Empty;
+            this.colorPlayers.Location = new System.Drawing.Point(93, 56);
+            this.colorPlayers.MaximumSize = new System.Drawing.Size(150, 20);
+            this.colorPlayers.MinimumSize = new System.Drawing.Size(45, 20);
+            this.colorPlayers.Name = "colorPlayers";
+            this.colorPlayers.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.colorPlayers.Size = new System.Drawing.Size(150, 20);
+            this.colorPlayers.TabIndex = 0;
+            this.colorPlayers.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            // 
+            // colorOtherNPC
+            // 
+            this.colorOtherNPC.EditValue = System.Drawing.Color.Empty;
+            this.colorOtherNPC.Location = new System.Drawing.Point(93, 82);
+            this.colorOtherNPC.MaximumSize = new System.Drawing.Size(150, 20);
+            this.colorOtherNPC.MinimumSize = new System.Drawing.Size(45, 20);
+            this.colorOtherNPC.Name = "colorOtherNPC";
+            this.colorOtherNPC.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.colorOtherNPC.Size = new System.Drawing.Size(150, 20);
+            this.colorOtherNPC.TabIndex = 0;
+            this.colorOtherNPC.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            // 
+            // ckbFriends
+            // 
+            this.ckbFriends.Location = new System.Drawing.Point(25, 30);
+            this.ckbFriends.Name = "ckbFriends";
+            this.ckbFriends.Properties.Caption = "Friends";
+            this.ckbFriends.Size = new System.Drawing.Size(62, 20);
+            this.ckbFriends.TabIndex = 0;
+            this.ckbFriends.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            // 
+            // containerGeneral
+            // 
+            this.containerGeneral.Appearance.BackColor = System.Drawing.SystemColors.Control;
+            this.containerGeneral.Appearance.Options.UseBackColor = true;
+            this.containerGeneral.Controls.Add(this.lblLayerDepth);
+            this.containerGeneral.Controls.Add(this.editLayerDepth);
+            this.containerGeneral.Controls.Add(this.ckbChacheEnable);
+            this.containerGeneral.Name = "containerGeneral";
+            this.containerGeneral.Size = new System.Drawing.Size(393, 63);
+            this.containerGeneral.TabIndex = 2;
+            // 
+            // lblLayerDepth
+            // 
+            this.lblLayerDepth.AutoSize = true;
+            this.lblLayerDepth.Location = new System.Drawing.Point(12, 37);
+            this.lblLayerDepth.Name = "lblLayerDepth";
+            this.lblLayerDepth.Size = new System.Drawing.Size(238, 13);
+            this.lblLayerDepth.TabIndex = 3;
+            this.lblLayerDepth.Text = "The limit of the layer\'s depth drawing on Mapper";
+            this.lblLayerDepth.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            // 
+            // editLayerDepth
+            // 
+            this.editLayerDepth.EditValue = new decimal(new int[] {
+            0,
+            0,
+            0,
+            0});
+            this.editLayerDepth.Location = new System.Drawing.Point(256, 34);
+            this.editLayerDepth.MenuManager = this.barManager;
+            this.editLayerDepth.Name = "editLayerDepth";
+            this.editLayerDepth.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.editLayerDepth.Properties.EditFormat.FormatType = DevExpress.Utils.FormatType.Numeric;
+            this.editLayerDepth.Properties.Increment = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.editLayerDepth.Properties.MaxValue = new decimal(new int[] {
+            1000000,
+            0,
+            0,
+            0});
+            this.editLayerDepth.Size = new System.Drawing.Size(120, 20);
+            this.editLayerDepth.TabIndex = 2;
+            this.editLayerDepth.EditValueChanged += new System.EventHandler(this.handler_LayerDepth_Changed);
+            this.editLayerDepth.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            // 
+            // ckbChacheEnable
+            // 
+            this.ckbChacheEnable.Location = new System.Drawing.Point(12, 10);
+            this.ckbChacheEnable.MenuManager = this.barManager;
+            this.ckbChacheEnable.Name = "ckbChacheEnable";
+            this.ckbChacheEnable.Properties.Caption = "Caching of the visible meshes (will take effect in a new Mapper window)";
+            this.ckbChacheEnable.Size = new System.Drawing.Size(374, 20);
+            this.ckbChacheEnable.TabIndex = 0;
+            this.ckbChacheEnable.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
+            // 
+            // navGroupGeneral
+            // 
+            this.navGroupGeneral.Caption = "General";
+            this.navGroupGeneral.ControlContainer = this.containerGeneral;
+            this.navGroupGeneral.GroupClientHeight = 70;
+            this.navGroupGeneral.GroupStyle = DevExpress.XtraNavBar.NavBarGroupStyle.ControlContainer;
+            this.navGroupGeneral.Name = "navGroupGeneral";
+            // 
+            // navGroupObjects
+            // 
+            this.navGroupObjects.Caption = "Objects";
+            this.navGroupObjects.ControlContainer = this.containerObjects;
+            this.navGroupObjects.GroupClientHeight = 182;
+            this.navGroupObjects.GroupStyle = DevExpress.XtraNavBar.NavBarGroupStyle.ControlContainer;
+            this.navGroupObjects.Name = "navGroupObjects";
             // 
             // MapperFormExt
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(390, 362);
-            this.Controls.Add(this.mapBox);
+            this.ClientSize = new System.Drawing.Size(415, 399);
+            this.Controls.Add(this.btnShowStatBar);
+            this.Controls.Add(this.panelSettings);
+            this.Controls.Add(this.MapPicture);
             this.Controls.Add(this.barDockControlLeft);
             this.Controls.Add(this.barDockControlRight);
             this.Controls.Add(this.barDockControlBottom);
             this.Controls.Add(this.barDockControlTop);
             this.DoubleBuffered = true;
+            this.IconOptions.ShowIcon = false;
+            this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.Name = "MapperFormExt";
-            this.ShowIcon = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "Mapper(Extended)";
             this.TopMost = true;
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.eventClosingMapperForm);
-            this.Load += new System.EventHandler(this.eventLoadMapperForm);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.handler_FormClose);
+            this.Load += new System.EventHandler(this.handler_FormLoad);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.handler_KeyUp);
+            this.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.popMenuOptions)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seWaypointDistance)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seMaxZDifference)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seEquivalenceDistance)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.itemEditCRList)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.itemEditCRName)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seDeleteRadius)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.teCRName)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.zoomer)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.editItemColor)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bsrcAstralSettings)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.mapBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MapPicture)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.panelSettings)).EndInit();
+            this.panelSettings.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.navBarCustomization)).EndInit();
+            this.navBarCustomization.ResumeLayout(false);
+            this.containerMeshes.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.colorEditBidirPath.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorBackground.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorEditUnidirPath.Properties)).EndInit();
+            this.containerObjects.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.grpNodeCustomization)).EndInit();
+            this.grpNodeCustomization.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.ckbNodes.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorNodes.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ckbSkillnodes.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorSkillnodes.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.grpEntityCustomization)).EndInit();
+            this.grpEntityCustomization.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.ckbEnemies.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ckbOtherNPC.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorEnemies.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ckbPlayers.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorFriends.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorPlayers.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.colorOtherNPC.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ckbFriends.Properties)).EndInit();
+            this.containerGeneral.ResumeLayout(false);
+            this.containerGeneral.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.editLayerDepth.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ckbChacheEnable.Properties)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -652,63 +1462,111 @@ namespace EntityTools.Patches.Mapper
 
     #endregion
 
-        private static MapperFormExt @this;
-
-        private Astral.Forms.UserControls.Mapper mapper = null;
-        private GraphicsNW graphics = null;
-
         private BackgroundWorker backgroundWorker;
         private BarManager barManager;
         private BarDockControl barDockControlTop;
         private BarDockControl barDockControlBottom;
         private BarDockControl barDockControlLeft;
         private BarDockControl barDockControlRight;
-        private BarSubItem barMapper;
-        private BarCheckItem menuUnidirectional;
+        private BarCheckItem btnMappingUnidirectional;
         private RepositoryItemSpinEdit seDeleteRadius;
-        private BarSubItem barCustomRegion;
-        private BarButtonItem menuRectangularCR;
-        private BarButtonItem menuEllipticalCR;
-        private BarSubItem barNodes;
-        private BarButtonItem menuImportGame;
-        private BarButtonItem menuImportProfile;
+        private BarButtonItem btnAddCR;
+        private BarButtonItem btnImportMeshesFromGame;
+        private BarButtonItem btnImportMeshesFromProfile;
         private BarButtonItem menuImportMesh;
-        private BarButtonItem menuExportMesh;
-        private BarSubItem barOptions;
-        private BarEditItem menuWaypointDistance;
+        private BarButtonItem btnExportMeshes;
+        private BarEditItem editWaypointDistance;
         private RepositoryItemSpinEdit seWaypointDistance;
-        private BarEditItem menuMaxZDifference;
+        private BarEditItem editMaxZDifference;
         private RepositoryItemSpinEdit seMaxZDifference;
-        private BarEditItem menuEquivalenceDistance;
+        private BarEditItem editEquivalenceDistance;
         private RepositoryItemSpinEdit seEquivalenceDistance;
-        private BarEditItem menuDeleteRadius;
-        private BarButtonItem menuClear;
-        private BarCheckItem menuBidirectional;
-        private BarCheckItem menuForceLinkLast;
-        private BarCheckItem menuLinearPath;
-        private BarCheckItem menuCheckStopMapping;
-        private Bar toolbarMainMapper;
-        private BarButtonItem menuBtnStopMapping;
-        private BarButtonGroup toolGroupMapping;
-        private BarButtonGroup toolGroupCR;
-        private BarButtonGroup toolGroupNodes;
-        private BarButtonItem menuOptions;
+        private BarEditItem editDeleteRadius;
+        private BarButtonItem btnClearMeshes;
+        private BarCheckItem btnMappingBidirectional;
+        private BarCheckItem btnMappingForceLink;
+        private BarCheckItem btnMappingLinearPath;
+        private BarCheckItem btnMappingStop;
+        private Bar barMapping;
+        private BarButtonGroup groupMapping;
+        private BarButtonGroup groupCR;
+        private BarButtonGroup groupImportExportNodes;
+        private BarButtonItem btnOptions;
         private PopupMenu popMenuOptions;
+        private BarEditItem editCRName;
+        private RepositoryItemTextEdit itemEditCRName;
+        private BarButtonItem btnCRAdditionAccept;
+        private BarButtonItem btnCRCancel;
+        private Bar barStatus;
+        private BarStaticItem lblMousePos;
         private BindingSource bsrcAstralSettings;
-        private Bar toolbarCustomRegion;
-        private BarStaticItem menuLableCR;
-        private BarEditItem menuCRName;
-        private RepositoryItemTextEdit teCRName;
-        private BarButtonItem menuCRAccept;
-        private BarButtonItem menuCRCancel;
-        private BarCheckItem menuCacheActive;
-        private Bar statusBar;
-        private BarStaticItem statMousePos;
-        private BarEditItem statZoom;
-        private RepositoryItemZoomTrackBar zoomer;
-        private BarCheckItem statCenterPlayer;
-        private BarStaticItem statCenterPlayerText;
-        private PictureBox mapBox;
+        private Button btnShowStatBar;
+        private BarButtonItem btnSaveMeshes;
+        private Bar barMeshes;
+        private BarCheckItem btnMoveNodes;
+        private BarCheckItem btnRemoveNodes;
+        private BarCheckItem btnEditEdges;
+        private BarButtonGroup groupEditMeshes;
+        private BarButtonItem btnUndo;
+        private BarButtonItem btnEditCR;
+        private BarButtonItem btnMeshesInfo;
+        private BarButtonItem btnCompression;
+        private Bar barEditCustomRegion;
+        private BarCheckItem btnCRTypeSelector;
+        private BarButtonItem btnCREditionAccept;
+        private BarEditItem editCRSelector;
+        private RepositoryItemLookUpEdit itemEditCRList;
+        private BarCheckItem btnLockMapOnPlayer;
+        private BarCheckItem btnCRRename;
+        private PictureBox MapPicture;
+        private BarButtonGroup groupZoom;
+        private BarButtonItem btnZoomIn;
+        private BarButtonItem btnZoomOut;
+        private BarStaticItem lblZoom;
+        private Bar barCustomRegions;
+        private Bar barNodeTools;
+        private BarButtonGroup groupSaveUndo;
+        private BarEditItem editBidirPathColor;
+        private RepositoryItemColorEdit editItemColor;
+        private BarEditItem editUnidirPathColor;
+        private BarButtonItem btnLockOnSpecialObject;
+        private DevExpress.XtraEditors.PanelControl panelSettings;
+        private DevExpress.XtraEditors.ColorEdit colorEditUnidirPath;
+        private DevExpress.XtraEditors.ColorEdit colorEditBidirPath;
+        private BarCheckItem btnSettings;
+        private BarStaticItem lblPlayerPos;
+        private BarStaticItem lblDrawInfo;
+        private BarCheckItem btnDistanceMeasurement;
+        private DevExpress.XtraNavBar.NavBarControl navBarCustomization;
+        private DevExpress.XtraNavBar.NavBarGroup navGroupMeshes;
+        private DevExpress.XtraNavBar.NavBarGroup navGroupGeneral;
+        private DevExpress.XtraNavBar.NavBarGroup navGroupObjects;
+        private DevExpress.XtraNavBar.NavBarGroupControlContainer containerMeshes;
+        private DevExpress.XtraNavBar.NavBarGroupControlContainer containerObjects;
+        private DevExpress.XtraNavBar.NavBarGroupControlContainer containerGeneral;
+        private DevExpress.XtraEditors.CheckEdit ckbNodes;
+        private DevExpress.XtraEditors.CheckEdit ckbFriends;
+        private DevExpress.XtraEditors.CheckEdit ckbEnemies;
+        private DevExpress.XtraEditors.ColorEdit colorNodes;
+        private DevExpress.XtraEditors.ColorEdit colorFriends;
+        private DevExpress.XtraEditors.ColorEdit colorEnemies;
+        private DevExpress.XtraEditors.CheckEdit ckbPlayers;
+        private DevExpress.XtraEditors.ColorEdit colorPlayers;
+        private DevExpress.XtraEditors.ColorEdit colorBackground;
+        private DevExpress.XtraEditors.CheckEdit ckbSkillnodes;
+        private DevExpress.XtraEditors.ColorEdit colorSkillnodes;
+        private DevExpress.XtraEditors.CheckEdit ckbOtherNPC;
+        private DevExpress.XtraEditors.ColorEdit colorOtherNPC;
+        private DevExpress.XtraEditors.GroupControl grpNodeCustomization;
+        private DevExpress.XtraEditors.GroupControl grpEntityCustomization;
+        private BarCheckItem btnAddRoad;
+        private Label lblBackground;
+        private Label lblUnidirPath;
+        private Label lblBidirPath;
+        private DevExpress.XtraEditors.CheckEdit ckbChacheEnable;
+        private DevExpress.XtraEditors.SpinEdit editLayerDepth;
+        private Label lblLayerDepth;
+        private BarCheckItem btnObjectInfo;
     } 
 #endif
 }

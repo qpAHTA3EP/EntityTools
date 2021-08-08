@@ -13,6 +13,7 @@ namespace EntityTools.Settings
         /// Интервал времени между обновлениями общего кэша Entity
         /// </summary>
         [Bindable(true)]
+        [Description("Интервал времени между обновлениями общего кэша Entity")]
         public int GlobalCacheTime
         {
             get => _cacheTime;
@@ -21,7 +22,7 @@ namespace EntityTools.Settings
                 if (_cacheTime != value)
                 {
                     _cacheTime = Math.Max(value, 500);
-                    base.NotifyPropertyChanged(nameof(GlobalCacheTime));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -31,6 +32,7 @@ namespace EntityTools.Settings
         /// Интервал времени между обновлениями кэша во время боя
         /// </summary>
         [Bindable(true)]
+        [Description("Интервал времени между обновлениями кэша во время боя")]
         public int CombatCacheTime
         {
             get => _combatCacheTime;
@@ -40,7 +42,7 @@ namespace EntityTools.Settings
                 {
 
                     _combatCacheTime = Math.Max(value, 100);
-                    base.NotifyPropertyChanged(nameof(CombatCacheTime));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -50,6 +52,7 @@ namespace EntityTools.Settings
         /// Интервал времени обновления Entity, кэшированного в командах и условиях локально
         /// </summary>
         [Bindable(true)]
+        [Description("Интервал времени обновления Entity, кэшированного в командах и условиях локально")]
         public int LocalCacheTime
         {
             get => _localCacheTime;
@@ -58,10 +61,16 @@ namespace EntityTools.Settings
                 if (_localCacheTime != value)
                 {
                     _localCacheTime = Math.Max(value, 100);
-                    base.NotifyPropertyChanged(nameof(LocalCacheTime));
+                    NotifyPropertyChanged();
                 }
             }
         }
         private int _localCacheTime = 500;
+
+
+        public override string ToString()
+        {
+            return nameof(EntityCacheSettings);
+        }
     }
 }

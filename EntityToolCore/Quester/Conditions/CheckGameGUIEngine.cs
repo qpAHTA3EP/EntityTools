@@ -10,36 +10,90 @@ using System.Text;
 using System.Text.RegularExpressions;
 using static Astral.Quester.Classes.Condition;
 using EntityTools;
+using EntityTools.Core.Interfaces;
 
 namespace EntityCore.Quester.Conditions
 {
-    public class CheckGameGUIEngine : IQuesterConditionEngine
+    public class CheckGameGuiEngine : IQuesterConditionEngine
     {
         CheckGameGUI @this = null;
 
         private UIGen uiGen = null;
         private string label = string.Empty;
+        private string actionIDstr;
 
-        internal CheckGameGUIEngine(CheckGameGUI ckUiGen)
+        internal CheckGameGuiEngine(CheckGameGUI ckUiGen)
         {
+#if false
             @this = ckUiGen;
 
-#if CORE_INTERFACES
-            @this.ConditionEngine = this;
+            @this.Engine = this;
+            @this.PropertyChanged += PropertyChanged; 
+#else
+            InternalRebase(ckUiGen);
 #endif
-            @this.PropertyChanged += PropertyChanged;
-
             ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
+        }
+        ~CheckGameGuiEngine()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = null;
+                @this = null;
+            }
         }
 
         internal void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (object.ReferenceEquals(sender, @this))
+            if (ReferenceEquals(sender, @this))
             {
                 if (e.PropertyName == nameof(@this.UiGenID))
                     label = string.Empty;
                 uiGen = null;
             }
+        }
+
+        public bool Rebase(Astral.Quester.Classes.Condition condition)
+        {
+            if (condition is null)
+                return false;
+            if (ReferenceEquals(condition, @this))
+                return true;
+            if (condition is CheckGameGUI ckUiGen)
+            {
+                InternalRebase(ckUiGen);
+                ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} reinitialized");
+                return true;
+            }
+
+            string debugStr = string.Concat("Rebase failed. ", condition.GetType().Name, '[', condition.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(CheckGameGUI) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
+        }
+
+        private bool InternalRebase(CheckGameGUI ckUiGen)
+        {
+            // Убираем привязку к старой команде
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = null;
+            }
+
+            @this = ckUiGen;
+            @this.PropertyChanged += PropertyChanged;
+
+            actionIDstr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+
+            @this.Engine = this;
+
+            return true;
         }
 
         public bool IsValid
@@ -136,18 +190,19 @@ namespace EntityCore.Quester.Conditions
             if (string.IsNullOrEmpty(uiVar.Value) && string.IsNullOrEmpty(@this._uiGenPropertyValue))
                 result = true;
             else switch (@this._uiGenPropertyValueType)
-                {
-                    case ItemFilterStringType.Simple:
-                        result = uiVar.Value.CompareToSimplePattern(@this._uiGenPropertyValue);
-                        break;
-                    case ItemFilterStringType.Regex:
-                        result = Regex.IsMatch(uiVar.Value, @this._uiGenPropertyValue);
-                        break;
-                }
+            {
+                case ItemFilterStringType.Simple:
+                    result = uiVar.Value.CompareToSimplePattern(@this._uiGenPropertyValue);
+                    break;
+                case ItemFilterStringType.Regex:
+                    //TODO Использовать предкомпилированный Regex
+                    result = Regex.IsMatch(uiVar.Value, @this._uiGenPropertyValue);
+                    break;
+            }
 
             if (@this._propertySign == Presence.Equal)
                 return result;
-            else return !result;
+            return !result;
         }
     }
 }

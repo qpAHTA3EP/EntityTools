@@ -1,21 +1,20 @@
-﻿using Astral.Quester.Classes;
-using EntityTools.Tools;
-using EntityTools.Editors;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Text;
-using Astral.Logic.UCC.Classes;
-using EntityTools.Enums;
-using EntityTools.UCC.Conditions;
-using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 using System.Xml.Serialization;
-using EntityTools;
+using Astral.Logic.UCC.Classes;
+using EntityTools.Editors;
+using EntityTools.Enums;
+using EntityTools.Tools;
+using EntityTools.UCC.Actions;
+using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 
 namespace EntityTools.UCC.Conditions
 {
     [Serializable]
-    public class UCCConditionPack : Astral.Logic.UCC.Classes.UCCCondition, ICustomUCCCondition
+    // ReSharper disable once InconsistentNaming
+    public class UCCConditionPack : UCCCondition, ICustomUCCCondition
     {
 #if DEVELOPER
         [Description("Displayed name of the ConditionPack")]
@@ -43,17 +42,18 @@ namespace EntityTools.UCC.Conditions
 #if DEVELOPER
         [Description("The list of the Conditions")]
         [TypeConverter(typeof(CollectionTypeConverter))]
-        [Editor(typeof(UCCConditionListEditor), typeof(UITypeEditor))]
+        [Editor(typeof(UccConditionListEditor), typeof(UITypeEditor))]
 #else
         [Browsable(false)]
 #endif
         public ConditionList Conditions { get; set; } = new ConditionList();
 
 #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
+        bool ICustomUCCCondition.IsOK(UCCAction refAction)
         {
             bool result = true;
-            if (Conditions != null && Conditions.Count > 0)
+            if (Conditions?.Count > 0)
+            {
                 if (TestRule == LogicRule.Disjunction)
                 {
                     int lockedNum = 0;
@@ -63,7 +63,7 @@ namespace EntityTools.UCC.Conditions
                     {
                         if (c is ICustomUCCCondition iCond)
                         {
-                            if (iCond.Loked)
+                            if (iCond.Loсked)
                             {
                                 if (!iCond.IsOK(refAction))
                                 {
@@ -91,7 +91,7 @@ namespace EntityTools.UCC.Conditions
                         }
                     }
 
-                    // Если множетство незалоченных условий пустое, тогда условие истино
+                    // Если множество незалоченных условий пустое, тогда условие истино
                     // Если оно НЕ пустое, тогда должно встретиться хотя бы одно истиное
                     result = lockedTrue && (Conditions.Count == lockedNum || okUnlockedNum > 0);
                 }
@@ -99,24 +99,25 @@ namespace EntityTools.UCC.Conditions
                 {
                     // Проверка всех условий
                     foreach (UCCCondition c in Conditions)
+                    {
                         if (c is ICustomUCCCondition iCond)
                         {
-                            if (!iCond.IsOK(refAction))
-                            {
-                                result = false;
-                                break;
-                            }
+                            if (iCond.IsOK(refAction)) continue;
+                            result = false;
+                            break;
                         }
-                        else if (!c.IsOK(refAction))
+                        if (!c.IsOK(refAction))
                         {
                             result = false;
                             break;
                         }
+                    }
                 }
-            return (Not) ? !result : result;
+            }
+            return Not ? !result : result;
         }
 
-        bool ICustomUCCCondition.Loked { get => base.Locked; set => base.Locked = value; }
+        bool ICustomUCCCondition.Loсked { get => Locked; set => Locked = value; }
 
         string ICustomUCCCondition.TestInfos(UCCAction refAction/* = null*/)
         {
@@ -132,7 +133,7 @@ namespace EntityTools.UCC.Conditions
                     if (cond.Locked)
                         sb.Append("\t[L] ");
                     else sb.Append("\t[U] ");
-                    sb.Append(cond.ToString()).Append(" | Result: ");
+                    sb.Append(cond).Append(" | Result: ");
                     if (cond is ICustomUCCCondition iCond)
                         sb.Append(iCond.IsOK(refAction));
                     else sb.Append(cond.IsOK(refAction));
@@ -141,15 +142,16 @@ namespace EntityTools.UCC.Conditions
                 sb.Append("Negation flag (Not): ").Append(Not).AppendLine();
                 return sb.ToString();
             }
-            else return "The list 'Conditions' is empty";
+
+            return "The list 'Conditions' is empty";
         }
 #endregion
 
         public override string ToString()
         {
             if (string.IsNullOrEmpty(Name))
-                return "ConditionPack";
-            else return $"ConditionPack: {Name}";
+                return $"ConditionPack [{Conditions.Count}]";
+            return $"ConditionPack: {Name} [{Conditions.Count}]";
         }
 
         #region Hide Inherited Properties

@@ -1,14 +1,11 @@
-﻿using Astral.Classes.ItemFilter;
-using Astral.Quester.Classes;
-using EntityTools.Core.Proxies;
-using EntityTools.Editors;
-using EntityTools.Enums;
-using EntityTools.Tools;
-using MyNW.Classes;
-using MyNW.Internals;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using Astral.Classes.ItemFilter;
+using Astral.Quester.Classes;
+using EntityTools.Core.Interfaces;
+using EntityTools.Core.Proxies;
+using EntityTools.Editors;
 
 namespace EntityTools.Quester.Conditions
 {
@@ -17,17 +14,14 @@ namespace EntityTools.Quester.Conditions
     {
         #region Взаимодействие с ядром EntityTools
         public event PropertyChangedEventHandler PropertyChanged;
-#if CORE_INTERFACES
-        internal IQuesterConditionEngine Engine = null;
-#endif
+
+        internal IQuesterConditionEngine Engine;
         #endregion
 
         public EntityDistance()
         {
-#if CORE_INTERFACES
             Engine = new QuesterConditionProxy(this);
-#endif
-            // EntityTools.Core.Initialize(this);
+
             Distance = 0;
             Sign = Relation.Superior;
             EntityIdType = ItemFilterStringType.Simple;
@@ -121,7 +115,7 @@ namespace EntityTools.Quester.Conditions
 #else
         [Browsable(false)]
 #endif
-        public Condition.Relation Sign
+        public Relation Sign
         {
             get => _sign;
             set

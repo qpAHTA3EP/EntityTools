@@ -1,12 +1,11 @@
-﻿using Astral;
-using System;
+﻿using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace EntityTools.Patches
 {
 #if PATCH_ASTRAL
-    internal class Patch
+    internal abstract class Patch
     {
         protected MethodInfo methodToReplace;
         protected MethodInfo methodToInject;
@@ -22,29 +21,34 @@ namespace EntityTools.Patches
             this.methodToInject = methodToInject;
         }
 
+        public abstract bool NeedInjection { get; }
+
         public void Inject()
         {
-            if (methodToReplace != null
-                && methodToInject != null)
+            if (NeedInjection)
             {
-                RuntimeHelpers.PrepareMethod(methodToReplace.MethodHandle);
-                RuntimeHelpers.PrepareMethod(methodToInject.MethodHandle);
-
-                unsafe
+                if (methodToReplace != null
+                  && methodToInject != null)
                 {
-                    long* inj = (long*)methodToInject.MethodHandle.Value.ToPointer() + 1;
-                    long* tar = (long*)methodToReplace.MethodHandle.Value.ToPointer() + 1;
+                    RuntimeHelpers.PrepareMethod(methodToReplace.MethodHandle);
+                    RuntimeHelpers.PrepareMethod(methodToInject.MethodHandle);
 
-                    *tar = *inj;
+                    unsafe
+                    {
+                        long* inj = (long*)methodToInject.MethodHandle.Value.ToPointer() + 1;
+                        long* tar = (long*)methodToReplace.MethodHandle.Value.ToPointer() + 1;
+
+                        *tar = *inj;
+                    }
+                    ETLogger.WriteLine($"Patch of the '{methodToReplace.ReflectedType.Name}.{methodToReplace.Name}' succeeded!", true);
                 }
-                ETLogger.WriteLine($"Patch of the '{methodToReplace.ReflectedType.Name}.{methodToReplace.Name}' succeeded!", true);
-            }
-            else
-            {
-                string msg = string.Concat("Fail to inject:", Environment.NewLine,
-                                            (methodToReplace == null) ? $"MethodToReplace: NULL" : $"MethodToReplace: {methodToReplace.Name}", Environment.NewLine,
-                                            (methodToInject == null) ? $"MethodToInject: NULL" : $"MethodToInject: {methodToInject.Name}");
-                ETLogger.WriteLine(LogType.Error, msg, true);
+                else
+                {
+                    string msg = string.Concat("Fail to inject:", Environment.NewLine,
+                                                (methodToReplace == null) ? "MethodToReplace: NULL" : $"MethodToReplace: {methodToReplace.Name}", Environment.NewLine,
+                                                (methodToInject == null) ? "MethodToInject: NULL" : $"MethodToInject: {methodToInject.Name}");
+                    ETLogger.WriteLine(LogType.Error, msg, true);
+                }
             }
         }
     } 

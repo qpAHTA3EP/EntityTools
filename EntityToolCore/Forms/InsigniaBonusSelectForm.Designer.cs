@@ -107,7 +107,7 @@
             // btnFilter
             // 
             this.btnFilter.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnFilter.Location = new System.Drawing.Point(457, 10);
+            this.btnFilter.Location = new System.Drawing.Point(460, 9);
             this.btnFilter.Name = "btnFilter";
             this.btnFilter.Size = new System.Drawing.Size(75, 23);
             this.btnFilter.TabIndex = 3;
@@ -119,7 +119,7 @@
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(457, 313);
+            this.btnCancel.Location = new System.Drawing.Point(460, 323);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 3;
@@ -129,7 +129,7 @@
             // btnSelect
             // 
             this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelect.Location = new System.Drawing.Point(376, 313);
+            this.btnSelect.Location = new System.Drawing.Point(379, 323);
             this.btnSelect.Name = "btnSelect";
             this.btnSelect.Size = new System.Drawing.Size(75, 23);
             this.btnSelect.TabIndex = 3;
@@ -147,7 +147,7 @@
             this.BonusList.ItemHeight = 16;
             this.BonusList.Location = new System.Drawing.Point(15, 44);
             this.BonusList.Name = "BonusList";
-            this.BonusList.Size = new System.Drawing.Size(517, 196);
+            this.BonusList.Size = new System.Drawing.Size(520, 196);
             this.BonusList.Sorted = true;
             this.BonusList.TabIndex = 4;
             this.BonusList.SelectedIndexChanged += new System.EventHandler(this.BonusList_SelectedIndexChanged);
@@ -157,7 +157,7 @@
             this.Description.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Description.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.Description.Location = new System.Drawing.Point(129, 249);
+            this.Description.Location = new System.Drawing.Point(132, 259);
             this.Description.Multiline = true;
             this.Description.Name = "Description";
             this.Description.ReadOnly = true;
@@ -217,7 +217,7 @@
             // Insignia1
             // 
             this.Insignia1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Insignia1.Location = new System.Drawing.Point(15, 249);
+            this.Insignia1.Location = new System.Drawing.Point(18, 259);
             this.Insignia1.Name = "Insignia1";
             this.Insignia1.Size = new System.Drawing.Size(32, 32);
             this.Insignia1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -227,7 +227,7 @@
             // Insignia2
             // 
             this.Insignia2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Insignia2.Location = new System.Drawing.Point(53, 249);
+            this.Insignia2.Location = new System.Drawing.Point(56, 259);
             this.Insignia2.Name = "Insignia2";
             this.Insignia2.Size = new System.Drawing.Size(32, 32);
             this.Insignia2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -237,7 +237,7 @@
             // Insignia3
             // 
             this.Insignia3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Insignia3.Location = new System.Drawing.Point(91, 249);
+            this.Insignia3.Location = new System.Drawing.Point(94, 259);
             this.Insignia3.Name = "Insignia3";
             this.Insignia3.Size = new System.Drawing.Size(32, 32);
             this.Insignia3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -272,7 +272,9 @@
             this.Controls.Add(this.tbBarbed);
             this.Controls.Add(this.lbFilter);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
-            this.MinimumSize = new System.Drawing.Size(555, 385);
+            this.LookAndFeel.SkinName = "Office 2013 Light Gray";
+            this.LookAndFeel.UseDefaultLookAndFeel = false;
+            this.MinimumSize = new System.Drawing.Size(555, 382);
             this.Name = "InsigniaBonusSelectForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

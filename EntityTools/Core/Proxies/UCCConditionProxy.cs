@@ -1,50 +1,70 @@
-﻿using Astral.Logic.UCC.Classes;
+﻿using System;
+using Astral.Logic.UCC.Classes;
 using EntityTools.Core.Interfaces;
+using AcTp0Tools.Reflection;
 using EntityTools.UCC.Conditions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace EntityTools.Core.Proxies
 {
-    public class UCCConditionProxy : IUCCConditionEngine
+    public class UccConditionProxy : IUccConditionEngine
     {
-        private UCCCondition condition;
+        private UCCCondition _condition;
 
-        public UCCConditionProxy(UCCCondition c)
+        public UccConditionProxy(UCCCondition uccCondition)
         {
-            condition = c ?? throw new ArgumentNullException();
+            _condition = uccCondition ?? throw new ArgumentNullException(nameof(uccCondition));
         }
 
         public bool IsOK(UCCAction refAction)
         {
-            if (EntityTools.Core.Initialize(condition))
-                return condition.IsOK(refAction);
+            if (EntityTools.Core.Initialize(_condition))
+                return _condition.IsOK(refAction);
 
-            ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid. Stop bot", true);
+#if false
+            ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot", true);
 
-            EntityTools.StopBot();
+            EntityTools.StopBot(); 
+#endif
 
             return false;
         }
 
         public string Label()
         {
-            if (EntityTools.Core.Initialize(condition))
-                return condition.ToString();
-            else return condition.GetType().Name;
+            if (string.IsNullOrEmpty(_label))
+            {
+                if (EntityTools.Core.Initialize(_condition))
+                    _label = _condition.ToString();
+                else _label = $"{_condition.GetType().Name} [uninitialized]"; 
+            }
+            return _label;
         }
+        string _label;
 
         public string TestInfos(UCCAction refAction)
         {
-            if (EntityTools.Core.Initialize(condition))
+            if (EntityTools.Core.Initialize(_condition))
             {
-                if (condition is ICustomUCCCondition iCond)
+                if (_condition is ICustomUCCCondition iCond)
                     return iCond.TestInfos(refAction);
-                else return $"{condition.GetType().Name} | Result: {condition.IsOK(refAction)}!";
+                return $"{_condition.GetType().Name} | Result: {_condition.IsOK(refAction)}!";
             }
-            else return $"{condition.GetType().Name}: not initialized!";
+
+            return $"{_condition.GetType().Name}: not initialized!";
+        }
+
+        public bool Rebase(UCCCondition uccCondition)
+        {
+            return EntityTools.Core.Initialize(uccCondition);
+        }
+
+        public void Dispose()
+        {
+            if (_condition != null)
+            {
+                ReflectionHelper.SetFieldValue(_condition, "Engine", null);
+                _condition = null;
+            }
         }
     }
 }

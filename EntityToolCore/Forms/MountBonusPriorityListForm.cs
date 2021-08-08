@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using EntityTools.Enums;
 
 namespace EntityCore.Forms
 {
@@ -34,7 +35,7 @@ namespace EntityCore.Forms
         /// Словарь соответствия индексов элементов компонента PlayersClass
         /// и типов PlayerClassParagonType
         /// </summary>
-        private Dictionary<int, PlayerClassParagonType> PlayerClassIndexer = new Dictionary<int, PlayerClassParagonType>();
+        private Dictionary<int, PlayerParagonType> PlayerClassIndexer = new Dictionary<int, PlayerParagonType>();
 
         public MountBonusPriorityListForm()
         {
@@ -58,7 +59,7 @@ namespace EntityCore.Forms
                 MountBonusPriorityList = new BindingList<ParagonMountBonusPriorityDef>();
                 foreach (CharacterPath paragon in Game.CharacterPaths)
                 {
-                    Enum.TryParse(paragon.Name, out PlayerClassParagonType paragonType);
+                    Enum.TryParse(paragon.Name, out PlayerParagonType paragonType);
                     MountBonusPriorityList.Add(new ParagonMountBonusPriorityDef(paragonType));
                 }
             }
@@ -71,7 +72,7 @@ namespace EntityCore.Forms
                 {
                     ParagonMountBonusPriorityDef curBonList = cbPlayersClass.Items[i] as ParagonMountBonusPriorityDef;
                     if (curBonList!= null
-                        && EntityManager.LocalPlayer.Character?.CurrentPowerTreeBuild?.SecondaryPaths[0]?.Path?.PowerTree?.Name == curBonList.ClassParagonType.ToString())
+                        && EntityManager.LocalPlayer.Character?.CurrentPowerTreeBuild?.SecondaryPaths[0]?.Path?.PowerTree?.Name == curBonList.ParagonType.ToString())
                     {
                         cbPlayersClass.SelectedIndex = i;
                         break;

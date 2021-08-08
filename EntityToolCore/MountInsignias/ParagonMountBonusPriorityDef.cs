@@ -7,14 +7,15 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
+using EntityTools.Enums;
 
 namespace EntityCore.MountInsignias
 {
     [Serializable]
     public class ParagonMountBonusPriorityDef
     {
-        private PlayerClassParagonType clPrgType = PlayerClassParagonType.Unknown;
-        public PlayerClassParagonType ClassParagonType
+        private PlayerParagonType clPrgType = PlayerParagonType.Unknown;
+        public PlayerParagonType ParagonType
         {
             get => clPrgType;
             set
@@ -33,15 +34,15 @@ namespace EntityCore.MountInsignias
         {
             get
             {
-                if (ClassParagonType == PlayerClassParagonType.Unknown)
-                    return dispName = PlayerClassParagonType.Unknown.ToString();
+                if (ParagonType == PlayerParagonType.Unknown)
+                    return dispName = PlayerParagonType.Unknown.ToString();
 
                 if (!string.IsNullOrEmpty(dispName))
                     return dispName;
 
-                CharacterPath paragon = Game.CharacterPaths.Find(p => p.Name == ClassParagonType.ToString() );
+                CharacterPath paragon = Game.CharacterPaths.Find(p => p.Name == ParagonType.ToString() );
                 if(paragon == null || !paragon.IsValid)
-                    return dispName = PlayerClassParagonType.Unknown.ToString();
+                    return dispName = PlayerParagonType.Unknown.ToString();
 
                 if (paragon.RequiredClasses.Count > 0)
                     return dispName  = $"{paragon.RequiredClasses[0].Class.DisplayName}: {paragon.DisplayName}";
@@ -53,9 +54,9 @@ namespace EntityCore.MountInsignias
         public BindingList<MountBonusPriorityDef> MountBonusPriorityList { get; set; } = new BindingList<MountBonusPriorityDef>();
 
         public ParagonMountBonusPriorityDef() { }
-        public ParagonMountBonusPriorityDef(PlayerClassParagonType type)
+        public ParagonMountBonusPriorityDef(PlayerParagonType type)
         {
-            ClassParagonType = type;
+            ParagonType = type;
         }
     }
 }

@@ -259,3 +259,10 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+/EntityTools/Quester/Actions/PickUpMissionExt_2020-11-20.cs
+/EntityTools/Tools/Missions/MissionGiverInfo_2020-11-20.cs
+/EntityTools/Tools/Navigation/CustomNavigator (версия от 23.11.2020 10-34-49).cs
+/AMClient/References/x32
+/InterfaceDummyTest
+/AMClient.bak
+/EntityToolCore/Tools/PlayerTeamHelper - 2021-06-16.cs

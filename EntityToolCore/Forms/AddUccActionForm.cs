@@ -1,15 +1,11 @@
 ﻿using DevExpress.XtraEditors;
 using System;
-using System.Text;
 using System.Windows.Forms;
-using EntityTools.UCC.Conditions;
-using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 using Astral.Logic.UCC.Classes;
 using EntityTools.Extensions;
-using EntityTools.Reflection;
 using UCCEditor = Astral.Logic.UCC.Forms.Editor;
-using EntityTools.UCC.Actions;
 using System.Collections.Generic;
+using AcTp0Tools.Reflection;
 
 namespace EntityCore.Forms
 {
@@ -17,7 +13,7 @@ namespace EntityCore.Forms
     {
         // Редактор UCC
         private readonly UCCEditor editor = null;
-        private readonly InstancePropertyAccessor<UCCEditor, UCCAction> currentUccAction = null;
+        private readonly PropertyAccessor<UCCAction> currentUccAction = null;
 
         private static readonly List<Type> uccActionTypes = new List<Type>();
         private static Dictionary<Type, UCCAction> uccActions = new Dictionary<Type, UCCAction>();
@@ -25,7 +21,7 @@ namespace EntityCore.Forms
         static AddUccActionForm()
         {
             // Формируем список типов uccAction;
-            EntityTools.Patches.Patch_XmlSerializer_GetExtraTypes.GetExtraTypes(out List<Type> uccTypes, 1);
+            AcTp0Tools.Patches.Astral_Functions_XmlSerializer_GetExtraTypes.GetExtraTypes(out List<Type> uccTypes, 1);
             if(uccTypes != null && uccTypes.Count > 0)
             {
                 foreach (Type t in uccTypes)
@@ -40,7 +36,7 @@ namespace EntityCore.Forms
 
             editor = Application.OpenForms.Find<UCCEditor>();
             if(editor != null)
-                currentUccAction = editor.GetInstanceProperty<UCCEditor, UCCAction>("CurrentAction");
+                currentUccAction = editor.GetProperty<UCCAction>("CurrentAction");
 
             listOfActionTypes.DataSource = uccActionTypes;
             listOfActionTypes.DisplayMember = "Name";
@@ -50,11 +46,6 @@ namespace EntityCore.Forms
         {
             AddUccActionForm @this = new AddUccActionForm();
 
-#if disabled_20200527_1929
-            if (action != null)
-                @this.listOfActionTypes.SelectedItem = action.GetType();
-
-#endif
             if (@this.ShowDialog() == DialogResult.OK
                 && @this.listOfActionTypes.SelectedIndex >= 0)
             {
@@ -63,7 +54,7 @@ namespace EntityCore.Forms
                 {
                     action = newAction.Clone();
                     action.Target = newAction.Target;
-                    return action != null;
+                    return true;
                 }
             }
             action = null;

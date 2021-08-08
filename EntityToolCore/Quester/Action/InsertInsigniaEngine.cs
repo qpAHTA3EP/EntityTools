@@ -13,133 +13,79 @@ using Astral.Quester.Classes;
 using System.ComponentModel;
 using EntityTools.Core.Interfaces;
 using EntityTools;
+using EntityTools.Quester;
 
 namespace EntityCore.Quester.Action
 {
-    internal class InsertInsigniaEngine
-#if CORE_INTERFACES
-        : IQuesterActionEngine
-#endif
+    internal class InsertInsigniaEngine : IQuesterActionEngine
     {
         private InsertInsignia @this = null;
         private string label;
+        private string actionIDstr;
 
         internal InsertInsigniaEngine(InsertInsignia ii)
         {
             @this = ii;
-#if CORE_DELEGATES
-            @this.coreNeedToRun = NeedToRun;
-            @this.coreRun = Run;
-            @this.coreValidate = Validate;
-            @this.coreReset = Reset;
-            @this.coreGatherInfos = GatherInfos;
-            @this.coreLabel = Label;
-#endif
-#if CORE_INTERFACES
-            @this.ActionEngine = this;
-#endif
-            @this.PropertyChanged += PropertyChanged;
 
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {ActionLabel}");
+            @this.Bind(this);
+            @this.PropertyChanged += OnPropertyChanged;
+
+            ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} initialized: {ActionLabel}");
+        }
+        ~InsertInsigniaEngine()
+        {
+            Dispose();
         }
 
-        private void PropertyChanged(object sender, PropertyChangedEventArgs e) { }
-
-#if CORE_DELEGATES
-        public ActionResult Run()
+        public void Dispose()
         {
-            // freeInsignias - Список всхе неэкипированных инсигний (знаков скакунов)
-            List<InventorySlot> freeInsignias = null;
-
-            // Выбираем всех активных коней
-            List<InventorySlot> activeMounts = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.MountEquippedActiveSlots).GetItems;
-            //EntityManager.LocalPlayer.BagsItems.FindAll(slot => slot.BagId == MyNW.Patchables.Enums.InvBagIDs.MountEquippedActiveSlots);
-
-            foreach (InventorySlot mount in activeMounts)
+            if (@this != null)
             {
-#if DEBUG_INSERTINSIGNIA
-                int insertedNum = 0;
-
-                EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: Check mount '{mount.Item.ItemDef.InternalName}'");
-#endif
-                // Проверяем наличие свободного места для знака
-                foreach (ItemGemSlotDef insgnSlotDef in mount.Item.ItemDef.EffectiveItemGemSlots)
-                {
-                    // insgnSlotDef - описание слота в скакуне
-                    // insgnMountSlot - слот знака в скакуне
-                    ItemGemSlot insgnMountSlot = mount.Item.SpecialProps.GetGemSlotByIndex(insgnSlotDef.Index);
-                    if (insgnSlotDef != null && insgnSlotDef.IsValid
-                        && (insgnMountSlot == null || !insgnMountSlot.IsValid || !insgnMountSlot.SlottedItem.IsValid))
-                    {
-                        // обнаружен "пустой слот" знака скакуна
-#if DEBUG_INSERTINSIGNIA
-                        EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: Mount [{mount.Item.ItemDef.InternalName}] has free slot {insgnSlotDef.Index}");
-#endif
-                        // ищем в сумке подходящие инсигнии (знаки скакуна)
-                        if (freeInsignias == null || freeInsignias.Count == 0)
-                        {
-                            // Ищем в сумке все неэкипированные инсигнии (впервый раз)
-                            freeInsignias = EntityManager.LocalPlayer.BagsItems.FindAll(slot =>
-                                                                                            slot.Item.ItemDef.Categories.Contains(ItemCategory.Insignia)
-                                                                                        /* Вариант 2*/
-                                                                                        //slot.Item.ItemDef.Type == ItemType.Gem
-                                                                                        //&& (slot.Item.ItemDef.GemType == (uint)InsigniaType.Barbed 
-                                                                                        //    || slot.Item.ItemDef.GemType == (uint)InsigniaType.Crescent
-                                                                                        //    || slot.Item.ItemDef.GemType == (uint)InsigniaType.Enlightened
-                                                                                        //    || slot.Item.ItemDef.GemType == (uint)InsigniaType.Illuminated
-                                                                                        //    || slot.Item.ItemDef.GemType == (uint)InsigniaType.Regal)
-                                                                                        /* Вариант 3*/
-                                                                                        //slot.Item.ItemDef.InternalName.StartsWith("Insignia", System.StringComparison.OrdinalIgnoreCase)
-                                                                                        );
-                            if (freeInsignias == null || freeInsignias.Count == 0)
-                            {
-                                // в инвентаре отсутствуют инсигнии
-#if DEBUG_INSERTINSIGNIA
-                                EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: No one insignia found in the Bags");
-#endif
-                                return ActionResult.Skip;
-                            }
-                            // сортировка списка "инсигний";
-                            freeInsignias.Sort(InsigniaQualityDescendingComparison);
-                        }
-
-                        // Ищем первую попавшуюся подходящую инсигнию (знак скакуна)
-                        InventorySlot insigniaBagSlot = freeInsignias.Find(insSlot => insSlot.Filled && (insgnSlotDef.Type == (uint)InsigniaType.Universal || insSlot.Item.ItemDef.GemType == insgnSlotDef.Type));
-                        // сортировка списка "инсигний" по убыванию качества;
-                        freeInsignias.Sort(InsigniaQualityDescendingComparison);
-
-                        // экипируем найденный знак
-                        if (insigniaBagSlot != null && insigniaBagSlot.IsValid)
-                        {
-                            mount.Item.GemThisItem(insigniaBagSlot.Item, insgnSlotDef.Index);
-                            EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"{GetType().Name}: Insert '{insigniaBagSlot.Item.ItemDef.InternalName}' at the slot {insgnSlotDef.Index} of [{mount.Item.ItemDef.InternalName}]");
-#if DEBUG_INSERTINSIGNIA
-                            insertedNum++;
-#endif
-                            // Удаляем слот сумки, в котором находился знак, из списка
-                            // если этот слот стал пустым
-                            if (!insigniaBagSlot.Filled)
-                                freeInsignias.Remove(insigniaBagSlot);
-                        }
-                    }
-                }
+                @this.Unbind();
+                @this = null;
             }
-
-            return ActionResult.Completed;
         }
 
-        public bool NeedToRun() => true;
-        public bool Validate() => true;
-        public void Reset() { }
-        public void GatherInfos() { }
-        public string Label()
+        public bool Rebase(Astral.Quester.Classes.Action action)
         {
-            if (string.IsNullOrEmpty(label))
-                label = @this.GetType().Name;
-            return label;
-        } 
+            if (action is null)
+                return false;
+            if (ReferenceEquals(action, @this))
+                return true;
+            if (action is InsertInsignia ii)
+            {
+                InternalRebase(ii);
+                ETLogger.WriteLine(LogType.Debug, $"{actionIDstr} reinitialized");
+                return true;
+            }
+#if false
+            else ETLogger.WriteLine(LogType.Debug, $"Rebase failed. '{action}' has type '{action.GetType().Name}' which not equals to '{nameof(PickUpMissionExt)}'");
+            return false; 
+#else
+            string debugStr = string.Concat("Rebase failed. ", action.GetType().Name, '[', action.ActionID, "] can't be casted to '" + nameof(PickUpMissionExt) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
 #endif
-#if CORE_INTERFACES
+
+        }
+
+        private bool InternalRebase(InsertInsignia ii)
+        {
+            // Убираем привязку к старой команде
+            @this?.Unbind();
+
+            @this = ii;
+            @this.PropertyChanged += OnPropertyChanged;
+
+            actionIDstr = string.Concat(@this.GetType().Name, '[', @this.ActionID, ']');
+
+            @this.Bind(this);
+
+            return true;
+        }
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e) { }
+        public void OnPropertyChanged(Astral.Quester.Classes.Action sender, string propertyName) { }
+
         public bool NeedToRun => true;
 
         public ActionResult Run()
@@ -163,59 +109,61 @@ namespace EntityCore.Quester.Action
                 {
                     // insgnSlotDef - описание слота в скакуне
                     // insgnMountSlot - слот знака в скакуне
-                    ItemGemSlot insgnMountSlot = mount.Item.SpecialProps.GetGemSlotByIndex(insgnSlotDef.Index);
-                    if (insgnSlotDef != null && insgnSlotDef.IsValid
-                        && (insgnMountSlot == null || !insgnMountSlot.IsValid || !insgnMountSlot.SlottedItem.IsValid))
+                    if (insgnSlotDef.IsValid)
                     {
-                        // обнаружен "пустой слот" знака скакуна
-#if DEBUG_INSERTINSIGNIA
-                        ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}: Mount [{mount.Item.ItemDef.InternalName}] has free slot {insgnSlotDef.Index}");
-#endif
-                        // ищем в сумке подходящие инсигнии (знаки скакуна)
-                        if (freeInsignias == null || freeInsignias.Count == 0)
+                        ItemGemSlot insgnMountSlot = mount.Item.SpecialProps.GetGemSlotByIndex(insgnSlotDef.Index);
+                        if (insgnMountSlot == null || !insgnMountSlot.IsValid || !insgnMountSlot.SlottedItem.IsValid)
                         {
-                            // Ищем в сумке все неэкипированные инсигнии (впервый раз)
-                            freeInsignias = EntityManager.LocalPlayer.BagsItems.FindAll(slot => slot.Item.ItemDef.Categories.Contains(ItemCategory.Insignia)
-                                                                                        /* Вариант 2*/
-                                                                                        //slot.Item.ItemDef.Type == ItemType.Gem
-                                                                                        //&& (slot.Item.ItemDef.GemType == (uint)InsigniaType.Barbed 
-                                                                                        //    || slot.Item.ItemDef.GemType == (uint)InsigniaType.Crescent
-                                                                                        //    || slot.Item.ItemDef.GemType == (uint)InsigniaType.Enlightened
-                                                                                        //    || slot.Item.ItemDef.GemType == (uint)InsigniaType.Illuminated
-                                                                                        //    || slot.Item.ItemDef.GemType == (uint)InsigniaType.Regal)
-                                                                                        /* Вариант 3*/
-                                                                                        //slot.Item.ItemDef.InternalName.StartsWith("Insignia", System.StringComparison.OrdinalIgnoreCase)
-                                                                                        );
+                            // обнаружен "пустой слот" знака скакуна
+#if DEBUG_INSERTINSIGNIA
+                            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}: Mount [{mount.Item.ItemDef.InternalName}] has free slot {insgnSlotDef.Index}");
+#endif
+                            // ищем в сумке подходящие инсигнии (знаки скакуна)
                             if (freeInsignias == null || freeInsignias.Count == 0)
                             {
-                                // в инвентаре отсутствуют инсигнии
+                                // Ищем в сумке все неэкипированные инсигнии (впервый раз)
+                                freeInsignias = EntityManager.LocalPlayer.BagsItems.FindAll(slot => slot.Item.ItemDef.Categories.Contains(ItemCategory.Insignia)
+                                                                                            /* Вариант 2*/
+                                                                                            //slot.Item.ItemDef.Type == ItemType.Gem
+                                                                                            //&& (slot.Item.ItemDef.GemType == (uint)InsigniaType.Barbed 
+                                                                                            //    || slot.Item.ItemDef.GemType == (uint)InsigniaType.Crescent
+                                                                                            //    || slot.Item.ItemDef.GemType == (uint)InsigniaType.Enlightened
+                                                                                            //    || slot.Item.ItemDef.GemType == (uint)InsigniaType.Illuminated
+                                                                                            //    || slot.Item.ItemDef.GemType == (uint)InsigniaType.Regal)
+                                                                                            /* Вариант 3*/
+                                                                                            //slot.Item.ItemDef.InternalName.StartsWith("Insignia", System.StringComparison.OrdinalIgnoreCase)
+                                                                                            );
+                                if (freeInsignias.Count == 0)
+                                {
+                                    // в инвентаре отсутствуют инсигнии
 #if DEBUG_INSERTINSIGNIA
-                                ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}: No one insignia found in the Bags");
+                                    ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}: No one insignia found in the Bags");
 #endif
-                                return ActionResult.Skip;
+                                    return ActionResult.Skip;
+                                }
+                                // сортировка списка "инсигний";
+                                freeInsignias.Sort(InsigniaQualityDescendingComparison);
                             }
-                            // сортировка списка "инсигний";
+
+                            // Ищем первую попавшуюся подходящую инсигнию (знак скакуна)
+                            InventorySlot insigniaBagSlot = freeInsignias.Find(insSlot => insSlot.Filled && (insgnSlotDef.Type == (uint)InsigniaType.Universal || insSlot.Item.ItemDef.GemType == insgnSlotDef.Type));
+                            // сортировка списка "инсигний" по убыванию качества;
                             freeInsignias.Sort(InsigniaQualityDescendingComparison);
-                        }
 
-                        // Ищем первую попавшуюся подходящую инсигнию (знак скакуна)
-                        InventorySlot insigniaBagSlot = freeInsignias.Find(insSlot => insSlot.Filled && (insgnSlotDef.Type == (uint)InsigniaType.Universal || insSlot.Item.ItemDef.GemType == insgnSlotDef.Type));
-                        // сортировка списка "инсигний" по убыванию качества;
-                        freeInsignias.Sort(InsigniaQualityDescendingComparison);
-
-                        // экипируем найденный знак
-                        if (insigniaBagSlot != null && insigniaBagSlot.IsValid)
-                        {
-                            mount.Item.GemThisItem(insigniaBagSlot.Item, insgnSlotDef.Index);
-                            ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}: Insert '{insigniaBagSlot.Item.ItemDef.InternalName}' at the slot {insgnSlotDef.Index} of [{mount.Item.ItemDef.InternalName}]");
+                            // экипируем найденный знак
+                            if (insigniaBagSlot != null && insigniaBagSlot.IsValid)
+                            {
+                                mount.Item.GemThisItem(insigniaBagSlot.Item, insgnSlotDef.Index);
+                                ETLogger.WriteLine(LogType.Debug, $"{GetType().Name}: Insert '{insigniaBagSlot.Item.ItemDef.InternalName}' at the slot {insgnSlotDef.Index} of [{mount.Item.ItemDef.InternalName}]");
 #if DEBUG_INSERTINSIGNIA
-                            insertedNum++;
+                                insertedNum++;
 #endif
-                            // Удаляем слот сумки, в котором находился знак, из списка
-                            // если этот слот стал пустым
-                            if (!insigniaBagSlot.Filled)
-                                freeInsignias.Remove(insigniaBagSlot);
-                        }
+                                // Удаляем слот сумки, в котором находился знак, из списка
+                                // если этот слот стал пустым
+                                if (!insigniaBagSlot.Filled)
+                                    freeInsignias.Remove(insigniaBagSlot);
+                            }
+                        } 
                     }
                 }
             }
@@ -239,14 +187,13 @@ namespace EntityCore.Quester.Action
 
         public bool UseHotSpots => false;
 
-        public Vector3 InternalDestination => new Vector3();
+        public Vector3 InternalDestination => Vector3.Empty;
 
         public void InternalReset() { }
 
         public void GatherInfos() { }
 
-        public void OnMapDraw(GraphicsNW graph) { }
-#endif
+        public void OnMapDraw(GraphicsNW graphics) { }
 
         #region Вспомогательные функции
         /// <summary>

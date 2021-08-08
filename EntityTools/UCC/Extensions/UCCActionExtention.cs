@@ -1,14 +1,9 @@
-﻿using Astral.Logic.UCC.Classes;
-using Astral.Logic.UCC.Actions;
-using MyNW.Classes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Astral.Logic.UCC.Actions;
+using Astral.Logic.UCC.Classes;
+using AcTp0Tools.Reflection;
 using EntityTools.UCC.Actions;
+using MyNW.Classes;
 using MyNW.Internals;
-using EntityTools.Tools;
-using EntityTools.Reflection;
 
 namespace EntityTools.UCC.Extensions
 {
@@ -18,12 +13,12 @@ namespace EntityTools.UCC.Extensions
         {
             if (@this is ApproachEntity approachEntity)
                 return approachEntity.UnitRef;
-            else if (@this is DodgeFromEntity dodgeFromEntity)
+            if (@this is DodgeFromEntity dodgeFromEntity)
                 return dodgeFromEntity.UnitRef;
-            else if (@this is Spell spell
+            if (@this is Spell spell
                 && ReflectionHelper.GetPropertyValue(spell, "TargetEntity", out object result))
-                    return result as Entity;
-            else return EntityManager.LocalPlayer;
+                return result as Entity;
+            return EntityManager.LocalPlayer;
         }
     }
 }

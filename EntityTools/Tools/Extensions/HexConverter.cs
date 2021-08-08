@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace EntityTools.Extensions
@@ -28,7 +26,7 @@ namespace EntityTools.Extensions
         {
             if (string.IsNullOrEmpty(str))
                 return new byte[0];
-            else return Encoding.UTF8.GetBytes(str);
+            return Encoding.UTF8.GetBytes(str);
         }
 
 #if ENCRYPTOR || TEST || ENTITYTOOLS
@@ -103,7 +101,7 @@ namespace EntityTools.Extensions
         } 
         private static int GetHexVal(char hex)
         {
-            int val = (int)hex;
+            int val = hex;
             //For uppercase A-F letters:
             return val - (val < 58 ? 48 : 55);
             //For lowercase a-f letters:

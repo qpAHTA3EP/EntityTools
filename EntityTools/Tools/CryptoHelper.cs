@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 #if ENCRYPTOR
 using Extensions;
 using Encrypter;
 #else
-using EntityTools.Extensions;
-using EntityTools.Tools;
+
 #endif
 
 namespace EntityTools.Tools
@@ -128,7 +125,10 @@ namespace EntityTools.Tools
             }
             else Console.WriteLine($"Incorrect Data");
 #else
-                    catch {}
+                    catch
+                    {
+                        // ignored
+                    }
                 }
             }
 #endif
@@ -415,26 +415,28 @@ namespace EntityTools.Tools
 #endif
         public static bool Encrypt_Astral(byte[] data, string cryptKey, out byte[] encryptedData)
         {
-            if (data != null || data.Length > 0)
+            if (data?.Length > 0)
             {
-                MD5CryptoServiceProvider md5CryptoServiceProvider = new MD5CryptoServiceProvider();
-                byte[] key = md5CryptoServiceProvider.ComputeHash(Encoding.UTF8.GetBytes(cryptKey));
-                TripleDESCryptoServiceProvider tripleDESCryptoServiceProvider = new TripleDESCryptoServiceProvider
+                using (MD5CryptoServiceProvider md5CryptoServiceProvider = new MD5CryptoServiceProvider())
                 {
-                    Key = key,
-                    Mode = CipherMode.ECB,
-                    Padding = PaddingMode.PKCS7
-                };
-                try
-                {
-                    encryptedData = tripleDESCryptoServiceProvider.CreateEncryptor().TransformFinalBlock(data, 0, data.Length);
+                    byte[] key = md5CryptoServiceProvider.ComputeHash(Encoding.UTF8.GetBytes(cryptKey));
+                    using (TripleDESCryptoServiceProvider tripleDESCryptoServiceProvider = new TripleDESCryptoServiceProvider())
+                    {
+                        tripleDESCryptoServiceProvider.Key = key;
+                        tripleDESCryptoServiceProvider.Mode = CipherMode.ECB;
+                        tripleDESCryptoServiceProvider.Padding = PaddingMode.PKCS7;
+                        try
+                        {
+                            encryptedData = tripleDESCryptoServiceProvider.CreateEncryptor().TransformFinalBlock(data, 0, data.Length);
+                        }
+                        finally
+                        {
+                            tripleDESCryptoServiceProvider.Clear();
+                            md5CryptoServiceProvider.Clear();
+                        }
+                        return encryptedData != null && encryptedData.Length > 0;
+                    } 
                 }
-                finally
-                {
-                    tripleDESCryptoServiceProvider.Clear();
-                    md5CryptoServiceProvider.Clear();
-                }
-                return encryptedData != null && encryptedData.Length > 0;
             }
             encryptedData = null;
             return false;
@@ -446,26 +448,32 @@ namespace EntityTools.Tools
             {
                 try
                 {
-                    MD5CryptoServiceProvider md5CryptoServiceProvider = new MD5CryptoServiceProvider();
-                    byte[] key = md5CryptoServiceProvider.ComputeHash(Encoding.UTF8.GetBytes(cryptKey));
-                    TripleDESCryptoServiceProvider tripleDESCryptoServiceProvider = new TripleDESCryptoServiceProvider
+                    using (MD5CryptoServiceProvider md5CryptoServiceProvider = new MD5CryptoServiceProvider())
                     {
-                        Key = key,
-                        Mode = CipherMode.ECB,
-                        Padding = PaddingMode.PKCS7
-                    };
-                    try
-                    {
-                        decryptedData = tripleDESCryptoServiceProvider.CreateDecryptor().TransformFinalBlock(data, 0, data.Length);
+                        byte[] key = md5CryptoServiceProvider.ComputeHash(Encoding.UTF8.GetBytes(cryptKey));
+
+                        using (TripleDESCryptoServiceProvider tripleDESCryptoServiceProvider = new TripleDESCryptoServiceProvider())
+                        {
+                            tripleDESCryptoServiceProvider.Key = key;
+                            tripleDESCryptoServiceProvider.Mode = CipherMode.ECB;
+                            tripleDESCryptoServiceProvider.Padding = PaddingMode.PKCS7;
+                            try
+                            {
+                                decryptedData = tripleDESCryptoServiceProvider.CreateDecryptor().TransformFinalBlock(data, 0, data.Length);
+                            }
+                            finally
+                            {
+                                tripleDESCryptoServiceProvider.Clear();
+                                md5CryptoServiceProvider.Clear();
+                            }
+                            return decryptedData != null && decryptedData.Length > 0;  
+                        }
                     }
-                    finally
-                    {
-                        tripleDESCryptoServiceProvider.Clear();
-                        md5CryptoServiceProvider.Clear();
-                    }
-                    return decryptedData != null && decryptedData.Length > 0;
                 }
-                catch { }
+                catch
+                {
+                    // ignored
+                }
             }
             decryptedData = null;
             return false;

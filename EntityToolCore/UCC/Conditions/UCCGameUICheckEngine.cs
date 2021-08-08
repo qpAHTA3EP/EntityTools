@@ -8,37 +8,97 @@ using System.Text.RegularExpressions;
 using EntityTools.Extensions;
 using static Astral.Quester.Classes.Condition;
 using EntityTools;
+using System;
 
 namespace EntityCore.UCC.Conditions
 {
-    public class UCCGameUICheckEngine : IUCCConditionEngine
+    public class UccGameUiCheckEngine : IUccConditionEngine
     {
         #region Данные
         private UCCGameUICheck @this;
 
         private UIGen uiGen;
         private string label = string.Empty;
+        private string _idStr;
         #endregion
 
-        internal UCCGameUICheckEngine(UCCGameUICheck eck)
+        internal UccGameUiCheckEngine(UCCGameUICheck uiGenCheck)
         {
+#if false
             @this = eck;
-#if CORE_INTERFACES
             @this.Engine = this;
-#endif
             @this.PropertyChanged += PropertyChanged;
 
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
+            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}"); 
+#else
+            InternalRebase(uiGenCheck);
+            ETLogger.WriteLine(LogType.Debug, $"{_idStr} initialized: {Label()}");
+#endif
+        }
+        ~UccGameUiCheckEngine()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = null;
+                @this = null;
+            }
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (object.ReferenceEquals(sender, @this))
+            if (ReferenceEquals(sender, @this))
             {
                 if (e.PropertyName == nameof(@this.UiGenID))
                     label = string.Empty;
                 uiGen = null;
             }
+        }
+
+        public bool Rebase(UCCCondition condition)
+        {
+            if (condition is null)
+                return false;
+            if (ReferenceEquals(condition, @this))
+                return true;
+            if (condition is UCCGameUICheck uiGenCheck)
+            {
+                if (InternalRebase(uiGenCheck))
+                {
+                    ETLogger.WriteLine(LogType.Debug, $"{_idStr} reinitialized");
+                    return true;
+                }
+                ETLogger.WriteLine(LogType.Debug, $"{_idStr} rebase failed");
+                return false;
+            }
+
+            string debugStr = string.Concat("Rebase failed. ", condition.GetType().Name, '[', condition.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(UCCGameUICheck) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
+        }
+
+        private bool InternalRebase(UCCGameUICheck execPower)
+        {
+            // Убираем привязку к старому условию
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = null;
+            }
+
+            @this = execPower;
+            @this.PropertyChanged += PropertyChanged;
+
+            _idStr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+
+            @this.Engine = this;
+
+            return true;
         }
 
         public bool IsOK(UCCAction refAction)
@@ -76,9 +136,9 @@ namespace EntityCore.UCC.Conditions
 
         public string Label()
         {
-            if (string.IsNullOrEmpty(label))
-                label = $"{@this.GetType().Name} [{@this._uiGenID}]";
-            else label = @this.GetType().Name;
+            label = string.IsNullOrEmpty(label) 
+                ? $"{@this.GetType().Name} [{@this._uiGenID}]" 
+                : @this.GetType().Name;
 
             return label;
         }
@@ -129,18 +189,19 @@ namespace EntityCore.UCC.Conditions
             if (string.IsNullOrEmpty(uiVar.Value) && string.IsNullOrEmpty(@this._uiGenPropertyValue))
                 result = true;
             else switch (@this._uiGenPropertyValueType)
-                {
-                    case ItemFilterStringType.Simple:
-                        result = uiVar.Value.CompareToSimplePattern(@this._uiGenPropertyValue);
-                        break;
-                    case ItemFilterStringType.Regex:
-                        result = Regex.IsMatch(uiVar.Value, @this._uiGenPropertyValue);
-                        break;
-                }
+            {
+                case ItemFilterStringType.Simple:
+                    result = uiVar.Value.CompareToSimplePattern(@this._uiGenPropertyValue);
+                    break;
+                case ItemFilterStringType.Regex:
+                    //TODO Использовать предкомпилированный Regex
+                    result = Regex.IsMatch(uiVar.Value, @this._uiGenPropertyValue);
+                    break;
+            }
 
             if (@this._propertySign == Presence.Equal)
                 return result;
-            else return !result;
+            return !result;
         }
 
         private bool Validate(UIGen uiGen)

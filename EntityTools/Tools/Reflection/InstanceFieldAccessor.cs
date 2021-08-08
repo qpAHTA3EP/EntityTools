@@ -1,16 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace EntityTools.Reflection
 {
     public static class InstanceFieldAccessorFactory
     {
-        public static InstanceFieldAccessor<ContainerType, FieldType> GetInstanceField<ContainerType, FieldType>(this ContainerType instance, string propName, BindingFlags flags = BindingFlags.Default)
+        public static Func<ContainerType, FieldType> GetInstanceFieldAccessor<ContainerType, FieldType>(string fieldName, BindingFlags flags = BindingFlags.Default)
         {
-            return new InstanceFieldAccessor<ContainerType, FieldType>(instance, propName, flags);
+            if (string.IsNullOrEmpty(fieldName))
+                throw new ArgumentException("Field name is invalid");
+
+            if (flags == BindingFlags.Default)
+                flags = ReflectionHelper.DefaultFlags;
+
+            Type type = typeof(ContainerType);
+            if(type is null)
+                throw new ArgumentException("'ContainerType' template parameter is invalid");
+
+            FieldInfo fi = type.GetField(fieldName, flags | BindingFlags.Instance | BindingFlags.NonPublic);
+            if (fi != null)
+            {
+                if (fi.FieldType.Equals(typeof(FieldType)))
+                {
+                    return instance =>
+                    {
+                        object result = fi.GetValue(instance);
+                        return (FieldType)result;
+                    };
+                }
+            }
+            return null;
+        }
+        public static InstanceFieldAccessor<ContainerType, FieldType> GetInstanceField<ContainerType, FieldType>(this ContainerType instance, string fieldName, BindingFlags flags = BindingFlags.Default)
+        {
+            return new InstanceFieldAccessor<ContainerType, FieldType>(instance, fieldName, flags);
         }
     }
 
@@ -64,7 +87,8 @@ namespace EntityTools.Reflection
                         fieldInfo = fi;
                         return true;
                     }
-                    else return false;
+
+                    return false;
                 }
                 return Initialize(type.BaseType, fieldName, flags);
             }
@@ -82,7 +106,7 @@ namespace EntityTools.Reflection
             {
                 if (IsValid() && fieldInfo.GetValue(instance) is FieldType result)
                     return result;
-                else return default;                
+                return default;
             }
             set
             {

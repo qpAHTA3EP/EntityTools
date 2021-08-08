@@ -1,43 +1,20 @@
-﻿using Astral.Classes.ItemFilter;
-using Astral.Logic.UCC.Classes;
-using Astral.Logic.UCC.Ressources;
-using Astral.Quester.Classes;
-using EntityTools;
-using EntityTools.Extensions;
-using EntityTools.Editors;
-using EntityTools.Enums;
-using EntityTools.Tools;
-using MyNW.Classes;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Text.RegularExpressions;
+using System.Threading;
 using System.Xml.Serialization;
+using Astral.Classes.ItemFilter;
+using Astral.Logic.UCC.Classes;
+using Astral.Quester.Classes;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
+using EntityTools.Editors;
+using EntityTools.Enums;
 
 namespace EntityTools.UCC.Conditions
 {
     public class UCCGameUICheck : UCCCondition, ICustomUCCCondition
     {
-        #region Взаимодействие с EntityToolsCore
-#if CORE_INTERFACES
-        [NonSerialized]
-        internal IUCCConditionEngine Engine;
-#endif
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public UCCGameUICheck()
-        {
-            Sign = Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
-#if CORE_INTERFACES
-            Engine = new UCCConditionProxy(this);
-#endif
-            // EntityTools.Core.Initialize(this);
-        }
-        #endregion
-
-
         #region Опции команды
 #if DEVELOPER
         [Description("The Identifier of the Ingame user interface element")]
@@ -172,16 +149,31 @@ namespace EntityTools.UCC.Conditions
         #endregion
         #endregion
 
+        #region Взаимодействие с EntityToolsCore
+        [NonSerialized]
+        internal IUccConditionEngine Engine;
 
-        #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/) => Engine.IsOK(refAction);
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        bool ICustomUCCCondition.Loked { get => base.Locked; set => base.Locked = value; }
-
-        string ICustomUCCCondition.TestInfos(UCCAction refAction) => Engine.TestInfos(refAction);
+        public UCCGameUICheck()
+        {
+            Sign = Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
+            Engine = new UccConditionProxy(this);
+        }
+        private IUccConditionEngine MakeProxy()
+        {
+            return new UccConditionProxy(this);
+        }
         #endregion
 
+        #region ICustomUCCCondition
+        bool ICustomUCCCondition.IsOK(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).IsOK(refAction);
 
-        public override string ToString() => Engine.Label();
+        bool ICustomUCCCondition.Loсked { get => Locked; set => Locked = value; }
+
+        string ICustomUCCCondition.TestInfos(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).TestInfos(refAction);
+        #endregion
+
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
     }
 }

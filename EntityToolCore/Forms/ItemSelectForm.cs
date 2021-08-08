@@ -2,17 +2,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Linq;
 using System.Windows.Forms;
+using AcTp0Tools.Reflection;
 using DevExpress.XtraEditors;
-using Astral.Controllers;
-using System.Reflection;
-using EntityTools.Reflection;
-using Astral.Logic.UCC.Classes;
 
 namespace EntityCore.Forms
 {
@@ -20,13 +12,6 @@ namespace EntityCore.Forms
     {
         private static readonly Func<List<Type>> PluginsGetTypes = typeof(Astral.Controllers.Plugins).GetStaticFunction<List<Type>>("GetTypes");
 
-#if DELEGATES_FILL
-        public delegate object ProcessingItems(ListBox itemList);
-
-        private ProcessingItems FillList;
-        private ProcessingItems GetSelectedItem;
-
-#endif
         private Action fillListAction;
 
         public ItemSelectForm()
@@ -36,31 +21,9 @@ namespace EntityCore.Forms
 
         #region GetAnInstanceOfType
         /// <summary>
-        /// Выбор типа и конструирование обекта выбранного типа
+        /// Выбор типа и конструирование объекта выбранного типа
         /// </summary>
-        /// <typeparam name="T">базовый тип</typeparam>
-        /// <returns></returns>
         public static bool GetAnInstanceOfType<T>(out T selectedValue, bool includeBase = true) where T : class
-#if DELEGATES_FILL
-        {
-            ItemSelectForm selectForm =
-                (includeBase) ?
-                new ItemSelectForm()
-                {
-                    FillList = FillItems<T>,
-                    GetSelectedItem = GetItem
-                } :
-                new ItemSelectForm()
-                {
-                    FillList = FillDerivedItems<T>,
-                    GetSelectedItem = GetItem
-                };
-
-            if (selectForm.ShowDialog() == DialogResult.OK)
-                return selectForm.GetSelectedItem?.Invoke(selectForm.ItemList) as T;
-            else return null;
-        }
-#else
         {
             ItemSelectForm selectForm = new ItemSelectForm();
             if (includeBase)
@@ -106,7 +69,7 @@ namespace EntityCore.Forms
             return itemList.Items.Count;
         }
         /// <summary>
-        /// Добавление в списко и базового и производных типов
+        /// Добавление в список и базового и производных типов
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="itemList"></param>
@@ -115,8 +78,7 @@ namespace EntityCore.Forms
         {
             FillDerivedItems<T>(itemList);
             itemList.Items.Add(typeof(T));
-            if (itemList.Items.Count > 0)
-                itemList.DisplayMember = "Name";
+            itemList.DisplayMember = "Name";
             return itemList.Items.Count;
         }
 
@@ -131,43 +93,47 @@ namespace EntityCore.Forms
                 return Activator.CreateInstance(t);
             return null;
         }
-#endif
         #endregion
-
-#if DELEGATES_FILL
-        public static object GetAnItem(ProcessingItems fill, ProcessingItems get)
-        {
-            ItemSelectForm selectForm = new ItemSelectForm()
-            {
-                FillList = fill,
-                GetSelectedItem = get
-            };
-            if (selectForm.ShowDialog() == DialogResult.OK)
-                return selectForm.GetSelectedItem?.Invoke(selectForm.ItemList);
-            else return null;
-        } 
-#endif
 
         #region GetAnItem
         /// <summary>
         /// Выбор элемента из списка, формируемого функтором source
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="selectedValue"></param>
-        /// <returns></returns>
-        public static bool GetAnItem<T>(Func<IEnumerable<T>> source, ref T selectedValue)
+        public static bool GetAnItem<T>(Func<IEnumerable<T>> source, ref T selectedValue, string displayMember = "")
         {
             ItemSelectForm selectForm = new ItemSelectForm();
             T value = selectedValue;
             selectForm.fillListAction = () => {
-                    selectForm.ItemList.DataSource = source();
-                    if (value != null) selectForm.ItemList.SelectedItem = value;
-                };
-#if DELEGATES_FILL
-            selectForm.FillList = null;
-            selectForm.GetSelectedItem = null; 
-#endif
+                selectForm.ItemList.DataSource = source();
+                if (value != null) selectForm.ItemList.SelectedItem = value;
+            };
+            selectForm.ItemList.DisplayMember = displayMember;
+
+            if (selectForm.ShowDialog() == DialogResult.OK
+                && selectForm.ItemList.SelectedIndex >= 0)
+            {
+                selectedValue = (T)selectForm.ItemList.SelectedItem;
+                return true;
+            }
+            else return false;
+        }
+
+#if true
+        public static bool GetAnItem<T>(Func<IEnumerable<T>> source, ref T selectedValue, ListControlConvertEventHandler itemFormater)
+        {
+            ItemSelectForm selectForm = new ItemSelectForm();
+            T value = selectedValue;
+            selectForm.fillListAction = () =>
+            {
+                selectForm.ItemList.DataSource = source();
+                if (value != null) selectForm.ItemList.SelectedItem = value;
+            };
+            bool useFormatter = itemFormater != null;
+            if (useFormatter)
+            {
+                selectForm.ItemList.FormattingEnabled = true;
+                selectForm.ItemList.Format += itemFormater;
+            }
 
             if (selectForm.ShowDialog() == DialogResult.OK
                 && selectForm.ItemList.SelectedIndex >= 0)
@@ -177,10 +143,10 @@ namespace EntityCore.Forms
             }
             else
             {
-                //selectedValue = default(T);
                 return false;
             }
         } 
+#endif
         #endregion
 
         #region Обработчики
@@ -192,20 +158,7 @@ namespace EntityCore.Forms
 
         private void btnReload_Click(object sender, EventArgs e)
         {
-#if DELEGATES_FILL
-            FillList?.Invoke(ItemList);
-#else
             fillListAction?.Invoke();
-#endif
-        }
-
-            private void Form_Shown(object sender, EventArgs e)
-        {
-#if DELEGATES_FILL
-            FillList?.Invoke(ItemList);
-#else
-            fillListAction?.Invoke();
-#endif
         }
         #endregion
 

@@ -4,93 +4,152 @@
 //#define REFLECTION_ACCESS
 #define SMART_REFLECTION_ACCESS
 
+using AcTp0Tools;
 using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
 using EntityCore.Entities;
 using EntityTools;
 using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
-using EntityTools.Reflection;
 using EntityTools.UCC.Actions;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
 using System.Threading;
 using System.Xml.Serialization;
 using Unit = Astral.Logic.UCC.Ressources.Enums.Unit;
 
 namespace EntityCore.UCC.Actions
 {
-    public class ExecuteSpecificPowerEngine : IEntityInfos
-#if CORE_INTERFACES
-                 , IUCCActionEngine
+    public class ExecuteSpecificPowerEngine : IUccActionEngine
+#if IEntityDescriptor
+        , IEntityInfos  
 #endif
     {
         #region Данные
         private ExecuteSpecificPower @this;
 
-        private Predicate<Entity> checkEntity { get; set; } = null;
         private Entity entity = null;
         private bool slotedState = false;
         private string label = string.Empty;
+        private string _idStr;
 
-        private int attachedGameProcessId = 0;
+        private int   attachedGameProcessId = 0;
+        private uint  characterContainerId = 0;
+        private uint  powerId = 0;
         private Power power = null;
-#if REFLECTION_ACCESS
-        private static Type movementsType = null;
-#elif SMART_REFLECTION_ACCESS
-        private static readonly StaticPropertyAccessor<Entity> movementSpecificTarget = typeof(Astral.Logic.UCC.Controllers.Movements).GetStaticProperty<Entity>("SpecificTarget");
-        private static readonly StaticPropertyAccessor<int> movementRequireRange = typeof(Astral.Logic.UCC.Controllers.Movements).GetStaticProperty<int>("RequireRange");
-        private static readonly StaticPropertyAccessor<bool> movementRangeIsOk = typeof(Astral.Logic.UCC.Controllers.Movements).GetStaticProperty<bool>("RangeIsOk");
-        #endif
-
         #endregion
 
         internal ExecuteSpecificPowerEngine(ExecuteSpecificPower esp)
         {
-            @this = esp;
-#if CORE_INTERFACES
-            @this.Engine = this;
-#endif
-            @this.PropertyChanged += PropertyChanged;
+            InternalRebase(esp); 
+            ETLogger.WriteLine(LogType.Debug, $"{_idStr} initialized: {Label()}");
+        }
+        ~ExecuteSpecificPowerEngine()
+        {
+            Dispose();
+        }
 
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}");
+        public void Dispose()
+        {
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = null;
+                @this = null;
+            }
         }
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if(object.ReferenceEquals(sender, @this))
+            if(ReferenceEquals(sender, @this))
             {
-                if (object.ReferenceEquals(sender, @this))
+                if (ReferenceEquals(sender, @this))
                 {
+#if false
                     switch (e.PropertyName)
                     {
-                        case "EntityID":
-                            checkEntity = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                        case nameof(@this.EntityID):
+                            checkEntity = initialize_CheckEntity;
                             label = string.Empty;
                             break;
-                        case "EntityIdType":
-                            checkEntity = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                        case nameof(@this.EntityIdType):
+                            checkEntity = initialize_CheckEntity;
                             break;
-                        case "EntityNameType":
-                            checkEntity = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+                        case nameof(@this.EntityNameType):
+                            checkEntity = initialize_CheckEntity;
                             break;
-                        case "PowerID":
+                        case nameof(@this.PowerId):
                             power = null;
                             label = string.Empty;
                             break;
-                        case "CheckInTray":
+                        case nameof(@this.CheckInTray):
                             label = string.Empty;
                             break;
+                    } 
+#else
+                    string prName = e.PropertyName;
+                    if (prName == nameof(@this.EntityID) || prName == nameof(@this.EntityIdType) || prName == nameof(@this.EntityNameType))
+                        _key = null;
+                    else if (prName == nameof(@this.PowerId) || prName == nameof(@this.CheckInTray))
+                    {
+                        power = null;
+                        label = string.Empty;
                     }
+#endif
                     entity = null;
                     power = null;
                 }
             }
+        }
+
+        public bool Rebase(UCCAction action)
+        {
+            if (action is null)
+                return false;
+            if (ReferenceEquals(action, @this))
+                return true;
+            if (action is ExecuteSpecificPower execPower)
+            {
+                if (InternalRebase(execPower))
+                {
+                    ETLogger.WriteLine(LogType.Debug, $"{_idStr} reinitialized");
+                    return true;
+                }
+                ETLogger.WriteLine(LogType.Debug, $"{_idStr} rebase failed");
+                return false;
+            }
+
+            string debugStr = string.Concat("Rebase failed. ", action.GetType().Name, '[', action.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(ExecuteSpecificPower) + '\'');
+            ETLogger.WriteLine(LogType.Error, debugStr);
+            throw new InvalidCastException(debugStr);
+        }
+
+        private bool InternalRebase(ExecuteSpecificPower execPower)
+        {
+            // Убираем привязку к старому условию
+            if (@this != null)
+            {
+                @this.PropertyChanged -= PropertyChanged;
+                @this.Engine = null;//new EntityTools.Core.Proxies.UccActionProxy(@this);
+            }
+
+            @this = execPower;
+            @this.PropertyChanged += PropertyChanged;
+
+#if false
+            checkEntity = initialize_CheckEntity; 
+#else
+            _key = null;
+#endif
+
+            _idStr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+
+            @this.Engine = this;
+
+            return true;
         }
 
         #region IUCCActionEngine
@@ -98,7 +157,7 @@ namespace EntityCore.UCC.Actions
         {
             get
             {
-                Power p = GetCurrentPower();
+                var p = GetCurrentPower();
 
                 return ValidatePower(p)
                         && (!@this._checkPowerCooldown || !p.IsOnCooldown())
@@ -111,17 +170,12 @@ namespace EntityCore.UCC.Actions
 #if DEBUG_ExecuteSpecificPower
             ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower::Run() starts");
 #endif
-#if REFLECTION_ACCESS
-            if (movementsType == null)
-                movementsType = typeof(Astral.Logic.UCC.Controllers.Movements);
-#endif
-
             Power currentPower = GetCurrentPower();
 
             if (!ValidatePower(currentPower))
             {
 #if DEBUG_ExecuteSpecificPower
-                ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Fail to get Power '{@this._powerId}' by 'PowerId'");
+                ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Fail to get Power '{@this._powerId}' by 'PowerId'");
 #endif
                 return false;
             }
@@ -132,64 +186,16 @@ namespace EntityCore.UCC.Actions
                 switch (@this.Target)
                 {
                     case Unit.MostInjuredAlly:
-#if REFLECTION_ACCESS
-                        if (!ReflectionHelper.SetStaticPropertyValue(movementsType, "SpecificTarget", ActionsPlayer.MostInjuredAlly/*, BindingFlags.Static | BindingFlags.NonPublic*/))
-                        {
-#if DEBUG_ExecuteSpecificPower
-                            EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to set UCC.Controllers.Movements.SpecificTarget to 'MostInjuredAlly'");
-#endif
-                            return false;
-                        }
-#elif SMART_REFLECTION_ACCESS
-                        movementSpecificTarget.Value = ActionsPlayer.MostInjuredAlly;
-#else
-                        Astral.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.MostInjuredAlly;
-#endif
+                        AstralAccessors.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.MostInjuredAlly;
                         break;
                     case Unit.StrongestAdd:
-#if REFLECTION_ACCESS
-                        if (!ReflectionHelper.SetStaticPropertyValue(movementsType, "SpecificTarget", ActionsPlayer.AnAdd/*, BindingFlags.Static | BindingFlags.NonPublic*/))
-                        {
-#if DEBUG_ExecuteSpecificPower
-                            EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to set UCC.Controllers.Movements.SpecificTarget to 'AnAdd'");
-#endif
-                            return false;
-                        }
-#elif SMART_REFLECTION_ACCESS
-                        movementSpecificTarget.Value = ActionsPlayer.AnAdd;
-#else
-                        Astral.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.AnAdd;
-#endif
+                        AstralAccessors.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.AnAdd;
                         break;
                     case Unit.StrongestTeamMember:
-#if REFLECTION_ACCESS
-                        if (!ReflectionHelper.SetStaticPropertyValue(movementsType, "SpecificTarget", ActionsPlayer.StrongestTeamMember/*, BindingFlags.Static | BindingFlags.NonPublic*/))
-                        {
-#if DEBUG
-                            EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to set UCC.Controllers.Movements.SpecificTarget to 'StrongestTeamMember'");
-#endif
-                            return false;
-                        }
-#elif SMART_REFLECTION_ACCESS
-                        movementSpecificTarget.Value = ActionsPlayer.StrongestTeamMember;
-#else
-                        Astral.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.StrongestTeamMember;
-#endif
+                        AstralAccessors.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.StrongestTeamMember;
                         break;
                     default:
-#if REFLECTION_ACCESS
-                        if (!ReflectionHelper.SetStaticPropertyValue(movementsType, "SpecificTarget", null/*, BindingFlags.Static | BindingFlags.NonPublic*/))
-                        {
-#if DEBUG_ExecuteSpecificPower
-                            EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to set UCC.Controllers.Movements.SpecificTarget to 'null'");
-#endif
-                            return false;
-                        }
-#elif SMART_REFLECTION_ACCESS
-                        movementSpecificTarget.Value = ActionsPlayer.StrongestTeamMember;
-#else
-                        Astral.Logic.UCC.Controllers.Movements.SpecificTarget = null;
-#endif
+                        AstralAccessors.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.StrongestTeamMember;
                         break;
                 }
                 int effectiveRange = Powers.getEffectiveRange(powerDef);
@@ -203,26 +209,10 @@ namespace EntityCore.UCC.Actions
                     {
                         effectiveRange = 7;
                     }
-#if REFLECTION_ACCESS
-                    if (!ReflectionHelper.SetStaticPropertyValue(movementsType, "RequireRange", effectiveRange - 2/*, BindingFlags.Static | BindingFlags.SetProperty*/))
-                    {
-#if DEBUG_ExecuteSpecificPower
-                        EntityToolsLogger.WriteLine(Astral.Logger.LogType.Debug, $"ExecuteSpecificPower: Fail to set UCC.Controllers.Movements.RequireRange to '{effectiveRange - 2}'");
-#endif
-                        return false;
-                    }
-#elif SMART_REFLECTION_ACCESS
-                    movementRequireRange.Value = effectiveRange - 2;
-#else
-                    Astral.Logic.UCC.Controllers.Movements.RequireRange = range - 2;
-#endif
-#if REFLECTION_ACCESS
-                    while (ReflectionHelper.GetPropertyValue(movementsType, "RangeIsOk", out object RangeIsOk) && RangeIsOk.Equals(true))
-#elif SMART_REFLECTION_ACCESS
-                    while ((bool)movementRangeIsOk)
-#else
-                    while (Astral.Logic.UCC.Controllers.Movements.RangeIsOk)
-#endif
+
+                    AstralAccessors.Logic.UCC.Controllers.Movements.RequireRange = effectiveRange - 2;
+
+                    while (AstralAccessors.Logic.UCC.Controllers.Movements.RangeIsOk)
                     {
                         if (Astral.Logic.UCC.Core.CurrentTarget.IsDead)
                         {
@@ -246,7 +236,7 @@ namespace EntityCore.UCC.Actions
             {
                 castingTime = Powers.getEffectiveTimeCharge(powerDef);
             }
-            Entity target = new Entity(UnitRef.Pointer);//new Entity(TargetEntity.Pointer);
+            Entity target = new Entity(UnitRef.Pointer);
             if (target.ContainerId != EntityManager.LocalPlayer.ContainerId && !target.Location.IsInYawFace)
             {
                 target.Location.Face();
@@ -257,12 +247,12 @@ namespace EntityCore.UCC.Actions
                 }
                 Thread.Sleep(100);
             }
-            double effectiveTimeActivate = (double)Powers.getEffectiveTimeActivate(powerDef) * 1.5;
+            double effectiveTimeActivate = Powers.getEffectiveTimeActivate(powerDef) * 1.5;
             Astral.Classes.Timeout castingTimeout = new Astral.Classes.Timeout(castingTime);
 
             try
             {
-                if (!powerDef.GroundTargeted && !powerDef.Categories.Contains(PowerCategory.IgnorePitch))
+                if (!powerDef.GroundTargeted && !powerDef.Categories.Contains(PowerCategory.Ignorepitch))
                 {
                     target.Location.Face();
 #if DEBUG_ExecuteSpecificPower
@@ -296,13 +286,27 @@ namespace EntityCore.UCC.Actions
                     Thread.Sleep(20);
                 }
             }
-            catch { }
+#if DEBUG_ExecuteSpecificPower
+            catch (Exception e)
+            {
+                ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Catch an exception trying activate power '{currentPower.PowerDef.InternalName}' \n\r{e.Message}");
+            }
+#endif
             finally
             {
 #if DEBUG_ExecuteSpecificPower
                 ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Deactivate ExecPower '{currentPower.PowerDef.InternalName}' on target {target.Name}[{target.InternalName}]");
 #endif
-                Powers.ExecPower(currentPower, target, false);
+                try
+                {
+                    Powers.ExecPower(currentPower, target, false);
+                }
+                catch (Exception e)
+                {
+#if DEBUG_ExecuteSpecificPower
+                    ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Catch an exception trying deactivate power '{currentPower.PowerDef.InternalName}'\n\r {e.Message}");
+#endif
+                }
             }
             if (!@this._forceMaintain)
             {
@@ -317,17 +321,16 @@ namespace EntityCore.UCC.Actions
             {
                 if (!string.IsNullOrEmpty(@this._entityId))
                 {
-                    if (checkEntity == null)
-                        checkEntity = EntityToPatternComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
-                    if (ValidateEntity(entity))
+                    var entityKey = EntityKey;
+                    if (entityKey.Validate(entity))
                         return entity;
-                    else entity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                                 @this._healthCheck, @this._reactionRange,
-                                                                 (@this._reactionZRange > 0) ? @this._reactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference,
-                                                                 @this._regionCheck, null, @this._aura.Checker);
+                    else
+                    {
+                        entity = SearchCached.FindClosestEntity(entityKey, null);
 
-                    if (ValidateEntity(entity))
-                        return entity;
+                        if (entity != null)
+                            return entity;
+                    }
                 }
                 switch (@this.Target)
                 {
@@ -347,24 +350,27 @@ namespace EntityCore.UCC.Actions
 
         public string Label()
         {
-            if (string.IsNullOrEmpty(label))
+            if (!string.IsNullOrEmpty(@this._powerId) && string.IsNullOrEmpty(label))
             {
                 Power currentPower = GetCurrentPower();
 
                 if (ValidatePower(currentPower))
                 {
-                    StringBuilder str = new StringBuilder();
-                    if (@this._checkInTray && (slotedState = checkIsSlotted))
-                        str.Append("[Slotted] ");
                     PowerDef powDef = currentPower.EffectivePowerDef();
-                    if (powDef.DisplayName.Length > 0)
-                        str.Append(powDef.DisplayName);
-                    else str.Append(powDef.InternalName);
-
-                    label = str.ToString();
+                    if (powDef != null && powDef.IsValid)
+                        label = string.Concat((@this._checkInTray && (slotedState = СurrentPowerIsSlotted)) ? "[Slotted] " : string.Empty,
+                            (powDef.DisplayName.Length > 0) ? powDef.DisplayName : powDef.InternalName);
                 }
-
-                label = "Unknow Power";
+                else
+                {
+                    var powerDefByPowerId = Powers.GetPowerDefByPowerId(@this._powerId);
+                    if (powerDefByPowerId.IsValid)
+                    {
+                        label = string.Concat(powerDefByPowerId.DisplayName, " (Unknown Power)");
+                    }
+                }
+                if (string.IsNullOrEmpty(label))
+                    label = "Unknow Power";
             }
 
             return label;
@@ -374,28 +380,31 @@ namespace EntityCore.UCC.Actions
         #region Вспомогательные функции
         [XmlIgnore]
         [Browsable(false)]
-        private bool checkIsSlotted => power?.IsInTray == true;
+        private bool СurrentPowerIsSlotted => power?.IsInTray == true;
         private bool ValidatePower(Power p)
         {
             return attachedGameProcessId == Astral.API.AttachedGameProcess.Id
-                && p != null && p.IsValid && p.PowerDef.InternalName == @this._powerId;
-        }
-        private bool ValidateEntity(Entity e)
-        {
-            return e != null && e.IsValid && checkEntity?.Invoke(e) == true;
+                && characterContainerId == EntityManager.LocalPlayer.ContainerId
+                && p != null 
+                && (p.PowerId == powerId
+                    || p.PowerDef.InternalName == @this._powerId 
+                    || p.EffectivePowerDef().InternalName == @this._powerId);
         }
         private Power GetCurrentPower()
         {
             if (!ValidatePower(power))
             {
                 attachedGameProcessId = Astral.API.AttachedGameProcess.Id;
+                characterContainerId = EntityManager.LocalPlayer.ContainerId;
                 power = Powers.GetPowerByInternalName(@this._powerId);
+                powerId = power?.PowerId ?? 0;
             }
             return power;
         }
         #endregion
 
 
+#if IEntityDescriptor
         public bool EntityDiagnosticString(out string infoString)
         {
             StringBuilder sb = new StringBuilder();
@@ -403,26 +412,21 @@ namespace EntityCore.UCC.Actions
             sb.Append("EntityID: ").AppendLine(@this._entityId);
             sb.Append("EntityIdType: ").AppendLine(@this._entityIdType.ToString());
             sb.Append("EntityNameType: ").AppendLine(@this._entityNameType.ToString());
-            //sb.Append("EntitySetType: ").AppendLine(@this._entitySetType.ToString());
             sb.Append("HealthCheck: ").AppendLine(@this._healthCheck.ToString());
             sb.Append("ReactionRange: ").AppendLine(@this._reactionRange.ToString());
             sb.Append("ReactionZRange: ").AppendLine(@this._reactionZRange.ToString());
             sb.Append("RegionCheck: ").AppendLine(@this._regionCheck.ToString());
             sb.Append("Aura: ").AppendLine(@this._aura.ToString());
-            //if (@this._customRegionNames != null && @this._customRegionNames.Count > 0)
-            //{
-            //    sb.Append("RegionCheck: {").Append(@this._customRegionNames[0]);
-            //    for (int i = 1; i < @this._customRegionNames.Count; i++)
-            //        sb.Append(", ").Append(@this._customRegionNames[i]);
-            //    sb.AppendLine("}");
-            //}
             sb.AppendLine();
-            //sb.Append("NeedToRun: ").AppendLine(NeedToRun.ToString());
-            //sb.AppendLine();
 
             // список всех Entity, удовлетворяющих условиям
+#if false
             LinkedList<Entity> entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                                     @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck);
+                                                                         @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck); 
+#else
+            var entityKey = EntityKey;
+            LinkedList<Entity> entities = SearchCached.FindAllEntity(entityKey);
+#endif
 
 
             // Количество Entity, удовлетворяющих условиям
@@ -432,8 +436,12 @@ namespace EntityCore.UCC.Actions
             sb.AppendLine();
 
             // Ближайшее Entity (найдено при вызове ie.NeedToRun, поэтому строка ниже закомментирована)
+#if false
             entity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                    @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck);
+                                                        @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck); 
+#else
+            entity = SearchCached.FindClosestEntity(entityKey, null);
+#endif
             if (entity != null)
             {
                 bool distOk = entity.Location.Distance3DFromPlayer < @this._reactionRange;
@@ -464,6 +472,52 @@ namespace EntityCore.UCC.Actions
 
             infoString = sb.ToString();
             return true;
+        } 
+#endif
+
+#if true
+        /// <summary>
+        /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
+        /// </summary>
+        public EntityCacheRecordKey EntityKey
+        {
+            get
+            {
+                if (_key is null)// && (@this._entityNameType == EntityNameType.Empty || !string.IsNullOrEmpty(@this._entityId)))
+                    _key = new EntityCacheRecordKey(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete);
+                return _key;
+            }
         }
+        private EntityCacheRecordKey _key;
+#else
+        private Predicate<Entity> checkEntity { get; set; } = null;
+        private bool ValidateEntity(Entity e)
+        {
+            return e != null && e.IsValid && checkEntity?.Invoke(e) == true;
+        }
+        /// <summary>
+        /// Метод, инициализирующий функтор <see cref="checkEntity"/>,
+        /// использующийся для проверки сущности <paramref name="e"/> на соответствия идентификатору <see cref="EntityID"/>
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        private bool initialize_CheckEntity(Entity e)
+        {
+            Predicate<Entity> predicate = EntityComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+
+            bool extendedDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
+            string currentMethodName = extendedDebugInfo ? string.Concat(actionIDstr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
+            if (predicate != null)
+            {
+                if (extendedDebugInfo)
+                    ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Initialize '" + nameof(checkEntity) + '\''));
+                checkEntity = predicate;
+                return e != null && checkEntity(e);
+            }
+            else if (extendedDebugInfo)
+                ETLogger.WriteLine(LogType.Error, string.Concat(currentMethodName, ": Fail to initialize " + nameof(checkEntity) + '\''));
+            return false;
+        } 
+#endif
     }
 }

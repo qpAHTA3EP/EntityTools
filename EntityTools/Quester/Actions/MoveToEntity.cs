@@ -1,35 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Xml.Serialization;
-using Astral.Classes.ItemFilter;
+﻿using Astral.Classes.ItemFilter;
 using Astral.Logic.Classes.Map;
-using EntityTools.Editors;
-using MyNW.Classes;
-using EntityTools.Enums;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
+using EntityTools.Editors;
+using EntityTools.Enums;
+using EntityTools.Tools.CustomRegions;
+using MyNW.Classes;
+using System;
+using System.ComponentModel;
+using System.Drawing.Design;
+using System.Runtime.CompilerServices;
+using System.Xml.Serialization;
+using Action = Astral.Quester.Classes.Action;
 
 namespace EntityTools.Quester.Actions
 {
     [Serializable]
-    public class MoveToEntity : Astral.Quester.Classes.Action, INotifyPropertyChanged
+    public class MoveToEntity : Action, INotifyPropertyChanged, IEntityDescriptor
     {
-        #region Взаимодействие с ядром EntityToolsCore
-        public event PropertyChangedEventHandler PropertyChanged;
-
-#if CORE_INTERFACES
-        [NonSerialized]
-        internal IQuesterActionEngine Engine;
-#endif
-
-        public MoveToEntity()
-        {
-            Engine = new QuesterActionProxy(this);
-        }
-        #endregion
-
         #region Опции команды
 #if DEVELOPER
         [Description("ID of the Entity for the search")]
@@ -46,7 +34,7 @@ namespace EntityTools.Quester.Actions
                 if (_entityId != value)
                 {
                     _entityId = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityID)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -68,7 +56,7 @@ namespace EntityTools.Quester.Actions
                 if (_entityIdType != value)
                 {
                     _entityIdType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityIdType)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -88,7 +76,7 @@ namespace EntityTools.Quester.Actions
                 if (_entityNameType != value)
                 {
                     _entityNameType = value;
-                    //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityNameType)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -109,11 +97,11 @@ namespace EntityTools.Quester.Actions
                 if (_regionCheck != value)
                 {
                     _regionCheck = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RegionCheck)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal bool _regionCheck = false;
+        internal bool _regionCheck;
 
 #if DEVELOPER
         [Description("Check if Entity's health greater than zero:\n" +
@@ -127,17 +115,17 @@ namespace EntityTools.Quester.Actions
         {
             get => _healthCheck; set
             {
-                if (_healthCheck = value)
+                if (_healthCheck != value)
                 {
                     _healthCheck = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HealthCheck)));
+                    NotifyPropertyChanged();
                 }
             }
         }
         internal bool _healthCheck = true;
 
 #if DEVELOPER
-        [Description("True: Do not change the target Entity while it is alive or until the Bot within 'Distance' of it\n" +
+        [Description("True: Do not change the target Entity while it is alive or until the Bot within '"+nameof(Distance)+"' of it\n" +
                      "False: Constantly scan an area and target the nearest Entity")]
         [Category("Optional")]
 #else
@@ -150,7 +138,7 @@ namespace EntityTools.Quester.Actions
                 if (_holdTargetEntity != value)
                 {
                     _holdTargetEntity = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HoldTargetEntity)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -167,14 +155,14 @@ namespace EntityTools.Quester.Actions
         {
             get => _reactionRange; set
             {
-                if (_reactionRange != value)
+                if (Math.Abs(_reactionRange - value) > 0.1f)
                 {
                     _reactionRange = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionRange)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal float _reactionRange = 0;
+        internal float _reactionRange;
 
 #if DEVELOPER
         [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
@@ -187,23 +175,25 @@ namespace EntityTools.Quester.Actions
         {
             get => _reactionZRange; set
             {
-                if (_reactionZRange != value)
+                if (Math.Abs(_reactionZRange - value) > 0.1f)
                 {
                     _reactionZRange = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionZRange)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal float _reactionZRange = 0;
+        internal float _reactionZRange;
 
 #if DEVELOPER
         [Description("CustomRegion names collection")]
-        [Editor(typeof(CustomRegionListEditor), typeof(UITypeEditor))]
+        [Editor(typeof(CustomRegionCollectionEditor), typeof(UITypeEditor))]
         [Category("Optional")]
 #else
         [Browsable(false)]
 #endif
-        public List<string> CustomRegionNames
+        [XmlElement("CustomRegionNames")]
+        [NotifyParentProperty(true)]
+        public CustomRegionCollection CustomRegionNames
         {
             get => _customRegionNames;
             set
@@ -211,34 +201,36 @@ namespace EntityTools.Quester.Actions
                 if (_customRegionNames != value)
                 {
                     _customRegionNames = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionNames)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal List<string> _customRegionNames = new List<string>();
+        internal CustomRegionCollection _customRegionNames = new CustomRegionCollection();
 
 
 #if DEVELOPER
-        [Description("Distance to the Entity by which it is necessary to approach")]
+        [Description("Distance to the Entity by which it is necessary to approach.\n" +
+                     "Keep in mind that the distance below 5 is too small to display on the Mapper")]
         [Category("Interruptions")]
 #else
         [Browsable(false)]
 #endif
+
         public float Distance
         {
             get => _distance; set
             {
-                if (_distance != value)
+                if (Math.Abs(_distance - value) > 0.1f)
                 {
                     _distance = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Distance)));
+                    NotifyPropertyChanged();
                 }
             }
         }
         internal float _distance = 30;
 
 #if DEVELOPER
-        [Description("Enable 'IgnoreCombat' profile value while playing action")]
+        [Description("Enable '"+nameof(IgnoreCombat)+"' profile value while playing action")]
         [Category("Interruptions")]
 #else
         [Browsable(false)]
@@ -250,29 +242,20 @@ namespace EntityTools.Quester.Actions
                 if (_ignoreCombat != value)
                 {
                     _ignoreCombat = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IgnoreCombat)));
+                    NotifyPropertyChanged();
                 }
             }
         }
         internal bool _ignoreCombat = true;
 
-        //TODO: Добавить опцию, которая автоматически прерывать бой при удалении от заданного Entity.
-        // - автоматическая вставлка/удаление (при завершении команды) AbortCombat
-        // - фоновый процесс
-        // - делегат-аргумент для CombatUnit
-
-        //TODO: Исправить описание
 #if DEVELOPER
-        //[Description("Check the distance to Target entity during the battle and abort combat if it becomes greater the 'MaintainCombatDistance'\n" +
-        //             "However the distance checking is not performed if the value less than 'Distance'")]
-        [Description("The battle is aborted outside 'AbortCombatDistance' radius from the target entity.\n" +
-                     "The combat is restored within the 'Distance' radius.\n" +
-                     "However, this is not performed if the value less than 'Distance' or 'IgnoreCombat' is False.")]
+        [Description("The battle is aborted outside '"+nameof(AbortCombatDistance) +"' radius from the target entity.\n" +
+                     "The combat is restored within the '"+nameof(Distance)+"' radius.\n" +
+                     "However, this is not performed if the value less than '"+ nameof(Distance) +"' or '"+nameof(IgnoreCombat)+"' is False.")]
         [Category("Interruptions")]
 #else
         [Browsable(false)]
 #endif
-        //[XmlElement("AbortCombatDistance")]
         public uint AbortCombatDistance
         {
             get => _abortCombatDistance; set
@@ -280,11 +263,11 @@ namespace EntityTools.Quester.Actions
                 if (_abortCombatDistance != value)
                 {
                     _abortCombatDistance = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AbortCombatDistance)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal uint _abortCombatDistance = 0;
+        internal uint _abortCombatDistance;
 
 #if DEVELOPER
         [Description("True: Complete an action when the Entity is closer than 'Distance'\n" +
@@ -300,11 +283,33 @@ namespace EntityTools.Quester.Actions
                 if (_stopOnApproached != value)
                 {
                     _stopOnApproached = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StopOnApproached)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal bool _stopOnApproached = false;
+        internal bool _stopOnApproached;
+
+#if false
+#if DEVELOPER
+        [Description("True: Complete an action when the Entity is closer than 'Distance'\n" +
+                     "False: Follow an Entity regardless of its distance")]
+        [Category("Interruptions")]
+#else
+        [Browsable(false)]
+#endif
+        public bool StopOnEntityAbsent
+        {
+            get => _stopOnEntityAbsent; set
+            {
+                if (_stopOnEntityAbsent != value)
+                {
+                    _stopOnEntityAbsent = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        internal bool _stopOnEntityAbsent; 
+#endif
 
 #if DEVELOPER
         [Description("True: Clear the list of attackers and attack the target Entity when it is approached\n" +
@@ -317,20 +322,47 @@ namespace EntityTools.Quester.Actions
         {
             get => _attackTargetEntity; set
             {
-                if (_attackTargetEntity = value)
+                if (_attackTargetEntity != value)
                 {
                     _attackTargetEntity = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AttackTargetEntity)));
+                    NotifyPropertyChanged();
                 }
             }
         }
         internal bool _attackTargetEntity = true;
 
+        //TODO Добавить опции IgnoreCombatMinHP, EntitySearchTime
+
+#if DEVELOPER
+        [Description("Reset current HotSpot after approaching the target Entity")]
+#else
+        [Browsable(false)]
+#endif
+        public bool ResetCurrentHotSpot
+        {
+            get => _resetCurrentHotSpot; set
+            {
+                if (_resetCurrentHotSpot != value)
+                {
+                    _resetCurrentHotSpot = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        internal bool _resetCurrentHotSpot = false;
+
 #if DEVELOPER
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
         [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
-        public string TestInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>";
+        public string TestInfo => @"Нажми на кнопку '...' чтобы увидеть больше =>";
+
+#if false
+        [XmlIgnore]
+        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
+        [Description("Нажми на кнопку '...' чтобы увидеть информацию о текущей цели")]
+        public string TargetInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>"; 
+#endif
 #endif
 
         [XmlIgnore]
@@ -338,7 +370,34 @@ namespace EntityTools.Quester.Actions
         public override string Category => "Basic";
         #endregion
 
-#if CORE_INTERFACES
+        #region Взаимодействие с ядром EntityToolsCore
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            Engine.OnPropertyChanged(this, propertyName);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        [XmlIgnore]
+        [NonSerialized]
+        private IQuesterActionEngine Engine;
+
+        public MoveToEntity()
+        {
+            Engine = new QuesterActionProxy(this);
+        }
+
+        public void Bind(IQuesterActionEngine engine)
+        {
+            Engine = engine;
+        }
+        public void Unbind()
+        {
+            Engine = new QuesterActionProxy(this);
+            PropertyChanged = null;
+        }
+        #endregion
+
         // Интерфес Quester.Action, реализованный через ActionEngine
         public override bool NeedToRun => Engine.NeedToRun;
         public override ActionResult Run() => Engine.Run();
@@ -351,6 +410,5 @@ namespace EntityTools.Quester.Actions
         public override void GatherInfos() => Engine.GatherInfos();
         public override void InternalReset() => Engine.InternalReset();
         public override void OnMapDraw(GraphicsNW graph) => Engine.OnMapDraw(graph);
-#endif
     }
 }

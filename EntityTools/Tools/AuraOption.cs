@@ -1,21 +1,19 @@
-﻿using Astral.Classes.ItemFilter;
-using EntityTools.Extensions;
-using EntityTools.Editors;
-using EntityTools.Enums;
-using MyNW.Classes;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Xml.Serialization;
-using Sign = Astral.Logic.UCC.Ressources.Enums.Sign;
+using Astral.Classes.ItemFilter;
+using EntityTools.Editors;
+using MyNW.Classes;
+using AstralSign = Astral.Logic.UCC.Ressources.Enums.Sign;
 
 namespace EntityTools.Tools
 {
     [Serializable]
     public class AuraOption
     {
+        Predicate<string> _idComparer;
+
 #if DEVELOPER
         [Description("An Identifier of the Aura which is checked on the the Entity")]
         [Editor(typeof(AuraIdEditor), typeof(UITypeEditor))]
@@ -27,11 +25,9 @@ namespace EntityTools.Tools
             get => _auraId;
             set
             {
-                if (_auraId != value)
-                {
-                    _auraId = value;
-                    patternPos = value.GetSimplePatternPosition(out auraPattern);
-                }
+                _auraId = value;
+                _idComparer = _auraId.GetComparer(_auraNameType);
+                _label = string.Empty;
             }
         }
         internal string _auraId;
@@ -39,132 +35,148 @@ namespace EntityTools.Tools
 #if !DEVELOPER
         [Browsable(false)]
 #endif
-        public ItemFilterStringType AuraNameType { get; set; } = ItemFilterStringType.Simple;
-
+        public ItemFilterStringType AuraNameType
+        {
+            get => _auraNameType;
+            set
+            {
+                _auraNameType = value;
+                _idComparer = _auraId.GetComparer(_auraNameType);
+            }
+        }
+        private ItemFilterStringType _auraNameType = ItemFilterStringType.Simple;
 #if !DEVELOPER
         [Browsable(false)]
 #endif
         public int Stacks
         {
-            get => _stacks; set
+            get => _stacks;
+            set
             {
                 _stacks = value;
+                _label = string.Empty;
             }
         }
-        internal int _stacks = 0;
+        internal int _stacks;
 
 #if !DEVELOPER
         [Browsable(false)]
 #endif
-        public Sign Sign
+        public AstralSign Sign
         {
-            get => _sign; set
+            get => _sign;
+            set
             {
                 _sign = value;
+                _checker = null;
+                _label = string.Empty;
             }
         }
-        internal Sign _sign = Sign.Superior;
+        internal AstralSign _sign = AstralSign.Superior;
 
-        private string auraPattern;
-        private SimplePatternPos patternPos = SimplePatternPos.None;
-
+        /// <summary>
+        /// Предикат, проверяющий наличие заданной ауры на <seealso cref="Entity"/>
+        /// </summary>
         [XmlIgnore]
         [Browsable(false)]
-        public Predicate<Entity> Checker
+        public Predicate<Entity> IsMatch
         {
             get
             {
                 if (!string.IsNullOrEmpty(_auraId))
-                    if (Sign == Sign.Superior)
-                        switch (AuraNameType)
+                {
+                    if (_checker is null)
+                    {
+                        if (_idComparer is null)
+                            _idComparer = _auraId.GetComparer(_auraNameType);
+                        switch (Sign)
                         {
-                            case ItemFilterStringType.Simple:
-                                return AuraCheck_SimpleSuperrior;
-                            case ItemFilterStringType.Regex:
-                                return AuraCheck_RegexSuperrior;
+                            case AstralSign.Inferior:
+                                _checker = AuraCheck_Inferior;
+                                break;
+                            case AstralSign.Superior:
+                                _checker = AuraCheck_Superior;
+                                break;
+                            case AstralSign.Equal:
+                                _checker = AuraCheck_Equal;
+                                break;
+                            case AstralSign.NotEqual:
+                                _checker = AuraCheck_NotEqual;
+                                break;
                         }
-                    else switch (AuraNameType)
-                        {
-                            case ItemFilterStringType.Simple:
-                                return AuraCheck_Simple;
-                            case ItemFilterStringType.Regex:
-                                return AuraCheck_Regex;
-                        }
+                    }
+                    return _checker;
+                }
                 return null;
             }
         }
+        Predicate<Entity> _checker;
 
-#region Методы_сравнения
-        private bool AuraCheck_SimpleSuperrior(Entity e)
+        #region Методы_сравнения
+        private bool AuraCheck_Superior(Entity e)
         {
             int num = 0;
             foreach (var mod in e.Character.Mods)
             {
-                if (mod.PowerDef.InternalName.CompareToSimplePattern(patternPos, auraPattern))
+                if (_idComparer(mod.PowerDef.InternalName))
                 {
                     num++;
-                    if (num > Stacks)
+                    if (num > _stacks)
                         return true;
                 }
             }
             return num > Stacks;
         }
-
-        private bool AuraCheck_Simple(Entity e)
-        {
-            int num = e.Character.Mods.Count(m => m.PowerDef.InternalName.CompareToSimplePattern(patternPos, auraPattern));
-            switch (Sign)
-            {
-                case Sign.Equal:
-                    return num == Stacks;
-                case Sign.NotEqual:
-                    return num != Stacks;
-                case Sign.Inferior:
-                    return num < Stacks;
-                case Sign.Superior:
-                    return num > Stacks;
-            }
-            return false;
-        }
-
-        private bool AuraCheck_RegexSuperrior(Entity e)
+        private bool AuraCheck_Inferior(Entity e)
         {
             int num = 0;
             foreach (var mod in e.Character.Mods)
             {
-                if (Regex.IsMatch(mod.PowerDef.InternalName, auraPattern))
+                if (_idComparer(mod.PowerDef.InternalName))
                 {
                     num++;
-                    if (num > Stacks)
-                        return true;
+                    if (num >= _stacks)
+                        return false;
                 }
             }
-            return num > Stacks;
+            return num < _stacks;
         }
-
-        private bool AuraCheck_Regex(Entity e)
+        private bool AuraCheck_Equal(Entity e)
         {
-            int num = e.Character.Mods.Count(m => Regex.IsMatch(m.PowerDef.InternalName, auraPattern));
-            switch (Sign)
+            int num = 0;
+            foreach (var mod in e.Character.Mods)
             {
-                case Sign.Equal:
-                    return num == Stacks;
-                case Sign.NotEqual:
-                    return num != Stacks;
-                case Sign.Inferior:
-                    return num < Stacks;
-                case Sign.Superior:
-                    return num > Stacks;
+                if (_idComparer(mod.PowerDef.InternalName))
+                {
+                    num++;
+                    if (num > _stacks)
+                        return false;
+                }
             }
-            return false;
+            return num == _stacks;
         }
-#endregion
+        private bool AuraCheck_NotEqual(Entity e)
+        {
+            int num = 0;
+            foreach (var mod in e.Character.Mods)
+            {
+                if (_idComparer(mod.PowerDef.InternalName))
+                    num++;
+            }
+            return num != _stacks;
+        }
+        #endregion
 
         public override string ToString()
         {
-            if (string.IsNullOrEmpty(_auraId))
-                return "Empty";
-            else return $"{_auraId} {Sign} {Stacks}";
+            if (!string.IsNullOrEmpty(_label))
+            {
+                if (string.IsNullOrEmpty(_auraId))
+                    _label = "Empty";
+                else _label = $"{_auraId} {_sign} {_stacks}"; 
+            }
+            return _label;
         }
+        string _label;
     }
 }

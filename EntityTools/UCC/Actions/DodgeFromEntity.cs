@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Threading;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Actions;
@@ -16,27 +17,8 @@ using static Astral.Logic.UCC.Ressources.Enums;
 namespace EntityTools.UCC.Actions
 {
     [Serializable]
-    public class DodgeFromEntity : UCCAction
+    public class DodgeFromEntity : UCCAction, IEntityDescriptor
     {
-        #region Взаимодействие с EntityToolsCore
-        private Dodge dodge = new Dodge();
-#if CORE_INTERFACES
-        [NonSerialized]
-        internal IUCCActionEngine Engine;
-#endif
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public DodgeFromEntity()
-        {
-            Target = Unit.Player;
-            dodge.Direction = DodgeDirection.DodgeSmart;
-#if CORE_INTERFACES
-            Engine = new UCCActionProxy(this);
-#endif
-            // EntityTools.Core.Initialize(this);
-        }
-        #endregion
-
         #region Опции команды
 #if DEVELOPER
         [Description("ID of the Entity for the search")]
@@ -229,7 +211,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal float _reactionZRange = 0;
+        internal float _reactionZRange;
 
 #if DEVELOPER
         [DisplayName("Moving time")]
@@ -282,7 +264,7 @@ namespace EntityTools.UCC.Actions
         #region Hide Inherited Properties
         [XmlIgnore]
         [Browsable(false)]
-        public new Astral.Logic.UCC.Ressources.Enums.Unit Target { get; set; }
+        public new Unit Target { get; set; }
 
         [XmlIgnore]
         [Browsable(false)]
@@ -294,37 +276,53 @@ namespace EntityTools.UCC.Actions
         #endregion
         #endregion
 
-        public override bool NeedToRun => Engine.NeedToRun;
+        #region Взаимодействие с EntityToolsCore
+        private Dodge dodge = new Dodge();
 
-        public override bool Run() => Engine.Run();
+        [NonSerialized]
+        internal IUccActionEngine Engine;
 
-        /// <summary>
-        /// Ссылка на ближайший к персонажу Entity
-        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public DodgeFromEntity()
+        {
+            Target = Unit.Player;
+            dodge.Direction = DodgeDirection.DodgeSmart;
+            Engine = new UccActionProxy(this);
+        }
+        private IUccActionEngine MakeProxy()
+        {
+            return new UccActionProxy(this);
+        }
+        #endregion
+
+        #region Интерфейс команды
+        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).NeedToRun;
+        public override bool Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Run();
         [XmlIgnore]
         [Browsable(false)]
-        public Entity UnitRef => Engine.UnitRef;
-
-        public override string ToString() => Engine.Label();
+        public Entity UnitRef => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).UnitRef;
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
+        #endregion
 
         public override UCCAction Clone()
         {
-            return base.BaseClone(new DodgeFromEntity
+            return BaseClone(new DodgeFromEntity
             {
-                _entityId = this._entityId,
-                _entityIdType = this._entityIdType,
-                _entityNameType = this._entityNameType,
-                _regionCheck = this._regionCheck,
-                _healthCheck = this._healthCheck,
-                _entityRadius = this._entityRadius,
-                _reactionRange = this._reactionRange,
-                _reactionZRange = this._reactionZRange,
+                _entityId = _entityId,
+                _entityIdType = _entityIdType,
+                _entityNameType = _entityNameType,
+                _regionCheck = _regionCheck,
+                _healthCheck = _healthCheck,
+                _entityRadius = _entityRadius,
+                _reactionRange = _reactionRange,
+                _reactionZRange = _reactionZRange,
                 _aura = new AuraOption
                 {
-                    AuraName = this._aura.AuraName,
-                    AuraNameType = this._aura.AuraNameType,
-                    Sign = this._aura.Sign,
-                    Stacks = this._aura.Stacks
+                    AuraName = _aura.AuraName,
+                    AuraNameType = _aura.AuraNameType,
+                    Sign = _aura.Sign,
+                    Stacks = _aura.Stacks
                 }
             });
         }

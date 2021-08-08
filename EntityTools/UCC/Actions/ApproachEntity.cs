@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Threading;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
-using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
@@ -15,24 +15,8 @@ using MyNW.Classes;
 namespace EntityTools.UCC.Actions
 {
     [Serializable]
-    public class ApproachEntity : UCCAction, INotifyPropertyChanged
+    public class ApproachEntity : UCCAction, INotifyPropertyChanged, IEntityDescriptor
     {
-        #region Взаимодействие с EntityToolsCore
-#if CORE_INTERFACES
-        [NonSerialized]
-        internal IUCCActionEngine Engine;
-#endif
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public ApproachEntity()
-        {
-#if CORE_INTERFACES
-            Engine = new UCCActionProxy(this);
-#endif
-            // EntityTools.Core.Initialize(this);
-        }
-        #endregion
-
         #region Опции команды
 #if DEVELOPER
         [Description("ID of the Entity for the search")]
@@ -169,7 +153,8 @@ namespace EntityTools.UCC.Actions
 #endif
         public AuraOption Aura
         {
-            get => _aura; set
+            get => _aura;
+            set
             {
                 if (_aura != value)
                 {
@@ -220,7 +205,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal float _reactionZRange = 0;
+        internal float _reactionZRange;
 
 #if DEVELOPER
         [XmlIgnore]
@@ -246,33 +231,49 @@ namespace EntityTools.UCC.Actions
 
         #endregion
 
+        #region Взаимодействие с EntityToolsCore
+        [NonSerialized]
+        internal IUccActionEngine Engine;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public ApproachEntity()
+        {
+            Engine = new UccActionProxy(this);
+        }
+        private IUccActionEngine MakeProxy()
+        {
+            return new UccActionProxy(this);
+        }
+        #endregion
+
         #region Интерфейс команды
-        public override bool NeedToRun => Engine.NeedToRun;
-        public override bool Run() => Engine.Run();
+        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).NeedToRun;
+        public override bool Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Run();
         [XmlIgnore]
         [Browsable(false)]
-        public Entity UnitRef => Engine.UnitRef;
-        public override string ToString() => Engine.Label();
+        public Entity UnitRef => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).UnitRef;
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
         #endregion
 
         public override UCCAction Clone()
         {
-            return base.BaseClone(new ApproachEntity
+            return BaseClone(new ApproachEntity
             {
-                _entityId = this._entityId,
-                _entityIdType = this._entityIdType,
-                _entityNameType = this._entityNameType,
-                _regionCheck = this._regionCheck,
-                _healthCheck = this._healthCheck,
-                _reactionRange = this._reactionRange,
-                _reactionZRange = this._reactionZRange,
-                _entityRadius = this._entityRadius,
+                _entityId = _entityId,
+                _entityIdType = _entityIdType,
+                _entityNameType = _entityNameType,
+                _regionCheck = _regionCheck,
+                _healthCheck = _healthCheck,
+                _reactionRange = _reactionRange,
+                _reactionZRange = _reactionZRange,
+                _entityRadius = _entityRadius,
                 _aura = new AuraOption
                 {
-                    AuraName = this._aura.AuraName,
-                    AuraNameType = this._aura.AuraNameType,
-                    Sign = this._aura.Sign,
-                    Stacks = this._aura.Stacks
+                    AuraName = _aura.AuraName,
+                    AuraNameType = _aura.AuraNameType,
+                    Sign = _aura.Sign,
+                    Stacks = _aura.Stacks
                 }
             });
         }

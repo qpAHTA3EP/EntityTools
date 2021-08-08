@@ -1,29 +1,24 @@
-﻿using EntityTools.Quester.Conditions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
+using Astral.Quester.Classes;
+using EntityTools.Quester.Conditions;
+using AcTp0Tools.Reflection;
+using EntityTools.Core.Interfaces;
 
 namespace EntityTools.Core.Proxies
 {
     internal class QuesterConditionProxy : IQuesterConditionEngine
     {
-        Astral.Quester.Classes.Condition condition;
-        internal QuesterConditionProxy(Astral.Quester.Classes.Condition c)
+        Condition _condition;
+        internal QuesterConditionProxy(Condition condition)
         {
-            condition = c ?? throw new ArgumentNullException();
-
+            _condition = condition ?? throw new ArgumentNullException(nameof(condition));
         }
         public bool IsValid
         {
             get
             {
-                if (EntityTools.Core.Initialize(condition))
-                    return condition.IsValid;
-
-                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid. Stop bot");
-
-                EntityTools.StopBot();
+                if (EntityTools.Core.Initialize(_condition))
+                    return _condition.IsValid;
 
                 return false;
             }
@@ -31,25 +26,44 @@ namespace EntityTools.Core.Proxies
 
         public void Reset()
         {
-            if (EntityTools.Core.Initialize(condition))
-                condition.Reset();
+            if (EntityTools.Core.Initialize(_condition))
+                _condition.Reset();
         }
 
         public string TestInfos
         {
             get
             {
-                if (EntityTools.Core.Initialize(condition))
-                    return condition.TestInfos;
-                return $"{condition.GetType().Name}: not initialized!";
+                if (EntityTools.Core.Initialize(_condition))
+                    return _condition.TestInfos;
+                return $"{_condition.GetType().Name} initialization failed";
             }
         }
 
         public string Label()
         {
-            if (EntityTools.Core.Initialize(condition))
-                return condition.ToString();
-            return condition.GetType().Name;
+            if (string.IsNullOrEmpty(_label))
+            {
+                if (EntityTools.Core.Initialize(_condition))
+                    _label = _condition.ToString();
+                else _label = $"{_condition.GetType().Name} [uninitialized]";
+            }
+            return _label;
+        }
+        string _label;
+
+        public bool Rebase(Condition condition)
+        {
+            return EntityTools.Core.Initialize(condition);
+        }
+
+        public void Dispose()
+        {
+            if (_condition != null)
+            {
+                ReflectionHelper.SetFieldValue(_condition, "Engine", null);
+                _condition = null;
+            }
         }
     }
 }

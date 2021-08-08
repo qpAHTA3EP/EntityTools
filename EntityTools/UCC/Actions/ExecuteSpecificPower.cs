@@ -6,47 +6,23 @@
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Text;
 using System.Threading;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
-using Astral.Controllers;
-using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
 using Astral.Quester.UIEditors;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
-using EntityTools.Reflection;
 using EntityTools.Tools;
 using MyNW.Classes;
-using MyNW.Internals;
-using MyNW.Patchables.Enums;
-using Unit = Astral.Logic.UCC.Ressources.Enums.Unit;
 
 namespace EntityTools.UCC.Actions
 {
     [Serializable]
-    public class ExecuteSpecificPower : UCCAction
+    public class ExecuteSpecificPower : UCCAction, IEntityIdentifier
     {
-        #region Взаимодействие с EntityToolsCore
-#if CORE_INTERFACES
-        [NonSerialized]
-        internal IUCCActionEngine Engine;
-#endif
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public ExecuteSpecificPower()
-        {
-            Target = Unit.Target;
-#if CORE_INTERFACES
-            Engine = new UCCActionProxy(this);
-#endif
-            // EntityTools.Core.Initialize(this);
-        }
-        #endregion
-
         #region Опции команды
 #if DEVELOPER
         [Editor(typeof(PowerAllIdEditor), typeof(UITypeEditor))]
@@ -85,7 +61,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal bool _checkPowerCooldown = false;
+        internal bool _checkPowerCooldown;
 
 #if DEVELOPER
         [Category("Optional")]
@@ -104,7 +80,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal bool _checkInTray = false;
+        internal bool _checkInTray;
 
 #if DEVELOPER
         [Category("Optional")]
@@ -124,7 +100,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal int _castingTime = 0;
+        internal int _castingTime;
 
 #if DEVELOPER
         [Category("Optional")]
@@ -143,7 +119,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal bool _forceMaintain = false;
+        internal bool _forceMaintain;
 
 #if DEVELOPER
         [Description("ID of the Entity that is preferred to attack\n" +
@@ -207,7 +183,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal EntityNameType _entityNameType = EntityNameType.NameUntranslated;
+        internal EntityNameType _entityNameType = EntityNameType.InternalName;
 
 #if DEVELOPER
         [Description("Check Entity's Ingame Region (Not CustomRegion):\n" +
@@ -314,7 +290,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal float _reactionZRange = 0;
+        internal float _reactionZRange;
 
 #if DEVELOPER
         [XmlIgnore]
@@ -331,40 +307,54 @@ namespace EntityTools.UCC.Actions
         #endregion
         #endregion
 
+        #region Взаимодействие с EntityToolsCore
+        [NonSerialized]
+        internal IUccActionEngine Engine;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public ExecuteSpecificPower()
+        {
+            Target = Astral.Logic.UCC.Ressources.Enums.Unit.Target;
+            Engine = new UccActionProxy(this);
+        }
+        private IUccActionEngine MakeProxy()
+        {
+            return new UccActionProxy(this);
+        }
+        #endregion
+
+        #region Интерфейс команды
+        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).NeedToRun;
+        public override bool Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Run();
         [XmlIgnore]
         [Browsable(false)]
-        public override bool NeedToRun => Engine.NeedToRun;
-
-        public override bool Run() => Engine.Run();
+        public Entity UnitRef => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).UnitRef;
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
+        #endregion
 
         public override UCCAction Clone()
         {
-            return base.BaseClone(new ExecuteSpecificPower
+            return BaseClone(new ExecuteSpecificPower
             {
-                _powerId = this._powerId,
-                _checkPowerCooldown = this._checkPowerCooldown,
-                _checkInTray = this._checkInTray,
-                _castingTime = this._castingTime,
-                _forceMaintain = this._forceMaintain,
-                _entityId = this._entityId,
-                _entityIdType = this._entityIdType,
-                _entityNameType = this._entityNameType,
-                _regionCheck = this._regionCheck,
-                _healthCheck = this._healthCheck,
+                _powerId = _powerId,
+                _checkPowerCooldown = _checkPowerCooldown,
+                _checkInTray = _checkInTray,
+                _castingTime = _castingTime,
+                _forceMaintain = _forceMaintain,
+                _entityId = _entityId,
+                _entityIdType = _entityIdType,
+                _entityNameType = _entityNameType,
+                _regionCheck = _regionCheck,
+                _healthCheck = _healthCheck,
                 _aura = new AuraOption
                 {
-                    AuraName = this._aura.AuraName,
-                    AuraNameType = this._aura.AuraNameType,
-                    Sign = this._aura.Sign,
-                    Stacks = this._aura.Stacks
+                    AuraName = _aura.AuraName,
+                    AuraNameType = _aura.AuraNameType,
+                    Sign = _aura.Sign,
+                    Stacks = _aura.Stacks
                 }
             });
         }
-
-        public override string ToString() => Engine.Label();
-
-        [XmlIgnore]
-        [Browsable(false)]
-        public Entity UnitRef => Engine.UnitRef;
     }
 }

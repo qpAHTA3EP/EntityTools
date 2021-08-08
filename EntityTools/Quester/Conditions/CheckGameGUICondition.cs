@@ -1,42 +1,19 @@
-﻿using Astral.Classes.ItemFilter;
+﻿using System.ComponentModel;
+using System.Drawing.Design;
+using System.Threading;
+using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
-using EntityTools.Extensions;
+using EntityTools.Core.Interfaces;
+using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
-using MyNW.Classes;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Text.RegularExpressions;
-using EntityTools.Core.Proxies;
+using EntityTools.Patches;
 
 namespace EntityTools.Quester.Conditions
 {
-    public class CheckGameGUI : Astral.Quester.Classes.Condition
+    public class CheckGameGUI : Condition
     {
-        #region Взаимодействие с ядром EntityTools
-        public event PropertyChangedEventHandler PropertyChanged;
-#if CORE_INTERFACES
-        internal IQuesterConditionEngine ConditionEngine = null;
-#endif
-
-        public CheckGameGUI()
-        {
-#if CORE_INTERFACES
-            ConditionEngine = new QuesterConditionProxy(this);
-#endif
-            // EntityTools.Core.Initialize(this);
-        }
-        #endregion
-
-#if PATCH_ASTRAL
-        static CheckGameGUI()
-        {
-            // Пременение патча на этапе десериализации (до инициализации плагина)
-            Patches.ETPatcher.Apply();
-        }
-#endif
-
-        #region Опции команды
+         #region Опции команды
 #if DEVELOPER
         [Description("The Identifier of the Ingame user interface element")]
         [Editor(typeof(UiIdEditor), typeof(UITypeEditor))]
@@ -140,7 +117,7 @@ namespace EntityTools.Quester.Conditions
 #else
         [Browsable(false)]
 #endif
-        public Condition.Presence PropertySign
+        public Presence PropertySign
         {
             get => _propertySign;
             set
@@ -155,13 +132,24 @@ namespace EntityTools.Quester.Conditions
         internal Presence _propertySign = Presence.Equal;
         #endregion
 
+        #region Взаимодействие с ядром EntityTools
+        internal IQuesterConditionEngine Engine;
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        public override bool IsValid => ConditionEngine.IsValid;
+        public CheckGameGUI()
+        {
+            Engine = new QuesterConditionProxy(this);
+        }
 
-        public override void Reset() => ConditionEngine.Reset();
+        private IQuesterConditionEngine MakeProxy()
+        {
+            return new QuesterConditionProxy(this);
+        }
+        #endregion
 
-        public override string ToString() => ConditionEngine.Label();
-
-        public override string TestInfos => ConditionEngine.TestInfos;
+        public override bool IsValid => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).IsValid;
+        public override void Reset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Reset();
+        public override string TestInfos => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).TestInfos;
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
     }
 }
