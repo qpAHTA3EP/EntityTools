@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Windows.Forms.VisualStyles;
 using AcTp0Tools.Classes.Targeting;
 using Astral.Classes.SkillTrain;
 using Astral.Controllers;
@@ -10,6 +11,7 @@ using Astral.Logic.UCC.Classes;
 using Astral.MultiTasks.Classes;
 using Astral.Quester.Classes;
 using AcTp0Tools.Reflection;
+using Astral;
 using Action = Astral.Quester.Classes.Action;
 
 using HarmonyLib; 
@@ -19,8 +21,8 @@ namespace AcTp0Tools.Patches
     /// <summary>
     /// Патч метода Astral.Functions.XmlSerializer.GetExtraTypes()
     /// </summary>
-    [HarmonyPatch(typeof(Astral.Functions.XmlSerializer), "GetExtraTypes")] 
-    public class Astral_Functions_XmlSerializer_GetExtraTypes
+    //[HarmonyPatch(typeof(Astral.Functions.XmlSerializer), "GetExtraTypes")] 
+    public static class Astral_Functions_XmlSerializer_GetExtraTypes
     {
         static Func<List<Type>> GetPluginTypes = typeof(Plugins).GetStaticFunction<List<Type>>("GetTypes");
         internal static List<Type> UccTypes = new List<Type>(20);
@@ -48,6 +50,17 @@ namespace AcTp0Tools.Patches
         [HarmonyPrefix] 
         public static bool GetExtraTypes(out List<Type> __result, int typeNum)
         {
+            // До загрузки сборок плагинов в домен приложения (см. Plugins.InitAssemblies) кэшировать списки типов не имеет смысла
+            // поэтому постфикс-патч AfterInitAssemblies устанавливает флаг _pluginsAssembliesLoaded,
+            // указывающий на то, что сборки плагинов загружены
+            if (!_pluginsAssembliesLoaded)
+            {
+                __result = emptyTypeList;
+                // Следующий вызов приводит к переполнению стека
+                //  __result = original_GetExtraTypes.Invoke(null, new object[] { typeNum }) as List<Type>;
+                return true;
+            }
+
             if (UccTypes.Count == 0 || QuesterTypes.Count == 0 || MultitaskTypes.Count == 0 || SkillTrainTypes.Count == 0)
             {
                 UccTypes.Clear();
@@ -57,7 +70,7 @@ namespace AcTp0Tools.Patches
                 UccTargetSelectorTypes.Clear();
                 
                 // Проверяем типы, объявленные в Астрале
-                FillTypeLists(Assembly.GetEntryAssembly().GetTypes());
+                FillTypeLists(Assembly.GetEntryAssembly()?.GetTypes());
 
                 // Проверяем типы, объявленные в плагинах
                 var types = GetPluginTypes();
@@ -69,24 +82,33 @@ namespace AcTp0Tools.Patches
             {
                 case 1: // UCC types
                     __result = UccTypes;
-                    break;
+                    return false;
                 case 2: // Quester types
                     __result = QuesterTypes;
-                    break;
+                    return false;
                 case 3: // SkillTrain types
                     __result = SkillTrainTypes;
-                    break;
+                    return false;
                 case 4: // Multitask types
-                    __result = MultitaskTypes;
-                    break;
-                default:
-                    emptyTypeList.Clear();
-                    __result = emptyTypeList;
-                break;
+                    __result = MultitaskTypes; 
+                    return false;
             }
-            return false;
+
+            __result = null;
+            return true;
         }
-        
+
+        /// <summary>
+        /// Отслеживание момента загрузки плагинов, после чего можно кэшировать списки типов
+        /// </summary>
+        private static void AfterInitAssemblies()
+        {
+            _pluginsAssembliesLoaded = true;
+        }
+        /// <summary>
+        /// Флаг, указывающий на загрузку плагинов
+        /// </summary>
+        private static bool _pluginsAssembliesLoaded;
 
         static readonly Type tQuesterAction = typeof(Action);
         static readonly Type tQuesterCondition = typeof(Condition);
@@ -103,9 +125,11 @@ namespace AcTp0Tools.Patches
 
         internal static void FillTypeLists(IEnumerable<Type> types)
         {
+            if(types is null)
+                return;
+            
             foreach (Type type in types)
             {
-#if true
                 if (tUccAction.IsAssignableFrom(type) ||
                     tUccCondition.IsAssignableFrom(type) ||
                     tQuesterCondition.IsAssignableFrom(type) ||
@@ -130,50 +154,59 @@ namespace AcTp0Tools.Patches
                 {
                     SkillTrainTypes.Add(type);
                 }
-#else
-                var baseType = type.BaseType;
-                if (baseType == tUCCAction)
+            }
+        }
+
+        /// <summary>
+        /// Статический метод, вызов которого влечет вызов статического конструктора и применение патей
+        /// </summary>
+        public static void ApplyPatches() {}
+
+        private static readonly Type tPlugins;
+        private static readonly Type tXmlSerializer;
+        private static readonly Type tPatch;
+
+        private static readonly MethodInfo original_InitAssemblies;
+        private static readonly MethodInfo postfix_InitAssemblies;
+
+        private static readonly MethodInfo original_GetExtraTypes;
+        private static readonly MethodInfo prefix_GetExtraTypes;
+
+        static Astral_Functions_XmlSerializer_GetExtraTypes()
+        {
+            tPlugins = typeof(Astral.Controllers.Plugins);
+            tPatch = typeof(Astral_Functions_XmlSerializer_GetExtraTypes);
+
+            if (tPlugins != null && tPatch != null)
+            {
+                original_InitAssemblies = AccessTools.Method(tPlugins, "InitAssemblies");
+                postfix_InitAssemblies = AccessTools.Method(tPatch, nameof(AfterInitAssemblies));
+
+                if (original_InitAssemblies != null
+                    && postfix_InitAssemblies != null)
                 {
-                    UCCTypes.Add(type);
-                    QuesterTypes.Add(type);
+                    AcTp0Patcher.Harmony.Patch(original_InitAssemblies, null,
+                        new HarmonyMethod(postfix_InitAssemblies));
+                    Astral.Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Controllers.Plugins.InitAssemblies()' succeeded");
                 }
-                else if (baseType == tUCCCondition)
+                else Astral.Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Controllers.Plugins.InitAssemblies()' failed");
+            }
+
+            tXmlSerializer = typeof(Astral.Functions.XmlSerializer);
+
+            if (tXmlSerializer != null && tPatch != null)
+            {
+                original_GetExtraTypes = AccessTools.Method(tXmlSerializer, nameof(GetExtraTypes));
+                prefix_GetExtraTypes = AccessTools.Method(tPatch, nameof(GetExtraTypes));
+
+                if (original_GetExtraTypes != null
+                    && prefix_GetExtraTypes != null)
                 {
-                    UCCTypes.Add(type);
-                    QuesterTypes.Add(type);
+                    AcTp0Patcher.Harmony.Patch(original_GetExtraTypes, 
+                        new HarmonyMethod(prefix_GetExtraTypes));
+                    Astral.Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Functions.XmlSerializer.GetExtraTypes()' succeeded");
                 }
-                else if (baseType == tTargetPriorityEntry)
-                {
-                    UCCTypes.Add(type);
-                }
-                else if (baseType == tQuesterAction)
-                {
-                    QuesterTypes.Add(type);
-                }
-                else if (baseType == tQuesterCondition)
-                {
-                    UCCTypes.Add(type);
-                    QuesterTypes.Add(type);
-                }
-                else if (baseType == tSkillTrainAction)
-                {
-                    SkillTrainTypes.Add(type);
-                }
-                else if (type.BaseType == tMTAction)
-                {
-                    MultitaskTypes.Add(type);
-                }
-                else if (baseType == tUccTargetSelector)
-                {
-                    UCCTypes.Add(type);
-                    QuesterTypes.Add(type);
-                }
-                else if (baseType == tUccTargetProcessor)
-                {
-                    UCCTypes.Add(type);
-                    QuesterTypes.Add(type);
-                } 
-#endif
+                else Astral.Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Functions.XmlSerializer.GetExtraTypes()' failed");
             }
         }
     } 

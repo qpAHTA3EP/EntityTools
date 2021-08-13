@@ -12,6 +12,7 @@ namespace AcTp0Tools.Patches
 
             //TODO заменить на алгоритм перебора вложенных типов
             AstralAccessors.Quester.Core.ApplyPatches();
+            Astral_Functions_XmlSerializer_GetExtraTypes.ApplyPatches();
         }
     }
 }
