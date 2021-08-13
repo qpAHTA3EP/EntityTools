@@ -424,6 +424,7 @@ namespace AcTp0Tools
                                 }
                             }
 
+#if load_mapMeshes
                             var mapName = EntityManager.LocalPlayer.MapState.MapName;
                             if (string.IsNullOrEmpty(mapName))
                                 return;
@@ -440,20 +441,25 @@ namespace AcTp0Tools
                                         meshes = meshesFromFile;
                                 }
                             }
-                            //else Astral.Logger.Notify($"File '{Path.GetFileName(profilePath)}' does not contain '{mapMeshesName}'");
+                            //else Astral.Logger.Notify($"File '{Path.GetFileName(profilePath)}' does not contain '{mapMeshesName}'");  
+#endif
 
                             Profile.ResetCompleted();
                             Profile = profile;
                             Astral.API.CurrentSettings.LastQuesterProfile = profilePath;
+                            // TODO Проверить не приводит ли следующая строка к некорректной работе AddIgnoredFoes
                             AstralAccessors.Logic.NW.Combats.BLAttackersList = null;
+
 
                             var allProfileMeshes = _mapsMeshes;
                             lock (allProfileMeshes)
                             {
                                 allProfileMeshes.Clear();
+#if load_mapMeshes
                                 if (meshes != null)
                                     allProfileMeshes.Add(mapName, meshes);
-                            }
+#endif
+                            } 
 
                             if (AstralAccessors.Controllers.BotComs.BotServer.Server.IsRunning)
                             {
@@ -664,9 +670,9 @@ namespace AcTp0Tools
                     }
                     return false;
                 }
-                #endregion
+#endregion
 
-                #region Events
+#region Events
 #if ProfileNewLoadEvents
                 /// <summary>
                 /// Делегат, вызываемый перед вызовом <seealso cref="Astral.Quester.Core.Load(string Path, bool savePath = true)"/>,
@@ -727,7 +733,7 @@ namespace AcTp0Tools
                     _mapsMeshes.Clear();
                     OnProfileChanged?.Invoke();
                 }
-                #endregion
+#endregion
 
                 internal static void ApplyPatches() { }
 
@@ -774,7 +780,9 @@ namespace AcTp0Tools
                         && prefixGetMeshes != null)
                     {
                         AcTp0Patcher.Harmony.Patch(originalGetMeshes, new HarmonyMethod(prefixGetMeshes));
+                        Astral.Logger.WriteLine(Logger.LogType.Debug, $"Patch the getter of the property 'Astral.Quester.Core.Meshes' succeeded");
                     }
+                    else Astral.Logger.WriteLine(Logger.LogType.Debug, $"Patch the getter of the property 'Astral.Quester.Core.Meshes' failed");
 
                     var propMapsMeshes = AccessTools.Property(tCore, nameof(Astral.Quester.Core.MapsMeshes));
                     var originalGetMapsMeshes = propMapsMeshes.GetGetMethod(true);
@@ -782,13 +790,22 @@ namespace AcTp0Tools
                     var prefixGetMapsMeshes = AccessTools.Method(tPatch, nameof(PrefixGetMapsMeshes));
                     var prefixSetMapsMeshes = AccessTools.Method(tPatch, nameof(PrefixSetMapsMeshes));
                     if (originalGetMapsMeshes != null
-                        && prefixGetMapsMeshes != null
-                        && originalSetMapsMeshes != null
-                        && prefixSetMapsMeshes != null)
+                        && prefixGetMapsMeshes != null)
                     {
                         AcTp0Patcher.Harmony.Patch(originalGetMapsMeshes, new HarmonyMethod(prefixGetMapsMeshes));
-                        AcTp0Patcher.Harmony.Patch(originalSetMapsMeshes, new HarmonyMethod(prefixSetMapsMeshes));
+                        Astral.Logger.WriteLine(Logger.LogType.Debug,
+                            $"Patch the getter of the property 'Astral.Quester.Core.MapsMeshes' succeeded");
                     }
+                    else Astral.Logger.WriteLine(Logger.LogType.Debug,
+                        $"Patch the getter of the property 'Astral.Quester.Core.MapsMeshes' failed");
+
+                    if (originalSetMapsMeshes != null
+                        && prefixSetMapsMeshes != null)
+                    {
+                        AcTp0Patcher.Harmony.Patch(originalSetMapsMeshes, new HarmonyMethod(prefixSetMapsMeshes));
+                        Astral.Logger.WriteLine(Logger.LogType.Debug, $"Patch the setter of the property 'Astral.Quester.Core.MapsMeshes' succeeded");
+                    }
+                    else Astral.Logger.WriteLine(Logger.LogType.Debug, $"Patch the setter of the property 'Astral.Quester.Core.MapsMeshes' failed");
 
                     var originalLoad = AccessTools.Method(tCore, nameof(Astral.Quester.Core.Load));
                     var prefixLoad = AccessTools.Method(tPatch, nameof(PrefixLoad));
@@ -796,7 +813,9 @@ namespace AcTp0Tools
                         prefixLoad != null)
                     {
                         AcTp0Patcher.Harmony.Patch(originalLoad, new HarmonyMethod(prefixLoad));
+                        Astral.Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Quester.Core.Load' succeeded");
                     }
+                    else Astral.Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Quester.Core.Load' failed");
 
                     var originalSave = AccessTools.Method(tCore, nameof(Astral.Quester.Core.Save));
                     var prefixSave = AccessTools.Method(tPatch, nameof(PrefixSave));
@@ -804,7 +823,10 @@ namespace AcTp0Tools
                         prefixSave != null)
                     {
                         AcTp0Patcher.Harmony.Patch(originalSave, new HarmonyMethod(prefixSave));
+                        Astral.Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Quester.Core.Save' succeeded");
                     }
+                    else Astral.Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Quester.Core.Save' failed");
+
                 }
             }
 
