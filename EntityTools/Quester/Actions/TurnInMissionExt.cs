@@ -115,7 +115,7 @@ namespace EntityTools.Quester.Actions
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractDistance)));
             }
         }
-        internal float _interactDistance = 5;
+        internal float _interactDistance = 10;
 
 #if DEVELOPER
         [Description("The minimum value is 1")]
@@ -133,7 +133,7 @@ namespace EntityTools.Quester.Actions
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractZDifference)));
             }
         }
-        internal float _interactZDifference = 5;
+        internal float _interactZDifference = 10;
 
 #if DEVELOPER
         [Editor(typeof(RewardsEditor), typeof(UITypeEditor))]
@@ -221,6 +221,10 @@ namespace EntityTools.Quester.Actions
         {
             get => string.Empty;
         }
+
+        [XmlIgnore]
+        [Browsable(false)]
+        public override string Category => "Basic";
         #endregion
 
         #region Взаимодействие с EntityToolsCore

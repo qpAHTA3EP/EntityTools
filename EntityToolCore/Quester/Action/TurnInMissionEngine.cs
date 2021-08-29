@@ -409,11 +409,14 @@ namespace EntityCore.Quester.Action
             if (MissionGiverInfoEditor.SetInfos(ref missionGiver, MissionGiverType.NPC))
             {
                 Entity entity = Interact.GetBetterEntityToInteract();
-                if (!missionGiver.IsMatching(entity)) return;
 
+                // проверять не имеет смысла, поскольку данные квестодатель только-что был указан пользователем
+                // if (!missionGiver.IsMatching(entity)) return;
+
+                // BUG ApproachMissionGiver не подводит к NPC
                 if (!entity.ApproachMissionGiver(@this._interactDistance, @this._interactZDifference)) return;
 
-                if (!entity.InteractMissionGiver(@this._interactDistance)) return;
+                if (!entity.InteractMissionGiver(@this._interactDistance)) return; 
 
                 Interact.WaitForInteraction();
 
