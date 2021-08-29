@@ -268,6 +268,7 @@ namespace EntityTools.Quester.Actions
         [Description("CustomRegion names collection")]
         [Editor(typeof(CustomRegionCollectionEditor), typeof(UITypeEditor))]
         [Category("Optional")]
+        [DisplayName("CustomRegions")]
 #else
         [Browsable(false)]
 #endif
@@ -370,7 +371,7 @@ namespace EntityTools.Quester.Actions
 
 #if DEVELOPER
         [Category("Interaction")]
-        [Description("Only one interaction with Entity is possible in 'InteractitTimeout' period")]
+        [Description("Only one interaction with Entity is possible in 'InteractingTimeout' period")]
 #else
         [Browsable(false)]
 #endif
