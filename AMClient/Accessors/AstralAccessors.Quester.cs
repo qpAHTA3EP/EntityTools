@@ -17,6 +17,7 @@ using System.Xml.Serialization;
 using Astral;
 using DevExpress.XtraEditors;
 using Action = System.Action;
+// ReSharper disable InconsistentNaming
 
 namespace AcTp0Tools
 {
@@ -171,18 +172,20 @@ namespace AcTp0Tools
                                 if (mapsMeshes.ContainsKey(mapName))
                                 {
                                     __result = mapsMeshes[mapName];
-                                    return false;
                                 }
-                                if (LoadMeshFromZipFile(CurrentProfileZipMeshFile, mapName, out Graph mesh))
+                                else if (LoadMeshFromZipFile(CurrentProfileZipMeshFile, mapName, out Graph mesh))
                                 {
                                     mapsMeshes.Add(mapName, mesh);
                                     __result = mesh;
-                                    return true;
+                                }
+                                else
+                                {
+                                    __result = new Graph();
+                                    mapsMeshes.Add(mapName, __result);
                                 }
                             }
                         }
                     }
-                    __result = new Graph();
 
                     return false;
                 }
