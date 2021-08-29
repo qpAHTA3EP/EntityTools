@@ -63,6 +63,7 @@ namespace EntityTools.Quester.Actions
         [Description("Distance to the Teammate by which it is necessary to approach.\n" +
                      "Keep in mind that the distance below 5 is too small to display on the Mapper")]
         [Category("Interruptions")]
+        [DisplayName("CombatDistance")]
 #else
         [Browsable(false)]
 #endif
