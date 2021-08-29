@@ -257,6 +257,7 @@ namespace EntityTools.Quester.Conditions
         [Description("The list of the CustomRegions where Entities is counted")]
         [Editor(typeof(CustomRegionCollectionEditor), typeof(UITypeEditor))]
         [Category("Location")]
+        [DisplayName("CustomRegions")]
 #else
         [Browsable(false)]
 #endif

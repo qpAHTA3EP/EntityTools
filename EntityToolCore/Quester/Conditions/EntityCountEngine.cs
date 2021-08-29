@@ -139,25 +139,7 @@ namespace EntityCore.Quester.Conditions
                         ETLogger.WriteLine(LogType.Debug, debugMsg);
                     }
 
-#if false
-                    switch (@this._sign)
-                    {
-                        case Relation.Equal:
-                            result = entCount == @this._value;
-                            break;
-                        case Relation.NotEqual:
-                            result = entCount != @this._value;
-                            break;
-                        case Relation.Inferior:
-                            result = entCount < @this._value;
-                            break;
-                        case Relation.Superior:
-                            result = entCount > @this._value;
-                            break;
-                    } 
-#else
                     result = countChecker(entCount);
-#endif
 
                     if (debugInfoEnabled)
                     {
