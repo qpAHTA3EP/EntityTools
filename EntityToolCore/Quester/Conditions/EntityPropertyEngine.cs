@@ -109,62 +109,17 @@ namespace EntityCore.Quester.Conditions
                 bool isValid = entityKey.Validate(entity);
                 if (timeout.IsTimedOut || !isValid)
                 {
-                    //if (!string.IsNullOrEmpty(@this._entityId))
-                        entity = SearchCached.FindClosestEntity(EntityKey, SpecialCheck);
+                    entity = SearchCached.FindClosestEntity(EntityKey, SpecialCheck);
                     isValid = entity != null;
                     timeout.ChangeTime(EntityTools.EntityTools.Config.EntityCache.LocalCacheTime);
                 }
 
                 if (isValid)
                 {
-#if true
                    return propertyValueChecker(entity);
-#else
-                    switch (@this.PropertyType)
-                    {
-                        case EntityPropertyType.Distance:
-                            switch (@this.Sign)
-                            {
-                                case Relation.Equal:
-                                    return Math.Abs(entity.Location.Distance3DFromPlayer - @this._value) < 0.1;
-                                case Relation.NotEqual:
-                                    return Math.Abs(entity.Location.Distance3DFromPlayer - @this._value) > 0.1;
-                                case Relation.Inferior:
-                                    return entity.Location.Distance3DFromPlayer < @this._value;
-                                case Relation.Superior:
-                                    return entity.Location.Distance3DFromPlayer > @this._value;
-                            }
-                            break;
-                        case EntityPropertyType.HealthPercent:
-                            switch (@this.Sign)
-                            {
-                                case Relation.Equal:
-                                    return Math.Abs(entity.Character.AttribsBasic.HealthPercent - @this._value) < 0.1;
-                                case Relation.NotEqual:
-                                    return Math.Abs(entity.Character.AttribsBasic.HealthPercent - @this._value) > 0.1;
-                                case Relation.Inferior:
-                                    return entity.Character.AttribsBasic.HealthPercent < @this._value;
-                                case Relation.Superior:
-                                    return entity.Character.AttribsBasic.HealthPercent > @this._value;
-                            }
-                            break;
-                        case EntityPropertyType.ZAxis:
-                            switch (@this.Sign)
-                            {
-                                case Relation.Equal:
-                                    return Math.Abs(entity.Location.Z - @this._value) < 0.1;
-                                case Relation.NotEqual:
-                                    return Math.Abs(entity.Location.Z - @this._value) > 0.1;
-                                case Relation.Inferior:
-                                    return entity.Location.Z < @this._value;
-                                case Relation.Superior:
-                                    return entity.Location.Z > @this._value;
-                            }
-                            break;
-                    } 
-#endif
                 }
-                else return @this._propertyType == EntityPropertyType.Distance && @this._sign == Relation.Superior;
+
+                return @this._propertyType == EntityPropertyType.Distance && @this._sign == Relation.Superior;
             }
         }
 
@@ -313,11 +268,11 @@ namespace EntityCore.Quester.Conditions
         }
         private bool Distance_Equal(Entity e)
         {
-            return Math.Abs(entity.Location.Distance3DFromPlayer - @this._value) < 0.1;
+            return Math.Abs(entity.Location.Distance3DFromPlayer - @this._value) <= 1;
         }
         private bool Distance_NotEqual(Entity e)
         {
-            return Math.Abs(entity.Location.Distance3DFromPlayer - @this._value) >= 0.1;
+            return Math.Abs(entity.Location.Distance3DFromPlayer - @this._value) > 1;
         }
 
         private bool HealthPercent_Inferior(Entity e)
@@ -330,11 +285,11 @@ namespace EntityCore.Quester.Conditions
         }
         private bool HealthPercent_Equal(Entity e)
         {
-            return Math.Abs(entity.Character.AttribsBasic.HealthPercent - @this._value) < 0.1;
+            return Math.Abs(entity.Character.AttribsBasic.HealthPercent - @this._value) <= 1;
         }
         private bool HealthPercent_NotEqual(Entity e)
         {
-            return Math.Abs(entity.Character.AttribsBasic.HealthPercent - @this._value) >= 0.1;
+            return Math.Abs(entity.Character.AttribsBasic.HealthPercent - @this._value) > 1;
         }
 
         private bool ZAxis_Inferior(Entity e)
@@ -347,80 +302,12 @@ namespace EntityCore.Quester.Conditions
         }
         private bool ZAxis_Equal(Entity e)
         {
-            return Math.Abs(entity.Z - @this._value) < 0.1;
+            return Math.Abs(entity.Z - @this._value) <= 1;
         }
         private bool ZAxis_NotEqual(Entity e)
         {
-            return Math.Abs(entity.Z - @this._value) >= 0.1;
+            return Math.Abs(entity.Z - @this._value) > 1;
         }
         #endregion
-
-#if IEntityDescriptor
-        public bool EntityDiagnosticString(out string infoString)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            sb.Append("EntityID: ").AppendLine(@this.EntityID);
-            sb.Append("EntityIdType: ").AppendLine(@this.EntityIdType.ToString());
-            sb.Append("EntityNameType: ").AppendLine(@this.EntityNameType.ToString());
-            sb.Append("HealthCheck: ").AppendLine(@this.HealthCheck.ToString());
-            sb.Append("ReactionRange: ").AppendLine(@this.ReactionRange.ToString());
-            sb.Append("ReactionZRange: ").AppendLine(@this.ReactionZRange.ToString());
-            sb.Append("RegionCheck: ").AppendLine(@this.RegionCheck.ToString());
-            if (@this.CustomRegionNames != null && @this.CustomRegionNames.Count > 0)
-            {
-                sb.Append("RegionCheck: {").Append(@this.CustomRegionNames[0]);
-                for (int i = 1; i < @this.CustomRegionNames.Count; i++)
-                    sb.Append(", ").Append(@this.CustomRegionNames[i]);
-                sb.AppendLine("}");
-            }
-
-            sb.AppendLine();
-
-            var entityKey = EntityKey;
-            var entityCheck = SpecialCheck;
-            LinkedList<Entity> entities = SearchCached.FindAllEntity(entityKey, entityCheck);
-
-            // Количество Entity, удовлетворяющих условиям
-            if (entities != null)
-                sb.Append("Founded Entities: ").AppendLine(entities.Count.ToString());
-            else sb.Append("Founded Entities: 0");
-            sb.AppendLine();
-
-            // Ближайшее Entity
-            Entity closestEntity = SearchCached.FindClosestEntity(entityKey, entityCheck);
-
-            if (closestEntity != null && closestEntity.IsValid)
-            {
-                bool distOk = @this._reactionRange <= 0 || closestEntity.Location.Distance3DFromPlayer < @this._reactionRange;
-                bool zOk = @this._reactionZRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(closestEntity.Location) < @this._reactionZRange;
-                bool alive = !@this._healthCheck || !closestEntity.IsDead;
-                sb.Append("ClosestEntity: ").Append(closestEntity.ToString());
-                if (distOk && zOk && alive)
-                    sb.AppendLine(" [MATCH]");
-                else sb.AppendLine(" [MISMATCH]");
-                sb.Append("\tName: ").AppendLine(closestEntity.Name);
-                sb.Append("\tInternalName: ").AppendLine(closestEntity.InternalName);
-                sb.Append("\tNameUntranslated: ").AppendLine(closestEntity.NameUntranslated);
-                sb.Append("\tIsDead: ").Append(closestEntity.IsDead.ToString());
-                if (alive)
-                    sb.AppendLine(" [OK]");
-                else sb.AppendLine(" [FAIL]"); sb.Append("\tRegion: '").Append(closestEntity.RegionInternalName).AppendLine("'");
-                sb.Append("\tLocation: ").AppendLine(closestEntity.Location.ToString());
-                sb.Append("\tDistance: ").Append(closestEntity.Location.Distance3DFromPlayer.ToString());
-                if (distOk)
-                    sb.AppendLine(" [OK]");
-                else sb.AppendLine(" [FAIL]");
-                sb.Append("\tZAxisDiff: ").Append(Astral.Logic.General.ZAxisDiffFromPlayer(closestEntity.Location).ToString());
-                if (zOk)
-                    sb.AppendLine(" [OK]");
-                else sb.AppendLine(" [FAIL]");
-            }
-            else sb.AppendLine("Closest Entity not found!");
-
-            infoString = sb.ToString();
-            return true;
-        } 
-#endif
     }
 }
