@@ -1550,18 +1550,31 @@ namespace EntityTools.Patches.Mapper
             ResetToolState();
 
             Graph graph = AstralAccessors.Quester.Core.Meshes;
-            if (graph.NodesCount > 0
-                && XtraMessageBox.Show(this,
-                   "Are you sure to import game nodes?\n" +
-                   "All nodes of the current map would be deleted!", "",
-                   MessageBoxButtons.YesNo) != DialogResult.Yes) 
-                return;
+            DialogResult dialogResult  = DialogResult.Yes;
+            if (graph.NodesCount > 0)
+                dialogResult = XtraMessageBox.Show(this,
+                    "Are you sure to import game nodes?\n" +
+                    "Yes: All nodes of the current map would be deleted!\n" +
+                    "No: All game nodes will be added to the current map without deleting existing nodes.", "",
+                    MessageBoxButtons.YesNoCancel);
 
-            using (graph.WriteLock())
+            switch (dialogResult)
             {
-                graph.Clear();
-                GoldenPath.GetCurrentMapGraph(graph);
+                case DialogResult.Yes:
+                    using (graph.WriteLock())
+                    {
+                        graph.Clear();
+                        GoldenPath.GetCurrentMapGraph(graph);
+                    }
+                    break;
+                case DialogResult.No:
+                    using (graph.WriteLock())
+                    {
+                        GoldenPath.GetCurrentMapGraph(graph);
+                    }
+                    break;
             }
+            
         }
 
         /// <summary>
