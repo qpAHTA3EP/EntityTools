@@ -261,6 +261,7 @@
     <Compile Include="Patches\ComplexPatch_Navigation.cs" />
     <Compile Include="Patches\Mapper\ComplexPatch_Mapper.cs" />
     <Compile Include="Patches\Quester\ComplexPatch_Quester_UccEditing.cs" />
+    <Compile Include="Quester\Actions\UpgradeItem.cs" />
     <Compile Include="Quester\Actions\MoveToTeammate.cs" />
     <Compile Include="Quester\Actions\RemoveIgnoredFoes.cs" />
     <Compile Include="Quester\Actions\AddIgnoredFoes.cs" />
