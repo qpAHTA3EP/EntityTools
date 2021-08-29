@@ -192,6 +192,7 @@ namespace EntityTools.Quester.Actions
         [Browsable(false)]
 #endif
         [XmlElement("CustomRegionNames")]
+        [DisplayName("CustomRegions")]
         [NotifyParentProperty(true)]
         public CustomRegionCollection CustomRegionNames
         {
@@ -212,6 +213,7 @@ namespace EntityTools.Quester.Actions
         [Description("Distance to the Entity by which it is necessary to approach.\n" +
                      "Keep in mind that the distance below 5 is too small to display on the Mapper")]
         [Category("Interruptions")]
+        [DisplayName("CombatDistance")]
 #else
         [Browsable(false)]
 #endif
