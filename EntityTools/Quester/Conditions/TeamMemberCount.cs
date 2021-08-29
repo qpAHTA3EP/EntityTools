@@ -19,6 +19,7 @@ namespace EntityTools.Quester.Conditions
         [Description("CustomRegion names collection")]
         [Editor(typeof(CustomRegionCollectionEditor), typeof(UITypeEditor))]
         [Category("Location")]
+        [DisplayName("CustomRegions")]
 #else
         [Browsable(false)]
 #endif
