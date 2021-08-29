@@ -436,12 +436,14 @@ namespace EntityCore.Quester.Action
                 if (missionGiver.Type == MissionGiverType.NPC)
                 {
                     Entity entity = Interact.GetBetterEntityToInteract();
-                    if (!missionGiver.IsMatching(entity)) return;
+                    // проверять не имеет смысла, поскольку данные квестодатель только-что был указан пользователем
+                    // if (!missionGiver.IsMatching(entity)) return;
 
                     //BUG ApproachMissionGiver не подводит к NPC
                     if (!entity.ApproachMissionGiver(@this._interactDistance, @this._interactZDifference)) return;
 
-                    if (!entity.InteractMissionGiver(@this._interactDistance)) return;
+                    if (!entity.InteractMissionGiver(@this._interactDistance)) return; 
+
                 }
                 else if (missionGiver.Type == MissionGiverType.Remote)
                 {
@@ -450,6 +452,7 @@ namespace EntityCore.Quester.Action
                     if (remoteContact is null || !remoteContact.IsValid) return;
                 }
                 else return;
+
                 //TODO: Проверять иконку на квестодателе, и если она отличается деактивировать опцию ContactHaveMission
                 Interact.WaitForInteraction();
 
@@ -458,14 +461,9 @@ namespace EntityCore.Quester.Action
 
                 if (contactDialog.Options.Count > 0)
                 {
-#if false
-                    string aDialogKey = GetAnId.GetADialogKey(); 
-#elif false
-                    MissionHelper.GetADialogKey(out string aDialogKey);
-#else
                     string aDialogKey = MissionHelper.GetADialogOption(out ContactDialogOption contactDialogOption)
                         ? contactDialogOption.Key : string.Empty;
-#endif
+
                     while (!string.IsNullOrEmpty(aDialogKey))
                     {
                         // Ищем индекс начала "текстового идентификатора миссии" в выбранном пункте диалога

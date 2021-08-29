@@ -46,26 +46,6 @@ namespace EntityTools.Quester.Actions
         internal string _missionId = string.Empty;
 
 #if DEVELOPER
-        [Description("Skip directly if mission is not available.")]
-#else
-        [Browsable(false)]
-#endif
-        public bool SkipOnFail
-        {
-            get => _skipOnFail;
-            set
-            {
-                if (_skipOnFail != value)
-                {
-                    _skipOnFail = value;
-                    NotifyPropertyChanged();
-                }
-
-            }
-        }
-        internal bool _skipOnFail = false;
-
-#if DEVELOPER
         [Editor(typeof(MissionGiverInfoEditor), typeof(UITypeEditor))]
         [Category("Required")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
@@ -87,24 +67,88 @@ namespace EntityTools.Quester.Actions
         }
         internal MissionGiverInfo _giver = new MissionGiverInfo();
 
-#if !DEVELOPER
-        [Browsable(false)]
+#if DEVELOPER
+        [Description("The minimum value is 5")]
+        [Category("Interaction")]
 #else
-        [Description("Check if contact have mission")]
+        [Browsable(false)]
 #endif
-        public ContactHaveMissionCheckType ContactHaveMission
+        public float InteractDistance
         {
-            get => _contactHaveMission;
+            get => _interactDistance;
             set
             {
-                if (_contactHaveMission == value) return;
-                _contactHaveMission = value;
+                value = Math.Max(value, 5);
+                if (_interactDistance == value) return;
+                _interactDistance = value;
                 NotifyPropertyChanged();
             }
         }
-        internal ContactHaveMissionCheckType _contactHaveMission = ContactHaveMissionCheckType.Any;
+        internal float _interactDistance = 10;
 
-#if !DEVELOPER
+#if DEVELOPER
+        [Description("The minimum value is 1")]
+        [Category("Interaction")]
+#else
+        [Browsable(false)]
+#endif
+        public float InteractZDifference
+        {
+            get => _interactZDifference;
+            set
+            {
+                value = Math.Max(value, 1);
+                if (_interactZDifference == value) return;
+                _interactZDifference = value;
+                NotifyPropertyChanged();
+            }
+        }
+        internal float _interactZDifference = 10;
+
+#if DEVELOPER
+        [Description("Answers in dialog which have to be performed before mission picking up")]
+        [Editor(typeof(DialogEditor), typeof(UITypeEditor))]
+        [Category("Interaction")]
+#else
+        [Browsable(false)]
+#endif
+        public List<string> Dialogs
+        {
+            get => _dialogs; set
+            {
+                if (_dialogs != value)
+                {
+                    _dialogs = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        internal List<string> _dialogs = new List<string>();
+
+#if DEVELOPER
+        [Description("Skip directly if mission is not available.")]
+        [Category("Interaction")]
+#else
+        [Browsable(false)]
+#endif
+        public bool SkipOnFail
+        {
+            get => _skipOnFail;
+            set
+            {
+                if (_skipOnFail != value)
+                {
+                    _skipOnFail = value;
+                    NotifyPropertyChanged();
+                }
+
+            }
+        }
+        internal bool _skipOnFail = false;
+
+#if DEVELOPER
+        [Category("Interaction")]
+#else
         [Browsable(false)]
 #endif
         public bool CloseContactDialog
@@ -118,6 +162,24 @@ namespace EntityTools.Quester.Actions
             }
         }
         internal bool _closeContactDialog;
+
+#if !DEVELOPER
+        [Browsable(false)]
+#else
+        [Description("Check if contact have mission")]
+        [Category("Optional")]
+#endif
+        public ContactHaveMissionCheckType ContactHaveMission
+        {
+            get => _contactHaveMission;
+            set
+            {
+                if (_contactHaveMission == value) return;
+                _contactHaveMission = value;
+                NotifyPropertyChanged();
+            }
+        }
+        internal ContactHaveMissionCheckType _contactHaveMission = ContactHaveMissionCheckType.Any;
 
 #if !DEVELOPER
         [Browsable(false)]
@@ -135,46 +197,11 @@ namespace EntityTools.Quester.Actions
         internal bool _ignoreCombat = false;
 
 #if DEVELOPER
-        [Description("The minimum value is 5")]
-#else
-        [Browsable(false)]
-#endif
-        public float InteractDistance
-        {
-            get => _interactDistance;
-            set
-            {
-                value = Math.Max(value, 5);
-                if (_interactDistance == value) return;
-                _interactDistance = value;
-                NotifyPropertyChanged();
-            }
-        }
-        internal float _interactDistance = 5;
-
-#if DEVELOPER
-        [Description("The minimum value is 1")]
-#else
-        [Browsable(false)]
-#endif
-        public float InteractZDifference
-        {
-            get => _interactZDifference;
-            set
-            {
-                value = Math.Max(value, 1);
-                if (_interactZDifference == value) return;
-                _interactZDifference = value;
-                NotifyPropertyChanged();
-            }
-        }
-        internal float _interactZDifference = 5;
-
-#if DEVELOPER
         [Editor(typeof(RewardsEditor), typeof(UITypeEditor))]
         [Description("Item that is requered in rewards to PickUpMission\n" +
                      "Simple wildcard (*) is allowed\n" +
                      "Mission Offer dialog have to be opened for choosen the ReqieredRewardItem")]
+        [Category("Optional")]
 #else
         [Browsable(false)]
 #endif
@@ -189,25 +216,6 @@ namespace EntityTools.Quester.Actions
             }
         }
         internal string _requiredRewardItem = string.Empty;
-
-#if DEVELOPER
-        [Description("Answers in dialog which have to be performed before mission picking up")]
-        [Editor(typeof(DialogEditor), typeof(UITypeEditor))]
-#else
-        [Browsable(false)]
-#endif
-        public List<string> Dialogs
-        {
-            get => _dialogs; set
-            {
-                if (_dialogs != value)
-                {
-                    _dialogs = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        internal List<string> _dialogs = new List<string>();
 
         [Browsable(false)]
         public string GiverId
@@ -253,6 +261,10 @@ namespace EntityTools.Quester.Actions
         {
             get => string.Empty;
         }
+
+        [XmlIgnore]
+        [Browsable(false)]
+        public override string Category => "Basic";
         #endregion
 
         #region Взаимодействие с EntityToolsCore
