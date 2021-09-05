@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
 using System.Threading;
+using Astral;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.Classes.Map;
 using Astral.Quester.UIEditors;
@@ -24,7 +25,7 @@ namespace EntityTools.Quester.Actions
         /// </summary>
         [Editor(typeof(ItemIdEditor), typeof(UITypeEditor))]
         [Category("Item")]
-        [Description("Идентификатор обрабатываемого предмета")]
+        [Description("Идентификатор обрабатываемого предмета.")]
         public string ItemId
         {
             get => _itemId;
@@ -42,7 +43,7 @@ namespace EntityTools.Quester.Actions
         [Category("Item")]
         [Description("Переключатель типа идентификатор предмета:\n" +
                      "Shimple : текстовая строка, допускающая символ подстановки '*' в начале или в конце.\n" +
-                     "Regex : регулярное выражение")]
+                     "Regex : регулярное выражение.")]
         public ItemFilterStringType ItemIdType
         {
             get => _itemIdType;
@@ -58,42 +59,44 @@ namespace EntityTools.Quester.Actions
         /// Флаг, позволяющий обрабатывать предметы, привязанные к персонажу
         /// </summary>
         [Category("Item")]
-        [Description("Флаг, позволяющий обрабатывать предметы, привязанные к персонажу")]
-        public bool AllowBounded 
+        [DisplayName("AllowBoundToCharacter")]
+        [Description("Флаг, позволяющий обрабатывать предметы, привязанные к персонажу.")]
+        public bool B2C
         { 
-            get => _allowBounded;
+            get => _b2c;
             set
             {
-                if (_allowBounded != value)
+                if (_b2c != value)
                 {
-                    _allowBounded = value;
+                    _b2c = value;
                     _itemIdPredicate = null;
                 }
             }
         }
 
-        private bool _allowBounded;
+        private bool _b2c;
 
 
         /// <summary>
         /// Флаг, позволяющий обрабатывать предметы, привязанные к аккаунту
         /// </summary>
         [Category("Item")]
-        [Description("Флаг, позволяющий обрабатывать предметы, привязанные к аккаунту")]
-        public bool AllowAccountBounded
+        [DisplayName("AllowBoundToAccount")]
+        [Description("Флаг, позволяющий обрабатывать предметы, привязанные к аккаунту.")]
+        public bool B2A
         {
-            get => _allowAccountBounded;
+            get => _b2a;
             set
             {
-                if (_allowAccountBounded != value)
+                if (_b2a != value)
                 {
-                    _allowAccountBounded = value;
+                    _b2a = value;
                     _itemIdPredicate = null;
                 }
             }
         }
 
-        private bool _allowAccountBounded;
+        private bool _b2a;
 
 
         /// <summary>
@@ -107,9 +110,9 @@ namespace EntityTools.Quester.Actions
                 if (_itemIdPredicate is null)
                 {
                     var internalNamePredicate = _itemId.GetComparer(_itemIdType, (InventorySlot s) => s.Item.ItemDef.InternalName);
-                    if (_allowAccountBounded)
+                    if (_b2a)
                     {
-                        if (_allowBounded)
+                        if (_b2c)
                         {
                             // Разрешено обрабатывать предметы с любой привязкой
                             _itemIdPredicate = internalNamePredicate;
@@ -117,7 +120,7 @@ namespace EntityTools.Quester.Actions
                         else
                         {
                             // Разрешено использовать свободные и предметы с привязкой к аккаунту
-                            // т.е. запредено использовать предметы с привязкой к персонажу ItemFlags.Bound
+                            // т.е. запрещено использовать предметы с привязкой к персонажу ItemFlags.Bound
                             _itemIdPredicate = s =>
                             {
                                 if (s is null || !s.IsValid)
@@ -135,10 +138,10 @@ namespace EntityTools.Quester.Actions
                     }
                     else
                     {
-                        if (_allowBounded)
+                        if (_b2c)
                         {
                             // Разрешено использовать свободные и предметы с привязкой к персонажу
-                            // т.е. запредено использовать предметы с привязкой к аккаунту ItemFlags.BoundToAccount
+                            // т.е. запрещено использовать предметы с привязкой к аккаунту ItemFlags.BoundToAccount
                             _itemIdPredicate = s =>
                             {
                                 if (s is null || !s.IsValid)
@@ -147,7 +150,7 @@ namespace EntityTools.Quester.Actions
                                 var item = s.Item;
                                 var flag = (ItemFlags)item.Flags;
 
-                                if ((flag & ItemFlags.BoundToAccount) == 0)
+                                if ((flag & ItemFlags.BoundToAccount) > 0)
                                     return false;
 
                                 return internalNamePredicate(s);
@@ -156,7 +159,7 @@ namespace EntityTools.Quester.Actions
                         else
                         {
                             // Разрешено использовать только свободные предметы
-                            // т.е. запредено использовать предметы с привязкой к аккаунту или персонажу
+                            // т.е. запрещено использовать предметы с привязкой к аккаунту или персонажу
                             var anyBoundFlags = ItemFlags.Bound | ItemFlags.BoundToAccount;
 
                             _itemIdPredicate = s =>
@@ -192,10 +195,11 @@ namespace EntityTools.Quester.Actions
         /// </summary>
         [DisplayName("ForcedFeedingRPNumber")]
         [Description("Количество очков обработки, для принудительного заполнения обрабатываемого предмета. \n" +
-                     "Используется если количество очков обработни не удалось вычислить, т.к. свойство ProgressionLogic не валидно.")]
-        public int Feed { get; set; } = 0;
+                     "Используется если количество очков обработни не удалось вычислить, т.к. свойство ProgressionLogic не валидно.\n" +
+                     "Значение -1 отключает принудительное заполнение предмета очками обработки.")]
+        public int Feed { get; set; } = -1;
 
-        [Description("Переключатель типа катализатора, который должен быть использован при обработке")]
+        [Description("Переключатель типа катализатора, который должен быть использован при обработке.")]
         public WardType Ward { get; set; } = WardType.None;
 
         public override string ActionLabel
@@ -236,7 +240,7 @@ namespace EntityTools.Quester.Actions
 
             bool filled = false;
             var searchResult = FindSlot(ItemIdPredicate, Ward, out InventorySlot itemSlot, out InventorySlot wardSlot);
-
+            
             switch (searchResult)
             {
                 case SearchResult.Unfilled:
@@ -255,7 +259,7 @@ namespace EntityTools.Quester.Actions
                 return ActionResult.Skip;
 
             if (searchResult != SearchResult.Indefinite
-                && !HaveRequiredItems(itemSlot))
+                && !HaveRequiredCatalysts(itemSlot))
                 return ActionResult.Skip;
 
             if (Ward != WardType.None)
@@ -318,21 +322,40 @@ namespace EntityTools.Quester.Actions
             if (fullFilled != null && fullFilled.IsValid && fullFilled.Filled)
             {
                 itemSlot = fullFilled;
+                Logger.WriteLine(Logger.LogType.Log, $"Found fully filled item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}]");
                 return SearchResult.FullFilled;
             }
 
             if (partialFilled !=null && partialFilled.IsValid && partialFilled.Filled)
             {
                 itemSlot = partialFilled;
+                var progression = itemSlot.Item.ProgressionLogic;
+                Logger.WriteLine(Logger.LogType.Log,
+                    string.Concat("Found partial filled ",
+                        (progression.IsValid && progression.CurrentRankTotalRequiredXP != 0)
+                            ? " (" +
+                              (progression.CurrentRankXP / progression.CurrentRankTotalRequiredXP / 100)
+                              .ToString("N1") + "%) "
+                            : string.Empty,
+                        " item '", itemSlot.Item.ItemDef.InternalName, "'[", itemSlot.Item.Id.ToString("X"), "]."
+                    )); 
                 return SearchResult.PartialFilled;
             }
 
             if (unfilled != null && unfilled.IsValid)
             {
                 itemSlot = unfilled;
+                Logger.WriteLine(Logger.LogType.Log, $"Found unfilled item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}].");
                 return SearchResult.Unfilled;
             }
 
+            if (itemSlot != null && itemSlot.IsValid && itemSlot.Filled)
+            {
+                Logger.WriteLine(Logger.LogType.Log, $"Found item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}] with invalid progression logic.");
+                return SearchResult.Indefinite;
+            }
+            
+            Logger.WriteLine(Logger.LogType.Log, $"No item found.");
             return SearchResult.Absent;
         }
 
@@ -401,7 +424,7 @@ namespace EntityTools.Quester.Actions
                 }
                 else 
                 {
-                    if (bounded2AccountWard is null
+                    if (bounded2CharacterWard is null
                         && wardPredicate(s))
                     {
                         var flag = (ItemFlags) s.Item.Flags;
@@ -416,34 +439,63 @@ namespace EntityTools.Quester.Actions
             }
 
             if (bounded2CharacterWard != null)
+            {
                 wardSlot = bounded2CharacterWard;
+                Logger.WriteLine(Logger.LogType.Log, $"Found ward '{wardSlot.Item.ItemDef.InternalName}' bounded to character.");
+            }
             else if (bounded2AccountWard != null)
+            {
                 wardSlot = bounded2AccountWard;
-            else wardSlot = unboundedWard;
+                Logger.WriteLine(Logger.LogType.Log, $"Found ward '{wardSlot.Item.ItemDef.InternalName}' bounded to account.");
+            }
+            else if(unboundedWard != null)
+            {
+                wardSlot = unboundedWard;
+                Logger.WriteLine(Logger.LogType.Log, $"Found unbounded ward '{wardSlot.Item.ItemDef.InternalName}'.");
+            }
+            else
+            {
+                Logger.WriteLine(Logger.LogType.Log, $"No required ward found.");
+                return SearchResult.Absent;
+            }
 
             if (fullFilled != null && fullFilled.IsValid && fullFilled.Filled)
             {
                 itemSlot = fullFilled;
+                Logger.WriteLine(Logger.LogType.Log, $"Found fully filled item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}].");
                 return SearchResult.FullFilled;
             }
 
             if (partialFilled != null && partialFilled.IsValid && partialFilled.Filled)
             {
                 itemSlot = partialFilled;
+                var progression = itemSlot.Item.ProgressionLogic;
+                Logger.WriteLine(Logger.LogType.Log,
+                    string.Concat("Found ", SearchResult.PartialFilled,
+                        (progression.IsValid && progression.CurrentRankTotalRequiredXP != 0)
+                            ? " (" +
+                              (progression.CurrentRankXP / progression.CurrentRankTotalRequiredXP / 100)
+                              .ToString("N1") + "%) "
+                            : string.Empty,
+                        " item '", itemSlot.Item.ItemDef.InternalName, "'[", itemSlot.Item.Id.ToString("X"), "]."
+                    )); 
                 return SearchResult.PartialFilled;
             }
 
             if (unfilled != null && unfilled.IsValid && unfilled.Filled)
             {
                 itemSlot = unfilled;
+                Logger.WriteLine(Logger.LogType.Log, $"Found unfilled item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}].");
                 return SearchResult.Unfilled;
             }
 
             if (itemSlot != null && itemSlot.IsValid && itemSlot.Filled)
             {
+                Logger.WriteLine(Logger.LogType.Log, $"Found item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}] with invalid progression logic.");
                 return SearchResult.Indefinite;
             }
 
+            Logger.WriteLine(Logger.LogType.Log, $"No item found.");
             return SearchResult.Absent;
         }
 
@@ -456,41 +508,51 @@ namespace EntityTools.Quester.Actions
         {
             var progress = s.Item.ProgressionLogic;
 
-
             int points;
             if (progress.IsValid)
                 points = (int) (progress.CurrentRankTotalRequiredXP - progress.CurrentRankXP);
             else
             {
                 var defaultFeed = Feed;
-                if (defaultFeed > 0)
-                    points = defaultFeed;
-                else return false;
+                if (defaultFeed < 0)
+                {
+                    Logger.WriteLine(Logger.LogType.Log, $"Can not calculate required RP. Feed Skip feeding.");
+                    return true;
+                }
+
+                if (defaultFeed == 0)
+                {
+                    Logger.WriteLine(Logger.LogType.Log, $"Can not calculate required RP and 'ForcedFeedingRPNumber' does not set."); 
+                    return false;
+                }
+                points = defaultFeed;
             }
 
             if (points == 0)
                 return true;
 
-            if (EntityManager.LocalPlayer.Inventory.RefinementCurrency >= points)
+            int refinementCurrency = EntityManager.LocalPlayer.Inventory.RefinementCurrency;
+            if (refinementCurrency >= points)
             {
+                Logger.WriteLine(Logger.LogType.Log, $"Feeding item {s.Item.ItemDef.InternalName}[{s.Item.Id:X}] with {points} RP.");
                 s.Feed(points);
                 Thread.Sleep(500);
                 return true;
             }
 
+            Logger.WriteLine(Logger.LogType.Log, $"Not enough {refinementCurrency - points} RP to feed item {s.Item.ItemDef.InternalName}[{s.Item.Id:X}].");
             return false;
         }
 
         /// <summary>
-        /// Проверяем наличие всех предметов, необходимых для обработки
+        /// Проверяем наличие всех компонентов, необходимых для обработки предмета <param name="itemSlot" />
         /// </summary>
-        /// <param name="itemSlot"></param>
-        /// <returns></returns>
-        private bool HaveRequiredItems(InventorySlot itemSlot)
+        private bool HaveRequiredCatalysts(InventorySlot itemSlot)
         {
             if (itemSlot == null) return false;
 
-            var progressionLogic = itemSlot.Item.ProgressionLogic;
+            var item = itemSlot.Item;
+            var progressionLogic = item.ProgressionLogic;
 
             if (!progressionLogic.IsValid)
                 return false;
@@ -499,25 +561,53 @@ namespace EntityTools.Quester.Actions
             
             if (!catalystItems.Any()) return true;
 
+            var itemDef = item.ItemDef;
+            var itemInternalName = itemDef.InternalName;
             var player = EntityManager.LocalPlayer;
 
             //TODO заменить итерацию catalystItems на итерацию инвентаря 
             foreach (var catalyst in catalystItems)
             {
+                var catalystNumRequired = catalyst.NumRequired;
+
+                // catalyst.Type == 2 у осколков волшебных камней брони и оружия
+                // при этом у них невалидно свойство catalyst.ItemDef,
+                // поэтому невозможно определить его InternalName
+                
+                if (catalyst.Type == 2u)
+                {
+                    var itemCount = player.GetItemCountByInternalNameInBags(itemInternalName);
+                    if (itemCount < catalystNumRequired + 1u)
+                    {
+                        Logger.WriteLine(
+                            $"Not enough {catalystNumRequired - itemCount + 1} catalysts '{itemInternalName}'");
+                        return false;
+                    }
+                    continue;
+                }
+
+
+                var catalystInternalName = catalyst.ItemDef.InternalName;
+
                 // Ищем реагент среди предметов в инвентаре
-                var count = player.GetItemCountByInternalNameInBags(catalyst.ItemDef.InternalName);
-                if (catalyst.ItemDef.InternalName == itemSlot.Item.ItemDef.InternalName)
+                var count = player.GetItemCountByInternalNameInBags(catalystInternalName);
+
+                if (catalystInternalName == itemInternalName)
                     count--;
-                if (count < catalyst.NumRequired)
+                if (count < catalystNumRequired)
                 {
                     // Поскольку реагент не найден среди предметов
                     // Ищем реагент в разделе ценностей (Numeric)
-                    count = (uint) player.Inventory.GetNumericCount(catalyst.ItemDef.InternalName);
-                    if (count < catalyst.NumRequired)
+                    count = (uint) player.Inventory.GetNumericCount(catalystInternalName);
+                    if (count < catalystNumRequired)
+                    {
+                        Logger.WriteLine($"Not enough {catalystNumRequired - count} catalysts '{itemInternalName}'");
                         return false;
+                    }
                 }
             }
 
+            Logger.WriteLine($"All catalysts are present");
             return true;
         }
     }
