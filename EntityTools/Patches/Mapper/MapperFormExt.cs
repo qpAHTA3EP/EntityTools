@@ -92,11 +92,11 @@ namespace EntityTools.Patches.Mapper
 
             barMapping.Visible = EntityTools.Config.Mapper.MapperForm.MappingBarVisible;
             barMeshes.Visible = EntityTools.Config.Mapper.MapperForm.MeshesBarVisible;
-            barNodeTools.Visible = EntityTools.Config.Mapper.MapperForm.NodeToolsBarVisible;
+            barGraphEditTools.Visible = EntityTools.Config.Mapper.MapperForm.NodeToolsBarVisible;
             barCustomRegions.Visible = EntityTools.Config.Mapper.MapperForm.CustomRegionBarVisible;
             barStatus.Visible = EntityTools.Config.Mapper.MapperForm.StatusBarVisible;
 
-            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barNodeTools.Visible && !barCustomRegions.Visible;
+            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barGraphEditTools.Visible && !barCustomRegions.Visible;
 
             Location = EntityTools.Config.Mapper.MapperForm.Location;
 
@@ -288,11 +288,11 @@ namespace EntityTools.Patches.Mapper
 
             barMapping.Visible = EntityTools.Config.Mapper.MapperForm.MappingBarVisible;
             barMeshes.Visible = EntityTools.Config.Mapper.MapperForm.MeshesBarVisible;
-            barNodeTools.Visible = EntityTools.Config.Mapper.MapperForm.NodeToolsBarVisible;
+            barGraphEditTools.Visible = EntityTools.Config.Mapper.MapperForm.NodeToolsBarVisible;
             barCustomRegions.Visible = EntityTools.Config.Mapper.MapperForm.CustomRegionBarVisible;
             barStatus.Visible = EntityTools.Config.Mapper.MapperForm.StatusBarVisible;
 
-            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barNodeTools.Visible && !barCustomRegions.Visible;
+            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barGraphEditTools.Visible && !barCustomRegions.Visible;
             Location = EntityTools.Config.Mapper.MapperForm.Location;
             Size = EntityTools.Config.Mapper.MapperForm.Size;
             backgroundWorker.RunWorkerAsync();
@@ -309,7 +309,7 @@ namespace EntityTools.Patches.Mapper
 
             EntityTools.Config.Mapper.MapperForm.MappingBarVisible = barMapping.Visible;
             EntityTools.Config.Mapper.MapperForm.MeshesBarVisible = barMeshes.Visible;
-            EntityTools.Config.Mapper.MapperForm.NodeToolsBarVisible = barNodeTools.Visible;
+            EntityTools.Config.Mapper.MapperForm.NodeToolsBarVisible = barGraphEditTools.Visible;
             EntityTools.Config.Mapper.MapperForm.CustomRegionBarVisible = barCustomRegions.Visible;
             EntityTools.Config.Mapper.MapperForm.StatusBarVisible = barStatus.Visible;
 
@@ -334,21 +334,13 @@ namespace EntityTools.Patches.Mapper
         private void work_MapperFormUpdate(object sender, DoWorkEventArgs e)
         {
             string formCaption = string.Empty,
-                   statusStr = string.Empty,
-                   playerPosStr = string.Empty,
-                   mousePosStr = string.Empty,
+                   statusStr,
+                   playerPosStr,
+                   mousePosStr,
                    zoomStr = string.Empty;
             Image img = null;
 
-            var updateFormStatus = new Action(() =>
-            {
-                Text = formCaption;
-                lblMousePos.Caption = mousePosStr;
-                lblPlayerPos.Caption = playerPosStr;
-                lblDrawInfo.Caption = statusStr;
-                lblZoom.Caption = zoomStr;
-                MapPicture.Image = img;
-            });
+
 
             //TODO Заменить Environment.TickCount на DateTime.Now.Ticks 
 #if DrawMapper_Measuring
@@ -503,7 +495,18 @@ namespace EntityTools.Patches.Mapper
                     }
 
                     if (InvokeRequired)
-                        Invoke(updateFormStatus);
+                    {
+                        Invoke(new Action(() =>
+                        {
+                            Text = formCaption;
+                            lblMousePos.Caption = mousePosStr;
+                            lblPlayerPos.Caption = playerPosStr;
+                            lblDrawInfo.Caption = statusStr;
+                            lblZoom.Caption = zoomStr;
+                            MapPicture.Image = img;
+                        }));
+
+                    }
                     else
                     {
                         Text = formCaption;
@@ -538,7 +541,7 @@ namespace EntityTools.Patches.Mapper
             var tool = CurrentTool;
             if (tool != null)
             {
-                double x = 0, y = 0;
+                double x, y;
                 IMapperTool undo = null;
                 if (tool.AllowNodeSelection)
                 {
@@ -557,8 +560,6 @@ namespace EntityTools.Patches.Mapper
                                 tool.OnMouseClick(graph, _selectedNodes, me, out undo);
                         }
                     }
-                    if (undo != null)
-                        _undoStack.Push(undo);
                 }
                 else if (tool.HandleMouseClick)
                 {
@@ -571,6 +572,8 @@ namespace EntityTools.Patches.Mapper
                     using (graph.WriteLock())
                         tool.OnMouseClick(graph, null, me, out undo);
                 }
+                if (undo != null)
+                    _undoStack.Push(undo);
             }
         }
 
@@ -587,7 +590,7 @@ namespace EntityTools.Patches.Mapper
             var tool = CurrentTool;
             if (tool != null)
             {
-                double x = 0, y = 0;
+                double x, y;
                 IMapperTool undo = null;
                 if (tool.AllowNodeSelection)
                 {
@@ -604,8 +607,6 @@ namespace EntityTools.Patches.Mapper
                                 tool.OnKeyUp(graph, _selectedNodes, e, x, y, out undo);
                         }
                     }
-                    if (undo != null)
-                        _undoStack.Push(undo);
                 }
                 else if (tool.HandleMouseClick)
                 {
@@ -616,6 +617,8 @@ namespace EntityTools.Patches.Mapper
                     using (graph.WriteLock())
                         tool.OnKeyUp(graph, _selectedNodes, e, x, y, out undo);
                 }
+                if (undo != null)
+                    _undoStack.Push(undo);
             }
         } 
         #endregion
@@ -856,7 +859,7 @@ namespace EntityTools.Patches.Mapper
                         _graphics.Reinitialize(EntityManager.LocalPlayer.Location, imgWidth, imgHeight, Zoom, out leftBorder, out topBorder, out rightBorder, out downBorder);
                     else _graphics.Reinitialize(imgWidth, imgHeight, Zoom, out leftBorder, out topBorder, out rightBorder, out downBorder);
 
-                    Vector3 location = null;
+                    Vector3 location;
                     float x, y;
 
                     #region Отрисовка нодов
@@ -1184,7 +1187,7 @@ namespace EntityTools.Patches.Mapper
 
             btnLockMapOnPlayer.Checked = false;
 
-            barEditCustomRegion.Text = "Add CustomRegion";
+            barEditCustomRegion.Text = @"Add CustomRegion";
             barEditCustomRegion.DockStyle = BarDockStyle.None;
             barEditCustomRegion.FloatLocation = new Point(Location.X + MapPicture.Location.X + 20, 
                 Location.Y + MapPicture.Location.Y + 20 
@@ -1227,7 +1230,7 @@ namespace EntityTools.Patches.Mapper
 
             btnLockMapOnPlayer.Checked = false;
 
-            barEditCustomRegion.Text = "Edit CustomRegion";
+            barEditCustomRegion.Text = @"Edit CustomRegion";
             barEditCustomRegion.DockStyle = BarDockStyle.None;
             barEditCustomRegion.FloatLocation = new Point(Location.X + MapPicture.Location.X + 20,
                 Location.Y + MapPicture.Location.Y + 20
@@ -1442,7 +1445,7 @@ namespace EntityTools.Patches.Mapper
 
         private void handler_BarVisibleChanged(object sender, EventArgs e)
         {
-            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barNodeTools.Visible && !barCustomRegions.Visible;
+            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barGraphEditTools.Visible && !barCustomRegions.Visible;
         }
 
         private void handler_ShowSettingsTab(object sender, ItemClickEventArgs e)
@@ -1469,13 +1472,13 @@ namespace EntityTools.Patches.Mapper
 
             string meshName = EntityManager.LocalPlayer.MapState.MapName + ".bin";
             string profileName = Astral.Controllers.Settings.Get.LastQuesterProfile;
-            var currentProfile = Astral.Quester.API.CurrentProfile;
-            bool useExternalMeshFile = currentProfile.UseExternalMeshFile && currentProfile.ExternalMeshFileName.Length >= 10;
-            string externalMeshFileName = useExternalMeshFile ? Path.Combine(Path.GetDirectoryName(profileName), currentProfile.ExternalMeshFileName) : string.Empty;
-            Graph mesh = AstralAccessors.Quester.Core.Meshes;
-
             if (File.Exists(profileName))
             {
+                var currentProfile = Astral.Quester.API.CurrentProfile;
+                bool useExternalMeshFile = currentProfile.UseExternalMeshFile && currentProfile.ExternalMeshFileName.Length >= 10;
+                string externalMeshFileName = useExternalMeshFile ? Path.Combine(Path.GetDirectoryName(profileName), currentProfile.ExternalMeshFileName) : string.Empty;
+                Graph mesh = AstralAccessors.Quester.Core.Meshes;
+
                 ZipArchive zipFile = null;
                 try
                 {

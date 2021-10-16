@@ -218,6 +218,7 @@
     <Compile Include="UCC\Actions\ApproachEntityEngine.cs" />
     <Compile Include="UCC\Actions\ChangeTargetEngine.cs" />
     <Compile Include="UCC\Actions\DodgeFromEntityEngine.cs" />
+    <Compile Include="UCC\Actions\PluggedSkillEngine.cs" />
     <Compile Include="UCC\Actions\ExecuteSpecificPowerEngine.cs" />
     <Compile Include="UCC\Actions\UseItemSpecialEngine.cs" />
     <Compile Include="Tools\Targeting\TeammateSupportTargetProcessor.cs" />

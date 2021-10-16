@@ -37,6 +37,12 @@ namespace EntityTools.Enums
         /// Игровой магазин кампаний
         /// </summary>
         RemoteVendor,
+#if false
+        /// <summary>
+        /// Нод-торговец
+        /// </summary>
+        Node, 
+#endif
         /// <summary>
         /// ВИП-магазин печатей
         /// </summary>

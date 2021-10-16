@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
@@ -9,21 +10,15 @@ using Astral.Quester.UIEditors;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
-#if true
 using EntityTools.Tools.BuySellItems;
 using MyNW.Classes;
-#else
-using EntityTools.Tools.ItemFilter;
-#endif
+
 
 namespace EntityTools.UCC.Actions
 {
     [Serializable]
     public class UseItemSpecial : UCCAction
     {
-#if DEVELOPER && CheckedListBoxCommonSelector_InvBagIDs
-        internal class InventoryBagsCheckedListBoxEditor : CheckedListBoxCommonEditor<InvBagIDs> { }
-#endif
 
 
         #region Опции команды
@@ -41,7 +36,7 @@ namespace EntityTools.UCC.Actions
                 if (_itemId != value)
                 {
                     _itemId = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ItemId)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -62,7 +57,7 @@ namespace EntityTools.UCC.Actions
                 if (_itemIdType != value)
                 {
                     _itemIdType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ItemIdType)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -80,94 +75,17 @@ namespace EntityTools.UCC.Actions
                 if (_checkItemCooldown != value)
                 {
                     _checkItemCooldown = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CheckItemCooldown)));
+                    NotifyPropertyChanged();
                 }
             }
         }
         internal bool _checkItemCooldown;
 
 
-#if disabled_20200527_1854
-#if DEVELOPER
-        [Category("Item")]
-        [Description("Identificator of the bag where Item would be searched\n" +
-            "When selected value is 'None' then item is searched in the all inventories")]
-        [Browsable(false)]
-#else
-        [Browsable(false)]
-#endif        
-        public InvBagIDs BagId
-        {
-#if CheckedListBoxCommonSelector_InvBagIDs
-            get
-            {
-                if (Bags != null && Bags.Items.Count > 0)
-                    return Bags.Items[0];
-                else return InvBagIDs.None;
-            }
-            set
-            {
-                if (Bags == null)
-                {
-                    Bags = new CheckedListBoxCommonSelector<InvBagIDs>();
-                    Bags.Items.Add(value);
-                }
-                else
-                {
-                    if (!Bags.Items.Contains(value))
-                        Bags.Items.Add(value);
-                }
-            } 
-#else
-            get
-            {
-#if disabled_20200527_1847
-                if (_bags != null)
-                    return _bags.FirstOrDefault();
 
-#endif
-                return InvBagIDs.None;
-            }
-            set
-            {
-                if (_bags == null)
-                {
-                    _bags = new BagsList();
-                    _bags.Add(value);
-                }
-                else
-                {
-                    _bags.Add(value);
-                }
-            }
-#endif
-        } 
-#endif
-
-#if CheckedListBoxCommonSelector_InvBagIDs
 #if DEVELOPER
         [Category("Item")]
-        [Description("Identificator of the bags where Item would be searched\n")]
-        [Editor(typeof(InventoryBagsCheckedListBoxEditor), typeof(UITypeEditor))]
-#else
-        [Browsable(false)]
-#endif
-        public CheckedListBoxCommonSelector<InvBagIDs> Bags
-        {
-            get => _bags; set
-            {
-                if (_bags != value)
-                {
-                    _bags = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Bags)));
-                }
-            }
-        }
-        internal CheckedListBoxCommonSelector<InvBagIDs> _bags = new CheckedListBoxCommonSelector<InvBagIDs>();
-#else
-#if DEVELOPER
-        [Category("Item")]
-        [Description("Identificator of the bags where Item would be searched\n")]
+        [Description("Identificator of the bags where Item would be searched")]
         [Editor(typeof(BagsListEditor), typeof(UITypeEditor))]
 #else
         [Browsable(false)]
@@ -179,12 +97,12 @@ namespace EntityTools.UCC.Actions
                 if (_bags != value)
                 {
                     _bags = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Bags)));
+                    NotifyPropertyChanged();
                 }
             }
         }
         internal BagsList _bags = BagsList.GetPlayerBagsAndPotions();
-#endif
+
 
         #region Hide Inherited Properties
         [XmlIgnore]
@@ -202,6 +120,11 @@ namespace EntityTools.UCC.Actions
         internal IUccActionEngine Engine;
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public UseItemSpecial()
         {

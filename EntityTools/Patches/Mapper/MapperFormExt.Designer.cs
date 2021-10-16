@@ -53,7 +53,7 @@ namespace EntityTools.Patches.Mapper
             this.seMaxZDifference = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
             this.editEquivalenceDistance = new DevExpress.XtraBars.BarEditItem();
             this.seEquivalenceDistance = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
-            this.barNodeTools = new DevExpress.XtraBars.Bar();
+            this.barGraphEditTools = new DevExpress.XtraBars.Bar();
             this.btnUndo = new DevExpress.XtraBars.BarButtonItem();
             this.groupEditMeshes = new DevExpress.XtraBars.BarButtonGroup();
             this.btnMoveNodes = new DevExpress.XtraBars.BarCheckItem();
@@ -193,7 +193,7 @@ namespace EntityTools.Patches.Mapper
             this.barManager.AllowQuickCustomization = false;
             this.barManager.Bars.AddRange(new DevExpress.XtraBars.Bar[] {
             this.barMapping,
-            this.barNodeTools,
+            this.barGraphEditTools,
             this.barMeshes,
             this.barCustomRegions,
             this.barEditCustomRegion,
@@ -429,18 +429,19 @@ namespace EntityTools.Patches.Mapper
             this.seEquivalenceDistance.Mask.EditMask = "N00";
             this.seEquivalenceDistance.Name = "seEquivalenceDistance";
             // 
-            // barNodeTools
+            // barGraphEditTools
             // 
-            this.barNodeTools.BarName = "NodeTools";
-            this.barNodeTools.DockCol = 1;
-            this.barNodeTools.DockRow = 0;
-            this.barNodeTools.DockStyle = DevExpress.XtraBars.BarDockStyle.Top;
-            this.barNodeTools.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
+            this.barGraphEditTools.BarName = "GraphEditTools";
+            this.barGraphEditTools.DockCol = 1;
+            this.barGraphEditTools.DockRow = 0;
+            this.barGraphEditTools.DockStyle = DevExpress.XtraBars.BarDockStyle.Top;
+            this.barGraphEditTools.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
             new DevExpress.XtraBars.LinkPersistInfo(this.btnUndo),
             new DevExpress.XtraBars.LinkPersistInfo(this.groupEditMeshes, true)});
-            this.barNodeTools.Offset = 207;
-            this.barNodeTools.Text = "Node Tools";
-            this.barNodeTools.Visible = false;
+            this.barGraphEditTools.Offset = 207;
+            this.barGraphEditTools.Text = "Graph Edit Tools";
+            this.barGraphEditTools.Visible = false;
+            this.barGraphEditTools.VisibleChanged += new System.EventHandler(this.handler_BarVisibleChanged);
             // 
             // btnUndo
             // 
@@ -616,6 +617,7 @@ namespace EntityTools.Patches.Mapper
             this.barCustomRegions.OptionsBar.AllowQuickCustomization = false;
             this.barCustomRegions.Text = "CustomRegion Tools";
             this.barCustomRegions.Visible = false;
+            this.barCustomRegions.VisibleChanged += new System.EventHandler(this.handler_BarVisibleChanged);
             // 
             // btnAddCR
             // 
@@ -659,7 +661,7 @@ namespace EntityTools.Patches.Mapper
             // 
             // btnCRTypeSelector
             // 
-            this.btnCRTypeSelector.Caption = "CustormRegion Type";
+            this.btnCRTypeSelector.Caption = "CustomRegion Form";
             this.btnCRTypeSelector.Hint = "Change type of the CustomRegion (Rectangular to Elliptical)";
             this.btnCRTypeSelector.Id = 106;
             this.btnCRTypeSelector.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCRRectang;
@@ -710,7 +712,7 @@ namespace EntityTools.Patches.Mapper
             // 
             // btnCRAdditionAccept
             // 
-            this.btnCRAdditionAccept.Caption = "Accept";
+            this.btnCRAdditionAccept.Caption = "Add";
             this.btnCRAdditionAccept.DropDownEnabled = false;
             this.btnCRAdditionAccept.Id = 79;
             this.btnCRAdditionAccept.ImageOptions.Image = global::EntityTools.Properties.Resources.miniAdd;
@@ -1524,7 +1526,7 @@ namespace EntityTools.Patches.Mapper
         private BarButtonItem btnZoomOut;
         private BarStaticItem lblZoom;
         private Bar barCustomRegions;
-        private Bar barNodeTools;
+        private Bar barGraphEditTools;
         private BarButtonGroup groupSaveUndo;
         private BarEditItem editBidirPathColor;
         private RepositoryItemColorEdit editItemColor;

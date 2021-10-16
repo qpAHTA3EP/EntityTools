@@ -1,7 +1,7 @@
 ﻿#if DEBUG
 #define DEBUG_ExecuteSpecificPower
 #endif
-//#define REFLECTION_ACCESS
+
 #define SMART_REFLECTION_ACCESS
 
 using AcTp0Tools;
@@ -19,27 +19,24 @@ using System;
 using System.ComponentModel;
 using System.Threading;
 using System.Xml.Serialization;
+using EntityTools.UCC.Conditions;
 using Unit = Astral.Logic.UCC.Ressources.Enums.Unit;
 
 namespace EntityCore.UCC.Actions
 {
     public class ExecuteSpecificPowerEngine : IUccActionEngine
-#if IEntityDescriptor
-        , IEntityInfos  
-#endif
     {
         #region Данные
         private ExecuteSpecificPower @this;
 
-        private Entity entity = null;
-        private bool slotedState = false;
+        private Entity entity;
         private string label = string.Empty;
         private string _idStr;
 
-        private int   attachedGameProcessId = 0;
-        private uint  characterContainerId = 0;
-        private uint  powerId = 0;
-        private Power power = null;
+        private int   attachedGameProcessId;
+        private uint  characterContainerId;
+        private uint  powerId;
+        private Power power;
         #endregion
 
         internal ExecuteSpecificPowerEngine(ExecuteSpecificPower esp)
@@ -139,11 +136,7 @@ namespace EntityCore.UCC.Actions
             @this = execPower;
             @this.PropertyChanged += PropertyChanged;
 
-#if false
-            checkEntity = initialize_CheckEntity; 
-#else
             _key = null;
-#endif
 
             _idStr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
 
@@ -159,9 +152,14 @@ namespace EntityCore.UCC.Actions
             {
                 var p = GetCurrentPower();
 
-                return ValidatePower(p)
-                        && (!@this._checkPowerCooldown || !p.IsOnCooldown())
-                        && (!@this._checkInTray || p.IsInTray);
+                if (p is null)
+                    return false;
+
+                if (@this._checkPowerCooldown && p.IsOnCooldown()
+                    || @this._checkInTray && !p.IsInTray)
+                    return false;
+
+                return ((ICustomUCCCondition)@this._customConditions).IsOK(@this);
             }
         }
 
@@ -172,7 +170,7 @@ namespace EntityCore.UCC.Actions
 #endif
             Power currentPower = GetCurrentPower();
 
-            if (!ValidatePower(currentPower))
+            if (currentPower is null)
             {
 #if DEBUG_ExecuteSpecificPower
                 ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Fail to get Power '{@this._powerId}' by 'PowerId'");
@@ -212,18 +210,13 @@ namespace EntityCore.UCC.Actions
 
                     AstralAccessors.Logic.UCC.Controllers.Movements.RequireRange = effectiveRange - 2;
 
-                    while (AstralAccessors.Logic.UCC.Controllers.Movements.RangeIsOk)
+                    while (!AstralAccessors.Logic.UCC.Controllers.Movements.RangeIsOk)
                     {
                         if (Astral.Logic.UCC.Core.CurrentTarget.IsDead)
                         {
                             return true;
                         }
                         Thread.Sleep(100);
-                        //if (Spell.stopMoveDodgeTO.IsTimedOut && AOECheck.PlayerIsInAOE)
-                        //{
-                        //    Spell.stopMoveDodgeTO.ChangeTime(3500);
-                        //    return true;
-                        //}
                     }
                 }
             }
@@ -354,12 +347,12 @@ namespace EntityCore.UCC.Actions
             {
                 Power currentPower = GetCurrentPower();
 
-                if (ValidatePower(currentPower))
+                if (currentPower != null)
                 {
-                    PowerDef powDef = currentPower.EffectivePowerDef();
+                    PowerDef powDef = currentPower.PowerDef;
                     if (powDef != null && powDef.IsValid)
-                        label = string.Concat((@this._checkInTray && (slotedState = СurrentPowerIsSlotted)) ? "[Slotted] " : string.Empty,
-                            (powDef.DisplayName.Length > 0) ? powDef.DisplayName : powDef.InternalName);
+                        label = string.Concat(@this._checkInTray && CurrentPowerIsSlotted ? "[Slotted] " : string.Empty,
+                            string.IsNullOrEmpty(powDef.DisplayName) ? powDef.InternalName : powDef.DisplayName);
                 }
                 else
                 {
@@ -370,7 +363,7 @@ namespace EntityCore.UCC.Actions
                     }
                 }
                 if (string.IsNullOrEmpty(label))
-                    label = "Unknow Power";
+                    label = "Unknown Power";
             }
 
             return label;
@@ -380,144 +373,43 @@ namespace EntityCore.UCC.Actions
         #region Вспомогательные функции
         [XmlIgnore]
         [Browsable(false)]
-        private bool СurrentPowerIsSlotted => power?.IsInTray == true;
-        private bool ValidatePower(Power p)
-        {
-            return attachedGameProcessId == Astral.API.AttachedGameProcess.Id
-                && characterContainerId == EntityManager.LocalPlayer.ContainerId
-                && p != null 
-                && (p.PowerId == powerId
-                    || p.PowerDef.InternalName == @this._powerId 
-                    || p.EffectivePowerDef().InternalName == @this._powerId);
-        }
+        private bool CurrentPowerIsSlotted => power?.IsInTray == true;
+
         private Power GetCurrentPower()
         {
-            if (!ValidatePower(power))
+            if (!(attachedGameProcessId == Astral.API.AttachedGameProcess.Id
+                  && characterContainerId == EntityManager.LocalPlayer.ContainerId
+                  && power != null
+                  && (power.PowerId == powerId
+                      || string.Equals(power.PowerDef.InternalName, @this._powerId, StringComparison.Ordinal)
+                      || string.Equals(power.EffectivePowerDef().InternalName, @this._powerId, StringComparison.Ordinal))))
             {
-                attachedGameProcessId = Astral.API.AttachedGameProcess.Id;
-                characterContainerId = EntityManager.LocalPlayer.ContainerId;
                 power = Powers.GetPowerByInternalName(@this._powerId);
-                powerId = power?.PowerId ?? 0;
+                if (power != null)
+                {
+                    powerId = power.PowerId;
+                    attachedGameProcessId = Astral.API.AttachedGameProcess.Id;
+                    characterContainerId = EntityManager.LocalPlayer.ContainerId;
+                }
+                else
+                {
+                    powerId = 0;
+                    attachedGameProcessId = 0;
+                    characterContainerId = 0;
+                }
             }
             return power;
         }
         #endregion
 
 
-#if IEntityDescriptor
-        public bool EntityDiagnosticString(out string infoString)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            sb.Append("EntityID: ").AppendLine(@this._entityId);
-            sb.Append("EntityIdType: ").AppendLine(@this._entityIdType.ToString());
-            sb.Append("EntityNameType: ").AppendLine(@this._entityNameType.ToString());
-            sb.Append("HealthCheck: ").AppendLine(@this._healthCheck.ToString());
-            sb.Append("ReactionRange: ").AppendLine(@this._reactionRange.ToString());
-            sb.Append("ReactionZRange: ").AppendLine(@this._reactionZRange.ToString());
-            sb.Append("RegionCheck: ").AppendLine(@this._regionCheck.ToString());
-            sb.Append("Aura: ").AppendLine(@this._aura.ToString());
-            sb.AppendLine();
-
-            // список всех Entity, удовлетворяющих условиям
-#if false
-            LinkedList<Entity> entities = SearchCached.FindAllEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                                         @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck); 
-#else
-            var entityKey = EntityKey;
-            LinkedList<Entity> entities = SearchCached.FindAllEntity(entityKey);
-#endif
-
-
-            // Количество Entity, удовлетворяющих условиям
-            if (entities != null)
-                sb.Append("Founded Entities: ").AppendLine(entities.Count.ToString());
-            else sb.Append("Founded Entities: 0");
-            sb.AppendLine();
-
-            // Ближайшее Entity (найдено при вызове ie.NeedToRun, поэтому строка ниже закомментирована)
-#if false
-            entity = SearchCached.FindClosestEntity(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete,
-                                                        @this._healthCheck, @this._reactionRange, @this._reactionZRange, @this._regionCheck); 
-#else
-            entity = SearchCached.FindClosestEntity(entityKey, null);
-#endif
-            if (entity != null)
-            {
-                bool distOk = entity.Location.Distance3DFromPlayer < @this._reactionRange;
-                bool zOk = @this._reactionZRange <= 0 || Astral.Logic.General.ZAxisDiffFromPlayer(entity.Location) < @this._reactionZRange;
-                bool alive = !@this._healthCheck || !entity.IsDead;
-                sb.Append("ClosestEntity: ").Append(entity.ToString());
-                if (distOk && zOk && alive)
-                    sb.AppendLine(" [MATCH]");
-                else sb.AppendLine(" [MISMATCH]");
-                sb.Append("\tName: ").AppendLine(entity.Name);
-                sb.Append("\tInternalName: ").AppendLine(entity.InternalName);
-                sb.Append("\tNameUntranslated: ").AppendLine(entity.NameUntranslated);
-                sb.Append("\tIsDead: ").Append(entity.IsDead.ToString());
-                if (alive)
-                    sb.AppendLine(" [OK]");
-                else sb.AppendLine(" [FAIL]"); sb.Append("\tRegion: '").Append(entity.RegionInternalName).AppendLine("'");
-                sb.Append("\tLocation: ").AppendLine(entity.Location.ToString());
-                sb.Append("\tDistance: ").Append(entity.Location.Distance3DFromPlayer.ToString());
-                if (distOk)
-                    sb.AppendLine(" [OK]");
-                else sb.AppendLine(" [FAIL]");
-                sb.Append("\tZAxisDiff: ").Append(Astral.Logic.General.ZAxisDiffFromPlayer(entity.Location).ToString());
-                if (zOk)
-                    sb.AppendLine(" [OK]");
-                else sb.AppendLine(" [FAIL]");
-            }
-            else sb.AppendLine("Closest Entity not found!");
-
-            infoString = sb.ToString();
-            return true;
-        } 
-#endif
-
-#if true
         /// <summary>
         /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
         /// </summary>
-        public EntityCacheRecordKey EntityKey
-        {
-            get
-            {
-                if (_key is null)// && (@this._entityNameType == EntityNameType.Empty || !string.IsNullOrEmpty(@this._entityId)))
-                    _key = new EntityCacheRecordKey(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete);
-                return _key;
-            }
-        }
-        private EntityCacheRecordKey _key;
-#else
-        private Predicate<Entity> checkEntity { get; set; } = null;
-        private bool ValidateEntity(Entity e)
-        {
-            return e != null && e.IsValid && checkEntity?.Invoke(e) == true;
-        }
-        /// <summary>
-        /// Метод, инициализирующий функтор <see cref="checkEntity"/>,
-        /// использующийся для проверки сущности <paramref name="e"/> на соответствия идентификатору <see cref="EntityID"/>
-        /// </summary>
-        /// <param name="e"></param>
-        /// <returns></returns>
-        private bool initialize_CheckEntity(Entity e)
-        {
-            Predicate<Entity> predicate = EntityComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
+        public EntityCacheRecordKey EntityKey =>
+            _key ?? (_key = new EntityCacheRecordKey(@this._entityId, @this._entityIdType,
+                @this._entityNameType, EntitySetType.Complete));
 
-            bool extendedDebugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
-            string currentMethodName = extendedDebugInfo ? string.Concat(actionIDstr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
-            if (predicate != null)
-            {
-                if (extendedDebugInfo)
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Initialize '" + nameof(checkEntity) + '\''));
-                checkEntity = predicate;
-                return e != null && checkEntity(e);
-            }
-            else if (extendedDebugInfo)
-                ETLogger.WriteLine(LogType.Error, string.Concat(currentMethodName, ": Fail to initialize " + nameof(checkEntity) + '\''));
-            return false;
-        } 
-#endif
+        private EntityCacheRecordKey _key;
     }
 }

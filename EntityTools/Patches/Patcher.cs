@@ -48,7 +48,9 @@ namespace EntityTools.Patches
                 ComplexPatch_Mapper.Apply();
                 // Изменение команды квестера AddUCCAction и сопутствующие патчи
                 ComplexPatch_Quester_UccEditing.Apply();
-#if HARMONY
+                //// Перехват исключений в MyNW.Internals.WorldDrawing.\u0001()
+                MyNW_Internals_WorldDrawing.ApplyPatches();
+
                 try
                 {
 #if true
@@ -62,7 +64,6 @@ namespace EntityTools.Patches
                 {
                     ETLogger.WriteLine(LogType.Error, "Harmony patches are failed!",true);
                 }
-#endif
                 _applied = true;
             }
         }

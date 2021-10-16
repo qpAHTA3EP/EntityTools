@@ -35,16 +35,16 @@ namespace EntityTools.Core
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            DevExpress.XtraEditors.Controls.EditorButtonImageOptions editorButtonImageOptions3 = new DevExpress.XtraEditors.Controls.EditorButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject9 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject10 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject11 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject12 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraEditors.Controls.EditorButtonImageOptions editorButtonImageOptions4 = new DevExpress.XtraEditors.Controls.EditorButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject13 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject14 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject15 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject16 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraEditors.Controls.EditorButtonImageOptions editorButtonImageOptions1 = new DevExpress.XtraEditors.Controls.EditorButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject1 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject2 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject3 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject4 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraEditors.Controls.EditorButtonImageOptions editorButtonImageOptions2 = new DevExpress.XtraEditors.Controls.EditorButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject5 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject6 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject7 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject8 = new DevExpress.Utils.SerializableAppearanceObject();
             this.fldrBroserDlg = new System.Windows.Forms.FolderBrowserDialog();
             this.tbclMain = new DevExpress.XtraTab.XtraTabControl();
             this.tabUtilities = new DevExpress.XtraTab.XtraTabPage();
@@ -307,8 +307,8 @@ namespace EntityTools.Core
             this.tbExportFileSelector.Location = new System.Drawing.Point(9, 52);
             this.tbExportFileSelector.Name = "tbExportFileSelector";
             this.tbExportFileSelector.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Undo, "", -1, true, true, false, editorButtonImageOptions3, new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject9, serializableAppearanceObject10, serializableAppearanceObject11, serializableAppearanceObject12, "Restore defaul export file", null, null, DevExpress.Utils.ToolTipAnchor.Default),
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Ellipsis, "", -1, true, true, false, editorButtonImageOptions4, new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject13, serializableAppearanceObject14, serializableAppearanceObject15, serializableAppearanceObject16, "Set export file location", null, null, DevExpress.Utils.ToolTipAnchor.Default)});
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Undo, "", -1, true, true, false, editorButtonImageOptions1, new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject1, serializableAppearanceObject2, serializableAppearanceObject3, serializableAppearanceObject4, "Restore defaul export file", null, null, DevExpress.Utils.ToolTipAnchor.Default),
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Ellipsis, "", -1, true, true, false, editorButtonImageOptions2, new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject5, serializableAppearanceObject6, serializableAppearanceObject7, serializableAppearanceObject8, "Set export file location", null, null, DevExpress.Utils.ToolTipAnchor.Default)});
             this.tbExportFileSelector.Properties.HideSelection = false;
             this.tbExportFileSelector.Properties.NullText = "Enter the Filename";
             this.tbExportFileSelector.Size = new System.Drawing.Size(332, 20);
@@ -394,6 +394,8 @@ namespace EntityTools.Core
             this.tabRelogger.Controls.Add(this.tbMashineId);
             this.tabRelogger.Name = "tabRelogger";
             this.tabRelogger.Padding = new System.Windows.Forms.Padding(5);
+            this.tabRelogger.PageEnabled = false;
+            this.tabRelogger.PageVisible = false;
             this.tabRelogger.Size = new System.Drawing.Size(368, 391);
             this.tabRelogger.Text = "Relogger";
             // 
@@ -477,6 +479,8 @@ namespace EntityTools.Core
             this.tabDebug.Controls.Add(this.btnTest3);
             this.tabDebug.Name = "tabDebug";
             this.tabDebug.Padding = new System.Windows.Forms.Padding(6);
+            this.tabDebug.PageEnabled = false;
+            this.tabDebug.PageVisible = false;
             this.tabDebug.Size = new System.Drawing.Size(368, 391);
             this.tabDebug.Text = "Debug";
             // 

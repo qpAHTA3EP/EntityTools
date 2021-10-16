@@ -16,6 +16,8 @@ using EntityCore.Entities;
 
 namespace EntityCore.Tools
 {
+    //TODO: Исправить обработку барда
+
     public static class PlayerTeamHelper
     {
         #region Identifiers

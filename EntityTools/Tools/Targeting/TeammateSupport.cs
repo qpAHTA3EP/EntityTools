@@ -33,6 +33,7 @@ namespace EntityTools.Tools.Targeting
         }
         internal Teammates teammate;
 
+
 #if false
         [NotifyParentProperty(true)]
         public int TeammateMinHP

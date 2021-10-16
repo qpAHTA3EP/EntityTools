@@ -28,8 +28,10 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using AcTp0Tools.Reflection;
+using Astral.Logic.NW;
 using EntityTools.Tools.Targeting;
 using MyNW.Classes.ItemProgression;
+using MyNW.Patchables.Enums;
 using API = Astral.Quester.API;
 using Task = System.Threading.Tasks.Task;
 
@@ -151,6 +153,50 @@ namespace EntityTools.Core
 
         private void handler_Test_1(object sender, EventArgs e)
         {
+            StringBuilder sb = new StringBuilder("Powers:\n");
+
+            for (int i = 0; i < 15; i++)
+            {
+                var power = Powers.GetPowerBySlot(i);
+                if (power != null && power.IsValid)
+                {
+                    var powDef = power.PowerDef;
+                    //sb.Append("\t[").Append(i).Append("]\t").Append(powDef.DisplayName).Append(" (").Append(powDef.InternalName).AppendLine(")");
+                    sb.AppendFormat("\t[{0}]\t{1} ({2})\n", i, powDef.DisplayName, powDef.InternalName);
+                }
+                else
+                {
+                    //sb.Append("\t[").Append(i).AppendLine("]\tInvalid");
+                    sb.AppendFormat("\t[{0}]\tInvalid\n", i);
+                }
+            }
+
+            sb.AppendLine("------------------");
+
+            var art = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.ArtifactPrimary).GetItems.FirstOrDefault()?.Item;
+            if (art != null && art.IsValid)
+            {
+                var power = art.Powers.FirstOrDefault();
+                if (power != null && power.IsValid)
+                {
+                    var powDef = power.PowerDef;
+                    sb.AppendFormat("Artifact\t[{0}]\t{1} ({2})\n", power.TraySlot, powDef.DisplayName, powDef.InternalName);
+                }
+            }
+            var mount = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.MountEquippedActivePower).GetItems.FirstOrDefault()?.Item;
+            if (mount != null && mount.IsValid)
+            {
+                var power = mount.Powers.FirstOrDefault();
+                if (power != null && power.IsValid)
+                {
+                    var powDef = power.PowerDef;
+                    sb.AppendFormat("Mount\t[{0}]\t{1} ({2})\n", power.TraySlot, powDef.DisplayName, powDef.InternalName);
+                }
+            }
+
+            XtraMessageBox.Show(sb.ToString());
+
+            
         }
 
         private void handler_Test_2(object sender, EventArgs e)

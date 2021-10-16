@@ -101,8 +101,9 @@ namespace EntityTools.Quester.Actions
 
         /// <summary>
         /// Функтор, определяющий соответствие <see cref="InventorySlot"/> группе идентификаторов:
-        /// <see cref="ItemId"/>, <see cref="ItemIdType"/>, <see cref="AllowBounded"/>  <see cref="AllowAccountBounded"/>
+        /// <see cref="ItemId"/>, <see cref="ItemIdType"/>, <see cref="B2C"/>  <see cref="B2A"/>
         /// </summary>
+        [Browsable(false)]
         private Predicate<InventorySlot> ItemIdPredicate
         {
             get
@@ -195,7 +196,7 @@ namespace EntityTools.Quester.Actions
         /// </summary>
         [DisplayName("ForcedFeedingRPNumber")]
         [Description("Количество очков обработки, для принудительного заполнения обрабатываемого предмета. \n" +
-                     "Используется если количество очков обработни не удалось вычислить, т.к. свойство ProgressionLogic не валидно.\n" +
+                     "Используется если количество очков обработки не удалось вычислить, т.к. у предмета не валидно свойство ProgressionLogic.\n" +
                      "Значение -1 отключает принудительное заполнение предмета очками обработки.")]
         public int Feed { get; set; } = -1;
 

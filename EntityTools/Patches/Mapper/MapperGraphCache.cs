@@ -488,9 +488,9 @@ namespace EntityTools.Patches.Mapper
                     return player.IsValid && !player.IsLoading
                             && !(_nodesLocker.IsReadLockHeld || _nodesLocker.IsUpgradeableReadLockHeld || _nodesLocker.IsWriteLockHeld)
                             && (cacheTimeout.IsTimedOut
-                                || cacheX_0_75 != double.MaxValue && Math.Abs(location.X - centerX) > cacheX_0_75
-                                || cacheY_0_75 != double.MaxValue && Math.Abs(location.Y - centerY) > cacheY_0_75
-                                || cacheZ_0_75 != double.MaxValue && Math.Abs(location.Z - centerZ) > cacheZ_0_75
+                                || Math.Abs(cacheX_0_75 - double.MaxValue) > 1 && Math.Abs(location.X - centerX) > cacheX_0_75
+                                || Math.Abs(cacheY_0_75 - double.MaxValue) > 1 && Math.Abs(location.Y - centerY) > cacheY_0_75
+                                || Math.Abs(cacheZ_0_75 - double.MaxValue) > 1 && Math.Abs(location.Z - centerZ) > cacheZ_0_75
                                 || player.MapAndRegion != _cachedMapAndRegion);
                 }
 
@@ -549,11 +549,15 @@ namespace EntityTools.Patches.Mapper
             {
                 _nodes.Clear();
                 var graph = getGraph();//FullGraph;
-                using (graph.ReadLock())
+
+                if (graph != null)
                 {
-                    foreach (Node node in graph.NodesCollection)
-                        if (NeedCache(node))
-                            _nodes.AddLast(node);
+                    using (graph.ReadLock())
+                    {
+                        foreach (Node node in graph.NodesCollection)
+                            if (NeedCache(node))
+                                _nodes.AddLast(node);
+                    } 
                 }
             }
             _cachedMapAndRegion = EntityManager.LocalPlayer.MapAndRegion;

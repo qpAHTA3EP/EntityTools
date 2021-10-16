@@ -260,7 +260,9 @@
     <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
     <Compile Include="Patches\ComplexPatch_Navigation.cs" />
     <Compile Include="Patches\Mapper\ComplexPatch_Mapper.cs" />
+    <Compile Include="Patches\MyNW_Internals_WorldDrawing.cs" />
     <Compile Include="Patches\Quester\ComplexPatch_Quester_UccEditing.cs" />
+    <Compile Include="Quester\Actions\PromoteTeammate.cs" />
     <Compile Include="Quester\Actions\UpgradeItem.cs" />
     <Compile Include="Quester\Actions\MoveToTeammate.cs" />
     <Compile Include="Quester\Actions\RemoveIgnoredFoes.cs" />
@@ -307,7 +309,7 @@
     </Compile>
     <Compile Include="Quester\Actions\BuySellItemsExt.cs" />
     <Compile Include="Quester\Actions\ChangeInstanceToLeader.cs" />
-    <Compile Include="Quester\Actions\Enums.cs" />
+    <Compile Include="Quester\Enums.cs" />
     <Compile Include="Quester\Actions\InsertInsignia.cs" />
     <Compile Include="Quester\Actions\Deprecated\InteractEntity.cs" />
     <Compile Include="Quester\Actions\InteractEntities.cs" />
@@ -427,6 +429,8 @@
     <Compile Include="UCC\Actions\ChangeTarget.cs" />
     <Compile Include="Tools\Targeting\Enums.cs" />
     <Compile Include="Tools\Targeting\TeammateSupport.cs" />
+    <Compile Include="UCC\Actions\PluggedSkill.cs" />
+    <Compile Include="UCC\AstralAutogenerateProfile.cs" />
     <Compile Include="UCC\IUccConditionPack.cs" />
     <Compile Include="UCC\Enums.cs" />
     <Compile Include="UCC\Extensions\UCCActionExtention.cs" />

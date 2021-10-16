@@ -1,13 +1,12 @@
-﻿using System;
+﻿using Astral.Logic.UCC.Classes;
+using EntityTools.Editors;
+using EntityTools.Enums;
+using EntityTools.Tools;
+using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Text;
 using System.Xml.Serialization;
-using Astral.Logic.UCC.Classes;
-using EntityTools.Editors;
-using EntityTools.Enums;
-using EntityTools.Tools;
-using EntityTools.UCC.Actions;
 using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 
 namespace EntityTools.UCC.Conditions

@@ -19,7 +19,14 @@ namespace EntityTools.Quester.Actions
 
         public override bool UseHotSpots => false;
 
-        protected override bool IntenalConditions => true;
+        protected override bool IntenalConditions
+        {
+            get
+            {
+                var team = EntityManager.LocalPlayer.PlayerTeam;
+                return team.IsInTeam && !team.IsLeader;
+            }
+        }
 
         protected override Vector3 InternalDestination => Vector3.Empty;
 
@@ -27,51 +34,13 @@ namespace EntityTools.Quester.Actions
 
         public override void GatherInfos(){}
         public override void InternalReset(){}
-        public override void OnMapDraw(GraphicsNW graph){}
+        public override void OnMapDraw(GraphicsNW graph) {}
 
         public override ActionResult Run()
         {
             //Определение номера инстанса в PossibleMapChoice.InstanceIndex
             //return Memory.MMemory.Read<uint>(base.Pointer + 40);
-#if false
-            if (EntityManager.LocalPlayer.PlayerTeam.IsInTeam)
-            {
-                if (EntityManager.LocalPlayer.PlayerTeam.IsLeader)
-                    return ActionResult.Skip;
 
-                TeamMember player = EntityManager.LocalPlayer.PlayerTeam.Team.Members.Find(mem => mem.InternalName == EntityManager.LocalPlayer.InternalName);
-                TeamMember leader = EntityManager.LocalPlayer.PlayerTeam.Team.Members.Find(mem => mem.EntityId == EntityManager.LocalPlayer.PlayerTeam.Team.Leader.EntityId);
-
-                if (player != null && player.IsValid && leader != null && leader.IsValid)
-                {
-                    if (leader.MapName != player.MapName)
-                        return ActionResult.Fail;
-
-                    Instances.ChangeInstanceResult changeInstanceResult = CommonTools.ChangeInstance(leader.MapInstanceNumber);
-
-                    if (changeInstanceResult == Instances.ChangeInstanceResult.Combat
-                        || changeInstanceResult == Instances.ChangeInstanceResult.CantChange)
-                    {
-                        return ActionResult.Running;
-                    }
-                    if (changeInstanceResult == Instances.ChangeInstanceResult.Success)
-                    {
-                        //Astral.Classes.Timeout SearchTimeout = new Astral.Classes.Timeout(7000);
-                        //while (Core.GetNearesNodetPosition(EntityManager.LocalPlayer.Location, false).Distance3DFromPlayer > 100.0)
-                        //{
-                        //    if (SearchTimeout.IsTimedOut)
-                        //    {
-                        //        Astral.Logger.WriteLine("Respawn point too far away the path, stop bot.");
-                        //        Roles.ToggleRole(false);
-                        //        return Action.ActionResult.Fail;
-                        //    }
-                        //    Thread.Sleep(500);
-                        //}
-                        return ActionResult.Completed;
-                    }
-                }
-            } 
-#else
             var team = EntityManager.LocalPlayer.PlayerTeam;
 
             if (!team.IsInTeam) 
@@ -97,7 +66,6 @@ namespace EntityTools.Quester.Actions
                     return ActionResult.Completed;
                 }
             }
-#endif
             return ActionResult.Fail;
         }
 
@@ -126,26 +94,11 @@ namespace EntityTools.Quester.Actions
                 }
             }
 
-#if false
-            if (tmPlayer != null && tmLeader != null
-                    && tmPlayer.MapName == tmLeader.MapName)
-
-            {
-                var playerEntity = tmPlayer.Entity;
-                var leaderEntity = tmLeader.Entity;
-                //BUG Если персонажи в разных инстансах, то tmLeader.Entity - не валидна
-                return playerEntity.IAICombatTeamID == leaderEntity.IAICombatTeamID
-                       && playerEntity.RegionInternalName == leaderEntity.RegionInternalName;
-            }
-
-            return false; 
-#else
             return tmPlayer != null 
                    && tmPlayer.IsValid
                    && tmLeader != null
                    && tmLeader.IsValid
-                   && tmPlayer.MapName == tmLeader.MapName;
-#endif
+                   && string.Equals(tmPlayer.MapName, tmLeader.MapName, StringComparison.Ordinal);
         }
     }
 }

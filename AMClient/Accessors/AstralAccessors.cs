@@ -2,7 +2,6 @@
 using Astral.Classes.ItemFilter;
 using MyNW.Classes;
 using System;
-using HarmonyLib;
 
 namespace AcTp0Tools
 {

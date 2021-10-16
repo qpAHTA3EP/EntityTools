@@ -59,6 +59,7 @@ namespace EntityTools.UCC.Conditions
 #if DEVELOPER
         [Description("The Value of the GUI element's property which is checked\n" +
                      "Ignored if property 'Tested' is not equals to 'Property'")]
+        [DisplayName("PropertyValue")]
         [Category("GuiProperty")]
 #else
         [Browsable(false)]
@@ -81,6 +82,7 @@ namespace EntityTools.UCC.Conditions
                      "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
                      "Regex: Regular expression\n" +
                      "Ignored if property 'Tested' is not equals to 'Property'")]
+        [DisplayName("UiGenPropertyType")]
         [Category("GuiProperty")]
 #else
         [Browsable(false)]

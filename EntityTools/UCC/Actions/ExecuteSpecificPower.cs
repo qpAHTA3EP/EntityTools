@@ -6,6 +6,7 @@
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
@@ -16,6 +17,7 @@ using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Tools;
+using EntityTools.UCC.Conditions;
 using MyNW.Classes;
 
 namespace EntityTools.UCC.Actions
@@ -38,7 +40,7 @@ namespace EntityTools.UCC.Actions
                 if (_powerId != value)
                 {
                     _powerId = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PowerId)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -57,7 +59,7 @@ namespace EntityTools.UCC.Actions
                 if (_checkPowerCooldown != value)
                 {
                     _checkPowerCooldown = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CheckPowerCooldown)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -76,7 +78,7 @@ namespace EntityTools.UCC.Actions
                 if (_checkInTray != value)
                 {
                     _checkInTray = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CheckInTray)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -96,7 +98,7 @@ namespace EntityTools.UCC.Actions
                 if (_castingTime != value)
                 {
                     _castingTime = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CastingTime)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -115,7 +117,7 @@ namespace EntityTools.UCC.Actions
                 if (_forceMaintain != value)
                 {
                     _forceMaintain = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ForceMaintain)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -137,7 +139,7 @@ namespace EntityTools.UCC.Actions
                 if (_entityId != value)
                 {
                     _entityId = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityID)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -159,7 +161,7 @@ namespace EntityTools.UCC.Actions
                 if (_entityIdType != value)
                 {
                     _entityIdType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityIdType)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -179,7 +181,7 @@ namespace EntityTools.UCC.Actions
                 if (_entityNameType != value)
                 {
                     _entityNameType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityNameType)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -201,7 +203,7 @@ namespace EntityTools.UCC.Actions
                 if (_regionCheck != value)
                 {
                     _regionCheck = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RegionCheck)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -223,7 +225,7 @@ namespace EntityTools.UCC.Actions
                 if (_healthCheck != value)
                 {
                     _healthCheck = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HealthCheck)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -244,7 +246,7 @@ namespace EntityTools.UCC.Actions
                 if (_aura != value)
                 {
                     _aura = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Aura)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -265,7 +267,7 @@ namespace EntityTools.UCC.Actions
                 if (_reactionRange != value)
                 {
                     _reactionRange = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionRange)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -286,7 +288,7 @@ namespace EntityTools.UCC.Actions
                 if (_reactionZRange != value)
                 {
                     _reactionZRange = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionZRange)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -295,10 +297,32 @@ namespace EntityTools.UCC.Actions
 #if DEVELOPER
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
-        [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
-        //[Category("Entity")]
-        public string TestInfo { get; } = "Нажми '...' =>";
+        [Description("Press '...', to test 'TargetEntity' options.")]
+        [Category("TargetEntity")]
+        public string TestEntity => "Нажми '...' =>";
 #endif
+
+#if DEVELOPER
+        [Category("Optional")]
+        [Editor(typeof(UccConditionListEditor), typeof(UITypeEditor))]
+        [Description("Набор нестандартных UCC-условий, которые проверяют после основных")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+#else
+        [Browsable(false)]
+#endif
+        public UCCConditionPack CustomConditions
+        {
+            get => _customConditions;
+            set
+            {
+                if (ReferenceEquals(_customConditions, value))
+                    return;
+
+                _customConditions = value;
+                NotifyPropertyChanged();
+            }
+        }
+        internal UCCConditionPack _customConditions = new UCCConditionPack();
 
         #region Hide Inherited Properties
         [XmlIgnore]
@@ -312,6 +336,12 @@ namespace EntityTools.UCC.Actions
         internal IUccActionEngine Engine;
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            //Engine.OnPropertyChanged(this, propertyName);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public ExecuteSpecificPower()
         {

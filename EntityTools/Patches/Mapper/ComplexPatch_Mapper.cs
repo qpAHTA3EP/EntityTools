@@ -12,6 +12,7 @@ using AStar;
 
 namespace EntityTools.Patches.Mapper
 {
+    //TODO Добавить проверку версии AStar
     internal static class ComplexPatch_Mapper
     {
         private static MapperFormExt mapperForm;
@@ -41,49 +42,49 @@ namespace EntityTools.Patches.Mapper
             original_OpenForm = AccessTools.Method(tMapper, nameof(Astral.Quester.Forms.MapperForm.Open));
             if (original_OpenForm is null)
             {
-                ETLogger.WriteLine($@"{nameof(original_OpenForm)} not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{original_OpenForm}' not found");
                 return;
             }
             prefix_OpenForm = AccessTools.Method(tPatch, nameof(OpenMapper));
             if (prefix_OpenForm is null)
             {
-                ETLogger.WriteLine($@"{nameof(prefix_OpenForm)} not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{prefix_OpenForm}' not found");
                 return;
             }
             original_Navmesh_DrawRoad = AccessTools.Method(tNavmesh, "DrawRoad");
             if (original_Navmesh_DrawRoad is null)
             {
-                ETLogger.WriteLine($@"{nameof(original_Navmesh_DrawRoad)} not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{original_Navmesh_DrawRoad}' not found");
                 return;
             }
             prefix_Navmesh_DrawRoad = AccessTools.Method(tPatch, nameof(PrefixDrawRoad));
             if (prefix_Navmesh_DrawRoad is null)
             {
-                ETLogger.WriteLine($@"{nameof(prefix_Navmesh_DrawRoad)} not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{prefix_Navmesh_DrawRoad}' not found");
                 return;
             }
             original_DrawHotSpots = AccessTools.Method(tNavmesh, "DrawHotSpots");
             if (original_DrawHotSpots is null)
             {
-                ETLogger.WriteLine($@"{nameof(original_DrawHotSpots)} not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{original_DrawHotSpots}' not found");
                 return;
             }
             prefix_DrawHotSpots = AccessTools.Method(tPatch, nameof(DrawHotSpots));
             if (prefix_DrawHotSpots is null)
             {
-                ETLogger.WriteLine($@"{nameof(prefix_DrawHotSpots)} not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{prefix_DrawHotSpots}' not found");
                 return;
             }
             original_DrawMeshes = AccessTools.Method(tPicture, "DrawMeshes");
             if (original_DrawMeshes is null)
             {
-                ETLogger.WriteLine($@"{nameof(original_DrawMeshes)} not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{original_DrawMeshes}' not found");
                 return;
             }
             prefix_DrawMeshes = AccessTools.Method(tPatch, nameof(DrawMeshes));
             if (prefix_DrawMeshes is null)
             {
-                ETLogger.WriteLine($@"{nameof(prefix_DrawMeshes)} not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{prefix_DrawMeshes}' not found");
                 return;
             }
             Action unPatch = null;
@@ -92,18 +93,28 @@ namespace EntityTools.Patches.Mapper
             {
                 AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_OpenForm,
                     new HarmonyMethod(prefix_OpenForm));
-                unPatch = () => AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_OpenForm, prefix_OpenForm);
+                unPatch = () =>
+                {
+                    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{original_OpenForm}'");
+                    AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_OpenForm, prefix_OpenForm);
+                };
 
                 AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_Navmesh_DrawRoad,
                     new HarmonyMethod(prefix_Navmesh_DrawRoad));
                 unPatch += () =>
+                {
+                    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{prefix_Navmesh_DrawRoad}'");
                     AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_Navmesh_DrawRoad,
                         prefix_Navmesh_DrawRoad);
+                };
 
                 AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_DrawMeshes,
                     new HarmonyMethod(prefix_DrawMeshes));
                 unPatch += () =>
+                {
+                    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{prefix_DrawMeshes}'");
                     AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_DrawMeshes, prefix_DrawMeshes);
+                };
 
 #if false
                 //BUG вызывает исключение
@@ -152,14 +163,14 @@ namespace EntityTools.Patches.Mapper
             }
             catch (Exception e)
             {
+                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Mapper)}' failed");
                 unPatch?.Invoke();
-                ETLogger.WriteLine(LogType.Error, $@"{nameof(ComplexPatch_Mapper)} failed");
                 ETLogger.WriteLine(LogType.Error, e.ToString());
                 throw;
             }
 
             PatchesWasApplied = true;
-            ETLogger.WriteLine($@"{nameof(ComplexPatch_Mapper)} succeeded");
+            ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' succeeded");
         }
 
         internal static bool OpenMapper()
@@ -237,7 +248,7 @@ public static void Astral.Logic.Navmesh.DrawRoad(List<Vector3> waypoints, graph 
 #endif
                     Vector3 startPos = wp.Current;
                     bool startVisible = false,
-                         endVisible = false;
+                         endVisible;
                     double x = startPos.X,
                            y = startPos.Y;
                     // Отсеиваем и не отрисовываем точки пути, расположенные за пределами видимого изображения

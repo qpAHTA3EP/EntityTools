@@ -18,7 +18,7 @@ namespace EntityTools.Tools.Targeting
     {
         #region Опции команды
 #if DEVELOPER
-        [Description("ID of the Entity for the search")]
+        [Description("The text identifier or part of it used to search for an Entity")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
 #else
@@ -64,7 +64,7 @@ namespace EntityTools.Tools.Targeting
         internal ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
 
 #if DEVELOPER
-        [Description("The switcher of the Entity filed which compared to the property EntityID")]
+        [Description("The switcher of the Entity property which compared to 'EntityID'")]
         [Category("Entity")]
 #else
         [Browsable(false)]

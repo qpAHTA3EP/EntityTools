@@ -1,4 +1,5 @@
-﻿using AStar;
+﻿using System;
+using AStar;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -10,20 +11,38 @@ namespace EntityTools.Patches.Mapper.Tools
     /// </summary>
     public class RelocateNodesTool : IMapperTool
     {
+        public RelocateNodesTool()
+        {
+            movedNodes = new List<Node>();
+            selectedNodes = new LinkedList<Node>();
+        }
+
+        protected RelocateNodesTool(List<Node> moved, double dx, double dy)
+        {
+            if (moved is null)
+                throw new ArgumentNullException(nameof(moved));
+            movedNodes = moved;
+
+            dX = dx;
+            dY = dy;
+
+            selectedNodes = new LinkedList<Node>();
+        }
+
         /// <summary>
         /// Список перемещенных вершин
         /// </summary>
-        List<Node> movedNodes = new List<Node>();
+        readonly List<Node> movedNodes;
 
         /// <summary>
         /// Смещение координат
         /// </summary>
-        double dX, dY;
+        readonly private double dX, dY;
 
         /// <summary>
         /// Набор выделенных вершин
         /// </summary>
-        private readonly LinkedList<Node> selectedNodes = new LinkedList<Node>();
+        private readonly LinkedList<Node> selectedNodes;
         private int graphHash;
 
         // координаты начала области выделения вершин
@@ -144,7 +163,7 @@ namespace EntityTools.Patches.Mapper.Tools
             var redBrush = Brushes.Red;
             var orangeBrush = Brushes.Orange;
             var redPen = Pens.Orange;
-#if true
+
             foreach (var node in nodes)
             {
                 var pos = node.Position;
@@ -187,61 +206,10 @@ namespace EntityTools.Patches.Mapper.Tools
                 //отрисовка вершины в исходной позиции
                 graphics.FillCircleCentered(redBrush, pos, 14);
                 graphics.FillCircleCentered(orangeBrush, pos);
-            } 
-#else
-            var element = nodes.First;
-            while (element != null)
-            {
-                var node = element.Value;
-                var pos = node.Position;
-                var x1 = pos.X + dx;
-                var y1 = pos.Y + dy;
-
-                //отрисовка вершины в новой позиции
-                graphics.FillCircleCentered(orangeBrush, x1, y1, 16);
-                graphics.FillCircleCentered(redBrush, x1, y1, 10);
-
-                foreach (Arc arc in node.IncomingArcs)
-                {
-                    var startNode = arc.StartNode;
-                    if (startNode.Passable)
-                    {
-                        var startNodePos = startNode.Position;
-                        if (IsInTail(element, startNode))
-                        {
-                            double x2 = startNodePos.X + dx,
-                                y2 = startNodePos.Y + dy;
-                            graphics.DrawLine(redPen, x1, y1, x2, y2);
-                        }
-                        else graphics.DrawLine(redPen, x1, y1, startNodePos.X, startNodePos.Y);
-                    }
-                }
-                foreach (Arc arc in node.OutgoingArcs)
-                {
-                    var endNode = arc.EndNode;
-                    if (endNode.Passable)
-                    {
-                        var endNodePos = endNode.Position;
-                        if (IsInTail(element, endNode))
-                        {
-                            double x2 = endNodePos.X + dx,
-                                y2 = endNodePos.Y + dy;
-                            graphics.DrawLine(redPen, x1, y1, x2, y2);
-                        }
-                        else graphics.DrawLine(redPen, x1, y1, endNodePos.X, endNodePos.Y);
-                    }
-                }
-
-                //отрисовка вершины в исходной позиции
-                graphics.FillCircleCentered(redBrush, pos, 14);
-                graphics.FillCircleCentered(orangeBrush, pos);
-
-                element = element.Next;
             }
-
-#endif
         }
 
+#if false
         /// <summary>
         /// Проверка наличия вершины <param name="node"/> в хвосте списка, на который указывает элемент <param name="tail"/>
         /// </summary>
@@ -256,67 +224,6 @@ namespace EntityTools.Patches.Mapper.Tools
             }
 
             return false;
-        }
-#if disabled_20200513_1311
-        /// <summary>
-        /// Отрисовка выбранной вершины в исходном положении
-        /// </summary>m
-        private static void Draw_SelectedNode(MapperGraphics graphics, Node node)
-        {
-            graphics.FillCircleCentered(Brushes.Red, node.Position, 14);
-            graphics.FillCircleCentered(Brushes.Orange, node.Position);
-        }
-
-        /// <summary>
-        /// Отрисовка нового положения вершины
-        /// </summary>
-        private static void Draw_NewNodePos(MapperGraphics graphics, Node node, double dx, double dy)
-        {
-            var x = node.X + dx;
-            var y = node.Y + dy;
-            graphics.FillCircleCentered(Brushes.Orange, x, y, 16);
-            graphics.FillCircleCentered(Brushes.Red, x, y, 10);
-        }
-
-        /// <summary>
-        /// Отрисовка нового положения ребер
-        /// </summary>
-        private static void Draw_NewEdgePos(MapperGraphics graphics, LinkedList<Node> nodes, Node node, double dx, double dy)
-        {
-            double x1 = node.X + dx,
-                y1 = node.Y + dy;
-
-            if (nodes is null || nodes.Count == 0)
-                return;
-
-            foreach (Arc arc in node.IncomingArcs)
-            {
-                if (arc.StartNode.Passable)
-                {
-                    var startNodePos = arc.StartNode.Position;
-                    if (nodes.Contains(arc.StartNode))
-                    {
-                        double x2 = startNodePos.X + dx,
-                                y2 = startNodePos.Y + dy;
-                        graphics.DrawLine(Pens.Orange, x1, y1, x2, y2);
-                    }
-                    else graphics.DrawLine(Pens.Orange, x1, y1, startNodePos.X, startNodePos.Y);
-                }
-            }
-            foreach (Arc arc in node.OutgoingArcs)
-            {
-                if (arc.EndNode.Passable)
-                {
-                    var endNodePos = arc.EndNode.Position;
-                    if (nodes.Contains(arc.EndNode))
-                    {
-                        double x2 = endNodePos.X + dx,
-                                y2 = endNodePos.Y + dy;
-                        graphics.DrawLine(Pens.Orange, x1, y1, x2, y2);
-                    }
-                    else graphics.DrawLine(Pens.Orange, x1, y1, endNodePos.X, endNodePos.Y);
-                }
-            }
         } 
 #endif
 
@@ -463,7 +370,7 @@ namespace EntityTools.Patches.Mapper.Tools
                 node.Move(dx, dy, 0);
                 nodes.Add(node);
             }
-            undo = new RelocateNodesTool { movedNodes = nodes, dX = dx, dY = dy };
+            undo = new RelocateNodesTool(nodes, dx, dy);
         }
 
         /// <summary>
@@ -471,6 +378,7 @@ namespace EntityTools.Patches.Mapper.Tools
         /// </summary>
         public bool Applied => movedNodes.Count > 0;
 
+        //TODO Починить Undo
         /// <summary>
         /// Откат изменений, внесенных инструментом
         /// </summary>

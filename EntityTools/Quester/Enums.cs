@@ -32,13 +32,13 @@ namespace EntityTools.Enums
         /// </summary>
         Preservation,
         /// <summary>
-        /// Полный катализацтор, идентификатор которого начинается с 'Fuse_Ward_Coalescent'
+        /// Полный катализатор, идентификатор которого начинается с 'Fuse_Ward_Coalescent'
         /// </summary>
         Coalescent
     }
 
     /// <summary>
-    /// Разультаты поиска предмета
+    /// Результаты поиска предмета
     /// </summary>
     public enum SearchResult
     {
@@ -55,12 +55,35 @@ namespace EntityTools.Enums
         /// </summary>
         PartialFilled,
         /// <summary>
-        /// Найден полностью заколненный предмет, готовый к обработке
+        /// Найден полностью заполненный предмет, готовый к обработке
         /// </summary>
         FullFilled,
         /// <summary>
-        /// Предмет найден, но стату обработки неопределен
+        /// Предмет найден, но статус обработки не определен (ProgressionLogic не валидна) 
         /// </summary>
         Indefinite
+    }
+
+    /// <summary>
+    /// Способы передачи лидерства ("короны") другому члену группы
+    /// </summary>
+    public enum PromotionType
+    {
+        /// <summary>
+        /// Передать "корону" первому члену группы в списке
+        /// </summary>
+        FirstAvailable,
+        /// <summary>
+        /// Передать "корону"  члену группы, следующему за лидером в порядке следования
+        /// </summary>
+        NextOne,
+        /// <summary>
+        /// Передать "корону" члену группы, следующему за лидером в алфавитном порядке
+        /// </summary>
+        NextAlphabetical,
+        /// <summary>
+        /// Передать "корону" случайному члену группы
+        /// </summary>
+        Random
     }
 }

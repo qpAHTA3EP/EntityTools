@@ -317,7 +317,7 @@ namespace EntityTools.Quester.Actions
         public override ActionResult Run()
         {
             bool extendedDebugInfo  = ExtendedDebugInfo;
-            Entity theVendor = null;
+            Entity theVendor;
             string methodName = extendedDebugInfo ? string.Concat(MethodBase.GetCurrentMethod().Name) : string.Empty;
             if (tryNum > 0)
             {
@@ -393,14 +393,7 @@ namespace EntityTools.Quester.Actions
                         }
                         else if (extendedDebugInfo)
                             debug.Value.AddInfo(string.Concat(methodName, ": Vendor '", theVendor.InternalName, "' already summoned"));
-#if true
                         return Traiding(theVendor); 
-#else
-                        Entity professionsVendor = VIP_GetNearestEntityByCostume?.Invoke("Vip_Professions_Vendor");
-                        if (professionsVendor != null)
-                            return Traiding(professionsVendor);
-                        else return ActionResult.Running;
-#endif
                     case VendorType.RemoteVendor:
                         // TODO для вызова RemoteVendor, которые не видные в окне выбора, нужно реализовать торговлю как в QuesterAssistant через Injection.cmdwrapper_contact_StartRemoteContact(this.RemoteContact);
                         if (extendedDebugInfo)

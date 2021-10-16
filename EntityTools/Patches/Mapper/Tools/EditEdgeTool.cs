@@ -109,7 +109,7 @@ namespace EntityTools.Patches.Mapper.Tools
                         if (arcsNum == 0)
                         {
                             // Добавляем ребро, так как между выбранными вершинами нет рёбер
-                            if (Control.ModifierKeys == Keys.Control)
+                            if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
                             // добавляем ребро в прямом направлении
                             {
                                 Arc arc = graph.AddArc(startNode, endNode, 1);
@@ -129,7 +129,8 @@ namespace EntityTools.Patches.Mapper.Tools
                             }
                         }
 
-                        startNode = endNode;
+                        if ((Control.ModifierKeys & Keys.Alt) != Keys.Alt)
+                            startNode = endNode;
                     }
                     else
                     {

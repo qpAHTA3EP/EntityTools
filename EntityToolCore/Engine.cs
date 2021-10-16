@@ -173,6 +173,12 @@ namespace EntityCore
                     case ExecuteSpecificPower execPower:
                         DictUccAction.Add(execPower, new ExecuteSpecificPowerEngine(execPower));
                         return true;
+                    //case ExecutePowerSmart execPowerSmart:
+                    //    DictUccAction.Add(execPowerSmart, new ExecutePowerSmartEngine(execPowerSmart));
+                    //    return true;
+                    case PluggedSkill artPower:
+                        DictUccAction.Add(artPower, new PluggedSkillEngine(artPower));
+                        return true;
                     case UseItemSpecial useItem:
                         DictUccAction.Add(useItem, new UseItemSpecialEngine(useItem));
                         return true;

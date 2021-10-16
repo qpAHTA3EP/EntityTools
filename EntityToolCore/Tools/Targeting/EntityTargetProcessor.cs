@@ -98,9 +98,18 @@ namespace EntityCore.Tools.Targeting
         /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
         /// </summary>
         [Browsable(false)]
-        public EntityCacheRecordKey EntityKey =>
-            _key ?? (_key = new EntityCacheRecordKey(selector._entityId, selector._entityIdType,
-                selector._entityNameType));
+        public EntityCacheRecordKey EntityKey
+        {
+            get
+            {
+                var key = _key;
+                if (key == null)
+                    _key = new EntityCacheRecordKey(selector._entityId, selector._entityIdType,
+                        selector._entityNameType);
+                return key;
+
+            }
+        }
 
         private EntityCacheRecordKey _key;
 
@@ -110,7 +119,12 @@ namespace EntityCore.Tools.Targeting
         [Browsable(false)]
         public override Predicate<Entity> SpecialCheck
         {
-            get => _specialCheck;
+            get
+            {
+                if (_specialCheck == null)
+                    _specialCheck = ett => true;
+                return _specialCheck;
+            }
             set { _specialCheck = value ?? (ett => true); }
         }
 

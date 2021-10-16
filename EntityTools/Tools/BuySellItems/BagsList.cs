@@ -1,12 +1,9 @@
-﻿#define BagsList_Enumerable
-//#define BagsList_Items
-#define BagsList_IXmlSerializable
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -21,15 +18,8 @@ namespace EntityTools.Tools.BuySellItems
     /// Список сумок
     /// </summary>
     [Serializable]
-    public class BagsList : INotifyPropertyChanged
-#if BagsList_Enumerable
-                        , IEnumerable<InvBagIDs>
-#if BagsList_IXmlSerializable
-                        , IXmlSerializable
-#endif
-#elif BagsList_IXmlSerializable
-        : IXmlSerializable
-#endif
+    public class BagsList : INotifyPropertyChanged, IEnumerable<InvBagIDs>, IXmlSerializable
+
     {
         #region Предустановленные наборы сумок
         /// <summary>
@@ -38,18 +28,23 @@ namespace EntityTools.Tools.BuySellItems
         public static BagsList GetPlayerBags()
         {
             //new InvBagIDs[] { InvBagIDs.Inventory, InvBagIDs.PlayerBag1, InvBagIDs.PlayerBag2, InvBagIDs.PlayerBag3, InvBagIDs.PlayerBag4, InvBagIDs.PlayerBag5, InvBagIDs.PlayerBag6, InvBagIDs.PlayerBag7, InvBagIDs.PlayerBag8, InvBagIDs.PlayerBag9, InvBagIDs.Overflow };
-            BagsList bags = new BagsList();
-            bags._bags[(int)InvBagIDs.Inventory] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag1] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag2] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag3] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag4] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag5] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag6] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag7] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag8] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag9] = true;
-            bags._bags[(int)InvBagIDs.Overflow] = true;
+            BagsList bags = new BagsList
+            {
+                _bags =
+                {
+                    [(int) InvBagIDs.Inventory] = true,
+                    [(int) InvBagIDs.PlayerBag1] = true,
+                    [(int) InvBagIDs.PlayerBag2] = true,
+                    [(int) InvBagIDs.PlayerBag3] = true,
+                    [(int) InvBagIDs.PlayerBag4] = true,
+                    [(int) InvBagIDs.PlayerBag5] = true,
+                    [(int) InvBagIDs.PlayerBag6] = true,
+                    [(int) InvBagIDs.PlayerBag7] = true,
+                    [(int) InvBagIDs.PlayerBag8] = true,
+                    [(int) InvBagIDs.PlayerBag9] = true,
+                    [(int) InvBagIDs.Overflow] = true
+                }
+            };
             return bags;
         }
         /// <summary>
@@ -58,19 +53,24 @@ namespace EntityTools.Tools.BuySellItems
         public static BagsList GetPlayerBagsAndPotions()
         {
             //new InvBagIDs[] { InvBagIDs.Inventory, InvBagIDs.PlayerBag1, InvBagIDs.PlayerBag2, InvBagIDs.PlayerBag3, InvBagIDs.PlayerBag4, InvBagIDs.PlayerBag5, InvBagIDs.PlayerBag6, InvBagIDs.PlayerBag7, InvBagIDs.PlayerBag8, InvBagIDs.PlayerBag9, InvBagIDs.Overflow };
-            BagsList bags = new BagsList();
-            bags._bags[(int)InvBagIDs.Inventory] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag1] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag2] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag3] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag4] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag5] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag6] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag7] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag8] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag9] = true;
-            bags._bags[(int)InvBagIDs.Overflow] = true;
-            bags._bags[(int)InvBagIDs.Potions] = true;
+            BagsList bags = new BagsList
+            {
+                _bags =
+                {
+                    [(int) InvBagIDs.Inventory] = true,
+                    [(int) InvBagIDs.PlayerBag1] = true,
+                    [(int) InvBagIDs.PlayerBag2] = true,
+                    [(int) InvBagIDs.PlayerBag3] = true,
+                    [(int) InvBagIDs.PlayerBag4] = true,
+                    [(int) InvBagIDs.PlayerBag5] = true,
+                    [(int) InvBagIDs.PlayerBag6] = true,
+                    [(int) InvBagIDs.PlayerBag7] = true,
+                    [(int) InvBagIDs.PlayerBag8] = true,
+                    [(int) InvBagIDs.PlayerBag9] = true,
+                    [(int) InvBagIDs.Overflow] = true,
+                    [(int) InvBagIDs.Potions] = true
+                }
+            };
             return bags;
         }
         /// <summary>
@@ -78,35 +78,38 @@ namespace EntityTools.Tools.BuySellItems
         /// </summary>
         public static BagsList GetFullPlayerInventory()
         {
-            //new InvBagIDs[] { InvBagIDs.Inventory, InvBagIDs.PlayerBag1, InvBagIDs.PlayerBag2, InvBagIDs.PlayerBag3, InvBagIDs.PlayerBag4, InvBagIDs.PlayerBag5, InvBagIDs.PlayerBag6, InvBagIDs.PlayerBag7, InvBagIDs.PlayerBag8, InvBagIDs.PlayerBag9, InvBagIDs.Overflow,
-            //                  InvBagIDs.AdventuringHead, InvBagIDs.AdventuringNeck, InvBagIDs.AdventuringArmor, InvBagIDs.AdventuringArms, InvBagIDs.AdventuringWaist, InvBagIDs.AdventuringFeet, InvBagIDs.AdventuringHands, InvBagIDs.AdventuringShirt, InvBagIDs.AdventuringTrousers, InvBagIDs.AdventuringRanged, InvBagIDs.AdventuringRings, InvBagIDs.AdventuringSurges, InvBagIDs.ArtifactPrimary, InvBagIDs.ArtifactSecondary };
-            BagsList bags = new BagsList();
-            bags._bags[(int)InvBagIDs.AdventuringHead] = true;
-            bags._bags[(int)InvBagIDs.AdventuringNeck] = true;
-            bags._bags[(int)InvBagIDs.AdventuringArmor] = true;
-            bags._bags[(int)InvBagIDs.AdventuringArms] = true;
-            bags._bags[(int)InvBagIDs.AdventuringWaist] = true;
-            bags._bags[(int)InvBagIDs.AdventuringFeet] = true;
-            bags._bags[(int)InvBagIDs.AdventuringHands] = true;
-            bags._bags[(int)InvBagIDs.AdventuringShirt] = true;
-            bags._bags[(int)InvBagIDs.AdventuringTrousers] = true;
-            bags._bags[(int)InvBagIDs.AdventuringRanged] = true;
-            bags._bags[(int)InvBagIDs.AdventuringRings] = true;
-            bags._bags[(int)InvBagIDs.AdventuringSurges] = true;
-            bags._bags[(int)InvBagIDs.ArtifactPrimary] = true;
-            bags._bags[(int)InvBagIDs.ArtifactSecondary] = true;
-            bags._bags[(int)InvBagIDs.Inventory] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag1] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag2] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag3] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag4] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag5] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag6] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag7] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag8] = true;
-            bags._bags[(int)InvBagIDs.PlayerBag9] = true;
-            bags._bags[(int)InvBagIDs.Overflow] = true;
-            bags._bags[(int)InvBagIDs.Potions] = true;
+            BagsList bags = new BagsList
+            {
+                _bags =
+                {
+                    [(int) InvBagIDs.AdventuringHead] = true,
+                    [(int) InvBagIDs.AdventuringNeck] = true,
+                    [(int) InvBagIDs.AdventuringArmor] = true,
+                    [(int) InvBagIDs.AdventuringArms] = true,
+                    [(int) InvBagIDs.AdventuringWaist] = true,
+                    [(int) InvBagIDs.AdventuringFeet] = true,
+                    [(int) InvBagIDs.AdventuringHands] = true,
+                    [(int) InvBagIDs.AdventuringShirt] = true,
+                    [(int) InvBagIDs.AdventuringTrousers] = true,
+                    [(int) InvBagIDs.AdventuringRanged] = true,
+                    [(int) InvBagIDs.AdventuringRings] = true,
+                    [(int) InvBagIDs.AdventuringSurges] = true,
+                    [(int) InvBagIDs.ArtifactPrimary] = true,
+                    [(int) InvBagIDs.ArtifactSecondary] = true,
+                    [(int) InvBagIDs.Inventory] = true,
+                    [(int) InvBagIDs.PlayerBag1] = true,
+                    [(int) InvBagIDs.PlayerBag2] = true,
+                    [(int) InvBagIDs.PlayerBag3] = true,
+                    [(int) InvBagIDs.PlayerBag4] = true,
+                    [(int) InvBagIDs.PlayerBag5] = true,
+                    [(int) InvBagIDs.PlayerBag6] = true,
+                    [(int) InvBagIDs.PlayerBag7] = true,
+                    [(int) InvBagIDs.PlayerBag8] = true,
+                    [(int) InvBagIDs.PlayerBag9] = true,
+                    [(int) InvBagIDs.Overflow] = true,
+                    [(int) InvBagIDs.Potions] = true
+                }
+            };
             return bags;
         }
         /// <summary>
@@ -114,18 +117,22 @@ namespace EntityTools.Tools.BuySellItems
         /// </summary>
         public static BagsList GetBanks()
         {
-            //new InvBagIDs[] { InvBagIDs.Bank, InvBagIDs.Bank1, InvBagIDs.Bank2, InvBagIDs.Bank3, InvBagIDs.Bank4, InvBagIDs.Bank5, InvBagIDs.Bank6, InvBagIDs.Bank7, InvBagIDs.Bank8, InvBagIDs.Bank9 };
-            BagsList bags = new BagsList();
-            bags._bags[(int)InvBagIDs.Bank] = true;
-            bags._bags[(int)InvBagIDs.Bank1] = true;
-            bags._bags[(int)InvBagIDs.Bank2] = true;
-            bags._bags[(int)InvBagIDs.Bank3] = true;
-            bags._bags[(int)InvBagIDs.Bank4] = true;
-            bags._bags[(int)InvBagIDs.Bank5] = true;
-            bags._bags[(int)InvBagIDs.Bank6] = true;
-            bags._bags[(int)InvBagIDs.Bank7] = true;
-            bags._bags[(int)InvBagIDs.Bank8] = true;
-            bags._bags[(int)InvBagIDs.Bank9] = true;
+            BagsList bags = new BagsList
+            {
+                _bags =
+                {
+                    [(int) InvBagIDs.Bank] = true,
+                    [(int) InvBagIDs.Bank1] = true,
+                    [(int) InvBagIDs.Bank2] = true,
+                    [(int) InvBagIDs.Bank3] = true,
+                    [(int) InvBagIDs.Bank4] = true,
+                    [(int) InvBagIDs.Bank5] = true,
+                    [(int) InvBagIDs.Bank6] = true,
+                    [(int) InvBagIDs.Bank7] = true,
+                    [(int) InvBagIDs.Bank8] = true,
+                    [(int) InvBagIDs.Bank9] = true
+                }
+            };
             return bags;
         }
 
@@ -134,22 +141,26 @@ namespace EntityTools.Tools.BuySellItems
         /// </summary>
         public static BagsList GetEquipments()
         {
-            //new InvBagIDs[] { InvBagIDs.AdventuringHead, InvBagIDs.AdventuringNeck, InvBagIDs.AdventuringArmor, InvBagIDs.AdventuringArms, InvBagIDs.AdventuringWaist, InvBagIDs.AdventuringFeet, InvBagIDs.AdventuringHands, InvBagIDs.AdventuringShirt, InvBagIDs.AdventuringTrousers, InvBagIDs.AdventuringRanged, InvBagIDs.AdventuringRings, InvBagIDs.AdventuringSurges, InvBagIDs.AdventuringWaist, InvBagIDs.ArtifactPrimary, InvBagIDs.ArtifactSecondary };
-            BagsList bags = new BagsList();
-            bags._bags[(int)InvBagIDs.AdventuringHead] = true;
-            bags._bags[(int)InvBagIDs.AdventuringNeck] = true;
-            bags._bags[(int)InvBagIDs.AdventuringArmor] = true;
-            bags._bags[(int)InvBagIDs.AdventuringArms] = true;
-            bags._bags[(int)InvBagIDs.AdventuringWaist] = true;
-            bags._bags[(int)InvBagIDs.AdventuringFeet] = true;
-            bags._bags[(int)InvBagIDs.AdventuringHands] = true;
-            bags._bags[(int)InvBagIDs.AdventuringShirt] = true;
-            bags._bags[(int)InvBagIDs.AdventuringTrousers] = true;
-            bags._bags[(int)InvBagIDs.AdventuringRanged] = true;
-            bags._bags[(int)InvBagIDs.AdventuringRings] = true;
-            bags._bags[(int)InvBagIDs.AdventuringSurges] = true;
-            bags._bags[(int)InvBagIDs.ArtifactPrimary] = true;
-            bags._bags[(int)InvBagIDs.ArtifactSecondary] = true;
+            BagsList bags = new BagsList
+            {
+                _bags =
+                {
+                    [(int) InvBagIDs.AdventuringHead] = true,
+                    [(int) InvBagIDs.AdventuringNeck] = true,
+                    [(int) InvBagIDs.AdventuringArmor] = true,
+                    [(int) InvBagIDs.AdventuringArms] = true,
+                    [(int) InvBagIDs.AdventuringWaist] = true,
+                    [(int) InvBagIDs.AdventuringFeet] = true,
+                    [(int) InvBagIDs.AdventuringHands] = true,
+                    [(int) InvBagIDs.AdventuringShirt] = true,
+                    [(int) InvBagIDs.AdventuringTrousers] = true,
+                    [(int) InvBagIDs.AdventuringRanged] = true,
+                    [(int) InvBagIDs.AdventuringRings] = true,
+                    [(int) InvBagIDs.AdventuringSurges] = true,
+                    [(int) InvBagIDs.ArtifactPrimary] = true,
+                    [(int) InvBagIDs.ArtifactSecondary] = true
+                }
+            };
             return bags;
         }
         public static bool IsEquipmentsBag(InvBagIDs id)
@@ -193,6 +204,11 @@ namespace EntityTools.Tools.BuySellItems
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        protected void NotifyPropertyChange([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         /// <summary>
         /// Флаги сумок
         /// </summary>
@@ -206,37 +222,19 @@ namespace EntityTools.Tools.BuySellItems
             }
             set
             {
-                if (_bags[(int)bagId] != value)
+                var bagInclusion = _bags[(int) bagId];
+                if (bagInclusion != value)
                 {
-                    if (_bags[(int)bagId])
+                    if (bagInclusion)
                         _count--;
                     else _count++;
 
                     _bags[(int)bagId] = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(bagId.ToString()));
+                    NotifyPropertyChange(nameof(Count));
                 }
             }
         }
 
-#if BagsList_Items
-        [Browsable(false)]
-        public IEnumerable<InvBagIDs> Items
-        {
-            get
-            {
-                return GetSelectedBagsId();
-            }
-            set
-            {
-                _bags.SetAll(false);
-                if(value != null)
-                {
-                    foreach (InvBagIDs id in value)
-                        _bags[(int)id] = true;
-                }
-            }
-        }
-#endif
 
         /// <summary>
         /// Перечисление идентификаторов выбранных сумок
@@ -281,7 +279,7 @@ namespace EntityTools.Tools.BuySellItems
         /// <summary>
         /// Количество выбранных сумок
         /// </summary>
-        public uint Count { get => _count; }
+        public uint Count => _count;
         uint _count;
 
         /// <summary>
@@ -291,6 +289,7 @@ namespace EntityTools.Tools.BuySellItems
         {
             _bags.SetAll(false);
             _count = 0;
+            NotifyPropertyChange(nameof(Count));
         }
 
         //создание копии списка
@@ -301,7 +300,6 @@ namespace EntityTools.Tools.BuySellItems
             return newBags;
         }
 
-#if BagsList_Enumerable
         /// <summary>
         /// добавление сумки в список
         /// </summary>
@@ -313,19 +311,20 @@ namespace EntityTools.Tools.BuySellItems
                 if (!_bags[(int)id])
                     _count++;
                 _bags[(int)id] = true;
-                
+                NotifyPropertyChange(nameof(Count));
             }
         }
 
         /// <summary>
-        /// добавление сумки в список
+        /// Добавление сумки <param name="id"/> в список
         /// </summary>
-        /// <param name="obj"></param>
+        /// <param name="id">Идентификатор добавляемой сумки</param>
         public void Add(InvBagIDs id)
         {
             if (!_bags[(int)id])
                 _count++;
             _bags[(int)id] = true;
+            NotifyPropertyChange(nameof(Count));
         }
 
         public IEnumerator<InvBagIDs> GetEnumerator()
@@ -403,9 +402,8 @@ namespace EntityTools.Tools.BuySellItems
                 ind = -1;
             }
         }
-#endif
+
         #region IXmlSerializable
-#if BagsList_IXmlSerializable
         public XmlSchema GetSchema()
         {
             return null;
@@ -420,10 +418,7 @@ namespace EntityTools.Tools.BuySellItems
             if(reader.IsStartElement())
             {
                 string name = reader.Name;
-#if false
-                if (name == nameof(BagsList)
-            || name == "Bags") 
-#endif
+
                 {
                     if (reader.IsEmptyElement)
                     {
@@ -436,35 +431,6 @@ namespace EntityTools.Tools.BuySellItems
                         reader.ReadEndElement();
                     }
                 }
-#if false
-                while (reader.ReadState == ReadState.Interactive)
-                {
-                    string name = reader.Name;
-                    if (name == nameof(InvBagIDs))
-                    {
-                        string bagName = reader.ReadElementContentAsString(name, string.Empty);
-                        if (Enum.TryParse(bagName, out InvBagIDs bagId))
-                            _bags[(int)bagId] = true;
-                        else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name}: Expect the {nameof(InvBagIDs)} but has the value '{bagName}'", true);
-                    }
-                    else if (name == nameof(BagsList)
-#if BagsList_Items
-                             || name == nameof(Items)
-#else
-                             || name == "Items"
-#endif
-                             || name == "Bags")
-                    {
-                        if (reader.IsStartElement())
-                        {
-                            reader.ReadStartElement(name);
-                            ReadInnerXml(reader, name);
-                            reader.ReadEndElement();
-                        }
-                    }
-                    else reader.Skip();
-                } 
-#endif
             }
         }
 
@@ -482,7 +448,10 @@ namespace EntityTools.Tools.BuySellItems
                 {
                     string bagName = reader.ReadElementContentAsString(name, string.Empty);
                     if (Enum.TryParse(bagName, out InvBagIDs bagId))
+                    {
                         _bags[(int)bagId] = true;
+                        _count++;
+                    }
                     else ETLogger.WriteLine(LogType.Error, $"{MethodBase.GetCurrentMethod().Name}: Expect the {nameof(InvBagIDs)} but has the value '{bagName}'", true);
                 }
                 else if (name == xmlEndElement)
@@ -492,12 +461,8 @@ namespace EntityTools.Tools.BuySellItems
                     throw new XmlException($"{MethodBase.GetCurrentMethod().Name}: Unexpected XmlStartElement '{name}' while there are should be the XmlEndElement '{xmlEndElement}'");
                 }
                 else if (name == nameof(BagsList)
-#if BagsList_Items
-                            || name == nameof(Items)
-#else
-                            || name == "Items"
-#endif
-                            || name == "Bags")
+                         || name == "Items"
+                         || name == "Bags")
                 {
                     if (reader.IsStartElement())
                     {
@@ -525,7 +490,6 @@ namespace EntityTools.Tools.BuySellItems
                 writer.WriteEndElement();
             }
         } 
-#endif
         #endregion
     }
 }
