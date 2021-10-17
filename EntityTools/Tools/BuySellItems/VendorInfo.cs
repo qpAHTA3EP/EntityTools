@@ -1,6 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Drawing.Design;
 using Astral.Logic.NW;
+using Astral.Quester.UIEditors;
 using EntityTools.Enums;
+using EntityTools.Tools.Navigation;
 using MyNW.Classes;
 using MyNW.Internals;
 
@@ -62,7 +66,8 @@ namespace EntityTools.Tools.BuySellItems
         //Отображаемое имя
         public string DisplayName
         {
-            get => _displayName; set
+            get => _displayName; 
+            set
             {
                 if (_displayName != value)
                 {
@@ -120,6 +125,7 @@ namespace EntityTools.Tools.BuySellItems
         /// <summary>
         /// Карта, на которой находится торговец
         /// </summary>
+        [Editor(typeof(CurrentMapEdit), typeof(UITypeEditor))]
         public string MapName
         {
             get => _mapName; set
@@ -146,6 +152,7 @@ namespace EntityTools.Tools.BuySellItems
         /// <summary>
         /// Внутриигровой регион карты, в котором находится торговец
         /// </summary>
+        [Editor(typeof(CurrentRegionEdit), typeof(UITypeEditor))]
         public string RegionName
         {
             get => _regionName; set
@@ -172,9 +179,11 @@ namespace EntityTools.Tools.BuySellItems
             {
                 switch (_vendorType)
                 {
+#if false
                     case VendorType.None:
                         isMatch = false;
-                        break;
+                        break; 
+#endif
 #if VendorType_Auto
                     case VendorType.Auto:
                         isMatch = false;
@@ -187,7 +196,7 @@ namespace EntityTools.Tools.BuySellItems
                         break;
                     case VendorType.ArtifactVendor:
                         isMatch = entity.InternalName == "Vip_Professions_Vendor"
-                                    || entity.InternalName.StartsWith("Artifact_Auroraswholerealmscatalogue_Shopkeeper");
+                                  || entity.InternalName.StartsWith("Artifact_Auroraswholerealmscatalogue_Shopkeeper", StringComparison.Ordinal);
                         break;
                     case VendorType.VIPProfessionVendor:
                         isMatch = entity.InternalName == "Vip_Professions_Vendor"
@@ -200,6 +209,15 @@ namespace EntityTools.Tools.BuySellItems
                 }
             }
             return isMatch;
+        }
+
+        public bool IsMatch(WorldInteractionNode node)
+        {
+            var player = EntityManager.LocalPlayer;
+            return _vendorType == VendorType.Node
+                   && string.Equals(_regionName, player.RegionInternalName, StringComparison.Ordinal)
+                   && string.Equals(_mapName, player.MapState.MapName, StringComparison.Ordinal)
+                   && NavigationHelper.SquareDistance3D(_position, node.Location) <= 1.0;
         }
 
         /// <summary>
@@ -240,22 +258,10 @@ namespace EntityTools.Tools.BuySellItems
                             valid = true;
                         }
                         break;
-#if VendorType_Auto
-                    case VendorType.Auto:
-                        valid = false;
+                    case VendorType.Node:
+                        valid = !string.IsNullOrEmpty(_mapName)
+                                && _position.IsValid;
                         break;
-#endif
-#if false
-                    case VendorType.ArtifactVendor:
-                        valid = SpecialVendor.IsAvailable();
-                        break;
-                    case VendorType.VIPProfessionVendor:
-                        valid = VIP.CanSummonProfessionVendor;
-                        break;
-                    case VendorType.VIPSealTrader:
-                        valid = VIP.CanSummonSealTrader;
-                        break; 
-#endif
                     case VendorType.Normal:
                         valid = !(string.IsNullOrEmpty(_costumeName)
                                     || string.IsNullOrEmpty(_mapName)
@@ -276,27 +282,27 @@ namespace EntityTools.Tools.BuySellItems
             get
             {
                 bool available = false;
+                var player = EntityManager.LocalPlayer;
                 switch (_vendorType)
                 {
                     case VendorType.None:
-                        available = false;
                         if (_mapName == "All" || string.IsNullOrEmpty(_mapName))
                         {
-                            if (_costumeName == VendorType.ArtifactVendor.ToString())
+                            switch (_costumeName)
                             {
-                                _vendorType = VendorType.ArtifactVendor;
-                                available = true;
-                            }
-                            else if (_costumeName == VendorType.VIPProfessionVendor.ToString())
-                            {
-                                _vendorType = VendorType.VIPProfessionVendor;
-                                available = true;
-                            }
-                            else if (_costumeName == VendorType.VIPSealTrader.ToString()
-                                    || _costumeName == "VIPSummonSealTrader")
-                            {
-                                _vendorType = VendorType.VIPSealTrader;
-                                available = true;
+                                case nameof(VendorType.ArtifactVendor):
+                                    _vendorType = VendorType.ArtifactVendor;
+                                    available = SpecialVendor.IsAvailable() || SpecialVendor.VendorEntity.IsValid;
+                                    break;
+                                case nameof(VendorType.VIPProfessionVendor):
+                                    _vendorType = VendorType.VIPProfessionVendor;
+                                    available = VIP.CanSummonProfessionVendor;
+                                    break;
+                                case nameof(VendorType.VIPSealTrader):
+                                case "VIPSummonSealTrader":
+                                    _vendorType = VendorType.VIPSealTrader;
+                                    available = VIP.CanSummonSealTrader;
+                                    break;
                             }
                         }
                         else if (!string.IsNullOrEmpty(_costumeName)
@@ -306,11 +312,6 @@ namespace EntityTools.Tools.BuySellItems
                             available = true;
                         }
                         break;
-#if VendorType_Auto
-                    case VendorType.Auto:
-                        available = false;
-                        break; 
-#endif
                     case VendorType.ArtifactVendor:
                         // Если торговец уже призван, то IsAvailable() возвращает false
                         available = SpecialVendor.IsAvailable() || SpecialVendor.VendorEntity.IsValid;
@@ -321,8 +322,12 @@ namespace EntityTools.Tools.BuySellItems
                     case VendorType.VIPSealTrader:
                         available = VIP.CanSummonSealTrader;
                         break;
+                    case VendorType.Node:
+                        available = _position.IsValid
+                                    && _mapName == player.MapState.MapName
+                                    && _regionName == player.RegionInternalName;
+                        break;
                     case VendorType.Normal:
-                        var player = EntityManager.LocalPlayer;
                         available = !string.IsNullOrEmpty(_costumeName)
                                     && _mapName == player.MapState.MapName
                                     && _regionName == player.RegionInternalName;
@@ -337,13 +342,14 @@ namespace EntityTools.Tools.BuySellItems
         {
             get
             {
-                if (_vendorType == VendorType.Normal)
+                if (_vendorType == VendorType.Normal
+                    || _vendorType == VendorType.Node)
                 {
                     if (_position != null && _position.IsValid && IsAvailable)
                         return _position.Distance3DFromPlayer;
-                    else return double.MaxValue;
+                    return double.MaxValue;
                 }
-                else return 0;
+                return 0;
             }
         }
 
@@ -357,24 +363,23 @@ namespace EntityTools.Tools.BuySellItems
                     case VendorType.None:
                         if (_mapName == "All" || string.IsNullOrEmpty(_mapName))
                         {
-                            if (_costumeName == VendorType.ArtifactVendor.ToString())
+                            switch (_costumeName)
                             {
-                                _vendorType = VendorType.ArtifactVendor;
-                                label = ToString();
+                                case nameof(VendorType.ArtifactVendor):
+                                    _vendorType = VendorType.ArtifactVendor;
+                                    break;
+                                case nameof(VendorType.VIPProfessionVendor):
+                                    _vendorType = VendorType.VIPProfessionVendor;
+                                    break;
+                                case nameof(VendorType.VIPSealTrader):
+                                case "VIPSummonSealTrader":
+                                    _vendorType = VendorType.VIPSealTrader;
+                                    break;
+                                default:
+                                    return label = "Not set";
                             }
-                            else if (_costumeName == VendorType.VIPProfessionVendor.ToString())
-                            {
-                                _vendorType = VendorType.VIPProfessionVendor;
-                                label = ToString();
-                            }
-                            else if (_costumeName == VendorType.VIPSealTrader.ToString()
-                                    || _costumeName == "VIPSummonSealTrader")
-                            {
-                                _vendorType = VendorType.VIPSealTrader;
-                                label = ToString();
-                            }
-                            
-                            else label = "Not set";
+
+                            label = ToString();
                         }
                         else if (!string.IsNullOrEmpty(_costumeName)
                                  && _position.IsValid)
@@ -384,15 +389,17 @@ namespace EntityTools.Tools.BuySellItems
                         }
                         else label = "Not set";
                         break;
-#if VendorType_Auto
-                    case VendorType.Auto:
-                        label = "Auto";
-                        break; 
-#endif
                     case VendorType.Normal:
-                        if (_mapName.Length > 0)
+                        if (!string.IsNullOrEmpty(_mapName))
                         {
                             label = string.Concat(_displayName, " (", _mapName, (_regionName.Length > 0) ? ("/" + _regionName) : string.Empty, ")");
+                        }
+                        else label = "Not set";
+                        break;
+                    case VendorType.Node:
+                        if (!string.IsNullOrEmpty(_mapName))
+                        {
+                            label = string.Concat("Node <", _position.X.ToString("N1"), ", ", _position.Y.ToString("N1"), ", ", _position.X.ToString("N1"), "> (", _mapName, string.IsNullOrEmpty(_regionName) ? string.Empty : "/" + _regionName, ")");
                         }
                         else label = "Not set";
                         break;

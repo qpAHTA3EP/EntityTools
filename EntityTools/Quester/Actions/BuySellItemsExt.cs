@@ -4,9 +4,11 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Remoting.Channels;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using AcTp0Tools;
 using Astral;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.Classes.Map;
@@ -20,6 +22,7 @@ using EntityTools.Enums;
 using EntityTools.Extensions;
 using AcTp0Tools.Reflection;
 using EntityTools.Tools.BuySellItems;
+using EntityTools.Tools.Navigation;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
@@ -39,6 +42,7 @@ namespace EntityTools.Quester.Actions
         #region Опции команды
 #if DEVELOPER
         [Editor(typeof(VendorInfoEditor), typeof(UITypeEditor))]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
         [Category("Vendor")]
 #else
         [Browsable(false)]
@@ -242,15 +246,16 @@ namespace EntityTools.Quester.Actions
                     || @this._buyOptions.Count > 0;
             }
         }
-        protected override Vector3 InternalDestination => Vendor.Position;
+        protected override Vector3 InternalDestination => _vendor.Position;
         public override void GatherInfos()
         {
 #if DEVELOPER
             if (VendorInfoEditor.SetInfos(out VendorInfo vndInfo))
             {
-                Vendor = vndInfo;
+                _vendor = vndInfo;
                 if (XtraMessageBox.Show("Add a dialog ? (open the dialog window before)", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
+                    var player = EntityManager.LocalPlayer.Player;
                     switch (@this._vendor.VendorType)
                     {
                         case VendorType.ArtifactVendor:
@@ -269,15 +274,34 @@ namespace EntityTools.Quester.Actions
                             Interact.WaitForInteraction();
                             break;
                         case VendorType.RemoteVendor:
-                            RemoteContact remoteContact = EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts.Find(ct => ct.ContactDef == Vendor.CostumeName);
+                            RemoteContact remoteContact = player.InteractInfo.RemoteContacts.Find(ct => ct.ContactDef == _vendor.CostumeName);
                             if (remoteContact != null)
                             {
                                 remoteContact.Start();
                                 Interact.WaitForInteraction();
                             }
                             break;
+                        case VendorType.Node:
+                            foreach (TargetableNode targetableNode in player.InteractStatus.TargetableNodes)
+                            {
+                                if (_vendor.IsMatch(targetableNode.WorldInteractionNode))
+                                {
+                                    var currentNode = new Interact.DynaNode(targetableNode.WorldInteractionNode.Key);
+
+                                    //Approach.NodeForInteraction(currentNode);
+                                    //Interact.WaitForInteraction();
+                                    //AstralAccessors.Controllers.Engine.MainEngine.Navigation.Stop();
+                                    //Thread.Sleep(500);
+                                    if (!currentNode.Node.WorldInteractionNode.Interact())
+                                    {
+                                        break;
+                                    }
+                                    Interact.WaitForInteraction();
+                                }
+                            }
+                            break;
                         default:
-                            ContactInfo contactInfo = EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts.Find(ct => ct.Entity.IsValid && Vendor.IsMatch(ct.Entity));
+                            ContactInfo contactInfo = player.InteractInfo.NearbyContacts.Find(ct => ct.Entity.IsValid && Vendor.IsMatch(ct.Entity));
                             if (contactInfo != null)
                             {
                                 Interact.Vendor(contactInfo.Entity);
@@ -285,7 +309,15 @@ namespace EntityTools.Quester.Actions
                             }
                             break;
                     }
-                    DialogEdit.Show(VendorMenus);
+
+                    var screenType = player.InteractInfo.ContactDialog.ScreenType;
+                    if (screenType == ScreenType.List
+                        || screenType == ScreenType.Buttons
+                        || screenType == ScreenType.Store
+                        || screenType == ScreenType.StoreCollection)
+                    {
+                        DialogEdit.Show(VendorMenus);
+                    }
                 }
             }
 #endif
@@ -295,7 +327,11 @@ namespace EntityTools.Quester.Actions
             tryNum = _tries;
             slots2sellCache = null;
         }
-        public override void OnMapDraw(GraphicsNW graph) { }
+
+        public override void OnMapDraw(GraphicsNW graph)
+        {
+            //TODO: Отрисовывать вендора-NPC/Node
+        }
         protected override ActionValidity InternalValidity
         {
             get
@@ -318,9 +354,11 @@ namespace EntityTools.Quester.Actions
         {
             bool extendedDebugInfo  = ExtendedDebugInfo;
             Entity theVendor;
-            string methodName = extendedDebugInfo ? string.Concat(MethodBase.GetCurrentMethod().Name) : string.Empty;
+            string methodName = extendedDebugInfo ? MethodBase.GetCurrentMethod().Name : string.Empty;
             if (tryNum > 0)
             {
+                var player = EntityManager.LocalPlayer.Player;
+
                 tryNum--;
                 switch (@this._vendor.VendorType)
                 {
@@ -398,7 +436,7 @@ namespace EntityTools.Quester.Actions
                         // TODO для вызова RemoteVendor, которые не видные в окне выбора, нужно реализовать торговлю как в QuesterAssistant через Injection.cmdwrapper_contact_StartRemoteContact(this.RemoteContact);
                         if (extendedDebugInfo)
                             debug.Value.AddInfo(string.Concat(methodName, ": Call 'RemoteVendor'"));
-                        RemoteContact remoteContact = EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts.Find(ct => ct.ContactDef == _vendor.CostumeName);
+                        RemoteContact remoteContact = player.InteractInfo.RemoteContacts.Find(ct => ct.ContactDef == _vendor.CostumeName);
                         if (extendedDebugInfo)
                         {
                             if (remoteContact != null && remoteContact.IsValid)
@@ -406,13 +444,54 @@ namespace EntityTools.Quester.Actions
                             else debug.Value.AddInfo(string.Concat(methodName, ": Calling failed"));
                         }
                         return RemoteTraiding(remoteContact);
+                    case VendorType.Node:
+                        if (extendedDebugInfo)
+                            debug.Value.AddInfo(string.Concat(methodName, ": Search '", _vendor.ToString(), '\''));
+
+                        WorldInteractionNode targetNode = null;
+                        foreach (TargetableNode targetableNode in player.InteractStatus.TargetableNodes)
+                        {
+                            var worldIntNode = targetableNode.WorldInteractionNode;
+                            if (_vendor.IsMatch(worldIntNode))
+                            {
+                                targetNode = worldIntNode;
+                                break;
+                            }
+                        }
+
+                        if (targetNode != null)
+                        {
+                            if (extendedDebugInfo)
+                            {
+                                var pos = targetNode.Location;
+                                debug.Value.AddInfo(string.Concat(methodName, ": Vendor-Node <", pos.X.ToString("N1"), ", ", pos.Y.ToString("N1"), ", ", pos.Z.ToString("N1"), ">  was successfully found at the Distance = ", pos.Distance3DFromPlayer.ToString("N1")));
+                            }
+                            return Traiding(targetNode);
+                        }
+                        else
+                        {
+                            if(tryNum < _tries)
+                            {
+                                if (extendedDebugInfo)
+                                    debug.Value.AddInfo(string.Concat(methodName, ": Vendor-Node not found. Approach Position to retry"));
+
+                                Approach.PostionByDistance(_vendor.Position, 5);
+
+                                Thread.Sleep(1000);
+                                tryNum++;
+                                return ActionResult.Running;
+                            }
+                            if (extendedDebugInfo)
+                                debug.Value.AddInfo(string.Concat(methodName, ": Vendor-Node not found. Tries are exhausted."));
+                        }
+                        break;
                     default:
                         if (extendedDebugInfo)
                             debug.Value.AddInfo(string.Concat(methodName, ": Search '", _vendor.CostumeName, '\''));
                         // ищем ближайший "контакт" совпадающий с Vendor
                         double dist = double.MaxValue;
                         ContactInfo contactInfo = null;
-                        foreach (var cntInfo in EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts)
+                        foreach (var cntInfo in player.InteractInfo.NearbyContacts)
                         {
                             double curDist = cntInfo.Entity.Location.Distance3DFromPlayer;
                             if (curDist < dist && _vendor.IsMatch(cntInfo.Entity))
@@ -427,7 +506,11 @@ namespace EntityTools.Quester.Actions
                                 debug.Value.AddInfo(string.Concat(methodName, ": Vendor '", contactInfo.Entity.Name, '[', contactInfo.Entity.InternalName, "]' was successfully found at the Distance = ", dist));
                             return Traiding(contactInfo.Entity);
                         }
-                        else debug.Value.AddInfo(string.Concat(methodName, ": Search failed"));
+                        else
+                        {
+                            if (extendedDebugInfo)
+                                debug.Value.AddInfo(string.Concat(methodName, ": Search failed"));
+                        }
                         break;
                 }
             }
@@ -514,24 +597,66 @@ namespace EntityTools.Quester.Actions
         }
 
         /// <summary>
-        /// Торговая сессия с вендором-NPC, включая призываемых
+        /// Торговая сессия с вендором-NPC <param name="vendorEntity"/>
         /// </summary>
-        /// <param name="vendorEntity"></param>
-        /// <returns></returns>
         private ActionResult Traiding(Entity vendorEntity)
         {
             bool extendedDebugInfo = ExtendedDebugInfo;
             string methodName = MethodBase.GetCurrentMethod().Name;
-            if (vendorEntity != null)
+            if (vendorEntity != null && vendorEntity.IsValid)
             {
                 if (extendedDebugInfo)
                     debug.Value.AddInfo(string.Concat(methodName, ": Begins"));
 
                 // взаимодействие с вендором для открытия окна магазина
-                if (ApproachAndInteractToVendor(vendorEntity))
+                if (ApproachAndInteractVendor(vendorEntity))
                 {
 #if false
                     // ApproachAndInteractToVendor гарантирует, что торговец может совершать сделки
+                    // дополнительная проверка не нужна
+                    ScreenType screenType = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.ScreenType;
+                    if (/*screenType == ScreenType.List || */screenType == ScreenType.Store || screenType == ScreenType.StoreCollection)
+
+#endif
+                    {
+                        // Продажа предметов
+                        SellItems();
+
+                        // Покупка предметов
+                        ActionResult result = BuyItems();
+
+                        // Закрытие диалогового окна
+                        if (@this._closeContactDialog)
+                        {
+                            if (extendedDebugInfo)
+                                debug.Value.AddInfo(string.Concat(methodName, ": CloseContactDialog"));
+
+                            EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
+                        }
+                        return result;
+                    }
+                }
+            }
+            return ActionResult.Running;
+        }
+
+        /// <summary>
+        /// Торговая сессия с вендором <param name="vendorNode"/>
+        /// </summary>
+        private ActionResult Traiding(WorldInteractionNode vendorNode)
+        {
+            bool extendedDebugInfo = ExtendedDebugInfo;
+            string methodName = MethodBase.GetCurrentMethod().Name;
+            if (vendorNode != null && vendorNode.IsValid)
+            {
+                if (extendedDebugInfo)
+                    debug.Value.AddInfo(string.Concat(methodName, ": Begins"));
+
+                // взаимодействие с вендором для открытия окна магазина
+                if (ApproachAndInteractNode(vendorNode))
+                {
+#if false
+                    // ApproachAndInteractNode гарантирует, что торговец может совершать сделки
                     // дополнительная проверка не нужна
                     ScreenType screenType = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.ScreenType;
                     if (/*screenType == ScreenType.List || */screenType == ScreenType.Store || screenType == ScreenType.StoreCollection)
@@ -566,7 +691,7 @@ namespace EntityTools.Quester.Actions
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        private bool ApproachAndInteractToVendor(Entity entity)
+        private bool ApproachAndInteractVendor(Entity entity)
         {
             bool extendedDebugInfo = ExtendedDebugInfo;
             string methodName = MethodBase.GetCurrentMethod().Name;
@@ -662,6 +787,114 @@ namespace EntityTools.Quester.Actions
 
             if (extendedDebugInfo)
                 debug.Value.AddInfo(string.Concat(methodName, ": VendorEntity checks failed"));
+
+            return false;
+        }
+
+        private bool ApproachAndInteractNode(WorldInteractionNode node)
+        {
+            bool extendedDebugInfo = ExtendedDebugInfo;
+            string methodName = MethodBase.GetCurrentMethod().Name;
+
+            if (extendedDebugInfo)
+                debug.Value.AddInfo(string.Concat(methodName, ": Begins"));
+
+            if (_vendor.IsMatch(node))
+            {
+                if (extendedDebugInfo)
+                    debug.Value.AddInfo(string.Concat(methodName, ": Vendor-Node is ok"));
+
+                ContactDialog contactDialog = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog;
+                bool ready;
+                if (contactDialog.IsValid)
+                {
+                    ScreenType screenType = contactDialog.ScreenType;
+
+                    if (extendedDebugInfo)
+                        debug.Value.AddInfo(string.Concat(methodName, ": ContactDialog is valid. ScreenType = ", screenType));
+
+                    // Открыто диалоговое окно
+                    if (screenType == ScreenType.List || screenType == ScreenType.Buttons)
+                    {
+                        // Открыто диалоговое окно продавца
+                        if (@this._vendorMenus.Count > 0)
+                        {
+                            if (extendedDebugInfo)
+                                debug.Value.AddInfo(string.Concat(methodName, ": Call Interact.DoDialog(..)"));
+                            Interact.DoDialog(_vendorMenus);
+                        }
+                        ready = Check_ReadyToTraid(contactDialog.ScreenType);
+                        if (extendedDebugInfo)
+                            debug.Value.AddInfo(string.Concat(methodName, ": ReadyToTraid = ", ready));
+
+                        return ready;
+                    }
+
+                    if (screenType == ScreenType.Store || screenType == ScreenType.StoreCollection)
+                        // Открыто витрина магазина (список товаров)
+                        // необходимо переключиться на нужную вкладку
+                    {
+                        if (@this._vendorMenus.Count > 0)
+                        {
+                            string key = @this._vendorMenus.Last();
+                            if (contactDialog.HasOptionByKey(key))
+                            {
+                                if (extendedDebugInfo)
+                                    debug.Value.AddInfo(string.Concat(methodName, ": Select Shop-Tab"));
+
+                                contactDialog.SelectOptionByKey(key);
+                            }
+                        }
+                        ready = Check_ReadyToTraid(contactDialog.ScreenType);
+                        if (extendedDebugInfo)
+                            debug.Value.AddInfo(string.Concat(methodName, ": ReadyToTraid = ", ready));
+
+                        return ready;
+                    }
+                    if (@this._closeContactDialog)
+                    {
+                        if (extendedDebugInfo)
+                            debug.Value.AddInfo(string.Concat(methodName, ": CloseContactDialog"));
+                        contactDialog.Close();
+                    }
+                }
+                else if (extendedDebugInfo)
+                    debug.Value.AddInfo(string.Concat(methodName, ": ContactDialog is invalid"));
+
+                double dist = node.Location.Distance3DFromPlayer;
+                if (!contactDialog.IsValid || dist > 10)
+                {
+                    // Расстояние до продавца больше 10
+                    if (extendedDebugInfo)
+                        debug.Value.AddInfo(string.Concat(methodName, ": Distance to the Vendor-Node = ", dist, ". Interact with Node"));
+
+                    var dynaNode = new Interact.DynaNode(node.Key);
+                    Approach.NodeForInteraction(dynaNode);
+                    bool interactResult = dynaNode.Node.WorldInteractionNode.Interact();
+                    Interact.WaitForInteraction();
+                    
+                    if (@this._vendorMenus.Count > 0)
+                        Interact.DoDialog(_vendorMenus);
+
+                    Thread.Sleep(500);
+
+                    var screenType = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.ScreenType;
+                    ready = Check_ReadyToTraid(screenType);
+                    if (extendedDebugInfo)
+                    {
+                        debug.Value.AddInfo(string.Concat(methodName, ": InteractionResult = ", interactResult, ", ReadyToTraid = ", ready, "ScreenType = ", screenType));
+                    }
+                    return interactResult && ready;
+                }
+                ready = Check_ReadyToTraid(contactDialog.ScreenType);
+                if (extendedDebugInfo)
+                    debug.Value.AddInfo(string.Concat(methodName, ": ReadyToTraid = ", ready));
+
+                return ready;
+            }
+
+            if (extendedDebugInfo)
+                debug.Value.AddInfo(string.Concat(methodName, ": Vendor-Node checks failed"));
 
             return false;
         }
@@ -763,7 +996,9 @@ namespace EntityTools.Quester.Actions
 
                         var slotCache = indexedBags[filterEntry];
                         List<ItemDef> boughtItems = null;
-                        BuyItemResult buyItemResult = (slotCache is null) ? BuyAnItem(filterEntry, ref boughtItems) : BuyAnItem(filterEntry, slotCache, ref boughtItems);
+                        BuyItemResult buyItemResult = slotCache is null 
+                            ? BuyAnItem(filterEntry, ref boughtItems) 
+                            : BuyAnItem(filterEntry, slotCache, ref boughtItems);
 
                         if (extendedDebugInfo)
                             debug.Value.AddInfo(string.Concat(methodName, ": Result: ", buyItemResult));
@@ -778,7 +1013,7 @@ namespace EntityTools.Quester.Actions
                                     {
                                         foreach (ItemDef item in boughtItems)
                                         {
-                                            // Здесь не учитывается возможно приобретения и экипировки нескольких вещений (например, колец)
+                                            // Здесь не учитывается возможность приобретения и экипировки нескольких вещей (например, колец)
 
                                             InventorySlot slot = _buyBags.Find(item);
                                             if (slot != null)
@@ -809,6 +1044,7 @@ namespace EntityTools.Quester.Actions
         /// Обработка одной позиции списка покупок
         /// </summary>
         /// <param name="item2buy"></param>
+        /// <param name="boughtItems"></param>
         /// <returns></returns>
         private BuyItemResult BuyAnItem(ItemFilterEntryExt item2buy, ref List<ItemDef> boughtItems)
         {
@@ -847,7 +1083,6 @@ namespace EntityTools.Quester.Actions
                                         // 0 - одна штука
                                         uint mayBuyInBulk = storeItemInfo.Item.ItemDef.MayBuyInBulk;
 
-                                        //if (!item2buy.BuyByOne)
                                         if (mayBuyInBulk > toBuyNum)
                                         {
                                             // Единовременная покупка нужного количества предметов
@@ -870,8 +1105,8 @@ namespace EntityTools.Quester.Actions
                                             if (extendedDebugInfo)
                                                 debug.Value.AddInfo(str);
 
-                                            uint totalPurchasedNum = 0;
-                                            for (totalPurchasedNum = 0; totalPurchasedNum < toBuyNum; totalPurchasedNum++)
+                                            uint totalPurchasedNum;
+                                            for (totalPurchasedNum = 0; totalPurchasedNum <= toBuyNum; totalPurchasedNum++)
                                             {
                                                 storeItemInfo.BuyItem(1);
                                                 Thread.Sleep(250);
@@ -916,9 +1151,7 @@ namespace EntityTools.Quester.Actions
                             }
                         }
                     }
-                    //else return BuyItemResult.Skiped;
                 }
-                //else return BuyItemResult.Error;
             }
             return result;
         }
@@ -989,7 +1222,7 @@ namespace EntityTools.Quester.Actions
                                             Logger.WriteLine(str);
 
                                             uint totalPurchasedNum = 0;
-                                            for (totalPurchasedNum = 0; totalPurchasedNum < toBuyNum; totalPurchasedNum++)
+                                            for (totalPurchasedNum = 0; totalPurchasedNum <= toBuyNum; totalPurchasedNum++)
                                             {
                                                 storeItemInfo.BuyItem(1);
                                                 Thread.Sleep(250);

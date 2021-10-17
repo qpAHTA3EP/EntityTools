@@ -1,16 +1,13 @@
-﻿using System;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Windows.Forms;
-using Astral.Logic.NW;
-using Astral.Quester.Classes;
-using Astral.Quester.Forms;
+﻿using Astral.Quester.Forms;
 using DevExpress.XtraEditors;
 using EntityTools.Enums;
 using EntityTools.Tools.BuySellItems;
 using MyNW.Classes;
 using MyNW.Internals;
-//using static EntityTools.Reflection.PrivateConsructor;
+using System;
+using System.ComponentModel;
+using System.Drawing.Design;
+using System.Windows.Forms;
 
 namespace EntityTools.Editors
 {
@@ -21,6 +18,7 @@ namespace EntityTools.Editors
                                                                     VendorType.Normal,
                                                                     VendorType.ArtifactVendor,
                                                                     VendorType.RemoteVendor,
+                                                                    VendorType.Node,
                                                                     VendorType.VIPSealTrader,
                                                                     VendorType.VIPProfessionVendor
                                                                 };
@@ -44,11 +42,12 @@ namespace EntityTools.Editors
         public static bool SetInfos(out VendorInfo vendor)
         {
             vendor = null;
-            VendorType vndType = VendorType.None;
-            VendorInfo vendorInfo = null;
+            var vndType = VendorType.None;
+            var localPlayer = EntityManager.LocalPlayer;
 
             if (EntityTools.Core.UserRequest_SelectItem(() => displayedVendors, ref vndType))
             {
+                VendorInfo vendorInfo;
                 switch (vndType)
                 {
                     case VendorType.None:
@@ -67,8 +66,8 @@ namespace EntityTools.Editors
                                 CostumeName = entity.CostumeRef.CostumeName,
                                 DisplayName = entity.Name,
                                 Position = entity.Location.Clone(),
-                                MapName = EntityManager.LocalPlayer.MapState.MapName,
-                                RegionName = EntityManager.LocalPlayer.RegionInternalName
+                                MapName = localPlayer.MapState.MapName,
+                                RegionName = localPlayer.RegionInternalName
                             };
                             vendor = vendorInfo;
                             return true;
@@ -87,7 +86,7 @@ namespace EntityTools.Editors
                             vendor = vendorInfo;
                             if ((XtraMessageBox.Show("Call it now ?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes))
                             {
-                                foreach (RemoteContact remoteContact in EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts)
+                                foreach (RemoteContact remoteContact in localPlayer.Player.InteractInfo.RemoteContacts)
                                 {
                                     if (remoteContact.ContactDef == contactName)
                                     {
@@ -99,6 +98,22 @@ namespace EntityTools.Editors
                             }
                         }
                         return !string.IsNullOrEmpty(contactName);
+                    case VendorType.Node:
+                        Vector3 pos = new Vector3();
+                        if (EntityTools.Core.UserRequest_GetNodeLocation(ref pos, "Get vendor-Node location"))
+                        {
+                            vendorInfo = new VendorInfo
+                            {
+                                VendorType = vndType,
+                                Position = pos,
+                                // DisplayName = $"Node <{pos.X:N1}, {pos.Y:N1}, {pos.Z:N1}>",
+                                MapName = localPlayer.MapState.MapName,
+                                RegionName = localPlayer.RegionInternalName
+                            };
+                            vendor = vendorInfo;
+                            return true;
+                        }
+                        return true;
                     default:
                         vendorInfo = new VendorInfo
                         {
