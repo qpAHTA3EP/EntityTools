@@ -9,13 +9,17 @@ namespace EntityTools.Enums
         /// </summary>
         Disabled,
         /// <summary>
-        /// Проверять только главные миссии
+        /// Проверять только главные миссии (Приключения, Adventure)
         /// </summary>
         Main,
         /// <summary>
         /// Проверять наличие повторяемых миссий
         /// </summary>
         RepeatablesOnly,
+        /// <summary>
+        /// Проверять только миссии "событи"
+        /// </summary>
+        Event,
         /// <summary>
         /// Проверять наличие любых миссий
         /// </summary>

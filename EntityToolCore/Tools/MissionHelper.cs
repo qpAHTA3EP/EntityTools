@@ -168,12 +168,15 @@ namespace EntityCore.Tools.Missions
                     return indicator == IndicatorType.MissionAvailable
                            || indicator == IndicatorType.MissionRepeatableAvailable
                            || indicator == IndicatorType.MissionRepeatableAvailableOverride
-                           || indicator == IndicatorType.Main_Available;
+                           || indicator == IndicatorType.Main_Available
+                           || indicator == IndicatorType.Event_Available;
                 case ContactHaveMissionCheckType.RepeatablesOnly:
                     return indicator == IndicatorType.MissionRepeatableAvailable
                            || indicator == IndicatorType.MissionRepeatableAvailableOverride;
                 case ContactHaveMissionCheckType.Main:
                     return indicator == IndicatorType.Main_Available;
+                case ContactHaveMissionCheckType.Event:
+                    return indicator == IndicatorType.Event_Available;
                 default:
                     return true;
             }
