@@ -493,9 +493,19 @@ namespace AcTp0Tools
                 public static void Save(bool saveAs = false)
                 {
                     string fullProfileName = Astral.API.CurrentSettings.LastQuesterProfile;
-                    string profileName = string.IsNullOrEmpty(Astral.API.CurrentSettings.LastQuesterProfile)
-                        ? EntityManager.LocalPlayer.MapState.MapName
-                        : Path.GetFileNameWithoutExtension(Astral.API.CurrentSettings.LastQuesterProfile);
+                    string profileName;
+                    if (string.IsNullOrEmpty(fullProfileName))
+                    {
+                        profileName = EntityManager.LocalPlayer.MapState.MapName;
+                    }
+                    else
+                    {
+                        profileName = Path.GetFileName(fullProfileName);
+                        if (profileName.EndsWith("amp.zip"))
+                            profileName = profileName.Substring(0, profileName.Length - 8);
+                    }
+
+                    
                     string dirName = Path.GetDirectoryName(fullProfileName);
                     if (string.IsNullOrEmpty(dirName))
                         dirName = Directories.ProfilesPath;
@@ -576,14 +586,14 @@ namespace AcTp0Tools
                             }
                         }
 
-                        Astral.API.CurrentSettings.LastQuesterProfile = fullProfileName;
+                        API.CurrentSettings.LastQuesterProfile = fullProfileName;
 
-                        Astral.Logger.Notify(string.Concat("Profile '", fullProfileName, "' saved"));
+                        Logger.Notify(string.Concat("Profile '", fullProfileName, "' saved"));
                     }
                     catch (Exception exc)
                     {
-                        Astral.Logger.WriteLine(Astral.Logger.LogType.Debug, exc.ToString());
-                        Astral.Logger.Notify(string.Concat("Profile '", fullProfileName, "' saved"), true);
+                        Logger.WriteLine(Logger.LogType.Debug, exc.ToString());
+                        Logger.Notify(string.Concat("Profile '", fullProfileName, "' saved"), true);
                     }
                     finally
                     {
