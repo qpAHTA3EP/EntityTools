@@ -31,6 +31,8 @@ namespace AcTp0Tools.Patches
         internal static List<Type> SkillTrainTypes = new List<Type>(50);
         internal static List<Type> UccTargetSelectorTypes = new List<Type>(4);
 
+        internal static Type Before3DDraw_Wrapper;
+
         static readonly List<Type> emptyTypeList = new List<Type>();
 #if false
         internal HarmonyPatch_XmlSerializer_GetExtraTypes() : base(typeof(Astral.Functions.XmlSerializer).GetMethod("GetExtraTypes", ReflectionHelper.DefaultFlags), typeof(HarmonyPatch_XmlSerializer_GetExtraTypes).GetMethod(nameof(GetExtraTypes), ReflectionHelper.DefaultFlags)) { }
@@ -153,6 +155,10 @@ namespace AcTp0Tools.Patches
                 else if (tSkillTrainAction.IsAssignableFrom(type))
                 {
                     SkillTrainTypes.Add(type);
+                }
+                else if (type.FullName == "\u0001.\u0002")
+                {
+                    Before3DDraw_Wrapper = type;
                 }
             }
         }

@@ -123,7 +123,7 @@
     <Compile Include="Patches\Astr0Patcher.cs" />
     <Compile Include="Patches\Astral.Quester.Classes.Conditions.QuestInfo.ToString.cs" />
     <Compile Include="Patches\Astral.Functions.XmlSerializer.GetExtraTypes.cs" />
-    <Compile Include="Patches\MyNW.Internals.WorldDrawing.cs" />
+    <Compile Include="Patches\Astral.Core.Before3DDraw.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Harmony\Public\Attributes.cs" />
