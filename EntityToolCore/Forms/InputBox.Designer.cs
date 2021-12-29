@@ -86,6 +86,7 @@ namespace EntityCore.Forms
             this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.Name = "InputBox";
             this.ShowInTaskbar = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "InputBox";
             this.TopMost = true;
             this.Load += new System.EventHandler(this.handler_FormLoad);

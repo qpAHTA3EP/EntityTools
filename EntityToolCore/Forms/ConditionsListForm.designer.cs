@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             this.splitContainer = new System.Windows.Forms.SplitContainer();
+            this.cheNegation = new DevExpress.XtraEditors.CheckEdit();
+            this.cbLogic = new DevExpress.XtraEditors.ComboBoxEdit();
             this.lsbxConditions = new System.Windows.Forms.CheckedListBox();
             this.Properties = new System.Windows.Forms.PropertyGrid();
             this.bntAdd = new System.Windows.Forms.Button();
@@ -39,14 +41,12 @@
             this.btnPaste = new System.Windows.Forms.Button();
             this.btnCopy = new System.Windows.Forms.Button();
             this.btnTestAll = new System.Windows.Forms.Button();
-            this.cbLogic = new DevExpress.XtraEditors.ComboBoxEdit();
-            this.cheNegation = new DevExpress.XtraEditors.CheckEdit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.cbLogic.Properties)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.cheNegation.Properties)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cbLogic.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer
@@ -69,6 +69,23 @@
             this.splitContainer.Size = new System.Drawing.Size(594, 305);
             this.splitContainer.SplitterDistance = 251;
             this.splitContainer.TabIndex = 3;
+            // 
+            // cheNegation
+            // 
+            this.cheNegation.Location = new System.Drawing.Point(159, 0);
+            this.cheNegation.Name = "cheNegation";
+            this.cheNegation.Properties.Caption = "Negation";
+            this.cheNegation.Size = new System.Drawing.Size(135, 20);
+            this.cheNegation.TabIndex = 2;
+            // 
+            // cbLogic
+            // 
+            this.cbLogic.Location = new System.Drawing.Point(0, 0);
+            this.cbLogic.Name = "cbLogic";
+            this.cbLogic.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.cbLogic.Size = new System.Drawing.Size(153, 20);
+            this.cbLogic.TabIndex = 1;
             // 
             // lsbxConditions
             // 
@@ -230,23 +247,6 @@
             this.btnTestAll.UseVisualStyleBackColor = true;
             this.btnTestAll.Click += new System.EventHandler(this.handler_TestAll);
             // 
-            // cbLogic
-            // 
-            this.cbLogic.Location = new System.Drawing.Point(0, 0);
-            this.cbLogic.Name = "cbLogic";
-            this.cbLogic.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.cbLogic.Size = new System.Drawing.Size(153, 20);
-            this.cbLogic.TabIndex = 1;
-            // 
-            // cheNegation
-            // 
-            this.cheNegation.Location = new System.Drawing.Point(159, 0);
-            this.cheNegation.Name = "cheNegation";
-            this.cheNegation.Properties.Caption = "Negation";
-            this.cheNegation.Size = new System.Drawing.Size(135, 20);
-            this.cheNegation.TabIndex = 2;
-            // 
             // ConditionListForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -264,17 +264,18 @@
             this.Controls.Add(this.splitContainer);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.IconOptions.ShowIcon = false;
+            this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.MinimumSize = new System.Drawing.Size(598, 383);
             this.Name = "ConditionListForm";
             this.ShowInTaskbar = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "ConditionList";
             this.splitContainer.Panel1.ResumeLayout(false);
             this.splitContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).EndInit();
             this.splitContainer.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.cbLogic.Properties)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.cheNegation.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.cbLogic.Properties)).EndInit();
             this.ResumeLayout(false);
 
         }

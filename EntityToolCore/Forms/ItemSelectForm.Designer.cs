@@ -91,7 +91,7 @@
             this.MinimumSize = new System.Drawing.Size(300, 300);
             this.Name = "ItemSelectForm";
             this.ShowInTaskbar = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "SelectForm";
             this.Shown += new System.EventHandler(this.btnReload_Click);
             this.ResumeLayout(false);

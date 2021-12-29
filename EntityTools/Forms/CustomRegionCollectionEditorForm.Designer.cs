@@ -249,7 +249,7 @@
             this.MinimumSize = new System.Drawing.Size(318, 419);
             this.Name = "CustomRegionCollectionEditorForm";
             this.ShowInTaskbar = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Shown += new System.EventHandler(this.handler_FormShown);
             ((System.ComponentModel.ISupportInitialize)(this.crList)).EndInit();
             this.spliter.Panel1.ResumeLayout(false);

@@ -84,7 +84,7 @@
             this.ItemList.SortOrder = System.Windows.Forms.SortOrder.Ascending;
             this.ItemList.TabIndex = 5;
             // 
-            // MultiItemSelectForm
+            // MultipleItemSelectForm
             // 
             this.AcceptButton = this.btnSelect;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -100,9 +100,9 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(318, 419);
-            this.Name = "MultiItemSelectForm";
+            this.Name = "MultipleItemSelectForm";
             this.ShowInTaskbar = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "MultiSelectForm";
             this.Shown += new System.EventHandler(this.handler_FormShown);
             ((System.ComponentModel.ISupportInitialize)(this.ItemList)).EndInit();

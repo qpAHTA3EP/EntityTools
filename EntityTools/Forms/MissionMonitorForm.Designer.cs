@@ -221,6 +221,7 @@
             this.Controls.Add(this.btnSelectMission);
             this.Controls.Add(this.tabControl);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.MinimumSize = new System.Drawing.Size(400, 300);
             this.Name = "MissionMonitorForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

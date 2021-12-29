@@ -49,7 +49,7 @@ namespace EntityCore.Forms
             this.lblFilters = new DevExpress.XtraEditors.LabelControl();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.Description = new System.Windows.Forms.TextBox();
-            this.ckbNewAuras = new System.Windows.Forms.CheckBox();
+            this.ckbAuraInspectionMode = new System.Windows.Forms.CheckBox();
             this.Selector = new DevExpress.XtraEditors.ComboBoxEdit();
             ((System.ComponentModel.ISupportInitialize)(this.Auras)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
@@ -87,7 +87,7 @@ namespace EntityCore.Forms
             this.Auras.Name = "Auras";
             this.Auras.Size = new System.Drawing.Size(360, 189);
             this.Auras.TabIndex = 3;
-            this.Auras.SelectedIndexChanged += new System.EventHandler(this.lbAuras_SelectedIndexChanged);
+            this.Auras.SelectedIndexChanged += new System.EventHandler(this.handler_SelectedAuraChanged);
             // 
             // btnSelect
             // 
@@ -101,7 +101,7 @@ namespace EntityCore.Forms
             this.btnSelect.Size = new System.Drawing.Size(74, 23);
             this.btnSelect.TabIndex = 4;
             this.btnSelect.Text = "Select";
-            this.btnSelect.Click += new System.EventHandler(this.btnSelect_Click);
+            this.btnSelect.Click += new System.EventHandler(this.handler_SelectAura);
             // 
             // btnReload
             // 
@@ -115,7 +115,7 @@ namespace EntityCore.Forms
             this.btnReload.Size = new System.Drawing.Size(74, 23);
             this.btnReload.TabIndex = 4;
             this.btnReload.Text = "Reload";
-            this.btnReload.Click += new System.EventHandler(this.btnReload_Click);
+            this.btnReload.Click += new System.EventHandler(this.handler_Reload);
             // 
             // NameFilter
             // 
@@ -175,18 +175,18 @@ namespace EntityCore.Forms
             this.Description.Size = new System.Drawing.Size(360, 74);
             this.Description.TabIndex = 9;
             // 
-            // ckbNewAuras
+            // ckbAuraInspectionMode
             // 
-            this.ckbNewAuras.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ckbNewAuras.AutoSize = true;
-            this.ckbNewAuras.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.ckbNewAuras.Location = new System.Drawing.Point(239, 63);
-            this.ckbNewAuras.Name = "ckbNewAuras";
-            this.ckbNewAuras.Size = new System.Drawing.Size(133, 17);
-            this.ckbNewAuras.TabIndex = 11;
-            this.ckbNewAuras.Text = "Display new auras only";
-            this.ckbNewAuras.UseVisualStyleBackColor = true;
-            this.ckbNewAuras.CheckedChanged += new System.EventHandler(this.ckbNewAuras_CheckedChanged);
+            this.ckbAuraInspectionMode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ckbAuraInspectionMode.AutoSize = true;
+            this.ckbAuraInspectionMode.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ckbAuraInspectionMode.Location = new System.Drawing.Point(239, 63);
+            this.ckbAuraInspectionMode.Name = "ckbAuraInspectionMode";
+            this.ckbAuraInspectionMode.Size = new System.Drawing.Size(133, 17);
+            this.ckbAuraInspectionMode.TabIndex = 11;
+            this.ckbAuraInspectionMode.Text = "Display new auras only";
+            this.ckbAuraInspectionMode.UseVisualStyleBackColor = true;
+            this.ckbAuraInspectionMode.CheckedChanged += new System.EventHandler(this.handler_AuraInspectionModeChanged);
             // 
             // Selector
             // 
@@ -198,6 +198,7 @@ namespace EntityCore.Forms
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.Selector.Size = new System.Drawing.Size(158, 20);
             this.Selector.TabIndex = 12;
+            this.Selector.SelectedValueChanged += new System.EventHandler(this.Handler_TargetSelect);
             // 
             // AuraSelectForm
             // 
@@ -206,7 +207,7 @@ namespace EntityCore.Forms
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(384, 418);
             this.Controls.Add(this.Selector);
-            this.Controls.Add(this.ckbNewAuras);
+            this.Controls.Add(this.ckbAuraInspectionMode);
             this.Controls.Add(this.unitRefName);
             this.Controls.Add(this.splitContainer);
             this.Controls.Add(this.InternalNameFilter);
@@ -221,9 +222,9 @@ namespace EntityCore.Forms
             this.MinimumSize = new System.Drawing.Size(386, 450);
             this.Name = "AuraSelectForm";
             this.ShowInTaskbar = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Select Aura";
-            this.Load += new System.EventHandler(this.AuraSelectForm_Load);
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.Text = "Aura Viewer";
+            this.Load += new System.EventHandler(this.handler_LoadForm);
             ((System.ComponentModel.ISupportInitialize)(this.Auras)).EndInit();
             this.splitContainer.Panel1.ResumeLayout(false);
             this.splitContainer.Panel2.ResumeLayout(false);
@@ -247,7 +248,7 @@ namespace EntityCore.Forms
         private LabelControl lblFilters;
         private SplitContainer splitContainer;
         private TextBox Description;
-        private CheckBox ckbNewAuras;
+        private CheckBox ckbAuraInspectionMode;
         private ComboBoxEdit Selector;
     }
 }

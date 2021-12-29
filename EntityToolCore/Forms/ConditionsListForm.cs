@@ -31,7 +31,7 @@ namespace EntityCore.Forms
                 currentUccAction = editor.GetProperty<UCCAction>("CurrentAction");
             if (currentUccAction == null)
             {
-                // Отключение кнопок тестирования, если окно редактора не нейдено
+                // Отключение кнопок тестирования, если окно редактора не найдено
                 btnTest.Enabled = false;
                 btnTestAll.Enabled = false;
             }
@@ -187,9 +187,11 @@ namespace EntityCore.Forms
             if (_conditionCopy != null)
             {
                 UCCCondition cond = CopyHelper.CreateDeepCopy(_conditionCopy);
-                lsbxConditions.Items.Add(cond);
-
+                allowConditionsItemChechedChangeInd = lsbxConditions.Items.Add(cond, cond.Locked);
+                lsbxConditions.SetItemChecked(allowConditionsItemChechedChangeInd, cond.Locked);
                 lsbxConditions.SelectedItem = cond;
+
+                lsbxConditions.Refresh();
             }
         }
 
@@ -259,8 +261,6 @@ namespace EntityCore.Forms
 
         private void handler_SelectedConditionChanged(object sender, EventArgs e)
         {
-            //if(Conditions.SelectedIndex >= 0  && Conditions.SelectedIndex < Conditions.Items.Count )
-            //    Properties.SelectedObject = Conditions.Items[Conditions.SelectedIndex];
             Properties.SelectedObject = lsbxConditions.SelectedItem;
         }
 
@@ -282,9 +282,7 @@ namespace EntityCore.Forms
             if (e.ChangedItem.Label == "Locked")
             {
                 allowConditionsItemChechedChangeInd = lsbxConditions.SelectedIndex;
-                //Conditions.ItemCheck -= Conditions_ItemCheck;
                 lsbxConditions.SetItemChecked(lsbxConditions.SelectedIndex, e.ChangedItem.Value.Equals(true));
-                //Conditions.ItemCheck += Conditions_ItemCheck;
             }
             lsbxConditions.Refresh();
         }

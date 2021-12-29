@@ -501,6 +501,7 @@ namespace EntityTools.Forms
             this.Controls.Add(this.barDockControl_0);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.IconOptions.ShowIcon = false;
+            this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.MinimumSize = new System.Drawing.Size(646, 200);
             this.Name = "ItemFilterEditorForm";
             this.ShowInTaskbar = false;

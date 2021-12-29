@@ -136,6 +136,7 @@ namespace EntityTools.Forms
             this.Controls.Add(this.btnAdd);
             this.Controls.Add(this.itemList);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.MinimumSize = new System.Drawing.Size(334, 293);
             this.Name = "ItemListEditorForm";
             this.ShowInTaskbar = false;

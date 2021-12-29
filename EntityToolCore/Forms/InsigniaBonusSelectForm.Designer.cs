@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.lbFilter = new System.Windows.Forms.Label();
             this.tbBarbed = new System.Windows.Forms.TextBox();
             this.tbCrescent = new System.Windows.Forms.TextBox();
@@ -38,7 +39,7 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnSelect = new System.Windows.Forms.Button();
             this.BonusList = new System.Windows.Forms.ListBox();
-            this.bindingSource = new System.Windows.Forms.BindingSource();
+            this.bindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.Description = new System.Windows.Forms.TextBox();
             this.pbBarbed = new System.Windows.Forms.PictureBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
@@ -107,7 +108,9 @@
             // btnFilter
             // 
             this.btnFilter.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnFilter.Location = new System.Drawing.Point(460, 9);
+            this.btnFilter.FlatAppearance.BorderSize = 0;
+            this.btnFilter.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnFilter.Location = new System.Drawing.Point(474, 9);
             this.btnFilter.Name = "btnFilter";
             this.btnFilter.Size = new System.Drawing.Size(75, 23);
             this.btnFilter.TabIndex = 3;
@@ -119,7 +122,9 @@
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(460, 323);
+            this.btnCancel.FlatAppearance.BorderSize = 0;
+            this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCancel.Location = new System.Drawing.Point(474, 330);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 3;
@@ -129,7 +134,9 @@
             // btnSelect
             // 
             this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelect.Location = new System.Drawing.Point(379, 323);
+            this.btnSelect.FlatAppearance.BorderSize = 0;
+            this.btnSelect.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSelect.Location = new System.Drawing.Point(393, 330);
             this.btnSelect.Name = "btnSelect";
             this.btnSelect.Size = new System.Drawing.Size(75, 23);
             this.btnSelect.TabIndex = 3;
@@ -147,7 +154,7 @@
             this.BonusList.ItemHeight = 16;
             this.BonusList.Location = new System.Drawing.Point(15, 44);
             this.BonusList.Name = "BonusList";
-            this.BonusList.Size = new System.Drawing.Size(520, 196);
+            this.BonusList.Size = new System.Drawing.Size(534, 196);
             this.BonusList.Sorted = true;
             this.BonusList.TabIndex = 4;
             this.BonusList.SelectedIndexChanged += new System.EventHandler(this.BonusList_SelectedIndexChanged);
@@ -157,11 +164,11 @@
             this.Description.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Description.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.Description.Location = new System.Drawing.Point(132, 259);
+            this.Description.Location = new System.Drawing.Point(132, 266);
             this.Description.Multiline = true;
             this.Description.Name = "Description";
             this.Description.ReadOnly = true;
-            this.Description.Size = new System.Drawing.Size(403, 52);
+            this.Description.Size = new System.Drawing.Size(417, 52);
             this.Description.TabIndex = 5;
             // 
             // pbBarbed
@@ -217,7 +224,7 @@
             // Insignia1
             // 
             this.Insignia1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Insignia1.Location = new System.Drawing.Point(18, 259);
+            this.Insignia1.Location = new System.Drawing.Point(18, 266);
             this.Insignia1.Name = "Insignia1";
             this.Insignia1.Size = new System.Drawing.Size(32, 32);
             this.Insignia1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -227,7 +234,7 @@
             // Insignia2
             // 
             this.Insignia2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Insignia2.Location = new System.Drawing.Point(56, 259);
+            this.Insignia2.Location = new System.Drawing.Point(56, 266);
             this.Insignia2.Name = "Insignia2";
             this.Insignia2.Size = new System.Drawing.Size(32, 32);
             this.Insignia2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -237,7 +244,7 @@
             // Insignia3
             // 
             this.Insignia3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Insignia3.Location = new System.Drawing.Point(94, 259);
+            this.Insignia3.Location = new System.Drawing.Point(94, 266);
             this.Insignia3.Name = "Insignia3";
             this.Insignia3.Size = new System.Drawing.Size(32, 32);
             this.Insignia3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -246,11 +253,9 @@
             // 
             // InsigniaBonusSelectForm
             // 
-            this.AcceptButton = this.btnSelect;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(547, 358);
+            this.ClientSize = new System.Drawing.Size(561, 365);
             this.ControlBox = false;
             this.Controls.Add(this.Insignia3);
             this.Controls.Add(this.Insignia2);
@@ -272,13 +277,12 @@
             this.Controls.Add(this.tbBarbed);
             this.Controls.Add(this.lbFilter);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
-            this.LookAndFeel.SkinName = "Office 2013 Light Gray";
+            this.IconOptions.ShowIcon = false;
             this.LookAndFeel.UseDefaultLookAndFeel = false;
-            this.MinimumSize = new System.Drawing.Size(555, 382);
+            this.MinimumSize = new System.Drawing.Size(541, 375);
             this.Name = "InsigniaBonusSelectForm";
-            this.ShowIcon = false;
             this.ShowInTaskbar = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "InsigniaBonuses";
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbBarbed)).EndInit();

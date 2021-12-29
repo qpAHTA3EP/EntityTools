@@ -40,6 +40,7 @@ namespace EntityTools.Forms
             this.btnAccountDown = new DevExpress.XtraEditors.SimpleButton();
             this.btnAccountUp = new DevExpress.XtraEditors.SimpleButton();
             this.btnAccountSort = new DevExpress.XtraEditors.SimpleButton();
+            this.btnAccountEdit = new DevExpress.XtraEditors.SimpleButton();
             this.btnAccountAdd = new DevExpress.XtraEditors.SimpleButton();
             this.lblPassword = new System.Windows.Forms.Label();
             this.lblLogin = new System.Windows.Forms.Label();
@@ -54,6 +55,7 @@ namespace EntityTools.Forms
             this.btnCharacterSort = new DevExpress.XtraEditors.SimpleButton();
             this.btnCharacterDown = new DevExpress.XtraEditors.SimpleButton();
             this.btnCharacterUp = new DevExpress.XtraEditors.SimpleButton();
+            this.btnCharacterEdit = new DevExpress.XtraEditors.SimpleButton();
             this.btnCharacterAdd = new DevExpress.XtraEditors.SimpleButton();
             this.lblMachineId = new System.Windows.Forms.Label();
             this.btnMachineIdImport = new DevExpress.XtraEditors.SimpleButton();
@@ -61,8 +63,6 @@ namespace EntityTools.Forms
             this.btnSave = new DevExpress.XtraEditors.SimpleButton();
             this.btnCancel = new DevExpress.XtraEditors.SimpleButton();
             this.bindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.btnAccountEdit = new DevExpress.XtraEditors.SimpleButton();
-            this.btnCharacterEdit = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerControl)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerControl.Panel1)).BeginInit();
             this.splitContainerControl.Panel1.SuspendLayout();
@@ -224,6 +224,18 @@ namespace EntityTools.Forms
             this.btnAccountSort.Size = new System.Drawing.Size(20, 20);
             this.btnAccountSort.TabIndex = 3;
             this.btnAccountSort.ToolTip = "Sort the account list";
+            // 
+            // btnAccountEdit
+            // 
+            this.btnAccountEdit.ImageOptions.Image = global::EntityTools.Properties.Resources.miniPen;
+            this.btnAccountEdit.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.TopCenter;
+            this.btnAccountEdit.Location = new System.Drawing.Point(90, 7);
+            this.btnAccountEdit.Name = "btnAccountEdit";
+            this.btnAccountEdit.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
+            this.btnAccountEdit.ShowFocusRectangle = DevExpress.Utils.DefaultBoolean.False;
+            this.btnAccountEdit.Size = new System.Drawing.Size(20, 20);
+            this.btnAccountEdit.TabIndex = 3;
+            this.btnAccountEdit.ToolTip = "Edit account name";
             // 
             // btnAccountAdd
             // 
@@ -404,6 +416,18 @@ namespace EntityTools.Forms
             this.btnCharacterUp.TabIndex = 3;
             this.btnCharacterUp.ToolTip = "Move character to the up";
             // 
+            // btnCharacterEdit
+            // 
+            this.btnCharacterEdit.ImageOptions.Image = global::EntityTools.Properties.Resources.miniPen;
+            this.btnCharacterEdit.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.TopCenter;
+            this.btnCharacterEdit.Location = new System.Drawing.Point(95, 7);
+            this.btnCharacterEdit.Name = "btnCharacterEdit";
+            this.btnCharacterEdit.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
+            this.btnCharacterEdit.ShowFocusRectangle = DevExpress.Utils.DefaultBoolean.False;
+            this.btnCharacterEdit.Size = new System.Drawing.Size(20, 20);
+            this.btnCharacterEdit.TabIndex = 3;
+            this.btnCharacterEdit.ToolTip = "Edit character name";
+            // 
             // btnCharacterAdd
             // 
             this.btnCharacterAdd.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnCharacterAdd.ImageOptions.Image")));
@@ -477,30 +501,6 @@ namespace EntityTools.Forms
             this.btnCancel.TabIndex = 5;
             this.btnCancel.Text = "Cancel";
             // 
-            // btnAccountEdit
-            // 
-            this.btnAccountEdit.ImageOptions.Image = global::EntityTools.Properties.Resources.miniPen;
-            this.btnAccountEdit.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.TopCenter;
-            this.btnAccountEdit.Location = new System.Drawing.Point(90, 7);
-            this.btnAccountEdit.Name = "btnAccountEdit";
-            this.btnAccountEdit.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
-            this.btnAccountEdit.ShowFocusRectangle = DevExpress.Utils.DefaultBoolean.False;
-            this.btnAccountEdit.Size = new System.Drawing.Size(20, 20);
-            this.btnAccountEdit.TabIndex = 3;
-            this.btnAccountEdit.ToolTip = "Edit account name";
-            // 
-            // btnCharacterEdit
-            // 
-            this.btnCharacterEdit.ImageOptions.Image = global::EntityTools.Properties.Resources.miniPen;
-            this.btnCharacterEdit.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.TopCenter;
-            this.btnCharacterEdit.Location = new System.Drawing.Point(95, 7);
-            this.btnCharacterEdit.Name = "btnCharacterEdit";
-            this.btnCharacterEdit.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
-            this.btnCharacterEdit.ShowFocusRectangle = DevExpress.Utils.DefaultBoolean.False;
-            this.btnCharacterEdit.Size = new System.Drawing.Size(20, 20);
-            this.btnCharacterEdit.TabIndex = 3;
-            this.btnCharacterEdit.ToolTip = "Edit character name";
-            // 
             // CredentialManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -514,8 +514,10 @@ namespace EntityTools.Forms
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.btnCancel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.MinimumSize = new System.Drawing.Size(530, 230);
             this.Name = "CredentialManager";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "CredentialManager";
             this.Load += new System.EventHandler(this.handler_Load);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerControl.Panel1)).EndInit();

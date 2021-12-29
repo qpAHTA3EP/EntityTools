@@ -13,7 +13,7 @@ using DevExpress.XtraEditors.Controls;
 using DevExpress.XtraGrid.Views.Grid;
 using EntityTools.Enums;
 using AcTp0Tools.Reflection;
-using EntityTools.Tools.BuySellItems;
+using EntityTools.Tools.Inventory;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
 

@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Astral.Classes.ItemFilter;
+﻿using Astral.Classes.ItemFilter;
 using Astral.Logic.NW;
 using DevExpress.XtraEditors;
-using EntityCore.Entities;
-using EntityCore.Forms;
 using EntityTools.Enums;
 using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
-using static EntityCore.Forms.EntitySelectForm;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using EntityTools.Tools.Export;
 
 namespace EntityCore.Forms
 {
@@ -54,7 +52,7 @@ namespace EntityCore.Forms
                                     if (betterEntityToInteract != null && betterEntityToInteract.IsValid)
                                     {
                                         entity = betterEntityToInteract;
-                                        unitRefName.Text = $"{entity.Name} [{entity.InternalName}]";
+                                        unitRefName.Text = $@"{entity.Name} [{entity.InternalName}]";
                                         break;
                                     }
                                 }
@@ -81,7 +79,7 @@ namespace EntityCore.Forms
                             return entity;
                     }
                 }
-                unitRefName.Text = "-";
+                unitRefName.Text = @"-";
                 return null;
             }
         }
@@ -106,19 +104,10 @@ namespace EntityCore.Forms
             return string.Empty;
         }
 
-        //static public void ShowFreeTool()
-        //{
-        //    AuraSelectForm @this = new AuraSelectForm();
-
-        //    @this.NameFilter.Text = string.Empty;
-        //    @this.InternalNameFilter.Text = string.Empty;
-
-        //    @this.Show(Astral.Forms.Main.ActiveForm);
-        //}
-
         private void FillAuraList(Character character)
         {
             Auras.Items.Clear();
+            Description.Text = string.Empty;
 
             if (character != null && character.IsValid)
             {
@@ -186,80 +175,46 @@ namespace EntityCore.Forms
         }
 
         #region Обработчики
-        //private void btnPlayer_Click(object sender, EventArgs e)
-        //{
-        //    //selectedAuraSource = SelectedAuraSource.Player;
-        //    Selector.SelectedItem = SelectedAuraSource.Player;
-        //    unitRefName.Text = EntityManager.LocalPlayer.InternalName;
-        //    FillAuraList(EntityManager.LocalPlayer.Character);
-        //}
-
-        //private void btnTarget_Click(object sender, EventArgs e)
-        //{
-        //    //selectedAuraSource = SelectedAuraSource.Target;
-        //    Selector.SelectedItem = SelectedAuraSource.Target;
-        //    unitRefName.Text = EntityManager.LocalPlayer.Character.CurrentTarget.InternalName;
-        //    FillAuraList(EntityManager.LocalPlayer.Character.CurrentTarget.Character);
-        //}
-
-        //private void btnEntity_Click(object sender, EventArgs e)
-        //{
-        //    //selectedAuraSource = SelectedAuraSource.Entity;
-        //    Selector.SelectedItem = SelectedAuraSource.Entity;
-        //    Entity entity = EntitySelectForm.GUIRequest();
-        //    if (entity != null)
-        //    {
-        //        if (!string.IsNullOrEmpty(entity.InternalName))
-        //            unitRefName.Text = entity.InternalName;
-        //        else if (!string.IsNullOrEmpty(entity.Name))
-        //            unitRefName.Text = entity.Name;
-        //        else unitRefName.Text = entity.NameUntranslated;
-        //        FillAuraList(entity.Character.CurrentTarget.Character);
-        //    }
-        //}
-
-        private void btnSelect_Click(object sender, EventArgs e)
+        private void handler_SelectAura(object sender, EventArgs e)
         {
             DialogResult = DialogResult.OK;
             Close();
         }
 
-        private void AuraSelectForm_Load(object sender, EventArgs e)
+        private void handler_LoadForm(object sender, EventArgs e)
         {
             Selector.Properties.Items.Clear();
             Selector.Properties.Items.AddRange(Enum.GetValues(typeof(SelectedAuraSource)));
         }
 
-        private void Selector_SelectedIndexChanged(object sender, EventArgs e)
+        private void Handler_TargetSelect(object sender, EventArgs e)
         {
-            ckbNewAuras.Checked = false;
+            ckbAuraInspectionMode.Checked = false;
             entity = null;
             FillAuraList(UnitRef?.Character);
         }
 
-        private void btnReload_Click(object sender, EventArgs e)
+        private void handler_Reload(object sender, EventArgs e)
         {
-            if (ckbNewAuras.Checked)
-                ckbNewAuras_CheckedChanged(sender, e);
+            if (ckbAuraInspectionMode.Checked)
+                handler_AuraInspectionModeChanged(sender, e);
             else FillAuraList(UnitRef?.Character);
         }
 
-        private void lbAuras_SelectedIndexChanged(object sender, EventArgs e)
+        private void handler_SelectedAuraChanged(object sender, EventArgs e)
         {
             if(Auras.SelectedItem is AuraInfo aura)
             {
                 Description.Text = aura.Description;
-                //webDescription.Document.OpenNew(true);
-                //webDescription.Document.Write(aura.Description);
             }
         }
 
-        private void ckbNewAuras_CheckedChanged(object sender, EventArgs e)
+        private void handler_AuraInspectionModeChanged(object sender, EventArgs e)
         {
             if (backgroundTaskFillAuraList?.Status == TaskStatus.Running)
                 tokenSource?.Cancel();
 
-            if (ckbNewAuras.Checked)
+            if (ckbAuraInspectionMode.Checked)
             {
                 tokenSource = new CancellationTokenSource();
                 cancellationToken = tokenSource.Token;

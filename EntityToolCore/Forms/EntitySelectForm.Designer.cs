@@ -94,7 +94,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dgvEntities.BackgroundColor = System.Drawing.SystemColors.Control;
             this.dgvEntities.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            this.dgvEntities.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
+            this.dgvEntities.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
             this.dgvEntities.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.dgvEntities.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.clmnName,
@@ -241,7 +241,7 @@
             this.Name = "EntitySelectForm";
             this.Padding = new System.Windows.Forms.Padding(10);
             this.ShowInTaskbar = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "EntitySelectForm";
             ((System.ComponentModel.ISupportInitialize)(this.dgvEntities)).EndInit();
             this.ResumeLayout(false);

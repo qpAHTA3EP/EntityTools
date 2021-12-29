@@ -76,6 +76,7 @@
             this.Controls.Add(this.pgObjectInfos);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.IconOptions.ShowIcon = false;
+            this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.Name = "ObjectInfoForm";
             this.Padding = new System.Windows.Forms.Padding(1);
             this.ShowInTaskbar = false;

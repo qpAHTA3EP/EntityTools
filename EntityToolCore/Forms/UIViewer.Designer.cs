@@ -253,7 +253,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.Name = "UIViewer";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "UIViewer";
             this.Load += new System.EventHandler(this.event_Refresh);
             this.splitContainer.Panel1.ResumeLayout(false);
