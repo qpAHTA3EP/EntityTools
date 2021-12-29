@@ -6,7 +6,6 @@ using Astral.Logic.NW;
 using Astral.Quester.Forms;
 using EntityCore.Enums;
 using EntityCore.Tools;
-using EntityCore.Tools.Missions;
 using EntityTools;
 using EntityTools.Core.Interfaces;
 using EntityTools.Editors;
@@ -34,11 +33,11 @@ namespace EntityCore.Quester.Action
         private TurnInMissionExt @this;
 
         #region данные ядра
-        private const int TIME = 5_000;
+        private const int TIME = 10_000;
 
         private ContactInfo giverContactInfo;
         private int tries;
-        private Astral.Classes.Timeout failTo = null;
+        private Astral.Classes.Timeout failTo;
         private string _label = string.Empty;
         private string _idStr = string.Empty;
         #endregion
@@ -111,10 +110,16 @@ namespace EntityCore.Quester.Action
         public void OnPropertyChanged(Astral.Quester.Classes.Action sender, string propertyName)
         {
             if (!ReferenceEquals(sender, @this)) return;
-            if (propertyName == nameof(@this.RequiredRewardItem))
-                //isRewardItem = initialize_IsRewardItem;
-                _rewardItemCheck = null;
-            else if (propertyName == nameof(@this.MissionId)) _label = string.Empty;
+
+            switch (propertyName)
+            {
+                case nameof(@this.RequiredRewardItem):
+                    _rewardItemCheck = null;
+                    break;
+                case nameof(@this.MissionId):
+                    _label = string.Empty;
+                    break;
+            }
         }
 
         public bool NeedToRun
@@ -124,16 +129,16 @@ namespace EntityCore.Quester.Action
                 bool debugInfoEnabled = ExtendedDebugInfo;
 
                 string currentMethodName = debugInfoEnabled
-                    ? string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name)
+                    ? $"{_idStr}.{MethodBase.GetCurrentMethod().Name}"
                     : string.Empty;
 
                 bool needToRun = false;
 
                 if (debugInfoEnabled)
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Begins"));
+                    ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Begins");
 
                 float searchDistance = Math.Max(@this._interactDistance + 0.5f, 10f);
-                float interactDistance = Math.Max(@this._interactDistance + 0.5f, 5.5f);
+                //float interactDistance = Math.Max(@this._interactDistance + 0.5f, 5.5f);
 
 
                 if (@this._giver.Type == MissionGiverType.NPC)
@@ -145,16 +150,18 @@ namespace EntityCore.Quester.Action
                         && Math.Abs(giverPos.Z - EntityManager.LocalPlayer.Z) <= @this._interactZDifference)
                     {
                         if (debugInfoEnabled)
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Distance to the Giver is ", giverDistance.ToString("N1"), ". Result 'true'"));
+                            ETLogger.WriteLine(LogType.Debug,
+                                $"{currentMethodName}: Distance to the Giver is {giverDistance:N1}. Result 'True'");
                         needToRun = true;
                     }  
                     else if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Faraway(", giverDistance.ToString("N1"), "). Result 'False'"));
+                        ETLogger.WriteLine(LogType.Debug,
+                            $"{currentMethodName}: Faraway({giverDistance:N1}). Result 'False'");
                 }
                 else if(@this._giver.Type == MissionGiverType.Remote)
                 {
                     if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Giver is remote. Result 'True'"));
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Giver is remote. Result 'True'");
                     needToRun = true;
                 }
 
@@ -163,7 +170,7 @@ namespace EntityCore.Quester.Action
                     AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true);
 
                     if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Disable combat"));
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Disable combat");
                 }
 
                 return needToRun;
@@ -179,12 +186,13 @@ namespace EntityCore.Quester.Action
                     : string.Empty;
 
             if (debugInfoEnabled)
-                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Begins try #", tries));
+                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Begins try #{tries}");
 
             if (!InternalConditions)
             {
                 if (debugInfoEnabled)
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": InternalConditions is False => ActionResult = '", ActionResult.Fail, '\''));
+                    ETLogger.WriteLine(LogType.Debug,
+                        $"{currentMethodName}: InternalConditions is False => ActionResult = '{ActionResult.Fail}'");
                 return ActionResult.Fail;
             }
             if (failTo is null)
@@ -195,7 +203,8 @@ namespace EntityCore.Quester.Action
                 bool inCombat = EntityManager.LocalPlayer.InCombat;
                 if (debugInfoEnabled)
                     ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Engage combat ",
-                        inCombat ? " => ActionResult = '" + ActionResult.Running + "'" : string.Empty));
+                        inCombat ? " => ActionResult = '" + ActionResult.Running + "'" 
+                                 : string.Empty));
                 AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(false);
                 if (inCombat)
                     return ActionResult.Running;
@@ -223,7 +232,8 @@ namespace EntityCore.Quester.Action
                         giverContactInfo = contactInfo;
 
                         if (debugInfoEnabled)
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Set GiverContactInfo to [", giverContactInfo, ']'));
+                            ETLogger.WriteLine(LogType.Debug,
+                                $"{currentMethodName}: Set GiverContactInfo to [{giverContactInfo.GetDebugDescription()}]");
                         break;
                     }
 
@@ -234,45 +244,49 @@ namespace EntityCore.Quester.Action
                         tries++;
 
                         if (debugInfoEnabled)
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": GiverContact is absent..."));
+                            ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: GiverContact is absent...");
 
                         goto Results;
                     }
                 }
                 else if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Keep GiverContactInfo [", giverContactInfo, ']'));
+                    ETLogger.WriteLine(LogType.Debug,
+                        $"{currentMethodName}: Keep GiverContactInfo [{giverContactInfo.GetDebugDescription()}]");
 
                 if (giverContactInfo != null)
                 {
                     Entity entity = giverContactInfo.Entity;
                     if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Entity [", entity.InternalName, ", ", entity.CostumeRef.CostumeName, "] match to MissionGiverInfo [", @this._giver, ']'));
+                        ETLogger.WriteLine(LogType.Debug,
+                            $"{currentMethodName}: Entity [{entity.GetDebugDescription()}] match to MissionGiverInfo [{@this._giver}]");
 
                     // Перемещаемся к квестодателю (в случае необходимости)
                     if (!entity.ApproachMissionGiver(interactDistance, @this._interactZDifference))
                     {
                         if (debugInfoEnabled)
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ApproachMissionGiver failed => ActionResult = '", ActionResult.Running, '\''));
+                            ETLogger.WriteLine(LogType.Debug,
+                                $"{currentMethodName}: ApproachMissionGiver failed => ActionResult = '{ActionResult.Running}'");
                         return ActionResult.Running;
                     }
-                    else if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ApproachMissionGiver succeeded"));
+                    if (debugInfoEnabled)
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: ApproachMissionGiver succeeded");
 
                     // Взаимодействуем с квестодателем
                     if (!entity.InteractMissionGiver(interactDistance))
                     {
                         if (debugInfoEnabled)
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": InteractMissionGiver failed => ActionResult = '", ActionResult.Running, '\''));
+                            ETLogger.WriteLine(LogType.Debug,
+                                $"{currentMethodName}: InteractMissionGiver failed => ActionResult = '{ActionResult.Running}'");
                         return ActionResult.Running;
                     }
-                    else if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": InteractMissionGiver succeeded"));
+                    if (debugInfoEnabled)
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: InteractMissionGiver succeeded");
                 }
             }
             else if (@this._giver.Type == MissionGiverType.Remote)
             {
                 if (debugInfoEnabled)
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Call 'RemoteContact'"));
+                    ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Call 'RemoteContact'");
                 var id = @this._giver.Id;
                 var remoteContact = EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts.FirstOrDefault(ct => ct.ContactDef == id);
 
@@ -280,14 +294,15 @@ namespace EntityCore.Quester.Action
                 {
                     remoteContact.Start();
                     if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Call RemoteContact '", remoteContact.ContactDef, "'"));
+                        ETLogger.WriteLine(LogType.Debug,
+                            $"{currentMethodName}: Call RemoteContact '{remoteContact.ContactDef}'");
                 }
                 else
                 {
                     tries++;
 
                     if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": RemoteContact '", id, "' does not found"));
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: RemoteContact '{id}' does not found");
 
                     goto Results;
                 }
@@ -295,18 +310,20 @@ namespace EntityCore.Quester.Action
             else
             {
                 if (debugInfoEnabled)
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Invalid Giver settings => ", ActionResult.Skip));
+                    ETLogger.WriteLine(LogType.Debug,
+                        $"{currentMethodName}: Invalid Giver settings => {ActionResult.Skip}");
 
                 return ActionResult.Skip;
             }
 
             // Проводим попытку принять задание
-            MissionProcessingResult processingResult = MissionHelper.ProccessingMissionDialog(@this._missionId, true, @this._dialogs, RewardItemCheck, TIME);
+            MissionProcessingResult processingResult = MissionHelper.ProcessingMissionDialog(@this._missionId, true, @this._dialogs, RewardItemCheck, TIME);
 
             tries++;
 
             if (debugInfoEnabled)
-                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ProccessingDialog result is '", processingResult, '\''));
+                ETLogger.WriteLine(LogType.Debug,
+                    $"{currentMethodName}: ProcessingDialog result is '{processingResult}'");
             switch (processingResult)
             {
                 case MissionProcessingResult.MissionTurnedIn:
@@ -319,7 +336,7 @@ namespace EntityCore.Quester.Action
                     else QuesterAssistantAccessors.Classes.Monitoring.Frames.Sleep(2000);
                     return ActionResult.Completed;
                 case MissionProcessingResult.MissionRequiredRewardNotFound:
-                    ETLogger.WriteLine(string.Concat(currentMethodName, ": Required mission reward not found..."), true);
+                    ETLogger.WriteLine($"{currentMethodName}: Required mission reward not found...", true);
                     if (@this._closeContactDialog)
                     {
                         GameHelper.CloseAllFrames();
@@ -339,7 +356,7 @@ namespace EntityCore.Quester.Action
                 : ActionResult.Fail;
 
             if (debugInfoEnabled)
-                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, " => ", result));
+                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName} => {result}");
 
             return result;
         }
@@ -360,10 +377,11 @@ namespace EntityCore.Quester.Action
             {
                 bool isGiverAccessible = @this._giver.IsAccessible;
                 uint bagsFreeSlots = EntityManager.LocalPlayer.BagsFreeSlots;
-                bool isMissionSucceded = MissionHelper.HaveMission(@this._missionId, out Mission mission) && mission.State == MissionState.Succeeded;
-                bool result = isGiverAccessible && bagsFreeSlots > 0 && isMissionSucceded;
+                bool isMissionSucceeded = MissionHelper.HaveMission(@this._missionId, out Mission mission) && mission.State == MissionState.Succeeded;
+                bool result = isGiverAccessible && bagsFreeSlots > 0 && isMissionSucceeded;
                 if (ExtendedDebugInfo)
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(_idStr, '.', nameof(InternalConditions), ": GiverAccessible(", isGiverAccessible, ") AND BagsFreeSlots(", bagsFreeSlots, ") MissionSucceded(", isMissionSucceded, ")) => ", result));
+                    ETLogger.WriteLine(LogType.Debug,
+                        $"{_idStr}.{nameof(InternalConditions)}: GiverAccessible({isGiverAccessible}) AND BagsFreeSlots({bagsFreeSlots}) AND MissionSucceeded({isMissionSucceeded}) => {result}");
                 return result;
             }
         }
@@ -482,10 +500,10 @@ namespace EntityCore.Quester.Action
                                         }
                                         while (!timer.IsTimedOut);
 
-                                        break;
                                     }
                                 }
                             }
+                            break;
                         }
                         else
                         {

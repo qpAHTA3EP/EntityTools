@@ -6,7 +6,6 @@ using Astral.Logic.NW;
 using Astral.Quester.Forms;
 using EntityCore.Enums;
 using EntityCore.Tools;
-using EntityCore.Tools.Missions;
 using EntityTools;
 using EntityTools.Core.Interfaces;
 using EntityTools.Editors;
@@ -39,7 +38,7 @@ namespace EntityCore.Quester.Action
         private PickUpMissionExt @this;
 
         #region данные ядра
-        private const int TIME = 300_000;
+        private const int TIME = 10_000;
 
         private ContactInfo giverContactInfo;
         private int tries;
@@ -178,12 +177,13 @@ namespace EntityCore.Quester.Action
                     : string.Empty;
 
             if (debugInfoEnabled)
-                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Begins try #", tries));
+                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Begins try #{tries}");
 
             if (!InternalConditions)
             {
                 if (debugInfoEnabled)
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": InternalConditions is False => ActionResult = '", ActionResult.Fail, '\''));
+                    ETLogger.WriteLine(LogType.Debug,
+                        $"{currentMethodName}: InternalConditions are False => ActionResult = '{ActionResult.Fail}{'\''}");
                 return ActionResult.Fail;
             }
 
@@ -198,131 +198,139 @@ namespace EntityCore.Quester.Action
                     return ActionResult.Running;
             }
 
-            if (@this._giver.Type == MissionGiverType.NPC)
+            switch (@this._giver.Type)
             {
-                float interactDistance = Math.Max(@this._interactDistance + 0.5f, 5.5f);
-                var giverPos = @this._giver.Position;
-                var giverDistance = @this._giver.Distance;
-
-                // Производит поиск NPC-Квестодателя
-                if (giverContactInfo is null || !@this._giver.IsMatching(giverContactInfo.Entity))
+                case MissionGiverType.NPC:
                 {
-                    giverContactInfo = null;
-                    foreach (ContactInfo contactInfo in EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts)
+                    float interactDistance = Math.Max(@this._interactDistance + 0.5f, 5.5f);
+                    var giverPos = @this._giver.Position;
+
+                    // Производит поиск NPC-Квестодателя
+                    if (giverContactInfo is null || !@this._giver.IsMatching(giverContactInfo.Entity))
                     {
-                        var contactEntity = contactInfo.Entity;
-                        var contactLocation = contactEntity.Location;
+                        giverContactInfo = null;
+                        foreach (ContactInfo contactInfo in EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts)
+                        {
+                            var contactEntity = contactInfo.Entity;
+                            var contactLocation = contactEntity.Location;
 
 
-                        if (Math.Abs(giverPos.Z - contactLocation.Z) >= @this._interactZDifference
-                            || !@this._giver.IsMatching(contactEntity))
-                                continue;
+                            if (Math.Abs(giverPos.Z - contactLocation.Z) <= @this._interactZDifference &&
+                                @this._giver.IsMatching(contactEntity))
+                            {
+                                giverContactInfo = contactInfo;
 
-                        giverContactInfo = contactInfo;
+                                if (debugInfoEnabled)
+                                    ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Set GiverContactInfo to [{giverContactInfo.GetDebugDescription()}]");
+                                break;
+                            }
+                        }
 
+                        if (giverContactInfo is null && @this._giver.Distance < interactDistance)
+                        {
+                            // Персонаж прибыл на место, однако, нужный NPC отсутствует
+                            // невозможно ни принять миссию, ни пропустить команду
+                            tries++;
+
+                            if (debugInfoEnabled)
+                                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: GiverContact is absent...");
+
+                            goto Results;
+                        }
+                    }
+                    else if (debugInfoEnabled)
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Keep GiverContactInfo [{giverContactInfo.GetDebugDescription()}]");
+
+                    if (giverContactInfo != null)
+                    {
+                        Entity entity = giverContactInfo.Entity;
                         if (debugInfoEnabled)
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Set GiverContactInfo to [", giverContactInfo, ']'));
-                        break;
+                            ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Entity [{entity.GetDebugDescription()}] match to MissionGiverInfo [{@this._giver}]");
+
+                        // Проверяем наличие задания у контакта 
+                        if (@this._contactHaveMission != ContactHaveMissionCheckType.Disabled)
+                        {
+                            if (!giverContactInfo.ContactHaveMission(@this._contactHaveMission))
+                            {
+                                if (debugInfoEnabled)
+                                    ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: ContactHaveMission is False => ActionResult = '{ActionResult.Skip}'");
+                                return ActionResult.Skip;
+                            }
+
+                            if (debugInfoEnabled)
+                                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: ContactHaveMission is True. Continue...");
+                        }
+                        else if (debugInfoEnabled)
+                            ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Skipped checking the condition 'ContactHaveMission'");
+
+                        // Перемещаемся к квестодателю (в случае необходимости)
+                        if (!entity.ApproachMissionGiver(@this._interactDistance, @this._interactZDifference))
+                        {
+                            if (debugInfoEnabled)
+                                ETLogger.WriteLine(LogType.Debug,  $"{currentMethodName}: ApproachMissionGiver failed => ActionResult = '{ActionResult.Running}'");
+                            return ActionResult.Running;
+                        }
+                        if (debugInfoEnabled)
+                            ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: ApproachMissionGiver succeeded");
+
+                        // Взаимодействуем с квестодателем
+                        if (!entity.InteractMissionGiver(@this._interactDistance))
+                        {
+                            if (debugInfoEnabled)
+                                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: InteractMissionGiver failed => ActionResult = '{ActionResult.Running}'");
+                            return ActionResult.Running;
+                        }
+                        if (debugInfoEnabled)
+                            ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: InteractMissionGiver succeeded");
                     }
 
-                    if (giverContactInfo is null && @this._giver.Distance < interactDistance)
+                    break;
+                }
+                case MissionGiverType.Remote:
+                {
+                    if (debugInfoEnabled)
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Calling 'RemoteContact'");
+                    var id = @this._giver.Id;
+                    var remoteContact = EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts.FirstOrDefault(ct => ct.ContactDef == id);
+
+                    //TODO для вызова RemoteVendor, которые не видные в окне выбора, нужно реализовать торговлю как в QuesterAssistant через Injection.cmdwrapper_contact_StartRemoteContact(this.RemoteContact);
+                    if (remoteContact != null && remoteContact.IsValid)
                     {
-                        // Персонаж прибыл на место, однако, нужный NPC отсутствует
-                        // невозможно ни принять миссию, ни пропустить команду
+                        remoteContact.Start();
+                        if (debugInfoEnabled)
+                            ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Call RemoteContact '{remoteContact.ContactDef}'");
+                    }
+                    else
+                    {
                         tries++;
 
                         if (debugInfoEnabled)
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": GiverContact is absent..."));
+                            ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: RemoteContact '{id}' does not found");
 
                         goto Results;
                     }
-                }
-                else if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Keep GiverContactInfo [", giverContactInfo, ']'));
 
-                if (giverContactInfo != null)
+                    break;
+                }
+                default:
                 {
-                    Entity entity = giverContactInfo.Entity;
                     if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Entity [", entity.InternalName, ", ", entity.CostumeRef.CostumeName, "] match to MissionGiverInfo [", @this._giver, ']'));
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Invalid Giver settings => {ActionResult.Skip}");
 
-                    // Проверяем наличие задания у контакта 
-                    if (@this._contactHaveMission != ContactHaveMissionCheckType.Disabled)
-                    {
-                        if (!MissionHelper.ContactHaveMission(giverContactInfo))
-                        {
-                            if (debugInfoEnabled)
-                                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ContactHaveMission is False => ActionResult = '", ActionResult.Skip, '\''));
-                            return ActionResult.Skip;
-                        }
-                        if (debugInfoEnabled)
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ContactHaveMission is True. Continue..."));
-                    }
-                    else if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Skiped checking the condition 'ContactHaveMission'"));
-
-                    // Перемещаемся к квестодателю (в случае необходимости)
-                    if (!entity.ApproachMissionGiver(@this._interactDistance, @this._interactZDifference))
-                    {
-                        if (debugInfoEnabled)
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ApproachMissionGiver failed => ActionResult = '", ActionResult.Running, '\''));
-                        return ActionResult.Running;
-                    }
-                    if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ApproachMissionGiver succeeded"));
-
-                    // Взаимодействуем с квестодателем
-                    if (!entity.InteractMissionGiver(@this._interactDistance))
-                    {
-                        if (debugInfoEnabled)
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": InteractMissionGiver failed => ActionResult = '", ActionResult.Running, '\''));
-                        return ActionResult.Running;
-                    }
-                    if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": InteractMissionGiver succeeded"));
+                    return ActionResult.Skip;
                 }
-            }
-            else if (@this._giver.Type == MissionGiverType.Remote)
-            {
-                if (debugInfoEnabled)
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Call 'RemoteContact'"));
-                var id = @this._giver.Id;
-                var remoteContact = EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts.FirstOrDefault(ct => ct.ContactDef == id);
-
-                if (remoteContact != null && remoteContact.IsValid)
-                {
-                    remoteContact.Start();
-                    if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Call RemoteContact '", remoteContact.ContactDef, "'"));
-                }
-                else
-                {
-                    tries++;
-
-                    if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": RemoteContact '", id, "' does not found"));
-
-                    goto Results;
-                }
-            }
-            else
-            {
-                if (debugInfoEnabled)
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Invalid Giver settings => ", ActionResult.Skip));
-
-                return ActionResult.Skip;
             }
 
             // Проводим попытку принять задание
 #if false
             MissionProcessingResult processingResult = ProccessingDialog(); 
 #else
-            MissionProcessingResult processingResult = MissionHelper.ProccessingMissionDialog(@this._missionId, false, @this._dialogs, RewardItemCheck, TIME);
+            MissionProcessingResult processingResult = MissionHelper.ProcessingMissionDialog(@this._missionId, false, @this._dialogs, RewardItemCheck, TIME);
 #endif
             tries++;
 
             if (debugInfoEnabled)
-                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ProccessingDialog result is '", processingResult, '\''));
+                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: ProcessingDialog result is '{processingResult}");
             switch (processingResult)
             {
                 case MissionProcessingResult.MissionAccepted:
@@ -340,12 +348,12 @@ namespace EntityCore.Quester.Action
                 case MissionProcessingResult.MissionNotFound:
                     if (@this._skipOnFail)
                     {
-                        ETLogger.WriteLine(string.Concat(currentMethodName, ": Mission not available..."), true);
+                        ETLogger.WriteLine($"{currentMethodName}: Mission not available...", true);
                         return ActionResult.Skip;
                     }
                     break;
                 case MissionProcessingResult.MissionRequiredRewardNotFound:
-                    ETLogger.WriteLine(string.Concat(currentMethodName, ": Required mission reward not found..."), true);
+                    ETLogger.WriteLine($"{currentMethodName}: Required mission reward not found...", true);
                     if (@this._closeContactDialog)
                     {
                         GameHelper.CloseAllFrames();
@@ -365,7 +373,7 @@ namespace EntityCore.Quester.Action
                 : ActionResult.Fail;
 
             if (debugInfoEnabled)
-                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, " => ", result));
+                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName} => {result}");
 
             return result;
         }
@@ -385,10 +393,17 @@ namespace EntityCore.Quester.Action
             get
             {
                 bool isGiverAccessible = @this._giver.IsAccessible;
+#if false
                 bool isHavingMissionOrCompleted = MissionHelper.CheckHavingMissionOrCompleted(@this._missionId);
                 bool result = isGiverAccessible && !isHavingMissionOrCompleted;
                 if (ExtendedDebugInfo)
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(_idStr, '.', nameof(InternalConditions), ": GiverAccessible(", isGiverAccessible, ") AND Not(HavingMissionOrCompleted(", isHavingMissionOrCompleted, ")) => ", result));
+                    ETLogger.WriteLine(LogType.Debug, string.Concat(_idStr, '.', nameof(InternalConditions), ": GiverAccessible(", isGiverAccessible, ") AND Not(HavingMissionOrCompleted(", isHavingMissionOrCompleted, ")) => ", result)); 
+#else
+                bool haveMission = MissionHelper.HaveMission(@this._missionId, out _);
+                bool result = isGiverAccessible && !haveMission;
+                if (ExtendedDebugInfo)
+                    ETLogger.WriteLine(LogType.Debug, string.Concat(_idStr, '.', nameof(InternalConditions), ": GiverAccessible(", isGiverAccessible, ") AND Not(HaveMission(", haveMission, ")) => ", result));
+#endif
                 return result;
             }
         }
@@ -413,7 +428,7 @@ namespace EntityCore.Quester.Action
             {
                 if (@this._giver.IsAccessible
                     && @this._giver.Distance >= @this._interactDistance)
-                        return @this._giver.Position.Clone();
+                    return @this._giver.Position.Clone();
                 return Vector3.Empty;
             }
         }
@@ -464,6 +479,7 @@ namespace EntityCore.Quester.Action
                     string aDialogKey = MissionHelper.GetADialogOption(out ContactDialogOption contactDialogOption)
                         ? contactDialogOption.Key : string.Empty;
 
+                    // BUG: Входит в бесконечный цикл, если выбран неативный пункт диалога, соответствующий недоступной и (или) ранее принятой миссии
                     while (!string.IsNullOrEmpty(aDialogKey))
                     {
                         // Ищем индекс начала "текстового идентификатора миссии" в выбранном пункте диалога
@@ -519,10 +535,10 @@ namespace EntityCore.Quester.Action
                                             }
                                         }
                                         while (!timer.IsTimedOut);
-                                        break;
                                     }
                                 }
                             } 
+                            break;
                         }
                         else
                         {
@@ -592,14 +608,33 @@ namespace EntityCore.Quester.Action
                     {
                         var strPred = StringToPatternComparer.GetComparer(@this._requiredRewardItem);
                         if (strPred != null)
-                            return _rewardItemCheck = (Item itm) => strPred(itm.ItemDef.InternalName);
+                            return _rewardItemCheck = itm => strPred(itm.ItemDef.InternalName);
                     }
-                    _rewardItemCheck = (Item itm) => true;
+                    _rewardItemCheck = itm => true;
                 }
                 return _rewardItemCheck;
             }
         }
         Predicate<Item> _rewardItemCheck;
+
+#if false
+        /// <summary>
+        /// Вспомогательный метод формирования текстового описания <param name="contactInfo"/> для вывода отладочной информации
+        /// </summary>
+        private string GetDebugDescriptionOf(ContactInfo contactInfo)
+        {
+            var entity = contactInfo.Entity;
+
+            return $"{entity.InternalName}; {entity.ContainerId:X}";
+        }
+        /// <summary>
+        /// Вспомогательный метод формирования текстового описания <param name="entity"/> для вывода отладочной информации
+        /// </summary>
+        private string GetDebugDescriptionOf(Entity entity)
+        {
+            return $"{entity.InternalName}; {entity.ContainerId:X}";
+        } 
+#endif
         #endregion
     }
 }
