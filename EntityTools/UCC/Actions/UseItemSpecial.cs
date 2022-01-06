@@ -1,17 +1,17 @@
-﻿using System;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Xml.Serialization;
-using Astral.Classes.ItemFilter;
+﻿using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
 using Astral.Quester.UIEditors;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
-using EntityTools.Tools.BuySellItems;
+using EntityTools.Tools.Inventory;
 using MyNW.Classes;
+using System;
+using System.ComponentModel;
+using System.Drawing.Design;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Xml.Serialization;
 
 
 namespace EntityTools.UCC.Actions
@@ -40,7 +40,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal string _itemId = string.Empty;
+        private string _itemId = string.Empty;
 
 #if DEVELOPER
         [Description("Type of and ItemId:\n" +
@@ -61,26 +61,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal ItemFilterStringType _itemIdType = ItemFilterStringType.Simple;
-
-#if DEVELOPER
-        [Category("Item")]
-#else
-        [Browsable(false)]
-#endif
-        public bool CheckItemCooldown
-        {
-            get => _checkItemCooldown; set
-            {
-                if (_checkItemCooldown != value)
-                {
-                    _checkItemCooldown = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        internal bool _checkItemCooldown;
-
+        private ItemFilterStringType _itemIdType = ItemFilterStringType.Simple;
 
 
 #if DEVELOPER
@@ -101,8 +82,44 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal BagsList _bags = BagsList.GetPlayerBagsAndPotions();
+        private BagsList _bags = BagsList.GetPlayerBagsAndPotions();
 
+#if DEVELOPER
+        [Category("Optional")]
+#else
+        [Browsable(false)]
+#endif
+        public bool CheckItemCooldown
+        {
+            get => _checkItemCooldown; set
+            {
+                if (_checkItemCooldown != value)
+                {
+                    _checkItemCooldown = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private bool _checkItemCooldown;
+
+#if DEVELOPER
+        [Category("Optional")]
+        [Description("Equip an item into the needed slot automatically if it can't be used from the bag")]
+#else
+        [Browsable(false)]
+#endif
+        public bool AutoEquip
+        {
+            get => _autoEquip; set
+            {
+                if (_autoEquip != value)
+                {
+                    _autoEquip = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private bool _autoEquip;
 
         #region Hide Inherited Properties
         [XmlIgnore]
@@ -123,7 +140,11 @@ namespace EntityTools.UCC.Actions
 
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            if (PropertyChanged != null)
+            {
+                var arg = new PropertyChangedEventArgs(propertyName);
+                PropertyChanged?.Invoke(this, arg);
+            }
         }
 
         public UseItemSpecial()
