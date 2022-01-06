@@ -12,6 +12,7 @@ using System.Drawing.Design;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Xml.Serialization;
+using EntityTools.Annotations;
 using EntityTools.Enums;
 using Action = Astral.Quester.Classes.Action;
 
@@ -179,7 +180,7 @@ namespace EntityTools.Quester.Actions
                 NotifyPropertyChanged();
             }
         }
-        internal ContactHaveMissionCheckType _contactHaveMission = ContactHaveMissionCheckType.Any;
+        internal ContactHaveMissionCheckType _contactHaveMission = ContactHaveMissionCheckType.Disabled;
 
 #if !DEVELOPER
         [Browsable(false)]
@@ -270,6 +271,7 @@ namespace EntityTools.Quester.Actions
         #region Взаимодействие с EntityToolsCore
         public event PropertyChangedEventHandler PropertyChanged;
 
+        [NotifyPropertyChangedInvocator]
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             Engine.OnPropertyChanged(this, propertyName);
