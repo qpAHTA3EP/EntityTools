@@ -37,6 +37,7 @@ using MyNW.Classes;
 
 namespace EntityTools.Patches.Mapper
 {
+    //TODO Подружить с ролью Professions
 #if PATCH_ASTRAL
     public partial class MapperFormExt : XtraForm //*/Form
     {
@@ -91,12 +92,12 @@ namespace EntityTools.Patches.Mapper
             MouseWheel += handler_MouseWheel;
 
             barMapping.Visible = EntityTools.Config.Mapper.MapperForm.MappingBarVisible;
-            barMeshes.Visible = EntityTools.Config.Mapper.MapperForm.MeshesBarVisible;
+            barGraphTools.Visible = EntityTools.Config.Mapper.MapperForm.MeshesBarVisible;
             barGraphEditTools.Visible = EntityTools.Config.Mapper.MapperForm.NodeToolsBarVisible;
             barCustomRegions.Visible = EntityTools.Config.Mapper.MapperForm.CustomRegionBarVisible;
             barStatus.Visible = EntityTools.Config.Mapper.MapperForm.StatusBarVisible;
 
-            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barGraphEditTools.Visible && !barCustomRegions.Visible;
+            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barGraphTools.Visible && !barGraphEditTools.Visible && !barCustomRegions.Visible;
 
             Location = EntityTools.Config.Mapper.MapperForm.Location;
 
@@ -287,12 +288,12 @@ namespace EntityTools.Patches.Mapper
             Binds.RemoveShiftAction(Keys.M);
 
             barMapping.Visible = EntityTools.Config.Mapper.MapperForm.MappingBarVisible;
-            barMeshes.Visible = EntityTools.Config.Mapper.MapperForm.MeshesBarVisible;
+            barGraphTools.Visible = EntityTools.Config.Mapper.MapperForm.MeshesBarVisible;
             barGraphEditTools.Visible = EntityTools.Config.Mapper.MapperForm.NodeToolsBarVisible;
             barCustomRegions.Visible = EntityTools.Config.Mapper.MapperForm.CustomRegionBarVisible;
             barStatus.Visible = EntityTools.Config.Mapper.MapperForm.StatusBarVisible;
 
-            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barGraphEditTools.Visible && !barCustomRegions.Visible;
+            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barGraphTools.Visible && !barGraphEditTools.Visible && !barCustomRegions.Visible;
             Location = EntityTools.Config.Mapper.MapperForm.Location;
             Size = EntityTools.Config.Mapper.MapperForm.Size;
             backgroundWorker.RunWorkerAsync();
@@ -308,7 +309,7 @@ namespace EntityTools.Patches.Mapper
             backgroundWorker.CancelAsync();
 
             EntityTools.Config.Mapper.MapperForm.MappingBarVisible = barMapping.Visible;
-            EntityTools.Config.Mapper.MapperForm.MeshesBarVisible = barMeshes.Visible;
+            EntityTools.Config.Mapper.MapperForm.MeshesBarVisible = barGraphTools.Visible;
             EntityTools.Config.Mapper.MapperForm.NodeToolsBarVisible = barGraphEditTools.Visible;
             EntityTools.Config.Mapper.MapperForm.CustomRegionBarVisible = barCustomRegions.Visible;
             EntityTools.Config.Mapper.MapperForm.StatusBarVisible = barStatus.Visible;
@@ -1192,7 +1193,7 @@ namespace EntityTools.Patches.Mapper
             barEditCustomRegion.FloatLocation = new Point(Location.X + MapPicture.Location.X + 20, 
                 Location.Y + MapPicture.Location.Y + 20 
                 + (barMapping.Visible && barMapping.DockStyle == BarDockStyle.Top ? barMapping.Size.Height : 0)
-                + (barMeshes.Visible && barMeshes.DockStyle == BarDockStyle.Top ? barMeshes.Size.Height : 0));
+                + (barGraphTools.Visible && barGraphTools.DockStyle == BarDockStyle.Top ? barGraphTools.Size.Height : 0));
             //barEditCustomRegion.FloatSize = new Size(Math.Max(100, MapPicture.Width - 40), 0);
             
             editCRName.Visibility = BarItemVisibility.Always;
@@ -1237,8 +1238,8 @@ namespace EntityTools.Patches.Mapper
                 + (barMapping.Visible && barMapping.DockStyle == BarDockStyle.Top
                     ? barMapping.Size.Height
                     : 0)
-                + (barMeshes.Visible && barMeshes.DockStyle == BarDockStyle.Top
-                    ? barMeshes.Size.Height
+                + (barGraphTools.Visible && barGraphTools.DockStyle == BarDockStyle.Top
+                    ? barGraphTools.Size.Height
                     : 0));
 
             editCRName.Visibility = BarItemVisibility.Never;
@@ -1445,7 +1446,7 @@ namespace EntityTools.Patches.Mapper
 
         private void handler_BarVisibleChanged(object sender, EventArgs e)
         {
-            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barGraphEditTools.Visible && !barCustomRegions.Visible;
+            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barGraphTools.Visible && !barGraphEditTools.Visible && !barCustomRegions.Visible;
         }
 
         private void handler_ShowSettingsTab(object sender, ItemClickEventArgs e)

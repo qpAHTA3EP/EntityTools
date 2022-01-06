@@ -48,88 +48,102 @@ namespace EntityTools.Patches
             var tRoad = typeof(Astral.Quester.Controllers.Road);
             var tPatch = typeof(ComplexPatch_Navigation);
 
-            original_Navmesh_GetPath = AccessTools.Method(tNavmesh, "getPath");
+            var Navmesh_GetPath = "getPath";
+            original_Navmesh_GetPath = AccessTools.Method(tNavmesh, Navmesh_GetPath);
             if (original_Navmesh_GetPath is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{original_Navmesh_GetPath}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Navmesh_GetPath}' not found");
                 return;
             }
+
             prefix_Navmesh_GetPath = AccessTools.Method(tPatch, nameof(PrefixGetPath));
             if (prefix_Navmesh_GetPath is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{prefix_Navmesh_GetPath}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(PrefixGetPath)}' not found");
                 return;
-            }            
-            original_Navmesh_GenerateRoad = AccessTools.Method(tNavmesh, "GenerateRoad");
+            }
+
+            var Navmesh_GenerateRoad = "GenerateRoad";
+            original_Navmesh_GenerateRoad = AccessTools.Method(tNavmesh, Navmesh_GenerateRoad);
             if (original_Navmesh_GenerateRoad is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{original_Navmesh_GenerateRoad}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Navmesh_GenerateRoad}' not found");
                 return;
             }
             prefix_Navmesh_GenerateRoad = AccessTools.Method(tPatch, nameof(PrefixGenerateRoad));
             if (prefix_Navmesh_GenerateRoad is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{prefix_Navmesh_GenerateRoad}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(PrefixGenerateRoad)}' not found");
                 return;
             }
+
+            var Navmesh_GetNearestNodeFromPosition = "GetNearestNodeFromPosition";
             original_Navmesh_GetNearestNodeFromPosition = AccessTools.Method(tNavmesh, "GetNearestNodeFromPosition");
             if (original_Navmesh_GetNearestNodeFromPosition is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{original_Navmesh_GetNearestNodeFromPosition}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Navmesh_GetNearestNodeFromPosition}' not found");
                 return;
             }
             prefix_Navmesh_GetNearestNodeFromPosition = AccessTools.Method(tPatch, nameof(PrefixGetNearestNodeFromPosition));
             if (prefix_Navmesh_GetNearestNodeFromPosition is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{prefix_Navmesh_GetNearestNodeFromPosition}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(PrefixGetNearestNodeFromPosition)}' not found");
                 return;
             }
+
+            var Navmesh_FixPath = "fixPath";
             original_Navmesh_FixPath = AccessTools.Method(tNavmesh, "fixPath");
             if (original_Navmesh_FixPath is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{original_Navmesh_FixPath}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Navmesh_FixPath}' not found");
                 return;
             }
             prefix_Navmesh_FixPath = AccessTools.Method(tPatch, nameof(PrefixFixPath));
             if (prefix_Navmesh_FixPath is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{prefix_Navmesh_FixPath}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(PrefixFixPath)}' not found");
                 return;
             }
-            original_Navmesh_TotalDistance = AccessTools.Method(tNavmesh, "TotalDistance");
+
+            var Navmesh_TotalDistance = "TotalDistance";
+            original_Navmesh_TotalDistance = AccessTools.Method(tNavmesh, Navmesh_TotalDistance);
             if (original_Navmesh_TotalDistance is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{original_Navmesh_TotalDistance}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Navmesh_TotalDistance}' not found");
                 return;
             }
             prefix_Navmesh_MethodInfo = AccessTools.Method(tPatch, nameof(PrefixTotalDistance));
             if (prefix_Navmesh_MethodInfo is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{prefix_Navmesh_MethodInfo}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(PrefixTotalDistance)}' not found");
                 return;
             }
-            original_Road_PathDistance = AccessTools.Method(tRoad, "PathDistance");
+
+            var Road_PathDistance = "PathDistance";
+            original_Road_PathDistance = AccessTools.Method(tRoad, Road_PathDistance );
             if (original_Road_PathDistance is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{original_Road_PathDistance}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Road_PathDistance}' not found");
                 return;
             }
             prefix_Road_PathDistance = AccessTools.Method(tPatch, nameof(PathDistance));
             if (prefix_Road_PathDistance is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{prefix_Road_PathDistance}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(PathDistance)}' not found");
                 return;
             }
-            original_Road_GenerateRoadFromPlayer = AccessTools.Method(tRoad, "GenerateRoadFromPlayer");
+
+            var Road_GenerateRoadFromPlayer  = "GenerateRoadFromPlayer";
+            original_Road_GenerateRoadFromPlayer = AccessTools.Method(tRoad, Road_GenerateRoadFromPlayer);
             if (original_Road_GenerateRoadFromPlayer is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{original_Road_GenerateRoadFromPlayer}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Road_GenerateRoadFromPlayer}' not found");
                 return;
             }
             prefix_Road_GenerateRoadFromPlayer = AccessTools.Method(tPatch, nameof(GenerateRoadFromPlayer));
             if (prefix_Road_GenerateRoadFromPlayer is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{prefix_Road_GenerateRoadFromPlayer}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(GenerateRoadFromPlayer)}' not found");
                 return;
             }
 
@@ -206,35 +220,34 @@ namespace EntityTools.Patches
         }
 
         #region GetPath
-#if false   // private static List<Vector3> Astral.Logic.Navmesh.getPath(Graph graph, Vector3 Start, Vector3 End)
-private static List<Vector3> Astral.Logic.Navmesh.getPath(Graph graph, Vector3 Start, Vector3 End)
-{
-	List<Vector3> list = new List<Vector3>();
-	if (graph == null)
-	{
-		list.Add(End.Clone());
-	}
-	else
-	{
-		if (Navmesh.GetNearestNodePosFromPosition(graph, End).Distance3D(End) < Start.Distance3D(End))
-		{
-			AStar astar = new AStar(graph);
-			Node nearestNodeFromPosition = Navmesh.GetNearestNodeFromPosition(graph, Start);
-			Node nearestNodeFromPosition2 = Navmesh.GetNearestNodeFromPosition(graph, End);
-			astar.SearchPath(nearestNodeFromPosition, nearestNodeFromPosition2);
-			if (astar.PathFound && astar.PathByNodes.Length != 0)
-			{
-				foreach (Node node in astar.PathByNodes)
-				{
-					list.Add(new Vector3((float)node.X, (float)node.Y, (float)node.Z));
-				}
-			}
-		}
-		list.Add(End);
-	}
-	return list;
-}
-#endif
+        //private static List<Vector3> Astral.Logic.Navmesh.getPath(Graph graph, Vector3 Start, Vector3 End)
+        //{
+        //	List<Vector3> list = new List<Vector3>();
+        //	if (graph == null)
+        //	{
+        //		list.Add(End.Clone());
+        //	}
+        //	else
+        //	{
+        //		if (Navmesh.GetNearestNodePosFromPosition(graph, End).Distance3D(End) < Start.Distance3D(End))
+        //		{
+        //			AStar astar = new AStar(graph);
+        //			Node nearestNodeFromPosition = Navmesh.GetNearestNodeFromPosition(graph, Start);
+        //			Node nearestNodeFromPosition2 = Navmesh.GetNearestNodeFromPosition(graph, End);
+        //			astar.SearchPath(nearestNodeFromPosition, nearestNodeFromPosition2);
+        //			if (astar.PathFound && astar.PathByNodes.Length != 0)
+        //			{
+        //				foreach (Node node in astar.PathByNodes)
+        //				{
+        //					list.Add(new Vector3((float)node.X, (float)node.Y, (float)node.Z));
+        //				}
+        //			}
+        //		}
+        //		list.Add(End);
+        //	}
+        //	return list;
+        //}
+
         /// <summary>
         /// Патч метода <see cref="Astral.Logic.Navmesh.getPath(Graph,Vector3,Vector3)"/>
         /// </summary>
@@ -244,14 +257,7 @@ private static List<Vector3> Astral.Logic.Navmesh.getPath(Graph graph, Vector3 S
                 __result = new List<Vector3>();
             if (graph != null)
             {
-#if false
-                graph.ClosestNodes(Start.X, Start.Y, Start.Z, out double _, out Node startNode,
-                            End.X, End.Y, End.Z, out double _, out Node endNode);
-
-                GetPathAndCorrect(graph, startNode, Start, endNode, End, ref __result); 
-#else
                 GetPathAndCorrect(graph, Start.X, Start.Y, Start.Z, End.X, End.Y, End.Z, ref __result);
-#endif
             }
             else __result.Add(End.Clone());
             
@@ -320,102 +326,6 @@ private static List<Vector3> Astral.Logic.Navmesh.getPath(Graph graph, Vector3 S
             return waypoints.Count > 1;
         }
 
-#if false
-        internal static bool GetPathAndCorrect(Graph graph, Node startNode, Vector3 start, Node endNode, Vector3 end,
-    ref List<Vector3> waypoints)
-        {
-            //TODO Переработать корректировку пути (первую и последнюю точки)
-            if (waypoints is null)
-                waypoints = new List<Vector3>();
-            if (ReferenceEquals(startNode, endNode) || graph is null)
-                return false;
-
-            AStar.AStar astar = new AStar.AStar(graph);
-
-#if PATCH_LOG
-                stopwatch.Restart(); 
-#endif
-            bool searchResult = astar.SearchPath(startNode, endNode);
-#if PATCH_LOG
-                stopwatch.Stop(); 
-#endif
-
-            if (!searchResult || !astar.PathFound) return false;
-
-            using (var wpe = astar.PathNodes.GetEnumerator())
-            {
-                if (wpe.MoveNext())
-                {
-                    var wp0 = wpe.Current ?? throw new NullReferenceException();
-                    if (wpe.MoveNext())
-                    {
-                        var wp1 = wpe.Current;
-                        if (start != null && start.IsValid)
-                        {
-                            var pos0 = wp0.Position;
-                            var pos1 = wp1.Position;
-
-                            // найденный путь содержит не менее 2 вершин
-                            // проверяем направления и корректируем "возврат"
-                            double x0 = pos0.X - start.X,
-                                y0 = pos0.Y - start.Y,
-                                z0 = pos0.Z - start.Z,
-                                x1 = pos1.X - start.X,
-                                y1 = pos1.Y - start.Y,
-                                z1 = pos1.Z - start.Z,
-                                d0 = x0 * x0 + y0 * y0 + z0 * z0,
-                                d1 = x1 * x1 + y1 * y1 + z1 * z1;
-
-                            // Вычисляем косинус угла между векторами (pos -> wp0) и (pos -> wp1)
-                            // из формулы скалярного произведения векторов
-                            double cos = (x0 * x1 + y0 * y1 + z0 * z1) / Math.Sqrt(d0 * d1);
-
-                            if (cos > 0 /*|| d1 > d0 * 1.21*/ || (z1 > 0 && z1 * z1 / d1 > 0.25))
-                            {
-                                // угол между векторами (from -> wp0) и (from -> wp1) меньше 90 градусов,
-                                // либо расстояние до обеих точек различается более чем на 10%,
-                                // крутизна угла на wp1 больше 30 град. к горизонту Oxy (z1 *z1 / d1 определяет квадрат синуса угла между вектором (from -> wp1) и его проектцией на Oxy)
-                                // поэтому добавляем в путь обе точки
-                                waypoints.Add(wp0.Position);
-                                waypoints.Add(wp1.Position);
-                            }
-                            else
-                            {
-                                // угол между направлениями из точки from на точки wp0 и wp1
-                                // больше 90 градусов, поэтому точку wp0 нужно "пропустить" (чтобы не возвращаться "назад")
-                                waypoints.Add(wp1.Position);
-                            }
-                        }
-                        else
-                        {
-                            waypoints.Add(wp0.Position);
-                            waypoints.Add(wp1.Position);
-                        }
-
-                        while (wpe.MoveNext())
-                        {
-                            waypoints.Add(wpe.Current.Position);
-                        }
-                    }
-                    else waypoints.Add(wp0.Position);
-                }
-            }
-#if PATCH_LOG
-                    if (waypoints.Count == 0)
-                    {
-                        stringBuilder.Clear();
-                        stringBuilder.AppendLine(nameof(Patch_Astral_Logic_Navmesh_GetPath));
-                        stringBuilder.Append("\tFrom '").Append(startNode).Append("' to '").Append(endNode).AppendLine("'");
-                        stringBuilder.Append("\tElapsedTime: ").Append(stopwatch.ElapsedMilliseconds).AppendLine(" ms");
-                        stringBuilder.AppendLine(Environment.StackTrace);
-
-                        ETLogger.WriteLine(LogType.Debug, stringBuilder.ToString());
-                    } 
-#endif
-            return waypoints.Count > 1;
-        } 
-#endif
-
         /// <summary>
         /// Построение пути <param name="waypoints"/> в графе <param name="graph"/> из точки c координатами (<param name="startX"/>, <param name="startY"/>, <param name="startZ"/>)
         /// к точке c координатами (<param name="endX"/>, <param name="endY"/>, <param name="endZ"/>)
@@ -426,9 +336,41 @@ private static List<Vector3> Astral.Logic.Navmesh.getPath(Graph graph, Vector3 S
                                                double endX, double endY, double endZ,
                                                ref List<Vector3> waypoints)
         {
-            if ((startX == 0 && startY == 0 && startZ == 0)
-                || (endX == 0 && endY == 0 && endZ == 0))
+            bool debugInfo = EntityTools.Config.Logger.DebugNavigation;
+            var methodName = debugInfo ? MethodBase.GetCurrentMethod().Name : string.Empty;
+
+
+            var player = EntityManager.LocalPlayer;
+
+            if (!player.IsValid || player.IsLoading)
+            {
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Error, $"{methodName}: The Player is out of the Game. Stop");
                 return false;
+            }
+
+            if (startX == 0 && startY == 0 && startZ == 0)
+            {
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Error, $"{methodName}: Start point is invalid. Stop\n{Environment.StackTrace}");
+                return false;
+            }
+            if (endX == 0 && endY == 0 && endZ == 0)
+            {
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Error, $"{methodName}: End point is invalid. Stop\n{Environment.StackTrace}");
+                return false;
+            }
+
+            if (graph is null || graph.NodesCount < 1)
+            {
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Error, $"{methodName}: Graph is Empty. Stop\n{Environment.StackTrace}");
+                return false;
+            }
+
+            if (debugInfo)
+                ETLogger.WriteLine(LogType.Error, $"{methodName}: Search Nodes in the Graph closest to the Start and the End point");
 
             // для краткости 'start' будем называть точку с координатами (startX, startY, startZ), не принадлежащую графу
             //               'end' - точку с координатами (endX, endY, endZ), не принадлежащую графу
@@ -437,13 +379,25 @@ private static List<Vector3> Astral.Logic.Navmesh.getPath(Graph graph, Vector3 S
             graph.ClosestNodes(startX, startY, startZ, out double distanceStart2StartNode, out Node startNode,
                 endX, endY, endZ, out double distanceEnd2EndNode, out Node endNode);
 
-            if (startNode is null || endNode is null)
+            if (startNode is null)
+            {
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Error, $"{methodName}: Start Node not found in the Graph. Stop\n{Environment.StackTrace}");
                 return false;
-
+            }
+            if (endNode is null)
+            {
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Error, $"{methodName}: End Node not found in the Graph. Stop\n{Environment.StackTrace}");
+                return false;
+            }
             double /*x0, y0, z0, x1, y1, z1,*/ distance0, distance1, cos;
 
             if (ReferenceEquals(startNode, endNode))
             {
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{methodName}: Only one Node of the Graph is located near the Start and the End points. Check direction");
+
                 // startNode и endNode совпадают, 
                 // то есть вблизи точек start и end находится только одна точка
                 var pos0 = endNode.Position;
@@ -466,20 +420,32 @@ private static List<Vector3> Astral.Logic.Navmesh.getPath(Graph graph, Vector3 S
                 cos = (x0 * x1 + y0 * y1 + z0 * z1) / distanceStart2StartNode * distanceEnd2EndNode;
 #endif 
 #else
-                cos = NavigationHelper.Cosine(pos0.X, pos0.Y, pos0.Z, startX, startY, startZ, endX, endY, endZ, out distance0, out distance1);
+                cos = NavigationHelper.Cosine(pos0.X, pos0.Y, pos0.Z, 
+                                              startX, startY, startZ, 
+                                              endX, endY, endZ, 
+                                              out distance0, out distance1);
 #endif
 
                 if (waypoints is null)
                     waypoints = new List<Vector3>(2);
 
-                if (cos < 0 
+                if (cos < 0
                     && distanceStart2StartNode > 5
                     && distanceEnd2EndNode > 5)
+                {
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: Insert found Node to the Path");
                     waypoints.Add(pos0);
+                }
+                else if (debugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{methodName}: Ignore found Node. Move directly to the End point");
 
                 waypoints.Add(new Vector3((float)endX, (float)endY, (float)endZ));
                 return true;
             }
+
+            if (debugInfo)
+                ETLogger.WriteLine(LogType.Debug, $"{methodName}: Starting the search of the Path using AStar.dll");
 
             var pathFinder = new AStar.AStar(graph);
 
@@ -491,47 +457,40 @@ private static List<Vector3> Astral.Logic.Navmesh.getPath(Graph graph, Vector3 S
                 stopwatch.Stop(); 
 #endif
 
-            if (!searchResult || !pathFinder.PathFound) return false;
+            if (!searchResult || !pathFinder.PathFound)
+            {
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Error, $"{methodName}: Path not found");
+                return false;
+            }
 
             var nodesCount = pathFinder.PathNodesCount;
+
+            if (debugInfo)
+                ETLogger.WriteLine(LogType.Debug, $"{methodName}: Found Path has {nodesCount} waypoints. Starting the checking of the direction and correction the Path if needed");
 
             if (waypoints is null)
                 waypoints = new List<Vector3>(nodesCount + 1);
 
             using (var enumerator = pathFinder.PathNodes.GetEnumerator())
             {
-                if (enumerator.MoveNext())
+                Node wp0;
+                if (enumerator.MoveNext()
+                    && (wp0 = enumerator.Current) != null)
                 {
-                    var wp0 = enumerator.Current;// ?? throw new NullReferenceException();
-                    if (enumerator.MoveNext())
+                    Node wp1;
+                    if (enumerator.MoveNext()
+                        && (wp1 = enumerator.Current) != null)
                     {
                         // Найденный путь содержит не менее 2 вершин
-                        var wp1 = enumerator.Current;
-
                         var pos0 = wp0.Position;
                         var pos1 = wp1.Position;
 
                         // Проверяем положение стартовой точки start относительно первых двух точек пути(pos0 и pos1 соответственно)
-#if false
-                        // pos0 - вершина угла, величину которого оцениваем
-                        x0 = startX - pos0.X;
-                        y0 = startY - pos0.Y;
-                        z0 = startZ - pos0.Z;
-                        x1 = pos1.X - pos0.X;
-                        y1 = pos1.Y - pos0.Y;
-                        z1 = pos1.Z - pos0.Z;
-                        d0 = x0 * x0 + y0 * y0 + z0 * z0;
-                        d1 = x1 * x1 + y1 * y1 + z1 * z1;
-
-                        // Вычисляем косинус угла между векторами (pos0 -> start) и (pos0 -> pos1)
-                        // из формулы скалярного произведения векторов
-                        cos = (x0 * x1 + y0 * y1 + z0 * z1) / Math.Sqrt(d0 * d1); 
-#else
                         cos = NavigationHelper.Cosine(pos0.X, pos0.Y, pos0.Z,
-                                                    startX, startY, startZ, 
-                                                    pos1.X, pos1.Y, pos1.Z, 
+                                                    startX, startY, startZ,
+                                                    pos1.X, pos1.Y, pos1.Z,
                                                     out _, out _);
-#endif
                         // cos(165) = -0,9659258262890682867497431997289
                         // cos(105) = -0,25881904510252076234889883762405
                         // cos(75)  =  0,25881904510252076234889883762405
@@ -551,27 +510,23 @@ private static List<Vector3> Astral.Logic.Navmesh.getPath(Graph graph, Vector3 S
                             // угол между векторами (wp0 -> start) и (wp0 -> wp1) меньше 90 градусов,
                             // то есть wp0 находится "позади" и её добавлять не нужно
                             // путь должен проходить только через wp1
+                            if (debugInfo)
+                                ETLogger.WriteLine(LogType.Debug, $"{methodName}: Skipping the first waypoint");
                         }
-#if false
-                        waypoints.Add(wp1.Position);
 
-                        while (enumerator.MoveNext())
-                        {
-                            waypoints.Add(enumerator.Current.Position);
-                        } 
-#else
                         if (nodesCount > 2)
                         {
                             waypoints.Add(wp1.Position);
-                            
+
                             // уменьшаем nodesCount на количество обработанных (скопированных) переменных
                             nodesCount -= 2;
 
                             // копируем все точки пути, за исключением последней
                             while (nodesCount > 1 && enumerator.MoveNext())
                             {
-                                wp0 = enumerator.Current;
-                                waypoints.Add(wp0.Position);
+                                var wpNext = enumerator.Current;
+                                if (wpNext != null)
+                                    waypoints.Add(wpNext.Position);
                                 --nodesCount;
                             }
 
@@ -589,55 +544,30 @@ private static List<Vector3> Astral.Logic.Navmesh.getPath(Graph graph, Vector3 S
 
                             // Проверяем положение конечной точки end относительно последних двух точек пути (pos0 и pos1 соответственно)
                             // pos1 - вершина угла, величину которого оцениваем
-#if false
-                            x0 = endX - pos1.X;
-                            y0 = endY - pos1.Y;
-                            z0 = endZ - pos1.Z;
-                            x1 = pos0.X - pos1.X;
-                            y1 = pos0.Y - pos1.Y;
-                            z1 = pos0.Z - pos1.Z;
-                            d0 = x0 * x0 + y0 * y0 + z0 * z0;
-                            d1 = x1 * x1 + y1 * y1 + z1 * z1;
 
-                            // Вычисляем косинус угла между векторами (pos1 -> pos0) и (pos1 -> end)
-                            // из формулы скалярного произведения векторов
-                            cos = (x0 * x1 + y0 * y1 + z0 * z1) / Math.Sqrt(d0 * d1); 
-#else
                             cos = NavigationHelper.Cosine(pos1.X, pos1.Y, pos1.Z,
                                 endX, endY, endZ,
                                 pos0.X, pos0.Y, pos0.Z,
                                 out _, out _);
-#endif
 
                             if (cos > 0)
                                 waypoints.Add(pos1);
                         }
-#endif
                     }
                     else
                     {
+                        if (debugInfo)
+                            ETLogger.WriteLine(LogType.Debug, $"{methodName}: The Path has only one waypoint. Check direction");
+
                         // Путь содержит только одну точку
                         //waypoints.Add(wp0.Position);
                         var pos0 = wp0.Position;
 
                         // Проверяем возможность продвинуться напрямую от start к end
                         // pos0 - вершина угла, величину которого оцениваем 
-#if false
-                        x0 = startX - pos0.X;
-                        y0 = startY - pos0.Y;
-                        z0 = startZ - pos0.Z;
-                        x1 = endX - pos0.X;
-                        y1 = endY - pos0.Y;
-                        z1 = endZ - pos0.Z;
-                        d0 = x0 * x0 + y0 * y0 + z0 * z0; // квадрат расстояния (pw0 -> start)
-                        d1 = x1 * x1 + y1 * y1 + z1 * z1; // квадрат расстояния (pw0 -> end)
-
-                        cos = (x0 * x1 + y0 * y1 + z0 * z1) / Math.Sqrt(d0 * d1); 
-#else
                         cos = NavigationHelper.Cosine(pos0.X, pos0.Y, pos0.Z,
                                                     startX, startY, startZ,
                                                     endX, endY, endZ, out distance0, out distance1);
-#endif
 
                         // Добавляем wp0 лишь в том случае,
                         // если стартовая точка находится в задней полуплоскости относительно вектора (wp0 -> end),
@@ -646,10 +576,15 @@ private static List<Vector3> Astral.Logic.Navmesh.getPath(Graph graph, Vector3 S
                             && distance0 > 25
                             && distance1 > 25)
                             waypoints.Add(pos0);
+                        else if (debugInfo)
+                            ETLogger.WriteLine(LogType.Debug, $"{methodName}: Remove waypoint from the Path. Move directly to the End point");
+
                     }
                 }
-            } 
-            
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Error, $"{methodName}: First waypoint is invalid. Reset the Path");
+            }
+
             waypoints.Add(new Vector3((float)endX, (float)endY, (float)endZ));
 #if PATCH_LOG
                     if (waypoints.Count == 0)
@@ -668,79 +603,78 @@ private static List<Vector3> Astral.Logic.Navmesh.getPath(Graph graph, Vector3 S
         #endregion
 
         #region GenerateRoad
-#if false   // public static Road Astral.Logic.Navmesh.GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool allowPathFinding)
-public static Road Astral.Logic.Navmesh.GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool allowPathFinding)
-{
-	string obj = "AddPointWork";
-	Road result;
-	lock (obj)
-	{
-		Road road = new Road();
-		if (Class1.CurrentSettings.UsePathfinding3)
-		{
-			List<Vector3> list = new List<Vector3>();
-			if (allowPathFinding || graph.Nodes.Count == 0)
-			{
-				list = PathFinding.GetPathAndCorrect(Start, End, Class1.CurrentSettings.AllowPartialPath);
-			}
-			if (list.Count > 0)
-			{
-				road.Type = Road.RoadGenType.PathFinding;
-				road.Waypoints = list;
-			}
-			else
-			{
-				List<Vector3> list2 = new List<Vector3>();
-				if (graph != null && graph.Nodes.Count > 0 && !BotClient.Client.tcpClient_0.Connected)
-				{
-					Vector3 nearestNodePosFromPosition = Navmesh.GetNearestNodePosFromPosition(graph, Start);
-					if (nearestNodePosFromPosition.Distance3D(Start) < 130.0)
-					{
-						road.Type = Road.RoadGenType.StandardGraph;
-						list2 = Navmesh.getPath(graph, nearestNodePosFromPosition, End);
-					}
-				}
-				if (list2.Count == 0 && BotClient.Client.tcpClient_0.Connected)
-				{
-					road.Type = Road.RoadGenType.StandardGraph;
-					list2 = BotClient.QueryPathToServer(Start, End);
-				}
-				if (list2.Count == 0)
-				{
-					road.Type = Road.RoadGenType.GoldenPathGraph;
-					list2 = Navmesh.GetPathAndCorrect(GoldenPath.GetCurrentMapGraphFromCache(), Start, End);
-				}
-				if (list2.Count > 0)
-				{
-					Vector3 vector = Vector3.Empty;
-					if (PathFinding.CheckDirection(Start, list2[0], ref vector))
-					{
-						List<Vector3> path = PathFinding.GetPathAndCorrect(Start, list2[0], true);
-						road.Waypoints.AddRange(path);
-					}
-					road.Waypoints.AddRange(list2);
-				}
-				else
-				{
-					List<Vector3> path2 = PathFinding.GetPathAndCorrect(Start, End, true);
-					road.Type = Road.RoadGenType.PartialPathFinding;
-					road.Waypoints = path2;
-				}
-			}
-		}
-		else if (graph == null)
-		{
-			road.Waypoints.Add(End.Clone());
-		}
-		else
-		{
-			road.Waypoints = Navmesh.GetPathAndCorrect(graph, Start, End);
-		}
-		result = road;
-	}
-	return result;
-}
-#endif
+        //public static Road Astral.Logic.Navmesh.GenerateRoad(Graph graph, Vector3 Start, Vector3 End, bool allowPathFinding)
+        //{
+        //	string obj = "AddPointWork";
+        //	Road result;
+        //	lock (obj)
+        //	{
+        //		Road road = new Road();
+        //		if (Class1.CurrentSettings.UsePathfinding3)
+        //		{
+        //			List<Vector3> list = new List<Vector3>();
+        //			if (allowPathFinding || graph.Nodes.Count == 0)
+        //			{
+        //				list = PathFinding.GetPathAndCorrect(Start, End, Class1.CurrentSettings.AllowPartialPath);
+        //			}
+        //			if (list.Count > 0)
+        //			{
+        //				road.Type = Road.RoadGenType.PathFinding;
+        //				road.Waypoints = list;
+        //			}
+        //			else
+        //			{
+        //				List<Vector3> list2 = new List<Vector3>();
+        //				if (graph != null && graph.Nodes.Count > 0 && !BotClient.Client.tcpClient_0.Connected)
+        //				{
+        //					Vector3 nearestNodePosFromPosition = Navmesh.GetNearestNodePosFromPosition(graph, Start);
+        //					if (nearestNodePosFromPosition.Distance3D(Start) < 130.0)
+        //					{
+        //						road.Type = Road.RoadGenType.StandardGraph;
+        //						list2 = Navmesh.getPath(graph, nearestNodePosFromPosition, End);
+        //					}
+        //				}
+        //				if (list2.Count == 0 && BotClient.Client.tcpClient_0.Connected)
+        //				{
+        //					road.Type = Road.RoadGenType.StandardGraph;
+        //					list2 = BotClient.QueryPathToServer(Start, End);
+        //				}
+        //				if (list2.Count == 0)
+        //				{
+        //					road.Type = Road.RoadGenType.GoldenPathGraph;
+        //					list2 = Navmesh.GetPathAndCorrect(GoldenPath.GetCurrentMapGraphFromCache(), Start, End);
+        //				}
+        //				if (list2.Count > 0)
+        //				{
+        //					Vector3 vector = Vector3.Empty;
+        //					if (PathFinding.CheckDirection(Start, list2[0], ref vector))
+        //					{
+        //						List<Vector3> path = PathFinding.GetPathAndCorrect(Start, list2[0], true);
+        //						road.Waypoints.AddRange(path);
+        //					}
+        //					road.Waypoints.AddRange(list2);
+        //				}
+        //				else
+        //				{
+        //					List<Vector3> path2 = PathFinding.GetPathAndCorrect(Start, End, true);
+        //					road.Type = Road.RoadGenType.PartialPathFinding;
+        //					road.Waypoints = path2;
+        //				}
+        //			}
+        //		}
+        //		else if (graph == null)
+        //		{
+        //			road.Waypoints.Add(End.Clone());
+        //		}
+        //		else
+        //		{
+        //			road.Waypoints = Navmesh.GetPathAndCorrect(graph, Start, End);
+        //		}
+        //		result = road;
+        //	}
+        //	return result;
+        //}
+
         private static readonly object @lock = new object();
 
         internal static Road GenerateRoad(Graph graph, Vector3 start, Vector3 end, bool allowPathFinding)
@@ -750,6 +684,9 @@ public static Road Astral.Logic.Navmesh.GenerateRoad(Graph graph, Vector3 Start,
         }
         private static bool PrefixGenerateRoad(out Road __result, Graph graph, Vector3 Start, Vector3 End, bool allowPathFinding)
         {
+            bool debugInfo = EntityTools.Config.Logger.DebugNavigation;
+            var methodName = debugInfo ? MethodBase.GetCurrentMethod().Name : string.Empty;
+
             //TODO Переработать корректировку пути (первую и последнюю точки)
             Road road = new Road();
 #if PATCH_LOG
@@ -764,18 +701,35 @@ public static Road Astral.Logic.Navmesh.GenerateRoad(Graph graph, Vector3 Start,
             stringBuilder.Append(nameof(Patch_Astral_Logic_Navmesh_GenerateRoad)).Append('.').AppendLine(nameof(GenerateRoad)); 
 #endif
 
-            if (Start != null && Start.IsValid
-                && End != null && End.IsValid)
+            if (End != null && End.IsValid)
             {
-#if false
-                string obj = "AddPointWork";
-                lock (obj)
-#elif true
+                if (Start == null || !Start.IsValid)
+                {
+                    var player = EntityManager.LocalPlayer;
+                    if (!player.IsValid || player.IsLoading)
+                    {
+                        if (debugInfo)
+                            ETLogger.WriteLine(LogType.Error, $"{methodName}: Start node is invalid. The Player is out of the Game. Stop\n{Environment.StackTrace}");
+                        __result = road;
+                        return false;
+                    }
+
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Error, $"{methodName}: Start node is invalid. Using the Player's location\n{Environment.StackTrace}");
+
+                    Start = player.Location.Clone();
+                }
 
                 bool graphOK = graph?.NodesCount > 0;
 
+                if(debugInfo)
+                {
+                    if (graphOK)
+                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: Graph has {graph.NodesCount} nodes");
+                    else ETLogger.WriteLine(LogType.Error, $"{methodName}: Graph is empty");
+                }
+
                 lock (@lock)
-#endif
                 {
 #if PATCH_LOG
                     stopwatch.Start(); 
@@ -797,8 +751,13 @@ public static Road Astral.Logic.Navmesh.GenerateRoad(Graph graph, Vector3 Start,
 #endif
                         }
 
-                        if (waypoints?.Count > 0)
+                        var pathCount = waypoints?.Count ?? 0;
+
+                        if (pathCount > 0)
                         {
+                            if (debugInfo)
+                                ETLogger.WriteLine(LogType.Debug, $"{methodName}: PathFinding found the path which has {pathCount} waypoints");
+
                             road.Type = Road.RoadGenType.PathFinding;
                             road.Waypoints = waypoints;
                         }
@@ -806,6 +765,9 @@ public static Road Astral.Logic.Navmesh.GenerateRoad(Graph graph, Vector3 Start,
                         {
                             if (waypoints is null)
                                 waypoints = new List<Vector3>();
+
+                            if (debugInfo)
+                                ETLogger.WriteLine(LogType.Debug, $"{methodName}: PathFinding did not found the path");
 
                             bool tcpClientConnected = AstralAccessors.Controllers.BotComs.BotClient.Client_TcpClient.Connected;
                             if (graphOK && !tcpClientConnected)
@@ -827,6 +789,14 @@ public static Road Astral.Logic.Navmesh.GenerateRoad(Graph graph, Vector3 Start,
                                              .Append(endNode).Append("} at the distance ").AppendLine(dist2.ToString())
                                              .Append("\tSearch time ").AppendLine(standardGraphSearching_Time.ToString()); 
 #endif
+                                if (debugInfo)
+                                {
+                                    pathCount = waypoints.Count;
+                                    if (pathCount > 0)
+                                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: AStar found in StandardGraph the path which has {pathCount} waypoints");
+                                    else
+                                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: AStar did not found the path in StandardGraph");
+                                }
                             }
 
                             if (waypoints.Count == 0 && tcpClientConnected)
@@ -841,6 +811,14 @@ public static Road Astral.Logic.Navmesh.GenerateRoad(Graph graph, Vector3 Start,
                                 stringBuilder.Append("Search QueryPathToServer {").Append(Start).Append("} => {").Append(End).AppendLine("}")
                                     .Append("\tSearch time ").AppendLine(queryPathToServer_Time.ToString()); 
 #endif
+                                if (debugInfo)
+                                {
+                                    pathCount = waypoints.Count;
+                                    if (pathCount > 0)
+                                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: Receive from Server the path which has {pathCount} waypoints");
+                                    else
+                                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: Server did not send the path");
+                                }
                             }
 
                             if (waypoints.Count == 0)
@@ -848,6 +826,9 @@ public static Road Astral.Logic.Navmesh.GenerateRoad(Graph graph, Vector3 Start,
 #if PATCH_LOG
                                 goldenPathSearch_Time = stopwatch.ElapsedTicks; 
 #endif
+                                if (debugInfo)
+                                    ETLogger.WriteLine(LogType.Debug, $"{methodName}: PathFinding and AStar did not found the path. Using GoldenPath");
+
                                 road.Type = Road.RoadGenType.GoldenPathGraph;
                                 var goldGraph = Astral.Logic.NW.GoldenPath.GetCurrentMapGraphFromCache();
                                 using (goldGraph.ReadLock())
@@ -859,29 +840,59 @@ public static Road Astral.Logic.Navmesh.GenerateRoad(Graph graph, Vector3 Start,
                                 stringBuilder.Append("Search GoldenPathSearch {").Append(Start).Append("} => {").Append(End).AppendLine("}")
                                     .Append("\tSearch time ").AppendLine(goldenPathSearch_Time.ToString()); 
 #endif
+                                if (debugInfo)
+                                {
+                                    pathCount = waypoints.Count;
+                                    if (pathCount > 0)
+                                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: AStar found in GoldenPath the path which has {pathCount} waypoints");
+                                    else
+                                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: AStar did not found the path in GoldenPath");
+                                }
                             }
 
-                            if (waypoints.Count > 0)
+                            pathCount = waypoints.Count;
+
+                            if (pathCount > 0)
                             {
 #if PATCH_LOG
                                 partialPathSearch_Time = stopwatch.ElapsedTicks; 
 #endif
-                                var vector = Vector3.Empty;
-                                if (PathFinding.CheckDirection(Start, waypoints[0], ref vector))
+                                var start2firstDistance = NavigationHelper.SquareDistance3D(Start, waypoints[0]);
+                                if (start2firstDistance > 100)
                                 {
-                                    List<Vector3> path = PathFinding.GetPath(Start, waypoints[0], true);
+                                    if (debugInfo)
+                                        ETLogger.WriteLine(LogType.Debug,
+                                            $"{methodName}: Path has {pathCount} waypoints. " +
+                                            $"Distance to the first waypoint is {start2firstDistance:N1} therefore using the PartialPathfinding");
+                                    
+                                    var vector = Vector3.Empty;
+                                    if (PathFinding.CheckDirection(Start, waypoints[0], ref vector))
+                                    {
+                                        List<Vector3> path = PathFinding.GetPath(Start, waypoints[0], true);
 
-                                    waypoints.InsertRange(0, path);
+                                        waypoints.InsertRange(0, path);
+                                    }
                                 }
+
                                 road.Waypoints = waypoints;
 #if PATCH_LOG
                                 partialPathSearch_Time = stopwatch.ElapsedTicks - partialPathSearch_Time;
                                 stringBuilder.Append("Search PartialPath from {").Append(Start).Append("} => {").Append(waypoints[0]).AppendLine("}")
                                     .Append("\tSearch time ").AppendLine(partialPathSearch_Time.ToString()); 
 #endif
+                                if (debugInfo)
+                                {
+                                    pathCount = waypoints.Count;
+                                    if (pathCount > 0)
+                                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: PathFinding found the path which has {pathCount} waypoints");
+                                    else
+                                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: PathFinding did not found the path");
+                                }
                             }
                             else
                             {
+                                if (debugInfo)
+                                    ETLogger.WriteLine(LogType.Debug, $"{methodName}: No path found. Using PathFinding");
 #if PATCH_LOG
                                 partialPathFinding_Time = stopwatch.ElapsedTicks; 
 #endif
@@ -897,6 +908,14 @@ public static Road Astral.Logic.Navmesh.GenerateRoad(Graph graph, Vector3 Start,
                                 stringBuilder.Append("PartialPathFinding from {").Append(Start).Append("} => {").Append(End).AppendLine("}")
                                     .Append("\tSearch time ").AppendLine(partialPathFinding_Time.ToString()); 
 #endif
+                                if (debugInfo)
+                                {
+                                    pathCount = waypoints.Count;
+                                    if (pathCount > 0)
+                                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: PathFinding found the path which has {pathCount} waypoints");
+                                    else
+                                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: PathFinding did not found the path");
+                                }
                             }
                         }
                     }
@@ -917,9 +936,20 @@ public static Road Astral.Logic.Navmesh.GenerateRoad(Graph graph, Vector3 Start,
                         stringBuilder.Append("DirectPathFinding from {").Append(Start).Append("} => {").Append(End).AppendLine("}")
                             .Append("\tSearch time ").AppendLine(directPathFinding_Time.ToString()); 
 #endif
+                        if (debugInfo)
+                        {
+                            var pathCount = road.Waypoints.Count;
+                            if (pathCount > 0)
+                                ETLogger.WriteLine(LogType.Debug, $"{methodName}: AStar found in StandardGraph the path which has {pathCount} waypoints");
+                            else
+                                ETLogger.WriteLine(LogType.Debug, $"{methodName}: AStar did not found the path in StandardGraph");
+                        }
                     }
                     else
                     {
+                        if (debugInfo)
+                            ETLogger.WriteLine(LogType.Debug, $"{methodName}: PathFinding are disabled and Graph is invalid therefore moving to the End waypoint directly");
+
                         road.Waypoints.Add(End.Clone());
                     }
 
@@ -949,6 +979,11 @@ public static Road Astral.Logic.Navmesh.GenerateRoad(Graph graph, Vector3 Start,
 #endif
                 }
             }
+            else
+            {
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Error, $"{methodName}: End node is invalid. Stop\n{Environment.StackTrace}");
+            }
             __result = road;
 
             return false;
@@ -956,33 +991,32 @@ public static Road Astral.Logic.Navmesh.GenerateRoad(Graph graph, Vector3 Start,
         #endregion
 
         #region GetNearestNodeFromPosition
-#if false   // public static Node Astral.Logic.Navmesh.GetNearestNodeFromPosition(Graph graph, Vector3 pos)
-public static Node Astral.Logic.Navmesh.GetNearestNodeFromPosition(Graph graph, Vector3 pos)
-{
-	double num = double.MaxValue;
-	Node result = new Node(0.0, 0.0, 0.0);
-	if (graph == null)
-	{
-		return new Node((double)pos.X, (double)pos.Y, (double)pos.Z);
-	}
-	foreach (object obj in graph.Nodes)
-	{
-		Node node = (Node)obj;
-		if (node.Passable)
-		{
-			Vector3 vector = new Vector3(pos.X, pos.Y, pos.Z);
-			Vector3 from = new Vector3((float)node.X, (float)node.Y, (float)node.Z);
-			double num2 = vector.Distance3D(from);
-			if (num2 < num)
-			{
-				num = num2;
-				result = node;
-			}
-		}
-	}
-    return result;
-}
-#endif
+        //public static Node Astral.Logic.Navmesh.GetNearestNodeFromPosition(Graph graph, Vector3 pos)
+        //{
+        //	double num = double.MaxValue;
+        //	Node result = new Node(0.0, 0.0, 0.0);
+        //	if (graph == null)
+        //	{
+        //		return new Node((double)pos.X, (double)pos.Y, (double)pos.Z);
+        //	}
+        //	foreach (object obj in graph.Nodes)
+        //	{
+        //		Node node = (Node)obj;
+        //		if (node.Passable)
+        //		{
+        //			Vector3 vector = new Vector3(pos.X, pos.Y, pos.Z);
+        //			Vector3 from = new Vector3((float)node.X, (float)node.Y, (float)node.Z);
+        //			double num2 = vector.Distance3D(from);
+        //			if (num2 < num)
+        //			{
+        //				num = num2;
+        //				result = node;
+        //			}
+        //		}
+        //	}
+        //    return result;
+        //}
+
         internal static Node GetNearestNodeFromPosition(Graph graph, Vector3 pos) 
         {
             PrefixGetNearestNodeFromPosition(out Node node, graph, pos);
@@ -1000,46 +1034,45 @@ public static Node Astral.Logic.Navmesh.GetNearestNodeFromPosition(Graph graph, 
         #endregion
 
         #region FixPath
-#if false   // private static void Astral.Logic.Navmesh.FixPath(List<Vector3> waypoints, Vector3 from)
-private static void Astral.Logic.Navmesh.FixPath(List<Vector3> waypoints, Vector3 from)
-{
-	int num = 0;
-	while (waypoints.Count > 1)
-	{
-		num++;
-		if (num > 3)
-		{
-			return;
-		}
-		double num2 = waypoints[0].Distance3D(from) + waypoints[0].Distance3D(waypoints[1]);
-		if (waypoints[1].Distance3D(from) * 1.1 <= num2)
-		{
-			waypoints.RemoveAt(0);
-		}
-	}
-}
-#endif
+        //private static void Astral.Logic.Navmesh.FixPath(List<Vector3> waypoints, Vector3 from)
+        //{
+        //	int num = 0;
+        //	while (waypoints.Count > 1)
+        //	{
+        //		num++;
+        //		if (num > 3)
+        //		{
+        //			return;
+        //		}
+        //		double num2 = waypoints[0].Distance3D(from) + waypoints[0].Distance3D(waypoints[1]);
+        //		if (waypoints[1].Distance3D(from) * 1.1 <= num2)
+        //		{
+        //			waypoints.RemoveAt(0);
+        //		}
+        //	}
+        //}
+
         // ReSharper disable UnusedParameter.Local
         private static void PrefixFixPath(List<Vector3> waypoints, Vector3 from) { }
         // ReSharper restore UnusedParameter.Local
         #endregion
 
         #region TotalDistance
-#if false   // public static double Astral.Logic.Navmesh.TotalDistance(List<Vector3> positions)
-public static double Astral.Logic.Navmesh.TotalDistance(List<Vector3> positions)
-{
-	if (positions.Count <= 1)
-	{
-		return 0.0;
-	}
-	double num = positions[0].Distance3D(positions[1]);
-	for (int i = 1; i < positions.Count; i++)
-	{
-		num += positions[i - 1].Distance3D(positions[i]);
-	}
-	return num;
-}
-#endif
+        // public static double Astral.Logic.Navmesh.TotalDistance(List<Vector3> positions)
+        //public static double Astral.Logic.Navmesh.TotalDistance(List<Vector3> positions)
+        //{
+        //	if (positions.Count <= 1)
+        //	{
+        //		return 0.0;
+        //	}
+        //	double num = positions[0].Distance3D(positions[1]);
+        //	for (int i = 1; i < positions.Count; i++)
+        //	{
+        //		num += positions[i - 1].Distance3D(positions[i]);
+        //	}
+        //	return num;
+        //}
+
         internal static double TotalDistance(List<Vector3> positions)
         {
             PrefixTotalDistance(out double distance, positions);
@@ -1070,61 +1103,102 @@ public static double Astral.Logic.Navmesh.TotalDistance(List<Vector3> positions)
         #endregion
 
         #region PathDistance
-#if false //Astral.Quester.Controllers.Road.PathDistance(Vector3 pos)
-internal static double Astral.Quester.Controllers.Road.PathDistance(Vector3 pos)
-{
-	Road road = Road.GenerateRoadFromPlayer(pos);
-	road.Waypoints.Insert(0, \u0001.LocalPlayer.Location);
-	return Navmesh.TotalDistance(road.Waypoints);
-}
-#endif
+        //internal static double Astral.Quester.Controllers.Road.PathDistance(Vector3 pos)
+        //{
+        //	Road road = Road.GenerateRoadFromPlayer(pos);
+        //	road.Waypoints.Insert(0, \u0001.LocalPlayer.Location);
+        //	return Navmesh.TotalDistance(road.Waypoints);
+        //}
+
         internal static bool PathDistance(out double __result, Vector3 pos)
         {
-            if (pos != null && pos.IsValid)
-            {
-#if true
-                var playerLocation = EntityManager.LocalPlayer.Location;
-                var graph = AstralAccessors.Controllers.Roles.CurrentRole.UsedMeshes;
+            bool debugInfo = EntityTools.Config.Logger.DebugNavigation;
+            var methodName = debugInfo ? MethodBase.GetCurrentMethod().Name : string.Empty;
 
-                if (graph?.NodesCount > 0)
+            __result = 0;
+
+            var player = EntityManager.LocalPlayer;
+
+            if (player.IsValid && !player.IsLoading)
+            {   
+                if (pos != null && pos.IsValid)
                 {
-                    var road = GenerateRoad(graph,
-                        playerLocation, pos, !Astral.API.CurrentSettings.PFOnlyForApproaches);
 
-                    if (road.Waypoints.Count > 1)
+                    var playerLocation = player.Location;
+                    var graph = AstralAccessors.Controllers.Roles.CurrentRole.UsedMeshes;
+
+                    if (graph?.NodesCount > 0)
                     {
-                        __result = MathHelper.Distance3D(playerLocation, road.Waypoints[0]);
-                        __result += TotalDistance(road.Waypoints);
+                        if (debugInfo)
+                            ETLogger.WriteLine(LogType.Debug, $"{methodName}: Starting Road generation");
+                        var road = GenerateRoad(graph,
+                            playerLocation, pos, !Astral.API.CurrentSettings.PFOnlyForApproaches);
+
+                        if (road.Waypoints.Count > 1)
+                        {
+                            __result = MathHelper.Distance3D(playerLocation, road.Waypoints[0]);
+                            __result += TotalDistance(road.Waypoints);
+
+                            if (debugInfo)
+                                ETLogger.WriteLine(LogType.Debug, $"{methodName}: Result is {__result:N1}");
+                        }
+                        else
+                        {
+                            __result = pos.Distance3D(playerLocation);
+                            if (debugInfo)
+                                ETLogger.WriteLine(LogType.Debug, $"{methodName}: Path has only one waypoint. Linear distance is {__result:N1}");
+                        }
                     }
-                    else __result = pos.Distance3DFromPlayer;
+                    else
+                    {
+                        __result = pos.Distance3D(playerLocation);
+                        if (debugInfo)
+                            ETLogger.WriteLine(LogType.Debug, $"{methodName}: Graph is empty. Linear distance is {__result:N1}");
+                    }
                 }
-                else __result = pos.Distance3D(playerLocation);
-#endif
+                else if (debugInfo)
+                    ETLogger.WriteLine(LogType.Error, $"{methodName}: End point is invalid. Stop");
             }
-            else __result = 0;//double.MaxValue;
+            else if (debugInfo)
+                ETLogger.WriteLine(LogType.Error, $"{methodName}: The Player is out of the Game. Stop");
 
             return false;
         }
         #endregion
 
         #region GenerateRoadFromPlayer
-#if false
-		internal static Road Astral.Quester.Controllers.Road.GenerateRoadFromPlayer(Vector3 end)
-		{
-			return Navmesh.GenerateRoadFromPlayer(Core.Meshes, end, !\u0001.CurrentSettings.PFOnlyForApproaches);
-		}
-#endif
-        internal static bool GenerateRoadFromPlayer(out Astral.Logic.Classes.FSM.Road __result, Vector3 end)
-        {
-            if (end?.IsValid == true)
-            {
-                var graph = AstralAccessors.Controllers.Roles.CurrentRole.UsedMeshes;
-                var playerLocation = EntityManager.LocalPlayer.Location;
-                __result = GenerateRoad(graph,
-                    playerLocation, end, !Astral.API.CurrentSettings.PFOnlyForApproaches);
+		//internal static Road Astral.Quester.Controllers.Road.GenerateRoadFromPlayer(Vector3 end)
+		//{
+		//	return Navmesh.GenerateRoadFromPlayer(Core.Meshes, end, !\u0001.CurrentSettings.PFOnlyForApproaches);
+		//}
 
+        internal static bool GenerateRoadFromPlayer(out Road __result, Vector3 end)
+        {
+            bool debugInfo = EntityTools.Config.Logger.DebugNavigation;
+            var methodName = debugInfo ? MethodBase.GetCurrentMethod().Name : string.Empty;
+
+            var player = EntityManager.LocalPlayer;
+
+            if (player.IsValid && !player.IsLoading)
+            {
+                if (end?.IsValid == true)
+                {
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: Starting Road generation");
+
+                    var playerLocation = player.Location;
+                    var graph = AstralAccessors.Controllers.Roles.CurrentRole.UsedMeshes;
+                    __result = GenerateRoad(graph,
+                        playerLocation, end, !Astral.API.CurrentSettings.PFOnlyForApproaches);
+                    return false;
+                }
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Error, $"{methodName}: End node is invalid. Stop\n{Environment.StackTrace}");
             }
-            else __result = new Astral.Logic.Classes.FSM.Road();
+            else if (debugInfo)
+                ETLogger.WriteLine(LogType.Error, $"{methodName}: The Player is out of the Game. Stop");
+
+            __result = new Road();
 
             return false;
         } 

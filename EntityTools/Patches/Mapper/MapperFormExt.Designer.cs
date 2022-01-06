@@ -59,7 +59,7 @@ namespace EntityTools.Patches.Mapper
             this.btnMoveNodes = new DevExpress.XtraBars.BarCheckItem();
             this.btnRemoveNodes = new DevExpress.XtraBars.BarCheckItem();
             this.btnEditEdges = new DevExpress.XtraBars.BarCheckItem();
-            this.barMeshes = new DevExpress.XtraBars.Bar();
+            this.barGraphTools = new DevExpress.XtraBars.Bar();
             this.btnSaveMeshes = new DevExpress.XtraBars.BarButtonItem();
             this.groupImportExportNodes = new DevExpress.XtraBars.BarButtonGroup();
             this.btnImportMeshesFromGame = new DevExpress.XtraBars.BarButtonItem();
@@ -194,7 +194,7 @@ namespace EntityTools.Patches.Mapper
             this.barManager.Bars.AddRange(new DevExpress.XtraBars.Bar[] {
             this.barMapping,
             this.barGraphEditTools,
-            this.barMeshes,
+            this.barGraphTools,
             this.barCustomRegions,
             this.barEditCustomRegion,
             this.barStatus});
@@ -493,13 +493,13 @@ namespace EntityTools.Patches.Mapper
             this.btnEditEdges.Name = "btnEditEdges";
             this.btnEditEdges.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_EditEdges_ModeChanged);
             // 
-            // barMeshes
+            // barGraphTools
             // 
-            this.barMeshes.BarName = "GraphTools";
-            this.barMeshes.DockCol = 0;
-            this.barMeshes.DockRow = 1;
-            this.barMeshes.DockStyle = DevExpress.XtraBars.BarDockStyle.Top;
-            this.barMeshes.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
+            this.barGraphTools.BarName = "GraphTools";
+            this.barGraphTools.DockCol = 0;
+            this.barGraphTools.DockRow = 1;
+            this.barGraphTools.DockStyle = DevExpress.XtraBars.BarDockStyle.Top;
+            this.barGraphTools.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
             new DevExpress.XtraBars.LinkPersistInfo(this.btnUndo),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnSaveMeshes),
             new DevExpress.XtraBars.LinkPersistInfo(this.groupImportExportNodes, true),
@@ -507,10 +507,10 @@ namespace EntityTools.Patches.Mapper
             new DevExpress.XtraBars.LinkPersistInfo(this.btnCompression),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnDistanceMeasurement, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnObjectInfo)});
-            this.barMeshes.OptionsBar.AllowQuickCustomization = false;
-            this.barMeshes.Text = "Graph Tools";
-            this.barMeshes.Visible = false;
-            this.barMeshes.VisibleChanged += new System.EventHandler(this.handler_BarVisibleChanged);
+            this.barGraphTools.OptionsBar.AllowQuickCustomization = false;
+            this.barGraphTools.Text = "Graph Tools";
+            this.barGraphTools.Visible = false;
+            this.barGraphTools.VisibleChanged += new System.EventHandler(this.handler_BarVisibleChanged);
             // 
             // btnSaveMeshes
             // 
@@ -1327,7 +1327,7 @@ namespace EntityTools.Patches.Mapper
             this.containerGeneral.Controls.Add(this.editLayerDepth);
             this.containerGeneral.Controls.Add(this.ckbChacheEnable);
             this.containerGeneral.Name = "containerGeneral";
-            this.containerGeneral.Size = new System.Drawing.Size(393, 63);
+            this.containerGeneral.Size = new System.Drawing.Size(415, 70);
             this.containerGeneral.TabIndex = 2;
             // 
             // lblLayerDepth
@@ -1504,7 +1504,7 @@ namespace EntityTools.Patches.Mapper
         private BindingSource bsrcAstralSettings;
         private Button btnShowStatBar;
         private BarButtonItem btnSaveMeshes;
-        private Bar barMeshes;
+        private Bar barGraphTools;
         private BarCheckItem btnMoveNodes;
         private BarCheckItem btnRemoveNodes;
         private BarCheckItem btnEditEdges;

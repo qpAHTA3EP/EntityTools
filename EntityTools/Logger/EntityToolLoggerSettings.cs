@@ -4,6 +4,7 @@ using System.IO;
 using Astral.Controllers;
 using AcTp0Tools.Reflection;
 using EntityTools.Quester.Actions;
+using EntityTools.Servises.SlideMonitor;
 
 namespace EntityTools.Settings
 {
@@ -69,6 +70,45 @@ namespace EntityTools.Settings
             }
         }
         private bool _debugMissionTools;
+
+        /// <summary>
+        /// Активация расширенной отладочной информации при поиске пути
+        /// </summary>
+        [Bindable(true)]
+        [Description("Активация расширенной отладочной информации при поиске пути")]
+        public bool DebugNavigation
+        {
+            get => _debugNavigation;
+            set
+            {
+                if (_debugNavigation != value)
+                {
+                    _debugNavigation = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private bool _debugNavigation;
+
+
+        /// <summary>
+        /// Активация расширенной отладочной информации <see cref="SlideMonitor"/>
+        /// </summary>
+        [Bindable(true)]
+        [Description("Активация расширенной отладочной информации " + nameof(SlideMonitor))]
+        public bool DebugSlideMonitor
+        {
+            get => _debugSlideMonitor;
+            set
+            {
+                if (_debugSlideMonitor != value)
+                {
+                    _debugSlideMonitor = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private bool _debugSlideMonitor;
 
         /// <summary>
         /// Активация расширенной отладочной информации по инструментам для работы с Entity

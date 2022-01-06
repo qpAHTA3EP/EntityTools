@@ -310,6 +310,7 @@ namespace EntityTools.Settings
         /// </summary>
         [Bindable(true)]
         [Category("Toolbar")]
+        [DisplayName("GraphToolsBarVisible")]
         [Description("Видимость панели инструментов 'Mashes Tools'")]
         public bool MeshesBarVisible
         {
@@ -330,6 +331,7 @@ namespace EntityTools.Settings
         /// </summary>
         [Bindable(true)]
         [Category("Toolbar")]
+        [DisplayName("GraphEditToolsBarVisible")]
         [Description("Видимость панели инструментов 'Node Tools'")]
         public bool NodeToolsBarVisible
         {
@@ -519,7 +521,7 @@ namespace EntityTools.Settings
 
         [Bindable(true)]
         [Category("Customization")]
-        [Description("Отображение дружественных NPC")]
+        [Description("Отображение дружественных NPC и Entity")]
         public bool DrawFriends
         {
             get => _drawFriends;
@@ -536,7 +538,7 @@ namespace EntityTools.Settings
 
         [Bindable(true)]
         [Category("Customization")]
-        [Description("Цвет дружественных NPC")]
+        [Description("Цвет дружественных NPC и Entity")]
         [XmlElement(Type = typeof(XmlColor))]
         public Color FriendColor
         {
@@ -589,7 +591,7 @@ namespace EntityTools.Settings
 
         [Bindable(true)]
         [Category("Customization")]
-        [Description("Отображение прочих NPC")]
+        [Description("Отображение нейтральных NPC и Entity")]
         public bool DrawOtherNPC
         {
             get => _drawOtherNpc;
@@ -607,7 +609,7 @@ namespace EntityTools.Settings
         [Bindable(true)]
         [XmlElement(Type = typeof(XmlColor))]
         [Category("Customization")]
-        [Description("Цвет прочих NPC")]
+        [Description("Цвет нейтральных NPC и Entity")]
         public Color OtherNPCColor
         {
             get => npcColor;
