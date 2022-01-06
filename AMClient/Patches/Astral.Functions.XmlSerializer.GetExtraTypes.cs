@@ -24,7 +24,6 @@ namespace AcTp0Tools.Patches
     //[HarmonyPatch(typeof(Astral.Functions.XmlSerializer), "GetExtraTypes")] 
     public static class Astral_Functions_XmlSerializer_GetExtraTypes
     {
-        static Func<List<Type>> GetPluginTypes = typeof(Plugins).GetStaticFunction<List<Type>>("GetTypes");
         internal static List<Type> UccTypes = new List<Type>(20);
         internal static List<Type> QuesterTypes = new List<Type>(100);
         internal static List<Type> MultitaskTypes = new List<Type>(10);
@@ -75,8 +74,9 @@ namespace AcTp0Tools.Patches
                 FillTypeLists(Assembly.GetEntryAssembly()?.GetTypes());
 
                 // Проверяем типы, объявленные в плагинах
-                var types = GetPluginTypes();
-                if (types != null && types.Count > 0)
+                var types = AstralAccessors.Controllers.Plugins.GetTypes();
+                //if (types != null && types.Count > 0)
+                if (types != null)
                     FillTypeLists(types); 
             }
 

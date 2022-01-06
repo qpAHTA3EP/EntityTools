@@ -3,6 +3,7 @@ using Astral.Logic.Classes.Map;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Reflection;
 using AcTp0Tools.Patches;
@@ -297,9 +298,10 @@ namespace AcTp0Tools
                 static Plugins()
                 {
                 }
-                private static readonly StaticPropertyAccessor<List<Assembly>> assemblies = 
-                    typeof(Astral.Controllers.Plugins).GetStaticProperty<List<Assembly>>(nameof(Assemblies));
-                private static readonly List<Assembly> emptyAssemblyList = new List<Assembly>();
+
+                /// <summary>
+                /// Коллекция сборок плагинов
+                /// </summary>
                 public static List<Assembly> Assemblies
                 {
                     get 
@@ -311,11 +313,103 @@ namespace AcTp0Tools
                         
                     }
                 }
+                private static readonly StaticPropertyAccessor<List<Assembly>> assemblies = 
+                    typeof(Astral.Controllers.Plugins).GetStaticProperty<List<Assembly>>(nameof(Assemblies));
+                private static readonly List<Assembly> emptyAssemblyList = new List<Assembly>();
 
                 public static IEnumerable<Type> UccTargetSelectors =>
                     Astral_Functions_XmlSerializer_GetExtraTypes.UccTargetSelectorTypes;
+
+                static Func<List<Type>> getTypes = typeof(Plugins).GetStaticFunction<List<Type>>("GetTypes");
+
+                /// <summary>
+                /// Перечисление типов, объявленных в плагинах
+                /// </summary>
+                /// <returns></returns>
+                public static IEnumerable<Type> GetTypes()
+                {
+                    //return getTypes();
+                    foreach (var assembly in assemblies.Value)
+                    {
+                        foreach (var type in assembly.GetTypes())
+                        {
+                            yield return type;
+                        }
+                    }
+                }
+
+                /// <summary>
+                /// Перечисление типов, производных от типа <typeparam name="TBase"/>,
+                /// объявленных в сборках-плагинах
+                /// </summary>
+                /// <typeparam name="TBase">Базовый тип, производные которого необходимо получить</typeparam>
+                /// <param name="includeBase">True, если в перечисление нужно включить базовый тип <typeparam name="TBase"/></param>
+                /// <returns></returns>
+                public static IEnumerable<Type> GetPluginTypesDerivedFrom<TBase>(bool includeBase = false)
+                {
+                    var baseType = typeof(TBase);
+                    if (includeBase)
+                        yield return baseType;
+                    foreach (var type in GetTypes())
+                    {
+                        if (baseType.IsAssignableFrom(type))
+                            yield return type;
+                    }
+                }
+
+
+#if false       // Вызывает ошибку доступа
+                /// <summary>
+                /// Перечисление всех типов, производных от типа <typeparamref name="TBase"/>,
+                /// объявленных во всех загруженных сборка
+                /// </summary>
+                /// <typeparam name="TBase">Базовый тип, производные которого необходимо получить</typeparam>
+                /// <param name="includeBase">True, если в перечисление нужно включить базовый тип <typeparamref name="TBase"/></param>
+                /// <returns></returns>
+                public static IEnumerable<Type> GetAllTypesDerivedFrom<TBase>(bool includeBase = true)
+                {
+                    var baseType = typeof(TBase);
+                    List<Type> typeList;
+
+                    if (!typeTreeDictionary.ContainsKey(baseType))
+                    {
+                        // Вариант с Linq
+                        //typeList = AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly =>
+                        //    assembly.GetTypes().Where(t => baseType.IsAssignableFrom(t))).ToList();
+
+                        // Вариант с перебором типов в цикле
+                        typeList = new List<Type>(8);
+                        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                        {
+                            foreach (var type in assembly.GetTypes())
+                            {
+                                if (baseType.IsAssignableFrom(type))
+                                    typeList.Add(type);
+                            }
+                        }
+
+                        // Добавление списка в коллекцию (кэширование)
+                        typeTreeDictionary.Add(baseType, typeList);
+                    }
+                    else typeList = typeTreeDictionary[baseType];
+
+                    if (includeBase)
+                        yield return baseType;
+                    if (typeTreeDictionary.ContainsKey(baseType))
+                    {
+                        foreach (var type in typeList)
+                        {
+                            yield return type;
+                        }
+                    }
+                } 
+
+                /// <summary>
+                /// Коллекция (кэш) поддерева типов, производных от типа, являющегося ключом словаря.
+                /// </summary>
+                private static readonly Dictionary<Type, List<Type>> typeTreeDictionary = new Dictionary<Type, List<Type>>();
+#endif
             }
         }
-
     }
 }
