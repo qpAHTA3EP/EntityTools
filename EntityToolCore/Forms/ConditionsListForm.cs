@@ -18,7 +18,7 @@ namespace EntityCore.Forms
         private static UCCCondition _conditionCopy;
         // Индекс элемента списка условий Conditions.Items
         // в котором допускается изменение состояния "Checked"
-        private int allowConditionsItemChechedChangeInd = -1;
+        private int allowConditionsItemCheckedChangeInd = -1;
         // Редактор UCC
         private readonly PropertyAccessor<UCCAction> currentUccAction;
 
@@ -49,8 +49,8 @@ namespace EntityCore.Forms
                 // Отображаем список условий
                 foreach (UCCCondition condition in conditions)
                 {
-                    @this.allowConditionsItemChechedChangeInd = @this.lsbxConditions.Items.Add(CopyHelper.CreateDeepCopy(condition));
-                    @this.lsbxConditions.SetItemChecked(@this.allowConditionsItemChechedChangeInd, condition.Locked);
+                    @this.allowConditionsItemCheckedChangeInd = @this.lsbxConditions.Items.Add(CopyHelper.CreateDeepCopy(condition));
+                    @this.lsbxConditions.SetItemChecked(@this.allowConditionsItemCheckedChangeInd, condition.Locked);
                 }
             }
 
@@ -80,8 +80,8 @@ namespace EntityCore.Forms
                 // Отображаем список условий
                 foreach (UCCCondition condition in conditions)
                 {
-                    @this.allowConditionsItemChechedChangeInd = @this.lsbxConditions.Items.Add(CopyHelper.CreateDeepCopy(condition));
-                    @this.lsbxConditions.SetItemChecked(@this.allowConditionsItemChechedChangeInd, condition.Locked);
+                    @this.allowConditionsItemCheckedChangeInd = @this.lsbxConditions.Items.Add(CopyHelper.CreateDeepCopy(condition));
+                    @this.lsbxConditions.SetItemChecked(@this.allowConditionsItemCheckedChangeInd, condition.Locked);
                 }
             }
             @this.cbLogic.SelectedItem = logic;
@@ -125,8 +125,8 @@ namespace EntityCore.Forms
                 // Отображаем список условий
                 foreach (UCCCondition condition in conditionPack.Conditions)
                 {
-                    @this.allowConditionsItemChechedChangeInd = @this.lsbxConditions.Items.Add(CopyHelper.CreateDeepCopy(condition));
-                    @this.lsbxConditions.SetItemChecked(@this.allowConditionsItemChechedChangeInd, condition.Locked);
+                    @this.allowConditionsItemCheckedChangeInd = @this.lsbxConditions.Items.Add(CopyHelper.CreateDeepCopy(condition));
+                    @this.lsbxConditions.SetItemChecked(@this.allowConditionsItemCheckedChangeInd, condition.Locked);
                 }
             }
 
@@ -154,8 +154,7 @@ namespace EntityCore.Forms
         #region Interface event
         private void handler_Add(object sender, EventArgs e)
         {
-            //if (AddAction.Show(typeof(UCCCondition)) is UCCCondition condition)
-            if (ItemSelectForm.GetAnInstanceOfType(out UCCCondition condition, false))
+            if (ItemSelectForm.GetAnInstance(out UCCCondition condition, false))
             {
                 lsbxConditions.Items.Add(condition);
                 lsbxConditions.SelectedItem = condition;
@@ -187,8 +186,8 @@ namespace EntityCore.Forms
             if (_conditionCopy != null)
             {
                 UCCCondition cond = CopyHelper.CreateDeepCopy(_conditionCopy);
-                allowConditionsItemChechedChangeInd = lsbxConditions.Items.Add(cond, cond.Locked);
-                lsbxConditions.SetItemChecked(allowConditionsItemChechedChangeInd, cond.Locked);
+                allowConditionsItemCheckedChangeInd = lsbxConditions.Items.Add(cond, cond.Locked);
+                lsbxConditions.SetItemChecked(allowConditionsItemCheckedChangeInd, cond.Locked);
                 lsbxConditions.SelectedItem = cond;
 
                 lsbxConditions.Refresh();
@@ -268,20 +267,20 @@ namespace EntityCore.Forms
         {
             // изменение состояния Checked у элемента разрешено, 
             // если его индекс совпадает с AllowConditionsItemChechedChangeInd
-            if (e.Index != allowConditionsItemChechedChangeInd
-                || allowConditionsItemChechedChangeInd < 0)
+            if (e.Index != allowConditionsItemCheckedChangeInd
+                || allowConditionsItemCheckedChangeInd < 0)
             {
                 // запрет изменения состояния Чекбокса
                 e.NewValue = e.CurrentValue;
             }
-            allowConditionsItemChechedChangeInd = -1;
+            allowConditionsItemCheckedChangeInd = -1;
         }
 
         private void handler_ConditionPropertyValueChanged(object s, PropertyValueChangedEventArgs e)
         {
             if (e.ChangedItem.Label == "Locked")
             {
-                allowConditionsItemChechedChangeInd = lsbxConditions.SelectedIndex;
+                allowConditionsItemCheckedChangeInd = lsbxConditions.SelectedIndex;
                 lsbxConditions.SetItemChecked(lsbxConditions.SelectedIndex, e.ChangedItem.Value.Equals(true));
             }
             lsbxConditions.Refresh();
