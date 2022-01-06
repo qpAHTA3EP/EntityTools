@@ -9,7 +9,7 @@ using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
 
-namespace EntityTools.Tools.BuySellItems
+namespace EntityTools.Tools.Inventory
 {
     /// <summary>
     /// Элемент фильтра предметов

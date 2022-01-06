@@ -7,7 +7,7 @@ using AcTp0Tools.Reflection;
 using MyNW.Classes;
 using MyNW.Patchables.Enums;
 
-namespace EntityTools.Tools.BuySellItems
+namespace EntityTools.Tools.Inventory
 {
     /// <summary>
     /// Индексированная сумка

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Astral.Classes.ItemFilter;
 using AcTp0Tools.Reflection;
-using EntityTools.Tools.BuySellItems;
+using EntityTools.Tools.Inventory;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
@@ -365,7 +365,7 @@ namespace EntityTools.Extensions
         {
             if (storeItem.Item.ItemDef.ProgressionDef.IsValid)
             {
-                // Предмет может быть "обработан" (апгрейжен), поэтому сравнивать по уровню предмета нет смысла
+                // Предмет может быть "обработан" (улучшен, upgraded), поэтому сравнивать по уровню предмета нет смысла
                 if (slotCache.Slots.Count > 0)
                 {
                     foreach (var slot in slotCache.Slots)
@@ -375,7 +375,7 @@ namespace EntityTools.Extensions
             }
             else
             {
-                // Предмет не может быть "обработан" (апгрейжен)
+                // Предмет не может быть "обработан" (улучшен, upgraded)
                 // сравниваем по уровню предмета
                 return slotCache.MaxItemLevel <= storeItem.Item.ItemDef.Level;
             }

@@ -8,7 +8,7 @@ using EntityTools.Tools.Navigation;
 using MyNW.Classes;
 using MyNW.Internals;
 
-namespace EntityTools.Tools.BuySellItems
+namespace EntityTools.Tools.Inventory
 {
     /// <summary>
     /// Класс, идентифицирующий продавца

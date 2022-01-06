@@ -12,7 +12,7 @@ using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
 
-namespace EntityTools.Tools.BuySellItems
+namespace EntityTools.Tools.Inventory
 {
     /// <summary>
     /// Список сумок
@@ -42,6 +42,7 @@ namespace EntityTools.Tools.BuySellItems
                     [(int) InvBagIDs.PlayerBag7] = true,
                     [(int) InvBagIDs.PlayerBag8] = true,
                     [(int) InvBagIDs.PlayerBag9] = true,
+                    [(int) InvBagIDs.PlayerBags] = true,
                     [(int) InvBagIDs.Overflow] = true
                 }
             };
@@ -67,6 +68,7 @@ namespace EntityTools.Tools.BuySellItems
                     [(int) InvBagIDs.PlayerBag7] = true,
                     [(int) InvBagIDs.PlayerBag8] = true,
                     [(int) InvBagIDs.PlayerBag9] = true,
+                    [(int) InvBagIDs.PlayerBags] = true,
                     [(int) InvBagIDs.Overflow] = true,
                     [(int) InvBagIDs.Potions] = true
                 }
@@ -106,6 +108,7 @@ namespace EntityTools.Tools.BuySellItems
                     [(int) InvBagIDs.PlayerBag7] = true,
                     [(int) InvBagIDs.PlayerBag8] = true,
                     [(int) InvBagIDs.PlayerBag9] = true,
+                    [(int) InvBagIDs.PlayerBags] = true,
                     [(int) InvBagIDs.Overflow] = true,
                     [(int) InvBagIDs.Potions] = true
                 }
@@ -184,11 +187,24 @@ namespace EntityTools.Tools.BuySellItems
 
         public BagsList()
         {
-            _bags = new BitArray(Enum.GetValues(typeof(InvBagIDs)).Length, false);// { InvBagIDs.Inventory, InvBagIDs.PlayerBag1, InvBagIDs.PlayerBag2, InvBagIDs.PlayerBag3, InvBagIDs.PlayerBag4, InvBagIDs.PlayerBag5, InvBagIDs.PlayerBag6, InvBagIDs.PlayerBag7, InvBagIDs.PlayerBag8, };
+            _bags = new BitArray(Enum.GetValues(typeof(InvBagIDs)).Length, false);
+            _bags[(int) InvBagIDs.Inventory] = true;
+            _bags[(int) InvBagIDs.PlayerBag1] = true;
+            _bags[(int) InvBagIDs.PlayerBag2] = true;
+            _bags[(int) InvBagIDs.PlayerBag3] = true;
+            _bags[(int) InvBagIDs.PlayerBag4] = true;
+            _bags[(int) InvBagIDs.PlayerBag5] = true;
+            _bags[(int) InvBagIDs.PlayerBag6] = true;
+            _bags[(int) InvBagIDs.PlayerBag7] = true;
+            _bags[(int) InvBagIDs.PlayerBag8] = true;
+            _bags[(int) InvBagIDs.PlayerBag9] = true;
+            _bags[(int) InvBagIDs.PlayerBags] = true;
+            _bags[(int) InvBagIDs.Overflow] = true;
         }
         public BagsList(InvBagIDs[] bagsList)
         {
-            if (bagsList != null)
+            _bags = new BitArray(Enum.GetValues(typeof(InvBagIDs)).Length, false);
+            if (bagsList != null && bagsList.Length > 0)
                 foreach (var id in bagsList)
                 {
                     _bags[(int)id] = true;
@@ -214,12 +230,10 @@ namespace EntityTools.Tools.BuySellItems
         /// </summary>
         /// <param name="bagId"></param>
         /// <returns></returns>
+        [NotifyParentProperty(true)]
         public bool this[InvBagIDs bagId]
         {
-            get
-            {
-                return _bags[(int)bagId];
-            }
+            get => _bags[(int)bagId];
             set
             {
                 var bagInclusion = _bags[(int) bagId];
@@ -279,6 +293,7 @@ namespace EntityTools.Tools.BuySellItems
         /// <summary>
         /// Количество выбранных сумок
         /// </summary>
+        [NotifyParentProperty(true)]
         public uint Count => _count;
         uint _count;
 
@@ -289,7 +304,7 @@ namespace EntityTools.Tools.BuySellItems
         {
             _bags.SetAll(false);
             _count = 0;
-            NotifyPropertyChange(nameof(Count));
+            NotifyPropertyChange();
         }
 
         //создание копии списка

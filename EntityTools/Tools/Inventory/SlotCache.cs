@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using MyNW.Classes;
 
-namespace EntityTools.Tools.BuySellItems
+namespace EntityTools.Tools.Inventory
 {
     /// <summary>
     /// Список слотов сумки, содержащие предметы, удовлетворяющих категории/фильтру

@@ -1,4 +1,4 @@
-﻿namespace EntityTools.Tools.BuySellItems
+﻿namespace EntityTools.Tools.Inventory
 {
     /// <summary>
     /// Статистические данные по предметам
