@@ -3,6 +3,7 @@
 #endif
 
 #define UnstuckSpell_Tasks
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ using API = Astral.Logic.UCC.API;
 
 namespace EntityTools.Services
 {
+    //TODO переделать через патч Astral.Logic.UCC.Core.CombatUnit
     public static class UnstuckSpells// : Astral.Logic.Classes.FSM.State
     {
         /// <summary>
@@ -326,27 +328,39 @@ namespace EntityTools.Services
             {
                 case CharClassCategory.DevotedCleric:
                     {
-                        // После изменения механии TabSpell у "Благочестивца" залипание умения возможно только у "Арбитра"
-                        if (EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Cleric_Arbiter)
+
+                        // После изменения механии TabSpell у "Благочестивца" залипание умения возможно только до выбора парагона
+                        if (player.Character.LevelExp >= 10)
+                        {
+                            string paragon = EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths
+                                .FirstOrDefault()?.Path.PowerTree.Name;
+
+                            if (!string.Equals(paragon, Cleric_Devout, StringComparison.Ordinal))
+                            {
+                                // Отключение скила 'Channeldivinity'
+                                GameCommands.Execute("specialClassPower 0");
+                                ETLogger.WriteLine($"{tastIdStr}: '{player.Character.Class.Category}' deactivate SpecialClassPower[{Cleric_Channeldivinity}]");
+
+                                // Ауры 'Devoted_Mechanic_Dps_Scales_Radiant' или 'Devoted_Mechanic_Dps_Scales_Fire'
+                                try
+                                {
+                                    GameCommands.Execute("specialClassPower 1");
+                                    Thread.Sleep(100);
+                                }
+                                catch { }
+                                finally
+                                {
+                                    GameCommands.Execute("specialClassPower 0");
+                                    ETLogger.WriteLine($"{tastIdStr}: '{player.Character.Class.Category}' convert '{Cleric_Arbiter_Mechanic}' to [Devinity]");
+                                }
+                            } 
+                        }
+                        else
                         {
                             // Отключение скила 'Channeldivinity'
                             GameCommands.Execute("specialClassPower 0");
                             ETLogger.WriteLine($"{tastIdStr}: '{player.Character.Class.Category}' deactivate SpecialClassPower[{Cleric_Channeldivinity}]");
-
-                            // Ауры 'Devoted_Mechanic_Dps_Scales_Radiant' или 'Devoted_Mechanic_Dps_Scales_Fire'
-                            try
-                            {
-                                GameCommands.Execute("specialClassPower 1");
-                                Thread.Sleep(100);
-                            }
-                            catch { }
-                            finally
-                            {
-                                GameCommands.Execute("specialClassPower 0");
-                                ETLogger.WriteLine($"{tastIdStr}: '{player.Character.Class.Category}' convert '{Cleric_Arbiter_Mechanic}' to [Devinity]");
-                            }
                         }
-
                         break;
                     }
                 case CharClassCategory.OathboundPaladin:
@@ -355,7 +369,9 @@ namespace EntityTools.Services
                         GameCommands.Execute("tacticalSpecial 0");
                         ETLogger.WriteLine($"{tastIdStr}: Deactivate TacticalSpecial[{Paladin_Shift}]");
 
-                        if (EntityManager.LocalPlayer.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.PowerTree.Name == Paladin_Oathkeeper)
+                        string paragon = player.Character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path
+                            .PowerTree.Name;
+                        if (string.Equals(paragon, Paladin_Oathkeeper, StringComparison.Ordinal))
                         {
                             // Paladin_Oathkeeper
                             // Отключаем "Paladin_Special_Divinecall"
@@ -369,7 +385,7 @@ namespace EntityTools.Services
 
                             foreach (AttribModNet mod in player.Character.Mods)
                             {
-                                if (mod.PowerDef.InternalName.StartsWith(Paladin_Justicar_Mechanic))
+                                if (mod.PowerDef.InternalName.StartsWith(Paladin_Justicar_Mechanic, StringComparison.Ordinal))
                                 {
                                     try
                                     {

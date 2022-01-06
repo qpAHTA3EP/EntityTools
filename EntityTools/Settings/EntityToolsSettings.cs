@@ -8,9 +8,10 @@ namespace EntityTools
     public class EntityToolsSettings
     {
         /// <summary>
-        /// Настройки UnstuckSpellTask
+        /// Настройки SpellStuckMonitor
         /// </summary>
-        [Description("Настройки фонового отключения умений (UnstuckSpell)")]
+        [Description("Настройки фонового отключения умений (SpellStuckMonitor)")]
+        [DisplayName("SpellStuckMonitor")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public UnstuckSpellsSettings UnstuckSpells { get; set; } = new UnstuckSpellsSettings();
 
