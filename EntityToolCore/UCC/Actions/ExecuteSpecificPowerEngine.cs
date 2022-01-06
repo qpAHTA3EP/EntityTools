@@ -19,7 +19,9 @@ using System;
 using System.ComponentModel;
 using System.Threading;
 using System.Xml.Serialization;
+using Astral.Classes;
 using EntityTools.UCC.Conditions;
+using Timeout = Astral.Classes.Timeout;
 using Unit = Astral.Logic.UCC.Ressources.Enums.Unit;
 
 namespace EntityCore.UCC.Actions
@@ -86,7 +88,7 @@ namespace EntityCore.UCC.Actions
                             label = string.Empty;
                             break;
                     } 
-#else
+#elif EntityTarget
                     string prName = e.PropertyName;
                     if (prName == nameof(@this.EntityID) || prName == nameof(@this.EntityIdType) || prName == nameof(@this.EntityNameType))
                         _key = null;
@@ -136,7 +138,9 @@ namespace EntityCore.UCC.Actions
             @this = execPower;
             @this.PropertyChanged += PropertyChanged;
 
-            _key = null;
+#if EntityTarget
+            _key = null; 
+#endif
 
             _idStr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
 
@@ -168,7 +172,7 @@ namespace EntityCore.UCC.Actions
 #if DEBUG_ExecuteSpecificPower
             ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower::Run() starts");
 #endif
-            Power currentPower = GetCurrentPower();
+            var currentPower = GetCurrentPower();
 
             if (currentPower is null)
             {
@@ -177,8 +181,9 @@ namespace EntityCore.UCC.Actions
 #endif
                 return false;
             }
-            Power entActivatedPower = currentPower.EntGetActivatedPower();
-            PowerDef powerDef = entActivatedPower.EntGetActivatedPower().EffectivePowerDef();
+            var entActivatedPower = currentPower.EntGetActivatedPower();
+            var powerDef = entActivatedPower.EntGetActivatedPower().EffectivePowerDef();
+            // Устанавливаем цель команды
             if (@this.Target != Unit.Player)
             {
                 switch (@this.Target)
@@ -193,9 +198,11 @@ namespace EntityCore.UCC.Actions
                         AstralAccessors.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.StrongestTeamMember;
                         break;
                     default:
-                        AstralAccessors.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.StrongestTeamMember;
+                        AstralAccessors.Logic.UCC.Controllers.Movements.SpecificTarget = null;//ActionsPlayer.StrongestTeamMember;
                         break;
                 }
+
+                // Вычисляем эффективный радиус действия команды
                 int effectiveRange = Powers.getEffectiveRange(powerDef);
 
                 if (@this.Range > 0)
@@ -210,10 +217,16 @@ namespace EntityCore.UCC.Actions
 
                     AstralAccessors.Logic.UCC.Controllers.Movements.RequireRange = effectiveRange - 2;
 
+                    // Пытаемся приблизиться к цели
+                    // Запуск Astral.Logic.UCC.Controllers.Movements.Start()
+                    // выполняется перед вызовом метода Run() текущей команды в 
+                    // Astral.Logic.UCC.Classes.ActionsPlayer.playActionList()
+                    var movingTimeout = new Timeout(1050);
                     while (!AstralAccessors.Logic.UCC.Controllers.Movements.RangeIsOk)
                     {
-                        if (Astral.Logic.UCC.Core.CurrentTarget.IsDead)
+                        if (Astral.Logic.UCC.Core.CurrentTarget.IsDead || movingTimeout.IsTimedOut)
                         {
+                            // Завершаем команду, если цель мертва, или попытка приблизиться к ней неудачна
                             return true;
                         }
                         Thread.Sleep(100);
@@ -233,7 +246,7 @@ namespace EntityCore.UCC.Actions
             if (target.ContainerId != EntityManager.LocalPlayer.ContainerId && !target.Location.IsInYawFace)
             {
                 target.Location.Face();
-                Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(750);
+                var timeout = new Timeout(750);
                 while (!target.Location.IsInYawFace && !timeout.IsTimedOut)
                 {
                     Thread.Sleep(20);
@@ -241,7 +254,7 @@ namespace EntityCore.UCC.Actions
                 Thread.Sleep(100);
             }
             double effectiveTimeActivate = Powers.getEffectiveTimeActivate(powerDef) * 1.5;
-            Astral.Classes.Timeout castingTimeout = new Astral.Classes.Timeout(castingTime);
+            var castingTimeout = new Timeout(castingTime);
 
             try
             {
@@ -312,6 +325,7 @@ namespace EntityCore.UCC.Actions
         {
             get
             {
+#if false
                 if (!string.IsNullOrEmpty(@this._entityId))
                 {
                     var entityKey = EntityKey;
@@ -324,7 +338,8 @@ namespace EntityCore.UCC.Actions
                         if (entity != null)
                             return entity;
                     }
-                }
+                } 
+#endif
                 switch (@this.Target)
                 {
                     case Unit.Player:
@@ -343,16 +358,18 @@ namespace EntityCore.UCC.Actions
 
         public string Label()
         {
-            if (!string.IsNullOrEmpty(@this._powerId) && string.IsNullOrEmpty(label))
+            if (string.IsNullOrEmpty(@this._powerId))
+                label = $"{nameof(@this.PowerId)} not defined";
+            else if (string.IsNullOrEmpty(label))
             {
-                Power currentPower = GetCurrentPower();
+                var currentPower = GetCurrentPower();
 
                 if (currentPower != null)
                 {
-                    PowerDef powDef = currentPower.PowerDef;
+                    var powDef = currentPower.PowerDef;
                     if (powDef != null && powDef.IsValid)
                         label = string.Concat(@this._checkInTray && CurrentPowerIsSlotted ? "[Slotted] " : string.Empty,
-                            string.IsNullOrEmpty(powDef.DisplayName) ? powDef.InternalName : powDef.DisplayName);
+                            string.IsNullOrEmpty(powDef.DisplayName) ? powDef.InternalName : $"{powDef.DisplayName} [{powDef.InternalName}]");
                 }
                 else
                 {
@@ -377,8 +394,11 @@ namespace EntityCore.UCC.Actions
 
         private Power GetCurrentPower()
         {
-            if (!(attachedGameProcessId == Astral.API.AttachedGameProcess.Id
-                  && characterContainerId == EntityManager.LocalPlayer.ContainerId
+            var player = EntityManager.LocalPlayer;
+            var processId = Astral.API.AttachedGameProcess.Id;
+
+            if (!(attachedGameProcessId == processId
+                  && characterContainerId == player.ContainerId
                   && power != null
                   && (power.PowerId == powerId
                       || string.Equals(power.PowerDef.InternalName, @this._powerId, StringComparison.Ordinal)
@@ -388,8 +408,8 @@ namespace EntityCore.UCC.Actions
                 if (power != null)
                 {
                     powerId = power.PowerId;
-                    attachedGameProcessId = Astral.API.AttachedGameProcess.Id;
-                    characterContainerId = EntityManager.LocalPlayer.ContainerId;
+                    attachedGameProcessId = processId;
+                    characterContainerId = player.ContainerId;
                 }
                 else
                 {
@@ -403,6 +423,7 @@ namespace EntityCore.UCC.Actions
         #endregion
 
 
+#if EntityTarget
         /// <summary>
         /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
         /// </summary>
@@ -410,6 +431,7 @@ namespace EntityCore.UCC.Actions
             _key ?? (_key = new EntityCacheRecordKey(@this._entityId, @this._entityIdType,
                 @this._entityNameType, EntitySetType.Complete));
 
-        private EntityCacheRecordKey _key;
+        private EntityCacheRecordKey _key; 
+#endif
     }
 }

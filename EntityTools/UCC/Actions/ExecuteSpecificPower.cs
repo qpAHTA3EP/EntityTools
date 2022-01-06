@@ -3,31 +3,31 @@
 #endif
 #define REFLECTION_ACCESS
 
+using Astral.Logic.UCC.Classes;
+using EntityTools.Core.Interfaces;
+using EntityTools.Core.Proxies;
+using EntityTools.Editors;
+using EntityTools.UCC.Conditions;
+using MyNW.Classes;
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Xml.Serialization;
-using Astral.Classes.ItemFilter;
-using Astral.Logic.UCC.Classes;
-using Astral.Quester.UIEditors;
-using EntityTools.Core.Interfaces;
-using EntityTools.Core.Proxies;
-using EntityTools.Editors;
-using EntityTools.Enums;
-using EntityTools.Tools;
-using EntityTools.UCC.Conditions;
-using MyNW.Classes;
 
 namespace EntityTools.UCC.Actions
 {
     [Serializable]
-    public class ExecuteSpecificPower : UCCAction, IEntityIdentifier
+    public class ExecuteSpecificPower : UCCAction
+#if EntityTarget
+        , IEntityIdentifier 
+#endif
     {
         #region Опции команды
 #if DEVELOPER
-        [Editor(typeof(PowerAllIdEditor), typeof(UITypeEditor))]
+        //[Editor(typeof(PowerAllIdEditor), typeof(UITypeEditor))]
+        [Editor(typeof(PowerIdEditor), typeof(UITypeEditor))]
         [Category("Required")]
 #else
         [Browsable(false)]
@@ -123,6 +123,7 @@ namespace EntityTools.UCC.Actions
         }
         internal bool _forceMaintain;
 
+#if EntityTarget
 #if DEVELOPER
         [Description("ID of the Entity that is preferred to attack\n" +
             "If Entity does not exist or EntityID is empty then the Target option is used")]
@@ -250,7 +251,9 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal AuraOption _aura = new AuraOption();
+        internal AuraOption _aura = new AuraOption(); 
+
+        
 
 #if DEVELOPER
         [Description("The maximum distance from the character within which the Entity is searched\n" +
@@ -300,6 +303,7 @@ namespace EntityTools.UCC.Actions
         [Description("Press '...', to test 'TargetEntity' options.")]
         [Category("TargetEntity")]
         public string TestEntity => "Нажми '...' =>";
+#endif
 #endif
 
 #if DEVELOPER
@@ -372,6 +376,7 @@ namespace EntityTools.UCC.Actions
                 _checkInTray = _checkInTray,
                 _castingTime = _castingTime,
                 _forceMaintain = _forceMaintain,
+#if EntityTarget
                 _entityId = _entityId,
                 _entityIdType = _entityIdType,
                 _entityNameType = _entityNameType,
@@ -383,7 +388,8 @@ namespace EntityTools.UCC.Actions
                     AuraNameType = _aura.AuraNameType,
                     Sign = _aura.Sign,
                     Stacks = _aura.Stacks
-                }
+                } 
+#endif
             });
         }
     }
