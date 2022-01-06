@@ -124,15 +124,6 @@ namespace EntityTools.UCC.Actions
             }
         }
         internal UCCConditionPack _customConditions = new UCCConditionPack();
-
-//#if DEVELOPER
-//        [Category("Optional")]
-//        [Editor(typeof(UccConditionListEditor), typeof(UITypeEditor))]
-//        [Description("Список игнорируемых умений")]
-//        [TypeConverter(typeof(ExpandableObjectConverter))]
-//#else
-//        [Browsable(false)]
-//#endif
         
 
         #region Hide Inherited Properties

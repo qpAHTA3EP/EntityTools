@@ -1,7 +1,7 @@
 ﻿using Astral.Quester.Forms;
 using DevExpress.XtraEditors;
 using EntityTools.Enums;
-using EntityTools.Tools.BuySellItems;
+using EntityTools.Tools.Inventory;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;

@@ -1,23 +1,16 @@
 ﻿using Astral.Classes;
 using Astral.Logic.UCC.Actions;
+using Astral.Logic.UCC.Classes;
 using EntityCore.Entities;
-using EntityTools.Core.Interfaces;
-using EntityTools.Enums;
 using EntityTools;
+using EntityTools.Core.Interfaces;
 using EntityTools.UCC.Actions;
 using MyNW.Classes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Astral.Logic.UCC.Classes;
 
 namespace EntityCore.UCC.Actions
 {
     class DodgeFromEntityEngine : IUccActionEngine
-#if IEntityDescriptor
-        , IEntityInfos  
-#endif
     {
         #region Данные
         private DodgeFromEntity @this;
@@ -284,6 +277,9 @@ namespace EntityCore.UCC.Actions
         #endregion
 
         #region Вспомогательные инструменты
+        // TODO: Добавить постфиксный патч Astral.Controllers.AOECheck.Check()
+        // который будет добавлять в список AOE Entity, от которых нужно уклоняться
+
         /// <summary>
         /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
         /// </summary>

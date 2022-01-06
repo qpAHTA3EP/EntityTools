@@ -1,16 +1,11 @@
-﻿using System;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Windows.Forms;
-using Astral.Logic.NW;
-using Astral.Quester.Classes;
-using Astral.Quester.Forms;
-using DevExpress.XtraEditors;
+﻿using Astral.Quester.Forms;
 using EntityTools.Enums;
-using EntityTools.Tools.BuySellItems;
 using EntityTools.Tools.Missions;
 using MyNW.Classes;
 using MyNW.Internals;
+using System;
+using System.ComponentModel;
+using System.Drawing.Design;
 //using static EntityTools.Reflection.PrivateConsructor;
 
 namespace EntityTools.Editors

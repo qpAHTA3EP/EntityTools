@@ -219,11 +219,11 @@ namespace EntityTools.Enums
         /// <summary>
         /// Бард (хил)
         /// </summary>
-        Bard_Healer = 0b01_00_00_00_00_00_00_00_00,
+        Bard_Minstrel = 0b01_00_00_00_00_00_00_00_00,
 
         /// <summary>
         /// Бард (ДД)
         /// </summary>
-        Bard_DD = 0b10_00_00_00_00_00_00_00_00
+        Bard_Swashbuckler = 0b10_00_00_00_00_00_00_00_00
     }
 }

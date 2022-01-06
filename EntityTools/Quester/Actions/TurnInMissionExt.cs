@@ -17,6 +17,7 @@ using Action = Astral.Quester.Classes.Action;
 using System.Xml.Serialization;
 using System.Collections.Generic;
 using System.Threading;
+using EntityTools.Annotations;
 
 [assembly: InternalsVisibleTo("EntityCore")]
 
@@ -42,7 +43,7 @@ namespace EntityTools.Quester.Actions
                 if (_missionId != value)
                 {
                     _missionId = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MissionId)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -63,7 +64,7 @@ namespace EntityTools.Quester.Actions
                 if (_giver != value)
                 {
                     _giver = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Giver)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -79,7 +80,7 @@ namespace EntityTools.Quester.Actions
             {
                 if (_closeContactDialog == value) return;
                 _closeContactDialog = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CloseContactDialog)));
+                NotifyPropertyChanged();
             }
         }
         internal bool _closeContactDialog;
@@ -94,7 +95,7 @@ namespace EntityTools.Quester.Actions
             {
                 if (_ignoreCombat == value) return;
                 _ignoreCombat = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IgnoreCombat)));
+                NotifyPropertyChanged();
             }
         }
         internal bool _ignoreCombat = false;
@@ -112,7 +113,7 @@ namespace EntityTools.Quester.Actions
                 value = Math.Max(value, 5);
                 if (_interactDistance == value) return;
                 _interactDistance = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractDistance)));
+                NotifyPropertyChanged();
             }
         }
         internal float _interactDistance = 10;
@@ -130,7 +131,7 @@ namespace EntityTools.Quester.Actions
                 value = Math.Max(value, 1);
                 if (_interactZDifference == value) return;
                 _interactZDifference = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InteractZDifference)));
+                NotifyPropertyChanged();
             }
         }
         internal float _interactZDifference = 10;
@@ -150,7 +151,7 @@ namespace EntityTools.Quester.Actions
             {
                 if (_requiredRewardItem == value) return;
                 _requiredRewardItem = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RequiredRewardItem)));
+                NotifyPropertyChanged();
             }
         }
         internal string _requiredRewardItem = string.Empty;
@@ -229,6 +230,13 @@ namespace EntityTools.Quester.Actions
 
         #region Взаимодействие с EntityToolsCore
         public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            Engine.OnPropertyChanged(this, propertyName);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         [NonSerialized]
         private IQuesterActionEngine Engine;

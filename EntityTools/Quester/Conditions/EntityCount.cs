@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Threading;
-using System.Xml.Serialization;
-using Astral.Classes.ItemFilter;
+﻿using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Tools.CustomRegions;
+using System;
+using System.ComponentModel;
+using System.Drawing.Design;
+using System.Threading;
+using System.Xml.Serialization;
 
 namespace EntityTools.Quester.Conditions
 {
@@ -37,7 +36,7 @@ namespace EntityTools.Quester.Conditions
                 if (_entityId != value)
                 {
                     _entityId = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityID))); 
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityID)));
                 }
             }
         }

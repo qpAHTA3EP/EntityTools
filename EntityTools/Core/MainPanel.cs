@@ -1,23 +1,23 @@
-﻿//#define Test_EntitySelectForm
-//#define DUMP_TEST
-
-using AcTp0Tools;
+﻿using AcTp0Tools.Reflection;
 using Astral;
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;
 using Astral.Forms;
 using Astral.Logic.Classes.FSM;
+using Astral.Logic.NW;
 using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Controls;
 using EntityTools.Enums;
 using EntityTools.Forms;
-using EntityTools.Patches.UCC;
 using EntityTools.Services;
 using EntityTools.Tools;
+using EntityTools.Tools.Export;
+using EntityTools.Tools.Targeting;
 using HarmonyLib;
 using Microsoft.Win32;
 using MyNW.Classes;
 using MyNW.Internals;
+using MyNW.Patchables.Enums;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -27,11 +27,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using AcTp0Tools.Reflection;
-using Astral.Logic.NW;
-using EntityTools.Tools.Targeting;
-using MyNW.Classes.ItemProgression;
-using MyNW.Patchables.Enums;
+using AcTp0Tools;
 using API = Astral.Quester.API;
 using Task = System.Threading.Tasks.Task;
 
@@ -195,8 +191,6 @@ namespace EntityTools.Core
             }
 
             XtraMessageBox.Show(sb.ToString());
-
-            
         }
 
         private void handler_Test_2(object sender, EventArgs e)
@@ -303,7 +297,7 @@ namespace EntityTools.Core
             }
 
             XtraMessageBox.Show(sb.ToString());
-#else
+#elif false
             var aoeType = typeof(AOECheck.AOE);
             var aoeList = Traverse.Create(typeof(AOECheck)).Property("List");
             Type aoeListType = aoeList.GetValue()?.GetType();
@@ -317,6 +311,18 @@ namespace EntityTools.Core
                                 $"{aoeListType1}\n" +
                                 $"{listType}\n" +
                                 $"{isEqualType}");
+#else
+            var changeWPDistance = API.Engine.Navigation.GetProperty<double>("ChangeWPDist");
+
+            if (!changeWPDistance.IsValid)
+            {
+                XtraMessageBox.Show($"Не удалось получить доступ к полю 'Navigation.ChangeWPDist'");
+                return;
+            }
+
+            var currentChangeWPDistance = changeWPDistance.Value;
+
+            XtraMessageBox.Show($"Текущее значение 'Navigation.ChangeWPDist' равно {currentChangeWPDistance}");
 #endif
         }
 

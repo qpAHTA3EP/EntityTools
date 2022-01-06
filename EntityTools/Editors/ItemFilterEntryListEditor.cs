@@ -1,14 +1,14 @@
+using EntityTools.Forms;
+using EntityTools.Tools.Inventory;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
-using EntityTools.Forms;
-using EntityTools.Tools.BuySellItems;
 
 namespace EntityTools.Editors
 {
-	// Token: 0x02000092 RID: 146
-	public class ItemFilterEntryListEditor : UITypeEditor
+    // Token: 0x02000092 RID: 146
+    public class ItemFilterEntryListEditor : UITypeEditor
 	{
 		// Token: 0x060005C8 RID: 1480 RVA: 0x000274FC File Offset: 0x000256FC
 		public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)

@@ -142,6 +142,23 @@ namespace EntityCore.Tools
         public static readonly string idRogue_Assassin = "Player_Secondary_MasterInfiltrator";
 
         /// <summary>
+        ///  Внутриигровой идентификатор класса Бард
+        /// </summary>
+        public static readonly string idBard = "Player_Bard";
+
+        /// <summary>
+        ///  Внутриигровой идентификатор класса Бард (Поющий клинок)
+        /// </summary>
+        public static readonly string idBard_Swashbuckler = "Player_Secondary_Swashbuckler";
+
+        /// <summary>
+        ///  Внутриигровой идентификатор класса Бард (Менестрель)
+        /// </summary>
+        public static readonly string idBard_Minstrel = "Player_Secondary_Minstrel";
+
+
+
+        /// <summary>
         /// Отображение текстового идентификатора парагона класса <param name="id"/> в соответствующий <seealso cref="PlayerParagonType"/>
         /// </summary>
         public static PlayerParagonType GetParagonType(string id)
@@ -261,6 +278,10 @@ namespace EntityCore.Tools
             id2type.Add(idRogue_WhisperKnife, PlayerParagonType.Rogue_WhisperKnife);
             id2type.Add(idRogue_Assassin, PlayerParagonType.Rogue_Assassin);
 
+            id2type.Add(idBard, PlayerParagonType.Bard);
+            id2type.Add(idBard_Swashbuckler, PlayerParagonType.Bard_Swashbuckler);
+            id2type.Add(idBard_Minstrel, PlayerParagonType.Bard_Minstrel);
+
 
 
             type2id.Add(PlayerParagonType.Wizard, idWizard);
@@ -294,6 +315,10 @@ namespace EntityCore.Tools
             type2id.Add(PlayerParagonType.Rogue, idRogue);
             type2id.Add(PlayerParagonType.Rogue_WhisperKnife, idRogue_WhisperKnife);
             type2id.Add(PlayerParagonType.Rogue_Assassin, idRogue_Assassin);
+
+            type2id.Add(PlayerParagonType.Bard, idBard);
+            type2id.Add(PlayerParagonType.Bard_Swashbuckler, idBard_Swashbuckler);
+            type2id.Add(PlayerParagonType.Bard_Minstrel, idBard_Minstrel);
         }
 
         #endregion
@@ -2151,7 +2176,7 @@ namespace EntityCore.Tools
         Healer = PlayerParagonType.Cleric_Devout |
                  PlayerParagonType.Warlock_SoulWeaver |
                  PlayerParagonType.Paladin_OathKeeper |
-                 PlayerParagonType.Bard_Healer,
+                 PlayerParagonType.Bard_Minstrel,
 
         /// <summary>
         /// Дамагер
@@ -2169,6 +2194,6 @@ namespace EntityCore.Tools
              PlayerParagonType.Rogue_Assassin |
              PlayerParagonType.Rogue_WhisperKnife |
              PlayerParagonType.Rogue |
-             PlayerParagonType.Bard_DD
+             PlayerParagonType.Bard_Swashbuckler
     }
 }

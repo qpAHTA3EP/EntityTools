@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
-using EntityTools.Tools.BuySellItems;
+using EntityTools.Tools.Inventory;
 using MyNW.Patchables.Enums;
 
 namespace EntityTools.Editors

@@ -3,6 +3,7 @@ using EntityTools.Patches.Mapper;
 using EntityTools.Patches.Quester;
 using EntityTools.Patches.UCC;
 using System.Reflection;
+using EntityTools.Servises.SlideMonitor;
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
@@ -42,14 +43,22 @@ namespace EntityTools.Patches
                     }
 
                 }
+
+
+                SlideMonitor.Apply();
+
+
                 // Изменение алгоритмов навигации
                 ComplexPatch_Navigation.Apply();
                 // Подмена штатного окна Mapper'a
                 ComplexPatch_Mapper.Apply();
                 // Изменение команды квестера AddUCCAction и сопутствующие патчи
                 ComplexPatch_Quester_UccEditing.Apply();
-                //// Перехват исключений в MyNW.Internals.WorldDrawing.\u0001()
-                MyNW_Internals_WorldDrawing.ApplyPatches();
+                // Перехват исключений в MyNW.Internals.WorldDrawing.\u0001()
+                // Не работает, т.к. метод '\u0001()' запускается в статическом конструкторе класса WorldDrawing
+                // то есть до применения патча
+                //MyNW_Internals_WorldDrawing.ApplyPatches();
+                //TODO Добавить патч AuraDetector
 
                 try
                 {

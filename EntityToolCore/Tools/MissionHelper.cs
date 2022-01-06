@@ -1,4 +1,12 @@
-﻿using Astral.Logic.NW;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Windows.Forms;
+using Astral.Logic.NW;
 using EntityCore.Enums;
 using EntityCore.Forms;
 using EntityCore.Tools.Navigation;
@@ -7,16 +15,8 @@ using EntityTools.Enums;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Windows.Forms;
 
-namespace EntityCore.Tools.Missions
+namespace EntityCore.Tools
 {
     public static class MissionHelper
     {
@@ -213,71 +213,6 @@ namespace EntityCore.Tools.Missions
         /// Оценка расстояния до квестодателя <paramref name="giverEntity"/> и перемещение к нему, в случае необходимости
         /// </summary>
         public static bool ApproachMissionGiver(this Entity giverEntity, float interactDistance = 5.5f, float maxZDifference = 5)
-#if false
-        {
-            bool debugInfoEnabled = EntityTools.EntityTools.Config.Logger.DebugMissionTools;
-
-            string currentMethodName = debugInfoEnabled
-                    ? MethodBase.GetCurrentMethod().Name
-                    : string.Empty;
-
-            // Проверяем расстояние до квестодателя и перемещаемся к нему 
-            var giverLocation = giverEntity.Location;
-            var playerLocation = EntityManager.LocalPlayer.Location;
-            double distance = giverLocation.Distance3D(playerLocation);
-            bool withingInteractDistance = distance <= interactDistance;
-            bool isInteractZDifferenceConstraint = maxZDifference <= 0;
-            float zDifference = isInteractZDifferenceConstraint ? 0 : Math.Abs(giverLocation.Z - playerLocation.Z);
-            bool withingInteractZDifference = isInteractZDifferenceConstraint || zDifference <= maxZDifference;
-            if (debugInfoEnabled)
-                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Begins (",
-                    "CalculatedInteractDistance = ", interactDistance.ToString("N1"),
-                    "; Distance = ", distance.ToString("N1"), withingInteractDistance ? "(withing)" : "(out)",
-                    "; zDifference = ", zDifference.ToString("N1"), isInteractZDifferenceConstraint ? (withingInteractZDifference ? " (withing))" : " (out))") : " (unlimited))"));
-
-            if (!(withingInteractDistance && withingInteractZDifference))
-            {
-                // Случается, что Approach.EntityByDistance() возвращает True, даже если расстояние превышает заданное
-                if (debugInfoEnabled)
-                {
-                    Stopwatch sw = new Stopwatch();
-                    sw.Start();
-#if false
-                    Approach.EntityByDistance(giverEntity, interactDistance);
-#else
-                    Approach.EntityForInteraction(giverEntity);
-#endif
-                    sw.Stop();
-                    playerLocation = EntityManager.LocalPlayer.Location;
-                    distance = giverLocation.Distance3D(playerLocation);
-                    withingInteractDistance = distance <= interactDistance;
-                    zDifference = isInteractZDifferenceConstraint ? 0 : Math.Abs(giverLocation.Z - playerLocation.Z);
-                    withingInteractZDifference = isInteractZDifferenceConstraint || zDifference <= maxZDifference;
-                    bool result = withingInteractDistance && withingInteractZDifference;
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Approach time = ", sw.ElapsedMilliseconds.ToString("N2"), " (", sw.ElapsedTicks, ')',
-                        "\n\t\tCalculatedInteractDistance = ", interactDistance.ToString("N1"),
-                        "\n\t\tDistance = ", distance.ToString("N1"), withingInteractDistance ? "(withing)" : "(out)",
-                        "\n\t\tzDifference = ", zDifference.ToString("N1"), isInteractZDifferenceConstraint ? (withingInteractZDifference ? " (withing)" : " (out)") : " (unlimited)",
-                        "\n\t" + nameof(Approach.EntityByDistance) + " => ", result));
-                    return result;
-                }
-                else
-                {
-#if false
-                    Approach.EntityByDistance(giverEntity, interactDistance);
-#else
-                    Approach.EntityForInteraction(giverEntity);
-#endif
-                    return giverLocation.Distance3D(playerLocation) <= interactDistance && (isInteractZDifferenceConstraint || Math.Abs(giverLocation.Z - playerLocation.Z) <= maxZDifference);
-                }
-            }
-            else if (debugInfoEnabled)
-            {
-                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": " + nameof(Approach.EntityByDistance) + "Skiped"));
-            }
-            return true;
-        } 
-#else
         {
             if (EntityTools.EntityTools.Config.Logger.DebugMissionTools)
             {
@@ -288,13 +223,13 @@ namespace EntityCore.Tools.Missions
                 var playerLocation = EntityManager.LocalPlayer.Location;
                 double distance = giverLocation.Distance3D(playerLocation);
                 bool withingInteractDistance = distance <= interactDistance;
-                bool isInteractZDifferenceConstraint = maxZDifference <= 0;
-                float zDifference = isInteractZDifferenceConstraint ? 0 : Math.Abs(giverLocation.Z - playerLocation.Z);
-                bool withingInteractZDifference = isInteractZDifferenceConstraint || zDifference <= maxZDifference;
+                bool ignoreInteractZDifferenceConstraint = maxZDifference <= 0;
+                float zDifference = ignoreInteractZDifferenceConstraint ? 0 : Math.Abs(giverLocation.Z - playerLocation.Z);
+                bool withingInteractZDifference = ignoreInteractZDifferenceConstraint || zDifference <= maxZDifference;
                 ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Begins (",
                     "CalculatedInteractDistance = ", interactDistance.ToString("N1"),
                     "; Distance = ", distance.ToString("N1"), withingInteractDistance ? "(withing)" : "(out)",
-                    "; zDifference = ", zDifference.ToString("N1"), isInteractZDifferenceConstraint ? (withingInteractZDifference ? " (withing))" : " (out))") : " (unlimited))"));
+                    "; zDifference = ", zDifference.ToString("N1"), ignoreInteractZDifferenceConstraint ? " (unlimited))" : (withingInteractZDifference ? " (withing))" : " (out))")));
 
                 if (!(withingInteractDistance && withingInteractZDifference))
                 {
@@ -311,18 +246,18 @@ namespace EntityCore.Tools.Missions
                     playerLocation = EntityManager.LocalPlayer.Location;
                     distance = giverLocation.Distance3D(playerLocation);
                     withingInteractDistance = distance <= interactDistance;
-                    zDifference = isInteractZDifferenceConstraint ? 0 : Math.Abs(giverLocation.Z - playerLocation.Z);
-                    withingInteractZDifference = isInteractZDifferenceConstraint || zDifference <= maxZDifference;
+                    zDifference = ignoreInteractZDifferenceConstraint ? 0 : Math.Abs(giverLocation.Z - playerLocation.Z);
+                    withingInteractZDifference = ignoreInteractZDifferenceConstraint || zDifference <= maxZDifference;
                     bool result = withingInteractDistance && withingInteractZDifference;
                     ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Approach time = ", sw.ElapsedMilliseconds.ToString("N2"), " (", sw.ElapsedTicks, ')',
                         "\n\t\tCalculatedInteractDistance = ", interactDistance.ToString("N1"),
                         "\n\t\tDistance = ", distance.ToString("N1"), withingInteractDistance ? "(withing)" : "(out)",
-                        "\n\t\tzDifference = ", zDifference.ToString("N1"), isInteractZDifferenceConstraint ? (withingInteractZDifference ? " (withing)" : " (out)") : " (unlimited)",
+                        "\n\t\tzDifference = ", zDifference.ToString("N1"), ignoreInteractZDifferenceConstraint ? " (unlimited)" : (withingInteractZDifference ? " (withing)" : " (out)"),
                         "\n\t" + nameof(Approach.EntityByDistance) + " => ", result));
                     return result;
                 }
                 
-                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": " + nameof(Approach.EntityByDistance) + "Skipped"));
+                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": " + nameof(Approach.EntityByDistance) + " Skipped"));
             }
             else
             {
@@ -354,7 +289,6 @@ namespace EntityCore.Tools.Missions
             }
             return true;
         }
-#endif
 
         /// <summary>
         /// Взаимодействие с квестодателем <paramref name="giverEntity"/> (открытитие диалогового окна) 
@@ -377,7 +311,7 @@ namespace EntityCore.Tools.Missions
                     "ScreenType = ", contactDialog.ScreenType, ')'));
 
             bool result;
-#if true
+
             if (!contactDialog.IsValid || contactDialog.ScreenType == ScreenType.None)
             {
                 if (debugInfoEnabled)
@@ -401,38 +335,14 @@ namespace EntityCore.Tools.Missions
                 if (debugInfoEnabled)
                     ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ", nameof(NavigationHelper.SmartInteract), " Skiped"));
             }
-#else
-            if (!contactDialog.IsValid || contactDialog.ScreenType == ScreenType.None)
-            {
-                if (debugInfoEnabled)
-                {
-                    Stopwatch sw = new Stopwatch();
-                    sw.Start();
-                    result = Interact.ForContactDialog(giverEntity);
-                    sw.Stop();
-                    contactDialog = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog;
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": SmartInteraction result = ", result, "; time = ", sw.ElapsedMilliseconds.ToString("N2"), "ms (", sw.ElapsedTicks, ")" +
-                        "\n\t\tContactDialog = ", contactDialog.IsValid ? "Valid" : "Invalid",
-                        "\n\t\tScreenType = ", contactDialog.ScreenType,
-                        "\n\t" + nameof(Interact.ForContactDialog) + " => ", result));
-                }
-                else result = Interact.ForContactDialog(giverEntity);
-            }
-            else
-            {
-                contactDialog = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog;
-                result = contactDialog.IsValid;
-                if (debugInfoEnabled)
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ", nameof(Interact.ForContactDialog), " Skiped"));
-            }
-#endif
+
             return result;
         }
 
         /// <summary>
         /// Обработка диалога взятия(сдачи) квеста
         /// </summary>
-        public static MissionProcessingResult ProccessingMissionDialog(string missionId, bool turnInMission = false, IList<string> optionalDialog = null, Predicate<Item> isRewardItem = null, int timeout = 5000)
+        public static MissionProcessingResult ProcessingMissionDialog(string missionId, bool turnInMission = false, IList<string> optionalDialog = null, Predicate<Item> isRewardItem = null, int timeout = 5000)
         {
             bool debugInfoEnabled = EntityTools.EntityTools.Config.Logger.DebugMissionTools;
 
@@ -441,31 +351,95 @@ namespace EntityCore.Tools.Missions
                     : string.Empty;
 
             if (debugInfoEnabled)
-                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Begin"));
+                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Begin");
 
             Interact.WaitForInteraction();
 
             var player = EntityManager.LocalPlayer.Player;
-            var contactDialog = player.InteractInfo.ContactDialog;
-            var screenType = contactDialog.ScreenType;
 
             // обрабатываем предварительные пункты диалога, если задано
             if (optionalDialog?.Count > 0)
                 MissionHelper.ProcessingOptionalDialogs(optionalDialog);
 
-            //TODO: Добавить возможность сдавать выполненную миссию (т.е. прописать необходимые для этого DialogKey
+            
             var timer = new Astral.Classes.Timeout(timeout);
             // Ключ принятия миссии:
             //      OptionsList.MissionOffer.Идентификатор_миссии_\d*
             // Ключ сдачи миссии:
             //      OptionsList.CompleteMission.Идентификатор_миссии_\d*
-            var missionDialogKey = turnInMission ? "OptionsList.CompleteMission." + missionId : "OptionsList.MissionOffer." + missionId;
+            var missionDialogKey = turnInMission ? "OptionsList.CompleteMission." + missionId
+                                                      : "OptionsList.MissionOffer." + missionId;
             MissionProcessingResult result;
+
+            var contactDialog = player.InteractInfo.ContactDialog;
+
             while (contactDialog.IsValid && !timer.IsTimedOut)
             {
+                var screenType = contactDialog.ScreenType;
                 // Диалоговое окно открыто
                 // Проверяем статус экрана 
-                if (!turnInMission && screenType == ScreenType.MissionOffer)
+                if (turnInMission)
+                {
+                    if (screenType == ScreenType.MissionTurnIn)
+                    {
+                        // Открыт экран принятия миссии
+                        // На экране принятия миссии узнать из АПИ, к какой миссии он относится, - нельзя
+                        // Проверяем наличие обязательных наград в окне миссии
+                        if (CheckRequiredRewardItem(isRewardItem))
+                        {
+                            // Сдаем миссию
+                            if (contactDialog.CheckDialogOptionAndSelect(d => d.Key.Equals("ViewCompleteMission.Continue", StringComparison.Ordinal),
+                                () => player.InteractInfo.ContactDialog.ScreenType == ScreenType.MissionOffer))
+                            {
+                                result = MissionProcessingResult.Error;
+                                var timer2 = new Astral.Classes.Timeout(timeout);
+                                while (!timer2.IsTimedOut)
+                                {
+                                    if (CompletedMission(missionId, out _))
+                                    {
+                                        result = MissionProcessingResult.MissionTurnedIn;
+                                        break;
+                                    }
+                                    Thread.Sleep(250);
+                                }
+
+                                if (debugInfoEnabled)
+                                    ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
+                                        "\n\t\tScreenType = ", screenType,
+                                        "\n\t\tCheckRequiredRewardItem = True" +
+                                        "\n\t\tSelect 'ViewCompleteMission.Continue' = True" +
+                                        "\n\t" + nameof(ProcessingMissionDialog) + " => ", result));
+                                return result;
+                            }
+                        }
+
+                        // В наградах отсутствуют обязательные итемы - отказываемся сдавать миссию.
+                        else if (contactDialog.CheckDialogOptionAndSelect(d => d.Key.Equals("ViewCompleteMission.Back", StringComparison.Ordinal),
+                            () => player.InteractInfo.ContactDialog.ScreenType == ScreenType.MissionOffer))
+                        {
+                            result = MissionProcessingResult.MissionRequiredRewardNotFound;
+                            if (debugInfoEnabled)
+                                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
+                                    "\n\t\tScreenType = ", screenType,
+                                    "\n\t\tCheckRequiredRewardItem = False" +
+                                    "\n\t\tSelect 'ViewCompleteMission.Back' = True" +
+                                    "\n\t" + nameof(ProcessingMissionDialog) + " => ", result));
+
+                            return result;
+                        }
+
+                        result = MissionProcessingResult.Error;
+                        if (debugInfoEnabled)
+                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
+                                "\n\t\tScreenType = ", screenType,
+                                "\n\t\tCheckRequiredRewardItem = False" +
+                                "\n\t\tSelect 'ViewCompleteMission.Back' = False" +
+                                "\n\t" + nameof(ProcessingMissionDialog) + " => ", result));
+
+                        return result;
+                    }
+                }
+                else if (screenType == ScreenType.MissionOffer)
                 {
                     // Открыт экран принятия миссии
                     // На экране принятия миссии узнать из АПИ, к какой миссии он относится, - нельзя
@@ -473,8 +447,8 @@ namespace EntityCore.Tools.Missions
                     if (CheckRequiredRewardItem(isRewardItem))
                     {
                         // Принимаем миссию
-                        if (contactDialog.CheckDialogOptionAndSelect(d => d.Key.Equals("ViewOfferedMission.Accept"),
-                            () => contactDialog.ScreenType == ScreenType.MissionOffer))
+                        if (contactDialog.CheckDialogOptionAndSelect(d => d.Key.Equals("ViewOfferedMission.Accept", StringComparison.Ordinal),
+                            () => player.InteractInfo.ContactDialog.ScreenType == ScreenType.MissionOffer))
                         {
                             result = MissionProcessingResult.MissionOfferAccepted;
                             var timer2 = new Astral.Classes.Timeout(timeout);
@@ -493,15 +467,14 @@ namespace EntityCore.Tools.Missions
                                     "\n\t\tScreenType = ", screenType,
                                     "\n\t\tCheckRequiredRewardItem = True" +
                                     "\n\t\tSelect 'ViewOfferedMission.Accept' = True" +
-                                    "\n\t" + nameof(ProccessingMissionDialog) + " => ", result));
+                                    "\n\t" + nameof(ProcessingMissionDialog) + " => ", result));
                             return result;
                         }
                     }
 
                     // В наградах отсутствуют обязательные итемы - отказываемся от миссии.
-#if true
-                    else if (contactDialog.CheckDialogOptionAndSelect(d => d.Key.Equals("ViewOfferedMission.Back"),
-                        () => contactDialog.ScreenType == ScreenType.MissionOffer))
+                    else if (contactDialog.CheckDialogOptionAndSelect(d => d.Key.Equals("ViewOfferedMission.Back", StringComparison.Ordinal),
+                        () => player.InteractInfo.ContactDialog.ScreenType == ScreenType.MissionOffer))
                     {
                         result = MissionProcessingResult.MissionRequiredRewardNotFound;
                         if (debugInfoEnabled)
@@ -509,93 +482,36 @@ namespace EntityCore.Tools.Missions
                                 "\n\t\tScreenType = ", screenType,
                                 "\n\t\tCheckRequeredRewardItem = False" +
                                 "\n\t\tSelect 'ViewOfferedMission.Back' = True" +
-                                "\n\t" + nameof(ProccessingMissionDialog) + " => ", result));
+                                "\n\t" + nameof(ProcessingMissionDialog) + " => ", result));
 
                         return result;
                     }
-#endif
+
                     result = MissionProcessingResult.Error;
                     if (debugInfoEnabled)
                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
                             "\n\t\tScreenType = ", screenType,
                             "\n\t\tCheckRequiredRewardItem = False" +
                             "\n\t\tSelect 'ViewOfferedMission.Back' = False" +
-                            "\n\t" + nameof(ProccessingMissionDialog) + " => ", result));
+                            "\n\t" + nameof(ProcessingMissionDialog) + " => ", result));
 
                     return result;
                 }
-                if (turnInMission && screenType == ScreenType.MissionTurnIn)
-                {
-                    // Открыт экран принятия миссии
-                    // На экране принятия миссии узнать из АПИ, к какой миссии он относится, - нельзя
-                    // Проверяем наличие обязательных наград в окне миссии
-                    if (CheckRequiredRewardItem(isRewardItem))
-                    {
-                        // Сдаем миссию
-                        if (contactDialog.CheckDialogOptionAndSelect(d => d.Key.Equals("ViewCompleteMission.Continue"),
-                            () => contactDialog.ScreenType == ScreenType.MissionOffer))
-                        {
-                            result = MissionProcessingResult.Error;
-                            var timer2 = new Astral.Classes.Timeout(timeout);
-                            while (!timer2.IsTimedOut)
-                            {
-                                if (CompletedMission(missionId, out _))
-                                {
-                                    result = MissionProcessingResult.MissionTurnedIn;
-                                    break;
-                                }
-                                Thread.Sleep(250);
-                            }
-
-                            if (debugInfoEnabled)
-                                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
-                                    "\n\t\tScreenType = ", screenType,
-                                    "\n\t\tCheckRequiredRewardItem = True" +
-                                    "\n\t\tSelect 'ViewCompleteMission.Continue' = True" +
-                                    "\n\t" + nameof(ProccessingMissionDialog) + " => ", result));
-                            return result;
-                        }
-                    }
-
-                    // В наградах отсутствуют обязательные итемы - отказываемся сдавать миссию.
-#if true
-                    else if (contactDialog.CheckDialogOptionAndSelect(d => d.Key.Equals("ViewCompleteMission.Back"),
-                        () => contactDialog.ScreenType == ScreenType.MissionOffer))
-                    {
-                        result = MissionProcessingResult.MissionRequiredRewardNotFound;
-                        if (debugInfoEnabled)
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
-                                "\n\t\tScreenType = ", screenType,
-                                "\n\t\tCheckRequiredRewardItem = False" +
-                                "\n\t\tSelect 'ViewCompleteMission.Back' = True" +
-                                "\n\t" + nameof(ProccessingMissionDialog) + " => ", result));
-
-                        return result;
-                    }
-#endif
-                    result = MissionProcessingResult.Error;
-                    if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
-                            "\n\t\tScreenType = ", screenType,
-                            "\n\t\tCheckRequiredRewardItem = False" +
-                            "\n\t\tSelect 'ViewCompleteMission.Back' = False" +
-                            "\n\t" + nameof(ProccessingMissionDialog) + " => ", result));
-
-                    return result;
-                }
+                
                 if (screenType == ScreenType.List)
                 {
                     // Открыт экран списка пунктов диалога
                     // ContactDialog.ScreenType = List
                     // ContactDialog.Options[].Key:
                     //      OptionsList.MissionOffer.Идентификатор_миссии* - Пункт диалога, инициирующий принятие миссии
-                    //      OptionsList.CompleteMission.Идентификатор_миссии_\d* - Пункт диалога, инициирующия сдачу миссии
+                    //      OptionsList.CompleteMission.Идентификатор_миссии_\d* - Пункт диалога, инициирующий сдачу миссии
                     //      OptionsList.Exit - Закрыть диалоговое окно
                     // Принимаем задачу в несколько этапов
                     // 1. Активируем пункт диалога, содержащий идентификатору задачи
                     // 2. Проверяем наличие награды
                     // 3. Принимаем задачу путем активации соответствующего пункта диалога
-                    if (contactDialog.CheckDialogOptionAndSelect(d => d.Key.StartsWith(missionDialogKey), () => contactDialog.ScreenType == screenType))
+                    var currentScreenType = screenType;
+                    if (contactDialog.CheckDialogOptionAndSelect(d => d.Key.StartsWith(missionDialogKey, StringComparison.Ordinal), () => player.InteractInfo.ContactDialog.ScreenType == currentScreenType))
                     {
 #if false               // 2й и 3й этапы производятся на экране ScreenType.MissionOffer, обработка которого будет произведена на следующем цикле
                         contactDialog = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog;
@@ -651,17 +567,19 @@ namespace EntityCore.Tools.Missions
                         } 
 #else
                         if (debugInfoEnabled)
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Select the option '", missionId, "' on '", screenType, "' screen. Continue..."));
+                            ETLogger.WriteLine(LogType.Debug,
+                                $"{currentMethodName}: Select the option '{missionId}' on '{screenType}' screen. Continue...");
 #endif
                     }
                     else
                     {
                         result = MissionProcessingResult.MissionNotFound;
                         if (debugInfoEnabled)
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
-                                "\n\t\tScreenType = ", screenType,
-                                "\n\t\tSelect '", missionId, "' = False" +
-                                "\n\t" + nameof(ProccessingMissionDialog) + " => ", result));
+                            ETLogger.WriteLine(LogType.Debug,
+                                $"{currentMethodName}:\n" +
+                                $"\t\tScreenType = {screenType}\n" +
+                                $"\t\tSelect '{missionId}' = False\n" +
+                                $"\t{nameof(ProcessingMissionDialog)} => {result}");
                         return result;
                     }
                 }
@@ -682,9 +600,10 @@ namespace EntityCore.Tools.Missions
                     if (isAccessible)
 #endif
                     {
-                        bool selectResult = lastOption.Select();
+                        lastOption.Select();
                         if (debugInfoEnabled)
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Selection of '", lastOption.Key, "' on ScreenType(", screenType, ") succedded. Continue..."));
+                            ETLogger.WriteLine(LogType.Debug,
+                                $"{currentMethodName}: Selection of '{lastOption.Key}' on ScreenType({screenType}) succeeded. Continue...");
                     }
                     else
                     {
@@ -694,7 +613,7 @@ namespace EntityCore.Tools.Missions
                             ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
                                 "\n\t\tScreenType = ", screenType,
                                 "\n\t\tLast item in ContactDialog.Options inaccessible" +
-                                "\n\t" + nameof(ProccessingMissionDialog) + " => ", result));
+                                "\n\t" + nameof(ProcessingMissionDialog) + " => ", result));
                             return result;
                         }
                     }
@@ -705,19 +624,18 @@ namespace EntityCore.Tools.Missions
                     if (debugInfoEnabled)
                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
                             "\n\t\tScreenType = ", screenType,
-                            "\n\t" + nameof(ProccessingMissionDialog) + " => ", result));
+                            "\n\t" + nameof(ProcessingMissionDialog) + " => ", result));
                     return result;
                 }
 
                 Thread.Sleep(1000);
                 contactDialog = player.InteractInfo.ContactDialog;
-                screenType = contactDialog.ScreenType;
             }
 
 
             result = MissionProcessingResult.Error;
             if (debugInfoEnabled)
-                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Time is out => ", result));
+                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Time is out => {result}");
             return result;
         }
 
@@ -735,7 +653,6 @@ namespace EntityCore.Tools.Missions
                     : string.Empty;
 
                 var player = EntityManager.LocalPlayer.Player;
-                var interactInfo = EntityManager.LocalPlayer.Player.InteractInfo;
                 foreach (string key in dialogs)
                 {
                     var contactDialog = player.InteractInfo.ContactDialog;
@@ -797,7 +714,8 @@ namespace EntityCore.Tools.Missions
         public static bool GetADialogKey(out string key)
         {
             key = string.Empty;
-            Func<IEnumerable<string>> source = () =>
+
+            IEnumerable<string> Source()
             {
                 var options = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options;
                 if (options.Count > 0)
@@ -807,13 +725,15 @@ namespace EntityCore.Tools.Missions
                     {
                         keys.Add(option.Key);
                     }
+
                     return keys;
                 }
+
                 return Enumerable.Empty<string>();
-            };
+            }
 
             string value = string.Empty;
-            if (ItemSelectForm.GetAnItem(source, ref value))
+            if (ItemSelectForm.GetAnItem(Source, ref value))
             {
                 key = value;
                 return true;
@@ -823,7 +743,8 @@ namespace EntityCore.Tools.Missions
         public static bool GetADialogOption(out ContactDialogOption selectedOption)
         {
             selectedOption = null;
-            Func<IEnumerable<ContactDialogOption>> source = () =>
+
+            IEnumerable<ContactDialogOption> Source()
             {
                 var options = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Options;
                 if (options.Count > 0)
@@ -831,23 +752,43 @@ namespace EntityCore.Tools.Missions
                     var optionList = new List<ContactDialogOption>(options);
                     return optionList;
                 }
+
                 return Enumerable.Empty<ContactDialogOption>();
-            };
+            }
 
             ContactDialogOption selectedValue = null;
-            if (ItemSelectForm.GetAnItem(source, ref selectedValue, dialogOptionFormatter))
+            if (ItemSelectForm.GetAnItem(Source, ref selectedValue, DialogOptionFormatter))
             {
                 selectedOption = selectedValue;
                 return selectedOption.IsValid;
             }
             return false;
         }
-        private static void dialogOptionFormatter(object sender, ListControlConvertEventArgs e)
+        private static void DialogOptionFormatter(object sender, ListControlConvertEventArgs e)
         {
             if (e.Value is ContactDialogOption option)
             {
-                e.Value = string.Concat(Regex.Replace(option.DisplayName.ToString(), "<[^>]+>", string.Empty), " [", option.Key, ']');
+                e.Value = string.Concat(Regex.Replace(option.DisplayName, "<[^>]+>", string.Empty), " [", option.Key, ']');
             }
-        } 
+        }
+
+
+
+        /// <summary>
+        /// Вспомогательный метод формирования текстового описания <param name="contactInfo"/> для вывода отладочной информации
+        /// </summary>
+        public static string GetDebugDescription(this ContactInfo contactInfo)
+        {
+            var entity = contactInfo.Entity;
+
+            return $"{entity.InternalName}; {entity.ContainerId:X}";
+        }
+        /// <summary>
+        /// Вспомогательный метод формирования текстового описания <param name="entity"/> для вывода отладочной информации
+        /// </summary>
+        public static string GetDebugDescription(this Entity entity)
+        {
+            return $"{entity.InternalName}; {entity.ContainerId:X}";
+        }
     }
 }
