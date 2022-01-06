@@ -102,10 +102,17 @@ namespace EntityTools.Tools
         /// <returns></returns>
         public static Predicate<T> GetComparer<T>(this string pattern, ItemFilterStringType strMatchType, Func<T, string> selector) where T : class
         {
-            Predicate<string> predicate = GetComparer(pattern, strMatchType);
+            var predicate = GetComparer(pattern, strMatchType);
 
             return obj => predicate(selector(obj)); 
         }
+        public static Func<T, bool> GetCompareFunc<T>(this string pattern, ItemFilterStringType strMatchType, Func<T, string> selector) where T : class
+        {
+            var predicate = GetComparer(pattern, strMatchType);
+
+            return obj => predicate(selector(obj));
+        }
+
 
     }
 }
