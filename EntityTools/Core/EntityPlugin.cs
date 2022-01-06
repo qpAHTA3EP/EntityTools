@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
-using System.Windows.Forms;
-using System.Xml.Serialization;
-using AcTp0Tools.Reflection;
+﻿using AcTp0Tools.Reflection;
 using Astral.Addons;
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;
@@ -26,8 +16,17 @@ using EntityTools.Patches.Mapper;
 using EntityTools.Properties;
 using EntityTools.Services;
 using EntityTools.Tools;
-using EntityTools.UCC.Conditions;
 using MyNW.Classes;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
+using System.Xml.Serialization;
 using Action = Astral.Quester.Classes.Action;
 
 [assembly: InternalsVisibleTo("EntityCore")]
@@ -35,6 +34,7 @@ using Action = Astral.Quester.Classes.Action;
 [assembly: SuppressIldasm()]
 #endif
 
+// ReSharper disable once CheckNamespace
 namespace EntityTools
 {
     public class EntityTools : Plugin
@@ -194,12 +194,20 @@ namespace EntityTools
             try
             {
                 if (!Directory.Exists(Path.GetDirectoryName(FileTools.SettingsFile)))
-                    Directory.CreateDirectory(Path.GetDirectoryName(FileTools.SettingsFile));
-
-                XmlSerializer serialiser = new XmlSerializer(/*typeof(SettingsContainer)*/Config.GetType());
-                using (TextWriter FileStream = new StreamWriter(FileTools.SettingsFile, false))
                 {
-                    serialiser.Serialize(FileStream, Config);
+                    var dir = Path.GetDirectoryName(FileTools.SettingsFile);
+                    if (string.IsNullOrEmpty(dir))
+                    {
+                        ETLogger.WriteLine(LogType.Error, $"{nameof(EntityTools)}: Error to save settings file {Path.GetFileName(FileTools.SettingsFile)}", true);
+                        return;
+                    }
+                    Directory.CreateDirectory(dir);
+                }
+
+                XmlSerializer serializer = new XmlSerializer(/*typeof(SettingsContainer)*/Config.GetType());
+                using (TextWriter fileStream = new StreamWriter(FileTools.SettingsFile, false))
+                {
+                    serializer.Serialize(fileStream, Config);
                 }
             }
             catch (Exception exp)
@@ -368,11 +376,23 @@ namespace EntityTools
             public bool UserRequest_SelectItem<T>(Func<IEnumerable<T>> source, ref T selectedValue, string displayName = "")
             {
                 if (InternalInitialize())
-                    return Core.UserRequest_SelectItem(source, ref selectedValue);
+                    return Core.UserRequest_SelectItem(source, ref selectedValue, displayName);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rItem request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! UIGen request denied.", true);
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! Item request denied.", true);
+
+                return false;
+            }
+
+            public bool UserRequest_SelectItem<T>(Func<IEnumerable<T>> source, ref T selectedValue, ListControlConvertEventHandler itemFormatter)
+            {
+                if (InternalInitialize())
+                    return Core.UserRequest_SelectItem(source, ref selectedValue, itemFormatter);
+
+                XtraMessageBox.Show("EntityToolsCore is invalid!\n\rItem request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! Item request denied.", true);
 
                 return false;
             }
@@ -384,7 +404,7 @@ namespace EntityTools
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rItems request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! UIGen request denied.", true);
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! Items request denied.", true);
 
                 return false;
             }
@@ -595,30 +615,30 @@ namespace EntityTools
                                         {
                                             Assembly assembly = Assembly.Load(coreBytes);
                                             CoreHash = CryptoHelper.MD5_HashString(coreBytes);
-        #endif
+#endif
                                             Type coreType = typeof(IEntityToolsCore);
-                                            if (assembly != null)
-                                                foreach (Type type in assembly.GetTypes())
-                                                {
-        #if false
+                                            foreach (Type type in assembly.GetTypes())
+                                            {
+#if false
                                                 if (type.GetInterface(nameof(IEntityToolsCore)) != null)
-        #else
-                                                    if (type.GetInterfaces().Contains(coreType))
-        #endif
+#else
+                                                if (type.GetInterfaces().Contains(coreType))
+#endif
+                                                {
+                                                    if (Activator.CreateInstance(type) is IEntityToolsCore core)
                                                     {
-                                                        if (Activator.CreateInstance(type) is IEntityToolsCore core)
-                                                        {
-                                                            Core = core;
-                                                            return true;
-                                                        }
+                                                        Core = core;
+                                                        return true;
                                                     }
                                                 }
+                                            }
                                         }
-        #if !ENCRYPTED_CORE
+#if !ENCRYPTED_CORE
                                         catch
                                         {
+                                            // ignored
                                         }
-        #else
+#else
                                     catch (Exception e)
                                     {
                                         string msg = "Fail to load decrypted EntityToolCore\r\n" + e.Message;

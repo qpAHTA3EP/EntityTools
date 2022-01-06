@@ -6,6 +6,7 @@ using EntityTools.Enums;
 using MyNW.Classes;
 using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 using QuesterAction = Astral.Quester.Classes.Action;
 using UCCConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 
@@ -22,6 +23,9 @@ namespace EntityTools.Core.Interfaces
         bool Initialize(UCCCondition condition);
 #if DEVELOPER
         bool UserRequest_SelectItem<T>(Func<IEnumerable<T>> source, ref T selectedValue, string displayName = "");
+
+        bool UserRequest_SelectItem<T>(Func<IEnumerable<T>> source, ref T selectedValue,
+            ListControlConvertEventHandler itemFormatter);
 
         bool UserRequest_SelectItemList<T>(Func<IEnumerable<T>> source, ref IList<T> selectedValues, string caption = "");
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
 using Astral.Quester.Classes;
@@ -50,6 +51,11 @@ namespace EntityTools.Core
 
 #if DEVELOPER
         public bool UserRequest_SelectItem<T>(Func<IEnumerable<T>> source, ref T selectedValue, string displayName = "")
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UserRequest_SelectItem<T>(Func<IEnumerable<T>> source, ref T selectedValue, ListControlConvertEventHandler itemFormatter)
         {
             throw new NotImplementedException();
         }

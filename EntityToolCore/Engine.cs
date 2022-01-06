@@ -1,37 +1,36 @@
-﻿using Astral.Logic.UCC.Classes;
-using Astral.Quester.Classes;
-using System;
-using System.Collections.Generic;
-using EntityTools.Quester.Actions;
-using EntityCore.Quester.Action;
-using EntityTools.Quester.Conditions;
+﻿using AcTp0Tools;
 using Astral.Classes.ItemFilter;
-using EntityTools.Enums;
+using Astral.Logic.NW;
+using Astral.Logic.UCC.Classes;
+using Astral.Quester.Classes;
+using DevExpress.Utils;
 using DevExpress.XtraEditors;
-using MyNW.Classes;
 using EntityCore.Entities;
 using EntityCore.Forms;
-using System.Windows.Forms;
-using MyNW.Internals;
+using EntityCore.Quester.Action;
 using EntityCore.Quester.Conditions;
-using EntityTools.Core.Interfaces;
-using EntityTools.UCC.Conditions;
-using EntityTools.UCC.Actions;
+using EntityCore.Tools;
 using EntityCore.UCC.Actions;
 using EntityCore.UCC.Conditions;
-using UCCConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
+using EntityTools;
+using EntityTools.Core.Interfaces;
+using EntityTools.Enums;
+using EntityTools.Forms;
+using EntityTools.Quester.Actions;
+using EntityTools.Quester.Conditions;
+using EntityTools.Tools.Extensions;
+using EntityTools.Tools.Targeting;
+using EntityTools.UCC.Actions;
+using EntityTools.UCC.Conditions;
+using MyNW.Classes;
+using MyNW.Internals;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
-using EntityTools;
-using Astral.Logic.NW;
-using System.Linq;
-using EntityTools.Tools.Extensions;
-using AcTp0Tools;
-using DevExpress.Utils;
-using EntityCore.Tools;
-using EntityTools.Forms;
-using EntityTools.Quester;
-using EntityTools.Tools.Targeting;
+using UCCConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 
 namespace EntityCore
 {
@@ -86,7 +85,11 @@ namespace EntityCore
                         return Initialize(uccCondition);
                 }
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
+
             return false;
         }
         public bool Initialize(QuesterAction action)
@@ -234,6 +237,18 @@ namespace EntityCore
             return false;
         }
 
+        public bool UserRequest_SelectItem<T>(Func<IEnumerable<T>> source, ref T selectedValue,
+            ListControlConvertEventHandler itemFormatter)
+        {
+            T value = selectedValue;
+            if (ItemSelectForm.GetAnItem(source, ref value, itemFormatter))
+            {
+                selectedValue = value;
+                return true;
+            }
+            return false;
+        }
+
         public bool UserRequest_SelectItemList<T>(Func<IEnumerable<T>> source, ref IList<T> selectedValues, string caption = "")
         {
             var value = selectedValues;
@@ -263,7 +278,7 @@ namespace EntityCore
 
         public bool UserRequest_SelectUIGenId(ref string id)
         {
-            string newId = Forms.UIViewer.GUIRequest(id);
+            string newId = UIViewer.GUIRequest(id);
             if (!string.IsNullOrEmpty(newId))
             {
                 id = newId;
@@ -274,7 +289,7 @@ namespace EntityCore
 
         public bool UserRequest_EditUccConditions(ref UCCConditionList list)
         {
-            UCCConditionList newList = Forms.ConditionListForm.UserRequest(list);
+            UCCConditionList newList = ConditionListForm.UserRequest(list);
             if (newList != null)
             {
                 if (!ReferenceEquals(list, newList))
@@ -286,7 +301,7 @@ namespace EntityCore
 
         public bool UserRequest_EditUccConditions(ref UCCConditionList list, ref LogicRule logic, ref bool negation)
         {
-            return Forms.ConditionListForm.UserRequest(ref list, ref logic, ref negation);
+            return ConditionListForm.UserRequest(ref list, ref logic, ref negation);
         }
 
         public bool UserRequest_EditEntityId(ref string entPattern, ref ItemFilterStringType strMatchType, ref EntityNameType nameType)
@@ -366,7 +381,7 @@ namespace EntityCore
         
         public bool UserRequest_GetUccAction(out UCCAction action)
         {
-            return Forms.AddUccActionForm.GUIRequest(out action);
+            return AddUccActionForm.GUIRequest(out action);
         }
         #endregion
 
@@ -390,7 +405,7 @@ namespace EntityCore
         {
             switch (monitor)
             {
-                case PlayerTeamMonitor team:
+                case PlayerTeamMonitor _:
                     new ObjectInfoForm().Show(new PlayerTeamHelper.Monitor(), 500);
                     break;
                 default:

@@ -1,18 +1,25 @@
-﻿//#define DELEGATES_FILL
-
+﻿using AcTp0Tools;
+using DevExpress.XtraEditors;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
-using AcTp0Tools.Reflection;
-using DevExpress.XtraEditors;
 
 namespace EntityCore.Forms
 {
-    public partial class ItemSelectForm :XtraForm
+    public partial class ItemSelectForm : XtraForm
     {
-        private static readonly Func<List<Type>> PluginsGetTypes = typeof(Astral.Controllers.Plugins).GetStaticFunction<List<Type>>("GetTypes");
-
-        private Action fillListAction;
+        /// <summary>
+        /// Функтор заполнения списка нефильтрованным данными
+        /// </summary>
+        private Action<ListBox.ObjectCollection> dataFilling;
+        /// <summary>
+        ///  Функтор заполнения списка фильтрованным данными
+        /// </summary>
+        private Action<ListBox.ObjectCollection, string> dataFiltering;
+        private object defaultValue;
 
         public ItemSelectForm()
         {
@@ -23,153 +30,221 @@ namespace EntityCore.Forms
         /// <summary>
         /// Выбор типа и конструирование объекта выбранного типа
         /// </summary>
-        public static bool GetAnInstanceOfType<T>(out T selectedValue, bool includeBase = true) where T : class
+        public static bool GetAnInstance<T>(out T selectedValue, bool includeBase = false)
         {
-            ItemSelectForm selectForm = new ItemSelectForm();
-            if (includeBase)
-                selectForm.fillListAction = () => FillItems<T>(selectForm.ItemList);
-            else selectForm.fillListAction = () => FillDerivedItems<T>(selectForm.ItemList);
+            // Полный список типов не меняется после загрузки приложения
+            // поэтому его обновлять нет смысла
+            var data = AstralAccessors.Controllers.Plugins.GetPluginTypesDerivedFrom<T>(includeBase).ToList();
 
-            if (selectForm.ShowDialog() == DialogResult.OK
-                && selectForm.ItemList.SelectedIndex >= 0)
+            var @this = new ItemSelectForm
             {
-                if (selectForm.ItemList.SelectedItem is Type type)
+                dataFilling = (items) =>
                 {
-                    selectedValue = Activator.CreateInstance(type) as T;
+                    items.Clear();
+                    foreach (var type in data)
+                    {
+                        items.Add(type);
+                    }
+                },
+                dataFiltering = (items, filter) =>
+                {
+                    items.Clear();
+                    foreach (var type in data)
+                    {
+                        if (type.Name.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0)
+                            items.Add(type);
+                    }
+                },
+                ItemList =
+                {
+                    DisplayMember = nameof(Type.Name)
+                }
+            };
+
+            if (@this.ShowDialog() == DialogResult.OK
+                && @this.ItemList.SelectedIndex >= 0)
+            {
+                if (@this.ItemList.SelectedItem is Type type)
+                {
+                    selectedValue = (T)Activator.CreateInstance(type);
                     return selectedValue != null;
                 }
             }
-            selectedValue = default(T);
+            selectedValue = default;
             return false;
-        }
-        /// <summary>
-        /// Добавление производных типов в список
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="itemList"></param>
-        /// <returns></returns>
-        private static object FillDerivedItems<T>(ListBox itemList)
-        {
-            itemList.Items.Clear();
-            itemList.DisplayMember = string.Empty;
-            Type baseType = typeof(T);
-            List<Type> typeList = PluginsGetTypes();
-            if (typeList != null)
-            {
-                foreach (Type t in typeList)
-                {
-                    if (baseType.Equals(t.BaseType))
-                    {
-                        int ind = itemList.Items.Add(t);
-                    }
-                }
-            }
-            if (itemList.Items.Count > 0)
-                itemList.DisplayMember = "Name";
-            return itemList.Items.Count;
-        }
-        /// <summary>
-        /// Добавление в список и базового и производных типов
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="itemList"></param>
-        /// <returns></returns>
-        private static object FillItems<T>(ListBox itemList)
-        {
-            FillDerivedItems<T>(itemList);
-            itemList.Items.Add(typeof(T));
-            itemList.DisplayMember = "Name";
-            return itemList.Items.Count;
-        }
-
-        /// <summary>
-        /// конструирование объекта выбранного типа
-        /// </summary>
-        /// <param name="itemList"></param>
-        /// <returns></returns>
-        private static object GetItem(ListBox itemList)
-        {
-            if (itemList.SelectedItem is Type t)
-                return Activator.CreateInstance(t);
-            return null;
         }
         #endregion
 
         #region GetAnItem
+
         /// <summary>
-        /// Выбор элемента из списка, формируемого функтором source
+        /// Выбор элемента из списка, формируемого функтором <param name="source"/>
         /// </summary>
         public static bool GetAnItem<T>(Func<IEnumerable<T>> source, ref T selectedValue, string displayMember = "")
         {
-            ItemSelectForm selectForm = new ItemSelectForm();
-            T value = selectedValue;
-            selectForm.fillListAction = () => {
-                selectForm.ItemList.DataSource = source();
-                if (value != null) selectForm.ItemList.SelectedItem = value;
-            };
-            selectForm.ItemList.DisplayMember = displayMember;
+            if (source is null)
+                throw new ArgumentNullException(nameof(source));
 
-            if (selectForm.ShowDialog() == DialogResult.OK
-                && selectForm.ItemList.SelectedIndex >= 0)
+            ItemSelectForm @this = new ItemSelectForm();
+            @this.defaultValue = selectedValue;
+
+            @this.dataFilling = items =>
             {
-                selectedValue = (T)selectForm.ItemList.SelectedItem;
+                items.Clear();
+                foreach (var t in source())
+                {
+                    items.Add(t);
+                }
+            };
+
+            if (!string.IsNullOrEmpty(displayMember))
+            {
+                // Если задан параметр displayMember, то фильтрация выполняется по свойству с данном именем
+                PropertyInfo pi = typeof(T).GetProperty(displayMember);
+                if (pi != null)
+                {
+                    @this.dataFiltering = (items, filter) =>
+                    {
+                        items.Clear();
+                        foreach (var t in source()
+                            .Where(i => pi.GetValue(i).ToString().IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0))
+                        {
+                            items.Add(t);
+                        }
+                    };
+                }
+                else
+                {
+                    // Свойство с именем displayMember не найдено, поэтому сбрасываем данный параметр
+                    displayMember = string.Empty;
+                }
+            }
+            if (string.IsNullOrEmpty(displayMember))
+            {
+                // Выполняем фильтрацию по строковому представлению объекта
+                @this.dataFiltering = (items, filter) =>
+                {
+                    items.Clear();
+                    foreach (var t in source().Where(i =>
+                        i.ToString().IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0))
+                    {
+                        items.Add(t);
+                    }
+                };
+            }
+
+            @this.ItemList.DisplayMember = displayMember;
+
+            if (@this.ShowDialog() == DialogResult.OK
+                && @this.ItemList.SelectedIndex >= 0)
+            {
+                selectedValue = (T)@this.ItemList.SelectedItem;
                 return true;
             }
-            else return false;
+            
+            return false;
         }
 
-#if true
-        public static bool GetAnItem<T>(Func<IEnumerable<T>> source, ref T selectedValue, ListControlConvertEventHandler itemFormater)
+        /// <summary>
+        /// Выбор элемента из списка, формируемого функтором <param name="source"/>
+        /// При этом каждый элемент выводится в виде, отформатированном <param name="itemFormatter"/>
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="selectedValue"></param>
+        /// <param name="itemFormatter"></param>
+        /// <returns></returns>
+        public static bool GetAnItem<T>(Func<IEnumerable<T>> source, ref T selectedValue, ListControlConvertEventHandler itemFormatter)
         {
-            ItemSelectForm selectForm = new ItemSelectForm();
-            T value = selectedValue;
-            selectForm.fillListAction = () =>
+            if (source is null)
+                throw new ArgumentNullException(nameof(source));
+
+            Type type = typeof(T);
+
+            var @this = new ItemSelectForm();
+            @this.defaultValue = selectedValue;
+
+            @this.dataFilling = items =>
             {
-                selectForm.ItemList.DataSource = source();
-                if (value != null) selectForm.ItemList.SelectedItem = value;
+                items.Clear();
+                foreach (var t in source())
+                {
+                    items.Add(t);
+                }
             };
-            bool useFormatter = itemFormater != null;
+
+            bool useFormatter = itemFormatter != null;
             if (useFormatter)
             {
-                selectForm.ItemList.FormattingEnabled = true;
-                selectForm.ItemList.Format += itemFormater;
-            }
+                @this.ItemList.FormattingEnabled = true;
+                @this.ItemList.Format += itemFormatter;
+                // Выполняем фильтрацию по отформатированному представлению объекта
+                @this.dataFiltering = (items, filter) =>
+                {
+                    items.Clear();
 
-            if (selectForm.ShowDialog() == DialogResult.OK
-                && selectForm.ItemList.SelectedIndex >= 0)
-            {
-                selectedValue = (T)selectForm.ItemList.SelectedItem;
-                return true;
+                    foreach (var item in source())
+                    {
+                        var arg = new ListControlConvertEventArgs(item, type, null);
+                        itemFormatter(item, arg);
+
+                        if (arg.Value.ToString().IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0)
+                            items.Add(item);
+                    }
+                };
             }
             else
             {
-                return false;
+                // Выполняем фильтрацию по строковому представлению объекта
+                @this.dataFiltering = (items, filter) =>
+                {
+                    items.Clear();
+                    foreach (var item in source().Where(i =>
+                        i.ToString().IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0))
+                    {
+                        items.Add(item);
+                    }
+                };
             }
-        } 
-#endif
+            if (@this.ShowDialog() == DialogResult.OK
+                && @this.ItemList.SelectedIndex >= 0)
+            {
+                var val = @this.ItemList.SelectedItem;
+                if (val != null)
+                {
+                    selectedValue = (T) val;
+                    return true;
+                }
+            }
+
+            return false;
+        }
         #endregion
 
         #region Обработчики
         private void btnSelect_Click(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.OK;
+            DialogResult = DialogResult.OK;
             Close();
         }
 
         private void btnReload_Click(object sender, EventArgs e)
         {
-            fillListAction?.Invoke();
+            var selectedItem = ItemList.SelectedItem ?? defaultValue;
+            tbFilter.Text = string.Empty;
+
+            dataFilling(ItemList.Items);
+            ItemList.SelectedItem = selectedItem;
         }
         #endregion
 
         #region Переход к элементу начинающемуся с itemNameBuf (по нажатию клавиш) 
-        string itemNameBuf = string.Empty;
+        //string itemNameBuf = string.Empty;
         private void ItemList_KeyDown(object sender, KeyEventArgs e)
         {
             if(e.KeyCode == Keys.Escape)
             {
                 // Сброс буфера
-                itemNameBuf = string.Empty;
+                //itemNameBuf = string.Empty;
                 e.SuppressKeyPress = true;
             }
             if (ItemList.DataSource is null && e.Control && e.KeyCode == Keys.S)
@@ -191,7 +266,7 @@ namespace EntityCore.Forms
             {
                 char startChar = e.KeyChar;
                 int startInd = 0;
-                string itemStr = string.Empty;
+                string itemStr;
                 // Определяем стартовую позицию для поиска
                 if (ItemList.SelectedIndex >= 0)
                 {
@@ -227,6 +302,25 @@ namespace EntityCore.Forms
                         }
                     }
                 }
+            }
+        }
+        #endregion
+
+        #region Filtering
+        private void tbFilter_TextChanged(object sender, EventArgs e)
+        {
+            var filter = tbFilter.Text;
+            if (string.IsNullOrEmpty(filter))
+            {
+                btnReload_Click(sender, null);
+            }
+            else
+            {
+                var selectedItem = ItemList.SelectedItem ?? defaultValue;
+
+                dataFiltering(ItemList.Items, filter);
+
+                ItemList.SelectedItem = selectedItem;
             }
         }
         #endregion
