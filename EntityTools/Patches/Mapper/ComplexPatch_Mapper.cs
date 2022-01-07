@@ -42,49 +42,49 @@ namespace EntityTools.Patches.Mapper
             original_OpenForm = AccessTools.Method(tMapper, nameof(Astral.Quester.Forms.MapperForm.Open));
             if (original_OpenForm is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{original_OpenForm}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{original_OpenForm}' not found", true);
                 return;
             }
             prefix_OpenForm = AccessTools.Method(tPatch, nameof(OpenMapper));
             if (prefix_OpenForm is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{prefix_OpenForm}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{prefix_OpenForm}' not found", true);
                 return;
             }
             original_Navmesh_DrawRoad = AccessTools.Method(tNavmesh, "DrawRoad");
             if (original_Navmesh_DrawRoad is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{original_Navmesh_DrawRoad}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{original_Navmesh_DrawRoad}' not found", true);
                 return;
             }
             prefix_Navmesh_DrawRoad = AccessTools.Method(tPatch, nameof(PrefixDrawRoad));
             if (prefix_Navmesh_DrawRoad is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{prefix_Navmesh_DrawRoad}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{prefix_Navmesh_DrawRoad}' not found", true);
                 return;
             }
             original_DrawHotSpots = AccessTools.Method(tNavmesh, "DrawHotSpots");
             if (original_DrawHotSpots is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{original_DrawHotSpots}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{original_DrawHotSpots}' not found", true);
                 return;
             }
             prefix_DrawHotSpots = AccessTools.Method(tPatch, nameof(DrawHotSpots));
             if (prefix_DrawHotSpots is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{prefix_DrawHotSpots}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{prefix_DrawHotSpots}' not found", true);
                 return;
             }
             original_DrawMeshes = AccessTools.Method(tPicture, "DrawMeshes");
             if (original_DrawMeshes is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{original_DrawMeshes}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{original_DrawMeshes}' not found", true);
                 return;
             }
             prefix_DrawMeshes = AccessTools.Method(tPatch, nameof(DrawMeshes));
             if (prefix_DrawMeshes is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{prefix_DrawMeshes}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' failed. Method '{prefix_DrawMeshes}' not found", true);
                 return;
             }
             Action unPatch = null;
@@ -95,7 +95,7 @@ namespace EntityTools.Patches.Mapper
                     new HarmonyMethod(prefix_OpenForm));
                 unPatch = () =>
                 {
-                    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{original_OpenForm}'");
+                    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{original_OpenForm}'", true);
                     AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_OpenForm, prefix_OpenForm);
                 };
 
@@ -103,7 +103,7 @@ namespace EntityTools.Patches.Mapper
                     new HarmonyMethod(prefix_Navmesh_DrawRoad));
                 unPatch += () =>
                 {
-                    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{prefix_Navmesh_DrawRoad}'");
+                    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{prefix_Navmesh_DrawRoad}'", true);
                     AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_Navmesh_DrawRoad,
                         prefix_Navmesh_DrawRoad);
                 };
@@ -112,7 +112,7 @@ namespace EntityTools.Patches.Mapper
                     new HarmonyMethod(prefix_DrawMeshes));
                 unPatch += () =>
                 {
-                    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{prefix_DrawMeshes}'");
+                    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{prefix_DrawMeshes}'", true);
                     AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_DrawMeshes, prefix_DrawMeshes);
                 };
 
@@ -160,17 +160,16 @@ namespace EntityTools.Patches.Mapper
                     *tar = *inj;
                 }
 #endif
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' succeeded", true);
             }
             catch (Exception e)
             {
-                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Mapper)}' failed");
+                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Mapper)}' failed", true);
                 unPatch?.Invoke();
-                ETLogger.WriteLine(LogType.Error, e.ToString());
-                throw;
+                ETLogger.WriteLine(LogType.Error, e.ToString(), true);
             }
 
             PatchesWasApplied = true;
-            ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Mapper)}' succeeded");
         }
 
         internal static bool OpenMapper()

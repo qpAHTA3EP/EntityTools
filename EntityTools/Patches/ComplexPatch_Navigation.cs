@@ -52,14 +52,14 @@ namespace EntityTools.Patches
             original_Navmesh_GetPath = AccessTools.Method(tNavmesh, Navmesh_GetPath);
             if (original_Navmesh_GetPath is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Navmesh_GetPath}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Navmesh_GetPath}' not found", true);
                 return;
             }
 
             prefix_Navmesh_GetPath = AccessTools.Method(tPatch, nameof(PrefixGetPath));
             if (prefix_Navmesh_GetPath is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(PrefixGetPath)}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(PrefixGetPath)}' not found", true);
                 return;
             }
 
@@ -67,13 +67,13 @@ namespace EntityTools.Patches
             original_Navmesh_GenerateRoad = AccessTools.Method(tNavmesh, Navmesh_GenerateRoad);
             if (original_Navmesh_GenerateRoad is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Navmesh_GenerateRoad}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Navmesh_GenerateRoad}' not found", true);
                 return;
             }
             prefix_Navmesh_GenerateRoad = AccessTools.Method(tPatch, nameof(PrefixGenerateRoad));
             if (prefix_Navmesh_GenerateRoad is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(PrefixGenerateRoad)}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(PrefixGenerateRoad)}' not found", true);
                 return;
             }
 
@@ -81,13 +81,13 @@ namespace EntityTools.Patches
             original_Navmesh_GetNearestNodeFromPosition = AccessTools.Method(tNavmesh, "GetNearestNodeFromPosition");
             if (original_Navmesh_GetNearestNodeFromPosition is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Navmesh_GetNearestNodeFromPosition}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Navmesh_GetNearestNodeFromPosition}' not found", true);
                 return;
             }
             prefix_Navmesh_GetNearestNodeFromPosition = AccessTools.Method(tPatch, nameof(PrefixGetNearestNodeFromPosition));
             if (prefix_Navmesh_GetNearestNodeFromPosition is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(PrefixGetNearestNodeFromPosition)}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(PrefixGetNearestNodeFromPosition)}' not found", true);
                 return;
             }
 
@@ -95,13 +95,13 @@ namespace EntityTools.Patches
             original_Navmesh_FixPath = AccessTools.Method(tNavmesh, "fixPath");
             if (original_Navmesh_FixPath is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Navmesh_FixPath}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Navmesh_FixPath}' not found", true);
                 return;
             }
             prefix_Navmesh_FixPath = AccessTools.Method(tPatch, nameof(PrefixFixPath));
             if (prefix_Navmesh_FixPath is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(PrefixFixPath)}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(PrefixFixPath)}' not found", true);
                 return;
             }
 
@@ -109,13 +109,13 @@ namespace EntityTools.Patches
             original_Navmesh_TotalDistance = AccessTools.Method(tNavmesh, Navmesh_TotalDistance);
             if (original_Navmesh_TotalDistance is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Navmesh_TotalDistance}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Navmesh_TotalDistance}' not found", true);
                 return;
             }
             prefix_Navmesh_MethodInfo = AccessTools.Method(tPatch, nameof(PrefixTotalDistance));
             if (prefix_Navmesh_MethodInfo is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(PrefixTotalDistance)}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(PrefixTotalDistance)}' not found", true);
                 return;
             }
 
@@ -123,13 +123,13 @@ namespace EntityTools.Patches
             original_Road_PathDistance = AccessTools.Method(tRoad, Road_PathDistance );
             if (original_Road_PathDistance is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Road_PathDistance}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Road_PathDistance}' not found", true);
                 return;
             }
             prefix_Road_PathDistance = AccessTools.Method(tPatch, nameof(PathDistance));
             if (prefix_Road_PathDistance is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(PathDistance)}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(PathDistance)}' not found", true);
                 return;
             }
 
@@ -137,13 +137,13 @@ namespace EntityTools.Patches
             original_Road_GenerateRoadFromPlayer = AccessTools.Method(tRoad, Road_GenerateRoadFromPlayer);
             if (original_Road_GenerateRoadFromPlayer is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Road_GenerateRoadFromPlayer}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{Road_GenerateRoadFromPlayer}' not found", true);
                 return;
             }
             prefix_Road_GenerateRoadFromPlayer = AccessTools.Method(tPatch, nameof(GenerateRoadFromPlayer));
             if (prefix_Road_GenerateRoadFromPlayer is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(GenerateRoadFromPlayer)}' not found");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' failed. Method '{nameof(GenerateRoadFromPlayer)}' not found", true);
                 return;
             }
 
@@ -154,7 +154,7 @@ namespace EntityTools.Patches
                 AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_Navmesh_GetPath, new HarmonyMethod(prefix_Navmesh_GetPath));
                 unPatch = () =>
                 {
-                    ETLogger.WriteLine(LogType.Debug, $@"Unpatch method '{original_Navmesh_GetPath}'.");
+                    ETLogger.WriteLine(LogType.Debug, $@"Unpatch method '{original_Navmesh_GetPath}'.", true);
                     AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_Navmesh_GetPath,
                             prefix_Navmesh_GetPath);
                 };
@@ -162,7 +162,7 @@ namespace EntityTools.Patches
                 AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_Navmesh_GenerateRoad, new HarmonyMethod(prefix_Navmesh_GenerateRoad));
                 unPatch += () =>
                 {
-                    ETLogger.WriteLine(LogType.Debug, $@"Unpatch method '{original_Navmesh_GenerateRoad}'.");
+                    ETLogger.WriteLine(LogType.Debug, $@"Unpatch method '{original_Navmesh_GenerateRoad}'.", true);
                     AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_Navmesh_GenerateRoad,
                             prefix_Navmesh_GenerateRoad);
                 };
@@ -170,7 +170,7 @@ namespace EntityTools.Patches
                 AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_Navmesh_GetNearestNodeFromPosition, new HarmonyMethod(prefix_Navmesh_GetNearestNodeFromPosition));
                 unPatch += () =>
                 {
-                    ETLogger.WriteLine(LogType.Debug, $@"Unpatch method '{original_Navmesh_GetNearestNodeFromPosition}'.");
+                    ETLogger.WriteLine(LogType.Debug, $@"Unpatch method '{original_Navmesh_GetNearestNodeFromPosition}'.", true);
                     AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_Navmesh_GetNearestNodeFromPosition,
                             prefix_Navmesh_GetNearestNodeFromPosition);
                 };
@@ -178,7 +178,7 @@ namespace EntityTools.Patches
                 AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_Navmesh_FixPath, new HarmonyMethod(prefix_Navmesh_FixPath));
                 unPatch += () =>
                 {
-                    ETLogger.WriteLine(LogType.Debug, $@"Unpatch method '{original_Navmesh_FixPath}'.");
+                    ETLogger.WriteLine(LogType.Debug, $@"Unpatch method '{original_Navmesh_FixPath}'.", true);
                     AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_Navmesh_FixPath,
                             prefix_Navmesh_FixPath);
                 };
@@ -186,7 +186,7 @@ namespace EntityTools.Patches
                 AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_Navmesh_TotalDistance, new HarmonyMethod(prefix_Navmesh_MethodInfo));
                 unPatch += () =>
                 {
-                    ETLogger.WriteLine(LogType.Debug, $@"Unpatch method '{original_Navmesh_TotalDistance}'.");
+                    ETLogger.WriteLine(LogType.Debug, $@"Unpatch method '{original_Navmesh_TotalDistance}'.", true);
                     AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_Navmesh_TotalDistance,
                             prefix_Navmesh_MethodInfo);
                 };
@@ -194,29 +194,29 @@ namespace EntityTools.Patches
                 AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_Road_PathDistance, new HarmonyMethod(prefix_Road_PathDistance));
                 unPatch += () =>
                 {
-                    ETLogger.WriteLine(LogType.Debug, $@"Unpatch of the '{original_Road_PathDistance}'.");
+                    ETLogger.WriteLine(LogType.Debug, $@"Unpatch of the '{original_Road_PathDistance}'.", true);
                     AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_Road_PathDistance,
                             prefix_Road_PathDistance);
                 };
 
                 AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_Road_GenerateRoadFromPlayer, new HarmonyMethod(prefix_Road_GenerateRoadFromPlayer));
-                unPatch += () =>
-                {
-                    ETLogger.WriteLine(LogType.Debug, $@"Unpatch method '{original_Road_GenerateRoadFromPlayer}'.");
-                    AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_Road_GenerateRoadFromPlayer,
-                            prefix_Road_GenerateRoadFromPlayer);
-                };
+                //unPatch += () =>
+                //{
+                //    ETLogger.WriteLine(LogType.Debug, $@"Unpatch method '{original_Road_GenerateRoadFromPlayer}'.", true);
+                //    AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_Road_GenerateRoadFromPlayer,
+                //            prefix_Road_GenerateRoadFromPlayer);
+                //};
+
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' succeeded", true);
             }
             catch (Exception e)
             {
-                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Navigation)}' failed");
+                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Navigation)}' failed", true);
                 unPatch?.Invoke();
-                ETLogger.WriteLine(LogType.Error, e.ToString());
-                throw;
+                ETLogger.WriteLine(LogType.Error, e.ToString(), true);
             }
 
             PatchesWasApplied = true;
-            ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' succeeded");
         }
 
         #region GetPath

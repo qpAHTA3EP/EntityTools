@@ -1,10 +1,5 @@
-﻿using HarmonyLib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Astral.Quester.Classes.Conditions;
+﻿using Astral.Quester.Classes.Conditions;
+using HarmonyLib;
 
 namespace AcTp0Tools.Patches
 {

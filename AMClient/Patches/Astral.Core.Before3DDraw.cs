@@ -77,11 +77,11 @@ namespace AcTp0Tools.Patches
             try
             {
                 var harPatch = new HarmonyMethod(finalizer);
-                unPatch = () =>
-                {
-                    Logger.WriteLine(Logger.LogType.Debug, $@"Unpatch '{nameof(Astral_Core_Before3DDraw)}'");
-                    AcTp0Patcher.Harmony.Unpatch(original_Before3DDraw, finalizer);
-                };
+                //unPatch = () =>
+                //{
+                //    Logger.WriteLine(Logger.LogType.Debug, $@"Unpatch '{nameof(Astral_Core_Before3DDraw)}'");
+                //    AcTp0Patcher.Harmony.Unpatch(original_Before3DDraw, finalizer);
+                //};
                 AcTp0Patcher.Harmony.Patch(original_Before3DDraw, null, null, null, harPatch);
                 Logger.WriteLine(Logger.LogType.Debug, $@"Patch '{nameof(Astral_Core_Before3DDraw)}' succeeded.");
             }

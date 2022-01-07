@@ -23,9 +23,6 @@ namespace EntityTools.Patches
         private static readonly Patch_VIP_SealTraderEntity Patch_VIP_SealTraderEntity = new Patch_VIP_SealTraderEntity();
         private static readonly Patch_VIP_ProfessionVendorEntity Patch_VIP_ProfessionVendorEntity = new Patch_VIP_ProfessionVendorEntity();
 
-        //private static readonly Patch_Astral_Quester_Core_Save Patch_Astral_Quester_Core_Save = new Patch_Astral_Quester_Core_Save();
-
-
         // Патч метода выбора текущего индекса
         private static readonly Astral_Logic_General_GetNearestIndexInPositionList Astral_Logic_General_GetNearestIndexInPositionList = new Astral_Logic_General_GetNearestIndexInPositionList();
 
@@ -58,7 +55,8 @@ namespace EntityTools.Patches
                 // Не работает, т.к. метод '\u0001()' запускается в статическом конструкторе класса WorldDrawing
                 // то есть до применения патча
                 //MyNW_Internals_WorldDrawing.ApplyPatches();
-                //TODO Добавить патч AuraDetector
+                // Подмена окна выбора Ауры
+                Patch_AuraDetector.Apply();
 
                 try
                 {

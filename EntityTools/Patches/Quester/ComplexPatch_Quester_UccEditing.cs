@@ -54,34 +54,34 @@ namespace EntityTools.Patches.Quester
                                                                 ?.GetGetMethod(true);
             if (original_AddUCCAction_InternalValidity is null)
             {
-                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed. Method '{original_AddUCCAction_InternalValidity}' not found");
+                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed. Method '{original_AddUCCAction_InternalValidity}' not found", true);
                 return;
             }
             original_AddUCCAction_Run = AccessTools.Method(tAddUCCActions, nameof(Astral.Quester.Classes.Actions.AddUCCActions.Run));
             if(original_AddUCCAction_Run is null)
             {
-                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed. Method '{original_AddUCCAction_Run}' not found");
+                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed. Method '{original_AddUCCAction_Run}' not found", true);
                 return;
             }            
             original_SpecialAction_Run_RemoveAllTempUCCActions = AccessTools.Method(typeof(Astral.Quester.Classes.Actions.SpecialAction),
                                                                                 nameof(Astral.Quester.Classes.Actions.SpecialAction.Run));
             if (original_SpecialAction_Run_RemoveAllTempUCCActions is null)
             {
-                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed. Method '{original_SpecialAction_Run_RemoveAllTempUCCActions}' not found");
+                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed. Method '{original_SpecialAction_Run_RemoveAllTempUCCActions}' not found", true);
                 return;
             }
             original_UccProfile_Save = AccessTools.Method(typeof(Astral.Logic.UCC.Classes.Profil),
                                                       nameof(Astral.Logic.UCC.Classes.Profil.Save));
             if (original_UccProfile_Save is null)
             {
-                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed. Method '{original_UccProfile_Save}' not found");
+                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed. Method '{original_UccProfile_Save}' not found", true);
                 return;
             }
             original_UccProfile_ToString = AccessTools.Method(typeof(Astral.Logic.UCC.Classes.Profil),
                                                           nameof(Astral.Logic.UCC.Classes.Profil.ToString));
             if (original_UccProfile_ToString is null)
             {
-                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed. Method '{original_UccProfile_ToString}' not found");
+                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed. Method '{original_UccProfile_ToString}' not found", true);
                 return;
             }
             original_UCCProfileEditor_EditValue = AccessTools.Method(typeof(Astral.Quester.UIEditors.UCCProfileEditor),
@@ -89,44 +89,44 @@ namespace EntityTools.Patches.Quester
                                                                      new[] { typeof(ITypeDescriptorContext), typeof(IServiceProvider), typeof(object) });
             if (original_UCCProfileEditor_EditValue is null)
             {
-                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed. Method '{original_UCCProfileEditor_EditValue}' not found");
+                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed. Method '{original_UCCProfileEditor_EditValue}' not found", true);
                 return;
             }
 
             prefix_AddUCCAction_InternalValidity = AccessTools.Method(tPatch, nameof(AddUCCAction_InternalValidity));
             if (prefix_AddUCCAction_InternalValidity is null)
             {
-                ETLogger.WriteLine(LogType.Error, $@"Patch '{{nameof(ComplexPatch_Quester_UccEditing)}}' failed. Method '{prefix_AddUCCAction_InternalValidity}' not found");
+                ETLogger.WriteLine(LogType.Error, $@"Patch '{{nameof(ComplexPatch_Quester_UccEditing)}}' failed. Method '{prefix_AddUCCAction_InternalValidity}' not found", true);
                 return;
             }
             prefix_AddUCCAction_Run = AccessTools.Method(tPatch, nameof(AddUCCAction_Run));
             if (prefix_AddUCCAction_Run is null)
             {
-                ETLogger.WriteLine(LogType.Error, $@"Patch '{{nameof(ComplexPatch_Quester_UccEditing)}}' failed. Method '{prefix_AddUCCAction_Run}' not found");
+                ETLogger.WriteLine(LogType.Error, $@"Patch '{{nameof(ComplexPatch_Quester_UccEditing)}}' failed. Method '{prefix_AddUCCAction_Run}' not found", true);
                 return;
             }
             prefix_SpecialAction_Run_RemoveAllTempUCCActions = AccessTools.Method(tPatch, nameof(SpecialAction_Run_RemoveAllTempUCCActions));
             if (prefix_SpecialAction_Run_RemoveAllTempUCCActions is null)
             {
-                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed. Method '{prefix_SpecialAction_Run_RemoveAllTempUCCActions}' not found");
+                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed. Method '{prefix_SpecialAction_Run_RemoveAllTempUCCActions}' not found", true);
                 return;
             }            
             prefix_UccProfile_Save = AccessTools.Method(tPatch, nameof(UccProfile_Save));
             if (prefix_UccProfile_Save is null)
             {
-                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed. Method '{prefix_UccProfile_Save}' not found");
+                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed. Method '{prefix_UccProfile_Save}' not found", true);
                 return;
             }
             prefix_UccProfile_ToString = AccessTools.Method(tPatch, nameof(UccProfile_ToString));
             if (prefix_UccProfile_ToString is null)
             {
-                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed. Method '{prefix_UccProfile_ToString}' not found");
+                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed. Method '{prefix_UccProfile_ToString}' not found", true);
                 return;
             }
             prefix_UCCProfileEditor_EditValue = AccessTools.Method(tPatch, nameof(UCCProfileEditor_EditValue));
             if (prefix_UCCProfileEditor_EditValue is null)
             {
-                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed. Method '{prefix_UCCProfileEditor_EditValue}' not found");
+                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed. Method '{prefix_UCCProfileEditor_EditValue}' not found", true);
                 return;
             }
 
@@ -137,7 +137,7 @@ namespace EntityTools.Patches.Quester
                 AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_AddUCCAction_InternalValidity, new HarmonyMethod(prefix_AddUCCAction_InternalValidity));
                 unpatch = () =>
                 {
-                    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{original_AddUCCAction_InternalValidity}'");
+                    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{original_AddUCCAction_InternalValidity}'", true);
                     AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_AddUCCAction_InternalValidity,
                             prefix_AddUCCAction_InternalValidity);
                 };
@@ -145,7 +145,7 @@ namespace EntityTools.Patches.Quester
                 AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_AddUCCAction_Run, new HarmonyMethod(prefix_AddUCCAction_Run));
                 unpatch += () =>
                 {
-                    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{prefix_AddUCCAction_Run}'");
+                    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{prefix_AddUCCAction_Run}'", true);
                     AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_AddUCCAction_Run,
                             prefix_AddUCCAction_Run);
                 };
@@ -153,7 +153,7 @@ namespace EntityTools.Patches.Quester
                 AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_SpecialAction_Run_RemoveAllTempUCCActions, new HarmonyMethod(prefix_SpecialAction_Run_RemoveAllTempUCCActions));
                 unpatch += () =>
                 {
-                    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{original_SpecialAction_Run_RemoveAllTempUCCActions}'");
+                    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{original_SpecialAction_Run_RemoveAllTempUCCActions}'", true);
                     AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(
                             original_SpecialAction_Run_RemoveAllTempUCCActions,
                             prefix_SpecialAction_Run_RemoveAllTempUCCActions);
@@ -162,32 +162,30 @@ namespace EntityTools.Patches.Quester
                 AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_UccProfile_Save, new HarmonyMethod(prefix_UccProfile_Save));
                 unpatch += () =>
                 {
-                    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{original_UccProfile_Save}'");
+                    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{original_UccProfile_Save}'", true);
                     AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_UccProfile_Save,
                             prefix_UccProfile_Save);
                 };
 
                 AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_UccProfile_ToString, new HarmonyMethod(prefix_UccProfile_ToString));
-                unpatch += () =>
-                {
-                    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{original_UccProfile_ToString}'");
-                    AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_UccProfile_ToString,
-                            prefix_UccProfile_ToString);
-                };
+                //unpatch += () =>
+                //{
+                //    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{original_UccProfile_ToString}'", true);
+                //    AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_UccProfile_ToString,
+                //            prefix_UccProfile_ToString);
+                //};
 
                 AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_UCCProfileEditor_EditValue, new HarmonyMethod(prefix_UCCProfileEditor_EditValue));
                     
-                PatchesWasApplied = true;
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' succeeded", true);
             }
             catch (Exception e)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed");
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' failed", true);
                 unpatch?.Invoke();
                 ETLogger.WriteLine(LogType.Error, e.ToString());
-                throw;
             }
             PatchesWasApplied = true;
-            ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Quester_UccEditing)}' succeeded");
         }
 
         /// <summary>

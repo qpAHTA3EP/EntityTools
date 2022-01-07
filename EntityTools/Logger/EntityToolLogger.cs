@@ -39,8 +39,7 @@ namespace EntityTools
 
         public static void WriteLine(string text, bool toAstral = false)
         {
-            if(EntityTools.Config.Logger.Active)
-                WriteLine(LogType.Log, text, toAstral);
+            WriteLine(LogType.Log, text, toAstral);
         }
 
         public static void WriteLine(LogType logType, string text, bool toAstral = false)
@@ -56,18 +55,12 @@ namespace EntityTools
                         {
                             case LogType.Log:
                                 LogCache.Append(" [LOG] ");
-                                if (toAstral)
-                                    Logger.WriteLine(Logger.LogType.Log, text);
                                 break;
                             case LogType.Debug:
                                 LogCache.Append(" [DBG] ");
-                                if (toAstral)
-                                    Logger.WriteLine(Logger.LogType.Debug, text);
                                 break;
                             case LogType.Error:
                                 LogCache.Append(" [ERR] ");
-                                if (toAstral)
-                                    Logger.WriteLine(Logger.LogType.Debug, text);
                                 break;
                         }
 
@@ -78,6 +71,10 @@ namespace EntityTools
                 {
                     File.AppendAllText(logFilePath, DateTime.Now.ToString("[HH:mm:ss] [ERR]") + e);
                 }
+            }
+            if (toAstral)
+            {
+                Logger.WriteLine(Logger.LogType.Debug, text);
             }
         }
 
