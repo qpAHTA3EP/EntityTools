@@ -107,6 +107,25 @@ namespace EntityTools.Settings
         }
         private bool sealTraderEntity = true;
 
+        /// <summary>
+        /// Активация или деактивация Патча AuraDetector
+        /// </summary>
+        [Bindable(true)]
+        [Description("Управление патчем AuraDetector")]
+        public bool AuraDetector
+        {
+            get => auraDetector;
+            set
+            {
+                if (auraDetector != value)
+                {
+                    auraDetector = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private bool auraDetector = true;
+        
         public override string ToString()
         {
             int num = 0;
@@ -115,7 +134,8 @@ namespace EntityTools.Settings
             if (professionVendorEntity) num++;
             if (sealTraderEntity) num++;
             if (getNearestIndexInPositionList) num++;
-            return string.Concat('(', num, " of 5)");
+            if (auraDetector) num++;
+            return string.Concat('(', num, " of 6)");
         }
     }
 }
