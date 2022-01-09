@@ -9,11 +9,28 @@ namespace AcTp0Tools.Reflection
     /// </summary>
     public static partial class ReflectionHelper
     {
+        /// <summary>
+        /// Конструирование делегата <seealso cref="Action"/>, осуществляющего через механизм рефлексии,
+        /// доступ к методу <paramref name="methodName"/> объекта типа <paramref name="containerType"/>.
+        /// </summary>
+        /// <param name="containerType">Тип, декларирующий искомый метод</param>
+        /// <param name="methodName">Имя метода</param>
+        /// <param name="flags"></param>
+        /// <returns>Сконструированный делегат</returns>
         public static Action GetStaticAction(this Type containerType, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
             return ConstructStaticAction<Action>(containerType, methodName, new Type[] { }, flags);
         }
 
+        /// <summary>
+        /// Конструирование делегата <seealso cref="Action{ArgumentT1}"/>, осуществляющего через механизм рефлексии,
+        /// доступ к методу <paramref name="methodName"/> объекта типа <paramref name="containerType"/>,
+        /// который принимает один аргумент типа <typeparamref name="ArgumentT1"/>
+        /// </summary>
+        /// <param name="containerType">Тип, декларирующий искомый метод</param>
+        /// <param name="methodName">Имя метода</param>
+        /// <param name="flags"></param>
+        /// <returns>Сконструированный делегат</returns>
         public static Action<ArgumentT1>
                              GetStaticAction<ArgumentT1>(this Type containerType, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
@@ -21,6 +38,15 @@ namespace AcTp0Tools.Reflection
                             new[] { typeof(ArgumentT1) }, flags);
         }
 
+        /// <summary>
+        /// Конструирование делегата <seealso cref="Action{ArgumentT1, ArgumentT2}"/>, осуществляющего через механизм рефлексии,
+        /// доступ к методу <paramref name="methodName"/> объекта типа <paramref name="containerType"/>,
+        /// который принимает два аргумента типа <typeparamref name="ArgumentT1"/> и <typeparamref name="ArgumentT2"/>
+        /// </summary>
+        /// <param name="containerType">Тип, декларирующий искомый метод</param>
+        /// <param name="methodName">Имя метода</param>
+        /// <param name="flags"></param>
+        /// <returns>Сконструированный делегат</returns>
         public static Action<ArgumentT1, ArgumentT2>
                              GetStaticAction<ArgumentT1, ArgumentT2>(this Type containerType, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
@@ -28,6 +54,15 @@ namespace AcTp0Tools.Reflection
                             new[] { typeof(ArgumentT1), typeof(ArgumentT2) }, flags);
         }
 
+        /// <summary>
+        /// Конструирование делегата <seealso cref="Action{ArgumentT1, ArgumentT2, ArgumentT3}"/>, осуществляющего через механизм рефлексии,
+        /// доступ к методу <paramref name="methodName"/> объекта типа <paramref name="containerType"/>,
+        /// который принимает три аргумента типа <typeparamref name="ArgumentT1"/>, <typeparamref name="ArgumentT2"/> и <typeparamref name="ArgumentT3"/>
+        /// </summary>
+        /// <param name="containerType">Тип, декларирующий искомый метод</param>
+        /// <param name="methodName">Имя метода</param>
+        /// <param name="flags"></param>
+        /// <returns>Сконструированный делегат</returns>
         public static Action<ArgumentT1, ArgumentT2, ArgumentT3>
                              GetStaticAction<ArgumentT1, ArgumentT2, ArgumentT3>(this Type containerType, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
@@ -36,6 +71,15 @@ namespace AcTp0Tools.Reflection
                             flags);
         }
 
+        /// <summary>
+        /// Конструирование делегата <seealso cref="Action{ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4}"/>, осуществляющего через механизм рефлексии,
+        /// доступ к методу <paramref name="methodName"/> объекта типа <paramref name="containerType"/>,
+        /// который принимает четыре аргумента типа <typeparamref name="ArgumentT1"/>, <typeparamref name="ArgumentT2"/>, <typeparamref name="ArgumentT3"/> и <typeparamref name="ArgumentT4"/>
+        /// </summary>
+        /// <param name="containerType">Тип, декларирующий искомый метод</param>
+        /// <param name="methodName">Имя метода</param>
+        /// <param name="flags"></param>
+        /// <returns>Сконструированный делегат</returns>
         public static Action<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4>
                              GetStaticAction<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4>(this Type containerType, string methodName = "", BindingFlags flags = BindingFlags.Default)
         {
@@ -44,6 +88,15 @@ namespace AcTp0Tools.Reflection
                             flags);
         }
 
+        /// <summary>
+        /// Конструирование делегата <seealso cref="Action{ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5}"/>, осуществляющего через механизм рефлексии,
+        /// доступ к методу <paramref name="methodName"/> объекта типа <paramref name="containerType"/>,
+        /// который принимает пять аргументов типа <typeparamref name="ArgumentT1"/>, <typeparamref name="ArgumentT2"/>, <typeparamref name="ArgumentT3"/>, <typeparamref name="ArgumentT4"/> и <typeparamref name="ArgumentT5"/>
+        /// </summary>
+        /// <param name="containerType">Тип, декларирующий искомый метод</param>
+        /// <param name="methodName">Имя метода</param>
+        /// <param name="flags"></param>
+        /// <returns>Сконструированный делегат</returns>
         public static Action<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5>
                              GetStaticVoidDelegate<ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ArgumentT5>(this Type containerType, string methodName, BindingFlags flags = BindingFlags.Default)
         {
@@ -52,6 +105,15 @@ namespace AcTp0Tools.Reflection
                             flags);
         }
 
+        /// <summary>
+        /// Метод, конструирующий делегат типа <typeparamref name="DelegateT"/>
+        /// </summary>
+        /// <typeparam name="DelegateT"></typeparam>
+        /// <param name="containerType"></param>
+        /// <param name="methodName"></param>
+        /// <param name="argumentTypes"></param>
+        /// <param name="flags"></param>
+        /// <returns></returns>
         private static DelegateT ConstructStaticAction<DelegateT>(Type containerType, string methodName, Type[] argumentTypes, BindingFlags flags = BindingFlags.Default) where DelegateT : class
         {
             if (containerType is null)

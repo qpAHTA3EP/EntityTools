@@ -6,7 +6,7 @@ namespace EntityTools.Patches
 {
     /// <summary>
     /// Патч, заменяющий штатное окно выбора ауры 'AuraDetector' на модифицированное 'AuraViewer'
-    /// <see cref="https://qpahta3ep.github.io/EntityToolsDocs/MainPanel/AuraViewer-RU.html"/>
+    /// <see href="https://qpahta3ep.github.io/EntityToolsDocs/MainPanel/AuraViewer-RU.html"/>
     /// </summary>
     public static class Patch_AuraDetector
     {

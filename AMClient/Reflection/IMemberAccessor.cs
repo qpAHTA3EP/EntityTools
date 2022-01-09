@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 
 namespace AcTp0Tools.Reflection
 {
     /// <summary>
-    /// Инферфес объекта, предоставляющего доступ к члеену типа <typeparamref name="C"/>
+    /// Инферфейс объекта, предоставляющего доступ к члену типа <typeparamref name="T"/>
     /// </summary>
     public interface IMemberAccessor<T>
     {
@@ -36,14 +31,19 @@ namespace AcTp0Tools.Reflection
 
 
     /// <summary>
-    /// Инферфес объекта, предоставляющего доступ к члену экземпляра типа <typeparamref name="C"/>
+    /// Инферфейс объекта, предоставляющего доступ к члену типа <typeparamref name="T"/>,
+    /// инкапсулированного в экземпляр типа <typeparamref name="C"/>
     /// </summary>
     public interface IInstanceMemberAccessor<C, T> : IMemberAccessor<T>
     {
         /// <summary>
         /// Экземпляр типа <typeparamref name="C"/>, к члену которого предоставляется доступ
         /// </summary>
-        C Instance { get; set; }
+        C Instance 
+        { 
+            get; 
+            //set;
+        }
         /// <summary>
         /// Чтение значение члена объекта <paramref name="instance"/>
         /// </summary>
@@ -59,7 +59,7 @@ namespace AcTp0Tools.Reflection
     }
 
     /// <summary>
-    /// Инферфес объекта, предоставляющего доступ к члеену типа
+    /// Инферфейс объекта, предоставляющего доступ к члену типа <typeparamref name="T"/>
     /// </summary>
     public interface IInstanceMemberAccessor<T> : IInstanceMemberAccessor<object, T> { }
 }

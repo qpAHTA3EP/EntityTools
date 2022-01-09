@@ -91,6 +91,7 @@ namespace EntityTools.Patches.Mapper
             this.btnZoomIn = new DevExpress.XtraBars.BarButtonItem();
             this.lblZoom = new DevExpress.XtraBars.BarStaticItem();
             this.btnZoomOut = new DevExpress.XtraBars.BarButtonItem();
+            this.btnPanelVisibility = new DevExpress.XtraBars.BarButtonItem();
             this.lblPlayerPos = new DevExpress.XtraBars.BarStaticItem();
             this.lblMousePos = new DevExpress.XtraBars.BarStaticItem();
             this.lblDrawInfo = new DevExpress.XtraBars.BarStaticItem();
@@ -254,8 +255,9 @@ namespace EntityTools.Patches.Mapper
             this.lblDrawInfo,
             this.btnDistanceMeasurement,
             this.btnAddRoad,
-            this.btnObjectInfo});
-            this.barManager.MaxItemId = 135;
+            this.btnObjectInfo,
+            this.btnPanelVisibility});
+            this.barManager.MaxItemId = 136;
             this.barManager.OptionsLayout.AllowAddNewItems = false;
             this.barManager.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.seDeleteRadius,
@@ -747,6 +749,7 @@ namespace EntityTools.Patches.Mapper
             new DevExpress.XtraBars.LinkPersistInfo(this.btnSettings, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.groupSaveUndo, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.groupZoom, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnPanelVisibility),
             new DevExpress.XtraBars.LinkPersistInfo(this.lblPlayerPos, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.lblMousePos, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.lblDrawInfo, true)});
@@ -821,6 +824,15 @@ namespace EntityTools.Patches.Mapper
             this.btnZoomOut.ImageOptions.Image = global::EntityTools.Properties.Resources.Zoomout_16x16;
             this.btnZoomOut.Name = "btnZoomOut";
             this.btnZoomOut.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ZoomOut);
+            // 
+            // btnPanelVisibility
+            // 
+            this.btnPanelVisibility.Caption = "Panel Visibility";
+            this.btnPanelVisibility.Hint = "Show (hide) tools panel";
+            this.btnPanelVisibility.Id = 135;
+            this.btnPanelVisibility.ImageOptions.Image = global::EntityTools.Properties.Resources.miniPanelVisibility;
+            this.btnPanelVisibility.Name = "btnPanelVisibility";
+            this.btnPanelVisibility.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Change_PanelVisibility);
             // 
             // lblPlayerPos
             // 
@@ -1569,6 +1581,7 @@ namespace EntityTools.Patches.Mapper
         private DevExpress.XtraEditors.SpinEdit editLayerDepth;
         private Label lblLayerDepth;
         private BarCheckItem btnObjectInfo;
+        private BarButtonItem btnPanelVisibility;
     } 
 #endif
 }

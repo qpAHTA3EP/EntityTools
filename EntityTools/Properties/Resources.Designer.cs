@@ -373,6 +373,16 @@ namespace EntityTools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap miniPanelVisibility {
+            get {
+                object obj = ResourceManager.GetObject("miniPanelVisibility", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap miniPen {
             get {
                 object obj = ResourceManager.GetObject("miniPen", resourceCulture);

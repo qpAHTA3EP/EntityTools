@@ -29,7 +29,11 @@ namespace AcTp0Tools
         /// </summary>
         public static class ItemFilter
         {
-            public static readonly Func<ItemFilterCore, Func<Item, bool>> IsMatch = InstanceAccessor<ItemFilterCore>.GetFunction<Item, bool>("\u0001");
+#if false
+            public static readonly Func<ItemFilterCore, Func<Item, bool>> IsMatch = InstanceAccessor<ItemFilterCore>.GetFunction<Item, bool>("\u0001"); 
+#else
+            public static readonly Func<ItemFilterCore, Item, bool> IsMatch = typeof(ItemFilterCore).GetFunctionAccessor<Item, bool>("\u0001");
+#endif
         }
 
     }

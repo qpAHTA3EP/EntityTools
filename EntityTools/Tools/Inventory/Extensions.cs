@@ -477,10 +477,10 @@ namespace EntityTools.Extensions
                 {
                     predicate = item => {
                         return Inventory.CanSell(item)
-                               && AstralAccessors.ItemFilter.IsMatch(filter)(item);
+                               && AstralAccessors.ItemFilter.IsMatch(filter, item);
                     };
                 }
-                else predicate = item => AstralAccessors.ItemFilter.IsMatch(filter)(item);
+                else predicate = item => AstralAccessors.ItemFilter.IsMatch(filter, item);
 
                 List<InventorySlot> slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.Inventory).GetItems;
                 if (slots != null && slots.Count > 0)
@@ -548,10 +548,10 @@ namespace EntityTools.Extensions
                 {
                     predicate = item => {
                         return Inventory.CanSell(item)
-                               && AstralAccessors.ItemFilter.IsMatch(filter)(item);
+                               && AstralAccessors.ItemFilter.IsMatch(filter, item);
                     };
                 }
-                else predicate = item => AstralAccessors.ItemFilter.IsMatch(filter)(item);
+                else predicate = item => AstralAccessors.ItemFilter.IsMatch(filter, item);
 #endif
 
                 // Сканируем все выбранные сумки и добавляем подходящие предметы в список

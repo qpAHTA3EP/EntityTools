@@ -1,14 +1,15 @@
-﻿using AStar;
+﻿using AcTp0Tools.Patches;
+using AcTp0Tools.Reflection;
+using AStar;
+using Astral;
+using Astral.Addons;
 using Astral.Logic.Classes.Map;
-using HarmonyLib;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
 using System.Reflection;
-using AcTp0Tools.Patches;
-using AcTp0Tools.Reflection;
 
+// ReSharper disable once CheckNamespace
 namespace AcTp0Tools
 {
     /// <summary>
@@ -16,8 +17,6 @@ namespace AcTp0Tools
     /// </summary>
     public static partial class AstralAccessors
     {
-        // TODO : Заменить Traverse на собственные объекты, т.к. они быстрее на ~30%
-
         /// <summary>
         /// Доступ к закрытым членам Astral.Controllers
         /// </summary>
@@ -26,85 +25,95 @@ namespace AcTp0Tools
             // Ошибка доступа времени исполнения
             public static class Roles
             {
-#if false
-                public static readonly StaticPropertyAccessor<Astral.Addons.Role> CurrentRole;
+#if HARMONY_TRAVERSE
+
                 static Roles()
                 {
-                    Type type = Assembly.GetEntryAssembly()?.GetType("Astral.Controllers.Roles");//typeof(Astral.Controllers.Roles);
+                    Type type = Assembly.GetEntryAssembly()?.GetType("Astral.Controllers.Roles");
                     if (type != null)
-                        CurrentRole = type.GetStaticProperty<Astral.Addons.Role>("CurrentRole");
-                } 
-#endif
-                /// <summary>
-                /// Объект, соответствующий текущей роли Астрала
-                /// </summary>
+                    {
+                        currentRole = Traverse.Create(type).Property("CurrentRole"); 
+                        _currentRoleObject = currentRole.GetValue();
+                    }
+                }
+
                 private static readonly Traverse currentRole;
-                private static object _currentRoleObject;
-
-#if false
-                /// <summary>
-                /// Вызов метода CurrentRole.OnMapDraw(GraphicsNW graphicsNW)
-                /// </summary>
-                /// <param name="graphicsNW"></param>
-                public static bool CurrentRole_OnMapDraw(GraphicsNW graphicsNW)
+                private static Role _currentRoleObject; 
+#else
+                static Roles()
                 {
-                    object role = _currentRole.GetValue();
-                    if (role is null)
+                    var assembly = Assembly.GetEntryAssembly();
+                    if (assembly != null)
                     {
-                        _currentRoleObject = null;
-                        _currentRole_OnMapDraw = null;
-                        return false;
-                    }
-                    if (role != _currentRoleObject)
-                    {
-                        _currentRoleObject = role;
-                        _currentRole_OnMapDraw = Traverse.Create(_currentRoleObject).Method("OnMapDraw", graphicsNW);
-                    }
-                    if (_currentRoleObject != null && _currentRole_OnMapDraw is null)
-                        _currentRole_OnMapDraw = Traverse.Create(_currentRoleObject).Method("OnMapDraw", graphicsNW);
-
-                    if (_currentRole_OnMapDraw != null)
-                    {
-                        _currentRole_OnMapDraw.GetValue(graphicsNW);
-                        return true;
-                    }
-                    return false;
-                }
-                private static Traverse _currentRole_OnMapDraw;
-
-                /// <summary>
-                /// Чтение имени роли, выполняемой Астралом
-                /// </summary>
-                public static string CurrentRole_Name
-                {
-                    get
-                    {
-                        object role = _currentRole.GetValue();
-                        if (role is null)
+                        foreach (var type in assembly.GetTypes())
                         {
-                            _currentRoleObject = null;
-                            _currentRole_Name = null;
-                            return string.Empty;
+                            var fullName = type.FullName;
+                            if (fullName == typeName_Controler_Roles)
+                            {
+                                tControler_Roles = type;
+                                if (tRole != null)
+                                    break;
+                            }
+                            else if (fullName == typeName_Role)
+                            {
+                                tRole = type;
+                                if (tControler_Roles != null)
+                                    break;
+                            }
                         }
-                        if (role != _currentRoleObject || _currentRole_Name == null)
+
+                        if (tControler_Roles is null)
                         {
-                            _currentRoleObject = role;
-                            _currentRole_Name = Traverse.Create(_currentRoleObject).Property<string>("Name");
+                            Logger.WriteLine(Logger.LogType.Debug, $"Does not found type '{typeName_Controler_Roles}'");
                         }
-                        if (_currentRole_Name != null)
-                            return _currentRole_Name.Value;
-                        return string.Empty;
+                        else if (tRole is null)
+                        {
+                            Logger.WriteLine(Logger.LogType.Debug, $"Does not found type '{typeName_Role}'");
+                        }
+                        else 
+                        {
+                            currentRoleAccessor = tControler_Roles.GetStaticProperty("CurrentRole", tRole);
+                        }
                     }
                 }
-                private static Traverse<string> _currentRole_Name; 
+
+                /// <summary>
+                /// Объект, предоставляющий доступ к приватному свойству <see cref="Astral.Controllers.Roles.CurrentRole"/>
+                /// </summary>
+                private static readonly StaticPropertyAccessor currentRoleAccessor;
+
+                /// <summary>
+                /// Полное имя закрытого типа <see cref="Astral.Controllers.Roles"/>
+                /// </summary>
+                private const string typeName_Controler_Roles = "Astral.Controllers.Roles";
+                /// <summary>
+                /// Полное имя закрытого типа <see cref="Astral.Addons.Role"/>
+                /// </summary>
+                private const string typeName_Role = "Astral.Addons.Role";
+
+                /// <summary>
+                /// Закрытый тип <see cref="Astral.Controllers.Roles"/>
+                /// </summary>
+                private static readonly Type tControler_Roles;
+                /// <summary>
+                /// Закрытый тип <see cref="Astral.Addons.Role"/>
+                /// </summary>
+                private static readonly Type tRole;
 #endif
+
 
                 public static class CurrentRole
                 {
+                    /// <summary>
+                    /// Вызов метода <see cref="Astral.Controllers.Roles.CurrentRole.OnMapDraw{GraphicsNW}"/> активной роли Астрала. 
+                    /// <remarks>Поскольку данный метод является виртуальным, функтор доступа <see cref="_usedMeshes"/>
+                    /// необходимо обновлять при смене активной роли</remarks>
+                    /// </summary>
                     public static Graph UsedMeshes
                     {
                         get
                         {
+#if HARMONY_TRAVERSE
                             object role = currentRole.GetValue();
                             if (role is null)
                             {
@@ -115,19 +124,41 @@ namespace AcTp0Tools
                             {
                                 _currentRoleObject = role;
                                 _usedMeshes = Traverse.Create(_currentRoleObject).Property<Graph>("UsedMeshes");
-                            }
-
+                            } 
                             return _usedMeshes?.Value;
+#elif ROLE_USEDMESHES
+
+                            var role = currentRoleAccessor.Value;
+                            if (_usedMeshes?.Instance != role)
+                            {
+                                _usedMeshes = role.GetProperty<Graph>(nameof(UsedMeshes));
+                            }
+                            return _usedMeshes?.Value;
+#else
+                            // Отображаются Сделать взаимодействие с AstralAccessor.Quester.Core.Meshes
+                            if (Name == nameof(Astral.Grinder))
+                                return Astral.Grinder.API.CurrentProfile.Meshes;
+                            return Quester.Core.Meshes;
+
+#endif
                         }
                     }
-                    private static Traverse<Graph> _usedMeshes;
+#if HARMONY_TRAVERSE
+                    private static Traverse<Graph> _usedMeshes; 
+#else
+                    private static PropertyAccessor<Graph> _usedMeshes;
+#endif
 
                     /// <summary>
-                    /// Вызов метода CurrentRole.OnMapDraw(GraphicsNW graphicsNW)
+                    /// Вызов метода <see cref="Astral.Controllers.Roles.CurrentRole.OnMapDraw{GraphicsNW}"/> активной роли Астрала
+                    /// <remarks>Поскольку данный метод является виртуальным, функтор доступа <see cref="_onMapDraw"/>
+                    /// необходимо обновлять при смене активной роли</remarks>
                     /// </summary>
                     /// <param name="graphicsNW"></param>
+                    /// <returns>Флаг, указывающий на успешное выполнение метода</returns>
                     public static bool OnMapDraw(GraphicsNW graphicsNW)
                     {
+#if HARMONY_TRAVERSE
                         object role = currentRole.GetValue();
                         if (role is null)
                         {
@@ -146,18 +177,71 @@ namespace AcTp0Tools
                         {
                             _onMapDraw.GetValue(graphicsNW);
                             return true;
-                        }
+                        } 
                         return false;
+#else
+                        var role = currentRoleAccessor.Value;
+
+                        if (role != null)
+                        {
+                            // Поскольку объект Astral.Controllers.Roles.CurrentRole может быть любого из дочерних типов
+                            // нужно проверять 
+                            if (!ReferenceEquals(role, _onMapDrawTarget))
+                            {
+                                _onMapDraw = role.GetType().GetAction<GraphicsNW>(nameof(OnMapDraw));
+                                _onMapDrawTarget = role;
+                            }
+
+                            if (_onMapDraw != null)
+                            {
+                                _onMapDraw(_onMapDrawTarget, graphicsNW);
+                                return true;
+                            }
+                        } 
+
+                        return false;
+#endif
                     }
-                    private static Traverse _onMapDraw;
 
                     /// <summary>
-                    /// Чтение имени роли, выполняемой Астралом
+                    /// Метод заглушка, используемый при ошибке получения доступа к <see cref="Astral.Controllers.Roles.CurrentRole.OnMapDraw{GraphicsNW}"/>
+                    /// </summary>
+                    /// <param name="o"></param>
+                    /// <param name="g"></param>
+                    /// <returns></returns>
+                    private static void OnMapDraw_Stub(object o, GraphicsNW g)
+                    {
+#if false
+                        Logger.WriteLine(Logger.LogType.Debug, $"Access violation to method 'OnMapDraw' of the object '{o}'\n" +
+                                                                               $"{Environment.StackTrace}"); 
+#else
+                        Logger.WriteLine(Logger.LogType.Debug, $"Accessor to the method 'OnMapDraw' of the object '{o}' is not initialized.\n" +
+                                                               $"{Environment.StackTrace}");
+#endif
+                    }
+#if HARMONY_TRAVERSE
+                    private static Traverse _onMapDraw; 
+#else
+                    /// <summary>
+                    /// Функтор доступа к функции объекта
+                    /// </summary>
+                    private static Action<object, GraphicsNW> _onMapDraw = null;
+                    /// <summary>
+                    /// Кэш объекта, с которым связан делегат <see cref="_onMapDraw"/>
+                    /// </summary>
+                    private static object _onMapDrawTarget = null;
+#endif
+
+                    /// <summary>
+                    /// Чтение названия активной роли Астралом (свойство <see cref="Role.Name"/>).
+                    /// <remarks>Поскольку данное свойство является виртуальным, функтор доступа <see cref="_nameAccessor"/>
+                    /// необходимо обновлять при смене активной роли</remarks>
                     /// </summary>
                     public static string Name
                     {
                         get
                         {
+#if HARMONY_TRAVERSE
                             object role = currentRole.GetValue();
                             if (role is null)
                             {
@@ -170,42 +254,61 @@ namespace AcTp0Tools
                                 _name = Traverse.Create(_currentRoleObject).Property<string>("Name");
                             }
                             if (_name != null)
-                                return _name.Value;
+                                return _name.Value; 
                             return string.Empty;
+#else
+                            var role = currentRoleAccessor.Value;
+                            if (role != null
+                                && _nameAccessor?.Instance != null)
+                            {
+                                _nameAccessor = role.GetProperty<string>(nameof(Role.Name));
+                            }
+                            return _nameAccessor?.Value;
+#endif
                         }
                     }
+#if HARMONY_TRAVERSE
                     private static Traverse<string> _name;
+#else
+                    private static PropertyAccessor<string> _nameAccessor;
+#endif
 
                     static CurrentRole()
                     {
+#if HARMONY_TRAVERSE
                         _currentRoleObject = currentRole.GetValue();
                         if (_currentRoleObject != null)
                         {
-                            _name = Traverse.Create(_currentRoleObject).Property<string>("Name");
+                            _name = Traverse.Create(_currentRoleObject).Property<string>("Name"); 
                         }
+#endif
+                        _onMapDraw = OnMapDraw_Stub;
                     }
 
+#if HARMONY_TRAVERSE
                     private static void ResetTraverses()
                     {
                         _currentRoleObject = null;
                         _usedMeshes = null;
                         _onMapDraw = null;
                         _name = null;
-                    }
-                }
-
-                static Roles()
-                {
-                    Type type = Assembly.GetEntryAssembly()?.GetType("Astral.Controllers.Roles");
-                    if (type != null)
+                    } 
+#endif
+                    /// <summary>
+                    /// Метод логирования ошибок доступа
+                    /// </summary>
+                    /// <param name="obj"></param>
+                    /// <param name="method"></param>
+                    private static void ReportAccessViolation(object obj, MethodBase method)
                     {
-                        currentRole = Traverse.Create(type).Property("CurrentRole");
-                        _currentRoleObject = currentRole.GetValue();
+                        Logger.WriteLine(Logger.LogType.Debug, $"Access violation to method '{method.Name}' of the object '{obj}'\n" +
+                                                               $"{Environment.StackTrace}");
                     }
                 }
             }
 
-            // Ошибка доступа времени исполнения
+
+#if AOECheck // Ошибка доступа времени исполнения поскольку тип Astral.Controllers.AOECheck.AOE является приватным
             public static class AOECheck
             {
 #if false
@@ -218,8 +321,8 @@ namespace AcTp0Tools
 
                     object list = aoeList.PropertyExists() ? aoeList.GetValue() : null;
                     if (list != null)
-                        _aoeList_Enumerator = Traverse.Create(list).Method("GetEnumerator");
-                    var enumeratorObj = _aoeList_Enumerator.GetValue();
+                        aoeList_Enumerator = Traverse.Create(list).Method("GetEnumerator");
+                    var enumeratorObj = aoeList_Enumerator.GetValue();
                     if (enumeratorObj != null && enumeratorObj is IDisposable disposable)
                     {
                         Traverse enumeratorMoveToNext = Traverse.Create(enumeratorObj).Method("MoveToNext");
@@ -237,7 +340,7 @@ namespace AcTp0Tools
                         }
                     }
                 }
-                private static Traverse _aoeList_Enumerator;
+                private static Traverse aoeList_Enumerator;
 
                 static AOECheck()
                 {
@@ -245,7 +348,8 @@ namespace AcTp0Tools
                     if (type != null)
                         aoeList = Traverse.Create(type).Property("List");
                 }
-            }
+            } 
+#endif
 
             public static class BotComs
             {
@@ -258,8 +362,8 @@ namespace AcTp0Tools
                             .GetStaticProperty<Astral.Functions.TCP.Client.Client>("Client");
 
 
-                    private static readonly FieldAccessor<System.Net.Sockets.TcpClient> tcpClientAccessor 
-                        = typeof(Astral.Functions.TCP.Client.Client).GetField<System.Net.Sockets.TcpClient>("\u0002");
+                    private static readonly FieldAccessor<TcpClient> tcpClientAccessor 
+                        = typeof(Astral.Functions.TCP.Client.Client).GetField<TcpClient>("\u0002");
 
                     public static TcpClient Client_TcpClient => tcpClientAccessor[client.Value];
                 }
@@ -268,10 +372,10 @@ namespace AcTp0Tools
                 {
                     public static Astral.Functions.TCP.Server.Server Server
                     {
-                        get => _server.Value;
-                        set => _server.Value = value;
+                        get => server.Value;
+                        set => server.Value = value;
                     }
-                    private static StaticPropertyAccessor<Astral.Functions.TCP.Server.Server> _server;
+                    private static readonly StaticPropertyAccessor<Astral.Functions.TCP.Server.Server> server;
 
                     public static readonly Action SendQuesterProfileInfos;
 
@@ -279,7 +383,7 @@ namespace AcTp0Tools
                     {
                         var tBotServer = typeof(Astral.Controllers.BotComs.BotServer);
 
-                        _server = tBotServer.GetStaticProperty<Astral.Functions.TCP.Server.Server>(nameof(Astral.Controllers.BotComs.BotServer.Server));
+                        server = tBotServer.GetStaticProperty<Astral.Functions.TCP.Server.Server>(nameof(Astral.Controllers.BotComs.BotServer.Server));
                         SendQuesterProfileInfos = tBotServer.GetStaticAction(nameof(Astral.Controllers.BotComs.BotServer.SendQuesterProfileInfos));
                     }
                 }
@@ -295,10 +399,6 @@ namespace AcTp0Tools
 
             public static class Plugins
             {
-                static Plugins()
-                {
-                }
-
                 /// <summary>
                 /// Коллекция сборок плагинов
                 /// </summary>
@@ -320,10 +420,10 @@ namespace AcTp0Tools
                 public static IEnumerable<Type> UccTargetSelectors =>
                     Astral_Functions_XmlSerializer_GetExtraTypes.UccTargetSelectorTypes;
 
-                static Func<List<Type>> getTypes = typeof(Plugins).GetStaticFunction<List<Type>>("GetTypes");
+                //static Func<List<Type>> getTypes = typeof(Plugins).GetStaticFunction<List<Type>>("GetTypes");
 
                 /// <summary>
-                /// Перечисление типов, объявленных в плагинах
+                /// Перечисление типов, объявленных в плагинах <see cref="Astral.Controllers.Plugins"/>
                 /// </summary>
                 /// <returns></returns>
                 public static IEnumerable<Type> GetTypes()
@@ -358,7 +458,7 @@ namespace AcTp0Tools
                 }
 
 
-#if false       // Вызывает ошибку доступа
+#if false       // Во время выполнения вызывает ошибку доступа при перечислении системных типов
                 /// <summary>
                 /// Перечисление всех типов, производных от типа <typeparamref name="TBase"/>,
                 /// объявленных во всех загруженных сборка

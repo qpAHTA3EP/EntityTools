@@ -3,8 +3,6 @@ using DevExpress.XtraEditors;
 using EntityTools.Enums;
 using EntityTools.Tools.CustomRegions;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -12,8 +10,7 @@ namespace EntityTools.Forms
 {
     public partial class CustomRegionCollectionEditorForm : XtraForm
     {
-        //TODO: Если снять отметки со всех регионов, то возвращается старая коллекция
-        //TODO: Добавить кнопки: отмет все, снять все отметки, отметить все свободные, снять все отмеченные
+        //TODO: Добавить кнопки: отметить все, снять все отметки, отметить все свободные, снять все отмеченные
 
         private static CustomRegionCollectionEditorForm @this = null;
 
@@ -73,7 +70,7 @@ namespace EntityTools.Forms
                                 checkState = CheckState.Indeterminate;
                             @this.crList.Items.Add(crEntry.Clone(), checkState);
                         }
-                        // Удаление дубликатов из списка отображаемы CustomRegion'ов
+                        // Удаление дубликатов из списка отображаемых CustomRegion'ов
                         else if(@this.crList.Items.FirstOrDefault(item => ((CustomRegionEntry)item.Value).Name == cr.Name) is null)
                             @this.crList.Items.Add(new CustomRegionEntry(cr.Name, InclusionType.Ignore), CheckState.Unchecked);
                     }
@@ -99,7 +96,6 @@ namespace EntityTools.Forms
                     inclusion = InclusionType.Exclusion;
 
                 CustomRegionCollection newCrCollection = new CustomRegionCollection();
-
 
                 for (int i = 0; i < @this.crList.ItemCount; i++)
                 {

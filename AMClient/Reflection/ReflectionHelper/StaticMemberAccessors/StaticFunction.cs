@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
+// ReSharper disable once CheckNamespace
 namespace AcTp0Tools.Reflection
 {
     /// <summary>
@@ -10,11 +11,11 @@ namespace AcTp0Tools.Reflection
     public static partial class ReflectionHelper
     {
         /// <summary>
-        /// Конструирование делегата, осуществляющего через механизм рефлексии 
-        /// доступ к статическкому методу класса, и возвращающего значение типа ReturnT
+        /// Конструирование делегата <see cref="Func{ReturnT}"/>, осуществляющего через механизм рефлексии 
+        /// доступ к статическому методу типа <paramref name="containerType"/>, и возвращающего значение типа <typeparamref name="ReturnT"/>
         /// </summary>
         /// <typeparam name="ReturnT">Тип возвращаемого значения</typeparam>
-        /// <param name="type">Тип, декларирующий искомый методв</param>
+        /// <param name="containerType">Тип, декларирующий искомый метод</param>
         /// <param name="methodName">Имя метода</param>
         /// <param name="flags"></param>
         /// <returns>Сконструированный делегат</returns>
@@ -24,11 +25,13 @@ namespace AcTp0Tools.Reflection
         }
 
         /// <summary>
-        /// Конструирование делегата, осуществляющего через механизм рефлексии 
-        /// доступ к статическкому методу класса, и возвращающего значение типа ReturnT
+        /// Конструирование делегата <see cref="Func{ArgumentT1, ReturnT}"/>, осуществляющего через механизм рефлексии 
+        /// доступ к статическому методу типа <paramref name="containerType"/>, и возвращающего значение типа <typeparamref name="ReturnT"/>,
+        /// принимающего один аргумент типа <typeparamref name="ArgumentT1"/>
         /// </summary>
         /// <typeparam name="ReturnT">Тип возвращаемого значения</typeparam>
-        /// <param name="type">Тип, декларирующий искомый методв</param>
+        /// <typeparam name="ArgumentT1"></typeparam>
+        /// <param name="containerType">Тип, декларирующий искомый метод</param>
         /// <param name="methodName">Имя метода</param>
         /// <param name="flags"></param>
         /// <returns>Сконструированный делегат</returns>
@@ -40,11 +43,14 @@ namespace AcTp0Tools.Reflection
         }
 
         /// <summary>
-        /// Конструирование делегата, осуществляющего через механизм рефлексии 
-        /// доступ к статическкому методу класса, и возвращающего значение типа ReturnT
+        /// Конструирование делегата <see cref="Func{ArgumentT1, ArgumentT2, ReturnT}"/>, осуществляющего через механизм рефлексии 
+        /// доступ к статическому методу типа <paramref name="containerType"/>, и возвращающего значение типа <typeparamref name="ReturnT"/>,
+        /// принимающего два аргумента типа <typeparamref name="ArgumentT1"/> и <typeparamref name="ArgumentT2"/>
         /// </summary>
         /// <typeparam name="ReturnT">Тип возвращаемого значения</typeparam>
-        /// <param name="type">Тип, декларирующий искомый методв</param>
+        /// <typeparam name="ArgumentT1"></typeparam>
+        /// <typeparam name="ArgumentT2"></typeparam>
+        /// <param name="containerType">Тип, декларирующий искомый метод</param>
         /// <param name="methodName">Имя метода</param>
         /// <param name="flags"></param>
         /// <returns>Сконструированный делегат</returns>
@@ -56,11 +62,15 @@ namespace AcTp0Tools.Reflection
         }
 
         /// <summary>
-        /// Конструирование делегата, осуществляющего через механизм рефлексии 
-        /// доступ к статическкому методу класса, и возвращающего значение типа ReturnT
+        /// Конструирование делегата <see cref="Func{ArgumentT1, ArgumentT2, ArgumentT3, ReturnT}"/>, осуществляющего через механизм рефлексии 
+        /// доступ к статическому методу типа <paramref name="containerType"/>, и возвращающего значение типа <typeparamref name="ReturnT"/>,
+        /// принимающего три аргумента типа <typeparamref name="ArgumentT1"/>, <typeparamref name="ArgumentT2"/> и <typeparamref name="ArgumentT3"/>
         /// </summary>
         /// <typeparam name="ReturnT">Тип возвращаемого значения</typeparam>
-        /// <param name="type">Тип, декларирующий искомый методв</param>
+        /// <typeparam name="ArgumentT1"></typeparam>
+        /// <typeparam name="ArgumentT2"></typeparam>
+        /// <typeparam name="ArgumentT3"></typeparam>
+        /// <param name="containerType">Тип, декларирующий искомый метод</param>
         /// <param name="methodName">Имя метода</param>
         /// <param name="flags"></param>
         /// <returns>Сконструированный делегат</returns>
@@ -81,11 +91,17 @@ namespace AcTp0Tools.Reflection
         }
 
         /// <summary>
-        /// Конструирование делегата, осуществляющего через механизм рефлексии 
-        /// доступ к статическкому методу класса, и возвращающего значение типа ReturnT
+        /// Конструирование делегата <see cref="Func{ArgumentT1, ArgumentT2, ArgumentT3, ArgumentT4, ReturnT}"/>, осуществляющего через механизм рефлексии 
+        /// доступ к статическому методу типа <paramref name="containerType"/>, и возвращающего значение типа <typeparamref name="ReturnT"/>,
+        /// принимающего четыре аргумента типа <typeparamref name="ArgumentT1"/>, <typeparamref name="ArgumentT2"/>, <typeparamref name="ArgumentT3"/> и <typeparamref name="ArgumentT4"/>
         /// </summary>
         /// <typeparam name="ReturnT">Тип возвращаемого значения</typeparam>
-        /// <param name="type">Тип, декларирующий искомый методв</param>
+        /// <typeparam name="ArgumentT1"></typeparam>
+        /// <typeparam name="ArgumentT2"></typeparam>
+        /// <typeparam name="ArgumentT3"></typeparam>
+        /// <typeparam name="ArgumentT4"></typeparam>
+        /// <typeparam name="ArgumentT5"></typeparam>
+        /// <param name="containerType">Тип, декларирующий искомый метод</param>
         /// <param name="methodName">Имя метода</param>
         /// <param name="flags"></param>
         /// <returns>Сконструированный делегат</returns>
@@ -97,6 +113,16 @@ namespace AcTp0Tools.Reflection
                         flags);
         }
 
+        /// <summary>
+        /// Конструирование делегата типа <typeparamref name="DelegateT"/>
+        /// </summary>
+        /// <typeparam name="DelegateT"></typeparam>
+        /// <typeparam name="ReturnT"></typeparam>
+        /// <param name="containerType"></param>
+        /// <param name="methodName"></param>
+        /// <param name="argumentTypes"></param>
+        /// <param name="flags"></param>
+        /// <returns></returns>
         private static DelegateT ConstructStaticFunction<DelegateT, ReturnT>(Type containerType, string methodName, Type[] argumentTypes, BindingFlags flags = BindingFlags.Default) where DelegateT : class
         {
             if (containerType is null)
@@ -140,7 +166,7 @@ namespace AcTp0Tools.Reflection
                 method = type.GetMethod(methodName, flags, null, inputTypes, null);
                 if (method != null)
                 {
-                    if (method.ReturnType.Equals(returnType))
+                    if (method.ReturnType == returnType)
                         return true;
                     method = null;
                     return false;
@@ -172,7 +198,7 @@ namespace AcTp0Tools.Reflection
                         bool flag = true;
                         for (int i = 0; i < arguments.Length; i++)
                         {
-                            if (!arguments[i].ParameterType.Equals(inputTypes[i]))
+                            if (arguments[i].ParameterType != inputTypes[i])
                             {
                                 flag = false;
                                 break;

@@ -641,9 +641,6 @@
     <None Include="Resources\miniAddCR_3.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\customization_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\select_16x16.png" />
   </ItemGroup>
   <ItemGroup>
@@ -663,9 +660,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\miniRoad.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\charArrow_16x16..png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\show_16x16.png" />
@@ -702,6 +696,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="UCC\Classes\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PanelVisibility_16x16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

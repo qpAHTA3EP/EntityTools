@@ -8,28 +8,48 @@ namespace AcTp0Tools.Reflection
     {
         //TODO Добавить нетипизированную перегрузку  FieldAccessor<object> GetField(this object instance, string propertyName, BindingFlags flags = BindingFlags.Default)
         //TODO Добавить нетипизированную перегрузку  FieldAccessor<object> GetField(this Type containerType, string propertyName, BindingFlags flags = BindingFlags.Default)
+        // TODO Добавить FieldAccessorStub
+        public static FieldAccessor<ContainerType, FieldType> GetField<ContainerType, FieldType>(this ContainerType instance, string fieldName, BindingFlags flags = BindingFlags.Default, Action<ContainerType, MethodBase> onFail = null)
+        {
+            var accessor = new FieldAccessor<ContainerType, FieldType>(instance, fieldName, flags);
+            if (accessor is null
+                && onFail != null)
+                accessor = new FieldAccessorStub<ContainerType, FieldType>(onFail);
 
-        public static FieldAccessor<ContainerType, FieldType> GetField<ContainerType, FieldType>(this ContainerType instance, string fieldName, BindingFlags flags = BindingFlags.Default)
-        {
-            return new FieldAccessor<ContainerType, FieldType>(instance, fieldName, flags);
+            return accessor;
         }
-        public static FieldAccessor<FieldType>                GetField<FieldType>(this object instance, string fieldName, BindingFlags flags = BindingFlags.Default)
+        public static FieldAccessor<FieldType>                GetField<FieldType>(this object instance, string fieldName, BindingFlags flags = BindingFlags.Default, Action<object, MethodBase> onFail = null)
         {
-            return new FieldAccessor<FieldType>(instance, fieldName, flags);
+            var accessor = new FieldAccessor<FieldType>(instance, fieldName, flags);
+            if (accessor is null
+                && onFail != null)
+                accessor = new FieldAccessorStub<FieldType>(instance, onFail);
+
+            return accessor;
         }
-        public static FieldAccessor<ContainerType, FieldType> GetField<ContainerType, FieldType>(this Type instanceType, string fieldName, BindingFlags flags = BindingFlags.Default)
+        public static FieldAccessor<ContainerType, FieldType> GetField<ContainerType, FieldType>(this Type containerType, string fieldName, BindingFlags flags = BindingFlags.Default, Action<ContainerType, MethodBase> onFail = null)
         {
-            return new FieldAccessor<ContainerType, FieldType>(instanceType, fieldName, flags);
+            var accessor = new FieldAccessor<ContainerType, FieldType>(containerType, fieldName, flags);
+            if (accessor is null
+                && onFail != null)
+                accessor = new FieldAccessorStub<ContainerType, FieldType>(onFail);
+
+            return accessor;
         }
-        public static FieldAccessor<FieldType>                GetField<FieldType>(this Type instanceType, string fieldName, BindingFlags flags = BindingFlags.Default)
+        public static FieldAccessor<FieldType>                GetField<FieldType>(this Type containerType, string fieldName, BindingFlags flags = BindingFlags.Default, Action<object, MethodBase> onFail = null)
         {
-            return new FieldAccessor<FieldType>(instanceType, fieldName, flags);
+            var accessor = new FieldAccessor<FieldType>(containerType, fieldName, flags);
+            if (accessor is null
+                && onFail != null)
+                accessor = new FieldAccessorStub<FieldType>(onFail);
+
+            return accessor;
         }
 
         /// <summary>
         /// Получение доступа к коллекции полей, имеющим тип <typeparamref name="FieldType"/> и инкапсулированных в объекте <paramref name="instance"/>
         /// </summary>
-        public static IEnumerable<FieldAccessor<FieldType>>   GetFields<FieldType>(this object instance, BindingFlags flags = BindingFlags.Default)
+        public static IEnumerable<FieldAccessor<FieldType>>   GetFields<FieldType>(this object instance, BindingFlags flags = BindingFlags.Default, Action<object, MethodBase> onFail = null)
         {
             if (flags == BindingFlags.Default)
                 flags = ReflectionHelper.DefaultFlags;
@@ -39,22 +59,36 @@ namespace AcTp0Tools.Reflection
             foreach (var fieldInfo in type.GetFields(flags | BindingFlags.Instance | BindingFlags.NonPublic))
             {
                 if (fieldInfo.FieldType == fieldType)
-                    yield return new FieldAccessor<FieldType>(fieldInfo);
+                {
+                    var accessor = new FieldAccessor<FieldType>(instance, fieldInfo);
+                    if (accessor is null
+                        && onFail != null)
+                        accessor = new FieldAccessorStub<FieldType>(instance, onFail);
+
+                    yield return accessor;
+                }
             }
         }
         /// <summary>
-        /// Получение доступа к коллекции полей, имеющим тип <typeparamref name="FieldType"/> и инкапслуированных в типе <paramref name="instanceType"/> 
+        /// Получение доступа к коллекции полей, имеющим тип <typeparamref name="FieldType"/> и инкапсулированных в типе <paramref name="containerType"/> 
         /// </summary>
-        public static IEnumerable<FieldAccessor<FieldType>>   GetFields<FieldType>(this Type instanceType, BindingFlags flags = BindingFlags.Default)
+        public static IEnumerable<FieldAccessor<FieldType>>  GetFields<FieldType>(this Type containerType, BindingFlags flags = BindingFlags.Default, Action<object, MethodBase> onFail = null)
         {
             if (flags == BindingFlags.Default)
                 flags = ReflectionHelper.DefaultFlags;
 
             var fieldType = typeof(FieldType);
-            foreach (var fieldInfo in instanceType.GetFields(flags | BindingFlags.Instance | BindingFlags.NonPublic))
+            foreach (var fieldInfo in containerType.GetFields(flags | BindingFlags.Instance | BindingFlags.NonPublic))
             {
                 if (fieldInfo.FieldType == fieldType)
-                    yield return new FieldAccessor<FieldType>(fieldInfo);
+                {
+                    var accessor = new FieldAccessor<FieldType>(fieldInfo);
+                    if (accessor is null
+                        && onFail != null)
+                        accessor = new FieldAccessorStub<FieldType>(onFail);
+
+                    yield return accessor;
+                }
             }
         }
     }
@@ -66,17 +100,19 @@ namespace AcTp0Tools.Reflection
     {
         public ContainerType Instance
         {
-            get => _instance;
-            set => _instance = value;
+            get => instance;
+            set => instance = value;
         }
 
-        private ContainerType _instance;
+        protected ContainerType instance;
 
-        public MemberInfo MemberInfo => _fieldInfo;
-        public FieldInfo FieldInfo => _fieldInfo;
-        private FieldInfo _fieldInfo;
+        public MemberInfo MemberInfo => fieldInfo;
+        public FieldInfo FieldInfo => fieldInfo;
+        protected FieldInfo fieldInfo;
 
-        public bool IsValid => _fieldInfo != null;
+        public bool IsValid => fieldInfo != null;
+
+        protected FieldAccessor() { }
 
         public FieldAccessor(Type instanceType, string fieldName, BindingFlags flags = BindingFlags.Default)
         {
@@ -89,12 +125,7 @@ namespace AcTp0Tools.Reflection
             if (flags == BindingFlags.Default)
                 flags = ReflectionHelper.DefaultFlags;
 
-#if true
             Initialize(instanceType, fieldName, flags | BindingFlags.Instance | BindingFlags.NonPublic);
-#else
-            if (!Initialize(instanceType, fieldName, flags | BindingFlags.Instance | BindingFlags.NonPublic))
-                throw new TargetException($"Field '{fieldName}' does not found in '{instanceType.FullName}'"); 
-#endif
         }
 
         public FieldAccessor(ContainerType instance, string fieldName, BindingFlags flags = BindingFlags.Default)
@@ -110,29 +141,10 @@ namespace AcTp0Tools.Reflection
 
             Type instanceType = instance.GetType();
 
-#if false
-            if (!Initialize(instanceType, fieldName, flags | BindingFlags.Instance | BindingFlags.NonPublic))
-                throw new TargetException($"Field '{fieldName}' does not found in '{type.FullName}'"); 
-#else
             if (Initialize(instanceType, fieldName, flags | BindingFlags.Instance | BindingFlags.NonPublic))
-#endif
-                _instance = instance;
+                this.instance = instance;
         }
 
-#if false
-        public Field(Type instanceType, FieldInfo fieldInfo)
-        {
-            if (instanceType is null)
-                throw new ArgumentNullException(nameof(instanceType));
-
-            if (fieldInfo is null)
-                throw new ArgumentNullException(nameof(fieldInfo));
-            _fieldInfo = fieldInfo;
-
-            if (!Initialize(fieldInfo))
-                throw new TargetException($"Field '{fieldInfo.Name}' does not present in '{instanceType.FullName}'");
-        } 
-#else
         public FieldAccessor(FieldInfo fieldInfo)
         {
             if (fieldInfo is null)
@@ -142,14 +154,8 @@ namespace AcTp0Tools.Reflection
             if (fieldInfo.ReflectedType != containerType)
                 throw new ArgumentException($"ReflectedType of the '{fieldInfo.Name}' is '{fieldInfo.ReflectedType.FullName}' does not equal to parameter ContainerType '{containerType.FullName}'", nameof(fieldInfo));
 
-#if true
             Initialize(fieldInfo);
-#else
-            if (!Initialize(fieldInfo))
-                throw new TargetException($"Field '{fieldInfo.Name}' does not present in '{containerType.FullName}'"); 
-#endif
         }
-#endif
 
         public FieldAccessor(ContainerType instance, FieldInfo fieldInfo)
         {
@@ -163,14 +169,9 @@ namespace AcTp0Tools.Reflection
             if (fieldInfo.ReflectedType != containerType)
                 throw new ArgumentException($"ReflectedType of the '{fieldInfo.Name}' is '{fieldInfo.ReflectedType?.FullName}' does not equal to parameter ContainerType '{containerType.FullName}'", nameof(fieldInfo));
 
-#if false
-            if (!Initialize(fieldInfo))
-                throw new TargetException($"Field '{fieldInfo.Name}' does not present in '{containerType.FullName}'"); 
-#else
             if(Initialize(fieldInfo))
-#endif
 
-                _instance = instance;
+            this.instance = instance;
         }
 
         /// <summary>
@@ -191,15 +192,11 @@ namespace AcTp0Tools.Reflection
         {
             if (fieldInfo != null)
             {
-#if false
-                if (fieldInfo.FieldType.Equals(typeof(FieldType))) 
-#else
                 var fieldType = typeof(FieldType);
                 if (fieldInfo.FieldType == fieldType
                     || fieldType.IsAssignableFrom(fieldInfo.FieldType))
-#endif
                 {
-                    _fieldInfo = fieldInfo;
+                    this.fieldInfo = fieldInfo;
                     return true;
                 }   
             }
@@ -207,70 +204,209 @@ namespace AcTp0Tools.Reflection
         }
 
         /// <summary>
-        /// Доступ к полю объекта <paramref name="instance"/>
+        /// Доступ к полю объекта <paramref name="inst"/>
         /// </summary>
-        public FieldType this[ContainerType instance]
+        public virtual FieldType this[ContainerType inst]
         {
             get
             {
-                if (_fieldInfo.GetValue(instance) is FieldType result)
+                if (fieldInfo.GetValue(inst) is FieldType result)
                     return result;
                 return default;
             }
             set
             {
-                _fieldInfo.SetValue(instance, value);
+                fieldInfo.SetValue(inst, value);
             }
         }
 
-        public FieldType Value
+        public virtual FieldType Value
         {
             get
             {
-                if (_fieldInfo.GetValue(_instance) is FieldType result)
+                if (fieldInfo.GetValue(instance) is FieldType result)
                     return result;
                 return default;
             }
             set
             {
-                _fieldInfo.SetValue(_instance, value);
+                fieldInfo.SetValue(instance, value);
             }
         }
 
-        public FieldType GetValue()
+        public virtual FieldType GetValue()
         {
-            if (_fieldInfo.GetValue(_instance) is FieldType result)
+            if (fieldInfo.GetValue(instance) is FieldType result)
                 return result;
             return default;
         }
-        public void SetValue(FieldType value)
+        public virtual void SetValue(FieldType value)
         {
-            _fieldInfo.SetValue(_instance, value);
+            fieldInfo.SetValue(instance, value);
         }
 
-        public FieldType GetValueFrom(ContainerType instance)
+        public virtual FieldType GetValueFrom(ContainerType inst)
         {
-            if (_fieldInfo.GetValue(instance) is FieldType result)
+            if (fieldInfo.GetValue(inst) is FieldType result)
                 return result;
             return default;
         }
-        public void SetValueTo(ContainerType instance, FieldType value)
+        public virtual void SetValueTo(ContainerType inst, FieldType value)
         {
-            _fieldInfo.SetValue(instance, value);
+            fieldInfo.SetValue(inst, value);
         }
 
         public static implicit operator FieldType(FieldAccessor<ContainerType, FieldType> accessor) => accessor.Value;
     }
 
-#if true
     public class FieldAccessor<FieldType> : FieldAccessor<object, FieldType>
     {
+        protected FieldAccessor(){}
+
         public FieldAccessor(Type instanceType, string fieldName, BindingFlags flags = BindingFlags.Default) : base(instanceType, fieldName, flags) { }
         public FieldAccessor(object instance, string fieldName, BindingFlags flags = BindingFlags.Default) : base(instance, fieldName, flags) { }
         public FieldAccessor(object instance, FieldInfo fieldInfo) : base(instance, fieldInfo) { }
         public FieldAccessor(FieldInfo fieldInfo) : base(fieldInfo) { }
     }
-#else
+
+    /// <summary>
+    /// Класс-заглушка, возвращаемый в случае невозможности получения доступа к заданному полю
+    /// и выполняющий действие <see cref="onFail"/> при попытке чтения/записи значения свойства
+    /// </summary>
+    /// <typeparam name="ContainerType"></typeparam>
+    /// <typeparam name="FieldType"></typeparam>
+    public class FieldAccessorStub<ContainerType, FieldType> : FieldAccessor<ContainerType, FieldType>
+    {
+        private readonly Action<ContainerType, MethodBase> onFail;
+
+        public FieldAccessorStub(Action<ContainerType, MethodBase> onFail)
+        {
+            this.onFail = onFail;
+        }
+        public FieldAccessorStub(ContainerType inst, Action<ContainerType, MethodBase> onFail)
+        {
+            instance = inst;
+            this.onFail = onFail;
+        }
+
+        public override FieldType this[ContainerType inst]
+        {
+            get
+            {
+                onFail(inst, MethodBase.GetCurrentMethod());
+                return default;
+            }
+            set
+            {
+                onFail(inst, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        public override FieldType GetValue()
+        {
+            onFail(instance, MethodBase.GetCurrentMethod());
+            return default;
+        }
+
+        public override FieldType GetValueFrom(ContainerType inst)
+        {
+            onFail(inst, MethodBase.GetCurrentMethod());
+            return default;
+        }
+
+        public override void SetValue(FieldType value)
+        {
+            onFail(instance, MethodBase.GetCurrentMethod());
+        }
+
+        public override void SetValueTo(ContainerType inst, FieldType value)
+        {
+            onFail(inst, MethodBase.GetCurrentMethod());
+        }
+
+        public override FieldType Value
+        {
+            get
+            {
+                onFail(instance, MethodBase.GetCurrentMethod());
+                return default;
+            }
+            set
+            {
+                onFail(instance, MethodBase.GetCurrentMethod());
+            }
+        }
+    }
+
+    /// <summary>
+    /// Класс-заглушка, возвращаемый в случае невозможности получения доступа к заданному полю
+    /// и выполняющий действие <see cref="onFail"/> при попытке чтения/записи значения свойства
+    /// </summary>
+    /// <typeparam name="FieldType"></typeparam>
+    public class FieldAccessorStub<FieldType> : FieldAccessor<FieldType>
+    {
+        private readonly Action<object, MethodBase> onFail;
+
+        public FieldAccessorStub(Action<object, MethodBase> onFail)
+        {
+            this.onFail = onFail;
+        }
+        public FieldAccessorStub(object inst, Action<object, MethodBase> onFail)
+        {
+            instance = inst;
+            this.onFail = onFail;
+        }
+
+        public override FieldType this[object inst]
+        {
+            get
+            {
+                onFail(inst, MethodBase.GetCurrentMethod());
+                return default;
+            }
+            set
+            {
+                onFail(inst, MethodBase.GetCurrentMethod());
+            }
+        }
+
+        public override FieldType GetValue()
+        {
+            onFail(instance, MethodBase.GetCurrentMethod());
+            return default;
+        }
+
+        public override FieldType GetValueFrom(object inst)
+        {
+            onFail(inst, MethodBase.GetCurrentMethod());
+            return default;
+        }
+
+        public override void SetValue(FieldType value)
+        {
+            onFail(instance, MethodBase.GetCurrentMethod());
+        }
+
+        public override void SetValueTo(object inst, FieldType value)
+        {
+            onFail(inst, MethodBase.GetCurrentMethod());
+        }
+
+        public override FieldType Value
+        {
+            get
+            {
+                onFail(instance, MethodBase.GetCurrentMethod());
+                return default;
+            }
+            set
+            {
+                onFail(instance, MethodBase.GetCurrentMethod());
+            }
+        }
+    }
+
+#if false
     /// <summary>
     /// Класс, инкапсулирующий доступ к полю экземпляра объекта
     /// </summary>

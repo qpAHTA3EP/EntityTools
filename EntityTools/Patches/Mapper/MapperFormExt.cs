@@ -39,7 +39,7 @@ namespace EntityTools.Patches.Mapper
 {
     //TODO Подружить с ролью Professions
 #if PATCH_ASTRAL
-    public partial class MapperFormExt : XtraForm //*/Form
+    public partial class MapperFormExt : XtraForm 
     {
         /// <summary>
         /// Флаг удержания персонажа в центре карты
@@ -950,8 +950,7 @@ namespace EntityTools.Patches.Mapper
                     {
                         if (!AstralAccessors.Controllers.Roles.CurrentRole.OnMapDraw(_graphics))
                             //lock (AstralAccessors.Quester.Core.Meshes.Value.SyncRoot) <- Блокировка графа есть в DrawMeshes(..)
-                            ComplexPatch_Mapper.DrawMeshes(_graphics,
-                                AstralAccessors.Quester.Core.Meshes);
+                            ComplexPatch_Mapper.DrawMeshes(_graphics, AstralAccessors.Quester.Core.Meshes);
                     }
                     catch (Exception ex)
                     {
@@ -2008,6 +2007,27 @@ namespace EntityTools.Patches.Mapper
             }
             else if (infoTool != null)
                 CurrentTool = null;
+        }
+
+        private void handler_Change_PanelVisibility(object sender, ItemClickEventArgs e)
+        {
+            if (!barMapping.Visible
+                || !barGraphTools.Visible
+                || !barGraphEditTools.Visible
+                || !barCustomRegions.Visible)
+            {
+                barMapping.Visible = true;
+                barGraphTools.Visible = true;
+                barGraphEditTools.Visible = true;
+                barCustomRegions.Visible = true;
+            }
+            else
+            {
+                barMapping.Visible = false;
+                barGraphTools.Visible = false;
+                barGraphEditTools.Visible = false;
+                barCustomRegions.Visible = false;
+            }
         }
     }
 #endif

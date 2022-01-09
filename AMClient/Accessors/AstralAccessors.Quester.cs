@@ -160,7 +160,7 @@ namespace AcTp0Tools
                 }
                 private static bool PrefixGetMeshes(ref Graph __result)
                 {
-                    Dictionary<string, Graph> mapsMeshes = _mapsMeshes;
+                    var mapsMeshes = _mapsMeshes;
                     lock (mapsMeshes)
                     {
                         var localPlayer = EntityManager.LocalPlayer;
