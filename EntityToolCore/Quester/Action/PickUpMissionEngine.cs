@@ -206,7 +206,7 @@ namespace EntityCore.Quester.Action
                     var giverPos = @this._giver.Position;
 
                     // Производит поиск NPC-Квестодателя
-                    if (giverContactInfo is null || !@this._giver.IsMatching(giverContactInfo.Entity))
+                    if (giverContactInfo is null || !@this._giver.IsMatch(giverContactInfo.Entity))
                     {
                         giverContactInfo = null;
                         foreach (ContactInfo contactInfo in EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts)
@@ -216,7 +216,7 @@ namespace EntityCore.Quester.Action
 
 
                             if (Math.Abs(giverPos.Z - contactLocation.Z) <= @this._interactZDifference &&
-                                @this._giver.IsMatching(contactEntity))
+                                @this._giver.IsMatch(contactEntity))
                             {
                                 giverContactInfo = contactInfo;
 

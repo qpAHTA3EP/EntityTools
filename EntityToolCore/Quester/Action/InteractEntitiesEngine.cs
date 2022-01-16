@@ -636,7 +636,7 @@ namespace EntityCore.Quester.Action
                 @this.HotSpots.Add(EntityManager.LocalPlayer.Location.Clone());
 
             if (string.IsNullOrEmpty(@this._entityId))
-                EntitySelectForm.GUIRequest(ref @this._entityId, ref @this._entityIdType, ref @this._entityNameType);
+                EntityViewer.GUIRequest(ref @this._entityId, ref @this._entityIdType, ref @this._entityNameType);
 
             _label = string.Empty;
         }

@@ -555,7 +555,7 @@ namespace EntityCore.Quester.Action
         public void GatherInfos()
         {
             if (string.IsNullOrEmpty(@this._entityId))
-                EntitySelectForm.GUIRequest(ref @this._entityId, ref @this._entityIdType, ref @this._entityNameType);
+                EntityViewer.GUIRequest(ref @this._entityId, ref @this._entityIdType, ref @this._entityNameType);
 
             if (@this.HotSpots.Count == 0)
                 @this.HotSpots.Add(EntityManager.LocalPlayer.Location.Clone());

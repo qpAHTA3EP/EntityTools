@@ -149,14 +149,14 @@ namespace EntityTools.Tools.Missions
             }
         }
 
-        private uint _tolerance = 1;
+        private uint _tolerance = 5;
 
         /// <summary>
         /// <paramref name="entity"/> соответствует параметрам квестодателя
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public bool IsMatching(Entity entity)
+        public bool IsMatch(Entity entity)
         {
             if (_type != MissionGiverType.NPC)
                 return false;
@@ -211,7 +211,6 @@ namespace EntityTools.Tools.Missions
 
                 var player = EntityManager.LocalPlayer;
 
-                
                 return string.IsNullOrEmpty(_mapName) 
                        || _mapName.Equals(player.MapState.MapName, StringComparison.Ordinal)
                           && (string.IsNullOrEmpty(_regionName) 

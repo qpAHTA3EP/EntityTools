@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Xml.Serialization;
 using MyNW.Classes;
 
 namespace EntityTools.Tools.Export
@@ -11,6 +12,10 @@ namespace EntityTools.Tools.Export
         public string InternalName { get; set; } = string.Empty;
         public string DisplayName { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        [XmlIgnore]
+        public bool Visible { get; set; } = true;
+        [XmlIgnore]
+        public bool IsValid => !string.IsNullOrEmpty(InternalName);
 
         public AuraInfo() { }
 
@@ -21,6 +26,7 @@ namespace EntityTools.Tools.Export
                 InternalName = def.InternalName;
                 DisplayName = def.DisplayName;
                 Description = Regex.Replace(def.Description, "<[^>]+>", string.Empty);
+                hash = -676643589 + EqualityComparer<string>.Default.GetHashCode(InternalName);
             }
         }
 
@@ -31,7 +37,13 @@ namespace EntityTools.Tools.Export
 
         public bool Equals(AuraInfo aura)
         {
-            return string.Equals(InternalName, aura?.InternalName, StringComparison.Ordinal);
+#if false
+            return string.Equals(InternalName, aura?.InternalName, StringComparison.Ordinal); 
+#else
+            if (aura is null)
+                return false;
+            return hash == aura.hash;
+#endif
         }
         public bool Equals(AttribModNet mod)
         {
@@ -60,10 +72,8 @@ namespace EntityTools.Tools.Export
             return -1;
         }
 
-        public override int GetHashCode()
-        {
-            return -676643589 + EqualityComparer<string>.Default.GetHashCode(InternalName);
-        }
+        public override int GetHashCode() => hash;
+        [NonSerialized] private readonly int hash = 0;
     }
 
     [Serializable]

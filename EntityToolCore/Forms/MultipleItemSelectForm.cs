@@ -152,10 +152,5 @@ namespace EntityCore.Forms
         {
             fillAction?.Invoke();
         }
-
-        private void handler_FormShown(object sender, EventArgs e)
-        {
-            fillAction?.Invoke();
-        }
     }
 }

@@ -316,7 +316,7 @@ namespace EntityCore.UCC.Actions
 #else
                     var pwr = GetCurrentPower();
 
-                    var targetMain = pwr.EffectivePowerDef()?.TargetMain;
+                    var targetMain = pwr?.EffectivePowerDef()?.TargetMain;
 
                     if (targetMain is null || !targetMain.IsValid)
                         _targetSelector = () => Astral.Logic.UCC.Core.CurrentTarget;

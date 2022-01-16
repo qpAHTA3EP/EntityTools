@@ -267,7 +267,7 @@ namespace EntityCore
 
         public bool UserRequest_SelectAuraId(ref string id)
         {
-            string newId = AuraSelectForm.GUIRequest();
+            string newId = AuraViewer.GUIRequest();
             if (!string.IsNullOrEmpty(newId))
             {
                 id = newId;
@@ -306,7 +306,7 @@ namespace EntityCore
 
         public bool UserRequest_EditEntityId(ref string entPattern, ref ItemFilterStringType strMatchType, ref EntityNameType nameType)
         {
-            return EntitySelectForm.GUIRequest(ref entPattern, ref strMatchType, ref nameType) != null;
+            return EntityViewer.GUIRequest(ref entPattern, ref strMatchType, ref nameType) != null;
         }
 
         public bool UserRequest_EditCustomRegionList(ref List<string> crList)

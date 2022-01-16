@@ -104,7 +104,7 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "MultiSelectForm";
-            this.Shown += new System.EventHandler(this.handler_FormShown);
+            this.Shown += new System.EventHandler(this.handler_Reload);
             ((System.ComponentModel.ISupportInitialize)(this.ItemList)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

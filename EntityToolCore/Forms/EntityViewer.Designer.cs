@@ -1,6 +1,6 @@
 ﻿namespace EntityCore.Forms
 {
-    partial class EntitySelectForm
+    partial class EntityViewer
     {
         /// <summary>
         /// Required designer variable.

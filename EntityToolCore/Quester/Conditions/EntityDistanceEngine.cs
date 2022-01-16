@@ -112,9 +112,9 @@ namespace EntityCore.Quester.Conditions
                     switch (@this._sign)
                     {
                         case Relation.Equal:
-                            return closestEntity != null && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer == @this._distance);
+                            return closestEntity != null && closestEntity.IsValid && (Math.Abs(closestEntity.Location.Distance3DFromPlayer - @this._distance) < 1);
                         case Relation.NotEqual:
-                            return closestEntity != null && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer != @this._distance);
+                            return closestEntity != null && closestEntity.IsValid && (Math.Abs(closestEntity.Location.Distance3DFromPlayer - @this._distance) >= 1);
                         case Relation.Inferior:
                             return closestEntity != null && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer < @this._distance);
                         case Relation.Superior:

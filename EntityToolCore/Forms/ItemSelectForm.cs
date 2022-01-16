@@ -67,7 +67,7 @@ namespace EntityCore.Forms
                 if (@this.ItemList.SelectedItem is Type type)
                 {
                     selectedValue = (T)Activator.CreateInstance(type);
-                    return selectedValue != null;
+                    return !Equals(selectedValue, default(T));
                 }
             }
             selectedValue = default;
@@ -139,9 +139,9 @@ namespace EntityCore.Forms
                 && @this.ItemList.SelectedIndex >= 0)
             {
                 selectedValue = (T)@this.ItemList.SelectedItem;
-                return true;
+                return !Equals(selectedValue, default(T));
             }
-            
+
             return false;
         }
 
@@ -212,7 +212,7 @@ namespace EntityCore.Forms
                 if (val != null)
                 {
                     selectedValue = (T) val;
-                    return true;
+                    return !Equals(selectedValue, default(T));
                 }
             }
 

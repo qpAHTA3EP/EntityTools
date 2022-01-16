@@ -122,11 +122,11 @@
     <Compile Include="Extensions\FormCollectionExtentions.cs" />
     <Compile Include="Extensions\ListBoxItemCollectionExtension.cs" />
     <Compile Include="Extensions\ListTExtentions.cs" />
-    <Compile Include="Forms\AuraSelectForm.cs">
+    <Compile Include="Forms\AuraViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\AuraSelectForm.Designer.cs">
-      <DependentUpon>AuraSelectForm.cs</DependentUpon>
+    <Compile Include="Forms\AuraViewer.Designer.cs">
+      <DependentUpon>AuraViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\AddUccActionForm.cs">
       <SubType>Form</SubType>
@@ -140,11 +140,11 @@
     <Compile Include="Forms\ConditionsListForm.designer.cs">
       <DependentUpon>ConditionsListForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\EntitySelectForm.cs">
+    <Compile Include="Forms\EntityViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\EntitySelectForm.Designer.cs">
-      <DependentUpon>EntitySelectForm.cs</DependentUpon>
+    <Compile Include="Forms\EntityViewer.Designer.cs">
+      <DependentUpon>EntityViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\InputBox.cs">
       <SubType>Form</SubType>
@@ -228,8 +228,8 @@
     <Compile Include="UCC\Conditions\UCCEntityCheckEngine.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Forms\AuraSelectForm.resx">
-      <DependentUpon>AuraSelectForm.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\AuraViewer.resx">
+      <DependentUpon>AuraViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\AddUccActionForm.resx">
       <DependentUpon>AddUccActionForm.cs</DependentUpon>
@@ -237,8 +237,8 @@
     <EmbeddedResource Include="Forms\ConditionsListForm.resx">
       <DependentUpon>ConditionsListForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\EntitySelectForm.resx">
-      <DependentUpon>EntitySelectForm.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\EntityViewer.resx">
+      <DependentUpon>EntityViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\InputBox.resx">
       <DependentUpon>InputBox.cs</DependentUpon>

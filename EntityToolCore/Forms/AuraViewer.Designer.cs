@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Runtime.CompilerServices;
-using System.Threading;
+﻿using DevExpress.XtraEditors;
 using System.Windows.Forms;
-using Astral.Controllers;
-using DevExpress.XtraEditors;
-using MyNW.Classes;
 
 namespace EntityCore.Forms
 {
-    partial class AuraSelectForm
+    partial class AuraViewer
     {
         /// <summary>
         /// Required designer variable.
@@ -63,9 +55,9 @@ namespace EntityCore.Forms
             // 
             this.lblEntitySelector.Location = new System.Drawing.Point(12, 12);
             this.lblEntitySelector.Name = "lblEntitySelector";
-            this.lblEntitySelector.Size = new System.Drawing.Size(196, 13);
+            this.lblEntitySelector.Size = new System.Drawing.Size(195, 13);
             this.lblEntitySelector.TabIndex = 0;
-            this.lblEntitySelector.Text = "1. Select entity which to search an Aura:";
+            this.lblEntitySelector.Text = "1. Select the Entity having needed aura:";
             // 
             // unitRefName
             // 
@@ -82,7 +74,9 @@ namespace EntityCore.Forms
             // 
             // Auras
             // 
-            this.Auras.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Auras.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.Auras.Location = new System.Drawing.Point(0, 0);
             this.Auras.Name = "Auras";
             this.Auras.Size = new System.Drawing.Size(360, 189);
@@ -124,6 +118,7 @@ namespace EntityCore.Forms
             this.NameFilter.Name = "NameFilter";
             this.NameFilter.Size = new System.Drawing.Size(180, 21);
             this.NameFilter.TabIndex = 8;
+            this.NameFilter.TextChanged += new System.EventHandler(this.handler_FilterChanged);
             // 
             // InternalNameFilter
             // 
@@ -134,6 +129,7 @@ namespace EntityCore.Forms
             this.InternalNameFilter.Name = "InternalNameFilter";
             this.InternalNameFilter.Size = new System.Drawing.Size(174, 21);
             this.InternalNameFilter.TabIndex = 8;
+            this.InternalNameFilter.TextChanged += new System.EventHandler(this.handler_FilterChanged);
             // 
             // lblFilters
             // 
@@ -165,9 +161,10 @@ namespace EntityCore.Forms
             // 
             // Description
             // 
+            this.Description.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.Description.BackColor = System.Drawing.SystemColors.Window;
             this.Description.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.Description.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Description.Location = new System.Drawing.Point(0, 0);
             this.Description.Multiline = true;
             this.Description.Name = "Description";
@@ -198,7 +195,7 @@ namespace EntityCore.Forms
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
             this.Selector.Size = new System.Drawing.Size(158, 20);
             this.Selector.TabIndex = 12;
-            this.Selector.SelectedValueChanged += new System.EventHandler(this.Handler_TargetSelect);
+            this.Selector.SelectedValueChanged += new System.EventHandler(this.handler_TargetSelect);
             // 
             // AuraSelectForm
             // 
@@ -220,7 +217,7 @@ namespace EntityCore.Forms
             this.IconOptions.ShowIcon = false;
             this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.MinimumSize = new System.Drawing.Size(386, 450);
-            this.Name = "AuraSelectForm";
+            this.Name = "AuraViewer";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Aura Viewer";

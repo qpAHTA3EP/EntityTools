@@ -9,11 +9,11 @@ using System.Windows.Forms;
 
 namespace EntityCore.Forms
 {
-    public partial class EntitySelectForm : XtraForm //*/ Form
+    public partial class EntityViewer : XtraForm //*/ Form
     {
-        private static EntitySelectForm @this;
+        private static EntityViewer @this;
 
-        public EntitySelectForm()
+        public EntityViewer()
         {
             InitializeComponent();
             cbNameType.DataSource = Enum.GetValues(typeof(EntityNameType));
@@ -43,7 +43,7 @@ namespace EntityCore.Forms
         public static Entity GUIRequest(ref string entPattern, ref ItemFilterStringType strMatchType, ref EntityNameType nameType)
         {
             if (@this == null)
-                @this = new EntitySelectForm();
+                @this = new EntityViewer();
 
             //@this.entityCheck = EntityToPatternComparer.Get(entPattern, strMatchType, nameType);
             @this.entityPattern = entPattern;
