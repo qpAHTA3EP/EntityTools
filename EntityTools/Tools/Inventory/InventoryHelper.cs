@@ -247,7 +247,7 @@ namespace EntityTools.Tools.Inventory
 
         public static InventorySlot GetRingLeft()
         {
-            var slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.AdventuringRings).Slots;
+            var slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.Ring).Slots;
             if (slots.Count >= 0)
             {
                 var s = slots[0];
@@ -259,7 +259,7 @@ namespace EntityTools.Tools.Inventory
 
         public static InventorySlot GetRingRight()
         {
-            var slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.AdventuringRings).Slots;
+            var slots = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.Ring).Slots;
             if (slots.Count >= 1)
             {
                 var s = slots[1];
@@ -297,7 +297,7 @@ namespace EntityTools.Tools.Inventory
                     }
                     break;
                 case SpecificBags.WeaponMain:
-                    slots = player.GetInventoryBagById(InvBagIDs.AdventuringHands).Slots;
+                    slots = player.GetInventoryBagById(InvBagIDs.Melee).Slots;
                     if (slots != null && slots.Count > 0)
                     {
                         s = slots[0];
@@ -305,21 +305,21 @@ namespace EntityTools.Tools.Inventory
                     }
                     break;
                 case SpecificBags.WeaponSecondary:
-                    slots = player.GetInventoryBagById(InvBagIDs.AdventuringHands).Slots;
+                    slots = player.GetInventoryBagById(InvBagIDs.Melee).Slots;
                     if (slots != null && slots.Count > 1)
                     {
                         return slots[1];
                     }
                     break;
                 case SpecificBags.RingLeft:
-                    slots = player.GetInventoryBagById(InvBagIDs.AdventuringRings).Slots;
+                    slots = player.GetInventoryBagById(InvBagIDs.Ring).Slots;
                     if (slots != null && slots.Count > 0)
                     {
                         return slots[0];
                     }
                     break;
                 case SpecificBags.RingRight:
-                    slots = player.GetInventoryBagById(InvBagIDs.AdventuringRings).Slots;
+                    slots = player.GetInventoryBagById(InvBagIDs.Ring).Slots;
                     if (slots != null && slots.Count > 1)
                     {
                         return slots[1];
@@ -378,16 +378,16 @@ namespace EntityTools.Tools.Inventory
             {
                 switch (bagId)
                 {
-                    case InvBagIDs.AdventuringHead:
-                    case InvBagIDs.AdventuringNeck:
-                    case InvBagIDs.AdventuringArmor:
-                    case InvBagIDs.AdventuringArms:
-                    case InvBagIDs.AdventuringWaist:
-                    case InvBagIDs.AdventuringFeet:
-                    case InvBagIDs.AdventuringHands:
-                    case InvBagIDs.AdventuringShirt:
-                    case InvBagIDs.AdventuringTrousers:
-                    case InvBagIDs.AdventuringRings:
+                    case InvBagIDs.Head:
+                    case InvBagIDs.Neck:
+                    case InvBagIDs.Armor:
+                    case InvBagIDs.Arms:
+                    case InvBagIDs.Waist:
+                    case InvBagIDs.Feet:
+                    case InvBagIDs.Melee:
+                    case InvBagIDs.Shirt:
+                    case InvBagIDs.Pants:
+                    case InvBagIDs.Ring:
                         return true;
                     //case InvBagIDs.ArtifactPrimary:
                     //case InvBagIDs.ArtifactSecondary:

@@ -84,18 +84,18 @@ namespace EntityTools.Tools.Inventory
             {
                 _bags =
                 {
-                    [(int) InvBagIDs.AdventuringHead] = true,
-                    [(int) InvBagIDs.AdventuringNeck] = true,
-                    [(int) InvBagIDs.AdventuringArmor] = true,
-                    [(int) InvBagIDs.AdventuringArms] = true,
-                    [(int) InvBagIDs.AdventuringWaist] = true,
-                    [(int) InvBagIDs.AdventuringFeet] = true,
-                    [(int) InvBagIDs.AdventuringHands] = true,
-                    [(int) InvBagIDs.AdventuringShirt] = true,
-                    [(int) InvBagIDs.AdventuringTrousers] = true,
-                    [(int) InvBagIDs.AdventuringRanged] = true,
-                    [(int) InvBagIDs.AdventuringRings] = true,
-                    [(int) InvBagIDs.AdventuringSurges] = true,
+                    [(int) InvBagIDs.Head] = true,
+                    [(int) InvBagIDs.Neck] = true,
+                    [(int) InvBagIDs.Armor] = true,
+                    [(int) InvBagIDs.Arms] = true,
+                    [(int) InvBagIDs.Waist] = true,
+                    [(int) InvBagIDs.Feet] = true,
+                    [(int) InvBagIDs.Melee] = true,
+                    [(int) InvBagIDs.Shirt] = true,
+                    [(int) InvBagIDs.Pants] = true,
+                    [(int) InvBagIDs.Ranged] = true,
+                    [(int) InvBagIDs.Ring] = true,
+                    [(int) InvBagIDs.Surges] = true,
                     [(int) InvBagIDs.ArtifactPrimary] = true,
                     [(int) InvBagIDs.ArtifactSecondary] = true,
                     [(int) InvBagIDs.Inventory] = true,
@@ -148,18 +148,18 @@ namespace EntityTools.Tools.Inventory
             {
                 _bags =
                 {
-                    [(int) InvBagIDs.AdventuringHead] = true,
-                    [(int) InvBagIDs.AdventuringNeck] = true,
-                    [(int) InvBagIDs.AdventuringArmor] = true,
-                    [(int) InvBagIDs.AdventuringArms] = true,
-                    [(int) InvBagIDs.AdventuringWaist] = true,
-                    [(int) InvBagIDs.AdventuringFeet] = true,
-                    [(int) InvBagIDs.AdventuringHands] = true,
-                    [(int) InvBagIDs.AdventuringShirt] = true,
-                    [(int) InvBagIDs.AdventuringTrousers] = true,
-                    [(int) InvBagIDs.AdventuringRanged] = true,
-                    [(int) InvBagIDs.AdventuringRings] = true,
-                    [(int) InvBagIDs.AdventuringSurges] = true,
+                    [(int) InvBagIDs.Head] = true,
+                    [(int) InvBagIDs.Neck] = true,
+                    [(int) InvBagIDs.Armor] = true,
+                    [(int) InvBagIDs.Arms] = true,
+                    [(int) InvBagIDs.Waist] = true,
+                    [(int) InvBagIDs.Feet] = true,
+                    [(int) InvBagIDs.Melee] = true,
+                    [(int) InvBagIDs.Shirt] = true,
+                    [(int) InvBagIDs.Pants] = true,
+                    [(int) InvBagIDs.Ranged] = true,
+                    [(int) InvBagIDs.Ring] = true,
+                    [(int) InvBagIDs.Surges] = true,
                     [(int) InvBagIDs.ArtifactPrimary] = true,
                     [(int) InvBagIDs.ArtifactSecondary] = true
                 }
@@ -168,18 +168,18 @@ namespace EntityTools.Tools.Inventory
         }
         public static bool IsEquipmentsBag(InvBagIDs id)
         {
-            return id == InvBagIDs.AdventuringHead
-                   || id == InvBagIDs.AdventuringNeck
-                   || id == InvBagIDs.AdventuringArmor
-                   || id == InvBagIDs.AdventuringArms
-                   || id == InvBagIDs.AdventuringWaist
-                   || id == InvBagIDs.AdventuringFeet
-                   || id == InvBagIDs.AdventuringHands
-                   || id == InvBagIDs.AdventuringShirt
-                   || id == InvBagIDs.AdventuringTrousers
-                   || id == InvBagIDs.AdventuringRanged
-                   || id == InvBagIDs.AdventuringRings
-                   || id == InvBagIDs.AdventuringSurges
+            return id == InvBagIDs.Head
+                   || id == InvBagIDs.Neck
+                   || id == InvBagIDs.Armor
+                   || id == InvBagIDs.Arms
+                   || id == InvBagIDs.Waist
+                   || id == InvBagIDs.Feet
+                   || id == InvBagIDs.Melee
+                   || id == InvBagIDs.Shirt
+                   || id == InvBagIDs.Pants
+                   || id == InvBagIDs.Ranged
+                   || id == InvBagIDs.Ring
+                   || id == InvBagIDs.Surges
                    || id == InvBagIDs.ArtifactPrimary
                    || id == InvBagIDs.ArtifactSecondary;
         } 
@@ -216,7 +216,7 @@ namespace EntityTools.Tools.Inventory
         /// Список флагов-сумок
         /// </summary>
         [XmlIgnore]
-        BitArray _bags = new BitArray(Enum.GetValues(typeof(InvBagIDs)).Length, false);
+        BitArray _bags;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
