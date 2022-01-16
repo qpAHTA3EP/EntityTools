@@ -126,7 +126,7 @@ namespace AcTp0Tools
                                 _usedMeshes = Traverse.Create(_currentRoleObject).Property<Graph>("UsedMeshes");
                             } 
                             return _usedMeshes?.Value;
-#elif ROLE_USEDMESHES
+#else
 
                             var role = currentRoleAccessor.Value;
                             if (_usedMeshes?.Instance != role)
@@ -134,11 +134,6 @@ namespace AcTp0Tools
                                 _usedMeshes = role.GetProperty<Graph>(nameof(UsedMeshes));
                             }
                             return _usedMeshes?.Value;
-#else
-                            // Отображаются Сделать взаимодействие с AstralAccessor.Quester.Core.Meshes
-                            if (Name == nameof(Astral.Grinder))
-                                return Astral.Grinder.API.CurrentProfile.Meshes;
-                            return Quester.Core.Meshes;
 
 #endif
                         }

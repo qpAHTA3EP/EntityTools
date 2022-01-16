@@ -1,6 +1,7 @@
 ﻿using AcTp0Tools.Patches;
 using AcTp0Tools.Reflection;
 using AStar;
+using Astral;
 using Astral.Controllers;
 using Astral.Quester.Classes;
 using HarmonyLib;
@@ -14,9 +15,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using Astral;
-using DevExpress.XtraEditors;
-using Action = System.Action;
 // ReSharper disable InconsistentNaming
 
 namespace AcTp0Tools
@@ -233,6 +231,9 @@ namespace AcTp0Tools
                 /// </summary>
                 public static Dictionary<string, Graph> MapsMeshes => _mapsMeshes;
                 private static Dictionary<string, Graph> _mapsMeshes = new Dictionary<string, Graph>();
+                // TODO Использовать RWLocker для синхронизации доступа к _mapsMeshes
+                //private static readonly AStar.Tools.RWLocker mapsMeshesLocker = new RWLocker();
+
                 private static bool PrefixGetMapsMeshes(ref Dictionary<string, Graph> __result)
                 {
                     __result = _mapsMeshes;
