@@ -27,7 +27,7 @@ namespace AcTp0Tools
         /// <summary>
         /// Доступ к закрытым членам Astral.Quester
         /// </summary>
-        public static class Quester
+        public static partial class Quester
         {
 #if false
             public static class Action
@@ -373,6 +373,15 @@ namespace AcTp0Tools
                 }
 
                 /// <summary>
+                /// Объеявление делегата, вызываемого в случае ошибки загрузки quester-профиля
+                /// </summary>
+                /// <param name="profile">Поток исходного файла профиля</param>
+                /// <param name="modifiedProfile">Поток модифицированного (исправленного) файла профиля.</param>
+                /// <param name="save">Флаг необходимости замены оригинального файла на модифицированный</param>
+                /// <returns>Флаг успешности преобразования</returns>
+                public delegate bool QuesterProfileLoadErrorEvent(Stream profile, out Stream modifiedProfile, out bool save);
+
+                /// <summary>
                 /// препатч <seealso cref="Astral.Quester.Core.Load(string, bool)"/>
                 /// </summary>
                 private static bool PrefixLoad(string Path, bool savePath = true)
@@ -402,14 +411,16 @@ namespace AcTp0Tools
                         profilePath = openFileDialog.FileName;
                     }
 
-                    using (var zipFile = ZipFile.Open(profilePath, ZipArchiveMode.Read))
+                    int mods = 0;
+                    using (var zipFile = ZipFile.Open(profilePath, Preprocessor.Active && Preprocessor.AutoSave ?  ZipArchiveMode.Update : ZipArchiveMode.Read))
                     {
                         try
                         {
                             ZipArchiveEntry zipProfileEntry = zipFile.GetEntry("profile.xml");
                             if (zipProfileEntry is null)
                             {
-                                Astral.Logger.Notify($"File '{Path.GetFileName(profilePath)}' does not contain 'profile.xml'");
+                                Astral.Logger.Notify(
+                                    $"File '{Path.GetFileName(profilePath)}' does not contain 'profile.xml'", true);
                                 return;
                             }
 
@@ -418,16 +429,25 @@ namespace AcTp0Tools
                             {
                                 Astral_Functions_XmlSerializer_GetExtraTypes.GetExtraTypes(out List<Type> types, 2);
                                 XmlSerializer serializer = new XmlSerializer(typeof(Profile), types.ToArray());
-                                profile = serializer.Deserialize(stream) as Profile;
+                                if (Preprocessor.Active)
+                                {
+                                    using (var profileStream = Preprocessor.Replace(stream, out mods))
+                                    {
+                                        profile = serializer.Deserialize(profileStream) as Profile;
+                                        if(mods > 0)
+                                            Logger.Notify($"There are {mods} modifications in the profile '{Path.GetFileName(profilePath)}'");
+                                    }
+                                }
+                                else profile = serializer.Deserialize(stream) as Profile;
 
                                 if (profile is null)
                                 {
-                                    Astral.Logger.Notify($"Unable to load {profilePath}'. Deserialization of 'profile.xml' failed", true);
-                                    //Astral.Logger.WriteLine("Unable to load " + profilePath);
+                                    Astral.Logger.Notify(
+                                        $"Unable to load {profilePath}'. Deserialization of 'profile.xml' failed",
+                                        true);
                                     return;
                                 }
                             }
-
 #if load_mapMeshes
                             var mapName = EntityManager.LocalPlayer.MapState.MapName;
                             if (string.IsNullOrEmpty(mapName))
@@ -448,8 +468,9 @@ namespace AcTp0Tools
                             //else Astral.Logger.Notify($"File '{Path.GetFileName(profilePath)}' does not contain '{mapMeshesName}'");  
 #endif
 
-                            Profile.ResetCompleted();
+                            Profile?.ResetCompleted();
                             Profile = profile;
+
                             Astral.API.CurrentSettings.LastQuesterProfile = profilePath;
                             // TODO Проверить не приводит ли следующая строка к некорректной работе AddIgnoredFoes
                             AstralAccessors.Logic.NW.Combats.BLAttackersList = null;
@@ -463,11 +484,18 @@ namespace AcTp0Tools
                                 if (meshes != null)
                                     allProfileMeshes.Add(mapName, meshes);
 #endif
-                            } 
+                            }
 
                             if (AstralAccessors.Controllers.BotComs.BotServer.Server.IsRunning)
                             {
                                 AstralAccessors.Controllers.BotComs.BotServer.SendQuesterProfileInfos();
+                            }
+
+                            if (mods > 0
+                                //&& Preprocessor.Active
+                                && Preprocessor.AutoSave)
+                            {
+                                SaveProfile(zipFile);
                             }
                         }
                         catch (ThreadAbortException)
@@ -476,7 +504,6 @@ namespace AcTp0Tools
                         catch (Exception ex)
                         {
                             Logger.Notify(ex.ToString(), true);
-                            //XtraMessageBox.Show(ex.ToString());
                         }
                     }
                 }
@@ -542,7 +569,6 @@ namespace AcTp0Tools
                     ZipArchive zipFile = null;
                     try
                     {
-
                         // Открываем архивный файл профиля
                         zipFile = ZipFile.Open(fullProfileName, File.Exists(fullProfileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create);
 
@@ -589,12 +615,12 @@ namespace AcTp0Tools
 
                         API.CurrentSettings.LastQuesterProfile = fullProfileName;
 
-                        Logger.Notify(string.Concat("Profile '", fullProfileName, "' saved"));
+                        Logger.Notify($"Profile '{fullProfileName}' saved");
                     }
                     catch (Exception exc)
                     {
                         Logger.WriteLine(Logger.LogType.Debug, exc.ToString());
-                        Logger.Notify(string.Concat("Profile '", fullProfileName, "' saved"), true);
+                        Logger.Notify($"Profile '{fullProfileName}' saved", true);
                     }
                     finally
                     {
@@ -607,10 +633,15 @@ namespace AcTp0Tools
                 /// </summary>
                 public static bool SaveMesh(ZipArchive zipFile, string meshName, Graph mesh, BinaryFormatter binaryFormatter = null)
                 {
-                    //TODO: Безопасное сохранение mesh'а, чтобы при возникновении ошибки старое содержимое не удалялось
-                    //TODO: Исправить сохранение внешних мешей
                     if (zipFile is null)
                         return false;
+
+                    if (zipFile.Mode != ZipArchiveMode.Update
+                        && zipFile.Mode != ZipArchiveMode.Create)
+                        return false;
+
+                    //TODO: Безопасное сохранение mesh'а, чтобы при возникновении ошибки старое содержимое не удалялось
+                    //TODO: Исправить сохранение внешних мешей
 
                     if (binaryFormatter is null)
                         binaryFormatter = new BinaryFormatter();
@@ -622,16 +653,20 @@ namespace AcTp0Tools
                             binaryFormatter.Serialize(memoryStream, mesh);
 
                             ZipArchiveEntry zipMeshEntry;
+#if false
                             if (zipFile.Mode == ZipArchiveMode.Update)
                             {
                                 zipMeshEntry = zipFile.GetEntry(meshName);
                                 if (zipMeshEntry != null)
                                     zipMeshEntry.Delete();
-                            }
+                            } 
                             zipMeshEntry = zipFile.CreateEntry(meshName);
-
+#else
+                            zipMeshEntry = zipFile.GetEntry(meshName) ?? zipFile.CreateEntry(meshName);
+#endif
                             using (var zipMeshStream = zipMeshEntry.Open())
                             {
+                                zipMeshStream.SetLength(memoryStream.Length);
                                 memoryStream.WriteTo(zipMeshStream);
                                 return true;
                             }
@@ -650,6 +685,10 @@ namespace AcTp0Tools
                 /// </summary>
                 public static bool SaveProfile(ZipArchive zipFile)
                 {
+                    if (zipFile.Mode != ZipArchiveMode.Update
+                        && zipFile.Mode != ZipArchiveMode.Create)
+                        return false;
+
                     //TODO: Безопасное сохранение профиля, чтобы при возникновении ошибки старое содержимое не удалялось
                     var currentProfile = Profile;
 
@@ -664,14 +703,25 @@ namespace AcTp0Tools
                             serializer.Serialize(memStream, currentProfile);
 
                             ZipArchiveEntry zipProfileEntry;
+#if false
+                            //byte[] backupProfileEntry;
                             if (zipFile.Mode == ZipArchiveMode.Update)
                             {
                                 zipProfileEntry = zipFile.GetEntry("profile.xml");
+                                //using (var stream = zipProfileEntry.Open())
+                                //{
+                                //    backupProfileEntry = new byte[stream.Length];
+                                //    stream.Read(backupProfileEntry,0, stream.Length);
+                                //}
                                 zipProfileEntry?.Delete();
                             }
-                            zipProfileEntry = zipFile.CreateEntry("profile.xml");
+                            zipProfileEntry = zipFile.CreateEntry("profile.xml"); 
+#else
+                            zipProfileEntry = zipFile.GetEntry("profile.xml") ?? zipFile.CreateEntry("profile.xml");
+#endif
                             using (var zipProfileStream = zipProfileEntry.Open())
                             {
+                                zipProfileStream.SetLength(memStream.Length);
                                 memStream.WriteTo(zipProfileStream);
                                 return true;
                             }

@@ -27,6 +27,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using AcTp0Tools;
 using Action = Astral.Quester.Classes.Action;
 
 [assembly: InternalsVisibleTo("EntityCore")]
@@ -193,10 +194,12 @@ namespace EntityTools
         {
             try
             {
+                AstralAccessors.Quester.SavePreprocessor();
+
                 if (!Directory.Exists(Path.GetDirectoryName(FileTools.SettingsFile)))
                 {
                     var dir = Path.GetDirectoryName(FileTools.SettingsFile);
-                    if (string.IsNullOrEmpty(dir))
+                    if (!string.IsNullOrEmpty(dir))
                     {
                         ETLogger.WriteLine(LogType.Error, $"{nameof(EntityTools)}: Error to save settings file {Path.GetFileName(FileTools.SettingsFile)}", true);
                         return;

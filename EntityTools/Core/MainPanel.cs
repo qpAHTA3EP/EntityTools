@@ -1,10 +1,12 @@
-﻿using AcTp0Tools.Reflection;
+﻿using AcTp0Tools.Patches;
+using AcTp0Tools.Reflection;
 using Astral;
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;
 using Astral.Forms;
 using Astral.Logic.Classes.FSM;
 using Astral.Logic.NW;
+using Astral.Quester.Classes;
 using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Controls;
 using EntityTools.Enums;
@@ -13,7 +15,6 @@ using EntityTools.Services;
 using EntityTools.Tools;
 using EntityTools.Tools.Export;
 using EntityTools.Tools.Targeting;
-using HarmonyLib;
 using Microsoft.Win32;
 using MyNW.Classes;
 using MyNW.Internals;
@@ -22,12 +23,15 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using AcTp0Tools;
+using AStar;
+using DevExpress.Utils.Extensions;
 using API = Astral.Quester.API;
 using Task = System.Threading.Tasks.Task;
 
@@ -95,7 +99,30 @@ namespace EntityTools.Core
                 nameof(EntityTools.Config.Logger.Active),
                 false, DataSourceUpdateMode.OnPropertyChanged);
 #endif
+            #region QuesterProfilePreprocessing
+            ckbEnapleQuesterProfilePreprocessing.DataBindings.Add(nameof(ckbEnapleQuesterProfilePreprocessing.Checked),
+                    AstralAccessors.Quester.Preprocessor,
+                    nameof(AstralAccessors.Quester.Preprocessor.Active),
+                    false, DataSourceUpdateMode.OnPropertyChanged);
 
+            ckbAutoSavePreprocessedProfile.DataBindings.Add(nameof(ckbAutoSavePreprocessedProfile.Checked),
+                AstralAccessors.Quester.Preprocessor,
+                nameof(AstralAccessors.Quester.Preprocessor.AutoSave),
+                false, DataSourceUpdateMode.OnPropertyChanged);
+
+            ckbAutoSavePreprocessedProfile.DataBindings.Add(nameof(ckbAutoSavePreprocessedProfile.Enabled),
+                AstralAccessors.Quester.Preprocessor,
+                nameof(AstralAccessors.Quester.Preprocessor.Active),
+                false, DataSourceUpdateMode.OnPropertyChanged);
+
+
+            gridReplacements.DataSource = AstralAccessors.Quester.Preprocessor.Replacement;
+
+            gridReplacements.DataBindings.Add(nameof(gridReplacements.Enabled),
+                AstralAccessors.Quester.Preprocessor,
+                nameof(AstralAccessors.Quester.Preprocessor.Active),
+                false, DataSourceUpdateMode.OnPropertyChanged);
+            #endregion
 
 
 #if false
@@ -229,7 +256,7 @@ namespace EntityTools.Core
             }
             XtraMessageBox.Show(type.ToString());
 
-#else
+#elif false
             var aoeList = Traverse.Create(typeof(AOECheck)).Property("List").GetValue();
 
             //var iterator = aoeList.GetValue<List<AOECheck.AOE>>().GetEnumerator();
@@ -311,7 +338,7 @@ namespace EntityTools.Core
                                 $"{aoeListType1}\n" +
                                 $"{listType}\n" +
                                 $"{isEqualType}");
-#else
+#elif false
             var changeWPDistance = API.Engine.Navigation.GetProperty<double>("ChangeWPDist");
 
             if (!changeWPDistance.IsValid)
@@ -324,6 +351,7 @@ namespace EntityTools.Core
 
             XtraMessageBox.Show($"Текущее значение 'Navigation.ChangeWPDist' равно {currentChangeWPDistance}");
 #endif
+
         }
 
         private void handler_Test_4(object sender, EventArgs e)
@@ -710,6 +738,275 @@ namespace EntityTools.Core
         {
             //new ObjectInfoForm().Show(new PlayerTeamMonitor(), 500);
             EntityTools.Core.Monitor(new PlayerTeamMonitor());
+        }
+
+        private void handler_AddProcessingItem(object sender, EventArgs e)
+        {
+#if true
+            var item = new AstralAccessors.Quester.ReplacementItem();
+            AstralAccessors.Quester.Preprocessor.Replacement.Add(item);
+#else
+            gridViewPreprocessing.AddNewRow();
+#endif
+        }
+
+        private void handler_DeleteProcessingItem(object sender, EventArgs e)
+        {
+#if false
+            if (gridPreprocessingProfile.FocusedView is GridView gridView)
+            {
+                if (gridView.FocusedValue is ReplacementItem item)
+                {
+                    gridView.DeleteSelectedRows();
+                }
+            } 
+#else
+            gridViewPreprocessing.DeleteSelectedRows(); 
+#endif
+        }
+
+        private void handler_ClearProcessingItems(object sender, EventArgs e)
+        {
+            if (XtraMessageBox.Show($"Are you sure to to delete all items ?",
+                                    "Clear Items", MessageBoxButtons.YesNo) ==
+                DialogResult.Yes)
+            {
+                AstralAccessors.Quester.Preprocessor.Replacement.Clear();
+            }
+        }
+
+        private void handler_TestProcessingItem(object sender, EventArgs e)
+        {
+#if false
+            if (gridViewPreprocessing.GetFocusedRow() is ReplacementItem item)
+            {
+                if (!item.IsValid)
+                {
+                    XtraMessageBox.Show($"Selected processing Item is invalid",
+                        "Error", MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    return;
+                }
+
+                var testdata = new[]
+                {
+                    "AdventuringHead",
+                    "AdventuringTrousers",
+                    "AdventuringRings",
+                    "AdventuringHands"
+                };
+
+                var sb = new StringBuilder("Processing result: \n\t");
+                sb.AppendLine($"({item.Type}){item.Pattern} => {item.Replacement}\n");
+
+                foreach (var s in testdata)
+                {
+                    sb.AppendLine(item.Replace(s, out string output)
+                        ? $"\t{s} => {output}"
+                        : $"\t{s}");
+                }
+
+                XtraMessageBox.Show(sb.ToString());
+            } 
+#else
+            var replacement = AstralAccessors.Quester.Preprocessor.Replacement;
+
+            if(replacement.Count == 0)
+                return;
+
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                InitialDirectory = Directories.ProfilesPath,
+                DefaultExt = "amp.zip",
+                Filter = @"Astral mission profile (*.amp.zip)|*.amp.zip"
+            };
+
+            if (openFileDialog.ShowDialog() != DialogResult.OK)
+                return;
+
+            var profilePath = openFileDialog.FileName;
+
+            using (var zipFile = ZipFile.Open(profilePath, ZipArchiveMode.Read))
+            {
+                try
+                {
+                    ZipArchiveEntry zipProfileEntry = zipFile.GetEntry("profile.xml");
+                    if (zipProfileEntry is null)
+                    {
+                        Astral.Logger.Notify($"File '{Path.GetFileName(profilePath)}' does not contain 'profile.xml'");
+                        return;
+                    }
+
+                    using (var stream = zipProfileEntry.Open())
+                    {
+                        Astral_Functions_XmlSerializer_GetExtraTypes.GetExtraTypes(out List<Type> types, 2);
+
+                        int lineNum = -1;
+                        int matchNum = 0;
+                        var report = new StringBuilder($"Reading profile {profilePath}\n");
+                        var modifiedProfile = new StringBuilder();
+
+                        using (var reader = new StreamReader(stream))
+                        {
+                            string inLine;
+                            while ((inLine = reader.ReadLine()) != null)
+                            {
+                                var line = inLine;
+                                lineNum++;
+                                int lineChanges = 0;
+                                foreach (var item in replacement)
+                                {
+                                    if (item.Replace(line, out string outStr))
+                                    {
+                                        matchNum++;
+                                        lineChanges++;
+                                        line = outStr;
+                                    }
+                                }
+
+                                if (lineChanges > 0)
+                                {
+                                    report.AppendFormat("[{0:########}] line '{1}'\n", lineNum, inLine.Trim());
+                                    report.Append("\t=> '").Append(line.Trim()).AppendLine("'");
+                                }
+
+                                modifiedProfile.AppendLine(inLine);
+                            }
+                        }
+                        if (matchNum > 0)
+                        {
+                            report.Append(matchNum).AppendLine(" modifications are done");
+
+                            var reportPath = (profilePath.EndsWith(".amp.zip")
+                                                   ? profilePath.Substring(0, profilePath.Length - 8)
+                                                   : profilePath)
+                                + DateTime.Now.ToString(@"_yyyy-MM-dd_HH-mm\.\l\o\g");
+
+                            File.WriteAllText(reportPath, report.ToString());
+
+                            if (XtraMessageBox.Show($"There are {matchNum} modifications in the profile '{Path.GetFileName(profilePath)}'.\n" +
+                                                    "Would you like to open detail report", "Preprocessing result", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                            {
+                                if (File.Exists(reportPath))
+                                {
+                                    Process.Start(reportPath);
+                                } 
+                            }
+                        }
+                    }
+                }
+                catch (ThreadAbortException)
+                {
+                }
+                catch (Exception ex)
+                {
+                    Logger.Notify(ex.ToString(), true);
+                    //XtraMessageBox.Show(ex.ToString());
+                }
+            }
+#endif
+        }
+
+        private void handler_Help(object sender, EventArgs e)
+        {
+            XtraMessageBox.Show("Пример:\n" +
+                                "\tType := Regex\n" +
+                                "\tPattern := \\bAdventuring(?!Hands|Trousers|Rings)(?<name>\\w+)\\b\n" +
+                                "\tReplacement := ${name}\n" +
+                                "Регулярное выражение \"Pattern\" интерпретируется следующим образом:\n" +
+                                "Алфавитно цифровая последовательность должна начинаться словом \"Adventuring\",\n" +
+                                "при этом ему должен предшествовать любой символ не относящийся к алфавитно-цифровым.\n" +
+                                "Следом не должны встречаться подстроки \"Hands\", \"Trousers\" или \"Rings\" (без пробелов или иных разделителе).\n" +
+                                "\n" +
+                                "Последовательность должна заканчивается группой из одного и более алфавитно-цифровых символов \"\\w+\",\n" +
+                                "которой присваивается имя 'name'. Эта группа будет использоваться при формировании новой строки.\n" +
+                                "\n" +
+                                "Выражение подстановки \"${name}\" при обработке будет заменено на захваченную именованную группу символов \"name\"\n" +
+                                "\n" +
+                                "Таким образом, выражение \"AdventuringHead\" будет преобразовано в \"Head\",\n" +
+                                "тогда как выражение \"AdventuringTrousers\" останется неизменным, поскольку содержит запрещенную подстроку \"Trousers\"",
+                                "Пример", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void handler_ExportPreprocessingProfile(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                InitialDirectory = Directories.SettingsPath,
+                DefaultExt = "xml",
+                Filter = "Replacements (*.xml)|*.xml",
+                FileName = "Replacements.xml"
+            };
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var items = AstralAccessors.Quester.Preprocessor.Replacement;
+                XmlSerializer serializer = new XmlSerializer(items.GetType());
+                using (FileStream file = File.Create(saveFileDialog.FileName))
+                {
+                    serializer.Serialize(file, items);
+                }
+            }
+        }
+
+        private void handler_ImportPreprocessingProfile(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.InitialDirectory = Directories.SettingsPath;
+            openFileDialog.DefaultExt = "xml";
+            openFileDialog.Filter = "Replacements (*.xml)|*.xml";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                List<AstralAccessors.Quester.ReplacementItem> items = null;
+
+                XmlSerializer serialiser = new XmlSerializer(typeof(List<AstralAccessors.Quester.ReplacementItem>));
+                using (StreamReader fileStream = new StreamReader(openFileDialog.FileName))
+                {
+                    if (serialiser.Deserialize(fileStream) is List<AstralAccessors.Quester.ReplacementItem> list)
+                    {
+                        items = list;
+                    }
+                }
+                if (items?.Count > 0)
+                {
+                    var replacements = AstralAccessors.Quester.Preprocessor.Replacement;
+                    gridReplacements.BeginUpdate();
+                    if (replacements.Count > 0)
+                    {
+                        switch (XtraMessageBox.Show($"The 'Preprocessing List' has {replacements.Count} items.\n" +
+                                                    $"\tPress 'Yes' to add item to the existing list\n" +
+                                                    $"\tPress 'No' to replace they.", "Import Preprocessing List", MessageBoxButtons.YesNoCancel))
+                        {
+                            case DialogResult.Yes: // Добавление к существующему списку
+                                foreach (var item in items)
+                                    replacements.Add(item);
+                                return;
+                            case DialogResult.No: // Замена существующего списка
+                                replacements.Clear();
+                                foreach (var item in items)
+                                    if(!replacements.Contains(item))
+                                        replacements.Add(item);
+                                return;
+                            default:
+                                return;
+                        }
+                    }
+
+                    foreach (var item in items)
+                        if (!replacements.Contains(item))
+                            replacements.Add(item);
+                    gridReplacements.EndUpdate();
+                }
+                else
+                {
+                    XtraMessageBox.Show("Empty or file opening error.");
+                }
+            }
+        }
+
+        private void handler_SaveQuesterProfilePreprocessor(object sender, EventArgs e)
+        {
+            AstralAccessors.Quester.SavePreprocessor();
         }
     }
 }

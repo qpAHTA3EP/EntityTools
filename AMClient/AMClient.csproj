@@ -39,8 +39,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AStar">
+    <Reference Include="AStar, Version=2.21.508.2127, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>..\References\x64\AStar.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
     <Reference Include="Astral_patched, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -99,6 +100,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Accessors\AstralAccessors.General.cs" />
+    <Compile Include="Accessors\AstralAccessors.Quester.Preprocessor.cs" />
     <Compile Include="AMClient\Client.cs" />
     <Compile Include="Classes\Enums.cs" />
     <Compile Include="Classes\Targeting\TargetSelector.cs" />
