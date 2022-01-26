@@ -464,6 +464,7 @@ namespace EntityTools.Forms
             this.btnDelete.TabIndex = 24;
             this.btnDelete.Text = "Delete";
             this.btnDelete.ToolTip = "Delete selected filter entry";
+            this.btnDelete.Click += new System.EventHandler(this.DeleteItemFilter);
             // 
             // btnAdd
             // 
@@ -477,6 +478,7 @@ namespace EntityTools.Forms
             this.btnAdd.TabIndex = 30;
             this.btnAdd.Text = "Add";
             this.btnAdd.ToolTip = "Import Filter list from the File";
+            this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
             // 
             // ItemFilterEditorForm
             // 

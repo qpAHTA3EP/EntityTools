@@ -14,7 +14,6 @@ using System.Reflection;
 
 namespace EntityTools.Patches
 {
-    //TODO Добавить проверку версии AStar
     internal static class ComplexPatch_Navigation
     { 
         public static bool PatchesWasApplied { get; private set; }

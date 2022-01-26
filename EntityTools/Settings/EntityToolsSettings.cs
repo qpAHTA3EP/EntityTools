@@ -60,6 +60,15 @@ namespace EntityTools
         public MissionMonitorSettings MissionMonitor { get; set; } = new MissionMonitorSettings();
 
 #if false
+        /// <summary>
+        /// Настройки предобработки Quester-профиля <see cref="PreprocessingSettings"/>
+        /// </summary>
+        [Description("Настройки предобработки quester-профиля")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public PreprocessingSettings QuesterProfilePreprocessing { get; set; } = new PreprocessingSettings(); 
+#endif
+
+#if false
         #region Сериализация/десериализация статических полей класса статического класса
         /// <summary>
         /// 

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
-using System.Xml.Serialization;
+﻿using AcTp0Tools.Reflection;
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;
 using Astral.Quester.Forms;
@@ -12,10 +6,16 @@ using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Controls;
 using DevExpress.XtraGrid.Views.Grid;
 using EntityTools.Enums;
-using AcTp0Tools.Reflection;
 using EntityTools.Tools.Inventory;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace EntityTools.Forms
 {
@@ -35,7 +35,7 @@ namespace EntityTools.Forms
         /// <summary>
         /// Список-фильтров
         /// </summary>
-        BindingList<ItemFilterEntryExt> filter = new BindingList<ItemFilterEntryExt>();
+        ObservableCollection<ItemFilterEntryExt> filter = new ObservableCollection<ItemFilterEntryExt>();//new BindingList<ItemFilterEntryExt>();
 
         /// <summary>
         /// Функтор, заполняющий фильтр исходными значениями
@@ -168,20 +168,23 @@ namespace EntityTools.Forms
         /// <param name="e"></param>
         private void btnExport_Click(object sender, EventArgs e)
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.InitialDirectory = Directories.SettingsPath;
-            saveFileDialog.DefaultExt = "xml";
-            saveFileDialog.Filter = nameof(ItemFilterEntryExt) + " filter profile (*.xml)|*.xml";
-            saveFileDialog.FileName = nameof(ItemFilterEntryExt) + "_Filters.xml";
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                InitialDirectory = Directories.SettingsPath,
+                DefaultExt = "xml",
+                Filter = nameof(ItemFilterEntryExt) + " filter profile (*.xml)|*.xml",
+                FileName = nameof(ItemFilterEntryExt) + "_Filters.xml"
+            };
+
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
 #if false
                 Astral.Functions.XmlSerializer.Serialize(saveFileDialog.FileName, filter.ToList()); 
 #else
-                XmlSerializer serialiser = new XmlSerializer(/*typeof(SettingsContainer)*/filter.GetType());
+                XmlSerializer serializer = new XmlSerializer(filter.GetType());
                 using (FileStream file = File.Create(saveFileDialog.FileName))
                 {
-                    serialiser.Serialize(file, filter);
+                    serializer.Serialize(file, filter);
                 }
 #endif
             }
@@ -344,6 +347,22 @@ namespace EntityTools.Forms
         private void ItemFilterEditorForm_Shown(object sender, EventArgs e)
         {
             fillListAction?.Invoke();
+        }
+
+        private void DeleteItemFilter(object sender, EventArgs e)
+        {
+            if (purchaseOptions.FocusedView is GridView grid)
+            {
+                grid.DeleteSelectedRows();
+            }
+        }
+
+        private void btnAdd_Click(object sender, EventArgs e)
+        {
+            if (purchaseOptions.FocusedView is GridView grid)
+            {
+                grid.AddNewRow();
+            }
         }
     }
 }

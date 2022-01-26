@@ -22,7 +22,7 @@ namespace EntityCore.Quester.Conditions
         /// <summary>
         /// Кэшированное число членов группы, удовлетворяющих критериям
         /// </summary>
-        private int membersCount = 0;
+        //private int membersCount;
         private string _label = string.Empty;
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace EntityCore.Quester.Conditions
                 memberCountChecker = Initicalize_MemberCountChecker;
                 counter = Initialize_Counter;
 
-                membersCount = 0;
+                //membersCount = 0;
             }
         }
 
@@ -116,7 +116,7 @@ namespace EntityCore.Quester.Conditions
 
         public void Reset()
         {
-            membersCount = 0;
+            //membersCount = 0;
             _label = string.Empty;
         }
 
@@ -193,7 +193,7 @@ namespace EntityCore.Quester.Conditions
                                         }
                                         break;
                                     case Relation.Equal:
-                                        if (memberDistance == @this._distance)
+                                        if (Math.Abs(memberDistance - @this._distance) <= 1.0)
                                         {
                                             if (@this._customRegionCheck == Presence.Equal && match)
                                                 memsCount++;
@@ -202,7 +202,7 @@ namespace EntityCore.Quester.Conditions
                                         }
                                         break;
                                     case Relation.NotEqual:
-                                        if (memberDistance != @this._distance)
+                                        if (Math.Abs(memberDistance - @this._distance) > 1.0)
                                         {
                                             if (@this._customRegionCheck == Presence.Equal && match)
                                                 memsCount++;
@@ -225,11 +225,11 @@ namespace EntityCore.Quester.Conditions
                                             memsCount++;
                                         break;
                                     case Relation.Equal:
-                                        if (memberDistance == @this._distance)
+                                        if (Math.Abs(memberDistance - @this._distance) <= 1.0)
                                             memsCount++;
                                         break;
                                     case Relation.NotEqual:
-                                        if (memberDistance != @this._distance)
+                                        if (Math.Abs(memberDistance - @this._distance) > 1.0)
                                             memsCount++;
                                         break;
                                 }

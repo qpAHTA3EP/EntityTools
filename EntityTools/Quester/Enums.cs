@@ -136,52 +136,52 @@ namespace EntityTools.Enums
         /// <summary>
         /// Шлем (голова)
         /// </summary>
-        Head = InvBagIDs.AdventuringHead,
+        Head = InvBagIDs.Head,
         /// <summary>
         /// Ожерелье (шея)
         /// </summary>
-        Neck = InvBagIDs.AdventuringNeck,
+        Neck = InvBagIDs.Neck,
         /// <summary>
         /// Броня (тело)
         /// </summary>
-        Body = InvBagIDs.AdventuringArmor,
+        Body = InvBagIDs.Armor,
         /// <summary>
         /// Наручи (руки)
         /// </summary>
-        Arms = InvBagIDs.AdventuringArms,
+        Arms = InvBagIDs.Arms,
         /// <summary>
         /// Пояс
         /// </summary>
-        Waist = InvBagIDs.AdventuringWaist,
+        Waist = InvBagIDs.Waist,
         /// <summary>
         /// Поножи (ноги)
         /// </summary>
-        Feet = InvBagIDs.AdventuringFeet,
+        Feet = InvBagIDs.Feet,
         //Hands = InvBagIDs.AdventuringHands,
         /// <summary>
         /// Основное оружие (для правой руки)
         /// </summary>
-        WeaponMain = InvBagIDs.AdventuringHands,
+        WeaponMain = InvBagIDs.Melee,
         /// <summary>
         /// Вспомогательное оружие или предмет (для левой руки)
         /// </summary>
-        WeaponSecondary = InvBagIDs.AdventuringHands + 1,
+        WeaponSecondary = InvBagIDs.Melee + 1,
         /// <summary>
         /// Рубашка
         /// </summary>
-        Shirt = InvBagIDs.AdventuringShirt,
+        Shirt = InvBagIDs.Shirt,
         /// <summary>
         /// Штаны
         /// </summary>
-        Paints = InvBagIDs.AdventuringTrousers,
+        Paints = InvBagIDs.Pants,
         /// <summary>
         /// Левое кольцо (верхнее, слот 0)
         /// </summary>
-        RingLeft = InvBagIDs.AdventuringRings,
+        RingLeft = InvBagIDs.Ring,
         /// <summary>
         /// Правое кольцо (нижнее, слот 1)
         /// </summary>
-        RingRight = InvBagIDs.AdventuringRings + 1,
+        RingRight = InvBagIDs.Ring + 1,
         /// <summary>
         /// Основной (активный) артефакт
         /// </summary>

@@ -2,7 +2,6 @@
 using Astral.Classes.ItemFilter;
 using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
-using Astral.Quester.Classes;
 using DevExpress.Utils;
 using DevExpress.XtraEditors;
 using EntityCore.Entities;
@@ -27,14 +26,16 @@ using MyNW.Internals;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
+using Astral.Quester.Classes;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 using UCCConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
 
 namespace EntityCore
 {
-    public class Engine : IEntityToolsCore
+    public partial class Engine : IEntityToolsCore
     {
         private static readonly Dictionary<QuesterAction, IQuesterActionEngine> DictQuesterAction = new Dictionary<QuesterAction, IQuesterActionEngine>();
         private static readonly Dictionary<QuesterCondition, IQuesterConditionEngine> DictQuesterCondition = new Dictionary<QuesterCondition, IQuesterConditionEngine>();
@@ -46,6 +47,9 @@ namespace EntityCore
 
         public Engine()
         {
+            if (!isValid)
+                throw new ReflectionTypeLoadException(new []{typeof(IEntityToolsCore) }, new Exception[] { null });
+
             AstralAccessors.Quester.Core.OnProfileChanged += ResetQuesterCache;
             ETLogger.WriteLine("EntityToolsCore loaded");
         }
@@ -65,7 +69,7 @@ namespace EntityCore
 
         public bool CheckCore()
         {
-            return true;
+            return isValid;
         }
 
         #region Инициализация элементов

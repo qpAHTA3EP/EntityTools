@@ -749,7 +749,7 @@ namespace EntityTools.Patches.Mapper
             new DevExpress.XtraBars.LinkPersistInfo(this.btnSettings, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.groupSaveUndo, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.groupZoom, true),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnPanelVisibility),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnPanelVisibility, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.lblPlayerPos, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.lblMousePos, true),
             new DevExpress.XtraBars.LinkPersistInfo(this.lblDrawInfo, true)});

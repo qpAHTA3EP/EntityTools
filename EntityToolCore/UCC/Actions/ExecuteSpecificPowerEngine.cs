@@ -31,7 +31,7 @@ namespace EntityCore.UCC.Actions
         #region Данные
         private ExecuteSpecificPower @this;
 
-        private Entity entity;
+        //private Entity entity;
         private string label = string.Empty;
         private string _idStr;
 
@@ -98,7 +98,7 @@ namespace EntityCore.UCC.Actions
                         label = string.Empty;
                     }
 #endif
-                    entity = null;
+                    //entity = null;
                     power = null;
                 }
             }

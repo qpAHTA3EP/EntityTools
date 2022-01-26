@@ -1,13 +1,10 @@
-﻿using Astral.Classes.ItemFilter;
-using Astral.Logic.UCC.Classes;
+﻿using Astral.Logic.UCC.Classes;
+using EntityTools;
 using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
+using EntityTools.Tools;
 using EntityTools.UCC.Conditions;
 using MyNW.Classes;
-using System.Text.RegularExpressions;
-using EntityTools.Extensions;
-using static Astral.Quester.Classes.Condition;
-using EntityTools;
 using System;
 
 namespace EntityCore.UCC.Conditions
@@ -24,16 +21,8 @@ namespace EntityCore.UCC.Conditions
 
         internal UccGameUiCheckEngine(UCCGameUICheck uiGenCheck)
         {
-#if false
-            @this = eck;
-            @this.Engine = this;
-            @this.PropertyChanged += PropertyChanged;
-
-            ETLogger.WriteLine(LogType.Debug, $"{@this.GetType().Name}[{@this.GetHashCode().ToString("X2")}] initialized: {Label()}"); 
-#else
             InternalRebase(uiGenCheck);
             ETLogger.WriteLine(LogType.Debug, $"{_idStr} initialized: {Label()}");
-#endif
         }
         ~UccGameUiCheckEngine()
         {
@@ -54,8 +43,12 @@ namespace EntityCore.UCC.Conditions
         {
             if (ReferenceEquals(sender, @this))
             {
-                if (e.PropertyName == nameof(@this.UiGenID))
-                    label = string.Empty;
+                var propName = e.PropertyName;
+                if (propName == nameof(@this.Check))
+                    uiGenChecker = initialize_uiGenChecker;
+                else if (propName == nameof(@this.UiGenProperty))
+                    uiGenPropertyValueChecker = initialize_CheckUIGenVarName;
+                label = string.Empty;
                 uiGen = null;
             }
         }
@@ -84,6 +77,7 @@ namespace EntityCore.UCC.Conditions
 
         private bool InternalRebase(UCCGameUICheck execPower)
         {
+            uiGen = null;
             // Убираем привязку к старому условию
             if (@this != null)
             {
@@ -95,6 +89,10 @@ namespace EntityCore.UCC.Conditions
             @this.PropertyChanged += PropertyChanged;
 
             _idStr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
+
+            label = string.Empty;
+            uiGenChecker = initialize_uiGenChecker;
+            uiGenPropertyValueChecker = initialize_CheckUIGenVarName;
 
             @this.Engine = this;
 
@@ -110,6 +108,9 @@ namespace EntityCore.UCC.Conditions
                     return false;
             }
 
+#if true
+            return uiGenChecker(uiGen);
+#else
             switch (@this._check)
             {
                 case UiGenCheckType.IsVisible:
@@ -129,16 +130,72 @@ namespace EntityCore.UCC.Conditions
                         return result;
                     }
                     break;
-            }
+            } 
 
             return false;
+#endif
         }
+
+        /// <summary>
+        /// Инициализация функтора <see cref="uiGenChecker"/>, проверяющего истинность заданного условия
+        /// </summary>
+        /// <param name="uigen"></param>
+        /// <returns></returns>
+        private bool initialize_uiGenChecker(UIGen uigen)
+        {
+            if (uiGenChecker is null)
+            {
+                Func<UIGen, bool> checker = null;
+                switch (@this._check)
+                {
+                    case UiGenCheckType.IsVisible:
+                        checker = uig => uig.IsVisible;
+                        break;
+                    case UiGenCheckType.IsHidden:
+                        checker = uig => !uig.IsVisible;
+                        break;
+                    case UiGenCheckType.Property:
+                        checker = uig =>
+                        {
+                            if (uig.IsVisible)
+                            {
+                                foreach (var uiVar in uig.Vars)
+                                    if (uiVar.IsValid && uiVar.Name == @this._uiGenProperty)
+                                    {
+                                        return uiGenPropertyValueChecker(uiVar);
+                                    }
+                            }
+                            return false;
+                        };
+                        break;
+                }
+
+                uiGenChecker = checker ?? ((_) => false);
+            }
+
+            return uiGenChecker(uigen);
+        }
+        private Func<UIGen, bool> uiGenChecker;
 
         public string Label()
         {
-            label = string.IsNullOrEmpty(label) 
-                ? $"{@this.GetType().Name} [{@this._uiGenID}]" 
-                : @this.GetType().Name;
+            if (string.IsNullOrEmpty(label))
+            {
+                if (string.IsNullOrEmpty(@this._uiGenID))
+                    label = @this.GetType().Name;
+                else
+                {
+                    if (@this.Check != UiGenCheckType.Property
+                        || string.IsNullOrEmpty(@this._uiGenProperty))
+                    {
+                        label = $"{@this.GetType().Name} [{@this._uiGenID}]";
+                    }
+                    else 
+                    {
+                        label = $"{@this.GetType().Name} [{@this._uiGenID}.{@this._uiGenProperty}]";
+                    }
+                }
+            }
 
             return label;
         }
@@ -149,7 +206,7 @@ namespace EntityCore.UCC.Conditions
             {
                 uiGen = MyNW.Internals.UIManager.AllUIGen.Find(x => x.Name == @this._uiGenID);
                 if (uiGen == null || !uiGen.IsValid)
-                    return $"GUI '{@this._uiGenID}' is not found."; ;
+                    return $"GUI '{@this._uiGenID}' is not found.";
             }
 
             switch (@this._check)
@@ -168,7 +225,7 @@ namespace EntityCore.UCC.Conditions
                         foreach (var uiVar in uiGen.Vars)
                             if (uiVar.IsValid && uiVar.Name == @this._uiGenProperty)
                             {
-                                if (CheckUiGenPropertyValue(uiVar))
+                                if (uiGenPropertyValueChecker(uiVar))
                                     return $"The Property '{@this._uiGenID}.{@this._uiGenProperty}' equals to '{uiVar.Value}'.";
                                 else return $"The Property '{@this._uiGenID}.{@this._uiGenProperty}' equals to '{uiVar.Value}'.";
                             }
@@ -180,6 +237,25 @@ namespace EntityCore.UCC.Conditions
             return $"GUI '{@this._uiGenID}' is not valid.";
         }
 
+#if true
+        /// <summary>
+        /// Инициализация функтора <see cref="uiGenPropertyValueChecker"/>? проверяющего значения переменной элемента интерфейса
+        /// </summary>
+        /// <param name="uiVar"></param>
+        /// <returns></returns>
+        private bool initialize_CheckUIGenVarName(UIVar uiVar)
+        {
+            if (uiGenPropertyValueChecker is null)
+            {
+                var checker = @this._uiGenPropertyValue.GetCompareFunc(@this._uiGenPropertyValueType, (UIVar v) => v.Value);
+                
+                uiGenPropertyValueChecker = checker ?? ((_) => false);
+            }
+
+            return uiGenPropertyValueChecker(uiVar);
+        }
+        private Func<UIVar, bool> uiGenPropertyValueChecker;
+#else
         private bool CheckUiGenPropertyValue(UIVar uiVar)
         {
             if (uiVar == null || !uiVar.IsValid)
@@ -189,24 +265,24 @@ namespace EntityCore.UCC.Conditions
             if (string.IsNullOrEmpty(uiVar.Value) && string.IsNullOrEmpty(@this._uiGenPropertyValue))
                 result = true;
             else switch (@this._uiGenPropertyValueType)
-            {
-                case ItemFilterStringType.Simple:
-                    result = uiVar.Value.CompareToSimplePattern(@this._uiGenPropertyValue);
-                    break;
-                case ItemFilterStringType.Regex:
-                    //TODO Использовать предкомпилированный Regex
-                    result = Regex.IsMatch(uiVar.Value, @this._uiGenPropertyValue);
-                    break;
-            }
+                {
+                    case ItemFilterStringType.Simple:
+                        result = uiVar.Value.CompareToSimplePattern(@this._uiGenPropertyValue);
+                        break;
+                    case ItemFilterStringType.Regex:
+                        result = Regex.IsMatch(uiVar.Value, @this._uiGenPropertyValue);
+                        break;
+                }
 
             if (@this._propertySign == Presence.Equal)
                 return result;
             return !result;
-        }
+        } 
+#endif
 
-        private bool Validate(UIGen uiGen)
+        private bool Validate(UIGen uigen)
         {
-            return uiGen != null && uiGen.IsValid && uiGen.Name == @this._uiGenID;
+            return uigen != null && uigen.IsValid && uigen.Name == @this._uiGenID;
         }
     }
 }

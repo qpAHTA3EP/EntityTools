@@ -14,7 +14,7 @@ namespace EntityTools.Patches
     /// <summary>
     /// Патчер, содержащий список всех патчей
     /// </summary>
-    internal static class ETPatcher
+    internal static partial class ETPatcher
     {
         private static readonly Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly = new Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly();
         
@@ -44,17 +44,20 @@ namespace EntityTools.Patches
 
                 SlideMonitor.Apply();
 
-
-                // Изменение алгоритмов навигации
-                ComplexPatch_Navigation.Apply();
-                // Подмена штатного окна Mapper'a
-                ComplexPatch_Mapper.Apply();
+                if (Assembly.ReflectionOnlyLoadFrom("AStar.dll").GetName().Version >= requiredAStar)
+                {
+                    // Изменение алгоритмов навигации
+                    ComplexPatch_Navigation.Apply();
+                    // Подмена штатного окна Mapper'a
+                    ComplexPatch_Mapper.Apply(); 
+                }
+                else
+                {
+                    ETLogger.WriteLine($@"Incorrect version of 'AStar.dll' therefore the patches  '{nameof(ComplexPatch_Navigation)}' and '{nameof(ComplexPatch_Mapper)}' did not applied.", true);
+                }
                 // Изменение команды квестера AddUCCAction и сопутствующие патчи
                 ComplexPatch_Quester_UccEditing.Apply();
-                // Перехват исключений в MyNW.Internals.WorldDrawing.\u0001()
-                // Не работает, т.к. метод '\u0001()' запускается в статическом конструкторе класса WorldDrawing
-                // то есть до применения патча
-                //MyNW_Internals_WorldDrawing.ApplyPatches();
+
                 // Подмена окна выбора Ауры
                 Patch_AuraDetector.Apply();
 

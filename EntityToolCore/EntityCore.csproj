@@ -63,7 +63,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AStar">
+    <Reference Include="AStar, Version=2.21.508.2127, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>..\..\..\References\x64\AStar.dll</HintPath>
       <Private>False</Private>
     </Reference>
@@ -108,6 +108,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Engine.cs" />
+    <Compile Include="Engine.tt.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Engine.tt</DependentUpon>
+    </Compile>
     <Compile Include="Entities\EntityCacheRecordKey.cs" />
     <Compile Include="Entities\EntityCache.cs" />
     <Compile Include="Entities\EntityCacheRecord.cs" />
@@ -366,7 +371,15 @@
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Engine.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Engine.tt.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>type $(TargetFileName)&gt;"EntityTools.dll:Core"</PostBuildEvent>

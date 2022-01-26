@@ -12,7 +12,6 @@ using AStar;
 
 namespace EntityTools.Patches.Mapper
 {
-    //TODO Добавить проверку версии AStar
     internal static class ComplexPatch_Mapper
     {
         private static MapperFormExt mapperForm;
