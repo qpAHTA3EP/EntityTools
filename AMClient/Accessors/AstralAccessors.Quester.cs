@@ -353,6 +353,13 @@ namespace AcTp0Tools
 
                     return loadedMaps;
                 }
+
+                private static bool PrefixLoadAllMeshes(out int __result)
+                {
+                    __result = LoadAllMeshes();
+                    return false;
+                }
+
 #endif
                 #endregion
 
@@ -361,6 +368,10 @@ namespace AcTp0Tools
                 private static readonly PropertyInfo propProfile;
                 private static readonly MethodInfo originalSetProfile;
                 private static readonly MethodInfo postfixSetProfile;
+
+                private static readonly MethodInfo originalLoadAllMeshes;
+                private static readonly MethodInfo prefixLoadAllMeshes;
+
                 public static Astral.Quester.Classes.Profile Profile
                 {
                     get => Astral.Quester.API.CurrentProfile;
@@ -507,7 +518,6 @@ namespace AcTp0Tools
                         }
                     }
                 }
-
                 private static bool PrefixSave(bool saveas = false)
                 {
                     Save(saveas);
@@ -518,6 +528,7 @@ namespace AcTp0Tools
                 /// Сохранение quester-профиля
                 /// Аналог <seealso cref="Astral.Quester.Core.Save(bool)"/>
                 /// </summary>
+                /// <param name="saveAs">Флаг необходимости выбора имени файла для сохранения профиля</param>
                 public static void Save(bool saveAs = false)
                 {
                     string fullProfileName = Astral.API.CurrentSettings.LastQuesterProfile;
@@ -539,7 +550,7 @@ namespace AcTp0Tools
                         dirName = Directories.ProfilesPath;
                     var currentProfile = Profile;
 
-                    bool useExternalMeshes = currentProfile.UseExternalMeshFile && currentProfile.ExternalMeshFileName.Length >= ".meshes.bin".Length + 1;
+                    bool useExternalMeshes = currentProfile.UseExternalMeshFile && currentProfile.ExternalMeshFileName.Length >= ".mesh.bin".Length + 1;
 
                     string externalMeshFileName = string.Empty;
                     bool needLoadAllMeshes = false;
@@ -579,38 +590,75 @@ namespace AcTp0Tools
                                 currentProfile.Saved = true;
                         }
 
+                        var binaryFormatter = new BinaryFormatter();
                         // Сохраняем файлы мешей
-                        if (useExternalMeshes)
+                        var currentProfileMeshes = _mapsMeshes;
+                        lock (currentProfileMeshes)
                         {
-                            // Если используется внешние меши
-                            // в файле профиля нужно удалить все "лишние" файлы
-                            if (zipFile.Mode == ZipArchiveMode.Update)
-                                foreach (var entry in zipFile.Entries)
-                                {
-                                    if (!entry.Name.Equals("profile.xml", StringComparison.OrdinalIgnoreCase))
-                                        entry.Delete();
-                                }
-                            // закрываем архив профиля
-                            zipFile.Dispose();
-
-                            // открываем архив с внешними мешами
-                            zipFile = ZipFile.Open(externalMeshFileName,
-                                File.Exists(externalMeshFileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create);
-                        }
-
-                        // сохраняем меши в архивный файл
-                        lock (_mapsMeshes)
-                        {
-                            BinaryFormatter binaryFormatter = new BinaryFormatter();
-                            foreach (var mesh in _mapsMeshes)
+                            // Локальная функция сохранения мешей профиля в заданный zipArchive
+                            void SaveAllMeshes(ZipArchive zipArchive, Dictionary<string, Graph> meshes, BinaryFormatter binFormatter)
                             {
-                                // удаляем мусор (скрытые вершины и ребра)
-                                mesh.Value.RemoveUnpassable();
+                                foreach (var mesh in meshes)
+                                {
+                                    // удаляем мусор (скрытые вершины и ребра)
+                                    mesh.Value.RemoveUnpassable();
 
-                                string meshName = mesh.Key + ".bin";
+                                    string meshName = mesh.Key + ".bin";
 
-                                SaveMesh(zipFile, meshName, mesh.Value, binaryFormatter);
+                                    SaveMesh(zipArchive, meshName, mesh.Value, binFormatter);
+                                }
+                            }                            
+                            
+                            if (useExternalMeshes)
+                            {
+                                // открываем архив с внешними мешами
+                                using (var externalMeshesZipFile = ZipFile.Open(externalMeshFileName,
+                                    File.Exists(externalMeshFileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create))
+                                {
+                                    // сохраняем все загруженные меши во внешний архивный файл
+                                    SaveAllMeshes(externalMeshesZipFile, currentProfileMeshes, binaryFormatter);
+
+                                    // Копируем файлы мешей из файла профиля во внешний архив
+                                    for (int i = 0; i < zipFile.Entries.Count;)
+                                    {
+                                        var entry = zipFile.Entries[i];
+
+                                        // Если используется внешние меши, в файле профиля нужно удалить все "лишние" файлы
+                                        var entryName = entry.Name;
+                                        if (!entryName.Equals("profile.xml", StringComparison.OrdinalIgnoreCase)
+                                            && entryName.EndsWith(".bin"))
+                                        {
+                                            var meshName = entryName.Substring(0, entryName.Length - ".bin".Length);
+                                            if (!currentProfileMeshes.ContainsKey(meshName))
+                                            {
+                                                // Меш карты, соответствующей entry, ОТСУТСТВУЕТ в currentProfileMeshes 
+                                                // и не был сохранен во внешний архивный файл
+                                                ZipArchiveEntry externalMeshEntry = null;
+                                                if (externalMeshesZipFile.Mode == ZipArchiveMode.Update)
+                                                    externalMeshEntry = externalMeshesZipFile.GetEntry(entryName);
+                                                if (externalMeshEntry is null)
+                                                    externalMeshEntry = externalMeshesZipFile.CreateEntry(entryName);
+                                                
+                                                // копирование меша из архива профиля во внешний архив 
+                                                using (var internalMeshStream = entry.Open())
+                                                using (var externalMeshStream = externalMeshEntry.Open())
+                                                {
+                                                    internalMeshStream.CopyTo(externalMeshStream);
+                                                }
+                                            }
+                                            // Удаление скопированного (дублирующегося) меша из архива профиля НЕВОЗМОЖНО
+                                            // Удаление влечет изменение коллекции и вызывает ошибку перечисления
+                                            entry.Delete();
+                                        }
+                                        else i++;
+                                    }
+                                }
                             }
+                            else
+                            {
+                                // сохраняем меши в архив профиля
+                                SaveAllMeshes(zipFile, currentProfileMeshes, binaryFormatter);
+                            } 
                         }
 
                         API.CurrentSettings.LastQuesterProfile = fullProfileName;
@@ -619,8 +667,7 @@ namespace AcTp0Tools
                     }
                     catch (Exception exc)
                     {
-                        Logger.WriteLine(Logger.LogType.Debug, exc.ToString());
-                        Logger.Notify($"Profile '{fullProfileName}' saved", true);
+                        Logger.Notify($"Catch an exception while saving profile '{fullProfileName}':\n{exc.ToString()}", true);
                     }
                     finally
                     {
@@ -652,21 +699,21 @@ namespace AcTp0Tools
                         {
                             binaryFormatter.Serialize(memoryStream, mesh);
 
-                            ZipArchiveEntry zipMeshEntry;
-#if false
-                            if (zipFile.Mode == ZipArchiveMode.Update)
-                            {
+                            ZipArchiveEntry zipMeshEntry = null;
+
+                            bool upgrading = true;
+                            if(zipFile.Mode == ZipArchiveMode.Update)
                                 zipMeshEntry = zipFile.GetEntry(meshName);
-                                if (zipMeshEntry != null)
-                                    zipMeshEntry.Delete();
-                            } 
-                            zipMeshEntry = zipFile.CreateEntry(meshName);
-#else
-                            zipMeshEntry = zipFile.GetEntry(meshName) ?? zipFile.CreateEntry(meshName);
-#endif
+                            if (zipMeshEntry == null)
+                            {
+                                zipMeshEntry = zipFile.CreateEntry(meshName);
+                                upgrading = false;
+                            }
+
                             using (var zipMeshStream = zipMeshEntry.Open())
                             {
-                                zipMeshStream.SetLength(memoryStream.Length);
+                                if(upgrading)
+                                    zipMeshStream.SetLength(memoryStream.Length);
                                 memoryStream.WriteTo(zipMeshStream);
                                 return true;
                             }
@@ -702,26 +749,21 @@ namespace AcTp0Tools
                             currentProfile.Saved = true;
                             serializer.Serialize(memStream, currentProfile);
 
-                            ZipArchiveEntry zipProfileEntry;
-#if false
-                            //byte[] backupProfileEntry;
-                            if (zipFile.Mode == ZipArchiveMode.Update)
-                            {
+                            ZipArchiveEntry zipProfileEntry = null;
+
+                            bool upgrading = true;
+                            if(zipFile.Mode == ZipArchiveMode.Update)
                                 zipProfileEntry = zipFile.GetEntry("profile.xml");
-                                //using (var stream = zipProfileEntry.Open())
-                                //{
-                                //    backupProfileEntry = new byte[stream.Length];
-                                //    stream.Read(backupProfileEntry,0, stream.Length);
-                                //}
-                                zipProfileEntry?.Delete();
+                            if (zipProfileEntry is null)
+                            {
+                                zipProfileEntry = zipFile.CreateEntry("profile.xml");
+                                upgrading = false;
                             }
-                            zipProfileEntry = zipFile.CreateEntry("profile.xml"); 
-#else
-                            zipProfileEntry = zipFile.GetEntry("profile.xml") ?? zipFile.CreateEntry("profile.xml");
-#endif
+
                             using (var zipProfileStream = zipProfileEntry.Open())
                             {
-                                zipProfileStream.SetLength(memStream.Length);
+                                if(upgrading)
+                                    zipProfileStream.SetLength(memStream.Length);
                                 memStream.WriteTo(zipProfileStream);
                                 return true;
                             }
@@ -803,6 +845,8 @@ namespace AcTp0Tools
 
                 static Core()
                 {
+                    // TODO Пропатчить Core.LoadAllMeshes
+
                     var tCore = typeof(Astral.Quester.Core);
                     var tPatch = typeof(Core);
 #if ProfileNewLoadEvents
@@ -891,6 +935,15 @@ namespace AcTp0Tools
                     }
                     else Astral.Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Quester.Core.Save' failed");
 
+                    originalLoadAllMeshes = AccessTools.Method(tCore, "LoadAllMeshes");
+                    prefixLoadAllMeshes = AccessTools.Method(tPatch, nameof(PrefixLoadAllMeshes));
+                    if (originalLoadAllMeshes != null &&
+                        prefixLoadAllMeshes != null)
+                    {
+                        AcTp0Patcher.Harmony.Patch(originalLoadAllMeshes, new HarmonyMethod(prefixLoadAllMeshes));
+                        Astral.Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Quester.Core.LoadAllMeshes' succeeded");
+                    }
+                    else Astral.Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Quester.Core.LoadAllMeshes' failed");
                 }
             }
 
