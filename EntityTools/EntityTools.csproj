@@ -145,6 +145,7 @@
   <ItemGroup>
     <Reference Include="AStar, Version=2.21.508.2127, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>..\..\..\References\x64\AStar.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
     <Reference Include="Astral_patched, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -193,6 +194,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression">
       <HintPath>..\References\x64\System.IO.Compression.dll</HintPath>
@@ -261,6 +263,12 @@
     <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
     <Compile Include="Patches\ComplexPatch_Navigation.cs" />
     <Compile Include="Patches\Mapper\ComplexPatch_Mapper.cs" />
+    <Compile Include="Patches\Mapper\Tools\CustomRegionToolForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Patches\Mapper\Tools\CustomRegionToolForm.Designer.cs">
+      <DependentUpon>CustomRegionToolForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Patches\Patcher.tt.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -487,6 +495,9 @@
     <EmbeddedResource Include="Forms\ObjectInfoForm.resx">
       <DependentUpon>ObjectInfoForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Patches\Mapper\Tools\CustomRegionToolForm.resx">
+      <DependentUpon>CustomRegionToolForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -711,6 +722,7 @@
     <ProjectReference Include="..\AMClient\AMClient.csproj">
       <Project>{fd0c9e2a-5d26-43aa-a227-bddaf9c30705}</Project>
       <Name>AMClient</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

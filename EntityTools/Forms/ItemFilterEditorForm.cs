@@ -359,10 +359,11 @@ namespace EntityTools.Forms
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
-            if (purchaseOptions.FocusedView is GridView grid)
-            {
-                grid.AddNewRow();
-            }
+            //if (purchaseOptions.FocusedView is GridView grid)
+            //{
+            //    grid.AddNewRow();
+            //}
+            filter.Add(new ItemFilterEntryExt());
         }
     }
 }

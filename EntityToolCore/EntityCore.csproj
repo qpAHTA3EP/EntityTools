@@ -65,6 +65,7 @@
   <ItemGroup>
     <Reference Include="AStar, Version=2.21.508.2127, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>..\..\..\References\x64\AStar.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
     <Reference Include="Astral_patched">
@@ -364,6 +365,7 @@
     <ProjectReference Include="..\AMClient\AMClient.csproj">
       <Project>{fd0c9e2a-5d26-43aa-a227-bddaf9c30705}</Project>
       <Name>AMClient</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\EntityTools\EntityTools.csproj">
       <Project>{df7f797e-db7e-44f9-a96a-020cfdb3c51e}</Project>

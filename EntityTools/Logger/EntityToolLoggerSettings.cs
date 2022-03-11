@@ -5,6 +5,7 @@ using Astral.Controllers;
 using AcTp0Tools.Reflection;
 using EntityTools.Quester.Actions;
 using EntityTools.Servises.SlideMonitor;
+using EntityTools.UCC.Actions;
 
 namespace EntityTools.Settings
 {
@@ -310,7 +311,7 @@ namespace EntityTools.Settings
             /// <summary>
             /// Активация расширенной отладочной информации по команде <seealso cref="UCC.Actions.ChangeTarget"/> 
             /// </summary>
-            [Description("Активация расширенной отладочной информации по команде ChangeTarget")]
+            [Description("Активация расширенной отладочной информации по команде " + nameof(ChangeTarget))]
             [Bindable(true)]
             public bool DebugChangeTarget
             {
@@ -320,11 +321,30 @@ namespace EntityTools.Settings
                     if (_debugChangeTarget != value)
                     {
                         _debugChangeTarget = value;
-                        NotifyPropertyChanged(/*nameof(DebugConditionChangeTarget)*/);
+                        NotifyPropertyChanged();
                     }
                 }
             }
             private bool _debugChangeTarget;
+
+            /// <summary>
+            /// Активация расширенной отладочной информации по команде <seealso cref="UCC.Actions.PluggedSkill"/> 
+            /// </summary>
+            [Description("Активация расширенной отладочной информации по команде " + nameof(PluggedSkill))]
+            [Bindable(true)]
+            public bool DebugPluggedSkill
+            {
+                get => _debugPluggedSkill;
+                set
+                {
+                    if (_debugPluggedSkill != value)
+                    {
+                        _debugPluggedSkill = value;
+                        NotifyPropertyChanged();
+                    }
+                }
+            }
+            private bool _debugPluggedSkill;
 
             public override string ToString()
             {

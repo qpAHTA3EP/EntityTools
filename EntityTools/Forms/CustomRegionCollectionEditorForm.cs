@@ -3,6 +3,7 @@ using DevExpress.XtraEditors;
 using EntityTools.Enums;
 using EntityTools.Tools.CustomRegions;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -203,6 +204,11 @@ namespace EntityTools.Forms
         private void handler_Mapper(object sender, EventArgs e)
         {
             Astral.Quester.Forms.MapperForm.Open();
+        }
+
+        private void handler_HelpRequested(object sender, HelpEventArgs hlpevent)
+        {
+            Process.Start(@"https://qpahta3ep.github.io/EntityToolsDocs/General/CustomRegionSet-RU.html");
         }
     }
 }

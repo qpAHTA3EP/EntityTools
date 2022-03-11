@@ -57,7 +57,7 @@
             // btnSelect
             // 
             this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelect.ImageOptions.Image = global::EntityTools.Properties.Resources.miniValid;
+            this.btnSelect.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnSelect.ImageOptions.Image")));
             this.btnSelect.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnSelect.ImageOptions.ImageToTextIndent = 6;
             this.btnSelect.Location = new System.Drawing.Point(256, 374);
@@ -205,7 +205,7 @@
             this.btnItemSelection.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnItemSelection.DropDownArrowStyle = DevExpress.XtraEditors.DropDownArrowStyle.Show;
             this.btnItemSelection.Enabled = false;
-            this.btnItemSelection.ImageOptions.Image = global::EntityTools.Properties.Resources.miniGear;
+            this.btnItemSelection.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnItemSelection.ImageOptions.Image")));
             this.btnItemSelection.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnItemSelection.ImageOptions.ImageToTextIndent = 6;
             this.btnItemSelection.Location = new System.Drawing.Point(164, 374);
@@ -219,7 +219,7 @@
             // btnOpenMapper
             // 
             this.btnOpenMapper.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnOpenMapper.ImageOptions.Image = global::EntityTools.Properties.Resources.miniRoad;
+            this.btnOpenMapper.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnOpenMapper.ImageOptions.Image")));
             this.btnOpenMapper.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnOpenMapper.Location = new System.Drawing.Point(12, 374);
             this.btnOpenMapper.Name = "btnOpenMapper";
@@ -242,6 +242,7 @@
             this.Controls.Add(this.btnReload);
             this.Controls.Add(this.btnSelect);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.HelpButton = true;
             this.IconOptions.ShowIcon = false;
             this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.MaximizeBox = false;
@@ -251,6 +252,7 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Shown += new System.EventHandler(this.handler_FormShown);
+            this.HelpRequested += new System.Windows.Forms.HelpEventHandler(this.handler_HelpRequested);
             ((System.ComponentModel.ISupportInitialize)(this.crList)).EndInit();
             this.spliter.Panel1.ResumeLayout(false);
             this.spliter.Panel2.ResumeLayout(false);

@@ -183,7 +183,7 @@ namespace EntityCore.UCC.Actions
             }
             var entActivatedPower = currentPower.EntGetActivatedPower();
             var powerDef = entActivatedPower.EntGetActivatedPower().EffectivePowerDef();
-            // Устанавливаем цель команды
+            // Устанавливаем цель для перемещения персонажа к ней
             if (@this.Target != Unit.Player)
             {
                 switch (@this.Target)
@@ -233,15 +233,11 @@ namespace EntityCore.UCC.Actions
                     }
                 }
             }
-            int castingTime;
-            if (@this.CastingTime > 0)
-            {
-                castingTime = @this.CastingTime;
-            }
-            else
-            {
-                castingTime = Powers.getEffectiveTimeCharge(powerDef);
-            }
+            
+            int castingTime = @this.CastingTime > 0 
+                ? @this.CastingTime 
+                : Powers.getEffectiveTimeCharge(powerDef);
+
             Entity target = new Entity(UnitRef.Pointer);
             if (target.ContainerId != EntityManager.LocalPlayer.ContainerId && !target.Location.IsInYawFace)
             {
@@ -253,6 +249,7 @@ namespace EntityCore.UCC.Actions
                 }
                 Thread.Sleep(100);
             }
+
             double effectiveTimeActivate = Powers.getEffectiveTimeActivate(powerDef) * 1.5;
             var castingTimeout = new Timeout(castingTime);
 
@@ -325,21 +322,6 @@ namespace EntityCore.UCC.Actions
         {
             get
             {
-#if false
-                if (!string.IsNullOrEmpty(@this._entityId))
-                {
-                    var entityKey = EntityKey;
-                    if (entityKey.Validate(entity))
-                        return entity;
-                    else
-                    {
-                        entity = SearchCached.FindClosestEntity(entityKey, null);
-
-                        if (entity != null)
-                            return entity;
-                    }
-                } 
-#endif
                 switch (@this.Target)
                 {
                     case Unit.Player:
@@ -408,12 +390,14 @@ namespace EntityCore.UCC.Actions
                 if (power != null)
                 {
                     powerId = power.PowerId;
+                    label = string.Empty;
                     attachedGameProcessId = processId;
                     characterContainerId = player.ContainerId;
                 }
                 else
                 {
                     powerId = 0;
+                    label = string.Empty;
                     attachedGameProcessId = 0;
                     characterContainerId = 0;
                 }

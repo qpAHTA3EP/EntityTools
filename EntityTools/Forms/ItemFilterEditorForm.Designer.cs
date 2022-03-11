@@ -91,7 +91,6 @@ namespace EntityTools.Forms
             this.btnEditItemFilterEntry});
             this.purchaseOptions.Size = new System.Drawing.Size(620, 230);
             this.purchaseOptions.TabIndex = 6;
-            this.purchaseOptions.UseEmbeddedNavigator = true;
             this.purchaseOptions.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridView});
             // 

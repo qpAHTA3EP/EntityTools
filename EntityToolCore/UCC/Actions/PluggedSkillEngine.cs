@@ -138,16 +138,17 @@ namespace EntityCore.UCC.Actions
 
         public bool Run()
         {
-#if DEBUG && ExecutePowerSmargDebug
-            ETLogger.WriteLine(LogType.Debug, $"{_idStr}:Run() starts");
-#endif
+            bool extendedDebugInfo = ExtendedDebugInfo;
+            if(extendedDebugInfo)
+                ETLogger.WriteLine(LogType.Debug, $"{_idStr}:Run() starts");
+
             var currentPower = GetCurrentPower();
 
             if (currentPower is null)
             {
-#if DEBUG && ExecutePowerSmargDebug
-                ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Fail to get Artifact's power");
-#endif
+                if (extendedDebugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Fail to get Artifact's power");
+
                 return false;
             }
             var entActivatedPower = currentPower.EntGetActivatedPower();
@@ -208,9 +209,10 @@ namespace EntityCore.UCC.Actions
                 if (!powerDef.GroundTargeted && !powerDef.Categories.Contains(PowerCategory.Ignorepitch))
                 {
                     target.Location.Face();
-#if DEBUG && ExecutePowerSmargDebug
-                    ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Activate ExecPower '{currentPower.PowerDef.InternalName}' on target {target.Name}[{target.InternalName}]");
-#endif
+
+                    if (extendedDebugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Activate ExecPower '{currentPower.PowerDef.InternalName}' on target {target.Name}[{target.InternalName}]");
+
                     Powers.ExecPower(currentPower, target, true);
                 }
                 else
@@ -218,14 +220,14 @@ namespace EntityCore.UCC.Actions
                     var location = target.Location;
                     location.Z += 3f;
                     location.Face();
-#if DEBUG && ExecutePowerSmargDebug
-                    ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Activate ExecPower '{currentPower.PowerDef.InternalName}' on location <{location.X:0,4:N2}, {location.Y:0,4:N2}, {location.Z:0,4:N2}>");
-#endif
+                    if (extendedDebugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Activate ExecPower '{currentPower.PowerDef.InternalName}' on location <{location.X:0,4:N2}, {location.Y:0,4:N2}, {location.Z:0,4:N2}>");
+
                     Powers.ExecPower(currentPower, location, true);
                 }
-#if DEBUG && ExecutePowerSmargDebug
-                ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Wait casting time ({castingTime} ms)");
-#endif
+                if (extendedDebugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Wait casting time ({castingTime} ms)");
+
                 while (!castingTimeout.IsTimedOut && !Astral.Controllers.AOECheck.PlayerIsInAOE)
                 {
                     if (Astral.Logic.UCC.Core.CurrentTarget.IsDead)
@@ -239,26 +241,23 @@ namespace EntityCore.UCC.Actions
                     Thread.Sleep(20);
                 }
             }
-#if DEBUG && ExecutePowerSmargDebug
             catch (Exception e)
             {
-                ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Catch an exception trying activate power '{currentPower.PowerDef.InternalName}'\n{e.Message}");
+                if (extendedDebugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Catch an exception trying activate power '{currentPower.PowerDef.InternalName}'\n{e.Message}");
             }
-#endif
             finally
             {
-#if DEBUG && ExecutePowerSmargDebug
-                ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Deactivate ExecPower '{currentPower.PowerDef.InternalName}' on target {target.Name}[{target.InternalName}]");
-#endif
+                if (extendedDebugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Deactivate ExecPower '{currentPower.PowerDef.InternalName}' on target {target.Name}[{target.InternalName}]");
                 try
                 {
                     Powers.ExecPower(currentPower, target, false);
                 }
                 catch (Exception e)
                 {
-#if DEBUG && ExecutePowerSmargDebug
-                    ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Catch an exception trying deactivate power '{currentPower.PowerDef.InternalName}'\n{e.Message}");
-#endif
+                    if (extendedDebugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Catch an exception trying deactivate power '{currentPower.PowerDef.InternalName}'\n{e.Message}");
                 }
             }
             //if (!@this._forceMaintain)
@@ -277,43 +276,6 @@ namespace EntityCore.UCC.Actions
             {
                 if (_targetSelector is null)
                 {
-#if false
-                    if (_specificTargetCache == UccTarget.Auto)
-                    {
-                        var pwr = GetCurrentPower();
-
-                        var targetMain = pwr.EffectivePowerDef()?.TargetMain;
-
-                        if (targetMain is null || !targetMain.IsValid)
-                            return Astral.Logic.UCC.Core.CurrentTarget;
-
-                        if (targetMain.Self)
-                            _specificTargetCache = UccTarget.Player;
-                        else if (targetMain.AffectFoe)
-                            _specificTargetCache = UccTarget.StrongestAdd;
-                        else if (targetMain.AffectFriend)
-                            _specificTargetCache = UccTarget.StrongestTeamMember;
-                    }
-
-
-                    switch (_specificTargetCache)
-                    {
-                        case UccTarget.Player:
-                            @this.Target = Unit.Player;
-                            return EntityManager.LocalPlayer;
-                        case UccTarget.MostInjuredAlly:
-                            @this.Target = Unit.MostInjuredAlly;
-                            return ActionsPlayer.MostInjuredAlly;
-                        case UccTarget.StrongestAdd:
-                            @this.Target = Unit.StrongestAdd;
-                            return ActionsPlayer.AnAdd;
-                        case UccTarget.StrongestTeamMember:
-                            @this.Target = Unit.StrongestTeamMember;
-                            return ActionsPlayer.StrongestTeamMember;
-                        default:
-                            return Astral.Logic.UCC.Core.CurrentTarget;
-                    }  
-#else
                     var pwr = GetCurrentPower();
 
                     var targetMain = pwr?.EffectivePowerDef()?.TargetMain;
@@ -327,7 +289,6 @@ namespace EntityCore.UCC.Actions
                     else if (targetMain.AffectFriend)
                         _targetSelector = () => ActionsPlayer.StrongestTeamMember;
                     else _targetSelector = () => Astral.Logic.UCC.Core.CurrentTarget;
-#endif
                 }
 
                 return _targetSelector();
@@ -382,13 +343,13 @@ namespace EntityCore.UCC.Actions
 
                 // Кэш не валиден и требует обновления
                 var isArtifactPower = @this._source == PluggedSkillSource.Artifact;
-                var items = player.GetInventoryBagById(isArtifactPower
+                var itemSlot = player.GetInventoryBagById(isArtifactPower
                                                                     ? InvBagIDs.ArtifactPrimary
-                                                                    : InvBagIDs.MountEquippedActivePower).GetItems;
+                                                                    : InvBagIDs.MountEquippedActivePower).Slots[0];
 
-                if (items.Any())
+                if (itemSlot.Filled)
                 {
-                    var item = items.FirstOrDefault()?.Item;
+                    var item = itemSlot.Item;
                     if (item != null)
                     {
                         var itemInternalName = item.ItemDef.InternalName;
@@ -407,22 +368,36 @@ namespace EntityCore.UCC.Actions
                         {
                             powerId = _power.PowerId;
                             powerName = itemInternalName;
+                            _label = string.Empty;
                             attachedGameProcessId = Astral.API.AttachedGameProcess.Id;
                             characterContainerId = player.ContainerId;
                             goto result;
                         }
-
                     }
-                } 
-                
+                }
             }
             powerId = 0;
+            powerName = string.Empty;
+            _label = string.Empty;
             attachedGameProcessId = 0;
             characterContainerId = 0;
             _power = null;
 
             result:
             return isIgnoredPower ? null : _power;
+        }
+
+
+        /// <summary>
+        /// Флаг настроек вывода расширенной отлаточной информации
+        /// </summary>
+        private bool ExtendedDebugInfo
+        {
+            get
+            {
+                var logConf = EntityTools.EntityTools.Config.Logger;
+                return logConf.UccActions.DebugChangeTarget && logConf.Active;
+            }
         }
         #endregion
     }

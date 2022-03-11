@@ -172,6 +172,14 @@ namespace EntityTools.Core
 #endif
 
             pgConfigs.SelectedObject = EntityTools.Config;
+
+#if DEBUG
+            tabDebug.PageVisible = true;
+            tabDebug.PageEnabled = true;
+#else
+            tabDebug.PageVisible = false;
+            tabDebug.PageEnabled = false;
+#endif
         }
 
         private void handler_Test_1(object sender, EventArgs e)
@@ -304,6 +312,9 @@ namespace EntityTools.Core
                     enumerator_Dispose.GetValue();
             }
 #endif
+            var slot = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.Inventory).Slots
+                .FirstOrDefault(s => s.Filled && s.Item.ItemDef.InternalName == "T1_Enchantment_Tutorial");
+            slot?.Evolve();
         }
 
         private void handler_Test_3(object sender, EventArgs e)

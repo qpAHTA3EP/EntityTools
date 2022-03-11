@@ -270,7 +270,7 @@ namespace EntityCore.Quester.Action
         private EntityPreprocessingResult Preprocessing_Entity(Entity entity)
         {
             bool extendedDebugInfo = ExtendedDebugInfo;
-            string currentMethodName = extendedDebugInfo ? string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
+            string currentMethodName = extendedDebugInfo ? $"{_idStr}.{MethodBase.GetCurrentMethod().Name}" : string.Empty;
 
             bool validationResult = EntityKey.Validate(entity);
 
@@ -283,7 +283,7 @@ namespace EntityCore.Quester.Action
 
                 if (extendedDebugInfo)
                     ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ", entity.GetDebugString(@this._entityNameType, "Entity", EntityDetail.Pointer), 
-                        " verification=", healthResult && distanceResult, " {Valid; ", (@this._healthCheck) ? (healthResult ? "Alive; " : "Dead; ") : "Skip; ",
+                        " verification=", healthResult && distanceResult, " {Valid; ", @this._healthCheck ? (healthResult ? "Alive; " : "Dead; ") : "Skip; ",
                         distanceResult ? "Near (" : "Faraway (", distance.ToString("N2"), ")}"));
 
                 if (!healthResult) return EntityPreprocessingResult.Failed;

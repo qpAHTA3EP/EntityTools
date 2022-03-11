@@ -21,17 +21,26 @@ namespace EntityTools.Forms
             }
         }
 
-        public void Show(object obj, int monitoringRefreshTime = 0)
+        protected new void Show(IWin32Window owner)
+        {
+            base.Show(owner);
+        }
+
+        public void Show(object obj, int refreshTime = 500, IWin32Window owner = null)
         {
             pgObjectInfos.SelectedObject = obj;
-            if (monitoringRefreshTime > 0)
-            {
-                this.monitoringRefreshTime = monitoringRefreshTime;
-                backgroundWorker.RunWorkerAsync();
-            }
+            if (refreshTime <= 0)
+                refreshTime = 500;
+            
+            monitoringRefreshTime = refreshTime;
+            backgroundWorker.RunWorkerAsync();
 
             Text = obj?.ToString() ?? string.Empty;
-            Show();
+            
+            //if(owner is null)
+            //    base.Show();
+            //else base.
+            Show(owner);
         }
 
         public sealed override string Text

@@ -198,13 +198,15 @@ namespace EntityTools.Core
             // cbEnchantHelperActivator
             // 
             this.cbEnchantHelperActivator.AutoSize = true;
+            this.cbEnchantHelperActivator.Enabled = false;
             this.cbEnchantHelperActivator.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cbEnchantHelperActivator.Location = new System.Drawing.Point(18, 169);
+            this.cbEnchantHelperActivator.Location = new System.Drawing.Point(231, 146);
             this.cbEnchantHelperActivator.Name = "cbEnchantHelperActivator";
             this.cbEnchantHelperActivator.Size = new System.Drawing.Size(128, 17);
             this.cbEnchantHelperActivator.TabIndex = 10;
             this.cbEnchantHelperActivator.Text = "Enable EnchantHelper";
             this.cbEnchantHelperActivator.UseVisualStyleBackColor = true;
+            this.cbEnchantHelperActivator.Visible = false;
             this.cbEnchantHelperActivator.CheckedChanged += new System.EventHandler(this.handler_EnchantHelperActivation);
             // 
             // btnValidate
@@ -364,7 +366,7 @@ namespace EntityTools.Core
             // 
             this.ckbMapperPatch.AutoSize = true;
             this.ckbMapperPatch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.ckbMapperPatch.Location = new System.Drawing.Point(18, 192);
+            this.ckbMapperPatch.Location = new System.Drawing.Point(18, 169);
             this.ckbMapperPatch.Name = "ckbMapperPatch";
             this.ckbMapperPatch.Size = new System.Drawing.Size(151, 17);
             this.ckbMapperPatch.TabIndex = 3;
@@ -846,6 +848,7 @@ namespace EntityTools.Core
             this.gridViewPreprocessing.OptionsNavigation.AutoFocusNewRow = true;
             this.gridViewPreprocessing.OptionsView.EnableAppearanceOddRow = true;
             this.gridViewPreprocessing.OptionsView.ShowGroupPanel = false;
+            this.gridViewPreprocessing.OptionsView.ShowIndicator = false;
             this.gridViewPreprocessing.OptionsView.ShowPreviewRowLines = DevExpress.Utils.DefaultBoolean.False;
             // 
             // clmnType
