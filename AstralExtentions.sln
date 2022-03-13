@@ -177,4 +177,15 @@ Global
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {390F9F67-D5D8-480F-92F1-BC844646E658}
 	EndGlobalSection
+	GlobalSection(AutomaticVersions) = postSolution
+		UpdateAssemblyVersion = True
+		UpdateAssemblyFileVersion = True
+		UpdateAssemblyInfoVersion = True
+		AssemblyVersionSettings = None.ShortYearStamp.YearMonth.TimeStamp
+		AssemblyFileVersionSettings = None.ShortYearStamp.MMddStamp.TimeStamp
+		AssemblyInfoVersionSettings = None.ShortYearStamp.MMddStamp.YearMonth
+		UpdatePackageVersion = False
+		AssemblyInfoVersionType = SettingsVersion
+		InheritWinAppVersionFrom = None
+	EndGlobalSection
 EndGlobal

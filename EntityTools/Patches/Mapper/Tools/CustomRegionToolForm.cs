@@ -1,21 +1,20 @@
-﻿using AcTp0Tools;
+﻿using Astral.Quester.Classes;
 using DevExpress.XtraEditors;
+using EntityTools.Properties;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using Astral.Quester.Classes;
-using EntityTools.Properties;
+// ReSharper disable InconsistentNaming
+
 
 namespace EntityTools.Patches.Mapper.Tools
 {
 
     public partial class CustomRegionToolForm : XtraForm //Form
     {
-        public CustomRegionToolForm()
-        {
-            InitializeComponent();
-        }
-
+        /// <summary>
+        /// Режим внешнего вида CustomRegionToolForm
+        /// </summary>
         public enum ViewMode
         {
             Undefined,
@@ -27,8 +26,88 @@ namespace EntityTools.Patches.Mapper.Tools
             /// Режим редактирования CustomRegion'a
             /// </summary>
             Edit
-        };
-        
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public enum SizeAttribute
+        {
+            X, 
+            Y,
+            Width,
+            Height
+        }
+
+        public CustomRegionToolForm()
+        {
+            InitializeComponent();
+        }
+
+        public int crX
+        {
+            get => Convert.ToInt32(editX.EditValue);
+            set
+            {
+                allowNotification = false;
+                editX.EditValue = value;
+                allowNotification = true;
+            }
+        }
+
+        public int crY
+        {
+            get => Convert.ToInt32(editY.EditValue);
+            set
+            {
+                allowNotification = false;
+                editY.EditValue = value;
+                allowNotification = true;
+            }
+        }
+
+        public int crWidths
+        {
+            get => int.TryParse(editWidth.Text, out int result) ? result : 1;
+            set
+            {
+                allowNotification = false;
+                editWidth.EditValue = value;
+                allowNotification = true;
+            }
+        }
+
+        public int crHeight
+        {
+            get => int.TryParse(editHeight.Text, out int result) ? result : 1;
+            set
+            {
+                allowNotification = false;
+                editHeight.EditValue = value;
+                allowNotification = true;
+            }
+        }
+
+        private bool allowNotification = true;
+
+        public void SetCustomRegionCoordinates(int x, int y)
+        {
+            allowNotification = false;
+            editX.EditValue = x;
+            editY.EditValue = y;
+            allowNotification = true;
+        }
+
+        public void SetCustomRegionSize(int x, int y, int width, int height)
+        {
+            allowNotification = false;
+            editX.EditValue = x;
+            editY.EditValue = y;
+            editWidth.EditValue = width;
+            editHeight.EditValue = height;
+            allowNotification = true;
+        }
+
         /// <summary>
         /// Переключение режима отображения
         /// </summary>
@@ -43,13 +122,27 @@ namespace EntityTools.Patches.Mapper.Tools
                     {
                         case ViewMode.Edit:
                             Text = @"Change CustomRegion";
-                            cbCRSelector.Visible = true;
+                            CustomRegionSelector.Visible = true;
                             editCRName.Visible = false;
+                            allowNotification = true;
                             break;
                         case ViewMode.Add:
                             Text = @"Add CustomRegion";
-                            cbCRSelector.Visible = false;
+                            CustomRegionSelector.Visible = false;
                             editCRName.Visible = true;
+                            allowNotification = true;
+                            break;
+                        case ViewMode.Undefined:
+                            editCRName.Text = string.Empty;
+                            editX.EditValue = 0;
+                            editY.EditValue = 0;
+                            editWidth.EditValue = 0;
+                            editHeight.EditValue = 0;
+                            AcceptChanges = null;
+                            CancelChanges = null;
+                            CustomRegionSizeChanged = null;
+                            SelectedCustomRegionChanged = null;
+                            allowNotification = false;
                             break;
                     }
 
@@ -60,7 +153,7 @@ namespace EntityTools.Patches.Mapper.Tools
         }
         private ViewMode mode;
 
-        public bool IsElliptical
+        public virtual bool IsElliptical
         {
             get => isElliptical;
             set
@@ -88,27 +181,57 @@ namespace EntityTools.Patches.Mapper.Tools
                     case ViewMode.Add:
                         return editCRName.EditValue?.ToString().Trim();
                     case ViewMode.Edit:
-                        return cbCRSelector.Text.Trim();
+                        return CustomRegionSelector.Text.Trim();
                     default:
                         return String.Empty;
                 }
             }
         }
 
-        public void Show(ViewMode mode, IWin32Window owner = null, Point? location = null)
+        public void Show(ViewMode viewMode, MapperFormExt owner = null, CustomRegion customRegion = null)
         {
-            if(mode == ViewMode.Undefined)
+            Mode = viewMode;
+            if (viewMode == ViewMode.Undefined)
+            {
                 return;
-            Mode = mode;
+            }
 
             if (!Visible)
             {
-                if (location != null)
-                    Location = (Point)location;
+                if (viewMode == ViewMode.Edit)
+                {
+                    RefreshCustomRegionList(customRegion);
+                }
 
-                if(owner != null)
+                if (customRegion != null)
+                {
+                    SetCustomRegionSize((int)customRegion.Position.X, (int)customRegion.Position.Y, 
+                                        Math.Abs(customRegion.Width), Math.Abs(customRegion.Height));
+                    IsElliptical = customRegion.Eliptic;
+                }
+                else SetCustomRegionSize(0,0,0,0);
+
+                if (owner != null)
+                {
+                    var pos = owner.Location;
+                    var y = pos.Y - Height - 10;
+                    if (y <= 10)
+                    {
+                        y = pos.Y + owner.Height + 10;
+                        if (y + Height > Screen.PrimaryScreen.WorkingArea.Height)
+                        {
+                            y = pos.Y + 20;
+                        }
+                    }
+                    StartPosition = FormStartPosition.Manual;
+                    Location = new Point(pos.X + 20, y);
                     base.Show(owner);
-                base.Show();
+                }
+                else
+                {
+                    StartPosition = FormStartPosition.CenterParent;
+                    base.Show();
+                }
             }
         }
 
@@ -117,88 +240,161 @@ namespace EntityTools.Patches.Mapper.Tools
 
         public delegate void CustomRegionToolEvent(CustomRegionToolForm sender, EventArgs e, object value = null);
 
-        /// <summary>
-        /// Изменить тип границы CustomRegion'a
-        /// </summary>
-        public event CustomRegionToolEvent ChangeCustomRegionType;
+        public delegate void CustomRegionSizeEvent(CustomRegionToolForm sender, SizeAttribute sizeAttribute, int value);
 
         /// <summary>
         /// Принять изменения CustomRegion'a
         /// </summary>
-        public event CustomRegionToolEvent AcceptChanges;
+        protected event CustomRegionToolEvent AcceptChanges;
 
         /// <summary>
         /// Отменить изменения CustomRegion'a
         /// </summary>
-        public event CustomRegionToolEvent CancelChanges;
+        protected event CustomRegionToolEvent CancelChanges;
+
+        /// <summary>
+        /// Уведомление об изменении размеров CustomRegion'a
+        /// </summary>
+        protected event CustomRegionSizeEvent CustomRegionSizeChanged;
 
         /// <summary>
         /// Отменить изменения CustomRegion'a
         /// </summary>
-        public event CustomRegionToolEvent SelectedCustomRegionChanged;
+        protected event CustomRegionToolEvent SelectedCustomRegionChanged;
 
-        public CustomRegion SelectedCustomRegion =>
-            mode == ViewMode.Edit 
-                ? cbCRSelector.SelectedItem as CustomRegion
-                : null;
-
-        private void handler_FormClosed(object sender, FormClosedEventArgs e)
+        public void SetEventHandlers(CustomRegionToolEvent onAccept, CustomRegionToolEvent onCancel, CustomRegionSizeEvent onCRSizeChanged,
+            CustomRegionToolEvent onSelectCR)
         {
-#if false
-            ChangeCustomRegionType = null;
-            AcceptChanges = null;
-            CancelChanges = null;
-            SelectedCustomRegionChanged = null; 
-#endif
-            cbCRSelector.DataSource = null;
-            editCRName.Text = string.Empty;
-        }
-
-        private void handler_ChangeCRShapeType(object sender, EventArgs e)
-        {
-            IsElliptical = !IsElliptical;
-            ChangeCustomRegionType?.Invoke(this, e, IsElliptical);
-        }
-
-        private void handler_Accept(object sender, EventArgs e)
-        {
-            AcceptChanges?.Invoke(this, e);
-        }
-
-        private void handler_Cancel(object sender, EventArgs e)
-        {
-            CancelChanges?.Invoke(this, e);
-        }
-
-        private void handler_SelectedCustomRegionChanged(object sender, EventArgs e)
-        {
-            SelectedCustomRegionChanged?.Invoke(this, e);
-        }
-
-        private void handler_VisibleChanged(object sender, EventArgs e)
-        {
-            if (!Visible)
+            if (mode != ViewMode.Undefined)
             {
-                Mode = ViewMode.Undefined;
-            }
-        }
-
-        public void RefreshCustomRegionList()
-        {
-            cbCRSelector.BeginUpdate();
-            if (mode == ViewMode.Edit)
-            {
-                var selectedItem = cbCRSelector.SelectedItem;
-                cbCRSelector.DataSource = null;
-                cbCRSelector.DisplayMember = nameof(CustomRegion.Name);
-                cbCRSelector.DataSource = Astral.Quester.API.CurrentProfile.CustomRegions;
-                cbCRSelector.SelectedItem = selectedItem;
+                AcceptChanges = onAccept;
+                CancelChanges = onCancel;
+                CustomRegionSizeChanged = onCRSizeChanged;
+                SelectedCustomRegionChanged = onSelectCR;
             }
             else
             {
-                cbCRSelector.DataSource = null;
+                XtraMessageBox.Show($"Can not set the event handler in '{ViewMode.Undefined}' mode",
+                    $"{nameof(CustomRegionToolForm)} initialization error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            cbCRSelector.EndUpdate();
+        }
+
+        public CustomRegion SelectedCustomRegion
+        {
+            get =>
+                mode == ViewMode.Edit
+                    ? CustomRegionSelector.SelectedItem as CustomRegion
+                    : null;
+            set
+            {
+                if (mode == ViewMode.Edit)
+                    CustomRegionSelector.SelectedItem = value;
+            }
+        }
+
+        protected void handler_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            AcceptChanges = null;
+            CancelChanges = null;
+            CustomRegionSizeChanged = null;
+            SelectedCustomRegionChanged = null; 
+
+            CustomRegionSelector.DataSource = null;
+            editCRName.Text = string.Empty;
+            Mode = ViewMode.Undefined;
+        }
+
+        protected void handler_ChangeCRType(object sender, EventArgs e)
+        {
+            IsElliptical = !IsElliptical;
+        }
+
+        protected void handler_Accept(object sender, EventArgs e)
+        {
+            var accept = AcceptChanges;
+            if (allowNotification && accept != null)
+                accept(this, e);
+        }
+
+        protected void handler_Cancel(object sender, EventArgs e)
+        {
+            var cancel = CancelChanges;
+            if (allowNotification && cancel != null)
+                cancel.Invoke(this, e);
+        }
+
+        protected void handler_SelectedCustomRegionChanged(object sender, EventArgs e)
+        {
+            var crChanged = SelectedCustomRegionChanged;
+            if (allowNotification && crChanged != null)
+                crChanged(this, e, CustomRegionSelector.SelectedItem);
+
+            if (CustomRegionSelector.SelectedItem is CustomRegion cr)
+            {
+                var pos = cr.Position;
+                SetCustomRegionSize((int)pos.X, (int)pos.Y, Math.Abs(cr.Width), Math.Abs(cr.Height));
+                IsElliptical = cr.Eliptic;
+                if (Owner is MapperFormExt mapper)
+                {
+                    mapper.CenterOfMap = pos.Clone();
+                }
+            }
+        }
+
+        public void RefreshCustomRegionList(CustomRegion customRegion = null)
+        {
+            CustomRegionSelector.BeginUpdate();
+            if (mode == ViewMode.Edit)
+            {
+                var selectedItem = customRegion ?? CustomRegionSelector.SelectedItem;
+                CustomRegionSelector.DataSource = null;
+                CustomRegionSelector.DisplayMember = nameof(CustomRegion.Name);
+                CustomRegionSelector.DataSource = Astral.Quester.API.CurrentProfile.CustomRegions;
+                CustomRegionSelector.SelectedItem = selectedItem;
+                if (customRegion != null
+                    && Owner is MapperFormExt mapper)
+                {
+                    mapper.CenterOfMap = customRegion.Position.Clone();
+                }
+            }
+            else
+            {
+                CustomRegionSelector.DataSource = null;
+            }
+            CustomRegionSelector.EndUpdate();
+        }
+
+        private void handler_XChanged(object sender, EventArgs e)
+        {
+            var sizeChanged = CustomRegionSizeChanged;
+            if (allowNotification && sizeChanged != null)
+                sizeChanged(this, SizeAttribute.X, crX);
+        }
+
+        private void handler_YChanged(object sender, EventArgs e)
+        {
+            var sizeChanged = CustomRegionSizeChanged;
+            if (allowNotification && sizeChanged != null)
+                sizeChanged.Invoke(this, SizeAttribute.Y, crY);
+        }
+
+        private void handled_HeightChanged(object sender, EventArgs e)
+        {
+            var sizeChanged = CustomRegionSizeChanged;
+            if (allowNotification && sizeChanged != null)
+                sizeChanged.Invoke(this, SizeAttribute.Height, crHeight);
+        }
+
+        private void handled_WidthChanged(object sender, EventArgs e)
+        {
+            var sizeChanged = CustomRegionSizeChanged;
+            if (allowNotification && sizeChanged != null)
+                sizeChanged.Invoke(this, SizeAttribute.Width, crWidths);
+        }
+
+        private void handler_SizeChanging(object sender, DevExpress.XtraEditors.Controls.ChangingEventArgs e)
+        {
+            e.Cancel = !int.TryParse(e.NewValue.ToString(), out int result) || result < 0;
         }
     }
 }

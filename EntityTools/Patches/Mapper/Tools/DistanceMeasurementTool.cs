@@ -31,7 +31,7 @@ namespace EntityTools.Patches.Mapper.Tools
 
         public bool AllowNodeSelection => false;
 
-        public bool CustomMouseCusor(double worldMouseX, double worldMouseY, out string text, out Alignment textAlignment, out Font font, out Brush brush)
+        public bool CustomMouseCursor(double worldMouseX, double worldMouseY, out string text, out Alignment textAlignment, out Font font, out Brush brush)
         {
             bool handleMouseCursor = false;
             text = string.Empty;

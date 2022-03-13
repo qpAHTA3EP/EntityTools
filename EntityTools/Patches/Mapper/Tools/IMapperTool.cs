@@ -49,7 +49,7 @@ namespace EntityTools.Patches.Mapper.Tools
         /// <summary>
         /// Инструмент предусматривает вывод специальной информации рядом с курсором мыши
         /// </summary>
-        bool CustomMouseCusor(double worldMouseX, double worldMouseY, out string text, out Alignment textAlignment, out Font font, out Brush brush);
+        bool CustomMouseCursor(double worldMouseX, double worldMouseY, out string text, out Alignment textAlignment, out Font font, out Brush brush);
 
         /// <summary>
         /// Проверка того, что инструмент был использован и его результаты можно "откатить"

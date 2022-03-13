@@ -10,7 +10,7 @@ namespace EntityTools.Patches.Mapper.Tools
 {
     public class MappingTool
     {
-        public MappingTool(Func<IGraph> getGraph, MappingMode mode = MappingMode.Stoped)
+        public MappingTool(Func<IGraph> getGraph, MappingMode mode = MappingMode.Stopped)
         {
             _mappingCache = new MapperGraphCache(getGraph)
             { 
@@ -54,7 +54,7 @@ namespace EntityTools.Patches.Mapper.Tools
             get => _mode;
             set
             {
-                if(value == MappingMode.Stoped)
+                if(value == MappingMode.Stopped)
                     StopMapping();
                 else StartMapping();
 
@@ -62,7 +62,7 @@ namespace EntityTools.Patches.Mapper.Tools
             }
         }
 
-        private MappingMode _mode = MappingMode.Stoped;
+        private MappingMode _mode = MappingMode.Stopped;
 
         /// <summary>
         /// Линейный путь (без боковых связей)
@@ -169,7 +169,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     else _lastNodeDetail = MappingToolHelper.LinkNearest_8_Side(EntityManager.LocalPlayer.Location.Clone(), _mappingCache, null, unitdirPath);
                 }
 
-                while (_mode != MappingMode.Stoped
+                while (_mode != MappingMode.Stopped
                        && _mapAndRegion_whereMapping.Equals(EntityManager.LocalPlayer.MapAndRegion)
                        && !token.IsCancellationRequested)
                 {
@@ -232,7 +232,7 @@ namespace EntityTools.Patches.Mapper.Tools
                     // Связываем текущее местоположение с графом
 
                     // unitdirPath - тип пути задается внутри основного цикла
-                    // т.к. в момент прерывания режим связывания установлен в MappingMode.Stoped
+                    // т.к. в момент прерывания режим связывания установлен в MappingMode.Stopped
 
                     if (_linear)
                         // Проверяется наличие вершины по курсу и связывается с найденной

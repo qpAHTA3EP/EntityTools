@@ -45,7 +45,7 @@
     {
         Bidirectional,
         Unidirectional,
-        Stoped
+        Stopped
     }
     /// <summary>
     /// Выравнивание (точки в прямоугольнике)

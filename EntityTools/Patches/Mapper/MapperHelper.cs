@@ -343,13 +343,13 @@ namespace EntityTools.Patches.Mapper
 #if false
         /// <summary>
         /// Вычисление размера (стороны квадрата) якоря для прямоугольника, 
-        /// заданного верхней левой точкой с координатами <paramref name="leftX"/>, <paramref name="topY"/> 
+        /// заданного верхней левой точкой с координатами <paramref name="leftX"/>, <paramref name="bottomY"/> 
         /// и правой нижней точкой с координатами <paramref name="rightX"/>, <paramref name="downY"/>.
         /// </summary>
-        public static double AnchorWorldSize(double leftX, double topY, double rightX, double downY)
+        public static double AnchorWorldSize(double leftX, double bottomY, double rightX, double downY)
         {
             double width = rightX - leftX,
-                   height = topY - downY,
+                   height = bottomY - downY,
                    anchorSize = Math.Max(2, Math.Min(Math.Min(width / 3, height / 3), DefaultAnchorSize));
             return anchorSize;
         } 
@@ -501,7 +501,7 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Отрисовка региона, ограниченного прямоугольником с верхней левой точкой с координатами <paramref name="leftX"/>, <paramref name="topY"/> 
         /// и правой нижней точкой с координатами <paramref name="rightX"/>, <paramref name="downY"/>.
-        /// Тип реоигна задается флагом <paramref name="isElliptical"/>
+        /// Тип региона задается флагом <paramref name="isElliptical"/>
         /// </summary>
         public static void DrawCustomRegion(this MapperGraphics graphics, double leftX, double topY, double rightX, double downY, bool isElliptical, bool drawAnchors = true)
         {
@@ -518,6 +518,7 @@ namespace EntityTools.Patches.Mapper
             Pen penCR = Pens.LimeGreen;
             Brush brushRect = (isElliptical) ? Brushes.DarkOliveGreen : Brushes.LimeGreen;
             Brush brushCR = Brushes.LimeGreen;
+            Brush mainAnchor = Brushes.DarkTurquoise;
             bool drawEdgeAnchors = drawAnchors && height > anchorSize * 3 && width > anchorSize * 3;
             bool drawCornerAnchors = drawAnchors && height > anchorSize && width > anchorSize;
 
@@ -541,7 +542,8 @@ namespace EntityTools.Patches.Mapper
             if (drawCornerAnchors)
             {
                 // Отрисовка якоря TopLeft
-                graphics.FillSquareCentered(brushCR, leftX, topY, anchorSize, true);
+                // Является основным якорем, координаты которого задат координаты CustomRegion'a
+                graphics.FillSquareCentered(mainAnchor, leftX, topY, anchorSize, true);
                 // Отрисовка якоря TopRight
                 graphics.FillSquareCentered(brushCR, rightX, topY, anchorSize, true);
                 // Отрисовка якоря Center

@@ -29,6 +29,16 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <ShouldCreateLogs>True</ShouldCreateLogs>
+    <AdvancedSettingsExpanded>False</AdvancedSettingsExpanded>
+    <UpdateAssemblyVersion>True</UpdateAssemblyVersion>
+    <UpdateAssemblyFileVersion>True</UpdateAssemblyFileVersion>
+    <UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
+    <AssemblyVersionSettings>None.ShortYearStamp.MMddStamp.TimeStamp</AssemblyVersionSettings>
+    <UpdatePackageVersion>False</UpdatePackageVersion>
+    <AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
+    <InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
+    <AssemblyFileVersionSettings>None.ShortYearStamp.MMddStamp.TimeStamp</AssemblyFileVersionSettings>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -263,12 +273,14 @@
     <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
     <Compile Include="Patches\ComplexPatch_Navigation.cs" />
     <Compile Include="Patches\Mapper\ComplexPatch_Mapper.cs" />
+    <Compile Include="Patches\Mapper\Tools\CustomRegionToolBase.cs" />
     <Compile Include="Patches\Mapper\Tools\CustomRegionToolForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Patches\Mapper\Tools\CustomRegionToolForm.Designer.cs">
       <DependentUpon>CustomRegionToolForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Patches\Mapper\Tools\ICustomRegionTool.cs" />
     <Compile Include="Patches\Patcher.tt.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
