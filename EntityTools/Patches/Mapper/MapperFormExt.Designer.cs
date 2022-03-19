@@ -73,16 +73,6 @@ namespace EntityTools.Patches.Mapper
             this.barCustomRegions = new DevExpress.XtraBars.Bar();
             this.btnAddCR = new DevExpress.XtraBars.BarButtonItem();
             this.btnEditCR = new DevExpress.XtraBars.BarButtonItem();
-            this.barEditCustomRegion = new DevExpress.XtraBars.Bar();
-            this.btnCRTypeSelector = new DevExpress.XtraBars.BarCheckItem();
-            this.btnCRRename = new DevExpress.XtraBars.BarCheckItem();
-            this.editCRSelector = new DevExpress.XtraBars.BarEditItem();
-            this.itemEditCRList = new DevExpress.XtraEditors.Repository.RepositoryItemLookUpEdit();
-            this.editCRName = new DevExpress.XtraBars.BarEditItem();
-            this.itemEditCRName = new DevExpress.XtraEditors.Repository.RepositoryItemTextEdit();
-            this.btnCRAdditionAccept = new DevExpress.XtraBars.BarButtonItem();
-            this.btnCREditionAccept = new DevExpress.XtraBars.BarButtonItem();
-            this.btnCRCancel = new DevExpress.XtraBars.BarButtonItem();
             this.barStatus = new DevExpress.XtraBars.Bar();
             this.btnLockMapOnPlayer = new DevExpress.XtraBars.BarCheckItem();
             this.btnSettings = new DevExpress.XtraBars.BarCheckItem();
@@ -101,7 +91,6 @@ namespace EntityTools.Patches.Mapper
             this.barDockControlLeft = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlRight = new DevExpress.XtraBars.BarDockControl();
             this.menuImportMesh = new DevExpress.XtraBars.BarButtonItem();
-            this.editDeleteRadius = new DevExpress.XtraBars.BarEditItem();
             this.seDeleteRadius = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
             this.groupCR = new DevExpress.XtraBars.BarButtonGroup();
             this.editBidirPathColor = new DevExpress.XtraBars.BarEditItem();
@@ -148,8 +137,6 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.seWaypointDistance)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seMaxZDifference)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seEquivalenceDistance)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.itemEditCRList)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.itemEditCRName)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seDeleteRadius)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.editItemColor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bsrcAstralSettings)).BeginInit();
@@ -198,7 +185,6 @@ namespace EntityTools.Patches.Mapper
             this.barGraphEditTools,
             this.barGraphTools,
             this.barCustomRegions,
-            this.barEditCustomRegion,
             this.barStatus});
             this.barManager.DockControls.Add(this.barDockControlTop);
             this.barManager.DockControls.Add(this.barDockControlBottom);
@@ -215,7 +201,6 @@ namespace EntityTools.Patches.Mapper
             this.editWaypointDistance,
             this.editMaxZDifference,
             this.editEquivalenceDistance,
-            this.editDeleteRadius,
             this.btnClearMeshes,
             this.btnMappingBidirectional,
             this.btnMappingForceLink,
@@ -225,9 +210,6 @@ namespace EntityTools.Patches.Mapper
             this.groupCR,
             this.groupImportExportNodes,
             this.btnOptions,
-            this.editCRName,
-            this.btnCRAdditionAccept,
-            this.btnCRCancel,
             this.lblMousePos,
             this.btnSaveMeshes,
             this.btnMoveNodes,
@@ -238,11 +220,7 @@ namespace EntityTools.Patches.Mapper
             this.btnEditCR,
             this.btnMeshesInfo,
             this.btnCompression,
-            this.btnCRTypeSelector,
-            this.btnCREditionAccept,
-            this.editCRSelector,
             this.btnLockMapOnPlayer,
-            this.btnCRRename,
             this.groupZoom,
             this.btnZoomIn,
             this.btnZoomOut,
@@ -259,15 +237,13 @@ namespace EntityTools.Patches.Mapper
             this.btnObjectInfo,
             this.btnPanelVisibility,
             this.btnDebugTool});
-            this.barManager.MaxItemId = 138;
+            this.barManager.MaxItemId = 145;
             this.barManager.OptionsLayout.AllowAddNewItems = false;
             this.barManager.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
             this.seDeleteRadius,
             this.seWaypointDistance,
             this.seMaxZDifference,
             this.seEquivalenceDistance,
-            this.itemEditCRName,
-            this.itemEditCRList,
             this.editItemColor});
             this.barManager.StatusBar = this.barStatus;
             // 
@@ -639,105 +615,6 @@ namespace EntityTools.Patches.Mapper
             this.btnEditCR.Name = "btnEditCR";
             this.btnEditCR.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_StartEditingCustomRegion);
             // 
-            // barEditCustomRegion
-            // 
-            this.barEditCustomRegion.BarName = "barEditCustomRegion";
-            this.barEditCustomRegion.CanDockStyle = ((DevExpress.XtraBars.BarCanDockStyle)((((DevExpress.XtraBars.BarCanDockStyle.Floating | DevExpress.XtraBars.BarCanDockStyle.Top) 
-            | DevExpress.XtraBars.BarCanDockStyle.Bottom) 
-            | DevExpress.XtraBars.BarCanDockStyle.Standalone)));
-            this.barEditCustomRegion.DockCol = 0;
-            this.barEditCustomRegion.DockRow = 0;
-            this.barEditCustomRegion.FloatLocation = new System.Drawing.Point(46, 560);
-            this.barEditCustomRegion.FloatSize = new System.Drawing.Size(397, 88);
-            this.barEditCustomRegion.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnCRTypeSelector),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnCRRename),
-            new DevExpress.XtraBars.LinkPersistInfo(DevExpress.XtraBars.BarLinkUserDefines.Width, this.editCRSelector, "", false, true, true, 231),
-            new DevExpress.XtraBars.LinkPersistInfo(DevExpress.XtraBars.BarLinkUserDefines.Width, this.editCRName, "", false, true, true, 216),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnCRAdditionAccept),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnCREditionAccept),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnCRCancel)});
-            this.barEditCustomRegion.OptionsBar.AllowQuickCustomization = false;
-            this.barEditCustomRegion.OptionsBar.DisableClose = true;
-            this.barEditCustomRegion.Text = "Edit CustomRegion";
-            this.barEditCustomRegion.Visible = false;
-            // 
-            // btnCRTypeSelector
-            // 
-            this.btnCRTypeSelector.Caption = "CustomRegion Form";
-            this.btnCRTypeSelector.Hint = "Change type of the CustomRegion (Rectangular to Elliptical)";
-            this.btnCRTypeSelector.Id = 106;
-            this.btnCRTypeSelector.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnCRTypeSelector.ImageOptions.Image")));
-            this.btnCRTypeSelector.Name = "btnCRTypeSelector";
-            this.btnCRTypeSelector.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ChangeCustomRegionType);
-            // 
-            // btnCRRename
-            // 
-            this.btnCRRename.Caption = "Edit the Name of the selected CustomRegion";
-            this.btnCRRename.Id = 115;
-            this.btnCRRename.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnCRRename.ImageOptions.Image")));
-            this.btnCRRename.ImageOptions.LargeImage = ((System.Drawing.Image)(resources.GetObject("btnCRRename.ImageOptions.LargeImage")));
-            this.btnCRRename.Name = "btnCRRename";
-            this.btnCRRename.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ChangedRenameCRMode);
-            // 
-            // editCRSelector
-            // 
-            this.editCRSelector.Edit = this.itemEditCRList;
-            this.editCRSelector.Id = 112;
-            this.editCRSelector.Name = "editCRSelector";
-            this.editCRSelector.EditValueChanged += new System.EventHandler(this.handler_ChangeSelectedCustomRegion);
-            // 
-            // itemEditCRList
-            // 
-            this.itemEditCRList.AcceptEditorTextAsNewValue = DevExpress.Utils.DefaultBoolean.False;
-            this.itemEditCRList.AllowDropDownWhenReadOnly = DevExpress.Utils.DefaultBoolean.True;
-            this.itemEditCRList.AllowNullInput = DevExpress.Utils.DefaultBoolean.False;
-            this.itemEditCRList.AutoHeight = false;
-            this.itemEditCRList.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.itemEditCRList.Columns.AddRange(new DevExpress.XtraEditors.Controls.LookUpColumnInfo[] {
-            new DevExpress.XtraEditors.Controls.LookUpColumnInfo("Name", "", 20, DevExpress.Utils.FormatType.None, "", true, DevExpress.Utils.HorzAlignment.Default, DevExpress.Data.ColumnSortOrder.Ascending, DevExpress.Utils.DefaultBoolean.Default)});
-            this.itemEditCRList.Name = "itemEditCRList";
-            this.itemEditCRList.NullText = "";
-            this.itemEditCRList.ShowFooter = false;
-            // 
-            // editCRName
-            // 
-            this.editCRName.Edit = this.itemEditCRName;
-            this.editCRName.Hint = "Enter name of the CustomRegion";
-            this.editCRName.Id = 78;
-            this.editCRName.Name = "editCRName";
-            // 
-            // itemEditCRName
-            // 
-            this.itemEditCRName.AutoHeight = false;
-            this.itemEditCRName.Name = "itemEditCRName";
-            // 
-            // btnCRAdditionAccept
-            // 
-            this.btnCRAdditionAccept.Caption = "Add";
-            this.btnCRAdditionAccept.DropDownEnabled = false;
-            this.btnCRAdditionAccept.Id = 79;
-            this.btnCRAdditionAccept.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnCRAdditionAccept.ImageOptions.Image")));
-            this.btnCRAdditionAccept.Name = "btnCRAdditionAccept";
-            this.btnCRAdditionAccept.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AcceptCRAddition);
-            // 
-            // btnCREditionAccept
-            // 
-            this.btnCREditionAccept.Caption = "Accept";
-            this.btnCREditionAccept.Id = 107;
-            this.btnCREditionAccept.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnCREditionAccept.ImageOptions.Image")));
-            this.btnCREditionAccept.Name = "btnCREditionAccept";
-            this.btnCREditionAccept.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AcceptCREdition);
-            // 
-            // btnCRCancel
-            // 
-            this.btnCRCancel.Caption = "Cancel";
-            this.btnCRCancel.Id = 80;
-            this.btnCRCancel.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnCRCancel.ImageOptions.Image")));
-            this.btnCRCancel.Name = "btnCRCancel";
-            this.btnCRCancel.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_CancelCRManipulation);
-            // 
             // barStatus
             // 
             this.barStatus.BarName = "statusBar";
@@ -919,16 +796,6 @@ namespace EntityTools.Patches.Mapper
             this.menuImportMesh.Id = 53;
             this.menuImportMesh.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("menuImportMesh.ImageOptions.Image")));
             this.menuImportMesh.Name = "menuImportMesh";
-            // 
-            // editDeleteRadius
-            // 
-            this.editDeleteRadius.Caption = "Node Delete Radius";
-            this.editDeleteRadius.Edit = this.seDeleteRadius;
-            this.editDeleteRadius.Id = 61;
-            this.editDeleteRadius.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
-            this.editDeleteRadius.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("editDeleteRadius.ImageOptions.Image")));
-            this.editDeleteRadius.Name = "editDeleteRadius";
-            this.editDeleteRadius.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
             // 
             // seDeleteRadius
             // 
@@ -1445,8 +1312,6 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.seWaypointDistance)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seMaxZDifference)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seEquivalenceDistance)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.itemEditCRList)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.itemEditCRName)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seDeleteRadius)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.editItemColor)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bsrcAstralSettings)).EndInit();
@@ -1496,6 +1361,7 @@ namespace EntityTools.Patches.Mapper
         private BarCheckItem btnMappingUnidirectional;
         private RepositoryItemSpinEdit seDeleteRadius;
         private BarButtonItem btnAddCR;
+        private BarButtonItem btnEditCR;
         private BarButtonItem btnImportMeshesFromGame;
         private BarButtonItem btnImportMeshesFromProfile;
         private BarButtonItem menuImportMesh;
@@ -1506,7 +1372,6 @@ namespace EntityTools.Patches.Mapper
         private RepositoryItemSpinEdit seMaxZDifference;
         private BarEditItem editEquivalenceDistance;
         private RepositoryItemSpinEdit seEquivalenceDistance;
-        private BarEditItem editDeleteRadius;
         private BarButtonItem btnClearMeshes;
         private BarCheckItem btnMappingBidirectional;
         private BarCheckItem btnMappingForceLink;
@@ -1518,10 +1383,6 @@ namespace EntityTools.Patches.Mapper
         private BarButtonGroup groupImportExportNodes;
         private BarButtonItem btnOptions;
         private PopupMenu popMenuOptions;
-        private BarEditItem editCRName;
-        private RepositoryItemTextEdit itemEditCRName;
-        private BarButtonItem btnCRAdditionAccept;
-        private BarButtonItem btnCRCancel;
         private Bar barStatus;
         private BarStaticItem lblMousePos;
         private BindingSource bsrcAstralSettings;
@@ -1533,16 +1394,9 @@ namespace EntityTools.Patches.Mapper
         private BarCheckItem btnEditEdges;
         private BarButtonGroup groupEditMeshes;
         private BarButtonItem btnUndo;
-        private BarButtonItem btnEditCR;
         private BarButtonItem btnMeshesInfo;
         private BarButtonItem btnCompression;
-        private Bar barEditCustomRegion;
-        private BarCheckItem btnCRTypeSelector;
-        private BarButtonItem btnCREditionAccept;
-        private BarEditItem editCRSelector;
-        private RepositoryItemLookUpEdit itemEditCRList;
         private BarCheckItem btnLockMapOnPlayer;
-        private BarCheckItem btnCRRename;
         private PictureBox MapPicture;
         private BarButtonGroup groupZoom;
         private BarButtonItem btnZoomIn;

@@ -132,32 +132,6 @@ namespace EntityTools.Patches.Mapper
                                                 EntityTools.Config.Mapper,
                                                 nameof(EntityTools.Config.Mapper.WaypointEquivalenceDistance),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
-#if false
-            menuCacheActive.DataBindings.Add(nameof(menuCacheActive.Checked),
-                                                    EntityTools.Config.Mapper,
-                                                    nameof(EntityTools.Config.Mapper.CacheActive),
-                                                    false, DataSourceUpdateMode.OnPropertyChanged); 
-#endif
-
-#if false
-            // Удаление двойным кликом мыши больше не используется
-
-            /* Astral.API.CurrentSettings.DeleteNodeRadius не реализует INotifyPropertyChanged
-             * поэтому привязка нижеуказанным методом невозможна
-             * menuDeleteRadius.DataBindings.Add(new Binding(nameof(menuDeleteRadius.EditValue),
-                                        EntityTools.Config.Mapper,
-                                        nameof(Astral.API.CurrentSettings.DeleteNodeRadius))); //*/
-
-            ((ISupportInitialize)bsrcAstralSettings).BeginInit();
-            bsrcAstralSettings.DataSource = API.CurrentSettings;
-            editDeleteRadius.DataBindings.Add(nameof(editDeleteRadius.EditValue),
-                                              bsrcAstralSettings,
-                                              nameof(API.CurrentSettings.DeleteNodeRadius),
-                                              false, DataSourceUpdateMode.OnPropertyChanged);
-            ((ISupportInitialize)bsrcAstralSettings).EndInit();
-            editDeleteRadius.Edit.EditValueChanged += handler_DeleteRadiusChanged;
-            editDeleteRadius.Edit.Leave += handler_DeleteRadiusChanged; 
-#endif
 
             btnMappingForceLink.DataBindings.Add(nameof(btnMappingForceLink.Checked),
                                                 EntityTools.Config.Mapper,
@@ -313,10 +287,6 @@ namespace EntityTools.Patches.Mapper
             EntityTools.Config.Mapper.MapperForm.NodeToolsBarVisible = barGraphEditTools.Visible;
             EntityTools.Config.Mapper.MapperForm.CustomRegionBarVisible = barCustomRegions.Visible;
             EntityTools.Config.Mapper.MapperForm.StatusBarVisible = barStatus.Visible;
-
-#if false
-            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barMeshes.Visible && !barNodeTools.Visible && !barCustomRegions.Visible; 
-#endif
 
             EntityTools.Config.Mapper.MapperForm.Location = Location;
             if(WindowState == FormWindowState.Normal)
@@ -738,11 +708,6 @@ namespace EntityTools.Patches.Mapper
             {
                 btnRemoveNodes.Checked = false;
             }
-            if (mode != MapperEditMode.AddCustomRegion
-                && mode != MapperEditMode.EditCustomRegion)
-            {
-                barEditCustomRegion.Visible = false;
-            }
             if(mode != MapperEditMode.DistanceMeasurement)
             {
                 btnDistanceMeasurement.Checked = false;
@@ -1119,14 +1084,8 @@ namespace EntityTools.Patches.Mapper
                     if (leftBorder <= x && x <= rightBorder && downBorder <= y && y <= topBorder)
                     {
                         double angle = EntityManager.LocalPlayer.Yaw * 180 / Math.PI;
-#if true
                         Bitmap image = MapperHelper.RotateImage(Resources.charArrow, (float)angle);
-                        //_graphics.FillCircleCentered(Brushes.DarkGoldenrod, EntityManager.LocalPlayer.Location, 15);
                         _graphics.drawImage(location, image);
-#else
-                        _graphics.FillCircleCentered(Brushes.DarkGoldenrod, EntityManager.LocalPlayer.Location, 15);
-                        _graphics.DrawImageCentered(EntityManager.LocalPlayer.Location, Properties.Resources.charArrow, angle);
-#endif
                     }
                     #endregion
                 }
@@ -1177,142 +1136,11 @@ namespace EntityTools.Patches.Mapper
         }
         string currentProfileName = string.Empty;
 
-#if false
-        private void handler_SelectedCustomRegionChanged(CustomRegionToolForm sender, EventArgs e, object value = null)
-        {
-            EditCustomRegionTool editCRTool = CurrentTool as EditCustomRegionTool;
-
-            var cr = sender.SelectedCustomRegion;
-            if (cr != null)
-            {
-                if (editCRTool is null)
-                    CurrentTool = new EditCustomRegionTool(cr);
-                else
-                {
-                    if (editCRTool.Modified
-                        && XtraMessageBox.Show($"Changes of the '{editCRTool.CustomRegionName}' can be lost!\n\r" +
-                                               "Press 'Yes' to save changes or 'No' to proceed", "", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning) == DialogResult.Yes)
-                    {
-                        editCRTool.Apply(Convert.ToString(editCRName.EditValue));
-                        СurrentProfileNeedSave = true;
-
-                        //Обновление списка CustomRegion'ов в Quester-редакторе
-                        AstralAccessors.Quester.Forms.Editor.EditorForm?.RefreshRegions();
-                        sender.RefreshCustomRegionList();
-
-                        CurrentTool = new EditCustomRegionTool(cr);
-                    }
-                    else editCRTool.AttachTo(cr);
-                }
-
-                var crPos = cr.Position.Clone();
-                crPos.Z = CenterOfMap.Z;
-                CenterOfMap = crPos;
-
-                btnCRTypeSelector.Checked = cr.Eliptic;
-            }
-            else if (editCRTool != null)
-                CurrentTool = null;
-        }
-
-        private void HandlerChangeCustomRegionType(CustomRegionToolForm sender, EventArgs e, object value = null)
-        {
-            bool isElliptical = sender.IsElliptical;
-            var tool = CurrentTool;
-            switch (tool)
-            {
-                case AddCustomRegionTool crAddTool:
-                    crAddTool.IsElliptical = isElliptical;
-                    break;
-                case EditCustomRegionTool crEditTool:
-                    crEditTool.IsElliptical = isElliptical;
-                    break;
-            }
-        }
-
-        private void handler_CancelCRChanges(CustomRegionToolForm sender, EventArgs e, object value = null)
-        {
-            var tool = CurrentTool;
-            if (tool is AddCustomRegionTool
-                || tool is EditCustomRegionTool)
-                CurrentTool = null;
-            //sender.Close();
-            sender.Hide();
-        }
-
-        private void handler_AcceptCRChanges(CustomRegionToolForm sender, EventArgs e, object value = null)
-        {
-            switch (CurrentTool)
-            {
-                case AddCustomRegionTool addTool:
-                    {
-
-
-                        break;
-                    }
-                case EditCustomRegionTool editTool:
-                    {
-                        var newName = sender.CustomRegionName;
-                        bool nameChanged = !string.IsNullOrEmpty(newName) && !editTool.CustomRegionName.Equals(newName);
-
-                        if (editTool.Modified || nameChanged)
-                        {
-                            var editedCR = editTool.Apply(newName);
-
-                            СurrentProfileNeedSave = true;
-
-                            //Обновление списка CustomRegion'ов в Quester-редакторе
-                            AstralAccessors.Quester.Forms.Editor.EditorForm?.RefreshRegions();
-                            sender.RefreshCustomRegionList();
-
-                            //editCRName.Visibility = BarItemVisibility.Never;
-                            //editCRName.EditValue = string.Empty;
-
-                            //btnCRRename.Checked = false;
-
-                            //editCRSelector.Visibility = BarItemVisibility.Always;
-                            //editCRSelector.Refresh();
-
-                            CurrentTool = new EditCustomRegionTool(editedCR);
-                        }
-
-                        break;
-                    }
-            }
-        } 
-#endif
-
         /// <summary>
         /// Запуск процедуры добавления CustomRegion'а
         /// </summary>
         private void handler_StartAddingCustomRegion(object sender, ItemClickEventArgs e)
         {
-#if false
-            var crToolPan = CustomRegionToolForm;
-            if (crToolPan.Visible)
-            {
-                crToolPan.Hide();
-                CurrentTool = null;
-                return;
-            }
-
-            AddCustomRegionTool addTool = CurrentTool as AddCustomRegionTool;
-            if (addTool is null)
-                CurrentTool = new AddCustomRegionTool(btnCRTypeSelector.Checked);
-
-            btnLockMapOnPlayer.Checked = false;
-
-            var y = Location.Y - crToolPan.Height - 10;
-            if (y <= 10)
-            {
-                y = Location.Y + 20
-                               + (barMapping.Visible && barMapping.DockStyle == BarDockStyle.Top ? barMapping.Size.Height : 0)
-                               + (barCustomRegions.Visible && barCustomRegions.DockStyle == BarDockStyle.Top ? barCustomRegions.Size.Height : 0)
-                               + (barGraphTools.Visible && barGraphTools.DockStyle == BarDockStyle.Top ? barGraphTools.Size.Height : 0);
-            }
-            crToolPan.Show(CustomRegionToolForm.ViewMode.Add, this,
-                new Point(Location.X + 20, y)); 
-#else
             if (CurrentTool is AddCustomRegionTool addTool)
             {
                 addTool.Close();
@@ -1323,7 +1151,6 @@ namespace EntityTools.Patches.Mapper
                 btnLockMapOnPlayer.Checked = false;
                 CurrentTool = new AddCustomRegionTool(this, OnCustomRegionAdded);
             }
-#endif
         }
 
         /// <summary>
@@ -1342,39 +1169,6 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         private void handler_StartEditingCustomRegion(object sender, ItemClickEventArgs e)
         {
-#if false
-            var customRegions = Astral.Quester.API.CurrentProfile.CustomRegions;
-            if (customRegions.Count == 0)
-            {
-                XtraMessageBox.Show("No CustomRegions available to change");
-                return;
-            }
-
-            var crToolPan = CustomRegionToolForm;
-            if (crToolPan.Visible)
-            {
-                crToolPan.Hide();
-                CurrentTool = null;
-                return;
-            }
-
-            var editTool = CurrentTool as EditCustomRegionTool;
-            if (editTool is null)
-                CurrentTool = new EditCustomRegionTool();
-
-            btnLockMapOnPlayer.Checked = false;
-
-            var y = Location.Y - crToolPan.Height - 10;
-            if (y <= 10)
-            {
-                y = Location.Y + 20
-                               + (barMapping.Visible && barMapping.DockStyle == BarDockStyle.Top ? barMapping.Size.Height : 0)
-                               + (barCustomRegions.Visible && barCustomRegions.DockStyle == BarDockStyle.Top ? barCustomRegions.Size.Height : 0)
-                               + (barGraphTools.Visible && barGraphTools.DockStyle == BarDockStyle.Top ? barGraphTools.Size.Height : 0);
-            }
-            crToolPan.Show(CustomRegionToolForm.ViewMode.Edit, this,
-                           new Point(Location.X + 20, y)); 
-#else
             if (CurrentTool is EditCustomRegionTool editTool)
             {
                 editTool.Close();
@@ -1389,7 +1183,6 @@ namespace EntityTools.Patches.Mapper
                     CurrentTool = new EditCustomRegionTool(null, this, OnCustomRegionEdited); 
                 }
             }
-#endif
         }
 
         /// <summary>
@@ -1406,178 +1199,6 @@ namespace EntityTools.Patches.Mapper
                 _undoStack.Push(undo);
             }
             else CurrentTool = null;
-        }
-
-        /// <summary>
-        /// Изменение модифицируемого CustomRegion'a
-        /// </summary>
-        private void handler_ChangeSelectedCustomRegion(object sender, EventArgs e = null)
-        {
-#if UsingBarEditCustomRegion
-            EditCustomRegionTool editCRTool = CurrentTool as EditCustomRegionTool;
-
-            if (editCRSelector.EditValue is CustomRegion cr)
-            {
-                if (editCRTool is null)
-                    CurrentTool = new EditCustomRegionTool(cr);
-                else
-                {
-                    if (editCRTool.Modified
-                        && XtraMessageBox.Show($"Changes of the '{editCRTool.CustomRegionName}' can be lost!\n\r" +
-                                               "Press 'Yes' to save changes or 'No' to proceed", "", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning) == DialogResult.Yes)
-                    {
-                        editCRTool.Apply(Convert.ToString(editCRName.EditValue));
-                        СurrentProfileNeedSave = true;
-
-                        //Обновление списка CustomRegion'ов в Quester-редакторе
-                        AstralAccessors.Quester.Forms.Editor.EditorForm?.RefreshRegions();
-
-                        CurrentTool = new EditCustomRegionTool(cr);
-                    }
-                    else editCRTool.AttachTo(cr);
-                }
-
-                var crPos = cr.Position.Clone();
-                crPos.Z = CenterOfMap.Z;
-                CenterOfMap = crPos;
-
-                btnCRTypeSelector.Checked = cr.Eliptic;
-            }
-            else if (editCRTool != null)
-                CurrentTool = null; 
-#endif
-        }
-
-        /// <summary>
-        /// Завершение процедуры добавления региона
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void handler_AcceptCRAddition(object sender, ItemClickEventArgs e)
-        {
-#if UsingBarEditCustomRegion
-            if (CurrentTool is AddCustomRegionTool addCRtool)
-            {
-                if (!addCRtool.IsReady)
-                {
-                    XtraMessageBox.Show("Coordinates  of the CustomRegion is not valid!");
-                    return;
-                }
-
-                string crName = editCRName.EditValue.ToString().Trim();
-                if (string.IsNullOrEmpty(crName))
-                    XtraMessageBox.Show("The Name of the CustomRegion is not valid !");
-                else
-                {
-                    var crList = Astral.Quester.API.CurrentProfile.CustomRegions;
-                    if (crList.Count > 0 && (crList.Find(cr => cr.Name == crName) != null)
-                        && XtraMessageBox.Show($"CustomRegion '{crName}' is already exist.\n\r" +
-                                "Press 'Yes' to proceed or 'No' to change name", $"{crName} is exist", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
-                        return;
-                    {
-                        var cr = addCRtool.Apply(crName);
-                        if (cr != null)
-                        {
-                            crList.Add(cr);
-                            СurrentProfileNeedSave = true;
-
-                            //Обновление списка CustomRegion'ов в Quester-редакторе
-                            AstralAccessors.Quester.Forms.Editor.EditorForm?.RefreshRegions();
-
-                            //_undoStack.Push(addCRtool); <- вызывается в CurrentTool.set
-                            CurrentTool = null;
-                            barEditCustomRegion.Visible = false;
-                        }
-                        else XtraMessageBox.Show($"Something wrong. '{crName}' was not added");
-                    }
-                }
-            } 
-#endif
-        }
-
-        private void handler_AcceptCREdition(object sender, ItemClickEventArgs e)
-        {
-#if UsingBarEditCustomRegion
-            if (CurrentTool is EditCustomRegionTool editCRTool)
-            {
-                var newName = editCRName.EditValue.ToString();
-                bool nameChanged = btnCRRename.Checked && !string.IsNullOrEmpty(newName) && !editCRTool.CustomRegionName.Equals(newName);
-
-                if (editCRTool.Modified || nameChanged)
-                {
-                    var editedCR = editCRTool.Apply(newName);
-
-                    СurrentProfileNeedSave = true;
-
-                    //Обновление списка CustomRegion'ов в Quester-редакторе
-                    AstralAccessors.Quester.Forms.Editor.EditorForm?.RefreshRegions();
-
-                    editCRName.Visibility = BarItemVisibility.Never;
-                    editCRName.EditValue = string.Empty;
-
-                    btnCRRename.Checked = false;
-
-                    editCRSelector.Visibility = BarItemVisibility.Always;
-                    editCRSelector.Refresh();
-
-                    CurrentTool = new EditCustomRegionTool(editedCR);
-                }
-            } 
-#endif
-        }
-
-        /// <summary>
-        /// Прерывание процедуры добавления/редактирования региона
-        /// </summary>
-        private void handler_CancelCRManipulation(object sender, ItemClickEventArgs e)
-        {
-#if UsingBarEditCustomRegion
-            var tool = CurrentTool;
-            if (tool is AddCustomRegionTool
-                || tool is EditCustomRegionTool)
-                CurrentTool = null;
-            barEditCustomRegion.Visible = false; 
-#endif
-        }
-
-        /// <summary>
-        /// Переключение типа CustomRegion'a
-        /// </summary>
-        private void handler_ChangeCustomRegionType(object sender, ItemClickEventArgs e)
-        {
-#if UsingBarEditCustomRegion
-            if (btnCRTypeSelector.Checked)
-                btnCRTypeSelector.ImageOptions.Image = Resources.miniCREllipce;
-            else
-                btnCRTypeSelector.ImageOptions.Image = Resources.miniCRRectang;
-
-            var tool = CurrentTool;
-            if (tool is AddCustomRegionTool addCRtool)
-                addCRtool.IsElliptical = btnCRTypeSelector.Checked;
-            else if (tool is EditCustomRegionTool editCRtool)
-                editCRtool.IsElliptical = btnCRTypeSelector.Checked; 
-#endif
-        }
-
-        private void handler_ChangedRenameCRMode(object sender = null, ItemClickEventArgs e = null)
-        {
-#if UsingBarEditCustomRegion
-            if (btnCRRename.Checked)
-            {
-                if (editCRSelector.EditValue is CustomRegion cr)
-                    editCRName.EditValue = cr.Name;
-                else editCRName.EditValue = string.Empty;
-                editCRSelector.Visibility = BarItemVisibility.Never;
-                editCRName.Visibility = BarItemVisibility.Always;
-                editCRName.EditWidth = editCRSelector.EditWidth;
-            }
-            else
-            {
-                editCRName.EditValue = string.Empty;
-                editCRSelector.Visibility = BarItemVisibility.Always;
-                editCRName.Visibility = BarItemVisibility.Never;
-            } 
-#endif
         }
         #endregion
 
