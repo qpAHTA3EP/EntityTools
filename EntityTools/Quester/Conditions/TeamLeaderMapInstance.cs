@@ -1,9 +1,8 @@
-﻿using System;
-using System.ComponentModel;
-using Astral.Quester.Classes;
-using EntityTools.Patches;
+﻿using Astral.Quester.Classes;
 using MyNW.Classes;
 using MyNW.Internals;
+using System;
+using System.ComponentModel;
 
 namespace EntityTools.Quester.Conditions
 {
@@ -14,7 +13,7 @@ namespace EntityTools.Quester.Conditions
         static TeamLeaderMapInstance()
         {
             // Пременение патча на этапе десериализации (до инициализации плагина)
-            ETPatcher.Apply();
+            //ETPatcher.Apply();
         }
 #endif
         [Description("There is a bug: the bot does not detect correctly the current number of the map's instance \n" +

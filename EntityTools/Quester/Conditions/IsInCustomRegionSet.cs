@@ -22,7 +22,7 @@ namespace EntityTools.Quester.Conditions
         static IsInCustomRegionSet()
         {
             // Пременение патча на этапе десериализации (до инициализации плагина)
-            ETPatcher.Apply();
+            //ETPatcher.Apply();
         }
 #endif
 
