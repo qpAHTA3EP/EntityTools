@@ -29,6 +29,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using Astral.Quester.Classes;
+using EntityTools.Tools;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 using UCCConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
@@ -410,10 +411,13 @@ namespace EntityCore
             switch (monitor)
             {
                 case PlayerTeamMonitor _:
-                    new ObjectInfoForm().Show(new PlayerTeamHelper.Monitor(), 500);
+                    ObjectInfoForm.Show(new PlayerTeamHelper.Monitor(), 500);
+                    break;
+                case EntityCacheMonitor _:
+                    CollectionInfoForm.Show(() => SearchCached.EntityCache, 500);
                     break;
                 default:
-                    new ObjectInfoForm().Show(monitor, 500);
+                    ObjectInfoForm.Show(monitor);
                     break;
             }
             

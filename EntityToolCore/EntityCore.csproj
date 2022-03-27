@@ -170,6 +170,12 @@
     <Compile Include="Forms\ItemSelectForm.Designer.cs">
       <DependentUpon>ItemSelectForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\CollectionInfoForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CollectionInfoForm.Designer.cs">
+      <DependentUpon>CollectionInfoForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\MountBonusPriorityListForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -255,6 +261,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ItemSelectForm.resx">
       <DependentUpon>ItemSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CollectionInfoForm.resx">
+      <DependentUpon>CollectionInfoForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MountBonusPriorityListForm.resx">
       <DependentUpon>MountBonusPriorityListForm.cs</DependentUpon>

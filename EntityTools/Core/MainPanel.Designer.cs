@@ -35,16 +35,16 @@ namespace EntityTools.Core
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            DevExpress.XtraEditors.Controls.EditorButtonImageOptions editorButtonImageOptions3 = new DevExpress.XtraEditors.Controls.EditorButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject9 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject10 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject11 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject12 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraEditors.Controls.EditorButtonImageOptions editorButtonImageOptions4 = new DevExpress.XtraEditors.Controls.EditorButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject13 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject14 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject15 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject16 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraEditors.Controls.EditorButtonImageOptions editorButtonImageOptions1 = new DevExpress.XtraEditors.Controls.EditorButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject1 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject2 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject3 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject4 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraEditors.Controls.EditorButtonImageOptions editorButtonImageOptions2 = new DevExpress.XtraEditors.Controls.EditorButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject5 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject6 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject7 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject8 = new DevExpress.Utils.SerializableAppearanceObject();
             this.fldrBroserDlg = new System.Windows.Forms.FolderBrowserDialog();
             this.tbclMain = new DevExpress.XtraTab.XtraTabControl();
             this.tabUtilities = new DevExpress.XtraTab.XtraTabPage();
@@ -107,6 +107,7 @@ namespace EntityTools.Core
             this.dlgSaveFile = new System.Windows.Forms.SaveFileDialog();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
+            this.btnEntityCacheMonitor = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
             this.tbclMain.SuspendLayout();
             this.tabUtilities.SuspendLayout();
@@ -146,6 +147,7 @@ namespace EntityTools.Core
             this.tabUtilities.Controls.Add(this.btnUiViewer);
             this.tabUtilities.Controls.Add(this.btnAuraViewer);
             this.tabUtilities.Controls.Add(this.btnMissionMonitor);
+            this.tabUtilities.Controls.Add(this.btnEntityCacheMonitor);
             this.tabUtilities.Controls.Add(this.btnEntities);
             this.tabUtilities.Controls.Add(this.ckbSpellStuckMonitor);
             this.tabUtilities.Controls.Add(this.gbxExport);
@@ -230,7 +232,7 @@ namespace EntityTools.Core
             this.btnTeamMonitor.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnTeamMonitor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnTeamMonitor.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnTeamMonitor.Location = new System.Drawing.Point(245, 293);
+            this.btnTeamMonitor.Location = new System.Drawing.Point(245, 247);
             this.btnTeamMonitor.Name = "btnTeamMonitor";
             this.btnTeamMonitor.Size = new System.Drawing.Size(113, 40);
             this.btnTeamMonitor.TabIndex = 0;
@@ -329,8 +331,8 @@ namespace EntityTools.Core
             this.tbExportFileSelector.Location = new System.Drawing.Point(9, 52);
             this.tbExportFileSelector.Name = "tbExportFileSelector";
             this.tbExportFileSelector.Properties.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Undo, "", -1, true, true, false, editorButtonImageOptions3, new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject9, serializableAppearanceObject10, serializableAppearanceObject11, serializableAppearanceObject12, "Restore defaul export file", null, null, DevExpress.Utils.ToolTipAnchor.Default),
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Ellipsis, "", -1, true, true, false, editorButtonImageOptions4, new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject13, serializableAppearanceObject14, serializableAppearanceObject15, serializableAppearanceObject16, "Set export file location", null, null, DevExpress.Utils.ToolTipAnchor.Default)});
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Undo, "", -1, true, true, false, editorButtonImageOptions1, new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject1, serializableAppearanceObject2, serializableAppearanceObject3, serializableAppearanceObject4, "Restore defaul export file", null, null, DevExpress.Utils.ToolTipAnchor.Default),
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Ellipsis, "", -1, true, true, false, editorButtonImageOptions2, new DevExpress.Utils.KeyShortcut(System.Windows.Forms.Keys.None), serializableAppearanceObject5, serializableAppearanceObject6, serializableAppearanceObject7, serializableAppearanceObject8, "Set export file location", null, null, DevExpress.Utils.ToolTipAnchor.Default)});
             this.tbExportFileSelector.Properties.HideSelection = false;
             this.tbExportFileSelector.Properties.NullText = "Enter the Filename";
             this.tbExportFileSelector.Size = new System.Drawing.Size(332, 20);
@@ -914,6 +916,20 @@ namespace EntityTools.Core
             this.backgroundWorker.WorkerSupportsCancellation = true;
             this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.work_BlackList);
             // 
+            // btnEntityCacheMonitor
+            // 
+            this.btnEntityCacheMonitor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnEntityCacheMonitor.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
+            this.btnEntityCacheMonitor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnEntityCacheMonitor.Font = new System.Drawing.Font("Tahoma", 14F, System.Drawing.FontStyle.Bold);
+            this.btnEntityCacheMonitor.Location = new System.Drawing.Point(128, 293);
+            this.btnEntityCacheMonitor.Name = "btnEntityCacheMonitor";
+            this.btnEntityCacheMonitor.Size = new System.Drawing.Size(230, 40);
+            this.btnEntityCacheMonitor.TabIndex = 0;
+            this.btnEntityCacheMonitor.Text = "Entity cache monitor";
+            this.btnEntityCacheMonitor.UseVisualStyleBackColor = true;
+            this.btnEntityCacheMonitor.Click += new System.EventHandler(this.handler_EntityCacheMonitor);
+            // 
             // EntityToolsMainPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1005,5 +1021,6 @@ namespace EntityTools.Core
         private DevExpress.XtraGrid.Columns.GridColumn clmnType;
         private DevExpress.XtraGrid.Columns.GridColumn clmnPattern;
         private DevExpress.XtraGrid.Columns.GridColumn clmnReplacement;
+        private Button btnEntityCacheMonitor;
     }
 }

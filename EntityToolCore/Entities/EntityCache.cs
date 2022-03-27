@@ -1,4 +1,4 @@
-﻿//#define PROFILING
+﻿#define PROFILING
 
 using AcTp0Tools;
 using Astral.Classes.ItemFilter;
@@ -41,7 +41,9 @@ namespace EntityCore.Entities
         }
 
 #if PROFILING
+        public int MatchCount => matchCount;
         private static int matchCount = 0;
+        public int MismatchCount => matchCount;
         private static int mismatchCount = 0;
 
         public static void ResetWatch()

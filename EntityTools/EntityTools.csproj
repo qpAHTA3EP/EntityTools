@@ -428,6 +428,7 @@
     <Compile Include="Tools\Missions\Monitor\MissionMonitorSettings.cs" />
     <Compile Include="Tools\Missions\Monitor\MissionTreeNode.cs" />
     <Compile Include="Tools\Missions\Monitor\MissionTreeNodeSettings.cs" />
+    <Compile Include="Tools\Monitoring.cs" />
     <Compile Include="Tools\Navigation\NavigationHelper.cs" />
     <Compile Include="Tools\Relogger\ProcessMemoryHelper.cs" />
     <Compile Include="Tools\Relogger\ReloggerHelper.cs" />

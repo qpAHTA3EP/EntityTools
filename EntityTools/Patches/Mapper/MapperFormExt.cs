@@ -32,7 +32,7 @@ using Astral.Logic.NW;
 using Astral.Quester.Classes;
 using EntityTools.Forms;
 using MyNW.Classes;
-// ReSharper disable UnusedVariable
+
 #endif
 
 namespace EntityTools.Patches.Mapper
@@ -1801,14 +1801,14 @@ namespace EntityTools.Patches.Mapper
             }
         }
 
-        private void handler_HelpRequested(object sender, HelpEventArgs hlpevent)
+        private void handler_HelpRequested(object sender, HelpEventArgs _)
         {
             Process.Start(@"https://qpahta3ep.github.io/EntityToolsDocs/Patches/Mapper/Mapper-RU.html");
         }
 
         private void handler_OpenDebugTool(object sender, ItemClickEventArgs e)
         {
-            new ObjectInfoForm().Show(CurrentTool, 0, this);
+            ObjectInfoForm.Show(CurrentTool, 0, this);
         }
     }
 #endif

@@ -1,4 +1,4 @@
 ﻿namespace EntityTools.Tools.Targeting
 {
-    internal class PlayerTeamMonitor { }
+    internal struct PlayerTeamMonitor { }
 }

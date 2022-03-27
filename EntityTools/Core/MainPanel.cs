@@ -1019,5 +1019,10 @@ namespace EntityTools.Core
         {
             AstralAccessors.Quester.SavePreprocessor();
         }
+
+        private void handler_EntityCacheMonitor(object sender, EventArgs e)
+        {
+            EntityTools.Core.Monitor(new EntityCacheMonitor());
+        }
     }
 }

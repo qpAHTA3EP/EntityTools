@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
-using AStar;
-using DevExpress.XtraEditors;
+﻿using AStar;
 using EntityTools.Forms;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace EntityTools.Patches.Mapper.Tools
 {
@@ -16,8 +12,7 @@ namespace EntityTools.Patches.Mapper.Tools
     {
         private object selectedObject;
         private double x, y;
-        private StringBuilder infoBuilder = new StringBuilder();
-        ObjectInfoForm infoForm = new ObjectInfoForm();
+        ObjectInfoForm infoForm;
 
         /// <summary>
         /// Использование механизма выделения вершин
@@ -87,31 +82,7 @@ namespace EntityTools.Patches.Mapper.Tools
 
             selectedObject = obj;
 
-#if false
-            if (selectedObject is Node nd)
-            {
-                x = nd.X;
-                y = nd.Y;
-                infoBuilder.Clear();
-                infoBuilder.Append("Node at position ").AppendLine(nd.ToString());
-                infoBuilder.AppendLine(nd.Passable ? "Passable; " : "Unpassable");
-                infoBuilder.AppendFormat("{0} {1:N0}:\n\r", nameof(nd.IncomingArcs), nd.IncomingArcsCount);
-                foreach (var arc in nd.IncomingArcs)
-                    infoBuilder.AppendFormat("\t{0}\n\r", arc);
-                infoBuilder.AppendFormat("{0} {1:N0}:\n\r", nameof(nd.OutgoingArcs), nd.OutgoingArcsCount);
-                foreach (var arc in nd.OutgoingArcs)
-                    infoBuilder.AppendFormat("\t{0}\n\r", arc); 
-                XtraMessageBox.Show(infoBuilder.ToString());
-            }
-            else
-            {
-                x = 0;
-                y = 0;
-            }
-#else
-
             ShowObject(selectedObject);
-#endif
         }
 
         /// <summary>
@@ -126,16 +97,12 @@ namespace EntityTools.Patches.Mapper.Tools
 
         private void ShowObject(object obj)
         {
-            if(infoForm == null || infoForm.IsDisposed)
-                infoForm = new ObjectInfoForm();
-            infoForm.Visible = true;
-            infoForm.Show(obj);
+            infoForm = ObjectInfoForm.Show(obj);
         }
 
         private void Hide()
         {
-            if (infoForm != null && !infoForm.IsDisposed)
-                infoForm.Visible = false;
+            infoForm.Close();
         }
     }
 }

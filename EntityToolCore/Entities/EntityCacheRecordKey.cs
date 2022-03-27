@@ -14,6 +14,7 @@ namespace EntityCore.Entities
             NameType = nt;
             EntitySetType = est;
             comparer = Comparer_Initializer;
+            str = $"{Pattern}({NameType}, {MatchType}, {EntitySetType})";
         }
 
         public readonly string Pattern = string.Empty;
@@ -79,5 +80,8 @@ namespace EntityCore.Entities
             return comparer(entity);
         }
         #endregion
+
+        public override string ToString() => str;
+        private string str;
     }
 }

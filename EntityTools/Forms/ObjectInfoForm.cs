@@ -9,9 +9,9 @@ namespace EntityTools.Forms
     public partial class ObjectInfoForm : XtraForm
     {
         readonly List<ObjectInfoForm> childForms = new List<ObjectInfoForm>();
-        private int monitoringRefreshTime = 0;
+        private int monitoringRefreshTime;
 
-        public ObjectInfoForm(object obj = null)
+        protected ObjectInfoForm(object obj = null)
         {
             InitializeComponent();
             if (obj != null)
@@ -24,23 +24,31 @@ namespace EntityTools.Forms
         protected new void Show(IWin32Window owner)
         {
             base.Show(owner);
+            backgroundWorker.RunWorkerAsync();
         }
 
-        public void Show(object obj, int refreshTime = 500, IWin32Window owner = null)
+        public static ObjectInfoForm Show(object obj, int refreshTime = 500, IWin32Window owner = null)
         {
-            pgObjectInfos.SelectedObject = obj;
+            if (obj is null)
+                throw new ArgumentNullException(nameof(obj));
+
             if (refreshTime <= 0)
                 refreshTime = 500;
-            
-            monitoringRefreshTime = refreshTime;
-            backgroundWorker.RunWorkerAsync();
 
-            Text = obj?.ToString() ?? string.Empty;
-            
+            var @this = new ObjectInfoForm
+            {
+                pgObjectInfos = {SelectedObject = obj},
+                monitoringRefreshTime = refreshTime,
+
+                Text = obj.ToString()
+            };
+
             //if(owner is null)
             //    base.Show();
             //else base.
-            Show(owner);
+            @this.Show(owner);
+
+            return @this;
         }
 
         public sealed override string Text
@@ -54,9 +62,7 @@ namespace EntityTools.Forms
             var obj = pgObjectInfos.SelectedGridItem.Value;
             if (obj != null && obj.GetType().IsClass)
             {
-                var form = new ObjectInfoForm();
-                childForms.Add(form);
-                form.Show(obj, monitoringRefreshTime);
+                childForms.Add(Show(obj, monitoringRefreshTime));
             }
         }
 
