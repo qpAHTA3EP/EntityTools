@@ -8,6 +8,7 @@ using MyNW.Internals;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace EntityCore.Entities
 {
@@ -19,12 +20,12 @@ namespace EntityCore.Entities
         public EntityCacheRecord(string p, ItemFilterStringType mp = ItemFilterStringType.Simple, EntityNameType nt = EntityNameType.NameUntranslated, EntitySetType est = EntitySetType.Complete)
         {
             Key = new EntityCacheRecordKey(p, mp, nt, est);
-            _initTick = Environment.TickCount;
+            _initTime = DateTime.Now;
         }
         public EntityCacheRecord(EntityCacheRecordKey key)
         {
             Key = key;
-            _initTick = Environment.TickCount;
+            _initTime = DateTime.Now;
         }
 
 #if PROFILING
@@ -46,9 +47,9 @@ namespace EntityCore.Entities
         /// <summary>
         /// Количество кэшированных <see cref="Entity"/>
         /// </summary>
-        public int Capacity => entities.Count;
+        public uint Capacity => (uint)entities.Count;
 
-        public int LeftTime => Environment.TickCount - _lastAccessTick;
+        public TimeSpan LeftTime => DateTime.Now - _lastAccessTime;
 
         /// <summary>
         /// Число обращений (считываний) к записи
@@ -59,8 +60,8 @@ namespace EntityCore.Entities
         /// <summary>
         /// Число регенераций кэша
         /// </summary>
-        public int RegenCount => _regenCount;
-        private int _regenCount;
+        public uint RegenCount => _regenCount;
+        private uint _regenCount;
 
         /// <summary>
         /// Относительное Количество считываний в секунду с момента инициализации
@@ -69,32 +70,32 @@ namespace EntityCore.Entities
         {
             get
             {
-                var ticks = Environment.TickCount - _initTick;
-                if (ticks > 0)
-                    return _accessCount * 1000d / ticks;
-                return _accessCount*1000d;
+                var interval = DateTime.Now - _initTime;
+                if (interval.Ticks > 0)
+                    return _accessCount / interval.TotalSeconds;
+                return _accessCount;
             }
         }
 
         /// <summary>
         /// Среднее время регенерации
         /// </summary>
-        public double RegenTicksAvg => _regenCount == 0 ? _regenTiсksTotal / (double)_regenCount : _regenTiсksTotal;
-        private int _regenTiсksTotal;
-        public int RegenTicksMin => _regenTiсksMin;
-        private int _regenTiсksMin = int.MaxValue;
-        public int RegenTicksMax => _regenTiсksMax;
-        private int _regenTiсksMax;
+        public TimeSpan RegenTimeAvg => _regenCount == 0 ? new TimeSpan(_regenTimeTotal.Ticks / _regenCount) : _regenTimeTotal;
+        private TimeSpan _regenTimeTotal;
+        public TimeSpan RegenTimesMin => _regenTimeMin;
+        private TimeSpan _regenTimeMin = TimeSpan.MaxValue;
+        public TimeSpan RegenTimeMax => _regenTimeMax;
+        private TimeSpan _regenTimeMax;
 
         /// <summary>
         /// Среднее время доступа
         /// </summary>
-        public double AccessTicksAvg => _regenCount == 0 ? _accessTiсksTotal / (double) _regenCount : _accessTiсksTotal;
-        private int _accessTiсksTotal;
-        public int AccessTicksMax => _accessTiсksMax;
-        private int _accessTiсksMax;
-        public int AccessTicksMin => _accessTiсksMin;
-        private int _accessTiсksMin = int.MaxValue;
+        public TimeSpan AccessTimeAvg => _regenCount == 0 ? new TimeSpan(_accessTimeTotal.Ticks / _regenCount) : _accessTimeTotal;
+        private TimeSpan _accessTimeTotal;
+        public TimeSpan AccessTimeMax => _accessTimeMax;
+        private TimeSpan _accessTimeMax;
+        public TimeSpan AccessTimeMin => _accessTimeMin;
+        private TimeSpan _accessTimeMin = TimeSpan.MaxValue;
 #endif
 
         public string RecordKey => Key.ToString();
@@ -106,25 +107,28 @@ namespace EntityCore.Entities
         /// <summary>
         /// Отметка времени инициализации записи
         /// </summary>
-        public int InitializationTick => _initTick;
-        private int _initTick;
+        [DisplayFormat(DataFormatString = "{HH.mm.ss.fffffff}")]
+        public DateTime InitializationTime => _initTime;
+        private DateTime _initTime;
 
         /// <summary>
         /// Отметка времени последнего доступа
         /// </summary>
-        public int LastAccessTick => _lastAccessTick;
-        private int _lastAccessTick;
+        [DisplayFormat(DataFormatString = "{HH.mm.ss.fffffff}")]
+        public DateTime LastAccessTime => _lastAccessTime;
+        private DateTime _lastAccessTime;
 
         /// <summary>
         /// Отметка времени последней регенации кэша
         /// </summary>
-        public int LastRegenTick => _lastRegenTick;
-        private int _lastRegenTick;
+        [DisplayFormat(DataFormatString = "{HH.mm.ss.fffffff}")]
+        public DateTime LastRegenTime => _lastRegenTime;
+        private DateTime _lastRegenTime;
 
         /// <summary>
         /// Отметка времени, после которой должна быть произведена регенерация кэша
         /// </summary>
-        private int _nextRegenTick;
+        private DateTime _nextRegenTime;
 
         /// <summary>
         /// Кэшированные <see cref="Entity"/>
@@ -133,27 +137,27 @@ namespace EntityCore.Entities
 
         public IEnumerator<Entity> GetEnumerator()
         {
-            var ticks = Environment.TickCount;
-            if (_nextRegenTick <= ticks)
+            var time = DateTime.Now;
+            if (_nextRegenTime <= time)
             {
                 Regen();
-                ticks = Environment.TickCount;
+                time = DateTime.Now;
             }
             _accessCount++;
-            _lastAccessTick = ticks;
+            _lastAccessTime = time;
             return entities.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            var ticks = Environment.TickCount;
-            if (_nextRegenTick <= ticks)
+            var time = DateTime.Now;
+            if (_nextRegenTime <= time)
             {
                 Regen();
-                ticks = Environment.TickCount;
+                time = DateTime.Now;
             }
             _accessCount++;
-            _lastAccessTick = ticks;
+            _lastAccessTime = time;
             return entities.GetEnumerator();
         }
 
@@ -165,7 +169,7 @@ namespace EntityCore.Entities
 #if PROFILING
             _regenCount++;
             TotalRegenCount++;
-            int ticks = Environment.TickCount;
+            var start = DateTime.Now;
 #endif
             LinkedList<Entity> entts = Key.EntitySetType == EntitySetType.Contacts 
                 ? SearchDirect.GetContactEntities(Key) 
@@ -174,18 +178,18 @@ namespace EntityCore.Entities
             if (entts != null)
                 entities = entts;
             else entities.Clear();
-            _lastRegenTick = Environment.TickCount;
+            _lastRegenTime = DateTime.Now;
             if (EntityManager.LocalPlayer.InCombat
                 && !Astral.Quester.API.IgnoreCombat)
-                _nextRegenTick = _lastRegenTick + EntityTools.EntityTools.Config.EntityCache.GlobalCacheTime;
-            else _nextRegenTick = _lastRegenTick + EntityTools.EntityTools.Config.EntityCache.CombatCacheTime;
+                _nextRegenTime = _lastRegenTime.AddMilliseconds(EntityTools.EntityTools.Config.EntityCache.GlobalCacheTime);
+            else _nextRegenTime = _lastRegenTime.AddMilliseconds(EntityTools.EntityTools.Config.EntityCache.CombatCacheTime);
 #if PROFILING
-            ticks = Environment.TickCount - ticks;
-            _regenTiсksTotal += ticks;
-            if (_regenTiсksMin > ticks)
-                _regenTiсksMin = ticks;
-            if (_regenTiсksMax < ticks)
-                _regenTiсksMax = ticks;
+            var interval = _lastRegenTime - start;
+            _regenTimeTotal += interval;
+            if (_regenTimeMin > interval)
+                _regenTimeMin = interval;
+            if (_regenTimeMax < interval)
+                _regenTimeMax = interval;
             TotalCachedEntities += entities.Count;
 #endif
         }
@@ -194,7 +198,7 @@ namespace EntityCore.Entities
 #if PROFILING
             _regenCount++;
             TotalRegenCount++;
-            int ticks = Environment.TickCount;
+            var start = DateTime.Now;
 #endif
             LinkedList<Entity> entts = Key.EntitySetType == EntitySetType.Contacts 
                 ? SearchDirect.GetContactEntities(Key, action) 
@@ -203,18 +207,18 @@ namespace EntityCore.Entities
             if (entts != null)
                 entities = entts;
             else entities.Clear();
-            _lastRegenTick = Environment.TickCount;
+            _lastRegenTime = DateTime.Now;
             if (EntityManager.LocalPlayer.InCombat
                 && !Astral.Quester.API.IgnoreCombat)
-                _nextRegenTick = _lastRegenTick + EntityTools.EntityTools.Config.EntityCache.GlobalCacheTime;
-            else _nextRegenTick = _lastRegenTick + EntityTools.EntityTools.Config.EntityCache.CombatCacheTime;
+                _nextRegenTime = _lastRegenTime.AddMilliseconds(EntityTools.EntityTools.Config.EntityCache.GlobalCacheTime);
+            else _nextRegenTime = _lastRegenTime.AddMilliseconds(EntityTools.EntityTools.Config.EntityCache.CombatCacheTime);
 #if PROFILING
-            ticks = Environment.TickCount - ticks;
-            _regenTiсksTotal += ticks;
-            if (_regenTiсksMin > ticks)
-                _regenTiсksMin = ticks;
-            if (_regenTiсksMax < ticks)
-                _regenTiсksMax = ticks;
+            var interval = _lastRegenTime - start;
+            _regenTimeTotal += interval;
+            if (_regenTimeMin > interval)
+                _regenTimeMin = interval;
+            if (_regenTimeMax < interval)
+                _regenTimeMax = interval;
             TotalCachedEntities += entities.Count;
 #endif
         }
@@ -226,20 +230,20 @@ namespace EntityCore.Entities
         public void Processing(Action<Entity> action)
         {
 #if PROFILING
-            var ticks = Environment.TickCount;
+            var start = DateTime.Now;
 #endif
-            if (_nextRegenTick <= ticks)
+            if (_nextRegenTime <= start)
             {
                 Regen(action);
 #if PROFILING
                 _accessCount++;
-                _lastAccessTick = Environment.TickCount;
-                ticks = _lastAccessTick - ticks;
-                _accessTiсksTotal += ticks;
-                if (_accessTiсksMin > ticks)
-                    _accessTiсksMin = ticks;
-                if (_accessTiсksMax < ticks)
-                    _accessTiсksMax = ticks;
+                _lastAccessTime = DateTime.Now;
+                var interval = _lastAccessTime - start;
+                _accessTimeTotal += interval;
+                if (_accessTimeMin > interval)
+                    _accessTimeMin = interval;
+                if (_accessTimeMax < interval)
+                    _accessTimeMax = interval;
 #endif
             }
             else if (entities != null && entities.Count > 0)
@@ -258,13 +262,13 @@ namespace EntityCore.Entities
                 } while (eNode != null);
 #if PROFILING
                 _accessCount++;
-                _lastAccessTick = ticks;
-                ticks = _lastAccessTick - ticks;
-                _accessTiсksTotal += ticks;
-                if (_accessTiсksMin > ticks)
-                    _accessTiсksMin = ticks;
-                if (_accessTiсksMax < ticks)
-                    _accessTiсksMax = ticks;
+                _lastAccessTime = DateTime.Now;
+                var interval = _lastAccessTime - start;
+                _accessTimeTotal += interval;
+                if (_accessTimeMin > interval)
+                    _accessTimeMin = interval;
+                if (_accessTimeMax < interval)
+                    _accessTimeMax = interval;
 #endif
             }
         }

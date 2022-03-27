@@ -51,6 +51,7 @@ namespace EntityCore.Forms
             // 
             this.gridView.GridControl = this.gridControl;
             this.gridView.Name = "gridView";
+            this.gridView.OptionsBehavior.ReadOnly = true;
             this.gridView.OptionsView.ShowGroupPanel = false;
             // 
             // backgroundWorker
