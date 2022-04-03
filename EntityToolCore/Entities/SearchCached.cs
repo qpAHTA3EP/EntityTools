@@ -1,4 +1,4 @@
-﻿#define PROFILING
+﻿//#define PROFILING
 
 using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
@@ -15,7 +15,7 @@ namespace EntityCore.Entities
     public static class SearchCached
     {
 #if PROFILING
-        static readonly long interval = 10000;
+        private static readonly long interval = 10000;
 
         private static readonly Stopwatch Stopwatch = new Stopwatch();
         private static int _count;
@@ -48,7 +48,7 @@ namespace EntityCore.Entities
                 {
                     ETLogger.WriteLine(LogType.Debug, $"SearchCached::FrequencyDistribution:");
                     var list = FrequencyDistribution.ToList();
-                    list.Sort((l, r) => { return (int)l.Key - (int)r.Key; } );
+                    list.Sort((l, r) => (int)l.Key - (int)r.Key);
                     foreach (var i in list)
                         ETLogger.WriteLine(LogType.Debug, $"\t\t{i.Key * (double)interval / 10000d:N3} := {i.Value:N0}");
                 }
@@ -89,38 +89,37 @@ namespace EntityCore.Entities
             try
             {
 #endif
+                // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
+                LinkedList<Entity> entities = new LinkedList<Entity>();
+                // Конструируем функтор для поиска Entity в соответствии с доп. условиями
+                var predicate = SearchHelper.Construct_EntityAttributePredicate(healthCheck, 
+                                                          range, zRange, 
+                                                          regionCheck, 
+                                                          customRegions, 
+                                                          specialCheck);
+                void EvaluateAndCollectEntity(Entity entity)
+                {
+                    if (predicate(entity))
+                        entities.AddLast(entity);
+                }
 
-            // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
-            LinkedList<Entity> entities = new LinkedList<Entity>();
-            // Конструируем функтор для поиска Entity в соответствии с доп. условиями
-            var predicate = SearchHelper.Construct_EntityAttributePredicate(healthCheck, 
-                                                      range, zRange, 
-                                                      regionCheck, 
-                                                      customRegions, 
-                                                      specialCheck);
-            void EvaluateAndCollectEntity(Entity entity)
-            {
-                if (predicate(entity))
-                    entities.AddLast(entity);
-            }
 
+                // Проверяем наличие кэша
+                if (EntityCache.TryGetValue(out EntityCacheRecord cachedEntities, pattern, matchType, nameType, setType))
+                {
+                    // Проверяем Entities применяя функтор ко всем Entity, удовлетворяющим шаблону
+                    // Функтор EvaluateAndCollectEntity заполняет entities
+                    cachedEntities.Processing(EvaluateAndCollectEntity);
+                }
+                else
+                {
+                    // Кэш не обнаружен
+                    // Функтор EvaluateAndCollectEntity заполняет entities
+                    cachedEntities = EntityCache.MakeCache(pattern, matchType, nameType, setType);
+                    cachedEntities.Processing(EvaluateAndCollectEntity);
+                }
 
-            // Проверяем наличие кэша
-            if (EntityCache.TryGetValue(out EntityCacheRecord cachedEntities, pattern, matchType, nameType, setType))
-            {
-                // Проверяем Entities применяя функтор ко всем Entity, удовлетворяющим шаблону
-                // Функтор EvaluateAndCollectEntity заполняет entities
-                cachedEntities.Processing(EvaluateAndCollectEntity);
-            }
-            else
-            {
-                // Кэш не обнаружен
-                // Функтор EvaluateAndCollectEntity заполняет entities
-                cachedEntities = EntityCache.MakeCache(pattern, matchType, nameType, setType);
-                cachedEntities.Processing(EvaluateAndCollectEntity);
-            }
-
-            return entities;
+                return entities;
 #if PROFILING
             }
             finally
@@ -153,47 +152,46 @@ namespace EntityCore.Entities
         {
 #if PROFILING
             _count++;
-            TimeSpan startTime = Stopwatch.Elapsed;
-            Stopwatch.Start();
+            Stopwatch.Restart();
             try
             {
 #endif
-            if (key is null || !key.IsValid)
-                return null;
+                if (key is null || !key.IsValid)
+                    return null;
 
-            // конструируем функтор для дополнительных проверок Entity и заполнения списка
-            LinkedList<Entity> entities = new LinkedList<Entity>();
-            
-            // Конструируем функтор для поиска Entity в соответствии с доп. условиями
-            Action<Entity> evaluateAndCollectEntity;
-            if (specialCheck is null)
-                evaluateAndCollectEntity = (entity) => entities.AddLast(entity);
-            else evaluateAndCollectEntity = (entity) =>
-                    {
-                        if (specialCheck(entity))
-                            entities.AddLast(entity);
-                    };
+                // конструируем функтор для дополнительных проверок Entity и заполнения списка
+                LinkedList<Entity> entities = new LinkedList<Entity>();
+                
+                // Конструируем функтор для поиска Entity в соответствии с доп. условиями
+                Action<Entity> evaluateAndCollectEntity;
+                if (specialCheck is null)
+                    evaluateAndCollectEntity = (entity) => entities.AddLast(entity);
+                else evaluateAndCollectEntity = (entity) =>
+                        {
+                            if (specialCheck(entity))
+                                entities.AddLast(entity);
+                        };
 
-            // Проверяем наличие кэша
-            if (EntityCache.Contains(key))
-            {
-                // Обнаружена кэшированная запись
-                // Проверяем Entities применяя функтор ко всем Entity, удовлетворяющим шаблону
-                EntityCache[key].Processing(evaluateAndCollectEntity);
-            }
-            else
-            {
-                // Кэш не обнаружен
-                EntityCache.MakeCache(key).Processing(evaluateAndCollectEntity);
-            }
+                // Проверяем наличие кэша
+                if (EntityCache.Contains(key))
+                {
+                    // Обнаружена кэшированная запись
+                    // Проверяем Entities применяя функтор ко всем Entity, удовлетворяющим шаблону
+                    EntityCache[key].Processing(evaluateAndCollectEntity);
+                }
+                else
+                {
+                    // Кэш не обнаружен
+                    EntityCache.MakeCache(key).Processing(evaluateAndCollectEntity);
+                }
 
-            return entities;
+                return entities;
 #if PROFILING
             }
             finally
             {
                 Stopwatch.Stop();
-                TimeSpan time = Stopwatch.Elapsed.Subtract(startTime);
+                TimeSpan time = Stopwatch.Elapsed;
                 if (time > _maxTime)
                 {
                     _maxTime = time;
@@ -232,55 +230,53 @@ namespace EntityCore.Entities
         {
 #if PROFILING
             _count++;
-            TimeSpan startTime = Stopwatch.Elapsed;
-            Stopwatch.Start();
+            Stopwatch.Restart();
             try
             {
 #endif
+                // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
+                float closestDistance = (range == 0) ? float.MaxValue : range;
+                Entity closestEntity = null;
+                Action<Entity> processor;
 
-            // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
-            float closestDistance = (range == 0) ? float.MaxValue : range;
-            Entity closestEntity = null;
-            Action<Entity> processor;
-
-            // Конструируем функтор для поиска Entity в соответствии с доп. условиями
-            var predicate = SearchHelper.Construct_EntityAttributePredicate(healthCheck,
-                                                      range, zRange,
-                                                      regionCheck,
-                                                      customRegions,
-                                                      specialCheck);
-            processor = (entity) =>
-            {
-                if (!predicate(entity)) return;
-
-                float dist = entity.CombatDistance3;
-                if (closestDistance > dist)
+                // Конструируем функтор для поиска Entity в соответствии с доп. условиями
+                var predicate = SearchHelper.Construct_EntityAttributePredicate(healthCheck,
+                                                          range, zRange,
+                                                          regionCheck,
+                                                          customRegions,
+                                                          specialCheck);
+                processor = (entity) =>
                 {
-                    closestEntity = entity;
-                    closestDistance = dist;
+                    if (!predicate(entity)) return;
+
+                    float dist = entity.CombatDistance3;
+                    if (closestDistance > dist)
+                    {
+                        closestEntity = entity;
+                        closestDistance = dist;
+                    }
+                };
+
+
+                if (EntityCache.TryGetValue(out EntityCacheRecord cachedEntities, pattern, matchType, nameType, setType))
+                {
+                    // Обнаружена кэшированная запись
+                    // Проверяем Entities применяя функтор ко всем Entity, удовлетворяющим шаблону
+                    cachedEntities.Processing(processor);
                 }
-            };
-
-
-            if (EntityCache.TryGetValue(out EntityCacheRecord cachedEntities, pattern, matchType, nameType, setType))
-            {
-                // Обнаружена кэшированная запись
-                // Проверяем Entities применяя функтор ко всем Entity, удовлетворяющим шаблону
-                cachedEntities.Processing(processor);
-            }
-            else
-            {
-                // Кэш не обнаружен
-                cachedEntities = EntityCache.MakeCache(pattern, matchType, nameType, setType);
-                cachedEntities.Processing(processor);
-            }
-            return closestEntity;
+                else
+                {
+                    // Кэш не обнаружен
+                    cachedEntities = EntityCache.MakeCache(pattern, matchType, nameType, setType);
+                    cachedEntities.Processing(processor);
+                }
+                return closestEntity;
 #if PROFILING
             }
             finally
             {
                 Stopwatch.Stop();
-                TimeSpan time = Stopwatch.Elapsed.Subtract(startTime);
+                TimeSpan time = Stopwatch.Elapsed;
                 if (time > _maxTime)
                     _maxTime = time;
                 else if (time < _minTime)
@@ -305,23 +301,33 @@ namespace EntityCore.Entities
         {
 #if PROFILING
             _count++;
-            TimeSpan startTime = Stopwatch.Elapsed;
-            Stopwatch.Start();
+            Stopwatch.Restart();
             try
             {
 #endif
-            if (key is null || !key.IsValid)
-                return null;
+                if (key is null || !key.IsValid)
+                    return null;
 
-            // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
-            Entity closestEntity = null;
-            float closestDistance = float.MaxValue;
-            Action<Entity> action;
+                // конструируем функтор для дополнительных проверок Entity и поиска ближайшего
+                Entity closestEntity = null;
+                float closestDistance = float.MaxValue;
+                Action<Entity> action;
 
-            // Конструируем функтор для поиска Entity, соответствующего specialCheck
-            if (specialCheck is null)
-                action = (entity) =>
+                // Конструируем функтор для поиска Entity, соответствующего specialCheck
+                if (specialCheck is null)
+                    action = (entity) =>
+                    {
+                        float dist = entity.CombatDistance3;
+                        if (closestDistance > dist)
+                        {
+                            closestDistance = dist;
+                            closestEntity = entity;
+                        }
+                    };
+                else action = (entity) =>
                 {
+                    if (!specialCheck(entity)) return;
+
                     float dist = entity.CombatDistance3;
                     if (closestDistance > dist)
                     {
@@ -329,36 +335,25 @@ namespace EntityCore.Entities
                         closestEntity = entity;
                     }
                 };
-            else action = (entity) =>
-            {
-                if (!specialCheck(entity)) return;
-
-                float dist = entity.CombatDistance3;
-                if (closestDistance > dist)
+                if (EntityCache.Contains(key))
                 {
-                    closestDistance = dist;
-                    closestEntity = entity;
+                    // Обнаружена кэшированная запись
+                    // Проверяем Entities применяя функтор ко всем Entity, удовлетворяющим шаблону
+                    EntityCache[key].Processing(action);
                 }
-            };
-            if (EntityCache.Contains(key))
-            {
-                // Обнаружена кэшированная запись
-                // Проверяем Entities применяя функтор ко всем Entity, удовлетворяющим шаблону
-                EntityCache[key].Processing(action);
-            }
-            else
-            {
-                // Кэш не обнаружен
-                EntityCache.MakeCache(key).Processing(action);
-            }
+                else
+                {
+                    // Кэш не обнаружен
+                    EntityCache.MakeCache(key).Processing(action);
+                }
 
-            return closestEntity;
+                return closestEntity;
 #if PROFILING
             }
             finally
             {
                 Stopwatch.Stop();
-                TimeSpan time = Stopwatch.Elapsed.Subtract(startTime);
+                TimeSpan time = Stopwatch.Elapsed;
                 if (time > _maxTime)
                     _maxTime = time;
                 else if (time < _minTime)

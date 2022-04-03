@@ -15,12 +15,14 @@ namespace EntityCore.Entities
             EntitySetType = est;
             comparer = Comparer_Initializer;
             str = $"{Pattern}({NameType}, {MatchType}, {EntitySetType})";
+            hashCode = str.GetHashCode();
         }
 
-        public readonly string Pattern = string.Empty;
-        public readonly ItemFilterStringType MatchType = ItemFilterStringType.Simple;
-        public readonly EntityNameType NameType = EntityNameType.InternalName;
-        public readonly EntitySetType EntitySetType = EntitySetType.Complete;
+        public readonly string Pattern;
+        public readonly ItemFilterStringType MatchType;
+        public readonly EntityNameType NameType;
+        public readonly EntitySetType EntitySetType;
+        private readonly int hashCode;
 
         public bool IsValid => NameType == EntityNameType.Empty 
                                || !string.IsNullOrEmpty(Pattern);
@@ -42,10 +44,7 @@ namespace EntityCore.Entities
                    && Pattern == other.Pattern;
         }
 
-        public override int GetHashCode()
-        {
-            return Pattern.GetHashCode();
-        }
+        public override int GetHashCode() => hashCode;
 
         #region IsMatch
         /// <summary>

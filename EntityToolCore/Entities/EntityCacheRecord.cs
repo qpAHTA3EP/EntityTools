@@ -9,6 +9,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 
 namespace EntityCore.Entities
 {
@@ -32,6 +33,9 @@ namespace EntityCore.Entities
         public static int TotalRegenCount;
         public static int TotalCachedEntities;
 
+        private Stopwatch regenSw = new Stopwatch();
+        private Stopwatch accessWs = new Stopwatch();
+
         public static void ResetWatch()
         {
             TotalRegenCount = 0;
@@ -49,7 +53,12 @@ namespace EntityCore.Entities
         /// </summary>
         public uint Capacity => (uint)entities.Count;
 
-        public TimeSpan LeftTime => DateTime.Now - _lastAccessTime;
+        /// <summary>
+        /// Время, прошедшее с момента последнего чтения записи
+        /// </summary>
+        public TimeSpan ElapsedTime => DateTime.Now - _lastAccessTime;
+
+        public double Rank => _accessCount == 0 ? (DateTime.Now - _initTime).Ticks / (double)_accessCount : (DateTime.Now - _initTime).Ticks;
 
         /// <summary>
         /// Число обращений (считываний) к записи
@@ -80,17 +89,19 @@ namespace EntityCore.Entities
         /// <summary>
         /// Среднее время регенерации
         /// </summary>
-        public TimeSpan RegenTimeAvg => _regenCount == 0 ? new TimeSpan(_regenTimeTotal.Ticks / _regenCount) : _regenTimeTotal;
+        public TimeSpan RegenTimeAvg => _regenCount > 0 ? new TimeSpan(_regenTimeTotal.Ticks / _regenCount) : _regenTimeTotal;
+        public TimeSpan RegenTimeTotal => _regenTimeTotal;
         private TimeSpan _regenTimeTotal;
-        public TimeSpan RegenTimesMin => _regenTimeMin;
-        private TimeSpan _regenTimeMin = TimeSpan.MaxValue;
+        public TimeSpan RegenTimeMin => regenTimeMin;
+        private TimeSpan regenTimeMin = TimeSpan.MaxValue;
         public TimeSpan RegenTimeMax => _regenTimeMax;
         private TimeSpan _regenTimeMax;
 
         /// <summary>
         /// Среднее время доступа
         /// </summary>
-        public TimeSpan AccessTimeAvg => _regenCount == 0 ? new TimeSpan(_accessTimeTotal.Ticks / _regenCount) : _accessTimeTotal;
+        public TimeSpan AccessTimeAvg => _accessCount > 0 ? new TimeSpan(_accessTimeTotal.Ticks / _accessCount) : _accessTimeTotal;
+        public TimeSpan AccessTimeTotal => _accessTimeTotal;
         private TimeSpan _accessTimeTotal;
         public TimeSpan AccessTimeMax => _accessTimeMax;
         private TimeSpan _accessTimeMax;
@@ -107,21 +118,21 @@ namespace EntityCore.Entities
         /// <summary>
         /// Отметка времени инициализации записи
         /// </summary>
-        [DisplayFormat(DataFormatString = "{HH.mm.ss.fffffff}")]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{HH.mm.ss.fffffff}")]
         public DateTime InitializationTime => _initTime;
         private DateTime _initTime;
 
         /// <summary>
         /// Отметка времени последнего доступа
         /// </summary>
-        [DisplayFormat(DataFormatString = "{HH.mm.ss.fffffff}")]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{HH.mm.ss.fffffff}")]
         public DateTime LastAccessTime => _lastAccessTime;
         private DateTime _lastAccessTime;
 
         /// <summary>
         /// Отметка времени последней регенации кэша
         /// </summary>
-        [DisplayFormat(DataFormatString = "{HH.mm.ss.fffffff}")]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{HH.mm.ss.fffffff}")]
         public DateTime LastRegenTime => _lastRegenTime;
         private DateTime _lastRegenTime;
 
@@ -137,14 +148,14 @@ namespace EntityCore.Entities
 
         public IEnumerator<Entity> GetEnumerator()
         {
-            var time = DateTime.Now;
-            if (_nextRegenTime <= time)
+            var now = DateTime.Now;
+            if (_nextRegenTime <= now)
             {
                 Regen();
-                time = DateTime.Now;
+                now = DateTime.Now;
             }
             _accessCount++;
-            _lastAccessTime = time;
+            _lastAccessTime = now;
             return entities.GetEnumerator();
         }
 
@@ -169,7 +180,7 @@ namespace EntityCore.Entities
 #if PROFILING
             _regenCount++;
             TotalRegenCount++;
-            var start = DateTime.Now;
+            regenSw.Restart();
 #endif
             LinkedList<Entity> entts = Key.EntitySetType == EntitySetType.Contacts 
                 ? SearchDirect.GetContactEntities(Key) 
@@ -184,12 +195,14 @@ namespace EntityCore.Entities
                 _nextRegenTime = _lastRegenTime.AddMilliseconds(EntityTools.EntityTools.Config.EntityCache.GlobalCacheTime);
             else _nextRegenTime = _lastRegenTime.AddMilliseconds(EntityTools.EntityTools.Config.EntityCache.CombatCacheTime);
 #if PROFILING
-            var interval = _lastRegenTime - start;
+            regenSw.Stop();
+            var interval = regenSw.Elapsed;
             _regenTimeTotal += interval;
-            if (_regenTimeMin > interval)
-                _regenTimeMin = interval;
+            if (regenTimeMin > interval)
+                regenTimeMin = interval;
             if (_regenTimeMax < interval)
                 _regenTimeMax = interval;
+
             TotalCachedEntities += entities.Count;
 #endif
         }
@@ -198,7 +211,7 @@ namespace EntityCore.Entities
 #if PROFILING
             _regenCount++;
             TotalRegenCount++;
-            var start = DateTime.Now;
+            regenSw.Restart();
 #endif
             LinkedList<Entity> entts = Key.EntitySetType == EntitySetType.Contacts 
                 ? SearchDirect.GetContactEntities(Key, action) 
@@ -213,12 +226,14 @@ namespace EntityCore.Entities
                 _nextRegenTime = _lastRegenTime.AddMilliseconds(EntityTools.EntityTools.Config.EntityCache.GlobalCacheTime);
             else _nextRegenTime = _lastRegenTime.AddMilliseconds(EntityTools.EntityTools.Config.EntityCache.CombatCacheTime);
 #if PROFILING
-            var interval = _lastRegenTime - start;
-            _regenTimeTotal += interval;
-            if (_regenTimeMin > interval)
-                _regenTimeMin = interval;
-            if (_regenTimeMax < interval)
-                _regenTimeMax = interval;
+            regenSw.Stop();
+            var time = regenSw.Elapsed;
+            _regenTimeTotal += time;
+            if (_regenTimeMax < time)
+                _regenTimeMax = time; 
+            else if (regenTimeMin > time)
+                regenTimeMin = time;
+            
             TotalCachedEntities += entities.Count;
 #endif
         }
@@ -231,19 +246,21 @@ namespace EntityCore.Entities
         {
 #if PROFILING
             var start = DateTime.Now;
+            accessWs.Restart();
 #endif
             if (_nextRegenTime <= start)
             {
                 Regen(action);
 #if PROFILING
+                accessWs.Stop();
                 _accessCount++;
                 _lastAccessTime = DateTime.Now;
-                var interval = _lastAccessTime - start;
-                _accessTimeTotal += interval;
-                if (_accessTimeMin > interval)
-                    _accessTimeMin = interval;
-                if (_accessTimeMax < interval)
-                    _accessTimeMax = interval;
+                var time = accessWs.Elapsed;
+                _accessTimeTotal += time;
+                if (_accessTimeMax < time)
+                    _accessTimeMax = time;
+                else if (_accessTimeMin > time)
+                    _accessTimeMin = time;
 #endif
             }
             else if (entities != null && entities.Count > 0)
@@ -263,12 +280,12 @@ namespace EntityCore.Entities
 #if PROFILING
                 _accessCount++;
                 _lastAccessTime = DateTime.Now;
-                var interval = _lastAccessTime - start;
-                _accessTimeTotal += interval;
-                if (_accessTimeMin > interval)
-                    _accessTimeMin = interval;
-                if (_accessTimeMax < interval)
-                    _accessTimeMax = interval;
+                var time = _lastAccessTime - start;
+                _accessTimeTotal += time;
+                if (_accessTimeMax < time)
+                    _accessTimeMax = time;
+                else if (_accessTimeMin > time)
+                    _accessTimeMin = time;
 #endif
             }
         }

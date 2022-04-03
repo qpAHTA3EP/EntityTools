@@ -4,6 +4,7 @@ using AcTp0Tools;
 using Astral.Classes.ItemFilter;
 using EntityTools.Enums;
 using System.Collections.ObjectModel;
+using System.Text;
 using EntityTools;
 
 namespace EntityCore.Entities
@@ -19,15 +20,74 @@ namespace EntityCore.Entities
             AstralAccessors.Quester.Core.AfterLoad += ResetCache;
             AstralAccessors.Quester.Core.AfterNew += ResetCache; 
 #endif
-            //AstralAccessors.Quester.Core.OnProfileChanged += ResetCache;
+            AstralAccessors.Quester.Core.OnProfileChanged += ResetCache;
         }
 
-        private void ResetCache()
+        private readonly StringBuilder logBuilder = new StringBuilder();
+
+        public void ResetCache()
         {
-            lock (this)
+            if (Count > 0)
             {
-                Clear(); 
+                lock (this)
+                {
+                    LogStatistics();
+                    _matchCount = 0;
+                    _mismatchCount = 0;
+                    Clear();
+                }
             }
+        }
+
+        public void LogStatistics()
+        {
+            logBuilder.Clear();
+            logBuilder.Append('\'').Append(nameof(EntityCache)).AppendLine("' usage statistics:");
+            logBuilder.Append("Total records: ").AppendLine(Count.ToString());
+            logBuilder.Append("matchCount: ").Append(_matchCount).Append("mismatchCount: ")
+                .AppendLine(_mismatchCount.ToString());
+            logBuilder.Append(nameof(EntityCacheRecord.Key)).Append("; ")
+                .Append(nameof(EntityCacheRecord.Rank)).Append("; ")
+                .Append(nameof(EntityCacheRecord.Capacity)).Append("; ")
+                .Append(nameof(EntityCacheRecord.InitializationTime)).Append("; ")
+                .Append(nameof(EntityCacheRecord.ElapsedTime)).Append("; ")
+                .Append(nameof(EntityCacheRecord.AccessCount)).Append("; ")
+                .Append(nameof(EntityCacheRecord.LastAccessTime)).Append("; ")
+                .Append(nameof(EntityCacheRecord.AccessPerSecond)).Append("; ")
+                .Append(nameof(EntityCacheRecord.AccessTimeTotal)).Append("; ")
+                .Append(nameof(EntityCacheRecord.AccessTimeAvg)).Append("; ")
+                .Append(nameof(EntityCacheRecord.AccessTimeMin)).Append("; ")
+                .Append(nameof(EntityCacheRecord.AccessTimeMax)).Append("; ")
+                .Append(nameof(EntityCacheRecord.RegenCount)).Append("; ")
+                .Append(nameof(EntityCacheRecord.LastRegenTime)).Append("; ")
+                .Append(nameof(EntityCacheRecord.RegenTimeTotal)).Append("; ")
+                .Append(nameof(EntityCacheRecord.RegenTimeAvg)).Append("; ")
+                .Append(nameof(EntityCacheRecord.RegenTimeMin)).Append("; ")
+                .Append(nameof(EntityCacheRecord.RegenTimeMax)).AppendLine();
+
+            foreach (var rec in this)
+            {
+                logBuilder.Append(rec.Key).Append("; ")
+                    .Append(rec.Rank).Append("; ")
+                    .Append(rec.Capacity).Append("; ")
+                    .Append(rec.InitializationTime).Append("; ")
+                    .Append(rec.ElapsedTime).Append("; ")
+                    .Append(rec.AccessCount).Append("; ")
+                    .Append(rec.LastAccessTime).Append("; ")
+                    .Append(rec.AccessPerSecond).Append("; ")
+                    .Append(rec.AccessTimeAvg).Append("; ")
+                    .Append(rec.AccessTimeTotal).Append("; ")
+                    .Append(rec.AccessTimeMin).Append("; ")
+                    .Append(rec.AccessTimeMax).Append("; ")
+                    .Append(rec.RegenCount).Append("; ")
+                    .Append(rec.LastRegenTime).Append("; ")
+                    .Append(rec.RegenTimeAvg).Append("; ")
+                    .Append(rec.RegenTimeTotal).Append("; ")
+                    .Append(rec.RegenTimeMin).Append("; ")
+                    .Append(rec.RegenTimeMax).AppendLine();
+            }
+
+            ETLogger.WriteLine(logBuilder.ToString());
         }
 
         ~EntityCache()
@@ -35,17 +95,17 @@ namespace EntityCore.Entities
 #if false
             AstralAccessors.Quester.Core.AfterLoad -= ResetCache;
             AstralAccessors.Quester.Core.AfterNew -= ResetCache; 
-
 #endif
-            AstralAccessors.Quester.Core.OnProfileChanged += ResetCache;
+            AstralAccessors.Quester.Core.OnProfileChanged -= ResetCache;
         }
 
 #if PROFILING
-        public int MatchCount => matchCount;
-        private static int matchCount = 0;
-        public int MismatchCount => matchCount;
-        private static int mismatchCount = 0;
+        public int MatchCount => _matchCount;
+        private static int _matchCount;
+        public int MismatchCount => _matchCount;
+        private static int _mismatchCount;
 
+#if false
         public static void ResetWatch()
         {
             matchCount = 0;
@@ -56,7 +116,8 @@ namespace EntityCore.Entities
         public static void LogWatch()
         {
             ETLogger.WriteLine(LogType.Debug, $"EntityCache: matchCount: {matchCount}, mismatchCount: {mismatchCount}");
-        }
+        } 
+#endif
 #endif
         protected override EntityCacheRecordKey GetKeyForItem(EntityCacheRecord item)
         {
@@ -70,17 +131,32 @@ namespace EntityCore.Entities
             if (Contains(key))
             {
 #if PROFILING
-                matchCount++;
+                _matchCount++;
 #endif
                 record = this[key];
                 return true;
             }
 #if PROFILING
-            mismatchCount++;
+            _mismatchCount++;
 #endif
             return false;
         }
-
+        public bool TryGetValue(out EntityCacheRecord record, EntityCacheRecordKey key)
+        {
+            record = null;
+            if (Contains(key))
+            {
+#if PROFILING
+                _matchCount++;
+#endif
+                record = this[key];
+                return true;
+            }
+#if PROFILING
+            _mismatchCount++;
+#endif
+            return false;
+        }
         public EntityCacheRecord MakeCache(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.InternalName, EntitySetType setType = EntitySetType.Complete)
         {
             EntityCacheRecord record = new EntityCacheRecord(pattern, matchType, nameType, setType);
@@ -96,7 +172,33 @@ namespace EntityCore.Entities
         public bool Contains(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.InternalName, EntitySetType setType = EntitySetType.Complete)
         {
             EntityCacheRecordKey key = new EntityCacheRecordKey(pattern, matchType, nameType, setType);
-            return Contains(key);
+            bool contains = Contains(key);
+#if PROFILING
+            if (contains)
+            {
+                _matchCount++;
+            }
+            else
+            {
+                _mismatchCount++;
+            }
+#endif
+            return contains;
+        }
+        public new bool Contains(EntityCacheRecordKey key)
+        {
+            bool contains = base.Contains(key);
+#if PROFILING
+            if (contains)
+            {
+                _matchCount++;
+            }
+            else
+            {
+                _mismatchCount++;
+            }
+#endif
+            return contains;
         }
     }
 }
