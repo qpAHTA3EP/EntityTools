@@ -217,6 +217,24 @@ namespace EntityTools.Quester.Actions
             }
         }
         internal string _requiredRewardItem = string.Empty;
+#if DEVELOPER
+        [Description("The Id of the Action executing if the '" + nameof(RequiredRewardItem) + "' would be missing")]
+        [Category("Optional")]
+        [DisplayName("TargetActionOnRequiredRewardMissing")]
+#else
+        [Browsable(false)]
+#endif
+        public Guid TargetAction
+        {
+            get => _targetActionId;
+            set
+            {
+                if (_targetActionId == value) return;
+                _targetActionId = value;
+                NotifyPropertyChanged();
+            }
+        }
+        internal Guid _targetActionId = Guid.Empty;
 
         [Browsable(false)]
         public string GiverId

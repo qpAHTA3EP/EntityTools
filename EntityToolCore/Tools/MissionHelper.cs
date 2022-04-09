@@ -417,7 +417,7 @@ namespace EntityCore.Tools
                         else if (contactDialog.CheckDialogOptionAndSelect(d => d.Key.Equals("ViewCompleteMission.Back", StringComparison.Ordinal),
                             () => player.InteractInfo.ContactDialog.ScreenType == ScreenType.MissionOffer))
                         {
-                            result = MissionProcessingResult.MissionRequiredRewardNotFound;
+                            result = MissionProcessingResult.MissionRequiredRewardMissing;
                             if (debugInfoEnabled)
                                 ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
                                     "\n\t\tScreenType = ", screenType,
@@ -446,9 +446,13 @@ namespace EntityCore.Tools
                     // Проверяем наличие обязательных наград в окне миссии
                     if (CheckRequiredRewardItem(isRewardItem))
                     {
+                        result = MissionProcessingResult.Error;
+
                         // Принимаем миссию
-                        if (contactDialog.CheckDialogOptionAndSelect(d => d.Key.Equals("ViewOfferedMission.Accept", StringComparison.Ordinal),
-                            () => player.InteractInfo.ContactDialog.ScreenType == ScreenType.MissionOffer))
+                        bool accepted = contactDialog.CheckDialogOptionAndSelect(
+                                                        d => d.Key.Equals("ViewOfferedMission.Accept", StringComparison.Ordinal),
+                                                        () => player.InteractInfo.ContactDialog.ScreenType == ScreenType.MissionOffer);
+                        if (accepted)
                         {
                             result = MissionProcessingResult.MissionOfferAccepted;
                             var timer2 = new Astral.Classes.Timeout(timeout);
@@ -461,41 +465,44 @@ namespace EntityCore.Tools
                                 }
                                 Thread.Sleep(250);
                             }
-
-                            if (debugInfoEnabled)
-                                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
-                                    "\n\t\tScreenType = ", screenType,
-                                    "\n\t\tCheckRequiredRewardItem = True" +
-                                    "\n\t\tSelect 'ViewOfferedMission.Accept' = True" +
-                                    "\n\t" + nameof(ProcessingMissionDialog) + " => ", result));
-                            return result;
                         }
+
+                        if (debugInfoEnabled)
+                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
+                                "\n\t\tScreenType = ", screenType,
+                                "\n\t\tCheckRequiredRewardItem = True" +
+                                "\n\t\tSelect 'ViewOfferedMission.Accept' = " + accepted +
+                                "\n\t" + nameof(ProcessingMissionDialog) + " => ", result));
+                        return result;
                     }
 
                     // В наградах отсутствуют обязательные итемы - отказываемся от миссии.
-                    else if (contactDialog.CheckDialogOptionAndSelect(d => d.Key.Equals("ViewOfferedMission.Back", StringComparison.Ordinal),
-                        () => player.InteractInfo.ContactDialog.ScreenType == ScreenType.MissionOffer))
+                    else 
                     {
-                        result = MissionProcessingResult.MissionRequiredRewardNotFound;
+                        result = MissionProcessingResult.MissionRequiredRewardMissing;
+                        bool goBackScreen = contactDialog.CheckDialogOptionAndSelect(
+                                                            d => d.Key.Equals("ViewOfferedMission.Back", StringComparison.Ordinal),
+                                                            () => player.InteractInfo.ContactDialog.ScreenType == ScreenType.MissionOffer);
+                        
                         if (debugInfoEnabled)
                             ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
                                 "\n\t\tScreenType = ", screenType,
                                 "\n\t\tCheckRequeredRewardItem = False" +
-                                "\n\t\tSelect 'ViewOfferedMission.Back' = True" +
+                                "\n\t\tSelect 'ViewOfferedMission.Back' = " + goBackScreen +
                                 "\n\t" + nameof(ProcessingMissionDialog) + " => ", result));
-
+                        
                         return result;
                     }
 
-                    result = MissionProcessingResult.Error;
-                    if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
-                            "\n\t\tScreenType = ", screenType,
-                            "\n\t\tCheckRequiredRewardItem = False" +
-                            "\n\t\tSelect 'ViewOfferedMission.Back' = False" +
-                            "\n\t" + nameof(ProcessingMissionDialog) + " => ", result));
+                    //result = MissionProcessingResult.Error;
+                    //if (debugInfoEnabled)
+                    //    ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
+                    //        "\n\t\tScreenType = ", screenType,
+                    //        "\n\t\tCheckRequiredRewardItem = False" +
+                    //        "\n\t\tSelect 'ViewOfferedMission.Back' = False" +
+                    //        "\n\t" + nameof(ProcessingMissionDialog) + " => ", result));
 
-                    return result;
+                    //return result;
                 }
                 
                 if (screenType == ScreenType.List)
@@ -555,7 +562,7 @@ namespace EntityCore.Tools
                             }
                             else
                             {
-                                result = MissionPickUpResult.MissionRequiredRewardNotFound;
+                                result = MissionPickUpResult.MissionRequiredRewardMissing;
                                 if (debugInfoEnabled)
                                     ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
                                         "\n\t\tScreenType = ", screenType,

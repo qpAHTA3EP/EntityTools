@@ -141,6 +141,7 @@ namespace EntityTools.Quester.Actions
         [Description("Item that is requered in rewards to TurnInMission\n" +
                      "Simple wildcard (*) is allowed\n" +
                      "Mission Offer dialog have to be opened for choosen the ReqieredRewardItem")]
+        [Category("Optional")]
 #else
         [Browsable(false)]
 #endif
@@ -155,6 +156,24 @@ namespace EntityTools.Quester.Actions
             }
         }
         internal string _requiredRewardItem = string.Empty;
+#if DEVELOPER
+        [Description("The Id of the Action executing if the '" + nameof(RequiredRewardItem) + "' would be missing")]
+        [Category("Optional")]
+        [DisplayName("TargetActionOnRequiredRewardMissing")]
+#else
+        [Browsable(false)]
+#endif
+        public Guid TargetAction
+        {
+            get => _targetActionId;
+            set
+            {
+                if (_targetActionId == value) return;
+                _targetActionId = value;
+                NotifyPropertyChanged();
+            }
+        }
+        internal Guid _targetActionId = Guid.Empty;
 
 #if DEVELOPER
         [Description("Answers in dialog which have to be performed before mission picking up")]

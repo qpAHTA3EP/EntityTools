@@ -33,7 +33,7 @@
         /// <summary>
         /// Награда за целевую миссию не содержит обязательного предмета
         /// </summary>
-        MissionRequiredRewardNotFound,
+        MissionRequiredRewardMissing,
         /// <summary>
         /// Целвая миссия принята
         /// </summary>

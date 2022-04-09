@@ -374,12 +374,22 @@ namespace AcTp0Tools
 
                     public static readonly Action SendQuesterProfileInfos;
 
+                    public static bool ForceRefreshTasks
+                    {
+                        get => forceRefreshTasks.Value;
+                        set => forceRefreshTasks.Value = value;
+                    }
+                    private static readonly StaticPropertyAccessor<bool> forceRefreshTasks;
+
                     static BotServer()
                     {
                         var tBotServer = typeof(Astral.Controllers.BotComs.BotServer);
 
                         server = tBotServer.GetStaticProperty<Astral.Functions.TCP.Server.Server>(nameof(Astral.Controllers.BotComs.BotServer.Server));
+                        forceRefreshTasks = tBotServer.GetStaticProperty<bool>(nameof(ForceRefreshTasks));
+
                         SendQuesterProfileInfos = tBotServer.GetStaticAction(nameof(Astral.Controllers.BotComs.BotServer.SendQuesterProfileInfos));
+
                     }
                 }
             }

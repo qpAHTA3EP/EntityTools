@@ -352,14 +352,29 @@ namespace EntityCore.Quester.Action
                         return ActionResult.Skip;
                     }
                     break;
-                case MissionProcessingResult.MissionRequiredRewardNotFound:
+                case MissionProcessingResult.MissionRequiredRewardMissing:
                     ETLogger.WriteLine($"{currentMethodName}: Required mission reward not found...", true);
                     if (@this._closeContactDialog)
                     {
                         GameHelper.CloseAllFrames();
-                        Thread.Sleep(2000);
+                        Thread.Sleep(1000);
                     }
                     else QuesterAssistantAccessors.Classes.Monitoring.Frames.Sleep(2000);
+
+                    if (@this._targetActionId != Guid.Empty)
+                    {
+                        var targetAction = Astral.Quester.API.CurrentProfile.GetActionByID(@this._targetActionId);
+                        if (targetAction == null)
+                        {
+                            //ETLogger.WriteLine($"{currentMethodName}: {@this.GetPropertyDisplayName(o => o.TargetAction)}: {nameof(@this.TargetAction)} not found !", true);
+                            ETLogger.WriteLine($"{currentMethodName}: Action[{@this.TargetAction}] not found !", true);
+                            return ActionResult.Fail;
+                        }
+                        ETLogger.WriteLine($"Set action to '{targetAction}' {targetAction.ActionID}");
+                        Astral.Quester.API.CurrentProfile.MainActionPack.SetStartPoint(targetAction);
+                        
+                        AstralAccessors.Controllers.BotComs.BotServer.ForceRefreshTasks = true;
+                    }
                     return ActionResult.Skip;
                 case MissionProcessingResult.Error:
                     GameHelper.CloseAllFrames();
