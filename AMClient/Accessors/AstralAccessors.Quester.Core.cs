@@ -472,18 +472,21 @@ namespace AcTp0Tools
                             }
                             return;
                         }
-                        catch (ThreadAbortException)
+                        catch (ThreadAbortException ex)
                         {
+                            Logger.Notify(ex.ToString(), true);
+                            break;
                         }
-                        catch (IOException)
-                        {
-                            readTries--;
-                            Thread.Sleep(500);
-                        }
+                        //catch (IOException ex)
+                        //{
+                        //    Logger.Notify(ex.ToString(), true);
+                        //}
                         catch (Exception ex)
                         {
                             Logger.Notify(ex.ToString(), true);
                         }
+                        Thread.Sleep(500);
+                        readTries--;
                     }
                 }
                 private static bool PrefixSave(bool saveas = false)
