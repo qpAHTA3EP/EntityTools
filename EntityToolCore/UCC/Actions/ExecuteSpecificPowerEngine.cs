@@ -63,44 +63,41 @@ namespace EntityCore.UCC.Actions
 
         private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if(ReferenceEquals(sender, @this))
+            if (ReferenceEquals(sender, @this))
             {
-                if (ReferenceEquals(sender, @this))
+    #if false
+                switch (e.PropertyName)
                 {
-#if false
-                    switch (e.PropertyName)
-                    {
-                        case nameof(@this.EntityID):
-                            checkEntity = initialize_CheckEntity;
-                            label = string.Empty;
-                            break;
-                        case nameof(@this.EntityIdType):
-                            checkEntity = initialize_CheckEntity;
-                            break;
-                        case nameof(@this.EntityNameType):
-                            checkEntity = initialize_CheckEntity;
-                            break;
-                        case nameof(@this.PowerId):
-                            power = null;
-                            label = string.Empty;
-                            break;
-                        case nameof(@this.CheckInTray):
-                            label = string.Empty;
-                            break;
-                    } 
-#elif EntityTarget
-                    string prName = e.PropertyName;
-                    if (prName == nameof(@this.EntityID) || prName == nameof(@this.EntityIdType) || prName == nameof(@this.EntityNameType))
-                        _key = null;
-                    else if (prName == nameof(@this.PowerId) || prName == nameof(@this.CheckInTray))
-                    {
+                    case nameof(@this.EntityID):
+                        checkEntity = initialize_CheckEntity;
+                        label = string.Empty;
+                        break;
+                    case nameof(@this.EntityIdType):
+                        checkEntity = initialize_CheckEntity;
+                        break;
+                    case nameof(@this.EntityNameType):
+                        checkEntity = initialize_CheckEntity;
+                        break;
+                    case nameof(@this.PowerId):
                         power = null;
                         label = string.Empty;
-                    }
-#endif
-                    //entity = null;
+                        break;
+                    case nameof(@this.CheckInTray):
+                        label = string.Empty;
+                        break;
+                } 
+    #elif EntityTarget
+                string prName = e.PropertyName;
+                if (prName == nameof(@this.EntityID) || prName == nameof(@this.EntityIdType) || prName == nameof(@this.EntityNameType))
+                    _key = null;
+                else if (prName == nameof(@this.PowerId) || prName == nameof(@this.CheckInTray))
+                {
                     power = null;
+                    label = string.Empty;
                 }
+    #endif
+                //entity = null;
+                power = null;
             }
         }
 

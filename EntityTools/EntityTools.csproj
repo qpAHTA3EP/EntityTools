@@ -223,6 +223,8 @@
     <Compile Include="Editors\CustomRegionCollectionEditor.cs" />
     <Compile Include="Editors\PowerIdEditor.cs" />
     <Compile Include="Editors\MissionGiverInfoEditor.cs" />
+    <Compile Include="Editors\PositionEditor.cs" />
+    <Compile Include="Editors\ZRangeEditor.cs" />
     <Compile Include="Editors\TestEditors\TargetSelectorTestEditor.cs" />
     <Compile Include="Forms\CredentialManager2.cs">
       <SubType>Form</SubType>
@@ -289,6 +291,7 @@
     <Compile Include="Patches\Patch_AuraDetector.cs" />
     <Compile Include="Patches\Quester\ComplexPatch_Quester_UccEditing.cs" />
     <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Quester\Actions\ExecutePowerExt.cs" />
     <Compile Include="Quester\Actions\PromoteTeammate.cs" />
     <Compile Include="Quester\Actions\UpgradeItem.cs" />
     <Compile Include="Quester\Actions\MoveToTeammate.cs" />
@@ -385,6 +388,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Patches\Mapper\MapperSettings.cs" />
+    <Compile Include="Tools\Classes\Range.cs" />
     <Compile Include="Tools\Combats\IgnoredFoes\IgnoredFoesContainer.cs" />
     <Compile Include="Tools\Combats\IgnoredFoes\IgnoredFoesCore.cs" />
     <Compile Include="Tools\Combats\IgnoredFoes\IgnoredFoesEntry.cs" />
@@ -461,7 +465,6 @@
     <Compile Include="Tools\Targeting\Enums.cs" />
     <Compile Include="Tools\Targeting\TeammateSupport.cs" />
     <Compile Include="UCC\Actions\PluggedSkill.cs" />
-    <Compile Include="UCC\AstralAutogenerateProfile.cs" />
     <Compile Include="UCC\IUccConditionPack.cs" />
     <Compile Include="UCC\Enums.cs" />
     <Compile Include="UCC\Extensions\UCCActionExtention.cs" />

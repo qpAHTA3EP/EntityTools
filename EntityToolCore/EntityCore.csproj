@@ -202,6 +202,7 @@
       <DependentUpon>UIViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="IEntityInfos.cs" />
+    <Compile Include="Quester\Action\ExecutePowerEngine.cs" />
     <Compile Include="Quester\Action\MoveToTeammateEngine.cs" />
     <Compile Include="Quester\Action\MoveToEntityEngine.cs" />
     <Compile Include="Quester\Action\TurnInMissionEngine.cs" />

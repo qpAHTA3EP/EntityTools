@@ -124,6 +124,9 @@ namespace EntityCore
                     case MoveToTeammate m2t:
                         DictQuesterAction.Add(m2t, new MoveToTeammateEngine(m2t));
                         return true;
+                    case ExecutePowerExt exPow:
+                        DictQuesterAction.Add(exPow, new ExecutePowerEngine(exPow));
+                        return true;
                 }
             }
             catch (Exception e)
@@ -333,9 +336,9 @@ namespace EntityCore
             return false;
         }
 
-        public bool UserRequest_GetNodeLocation(ref Vector3 pos, string caption)
+        public bool UserRequest_GetNodeLocation(ref Vector3 pos, string caption, string message = "")
         {
-            while (TargetSelectForm.GUIRequest(caption) == DialogResult.OK)
+            while (TargetSelectForm.GUIRequest(caption, message) == DialogResult.OK)
             {
                 if (EntityManager.LocalPlayer.Player.InteractStatus.pMouseOverNode != IntPtr.Zero)
                 {
@@ -358,9 +361,32 @@ namespace EntityCore
             return false;
         }
 
+        public bool UserRequest_GetPosition(ref Vector3 pos, string caption, string message = "")
+        {
+            while (TargetSelectForm.GUIRequest(caption, message) == DialogResult.OK)
+            {
+                var loc = EntityManager.LocalPlayer.Location;
+                if (loc.IsValid)
+                {
+                    var node = AstralAccessors.Quester.Core.Meshes.ClosestNode(loc.X, loc.Y, loc.Z, out double dist, false);
+
+                    if (node is null
+                        || dist > 10)
+                    {
+                        pos = loc;
+                        return true;
+                    }
+
+                    pos = node.Position;
+                    return true; 
+                }
+            }
+            return false;
+        }
+
         public bool UserRequest_GetEntityToInteract(ref Entity entity)
         {
-            while (TargetSelectForm.GUIRequest("Target the NPC and press ok.") == DialogResult.OK)
+            while (TargetSelectForm.GUIRequest("Get NPC", "Target the NPC and press ok.") == DialogResult.OK)
             {
                 Entity betterEntityToInteract = Interact.GetBetterEntityToInteract();
                 if (betterEntityToInteract.IsValid)

@@ -90,7 +90,7 @@ namespace EntityTools.Core
             throw new NotImplementedException();
         }
 
-        public bool UserRequest_GetNodeLocation(ref Vector3 pos, string caption)
+        public bool UserRequest_GetNodeLocation(ref Vector3 pos, string caption, string message = "")
         {
             throw new NotImplementedException();
         }
@@ -106,6 +106,11 @@ namespace EntityTools.Core
         }
         
         public bool UserRequest_SelectUIGenId(ref string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UserRequest_GetPosition(ref Vector3 pos, string caption, string message = "")
         {
             throw new NotImplementedException();
         }

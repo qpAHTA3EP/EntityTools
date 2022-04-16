@@ -4,6 +4,7 @@ using System.IO;
 using Astral.Controllers;
 using AcTp0Tools.Reflection;
 using EntityTools.Quester.Actions;
+using EntityTools.Quester.Conditions;
 using EntityTools.Servises.SlideMonitor;
 using EntityTools.UCC.Actions;
 
@@ -175,7 +176,7 @@ namespace EntityTools.Settings
             /// Активация расширенной отладочной информации по <seealso cref="Quester.Actions.InteractEntities"/>
             /// </summary>
             [Bindable(true)]
-            [Description("Активация расширенной отладочной информации по команде InteractEntities")]
+            [Description("Активация расширенной отладочной информации по команде " + nameof(InteractEntities))]
             public bool DebugInteractEntities
             {
                 get => _debugInteractEntities;
@@ -194,7 +195,7 @@ namespace EntityTools.Settings
             /// Активация расширенной отладочной информации по <seealso cref="Quester.Actions.BuySellItemsExt"/>
             /// </summary>
             [Bindable(true)]
-            [Description("Активация расширенной отладочной информации по команде BuySellItemsExt")]
+            [Description("Активация расширенной отладочной информации по команде " + nameof(BuySellItemsExt))]
             public bool DebugBuySellItems
             {
                 get => _debugBuySellItem;
@@ -213,7 +214,7 @@ namespace EntityTools.Settings
             /// Активация расширенной отладочной информации по <seealso cref="Quester.Actions.PickUpMissionExt"/>
             /// </summary>
             [Bindable(true)]
-            [Description("Активация расширенной отладочной информации по команде PickUpMissionExt")]
+            [Description("Активация расширенной отладочной информации по команде " + nameof(PickUpMissionExt))]
             public bool DebugPickUpMissionExt
             {
                 get => _debugPickUpMissionExt;
@@ -232,7 +233,7 @@ namespace EntityTools.Settings
             /// Активация расширенной отладочной информации по <seealso cref="Quester.Actions.TurnInMissionExt"/>
             /// </summary>
             [Bindable(true)]
-            [Description("Активация расширенной отладочной информации по команде TurnInMissionExt")]
+            [Description("Активация расширенной отладочной информации по команде " + nameof(TurnInMissionExt))]
             public bool DebugTurnInMissionExt
             {
                 get => _debugTurnInMissionExt;
@@ -247,11 +248,30 @@ namespace EntityTools.Settings
             }
             private bool _debugTurnInMissionExt;
 
+            /// <summary>
+            /// Активация расширенной отладочной информации по <seealso cref="Quester.Actions.ExecutePowerExt"/>
+            /// </summary>
+            [Bindable(true)]
+            [Description("Активация расширенной отладочной информации по команде " + nameof(ExecutePowerExt))]
+            public bool DebugExecutePowerExt
+            {
+                get => _debugExecutePowerExt;
+                set
+                {
+                    if (_debugExecutePowerExt != value)
+                    {
+                        _debugExecutePowerExt = value;
+                        NotifyPropertyChanged();
+                    }
+                }
+            }
+            private bool _debugExecutePowerExt;
+
             public override string ToString()
             {
                 int total = 0;
                 int active = 0;
-                foreach(var field in this.GetType().GetFields(ReflectionHelper.DefaultFlags))
+                foreach(var field in GetType().GetFields(ReflectionHelper.DefaultFlags))
                 {
                     total++;
                     if (field.GetValue(this).Equals(true))
@@ -272,7 +292,7 @@ namespace EntityTools.Settings
             /// Активация расширенной отладочной информации по условию <seealso cref="Quester.Conditions.EntityCount"/>
             /// </summary>
             [Bindable(true)]
-            [Description("Активация расширенной отладочной информации по условию EntityCount")]
+            [Description("Активация расширенной отладочной информации по условию " + nameof(EntityCount))]
             public bool DebugEntityCount
             {
                 get => _debugEntityCount;

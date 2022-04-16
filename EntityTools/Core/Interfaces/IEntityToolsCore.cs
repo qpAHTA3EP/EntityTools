@@ -43,7 +43,10 @@ namespace EntityTools.Core.Interfaces
         bool UserRequest_EditUccConditions(ref UCCConditionList list, ref LogicRule logic, ref bool negation);
         
         bool UserRequest_EditCustomRegionList(ref List<string> crList);
-        bool UserRequest_GetNodeLocation(ref Vector3 pos, string caption);
+        bool UserRequest_GetNodeLocation(ref Vector3 pos, string caption, string message = "");
+
+        bool UserRequest_GetPosition(ref Vector3 pos, string caption, string message = "");
+
         bool UserRequest_GetEntityToInteract(ref Entity entity);
 
         bool UserRequest_GetUccAction(out UCCAction action);

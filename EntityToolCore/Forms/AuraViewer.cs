@@ -46,7 +46,7 @@ namespace EntityCore.Forms
                             entityCache = EntityManager.LocalPlayer;
                             break;
                         case SelectedAuraSource.Target:
-                            while (TargetSelectForm.GUIRequest("Target NPC and press ok.", this) == DialogResult.OK)
+                            while (TargetSelectForm.GUIRequest("Get NPC", "Target NPC and press ok.") == DialogResult.OK)
                             {
                                 Entity betterEntityToInteract = Interact.GetBetterEntityToInteract();
                                 if (betterEntityToInteract != null && betterEntityToInteract.IsValid)

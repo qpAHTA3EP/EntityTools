@@ -100,7 +100,7 @@ namespace EntityTools.Editors
                         return !string.IsNullOrEmpty(contactName);
                     case VendorType.Node:
                         Vector3 pos = new Vector3();
-                        if (EntityTools.Core.UserRequest_GetNodeLocation(ref pos, "Get vendor-Node location"))
+                        if (EntityTools.Core.UserRequest_GetNodeLocation(ref pos, "Get Vendor", "Get vendor-node location"))
                         {
                             vendorInfo = new VendorInfo
                             {

@@ -717,7 +717,7 @@ namespace EntityCore.Tools.Navigation
         /// <summary>
         /// Полная остановка навигации (перемещения)
         /// </summary>
-        private static void StopNavigationCompletly()
+        public static void StopNavigationCompletly()
         {
             // Остановка движка навигации "активной роли"
             var mainEngineNavigation = AstralAccessors.Controllers.Engine.MainEngine.Navigation;

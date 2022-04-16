@@ -496,18 +496,29 @@ namespace EntityTools
                 return false;
             }
 
-            public bool UserRequest_GetNodeLocation(ref Vector3 pos, string caption)
+            public bool UserRequest_GetNodeLocation(ref Vector3 pos, string caption, string message = "")
             {
                 if (InternalInitialize())
-                    return Core.UserRequest_GetNodeLocation(ref pos, caption);
+                    return Core.UserRequest_GetNodeLocation(ref pos, caption, message);
 
-                XtraMessageBox.Show("EntityToolsCore is invalid!\n\rNodeLocation request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                XtraMessageBox.Show("EntityToolsCore is invalid!\nNodeLocation request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                 ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! Node Location request denied.", true);
 
                 return false;
             }
 
+            public bool UserRequest_GetPosition(ref Vector3 pos, string caption, string message = "")
+            {
+                if (InternalInitialize())
+                    return Core.UserRequest_GetPosition(ref pos, caption, message);
+
+                XtraMessageBox.Show("EntityToolsCore is invalid!\nPosition request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                ETLogger.WriteLine(LogType.Error, "EntityToolsCore is invalid! Position request denied.", true);
+
+                return false;
+            }
             public bool UserRequest_GetEntityToInteract(ref Entity entity)
             {
                 if (InternalInitialize())

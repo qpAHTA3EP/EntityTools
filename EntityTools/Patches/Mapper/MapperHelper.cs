@@ -236,6 +236,41 @@ namespace EntityTools.Patches.Mapper
             return dx * dx + dy * dy;
         }
         /// <summary>
+        /// Квадрат расстояния между точками в плоскости Oxy
+        /// </summary>
+        public static double SquareDistance2D(Vector2 p1, Vector2 p2)
+        {
+
+            double dx = p2.X - p1.X;
+            double dy = p2.Y - p1.Y;
+
+            return dx * dx + dy * dy;
+        }
+        /// <summary>
+        /// Квадрат расстояния между точками в 3D
+        /// </summary>
+        public static double SquareDistance3D(double x1, double y1, double z1, double x2, double y2, double z2)
+        {
+
+            double dx = x2 - x1;
+            double dy = z2 - y1;
+            double dz = z2 - z1;
+
+            return dx * dx + dy * dy + dz * dz;
+        }
+        /// <summary>
+        /// Квадрат расстояния между точками в 3D
+        /// </summary>
+        public static double SquareDistance3D(Vector3 p1, Vector3 p2)
+        {
+
+            double dx = p2.X - p1.X;
+            double dy = p2.Y - p1.Y;
+            double dz = p2.Z - p1.Z;
+
+            return dx * dx + dy * dy + dz * dz;
+        }
+        /// <summary>
         /// Расстояние между проекциями точек <paramref name="p1"/> и <paramref name="p2"/> на плоскость Оху
         /// </summary>
         public static double Distance2D(Point3D p1, Point3D p2)
