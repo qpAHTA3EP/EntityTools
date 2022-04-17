@@ -336,7 +336,7 @@ namespace EntityTools
                 if (InternalInitialize())
                     return Core.Initialize(obj);
                 ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing '{obj.GetType().Name}'. Stop bot");
-                StopBot();
+                //StopBot();
                 return false;
             }
 
@@ -345,7 +345,7 @@ namespace EntityTools
                 if (InternalInitialize())
                     return Core.Initialize(action);
                 ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing in quester action '{action.GetType().Name}'[{action.ActionID}]. Stop bot", true);
-                StopBot();
+                //StopBot();
                 return false;
             }
 
@@ -354,7 +354,7 @@ namespace EntityTools
                 if (InternalInitialize())
                     return Core.Initialize(condition);
                 ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing in quester condition '{condition.GetType().Name}'[{condition.GetHashCode():X2}]. Stop bot", true);
-                StopBot();
+                //StopBot();
                 return false;
             }
 
@@ -363,7 +363,7 @@ namespace EntityTools
                 if (InternalInitialize())
                     return Core.Initialize(action);
                 ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing in ucc action '{action.GetType().Name}'[{action.GetHashCode():X2}]. Stop bot", true);
-                StopBot();
+                //StopBot();
                 return false;
             }
 
@@ -372,7 +372,7 @@ namespace EntityTools
                 if (InternalInitialize())
                     return Core.Initialize(condition);
                 ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing in ucc condition '{condition.GetType().Name}'[{condition.GetHashCode():X2}]. Stop bot", true);
-                StopBot();
+                //StopBot();
                 return false;
             }
 #if DEVELOPER

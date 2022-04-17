@@ -348,6 +348,25 @@ namespace EntityTools.Settings
             private bool _debugChangeTarget;
 
             /// <summary>
+            /// Активация расширенной отладочной информации по команде <seealso cref="UCC.Actions.ExecuteSpecificPower"/> 
+            /// </summary>
+            [Description("Активация расширенной отладочной информации по команде " + nameof(ExecuteSpecificPower))]
+            [Bindable(true)]
+            public bool DebugExecuteSpecificPower
+            {
+                get => _debugExecuteSpecificPower;
+                set
+                {
+                    if (_debugExecuteSpecificPower != value)
+                    {
+                        _debugExecuteSpecificPower = value;
+                        NotifyPropertyChanged();
+                    }
+                }
+            }
+            private bool _debugExecuteSpecificPower;
+
+            /// <summary>
             /// Активация расширенной отладочной информации по команде <seealso cref="UCC.Actions.PluggedSkill"/> 
             /// </summary>
             [Description("Активация расширенной отладочной информации по команде " + nameof(PluggedSkill))]

@@ -1,20 +1,20 @@
-﻿#define ExecutePowerSmargDebug
-
-using AcTp0Tools;
+﻿using System.Linq;
 using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
+using EntityCore.Tools.Powers;
 using EntityTools;
 using EntityTools.Core.Interfaces;
-using EntityTools.Enums;
 using EntityTools.UCC.Actions;
+using EntityTools.Enums;
+using PowerHelper = EntityCore.Tools.Powers.PowerHelper;
+using PowerResult = EntityCore.Tools.Powers.PowerResult;
 using EntityTools.UCC.Conditions;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
 using System;
 using System.ComponentModel;
-using System.Linq;
-using System.Threading;
+using System.Reflection;
 
 namespace EntityCore.UCC.Actions
 {
@@ -139,24 +139,45 @@ namespace EntityCore.UCC.Actions
         public bool Run()
         {
             bool extendedDebugInfo = ExtendedDebugInfo;
-            if(extendedDebugInfo)
-                ETLogger.WriteLine(LogType.Debug, $"{_idStr}:Run() starts");
+
+            string actionIdStr = extendedDebugInfo
+                ? $"{_idStr}.{MethodBase.GetCurrentMethod()?.Name ?? nameof(Run)}"
+                : string.Empty;
+
+            if (extendedDebugInfo)
+                ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: starts");
 
             var currentPower = GetCurrentPower();
 
             if (currentPower is null)
             {
                 if (extendedDebugInfo)
-                    ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Fail to get Artifact's power");
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Fail to get Artifact's power");
 
                 return false;
             }
+
+            var targetEntity = UnitRef;
+            if (targetEntity is null || !targetEntity.IsValid || targetEntity.IsDead)
+                return true;
+
+#if true
+            var powResult = currentPower.ExecutePower(targetEntity, 0, @this.Range, false, extendedDebugInfo);
+
+            switch (powResult)
+            {
+                case PowerResult.Succeed:
+                    if (extendedDebugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Result => {powResult}");
+                    return true;
+                default:
+                    if (extendedDebugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Result => {powResult}");
+                    return false;
+            }
+#else
             var entActivatedPower = currentPower.EntGetActivatedPower();
             var powerDef = entActivatedPower.EntGetActivatedPower().EffectivePowerDef();
-
-            var target = UnitRef;
-            if (target is null || !target.IsValid || target.IsDead)
-                return true;
 
             var player = EntityManager.LocalPlayer;
 
@@ -201,7 +222,6 @@ namespace EntityCore.UCC.Actions
                 Thread.Sleep(100);
             }
 
-            double effectiveTimeActivate = Powers.getEffectiveTimeActivate(powerDef) * 1.5;
             Astral.Classes.Timeout castingTimeout = new Astral.Classes.Timeout(castingTime);
 
             try
@@ -211,7 +231,7 @@ namespace EntityCore.UCC.Actions
                     target.Location.Face();
 
                     if (extendedDebugInfo)
-                        ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Activate ExecPower '{currentPower.PowerDef.InternalName}' on target {target.Name}[{target.InternalName}]");
+                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Activate ExecPower '{currentPower.PowerDef.InternalName}' on target {target.Name}[{target.InternalName}]");
 
                     Powers.ExecPower(currentPower, target, true);
                 }
@@ -221,12 +241,12 @@ namespace EntityCore.UCC.Actions
                     location.Z += 3f;
                     location.Face();
                     if (extendedDebugInfo)
-                        ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Activate ExecPower '{currentPower.PowerDef.InternalName}' on location <{location.X:0,4:N2}, {location.Y:0,4:N2}, {location.Z:0,4:N2}>");
+                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Activate ExecPower '{currentPower.PowerDef.InternalName}' on location <{location.X:0,4:N2}, {location.Y:0,4:N2}, {location.Z:0,4:N2}>");
 
                     Powers.ExecPower(currentPower, location, true);
                 }
                 if (extendedDebugInfo)
-                    ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Wait casting time ({castingTime} ms)");
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Wait casting time ({castingTime} ms)");
 
                 while (!castingTimeout.IsTimedOut && !Astral.Controllers.AOECheck.PlayerIsInAOE)
                 {
@@ -244,12 +264,12 @@ namespace EntityCore.UCC.Actions
             catch (Exception e)
             {
                 if (extendedDebugInfo)
-                    ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Catch an exception trying activate power '{currentPower.PowerDef.InternalName}'\n{e.Message}");
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Catch an exception trying activate power '{currentPower.PowerDef.InternalName}'\n{e.Message}");
             }
             finally
             {
                 if (extendedDebugInfo)
-                    ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Deactivate ExecPower '{currentPower.PowerDef.InternalName}' on target {target.Name}[{target.InternalName}]");
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Deactivate ExecPower '{currentPower.PowerDef.InternalName}' on target {target.Name}[{target.InternalName}]");
                 try
                 {
                     Powers.ExecPower(currentPower, target, false);
@@ -257,14 +277,16 @@ namespace EntityCore.UCC.Actions
                 catch (Exception e)
                 {
                     if (extendedDebugInfo)
-                        ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Catch an exception trying deactivate power '{currentPower.PowerDef.InternalName}'\n{e.Message}");
+                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Catch an exception trying deactivate power '{currentPower.PowerDef.InternalName}'\n{e.Message}");
                 }
             }
             //if (!@this._forceMaintain)
             {
+                double effectiveTimeActivate = Powers.getEffectiveTimeActivate(powerDef) * 1.5;
                 Powers.WaitPowerActivation(currentPower, (int)effectiveTimeActivate);
             }
-            return true;
+            return true; 
+#endif
         }
 
         /// <summary>

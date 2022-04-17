@@ -1,9 +1,4 @@
-﻿#if DEBUG
-#define DEBUG_ExecuteSpecificPower
-#endif
-#define REFLECTION_ACCESS
-
-using Astral.Logic.UCC.Classes;
+﻿using Astral.Logic.UCC.Classes;
 using Astral.Quester.UIEditors;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
@@ -44,64 +39,6 @@ namespace EntityTools.UCC.Actions
             }
         }
         internal PluggedSkillSource _source = PluggedSkillSource.Mount;
-
-        //#if DEVELOPER
-        //        [Category("Optional")]
-        //#else
-        //        [Browsable(false)]
-        //#endif
-        //        public bool CheckPowerCooldown
-        //        {
-        //            get => _checkPowerCooldown;
-        //            set
-        //            {
-        //                if (_checkPowerCooldown != value)
-        //                {
-        //                    _checkPowerCooldown = value;
-        //                    NotifyPropertyChanged();
-        //                }
-        //            }
-        //        }
-        //        internal bool _checkPowerCooldown;
-
-        //#if DEVELOPER
-        //        [Category("Optional")]
-        //#else
-        //        [Browsable(false)]
-        //#endif
-        //        public bool CheckInTray
-        //        {
-        //            get => _checkInTray;
-        //            set
-        //            {
-        //                if (_checkInTray != value)
-        //                {
-        //                    _checkInTray = value;
-        //                    NotifyPropertyChanged();
-        //                }
-        //            }
-        //        }
-        //        internal bool _checkInTray;
-
-        //#if DEVELOPER
-        //        [Category("Optional")]
-        //        [DisplayName("CastingTime (ms)")]
-        //#else
-        //        [Browsable(false)]
-        //#endif
-        //        public int CastingTime
-        //        {
-        //            get => _castingTime;
-        //            set
-        //            {
-        //                if (_castingTime != value)
-        //                {
-        //                    _castingTime = value;
-        //                    NotifyPropertyChanged();
-        //                }
-        //            }
-        //        }
-        //        internal int _castingTime;
 
 #if DEVELOPER
         [Category("Optional")]

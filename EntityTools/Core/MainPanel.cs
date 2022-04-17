@@ -741,7 +741,7 @@ namespace EntityTools.Core
 
         private void handler_OpenCredentialManager(object sender, EventArgs e)
         {
-            var form = new CredentialManager();
+            var form = new CredentialManager2();
             form.Show();
         }
 

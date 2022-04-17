@@ -1,21 +1,20 @@
-﻿#define DEBUG_POWER
-
-using AcTp0Tools;
+﻿using AcTp0Tools;
 using Astral.Logic.Classes.Map;
 using Astral.Logic.NW;
 using EntityCore.Forms;
+using EntityCore.Tools.Powers;
+using EntityCore.Tools.Navigation;
 using EntityTools;
 using EntityTools.Core.Interfaces;
 using EntityTools.Patches.Mapper;
 using EntityTools.Quester.Actions;
-using EntityCore.Tools.Navigation;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Threading;
+using System.Reflection;
 using System.Windows.Forms;
 using static Astral.Quester.Classes.Action;
 
@@ -117,128 +116,65 @@ namespace EntityCore.Quester.Action
         public ActionResult Run()
         {
             bool debugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugExecutePowerExt;
+            string currentMethodName = debugInfo ? string.Concat(actionIDstr, '.', MethodBase.GetCurrentMethod()?.Name ?? nameof(Run)) : string.Empty;
 
-#if DEBUG_POWER
-            if(debugInfo)
-                ETLogger.WriteLine(LogType.Debug, $"{actionIDstr}::Run() starts");
-#endif
+            if (debugInfo)
+                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: starts");
             NavigationHelper.StopNavigationCompletly();
 
             var currentPower = GetCurrentPower();
 
             if (currentPower is null)
             {
-#if DEBUG_POWER
                 if (debugInfo)
-                    ETLogger.WriteLine(LogType.Debug, $"{actionIDstr}: Fail to get Power '{@this.PowerId}' by 'PowerId'");
-#endif
+                    ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Fail to get Power '{@this.PowerId}' by '" + nameof(@this.PowerId) + "'");
                 return ActionResult.Fail;
             }
-            var entActivatedPower = currentPower.EntGetActivatedPower();
-            var powerDef = entActivatedPower.EntGetActivatedPower().EffectivePowerDef();
 
-            var tarPos = @this.TargetPosition;
-            if (tarPos.IsInYawFace)
+            if (debugInfo)
+                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Activating Power '{@this.PowerId}'");
+
+            var powResult = currentPower.ExecutePower(@this.TargetPosition, @this.CastingTime, @this.Pause, 0, false, debugInfo);
+
+            switch (powResult)
             {
-                tarPos.Face();
-                var timeout = new Astral.Classes.Timeout(750);
-                while (!tarPos.IsInYawFace && !timeout.IsTimedOut)
-                {
-                    Thread.Sleep(20);
-                }
-                Thread.Sleep(100);
-            }
-
-            int castingTime = Math.Max(Powers.getEffectiveTimeCharge(powerDef), 500);
-            var castingTimeout = new Astral.Classes.Timeout(castingTime);
-
-            bool powerActivated = false;
-            try
-            {
-                tarPos.Face();
-#if DEBUG_POWER
-                if (debugInfo)
-                    ETLogger.WriteLine(LogType.Debug, $"{actionIDstr}: Activating ExecPower '{currentPower.PowerDef.InternalName}' on target <{tarPos.X:N2}, {tarPos.Y:N2}, {tarPos.Z:N2}>");
-#endif
-                Powers.ExecPower(currentPower, tarPos, true);
-                powerActivated = true;
-#if DEBUG_POWER
-                if (debugInfo)
-                    ETLogger.WriteLine(LogType.Debug, $"{actionIDstr}: Waiting casting time ({castingTime} ms)");
-#endif
-                while (!castingTimeout.IsTimedOut && !Astral.Controllers.AOECheck.PlayerIsInAOE)
-                {
-                    if (currentPower.UseCharges() && !currentPower.ChargeAvailable() || currentPower.IsActive)
-                    {
-                        break;
-                    }
-                    Thread.Sleep(20);
-                }
-#if DEBUG_POWER
-                if (debugInfo)
-                    ETLogger.WriteLine(LogType.Debug, $"{actionIDstr}: Pause after power activation");
-#endif
-                var pause = Math.Max(@this.Pause, 500);
-                Thread.Sleep(pause);
-
-                // Проверяем необходимость и возможность повторения команды
-                var rad = @this.TargetRadius;
-                if (rad > 0)
-                {
-                    rad = Math.Max(rad, 5);
-                    rad *= rad;
-                    var pos = EntityManager.LocalPlayer.Location.Clone();
-                    var dist2 = MapperHelper.SquareDistance3D(pos, @this.TargetPosition);
-                    if (dist2 > rad)
-                    {
-                        bool intCheck = internalCheck();
-                        var actRes = intCheck
-                            ? ActionResult.Running
-                            : ActionResult.Fail;
-#if DEBUG_POWER
-                        if (debugInfo)
-                            ETLogger.WriteLine(LogType.Debug, $"{actionIDstr}: Current player position: <{pos.X:N2}, {pos.Y:N2}, {pos.Z:N2}>. Distance to {nameof(@this.TargetPosition)} is {Math.Sqrt(dist2)}.\n" +
-                                                              $"InternalConditions '{intCheck}' => {actRes}");
-#endif
-                        // Расстояние от персонажа до TargetPosition больше TargetRadius,
-                        // поэтому выполнение команды нужно повторить
-                        return actRes;
-                    }
-#if DEBUG_POWER
+                case PowerResult.Fail:
                     if (debugInfo)
-                        ETLogger.WriteLine(LogType.Debug, $"{actionIDstr}: Current player position: <{pos.X:N2}, {pos.Y:N2}, {pos.Z:N2}>. Distance to {nameof(@this.TargetPosition)} is {Math.Sqrt(dist2)} => {ActionResult.Completed}");
-#endif
-                }
-            }
-#if DEBUG_POWER
-            catch (Exception e)
-            {
-                if (debugInfo)
-                    ETLogger.WriteLine(LogType.Error, $"{actionIDstr}: Catch an exception trying activate power '{currentPower.PowerDef.InternalName}' \n{e.Message}\n{e.StackTrace}");
-                return ActionResult.Fail;
-            }
-#endif
-            finally
-            {
-                if (powerActivated)
-                {
-#if DEBUG_POWER
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: ActionResult => {ActionResult.Fail}");
+                    return ActionResult.Fail;
+                case PowerResult.Skip:
                     if (debugInfo)
-                        ETLogger.WriteLine(LogType.Debug, $"{actionIDstr}: Deactivating ExecPower '{currentPower.PowerDef.InternalName}'");
-#endif
-                    try
-                    {
-                        Powers.ExecPower(currentPower, tarPos, false);
-                    }
-                    catch (Exception e)
-                    {
-#if DEBUG_POWER
-                        if (debugInfo)
-                            ETLogger.WriteLine(LogType.Debug, $"{actionIDstr}: Catch an exception trying deactivate power '{currentPower.PowerDef.InternalName}'\n{e.Message}\n{e.StackTrace}");
-#endif
-                    } 
-                }
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: ActionResult => {ActionResult.Skip}");
+                    return ActionResult.Skip;
             }
+
+            // Проверяем необходимость и возможность повторения команды
+            var rad = @this.TargetRadius;
+            if (rad > 0)
+            {
+                rad = Math.Max(rad, 5);
+                rad *= rad;
+                var pos = EntityManager.LocalPlayer.Location.Clone();
+                var dist2 = MapperHelper.SquareDistance3D(pos, @this.TargetPosition);
+                if (dist2 > rad)
+                {
+                    bool intCheck = internalCheck();
+                    var actRes = intCheck
+                        ? ActionResult.Running
+                        : ActionResult.Fail;
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Current player position: <{pos.X:N2}, {pos.Y:N2}, {pos.Z:N2}>. Distance to {nameof(@this.TargetPosition)} is {Math.Sqrt(dist2)}.\n" +
+                                                          $"InternalConditions '{intCheck}' => {actRes}");
+                    // Расстояние от персонажа до TargetPosition больше TargetRadius,
+                    // поэтому выполнение команды нужно повторить
+                    return actRes;
+                }
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Current player position: <{pos.X:N2}, {pos.Y:N2}, {pos.Z:N2}>. Distance to {nameof(@this.TargetPosition)} is {Math.Sqrt(dist2)} => {ActionResult.Completed}");
+            }
+            else if (debugInfo)
+                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: ActionResult => {ActionResult.Completed}");
+            
             return ActionResult.Completed;
         }
 

@@ -224,6 +224,8 @@
     <Compile Include="Quester\Action\PickUpMissionEngine.cs" />
     <Compile Include="Quester\Conditions\EntityPropertyEngine.cs" />
     <Compile Include="Quester\Conditions\EntityCountEngine.cs" />
+    <Compile Include="Tools\Powers\PowerCache.cs" />
+    <Compile Include="Tools\Powers\PowerHelper.cs" />
     <Compile Include="Tools\Enums.cs" />
     <Compile Include="Tools\GameHelper.cs" />
     <Compile Include="Tools\MissionHelper.cs" />
@@ -393,8 +395,12 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>type $(TargetFileName)&gt;"EntityTools.dll:Core"</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>"$(DevEnvDir)TextTransform.exe" -out "$(ProjectDir)Engine.tt.cs" "$(ProjectDir)Engine.tt"</PreBuildEvent>
   </PropertyGroup>
 </Project>

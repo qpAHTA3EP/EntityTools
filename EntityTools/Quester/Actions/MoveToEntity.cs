@@ -38,7 +38,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal string _entityId = string.Empty;
+        private string _entityId = string.Empty;
 
 #if DEVELOPER
         [Description("Type of and EntityID:\n" +
@@ -60,7 +60,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
+        private ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
 
 #if DEVELOPER
         [Description("The switcher of the Entity filed which compared to the property EntityID")]
@@ -80,7 +80,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal EntityNameType _entityNameType = EntityNameType.InternalName;
+        private EntityNameType _entityNameType = EntityNameType.InternalName;
 
 #if DEVELOPER
         [Description("Check Entity's Ingame Region (Not CustomRegion):\n" +
@@ -101,7 +101,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal bool _regionCheck;
+        private bool _regionCheck;
 
 #if DEVELOPER
         [Description("Check if Entity's health greater than zero:\n" +
@@ -122,7 +122,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal bool _healthCheck = true;
+        private bool _healthCheck = true;
 
 #if DEVELOPER
         [Description("True: Do not change the target Entity while it is alive or until the Bot within '"+nameof(Distance)+"' of it\n" +
@@ -142,7 +142,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal bool _holdTargetEntity = true;
+        private bool _holdTargetEntity = true;
 
 #if DEVELOPER
         [Description("The maximum distance from the character within which the Entity is searched\n" +
@@ -162,7 +162,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal float _reactionRange;
+        private float _reactionRange;
 
 #if DEVELOPER
         [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
@@ -182,7 +182,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal float _reactionZRange;
+        private float _reactionZRange;
 
 #if DEVELOPER
         [Description("CustomRegion names collection")]
@@ -206,7 +206,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal CustomRegionCollection _customRegionNames = new CustomRegionCollection();
+        private CustomRegionCollection _customRegionNames = new CustomRegionCollection();
 
 
 #if DEVELOPER
@@ -229,7 +229,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal float _distance = 30;
+        private float _distance = 30;
 
 #if DEVELOPER
         [Description("Enable '"+nameof(IgnoreCombat)+"' profile value while playing action")]
@@ -248,7 +248,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal bool _ignoreCombat = true;
+        private bool _ignoreCombat = true;
 
 #if DEVELOPER
         [Description("The battle is aborted outside '"+nameof(AbortCombatDistance) +"' radius from the target entity.\n" +
@@ -269,7 +269,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal uint _abortCombatDistance;
+        private uint _abortCombatDistance;
 
 #if DEVELOPER
         [Description("True: Complete an action when the Entity is closer than 'Distance'\n" +
@@ -289,29 +289,52 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal bool _stopOnApproached;
+        private bool _stopOnApproached;
 
-#if false
+        #region Опции команды
 #if DEVELOPER
-        [Description("True: Complete an action when the Entity is closer than 'Distance'\n" +
-                     "False: Follow an Entity regardless of its distance")]
-        [Category("Interruptions")]
+        [Description("The Id of the skill applied on the target Entity")]
+        [Editor(typeof(PowerIdEditor), typeof(UITypeEditor))]
+        [Category("First strike")]
 #else
         [Browsable(false)]
 #endif
-        public bool StopOnEntityAbsent
+        public string PowerId
         {
-            get => _stopOnEntityAbsent; set
+            get => _powerId;
+            set
             {
-                if (_stopOnEntityAbsent != value)
+                if (_powerId != value)
                 {
-                    _stopOnEntityAbsent = value;
+                    _powerId = value;
                     NotifyPropertyChanged();
                 }
             }
         }
-        internal bool _stopOnEntityAbsent; 
+        private string _powerId = string.Empty;
+
+#if DEVELOPER
+        [Description("The time needed to activate the skill '" + nameof(PowerId) + "'")]
+        [Category("First strike")]
+        [DisplayName("CastingTime (ms)")]
+#else
+        [Browsable(false)]
 #endif
+        public int CastingTime
+        {
+            get => _castingTime;
+            set
+            {
+                if (_castingTime != value)
+                {
+                    _castingTime = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private int _castingTime;
+
+
 
 #if DEVELOPER
         [Description("True: Clear the list of attackers and attack the target Entity when it is approached\n" +
@@ -331,7 +354,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal bool _attackTargetEntity = true;
+        private bool _attackTargetEntity = true;
 
         //TODO Добавить опции IgnoreCombatMinHP, EntitySearchTime
 
@@ -351,7 +374,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal bool _resetCurrentHotSpot = false;
+        private bool _resetCurrentHotSpot;
 
 #if DEVELOPER
         [XmlIgnore]
@@ -366,6 +389,7 @@ namespace EntityTools.Quester.Actions
         public string TargetInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>"; 
 #endif
 #endif
+#endregion
 
         [XmlIgnore]
         [Browsable(false)]

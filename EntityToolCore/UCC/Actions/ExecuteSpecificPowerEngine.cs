@@ -1,27 +1,16 @@
-﻿#if DEBUG
-#define DEBUG_ExecuteSpecificPower
-#endif
-
-#define SMART_REFLECTION_ACCESS
-
-using AcTp0Tools;
-using Astral.Logic.NW;
+﻿using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
-using EntityCore.Entities;
+using EntityCore.Tools.Powers;
 using EntityTools;
 using EntityTools.Core.Interfaces;
-using EntityTools.Enums;
 using EntityTools.UCC.Actions;
+using EntityTools.UCC.Conditions;
 using MyNW.Classes;
 using MyNW.Internals;
-using MyNW.Patchables.Enums;
 using System;
 using System.ComponentModel;
-using System.Threading;
+using System.Reflection;
 using System.Xml.Serialization;
-using Astral.Classes;
-using EntityTools.UCC.Conditions;
-using Timeout = Astral.Classes.Timeout;
 using Unit = Astral.Logic.UCC.Ressources.Enums.Unit;
 
 namespace EntityCore.UCC.Actions
@@ -61,11 +50,11 @@ namespace EntityCore.UCC.Actions
             }
         }
 
-        private void PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (ReferenceEquals(sender, @this))
             {
-    #if false
+#if false
                 switch (e.PropertyName)
                 {
                     case nameof(@this.EntityID):
@@ -86,7 +75,7 @@ namespace EntityCore.UCC.Actions
                         label = string.Empty;
                         break;
                 } 
-    #elif EntityTarget
+#elif EntityTarget
                 string prName = e.PropertyName;
                 if (prName == nameof(@this.EntityID) || prName == nameof(@this.EntityIdType) || prName == nameof(@this.EntityNameType))
                     _key = null;
@@ -95,7 +84,7 @@ namespace EntityCore.UCC.Actions
                     power = null;
                     label = string.Empty;
                 }
-    #endif
+#endif
                 //entity = null;
                 power = null;
             }
@@ -118,7 +107,8 @@ namespace EntityCore.UCC.Actions
                 return false;
             }
 
-            string debugStr = string.Concat("Rebase failed. ", action.GetType().Name, '[', action.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(ExecuteSpecificPower) + '\'');
+            string debugStr =
+                $"Rebase failed. {action.GetType().Name}[{action.GetHashCode():X2}] can't be cast to '{nameof(ExecuteSpecificPower)}'";
             ETLogger.WriteLine(LogType.Error, debugStr);
             throw new InvalidCastException(debugStr);
         }
@@ -166,39 +156,48 @@ namespace EntityCore.UCC.Actions
 
         public bool Run()
         {
-#if DEBUG_ExecuteSpecificPower
-            ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower::Run() starts");
-#endif
+            bool debugInfo = EntityTools.EntityTools.Config.Logger.UccActions.DebugExecuteSpecificPower;
+
+            string actionIdStr = debugInfo
+                    ? $"{_idStr}.{MethodBase.GetCurrentMethod()?.Name ?? nameof(Run)}"
+                    : string.Empty;
+
+            if(debugInfo)
+                ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: starts");
+
             var currentPower = GetCurrentPower();
 
             if (currentPower is null)
             {
-#if DEBUG_ExecuteSpecificPower
-                ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Fail to get Power '{@this._powerId}' by 'PowerId'");
-#endif
+                if(debugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Fail to get Power '{@this._powerId}' by 'PowerId'");
+
                 return false;
             }
+
+            var targetEntity = UnitRef;
+
+#if true
+            var powResult = currentPower.ExecutePower(targetEntity, @this.CastingTime, @this.Range, @this.ForceMaintain, debugInfo);
+
+            switch (powResult)
+            {
+                case PowerResult.Succeed:
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Result => {powResult}");
+                    return true;
+                default:
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Result => {powResult}");
+                    return false;
+            }
+#else
             var entActivatedPower = currentPower.EntGetActivatedPower();
             var powerDef = entActivatedPower.EntGetActivatedPower().EffectivePowerDef();
+
             // Устанавливаем цель для перемещения персонажа к ней
             if (@this.Target != Unit.Player)
             {
-                switch (@this.Target)
-                {
-                    case Unit.MostInjuredAlly:
-                        AstralAccessors.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.MostInjuredAlly;
-                        break;
-                    case Unit.StrongestAdd:
-                        AstralAccessors.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.AnAdd;
-                        break;
-                    case Unit.StrongestTeamMember:
-                        AstralAccessors.Logic.UCC.Controllers.Movements.SpecificTarget = ActionsPlayer.StrongestTeamMember;
-                        break;
-                    default:
-                        AstralAccessors.Logic.UCC.Controllers.Movements.SpecificTarget = null;//ActionsPlayer.StrongestTeamMember;
-                        break;
-                }
-
                 // Вычисляем эффективный радиус действия команды
                 int effectiveRange = Powers.getEffectiveRange(powerDef);
 
@@ -230,17 +229,16 @@ namespace EntityCore.UCC.Actions
                     }
                 }
             }
-            
-            int castingTime = @this.CastingTime > 0 
-                ? @this.CastingTime 
+
+            int castingTime = @this.CastingTime > 0
+                ? @this.CastingTime
                 : Powers.getEffectiveTimeCharge(powerDef);
 
-            Entity target = new Entity(UnitRef.Pointer);
-            if (target.ContainerId != EntityManager.LocalPlayer.ContainerId && !target.Location.IsInYawFace)
+            if (targetEntity.ContainerId != EntityManager.LocalPlayer.ContainerId && !targetEntity.Location.IsInYawFace)
             {
-                target.Location.Face();
+                targetEntity.Location.Face();
                 var timeout = new Timeout(750);
-                while (!target.Location.IsInYawFace && !timeout.IsTimedOut)
+                while (!targetEntity.Location.IsInYawFace && !timeout.IsTimedOut)
                 {
                     Thread.Sleep(20);
                 }
@@ -254,25 +252,23 @@ namespace EntityCore.UCC.Actions
             {
                 if (!powerDef.GroundTargeted && !powerDef.Categories.Contains(PowerCategory.Ignorepitch))
                 {
-                    target.Location.Face();
-#if DEBUG_ExecuteSpecificPower
-                    ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Activate ExecPower '{currentPower.PowerDef.InternalName}' on target {target.Name}[{target.InternalName}]");
-#endif
-                    Powers.ExecPower(currentPower, target, true);
+                    targetEntity.Location.Face();
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Activate ExecPower '{currentPower.PowerDef.InternalName}' on target {targetEntity.Name}[{targetEntity.InternalName}]");
+                    Powers.ExecPower(currentPower, targetEntity, true);
                 }
                 else
                 {
-                    Vector3 location = target.Location;
+                    Vector3 location = targetEntity.Location;
                     location.Z += 3f;
                     location.Face();
-#if DEBUG_ExecuteSpecificPower
-                    ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Activate ExecPower '{currentPower.PowerDef.InternalName}' on location <{location.X.ToString("0,4:N2")}, {location.Y.ToString("0,4:N2")}, {location.Z.ToString("0,4:N2")}>");
-#endif
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Activate ExecPower '{currentPower.PowerDef.InternalName}' on location <{location.X.ToString("0,4:N2")}, {location.Y.ToString("0,4:N2")}, {location.Z.ToString("0,4:N2")}>");
+
                     Powers.ExecPower(currentPower, location, true);
                 }
-#if DEBUG_ExecuteSpecificPower
-                ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Wait casting time ({castingTime} ms)");
-#endif
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Wait casting time ({castingTime} ms)");
                 while (!castingTimeout.IsTimedOut && !Astral.Controllers.AOECheck.PlayerIsInAOE)
                 {
                     if (Astral.Logic.UCC.Core.CurrentTarget.IsDead)
@@ -286,33 +282,32 @@ namespace EntityCore.UCC.Actions
                     Thread.Sleep(20);
                 }
             }
-#if DEBUG_ExecuteSpecificPower
             catch (Exception e)
             {
-                ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Catch an exception trying activate power '{currentPower.PowerDef.InternalName}' \n\r{e.Message}");
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Catch an exception trying activate power '{currentPower.PowerDef.InternalName}' \n\r{e.Message}");
             }
-#endif
             finally
             {
-#if DEBUG_ExecuteSpecificPower
-                ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Deactivate ExecPower '{currentPower.PowerDef.InternalName}' on target {target.Name}[{target.InternalName}]");
-#endif
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Deactivate ExecPower '{currentPower.PowerDef.InternalName}' on target {targetEntity.Name}[{targetEntity.InternalName}]");
                 try
                 {
-                    Powers.ExecPower(currentPower, target, false);
+                    Powers.ExecPower(currentPower, targetEntity, false);
                 }
                 catch (Exception e)
                 {
-#if DEBUG_ExecuteSpecificPower
-                    ETLogger.WriteLine(LogType.Debug, $"ExecuteSpecificPower: Catch an exception trying deactivate power '{currentPower.PowerDef.InternalName}'\n\r {e.Message}");
-#endif
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Catch an exception trying deactivate power '{currentPower.PowerDef.InternalName}'\n\r {e.Message}");
+
                 }
             }
             if (!@this._forceMaintain)
             {
                 Powers.WaitPowerActivation(currentPower, (int)effectiveTimeActivate);
-            }
+            } 
             return true;
+#endif
         }
 
         public Entity UnitRef

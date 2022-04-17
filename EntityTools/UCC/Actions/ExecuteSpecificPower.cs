@@ -1,9 +1,4 @@
-﻿#if DEBUG
-#define DEBUG_ExecuteSpecificPower
-#endif
-#define REFLECTION_ACCESS
-
-using Astral.Logic.UCC.Classes;
+﻿using Astral.Logic.UCC.Classes;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
@@ -20,9 +15,6 @@ namespace EntityTools.UCC.Actions
 {
     [Serializable]
     public class ExecuteSpecificPower : UCCAction
-#if EntityTarget
-        , IEntityIdentifier 
-#endif
     {
         #region Опции команды
 #if DEVELOPER
