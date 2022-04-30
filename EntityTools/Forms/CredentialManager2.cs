@@ -10,11 +10,11 @@ using System.Linq;
 
 namespace EntityTools.Forms
 {
-    public partial class CredentialManager : XtraForm
+    public partial class CredentialManager2 : XtraForm
     {
         private Credentials credentials;
 
-        public CredentialManager()
+        public CredentialManager2()
         {
             InitializeComponent();
         }

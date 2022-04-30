@@ -1,7 +1,7 @@
 ﻿
 namespace EntityTools.Forms
 {
-    partial class CredentialManager
+    partial class CredentialManager2
     {
         /// <summary>
         /// Required designer variable.
@@ -30,7 +30,7 @@ namespace EntityTools.Forms
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CredentialManager));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CredentialManager2));
             this.btnLoad = new DevExpress.XtraEditors.SimpleButton();
             this.splitContainerControl = new DevExpress.XtraEditors.SplitContainerControl();
             this.btnAccountDelete = new DevExpress.XtraEditors.SimpleButton();

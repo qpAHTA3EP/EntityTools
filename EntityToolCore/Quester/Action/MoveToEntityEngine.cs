@@ -96,6 +96,7 @@ namespace EntityCore.Quester.Action
             _specialCheck = null;
 
             @this.Bind(this);
+            powerCache.PowerIdPattern = m2e.PowerId;
 
             return true;
         }
@@ -108,14 +109,21 @@ namespace EntityCore.Quester.Action
         {
             if (ReferenceEquals(sender, @this))
             {
-                if (propertyName == nameof(@this.EntityID)
-                    || propertyName == nameof(@this.EntityIdType)
-                    || propertyName == nameof(@this.EntityNameType))
+                switch (propertyName)
                 {
-                    _key = null;
-                    _label = string.Empty;
+                    case nameof(@this.EntityID):
+                    case nameof(@this.EntityIdType):
+                    case nameof(@this.EntityNameType):
+                        _key = null;
+                        _label = string.Empty;
+                        break;
+                    case nameof(@this.PowerId):
+                        powerCache.PowerIdPattern = @this.PowerId;
+                        break;
+                    default:
+                        _specialCheck = null;
+                        break;
                 }
-                else _specialCheck = null;
 
                 targetEntity = null;
                 closestEntity = null;
@@ -326,11 +334,10 @@ namespace EntityCore.Quester.Action
                 return;
             }
 
-            if (@this.AttackTargetEntity)
+            if (@this.AttackTargetEntity || powerCache.IsInitialized)
             {
                 // entity нужно атаковать
-                if (entity.RelationToPlayer == EntityRelation.Foe
-                    && entity.IsLineOfSight()
+                if (entity.IsLineOfSight()
                     && !entity.DoNotDraw
                     && !entity.IsUntargetable)
                 {
@@ -355,15 +362,17 @@ namespace EntityCore.Quester.Action
                         ETLogger.WriteLine(LogType.Debug,
                             $"{currentMethodName}: Engage combat and attack {entityStr} at the distance {entity.CombatDistance3:N2}");
 
-                    // атакуем entity
-                    var powId = @this.PowerId;
-                    if (!string.IsNullOrEmpty(powId))
+                    // Применяем умение на targetEntity
+                    if (powerCache.IsInitialized)
                     {
-                        var pow = GetCurrentPower();
+                        var pow = powerCache.Power;
                         if (pow != null)
                         {
                             if (extendedDebugInfo)
-                                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Activating Power '{@this.PowerId}' on {entityStr}");
+                            {
+                                var powDef = pow.PowerDef;
+                                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Activating Power '{powDef.DisplayName}'[{powDef.InternalName}] on {entityStr}");
+                            }
 
                             pow.ExecutePower(targetEntity, @this.CastingTime, (int)@this.Distance, false, extendedDebugInfo);
                         }
@@ -371,7 +380,9 @@ namespace EntityCore.Quester.Action
                             ETLogger.WriteLine(LogType.Debug,
                                 $"{currentMethodName}: Fail to get Power '{@this.PowerId}' by '"+ nameof(@this.PowerId)+"'");
                     }
-                    Astral.Logic.NW.Combats.CombatUnit(entity);
+                    // атакуем враждебное targetEntity
+                    if(entity.RelationToPlayer == EntityRelation.Foe)
+                        Astral.Logic.NW.Combats.CombatUnit(entity);
                     
                     return;
                 }
@@ -593,7 +604,12 @@ namespace EntityCore.Quester.Action
                 var entityId = @this.EntityID;
                 var entityIdType = @this.EntityIdType;
                 var entityNameType = @this.EntityNameType;
-                EntityViewer.GUIRequest(ref entityId, ref entityIdType, ref entityNameType);
+                if (EntityViewer.GUIRequest(ref entityId, ref entityIdType, ref entityNameType) != null)
+                {
+                    @this.EntityID = entityId;
+                    @this.EntityIdType = entityIdType;
+                    @this.EntityNameType = entityNameType;
+                }
             }
 
             if (@this.HotSpots.Count == 0)
@@ -734,6 +750,9 @@ namespace EntityCore.Quester.Action
         #endregion
 
         #region CurrentPower
+#if true
+        private readonly PowerCache powerCache = new PowerCache(string.Empty);
+#else
         private int attachedGameProcessId;
         private uint characterContainerId;
         private uint powerId;
@@ -769,6 +788,8 @@ namespace EntityCore.Quester.Action
             }
             return power;
         }
+#endif
+
         #endregion
     }
 }

@@ -304,8 +304,8 @@ namespace EntityTools.Quester.Actions
 #if DEVELOPER
         [Description("The offset of Z-coordinate from the '" + nameof(InitialPosition) + "'.\n" +
                      "When the new '" + nameof(ExecutePowerExt) + "' command  will be added to the profile the '" + nameof(zRange) + "' will be calculated as follows:\n" +
-                     "Min = " + nameof(InitialPosition) + "." + nameof(Vector3.Z) + " - " + nameof(ZRange)+"\n" +
-                     "Max = " + nameof(InitialPosition) + "." + nameof(Vector3.Z) + " + " + nameof(ZRange))]
+                     "Min = " + nameof(InitialPosition) + "." + nameof(Vector3.Z) + " - " + nameof(ZDeviation) +"\n" +
+                     "Max = " + nameof(InitialPosition) + "." + nameof(Vector3.Z) + " + " + nameof(ZDeviation))]
         [Category("Default option")]
         [DisplayName("ZDeviation")]
 #else
@@ -325,7 +325,7 @@ namespace EntityTools.Quester.Actions
 
 #if DEVELOPER
         [Description("Enable '" + nameof(IgnoreCombat) + "' profile value while playing action")]
-        [Category("Interruptions")]
+        [Category("Optional")]
 #else
         [Browsable(false)]
 #endif

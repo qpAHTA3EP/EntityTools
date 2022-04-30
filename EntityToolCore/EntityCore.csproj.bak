@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <AssemblyVersion>0.20.1117.1452</AssemblyVersion>
+    <AssemblyVersion>0.21.0422.0634</AssemblyVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -20,15 +20,16 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEVELOPER, CORE_INTERFACES</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEVELOPER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
     <LangVersion>7.3</LangVersion>
     <Prefer32Bit>false</Prefer32Bit>
+    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\References\x64\</OutputPath>
     <DefineConstants>TRACE;DEVELOPER, CORE_INTERFACES</DefineConstants>
@@ -40,7 +41,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\References\Encrypted\</OutputPath>
+    <OutputPath>..\References\x64\</OutputPath>
     <DefineConstants>TRACE;DEBUG;DEVELOPER, CORE_INTERFACES</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
@@ -51,7 +52,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Release|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\References\Encrypted\</OutputPath>
+    <OutputPath>..\References\x64\</OutputPath>
     <DefineConstants>DEVELOPER, CORE_INTERFACES</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
@@ -62,20 +63,37 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Astral_patched, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="AStar, Version=2.21.508.2127, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\..\..\References\x64\AStar.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\References\x64\Astral_patched.exe</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Data.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Utils.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="Astral_patched">
+      <HintPath>..\..\..\References\x64\Astral_patched.exe</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Utils.v18.1.UI, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Data.Desktop.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraEditors.v18.1, Version=18.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Data.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Printing.v20.2.Core, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.Utils.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraBars.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraEditors.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraGrid.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraLayout.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a">
       <Private>False</Private>
     </Reference>
     <Reference Include="MyNW">
@@ -83,31 +101,39 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Engine.cs" />
+    <Compile Include="Engine.tt.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Engine.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\EntityCacheRecordKey.cs" />
     <Compile Include="Entities\EntityCache.cs" />
-    <Compile Include="Entities\EntityComparerToPattern.cs" />
-    <Compile Include="Entities\EntitySelectionTools.cs" />
+    <Compile Include="Entities\EntityCacheRecord.cs" />
+    <Compile Include="Entities\EntityComparer.cs" />
+    <Compile Include="Entities\EntityDiagnosticTools.cs" />
+    <Compile Include="Entities\Enums.cs" />
     <Compile Include="Entities\SearchCached.cs" />
     <Compile Include="Entities\SearchDirect.cs" />
-    <Compile Include="Extensions\CustomRegionExtentions.cs" />
+    <Compile Include="Entities\SearchHelper.cs" />
+    <Compile Include="Entities\SimpleEntityWrapper.cs" />
+    <Compile Include="Extensions\EntityExtensions.cs" />
     <Compile Include="Extensions\FormCollectionExtentions.cs" />
     <Compile Include="Extensions\ListBoxItemCollectionExtension.cs" />
     <Compile Include="Extensions\ListTExtentions.cs" />
-    <Compile Include="Forms\AuraSelectForm.cs">
+    <Compile Include="Forms\AuraViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\AuraSelectForm.Designer.cs">
-      <DependentUpon>AuraSelectForm.cs</DependentUpon>
+    <Compile Include="Forms\AuraViewer.Designer.cs">
+      <DependentUpon>AuraViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\AddUccActionForm.cs">
       <SubType>Form</SubType>
@@ -121,11 +147,11 @@
     <Compile Include="Forms\ConditionsListForm.designer.cs">
       <DependentUpon>ConditionsListForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\EntitySelectForm.cs">
+    <Compile Include="Forms\EntityViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\EntitySelectForm.Designer.cs">
-      <DependentUpon>EntitySelectForm.cs</DependentUpon>
+    <Compile Include="Forms\EntityViewer.Designer.cs">
+      <DependentUpon>EntityViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\InputBox.cs">
       <SubType>Form</SubType>
@@ -145,17 +171,23 @@
     <Compile Include="Forms\ItemSelectForm.Designer.cs">
       <DependentUpon>ItemSelectForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\CollectionInfoForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CollectionInfoForm.Designer.cs">
+      <DependentUpon>CollectionInfoForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\MountBonusPriorityListForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\MountBonusPriorityListForm.Designer.cs">
       <DependentUpon>MountBonusPriorityListForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\MultiItemSelectForm.cs">
+    <Compile Include="Forms\MultipleItemSelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\MultiItemSelectForm.Designer.cs">
-      <DependentUpon>MultiItemSelectForm.cs</DependentUpon>
+    <Compile Include="Forms\MultipleItemSelectForm.Designer.cs">
+      <DependentUpon>MultipleItemSelectForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\TargetSelectForm.cs">
       <SubType>Form</SubType>
@@ -170,7 +202,10 @@
       <DependentUpon>UIViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="IEntityInfos.cs" />
+    <Compile Include="Quester\Action\ExecutePowerEngine.cs" />
+    <Compile Include="Quester\Action\MoveToTeammateEngine.cs" />
     <Compile Include="Quester\Action\MoveToEntityEngine.cs" />
+    <Compile Include="Quester\Action\TurnInMissionEngine.cs" />
     <Compile Include="Quester\Conditions\CheckGameGUIEngine.cs" />
     <Compile Include="Quester\Conditions\EntityDistanceEngine.cs" />
     <Compile Include="Quester\Conditions\TeamMembersCountEngine.cs" />
@@ -189,17 +224,28 @@
     <Compile Include="Quester\Action\PickUpMissionEngine.cs" />
     <Compile Include="Quester\Conditions\EntityPropertyEngine.cs" />
     <Compile Include="Quester\Conditions\EntityCountEngine.cs" />
+    <Compile Include="Tools\Powers\PowerCache.cs" />
+    <Compile Include="Tools\Powers\PowerHelper.cs" />
+    <Compile Include="Tools\Enums.cs" />
+    <Compile Include="Tools\GameHelper.cs" />
+    <Compile Include="Tools\MissionHelper.cs" />
+    <Compile Include="Tools\Navigation\NavigationHelper.cs" />
+    <Compile Include="Tools\PlayerTeamHelper.cs" />
     <Compile Include="UCC\Actions\ApproachEntityEngine.cs" />
+    <Compile Include="UCC\Actions\ChangeTargetEngine.cs" />
     <Compile Include="UCC\Actions\DodgeFromEntityEngine.cs" />
+    <Compile Include="UCC\Actions\PluggedSkillEngine.cs" />
     <Compile Include="UCC\Actions\ExecuteSpecificPowerEngine.cs" />
     <Compile Include="UCC\Actions\UseItemSpecialEngine.cs" />
+    <Compile Include="Tools\Targeting\TeammateSupportTargetProcessor.cs" />
+    <Compile Include="Tools\Targeting\EntityTargetProcessor.cs" />
     <Compile Include="UCC\Conditions\UCCGameUICheckEngine.cs" />
     <Compile Include="UCC\Conditions\UCCTargetMatchEntityEngine.cs" />
     <Compile Include="UCC\Conditions\UCCEntityCheckEngine.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Forms\AuraSelectForm.resx">
-      <DependentUpon>AuraSelectForm.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\AuraViewer.resx">
+      <DependentUpon>AuraViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\AddUccActionForm.resx">
       <DependentUpon>AddUccActionForm.cs</DependentUpon>
@@ -207,11 +253,12 @@
     <EmbeddedResource Include="Forms\ConditionsListForm.resx">
       <DependentUpon>ConditionsListForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\EntitySelectForm.resx">
-      <DependentUpon>EntitySelectForm.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\EntityViewer.resx">
+      <DependentUpon>EntityViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\InputBox.resx">
       <DependentUpon>InputBox.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\InsigniaBonusSelectForm.resx">
       <DependentUpon>InsigniaBonusSelectForm.cs</DependentUpon>
@@ -219,11 +266,14 @@
     <EmbeddedResource Include="Forms\ItemSelectForm.resx">
       <DependentUpon>ItemSelectForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CollectionInfoForm.resx">
+      <DependentUpon>CollectionInfoForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\MountBonusPriorityListForm.resx">
       <DependentUpon>MountBonusPriorityListForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\MultiItemSelectForm.resx">
-      <DependentUpon>MultiItemSelectForm.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\MultipleItemSelectForm.resx">
+      <DependentUpon>MultipleItemSelectForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TargetSelectForm.resx">
       <DependentUpon>TargetSelectForm.cs</DependentUpon>
@@ -325,6 +375,11 @@
     <EmbeddedResource Include="Resources\Icons_Inventory_Enchantments_Insignia_Universal.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AMClient\AMClient.csproj">
+      <Project>{fd0c9e2a-5d26-43aa-a227-bddaf9c30705}</Project>
+      <Name>AMClient</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\EntityTools\EntityTools.csproj">
       <Project>{df7f797e-db7e-44f9-a96a-020cfdb3c51e}</Project>
       <Name>EntityTools</Name>
@@ -332,10 +387,21 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Tools\" />
+    <Content Include="Engine.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Engine.tt.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>type $(TargetFileName)&gt;"EntityTools.dll:Core"</PostBuildEvent>
+    <PostBuildEvent>type $(TargetFileName)&gt;"EntityTools.dll:Core"
+copy /Y "EntityTools.*" "Plugins\EntityTools.*"</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>"$(DevEnvDir)TextTransform.exe" -out "$(ProjectDir)Engine.tt.cs" "$(ProjectDir)Engine.tt"</PreBuildEvent>
   </PropertyGroup>
 </Project>
