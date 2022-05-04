@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>EntityTools</RootNamespace>
     <AssemblyName>EntityTools</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <AssemblyVersion>0.21.0423.1129</AssemblyVersion>
@@ -221,6 +221,7 @@
     <Compile Include="Editors\ChangePluginSettingValueEditor.cs" />
     <Compile Include="Editors\CheckedListBoxEditor.cs" />
     <Compile Include="Editors\CustomRegionCollectionEditor.cs" />
+    <Compile Include="Editors\QuesterConditionEditor.cs" />
     <Compile Include="Editors\PowerIdEditor.cs" />
     <Compile Include="Editors\MissionGiverInfoEditor.cs" />
     <Compile Include="Editors\PositionEditor.cs" />

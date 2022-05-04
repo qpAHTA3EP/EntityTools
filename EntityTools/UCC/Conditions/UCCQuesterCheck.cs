@@ -10,8 +10,6 @@ namespace EntityTools.UCC.Conditions
     public class UCCQuesterCheck : UCCCondition, ICustomUCCCondition
     {
 #if DEVELOPER
-        internal class QuesterConditionEditor : AddTypeCommonEditor<QuesterCondition> { }
-
         [Editor(typeof(QuesterConditionEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         [XmlElement("QuesterCondition", typeof(QuesterCondition))]

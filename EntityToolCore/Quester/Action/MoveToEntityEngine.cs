@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Reflection;
+using Astral.Classes;
 using Astral.Logic.NW;
 using EntityCore.Tools.Powers;
 using static Astral.Quester.Classes.Action;
@@ -37,7 +38,8 @@ namespace EntityCore.Quester.Action
         private string _label = string.Empty;
         private Entity targetEntity;
         private Entity closestEntity;
-        private readonly Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(0);
+        private readonly Timeout internalCacheTimer = new Timeout(0);
+        private Timeout entityAbsenceTimer;
         #endregion
 
         internal MoveToEntityEngine(MoveToEntity m2e)
@@ -93,10 +95,12 @@ namespace EntityCore.Quester.Action
 
             _key = null;
             _label = string.Empty;
-            _specialCheck = null;
+            _specialEntityCheck = null;
 
             @this.Bind(this);
             powerCache.PowerIdPattern = m2e.PowerId;
+            internalCacheTimer.ChangeTime(0);
+            entityAbsenceTimer = null;
 
             return true;
         }
@@ -121,7 +125,7 @@ namespace EntityCore.Quester.Action
                         powerCache.PowerIdPattern = @this.PowerId;
                         break;
                     default:
-                        _specialCheck = null;
+                        _specialEntityCheck = null;
                         break;
                 }
 
@@ -162,13 +166,20 @@ namespace EntityCore.Quester.Action
                     targetEntity = null;
                 }
 
-                if (entityPreprocessingResult != EntityPreprocessingResult.Succeeded && timeout.IsTimedOut)
+                if (entityPreprocessingResult != EntityPreprocessingResult.Succeeded && internalCacheTimer.IsTimedOut)
                 {
                     // targetEntity не был обработан
-                    Entity entity = SearchCached.FindClosestEntity(EntityKey, SpecialCheck);
+                    Entity entity = SearchCached.FindClosestEntity(EntityKey, SpecialEntityEntityCheck);
 
                     if (entity != null)
                     {
+                        var entitySearchTime = @this.EntitySearchTime;
+                        if (entitySearchTime > 0)
+                        {
+                            if (entityAbsenceTimer is null)
+                                entityAbsenceTimer = new Timeout(entitySearchTime);
+                            else entityAbsenceTimer.ChangeTime(entitySearchTime);
+                        }
                         closestEntity = entity;
                         bool closestIsTarget = targetEntity != null && targetEntity.ContainerId == closestEntity.ContainerId;
 
@@ -219,19 +230,29 @@ namespace EntityCore.Quester.Action
                             }
                         }
                     }
-                    else if(extendedDebugInfo)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ClosestEntity not found"));
+                    else
+                    {
+                        var entitySearchTime = @this.EntitySearchTime;
+                        if (entitySearchTime > 0)
+                        {
+                            if (entityAbsenceTimer is null)
+                                entityAbsenceTimer = new Timeout(entitySearchTime);
+                        }
+                        if (extendedDebugInfo)
+                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ClosestEntity not found"));
 
-                    timeout.ChangeTime(EntityTools.EntityTools.Config.EntityCache.LocalCacheTime);
+                    }
+
+                    internalCacheTimer.ChangeTime(EntityTools.EntityTools.Config.EntityCache.LocalCacheTime);
                 }
 
                 bool needToRun = entityPreprocessingResult == EntityPreprocessingResult.Succeeded;
 
                 if (!needToRun)
                 {
-                    if (@this.IgnoreCombat)
+                    if (@this.IgnoreCombat && CheckingIgnoreCombatCondition())
                     {
-                        AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true);
+                        AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true, @this.IgnoreCombatMinHP, 5_000);
                         if (@this.AbortCombatDistance > @this.Distance)
                         {
                             AstralAccessors.Logic.NW.Combats.SetAbortCombatCondition(CombatShouldBeAborted, ShouldRemoveAbortCombatCondition);
@@ -555,7 +576,45 @@ namespace EntityCore.Quester.Action
         {
             get
             {
-                return @this.EntityNameType == EntityNameType.Empty || !string.IsNullOrEmpty(@this.EntityID);
+                if (@this.EntityNameType != EntityNameType.Empty
+                    && string.IsNullOrEmpty(@this.EntityID))
+                    return false;
+
+                if (entityAbsenceTimer is null)
+                    return true;
+
+                var player = EntityManager.LocalPlayer;
+
+                var map = @this.CurrentMap;
+                if (!string.IsNullOrEmpty(map) &&
+                    !map.Equals(player.MapState.MapName, StringComparison.Ordinal))
+                {
+                    if (ExtendedDebugInfo)
+                    {
+                        ETLogger.WriteLine(LogType.Debug, $"{_idStr}.{MethodBase.GetCurrentMethod()?.Name ?? nameof(InternalConditions)}: Player is out of map '{map}' .");
+                    }
+                    return false;
+                }
+
+                if (@this.CustomRegionsPlayerCheck && @this.CustomRegionNames.Outside(player.Location))
+                {
+                    if (ExtendedDebugInfo)
+                    {
+                        ETLogger.WriteLine(LogType.Debug, $"{_idStr}.{MethodBase.GetCurrentMethod()?.Name ?? nameof(InternalConditions)}: {nameof(@this.CustomRegionsPlayerCheck)} failed. Player is outside CustomRegions.");
+                    }
+                    return false;
+                }
+
+                if (entityAbsenceTimer.IsTimedOut)
+                {
+                    if (ExtendedDebugInfo)
+                    {
+                        ETLogger.WriteLine(LogType.Debug, $"{_idStr}.{MethodBase.GetCurrentMethod()?.Name ?? nameof(InternalConditions)}: {nameof(@this.EntitySearchTime)} is out.");
+                    }
+                    return false;
+                }
+
+                return true;
             }
         }
 
@@ -563,9 +622,10 @@ namespace EntityCore.Quester.Action
         {
             get
             {
-                if (!InternalConditions)
-                    return new ActionValidity($"The combination of the main Entity identifier attribute is not valid.\n\r" +
-                        $"Check {nameof(@this.EntityID)} and {nameof(@this.EntityNameType)} properties.");
+                if (string.IsNullOrEmpty(@this.EntityID) && @this.EntityNameType != EntityNameType.Empty)
+                    //return new ActionValidity($"The entity identifier {nameof(@this.EntityID)} is not valid.");
+                    return new ActionValidity($"The Entity identifier is not valid.\n" +
+                        $"Check options '{nameof(@this.EntityID)}' and '{nameof(@this.EntityNameType)}'.");
                 return new ActionValidity();
             }
         }
@@ -576,6 +636,11 @@ namespace EntityCore.Quester.Action
         {
             get
             {
+                var map = @this.CurrentMap;
+                if (!string.IsNullOrEmpty(map) &&
+                    !map.Equals(EntityManager.LocalPlayer.MapState.MapName, StringComparison.Ordinal))
+                    return Vector3.Empty;
+
                 if (EntityKey.Validate(targetEntity))
                 {
                     if (targetEntity.Location.Distance3DFromPlayer > @this.Distance)
@@ -611,6 +676,8 @@ namespace EntityCore.Quester.Action
                     @this.EntityNameType = entityNameType;
                 }
             }
+
+            @this.CurrentMap = EntityManager.LocalPlayer.MapState.MapName;
 
             if (@this.HotSpots.Count == 0)
                 @this.HotSpots.Add(EntityManager.LocalPlayer.Location.Clone());
@@ -734,19 +801,31 @@ namespace EntityCore.Quester.Action
         /// на предмет нахождения в пределах области, заданной <see cref="InteractEntities.CustomRegionNames"/>
         /// Использовать самомодифицирующийся предиката, т.к. предикат передается в <seealso cref="SearchCached.FindClosestEntity(EntityCacheRecordKey, Predicate{Entity})"/>
         /// </summary>        
-        private Predicate<Entity> SpecialCheck
+        private Predicate<Entity> SpecialEntityEntityCheck
         {
             get
             {
-                if (_specialCheck is null)
-                    _specialCheck = SearchHelper.Construct_EntityAttributePredicate(@this.HealthCheck,
+                if (_specialEntityCheck is null)
+                    _specialEntityCheck = SearchHelper.Construct_EntityAttributePredicate(@this.HealthCheck,
                                                             @this.ReactionRange, @this.ReactionZRange,
                                                             @this.RegionCheck,
                                                             @this.CustomRegionNames);
-                return _specialCheck;
+                return _specialEntityCheck;
             }
         } 
-        private Predicate<Entity> _specialCheck;
+        private Predicate<Entity> _specialEntityCheck;
+
+        /// <summary>
+        /// Проверка условия отключения боя <see cref="MoveToEntity.IgnoreCombatCondition"/>
+        /// </summary>
+        /// <returns>Результат проверки <see cref="MoveToEntity.IgnoreCombatCondition"/> либо True, если оно не задано.</returns>
+        private bool CheckingIgnoreCombatCondition()
+        {
+            var check = @this.IgnoreCombatCondition;
+            if (check != null)
+                return check.IsValid;
+            return true;
+        }
         #endregion
 
         #region CurrentPower
@@ -789,7 +868,6 @@ namespace EntityCore.Quester.Action
             return power;
         }
 #endif
-
         #endregion
     }
 }

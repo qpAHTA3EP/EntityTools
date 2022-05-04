@@ -190,7 +190,7 @@ namespace EntityTools.Tools.CustomRegions
                 foreach (var crEntry in collection)
                 {
                     if (reinitialize && !TryAddValue(clone ? crEntry.Clone() : crEntry))
-                            continue;
+                        continue;
 
                     switch (crEntry.Inclusion)
                     {
@@ -221,6 +221,7 @@ namespace EntityTools.Tools.CustomRegions
                     version_intersection = version;
                     version_intersection = version;
                 }
+
                 // Выбираем предикат
                 if (_exclusion.Count > 0)
                 {
@@ -253,6 +254,7 @@ namespace EntityTools.Tools.CustomRegions
                     }
                 }
             }
+            else predicate = check_true;
             return predicate;
         }
 
