@@ -1,20 +1,18 @@
 ﻿
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Windows.Forms.VisualStyles;
 using AcTp0Tools.Classes.Targeting;
+using Astral;
 using Astral.Classes.SkillTrain;
-using Astral.Controllers;
 using Astral.Logic.UCC.Classes;
 using Astral.MultiTasks.Classes;
 using Astral.Quester.Classes;
-using AcTp0Tools.Reflection;
-using Astral;
+using HarmonyLib;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text;
 using Action = Astral.Quester.Classes.Action;
-
-using HarmonyLib; 
+using Memory = MyNW.Memory;
 
 namespace AcTp0Tools.Patches
 {
@@ -64,20 +62,74 @@ namespace AcTp0Tools.Patches
 
             if (UccTypes.Count == 0 || QuesterTypes.Count == 0 || MultitaskTypes.Count == 0 || SkillTrainTypes.Count == 0)
             {
-                UccTypes.Clear();
-                QuesterTypes.Clear();
-                MultitaskTypes.Clear();
-                SkillTrainTypes.Clear();
-                UccTargetSelectorTypes.Clear();
-                
-                // Проверяем типы, объявленные в Астрале
-                FillTypeLists(Assembly.GetEntryAssembly()?.GetTypes());
+                try
+                {
+                    UccTypes.Clear();
+                    QuesterTypes.Clear();
+                    MultitaskTypes.Clear();
+                    SkillTrainTypes.Clear();
+                    UccTargetSelectorTypes.Clear();
 
-                // Проверяем типы, объявленные в плагинах
-                var types = AstralAccessors.Controllers.Plugins.GetTypes();
-                //if (types != null && types.Count > 0)
-                if (types != null)
-                    FillTypeLists(types); 
+                    // Проверяем типы, объявленные в Астрале
+                    FillTypeLists(Assembly.GetEntryAssembly()?.GetTypes());
+
+                    // Проверяем типы, объявленные в плагинах
+                    var types = AstralAccessors.Controllers.Plugins.GetTypes();
+                    //if (types != null && types.Count > 0)
+                    if (types != null)
+                        FillTypeLists(types);
+                }
+                catch (TypeLoadException ex)
+                {
+                    Memory.Detach();
+                    StringBuilder sb = new StringBuilder(ex.Message).AppendLine();
+                    var data = ex.Data;
+                    if (data.Count > 0)
+                    {
+                        sb.AppendLine("\tData: ");
+                        foreach (DictionaryEntry dt in data)
+                        {
+                            sb.AppendFormat("\tKey: {0,-20}      Value: {1}",
+                                "'" + dt.Key + "'", dt.Value);
+                        }
+                    }
+
+                    sb.Append("StackTrace: ").AppendLine(ex.StackTrace);
+
+                    Logger.WriteLine(Logger.LogType.Debug, sb.ToString());
+                    throw;
+                }
+                catch (ReflectionTypeLoadException ex)
+                {
+                    Memory.Detach();
+                    StringBuilder sb = new StringBuilder(ex.Message).AppendLine();
+                    if (ex.LoaderExceptions?.Length > 0)
+                    {
+                        foreach (var lEx in ex.LoaderExceptions)
+                        {
+                            sb.Append("\tLoaderException: ").AppendLine(lEx.Message);
+                            var smg = lEx.TargetSite?.ToString();
+                            if (!string.IsNullOrEmpty(smg))
+                            {
+                                sb.Append("\tTargetSite: ").AppendLine(lEx.TargetSite?.ToString() ?? "NULL");
+                            }
+                            var data = lEx.Data;
+                            if (data.Count > 0)
+                            {
+                                sb.AppendLine("\tData: ");
+                                foreach (DictionaryEntry dt in data)
+                                {
+                                    sb.AppendFormat("\t\tKey: {0,-20}      Value: {1}",
+                                        "'" + dt.Key + "'", dt.Value);
+                                } 
+                            }
+                        }
+                    }
+
+                    sb.Append("StackTrace: ").AppendLine(ex.StackTrace);
+                    Logger.WriteLine(Logger.LogType.Debug, sb.ToString());
+                    throw;
+                }
             }
 
             switch (typeNum)
@@ -92,7 +144,7 @@ namespace AcTp0Tools.Patches
                     __result = SkillTrainTypes;
                     return false;
                 case 4: // Multitask types
-                    __result = MultitaskTypes; 
+                    __result = MultitaskTypes;
                     return false;
             }
 
