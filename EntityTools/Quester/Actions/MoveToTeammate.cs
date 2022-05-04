@@ -18,7 +18,7 @@ namespace EntityTools.Quester.Actions
     [Serializable]
     public class MoveToTeammate : Action, INotifyPropertyChanged
     {
-        #region Опции команды
+        #region General
 #if DEVELOPER
         [Description("The selection of the supported teammate")]
         [Category("General")]
@@ -32,10 +32,132 @@ namespace EntityTools.Quester.Actions
             set
             {
                 supportOptions = value;
-                OnPropertyChanged();
+                NotifyPropertyChanged();
             }
         }
-        internal TeammateSupport supportOptions = new TeammateSupport();
+        private TeammateSupport supportOptions = new TeammateSupport();
+
+#if DEVELOPER
+        [XmlIgnore]
+        [Editor(typeof(TargetSelectorTestEditor), typeof(UITypeEditor))]
+        [Description("Test the Teammate searching.")]
+        [Category("General")]
+        public string TestSearch => @"Push button '...' =>";
+#endif 
+        #endregion
+
+
+        #region ManageCombatOptions
+#if DEVELOPER
+        [Description("Distance to the Teammate by which it is necessary to approach.\n" +
+                     "Keep in mind that the distance below 5 is too small to display on the Mapper")]
+        [Category("Manage Combat Options")]
+        [DisplayName("CombatDistance")]
+#else
+        [Browsable(false)]
+#endif
+
+        public float Distance
+        {
+            get => distance; set
+            {
+                if (Math.Abs(distance - value) > 0.1f)
+                {
+                    distance = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private float distance = 30;
+
+#if DEVELOPER
+        [Description("Enable '" + nameof(IgnoreCombat) + "' profile value while playing action")]
+        [Category("Manage Combat Options")]
+#else
+        [Browsable(false)]
+#endif
+        public bool IgnoreCombat
+        {
+            get => ignoreCombat; set
+            {
+                if (ignoreCombat != value)
+                {
+                    ignoreCombat = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private bool ignoreCombat = true;
+
+
+#if DEVELOPER
+        [Description("Sets the ucc option '" + nameof(IgnoreCombatMinHP) + "' when disabling combat mode.\n" +
+                     "Options ignored if the value is -1.")]
+        [Category("Manage Combat Options")]
+#else
+        [Browsable(false)]
+#endif
+        public int IgnoreCombatMinHP
+        {
+            get => _ignoreCombatMinHp; set
+            {
+                if (value < -1)
+                    value = 0;
+                if (value > 100)
+                    value = 100;
+                if (_ignoreCombatMinHp != value)
+                {
+                    _ignoreCombatMinHp = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private int _ignoreCombatMinHp = -1;
+#if DEVELOPER
+        [Description("Special check before disabling combat while playing action.\n" +
+                     "The condition is checking when option '" + nameof(IgnoreCombat) + "' is active.")]
+        [Category("Manage Combat Options")]
+        [Editor(typeof(QuesterConditionEditor), typeof(UITypeEditor))]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+#else
+        [Browsable(false)]
+#endif
+        public Astral.Quester.Classes.Condition IgnoreCombatCondition
+        {
+            get => _ignoreCombatCondition;
+            set
+            {
+                if (value != _ignoreCombatCondition)
+                {
+                    _ignoreCombatCondition = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private Astral.Quester.Classes.Condition _ignoreCombatCondition;
+
+#if DEVELOPER
+        [Description("The battle is aborted outside '" + nameof(AbortCombatDistance) + "' radius from the Teammate.\n" +
+                     "The combat is restored within the '" + nameof(Distance) + "' radius.\n" +
+                     "However, this is not performed if the value less than '" + nameof(Distance) + "' or '" + nameof(IgnoreCombat) + "' is False.")]
+        [Category("Manage Combat Options")]
+#else
+        [Browsable(false)]
+#endif
+        public uint AbortCombatDistance
+        {
+            get => abortCombatDistance; set
+            {
+                if (abortCombatDistance != value)
+                {
+                    abortCombatDistance = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        internal uint abortCombatDistance;
+        #endregion
+
 
 #if DEVELOPER
         [Description("CustomRegion names collection")]
@@ -52,100 +174,14 @@ namespace EntityTools.Quester.Actions
                 if (customRegions != value)
                 {
                     customRegions = value;
-                    OnPropertyChanged();
+                    NotifyPropertyChanged();
                 }
             }
         }
         internal CustomRegionCollection customRegions = new CustomRegionCollection();
 
 
-#if DEVELOPER
-        [Description("Distance to the Teammate by which it is necessary to approach.\n" +
-                     "Keep in mind that the distance below 5 is too small to display on the Mapper")]
-        [Category("Interruptions")]
-        [DisplayName("CombatDistance")]
-#else
-        [Browsable(false)]
-#endif
-
-        public float Distance
-        {
-            get => distance; set
-            {
-                if (Math.Abs(distance - value) > 0.1f)
-                {
-                    distance = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        internal float distance = 30;
-
-#if DEVELOPER
-        [Description("Enable '"+nameof(IgnoreCombat)+"' profile value while playing action")]
-        [Category("Interruptions")]
-#else
-        [Browsable(false)]
-#endif
-        public bool IgnoreCombat
-        {
-            get => ignoreCombat; set
-            {
-                if (ignoreCombat != value)
-                {
-                    ignoreCombat = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        internal bool ignoreCombat = true;
-
-#if DEVELOPER
-        [Description("The minimum percentage of the health  (in range 0-99) above which combat can be interrupted")]
-        [Category("Interruptions")]
-#else
-        [Browsable(false)]
-#endif
-        public int IgnoreCombatMinHP
-        {
-            get => ignoreCombatMinHP; set
-            {
-                if (value < 0)
-                    value = 0;
-                else if(value > 99)
-                {
-                    value = 99;
-                }
-                if (ignoreCombatMinHP != value)
-                {
-                    ignoreCombatMinHP = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        internal int ignoreCombatMinHP = 50;
-
-#if DEVELOPER
-        [Description("The battle is aborted outside '"+nameof(AbortCombatDistance) + "' radius from the Teammate.\n" +
-                     "The combat is restored within the '"+nameof(Distance)+"' radius.\n" +
-                     "However, this is not performed if the value less than '"+ nameof(Distance) +"' or '"+nameof(IgnoreCombat)+"' is False.")]
-        [Category("Interruptions")]
-#else
-        [Browsable(false)]
-#endif
-        public uint AbortCombatDistance
-        {
-            get => abortCombatDistance; set
-            {
-                if (abortCombatDistance != value)
-                {
-                    abortCombatDistance = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        internal uint abortCombatDistance;
-
+        #region Interruptions
 #if DEVELOPER
         [Description("True: Complete an action when the Teammate is closer than 'Distance'\n" +
                      "False: Follow an Teammate regardless of its distance")]
@@ -160,7 +196,7 @@ namespace EntityTools.Quester.Actions
                 if (stopOnApproached != value)
                 {
                     stopOnApproached = value;
-                    OnPropertyChanged();
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -182,64 +218,59 @@ namespace EntityTools.Quester.Actions
                 if (teammateSearchTime != value)
                 {
                     teammateSearchTime = value;
-                    OnPropertyChanged();
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal int teammateSearchTime = 10_000;
+        internal int teammateSearchTime = 10_000; 
+        #endregion
 
-#if DEVELOPER
-        [XmlIgnore]
-        [Editor(typeof(TargetSelectorTestEditor), typeof(UITypeEditor))]
-        [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
-        public string TestInfo { get; } = @"Нажми на кнопку '...' чтобы увидеть больше =>";
-#endif
 
         [XmlIgnore]
         [Browsable(false)]
         public override string Category => "Basic";
-        #endregion
+
 
         #region Взаимодействие с ядром EntityToolsCore
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            Engine.OnPropertyChanged(this, propertyName);
+            _engine.OnPropertyChanged(this, propertyName);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         [XmlIgnore]
         [NonSerialized]
-        internal IQuesterActionEngine Engine;
+        private IQuesterActionEngine _engine;
 
         public MoveToTeammate()
         {
-            Engine = new QuesterActionProxy(this);
+            _engine = new QuesterActionProxy(this);
         }
 
         public void Bind(IQuesterActionEngine engine)
         {
-            Engine = engine;
+            _engine = engine;
         }
         public void Unbind()
         {
-            Engine = new QuesterActionProxy(this);
+            _engine = new QuesterActionProxy(this);
             PropertyChanged = null;
         }
         #endregion
 
         // Интерфейс Quester.Action, реализованный через ActionEngine
-        public override bool NeedToRun => Engine.NeedToRun;
-        public override ActionResult Run() => Engine.Run();
-        public override string ActionLabel => Engine.ActionLabel;
+        public override bool NeedToRun => _engine.NeedToRun;
+        public override ActionResult Run() => _engine.Run();
+        public override string ActionLabel => _engine.ActionLabel;
         public override string InternalDisplayName => string.Empty;
-        public override bool UseHotSpots => Engine.UseHotSpots;
-        protected override bool IntenalConditions => Engine.InternalConditions;
-        protected override Vector3 InternalDestination => Engine.InternalDestination;
-        protected override ActionValidity InternalValidity => Engine.InternalValidity;
-        public override void GatherInfos() => Engine.GatherInfos();
-        public override void InternalReset() => Engine.InternalReset();
-        public override void OnMapDraw(GraphicsNW graph) => Engine.OnMapDraw(graph);
+        public override bool UseHotSpots => _engine.UseHotSpots;
+        protected override bool IntenalConditions => _engine.InternalConditions;
+        protected override Vector3 InternalDestination => _engine.InternalDestination;
+        protected override ActionValidity InternalValidity => _engine.InternalValidity;
+        public override void GatherInfos() => _engine.GatherInfos();
+        public override void InternalReset() => _engine.InternalReset();
+        public override void OnMapDraw(GraphicsNW graph) => _engine.OnMapDraw(graph);
     }
 }

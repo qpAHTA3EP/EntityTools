@@ -1,4 +1,4 @@
-﻿#define DEBUG_TARGET
+﻿//#define DEBUG_TARGET
 
 using AcTp0Tools;
 using Astral.Classes;
@@ -20,9 +20,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Reflection;
-using AcTp0Tools.Classes.Targeting;
-using EntityCore.Entities;
-using EntityCore.Tools;
 using static Astral.Quester.Classes.Action;
 // ReSharper disable InconsistentNaming
 
@@ -209,9 +206,9 @@ namespace EntityCore.Quester.Action
             _action = m2t;
             _idStr = string.Concat(_action.GetType().Name, '[', _action.ActionID, ']');
 
-            _targetProcessor = new TeammateSupportTargetProcessor(_action.supportOptions, GetSpecialTeammateCheck());
+            _targetProcessor = new TeammateSupportTargetProcessor(_action.SupportOptions, GetSpecialTeammateCheck());
 
-            _sqrtDistance = _action.distance;
+            _sqrtDistance = _action.Distance;
             _sqrtDistance *= _sqrtDistance;
             _sqrtAbortCombatDistance = _action.abortCombatDistance;
             _sqrtAbortCombatDistance *= _sqrtAbortCombatDistance;
@@ -238,7 +235,7 @@ namespace EntityCore.Quester.Action
                 {
                     case nameof(_action.SupportOptions):
                         _targetProcessor?.Dispose();
-                        _targetProcessor = new TeammateSupportTargetProcessor(_action.supportOptions, GetSpecialTeammateCheck());
+                        _targetProcessor = new TeammateSupportTargetProcessor(_action.SupportOptions, GetSpecialTeammateCheck());
                         _label = string.Empty;
                         break;
                     case nameof(_action.SupportOptions.Teammate):
@@ -247,7 +244,7 @@ namespace EntityCore.Quester.Action
                         _label = string.Empty;
                         break;
                     case nameof(_action.Distance):
-                        _sqrtDistance = _action.distance;
+                        _sqrtDistance = _action.Distance;
                         _sqrtDistance *= _sqrtDistance;
                         break;
                     case nameof(_action.AbortCombatDistance):
@@ -271,7 +268,7 @@ namespace EntityCore.Quester.Action
 
                 if (ExtendedDebugInfo)
                 {
-                    string currentMethodName = string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name);
+                    string currentMethodName = string.Concat(_idStr, '.', MethodBase.GetCurrentMethod()?.Name ?? nameof(NeedToRun));
 
                     ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, " : Begins"));
 
@@ -306,10 +303,11 @@ namespace EntityCore.Quester.Action
                             " verification=", needToRun, " {",
                             needToRun ? "Near (" : "Faraway (", Math.Sqrt(sqrtDistance).ToString("N2"), ")}"));
 
-                    if (!needToRun && _action.ignoreCombat)
+                    if (!needToRun && _action.IgnoreCombat
+                        && CheckingIgnoreCombatCondition())
                     {
-                        AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true, _action.ignoreCombatMinHP);
-                        if (_action.abortCombatDistance > _action.distance)
+                        AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true, _action.IgnoreCombatMinHP, 5_000);
+                        if (_action.abortCombatDistance > _action.Distance)
                         {
                             AstralAccessors.Logic.NW.Combats.SetAbortCombatCondition(CheckCombatShouldBeAborted_and_ChangeTarget, ShouldRemoveAbortCombatCondition);
                             ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, " : Disable combat and set abort combat condition"));
@@ -340,10 +338,10 @@ namespace EntityCore.Quester.Action
                             NavigationHelper.SquareDistance3D(EntityManager.LocalPlayer.Location, teammate.Entity.Location);
                     needToRun = sqrtDistance <= _sqrtDistance;
 
-                    if (!needToRun && _action.ignoreCombat)
+                    if (!needToRun && _action.IgnoreCombat)
                     {
-                        AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true, _action.ignoreCombatMinHP);
-                        if (_action.abortCombatDistance > _action.distance)
+                        AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true, _action.IgnoreCombatMinHP);
+                        if (_action.abortCombatDistance > _action.Distance)
                             AstralAccessors.Logic.NW.Combats.SetAbortCombatCondition(CheckCombatShouldBeAborted_and_ChangeTarget, ShouldRemoveAbortCombatCondition);
                     }
                 }
@@ -357,7 +355,7 @@ namespace EntityCore.Quester.Action
 
             if (ExtendedDebugInfo)
             {
-                string currentMethodName = string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name);
+                string currentMethodName = string.Concat(_idStr, '.', MethodBase.GetCurrentMethod()?.Name ?? nameof(Run));
 
                 ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, " : Begins"));
 
@@ -426,7 +424,7 @@ namespace EntityCore.Quester.Action
         {
             if (ExtendedDebugInfo)
             {
-                string currentMethodName = string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name);
+                string currentMethodName = string.Concat(_idStr, '.', MethodBase.GetCurrentMethod()?.Name ?? nameof(Attack_Target));
                 if (target is null)
                 {
                     ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Entity is NULL. Break"));
@@ -439,12 +437,12 @@ namespace EntityCore.Quester.Action
                     && !target.IsUntargetable)
                 {
                     // target враждебно и может быть атаковано
-                    string entityStr = target.GetDebugString(EntityNameType.InternalName, _action.supportOptions.foePreference.ToString(), EntityDetail.Pointer | EntityDetail.RelationToPlayer);
+                    string entityStr = target.GetDebugString(EntityNameType.InternalName, _action.SupportOptions.foePreference.ToString(), EntityDetail.Pointer | EntityDetail.RelationToPlayer);
 
                     //Astral.Quester.API.IgnoreCombat = false;
-                    AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(false, _action.ignoreCombatMinHP);
+                    AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(false, _action.IgnoreCombatMinHP);
 
-                    if (_action.abortCombatDistance > _action.distance)
+                    if (_action.abortCombatDistance > _action.Distance)
                     {
                         // устанавливаем прерывание боя
                         AstralAccessors.Logic.NW.Combats.SetAbortCombatCondition(CheckCombatShouldBeAborted_and_ChangeTarget, ShouldRemoveAbortCombatCondition);
@@ -469,9 +467,9 @@ namespace EntityCore.Quester.Action
                     // target враждебно и может быть атаковано
 
                     //Astral.Quester.API.IgnoreCombat = false;
-                    AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(false, _action.ignoreCombatMinHP);
+                    AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(false, _action.IgnoreCombatMinHP);
 
-                    if (_action.abortCombatDistance > _action.distance)
+                    if (_action.abortCombatDistance > _action.Distance)
                     {
                         // устанавливаем прерывание боя
                         AstralAccessors.Logic.NW.Combats.SetAbortCombatCondition(CheckCombatShouldBeAborted_and_ChangeTarget, ShouldRemoveAbortCombatCondition);
@@ -501,7 +499,7 @@ namespace EntityCore.Quester.Action
 
             if (ExtendedDebugInfo)
             {
-                string currentMethodName = string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name);
+                string currentMethodName = string.Concat(_idStr, '.', MethodBase.GetCurrentMethod()?.Name ?? nameof(CheckCombatShouldBeAborted_and_ChangeTarget));
 
                 var player = EntityManager.LocalPlayer;
 
@@ -527,7 +525,7 @@ namespace EntityCore.Quester.Action
                     if (target != null)
                     {
                         ETLogger.WriteLine(LogType.Debug,
-                            string.Concat(currentMethodName, ": ChangeTarget to ", target.GetDebugString(EntityNameType.InternalName, _action.supportOptions.foePreference.ToString(), EntityDetail.Pointer)));
+                            string.Concat(currentMethodName, ": ChangeTarget to ", target.GetDebugString(EntityNameType.InternalName, _action.SupportOptions.foePreference.ToString(), EntityDetail.Pointer)));
                         combatTarget = target;
                     }
 
@@ -571,22 +569,10 @@ namespace EntityCore.Quester.Action
         {
             get
             {
-#if false
-                if (string.IsNullOrEmpty(_label))
-                {
-                    var teammate = _targetProcessor.GetTeammate();
-                    _label = teammate is null
-                        ? $"{_action.GetType().Name} : {_action.supportOptions.teammate}"
-                        : $"{_action.GetType().Name} : {_action.supportOptions.teammate} ({teammate.InternalName})";
-                }
-
-                return _label; 
-#else
                 var teammate = _targetProcessor.GetTeammate();
                 return teammate is null
-                    ? $"{_action.GetType().Name} : {_action.supportOptions.teammate}"
-                    : $"{_action.GetType().Name} : {_action.supportOptions.teammate} ({teammate.InternalName})";
-#endif
+                    ? $"{_action.GetType().Name} : {_action.SupportOptions.teammate}"
+                    : $"{_action.GetType().Name} : {_action.SupportOptions.teammate} ({teammate.InternalName})";
             }
         }
 
@@ -658,21 +644,23 @@ namespace EntityCore.Quester.Action
             {
                 float x = pos.X,
                     y = pos.Y,
-                    diaD = _action.distance * 2,
+                    distance = _action.Distance,
+                    diaD = distance * 2,
                     diaACD = _action.abortCombatDistance * 2;
 
                 mapGraphics.FillRhombCentered(Brushes.Yellow, pos, 16, 16);
-                if (_action.distance > 11)
+                if (distance > 11)
                 {
                     mapGraphics.DrawCircleCentered(Pens.Yellow, x, y, diaD, true);
-                    if (_action.abortCombatDistance > _action.distance)
+                    if (_action.abortCombatDistance > distance)
                         mapGraphics.DrawCircleCentered(Pens.Yellow, x, y, diaACD, true);
                 }
             }
             else
             {
                 float x = pos.X,
-                      y = pos.Y;
+                      y = pos.Y,
+                      distance = _action.Distance;
                 List<Vector3> coords = new List<Vector3> {
                     new Vector3(x, y - 5, 0),
                     new Vector3(x - 4.33f, y + 2.5f, 0),
@@ -680,13 +668,13 @@ namespace EntityCore.Quester.Action
                 };
                 graphics.drawFillPolygon(coords, Brushes.Yellow);
 
-                int diaD = (int)(_action.distance * 2.0f * graphics.Zoom);
+                int diaD = (int)(distance * 2.0f * graphics.Zoom);
                 int diaACD = (int)(_action.abortCombatDistance * 2.0f * graphics.Zoom);
-                if (_action.distance > 5)
+                if (distance > 5)
                 {
                     graphics.drawEllipse(pos, new Size(diaD, diaD), Pens.Yellow);
 
-                    if (_action.abortCombatDistance > _action.distance)
+                    if (_action.abortCombatDistance > distance)
                     {
                         graphics.drawEllipse(pos, new Size(diaACD, diaACD), Pens.Orange);
                     }
@@ -719,6 +707,18 @@ namespace EntityCore.Quester.Action
             }
 
             return specialCheck;
+        }
+
+        /// <summary>
+        /// Проверка условия отключения боя <see cref="MoveToTeammate.IgnoreCombatCondition"/>
+        /// </summary>
+        /// <returns>Результат проверки <see cref="MoveToTeammate.IgnoreCombatCondition"/> либо True, если оно не задано.</returns>
+        private bool CheckingIgnoreCombatCondition()
+        {
+            var check = _action.IgnoreCombatCondition;
+            if (check != null)
+                return check.IsValid;
+            return true;
         }
         #endregion
     }
