@@ -103,9 +103,12 @@ namespace EntityCore.Quester.Action
             {
                 var d = MapperHelper.SquareDistance2D(EntityManager.LocalPlayer.Location, @this.InitialPosition);
 
-                if (d > 25 && @this.IgnoreCombat)
+                if (d > 25 
+                    && @this.IgnoreCombat
+                    && CheckingIgnoreCombatCondition())
                 {
-                    AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true, -1, 5000);
+                    AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true, @this.IgnoreCombatMinHP, 5_000);
+                    return false;
                 }
                 else AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(false);
 
@@ -375,6 +378,18 @@ namespace EntityCore.Quester.Action
                 }
             }
 
+        }
+
+        /// <summary>
+        /// Проверка условия отключения боя <see cref="MoveToEntity.IgnoreCombatCondition"/>
+        /// </summary>
+        /// <returns>Результат проверки <see cref="MoveToEntity.IgnoreCombatCondition"/> либо True, если оно не задано.</returns>
+        private bool CheckingIgnoreCombatCondition()
+        {
+            var check = @this.IgnoreCombatCondition;
+            if (check != null)
+                return check.IsValid;
+            return true;
         }
 
         #region CurrentPower

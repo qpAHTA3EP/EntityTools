@@ -56,93 +56,11 @@ namespace EntityTools.Quester.Actions
         }
         #endregion
 
-        /// <summary>
-        /// Точка, в которой необходимо использовать заданное умение
-        /// </summary>
-#if DEVELOPER
-        [Description("The position that the character should stand to use the power specified '" + nameof(PowerId) + "'")]
-        [Editor(typeof(PositionEditor), typeof(UITypeEditor))]
-        [Category("Required")]
-#else
-        [Browsable(false)]
-#endif   
-        public Vector3 InitialPosition
-        {
-            get => initialPosition;
-            set
-            {
-                if (value != initialPosition)
-                {
-                    initialPosition = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        private Vector3 initialPosition = Vector3.Empty;
 
-        /// <summary>
-        /// Точка, используемая в качестве цели для применения умения <see cref="PowerId"/>
-        /// </summary>
-#if DEVELOPER
-        [Description("The position used as the target point for the power specified by '" + nameof(PowerId) + "'")]
-        [Editor(typeof(PositionEditor), typeof(UITypeEditor))]
-        [Category("Required")]
-#else
-        [Browsable(false)]
-#endif   
-        public Vector3 TargetPosition
-        {
-            get => targetPosition;
-            set
-            {
-                if (value != targetPosition)
-                {
-                    targetPosition = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        private Vector3 targetPosition = Vector3.Empty;
-
-#if DEVELOPER
-        [Description("The radius of target area centered on '" + nameof(TargetPosition) + "'.\n" +
-                     "After executing the '"+ nameof(PowerId) +"' the character must be closer to the '" + nameof(TargetPosition) + "' than the '" + nameof(TargetRadius) + "' to complete action.\n" +
-                     "The action will be continued if the character is farther from the '" + nameof(TargetPosition) + "' than the specified '" + nameof(TargetRadius) + "'.\n" +
-                     "If value is zero the action completed after power executed.")]
-        [Category("Required")]
-#else
-        [Browsable(false)]
-#endif 
-        public uint TargetRadius
-        {
-            get => targetRad;
-            set
-            {
-                targetRad = value;
-                _targetRad = value;
-                NotifyPropertyChanged();
-            }
-        }
-        private uint targetRad;
-
-#if DEVELOPER
-        [Description("The default value of the '" + nameof(TargetRadius) + "' for each new command '" + nameof(ExecutePowerExt) + "'.")]
-        [Category("Default option")]
-#else
-        [Browsable(false)]
-#endif 
-        [XmlIgnore]
-        public uint DefaultTargetRadius
-        {
-            get => _targetRad;
-            set => _targetRad = value;
-        }
-        [NonSerialized]
-        private static uint _targetRad;
-
+        #region Power
 #if DEVELOPER
         [Editor(typeof(PowerIdEditor), typeof(UITypeEditor))]
-        [Category("Required")]
+        [Category("Power")]
 #else
         [Browsable(false)]
 #endif
@@ -165,7 +83,7 @@ namespace EntityTools.Quester.Actions
 
 #if DEVELOPER
         [Description("Time to cast the power. Minimum is 500 ms")]
-        [Category("Optional")]
+        [Category("Power")]
         [DisplayName("CastingTime (ms)")]
 #else
         [Browsable(false)]
@@ -188,7 +106,7 @@ namespace EntityTools.Quester.Actions
 
 #if DEVELOPER
         [Description("Time to wait after executing the power. Minimum is 500 ms")]
-        [Category("Optional")]
+        [Category("Power")]
         [DisplayName("Pause (ms)")]
 #else
         [Browsable(false)]
@@ -208,6 +126,33 @@ namespace EntityTools.Quester.Actions
             }
         }
         private int pause = 500;
+        #endregion
+
+
+        #region Location
+        /// <summary>
+        /// Точка, в которой необходимо использовать заданное умение
+        /// </summary>
+#if DEVELOPER
+        [Description("The position that the character should stand to use the power specified '" + nameof(PowerId) + "'")]
+        [Editor(typeof(PositionEditor), typeof(UITypeEditor))]
+        [Category("Location")]
+#else
+        [Browsable(false)]
+#endif   
+        public Vector3 InitialPosition
+        {
+            get => initialPosition;
+            set
+            {
+                if (value != initialPosition)
+                {
+                    initialPosition = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private Vector3 initialPosition = Vector3.Empty;
 
 #if DEVELOPER
         [Description("The collection of the CustomRegions specifying the area within which action could be applied.\n" +
@@ -247,7 +192,7 @@ namespace EntityTools.Quester.Actions
             get => currentMap;
             set
             {
-                if(value != currentMap)
+                if (value != currentMap)
                 {
                     currentMap = value;
                     NotifyPropertyChanged();
@@ -279,7 +224,7 @@ namespace EntityTools.Quester.Actions
         private string currentRegion;
 
 #if DEVELOPER
-        [Description("The interval of Z-coordinate within which the Character can reach the '"+ nameof(InitialPosition) + "' and the current action can be applied.\n" +
+        [Description("The interval of Z-coordinate within which the Character can reach the '" + nameof(InitialPosition) + "' and the current action can be applied.\n" +
                      "This condition is ignored when the '" + nameof(Range<float>.Min) + "' equals to '" + nameof(Range<float>.Max) + "'")]
         [Category("Location")]
         [Editor(typeof(ZRangeEditor), typeof(UITypeEditor))]
@@ -300,32 +245,61 @@ namespace EntityTools.Quester.Actions
             }
         }
         private Range<float> zRange = new Range<float>();
+        #endregion
+
+
+        #region Target
+        /// <summary>
+        /// Точка, используемая в качестве цели для применения умения <see cref="PowerId"/>
+        /// </summary>
+#if DEVELOPER
+        [Description("The position used as the target point for the power specified by '" + nameof(PowerId) + "'")]
+        [Editor(typeof(PositionEditor), typeof(UITypeEditor))]
+        [Category("Target")]
+#else
+        [Browsable(false)]
+#endif   
+        public Vector3 TargetPosition
+        {
+            get => targetPosition;
+            set
+            {
+                if (value != targetPosition)
+                {
+                    targetPosition = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private Vector3 targetPosition = Vector3.Empty;
 
 #if DEVELOPER
-        [Description("The offset of Z-coordinate from the '" + nameof(InitialPosition) + "'.\n" +
-                     "When the new '" + nameof(ExecutePowerExt) + "' command  will be added to the profile the '" + nameof(zRange) + "' will be calculated as follows:\n" +
-                     "Min = " + nameof(InitialPosition) + "." + nameof(Vector3.Z) + " - " + nameof(ZDeviation) +"\n" +
-                     "Max = " + nameof(InitialPosition) + "." + nameof(Vector3.Z) + " + " + nameof(ZDeviation))]
-        [Category("Default option")]
-        [DisplayName("ZDeviation")]
+        [Description("The radius of target area centered on '" + nameof(TargetPosition) + "'.\n" +
+                     "After executing the '" + nameof(PowerId) + "' the character must be closer to the '" + nameof(TargetPosition) + "' than the '" + nameof(TargetRadius) + "' to complete action.\n" +
+                     "The action will be continued if the character is farther from the '" + nameof(TargetPosition) + "' than the specified '" + nameof(TargetRadius) + "'.\n" +
+                     "If value is zero the action completed after power executed.")]
+        [Category("Target")]
 #else
         [Browsable(false)]
 #endif 
-        [XmlIgnore]
-        public uint ZDeviation
+        public uint TargetRadius
         {
-            get => _zDev;
+            get => targetRad;
             set
             {
-                _zDev = value;
+                targetRad = value;
+                _targetRad = value;
+                NotifyPropertyChanged();
             }
         }
-        [NonSerialized]
-        private static uint _zDev = 0;
+        private uint targetRad;
+        #endregion
 
+
+        #region ManageCombatOptions
 #if DEVELOPER
         [Description("Enable '" + nameof(IgnoreCombat) + "' profile value while playing action")]
-        [Category("Optional")]
+        [Category("Manage Combat Option")]
 #else
         [Browsable(false)]
 #endif
@@ -342,6 +316,94 @@ namespace EntityTools.Quester.Actions
         }
         private bool ignoreCombat = true;
 
+#if DEVELOPER
+        [Description("Sets the ucc option '" + nameof(IgnoreCombatMinHP) + "' when disabling combat mode.\n" +
+                     "Options ignored if the value is -1.")]
+        [Category("Manage Combat Options")]
+#else
+        [Browsable(false)]
+#endif
+        public int IgnoreCombatMinHP
+        {
+            get => _ignoreCombatMinHp; set
+            {
+                if (value < -1)
+                    value = 0;
+                if (value > 100)
+                    value = 100;
+                if (_ignoreCombatMinHp != value)
+                {
+                    _ignoreCombatMinHp = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private int _ignoreCombatMinHp = -1;
+
+#if DEVELOPER
+        [Description("Special check before disabling combat while playing action.\n" +
+                     "The condition is checking when option '" + nameof(IgnoreCombat) + "' is active.")]
+        [Category("Manage Combat Options")]
+        [Editor(typeof(QuesterConditionEditor), typeof(UITypeEditor))]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+#else
+        [Browsable(false)]
+#endif
+        public Astral.Quester.Classes.Condition IgnoreCombatCondition
+        {
+            get => _ignoreCombatCondition;
+            set
+            {
+                if (value != _ignoreCombatCondition)
+                {
+                    _ignoreCombatCondition = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        #endregion
+
+
+        #region DefaultOption
+#if DEVELOPER
+        [Description("The default value of the '" + nameof(TargetRadius) + "' for each new command '" + nameof(ExecutePowerExt) + "'.")]
+        [Category("Default option")]
+#else
+        [Browsable(false)]
+#endif 
+        [XmlIgnore]
+        public uint DefaultTargetRadius
+        {
+            get => _targetRad;
+            set => _targetRad = value;
+        }
+        [NonSerialized]
+        private static uint _targetRad;
+
+#if DEVELOPER
+        [Description("The offset of Z-coordinate from the '" + nameof(InitialPosition) + "'.\n" +
+                     "When the new '" + nameof(ExecutePowerExt) + "' command  will be added to the profile the '" + nameof(zRange) + "' will be calculated as follows:\n" +
+                     "Min = " + nameof(InitialPosition) + "." + nameof(Vector3.Z) + " - " + nameof(ZDeviation) + "\n" +
+                     "Max = " + nameof(InitialPosition) + "." + nameof(Vector3.Z) + " + " + nameof(ZDeviation))]
+        [Category("Default Option")]
+        [DisplayName("ZDeviation")]
+#else
+        [Browsable(false)]
+#endif 
+        [XmlIgnore]
+        public uint ZDeviation
+        {
+            get => _zDev;
+            set
+            {
+                _zDev = value;
+            }
+        }
+        [NonSerialized]
+        private static uint _zDev = 0; 
+        #endregion
+
+        private Astral.Quester.Classes.Condition _ignoreCombatCondition;
         public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).NeedToRun;
         public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Run();
         public override string ActionLabel => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).ActionLabel;
