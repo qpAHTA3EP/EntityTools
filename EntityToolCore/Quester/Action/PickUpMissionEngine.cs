@@ -123,7 +123,7 @@ namespace EntityCore.Quester.Action
                 bool debugInfoEnabled = ExtendedDebugInfo;
 
                 string currentMethodName = debugInfoEnabled
-                    ? string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name)
+                    ? string.Concat(_idStr, '.', MethodBase.GetCurrentMethod()?.Name ?? nameof(NeedToRun))
                     : string.Empty;
 
                 bool needToRun = false;
@@ -131,37 +131,41 @@ namespace EntityCore.Quester.Action
                 if (debugInfoEnabled)
                     ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Begins"));
 
-                float searchDistance = Math.Max(@this._interactDistance + 0.5f,
+                float searchDistance = Math.Max(@this.InteractDistance + 0.5f,
                                 @this.ContactHaveMission == ContactHaveMissionCheckType.Disabled ? 10f : 50f);
 
-                if (@this._giver.Type == MissionGiverType.NPC)
+                var giver = @this.Giver;
+                if (giver.Type == MissionGiverType.NPC)
                 {
-                    var giverPos = @this._giver.Position;
-                    var giverDistance = @this._giver.Distance;
+                    var giverPos = giver.Position;
+                    var giverDistance = giver.Distance;
 
                     if (giverDistance < searchDistance
-                        && Math.Abs(giverPos.Z - EntityManager.LocalPlayer.Z) <= @this._interactZDifference)
+                        && Math.Abs(giverPos.Z - EntityManager.LocalPlayer.Z) <= @this.InteractZDifference)
                     {
                         if (debugInfoEnabled)
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Distance to the Giver is ", giverDistance.ToString("N1"), ". Result 'true'"));
+                            ETLogger.WriteLine(LogType.Debug,
+                                $"{currentMethodName}: Distance to the Giver is {giverDistance:N1}. Result 'true'");
                         needToRun = true;
                     }  
                     else if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Faraway(", giverDistance.ToString("N1"), "). Result 'False'"));
+                        ETLogger.WriteLine(LogType.Debug,
+                            $"{currentMethodName}: Faraway({giverDistance:N1}). Result 'False'");
                 }
-                else if(@this._giver.Type == MissionGiverType.Remote)
+                else if(giver.Type == MissionGiverType.Remote)
                 {
                     if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Giver is remote. Result 'True'"));
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Giver is remote. Result 'True'");
                     needToRun = true;
                 }
 
-                if (@this._ignoreCombat && !needToRun)
+                if (@this.IgnoreCombat && !needToRun
+                    && CheckingIgnoreCombatCondition())
                 {
-                    AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true);
+                    AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true, @this.IgnoreCombatMinHP, 5_000);
 
                     if (debugInfoEnabled)
-                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Disable combat"));
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Disable combat");
                 }
 
                 return needToRun;
@@ -187,7 +191,7 @@ namespace EntityCore.Quester.Action
                 return ActionResult.Fail;
             }
 
-            if (@this._ignoreCombat)
+            if (@this.IgnoreCombat)
             {
                 bool inCombat = EntityManager.LocalPlayer.InCombat;
                 if (debugInfoEnabled)
@@ -198,15 +202,16 @@ namespace EntityCore.Quester.Action
                     return ActionResult.Running;
             }
 
-            switch (@this._giver.Type)
+            var giver = @this.Giver;
+            switch (giver.Type)
             {
                 case MissionGiverType.NPC:
                 {
-                    float interactDistance = Math.Max(@this._interactDistance + 0.5f, 5.5f);
-                    var giverPos = @this._giver.Position;
+                    float interactDistance = Math.Max(@this.InteractDistance + 0.5f, 5.5f);
+                    var giverPos = giver.Position;
 
                     // Производит поиск NPC-Квестодателя
-                    if (giverContactInfo is null || !@this._giver.IsMatch(giverContactInfo.Entity))
+                    if (giverContactInfo is null || !giver.IsMatch(giverContactInfo.Entity))
                     {
                         giverContactInfo = null;
                         foreach (ContactInfo contactInfo in EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts)
@@ -215,8 +220,8 @@ namespace EntityCore.Quester.Action
                             var contactLocation = contactEntity.Location;
 
 
-                            if (Math.Abs(giverPos.Z - contactLocation.Z) <= @this._interactZDifference &&
-                                @this._giver.IsMatch(contactEntity))
+                            if (Math.Abs(giverPos.Z - contactLocation.Z) <= @this.InteractZDifference &&
+                                giver.IsMatch(contactEntity))
                             {
                                 giverContactInfo = contactInfo;
 
@@ -226,7 +231,7 @@ namespace EntityCore.Quester.Action
                             }
                         }
 
-                        if (giverContactInfo is null && @this._giver.Distance < interactDistance)
+                        if (giverContactInfo is null && giver.Distance < interactDistance)
                         {
                             // Персонаж прибыл на место, однако, нужный NPC отсутствует
                             // невозможно ни принять миссию, ни пропустить команду
@@ -245,12 +250,13 @@ namespace EntityCore.Quester.Action
                     {
                         Entity entity = giverContactInfo.Entity;
                         if (debugInfoEnabled)
-                            ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Entity [{entity.GetDebugDescription()}] match to MissionGiverInfo [{@this._giver}]");
+                            ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Entity [{entity.GetDebugDescription()}] match to MissionGiverInfo [{giver}]");
 
                         // Проверяем наличие задания у контакта 
-                        if (@this._contactHaveMission != ContactHaveMissionCheckType.Disabled)
+                        var contactHaveMission = @this.ContactHaveMission;
+                        if (contactHaveMission != ContactHaveMissionCheckType.Disabled)
                         {
-                            if (!giverContactInfo.ContactHaveMission(@this._contactHaveMission))
+                            if (!giverContactInfo.ContactHaveMission(contactHaveMission))
                             {
                                 if (debugInfoEnabled)
                                     ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: ContactHaveMission is False => ActionResult = '{ActionResult.Skip}'");
@@ -264,7 +270,7 @@ namespace EntityCore.Quester.Action
                             ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Skipped checking the condition 'ContactHaveMission'");
 
                         // Перемещаемся к квестодателю (в случае необходимости)
-                        if (!entity.ApproachMissionGiver(@this._interactDistance, @this._interactZDifference))
+                        if (!entity.ApproachMissionGiver(@this.InteractDistance, @this.InteractZDifference))
                         {
                             if (debugInfoEnabled)
                                 ETLogger.WriteLine(LogType.Debug,  $"{currentMethodName}: ApproachMissionGiver failed => ActionResult = '{ActionResult.Running}'");
@@ -274,7 +280,7 @@ namespace EntityCore.Quester.Action
                             ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: ApproachMissionGiver succeeded");
 
                         // Взаимодействуем с квестодателем
-                        if (!entity.InteractMissionGiver(@this._interactDistance))
+                        if (!entity.InteractMissionGiver(@this.InteractDistance))
                         {
                             if (debugInfoEnabled)
                                 ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: InteractMissionGiver failed => ActionResult = '{ActionResult.Running}'");
@@ -290,7 +296,7 @@ namespace EntityCore.Quester.Action
                 {
                     if (debugInfoEnabled)
                         ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Calling 'RemoteContact'");
-                    var id = @this._giver.Id;
+                    var id = giver.Id;
                     var remoteContact = EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts.FirstOrDefault(ct => ct.ContactDef == id);
 
                     //TODO для вызова RemoteVendor, которые не видные в окне выбора, нужно реализовать торговлю как в QuesterAssistant через Injection.cmdwrapper_contact_StartRemoteContact(this.RemoteContact);
@@ -325,7 +331,7 @@ namespace EntityCore.Quester.Action
 #if false
             MissionProcessingResult processingResult = ProccessingDialog(); 
 #else
-            MissionProcessingResult processingResult = MissionHelper.ProcessingMissionDialog(@this._missionId, false, @this._dialogs, RewardItemCheck, TIME);
+            MissionProcessingResult processingResult = MissionHelper.ProcessingMissionDialog(@this.MissionId, false, @this.Dialogs, RewardItemCheck, TIME);
 #endif
             tries++;
 
@@ -335,7 +341,7 @@ namespace EntityCore.Quester.Action
             {
                 case MissionProcessingResult.MissionAccepted:
                     tries = int.MaxValue;
-                    if (@this._closeContactDialog)
+                    if (@this.CloseContactDialog)
                     {
                         GameHelper.CloseAllFrames();
                         Thread.Sleep(2000);
@@ -346,7 +352,7 @@ namespace EntityCore.Quester.Action
                     Thread.Sleep(1000);
                     break;
                 case MissionProcessingResult.MissionNotFound:
-                    if (@this._skipOnFail)
+                    if (@this.SkipOnFail)
                     {
                         ETLogger.WriteLine($"{currentMethodName}: Mission not available...", true);
                         return ActionResult.Skip;
@@ -354,16 +360,16 @@ namespace EntityCore.Quester.Action
                     break;
                 case MissionProcessingResult.MissionRequiredRewardMissing:
                     ETLogger.WriteLine($"{currentMethodName}: Required mission reward not found...", true);
-                    if (@this._closeContactDialog)
+                    if (@this.CloseContactDialog)
                     {
                         GameHelper.CloseAllFrames();
                         Thread.Sleep(1000);
                     }
                     else QuesterAssistantAccessors.Classes.Monitoring.Frames.Sleep(2000);
 
-                    if (@this._targetActionId != Guid.Empty)
+                    if (@this.TargetAction != Guid.Empty)
                     {
-                        var targetAction = Astral.Quester.API.CurrentProfile.GetActionByID(@this._targetActionId);
+                        var targetAction = Astral.Quester.API.CurrentProfile.GetActionByID(@this.TargetAction);
                         if (targetAction == null)
                         {
                             //ETLogger.WriteLine($"{currentMethodName}: {@this.GetPropertyDisplayName(o => o.TargetAction)}: {nameof(@this.TargetAction)} not found !", true);
@@ -383,7 +389,7 @@ namespace EntityCore.Quester.Action
             }
 
         Results:
-            ActionResult result = (@this._skipOnFail && tries < 3)
+            ActionResult result = (@this.SkipOnFail && tries < 3)
                 ? ActionResult.Running
                 : ActionResult.Fail;
 
@@ -398,7 +404,7 @@ namespace EntityCore.Quester.Action
             get
             {
                 if (string.IsNullOrEmpty(label))
-                    label = $"{@this.GetType().Name}: [{@this._missionId}]";
+                    label = $"{@this.GetType().Name}: [{@this.MissionId}]";
                 return label;
             }
         }
@@ -407,17 +413,18 @@ namespace EntityCore.Quester.Action
         {
             get
             {
-                bool isGiverAccessible = @this._giver.IsAccessible;
+                bool isGiverAccessible = @this.Giver.IsAccessible;
 #if false
                 bool isHavingMissionOrCompleted = MissionHelper.CheckHavingMissionOrCompleted(@this._missionId);
                 bool result = isGiverAccessible && !isHavingMissionOrCompleted;
                 if (ExtendedDebugInfo)
                     ETLogger.WriteLine(LogType.Debug, string.Concat(_idStr, '.', nameof(InternalConditions), ": GiverAccessible(", isGiverAccessible, ") AND Not(HavingMissionOrCompleted(", isHavingMissionOrCompleted, ")) => ", result)); 
 #else
-                bool haveMission = MissionHelper.HaveMission(@this._missionId, out _);
+                bool haveMission = MissionHelper.HaveMission(@this.MissionId, out _);
                 bool result = isGiverAccessible && !haveMission;
                 if (ExtendedDebugInfo)
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(_idStr, '.', nameof(InternalConditions), ": GiverAccessible(", isGiverAccessible, ") AND Not(HaveMission(", haveMission, ")) => ", result));
+                    ETLogger.WriteLine(LogType.Debug,
+                        $"{_idStr}.{nameof(InternalConditions)}: GiverAccessible({isGiverAccessible}) AND Not(HaveMission({haveMission})) => {result}");
 #endif
                 return result;
             }
@@ -427,9 +434,9 @@ namespace EntityCore.Quester.Action
         {
             get
             {
-                if (!@this._giver.IsValid) 
+                if (!@this.Giver.IsValid) 
                     return new ActionValidity("Invalid Giver.");
-                if (string.IsNullOrEmpty(@this._missionId))
+                if (string.IsNullOrEmpty(@this.MissionId))
                     return new ActionValidity("Invalid mission id.");
                 return new ActionValidity();
             }
@@ -441,9 +448,10 @@ namespace EntityCore.Quester.Action
         {
             get
             {
-                if (@this._giver.IsAccessible
-                    && @this._giver.Distance >= @this._interactDistance)
-                    return @this._giver.Position.Clone();
+                var giver = @this.Giver;
+                if (giver.IsAccessible
+                    && giver.Distance >= @this.InteractDistance)
+                    return giver.Position.Clone();
                 return Vector3.Empty;
             }
         }
@@ -470,9 +478,10 @@ namespace EntityCore.Quester.Action
                     // if (!missionGiver.IsMatching(entity)) return;
 
                     //BUG ApproachMissionGiver не подводит к NPC
-                    if (!entity.ApproachMissionGiver(@this._interactDistance, @this._interactZDifference)) return;
+                    var interactDistance = @this.InteractDistance;
+                    if (!entity.ApproachMissionGiver(interactDistance, @this.InteractZDifference)) return;
 
-                    if (!entity.InteractMissionGiver(@this._interactDistance)) return; 
+                    if (!entity.InteractMissionGiver(interactDistance)) return; 
 
                 }
                 else if (missionGiver.Type == MissionGiverType.Remote)
@@ -559,7 +568,7 @@ namespace EntityCore.Quester.Action
                         {
                             // Выбранный пункт диалога не содержит идентификатора миссии
                             // добавляем его в Dialogs
-                            @this._dialogs.Add(aDialogKey);
+                            @this.Dialogs.Add(aDialogKey);
                             interactInfo.ContactDialog.SelectOptionByKey(aDialogKey);
                             Thread.Sleep(1000);
 #if false
@@ -582,8 +591,8 @@ namespace EntityCore.Quester.Action
                 if (!string.IsNullOrEmpty(missionId)
                     && missionGiver.IsValid)
                 {
-                    @this._missionId = missionId;
-                    @this._giver = missionGiver;
+                    @this.MissionId = missionId;
+                    @this.Giver = missionGiver;
 
                     label = string.Empty;
                 }
@@ -592,11 +601,12 @@ namespace EntityCore.Quester.Action
 
         public void OnMapDraw(GraphicsNW graphics)
         {
-            if (@this._giver != null && @this._giver.Position.IsValid)
+            var giver = @this.Giver;
+            if (giver != null && giver.Position.IsValid)
             {
                 if (graphics is MapperGraphics graphicsExt)
-                    graphicsExt.FillCircleCentered(Brushes.Beige, @this._giver.Position, 10);
-                else graphics.drawFillEllipse(@this._giver.Position, MapperHelper.Size_10x10, Brushes.Beige);
+                    graphicsExt.FillCircleCentered(Brushes.Beige, giver.Position, 10);
+                else graphics.drawFillEllipse(giver.Position, MapperHelper.Size_10x10, Brushes.Beige);
             }
         }
 
@@ -619,9 +629,10 @@ namespace EntityCore.Quester.Action
             {
                 if (_rewardItemCheck is null)
                 {
-                    if (!string.IsNullOrEmpty(@this._requiredRewardItem))
+                    var requiredRewardItem = @this.RequiredRewardItem;
+                    if (!string.IsNullOrEmpty(requiredRewardItem))
                     {
-                        var strPred = StringToPatternComparer.GetComparer(@this._requiredRewardItem);
+                        var strPred = @this.RequiredRewardItem.GetComparer();
                         if (strPred != null)
                             return _rewardItemCheck = itm => strPred(itm.ItemDef.InternalName);
                     }
@@ -632,24 +643,17 @@ namespace EntityCore.Quester.Action
         }
         Predicate<Item> _rewardItemCheck;
 
-#if false
         /// <summary>
-        /// Вспомогательный метод формирования текстового описания <param name="contactInfo"/> для вывода отладочной информации
+        /// Проверка условия отключения боя <see cref="PickUpMissionExt.IgnoreCombatCondition"/>
         /// </summary>
-        private string GetDebugDescriptionOf(ContactInfo contactInfo)
+        /// <returns>Результат проверки <see cref="PickUpMissionExt.IgnoreCombatCondition"/> либо True, если оно не задано.</returns>
+        private bool CheckingIgnoreCombatCondition()
         {
-            var entity = contactInfo.Entity;
-
-            return $"{entity.InternalName}; {entity.ContainerId:X}";
+            var check = @this.IgnoreCombatCondition;
+            if (check != null)
+                return check.IsValid;
+            return true;
         }
-        /// <summary>
-        /// Вспомогательный метод формирования текстового описания <param name="entity"/> для вывода отладочной информации
-        /// </summary>
-        private string GetDebugDescriptionOf(Entity entity)
-        {
-            return $"{entity.InternalName}; {entity.ContainerId:X}";
-        } 
-#endif
         #endregion
     }
 }

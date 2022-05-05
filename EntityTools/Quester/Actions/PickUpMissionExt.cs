@@ -12,6 +12,7 @@ using System.Drawing.Design;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Xml.Serialization;
+using Astral.Quester.Classes.Actions;
 using EntityTools.Annotations;
 using EntityTools.Enums;
 using Action = Astral.Quester.Classes.Action;
@@ -25,8 +26,8 @@ namespace EntityTools.Quester.Actions
     {
         #region Опции команды
 #if DEVELOPER
-        [Description("Identifier of the Mission.\n\r" +
-            "Allows simple mask (*) at the begin and at the end")]
+        [Description("Identifier of the Mission.\n" +
+            "Allows simple mask (*) at the begin and at the end.")]
         [Editor(typeof(MainMissionEditor), typeof(UITypeEditor))]
         [Category("Required")]
 #else
@@ -44,7 +45,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal string _missionId = string.Empty;
+        private string _missionId = string.Empty;
 
 #if DEVELOPER
         [Editor(typeof(MissionGiverInfoEditor), typeof(UITypeEditor))]
@@ -66,10 +67,10 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal MissionGiverInfo _giver = new MissionGiverInfo();
+        private MissionGiverInfo _giver = new MissionGiverInfo();
 
 #if DEVELOPER
-        [Description("The minimum value is 5")]
+        [Description("The minimum value is 5.")]
         [Category("Interaction")]
 #else
         [Browsable(false)]
@@ -80,15 +81,15 @@ namespace EntityTools.Quester.Actions
             set
             {
                 value = Math.Max(value, 5);
-                if (_interactDistance == value) return;
+                if (Math.Abs(_interactDistance - value) < 0.1f) return;
                 _interactDistance = value;
                 NotifyPropertyChanged();
             }
         }
-        internal float _interactDistance = 10;
+        private float _interactDistance = 10;
 
 #if DEVELOPER
-        [Description("The minimum value is 1")]
+        [Description("The minimum value is 1.")]
         [Category("Interaction")]
 #else
         [Browsable(false)]
@@ -99,15 +100,15 @@ namespace EntityTools.Quester.Actions
             set
             {
                 value = Math.Max(value, 1);
-                if (_interactZDifference == value) return;
+                if (Math.Abs(_interactZDifference - value) < 0.1f) return;
                 _interactZDifference = value;
                 NotifyPropertyChanged();
             }
         }
-        internal float _interactZDifference = 10;
+        private float _interactZDifference = 10;
 
 #if DEVELOPER
-        [Description("Answers in dialog which have to be performed before mission picking up")]
+        [Description("Answers in dialog which have to be performed before mission picking up.")]
         [Editor(typeof(DialogEditor), typeof(UITypeEditor))]
         [Category("Interaction")]
 #else
@@ -124,7 +125,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal List<string> _dialogs = new List<string>();
+        private List<string> _dialogs = new List<string>();
 
 #if DEVELOPER
         [Description("Skip directly if mission is not available.")]
@@ -145,7 +146,7 @@ namespace EntityTools.Quester.Actions
 
             }
         }
-        internal bool _skipOnFail = false;
+        private bool _skipOnFail;
 
 #if DEVELOPER
         [Category("Interaction")]
@@ -162,12 +163,12 @@ namespace EntityTools.Quester.Actions
                 NotifyPropertyChanged();
             }
         }
-        internal bool _closeContactDialog;
+        private bool _closeContactDialog;
 
 #if !DEVELOPER
         [Browsable(false)]
 #else
-        [Description("Check if contact have mission")]
+        [Description("Check if contact have mission.")]
         [Category("Optional")]
 #endif
         public ContactHaveMissionCheckType ContactHaveMission
@@ -180,9 +181,13 @@ namespace EntityTools.Quester.Actions
                 NotifyPropertyChanged();
             }
         }
-        internal ContactHaveMissionCheckType _contactHaveMission = ContactHaveMissionCheckType.Disabled;
+        private ContactHaveMissionCheckType _contactHaveMission = ContactHaveMissionCheckType.Disabled;
 
-#if !DEVELOPER
+        #region Manage Combat Options
+#if DEVELOPER
+        [Description("Ignore the enemies while approaching the " + nameof(Giver) + ".")]
+        [Category("Manage Combat Options")]
+#else
         [Browsable(false)]
 #endif
         public bool IgnoreCombat
@@ -195,13 +200,61 @@ namespace EntityTools.Quester.Actions
                 NotifyPropertyChanged();
             }
         }
-        internal bool _ignoreCombat = false;
+        private bool _ignoreCombat;
+
+#if DEVELOPER
+        [Description("Sets the ucc option '" + nameof(IgnoreCombatMinHP) + "' when disabling combat mode.\n" +
+                     "Options ignored if the value is -1.")]
+        [Category("Manage Combat Options")]
+#else
+        [Browsable(false)]
+#endif
+        public int IgnoreCombatMinHP
+        {
+            get => _ignoreCombatMinHp; set
+            {
+                if (value < -1)
+                    value = 0;
+                if (value > 100)
+                    value = 100;
+                if (_ignoreCombatMinHp != value)
+                {
+                    _ignoreCombatMinHp = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private int _ignoreCombatMinHp = -1;
+
+#if DEVELOPER
+        [Description("Special check before disabling combat while playing action.\n" +
+                     "The condition is checking when option '" + nameof(IgnoreCombat) + "' is active.")]
+        [Category("Manage Combat Options")]
+        [Editor(typeof(QuesterConditionEditor), typeof(UITypeEditor))]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+#else
+        [Browsable(false)]
+#endif
+        public Astral.Quester.Classes.Condition IgnoreCombatCondition
+        {
+            get => _ignoreCombatCondition;
+            set
+            {
+                if (value != _ignoreCombatCondition)
+                {
+                    _ignoreCombatCondition = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private Astral.Quester.Classes.Condition _ignoreCombatCondition; 
+        #endregion
 
 #if DEVELOPER
         [Editor(typeof(RewardsEditor), typeof(UITypeEditor))]
-        [Description("Item that is requered in rewards to PickUpMission\n" +
-                     "Simple wildcard (*) is allowed\n" +
-                     "Mission Offer dialog have to be opened for choosen the ReqieredRewardItem")]
+        [Description("Item that is requered in rewards to " + nameof(PickUpMission) + ".\n" +
+                     "Simple wildcard (*) is allowed.\n" +
+                     "Mission Offer dialog have to be opened for choosen the " + nameof(RequiredRewardItem) + ".")]
         [Category("Optional")]
 #else
         [Browsable(false)]
@@ -216,9 +269,10 @@ namespace EntityTools.Quester.Actions
                 NotifyPropertyChanged();
             }
         }
-        internal string _requiredRewardItem = string.Empty;
+        private string _requiredRewardItem = string.Empty;
+
 #if DEVELOPER
-        [Description("The Id of the Action executing if the '" + nameof(RequiredRewardItem) + "' would be missing")]
+        [Description("The Id of the Action executing if the '" + nameof(RequiredRewardItem) + "' would be missing.")]
         [Category("Optional")]
         [DisplayName("TargetActionOnRequiredRewardMissing")]
 #else
@@ -234,12 +288,12 @@ namespace EntityTools.Quester.Actions
                 NotifyPropertyChanged();
             }
         }
-        internal Guid _targetActionId = Guid.Empty;
+        private Guid _targetActionId = Guid.Empty;
 
         [Browsable(false)]
         public string GiverId
         {
-            get => string.Empty;//_giver.Id;
+            get => string.Empty;
             set
             {
                 if (!string.IsNullOrEmpty(value))
@@ -258,28 +312,19 @@ namespace EntityTools.Quester.Actions
         }
         [Browsable(false)]
         [XmlIgnore]
-        public new bool PlayWhileUnSuccess
-        {
-            get => false;
-        }
+        public new bool PlayWhileUnSuccess => false;
+
         [Browsable(false)]
         [XmlIgnore]
-        public new bool PlayWhileConditionsAreOk
-        {
-            get => false;
-        }
+        public new bool PlayWhileConditionsAreOk => false;
+
         [Browsable(false)]
         [XmlIgnore]
-        public new bool Loop
-        {
-            get => false;
-        }
+        public new bool Loop => false;
+
         [Browsable(false)]
         [XmlIgnore]
-        public new string AssociateMissionSuccess
-        {
-            get => string.Empty;
-        }
+        public new string AssociateMissionSuccess => string.Empty;
 
         [XmlIgnore]
         [Browsable(false)]
@@ -292,16 +337,16 @@ namespace EntityTools.Quester.Actions
         [NotifyPropertyChangedInvocator]
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            Engine.OnPropertyChanged(this, propertyName);
+            _engine.OnPropertyChanged(this, propertyName);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         [NonSerialized]
-        private IQuesterActionEngine Engine;
+        private IQuesterActionEngine _engine;
 
         public PickUpMissionExt()
         {
-            Engine = MakeProxy();
+            _engine = MakeProxy();
             base.PlayWhileConditionsAreOk = false;
             base.PlayWhileUnSuccess = false;
             base.Loop = false;
@@ -309,11 +354,11 @@ namespace EntityTools.Quester.Actions
 
         public void Bind(IQuesterActionEngine engine)
         {
-            Engine = engine;
+            _engine = engine;
         }
         public void Unbind()
         {
-            Engine = MakeProxy();
+            _engine = MakeProxy();
             PropertyChanged = null;
         }
 
@@ -323,16 +368,16 @@ namespace EntityTools.Quester.Actions
         }
         #endregion
 
-        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).NeedToRun;
-        public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Run();
-        public override string ActionLabel => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).ActionLabel;
+        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).NeedToRun;
+        public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).Run();
+        public override string ActionLabel => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).ActionLabel;
         public override string InternalDisplayName => string.Empty;
-        public override bool UseHotSpots => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).UseHotSpots;
-        protected override bool IntenalConditions => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).InternalConditions;
-        protected override Vector3 InternalDestination => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).InternalDestination;
-        protected override ActionValidity InternalValidity => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).InternalValidity;
-        public override void GatherInfos() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).GatherInfos();
-        public override void InternalReset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).InternalReset();
-        public override void OnMapDraw(GraphicsNW graph) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).OnMapDraw(graph);
+        public override bool UseHotSpots => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).UseHotSpots;
+        protected override bool IntenalConditions => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).InternalConditions;
+        protected override Vector3 InternalDestination => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).InternalDestination;
+        protected override ActionValidity InternalValidity => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).InternalValidity;
+        public override void GatherInfos() => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).GatherInfos();
+        public override void InternalReset() => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).InternalReset();
+        public override void OnMapDraw(GraphicsNW graph) => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).OnMapDraw(graph);
     }
 }

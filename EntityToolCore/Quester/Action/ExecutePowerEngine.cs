@@ -381,9 +381,9 @@ namespace EntityCore.Quester.Action
         }
 
         /// <summary>
-        /// Проверка условия отключения боя <see cref="MoveToEntity.IgnoreCombatCondition"/>
+        /// Проверка условия отключения боя <see cref="ExecutePowerExt.IgnoreCombatCondition"/>
         /// </summary>
-        /// <returns>Результат проверки <see cref="MoveToEntity.IgnoreCombatCondition"/> либо True, если оно не задано.</returns>
+        /// <returns>Результат проверки <see cref="ExecutePowerExt.IgnoreCombatCondition"/> либо True, если оно не задано.</returns>
         private bool CheckingIgnoreCombatCondition()
         {
             var check = @this.IgnoreCombatCondition;

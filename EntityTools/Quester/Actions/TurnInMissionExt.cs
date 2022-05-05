@@ -47,7 +47,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal string _missionId = string.Empty;
+        private string _missionId = string.Empty;
 
 #if DEVELOPER
         [Editor(typeof(MissionGiverInfoEditor), typeof(UITypeEditor))]
@@ -68,7 +68,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal MissionGiverInfo _giver = new MissionGiverInfo();
+        private MissionGiverInfo _giver = new MissionGiverInfo();
 
 #if !DEVELOPER
         [Browsable(false)]
@@ -83,9 +83,14 @@ namespace EntityTools.Quester.Actions
                 NotifyPropertyChanged();
             }
         }
-        internal bool _closeContactDialog;
+        private bool _closeContactDialog;
 
-#if !DEVELOPER
+
+        #region Manage Combat Options
+#if DEVELOPER
+        [Description("Ignore the enemies while approaching the " + nameof(Giver) + ".")]
+        [Category("Manage Combat Options")]
+#else
         [Browsable(false)]
 #endif
         public bool IgnoreCombat
@@ -98,7 +103,56 @@ namespace EntityTools.Quester.Actions
                 NotifyPropertyChanged();
             }
         }
-        internal bool _ignoreCombat = false;
+        private bool _ignoreCombat;
+
+#if DEVELOPER
+        [Description("Sets the ucc option '" + nameof(IgnoreCombatMinHP) + "' when disabling combat mode.\n" +
+                     "Options ignored if the value is -1.")]
+        [Category("Manage Combat Options")]
+#else
+        [Browsable(false)]
+#endif
+        public int IgnoreCombatMinHP
+        {
+            get => _ignoreCombatMinHp; set
+            {
+                if (value < -1)
+                    value = 0;
+                if (value > 100)
+                    value = 100;
+                if (_ignoreCombatMinHp != value)
+                {
+                    _ignoreCombatMinHp = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private int _ignoreCombatMinHp = -1;
+
+#if DEVELOPER
+        [Description("Special check before disabling combat while playing action.\n" +
+                     "The condition is checking when option '" + nameof(IgnoreCombat) + "' is active.")]
+        [Category("Manage Combat Options")]
+        [Editor(typeof(QuesterConditionEditor), typeof(UITypeEditor))]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+#else
+        [Browsable(false)]
+#endif
+        public Astral.Quester.Classes.Condition IgnoreCombatCondition
+        {
+            get => _ignoreCombatCondition;
+            set
+            {
+                if (value != _ignoreCombatCondition)
+                {
+                    _ignoreCombatCondition = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private Astral.Quester.Classes.Condition _ignoreCombatCondition;
+        #endregion
+
 
 #if DEVELOPER
         [Description("The minimum value is 5")]
@@ -116,7 +170,7 @@ namespace EntityTools.Quester.Actions
                 NotifyPropertyChanged();
             }
         }
-        internal float _interactDistance = 10;
+        private float _interactDistance = 10;
 
 #if DEVELOPER
         [Description("The minimum value is 1")]
@@ -134,7 +188,7 @@ namespace EntityTools.Quester.Actions
                 NotifyPropertyChanged();
             }
         }
-        internal float _interactZDifference = 10;
+        private float _interactZDifference = 10;
 
 #if DEVELOPER
         [Editor(typeof(RewardsEditor), typeof(UITypeEditor))]
@@ -155,7 +209,8 @@ namespace EntityTools.Quester.Actions
                 NotifyPropertyChanged();
             }
         }
-        internal string _requiredRewardItem = string.Empty;
+        private string _requiredRewardItem = string.Empty;
+
 #if DEVELOPER
         [Description("The Id of the Action executing if the '" + nameof(RequiredRewardItem) + "' would be missing")]
         [Category("Optional")]
@@ -173,7 +228,7 @@ namespace EntityTools.Quester.Actions
                 NotifyPropertyChanged();
             }
         }
-        internal Guid _targetActionId = Guid.Empty;
+        private Guid _targetActionId = Guid.Empty;
 
 #if DEVELOPER
         [Description("Answers in dialog which have to be performed before mission picking up")]
@@ -192,7 +247,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal List<string> _dialogs = new List<string>();
+        private List<string> _dialogs = new List<string>();
 
         [Browsable(false)]
         public string GiverId
@@ -207,7 +262,7 @@ namespace EntityTools.Quester.Actions
         [Browsable(false)]
         public Vector3 GiverPosition
         {
-            get => null;//_giver.Position;
+            get => null;
             set
             {
                 if (value != null && value.IsValid)
@@ -219,29 +274,16 @@ namespace EntityTools.Quester.Actions
 
         [Browsable(false)]
         [XmlIgnore]
-        public new bool PlayWhileUnSuccess
-        {
-            get => false;
-        }
+        public new bool PlayWhileUnSuccess => false;
         [Browsable(false)]
         [XmlIgnore]
-        public new bool PlayWhileConditionsAreOk
-        {
-            get => false;
-        }
+        public new bool PlayWhileConditionsAreOk => false;
         [Browsable(false)]
         [XmlIgnore]
-        public new bool Loop
-        {
-            get => false;
-        }
+        public new bool Loop => false;
         [Browsable(false)]
         [XmlIgnore]
-        public new string AssociateMissionSuccess
-        {
-            get => string.Empty;
-        }
-
+        public new string AssociateMissionSuccess => string.Empty;
         [XmlIgnore]
         [Browsable(false)]
         public override string Category => "Basic";
@@ -253,16 +295,16 @@ namespace EntityTools.Quester.Actions
         [NotifyPropertyChangedInvocator]
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            Engine.OnPropertyChanged(this, propertyName);
+            _engine.OnPropertyChanged(this, propertyName);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         [NonSerialized]
-        private IQuesterActionEngine Engine;
+        private IQuesterActionEngine _engine;
 
         public TurnInMissionExt()
         {
-            Engine = MakeProxie();
+            _engine = MakeProxy();
             base.PlayWhileConditionsAreOk = false;
             base.PlayWhileUnSuccess = false;
             base.Loop = false;
@@ -270,30 +312,30 @@ namespace EntityTools.Quester.Actions
 
         public void Bind(IQuesterActionEngine engine)
         {
-            Engine = engine;
+            _engine = engine;
         }
         public void Unbind()
         {
-            Engine = MakeProxie();
+            _engine = MakeProxy();
             PropertyChanged = null;
         }
 
-        private IQuesterActionEngine MakeProxie()
+        private IQuesterActionEngine MakeProxy()
         {
             return new QuesterActionProxy(this);
         }
         #endregion
 
-        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).NeedToRun;
-        public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Run();
-        public override string ActionLabel => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).ActionLabel;
+        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).NeedToRun;
+        public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).Run();
+        public override string ActionLabel => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).ActionLabel;
         public override string InternalDisplayName => string.Empty;
-        public override bool UseHotSpots => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).UseHotSpots;
-        protected override bool IntenalConditions => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalConditions;
-        protected override Vector3 InternalDestination => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalDestination;
-        protected override ActionValidity InternalValidity => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalValidity;
-        public override void GatherInfos() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).GatherInfos();
-        public override void InternalReset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).InternalReset();
-        public override void OnMapDraw(GraphicsNW graph) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).OnMapDraw(graph);
+        public override bool UseHotSpots => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).UseHotSpots;
+        protected override bool IntenalConditions => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).InternalConditions;
+        protected override Vector3 InternalDestination => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).InternalDestination;
+        protected override ActionValidity InternalValidity => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).InternalValidity;
+        public override void GatherInfos() => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).GatherInfos();
+        public override void InternalReset() => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).InternalReset();
+        public override void OnMapDraw(GraphicsNW graph) => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).OnMapDraw(graph);
     }
 }

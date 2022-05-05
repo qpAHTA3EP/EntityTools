@@ -403,6 +403,7 @@ namespace EntityTools.Quester.Actions
         private static uint _zDev = 0; 
         #endregion
 
+
         private Astral.Quester.Classes.Condition _ignoreCombatCondition;
         public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).NeedToRun;
         public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Run();
