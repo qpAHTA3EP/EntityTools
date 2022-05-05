@@ -19,7 +19,6 @@ namespace EntityTools.Quester.Actions
     [Serializable]
     public class MoveToEntity : Action, INotifyPropertyChanged, IEntityDescriptor
     {
-        #region Опции команды
         #region Entity
 #if DEVELOPER
         [Description("The identifier of the Entity for the search.")]
@@ -90,7 +89,6 @@ namespace EntityTools.Quester.Actions
         [Description("Test the entity searching.")]
         [Category("Entity")]
         public string TestSearch => @"Push button '...' =>";
-
 #if false
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
@@ -102,136 +100,6 @@ namespace EntityTools.Quester.Actions
 
 
         #region EntitySearchOptions
-#if DEVELOPER
-        [Description("The maximum distance from the character within which the Entity is searched.\n" +
-            "The default value is 0, which disables distance checking.")]
-        [Category("Entity Search Options")]
-#else
-        [Browsable(false)]
-#endif
-        public float ReactionRange
-        {
-            get => _reactionRange; set
-            {
-                if (value < 0)
-                    value = 0;
-                if (Math.Abs(_reactionRange - value) > 0.1f)
-                {
-                    _reactionRange = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        private float _reactionRange;
-
-#if DEVELOPER
-        [Description("The maximum Z-coordiante difference with Player within which the Entity is searched.\n" +
-            "The default value is 0, which disables ZAxis checking.")]
-        [Category("Entity Search Options")]
-#else
-        [Browsable(false)]
-#endif
-        public float ReactionZRange
-        {
-            get => _reactionZRange; set
-            {
-                if (value < 0)
-                    value = 0;
-                if (Math.Abs(_reactionZRange - value) > 0.1f)
-                {
-                    _reactionZRange = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        private float _reactionZRange;
-
-#if DEVELOPER
-        [Description("Checking the Entity and the Player is in the same ingame Region (not CustomRegion):\n" +
-            "True: Only Entities located in the same Region as Player are detected,\n" +
-            "False: Entity's Region does not checked during search.")]
-        [Category("Entity Search Options")]
-#else
-        [Browsable(false)]
-#endif
-        public bool RegionCheck
-        {
-            get => _regionCheck; set
-            {
-                if (_regionCheck != value)
-                {
-                    _regionCheck = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        private bool _regionCheck;
-
-#if DEVELOPER
-        [Description("The collection of the CustomRegion that define the search area.")]
-        [Editor(typeof(CustomRegionCollectionEditor), typeof(UITypeEditor))]
-        [Category("Entity Search Options")]
-#else
-        [Browsable(false)]
-#endif
-        [XmlElement("CustomRegionNames")]
-        [DisplayName("CustomRegions")]
-        [NotifyParentProperty(true)]
-        public CustomRegionCollection CustomRegionNames
-        {
-            get => _customRegionNames;
-            set
-            {
-                if (_customRegionNames != value)
-                {
-                    _customRegionNames = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        private CustomRegionCollection _customRegionNames = new CustomRegionCollection();
-
-#if DEVELOPER
-        [Description("Checking the Player is in the area, defined by 'CustomRegions'")]
-        [Category("Entity Search Options")]
-#else
-        [Browsable(false)]
-#endif
-        public bool CustomRegionsPlayerCheck
-        {
-            get => customRegionsPlayerCheck; set
-            {
-                if (customRegionsPlayerCheck != value)
-                {
-                    customRegionsPlayerCheck = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        private bool customRegionsPlayerCheck;
-
-#if DEVELOPER
-        [Description("The name of the Map where action can be run.\n" +
-                     "Ignored if empty.")]
-        [Editor(typeof(CurrentMapEdit), typeof(UITypeEditor))]
-        [Category("Entity Search Options")]
-#else
-        [Browsable(false)]
-#endif        
-        public string CurrentMap
-        {
-            get => currentMap;
-            set
-            {
-                if (value != currentMap)
-                {
-                    currentMap = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        private string currentMap;
-
 #if DEVELOPER
         [Description("Checking the health of Entity not zero (it's alive):\n" +
             "True: Only Entities with nonzero health are detected,\n" +
@@ -276,10 +144,143 @@ namespace EntityTools.Quester.Actions
         #endregion
 
 
-        #region ManageCombat
+        #region SearchArea
+#if DEVELOPER
+        [Description("The maximum distance from the character within which the Entity is searched.\n" +
+            "The default value is 0, which disables distance checking.")]
+        [Category("Search Area")]
+#else
+        [Browsable(false)]
+#endif
+        public float ReactionRange
+        {
+            get => _reactionRange; set
+            {
+                if (value < 0)
+                    value = 0;
+                if (Math.Abs(_reactionRange - value) > 0.1f)
+                {
+                    _reactionRange = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private float _reactionRange;
+
+#if DEVELOPER
+        [Description("The maximum Z-coordiante difference with Player within which the Entity is searched.\n" +
+                     "The default value is 0, which disables Z-coordiante checking.")]
+        [Category("Search Area")]
+#else
+        [Browsable(false)]
+#endif
+        public float ReactionZRange
+        {
+            get => _reactionZRange; set
+            {
+                if (value < 0)
+                    value = 0;
+                if (Math.Abs(_reactionZRange - value) > 0.1f)
+                {
+                    _reactionZRange = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private float _reactionZRange;
+
+#if DEVELOPER
+        [Description("Checking the Entity and the Player is in the same ingame Region (not CustomRegion):\n" +
+            "True: Only Entities located in the same Region as Player are detected,\n" +
+            "False: Entity's Region does not checked during search.")]
+        [Category("Entity Search Options")]
+#else
+        [Browsable(false)]
+#endif
+        public bool RegionCheck
+        {
+            get => _regionCheck; set
+            {
+                if (_regionCheck != value)
+                {
+                    _regionCheck = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private bool _regionCheck;
+
+#if DEVELOPER
+        [Description("The collection of the CustomRegion that define the search area.")]
+        [Editor(typeof(CustomRegionCollectionEditor), typeof(UITypeEditor))]
+        [Category("Search Area")]
+#else
+        [Browsable(false)]
+#endif
+        [XmlElement("CustomRegionNames")]
+        [DisplayName("CustomRegions")]
+        [NotifyParentProperty(true)]
+        public CustomRegionCollection CustomRegionNames
+        {
+            get => _customRegionNames;
+            set
+            {
+                if (_customRegionNames != value)
+                {
+                    _customRegionNames = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private CustomRegionCollection _customRegionNames = new CustomRegionCollection();
+
+#if DEVELOPER
+        [Description("Checking the Player is in the area, defined by 'CustomRegions'")]
+        [Category("Search Area")]
+#else
+        [Browsable(false)]
+#endif
+        public bool CustomRegionsPlayerCheck
+        {
+            get => customRegionsPlayerCheck; set
+            {
+                if (customRegionsPlayerCheck != value)
+                {
+                    customRegionsPlayerCheck = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private bool customRegionsPlayerCheck;
+
+#if DEVELOPER
+        [Description("The name of the Map where current action can be run.\n" +
+                     "Ignored if empty.")]
+        [Editor(typeof(CurrentMapEdit), typeof(UITypeEditor))]
+        [Category("Search Area")]
+#else
+        [Browsable(false)]
+#endif        
+        public string CurrentMap
+        {
+            get => currentMap;
+            set
+            {
+                if (value != currentMap)
+                {
+                    currentMap = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private string currentMap;
+        #endregion
+
+
+        #region ManageCombatOptions
 #if DEVELOPER
         [Description("Distance to the Entity by which it is necessary to approach.\n" +
-                     "Keep in mind that the distance below 5 is too small to display on the Mapper.")]
+                     "The minimum value is 5.")]
         [Category("Manage Combat Options")]
         [DisplayName("CombatDistance")]
 #else
@@ -477,7 +478,7 @@ namespace EntityTools.Quester.Actions
         private bool _stopOnApproached;
 
 #if DEVELOPER
-        [Description("The command is interrupted upon entity search timer reaching zero (ms).\n" +
+        [Description("The command is interrupted upon entity search timer reaching zero (sec).\n" +
                      "Set zero value to infinite search.")]
         [Category("Interruptions")]
 #else
@@ -523,47 +524,46 @@ namespace EntityTools.Quester.Actions
         [XmlIgnore]
         [Browsable(false)]
         public override string Category => "Basic";
-        #endregion
 
         #region Взаимодействие с ядром EntityToolsCore
         public event PropertyChangedEventHandler PropertyChanged;
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            Engine.OnPropertyChanged(this, propertyName);
+            _engine.OnPropertyChanged(this, propertyName);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         [XmlIgnore]
         [NonSerialized]
-        private IQuesterActionEngine Engine;
+        private IQuesterActionEngine _engine;
 
         public MoveToEntity()
         {
-            Engine = new QuesterActionProxy(this);
+            _engine = new QuesterActionProxy(this);
         }
 
         public void Bind(IQuesterActionEngine engine)
         {
-            Engine = engine;
+            _engine = engine;
         }
         public void Unbind()
         {
-            Engine = new QuesterActionProxy(this);
+            _engine = new QuesterActionProxy(this);
             PropertyChanged = null;
         }
         #endregion
 
         // Интерфес Quester.Action, реализованный через ActionEngine
-        public override bool NeedToRun => Engine.NeedToRun;
-        public override ActionResult Run() => Engine.Run();
-        public override string ActionLabel => Engine.ActionLabel;
+        public override bool NeedToRun => _engine.NeedToRun;
+        public override ActionResult Run() => _engine.Run();
+        public override string ActionLabel => _engine.ActionLabel;
         public override string InternalDisplayName => string.Empty;
-        public override bool UseHotSpots => Engine.UseHotSpots;
-        protected override bool IntenalConditions => Engine.InternalConditions;
-        protected override Vector3 InternalDestination => Engine.InternalDestination;
-        protected override ActionValidity InternalValidity => Engine.InternalValidity;
-        public override void GatherInfos() => Engine.GatherInfos();
-        public override void InternalReset() => Engine.InternalReset();
-        public override void OnMapDraw(GraphicsNW graph) => Engine.OnMapDraw(graph);
+        public override bool UseHotSpots => _engine.UseHotSpots;
+        protected override bool IntenalConditions => _engine.InternalConditions;
+        protected override Vector3 InternalDestination => _engine.InternalDestination;
+        protected override ActionValidity InternalValidity => _engine.InternalValidity;
+        public override void GatherInfos() => _engine.GatherInfos();
+        public override void InternalReset() => _engine.InternalReset();
+        public override void OnMapDraw(GraphicsNW graph) => _engine.OnMapDraw(graph);
     }
 }
