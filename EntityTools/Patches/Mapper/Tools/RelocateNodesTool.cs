@@ -49,26 +49,6 @@ namespace EntityTools.Patches.Mapper.Tools
         private double selectAreaStartX;
         private double selectAreaStartY;
 
-#if false
-        public RelocateNodesTool() { }
-        private RelocateNodesTool(IEnumerable<Node> nodes, double dx, double dy)
-        {
-            dX = dx;
-            dY = dy;
-            movedNodes.AddRange(nodes);
-            movedNodes.ForEach(nd =>
-            {
-                var pos = nd.Position;
-                nd.Position = new Point3D(pos.X + dx, pos.Y + dy, pos.Z);
-            });
-        }
-        private RelocateNodesTool(Node node)
-        {
-            node.Passable = false;
-            movedNodes.Add(node);
-        } 
-#endif
-
         /// <summary>
         /// Использование механизма выделения вершин
         /// </summary>
@@ -110,16 +90,7 @@ namespace EntityTools.Patches.Mapper.Tools
                             double dy = worldMouseY - baseNode.Y;
 
                             // Отрисовываем выбранные вершины и их новое местоположение
-#if false
-                            foreach (Node node in selectedNodes)
-                            {
-                                Draw_NewEdgePos(graphics, selectedNodes, node, dx, dy);
-                                Draw_SelectedNode(graphics, node);
-                                Draw_NewNodePos(graphics, node, dx, dy);
-                            }  
-#else
                             Draw_SelectedNodes_Edges_NewNodesPositions(graphics, selectedNodes, dx, dy);
-#endif
                         }
                     }
                     break;
@@ -162,7 +133,7 @@ namespace EntityTools.Patches.Mapper.Tools
         {
             var redBrush = Brushes.Red;
             var orangeBrush = Brushes.Orange;
-            var redPen = Pens.Orange;
+            var orangePen = Pens.Orange;
 
             foreach (var node in nodes)
             {
@@ -183,9 +154,9 @@ namespace EntityTools.Patches.Mapper.Tools
                         {
                             double x2 = startNodePos.X + dx,
                                 y2 = startNodePos.Y + dy;
-                            graphics.DrawLine(redPen, x1, y1, x2, y2);
+                            graphics.DrawLine(orangePen, x1, y1, x2, y2);
                         }
-                        else graphics.DrawLine(redPen, x1, y1, startNodePos.X, startNodePos.Y);
+                        else graphics.DrawLine(orangePen, x1, y1, startNodePos.X, startNodePos.Y);
                     }
                 }
                 foreach (Arc arc in node.OutgoingArcs)
@@ -197,9 +168,9 @@ namespace EntityTools.Patches.Mapper.Tools
                         {
                             double x2 = endNodePos.X + dx,
                                 y2 = endNodePos.Y + dy;
-                            graphics.DrawLine(redPen, x1, y1, x2, y2);
+                            graphics.DrawLine(orangePen, x1, y1, x2, y2);
                         }
-                        else graphics.DrawLine(redPen, x1, y1, endNodePos.X, endNodePos.Y);
+                        else graphics.DrawLine(orangePen, x1, y1, endNodePos.X, endNodePos.Y);
                     }
                 }
 
@@ -208,24 +179,6 @@ namespace EntityTools.Patches.Mapper.Tools
                 graphics.FillCircleCentered(orangeBrush, pos);
             }
         }
-
-#if false
-        /// <summary>
-        /// Проверка наличия вершины <param name="node"/> в хвосте списка, на который указывает элемент <param name="tail"/>
-        /// </summary>
-        private static bool IsInTail(LinkedListNode<Node> tail, Node node)
-        {
-            tail = tail.Next;
-            while (tail != null)
-            {
-                if (tail.Value.Equals(node))
-                    return true;
-                tail = tail.Next;
-            }
-
-            return false;
-        } 
-#endif
 
         public bool HandleKeyUp => true;
         public void OnKeyUp(IGraph graph, NodeSelectTool _, KeyEventArgs e, double worldMouseX, double worldMouseY, out IMapperTool undo)
@@ -378,7 +331,6 @@ namespace EntityTools.Patches.Mapper.Tools
         /// </summary>
         public bool Applied => movedNodes.Count > 0;
 
-        //TODO Починить Undo
         /// <summary>
         /// Откат изменений, внесенных инструментом
         /// </summary>

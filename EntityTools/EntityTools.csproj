@@ -284,6 +284,13 @@
       <DependentUpon>CustomRegionToolForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Patches\Mapper\Tools\ICustomRegionTool.cs" />
+    <Compile Include="Patches\Mapper\Tools\MapperSettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Patches\Mapper\Tools\MapperSettingsForm.Designer.cs">
+      <DependentUpon>MapperSettingsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Patches\Mapper\Tools\AddNodeTool.cs" />
     <Compile Include="Patches\Patcher.tt.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -514,6 +521,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Patches\Mapper\Tools\CustomRegionToolForm.resx">
       <DependentUpon>CustomRegionToolForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Patches\Mapper\Tools\MapperSettingsForm.resx">
+      <DependentUpon>MapperSettingsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">

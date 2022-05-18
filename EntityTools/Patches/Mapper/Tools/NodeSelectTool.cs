@@ -11,7 +11,7 @@ namespace EntityTools.Patches.Mapper.Tools
     /// <summary>
     /// Инструмент для выделения вершин
     /// </summary>
-    public class NodeSelectTool : IEnumerable<Node>//, IDisposable
+    public class NodeSelectTool : IEnumerable<Node>
     {
         #region ReaderWriterLocker
         /// <summary>
@@ -60,44 +60,6 @@ namespace EntityTools.Patches.Mapper.Tools
             }
         }
 
-#if false
-        public NodeSelectTool(MapperFormExt form)
-        {
-            BindTo(form);
-        }
-
-        public void BindTo(MapperFormExt form)
-        {
-            if (!ReferenceEquals(mapper, form))
-            {
-                Unbind();
-                mapper = form;
-                if (mapper != null)
-                {
-                    mapper.OnMapperMouseClick += handler_RightMouseClick;
-                    mapper.OnMapperKeyUp += handler_KeyUp;
-                    mapper.OnMapperDraw += CustomDraw;
-                }
-            }
-        }
-
-        public void Unbind()
-        {
-            selectedNodes.Clear();
-            if (mapper != null)
-            {
-                mapper.OnMapperMouseClick -= handler_RightMouseClick;
-                mapper.OnMapperKeyUp -= handler_KeyUp;
-                mapper.OnMapperDraw -= CustomDraw;
-                mapper = null;
-            }
-        } 
-
-        public void Dispose()
-        {
-            Unbind();
-        }
-#endif
         /// <summary>
         /// Отрисовка выделения на Mapper'e
         /// </summary>
@@ -181,14 +143,6 @@ namespace EntityTools.Patches.Mapper.Tools
                             graphHash = hash;
                         }
                     }
-#if false
-                    else
-                    {
-                        // сбрасываем выделение 
-                        selectedNodes.Clear();
-                        graphHash = 0;
-                    } 
-#endif
                     break;
                 }
             }
@@ -220,14 +174,6 @@ namespace EntityTools.Patches.Mapper.Tools
         #region IEnumerable
         public IEnumerator<Node> GetEnumerator()
         {
-#if false
-            int hash = mapper._graphics.GraphCache.GetHashCode();
-            if (graphHash != hash)
-            {
-                selectedNodes.Clear();
-                return EmptyEnumerable<Node>.Instance;
-            } 
-#endif
             return selectedNodes.GetEnumerator();
         }
 
@@ -238,21 +184,6 @@ namespace EntityTools.Patches.Mapper.Tools
         #endregion
 
         public int Count => selectedNodes.Count;
-
-#if false
-        public void Add(Node node)
-        {
-            int hash = mapper._graphics.GraphCache.GetHashCode();
-            if (graphHash == hash)
-                selectedNodes.AddLast(node);
-            else
-            {
-                selectedNodes.Clear();
-                selectedNodes.AddLast(node);
-                graphHash = hash;
-            }
-        } 
-#endif
 
         public bool Remove(Node node)
         {

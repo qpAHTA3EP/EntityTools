@@ -1,11 +1,10 @@
-﻿using System;
-using System.Drawing;
-using System.Threading;
-using AStar.Tools;
+﻿using AStar.Tools;
 using Astral.Logic.Classes.Map;
-using AcTp0Tools.Reflection;
 using EntityTools.Settings;
 using MyNW.Classes;
+using System;
+using System.Drawing;
+using System.Threading;
 
 namespace EntityTools.Patches.Mapper
 {
@@ -37,30 +36,7 @@ namespace EntityTools.Patches.Mapper
         }
 
         #region Reflection
-        // TODO вместо FieldAccessor<> использовать локальные поля и пропатчить родительский класс GraphicsNW, чтобы обращение происходило к полям производного класса MapperGraphics, чтобы избавиться от значительных задержек на Reflection
-
-
-        /// <summary>
-        /// Получение доступа к приватному члену <seealso cref="GraphicsNW.g"/> типа Graphics
-        /// </summary>
-#if when__g__is_private
-        private Graphics Graphics => graphicsAccessor[this];
-        private static readonly FieldAccessor<Graphics> graphicsAccessor = typeof(GraphicsNW).GetField<Graphics>("g"); 
-#endif
-
-        /// <summary>
-        /// Получение доступа к приватному члену <seealso cref="GraphicsNW.g"/> типа Graphics
-        /// </summary>
-#if shen__img__is_private
-        private Image Image => imageAccessor[this];
-        private static readonly FieldAccessor<Image> imageAccessor = typeof(GraphicsNW).GetField<Image>("img"); 
-#endif
-
-#if false
-        public new int ImageHeight 
-#else
         public override int ImageHeight
-#endif
         {
             get => base.ImageHeight;
             set
@@ -69,11 +45,7 @@ namespace EntityTools.Patches.Mapper
                 _cache.CacheDistanceY = value / 1.8d / Zoom;
             }
         }
-#if false
-        public new int ImageWidth 
-#else
         public override int ImageWidth
-#endif
         {
             get => base.ImageWidth;
             set
@@ -83,16 +55,12 @@ namespace EntityTools.Patches.Mapper
             }
         }
 
-#if false
-        public new double Zoom 
-#else
+
         public override double Zoom
-#endif
         {
             get => base.Zoom;
             set
             {
-
                 if(base.Zoom != value)
                 {
                     base.Zoom = value;
@@ -102,11 +70,8 @@ namespace EntityTools.Patches.Mapper
             }
         }
 
-#if false
-        public new Vector3 CenterPosition 
-#else
+
         public override Vector3 CenterPosition
-#endif
         {
             get => base.CenterPosition.Clone();
             set
@@ -169,15 +134,17 @@ namespace EntityTools.Patches.Mapper
             {
                 if (_cache.CacheDistanceX > dx * 1.25
                     || _cache.CacheDistanceY > dy * 1.25
-                    || !_cache.InCacheArea(x1, y1) 
+                    || !_cache.InCacheArea(x1, y1)
                     || !_cache.InCacheArea(x2, y2))
-                        _cache.SetCacheArea(x1, y1, x2, y2);
+                {
+                    _cache.SetCacheArea(x1, y1, x2, y2);
+                }
 
                 base.ImageHeight = height;
                 base.ImageWidth = width;
                 base.Zoom = zoom;
             }
-            base.resetImage();
+            resetImage();
         }
 
         /// <summary>
@@ -228,7 +195,7 @@ namespace EntityTools.Patches.Mapper
 
         #region ReaderWriterLocker
         /// <summary>
-        /// Объект синхронизации доступа к объекту <see cref="graphicsNW"/>
+        /// Объект синхронизации доступа к объекту <see cref="GraphicsNW"/>
         /// </summary>
         private readonly ReaderWriterLockSlim @lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
@@ -343,21 +310,6 @@ namespace EntityTools.Patches.Mapper
             x = CenterPosition.X - (ImageWidth / 2.0 - imgX /*- 0.75*/) / scale;
             y = CenterPosition.Y + (ImageHeight / 2.0 - imgY /*- 0.75*/) / scale;
         }
-
-#if false
-        /// <summary>
-        /// Перевод координат курсора мыши в мировые координаты <param name="x"/> и <param name="y"/>
-        /// </summary>
-        public void GetMouseCursorWorldPosition(out double x, out double y)
-        {
-            var cersorPos = Control.MousePosition;// Cursor.Position;
-            var img = image;
-            double scale = Zoom;
-
-            x = CenterPosition.X - (img.Width / 2 - cersorPos.X /*- 0.75*/) / scale;
-            y = CenterPosition.Y + (img.Height / 2 - cersorPos.Y /*- 0.75*/) / scale;
-        }  
-#endif
         #endregion
 
         /// <summary>
@@ -438,7 +390,7 @@ namespace EntityTools.Patches.Mapper
 
         /// <summary>
         /// Нарисовать закрашенный прямоугольник со сторонами <paramref name="width"/> и <paramref name="height"/>, 
-        /// верхняя правая вершина которого задана координатами игрового мира <paramref name="worldCenterX"/>, <paramref name="worldCenterY"/>
+        /// верхняя правая вершина которого задана точкой игрового мира <paramref name="point"/>
         /// </summary>
         public void FillRectangle<TPoint>(Brush brush, TPoint point, double width, double height, bool useScale = false)
         {
@@ -446,7 +398,7 @@ namespace EntityTools.Patches.Mapper
         }
         /// <summary>
         /// Нарисовать закрашенный прямоугольник со сторонами <paramref name="width"/> и <paramref name="height"/>, 
-        /// верхняя правая вершина которого задана координатами игрового мира <paramref name="x1"/>, <paramref name="x2"/>
+        /// верхняя правая вершина которого задана координатами игрового мира <paramref name="worldX"/>, <paramref name="worldY"/>
         /// </summary>
         public void FillRectangle(Brush brush, double worldX, double worldY, double width, double height, bool useScale = false)
         {
@@ -488,7 +440,7 @@ namespace EntityTools.Patches.Mapper
         }
         /// <summary>
         /// Нарисовать прямоугольник со сторонами <paramref name="width"/> и <paramref name="height"/>, 
-        /// верхняя правая вершина которого задана координатами игрового мира <paramref name="worldCenterX"/>, <paramref name="worldCenterY"/>
+        /// верхняя правая вершина которого задана точкой игрового мира <paramref name="point"/>
         /// </summary>
         /// <typeparam name="TPoint"></typeparam>
         /// <param name="point"></param>
@@ -595,7 +547,7 @@ namespace EntityTools.Patches.Mapper
         }
         /// <summary>
         /// Отрисовка заполненного квадрата со стороной <paramref name="edge"/>
-        /// с центром в точке <paramref name="worldCenterPoint"/>, заданной в координатах игрового мира
+        /// с центром в точке с координатами <paramref name="worldCenterX"/> и <paramref name="worldCenterY"/>, заданной в координатах игрового мира
         /// </summary>
         public void FillSquareCentered(Brush brush, double worldCenterX, double worldCenterY, double edge, bool useScale = false)
         {
@@ -640,30 +592,8 @@ namespace EntityTools.Patches.Mapper
                 };
             g.FillPolygon(brush, points);
         }
-#if false
-        /// <summary>
-        /// Отрисовка изображения с центром в точке <paramref name="worldCenterPoint"/>, заданной в координатах игрового мира
-        /// </summary>
-        public void DrawImageCentered<TPoint>(TPoint worldCenterPoint, Image image, double angle)
-        {
-            GetImagePosition(worldCenterPoint, out double x, out double y);
-            float imgWidth = image.Width,
-                  imgHeight = image.Height;
-            if (angle != 0)
-            {
-                try
-                {
-                    graphics.RotateTransform((float)(angle/* - Math.PI / 2*/));
-                    graphics.DrawImage(image, (float)x - imgWidth / 2, (float)y - imgHeight / 2);
-                }
-                finally
-                {
-                    graphics.ResetTransform();
-                }
-            }
-            else graphics.DrawImage(image, (float)x, (float)y);
-        } 
-#endif
+
+
         /// <summary>
         /// Отрисовка линии из точки <paramref name="p1"/> в точку <paramref name="p2"/>
         /// </summary>

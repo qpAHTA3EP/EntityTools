@@ -39,8 +39,10 @@ namespace EntityTools.Patches.Mapper
 {
     //TODO Подружить с ролью Professions
 #if PATCH_ASTRAL
-    public partial class MapperFormExt : XtraForm 
+    public partial class MapperFormExt : XtraForm
     {
+        private MapperSettingsForm settingsForm;
+
         /// <summary>
         /// Флаг удержания персонажа в центре карты
         /// </summary>
@@ -142,96 +144,6 @@ namespace EntityTools.Patches.Mapper
                                                 EntityTools.Config.Mapper,
                                                 nameof(EntityTools.Config.Mapper.LinearPath),
                                                 false, DataSourceUpdateMode.OnPropertyChanged);
-
-            ckbChacheEnable.DataBindings.Add(nameof(ckbChacheEnable.Checked),
-                                                EntityTools.Config.Mapper,
-                                                nameof(EntityTools.Config.Mapper.CacheActive),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-
-            editLayerDepth.DataBindings.Add(nameof(editLayerDepth.Value),
-                                                EntityTools.Config.Mapper.MapperForm,
-                                                nameof(EntityTools.Config.Mapper.MapperForm.LayerDepth),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-
-            #region Customization
-            colorEditBidirPath.DataBindings.Add(nameof(colorEditBidirPath.EditValue),
-                                                    EntityTools.Config.Mapper.MapperForm,
-                                                    nameof(EntityTools.Config.Mapper.MapperForm.BidirectionalPathColor),
-                                                    false, DataSourceUpdateMode.OnPropertyChanged);
-
-            colorEditUnidirPath.DataBindings.Add(nameof(colorEditUnidirPath.EditValue),
-                                                EntityTools.Config.Mapper.MapperForm,
-                                                nameof(EntityTools.Config.Mapper.MapperForm.UnidirectionalPathColor),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-
-            colorBackground.DataBindings.Add(nameof(colorBackground.EditValue),
-                                                EntityTools.Config.Mapper.MapperForm,
-                                                nameof(EntityTools.Config.Mapper.MapperForm.BackgroundColor),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-
-
-            ckbEnemies.DataBindings.Add(nameof(ckbEnemies.Checked),
-                                            EntityTools.Config.Mapper.MapperForm,
-                                            nameof(EntityTools.Config.Mapper.MapperForm.DrawEnemies),
-                                            false, DataSourceUpdateMode.OnPropertyChanged);
-
-            colorEnemies.DataBindings.Add(nameof(colorEnemies.EditValue),
-                                    EntityTools.Config.Mapper.MapperForm,
-                                    nameof(EntityTools.Config.Mapper.MapperForm.EnemyColor),
-                                    false, DataSourceUpdateMode.OnPropertyChanged);
-
-            ckbFriends.DataBindings.Add(nameof(ckbFriends.Checked),
-                                    EntityTools.Config.Mapper.MapperForm,
-                                    nameof(EntityTools.Config.Mapper.MapperForm.DrawFriends),
-                                    false, DataSourceUpdateMode.OnPropertyChanged);
-
-            colorFriends.DataBindings.Add(nameof(colorFriends.EditValue),
-                                    EntityTools.Config.Mapper.MapperForm,
-                                    nameof(EntityTools.Config.Mapper.MapperForm.FriendColor),
-                                    false, DataSourceUpdateMode.OnPropertyChanged);
-
-            ckbPlayers.DataBindings.Add(nameof(ckbPlayers.Checked),
-                                    EntityTools.Config.Mapper.MapperForm,
-                                    nameof(EntityTools.Config.Mapper.MapperForm.DrawPlayers),
-                                    false, DataSourceUpdateMode.OnPropertyChanged);
-
-            colorPlayers.DataBindings.Add(nameof(colorPlayers.EditValue),
-                                    EntityTools.Config.Mapper.MapperForm,
-                                    nameof(EntityTools.Config.Mapper.MapperForm.PlayerColor),
-                                    false, DataSourceUpdateMode.OnPropertyChanged);
-
-            ckbOtherNPC.DataBindings.Add(nameof(ckbOtherNPC.Checked),
-                                    EntityTools.Config.Mapper.MapperForm,
-                                    nameof(EntityTools.Config.Mapper.MapperForm.DrawOtherNPC),
-                                    false, DataSourceUpdateMode.OnPropertyChanged);
-
-            colorOtherNPC.DataBindings.Add(nameof(colorOtherNPC.EditValue),
-                                    EntityTools.Config.Mapper.MapperForm,
-                                    nameof(EntityTools.Config.Mapper.MapperForm.OtherNPCColor),
-                                    false, DataSourceUpdateMode.OnPropertyChanged);
-
-            ckbNodes.DataBindings.Add(nameof(ckbNodes.Checked),
-                                    EntityTools.Config.Mapper.MapperForm,
-                                    nameof(EntityTools.Config.Mapper.MapperForm.DrawNodes),
-                                    false, DataSourceUpdateMode.OnPropertyChanged);
-
-            colorNodes.DataBindings.Add(nameof(colorNodes.EditValue),
-                                    EntityTools.Config.Mapper.MapperForm,
-                                    nameof(EntityTools.Config.Mapper.MapperForm.NodeColor),
-                                    false, DataSourceUpdateMode.OnPropertyChanged);
-
-            ckbSkillnodes.DataBindings.Add(nameof(ckbSkillnodes.Checked),
-                                    EntityTools.Config.Mapper.MapperForm,
-                                    nameof(EntityTools.Config.Mapper.MapperForm.DrawSkillNodes),
-                                    false, DataSourceUpdateMode.OnPropertyChanged);
-
-            colorSkillnodes.DataBindings.Add(nameof(colorSkillnodes.EditValue),
-                                    EntityTools.Config.Mapper.MapperForm,
-                                    nameof(EntityTools.Config.Mapper.MapperForm.SkillNodeColor),
-                                    false, DataSourceUpdateMode.OnPropertyChanged); 
-            #endregion
-
-
 #if false
             // Настройки панели инструментов 
             // Привязка к элементам управления вызывает ошибку времени выполнения
@@ -311,18 +223,16 @@ namespace EntityTools.Patches.Mapper
                    zoomStr = string.Empty;
             Image img = null;
 
-
-
             //TODO Заменить Environment.TickCount на DateTime.Now.Ticks 
 #if DrawMapper_Measuring
             Timeout timeout = new Timeout(0);
-            const int SPEED_MEASURES_NUM = 10;
-            const int MAPPER_MEASURES_NUM = 10;
+            const int speedMeasuresNum = 10;
+            const int mapperMeasuresNum = 10;
             Stopwatch sw = new Stopwatch();
 
-            long[] drawMapperMeasures = new long[MAPPER_MEASURES_NUM];
+            long[] drawMapperMeasures = new long[mapperMeasuresNum];
 
-            Tuple<Vector3, int, double>[] speedMeasures = new Tuple<Vector3, int, double>[SPEED_MEASURES_NUM];
+            Tuple<Vector3, int, double>[] speedMeasures = new Tuple<Vector3, int, double>[speedMeasuresNum];
             Vector3 lastPlayerPos = null;
             int lastTickCount = Environment.TickCount;
             int movingTime = 0;
@@ -359,8 +269,8 @@ namespace EntityTools.Patches.Mapper
                         Vector3 pos = LockOnPlayer ? playerPos : _graphics.CenterPosition;
 
                         // Вычисляем скорость перемещения;
-                        int currMeasureInd = currentMesure % SPEED_MEASURES_NUM;
-                        int prevMeasureInd = currMeasureInd == 0 ? SPEED_MEASURES_NUM - 1 : currMeasureInd - 1;
+                        int currMeasureInd = currentMesure % speedMeasuresNum;
+                        int prevMeasureInd = currMeasureInd == 0 ? speedMeasuresNum - 1 : currMeasureInd - 1;
                         var prevMeasure = speedMeasures[prevMeasureInd];
                         if (prevMeasure != null)
                         {
@@ -375,7 +285,7 @@ namespace EntityTools.Patches.Mapper
                         }
                         double speed = 0;
                         int num = 0;
-                        for (currMeasureInd = 0; currMeasureInd < SPEED_MEASURES_NUM; currMeasureInd++)
+                        for (currMeasureInd = 0; currMeasureInd < speedMeasuresNum; currMeasureInd++)
                         {
                             var measure = speedMeasures[currMeasureInd];
                             if (measure != null && measure.Item3 > 0)
@@ -440,7 +350,7 @@ namespace EntityTools.Patches.Mapper
                         using (_graphics.ReadLock())
                             img = _graphics.getImage();
                         
-                        drawMapperMeasures[currentMesure % MAPPER_MEASURES_NUM] = sw.ElapsedMilliseconds;
+                        drawMapperMeasures[currentMesure % mapperMeasuresNum] = sw.ElapsedMilliseconds;
 
                         currentMesure++;
                         frames++;
@@ -596,11 +506,11 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Инструмент для выделения вершин
         /// </summary>
-        internal readonly NodeSelectTool _selectedNodes = new NodeSelectTool();
+        private readonly NodeSelectTool _selectedNodes = new NodeSelectTool();
         /// <summary>
         /// Список изменений (для отката)
         /// </summary>
-        internal readonly Stack<IMapperTool> _undoStack = new Stack<IMapperTool>();
+        private readonly Stack<IMapperTool> _undoStack = new Stack<IMapperTool>();
 
         /// <summary>
         /// Хэш-код текущей активной карты
@@ -610,7 +520,7 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Активный инструмент изменения графа
         /// </summary>
-        internal IMapperTool CurrentTool
+        private IMapperTool CurrentTool
         {
             get => _currentTool;
             set
@@ -707,8 +617,12 @@ namespace EntityTools.Patches.Mapper
             if (mode != MapperEditMode.DeleteNodes)
             {
                 btnRemoveNodes.Checked = false;
+            } 
+            if (mode != MapperEditMode.AddNode)
+            {
+                btnAddNode.Checked = false;
             }
-            if(mode != MapperEditMode.DistanceMeasurement)
+            if (mode != MapperEditMode.DistanceMeasurement)
             {
                 btnDistanceMeasurement.Checked = false;
             }
@@ -764,7 +678,7 @@ namespace EntityTools.Patches.Mapper
             Zoom = 2.5;
         }
 
-        Timeout mouseWeelTimeout = new Timeout(0);
+        private readonly Timeout mouseWeelTimeout = new Timeout(0);
 
         private void handler_MouseWheel(object sender, MouseEventArgs e)
         {
@@ -801,6 +715,12 @@ namespace EntityTools.Patches.Mapper
 
         #region Drawings
         private readonly MapperGraphics _graphics = new MapperGraphics(360, 360);
+
+        public double CacheDistanceZ
+        {
+            get => _graphics.GraphCache.CacheDistanceZ;
+            set => _graphics.GraphCache.CacheDistanceZ = value;
+        }
 
         /// <summary>
         /// Метод для фоновой отрисовки карты
@@ -1223,14 +1143,14 @@ namespace EntityTools.Patches.Mapper
 
         private void handler_ShowSettingsTab(object sender, ItemClickEventArgs e)
         {
-            panelSettings.Visible = btnSettings.Checked;
+            if (settingsForm is null || settingsForm.IsDisposed)
+            {
+                settingsForm = new MapperSettingsForm();
+            }
+            if(!settingsForm.Visible)
+                settingsForm.Show(this);
         }
-
-        private void handler_LayerDepth_Changed(object sender, EventArgs e)
-        {
-            _graphics.GraphCache.CacheDistanceZ = editLayerDepth.Value > 0 ? Convert.ToDouble(editLayerDepth.Value) : double.MaxValue;
-        }
-                        #endregion
+        #endregion
 
         #region Изменение графа (Meshes)
         /// <summary>
@@ -1670,7 +1590,9 @@ namespace EntityTools.Patches.Mapper
                 LockOnPlayer = false;
             }
             else if (relocateTool != null)
-                CurrentTool = null; 
+            {
+                CurrentTool = null;
+            } 
         }
 
         private void handler_DeleteNodes_ModeChanged(object sender, ItemClickEventArgs e)
@@ -1683,8 +1605,26 @@ namespace EntityTools.Patches.Mapper
                 LockOnPlayer = false;
             }
             else if (removeTool != null)
-                    CurrentTool = null;
+            {
+                CurrentTool = null;
+            }
         }
+
+        private void handler_AddNode_ModeChanged(object sender, ItemClickEventArgs e)
+        {
+            AddNodeTool addTool = CurrentTool as AddNodeTool;
+            if (btnAddNode.Checked)
+            {
+                if (addTool is null)
+                    CurrentTool = new AddNodeTool();
+                LockOnPlayer = false;
+            }
+            else if (addTool != null)
+            {
+                CurrentTool = null;
+            }
+        }
+
         #endregion
         #endregion
 

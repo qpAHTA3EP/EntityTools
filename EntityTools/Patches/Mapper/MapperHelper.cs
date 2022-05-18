@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using AStar;
-using AcTp0Tools.Reflection;
+﻿using AStar;
 using MyNW.Classes;
 using MyNW.Internals;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace EntityTools.Patches.Mapper
 {
@@ -309,7 +308,7 @@ namespace EntityTools.Patches.Mapper
         {
             if (distance <= 0)
                 distance = double.MaxValue;
-            else if(distance != double.MaxValue)
+            else if(distance < double.MaxValue)
                 distance *= distance;
 
 
@@ -338,7 +337,7 @@ namespace EntityTools.Patches.Mapper
         {
             if (distance <= 0)
                 distance = double.MaxValue;
-            else if (distance != double.MaxValue)
+            else if (distance < double.MaxValue)
                 distance *= distance;
 
             foreach (T element in enumerable)
@@ -364,31 +363,10 @@ namespace EntityTools.Patches.Mapper
         public static void ClosestNodeOxyProjection(this IGraph graph, double x, double y, out Node node, out int hash,
             double distance = -1)
         {
-#if false
-            lock (graph.SyncRoot) 
-#elif false
-            using (graph.ReadLock())
-#endif
-            {
-                node = graph.ClosestNodeOxyProjection(x, y, distance);
-                hash = graph.GetHashCode();
-            }
+            node = graph.ClosestNodeOxyProjection(x, y, distance);
+            hash = graph.GetHashCode();
         }
 
-#if false
-        /// <summary>
-        /// Вычисление размера (стороны квадрата) якоря для прямоугольника, 
-        /// заданного верхней левой точкой с координатами <paramref name="leftX"/>, <paramref name="bottomY"/> 
-        /// и правой нижней точкой с координатами <paramref name="rightX"/>, <paramref name="downY"/>.
-        /// </summary>
-        public static double AnchorWorldSize(double leftX, double bottomY, double rightX, double downY)
-        {
-            double width = rightX - leftX,
-                   height = bottomY - downY,
-                   anchorSize = Math.Max(2, Math.Min(Math.Min(width / 3, height / 3), DefaultAnchorSize));
-            return anchorSize;
-        } 
-#endif
         /// <summary>
         /// Вычисление размера (стороны квадрата) якоря для прямоугольника со сторонами <paramref name="width"/> и <paramref name="height"/>
         /// </summary>

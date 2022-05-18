@@ -9,7 +9,6 @@ using System.Windows.Forms;
 
 namespace EntityTools.Patches.Mapper.Tools
 {
-
     public partial class CustomRegionToolForm : XtraForm //Form
     {
         /// <summary>

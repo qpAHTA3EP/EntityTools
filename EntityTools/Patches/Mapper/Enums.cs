@@ -20,6 +20,10 @@
         /// </summary>
         DeleteNodes,
         /// <summary>
+        /// Добавление новой вершины
+        /// </summary>
+        AddNode,
+        /// <summary>
         /// Ручное изменение ребер
         /// </summary>
         EditEdges,
