@@ -585,7 +585,6 @@ namespace EntityCore.Tools.Navigation
             // Полная остановка навигации
             StopNavigationCompletly();
             
-            var mainEngineNavigation = AstralAccessors.Controllers.Engine.MainEngine.Navigation;
             uint refId = entity.RefId;
             interactTime = Math.Max(interactTime, 500);
             var player = EntityManager.LocalPlayer.Player;
@@ -602,7 +601,8 @@ namespace EntityCore.Tools.Navigation
             do
             {
                 interactOption = player.InteractStatus.InteractOptions.FirstOrDefault(o => o.EntityRefId == refId);
-                if (interactOption != null && interactOption.CanInteract()//IsValid
+                if (interactOption != null 
+                    && interactOption.CanInteract()
                     && interactOption.Interact())
                 {
                     interactionWaitTimer.Reset();

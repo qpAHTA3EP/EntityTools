@@ -29,7 +29,7 @@ namespace EntityTools.Quester.Actions
         [Description("Identifier of the Mission.\n" +
             "Allows simple mask (*) at the begin and at the end.")]
         [Editor(typeof(MainMissionEditor), typeof(UITypeEditor))]
-        [Category("Required")]
+        [Category("Mission Options")]
 #else
         [Browsable(false)]
 #endif
@@ -49,7 +49,7 @@ namespace EntityTools.Quester.Actions
 
 #if DEVELOPER
         [Editor(typeof(MissionGiverInfoEditor), typeof(UITypeEditor))]
-        [Category("Required")]
+        [Category("Mission Options")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
 #else
         [Browsable(false)]
@@ -69,6 +69,48 @@ namespace EntityTools.Quester.Actions
         }
         private MissionGiverInfo _giver = new MissionGiverInfo();
 
+        [Browsable(false)]
+        public string GiverId
+        {
+            get => string.Empty;
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                    _giver.Id = value;
+            }
+        }
+        [Browsable(false)]
+        public Vector3 GiverPosition
+        {
+            get => null;
+            set
+            {
+                if (value != null && value.IsValid)
+                    _giver.Position = value;
+            }
+        }
+
+#if !DEVELOPER
+        [Browsable(false)]
+#else
+        [Description("Remote checking if contact have mission.")]
+        [Category("Mission Options")]
+#endif
+        public ContactHaveMissionCheckType ContactHaveMission
+        {
+            get => _contactHaveMission;
+            set
+            {
+                if (_contactHaveMission == value) return;
+                _contactHaveMission = value;
+                NotifyPropertyChanged();
+            }
+        }
+        private ContactHaveMissionCheckType _contactHaveMission = ContactHaveMissionCheckType.Disabled;
+        #endregion
+
+
+        #region Interaction
 #if DEVELOPER
         [Description("The minimum value is 5.")]
         [Category("Interaction")]
@@ -164,24 +206,8 @@ namespace EntityTools.Quester.Actions
             }
         }
         private bool _closeContactDialog;
+        #endregion
 
-#if !DEVELOPER
-        [Browsable(false)]
-#else
-        [Description("Check if contact have mission.")]
-        [Category("Optional")]
-#endif
-        public ContactHaveMissionCheckType ContactHaveMission
-        {
-            get => _contactHaveMission;
-            set
-            {
-                if (_contactHaveMission == value) return;
-                _contactHaveMission = value;
-                NotifyPropertyChanged();
-            }
-        }
-        private ContactHaveMissionCheckType _contactHaveMission = ContactHaveMissionCheckType.Disabled;
 
         #region Manage Combat Options
 #if DEVELOPER
@@ -247,9 +273,11 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        private Astral.Quester.Classes.Condition _ignoreCombatCondition; 
+        private Astral.Quester.Classes.Condition _ignoreCombatCondition;
         #endregion
 
+
+        #region Optional
 #if DEVELOPER
         [Editor(typeof(RewardsEditor), typeof(UITypeEditor))]
         [Description("Item that is requered in rewards to " + nameof(PickUpMission) + ".\n" +
@@ -289,27 +317,10 @@ namespace EntityTools.Quester.Actions
             }
         }
         private Guid _targetActionId = Guid.Empty;
+        #endregion
 
-        [Browsable(false)]
-        public string GiverId
-        {
-            get => string.Empty;
-            set
-            {
-                if (!string.IsNullOrEmpty(value))
-                    _giver.Id = value;
-            }
-        }
-        [Browsable(false)]
-        public Vector3 GiverPosition
-        {
-            get => null;
-            set
-            {
-                if (value != null && value.IsValid)
-                    _giver.Position = value;
-            }
-        }
+
+        #region HiddenOptions
         [Browsable(false)]
         [XmlIgnore]
         public new bool PlayWhileUnSuccess => false;

@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Reflection;
+using EntityCore.Entities;
 using static Astral.Quester.Classes.Action;
 // ReSharper disable InconsistentNaming
 
@@ -42,11 +43,11 @@ namespace EntityCore.Quester.Action
         private string _label = string.Empty;
         #endregion
 
-#if DEVELOPER && DEBUG_TARGET
         [TypeConverter(typeof(ExpandableObjectConverter))]
         [Category("Target")]
-        public object PlayerTarget => new SimpleEntityWrapper(AstralAccessors.Logic.UCC.Core.CurrentTarget);
+        public object Target => new SimpleEntityWrapper(_targetProcessor.GetTeammate());
 
+#if DEVELOPER && DEBUG_TARGET
         [TypeConverter(typeof(ExpandableObjectConverter))]
         [Category("Team")]
         public object Tank
@@ -210,7 +211,7 @@ namespace EntityCore.Quester.Action
 
             _sqrtDistance = _action.Distance;
             _sqrtDistance *= _sqrtDistance;
-            _sqrtAbortCombatDistance = _action.abortCombatDistance;
+            _sqrtAbortCombatDistance = _action.AbortCombatDistance;
             _sqrtAbortCombatDistance *= _sqrtAbortCombatDistance;
 
             _teammateAbsenceTimer = null;
@@ -221,12 +222,10 @@ namespace EntityCore.Quester.Action
             return true;
         }
 
-#if false
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             OnPropertyChanged(sender as Astral.Quester.Classes.Action, e.PropertyName);
         } 
-#endif
         public void OnPropertyChanged(Astral.Quester.Classes.Action sender, string propertyName)
         {
             if (ReferenceEquals(sender, _action))
@@ -248,7 +247,7 @@ namespace EntityCore.Quester.Action
                         _sqrtDistance *= _sqrtDistance;
                         break;
                     case nameof(_action.AbortCombatDistance):
-                        _sqrtAbortCombatDistance = _action.abortCombatDistance;
+                        _sqrtAbortCombatDistance = _action.AbortCombatDistance;
                         _sqrtAbortCombatDistance *= _sqrtAbortCombatDistance;
                         break;
                     case nameof(_action.CustomRegions):
@@ -258,7 +257,9 @@ namespace EntityCore.Quester.Action
             }
         }
 
-        [Category("Engine")]
+#if MONITORING
+        [Category("Engine")] 
+#endif
         public bool NeedToRun
         {
             get
@@ -275,10 +276,11 @@ namespace EntityCore.Quester.Action
 
                     if (teammate is null)
                     {
-                        if (_action.teammateSearchTime > 0)
+                        var teammateSearchTime = _action.TeammateSearchTime;
+                        if (teammateSearchTime > 0)
                         {
                             if (_teammateAbsenceTimer is null)
-                                _teammateAbsenceTimer = new Timeout(_action.teammateSearchTime);
+                                _teammateAbsenceTimer = new Timeout((int)teammateSearchTime);
                             else if (_teammateAbsenceTimer.IsTimedOut)
                             {
                                 ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, " : Teammate[NULL] and TeammateWaitTime is out"));
@@ -307,7 +309,7 @@ namespace EntityCore.Quester.Action
                         && CheckingIgnoreCombatCondition())
                     {
                         AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true, _action.IgnoreCombatMinHP, 5_000);
-                        if (_action.abortCombatDistance > _action.Distance)
+                        if (_action.AbortCombatDistance > _action.Distance)
                         {
                             AstralAccessors.Logic.NW.Combats.SetAbortCombatCondition(CheckCombatShouldBeAborted_and_ChangeTarget, ShouldRemoveAbortCombatCondition);
                             ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, " : Disable combat and set abort combat condition"));
@@ -321,10 +323,11 @@ namespace EntityCore.Quester.Action
                 {
                     if (teammate is null)
                     {
-                        if (_action.teammateSearchTime > 0)
+                        var teammateSearchTime = _action.TeammateSearchTime;
+                        if (teammateSearchTime > 0)
                         {
                             if (_teammateAbsenceTimer is null)
-                                _teammateAbsenceTimer = new Timeout(_action.teammateSearchTime);
+                                _teammateAbsenceTimer = new Timeout((int)teammateSearchTime);
                             else if (_teammateAbsenceTimer.IsTimedOut)
                                 return true;
                         }
@@ -341,7 +344,7 @@ namespace EntityCore.Quester.Action
                     if (!needToRun && _action.IgnoreCombat)
                     {
                         AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true, _action.IgnoreCombatMinHP);
-                        if (_action.abortCombatDistance > _action.Distance)
+                        if (_action.AbortCombatDistance > _action.Distance)
                             AstralAccessors.Logic.NW.Combats.SetAbortCombatCondition(CheckCombatShouldBeAborted_and_ChangeTarget, ShouldRemoveAbortCombatCondition);
                     }
                 }
@@ -364,12 +367,13 @@ namespace EntityCore.Quester.Action
                 {
                     actionResult = ActionResult.Running;
 
-                    if (_action.teammateSearchTime > 0)
+                    var teammateSearchTime = _action.TeammateSearchTime;
+                    if (teammateSearchTime > 0)
                     {
                         if (_teammateAbsenceTimer is null)
                         {
                             ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, " : Teammate[NULL]. Activate TeammateWaitTimer and continue..."));
-                            _teammateAbsenceTimer = new Timeout(_action.teammateSearchTime);
+                            _teammateAbsenceTimer = new Timeout((int)teammateSearchTime);
                         }
                         if (_teammateAbsenceTimer.IsTimedOut)
                         {
@@ -382,7 +386,7 @@ namespace EntityCore.Quester.Action
                 {
                     Attack_Target(_targetProcessor.GetTarget());
 
-                    actionResult = _action.stopOnApproached
+                    actionResult = _action.StopOnApproached
                         ? ActionResult.Completed
                         : ActionResult.Running; 
                 }
@@ -395,10 +399,11 @@ namespace EntityCore.Quester.Action
                 if (teammate is null)
                 {
                     actionResult = ActionResult.Running;
-                    if (_action.teammateSearchTime > 0)
+                    var teammateSearchTime = _action.TeammateSearchTime;
+                    if (teammateSearchTime > 0)
                     {
                         if (_teammateAbsenceTimer is null)
-                            _teammateAbsenceTimer = new Timeout(_action.teammateSearchTime);
+                            _teammateAbsenceTimer = new Timeout((int)teammateSearchTime);
                         actionResult = _teammateAbsenceTimer.IsTimedOut
                             ? ActionResult.Completed
                             : ActionResult.Running; 
@@ -408,7 +413,7 @@ namespace EntityCore.Quester.Action
                 {
                     Attack_Target(_targetProcessor.GetTarget());
 
-                    actionResult = _action.stopOnApproached
+                    actionResult = _action.StopOnApproached
                         ? ActionResult.Completed
                         : ActionResult.Running;
                 }
@@ -442,7 +447,7 @@ namespace EntityCore.Quester.Action
                     //Astral.Quester.API.IgnoreCombat = false;
                     AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(false, _action.IgnoreCombatMinHP);
 
-                    if (_action.abortCombatDistance > _action.Distance)
+                    if (_action.AbortCombatDistance > _action.Distance)
                     {
                         // устанавливаем прерывание боя
                         AstralAccessors.Logic.NW.Combats.SetAbortCombatCondition(CheckCombatShouldBeAborted_and_ChangeTarget, ShouldRemoveAbortCombatCondition);
@@ -469,7 +474,7 @@ namespace EntityCore.Quester.Action
                     //Astral.Quester.API.IgnoreCombat = false;
                     AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(false, _action.IgnoreCombatMinHP);
 
-                    if (_action.abortCombatDistance > _action.Distance)
+                    if (_action.AbortCombatDistance > _action.Distance)
                     {
                         // устанавливаем прерывание боя
                         AstralAccessors.Logic.NW.Combats.SetAbortCombatCondition(CheckCombatShouldBeAborted_and_ChangeTarget, ShouldRemoveAbortCombatCondition);
@@ -577,7 +582,7 @@ namespace EntityCore.Quester.Action
         }
 
         [Category("Engine")]
-        public bool InternalConditions => _action.teammateSearchTime == 0 
+        public bool InternalConditions => _action.TeammateSearchTime == 0 
                                           || _teammateAbsenceTimer is null 
                                           || !_teammateAbsenceTimer.IsTimedOut;
 
@@ -645,14 +650,15 @@ namespace EntityCore.Quester.Action
                 float x = pos.X,
                     y = pos.Y,
                     distance = _action.Distance,
+                    abortCombatDistance = _action.AbortCombatDistance,
                     diaD = distance * 2,
-                    diaACD = _action.abortCombatDistance * 2;
+                    diaACD = abortCombatDistance * 2;
 
                 mapGraphics.FillRhombCentered(Brushes.Yellow, pos, 16, 16);
                 if (distance > 11)
                 {
                     mapGraphics.DrawCircleCentered(Pens.Yellow, x, y, diaD, true);
-                    if (_action.abortCombatDistance > distance)
+                    if (abortCombatDistance > distance)
                         mapGraphics.DrawCircleCentered(Pens.Yellow, x, y, diaACD, true);
                 }
             }
@@ -660,7 +666,8 @@ namespace EntityCore.Quester.Action
             {
                 float x = pos.X,
                       y = pos.Y,
-                      distance = _action.Distance;
+                      distance = _action.Distance,
+                      abortCombatDistance= _action.AbortCombatDistance;
                 List<Vector3> coords = new List<Vector3> {
                     new Vector3(x, y - 5, 0),
                     new Vector3(x - 4.33f, y + 2.5f, 0),
@@ -669,12 +676,12 @@ namespace EntityCore.Quester.Action
                 graphics.drawFillPolygon(coords, Brushes.Yellow);
 
                 int diaD = (int)(distance * 2.0f * graphics.Zoom);
-                int diaACD = (int)(_action.abortCombatDistance * 2.0f * graphics.Zoom);
+                int diaACD = (int)(abortCombatDistance * 2.0f * graphics.Zoom);
                 if (distance > 5)
                 {
                     graphics.drawEllipse(pos, new Size(diaD, diaD), Pens.Yellow);
 
-                    if (_action.abortCombatDistance > distance)
+                    if (abortCombatDistance > distance)
                     {
                         graphics.drawEllipse(pos, new Size(diaACD, diaACD), Pens.Orange);
                     }
@@ -699,11 +706,11 @@ namespace EntityCore.Quester.Action
         {
             Predicate<Entity> specialCheck = null;
 
-            var crSet = _action.customRegions;
+            var crSet = _action.CustomRegions;
             if (crSet.Count > 0)
             {
                 specialCheck = (ett) =>
-                    _action.customRegions.Within(ett);
+                    crSet.Within(ett);
             }
 
             return specialCheck;

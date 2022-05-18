@@ -99,10 +99,11 @@ namespace EntityTools.Quester.Actions
 #endif
         public int IgnoreCombatMinHP
         {
-            get => _ignoreCombatMinHp; set
+            get => _ignoreCombatMinHp; 
+            set
             {
                 if (value < -1)
-                    value = 0;
+                    value = -1;
                 if (value > 100)
                     value = 100;
                 if (_ignoreCombatMinHp != value)
@@ -155,7 +156,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal uint abortCombatDistance;
+        private uint abortCombatDistance;
         #endregion
 
 
@@ -178,7 +179,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal CustomRegionCollection customRegions = new CustomRegionCollection();
+        private CustomRegionCollection customRegions = new CustomRegionCollection();
 
 
         #region Interruptions
@@ -200,7 +201,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal bool stopOnApproached;
+        private bool stopOnApproached;
 
 #if DEVELOPER
         [Description("The command is interrupted upon teammate search timer reaching zero (ms).\n" +
@@ -209,12 +210,11 @@ namespace EntityTools.Quester.Actions
 #else
         [Browsable(false)]
 #endif
-        public int TeammateSearchTime
+        public uint TeammateSearchTime
         {
-            get => teammateSearchTime; set
+            get => teammateSearchTime; 
+            set
             {
-                if (value < 0)
-                    value = 0;
                 if (teammateSearchTime != value)
                 {
                     teammateSearchTime = value;
@@ -222,7 +222,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
-        internal int teammateSearchTime = 10_000; 
+        private uint teammateSearchTime = 10_000; 
         #endregion
 
 
@@ -243,6 +243,8 @@ namespace EntityTools.Quester.Actions
         [XmlIgnore]
         [NonSerialized]
         private IQuesterActionEngine _engine;
+        [XmlIgnore]
+        internal object Engine => _engine;
 
         public MoveToTeammate()
         {
@@ -251,6 +253,7 @@ namespace EntityTools.Quester.Actions
 
         public void Bind(IQuesterActionEngine engine)
         {
+            PropertyChanged = null;
             _engine = engine;
         }
         public void Unbind()

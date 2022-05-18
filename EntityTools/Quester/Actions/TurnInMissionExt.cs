@@ -1,23 +1,19 @@
-﻿#define MissionGiverInfo
-//#define MissionGiverBase
-
-using Astral.Logic.Classes.Map;
+﻿using Astral.Logic.Classes.Map;
 using Astral.Quester.UIEditors;
+using EntityTools.Annotations;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
+using EntityTools.Editors;
+using EntityTools.Tools.Missions;
 using MyNW.Classes;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Runtime.CompilerServices;
-using EntityTools.Editors;
-using EntityTools.Tools;
-using EntityTools.Tools.Missions;
-using Action = Astral.Quester.Classes.Action;
-using System.Xml.Serialization;
-using System.Collections.Generic;
 using System.Threading;
-using EntityTools.Annotations;
+using System.Xml.Serialization;
+using Action = Astral.Quester.Classes.Action;
 
 [assembly: InternalsVisibleTo("EntityCore")]
 
@@ -26,12 +22,12 @@ namespace EntityTools.Quester.Actions
     [Serializable]
     public class TurnInMissionExt : Action, INotifyPropertyChanged
     {
-        #region Опции команды
+        #region Mission Options
 #if DEVELOPER
         [Description("Identifier of the Mission.\n\r" +
             "Allows simple mask (*) at the begin and at the end")]
         [Editor(typeof(MainMissionEditor), typeof(UITypeEditor))]
-        [Category("Required")]
+        [Category("Mission Options")]
 #else
         [Browsable(false)]
 #endif
@@ -51,7 +47,7 @@ namespace EntityTools.Quester.Actions
 
 #if DEVELOPER
         [Editor(typeof(MissionGiverInfoEditor), typeof(UITypeEditor))]
-        [Category("Required")]
+        [Category("Mission Options")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
 #else
         [Browsable(false)]
@@ -70,20 +66,30 @@ namespace EntityTools.Quester.Actions
         }
         private MissionGiverInfo _giver = new MissionGiverInfo();
 
-#if !DEVELOPER
+
         [Browsable(false)]
-#endif
-        public bool CloseContactDialog
+        public string GiverId
         {
-            get => _closeContactDialog;
+            get => string.Empty;//_giver.Id;
             set
             {
-                if (_closeContactDialog == value) return;
-                _closeContactDialog = value;
-                NotifyPropertyChanged();
+                if (!string.IsNullOrEmpty(value))
+                    _giver.Id = value;
             }
         }
-        private bool _closeContactDialog;
+        [Browsable(false)]
+        public Vector3 GiverPosition
+        {
+            get => null;
+            set
+            {
+                if (value != null && value.IsValid)
+                {
+                    _giver.Position = value;
+                }
+            }
+        }
+        #endregion
 
 
         #region Manage Combat Options
@@ -154,8 +160,10 @@ namespace EntityTools.Quester.Actions
         #endregion
 
 
+        #region Interaction
 #if DEVELOPER
         [Description("The minimum value is 5")]
+        [Category("Interaction")]
 #else
         [Browsable(false)]
 #endif
@@ -174,6 +182,7 @@ namespace EntityTools.Quester.Actions
 
 #if DEVELOPER
         [Description("The minimum value is 1")]
+        [Category("Interaction")]
 #else
         [Browsable(false)]
 #endif
@@ -190,6 +199,46 @@ namespace EntityTools.Quester.Actions
         }
         private float _interactZDifference = 10;
 
+#if DEVELOPER
+        [Description("Answers in dialog which have to be performed before mission picking up")]
+        [Editor(typeof(DialogEditor), typeof(UITypeEditor))]
+        [Category("Interaction")]
+#else
+        [Browsable(false)]
+#endif
+        public List<string> Dialogs
+        {
+            get => _dialogs; set
+            {
+                if (_dialogs != value)
+                {
+                    _dialogs = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Dialogs)));
+                }
+            }
+        }
+        private List<string> _dialogs = new List<string>();
+
+#if DEVELOPER
+        [Category("Interaction")]
+#else
+        [Browsable(false)]
+#endif
+        public bool CloseContactDialog
+        {
+            get => _closeContactDialog;
+            set
+            {
+                if (_closeContactDialog == value) return;
+                _closeContactDialog = value;
+                NotifyPropertyChanged();
+            }
+        }
+        private bool _closeContactDialog;
+        #endregion
+
+
+        #region Optional
 #if DEVELOPER
         [Editor(typeof(RewardsEditor), typeof(UITypeEditor))]
         [Description("Item that is requered in rewards to TurnInMission\n" +
@@ -229,48 +278,6 @@ namespace EntityTools.Quester.Actions
             }
         }
         private Guid _targetActionId = Guid.Empty;
-
-#if DEVELOPER
-        [Description("Answers in dialog which have to be performed before mission picking up")]
-        [Editor(typeof(DialogEditor), typeof(UITypeEditor))]
-#else
-        [Browsable(false)]
-#endif
-        public List<string> Dialogs
-        {
-            get => _dialogs; set
-            {
-                if (_dialogs != value)
-                {
-                    _dialogs = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Dialogs)));
-                }
-            }
-        }
-        private List<string> _dialogs = new List<string>();
-
-        [Browsable(false)]
-        public string GiverId
-        {
-            get => string.Empty;//_giver.Id;
-            set
-            {
-                if (!string.IsNullOrEmpty(value))
-                    _giver.Id = value;
-            }
-        }
-        [Browsable(false)]
-        public Vector3 GiverPosition
-        {
-            get => null;
-            set
-            {
-                if (value != null && value.IsValid)
-                {
-                    _giver.Position = value;
-                }
-            }
-        }
 
         [Browsable(false)]
         [XmlIgnore]

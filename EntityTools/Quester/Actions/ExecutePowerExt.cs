@@ -11,6 +11,7 @@ using System.Drawing.Design;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Xml.Serialization;
+using Astral.Quester.Forms;
 using Astral.Quester.UIEditors;
 using EntityTools.Tools.Classes;
 using EntityTools.Tools.CustomRegions;
@@ -78,8 +79,6 @@ namespace EntityTools.Quester.Actions
             }
         }
         private string powerId = string.Empty;
-        [NonSerialized]
-        private static string _lastPowerId;
 
 #if DEVELOPER
         [Description("Time to cast the power. Minimum is 500 ms")]
@@ -299,7 +298,7 @@ namespace EntityTools.Quester.Actions
         #region ManageCombatOptions
 #if DEVELOPER
         [Description("Enable '" + nameof(IgnoreCombat) + "' profile value while playing action")]
-        [Category("Manage Combat Option")]
+        [Category("Manage Combat Options")]
 #else
         [Browsable(false)]
 #endif
@@ -366,8 +365,25 @@ namespace EntityTools.Quester.Actions
 
         #region DefaultOption
 #if DEVELOPER
+        [Description("The default value of the '" + nameof(PowerId) + "' for each new command '" + nameof(ExecutePowerExt) + "'.")]
+        [Editor(typeof(PowerIdEditor), typeof(UITypeEditor))]
+        [Category("Default Options")]
+#else
+        [Browsable(false)]
+#endif
+        [XmlIgnore]
+        public static string PowerIdCache
+        {
+            get => _lastPowerId;
+            set => _lastPowerId = value;
+        }
+
+        [NonSerialized]
+        private static string _lastPowerId;
+
+#if DEVELOPER
         [Description("The default value of the '" + nameof(TargetRadius) + "' for each new command '" + nameof(ExecutePowerExt) + "'.")]
-        [Category("Default option")]
+        [Category("Default Options")]
 #else
         [Browsable(false)]
 #endif 
@@ -400,7 +416,7 @@ namespace EntityTools.Quester.Actions
             }
         }
         [NonSerialized]
-        private static uint _zDev = 0; 
+        private static uint _zDev; 
         #endregion
 
 

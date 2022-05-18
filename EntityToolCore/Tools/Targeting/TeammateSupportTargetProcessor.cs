@@ -20,12 +20,12 @@ namespace EntityCore.Tools.Targeting
     /// </summary>
     internal class TeammateSupportTargetProcessor : TargetProcessor
     {
-        private TeammateSupport _targeter;
+        private TeammateSupport _targetHelper;
 
         public TeammateSupportTargetProcessor(TeammateSupport protectMember, Predicate<Entity> specialCheck)
         {
-            _targeter = protectMember ?? throw new ArgumentException(nameof(protectMember));
-            _targeter.PropertyChanged += OnPropertyChanged;
+            _targetHelper = protectMember ?? throw new ArgumentException(nameof(protectMember));
+            _targetHelper.PropertyChanged += OnPropertyChanged;
             _specialCheck = specialCheck;
             GetTeammate = Initializer_GetTeammate;
         }
@@ -37,10 +37,10 @@ namespace EntityCore.Tools.Targeting
 
         public override void Dispose()
         {
-            if (_targeter != null)
+            if (_targetHelper != null)
             {
-                _targeter.PropertyChanged -= OnPropertyChanged;
-                _targeter = null;
+                _targetHelper.PropertyChanged -= OnPropertyChanged;
+                _targetHelper = null;
             }
 
             _specialCheck = null;
@@ -79,7 +79,7 @@ namespace EntityCore.Tools.Targeting
         {
             if (ExtendedDebugInfo)
             {
-                string currentMethodName = string.Concat(GetType().Name, '.', MethodBase.GetCurrentMethod().Name);
+                string currentMethodName = $"{GetType().Name}.{MethodBase.GetCurrentMethod()?.Name ?? nameof(GetTarget)}";
 
                 if (_targetCache != null)
                 {
@@ -103,31 +103,31 @@ namespace EntityCore.Tools.Targeting
                     string debugMsg = string.Concat(currentMethodName, ": Teammate change ",
                         _teammateCache is null ? "NULL " : _teammateCache.Entity.GetDebugString(EntityNameType.InternalName, "TeammateCache", EntityDetail.Pointer|EntityDetail.Health|EntityDetail.HealthPersent|EntityDetail.Distance),
                         " => ",
-                        newTeammate is null ? "NULL " : newTeammate.Entity.GetDebugString(EntityNameType.InternalName, _targeter.Teammate.ToString(), EntityDetail.Pointer | EntityDetail.Health | EntityDetail.HealthPersent | EntityDetail.Distance));
+                        newTeammate is null ? "NULL " : newTeammate.Entity.GetDebugString(EntityNameType.InternalName, _targetHelper.Teammate.ToString(), EntityDetail.Pointer | EntityDetail.Health | EntityDetail.HealthPersent | EntityDetail.Distance));
                     _teammateCache = newTeammate;
                     ETLogger.WriteLine(LogType.Debug, debugMsg,true);
 
                     if (_targetSelector is null)
                     {
-                        switch (_targeter.FoePreference)
+                        switch (_targetHelper.FoePreference)
                         {
                             case PreferredFoe.TeammatesTarget:
-                                _targetSelector = () => _teammateCache?.Entity.GetTeammatesTarget();
+                                _targetSelector = () => GetTeammate()?.Entity.GetTeammatesTarget();
                                 break;
                             case PreferredFoe.ClosestToPlayer:
-                                _targetSelector = () => _teammateCache?.Entity.GetClosestToPlayerAttacker();
+                                _targetSelector = () => GetTeammate()?.Entity.GetClosestToPlayerAttacker();
                                 break;
                             case PreferredFoe.ClosestToTeammate:
-                                _targetSelector = () => _teammateCache?.Entity.GetClosestAttacker();
+                                _targetSelector = () => GetTeammate()?.Entity.GetClosestAttacker();
                                 break;
                             case PreferredFoe.Sturdiest:
-                                _targetSelector = () => _teammateCache?.Entity.GetSturdiestAttacker();
+                                _targetSelector = () => GetTeammate()?.Entity.GetSturdiestAttacker();
                                 break;
                             case PreferredFoe.Weakest:
-                                _targetSelector = () => _teammateCache?.Entity.GetWeakestAttacker();
+                                _targetSelector = () => GetTeammate()?.Entity.GetWeakestAttacker();
                                 break;
                             case PreferredFoe.MostInjured:
-                                _targetSelector = () => _teammateCache?.Entity.GetMostInjuredAttacker();
+                                _targetSelector = () => GetTeammate()?.Entity.GetMostInjuredAttacker();
                                 break;
                             default:
                                 _targetSelector = () => null;
@@ -140,7 +140,7 @@ namespace EntityCore.Tools.Targeting
                     debugMsg = string.Concat(currentMethodName, ": Target change ",
                         _teammateCache is null ? "NULL " : _teammateCache.Entity.GetDebugString(EntityNameType.InternalName, "TargetCache", EntityDetail.Pointer | EntityDetail.Health | EntityDetail.HealthPersent | EntityDetail.Distance),
                         " => ",
-                        newTeammate is null ? "NULL " : newTeammate.Entity.GetDebugString(EntityNameType.InternalName, _targeter.FoePreference.ToString(), EntityDetail.Pointer | EntityDetail.Health | EntityDetail.HealthPersent | EntityDetail.Distance));
+                        newTeammate is null ? "NULL " : newTeammate.Entity.GetDebugString(EntityNameType.InternalName, _targetHelper.FoePreference.ToString(), EntityDetail.Pointer | EntityDetail.Health | EntityDetail.HealthPersent | EntityDetail.Distance));
                     _targetCache = newTarget;
                     ETLogger.WriteLine(LogType.Debug, debugMsg, true);
 
@@ -161,22 +161,22 @@ namespace EntityCore.Tools.Targeting
 
                 if (_targetSelector is null)
                 {
-                    switch (_targeter.FoePreference)
+                    switch (_targetHelper.FoePreference)
                     {
                         case PreferredFoe.TeammatesTarget:
-                            _targetSelector = () => _teammateCache?.Entity.GetTeammatesTarget();
+                            _targetSelector = () => GetTeammate()?.Entity.GetTeammatesTarget();
                             break;
                         case PreferredFoe.ClosestToPlayer:
-                            _targetSelector = () => _teammateCache?.Entity.GetClosestToPlayerAttacker();
+                            _targetSelector = () => GetTeammate()?.Entity.GetClosestToPlayerAttacker();
                             break;
                         case PreferredFoe.ClosestToTeammate:
-                            _targetSelector = () => _teammateCache?.Entity.GetClosestAttacker();
+                            _targetSelector = () => GetTeammate()?.Entity.GetClosestAttacker();
                             break;
                         case PreferredFoe.Sturdiest:
-                            _targetSelector = () => _teammateCache?.Entity.GetSturdiestAttacker();
+                            _targetSelector = () => GetTeammate()?.Entity.GetSturdiestAttacker();
                             break;
                         case PreferredFoe.Weakest:
-                            _targetSelector = () => _teammateCache?.Entity.GetWeakestAttacker();
+                            _targetSelector = () => GetTeammate()?.Entity.GetWeakestAttacker();
                             break;
                         default:
                             _targetSelector = () => null;
@@ -207,7 +207,7 @@ namespace EntityCore.Tools.Targeting
         {
             Func <TeamMember> teammateSelector;
             
-            switch (_targeter.Teammate)
+            switch (_targetHelper.Teammate)
             {
                 case Teammates.Leader:
                     if (_specialCheck != null)
@@ -275,27 +275,11 @@ namespace EntityCore.Tools.Targeting
 
         public override string Label()
         {
-#if false
-            if (string.IsNullOrEmpty(_label))
-            {
-
-                if (_targeter is null)
-                    _label = nameof(TeammateSupport);
-                else
-                {
-                    _label = _targeter.FoePreference == PreferredFoe.TeammatesTarget
-                        ? $"Assist {_targeter.Teammate}"
-                        : $"Protect '{_targeter.Teammate}' from '{_targeter.FoePreference}' Foe";
-                }
-            }
-            return _label; 
-#else
-            if (_targeter is null)
+            if (_targetHelper is null)
                 return nameof(TeammateSupport);
-            if (_targeter.FoePreference == PreferredFoe.TeammatesTarget)
-                return $"Assist {_targeter.Teammate}";
-            return $"Protect '{_targeter.Teammate}' from '{_targeter.FoePreference}' Foe";
-#endif
+            if (_targetHelper.FoePreference == PreferredFoe.TeammatesTarget)
+                return $"Assist {_targetHelper.Teammate}";
+            return $"Protect '{_targetHelper.Teammate}' from '{_targetHelper.FoePreference}' Foe";
         }
         //private string _label;
 

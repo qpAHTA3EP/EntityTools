@@ -367,6 +367,7 @@ namespace EntityCore.Entities
             Predicate<Entity> predicate;
             if (customRegions?.Count > 0)
             {
+                //TODO удалить аргумент outsideCustomRegions
                 if (outsideCustomRegions)
                 {
                     if (specialCheck is null)

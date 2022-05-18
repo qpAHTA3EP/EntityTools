@@ -13,7 +13,7 @@ namespace EntityCore.Entities
         }
         public SimpleEntityWrapper(TeamMember teamMember)
         {
-            entity = teamMember is null
+            entity = teamMember is null || !teamMember.IsValid
                 ? new Entity(IntPtr.Zero)
                 : teamMember.Entity;
         }

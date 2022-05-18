@@ -1,4 +1,4 @@
-﻿#define DEBUG_CHANGE_TARGET
+﻿//#define DEBUG_CHANGE_TARGET
 
 using AcTp0Tools;
 using AcTp0Tools.Classes.Targeting;
@@ -25,11 +25,11 @@ namespace EntityCore.UCC.Actions
     internal class ChangeTargetEngine : IUccActionEngine
     {
         #region Данные
-        private ChangeTarget action;
+        private ChangeTarget @this;
 
-#if DEVELOPER && DEBUG_CHANGE_TARGET
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public object PlayerTarget => new SimpleEntityWrapper(AstralAccessors.Logic.UCC.Core.CurrentTarget);
+        public object PlayerTarget => new SimpleEntityWrapper(_targetProcessor.GetTarget());
+#if DEVELOPER && DEBUG_CHANGE_TARGET
 
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public TargetProcessor TargetProcessor => _targetProcessor;
@@ -51,23 +51,24 @@ namespace EntityCore.UCC.Actions
 
         public void Dispose()
         {
-            if (action != null)
+            if (@this != null)
             {
-                action.PropertyChanged -= OnPropertyChanged;
-                action.Engine = null;
-                action = null;
+                @this.PropertyChanged -= OnPropertyChanged;
+                @this.Unbind();
+                @this = null;
             }
             _targetProcessor?.Dispose();
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (!ReferenceEquals(sender, action)) return;
+            if (!ReferenceEquals(sender, @this)) return;
             switch (e.PropertyName)
             {
                 case nameof(ChangeTarget.TargetSelector):
                     _targetProcessor?.Dispose();
-                    switch (action.targetSelector)
+                    var trgSelector = @this.TargetSelector;
+                    switch (trgSelector)
                     {
                         case EntityTarget entityTarget:
                             _targetProcessor = new EntityTargetProcessor(entityTarget, GetSpecialTeammateCheck());
@@ -76,10 +77,10 @@ namespace EntityCore.UCC.Actions
                             _targetProcessor = new TeammateSupportTargetProcessor(protectMember, GetSpecialTeammateCheck());
                             break;
                         default:
-                            var prc = action.targetSelector.GetDefaultProcessor(action);
+                            var prc = trgSelector.GetDefaultProcessor(@this);
                             if (prc != null)
                                 _targetProcessor = prc;
-                            else throw new Exception($"Can't realized the processor for the '{action.targetSelector.GetType()}'");
+                            else throw new Exception($"Can't realized the processor for the '{trgSelector.GetType()}'");
                             break;
                     }
                     break;
@@ -98,7 +99,7 @@ namespace EntityCore.UCC.Actions
         {
             if (action is null)
                 return false;
-            if (ReferenceEquals(action, this.action))
+            if (ReferenceEquals(action, @this))
                 return true;
             if (action is ChangeTarget changeTarget)
             {
@@ -120,17 +121,18 @@ namespace EntityCore.UCC.Actions
         private bool InternalRebase(ChangeTarget changeTarget)
         {
             // Убираем привязку к старому условию
-            if (action != null)
+            if (@this != null)
             {
-                action.PropertyChanged -= OnPropertyChanged;
-                action.Engine = null;
+                @this.PropertyChanged -= OnPropertyChanged;
+                @this.Unbind();
             }
             _targetProcessor?.Dispose();
 
-            action = changeTarget;
-            action.PropertyChanged += OnPropertyChanged;
+            @this = changeTarget;
+            @this.PropertyChanged += OnPropertyChanged;
 
-            switch (action.targetSelector)
+            var trgSelector = @this.TargetSelector;
+            switch (trgSelector)
             {
                 case EntityTarget entityTarget:
                     _targetProcessor = new EntityTargetProcessor(entityTarget, GetSpecialTeammateCheck());
@@ -139,16 +141,16 @@ namespace EntityCore.UCC.Actions
                     _targetProcessor = new TeammateSupportTargetProcessor(teammateSupport, GetSpecialTeammateCheck());
                     break;
                 default:
-                    var prc = action.targetSelector.GetDefaultProcessor(action);
+                    var prc = trgSelector.GetDefaultProcessor(@this);
                     if (prc != null)
                         _targetProcessor = prc;
-                    else throw new Exception($"Can't realized the processor for the '{action.targetSelector.GetType()}'");
+                    else throw new Exception($"Can't realized the processor for the '{trgSelector.GetType()}'");
                     break;
             }
 
-            _idStr = string.Concat(action.GetType().Name, '[', action.GetHashCode().ToString("X2"), ']');
+            _idStr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
 
-            action.Engine = this;
+            @this.Bind(this);
 
             return true;
         }
@@ -163,9 +165,9 @@ namespace EntityCore.UCC.Actions
                 bool extendedDebugInfo = ExtendedDebugInfo;
                 if (extendedDebugInfo)
                 {
-                    string currentMethodName = string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name);
+                    string currentMethodName = string.Concat(_idStr, '.', MethodBase.GetCurrentMethod()?.Name ?? nameof(NeedToRun));
 
-                    bool customConditionOK = ((ICustomUCCCondition)action._customConditions).IsOK(action);
+                    bool customConditionOK = ((ICustomUCCCondition)@this.CustomConditions).IsOK(@this);
                     if (!customConditionOK)
                     {
                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": CustomConditions check failed. Skip... "), true);
@@ -194,7 +196,7 @@ namespace EntityCore.UCC.Actions
                     return true;
                 }
                 
-                return ((ICustomUCCCondition)action._customConditions).IsOK(action) &&
+                return ((ICustomUCCCondition)@this.CustomConditions).IsOK(@this) &&
                        _targetProcessor.IsTargetMismatchedAndCanBeChanged(target);
             }
         }
@@ -206,7 +208,7 @@ namespace EntityCore.UCC.Actions
             bool extendedDebugInfo = ExtendedDebugInfo;
             if (extendedDebugInfo)
             {
-                string currentMethodName = string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name);
+                string currentMethodName = string.Concat(_idStr, '.', MethodBase.GetCurrentMethod()?.Name ?? nameof(Run));
                 if (target != null && target.IsValid)
                 {
                     ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ChangeTarget to ", target.GetDebugString(EntityNameType.InternalName, "NewTarget", EntityDetail.Alive | EntityDetail.Pointer | EntityDetail.Distance)), true);
@@ -250,7 +252,7 @@ namespace EntityCore.UCC.Actions
         {
             Predicate<Entity> specialCheck = null;
 
-            var range = action.Range;
+            var range = @this.Range;
             if (range > 0)
             {
                 range *= range;

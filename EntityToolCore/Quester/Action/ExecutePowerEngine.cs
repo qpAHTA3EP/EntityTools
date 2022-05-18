@@ -16,6 +16,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
+using EntityTools.Tools.Export;
 using static Astral.Quester.Classes.Action;
 
 namespace EntityCore.Quester.Action
@@ -241,11 +242,12 @@ namespace EntityCore.Quester.Action
 
         public void GatherInfos()
         {
-            if (TargetSelectForm.GUIRequest("Set InitialPosition", 
-                "Move the Character to the position where the Power could be activated and press F12") == 
-                DialogResult.OK)
+            var player = EntityManager.LocalPlayer;
+            if (player.IsValid && !player.IsLoading
+                && TargetSelectForm.GUIRequest("Set InitialPosition", 
+                                               "Move the Character to the position where the Power could be activated and press F12")
+                   == DialogResult.OK)
             {
-                var player = EntityManager.LocalPlayer;
                 var iniPos = player.Location;
                 if (iniPos.IsValid)
                 {
@@ -273,7 +275,7 @@ namespace EntityCore.Quester.Action
                             {
                                 @this.TargetPosition = tarPos;
                             }
-                            else tarPos = @this.TargetPosition = node.Position;
+                            else @this.TargetPosition = node.Position;
 
                             @this.CurrentMap = player.MapState.MapName;
                             @this.CurrentRegion = player.RegionInternalName;
@@ -286,7 +288,6 @@ namespace EntityCore.Quester.Action
                             {
                                 zRange.Min = (float)Math.Floor(zi - zDev);
                                 zRange.Max = (float)Math.Round(zi + zDev);
-                                return;
                             }
 #else
                             var zRange = @this.ZRange;
@@ -317,6 +318,30 @@ namespace EntityCore.Quester.Action
                                 zRange.Max = (float)Math.Round(Math.Max(zRange.Max, zi + 10));
                             } 
 #endif
+                            var pwId = @this.PowerId;
+                            if (string.IsNullOrEmpty(pwId))
+                            {
+                                if (!string.IsNullOrEmpty(pwId = ExecutePowerExt.PowerIdCache))
+                                {
+                                    @this.PowerId = pwId;
+                                    return;
+                                }
+
+                                IEnumerable<PowerInfo> GetPower()
+                                {
+                                    foreach (var pw in EntityManager.LocalPlayer.Character.Powers)
+                                    {
+                                        yield return new PowerInfo(pw);
+                                    }
+                                }
+
+                                PowerInfo powerInfo = null;
+                                if (ItemSelectForm.GetAnItem(GetPower, ref powerInfo, nameof(PowerInfo.FullName))
+                                    && powerInfo != null)
+                                {
+                                    @this.PowerId = powerInfo.InternalName;
+                                }
+                            }
                         }
                     }
                 }

@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Threading;
-using Astral.Quester.Classes;
+﻿using Astral.Quester.Classes;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Tools.CustomRegions;
+using System;
+using System.ComponentModel;
+using System.Drawing.Design;
+using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace EntityTools.Quester.Conditions
 {
@@ -31,15 +31,11 @@ namespace EntityTools.Quester.Conditions
                 if (_customRegionNames != value)
                 {
                     _customRegionNames = value;
-#if true
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionNames))); 
-#else
-                    Engine.OnPropertyChanged(this, nameof(CustomRegionNames));
-#endif
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal CustomRegionCollection _customRegionNames = new CustomRegionCollection();
+        private CustomRegionCollection _customRegionNames = new CustomRegionCollection();
 
 #if DEVELOPER
         [Description("The Check of the Team member's location relative to the custom regions\n" +
@@ -54,10 +50,10 @@ namespace EntityTools.Quester.Conditions
             get => _customRegionCheck; set
             {
                 _customRegionCheck = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionCheck)));
+                NotifyPropertyChanged();
             }
         }
-        internal Presence _customRegionCheck = Presence.Equal;
+        private Presence _customRegionCheck = Presence.Equal;
 
 #if DEVELOPER
         [Description("The Value which is compared by 'DistanceSign' with the distance between Player and Team member")]
@@ -69,11 +65,13 @@ namespace EntityTools.Quester.Conditions
         {
             get => _distance; set
             {
+                if (value < 0)
+                    value = 0;
                 _distance = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionCheck)));
+                NotifyPropertyChanged();
             }
         }
-        internal float _distance;
+        private float _distance;
 
 #if DEVELOPER
         [Description("Option specifies the comparison of the distance to the group member")]
@@ -86,10 +84,10 @@ namespace EntityTools.Quester.Conditions
             get => _distanceSign; set
             {
                 _distanceSign = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionCheck)));
+                NotifyPropertyChanged();
             }
         }
-        internal Relation _distanceSign = Relation.Superior;
+        private Relation _distanceSign = Relation.Superior;
 
 #if DEVELOPER
         [Description("The Value which is compared by 'Sign' with the counted Team members")]
@@ -97,15 +95,15 @@ namespace EntityTools.Quester.Conditions
 #else
         [Browsable(false)]
 #endif
-        public int MemberCount
+        public uint MemberCount
         {
             get => _memberCount; set
             {
                 _memberCount = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionCheck)));
+                NotifyPropertyChanged();
             }
         }
-        internal int _memberCount = 3;
+        private uint _memberCount = 3;
 
 #if DEVELOPER
         [Description("Option specifies the comparison of 'MemberCount' and the counted Team members")]
@@ -118,10 +116,10 @@ namespace EntityTools.Quester.Conditions
             get => _sign; set
             {
                 _sign = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionCheck)));
+                NotifyPropertyChanged();
             }
         }
-        internal Relation _sign = Relation.Inferior;
+        private Relation _sign = Relation.Inferior;
 
 #if DEVELOPER
         [Description("The Check of the Team member's Region (not CustomRegion)):\n" +
@@ -136,15 +134,19 @@ namespace EntityTools.Quester.Conditions
             get => _regionCheck; set
             {
                 _regionCheck = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionCheck)));
+                NotifyPropertyChanged();
             }
         }
-        internal bool _regionCheck;
+        private bool _regionCheck;
         #endregion
 
         #region взаимодействие с ядром
         internal IQuesterConditionEngine Engine;
         public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public TeamMembersCount()
         {

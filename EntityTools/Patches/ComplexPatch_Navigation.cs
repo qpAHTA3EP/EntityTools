@@ -336,7 +336,7 @@ namespace EntityTools.Patches
                                                ref List<Vector3> waypoints)
         {
             bool debugInfo = EntityTools.Config.Logger.DebugNavigation;
-            var methodName = debugInfo ? MethodBase.GetCurrentMethod().Name : string.Empty;
+            var methodName = debugInfo ? MethodBase.GetCurrentMethod()?.Name ?? nameof(GetPathAndCorrect) : string.Empty;
 
 
             var player = EntityManager.LocalPlayer;
@@ -684,7 +684,7 @@ namespace EntityTools.Patches
         private static bool PrefixGenerateRoad(out Road __result, Graph graph, Vector3 Start, Vector3 End, bool allowPathFinding)
         {
             bool debugInfo = EntityTools.Config.Logger.DebugNavigation;
-            var methodName = debugInfo ? MethodBase.GetCurrentMethod().Name : string.Empty;
+            var methodName = debugInfo ? MethodBase.GetCurrentMethod()?.Name ?? nameof(PrefixGenerateRoad) : string.Empty;
 
             //TODO Переработать корректировку пути (первую и последнюю точки)
             Road road = new Road();
@@ -1112,7 +1112,7 @@ namespace EntityTools.Patches
         internal static bool PathDistance(out double __result, Vector3 pos)
         {
             bool debugInfo = EntityTools.Config.Logger.DebugNavigation;
-            var methodName = debugInfo ? MethodBase.GetCurrentMethod().Name : string.Empty;
+            var methodName = debugInfo ? MethodBase.GetCurrentMethod()?.Name ?? nameof(PathDistance) : string.Empty;
 
             __result = 0;
 
@@ -1174,7 +1174,7 @@ namespace EntityTools.Patches
         internal static bool GenerateRoadFromPlayer(out Road __result, Vector3 end)
         {
             bool debugInfo = EntityTools.Config.Logger.DebugNavigation;
-            var methodName = debugInfo ? MethodBase.GetCurrentMethod().Name : string.Empty;
+            var methodName = debugInfo ? MethodBase.GetCurrentMethod()?.Name ?? nameof(GenerateRoadFromPlayer) : string.Empty;
 
             var player = EntityManager.LocalPlayer;
 

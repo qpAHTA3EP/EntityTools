@@ -334,7 +334,7 @@ namespace EntityTools.Quester.Actions
             get => _ignoreCombatMinHp; set
             {
                 if (value < -1)
-                    value = 0;
+                    value = -1;
                 if (value > 100)
                     value = 100;
                 if (_ignoreCombatMinHp != value)

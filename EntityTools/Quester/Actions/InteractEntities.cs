@@ -428,7 +428,7 @@ namespace EntityTools.Quester.Actions
             get => _ignoreCombatMinHp; set
             {
                 if (value < -1)
-                    value = 0;
+                    value = -1;
                 if (value > 100)
                     value = 100;
                 if (_ignoreCombatMinHp != value)
@@ -513,6 +513,7 @@ namespace EntityTools.Quester.Actions
 #if DEVELOPER
         [Category("Interaction")]
         [Description("Interaction timeout (sec) if InteractitOnce flag is set.")]
+        [DisplayName("InteractionTimeout")]
 #else
         [Browsable(false)]
 #endif

@@ -1,9 +1,9 @@
 ﻿using EntityTools.Forms;
+using EntityTools.Quester.Actions;
+using EntityTools.UCC.Actions;
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using EntityTools.Quester.Actions;
-using EntityTools.UCC.Actions;
 
 namespace EntityTools.Editors
 {
@@ -12,15 +12,19 @@ namespace EntityTools.Editors
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
+#if false
+            EntityTools.Core.Monitor(new PlayerTeamMonitor());
+#else
             switch (context?.Instance)
             {
-                case ChangeTarget changeTarget:
-                    ObjectInfoForm.Show(changeTarget.Engine, 500);
+                case ChangeTarget cht:
+                    ObjectInfoForm.Show(cht.Engine, 500);
                     break;
                 case MoveToTeammate m2t:
                     ObjectInfoForm.Show(m2t.Engine, 500);
                     break;
-            }
+            } 
+#endif
             return value;
         }
 

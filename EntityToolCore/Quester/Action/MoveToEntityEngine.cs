@@ -659,29 +659,32 @@ namespace EntityCore.Quester.Action
         public void GatherInfos()
         {
             var player = EntityManager.LocalPlayer;
-            if (@this.HotSpots.Count == 0)
+            if (player.IsValid && !player.IsLoading)
             {
-                var pos = player.Location.Clone();
-                Node node;
-                if ((node = AstralAccessors.Quester.Core.Meshes.ClosestNode(pos.X, pos.Y, pos.Z, out double distance, false)) != null
-                    && distance < 10)
-                    @this.HotSpots.Add(node.Position);
-                else @this.HotSpots.Add(pos);
-            }
-
-            @this.CurrentMap = player.MapState.MapName;
-
-            var entityId = @this.EntityID;
-            if (string.IsNullOrEmpty(entityId))
-            {
-                var entityIdType = @this.EntityIdType;
-                var entityNameType = @this.EntityNameType;
-                if (EntityViewer.GUIRequest(ref entityId, ref entityIdType, ref entityNameType) != null)
+                if (@this.HotSpots.Count == 0)
                 {
-                    @this.EntityID = entityId;
-                    @this.EntityIdType = entityIdType;
-                    @this.EntityNameType = entityNameType;
+                    var pos = player.Location.Clone();
+                    Node node;
+                    if ((node = AstralAccessors.Quester.Core.Meshes.ClosestNode(pos.X, pos.Y, pos.Z, out double distance, false)) != null
+                        && distance < 10)
+                        @this.HotSpots.Add(node.Position);
+                    else @this.HotSpots.Add(pos);
                 }
+
+                @this.CurrentMap = player.MapState.MapName;
+
+                var entityId = @this.EntityID;
+                if (string.IsNullOrEmpty(entityId))
+                {
+                    var entityIdType = @this.EntityIdType;
+                    var entityNameType = @this.EntityNameType;
+                    if (EntityViewer.GUIRequest(ref entityId, ref entityIdType, ref entityNameType) != null)
+                    {
+                        @this.EntityID = entityId;
+                        @this.EntityIdType = entityIdType;
+                        @this.EntityNameType = entityNameType;
+                    }
+                } 
             }
 
             _label = string.Empty;

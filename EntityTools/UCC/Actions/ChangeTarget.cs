@@ -25,7 +25,7 @@ namespace EntityTools.UCC.Actions
 #if DEVELOPER
         [Category("General")]
         [Editor(typeof(UccTargetSelectorEditor), typeof(UITypeEditor))]
-        [Description("Алгоритм выбора цели")]
+        [Description("Target selector algorithm.")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
 #else
         [Browsable(false)]
@@ -42,7 +42,7 @@ namespace EntityTools.UCC.Actions
                 } 
             }
         }
-        internal TargetSelector targetSelector = new EntityTarget();
+        private TargetSelector targetSelector = new EntityTarget();
 
         public new int Range
         {
@@ -78,7 +78,7 @@ namespace EntityTools.UCC.Actions
 #if DEVELOPER
         [Category("Optional")]
         [Editor(typeof(UccConditionListEditor), typeof(UITypeEditor))]
-        [Description("Набор нестандартных UCC-условий, которые проверяют после основных")]
+        [Description("Custom UCC-conditions set.")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
 #else
         [Browsable(false)]
@@ -95,24 +95,27 @@ namespace EntityTools.UCC.Actions
                 OnPropertyChanged();
             }
         }
-        internal UCCConditionPack _customConditions = new UCCConditionPack();
+        private UCCConditionPack _customConditions = new UCCConditionPack();
 
 #if DEVELOPER && DEBUG_CHANGE_TARGET
+        [Category("General")]
         [XmlIgnore]
         [Editor(typeof(TargetSelectorTestEditor), typeof(UITypeEditor))]
-        public string TestInfos { get; } = @"Нажми на кнопку '...' чтобы увидеть больше =>";
+        public string TestInfos => @"Push button '...' =>";
 #endif
         #endregion
 
         #region Взаимодействие с EntityToolsCore
-#if false && DEVELOPER && DEBUG_CHANGE_TARGET
+
+#if DEVELOPER && DEBUG_CHANGE_TARGET
         [Category("DEBUG")]
         [Browsable(false)]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public object InternalEngine => Engine;
+        [XmlIgnore]
+        public object Engine => _engine;
 #endif
         [NonSerialized] 
-        internal IUccActionEngine Engine;
+        private IUccActionEngine _engine;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -124,23 +127,33 @@ namespace EntityTools.UCC.Actions
 
         public ChangeTarget()
         {
-            Engine = new UccActionProxy(this);
+            _engine = new UccActionProxy(this);
             CoolDown = 500;
         }
         private IUccActionEngine MakeProxy()
         {
             return new UccActionProxy(this);
         }
+
+        public void Bind(IUccActionEngine engine)
+        {
+            _engine = engine;
+        }
+        public void Unbind()
+        {
+            _engine = new UccActionProxy(this);
+            PropertyChanged = null;
+        }
         #endregion
 
         #region Интерфейс команды
-        
-        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).NeedToRun;
-        public override bool Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Run();
+
+        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).NeedToRun;
+        public override bool Run() => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).Run();
         [XmlIgnore]
         [Browsable(false)]
-        public Entity UnitRef => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).UnitRef;
-        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
+        public Entity UnitRef => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).UnitRef;
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).Label();
         #endregion
 
         public override UCCAction Clone()
