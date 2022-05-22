@@ -18,6 +18,7 @@ namespace EntityTools.UCC.Actions
     public class ApproachEntity : UCCAction, INotifyPropertyChanged, IEntityDescriptor
     {
         #region Опции команды
+        #region Entity
 #if DEVELOPER
         [Description("ID of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
@@ -37,7 +38,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal string _entityId = string.Empty;
+        private string _entityId = string.Empty;
 
 #if DEVELOPER
         [Description("Type of and EntityID:\n" +
@@ -59,7 +60,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
+        private ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
 
 #if DEVELOPER
         [Description("The switcher of the Entity filed which compared to the property EntityID")]
@@ -79,7 +80,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal EntityNameType _entityNameType = EntityNameType.InternalName;
+        private EntityNameType _entityNameType = EntityNameType.InternalName;
 
 #if DEVELOPER
         [Category("Entity")]
@@ -97,13 +98,22 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal float _entityRadius = 12;
+        private float _entityRadius = 12;
 
+#if DEVELOPER
+        [XmlIgnore]
+        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
+        [Description("Test the Entity searching.")]
+        [Category("Entity")]
+        public string EntityTestInfo => "Push button '...' =>";
+#endif
+        #endregion
+
+        #region Entity Options
 #if DEVELOPER
         [Description("Check Entity's Ingame Region (Not CustomRegion):\n" +
             "True: Only Entities located in the same Region as Player are detected\n" +
             "False: Entity's Region does not checked during search")]
-        //[Category("Entity")]
         [Category("Optional")]
 #else
         [Browsable(false)]
@@ -119,13 +129,12 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal bool _regionCheck = true;
+        private bool _regionCheck = true;
 
 #if DEVELOPER
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
-        //[Category("Entity")]
         [Category("Optional")]
 #else
         [Browsable(false)]
@@ -141,12 +150,11 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal bool _healthCheck = true;
+        private bool _healthCheck = true;
 
 #if DEVELOPER
         [Description("Aura which checked on the Entity")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        //[Category("Entity")]
         [Category("Optional")]
 #else
         [Browsable(false)]
@@ -163,12 +171,11 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal AuraOption _aura = new AuraOption();
+        private AuraOption _aura = new AuraOption();
 
 #if DEVELOPER
         [Description("The maximum distance from the character within which the Entity is searched\n" +
             "The default value is 0, which disables distance checking")]
-        //[Category("Entity")]
         [Category("Optional")]
 #else
         [Browsable(false)]
@@ -184,7 +191,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal float _reactionRange = 30;
+        private float _reactionRange = 30;
 
 #if DEVELOPER
         [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
@@ -205,15 +212,8 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal float _reactionZRange;
-
-#if DEVELOPER
-        [XmlIgnore]
-        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
-        [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
-        //[Category("Entity")]
-        public string TestInfo { get; } = "Нажми '...' =>";
-#endif
+        private float _reactionZRange; 
+        #endregion
 
         #region Hide Inherited Properties
         [XmlIgnore]

@@ -1,4 +1,6 @@
-﻿namespace EntityTools.Enums
+﻿using MyNW.Classes;
+
+namespace EntityTools.Enums
 {
     /// <summary>
     /// Список 
@@ -27,5 +29,24 @@
         /// Умение скакуна
         /// </summary>
         Mount
+    }
+
+    /// <summary>
+    /// Тип проверки состояния умения <see cref="Power"/> 
+    /// </summary>
+    public enum PowerState
+    {
+        /// <summary>
+        /// Персонаж обладает умением <see cref="Power"/>
+        /// </summary>
+        HasPower,
+        /// <summary>
+        /// Персонаж не обладает умением <see cref="Power"/>
+        /// </summary>
+        HasntPower,
+        /// <summary>
+        /// Умение временно не может быть использовано (кулдаун)
+        /// </summary>
+        //OnCooldown
     }
 }

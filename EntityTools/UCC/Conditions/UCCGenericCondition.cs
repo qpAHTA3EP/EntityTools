@@ -17,7 +17,21 @@ namespace EntityTools.UCC.Conditions
             return false;
         }
 
-        bool ICustomUCCCondition.Loсked { get => Locked; set => Locked = value; }
+        bool ICustomUCCCondition.Locked { get => base.Locked; set => base.Locked = value; }
+
+        ICustomUCCCondition ICustomUCCCondition.Clone()
+        {
+            var copy = new UCCConditionPack
+            {
+                Sign = Sign,
+                Locked = Locked,
+                Target = Target,
+                Tested = Tested,
+                Value = Value
+            };
+
+            return copy;
+        }
 
 #if !DEVELOPER
         [Browsable(false)]

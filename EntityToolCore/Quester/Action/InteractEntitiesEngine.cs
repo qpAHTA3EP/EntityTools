@@ -270,6 +270,15 @@ namespace EntityCore.Quester.Action
                     ? $"{_idStr}.{MethodBase.GetCurrentMethod()?.Name ?? nameof(NeedToRun)}"
                     : string.Empty;
 
+                if (!InternalConditions)
+                {
+                    // Чтобы завершить команду нужно перейти к Run() и вернуть ActionResult.Fail
+                    // Переход к Run() возможен только при возврате true
+                    if (extendedDebugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: {nameof(InternalConditions)} are False. Force calling of {nameof(Run)}");
+                    return true;
+                }
+
                 if (extendedDebugInfo)
                     ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Begins");
 
@@ -392,6 +401,15 @@ namespace EntityCore.Quester.Action
             bool extendedDebugInfo = ExtendedDebugInfo;
             string currentMethodName = extendedDebugInfo ? $"{_idStr}.{MethodBase.GetCurrentMethod()?.Name ?? nameof(Run)}"
                 : string.Empty;
+
+            if (!InternalConditions)
+            {
+                if (extendedDebugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: {nameof(InternalConditions)} failed. ActionResult={ActionResult.Fail}.");
+                if (@this.IgnoreCombat)
+                    AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(false);
+                return ActionResult.Fail;
+            }
 
             if (extendedDebugInfo)
                 ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Begins");
@@ -791,17 +809,14 @@ namespace EntityCore.Quester.Action
         {
             get
             {
-                var map = @this.CurrentMap;
-                var player = EntityManager.LocalPlayer;
-                if (!string.IsNullOrEmpty(map) &&
-                    !map.Equals(player.MapState.MapName, StringComparison.Ordinal))
+                if (!InternalConditions)
                     return Vector3.Empty;
 
                 if (EntityKey.Validate(targetEntity))
                 {
                     if (targetEntity.Location.Distance3DFromPlayer > @this.InteractDistance)
                         return targetEntity.Location.Clone();
-                    return player.Location.Clone();
+                    return EntityManager.LocalPlayer.Location.Clone();
                 }
                 return Vector3.Empty;
             }

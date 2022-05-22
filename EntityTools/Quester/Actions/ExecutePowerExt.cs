@@ -23,41 +23,6 @@ namespace EntityTools.Quester.Actions
     [Serializable]
     public class ExecutePowerExt : Action, INotifyPropertyChanged
     {
-        #region Взаимодействие с EntityToolsCore
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        [NonSerialized]
-        internal IQuesterActionEngine Engine;
-
-        public ExecutePowerExt()
-        {
-            Engine = new QuesterActionProxy(this);
-            if (string.IsNullOrEmpty(powerId))
-                powerId = _lastPowerId;
-            if (_targetRad > 0)
-                TargetRadius = _targetRad;
-        }
-        public void Bind(IQuesterActionEngine engine)
-        {
-            Engine = engine;
-        }
-        public void Unbind()
-        {
-            Engine = new QuesterActionProxy(this);
-            PropertyChanged = null;
-        }
-        private IQuesterActionEngine MakeProxy()
-        {
-            return new QuesterActionProxy(this);
-        }
-        #endregion
-
-
         #region Power
 #if DEVELOPER
         [Editor(typeof(PowerIdEditor), typeof(UITypeEditor))]
@@ -416,7 +381,42 @@ namespace EntityTools.Quester.Actions
             }
         }
         [NonSerialized]
-        private static uint _zDev; 
+        private static uint _zDev;
+        #endregion
+
+
+        #region Взаимодействие с EntityToolsCore
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        [NonSerialized]
+        internal IQuesterActionEngine Engine;
+
+        public ExecutePowerExt()
+        {
+            Engine = new QuesterActionProxy(this);
+            if (string.IsNullOrEmpty(powerId))
+                powerId = _lastPowerId;
+            if (_targetRad > 0)
+                TargetRadius = _targetRad;
+        }
+        public void Bind(IQuesterActionEngine engine)
+        {
+            Engine = engine;
+        }
+        public void Unbind()
+        {
+            Engine = new QuesterActionProxy(this);
+            PropertyChanged = null;
+        }
+        private IQuesterActionEngine MakeProxy()
+        {
+            return new QuesterActionProxy(this);
+        }
         #endregion
 
 

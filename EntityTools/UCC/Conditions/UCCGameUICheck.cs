@@ -13,7 +13,7 @@ using EntityTools.Enums;
 
 namespace EntityTools.UCC.Conditions
 {
-    public class UCCGameUICheck : UCCCondition, ICustomUCCCondition
+    public class UccGameUiCheck : UCCCondition, ICustomUCCCondition
     {
         #region Опции команды
 #if DEVELOPER
@@ -22,19 +22,19 @@ namespace EntityTools.UCC.Conditions
 #else
         [Browsable(false)]
 #endif
-        public string UiGenID
+        public string UiGenId
         {
-            get { return _uiGenID; }
+            get { return uiGenId; }
             set
             {
-                if (_uiGenID != value)
+                if (uiGenId != value)
                 {
-                    _uiGenID = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UiGenID)));
+                    uiGenId = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UiGenId)));
                 }
             }
         }
-        internal string _uiGenID = "Team_Maptransferchoice_Waitingonteamlabel";
+        private string uiGenId = "Team_Maptransferchoice_Waitingonteamlabel";
 
 #if DEVELOPER
         [Description("The Name of the GUI element's property which is checked\n" +
@@ -54,7 +54,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal string _uiGenProperty;
+        private string _uiGenProperty;
 
 #if DEVELOPER
         [Description("The Value of the GUI element's property which is checked\n" +
@@ -75,7 +75,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal string _uiGenPropertyValue = string.Empty;
+        private string _uiGenPropertyValue = string.Empty;
 
 #if DEVELOPER
         [Description("Type of and UiGenPropertyValue:\n" +
@@ -99,7 +99,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal ItemFilterStringType _uiGenPropertyValueType = ItemFilterStringType.Simple;
+        private ItemFilterStringType _uiGenPropertyValueType = ItemFilterStringType.Simple;
 
 #if DEVELOPER
         [Category("GuiProperty")]
@@ -117,7 +117,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal Condition.Presence _propertySign = Condition.Presence.Equal;
+        private Condition.Presence _propertySign = Condition.Presence.Equal;
 
 #if !DEVELOPER
         [Browsable(false)]
@@ -134,7 +134,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal UiGenCheckType _check = UiGenCheckType.IsVisible;
+        private UiGenCheckType _check = UiGenCheckType.IsVisible;
 
         #region Hide Inherited Properties
         [XmlIgnore]
@@ -157,7 +157,7 @@ namespace EntityTools.UCC.Conditions
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public UCCGameUICheck()
+        public UccGameUiCheck()
         {
             Sign = Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
             Engine = new UccConditionProxy(this);
@@ -171,7 +171,26 @@ namespace EntityTools.UCC.Conditions
         #region ICustomUCCCondition
         bool ICustomUCCCondition.IsOK(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).IsOK(refAction);
 
-        bool ICustomUCCCondition.Loсked { get => Locked; set => Locked = value; }
+        bool ICustomUCCCondition.Locked { get => Locked; set => Locked = value; }
+
+        ICustomUCCCondition ICustomUCCCondition.Clone()
+        {
+            return new UccGameUiCheck
+            {
+                uiGenId = uiGenId,
+                _uiGenProperty = _uiGenProperty,
+                _uiGenPropertyValue = _uiGenPropertyValue,
+                _uiGenPropertyValueType = _uiGenPropertyValueType,
+                _propertySign = _propertySign,
+                _check = _check,
+
+                Sign = Sign,
+                Locked = Locked,
+                Target = Target,
+                Tested = Tested,
+                Value = Value
+            };
+        }
 
         string ICustomUCCCondition.TestInfos(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).TestInfos(refAction);
         #endregion

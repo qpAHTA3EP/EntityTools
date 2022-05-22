@@ -1,23 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Astral.Classes;
+﻿using Astral.Classes;
 using Astral.Quester.Classes;
 using EntityCore.Entities;
-using EntityTools.Enums;
-using EntityCore.Extensions;
-using EntityTools.Quester.Conditions;
-using MyNW.Classes;
-using static Astral.Quester.Classes.Condition;
 using EntityTools;
 using EntityTools.Core.Interfaces;
+using EntityTools.Enums;
+using EntityTools.Quester.Conditions;
+using MyNW.Classes;
+using System;
+using static Astral.Quester.Classes.Condition;
 
 namespace EntityCore.Quester.Conditions
 {
     internal class EntityPropertyEngine : IQuesterConditionEngine
-#if IEntityDescriptor
-        , IEntityInfos  
-#endif
     {
         private EntityProperty @this = null;
 
@@ -119,7 +113,7 @@ namespace EntityCore.Quester.Conditions
                    return propertyValueChecker(entity);
                 }
 
-                return @this._propertyType == EntityPropertyType.Distance && @this._sign == Relation.Superior;
+                return @this.PropertyType == EntityPropertyType.Distance && @this.Sign == Relation.Superior;
             }
         }
 
@@ -134,14 +128,14 @@ namespace EntityCore.Quester.Conditions
                 if (EntityKey.Validate(entity))
                 {
                     return string.Concat("Found closest Entity [",
-                        @this._entityNameType == EntityNameType.NameUntranslated ? entity.NameUntranslated : entity.InternalName,
+                        @this.EntityNameType == EntityNameType.NameUntranslated ? entity.NameUntranslated : entity.InternalName,
                         "] which ", @this.PropertyType, " = ",
                         @this.PropertyType == EntityPropertyType.Distance ? entity.Location.Distance3DFromPlayer.ToString("N2") :
                         @this.PropertyType == EntityPropertyType.ZAxis ? entity.Location.Z .ToString("N2") : entity.Character.AttribsBasic.HealthPercent.ToString("N2"));
                 }
                 else
                 {
-                    return string.Concat("No one Entity matched to [", @this._entityId, ']', Environment.NewLine,
+                    return string.Concat("No one Entity matched to [", @this.EntityID, ']', Environment.NewLine,
                         @this.PropertyType == EntityPropertyType.Distance ? "The distance to the missing Entity is considered equal to infinity." : string.Empty);
                 }
             }
@@ -150,7 +144,7 @@ namespace EntityCore.Quester.Conditions
         public string Label()
         {
             if (string.IsNullOrEmpty(_label))
-                _label = $"Entity [{@this._entityId}] {@this._propertyType} {@this._sign} to {@this._value}";
+                _label = $"Entity [{@this.EntityID}] {@this.PropertyType} {@this.Sign} to {@this.Value}";
             return _label;
         }
 
@@ -163,7 +157,7 @@ namespace EntityCore.Quester.Conditions
             get
             {
                 if (_key is null)
-                    _key = new EntityCacheRecordKey(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete);
+                    _key = new EntityCacheRecordKey(@this.EntityID, @this.EntityIdType, @this.EntityNameType, EntitySetType.Complete);
                 return _key;
             }
         }
@@ -178,10 +172,10 @@ namespace EntityCore.Quester.Conditions
             get
             {
                 if (_specialCheck is null)
-                    _specialCheck = SearchHelper.Construct_EntityAttributePredicate(@this._healthCheck,
-                                                            @this._reactionRange, @this._reactionZRange,
-                                                            @this._regionCheck,
-                                                            @this._customRegionNames);
+                    _specialCheck = SearchHelper.Construct_EntityAttributePredicate(@this.HealthCheck,
+                                                            @this.ReactionRange, @this.ReactionZRange,
+                                                            @this.RegionCheck,
+                                                            @this.CustomRegionNames);
                 return _specialCheck;
             }
         }
@@ -260,53 +254,53 @@ namespace EntityCore.Quester.Conditions
 
         private bool Distance_Inferior(Entity e)
         {
-            return  entity.Location.Distance3DFromPlayer < @this._value;
+            return  entity.Location.Distance3DFromPlayer < @this.Value;
         }
         private bool Distance_Superior(Entity e)
         {
-            return entity.Location.Distance3DFromPlayer > @this._value;
+            return entity.Location.Distance3DFromPlayer > @this.Value;
         }
         private bool Distance_Equal(Entity e)
         {
-            return Math.Abs(entity.Location.Distance3DFromPlayer - @this._value) <= 1;
+            return Math.Abs(entity.Location.Distance3DFromPlayer - @this.Value) <= 1;
         }
         private bool Distance_NotEqual(Entity e)
         {
-            return Math.Abs(entity.Location.Distance3DFromPlayer - @this._value) > 1;
+            return Math.Abs(entity.Location.Distance3DFromPlayer - @this.Value) > 1;
         }
 
         private bool HealthPercent_Inferior(Entity e)
         {
-            return entity.Character.AttribsBasic.HealthPercent < @this._value; ;
+            return entity.Character.AttribsBasic.HealthPercent < @this.Value;
         }
         private bool HealthPercent_Superior(Entity e)
         {
-            return entity.Character.AttribsBasic.HealthPercent > @this._value; ;
+            return entity.Character.AttribsBasic.HealthPercent > @this.Value;
         }
         private bool HealthPercent_Equal(Entity e)
         {
-            return Math.Abs(entity.Character.AttribsBasic.HealthPercent - @this._value) <= 1;
+            return Math.Abs(entity.Character.AttribsBasic.HealthPercent - @this.Value) <= 1;
         }
         private bool HealthPercent_NotEqual(Entity e)
         {
-            return Math.Abs(entity.Character.AttribsBasic.HealthPercent - @this._value) > 1;
+            return Math.Abs(entity.Character.AttribsBasic.HealthPercent - @this.Value) > 1;
         }
 
         private bool ZAxis_Inferior(Entity e)
         {
-            return entity.Z < @this._value; ;
+            return entity.Z < @this.Value; 
         }
         private bool ZAxis_Superior(Entity e)
         {
-            return entity.Z > @this._value; ;
+            return entity.Z > @this.Value;
         }
         private bool ZAxis_Equal(Entity e)
         {
-            return Math.Abs(entity.Z - @this._value) <= 1;
+            return Math.Abs(entity.Z - @this.Value) <= 1;
         }
         private bool ZAxis_NotEqual(Entity e)
         {
-            return Math.Abs(entity.Z - @this._value) > 1;
+            return Math.Abs(entity.Z - @this.Value) > 1;
         }
         #endregion
     }

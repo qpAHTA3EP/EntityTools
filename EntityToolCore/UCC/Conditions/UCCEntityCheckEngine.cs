@@ -1,18 +1,15 @@
-﻿using Astral.Logic.UCC.Classes;
+﻿using Astral.Classes;
+using Astral.Logic.UCC.Classes;
 using EntityCore.Entities;
+using EntityTools;
 using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
+using EntityTools.Quester.Actions;
 using EntityTools.UCC.Conditions;
+using EntityTools.UCC.Extensions;
 using MyNW.Classes;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Text;
-using System.Xml.Serialization;
-using EntityTools.UCC.Extensions;
-using Astral.Classes;
-using EntityTools;
 
 namespace EntityCore.UCC.Conditions
 {
@@ -24,8 +21,8 @@ namespace EntityCore.UCC.Conditions
 #if false
         private Predicate<Entity> checkEntity { get; set; } = null; 
 #endif
-        private Entity entity = null;
-        private Timeout timeout = new Timeout(0);
+        private Entity entity;
+        private readonly Timeout timeout = new Timeout(0);
         private string _label = string.Empty;
         private string _idStr;
         #endregion
@@ -138,56 +135,55 @@ namespace EntityCore.UCC.Conditions
             }
 
 
-            bool result = false;
             if (entityKey.Validate(entity))
             {
-                switch (@this._propertyType)
+                switch (@this.PropertyType)
                 {
                     case EntityPropertyType.Distance:
                         switch (@this.Sign)
                         {
                             case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
-                                return result = entity.Location.Distance3DFromPlayer == @this._propertyValue;
+                                return Math.Abs(entity.Location.Distance3DFromPlayer - @this.PropertyValue) <= 1;
                             case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
-                                return result = entity.Location.Distance3DFromPlayer != @this._propertyValue;
+                                return Math.Abs(entity.Location.Distance3DFromPlayer - @this.PropertyValue) > 1;
                             case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
-                                return result = entity.Location.Distance3DFromPlayer < @this._propertyValue;
+                                return entity.Location.Distance3DFromPlayer < @this.PropertyValue;
                             case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
-                                return result = entity.Location.Distance3DFromPlayer > @this._propertyValue;
+                                return entity.Location.Distance3DFromPlayer > @this.PropertyValue;
                         }
                         break;
                     case EntityPropertyType.HealthPercent:
                         switch (@this.Sign)
                         {
                             case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
-                                return result = entity.Character?.AttribsBasic?.HealthPercent == @this._propertyValue;
+                                return Math.Abs(entity.Character.AttribsBasic.HealthPercent - @this.PropertyValue) <= 1;
                             case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
-                                return result = entity.Character?.AttribsBasic?.HealthPercent != @this._propertyValue;
+                                return Math.Abs(entity.Character.AttribsBasic.HealthPercent - @this.PropertyValue) > 1;
                             case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
-                                return result = entity.Character?.AttribsBasic?.HealthPercent < @this._propertyValue;
+                                return entity.Character.AttribsBasic.HealthPercent < @this.PropertyValue;
                             case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
-                                return result = entity.Character?.AttribsBasic?.HealthPercent > @this._propertyValue;
+                                return entity.Character.AttribsBasic.HealthPercent > @this.PropertyValue;
                         }
                         break;
                     case EntityPropertyType.ZAxis:
                         switch (@this.Sign)
                         {
                             case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
-                                return result = entity.Location.Z == @this._propertyValue;
+                                return Math.Abs(entity.Location.Z - @this.PropertyValue) <= 1;
                             case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
-                                return result = entity.Location.Z != @this._propertyValue;
+                                return Math.Abs(entity.Location.Z - @this.PropertyValue) > 1;
                             case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
-                                return result = entity.Location.Z < @this._propertyValue;
+                                return entity.Location.Z < @this.PropertyValue;
                             case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
-                                return result = entity.Location.Z > @this._propertyValue;
+                                return entity.Location.Z > @this.PropertyValue;
                         }
                         break;
                 }
-                return result;
+                return false;
             }
             // Если Entity не найдено, условие будет истино в единственном случае:
-            else return @this._propertyType == EntityPropertyType.Distance
-                        && @this.Sign == Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
+            return @this.PropertyType == EntityPropertyType.Distance
+                   && @this.Sign == Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
         }
 
         public string TestInfos(UCCAction refAction)
@@ -201,9 +197,10 @@ namespace EntityCore.UCC.Conditions
 
             if (entityKey.Validate(closestEntity))
             {
-                StringBuilder sb = new StringBuilder("Found closect Entity");
-                sb.Append(" [").Append(closestEntity.NameUntranslated).Append(']').Append(" which ").Append(@this._propertyType).Append(" = ");
-                switch (@this._propertyType)
+                StringBuilder sb = new StringBuilder("Found closest Entity");
+                var propType = @this.PropertyType;
+                sb.Append(" [").Append(closestEntity.NameUntranslated).Append(']').Append(" which ").Append(propType).Append(" = ");
+                switch (propType)
                 {
                     case EntityPropertyType.Distance:
                         sb.Append(closestEntity.Location.Distance3DFromPlayer);
@@ -220,11 +217,10 @@ namespace EntityCore.UCC.Conditions
             else
             {
                 StringBuilder sb = new StringBuilder("No one Entity matched to");
-                sb.Append(" [").Append(@this._entityId).Append(']').AppendLine();
-                if (@this._propertyType == EntityPropertyType.Distance)
+                sb.Append(" [").Append(@this.EntityID).Append(']').AppendLine();
+                if (@this.PropertyType == EntityPropertyType.Distance)
                     sb.AppendLine("The distance to the missing Entity is considered equal to infinity.");
                 return sb.ToString();
-                //return string.Concat("No one Entity matched to [", @this._entityId, ']',Environment.NewLine, (@this._propertyType == EntityPropertyType.Distance)? "The distance to the missing Entity is considered equal to infinity." : string.Empty, "The distance to the missing Entity is considered equal to infinity.");
             }
         }
 
@@ -232,7 +228,7 @@ namespace EntityCore.UCC.Conditions
         {
             if (string.IsNullOrEmpty(_label))
             {
-                _label = $"{@this.GetType().Name} [{@this._entityId}]";
+                _label = $"{@this.GetType().Name} [{@this.EntityID}]";
             }
             else _label = @this.GetType().Name;
 
@@ -240,20 +236,14 @@ namespace EntityCore.UCC.Conditions
         }
         #endregion
 
-#if true
         #region Вспомогательные инструменты
         /// <summary>
         /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
         /// </summary>
-        public EntityCacheRecordKey EntityKey
-        {
-            get
-            {
-                if (_key is null)
-                    _key = new EntityCacheRecordKey(@this._entityId, @this._entityIdType, @this._entityNameType);
-                return _key;
-            }
-        }
+        public EntityCacheRecordKey EntityKey =>
+            _key ??
+            (_key = new EntityCacheRecordKey(@this.EntityID, @this.EntityIdType, @this.EntityNameType));
+
         private EntityCacheRecordKey _key;
 
         /// <summary>
@@ -266,45 +256,17 @@ namespace EntityCore.UCC.Conditions
             get
             {
                 if (_specialCheck is null)
-                    _specialCheck = SearchHelper.Construct_EntityAttributePredicate(@this._healthCheck,
-                                                            @this._reactionRange,
-                                                            //@this._reactionZRange,
-                                                            @this._reactionZRange > 0 ? @this._reactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference,
-                                                            @this._regionCheck,
-                                                            @this._aura.IsMatch);
+                    _specialCheck = SearchHelper.Construct_EntityAttributePredicate(@this.HealthCheck,
+                                                            @this.ReactionRange,
+                                                            @this.ReactionZRange > 0 
+                                                                ? @this.ReactionZRange 
+                                                                : Astral.Controllers.Settings.Get.MaxElevationDifference,
+                                                            @this.RegionCheck,
+                                                            @this.Aura.IsMatch);
                 return _specialCheck;
             }
         }
         private Predicate<Entity> _specialCheck;
         #endregion
-#else
-        private bool ValidateEntity(Entity e)
-        {
-#if false
-            return e != null && e.IsValid && checkEntity(e); 
-#else
-            return e != null && e.IsValid
-                    && (e.Character.IsValid || e.Critter.IsValid || e.Player.IsValid)
-                    && checkEntity(e);
-#endif
-        }
-
-        private bool initialize_CheckEntity(Entity e)
-        {
-            Predicate<Entity> predicate = EntityComparer.Get(@this._entityId, @this._entityIdType, @this._entityNameType);
-            if (predicate != null)
-            {
-#if DEBUG
-                ETLogger.WriteLine(LogType.Debug, $"{_idStr}: Comparer does not defined. Initialize.");
-#endif
-                checkEntity = predicate;
-                return checkEntity(e);
-            }
-#if DEBUG
-            else ETLogger.WriteLine(LogType.Error, $"{_idStr}: Fail to initialize the Comparer.");
-#endif
-            return false;
-        } 
-#endif
     }
 }

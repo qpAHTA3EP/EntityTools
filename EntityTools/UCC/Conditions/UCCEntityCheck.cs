@@ -35,7 +35,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal string _entityId = string.Empty;
+        private string _entityId = string.Empty;
 
 #if DEVELOPER
         [Description("Type of and EntityID:\n" +
@@ -57,7 +57,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
+        private ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
 
 #if DEVELOPER
         [Description("The switcher of the Entity filed which compared to the property EntityID")]
@@ -77,7 +77,15 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal EntityNameType _entityNameType = EntityNameType.InternalName;
+        private EntityNameType _entityNameType = EntityNameType.InternalName;
+
+#if DEVELOPER
+        [XmlIgnore]
+        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
+        [Description("Test the Entity searching.")]
+        [Category("Entity")]
+        public string EntityTestInfo => "Push button '...' =>";
+#endif
 
 #if DEVELOPER
         [Description("Check Entity's Region:\n" +
@@ -99,7 +107,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal bool _regionCheck;
+        private bool _regionCheck;
 
 #if DEVELOPER
         [Description("Check if Entity's health greater than zero:\n" +
@@ -121,7 +129,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal bool _healthCheck = true;
+        private bool _healthCheck = true;
 
 #if DEVELOPER
         [Description("The maximum distance from the character within which the Entity is searched\n" +
@@ -142,7 +150,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal float _reactionRange;
+        private float _reactionRange;
 
 #if DEVELOPER
         [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
@@ -163,7 +171,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal float _reactionZRange;
+        private float _reactionZRange;
 
 #if DEVELOPER
         [Description("Aura which checked on the Entity")]
@@ -183,7 +191,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal AuraOption _aura = new AuraOption();
+        private AuraOption _aura = new AuraOption();
 
 #if !DEVELOPER
         [Browsable(false)]
@@ -199,7 +207,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal EntityPropertyType _propertyType = EntityPropertyType.Distance;
+        private EntityPropertyType _propertyType = EntityPropertyType.Distance;
 
 #if !DEVELOPER
         [Browsable(false)]
@@ -215,17 +223,8 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal float _propertyValue;
+        private float _propertyValue;
 
-#if DEVELOPER
-        [XmlIgnore]
-        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
-        [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
-        //[Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
-        public string TestInfo { get; } = "Нажми '...' =>";
 
         #region Hide Inherited Properties
         [XmlIgnore]
@@ -241,6 +240,7 @@ namespace EntityTools.UCC.Conditions
         public new Astral.Logic.UCC.Ressources.Enums.ActionCond Tested { get; set; }
         #endregion
         #endregion
+
 
         #region Взаимодействие с EntityToolsCore
         [NonSerialized]
@@ -260,13 +260,45 @@ namespace EntityTools.UCC.Conditions
         }
         #endregion
 
+
         #region ICustomUCCCondition
         bool ICustomUCCCondition.IsOK(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).IsOK(refAction);
 
-        bool ICustomUCCCondition.Loсked { get => Locked; set => Locked = value; }
+        bool ICustomUCCCondition.Locked { get => base.Locked; set => base.Locked = value; }
+
+        ICustomUCCCondition ICustomUCCCondition.Clone()
+        {
+            var copy = new UCCEntityCheck
+            {
+                _entityId = _entityId,
+                _entityIdType = _entityIdType,
+                _entityNameType = _entityNameType,
+                _regionCheck = _regionCheck,
+                _healthCheck = _healthCheck,
+                _reactionRange = _reactionRange,
+                _reactionZRange = _reactionZRange,
+                _aura = new AuraOption
+                {
+                    AuraName = _aura.AuraName,
+                    AuraNameType = _aura.AuraNameType,
+                    Sign = _aura.Sign,
+                    Stacks = _aura.Stacks
+                },
+                _propertyType = _propertyType,
+                _propertyValue = _propertyValue,
+
+                Sign = Sign,
+                Locked = Locked,
+                Target = Target,
+                Tested = Tested,
+                Value = Value
+            };
+            return copy;
+        }
 
         string ICustomUCCCondition.TestInfos(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).TestInfos(refAction);
         #endregion
+
 
         public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
     }

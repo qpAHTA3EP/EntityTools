@@ -47,9 +47,6 @@ namespace EntityCore.Entities
                     {
                         var crCollection = customRegions.Value;
 
-                        //if(customRegionCheck.IsValid && customRegionCheck.Value == Condition.Presence.NotEquel)
-                        //    crCheck = crCollection.Outside;
-                        //else crCheck = crCollection.Within;
                         sb.Append("CustomRegions: ").Append(crCollection);
                         if (crCollection.Count > 0)
                         {
@@ -90,7 +87,7 @@ namespace EntityCore.Entities
                                                               entityDescriptor.ReactionRange,
                                                               entityDescriptor.ReactionZRange,
                                                               entityDescriptor.RegionCheck,
-                                                              customRegions.Value,
+                                                              customRegions.IsValid ? customRegions.Value : null,
                                                               customRegionCheck.IsValid && customRegionCheck.Value == Condition.Presence.NotEquel,
                                                               auraCheck);
 

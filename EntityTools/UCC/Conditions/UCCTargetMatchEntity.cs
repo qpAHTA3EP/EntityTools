@@ -35,7 +35,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal string _entityId = string.Empty;
+        private string _entityId = string.Empty;
 
 #if DEVELOPER
         [Description("Type of and EntityID:\n" +
@@ -57,7 +57,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
+        private ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
 
 #if DEVELOPER
         [Description("The switcher of the Entity filed which compared to the EntityID")]
@@ -77,17 +77,15 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal EntityNameType _entityNameType = EntityNameType.NameUntranslated;
+        private EntityNameType _entityNameType = EntityNameType.NameUntranslated;
 
 #if DEVELOPER
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
-        [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
-        //[Category("Entity")]
-#else
-        [Browsable(false)]
+        [Description("Test the Entity searching.")]
+        [Category("Entity")]
+        public string EntityTestInfo => "Push button '...' =>";
 #endif
-        public string TestInfo { get; } = "Нажми '...' =>";
 
 #if DEVELOPER
         [Description("The expected result of the comparison of the Target and EntityID.\n" +
@@ -107,7 +105,7 @@ namespace EntityTools.UCC.Conditions
                 }
             }
         }
-        internal MatchType _match = MatchType.Match;
+        private MatchType _match = MatchType.Match;
 
         #region Hide Inherited Properties
         [XmlIgnore]
@@ -149,7 +147,23 @@ namespace EntityTools.UCC.Conditions
         #region ICustomUCCCondition
         bool ICustomUCCCondition.IsOK(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).IsOK(refAction);
 
-        bool ICustomUCCCondition.Loсked { get => Locked; set => Locked = value; }
+        bool ICustomUCCCondition.Locked { get => base.Locked; set => base.Locked = value; }
+
+        ICustomUCCCondition ICustomUCCCondition.Clone()
+        {
+            return new UCCTargetMatchEntity
+            {
+                _entityId = _entityId,
+                _entityIdType = _entityIdType,
+                _entityNameType = _entityNameType,
+                _match = _match,
+                Sign = Sign,
+                Locked = Locked,
+                Target = Target,
+                Tested = Tested,
+                Value = Value
+            };
+        }
 
         string ICustomUCCCondition.TestInfos(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).TestInfos(refAction);
         #endregion

@@ -9,7 +9,6 @@ namespace EntityCore.Tools.Powers
     /// </summary>
     public class PowerCache
     {
-
         public PowerCache(string powId)
         {
             powerIdPattern = powId;
@@ -28,19 +27,19 @@ namespace EntityCore.Tools.Powers
         /// <summary>
         /// Идентификатор игрового клиента для отслеживания актуальности кэша
         /// </summary>
-        private int attachedGameProcessId;
+        private int cachedAttachedGameProcessId;
         /// <summary>
         /// Идентификатор персонажа для отслеживания актуальности кэша
         /// </summary>
-        private uint characterContainerId;
+        private uint cachedCharacterContainerId;
         /// <summary>
         /// Идентификатор умения для отслеживания актуальности кэша
         /// </summary>
-        private uint powerId;
+        private uint cachedPowerId;
         /// <summary>
         /// Кэшированное умение
         /// </summary>
-        private MyNW.Classes.Power power;
+        private MyNW.Classes.Power cachedPower;
         /// <summary>
         /// Функтор для проверки соответствия имени умения <see cref="PowerIdPattern"/>
         /// </summary>
@@ -106,10 +105,16 @@ namespace EntityCore.Tools.Powers
         /// </summary>
         public MyNW.Classes.Power Power => GetPower();
 
+        public void Reset()
+        {
+            powerIdPattern = string.Empty;
+            checker = (p) => false;
+            initialized = false;
+        }
+
         /// <summary>
         /// Кэшированное <see cref="MyNW.Classes.Power"/>
         /// </summary>
-
         public MyNW.Classes.Power GetPower()
         {
             if (!initialized)
@@ -118,29 +123,29 @@ namespace EntityCore.Tools.Powers
             var player = EntityManager.LocalPlayer;
             var processId = Astral.API.AttachedGameProcess.Id;
 
-            if (!(attachedGameProcessId == processId
-                  && characterContainerId == player.ContainerId
-                  && power != null
-                  && (power.PowerId == powerId
-                      || checker(power.PowerDef.InternalName)
-                      || checker(power.EffectivePowerDef().InternalName))))
+            if (!(cachedAttachedGameProcessId == processId
+                  && cachedCharacterContainerId == player.ContainerId
+                  && cachedPower != null
+                  && (cachedPower.PowerId == cachedPowerId
+                      || checker(cachedPower.PowerDef.InternalName)
+                      || checker(cachedPower.EffectivePowerDef().InternalName))))
             {
                 //power = Powers.GetPowerByInternalName(powId);
-                power = SearchPower();
-                if (power != null)
+                cachedPower = SearchPower();
+                if (cachedPower != null)
                 {
-                    powerId = power.PowerId;
-                    attachedGameProcessId = processId;
-                    characterContainerId = player.ContainerId;
+                    cachedPowerId = cachedPower.PowerId;
+                    cachedAttachedGameProcessId = processId;
+                    cachedCharacterContainerId = player.ContainerId;
                 }
                 else
                 {
-                    powerId = 0;
-                    attachedGameProcessId = 0;
-                    characterContainerId = 0;
+                    cachedPowerId = 0;
+                    cachedAttachedGameProcessId = 0;
+                    cachedCharacterContainerId = 0;
                 }
             }
-            return power;
+            return cachedPower;
         }
 
         /// <summary>

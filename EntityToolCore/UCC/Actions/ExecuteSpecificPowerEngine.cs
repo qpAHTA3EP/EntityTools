@@ -19,15 +19,12 @@ namespace EntityCore.UCC.Actions
     {
         #region Данные
         private ExecuteSpecificPower @this;
-
-        //private Entity entity;
+#if EntityTarget
+        private Entity entity; 
+#endif
         private string label = string.Empty;
         private string _idStr;
-
-        private int   attachedGameProcessId;
-        private uint  characterContainerId;
-        private uint  powerId;
-        private Power power;
+        private readonly PowerCache powerCache = new PowerCache(string.Empty);
         #endregion
 
         internal ExecuteSpecificPowerEngine(ExecuteSpecificPower esp)
@@ -84,9 +81,10 @@ namespace EntityCore.UCC.Actions
                     power = null;
                     label = string.Empty;
                 }
+                entity = null;
 #endif
-                //entity = null;
-                power = null;
+                label = string.Empty;
+                powerCache.PowerIdPattern = @this.PowerId;
             }
         }
 
@@ -141,16 +139,42 @@ namespace EntityCore.UCC.Actions
         {
             get
             {
-                var p = GetCurrentPower();
+                bool debugInfo = EntityTools.EntityTools.Config.Logger.UccActions.DebugExecuteSpecificPower;
+
+                string actionIdStr = debugInfo
+                    ? $"{_idStr}.{MethodBase.GetCurrentMethod()?.Name ?? nameof(NeedToRun)}"
+                    : string.Empty; 
+                
+                var p = powerCache.GetPower();
 
                 if (p is null)
+                {
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Power does not found.");
                     return false;
+                }
 
-                if (@this._checkPowerCooldown && p.IsOnCooldown()
-                    || @this._checkInTray && !p.IsInTray)
+                if (@this.CheckPowerCooldown && p.IsOnCooldown())
+                {
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Power is on Cooldown.");
                     return false;
+                }
 
-                return ((ICustomUCCCondition)@this._customConditions).IsOK(@this);
+                if (@this.CheckInTray && !p.IsInTray)
+                {
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Power is not Slotted.");
+                    return false;
+                }
+
+                if (!((ICustomUCCCondition) @this._customConditions).IsOK(@this))
+                {
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: CustomConditions are False.");
+                }
+
+                return true;
             }
         }
 
@@ -165,12 +189,12 @@ namespace EntityCore.UCC.Actions
             if(debugInfo)
                 ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: starts");
 
-            var currentPower = GetCurrentPower();
+            var currentPower = powerCache.GetPower();
 
             if (currentPower is null)
             {
                 if(debugInfo)
-                    ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Fail to get Power '{@this._powerId}' by 'PowerId'");
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Fail to get Power '{@this.PowerId}' by 'PowerId'");
 
                 return false;
             }
@@ -332,22 +356,23 @@ namespace EntityCore.UCC.Actions
 
         public string Label()
         {
-            if (string.IsNullOrEmpty(@this._powerId))
+            var pwrId = @this.PowerId;
+            if (string.IsNullOrEmpty(pwrId))
                 label = $"{nameof(@this.PowerId)} not defined";
             else if (string.IsNullOrEmpty(label))
             {
-                var currentPower = GetCurrentPower();
+                var currentPower = powerCache.GetPower();
 
                 if (currentPower != null)
                 {
                     var powDef = currentPower.PowerDef;
                     if (powDef != null && powDef.IsValid)
-                        label = string.Concat(@this._checkInTray && CurrentPowerIsSlotted ? "[Slotted] " : string.Empty,
+                        label = string.Concat(@this.CheckInTray && CurrentPowerIsSlotted ? "[Slotted] " : string.Empty,
                             string.IsNullOrEmpty(powDef.DisplayName) ? powDef.InternalName : $"{powDef.DisplayName} [{powDef.InternalName}]");
                 }
                 else
                 {
-                    var powerDefByPowerId = Powers.GetPowerDefByPowerId(@this._powerId);
+                    var powerDefByPowerId = Powers.GetPowerDefByPowerId(pwrId);
                     if (powerDefByPowerId.IsValid)
                     {
                         label = string.Concat(powerDefByPowerId.DisplayName, " (Unknown Power)");
@@ -364,38 +389,7 @@ namespace EntityCore.UCC.Actions
         #region Вспомогательные функции
         [XmlIgnore]
         [Browsable(false)]
-        private bool CurrentPowerIsSlotted => power?.IsInTray == true;
-
-        private Power GetCurrentPower()
-        {
-            var player = EntityManager.LocalPlayer;
-            var processId = Astral.API.AttachedGameProcess.Id;
-
-            if (!(attachedGameProcessId == processId
-                  && characterContainerId == player.ContainerId
-                  && power != null
-                  && (power.PowerId == powerId
-                      || string.Equals(power.PowerDef.InternalName, @this._powerId, StringComparison.Ordinal)
-                      || string.Equals(power.EffectivePowerDef().InternalName, @this._powerId, StringComparison.Ordinal))))
-            {
-                power = Powers.GetPowerByInternalName(@this._powerId);
-                if (power != null)
-                {
-                    powerId = power.PowerId;
-                    label = string.Empty;
-                    attachedGameProcessId = processId;
-                    characterContainerId = player.ContainerId;
-                }
-                else
-                {
-                    powerId = 0;
-                    label = string.Empty;
-                    attachedGameProcessId = 0;
-                    characterContainerId = 0;
-                }
-            }
-            return power;
-        }
+        private bool CurrentPowerIsSlotted => powerCache.GetPower()?.IsInTray == true;
         #endregion
 
 

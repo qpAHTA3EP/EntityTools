@@ -41,7 +41,7 @@ namespace EntityTools.Patches.Mapper.Tools
         /// </summary>
         public MapperEditMode EditMode => MapperEditMode.AddNode;
 
-        public bool HandleCustomDraw => newNode != null;
+        public bool HandleCustomDraw => true;
         /// <summary>
         /// Отрисовка новой вершин
         /// </summary>

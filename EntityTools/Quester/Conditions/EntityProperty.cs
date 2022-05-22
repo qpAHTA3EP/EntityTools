@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Threading;
-using System.Xml.Serialization;
-using Astral.Classes.ItemFilter;
+﻿using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Tools.CustomRegions;
+using System;
+using System.ComponentModel;
+using System.Drawing.Design;
+using System.Threading;
+using System.Xml.Serialization;
 
 namespace EntityTools.Quester.Conditions
 {
@@ -37,7 +36,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal string _entityId = string.Empty;
+        private string _entityId = string.Empty;
 
 #if DEVELOPER
         [Description("The switcher of the Entity filed which compared to the property EntityID")]
@@ -57,7 +56,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal EntityNameType _entityNameType = EntityNameType.InternalName;
+        private EntityNameType _entityNameType = EntityNameType.InternalName;
 
 #if DEVELOPER
         [Description("Type of and EntityID:\n" +
@@ -79,7 +78,15 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
+        private ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
+
+#if DEVELOPER
+        [XmlIgnore]
+        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
+        [Description("Test the Entity searching.")]
+        [Category("Entity")]
+        public string EntityTestInfo => "Push button '...' =>";
+#endif
 
 #if DEVELOPER
         [Description("Check Entity's Region:\n" +
@@ -100,7 +107,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal bool _regionCheck;
+        private bool _regionCheck;
 
 #if DEVELOPER
         [Description("Check if Entity's health greater than zero:\n" +
@@ -121,7 +128,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal bool _healthCheck = true;
+        private bool _healthCheck = true;
 
 
 #if DEVELOPER
@@ -144,7 +151,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal EntitySetType _entitySetType = EntitySetType.Complete;
+        private EntitySetType _entitySetType = EntitySetType.Complete;
 
 #if DEVELOPER
         [Description("The maximum distance from the character within which the Entity is searched\n" +
@@ -165,7 +172,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal float _reactionRange;
+        private float _reactionRange;
 
 #if DEVELOPER
         [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
@@ -186,7 +193,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal float _reactionZRange;
+        private float _reactionZRange;
 
 #if DEVELOPER
         [Description("CustomRegion names collection")]
@@ -207,7 +214,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal CustomRegionCollection _customRegionNames = new CustomRegionCollection();
+        private CustomRegionCollection _customRegionNames = new CustomRegionCollection();
 
 #if DEVELOPER
         [Category("Tested")]
@@ -225,7 +232,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal EntityPropertyType _propertyType = EntityPropertyType.Distance;
+        private EntityPropertyType _propertyType = EntityPropertyType.Distance;
 
 #if DEVELOPER
         [Category("Tested")]
@@ -244,7 +251,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal float _value;
+        private float _value;
 
 #if DEVELOPER
         [Description("Value comparison type to the closest Entity")]
@@ -264,36 +271,7 @@ namespace EntityTools.Quester.Conditions
                 }
             }
         }
-        internal Relation _sign = Relation.Superior;
-
-#if false
-#if DEVELOPER
-        [Description("Time between searches of the Entity (ms)")]
-        [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
-        public int SearchTimeInterval
-        {
-            get => _searchTimeInterval;
-            set
-            {
-                if (_searchTimeInterval != value)
-                {
-                    _searchTimeInterval = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SearchTimeInterval)));
-                }
-            }
-        }
-        internal int _searchTimeInterval = 200; 
-#endif
-
-#if DEVELOPER
-        [XmlIgnore]
-        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
-        [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
-        public string TestInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>";
-#endif
+        private Relation _sign = Relation.Superior;
         #endregion
 
 

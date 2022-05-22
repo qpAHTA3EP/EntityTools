@@ -47,24 +47,24 @@ namespace EntityCore.Forms
             if (conditions != null)
             {
                 // Отображаем список условий
-                foreach (UCCCondition condition in conditions)
+                foreach (UCCCondition cnd in conditions)
                 {
-                    @this.allowConditionsItemCheckedChangeInd = @this.lsbxConditions.Items.Add(CopyHelper.CreateDeepCopy(condition));
-                    @this.lsbxConditions.SetItemChecked(@this.allowConditionsItemCheckedChangeInd, condition.Locked);
+                    @this.allowConditionsItemCheckedChangeInd = @this.lsbxConditions.Items.Add(cnd is ICustomUCCCondition cstCnd ? (UCCCondition)cstCnd.Clone() : cnd.Clone());
+                    @this.lsbxConditions.SetItemChecked(@this.allowConditionsItemCheckedChangeInd, cnd.Locked);
                 }
             }
 
             if (@this.ShowDialog() == DialogResult.OK)
             {
                 // Формируем новый список условий
-                ConditionList newConditions = new ConditionList(@this.lsbxConditions.Items.Count);
+                ConditionList newConditionList = new ConditionList(@this.lsbxConditions.Items.Count);
                 foreach (object item in @this.lsbxConditions.Items)
                 {
-                    if (item is UCCCondition condition)
-                        newConditions.Add(condition);
+                    if (item is UCCCondition cnd)
+                        newConditionList.Add(cnd);
                 }
 
-                return newConditions;
+                return newConditionList;
             }
 
             return conditions;
@@ -78,10 +78,11 @@ namespace EntityCore.Forms
             if (conditions != null)
             {
                 // Отображаем список условий
-                foreach (UCCCondition condition in conditions)
+                foreach (UCCCondition cnd in conditions)
                 {
-                    @this.allowConditionsItemCheckedChangeInd = @this.lsbxConditions.Items.Add(CopyHelper.CreateDeepCopy(condition));
-                    @this.lsbxConditions.SetItemChecked(@this.allowConditionsItemCheckedChangeInd, condition.Locked);
+                    // BUG Использование CopyHelper.CreateDeepCopy приводит к StackOverflow
+                    @this.allowConditionsItemCheckedChangeInd = @this.lsbxConditions.Items.Add(cnd is ICustomUCCCondition cstCnd ? (UCCCondition)cstCnd.Clone() : cnd.Clone());
+                    @this.lsbxConditions.SetItemChecked(@this.allowConditionsItemCheckedChangeInd, cnd.Locked);
                 }
             }
             @this.cbLogic.SelectedItem = logic;
@@ -93,8 +94,8 @@ namespace EntityCore.Forms
                 ConditionList newConditions = new ConditionList(@this.lsbxConditions.Items.Count);
                 foreach (object item in @this.lsbxConditions.Items)
                 {
-                    if (item is UCCCondition condition)
-                        newConditions.Add(condition);
+                    if (item is UCCCondition cnd)
+                        newConditions.Add(cnd);
                 }
 
                 logic = (LogicRule) @this.cbLogic.SelectedItem;
@@ -123,10 +124,10 @@ namespace EntityCore.Forms
                 @this.cbLogic.SelectedItem = conditionPack.TestRule;
                 @this.cheNegation.Checked = conditionPack.Not;
                 // Отображаем список условий
-                foreach (UCCCondition condition in conditionPack.Conditions)
+                foreach (UCCCondition cnd in conditionPack.Conditions)
                 {
-                    @this.allowConditionsItemCheckedChangeInd = @this.lsbxConditions.Items.Add(CopyHelper.CreateDeepCopy(condition));
-                    @this.lsbxConditions.SetItemChecked(@this.allowConditionsItemCheckedChangeInd, condition.Locked);
+                    @this.allowConditionsItemCheckedChangeInd = @this.lsbxConditions.Items.Add(cnd is ICustomUCCCondition cstCnd ? (UCCCondition)cstCnd.Clone() : cnd.Clone());
+                    @this.lsbxConditions.SetItemChecked(@this.allowConditionsItemCheckedChangeInd, cnd.Locked);
                 }
             }
 
@@ -141,8 +142,8 @@ namespace EntityCore.Forms
                 var newConditions = newConditionPack.Conditions;
                 foreach (object item in @this.lsbxConditions.Items)
                 {
-                    if (item is UCCCondition condition)
-                        newConditions.Add(condition);
+                    if (item is UCCCondition cnd)
+                        newConditions.Add(cnd);
                 }
                 conditionPack = newConditionPack;
                 return true;

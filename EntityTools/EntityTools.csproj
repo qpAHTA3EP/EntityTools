@@ -473,6 +473,7 @@
     <Compile Include="Tools\Targeting\Enums.cs" />
     <Compile Include="Tools\Targeting\TeammateSupport.cs" />
     <Compile Include="UCC\Actions\PluggedSkill.cs" />
+    <Compile Include="UCC\Conditions\CheckPowerState.cs" />
     <Compile Include="UCC\IUccConditionPack.cs" />
     <Compile Include="UCC\Enums.cs" />
     <Compile Include="UCC\Extensions\UCCActionExtention.cs" />

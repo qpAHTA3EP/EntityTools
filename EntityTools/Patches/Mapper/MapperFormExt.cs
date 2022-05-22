@@ -620,7 +620,7 @@ namespace EntityTools.Patches.Mapper
             } 
             if (mode != MapperEditMode.AddNode)
             {
-                btnAddNode.Checked = false;
+                btnAddNodes.Checked = false;
             }
             if (mode != MapperEditMode.DistanceMeasurement)
             {
@@ -1613,7 +1613,7 @@ namespace EntityTools.Patches.Mapper
         private void handler_AddNode_ModeChanged(object sender, ItemClickEventArgs e)
         {
             AddNodeTool addTool = CurrentTool as AddNodeTool;
-            if (btnAddNode.Checked)
+            if (btnAddNodes.Checked)
             {
                 if (addTool is null)
                     CurrentTool = new AddNodeTool();

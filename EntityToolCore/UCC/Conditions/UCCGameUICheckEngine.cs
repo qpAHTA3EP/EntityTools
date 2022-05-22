@@ -12,14 +12,14 @@ namespace EntityCore.UCC.Conditions
     public class UccGameUiCheckEngine : IUccConditionEngine
     {
         #region Данные
-        private UCCGameUICheck @this;
+        private UccGameUiCheck @this;
 
         private UIGen uiGen;
         private string label = string.Empty;
         private string _idStr;
         #endregion
 
-        internal UccGameUiCheckEngine(UCCGameUICheck uiGenCheck)
+        internal UccGameUiCheckEngine(UccGameUiCheck uiGenCheck)
         {
             InternalRebase(uiGenCheck);
             ETLogger.WriteLine(LogType.Debug, $"{_idStr} initialized: {Label()}");
@@ -59,7 +59,7 @@ namespace EntityCore.UCC.Conditions
                 return false;
             if (ReferenceEquals(condition, @this))
                 return true;
-            if (condition is UCCGameUICheck uiGenCheck)
+            if (condition is UccGameUiCheck uiGenCheck)
             {
                 if (InternalRebase(uiGenCheck))
                 {
@@ -70,12 +70,12 @@ namespace EntityCore.UCC.Conditions
                 return false;
             }
 
-            string debugStr = string.Concat("Rebase failed. ", condition.GetType().Name, '[', condition.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(UCCGameUICheck) + '\'');
+            string debugStr = string.Concat("Rebase failed. ", condition.GetType().Name, '[', condition.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(UccGameUiCheck) + '\'');
             ETLogger.WriteLine(LogType.Error, debugStr);
             throw new InvalidCastException(debugStr);
         }
 
-        private bool InternalRebase(UCCGameUICheck execPower)
+        private bool InternalRebase(UccGameUiCheck execPower)
         {
             uiGen = null;
             // Убираем привязку к старому условию
@@ -101,39 +101,15 @@ namespace EntityCore.UCC.Conditions
 
         public bool IsOK(UCCAction refAction)
         {
-            if (!Validate(uiGen) && !string.IsNullOrEmpty(@this._uiGenID))
+            var genId = @this.UiGenId;
+            if (!Validate(uiGen) && !string.IsNullOrEmpty(genId))
             {
-                uiGen = MyNW.Internals.UIManager.AllUIGen.Find(x => x.Name == @this._uiGenID);
+                uiGen = MyNW.Internals.UIManager.AllUIGen.Find(x => x.Name.Equals(genId, StringComparison.Ordinal));
                 if (uiGen == null || !uiGen.IsValid)
                     return false;
             }
 
-#if true
             return uiGenChecker(uiGen);
-#else
-            switch (@this._check)
-            {
-                case UiGenCheckType.IsVisible:
-                    return uiGen.IsVisible;
-                case UiGenCheckType.IsHidden:
-                    return !uiGen.IsVisible;
-                case UiGenCheckType.Property:
-                    if (uiGen.IsVisible)
-                    {
-                        bool result = false;
-                        foreach (var uiVar in uiGen.Vars)
-                            if (uiVar.IsValid && uiVar.Name == @this._uiGenProperty)
-                            {
-                                result = CheckUiGenPropertyValue(uiVar);
-                                break;
-                            }
-                        return result;
-                    }
-                    break;
-            } 
-
-            return false;
-#endif
         }
 
         /// <summary>
@@ -146,7 +122,7 @@ namespace EntityCore.UCC.Conditions
             if (uiGenChecker is null)
             {
                 Func<UIGen, bool> checker = null;
-                switch (@this._check)
+                switch (@this.Check)
                 {
                     case UiGenCheckType.IsVisible:
                         checker = uig => uig.IsVisible;
@@ -160,7 +136,7 @@ namespace EntityCore.UCC.Conditions
                             if (uig.IsVisible)
                             {
                                 foreach (var uiVar in uig.Vars)
-                                    if (uiVar.IsValid && uiVar.Name == @this._uiGenProperty)
+                                    if (uiVar.IsValid && uiVar.Name.Equals(@this.UiGenProperty, StringComparison.Ordinal))
                                     {
                                         return uiGenPropertyValueChecker(uiVar);
                                     }
@@ -181,18 +157,20 @@ namespace EntityCore.UCC.Conditions
         {
             if (string.IsNullOrEmpty(label))
             {
-                if (string.IsNullOrEmpty(@this._uiGenID))
+                var genId = @this.UiGenId;
+                if (string.IsNullOrEmpty(genId))
                     label = @this.GetType().Name;
                 else
                 {
+                    var genProp = @this.UiGenProperty;
                     if (@this.Check != UiGenCheckType.Property
-                        || string.IsNullOrEmpty(@this._uiGenProperty))
+                        || string.IsNullOrEmpty(genProp))
                     {
-                        label = $"{@this.GetType().Name} [{@this._uiGenID}]";
+                        label = $"{@this.GetType().Name} [{genId}]";
                     }
                     else 
                     {
-                        label = $"{@this.GetType().Name} [{@this._uiGenID}.{@this._uiGenProperty}]";
+                        label = $"{@this.GetType().Name} [{genId}.{genProp}]";
                     }
                 }
             }
@@ -202,42 +180,43 @@ namespace EntityCore.UCC.Conditions
 
         public string TestInfos(UCCAction refAction)
         {
+            var genId = @this.UiGenId;
             if (!Validate(uiGen))
             {
-                uiGen = MyNW.Internals.UIManager.AllUIGen.Find(x => x.Name == @this._uiGenID);
+                uiGen = MyNW.Internals.UIManager.AllUIGen.Find(x => x.Name == genId);
                 if (uiGen == null || !uiGen.IsValid)
-                    return $"GUI '{@this._uiGenID}' is not found.";
+                    return $"GUI '{genId}' is not found.";
             }
 
-            switch (@this._check)
+            switch (@this.Check)
             {
                 case UiGenCheckType.IsVisible:
                     if (uiGen.IsVisible)
-                        return $"GUI '{@this._uiGenID}' is VISIBLE.";
-                    else return $"GUI '{@this._uiGenID}' is HIDDEN.";
+                        return $"GUI '{genId}' is VISIBLE.";
+                    else return $"GUI '{genId}' is HIDDEN.";
                 case UiGenCheckType.IsHidden:
                     if (uiGen.IsVisible)
-                        return $"GUI '{@this._uiGenID}' is VISIBLE.";
-                    else return $"GUI '{@this._uiGenID}' is HIDDEN.";
+                        return $"GUI '{genId}' is VISIBLE.";
+                    else return $"GUI '{genId}' is HIDDEN.";
                 case UiGenCheckType.Property:
+                    var genPrpt = @this.UiGenProperty;
                     if (uiGen.IsVisible)
                     {
                         foreach (var uiVar in uiGen.Vars)
-                            if (uiVar.IsValid && uiVar.Name == @this._uiGenProperty)
+                            if (uiVar.IsValid && uiVar.Name.Equals(genPrpt, StringComparison.Ordinal))
                             {
                                 if (uiGenPropertyValueChecker(uiVar))
-                                    return $"The Property '{@this._uiGenID}.{@this._uiGenProperty}' equals to '{uiVar.Value}'.";
-                                else return $"The Property '{@this._uiGenID}.{@this._uiGenProperty}' equals to '{uiVar.Value}'.";
+                                    return $"The Property '{genId}.{genPrpt}' equals to '{uiVar.Value}'.";
+                                else return $"The Property '{genId}.{genPrpt}' equals to '{uiVar.Value}'.";
                             }
-                        return $"The Property '@this.{@this._uiGenID}.{@this._uiGenProperty}' does not founded.";
+                        return $"The Property '@this.{genId}.{genPrpt}' does not founded.";
                     }
-                    else return $"GUI '{@this._uiGenID}' is HIDDEN. The Property '{@this._uiGenProperty}' did not checked.";
+                    else return $"GUI '{genId}' is HIDDEN. The Property '{genPrpt}' did not checked.";
             }
 
-            return $"GUI '{@this._uiGenID}' is not valid.";
+            return $"GUI '{genId}' is not valid.";
         }
 
-#if true
         /// <summary>
         /// Инициализация функтора <see cref="uiGenPropertyValueChecker"/>? проверяющего значения переменной элемента интерфейса
         /// </summary>
@@ -247,42 +226,19 @@ namespace EntityCore.UCC.Conditions
         {
             if (uiGenPropertyValueChecker is null)
             {
-                var checker = @this._uiGenPropertyValue.GetCompareFunc(@this._uiGenPropertyValueType, (UIVar v) => v.Value);
+                var checker = @this.UiGenPropertyValue.GetCompareFunc(@this.UiGenPropertyValueType, (UIVar v) => v.Value);
                 
-                uiGenPropertyValueChecker = checker ?? ((_) => false);
+                uiGenPropertyValueChecker = checker ?? (_ => false);
             }
 
             return uiGenPropertyValueChecker(uiVar);
         }
         private Func<UIVar, bool> uiGenPropertyValueChecker;
-#else
-        private bool CheckUiGenPropertyValue(UIVar uiVar)
-        {
-            if (uiVar == null || !uiVar.IsValid)
-                return false;
 
-            bool result = false;
-            if (string.IsNullOrEmpty(uiVar.Value) && string.IsNullOrEmpty(@this._uiGenPropertyValue))
-                result = true;
-            else switch (@this._uiGenPropertyValueType)
-                {
-                    case ItemFilterStringType.Simple:
-                        result = uiVar.Value.CompareToSimplePattern(@this._uiGenPropertyValue);
-                        break;
-                    case ItemFilterStringType.Regex:
-                        result = Regex.IsMatch(uiVar.Value, @this._uiGenPropertyValue);
-                        break;
-                }
-
-            if (@this._propertySign == Presence.Equal)
-                return result;
-            return !result;
-        } 
-#endif
 
         private bool Validate(UIGen uigen)
         {
-            return uigen != null && uigen.IsValid && uigen.Name == @this._uiGenID;
+            return uigen != null && uigen.IsValid && uigen.Name.Equals(@this.UiGenId, StringComparison.Ordinal);
         }
     }
 }

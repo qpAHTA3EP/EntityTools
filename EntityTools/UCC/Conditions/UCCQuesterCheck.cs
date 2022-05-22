@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Drawing.Design;
 using System.Xml.Serialization;
+using AcTp0Tools.Reflection;
 using Astral.Logic.UCC.Classes;
 using EntityTools.Editors;
 using QuesterCondition = Astral.Quester.Classes.Condition;
@@ -24,7 +25,23 @@ namespace EntityTools.UCC.Conditions
             return Condition?.IsValid == true;
         }
 
-        bool ICustomUCCCondition.Loсked { get => Locked; set => Locked = value; }
+        bool ICustomUCCCondition.Locked { get => base.Locked; set => base.Locked = value; }
+
+        ICustomUCCCondition ICustomUCCCondition.Clone()
+        {
+            var copy = new UCCQuesterCheck
+            {
+                Sign = Sign,
+                Locked = Locked,
+                Target = Target,
+                Tested = Tested,
+                Value = Value,
+            };
+            if (Condition != null)
+                copy.Condition = CopyHelper.CreateDeepCopy(Condition);
+
+            return copy;
+        }
 
         string ICustomUCCCondition.TestInfos(UCCAction refAction)
         {

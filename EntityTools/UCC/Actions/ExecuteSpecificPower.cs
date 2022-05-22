@@ -18,7 +18,6 @@ namespace EntityTools.UCC.Actions
     {
         #region Опции команды
 #if DEVELOPER
-        //[Editor(typeof(PowerAllIdEditor), typeof(UITypeEditor))]
         [Editor(typeof(PowerIdEditor), typeof(UITypeEditor))]
         [Category("Required")]
 #else
@@ -36,7 +35,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal string _powerId = string.Empty;
+        private string _powerId = string.Empty;
 
 #if DEVELOPER
         [Category("Optional")]
@@ -55,7 +54,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal bool _checkPowerCooldown;
+        private bool _checkPowerCooldown;
 
 #if DEVELOPER
         [Category("Optional")]
@@ -74,7 +73,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal bool _checkInTray;
+        private bool _checkInTray;
 
 #if DEVELOPER
         [Category("Optional")]
@@ -94,7 +93,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal int _castingTime;
+        private int _castingTime;
 
 #if DEVELOPER
         [Category("Optional")]
@@ -113,7 +112,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal bool _forceMaintain;
+        private bool _forceMaintain;
 
 #if EntityTarget
 #if DEVELOPER
@@ -136,7 +135,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal string _entityId = string.Empty;
+        private string _entityId = string.Empty;
 
 #if DEVELOPER
         [Description("Type of and EntityID:\n" +
@@ -158,7 +157,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
+        private ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
 
 #if DEVELOPER
         [Description("The switcher of the Entity filed which compared to the property EntityID")]
@@ -178,7 +177,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal EntityNameType _entityNameType = EntityNameType.InternalName;
+        private EntityNameType _entityNameType = EntityNameType.InternalName;
 
 #if DEVELOPER
         [Description("Check Entity's Ingame Region (Not CustomRegion):\n" +
@@ -200,7 +199,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal bool _regionCheck = true;
+        private bool _regionCheck = true;
 
 #if DEVELOPER
         [Description("Check if Entity's health greater than zero:\n" +
@@ -222,7 +221,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal bool _healthCheck = true;
+        private bool _healthCheck = true;
 
 #if DEVELOPER
         [Description("Aura which checked on the Entity")]
@@ -243,8 +242,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal AuraOption _aura = new AuraOption(); 
-
+        private AuraOption _aura = new AuraOption(); 
         
 
 #if DEVELOPER
@@ -266,7 +264,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal float _reactionRange = 60;
+        private float _reactionRange = 60;
 
 #if DEVELOPER
         [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
@@ -287,14 +285,14 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-        internal float _reactionZRange;
+        private float _reactionZRange;
 
 #if DEVELOPER
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
-        [Description("Press '...', to test 'TargetEntity' options.")]
-        [Category("TargetEntity")]
-        public string TestEntity => "Нажми '...' =>";
+        [Description("Test the Entity searching.")]
+        [Category("TargetEntity (Optional)")]
+        public string EntityTestInfo => "Push button '...' =>";
 #endif
 #endif
 
@@ -302,7 +300,7 @@ namespace EntityTools.UCC.Actions
         [Category("Optional")]
         [Editor(typeof(UccConditionListEditor), typeof(UITypeEditor))]
         [Description("Набор нестандартных UCC-условий, которые проверяют после основных")]
-        [TypeConverter(typeof(ExpandableObjectConverter))]
+        //[TypeConverter(typeof(ExpandableObjectConverter))]
 #else
         [Browsable(false)]
 #endif

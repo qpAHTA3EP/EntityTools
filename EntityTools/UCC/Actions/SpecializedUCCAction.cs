@@ -120,7 +120,7 @@ namespace EntityTools.UCC.Actions
                                         debugStr.Append("; ");
                                     debugStr.Append(iCond.GetType().Name);
 #endif
-                                if (iCond.Loсked)
+                                if (iCond.Locked)
                                 {
 #if DEBUG && DEBUG_LOG
                                         debugStr.Append("(L) ");

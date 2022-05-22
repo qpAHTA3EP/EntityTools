@@ -157,7 +157,6 @@ namespace EntityCore.Quester.Action
         public TargetProcessor TargetProcessor => _targetProcessor;
 #endif
 
-
         internal MoveToTeammateEngine(MoveToTeammate m2t)
         {
             InternalRebase(m2t);
@@ -360,6 +359,17 @@ namespace EntityCore.Quester.Action
             {
                 string currentMethodName = string.Concat(_idStr, '.', MethodBase.GetCurrentMethod()?.Name ?? nameof(Run));
 
+
+                if (!InternalConditions)
+                {
+                    ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: {nameof(InternalConditions)} failed. ActionResult={ActionResult.Fail}.");
+
+
+                    if (_action.IgnoreCombat)
+                        AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(false);
+                    return ActionResult.Fail;
+                }
+
                 ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, " : Begins"));
 
                 var teammate = _targetProcessor.GetTeammate();
@@ -395,6 +405,10 @@ namespace EntityCore.Quester.Action
             }
             else
             {
+
+                if (!InternalConditions)
+                    return ActionResult.Fail;
+
                 var teammate = _targetProcessor.GetTeammate();
                 if (teammate is null)
                 {

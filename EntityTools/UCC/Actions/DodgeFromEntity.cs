@@ -20,6 +20,7 @@ namespace EntityTools.UCC.Actions
     public class DodgeFromEntity : UCCAction, IEntityDescriptor
     {
         #region Опции команды
+        #region Entity
 #if DEVELOPER
         [Description("ID of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
@@ -101,6 +102,14 @@ namespace EntityTools.UCC.Actions
             }
         }
         internal float _entityRadius = 12;
+#if DEVELOPER
+        [XmlIgnore]
+        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
+        [Description("Test the Entity searching.")]
+        [Category("Entity")]
+        public string EntityTestInfo => "Push button '...' =>";
+#endif 
+        #endregion
 
 #if DEVELOPER
         [Description("Check Entity's Ingame Region (Not CustomRegion):\n" +
@@ -253,13 +262,6 @@ namespace EntityTools.UCC.Actions
         }
         internal DodgeDirection _dodgeDirection = DodgeDirection.DodgeSmart;
 
-#if DEVELOPER
-        [XmlIgnore]
-        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
-        [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
-        //[Category("Entity")]
-        public string TestInfo { get; } = "Нажми '...' =>";
-#endif
 
         #region Hide Inherited Properties
         [XmlIgnore]

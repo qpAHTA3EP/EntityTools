@@ -177,7 +177,7 @@ namespace EntityCore.Quester.Action
             bool debugInfoEnabled = ExtendedDebugInfo;
 
             string currentMethodName = debugInfoEnabled
-                    ? string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name)
+                    ? string.Concat(_idStr, '.', MethodBase.GetCurrentMethod()?.Name ?? nameof(Run) )
                     : string.Empty;
 
             if (debugInfoEnabled)
@@ -187,7 +187,7 @@ namespace EntityCore.Quester.Action
             {
                 if (debugInfoEnabled)
                     ETLogger.WriteLine(LogType.Debug,
-                        $"{currentMethodName}: InternalConditions are False => ActionResult = '{ActionResult.Fail}{'\''}");
+                        $"{currentMethodName}: {nameof(InternalConditions)} are False => ActionResult = '{ActionResult.Fail}{'\''}");
                 return ActionResult.Fail;
             }
 
@@ -414,18 +414,12 @@ namespace EntityCore.Quester.Action
             get
             {
                 bool isGiverAccessible = @this.Giver.IsAccessible;
-#if false
-                bool isHavingMissionOrCompleted = MissionHelper.CheckHavingMissionOrCompleted(@this._missionId);
-                bool result = isGiverAccessible && !isHavingMissionOrCompleted;
-                if (ExtendedDebugInfo)
-                    ETLogger.WriteLine(LogType.Debug, string.Concat(_idStr, '.', nameof(InternalConditions), ": GiverAccessible(", isGiverAccessible, ") AND Not(HavingMissionOrCompleted(", isHavingMissionOrCompleted, ")) => ", result)); 
-#else
+
                 bool haveMission = MissionHelper.HaveMission(@this.MissionId, out _);
                 bool result = isGiverAccessible && !haveMission;
                 if (ExtendedDebugInfo)
                     ETLogger.WriteLine(LogType.Debug,
                         $"{_idStr}.{nameof(InternalConditions)}: GiverAccessible({isGiverAccessible}) AND Not(HaveMission({haveMission})) => {result}");
-#endif
                 return result;
             }
         }

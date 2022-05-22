@@ -240,6 +240,7 @@
     <Compile Include="Tools\Targeting\TeammateSupportTargetProcessor.cs" />
     <Compile Include="Tools\Targeting\EntityTargetProcessor.cs" />
     <Compile Include="UCC\Conditions\UCCGameUICheckEngine.cs" />
+    <Compile Include="UCC\Conditions\CheckPowerStateEngine.cs" />
     <Compile Include="UCC\Conditions\UCCTargetMatchEntityEngine.cs" />
     <Compile Include="UCC\Conditions\UCCEntityCheckEngine.cs" />
   </ItemGroup>

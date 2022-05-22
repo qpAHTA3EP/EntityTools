@@ -58,7 +58,7 @@ namespace EntityTools.Patches.Mapper
             this.groupEditMeshes = new DevExpress.XtraBars.BarButtonGroup();
             this.btnMoveNodes = new DevExpress.XtraBars.BarCheckItem();
             this.btnRemoveNodes = new DevExpress.XtraBars.BarCheckItem();
-            this.btnAddNode = new DevExpress.XtraBars.BarCheckItem();
+            this.btnAddNodes = new DevExpress.XtraBars.BarCheckItem();
             this.btnEditEdges = new DevExpress.XtraBars.BarCheckItem();
             this.barGraphTools = new DevExpress.XtraBars.Bar();
             this.btnSaveMeshes = new DevExpress.XtraBars.BarButtonItem();
@@ -90,14 +90,8 @@ namespace EntityTools.Patches.Mapper
             this.barDockControlBottom = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlLeft = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlRight = new DevExpress.XtraBars.BarDockControl();
-            this.menuImportMesh = new DevExpress.XtraBars.BarButtonItem();
-            this.groupCR = new DevExpress.XtraBars.BarButtonGroup();
-            this.editBidirPathColor = new DevExpress.XtraBars.BarEditItem();
-            this.editItemColor = new DevExpress.XtraEditors.Repository.RepositoryItemColorEdit();
-            this.editUnidirPathColor = new DevExpress.XtraBars.BarEditItem();
-            this.btnLockOnSpecialObject = new DevExpress.XtraBars.BarButtonItem();
-            this.btnAddRoad = new DevExpress.XtraBars.BarCheckItem();
             this.seDeleteRadius = new DevExpress.XtraEditors.Repository.RepositoryItemSpinEdit();
+            this.editItemColor = new DevExpress.XtraEditors.Repository.RepositoryItemColorEdit();
             this.bsrcAstralSettings = new System.Windows.Forms.BindingSource(this.components);
             this.btnShowStatBar = new System.Windows.Forms.Button();
             this.MapPicture = new System.Windows.Forms.PictureBox();
@@ -106,8 +100,8 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.seWaypointDistance)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seMaxZDifference)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seEquivalenceDistance)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.editItemColor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seDeleteRadius)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.editItemColor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bsrcAstralSettings)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.MapPicture)).BeginInit();
             this.SuspendLayout();
@@ -137,7 +131,6 @@ namespace EntityTools.Patches.Mapper
             this.btnAddCR,
             this.btnImportMeshesFromGame,
             this.btnImportMeshesFromProfile,
-            this.menuImportMesh,
             this.btnExportMeshes,
             this.editWaypointDistance,
             this.editMaxZDifference,
@@ -148,7 +141,6 @@ namespace EntityTools.Patches.Mapper
             this.btnMappingLinearPath,
             this.btnMappingStop,
             this.groupMapping,
-            this.groupCR,
             this.groupImportExportNodes,
             this.btnOptions,
             this.lblMousePos,
@@ -167,17 +159,13 @@ namespace EntityTools.Patches.Mapper
             this.btnZoomOut,
             this.lblZoom,
             this.groupSaveUndo,
-            this.editBidirPathColor,
-            this.editUnidirPathColor,
-            this.btnLockOnSpecialObject,
             this.btnSettings,
             this.lblPlayerPos,
             this.lblDrawInfo,
             this.btnDistanceMeasurement,
-            this.btnAddRoad,
             this.btnObjectInfo,
             this.btnPanelVisibility,
-            this.btnAddNode});
+            this.btnAddNodes});
             this.barManager.MaxItemId = 146;
             this.barManager.OptionsLayout.AllowAddNewItems = false;
             this.barManager.RepositoryItems.AddRange(new DevExpress.XtraEditors.Repository.RepositoryItem[] {
@@ -381,14 +369,13 @@ namespace EntityTools.Patches.Mapper
             this.groupEditMeshes.Id = 96;
             this.groupEditMeshes.ItemLinks.Add(this.btnMoveNodes);
             this.groupEditMeshes.ItemLinks.Add(this.btnRemoveNodes);
-            this.groupEditMeshes.ItemLinks.Add(this.btnAddNode);
+            this.groupEditMeshes.ItemLinks.Add(this.btnAddNodes);
             this.groupEditMeshes.ItemLinks.Add(this.btnEditEdges);
             this.groupEditMeshes.Name = "groupEditMeshes";
             // 
             // btnMoveNodes
             // 
             this.btnMoveNodes.Caption = "Relocate Nodes";
-            this.btnMoveNodes.GroupIndex = 10;
             this.btnMoveNodes.Id = 92;
             this.btnMoveNodes.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnMoveNodes.ImageOptions.Image")));
             this.btnMoveNodes.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
@@ -399,7 +386,6 @@ namespace EntityTools.Patches.Mapper
             // btnRemoveNodes
             // 
             this.btnRemoveNodes.Caption = "Delete Nodes";
-            this.btnRemoveNodes.GroupIndex = 10;
             this.btnRemoveNodes.Id = 93;
             this.btnRemoveNodes.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnRemoveNodes.ImageOptions.Image")));
             this.btnRemoveNodes.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
@@ -407,19 +393,17 @@ namespace EntityTools.Patches.Mapper
             this.btnRemoveNodes.Name = "btnRemoveNodes";
             this.btnRemoveNodes.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_DeleteNodes_ModeChanged);
             // 
-            // btnAddNode
+            // btnAddNodes
             // 
-            this.btnAddNode.Caption = "Add Node";
-            this.btnAddNode.GroupIndex = 10;
-            this.btnAddNode.Id = 145;
-            this.btnAddNode.ImageOptions.Image = global::EntityTools.Properties.Resources.miniAdd;
-            this.btnAddNode.Name = "btnAddNode";
-            this.btnAddNode.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AddNode_ModeChanged);
+            this.btnAddNodes.Caption = "Add Nodes";
+            this.btnAddNodes.Id = 145;
+            this.btnAddNodes.ImageOptions.Image = global::EntityTools.Properties.Resources.miniAdd;
+            this.btnAddNodes.Name = "btnAddNodes";
+            this.btnAddNodes.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AddNode_ModeChanged);
             // 
             // btnEditEdges
             // 
             this.btnEditEdges.Caption = "Edit Edges";
-            this.btnEditEdges.GroupIndex = 10;
             this.btnEditEdges.Id = 94;
             this.btnEditEdges.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnEditEdges.ImageOptions.Image")));
             this.btnEditEdges.ItemShortcut = new DevExpress.XtraBars.BarShortcut(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
@@ -709,7 +693,7 @@ namespace EntityTools.Patches.Mapper
             this.barDockControlTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.barDockControlTop.Location = new System.Drawing.Point(0, 0);
             this.barDockControlTop.Manager = this.barManager;
-            this.barDockControlTop.Size = new System.Drawing.Size(403, 49);
+            this.barDockControlTop.Size = new System.Drawing.Size(429, 49);
             this.barDockControlTop.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.handler_PreviewKeyDown);
             // 
             // barDockControlBottom
@@ -718,7 +702,7 @@ namespace EntityTools.Patches.Mapper
             this.barDockControlBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.barDockControlBottom.Location = new System.Drawing.Point(0, 373);
             this.barDockControlBottom.Manager = this.barManager;
-            this.barDockControlBottom.Size = new System.Drawing.Size(403, 26);
+            this.barDockControlBottom.Size = new System.Drawing.Size(429, 26);
             // 
             // barDockControlLeft
             // 
@@ -732,67 +716,9 @@ namespace EntityTools.Patches.Mapper
             // 
             this.barDockControlRight.CausesValidation = false;
             this.barDockControlRight.Dock = System.Windows.Forms.DockStyle.Right;
-            this.barDockControlRight.Location = new System.Drawing.Point(403, 49);
+            this.barDockControlRight.Location = new System.Drawing.Point(429, 49);
             this.barDockControlRight.Manager = this.barManager;
             this.barDockControlRight.Size = new System.Drawing.Size(0, 324);
-            // 
-            // menuImportMesh
-            // 
-            this.menuImportMesh.Caption = "Import from Mesh";
-            this.menuImportMesh.Id = 53;
-            this.menuImportMesh.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("menuImportMesh.ImageOptions.Image")));
-            this.menuImportMesh.Name = "menuImportMesh";
-            // 
-            // groupCR
-            // 
-            this.groupCR.Caption = "CustomRegion";
-            this.groupCR.Id = 71;
-            this.groupCR.ItemLinks.Add(this.btnAddCR);
-            this.groupCR.ItemLinks.Add(this.btnEditCR);
-            this.groupCR.Name = "groupCR";
-            // 
-            // editBidirPathColor
-            // 
-            this.editBidirPathColor.Caption = "Bidir Path";
-            this.editBidirPathColor.Edit = this.editItemColor;
-            this.editBidirPathColor.Id = 126;
-            this.editBidirPathColor.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
-            this.editBidirPathColor.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("editBidirPathColor.ImageOptions.Image")));
-            this.editBidirPathColor.Name = "editBidirPathColor";
-            // 
-            // editItemColor
-            // 
-            this.editItemColor.AutoHeight = false;
-            this.editItemColor.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
-            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
-            this.editItemColor.Name = "editItemColor";
-            // 
-            // editUnidirPathColor
-            // 
-            this.editUnidirPathColor.Caption = "Unid Path";
-            this.editUnidirPathColor.Edit = this.editItemColor;
-            this.editUnidirPathColor.Id = 127;
-            this.editUnidirPathColor.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
-            this.editUnidirPathColor.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("editUnidirPathColor.ImageOptions.Image")));
-            this.editUnidirPathColor.Name = "editUnidirPathColor";
-            // 
-            // btnLockOnSpecialObject
-            // 
-            this.btnLockOnSpecialObject.Alignment = DevExpress.XtraBars.BarItemLinkAlignment.Right;
-            this.btnLockOnSpecialObject.Caption = "Lock On SpecialObject";
-            this.btnLockOnSpecialObject.Id = 128;
-            this.btnLockOnSpecialObject.ImageOptions.AllowGlyphSkinning = DevExpress.Utils.DefaultBoolean.True;
-            this.btnLockOnSpecialObject.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnLockOnSpecialObject.ImageOptions.Image")));
-            this.btnLockOnSpecialObject.Name = "btnLockOnSpecialObject";
-            this.btnLockOnSpecialObject.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_LockOnSpecialObject);
-            // 
-            // btnAddRoad
-            // 
-            this.btnAddRoad.Caption = "Add Road";
-            this.btnAddRoad.Description = "Добавить путь между двумя точками";
-            this.btnAddRoad.Id = 133;
-            this.btnAddRoad.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnAddRoad.ImageOptions.Image")));
-            this.btnAddRoad.Name = "btnAddRoad";
             // 
             // seDeleteRadius
             // 
@@ -814,6 +740,13 @@ namespace EntityTools.Patches.Mapper
             0});
             this.seDeleteRadius.Name = "seDeleteRadius";
             // 
+            // editItemColor
+            // 
+            this.editItemColor.AutoHeight = false;
+            this.editItemColor.Buttons.AddRange(new DevExpress.XtraEditors.Controls.EditorButton[] {
+            new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)});
+            this.editItemColor.Name = "editItemColor";
+            // 
             // btnShowStatBar
             // 
             this.btnShowStatBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -824,7 +757,7 @@ namespace EntityTools.Patches.Mapper
             this.btnShowStatBar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Transparent;
             this.btnShowStatBar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
             this.btnShowStatBar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnShowStatBar.Location = new System.Drawing.Point(386, 382);
+            this.btnShowStatBar.Location = new System.Drawing.Point(412, 382);
             this.btnShowStatBar.Name = "btnShowStatBar";
             this.btnShowStatBar.Size = new System.Drawing.Size(16, 16);
             this.btnShowStatBar.TabIndex = 4;
@@ -839,7 +772,7 @@ namespace EntityTools.Patches.Mapper
             this.MapPicture.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MapPicture.Location = new System.Drawing.Point(0, 49);
             this.MapPicture.Name = "MapPicture";
-            this.MapPicture.Size = new System.Drawing.Size(403, 324);
+            this.MapPicture.Size = new System.Drawing.Size(429, 324);
             this.MapPicture.TabIndex = 9;
             this.MapPicture.TabStop = false;
             this.MapPicture.MouseClick += new System.Windows.Forms.MouseEventHandler(this.handler_MouseClick);
@@ -851,7 +784,7 @@ namespace EntityTools.Patches.Mapper
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(403, 399);
+            this.ClientSize = new System.Drawing.Size(429, 399);
             this.Controls.Add(this.btnShowStatBar);
             this.Controls.Add(this.MapPicture);
             this.Controls.Add(this.barDockControlLeft);
@@ -876,8 +809,8 @@ namespace EntityTools.Patches.Mapper
             ((System.ComponentModel.ISupportInitialize)(this.seWaypointDistance)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seMaxZDifference)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seEquivalenceDistance)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.editItemColor)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.seDeleteRadius)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.editItemColor)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bsrcAstralSettings)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.MapPicture)).EndInit();
             this.ResumeLayout(false);
@@ -899,7 +832,6 @@ namespace EntityTools.Patches.Mapper
         private BarButtonItem btnEditCR;
         private BarButtonItem btnImportMeshesFromGame;
         private BarButtonItem btnImportMeshesFromProfile;
-        private BarButtonItem menuImportMesh;
         private BarButtonItem btnExportMeshes;
         private BarEditItem editWaypointDistance;
         private RepositoryItemSpinEdit seWaypointDistance;
@@ -914,7 +846,6 @@ namespace EntityTools.Patches.Mapper
         private BarCheckItem btnMappingStop;
         private Bar barMapping;
         private BarButtonGroup groupMapping;
-        private BarButtonGroup groupCR;
         private BarButtonGroup groupImportExportNodes;
         private BarButtonItem btnOptions;
         private PopupMenu popMenuOptions;
@@ -940,18 +871,14 @@ namespace EntityTools.Patches.Mapper
         private Bar barCustomRegions;
         private Bar barGraphEditTools;
         private BarButtonGroup groupSaveUndo;
-        private BarEditItem editBidirPathColor;
         private RepositoryItemColorEdit editItemColor;
-        private BarEditItem editUnidirPathColor;
-        private BarButtonItem btnLockOnSpecialObject;
         private BarButtonItem btnSettings;
         private BarStaticItem lblPlayerPos;
         private BarStaticItem lblDrawInfo;
         private BarCheckItem btnDistanceMeasurement;
-        private BarCheckItem btnAddRoad;
         private BarCheckItem btnObjectInfo;
         private BarButtonItem btnPanelVisibility;
-        private BarCheckItem btnAddNode;
+        private BarCheckItem btnAddNodes;
     } 
 #endif
 }

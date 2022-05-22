@@ -86,7 +86,7 @@ namespace EntityTools.Quester.Actions
 #if DEVELOPER
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
-        [Description("Test the entity searching.")]
+        [Description("Test the Entity searching.")]
         [Category("Entity")]
         public string TestSearch => @"Push button '...' =>";
 #if false

@@ -1,7 +1,7 @@
 ﻿using Astral.Quester.Classes;
 using EntityCore.Entities;
-using EntityCore.Extensions;
 using EntityTools;
+using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
 using EntityTools.Extensions;
 using EntityTools.Quester.Conditions;
@@ -10,18 +10,14 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using EntityTools.Core.Interfaces;
 using static Astral.Quester.Classes.Condition;
 
 namespace EntityCore.Quester.Conditions
 {
     internal class EntityCountEngine : IQuesterConditionEngine
-#if IEntityDescriptor
-        , IEntityInfos  
-#endif
     {
-        private EntityCount @this = null;
-        private LinkedList<Entity> entities = null;
+        private EntityCount @this;
+        private LinkedList<Entity> entities;
         private string _label = string.Empty;
 
         /// <summary>
@@ -113,7 +109,7 @@ namespace EntityCore.Quester.Conditions
             {
                 bool result = false;
                 bool debugInfoEnabled = ExtendedDebugInfo;
-                string currentMethodName = debugInfoEnabled ? string.Concat(_idStr, '.', MethodBase.GetCurrentMethod().Name) : string.Empty;
+                string currentMethodName = debugInfoEnabled ? string.Concat(_idStr, '.', MethodBase.GetCurrentMethod()?.Name ?? nameof(IsValid)) : string.Empty;
 
                 if (debugInfoEnabled)
                 {
@@ -121,7 +117,7 @@ namespace EntityCore.Quester.Conditions
                     ETLogger.WriteLine(LogType.Debug, debugMsg);
                 }
 
-                if (!string.IsNullOrEmpty(@this._entityId) || @this._entityNameType == EntityNameType.Empty)
+                if (!string.IsNullOrEmpty(@this.EntityID) || @this.EntityNameType == EntityNameType.Empty)
                 {
                     entities = SearchCached.FindAllEntity(EntityKey, SpecialCheck);
 
@@ -158,7 +154,8 @@ namespace EntityCore.Quester.Conditions
         {
             get
             {
-                if (!string.IsNullOrEmpty(@this._entityId) || @this._entityNameType == EntityNameType.Empty)
+                var enttId = @this.EntityID;
+                if (!string.IsNullOrEmpty(enttId) || @this.EntityNameType == EntityNameType.Empty)
                 {
                     entities = SearchCached.FindAllEntity(EntityKey, SpecialCheck);
 
@@ -167,7 +164,8 @@ namespace EntityCore.Quester.Conditions
 
                     if (entities != null && entities.Count > 0)
                     {
-                        if (@this._customRegionNames.Count > 0)
+                        var crList = @this.CustomRegionNames;
+                        if (crList.Count > 0)
                         {
                             strBldr.AppendLine();
                             foreach (Entity entity in entities)
@@ -191,7 +189,7 @@ namespace EntityCore.Quester.Conditions
                                 if (@this.CustomRegionCheck == Presence.NotEquel && !match)
                                     entCount++;
 
-                                switch (@this._entityNameType)
+                                switch (@this.EntityNameType)
                                 {
                                     case EntityNameType.InternalName:
                                         strBldr.Append($"\t[{entity.InternalName}] is in CustomRegions: ");
@@ -207,13 +205,13 @@ namespace EntityCore.Quester.Conditions
                             }
 
                             if (@this.CustomRegionCheck == Presence.Equal)
-                                strBldr.Insert(0, $"Total {entCount} Entities [{@this._entityId}] are detected in CustomRegions({@this._customRegionNames}):");
+                                strBldr.Insert(0, $"Total {entCount} Entities [{enttId}] are detected in CustomRegions({crList}):");
                             if (@this.CustomRegionCheck == Presence.NotEquel)
-                                strBldr.Insert(0, $"Total {entCount} Entities [{@this._entityId}] are detected out of CustomRegions({@this._customRegionNames}):");
+                                strBldr.Insert(0, $"Total {entCount} Entities [{enttId}] are detected out of CustomRegions({crList}):");
                         }
-                        else strBldr.AppendLine($"Total {entities.Count} Entities [{@this._entityId}] are detected");
+                        else strBldr.AppendLine($"Total {entities.Count} Entities [{enttId}] are detected");
                     }
-                    else strBldr.AppendLine($"No Entity [{@this._entityId}] was found.");
+                    else strBldr.AppendLine($"No Entity [{enttId}] was found.");
 
                     if (ExtendedDebugInfo)
                     {
@@ -223,16 +221,19 @@ namespace EntityCore.Quester.Conditions
                     }
                     return strBldr.ToString();
                 }
-                return $"Property '{nameof(@this._entityId)}' does not set !";
+                return $"Property '{nameof(enttId)}' does not set !";
             }
         }
 
         public string Label()
         {
             if (string.IsNullOrEmpty(_label))
-                if(string.IsNullOrEmpty(@this._entityId))
-                    _label = $"{@this.GetType().Name} {@this._sign} {@this._value}";
-                else _label = $"{@this.GetType().Name}({@this._entityId}) {@this._sign} {@this._value}";
+            {
+                var entId = @this.EntityID;
+                _label = string.IsNullOrEmpty(entId)
+                    ? $"{@this.GetType().Name} {@this.Sign} {@this.Value}"
+                    : $"{@this.GetType().Name}({entId}) {@this.Sign} {@this.Value}";
+            }
             return _label;
         }
 
@@ -240,20 +241,15 @@ namespace EntityCore.Quester.Conditions
         /// <summary>
         /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
         /// </summary>
-        public EntityCacheRecordKey EntityKey
-        {
-            get
-            {
-                if (_key is null)
-                    _key = new EntityCacheRecordKey(@this._entityId, @this._entityIdType, @this._entityNameType, EntitySetType.Complete);
-                return _key;
-            }
-        }
+        public EntityCacheRecordKey EntityKey =>
+            _key ?? (_key = new EntityCacheRecordKey(@this.EntityID, @this.EntityIdType,
+                                                     @this.EntityNameType, EntitySetType.Complete));
+
         private EntityCacheRecordKey _key;
 
         /// <summary>
         /// Функтор дополнительной проверки <seealso cref="Entity"/> 
-        /// на предмет нахождения в пределах области, заданной <see cref="InteractEntities.CustomRegionNames"/>
+        /// на предмет нахождения в пределах области, заданной <see cref="EntityCount.CustomRegionNames"/>
         /// </summary>        
         private Predicate<Entity> SpecialCheck
         {
@@ -261,11 +257,11 @@ namespace EntityCore.Quester.Conditions
             {
                 if(_specialCheck is null)
                 {
-                    _specialCheck = SearchHelper.Construct_EntityAttributePredicate(@this._healthCheck,
-                                                            @this._reactionRange, @this._reactionZRange,
-                                                            @this._regionCheck,
-                                                            @this._customRegionNames,
-                                                            @this._customRegionCheck == Presence.NotEquel);
+                    _specialCheck = SearchHelper.Construct_EntityAttributePredicate(@this.HealthCheck,
+                                                            @this.ReactionZRange, @this.ReactionZRange,
+                                                            @this.RegionCheck,
+                                                            @this.CustomRegionNames,
+                                                            @this.CustomRegionCheck == Presence.NotEquel);
 
                 }
                 return _specialCheck;
@@ -281,7 +277,7 @@ namespace EntityCore.Quester.Conditions
 
         private bool Initicalize_CountChecker(int count)
         {
-            switch (@this._sign)
+            switch (@this.Sign)
             {
                 case Relation.Inferior:
                     countChecker = Inferior_Than_Value;
@@ -300,19 +296,19 @@ namespace EntityCore.Quester.Conditions
         }
         private bool Inferior_Than_Value(int count)
         {
-            return count < @this._value;
+            return count < @this.Value;
         }
         private bool Superior_Than_Value(int count)
         {
-            return count > @this._value;
+            return count > @this.Value;
         }
         private bool Equal_To_Value(int count)
         {
-            return count == @this._value;
+            return count == @this.Value;
         }
         private bool NotEqual_To_Value(int count)
         {
-            return count != @this._value;
+            return count != @this.Value;
         }
         #endregion
 

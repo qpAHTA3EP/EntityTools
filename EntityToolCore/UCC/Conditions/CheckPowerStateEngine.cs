@@ -1,20 +1,18 @@
 ﻿using Astral.Logic.UCC.Classes;
-using EntityCore.Entities;
+using EntityCore.Tools.Powers;
 using EntityTools;
 using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
 using EntityTools.UCC.Conditions;
-using EntityTools.UCC.Extensions;
-using MyNW.Classes;
 using System;
-using System.Text;
 
 namespace EntityCore.UCC.Conditions
 {
-    public class UccTargetMatchEntityEngine : IUccConditionEngine
+    public class CheckPowerStateEngine : IUccConditionEngine
     {
         #region Данные
-        private UCCTargetMatchEntity @this;
+        private CheckPowerState @this;
+        private readonly PowerCache powerCache = new PowerCache(string.Empty);
 
 #if false
         private Predicate<Entity> checkEntity = null; 
@@ -24,12 +22,12 @@ namespace EntityCore.UCC.Conditions
         private string _idStr;
         #endregion
 
-        internal UccTargetMatchEntityEngine(UCCTargetMatchEntity tarMatch)
+        internal CheckPowerStateEngine(CheckPowerState pwrState)
         {
-            InternalRebase(tarMatch);
+            InternalRebase(pwrState);
             ETLogger.WriteLine(LogType.Debug, $"{_idStr} initialized: {Label()}");
         }
-        ~UccTargetMatchEntityEngine()
+        ~CheckPowerStateEngine()
         {
             Dispose();
         }
@@ -63,7 +61,8 @@ namespace EntityCore.UCC.Conditions
                         break;
                 } 
 #else
-                _key = null;
+                if(e.PropertyName == nameof(CheckPowerState.PowerId))
+                    powerCache.PowerIdPattern = @this.PowerId;
 #endif
             }
         }
@@ -74,9 +73,9 @@ namespace EntityCore.UCC.Conditions
                 return false;
             if (ReferenceEquals(condition, @this))
                 return true;
-            if (condition is UCCTargetMatchEntity tarMatch)
+            if (condition is CheckPowerState pwrState)
             {
-                if (InternalRebase(tarMatch))
+                if (InternalRebase(pwrState))
                 {
                     ETLogger.WriteLine(LogType.Debug, $"{_idStr} reinitialized");
                     return true;
@@ -85,24 +84,22 @@ namespace EntityCore.UCC.Conditions
                 return false;
             }
 
-            string debugStr = string.Concat("Rebase failed. ", condition.GetType().Name, '[', condition.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(UCCTargetMatchEntity) + '\'');
+            string debugStr = string.Concat("Rebase failed. ", condition.GetType().Name, '[', condition.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(CheckPowerState) + '\'');
             ETLogger.WriteLine(LogType.Error, debugStr);
             throw new InvalidCastException(debugStr);
         }
 
-        private bool InternalRebase(UCCTargetMatchEntity tarMatch)
+        private bool InternalRebase(CheckPowerState pwrState)
         {
             // Убираем привязку к старому условию
             if (@this != null)
             {
                 @this.PropertyChanged -= PropertyChanged;
-                @this.Engine = null;//new EntityTools.Core.Proxies.UccConditionProxy(@this);
+                @this.Engine = null;
             }
 
-            @this = tarMatch;
+            @this = pwrState;
             @this.PropertyChanged += PropertyChanged;
-
-            _key = null;
 
             _idStr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
 
@@ -114,69 +111,36 @@ namespace EntityCore.UCC.Conditions
         #region Вспомогательные методы
         public bool IsOK(UCCAction refAction)
         {
-            Entity target = refAction?.GetTarget();
+            var pwr = powerCache.GetPower();
 
-#if false
-            switch (@this._match)
+            switch (@this.CheckState)
             {
-                case MatchType.Match:
-                    return ValidateEntity(target);
-                case MatchType.Mismatch:
-                    return !ValidateEntity(target);
-            } 
+                case PowerState.HasPower:
+                    return pwr != null && pwr.IsValid;
+                case PowerState.HasntPower:
+                    return pwr == null || !pwr.IsValid;
+            }
+
             return false;
-#else
-            bool match = EntityKey.IsMatch(target);
-            if (@this.Match == MatchType.Match)
-                return match;
-            return !match;
-#endif
         }
 
         public string TestInfos(UCCAction refAction)
         {
-            Entity target = refAction?.GetTarget();
+            var pwr = powerCache.GetPower();
 
-            StringBuilder sb = new StringBuilder("Target ");
-            if (target != null)
+            if (pwr != null && pwr.IsValid)
             {
-                if (@this.EntityNameType == EntityNameType.InternalName)
-                    sb.Append('[').Append(target.InternalName).Append(']');
-                else sb.Append('[').Append(target.NameUntranslated).Append(']');
-                if (EntityKey.IsMatch(target))
-                    sb.Append(" match");
-                else sb.Append(" does not match");
-                sb.Append(" EntityID [").Append(@this.EntityID).Append(']');
+                var pwrDef = pwr.PowerDef;
+                return $"Character has Power {pwrDef.DisplayName}[{pwrDef.InternalName}].";
             }
-            else sb.Append("is NULL");
 
-            return sb.ToString();
+            return $"No Power [{@this.PowerId}] was found.";
         }
 
         public string Label()
         {
-            label = string.IsNullOrEmpty(label) 
-                        ? $"{@this.GetType().Name} [{@this.EntityID}]" 
-                        : @this.GetType().Name;
-
-            return label;
+            return $"CheckPowerState : {@this.CheckState} [{@this.PowerId}]";
         }
-        #endregion
-
-        #region Вспомогательные инструменты
-        /// <summary>
-        /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
-        /// </summary>
-        public EntityCacheRecordKey EntityKey
-        {
-            get
-            {
-                if (_key is null)
-                    _key = new EntityCacheRecordKey(@this.EntityID, @this.EntityIdType, @this.EntityNameType);
-                return _key;
-            }
-        }
-        private EntityCacheRecordKey _key;
         #endregion
     }
 }

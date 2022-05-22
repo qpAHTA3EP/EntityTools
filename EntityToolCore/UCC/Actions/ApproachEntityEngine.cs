@@ -108,7 +108,7 @@ namespace EntityCore.UCC.Actions
         {
             get
             {
-                if (!string.IsNullOrEmpty(@this._entityId))
+                if (!string.IsNullOrEmpty(@this.EntityID))
                 {
                     var entityKey = EntityKey;
                     if (timeout.IsTimedOut)
@@ -117,10 +117,10 @@ namespace EntityCore.UCC.Actions
 
                         timeout.ChangeTime(EntityTools.EntityTools.Config.EntityCache.CombatCacheTime);
 
-                        return entityCache != null && entityCache.CombatDistance > @this._entityRadius;
+                        return entityCache != null && entityCache.CombatDistance > @this.EntityRadius;
                     }
 
-                    return entityKey.Validate(entityCache) && !(@this._healthCheck && entityCache.IsDead) && entityCache.CombatDistance > @this._entityRadius;
+                    return entityKey.Validate(entityCache) && !(@this.HealthCheck && entityCache.IsDead) && entityCache.CombatDistance > @this.EntityRadius;
                 }
                 return false;
             }
@@ -128,8 +128,8 @@ namespace EntityCore.UCC.Actions
 
         public bool Run()
         {
-            if (entityCache.Location.Distance3DFromPlayer >= @this._entityRadius)
-                return Approach.EntityByDistance(entityCache, @this._entityRadius);
+            if (entityCache.Location.Distance3DFromPlayer >= @this.EntityRadius)
+                return Approach.EntityByDistance(entityCache, @this.EntityRadius);
             return true;
         }
 
@@ -137,7 +137,7 @@ namespace EntityCore.UCC.Actions
         {
             get
             {
-                if (!string.IsNullOrEmpty(@this._entityId))
+                if (!string.IsNullOrEmpty(@this.EntityID))
                 {
                     var entityKey = EntityKey;
                     if (entityKey.Validate(entityCache))
@@ -157,9 +157,10 @@ namespace EntityCore.UCC.Actions
         {
             if (string.IsNullOrEmpty(_label))
             {
-                if (string.IsNullOrEmpty(@this._entityId))
-                    _label = GetType().Name;
-                else _label = $"{GetType().Name} [{@this._entityId}]"; 
+                var entId = @this.EntityID;
+                if (string.IsNullOrEmpty(entId))
+                    _label = @this.GetType().Name;
+                else _label = $"{@this.GetType().Name} [{entId}]"; 
             }
             return _label;
         }
@@ -175,7 +176,7 @@ namespace EntityCore.UCC.Actions
             get
             {
                 if (_key is null)
-                    _key = new EntityCacheRecordKey(@this._entityId, @this._entityIdType, @this._entityNameType);
+                    _key = new EntityCacheRecordKey(@this.EntityID, @this.EntityIdType, @this.EntityNameType);
                 return _key;
             }
         }
@@ -191,12 +192,12 @@ namespace EntityCore.UCC.Actions
             get
             {
                 if (_specialCheck is null)
-                    _specialCheck = SearchHelper.Construct_EntityAttributePredicate(@this._healthCheck,
-                                                            @this._reactionRange,
+                    _specialCheck = SearchHelper.Construct_EntityAttributePredicate(@this.HealthCheck,
+                                                            @this.ReactionZRange,
                                                             //@this._reactionZRange,
-                                                            @this._reactionZRange > 0 ? @this._reactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference,
-                                                            @this._regionCheck, 
-                                                            @this._aura.IsMatch);
+                                                            @this.ReactionZRange > 0 ? @this.ReactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference,
+                                                            @this.RegionCheck, 
+                                                            @this.Aura.IsMatch);
                 return _specialCheck;
             }
         }

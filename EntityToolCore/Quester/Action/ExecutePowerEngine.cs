@@ -1,13 +1,13 @@
 ﻿using AcTp0Tools;
 using Astral.Logic.Classes.Map;
-using Astral.Logic.NW;
 using EntityCore.Forms;
-using EntityCore.Tools.Powers;
 using EntityCore.Tools.Navigation;
+using EntityCore.Tools.Powers;
 using EntityTools;
 using EntityTools.Core.Interfaces;
 using EntityTools.Patches.Mapper;
 using EntityTools.Quester.Actions;
+using EntityTools.Tools.Export;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
@@ -16,7 +16,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
-using EntityTools.Tools.Export;
 using static Astral.Quester.Classes.Action;
 
 namespace EntityCore.Quester.Action
@@ -26,6 +25,7 @@ namespace EntityCore.Quester.Action
         private ExecutePowerExt @this;
         private string label;
         private string actionIDstr;
+        private readonly PowerCache powerCache = new PowerCache(string.Empty);
 
         internal ExecutePowerEngine(ExecutePowerExt exPow)
         {
@@ -41,10 +41,10 @@ namespace EntityCore.Quester.Action
         {
             if (@this != null)
             {
-                power = null;
                 @this.Unbind();
                 @this = null;
             }
+            powerCache.Reset();
         }
 
         public bool Rebase(Astral.Quester.Classes.Action action)
@@ -71,7 +71,7 @@ namespace EntityCore.Quester.Action
             @this?.Unbind();
 
             @this = exPow;
-            power = null;
+            powerCache.Reset();
             label = String.Empty;
             @this.PropertyChanged += OnPropertyChanged;
 
@@ -92,8 +92,8 @@ namespace EntityCore.Quester.Action
         {
             if (propertyName == nameof(@this.PowerId))
             {
-                power = null;
-                label = String.Empty;
+                powerCache.PowerIdPattern = @this.PowerId;
+                label = string.Empty;
             }
             internalCheck = initialize_internalCheck;
         }
@@ -111,9 +111,9 @@ namespace EntityCore.Quester.Action
                     AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true, @this.IgnoreCombatMinHP, 5_000);
                     return false;
                 }
-                else AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(false);
+                AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(false);
 
-                return d <= 25 && GetCurrentPower()?.IsValid == true;
+                return d <= 25 && powerCache.GetPower() != null;
             }
         }
 
@@ -122,11 +122,20 @@ namespace EntityCore.Quester.Action
             bool debugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugExecutePowerExt;
             string currentMethodName = debugInfo ? string.Concat(actionIDstr, '.', MethodBase.GetCurrentMethod()?.Name ?? nameof(Run)) : string.Empty;
 
+
+            if (!InternalConditions)
+            {
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: {nameof(InternalConditions)} failed. ActionResult={ActionResult.Fail}.");
+                return ActionResult.Fail;
+            }
+
+
             if (debugInfo)
                 ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: starts");
             NavigationHelper.StopNavigationCompletly();
 
-            var currentPower = GetCurrentPower();
+            var currentPower = powerCache.GetPower();
 
             if (currentPower is null)
             {
@@ -236,7 +245,7 @@ namespace EntityCore.Quester.Action
 
         public void InternalReset()
         {
-            power = null;
+            powerCache.Reset();
             internalCheck = initialize_internalCheck;
         }
 
@@ -417,43 +426,6 @@ namespace EntityCore.Quester.Action
             return true;
         }
 
-        #region CurrentPower
-        private int attachedGameProcessId;
-        private uint characterContainerId;
-        private uint powerId;
-        private Power power;
-        private Power GetCurrentPower()
-        {
-            var player = EntityManager.LocalPlayer;
-            var processId = Astral.API.AttachedGameProcess.Id;
-            var powId = @this.PowerId;
-
-            if (!(attachedGameProcessId == processId
-                  && characterContainerId == player.ContainerId
-                  && power != null
-                  && (power.PowerId == powerId
-                      || string.Equals(power.PowerDef.InternalName, powId, StringComparison.Ordinal)
-                      || string.Equals(power.EffectivePowerDef().InternalName, powId, StringComparison.Ordinal))))
-            {
-                power = Powers.GetPowerByInternalName(powId);
-                if (power != null)
-                {
-                    powerId = power.PowerId;
-                    label = string.Empty;
-                    attachedGameProcessId = processId;
-                    characterContainerId = player.ContainerId;
-                }
-                else
-                {
-                    powerId = 0;
-                    label = string.Empty;
-                    attachedGameProcessId = 0;
-                    characterContainerId = 0;
-                }
-            }
-            return power;
-        }
-        #endregion
 
         #region internalCheck
         /// <summary>

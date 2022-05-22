@@ -219,7 +219,7 @@ namespace EntityCore
                     case UCCTargetMatchEntity targMatch:
                         DictUccCondition.Add(targMatch, new UccTargetMatchEntityEngine(targMatch));
                         return true;
-                    case UCCGameUICheck uiCheck:
+                    case UccGameUiCheck uiCheck:
                         DictUccCondition.Add(uiCheck, new UccGameUiCheckEngine(uiCheck));
                         return true;
                 }

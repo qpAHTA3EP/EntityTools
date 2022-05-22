@@ -62,7 +62,7 @@ namespace EntityTools.UCC.Conditions
                     {
                         if (c is ICustomUCCCondition iCond)
                         {
-                            if (iCond.Loсked)
+                            if (iCond.Locked)
                             {
                                 if (!iCond.IsOK(refAction))
                                 {
@@ -116,7 +116,34 @@ namespace EntityTools.UCC.Conditions
             return Not ? !result : result;
         }
 
-        bool ICustomUCCCondition.Loсked { get => Locked; set => Locked = value; }
+        bool ICustomUCCCondition.Locked { get => base.Locked; set => base.Locked = value; }
+
+        ICustomUCCCondition ICustomUCCCondition.Clone()
+        {
+            var copy = new UCCConditionPack
+            {
+                Name = Name,
+                Not = Not,
+                TestRule = TestRule,
+                Sign = Sign,
+                Locked = Locked,
+                Target = Target,
+                Tested = Tested,
+                Value = Value,
+                Conditions = new ConditionList(Conditions.Count)
+            };
+
+            foreach (var cnd in Conditions)
+            {
+                copy.Conditions.Add(
+                    cnd is ICustomUCCCondition cstCnd 
+                        ? (UCCCondition)cstCnd.Clone()
+                        : cnd.Clone()
+                    );
+            }
+
+            return copy;
+        }
 
         string ICustomUCCCondition.TestInfos(UCCAction refAction/* = null*/)
         {
