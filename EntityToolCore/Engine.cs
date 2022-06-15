@@ -29,6 +29,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using Astral.Quester.Classes;
+using EntityCore.Tools.Powers;
 using EntityTools.Tools;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
@@ -219,7 +220,7 @@ namespace EntityCore
                     case UCCTargetMatchEntity targMatch:
                         DictUccCondition.Add(targMatch, new UccTargetMatchEntityEngine(targMatch));
                         return true;
-                    case UccGameUiCheck uiCheck:
+                    case UCCGameUICheck uiCheck:
                         DictUccCondition.Add(uiCheck, new UccGameUiCheckEngine(uiCheck));
                         return true;
                 }
@@ -229,6 +230,36 @@ namespace EntityCore
                 ETLogger.WriteLine(LogType.Error, e.ToString());
             }
             return false;
+        }
+
+#if true
+        public bool TryGet<T>(ref T obj, params object[] args) where T : class
+        {
+
+            if (typeof(T) == typeof(IPowerCache))
+            {
+                obj = new PowerCache(args?.Length > 0 ? args[0].ToString() : string.Empty) as T;
+                return !Equals(obj, null);
+            }
+            return false;
+        } 
+#endif
+        public object Get(Type type, params object[] args)
+        {
+            if (type == typeof(IPowerCache))
+            {
+                return new PowerCache(args?.Length > 0 ? args[0].ToString() : string.Empty);
+            }
+            return null;
+        }
+
+        public T Get<T>(params object[] args) where T : class
+        {
+            if (typeof(T) == typeof(IPowerCache))
+            {
+                return new PowerCache(args?.Length > 0 ? args[0].ToString() : string.Empty) as T;
+            }
+            return default;
         }
         #endregion
 

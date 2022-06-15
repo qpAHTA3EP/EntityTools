@@ -27,9 +27,9 @@ namespace EntityTools.Editors
                     {
                         return new EntityTarget
                         {
-                            _entityId = strPattern,
-                            _entityIdType = strFilterType,
-                            _entityNameType = nameType
+                            EntityID = strPattern,
+                            EntityIdType = strFilterType,
+                            EntityNameType = nameType
                         };
                     }
                 }

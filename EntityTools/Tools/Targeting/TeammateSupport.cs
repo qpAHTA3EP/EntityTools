@@ -1,7 +1,6 @@
-﻿using System;
+﻿using EntityTools.Enums;
+using System;
 using System.ComponentModel;
-using AcTp0Tools.Classes.Targeting;
-using EntityTools.Enums;
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 

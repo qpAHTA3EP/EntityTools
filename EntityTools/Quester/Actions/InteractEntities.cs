@@ -619,7 +619,7 @@ namespace EntityTools.Quester.Actions
         #region Interruptions
 
 #if DEVELOPER
-        [Description("The command is interrupted upon entity search timer reaching zero (sec).\n" +
+        [Description("The command is interrupted upon entity search timer reaching zero (ms).\n" +
                      "Set zero value to infinite search.")]
         [Category("Interruptions")]
 #else

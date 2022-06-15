@@ -1,12 +1,11 @@
-﻿using AcTp0Tools.Patches;
-using AcTp0Tools.Reflection;
+﻿using AcTp0Tools;
+using AcTp0Tools.Patches;
 using Astral;
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;
 using Astral.Forms;
 using Astral.Logic.Classes.FSM;
 using Astral.Logic.NW;
-using Astral.Quester.Classes;
 using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Controls;
 using EntityTools.Enums;
@@ -16,7 +15,6 @@ using EntityTools.Tools;
 using EntityTools.Tools.Export;
 using EntityTools.Tools.Targeting;
 using Microsoft.Win32;
-using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
 using System;
@@ -29,9 +27,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using AcTp0Tools;
-using AStar;
-using DevExpress.Utils.Extensions;
+using EntityTools.Core.Interfaces;
 using API = Astral.Quester.API;
 using Task = System.Threading.Tasks.Task;
 
@@ -311,10 +307,27 @@ namespace EntityTools.Core
                 if (enumerator_Dispose.MethodExists())
                     enumerator_Dispose.GetValue();
             }
-#endif
+#elif false
             var slot = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.Inventory).Slots
                 .FirstOrDefault(s => s.Filled && s.Item.ItemDef.InternalName == "T1_Enchantment_Tutorial");
             slot?.Evolve();
+#elif true
+            var pwr = Powers.GetPowerByInternalName("M19_Instance_Fpower_Summon_Lulu");
+            if (pwr != null && pwr.IsValid)
+            {
+                var trg = Astral.Logic.UCC.Core.CurrentTarget;
+                if (trg != null && trg.IsValid)
+                {
+                    Powers.ExecPower(pwr, trg, true);
+                    Thread.Sleep(500);
+                    Powers.ExecPower(pwr, trg, false);
+                }
+            }
+            else
+            {
+                XtraMessageBox.Show("Power does not found");
+            }
+#endif
         }
 
         private void handler_Test_3(object sender, EventArgs e)
@@ -361,6 +374,22 @@ namespace EntityTools.Core
             var currentChangeWPDistance = changeWPDistance.Value;
 
             XtraMessageBox.Show($"Текущее значение 'Navigation.ChangeWPDist' равно {currentChangeWPDistance}");
+#elif true
+            var pwr = Powers.GetPowerBySlot(22);
+            if (pwr != null && pwr.IsValid)
+            {
+                var trg = Astral.Logic.UCC.Core.CurrentTarget;
+                if (trg != null && trg.IsValid)
+                {
+                    Powers.ExecPower(pwr, trg, true);
+                    Thread.Sleep(500);
+                    Powers.ExecPower(pwr, trg, false);
+                }
+            }
+            else
+            {
+                XtraMessageBox.Show("Power does not slotted");
+            }
 #endif
 
         }
@@ -497,15 +526,9 @@ namespace EntityTools.Core
                 if (string.IsNullOrEmpty(fullFileName) || fullFileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
                 {
                     fullFileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.ReplaceMask(FileTools.DefaultExportFileName));
-#if false
-                    MessageBox.Show("The specified filename is incorrect.\n" +
-                                                $"{expType} will be saved in the file:\n" +
-                                                fullFileName, "Caution!", MessageBoxButtons.OK); 
-#else
                     XtraMessageBox.Show("The specified filename is incorrect.\n" +
                                         $"{expType} will be saved in the file:\n" +
                                         fullFileName, "Caution!", MessageBoxButtons.OK);
-#endif
                 }
 
                 var dirName = Path.GetDirectoryName(fullFileName);
@@ -516,9 +539,9 @@ namespace EntityTools.Core
                 {
                     case ExportTypes.Auras:
                         {
-                            AurasWrapper auras = new AurasWrapper(EntityManager.LocalPlayer.Character);
+                            var auras = new AurasWrapper(EntityManager.LocalPlayer.Character);
 
-                            var serializer = new XmlSerializer(typeof(AurasWrapper));
+                            var serializer = new XmlSerializer(auras.GetType());
                             using (var fileStream = new StreamWriter(fullFileName))
                                 serializer.Serialize(fileStream, auras);
                             break;
@@ -527,16 +550,16 @@ namespace EntityTools.Core
                         {
                             var interfaces = new InterfaceWrapper();
 
-                            var serializer = new XmlSerializer(typeof(InterfaceWrapper));
+                            var serializer = new XmlSerializer(interfaces.GetType());
                             using (var fileStream = new StreamWriter(fullFileName))
                                 serializer.Serialize(fileStream, interfaces);
                             break;
                         }
                     case ExportTypes.Missions:
                         {
-                            MissionsWrapper missions = new MissionsWrapper(EntityManager.LocalPlayer);
+                            var missions = new MissionsWrapper(EntityManager.LocalPlayer);
 
-                            var serializer = new XmlSerializer(typeof(MissionsWrapper));
+                            var serializer = new XmlSerializer(missions.GetType());
                             using (var fileStream = new StreamWriter(fullFileName))
                                 serializer.Serialize(fileStream, missions);
                             break;
@@ -556,16 +579,22 @@ namespace EntityTools.Core
                             }
                             break;
                         }
+                    case ExportTypes.Powers:
+                    {
+                        var powers = new PowersWrapper();
+
+                        var serializer = new XmlSerializer(powers.GetType());
+                        using (var fileStream = new StreamWriter(fullFileName))
+                            serializer.Serialize(fileStream, powers);
+                        break;
+                    }
                 }
 
-#if false
-                if (MessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?",
-                            $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes) 
-#else
                 if (XtraMessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?",
                     $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
-#endif
+                {
                     Process.Start(fullFileName);
+                }
             }
         }
 
@@ -600,32 +629,82 @@ namespace EntityTools.Core
 
         private void handler_DebugMonitorActivate(object sender, EventArgs e)
         {
-            if(ckbDebugMonitor.Checked && BLAttackersList != null)
+#if BLAttackersListMonitor
+            if (ckbDebugMonitor.Checked && BLAttackersList != null)
+                backgroundWorker.RunWorkerAsync();
+            else backgroundWorker.CancelAsync(); 
+#elif true
+            if (ckbDebugMonitor.Checked)
                 backgroundWorker.RunWorkerAsync();
             else backgroundWorker.CancelAsync();
+#endif
         }
-        StaticFieldAccessor<Func<List<string>>> BLAttackersList = typeof(Astral.Logic.NW.Combats).GetStaticField<Func<List<string>>>("BLAttackersList");
 
+#if ShowMostInjuredAlly
         private void ShowMostInjuredAlly(Entity entity)
         {
             string info = string.Empty;
-            if(entity != null)
+            if (entity != null)
             {
-                info = string.Concat("MostInjuredAlly: ", entity.DebugName, Environment.NewLine, 
+                info = string.Concat("MostInjuredAlly: ", entity.DebugName, Environment.NewLine,
                     "--------------------------------------", Environment.NewLine,
                     '\t', nameof(entity.IsPlayer), '=', entity.IsPlayer, Environment.NewLine,
                     '\t', nameof(entity.CombatDistance3), '=', entity.CombatDistance3, Environment.NewLine,
                     '\t', nameof(entity.Character.AttribsBasic.HealthPercent), '=', entity.Character.AttribsBasic.HealthPercent);
             }
             tbDebugMonitorInfo.Text = info;
-        }
+        } 
+#endif
 
+        private void work_PowerSearch(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+
+#if true
+            IPowerCache powCache = EntityTools.Core.Get<IPowerCache>("M19_Instance_Fpower_Summon_Lulu");
+
+            if (powCache != null)
+            {
+                tbDebugMonitorInfo.Text = $"[{DateTime.Now:HH:mm:ss.ffff}] Start searching the power 'M19_Instance_Fpower_Summon_Lulu'\n";
+                while (!backgroundWorker.CancellationPending)
+                {
+                    var power = powCache.GetPower();
+
+                    string info = string.Concat('[', DateTime.Now.ToString("HH:mm:ss.ffff"), "] Power ",
+                        power != null && power.IsValid
+                            ? power.PowerDef.FullDisplayName + "[Slot=" + power.GetTraySlot() + ", Id=" + power.PowerId + "]"
+                            : "not found", Environment.NewLine);
+                    tbDebugMonitorInfo.AppendText(info);
+
+                    Thread.Sleep(550);
+                } 
+            }
+            else
+            {
+                tbDebugMonitorInfo.Text = $"[{DateTime.Now:HH:mm:ss.ffff}] Unable to initialize PowerCache for 'M19_Instance_Fpower_Summon_Lulu'\n";
+            }
+#else
+            tbDebugMonitorInfo.Text = $"[{DateTime.Now:HH:mm:ss.ffff}] Start searching the power 'M19_Instance_Fpower_Summon_Lulu'\n";
+            while (!backgroundWorker.CancellationPending)
+            {
+                var power = EntityManager.LocalPlayer.Character.Powers.FirstOrDefault(pwr => pwr.PowerDef.InternalName.Equals("M19_Instance_Fpower_Summon_Lulu", StringComparison.Ordinal));
+                string info = string.Concat('[', DateTime.Now.ToString("HH:mm:ss.ffff"), "] Power ",
+                                            power != null && power.IsValid
+                                                ? power.PowerDef.FullDisplayName + "[Slot=" + power.GetTraySlot() + ", Id=" + power.PowerId + "]"
+                                                : "not found", Environment.NewLine);
+                tbDebugMonitorInfo.AppendText(info);
+
+                Thread.Sleep(500);
+            } 
+#endif
+        }
+#if BLAttackersListMonitor
+        StaticFieldAccessor<Func<List<string>>> BLAttackersList = typeof(Astral.Logic.NW.Combats).GetStaticField<Func<List<string>>>("BLAttackersList");
         private void work_BlackList(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
             if (!BLAttackersList.IsValid
                 || BLAttackersList.Value is null)
                 return;
-            
+
             while (!backgroundWorker.CancellationPending)
             {
                 var list = BLAttackersList.Value();
@@ -634,7 +713,8 @@ namespace EntityTools.Core
                 else tbDebugMonitorInfo.Text = "FoeBlackList is empty";
                 Thread.Sleep(500);
             }
-        }
+        } 
+#endif
 
         private void handler_Up(object sender, EventArgs e)
         {

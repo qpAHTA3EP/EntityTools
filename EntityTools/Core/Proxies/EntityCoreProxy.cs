@@ -24,6 +24,11 @@ namespace EntityTools.Core
             throw new NotImplementedException(); 
         }
 
+        public T Get<T>(params object[] args) where T : class
+        {
+            throw new NotImplementedException();
+        }
+
         public bool Initialize(object obj)
         {
             throw new NotImplementedException();
@@ -45,6 +50,21 @@ namespace EntityTools.Core
         }
 
         public bool Initialize(UCCCondition condition)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool TryGet<T>(ref T obj, params object[] args) where T : class
+        {
+            throw new NotImplementedException();
+        }
+
+        public object Get(Type type, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Dispose()
         {
             throw new NotImplementedException();
         }
@@ -138,11 +158,6 @@ namespace EntityTools.Core
 #endif
 
         public bool CheckCore()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Dispose()
         {
             throw new NotImplementedException();
         }

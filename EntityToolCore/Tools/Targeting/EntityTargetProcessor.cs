@@ -1,6 +1,5 @@
 ﻿#define DEBUG_CHANGE_TARGET
 
-using AcTp0Tools.Classes.Targeting;
 using EntityCore.Entities;
 using EntityTools.Tools.Targeting;
 using MyNW.Classes;
@@ -63,6 +62,17 @@ namespace EntityCore.Tools.Targeting
 
         public override bool IsTargetMismatchedAndCanBeChanged(Entity target)
         {
+
+            /* BUG
+             * [23:45] System.NullReferenceException: Ссылка на объект не указывает на экземпляр объекта.
+                       в EntityCore.Tools.Targeting.EntityTargetProcessor.IsTargetMismatchedAndCanBeChanged(Entity target)
+                       в EntityCore.UCC.Actions.ChangeTargetEngine.get_NeedToRun()
+                       в EntityTools.UCC.Actions.ChangeTarget.get_NeedToRun() в D:\Source\EntityAddon\EntityTools\UCC\Actions\ChangeTarget.cs:строка 151
+                       в EntityTools.Core.Proxies.UccActionProxy.get_NeedToRun() в D:\Source\EntityAddon\EntityTools\Core\Proxies\UCCActionProxy.cs:строка 24
+                       в EntityTools.UCC.Actions.ChangeTarget.get_NeedToRun() в D:\Source\EntityAddon\EntityTools\UCC\Actions\ChangeTarget.cs:строка 151
+                       в Astral.Logic.UCC.Classes.ActionsPlayer.playActionList(Boolean breakOnAction, Boolean waitSpell)
+                       в Astral.Logic.UCC.Core.Run(Moment moment)
+             */
             var key = EntityKey;
             var check = SpecialCheck;
             if (key.Validate(target) && check(target))
@@ -86,9 +96,10 @@ namespace EntityCore.Tools.Targeting
         {
             if (string.IsNullOrEmpty(_label))
             {
-                _label = string.IsNullOrEmpty(selector._entityId)
+                var entityId = selector.EntityID;
+                _label = string.IsNullOrEmpty(entityId)
                     ? GetType().Name
-                    : $"Target Entity [{selector._entityId}]";
+                    : $"Target Entity [{entityId}]";
             }
             return _label;
         }
@@ -102,11 +113,10 @@ namespace EntityCore.Tools.Targeting
         {
             get
             {
-                var key = _key;
-                if (key == null)
-                    _key = new EntityCacheRecordKey(selector._entityId, selector._entityIdType,
-                        selector._entityNameType);
-                return key;
+                if (_key is null)
+                    _key = new EntityCacheRecordKey(selector.EntityID, selector.EntityIdType,
+                        selector.EntityNameType);
+                return _key;
 
             }
         }
@@ -121,11 +131,22 @@ namespace EntityCore.Tools.Targeting
         {
             get
             {
-                if (_specialCheck == null)
-                    _specialCheck = ett => true;
+                if (_specialCheck is null)
+                    _specialCheck = ett => !ett.IsDead && ett.Character.AttribsBasic.Health > 0;
                 return _specialCheck;
             }
-            set { _specialCheck = value ?? (ett => true); }
+            set
+            {
+                _specialCheck = value;
+                if (_specialCheck is null)
+                {
+                    _specialCheck = ett => !ett.IsDead && ett.Character.AttribsBasic.Health > 0;
+                }
+                else
+                {
+                    _specialCheck = ett => !ett.IsDead && ett.Character.AttribsBasic.Health > 0 && value(ett);
+                }
+            }
         }
 
         private Predicate<Entity> _specialCheck;

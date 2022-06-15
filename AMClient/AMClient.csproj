@@ -106,8 +106,6 @@
     <Compile Include="Classes\Credentials\CredAccountExt.cs" />
     <Compile Include="Classes\Credentials\CredentialsExt.cs" />
     <Compile Include="Classes\Enums.cs" />
-    <Compile Include="Classes\Targeting\TargetSelector.cs" />
-    <Compile Include="Classes\Targeting\TargetProcessor.cs" />
     <Compile Include="Harmony\Extras\DelegateTypeFactory.cs" />
     <Compile Include="Harmony\Extras\FastAccess.cs" />
     <Compile Include="Harmony\Extras\MethodInvoker.cs" />

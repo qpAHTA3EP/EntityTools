@@ -1,5 +1,4 @@
 ﻿
-using AcTp0Tools.Classes.Targeting;
 using Astral;
 using Astral.Classes.SkillTrain;
 using Astral.Logic.UCC.Classes;
@@ -9,6 +8,7 @@ using HarmonyLib;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using Action = Astral.Quester.Classes.Action;
@@ -20,6 +20,7 @@ namespace AcTp0Tools.Patches
     /// Патч метода Astral.Functions.XmlSerializer.GetExtraTypes()
     /// </summary>
     //[HarmonyPatch(typeof(Astral.Functions.XmlSerializer), "GetExtraTypes")] 
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static class Astral_Functions_XmlSerializer_GetExtraTypes
     {
         internal static List<Type> UccTypes = new List<Type>(20);
@@ -172,8 +173,8 @@ namespace AcTp0Tools.Patches
         
         static readonly Type tUccAction = typeof(UCCAction);
         static readonly Type tUccCondition = typeof(UCCCondition);
-        static readonly Type tUccTargetSelector = typeof(TargetSelector);
-        static readonly Type tUccTargetProcessor = typeof(TargetProcessor);
+        //static readonly Type tUccTargetSelector = typeof(TargetSelector);
+        //static readonly Type tUccTargetProcessor = typeof(TargetProcessor);
         static readonly Type tTargetPriorityEntry = typeof(TargetPriorityEntry);
 
 
@@ -184,21 +185,23 @@ namespace AcTp0Tools.Patches
             
             foreach (Type type in types)
             {
-                if (tUccAction.IsAssignableFrom(type) ||
-                    tUccCondition.IsAssignableFrom(type) ||
-                    tQuesterCondition.IsAssignableFrom(type) ||
-                    tUccTargetProcessor.IsAssignableFrom(type))
+                if (tUccAction.IsAssignableFrom(type) 
+                    || tUccCondition.IsAssignableFrom(type) 
+                    || tQuesterCondition.IsAssignableFrom(type) 
+                    //|| tUccTargetProcessor.IsAssignableFrom(type)
+                    )
                 {
                     UccTypes.Add(type);
                     QuesterTypes.Add(type);
                 }
-                else if(tUccTargetSelector.IsAssignableFrom(type))
-                {
-                    UccTypes.Add(type);
-                    QuesterTypes.Add(type);
-                    UccTargetSelectorTypes.Add(type);
-                }
-                else if (tQuesterAction.IsAssignableFrom(type))
+                //else if(tUccTargetSelector.IsAssignableFrom(type))
+                //{
+                //    UccTypes.Add(type);
+                //    QuesterTypes.Add(type);
+                //    UccTargetSelectorTypes.Add(type);
+                //}
+                //else 
+                if (tQuesterAction.IsAssignableFrom(type))
                     QuesterTypes.Add(type);
                 else if (tTargetPriorityEntry.IsAssignableFrom(type))
                     UccTypes.Add(type);

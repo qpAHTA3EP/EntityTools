@@ -32,7 +32,7 @@ namespace EntityCore.Quester.Action
         private Entity targetEntity;
         private Entity closestEntity;
         private readonly Astral.Classes.Timeout internalCacheTimer = new Astral.Classes.Timeout(0);
-        private Astral.Classes.Timeout entityAbsenceTimer;
+        private readonly Astral.Classes.Timeout entityAbsenceTimer = new Astral.Classes.Timeout(600_000_000);
         private string _label = string.Empty;
         private string _idStr = string.Empty;
         #endregion
@@ -95,6 +95,9 @@ namespace EntityCore.Quester.Action
 
             _idStr = $"{@this.GetType().Name}[{@this.ActionID}]";
 
+            internalCacheTimer.ChangeTime(0);
+            entityAbsenceTimer.ChangeTime(600_000_000);
+
             @this.Bind(this);
 
             return true;
@@ -111,9 +114,11 @@ namespace EntityCore.Quester.Action
             _label = string.Empty;
             _specialCheck = null;
 
-
             targetEntity = null;
+            closestEntity = null;
+
             internalCacheTimer.ChangeTime(0);
+            entityAbsenceTimer.ChangeTime(600_000_000);
         }
 
 #if false
@@ -425,9 +430,7 @@ namespace EntityCore.Quester.Action
                 ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: ActionResult={ActionResult.Running}");
 
             //  таймера остановки поиска
-            var entitySearchTime = @this.EntitySearchTime;
-            if (entitySearchTime > 0)
-                entityAbsenceTimer.ChangeTime(entitySearchTime * 1_000);
+            ResetEntitySearchTimer();
 
             if (@this.ResetCurrentHotSpot)
                 @this.CurrentHotSpotIndex = -1;
@@ -778,7 +781,7 @@ namespace EntityCore.Quester.Action
                     return false;
                 }
 
-                if (entityAbsenceTimer != null && entityAbsenceTimer.IsTimedOut)
+                if (entityAbsenceTimer.IsTimedOut)
                 {
                     if (ExtendedDebugInfo)
                     {
@@ -825,8 +828,10 @@ namespace EntityCore.Quester.Action
         public void InternalReset()
         {
             targetEntity = null;
+            closestEntity = null;
             _key = null;
             _label = string.Empty;
+            ResetEntitySearchTimer();
         }
 
         public void GatherInfos()
@@ -973,9 +978,7 @@ namespace EntityCore.Quester.Action
             var entitySearchTime = @this.EntitySearchTime;
             if (entitySearchTime > 0)
             {
-                if (entityAbsenceTimer is null)
-                    entityAbsenceTimer = new Astral.Classes.Timeout(entitySearchTime);
-                else entityAbsenceTimer.ChangeTime(entitySearchTime);
+                entityAbsenceTimer.ChangeTime(entitySearchTime);
             }
         }
 

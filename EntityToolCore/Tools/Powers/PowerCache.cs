@@ -1,13 +1,16 @@
-﻿using EntityTools.Tools;
+﻿#define DEBUG_POWERCACHE
+using EntityTools.Tools;
 using MyNW.Internals;
 using System;
+using EntityTools;
+using EntityTools.Core.Interfaces;
 
 namespace EntityCore.Tools.Powers
 {
     /// <summary>
     /// Класс, кэширующий <see cref="MyNW.Classes.Power"/>
     /// </summary>
-    public class PowerCache
+    public class PowerCache : IPowerCache
     {
         public PowerCache(string powId)
         {
@@ -118,7 +121,12 @@ namespace EntityCore.Tools.Powers
         public MyNW.Classes.Power GetPower()
         {
             if (!initialized)
+            {
+#if DEBUG_POWERCACHE
+                ETLogger.WriteLine(LogType.Debug, $"{nameof(PowerCache)}: Not initialized.");
+#endif
                 return null;
+            }
 
             var player = EntityManager.LocalPlayer;
             var processId = Astral.API.AttachedGameProcess.Id;
@@ -130,21 +138,35 @@ namespace EntityCore.Tools.Powers
                       || checker(cachedPower.PowerDef.InternalName)
                       || checker(cachedPower.EffectivePowerDef().InternalName))))
             {
+#if DEBUG_POWERCACHE
+                ETLogger.WriteLine(LogType.Debug, $"{nameof(PowerCache)}: Regen cache.");
+#endif
                 //power = Powers.GetPowerByInternalName(powId);
                 cachedPower = SearchPower();
                 if (cachedPower != null)
                 {
+#if DEBUG_POWERCACHE
+                    ETLogger.WriteLine(LogType.Debug, $"{nameof(PowerCache)}: Found Power {cachedPower.PowerDef.FullDisplayName}[{cachedPower.Pointer:X8}].");
+#endif
                     cachedPowerId = cachedPower.PowerId;
                     cachedAttachedGameProcessId = processId;
                     cachedCharacterContainerId = player.ContainerId;
                 }
                 else
                 {
+#if DEBUG_POWERCACHE
+                    ETLogger.WriteLine(LogType.Debug, $"{nameof(PowerCache)}: No Power {powerIdPattern} was found.");
+#endif
                     cachedPowerId = 0;
                     cachedAttachedGameProcessId = 0;
                     cachedCharacterContainerId = 0;
                 }
             }
+#if DEBUG_POWERCACHE
+            else
+                ETLogger.WriteLine(LogType.Debug, $"{nameof(PowerCache)}: Using cached Power {cachedPower.PowerDef.FullDisplayName}[{cachedPower.Pointer:X8}].");
+#endif
+
             return cachedPower;
         }
 
@@ -169,7 +191,7 @@ namespace EntityCore.Tools.Powers
                 {
                     return new MyNW.Classes.Power(pwr.Pointer);
                 }
-            }
+            } 
 
             return null;
         }

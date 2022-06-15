@@ -365,35 +365,40 @@ namespace EntityCore.UCC.Actions
 
                 // Кэш не валиден и требует обновления
                 var isArtifactPower = @this._source == PluggedSkillSource.Artifact;
-                var itemSlot = player.GetInventoryBagById(isArtifactPower
-                                                                    ? InvBagIDs.ArtifactPrimary
-                                                                    : InvBagIDs.MountEquippedActivePower).Slots[0];
-
-                if (itemSlot.Filled)
+                var bagSlots = player.GetInventoryBagById(isArtifactPower
+                    ? InvBagIDs.ArtifactPrimary
+                    : InvBagIDs.MountEquippedActivePower).Slots;
+                // Проверка наличия предмета/маунта в слоте
+                if (bagSlots.Count > 0)
                 {
-                    var item = itemSlot.Item;
-                    if (item != null)
+                    var itemSlot = bagSlots[0];
+
+                    if (itemSlot.Filled)
                     {
-                        var itemInternalName = item.ItemDef.InternalName;
-                        // В бою не применяются Артефактные умения:
-                        // - "Каталог "Аврора для всех миров"
-                        // - "Молот Гонда"
-                        isIgnoredPower = isArtifactPower
-                                         && (itemInternalName.StartsWith("Artifact_Auroraswholerealmscatalogue",
-                                                 StringComparison.Ordinal)
-                                             || itemInternalName.StartsWith("Artifact_Forgehammer_Of_Gond",
-                                                 StringComparison.Ordinal));
-
-                        _power = item.Powers.FirstOrDefault();
-
-                        if (_power != null)
+                        var item = itemSlot.Item;
+                        if (item != null)
                         {
-                            powerId = _power.PowerId;
-                            powerName = itemInternalName;
-                            _label = string.Empty;
-                            attachedGameProcessId = Astral.API.AttachedGameProcess.Id;
-                            characterContainerId = player.ContainerId;
-                            goto result;
+                            var itemInternalName = item.ItemDef.InternalName;
+                            // В бою не применяются Артефактные умения:
+                            // - "Каталог "Аврора для всех миров"
+                            // - "Молот Гонда"
+                            isIgnoredPower = isArtifactPower
+                                             && (itemInternalName.StartsWith("Artifact_Auroraswholerealmscatalogue",
+                                                     StringComparison.Ordinal)
+                                                 || itemInternalName.StartsWith("Artifact_Forgehammer_Of_Gond",
+                                                     StringComparison.Ordinal));
+
+                            _power = item.Powers.FirstOrDefault();
+
+                            if (_power != null)
+                            {
+                                powerId = _power.PowerId;
+                                powerName = itemInternalName;
+                                _label = string.Empty;
+                                attachedGameProcessId = Astral.API.AttachedGameProcess.Id;
+                                characterContainerId = player.ContainerId;
+                                goto result;
+                            }
                         }
                     }
                 }

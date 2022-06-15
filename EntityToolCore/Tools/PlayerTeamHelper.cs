@@ -22,137 +22,137 @@ namespace EntityCore.Tools
         /// <summary>
         /// Внутриигровой идентификатор класса Волшебник
         /// </summary>
-        public static readonly string idWizard = "Player_Controller";
+        public const string idWizard = "Player_Controller";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Волшебник (Чудотворец)
         /// </summary>
-        public static readonly string idWizard_Arcanist = "Player_Secondary_Spellstormmage";
+        public const string idWizard_Arcanist = "Player_Secondary_Spellstormmage";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Волшебник (Арканист)
         /// </summary>
-        public static readonly string idWizard_Thaumaturge = "Player_Secondary_MasterofFlame";
+        public const string idWizard_Thaumaturge = "Player_Secondary_MasterofFlame";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Клирик
         /// </summary>
-        public static readonly string idCleric = "Player_Devoted";
+        public const string idCleric = "Player_Devoted";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Клирик (Благочестивец)
         /// </summary>
-        public static readonly string idCleric_Devout = "Player_Secondary_AnointedChampion";
+        public const string idCleric_Devout = "Player_Secondary_AnointedChampion";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Клирик (Судья)
         /// </summary>
-        public static readonly string idCleric_Arbiter = "Player_Secondary_DivineOracle";
+        public const string idCleric_Arbiter = "Player_Secondary_DivineOracle";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Воин (бывший Страж)
         /// </summary>
-        public static readonly string idFighter = "Player_Guardian";
+        public const string idFighter = "Player_Guardian";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Воин (Авангард)
         /// </summary>
-        public static readonly string idFighter_Vanguard = "Player_Secondary_Ironvanguard";
+        public const string idFighter_Vanguard = "Player_Secondary_Ironvanguard";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Воин (Сорвиголова)
         /// </summary>
-        public static readonly string idFighter_Dreadnought = "Player_Secondary_Swordmaster_GF";
+        public const string idFighter_Dreadnought = "Player_Secondary_Swordmaster_GF";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Следопыт
         /// </summary>
-        public static readonly string idRanger = "Player_Archer";
+        public const string idRanger = "Player_Archer";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Следопыт (Охотник)
         /// </summary>
-        public static readonly string idRanger_Hunter = "Player_Secondary_Pathfinder";
+        public const string idRanger_Hunter = "Player_Secondary_Pathfinder";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Следопыт (Хранитель)
         /// </summary>
-        public static readonly string idRanger_Warden = "Player_Secondary_Stormwarden";
+        public const string idRanger_Warden = "Player_Secondary_Stormwarden";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Варвар
         /// </summary>
-        public static readonly string idBarbarian = "Player_Greatweapon";
+        public const string idBarbarian = "Player_Greatweapon";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Варвар (Страж)
         /// </summary>
-        public static readonly string idBarbarian_Sentinel = "Player_Secondary_Ironvanguard_GWF";
+        public const string idBarbarian_Sentinel = "Player_Secondary_Ironvanguard_GWF";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Варвар (Мастер клинка)
         /// </summary>
-        public static readonly string idBarbarian_BladeMaster = "Player_Secondary_Swordmaster";
+        public const string idBarbarian_BladeMaster = "Player_Secondary_Swordmaster";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Паладин
         /// </summary>
-        public static readonly string idPaladin = "Player_Paladin";
+        public const string idPaladin = "Player_Paladin";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Паладин (Клятвохранитель)
         /// </summary>
-        public static readonly string idPaladin_OathKeeper = "Player_Secondary_OathofDevotion";
+        public const string idPaladin_OathKeeper = "Player_Secondary_OathofDevotion";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Паладин (Юстициар)
         /// </summary>
-        public static readonly string idPaladin_Justicar = "Player_Secondary_OathofProtection";
+        public const string idPaladin_Justicar = "Player_Secondary_OathofProtection";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Чернокнижник
         /// </summary>
-        public static readonly string idWarlock = "Player_Scourge";
+        public const string idWarlock = "Player_Scourge";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Чернокнижник (Ткач душ)
         /// </summary>
-        public static readonly string idWarlock_SoulWeaver = "Player_Secondary_Soulbinder";
+        public const string idWarlock_SoulWeaver = "Player_Secondary_Soulbinder";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Чернокнижник (Вестник ада)
         /// </summary>
-        public static readonly string idWarlock_HellBringer = "Player_Secondary_Hellbringer";
+        public const string idWarlock_HellBringer = "Player_Secondary_Hellbringer";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Плут
         /// </summary>
-        public static readonly string idRogue = "Player_Trickster";
+        public const string idRogue = "Player_Trickster";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Плут (Убийца)
         /// </summary>
-        public static readonly string idRogue_WhisperKnife = "Player_Secondary_Whisperknife";
+        public const string idRogue_WhisperKnife = "Player_Secondary_Whisperknife";
 
         /// <summary>
         /// Внутриигровой идентификатор класса Плут (Шепчущий нож)
         /// </summary>
-        public static readonly string idRogue_Assassin = "Player_Secondary_MasterInfiltrator";
+        public const string idRogue_Assassin = "Player_Secondary_MasterInfiltrator";
 
         /// <summary>
         ///  Внутриигровой идентификатор класса Бард
         /// </summary>
-        public static readonly string idBard = "Player_Bard";
+        public const string idBard = "Player_Bard";
 
         /// <summary>
         ///  Внутриигровой идентификатор класса Бард (Поющий клинок)
         /// </summary>
-        public static readonly string idBard_Swashbuckler = "Player_Secondary_Swashbuckler";
+        public const string idBard_Swashbuckler = "Player_Secondary_Swashbuckler";
 
         /// <summary>
         ///  Внутриигровой идентификатор класса Бард (Менестрель)
         /// </summary>
-        public static readonly string idBard_Minstrel = "Player_Secondary_Minstrel";
+        public const string idBard_Minstrel = "Player_Secondary_Minstrel";
 
 
 
@@ -1043,13 +1043,13 @@ namespace EntityCore.Tools
         private static TeamMember Leader;
         private static int TanksNum;
         private static TeamMember Tank;
-        private static readonly TeamMember[] Tanks = new TeamMember[4];
+        private static readonly TeamMember[] Tanks = new TeamMember[5];
         private static int HealersNum;
         private static TeamMember Healer;
-        private static readonly TeamMember[] Healers = new TeamMember[4];
+        private static readonly TeamMember[] Healers = new TeamMember[5];
 
         private static int DDsNum;
-        private static readonly TeamMember[] DDs = new TeamMember[4];
+        private static readonly TeamMember[] DDs = new TeamMember[5];
         private static TeamMember Sturdiest;
         private static TeamMember SturdiestDD;
         private static TeamMember Weakest;
@@ -1063,6 +1063,7 @@ namespace EntityCore.Tools
         /// </summary>
         private static uint RegenerateCache()
         {
+            //BUG Периодически возникает ошибка "Индекс находится вне границ массива"
             Sturdiest = null;
             SturdiestDD = null;
             Weakest = null;
@@ -1096,412 +1097,6 @@ namespace EntityCore.Tools
             float maxTankHealth = 0;
             float maxHealerHealth = 0;
 
-#if false
-            foreach (var tm in team.Team.Members)
-            {
-                if (tm.EntityId == selfId)
-                    continue;
-
-                var tmEntity = tm.Entity;
-
-                var health = tmEntity.Character.AttribsBasic.MaxHealth;
-
-                if (health > maxHealth)
-                {
-                    maxHealth = health;
-                    Sturdiest = tm;
-                }
-                else if (health < minHealth)
-                {
-                    minHealth = health;
-                    Weakest = tm;
-                }
-
-                if (tm.EntityId == leaderId)
-                {
-                    Leader = tm;
-                }
-
-                var role = tmEntity.GetTeamRole();
-                switch (role)
-                {
-                    case TeamRoles.Tank:
-                        Tanks[TanksNum] = tm;
-                        TanksNum++;
-                        continue;
-                    case TeamRoles.Healer:
-                        Healers[HealersNum] = tm;
-                        HealersNum++;
-                        continue;
-                    case TeamRoles.DD:
-                        DDs[DDsNum] = tm;
-                        DDsNum++;
-                        if (health > maxDdHealth)
-                        {
-                            maxDdHealth = health;
-                            SturdiestDD = tm;
-                        }
-                        else if (health < minDdHealth)
-                        {
-                            minDdHealth = health;
-                            WeakestDD = tm;
-                        }
-                        continue;
-                }
-            } 
-#elif false
-            // Разворачиваем циклы
-            var members = team.Team.Members;
-            var teamCount = members.Count;
-            
-            if(teamCount == 0)
-                return 0;
-
-            var teamMember = members[0];
-
-            if (teamMember.EntityId == selfId)
-            {
-                Player = teamMember;
-            }
-            else
-            {
-                var tmEntity = teamMember.Entity;
-
-                var health = tmEntity.Character.AttribsBasic.MaxHealth;
-
-                if (health > maxHealth)
-                {
-                    maxHealth = health;
-                    Sturdiest = teamMember;
-                }
-                else if (health < minHealth)
-                {
-                    minHealth = health;
-                    Weakest = teamMember;
-                }
-
-                if (teamMember.EntityId == leaderId)
-                {
-                    Leader = teamMember;
-                }
-
-                var role = tmEntity.GetTeamRole();
-                switch (role)
-                {
-                    case TeamRoles.Tank:
-                        Tanks[TanksNum] = teamMember;
-                        TanksNum++; 
-                        if (health > maxTankHealth)
-                        {
-                            Tank = teamMember;
-                            maxTankHealth = health;
-                        }
-                        break;
-                    case TeamRoles.Healer:
-                        Healers[HealersNum] = teamMember;
-                        HealersNum++; 
-                        if (health > maxHealerHealth)
-                        {
-                            Healer = teamMember;
-                            maxHealerHealth = health;
-                        }
-                        break;
-                    case TeamRoles.DD:
-                        DDs[DDsNum] = teamMember;
-                        DDsNum++;
-                        if (health > maxDdHealth)
-                        {
-                            SturdiestDD = teamMember;
-                            maxDdHealth = health;
-                        }
-                        else if (health < minDdHealth)
-                        {
-                            WeakestDD = teamMember;
-                            minDdHealth = health;
-                        }
-                        break;
-                }
-            }
-
-            if (teamCount == 1)
-                goto RegenerateCacheFinish;
-
-            teamMember = members[1];
-            if (teamMember.EntityId == selfId)
-            {
-                Player = teamMember;
-            }
-            else
-            {
-                var tmEntity = teamMember.Entity;
-
-                var health = tmEntity.Character.AttribsBasic.MaxHealth;
-
-                if (health > maxHealth)
-                {
-                    maxHealth = health;
-                    Sturdiest = teamMember;
-                }
-                else if (health < minHealth)
-                {
-                    minHealth = health;
-                    Weakest = teamMember;
-                }
-
-                if (teamMember.EntityId == leaderId)
-                {
-                    Leader = teamMember;
-                }
-
-                var role = tmEntity.GetTeamRole();
-                switch (role)
-                {
-                    case TeamRoles.Tank:
-                        Tanks[TanksNum] = teamMember;
-                        TanksNum++; 
-                        if (health > maxTankHealth)
-                        {
-                            Tank = teamMember;
-                            maxTankHealth = health;
-                        }
-                        break;
-                    case TeamRoles.Healer:
-                        Healers[HealersNum] = teamMember;
-                        HealersNum++; 
-                        if (health > maxHealerHealth)
-                        {
-                            Healer = teamMember;
-                            maxHealerHealth = health;
-                        }
-                        break;
-                    case TeamRoles.DD:
-                        DDs[DDsNum] = teamMember;
-                        DDsNum++;
-                        if (health > maxDdHealth)
-                        {
-                            maxDdHealth = health;
-                            SturdiestDD = teamMember;
-                        }
-                        else if (health < minDdHealth)
-                        {
-                            minDdHealth = health;
-                            WeakestDD = teamMember;
-                        }
-                        break;
-                }
-            }
-
-            if (teamCount == 2)
-                goto RegenerateCacheFinish;
-
-            teamMember = members[2];
-            if (teamMember.EntityId == selfId)
-            {
-                Player = teamMember;
-            }
-            else
-            {
-                var tmEntity = teamMember.Entity;
-
-                var health = tmEntity.Character.AttribsBasic.MaxHealth;
-
-                if (health > maxHealth)
-                {
-                    maxHealth = health;
-                    Sturdiest = teamMember;
-                }
-                else if (health < minHealth)
-                {
-                    minHealth = health;
-                    Weakest = teamMember;
-                }
-
-                if (teamMember.EntityId == leaderId)
-                {
-                    Leader = teamMember;
-                }
-
-                var role = tmEntity.GetTeamRole();
-                switch (role)
-                {
-                    case TeamRoles.Tank:
-                        Tanks[TanksNum] = teamMember;
-                        TanksNum++; 
-                        if (health > maxTankHealth)
-                        {
-                            Tank = teamMember;
-                            maxTankHealth = health;
-                        }
-                        break;
-                    case TeamRoles.Healer:
-                        Healers[HealersNum] = teamMember;
-                        HealersNum++; 
-                        if (health > maxHealerHealth)
-                        {
-                            Healer = teamMember;
-                            maxHealerHealth = health;
-                        }
-                        break;
-                    case TeamRoles.DD:
-                        DDs[DDsNum] = teamMember;
-                        DDsNum++;
-                        if (health > maxDdHealth)
-                        {
-                            maxDdHealth = health;
-                            SturdiestDD = teamMember;
-                        }
-                        else if (health < minDdHealth)
-                        {
-                            minDdHealth = health;
-                            WeakestDD = teamMember;
-                        }
-                        break;
-                }
-            }
-
-            if (teamCount == 3)
-                goto RegenerateCacheFinish;
-
-            teamMember = members[3];
-            if (teamMember.EntityId == selfId)
-            {
-                Player = teamMember;
-            }
-            else
-            {
-                var tmEntity = teamMember.Entity;
-
-                var health = tmEntity.Character.AttribsBasic.MaxHealth;
-
-                if (health > maxHealth)
-                {
-                    maxHealth = health;
-                    Sturdiest = teamMember;
-                }
-                else if (health < minHealth)
-                {
-                    minHealth = health;
-                    Weakest = teamMember;
-                }
-
-                if (teamMember.EntityId == leaderId)
-                {
-                    Leader = teamMember;
-                }
-
-                var role = tmEntity.GetTeamRole();
-                switch (role)
-                {
-                    case TeamRoles.Tank:
-                        Tanks[TanksNum] = teamMember;
-                        TanksNum++; 
-                        if (health > maxTankHealth)
-                        {
-                            Tank = teamMember;
-                            maxTankHealth = health;
-                        }
-                        break;
-                    case TeamRoles.Healer:
-                        Healers[HealersNum] = teamMember;
-                        HealersNum++; 
-                        if (health > maxHealerHealth)
-                        {
-                            Healer = teamMember;
-                            maxHealerHealth = health;
-                        }
-                        break;
-                    case TeamRoles.DD:
-                        DDs[DDsNum] = teamMember;
-                        DDsNum++;
-                        if (health > maxDdHealth)
-                        {
-                            maxDdHealth = health;
-                            SturdiestDD = teamMember;
-                        }
-                        else if (health < minDdHealth)
-                        {
-                            minDdHealth = health;
-                            WeakestDD = teamMember;
-                        }
-                        break;
-                }
-            }
-
-            if (teamCount == 4)
-                goto RegenerateCacheFinish;
-
-            teamMember = members[4];
-            if (teamMember.EntityId == selfId)
-            {
-                Player = teamMember;
-            }
-            else
-            {
-                var tmEntity = teamMember.Entity;
-
-                var health = tmEntity.Character.AttribsBasic.MaxHealth;
-
-                if (health > maxHealth)
-                {
-                    //maxHealth = health;
-                    Sturdiest = teamMember;
-                }
-                else if (health < minHealth)
-                {
-                    //minHealth = health;
-                    Weakest = teamMember;
-                }
-
-                if (teamMember.EntityId == leaderId)
-                {
-                    Leader = teamMember;
-                }
-
-                var role = tmEntity.GetTeamRole();
-                switch (role)
-                {
-                    case TeamRoles.Tank:
-                        Tanks[TanksNum] = teamMember;
-                        TanksNum++; 
-                        if (health > maxTankHealth)
-                        {
-                            Tank = teamMember;
-                            //maxTankHealth = health;
-                        }
-                        break;
-                    case TeamRoles.Healer:
-                        Healers[HealersNum] = teamMember;
-                        HealersNum++; 
-                        if (health > maxHealerHealth)
-                        {
-                            Healer = teamMember;
-                            maxHealerHealth = health;
-                        }
-                        break;
-                    case TeamRoles.DD:
-                        DDs[DDsNum] = teamMember;
-                        DDsNum++;
-                        if (health > maxDdHealth)
-                        {
-                            //maxDdHealth = health;
-                            SturdiestDD = teamMember;
-                        }
-                        else if (health < minDdHealth)
-                        {
-                            //minDdHealth = health;
-                            WeakestDD = teamMember;
-                        }
-                        break;
-                }
-            }
-
-
-            RegenerateCacheFinish:
-            cacheTimeout.ChangeTime(player.InCombat 
-                ? EntityTools.EntityTools.Config.EntityCache.CombatCacheTime
-                : EntityTools.EntityTools.Config.EntityCache.GlobalCacheTime);
-            return CachedTeamId = team.TeamId;
-#else
             // Разворачиваем цикл в обратном порядке
             var members = team.Team.Members;
             var teamCount = members.Count;
@@ -1516,7 +1111,7 @@ namespace EntityCore.Tools
                 default: goto RegenerateCacheFinish;
             }
 
-            TeamMember_4:
+        TeamMember_4:
             var teamMember = members[4];
             if (teamMember.EntityId == selfId)
             {
@@ -1584,7 +1179,7 @@ namespace EntityCore.Tools
                 }
             }
 
-            TeamMember_3:
+        TeamMember_3:
             teamMember = members[3];
             if (teamMember.EntityId == selfId)
             {
@@ -1652,7 +1247,7 @@ namespace EntityCore.Tools
                 }
             }
 
-            TeamMember_2:
+        TeamMember_2:
             teamMember = members[2];
             if (teamMember.EntityId == selfId)
             {
@@ -1720,7 +1315,7 @@ namespace EntityCore.Tools
                 }
             }
 
-            TeamMember_1:
+        TeamMember_1:
             teamMember = members[1];
             if (teamMember.EntityId == selfId)
             {
@@ -1788,7 +1383,7 @@ namespace EntityCore.Tools
                 }
             }
             
-            TeamMember_0:
+        TeamMember_0:
             teamMember = members[0];
             if (teamMember.EntityId == selfId)
             {
@@ -1856,12 +1451,11 @@ namespace EntityCore.Tools
                 }
             }
 
-            RegenerateCacheFinish:
+        RegenerateCacheFinish:
             cacheTimeout.ChangeTime(player.InCombat
                 ? EntityTools.EntityTools.Config.EntityCache.CombatCacheTime
                 : EntityTools.EntityTools.Config.EntityCache.GlobalCacheTime);
             return CachedTeamId = team.TeamId;
-#endif
         }
 
         /// <summary>

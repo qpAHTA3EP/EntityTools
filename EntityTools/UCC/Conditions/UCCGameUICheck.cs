@@ -13,7 +13,7 @@ using EntityTools.Enums;
 
 namespace EntityTools.UCC.Conditions
 {
-    public class UccGameUiCheck : UCCCondition, ICustomUCCCondition
+    public class UCCGameUICheck : UCCCondition, ICustomUCCCondition
     {
         #region Опции команды
 #if DEVELOPER
@@ -157,7 +157,7 @@ namespace EntityTools.UCC.Conditions
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public UccGameUiCheck()
+        public UCCGameUICheck()
         {
             Sign = Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
             Engine = new UccConditionProxy(this);
@@ -175,7 +175,7 @@ namespace EntityTools.UCC.Conditions
 
         ICustomUCCCondition ICustomUCCCondition.Clone()
         {
-            return new UccGameUiCheck
+            return new UCCGameUICheck
             {
                 uiGenId = uiGenId,
                 _uiGenProperty = _uiGenProperty,

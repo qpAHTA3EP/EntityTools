@@ -218,6 +218,7 @@
   <ItemGroup>
     <Compile Include="Core\Interfaces\IEntityIdentifier.cs" />
     <Compile Include="Core\Interfaces\IEntityDescriptor.cs" />
+    <Compile Include="Core\Interfaces\IPowerCache.cs" />
     <Compile Include="Editors\ChangePluginSettingValueEditor.cs" />
     <Compile Include="Editors\CheckedListBoxEditor.cs" />
     <Compile Include="Editors\CustomRegionCollectionEditor.cs" />
@@ -468,6 +469,8 @@
     <Compile Include="Tools\Classes.cs" />
     <Compile Include="Tools\SysInformer.cs" />
     <Compile Include="Tools\Targeting\PlayerTeamMonitor.cs" />
+    <Compile Include="Tools\Targeting\TargetProcessor.cs" />
+    <Compile Include="Tools\Targeting\TargetSelector.cs" />
     <Compile Include="Tools\XmlColor.cs" />
     <Compile Include="UCC\Actions\ChangeTarget.cs" />
     <Compile Include="Tools\Targeting\Enums.cs" />

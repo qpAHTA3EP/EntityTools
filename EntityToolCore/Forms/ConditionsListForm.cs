@@ -90,6 +90,7 @@ namespace EntityCore.Forms
 
             if (@this.ShowDialog() == DialogResult.OK)
             {
+                //BUG : Неправильное копирование последнего условия из списка
                 // Формируем новый список условий
                 ConditionList newConditions = new ConditionList(@this.lsbxConditions.Items.Count);
                 foreach (object item in @this.lsbxConditions.Items)

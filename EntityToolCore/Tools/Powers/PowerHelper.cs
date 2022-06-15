@@ -19,8 +19,6 @@ namespace EntityCore.Tools.Powers
 
     public static class PowerHelper
     {
-
-
         /// <summary>
         /// Активация умения <paramref name="power"/> на область, заданную координатами <paramref name="targetPosition"/> 
         /// </summary>

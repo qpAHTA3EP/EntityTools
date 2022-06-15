@@ -11,7 +11,6 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Xml.Serialization;
 using AcTp0Tools.Annotations;
-using AcTp0Tools.Classes.Targeting;
 using EntityTools.Editors;
 using EntityTools.Tools.Targeting;
 using EntityTools.UCC.Conditions;
@@ -27,6 +26,8 @@ namespace EntityTools.UCC.Actions
         [Editor(typeof(UccTargetSelectorEditor), typeof(UITypeEditor))]
         [Description("Target selector algorithm.")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
+        [XmlElement(typeof(EntityTarget))]
+        [XmlElement(typeof(TeammateSupport))]
 #else
         [Browsable(false)]
 #endif

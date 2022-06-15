@@ -12,14 +12,14 @@ namespace EntityCore.UCC.Conditions
     public class UccGameUiCheckEngine : IUccConditionEngine
     {
         #region Данные
-        private UccGameUiCheck @this;
+        private UCCGameUICheck @this;
 
         private UIGen uiGen;
         private string label = string.Empty;
         private string _idStr;
         #endregion
 
-        internal UccGameUiCheckEngine(UccGameUiCheck uiGenCheck)
+        internal UccGameUiCheckEngine(UCCGameUICheck uiGenCheck)
         {
             InternalRebase(uiGenCheck);
             ETLogger.WriteLine(LogType.Debug, $"{_idStr} initialized: {Label()}");
@@ -59,7 +59,7 @@ namespace EntityCore.UCC.Conditions
                 return false;
             if (ReferenceEquals(condition, @this))
                 return true;
-            if (condition is UccGameUiCheck uiGenCheck)
+            if (condition is UCCGameUICheck uiGenCheck)
             {
                 if (InternalRebase(uiGenCheck))
                 {
@@ -70,12 +70,12 @@ namespace EntityCore.UCC.Conditions
                 return false;
             }
 
-            string debugStr = string.Concat("Rebase failed. ", condition.GetType().Name, '[', condition.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(UccGameUiCheck) + '\'');
+            string debugStr = string.Concat("Rebase failed. ", condition.GetType().Name, '[', condition.GetHashCode().ToString("X2"), "] can't be casted to '" + nameof(UCCGameUICheck) + '\'');
             ETLogger.WriteLine(LogType.Error, debugStr);
             throw new InvalidCastException(debugStr);
         }
 
-        private bool InternalRebase(UccGameUiCheck execPower)
+        private bool InternalRebase(UCCGameUICheck execPower)
         {
             uiGen = null;
             // Убираем привязку к старому условию

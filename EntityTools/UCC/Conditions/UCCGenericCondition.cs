@@ -21,7 +21,7 @@ namespace EntityTools.UCC.Conditions
 
         ICustomUCCCondition ICustomUCCCondition.Clone()
         {
-            var copy = new UCCConditionPack
+            var copy = new UCCGenericCondition
             {
                 Sign = Sign,
                 Locked = Locked,

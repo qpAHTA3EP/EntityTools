@@ -301,5 +301,10 @@ namespace EntityTools.UCC.Conditions
 
 
         public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
+
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, e);
+        }
     }
 }

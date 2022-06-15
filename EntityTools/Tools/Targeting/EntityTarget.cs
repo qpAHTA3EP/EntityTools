@@ -1,12 +1,11 @@
-﻿using System;
-using System.ComponentModel;
-using System.Drawing.Design;
-using AcTp0Tools.Classes.Targeting;
-using Astral.Classes.ItemFilter;
+﻿using Astral.Classes.ItemFilter;
 using EntityTools.Core.Interfaces;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using MyNW.Classes;
+using System;
+using System.ComponentModel;
+using System.Drawing.Design;
 
 namespace EntityTools.Tools.Targeting
 {
@@ -38,7 +37,8 @@ namespace EntityTools.Tools.Targeting
                 }
             }
         }
-        internal string _entityId = string.Empty;
+
+        private string _entityId = string.Empty;
 
 #if DEVELOPER
         [Description("Type of and EntityID:\n" +
@@ -61,7 +61,8 @@ namespace EntityTools.Tools.Targeting
                 }
             }
         }
-        internal ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
+
+        private ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
 
 #if DEVELOPER
         [Description("The switcher of the Entity property which compared to 'EntityID'")]
@@ -82,7 +83,8 @@ namespace EntityTools.Tools.Targeting
                 }
             }
         }
-        internal EntityNameType _entityNameType = EntityNameType.InternalName; 
+
+        private EntityNameType _entityNameType = EntityNameType.InternalName; 
         #endregion
 
         public override TargetSelector Clone()

@@ -5,6 +5,7 @@
         Auras = 0,
         Interfaces = 1,
         Missions = 2,
-        States = 3
+        States = 3,
+        Powers = 4
     }
 }

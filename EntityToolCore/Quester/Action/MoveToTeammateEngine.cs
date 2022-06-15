@@ -33,7 +33,7 @@ namespace EntityCore.Quester.Action
         /// </summary>
         private MoveToTeammate _action;
 
-        private Timeout _teammateAbsenceTimer;
+        private readonly Timeout _teammateAbsenceTimer = new Timeout(600_000_000);
         private TeammateSupportTargetProcessor _targetProcessor;
         private float _sqrtDistance;
         private float _sqrtAbortCombatDistance;
@@ -213,7 +213,7 @@ namespace EntityCore.Quester.Action
             _sqrtAbortCombatDistance = _action.AbortCombatDistance;
             _sqrtAbortCombatDistance *= _sqrtAbortCombatDistance;
 
-            _teammateAbsenceTimer = null;
+            _teammateAbsenceTimer.ChangeTime(600_000_000);
             _label = string.Empty;
 
             _action.Bind(this);
@@ -275,18 +275,12 @@ namespace EntityCore.Quester.Action
 
                     if (teammate is null)
                     {
-                        var teammateSearchTime = _action.TeammateSearchTime;
-                        if (teammateSearchTime > 0)
+                        if (_teammateAbsenceTimer.IsTimedOut)
                         {
-                            if (_teammateAbsenceTimer is null)
-                                _teammateAbsenceTimer = new Timeout((int)teammateSearchTime);
-                            else if (_teammateAbsenceTimer.IsTimedOut)
-                            {
-                                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, " : Teammate[NULL] and TeammateWaitTime is out"));
-                                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, " : Result 'true'"));
+                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, " : Teammate[NULL] and TeammateWaitTime is out"));
+                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, " : Result 'true'"));
 
-                                return true;
-                            }
+                            return true;
                         }
 
                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, " : Teammate[NULL]"));
@@ -294,7 +288,6 @@ namespace EntityCore.Quester.Action
 
                         return false;
                     }
-                    _teammateAbsenceTimer = null;
 
                     double sqrtDistance =
                             NavigationHelper.SquareDistance3D(EntityManager.LocalPlayer.Location, teammate.Entity.Location);
@@ -320,21 +313,8 @@ namespace EntityCore.Quester.Action
                 }
                 else
                 {
-                    if (teammate is null)
-                    {
-                        var teammateSearchTime = _action.TeammateSearchTime;
-                        if (teammateSearchTime > 0)
-                        {
-                            if (_teammateAbsenceTimer is null)
-                                _teammateAbsenceTimer = new Timeout((int)teammateSearchTime);
-                            else if (_teammateAbsenceTimer.IsTimedOut)
-                                return true;
-                        }
-
-                        return false;
-                    }
-                    _teammateAbsenceTimer = null;
-
+                    if (_teammateAbsenceTimer.IsTimedOut)
+                        return true;
 
                     double sqrtDistance =
                             NavigationHelper.SquareDistance3D(EntityManager.LocalPlayer.Location, teammate.Entity.Location);
@@ -346,7 +326,9 @@ namespace EntityCore.Quester.Action
                         if (_action.AbortCombatDistance > _action.Distance)
                             AstralAccessors.Logic.NW.Combats.SetAbortCombatCondition(CheckCombatShouldBeAborted_and_ChangeTarget, ShouldRemoveAbortCombatCondition);
                     }
-                }
+                }                    
+                if(NeedToRun)
+                    ResetSearchTimer();
                 return needToRun;
             }
         }
@@ -364,7 +346,6 @@ namespace EntityCore.Quester.Action
                 {
                     ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: {nameof(InternalConditions)} failed. ActionResult={ActionResult.Fail}.");
 
-
                     if (_action.IgnoreCombat)
                         AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(false);
                     return ActionResult.Fail;
@@ -376,20 +357,10 @@ namespace EntityCore.Quester.Action
                 if (teammate is null)
                 {
                     actionResult = ActionResult.Running;
-
-                    var teammateSearchTime = _action.TeammateSearchTime;
-                    if (teammateSearchTime > 0)
+                    if (_teammateAbsenceTimer.IsTimedOut)
                     {
-                        if (_teammateAbsenceTimer is null)
-                        {
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, " : Teammate[NULL]. Activate TeammateWaitTimer and continue..."));
-                            _teammateAbsenceTimer = new Timeout((int)teammateSearchTime);
-                        }
-                        if (_teammateAbsenceTimer.IsTimedOut)
-                        {
-                            ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, " : Teammate[NULL] and TeammateWaitTime is out. Stop"));
-                            actionResult = ActionResult.Fail;
-                        }
+                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, " : Teammate[NULL] and TeammateWaitTime is out. Stop"));
+                        actionResult = ActionResult.Fail;
                     }
                 }
                 else
@@ -412,16 +383,10 @@ namespace EntityCore.Quester.Action
                 var teammate = _targetProcessor.GetTeammate();
                 if (teammate is null)
                 {
-                    actionResult = ActionResult.Running;
-                    var teammateSearchTime = _action.TeammateSearchTime;
-                    if (teammateSearchTime > 0)
-                    {
-                        if (_teammateAbsenceTimer is null)
-                            _teammateAbsenceTimer = new Timeout((int)teammateSearchTime);
-                        actionResult = _teammateAbsenceTimer.IsTimedOut
-                            ? ActionResult.Completed
-                            : ActionResult.Running; 
-                    }
+                    
+                    actionResult = _teammateAbsenceTimer.IsTimedOut 
+                        ? ActionResult.Fail
+                        : ActionResult.Running;
                 }
                 else
                 {
@@ -432,6 +397,7 @@ namespace EntityCore.Quester.Action
                         : ActionResult.Running;
                 }
             }
+            ResetSearchTimer();
             return actionResult;
         }
 
@@ -628,8 +594,9 @@ namespace EntityCore.Quester.Action
         public void InternalReset()
         {
             _targetProcessor.Reset();
-            _teammateAbsenceTimer = null;
+            _teammateAbsenceTimer.ChangeTime(int.MaxValue);
 
+            ResetSearchTimer();
             AstralAccessors.Logic.NW.Combats.RemoveAbortCombatCondition();
 
             if (ExtendedDebugInfo)
@@ -715,7 +682,18 @@ namespace EntityCore.Quester.Action
                 return logConf.QuesterActions.DebugMoveToTeammate && logConf.Active;
             }
         }
-        
+
+        /// <summary>
+        /// Обновление таймера остановки поиска 
+        /// </summary>
+        private void ResetSearchTimer()
+        {
+            var time = _action.TeammateSearchTime;
+            if (time > 0)
+            {
+                _teammateAbsenceTimer.ChangeTime((int)time);
+            }
+        }
         private Predicate<Entity> GetSpecialTeammateCheck()
         {
             Predicate<Entity> specialCheck = null;

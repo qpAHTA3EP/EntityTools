@@ -40,7 +40,7 @@ namespace EntityCore.Quester.Action
         private Entity targetEntity;
         private Entity closestEntity;
         private readonly Timeout internalCacheTimer = new Timeout(0);
-        private Timeout entityAbsenceTimer;
+        private readonly Timeout entityAbsenceTimer = new Timeout(600_000_000);
         private readonly PowerCache powerCache = new PowerCache(string.Empty);
         #endregion
 
@@ -105,7 +105,7 @@ namespace EntityCore.Quester.Action
             @this.Bind(this);
             powerCache.PowerIdPattern = m2e.PowerId;
             internalCacheTimer.ChangeTime(0);
-            entityAbsenceTimer = null;
+            entityAbsenceTimer.ChangeTime(600_000_000);
 
             return true;
         }
@@ -128,6 +128,9 @@ namespace EntityCore.Quester.Action
                         break;
                     case nameof(@this.PowerId):
                         powerCache.PowerIdPattern = @this.PowerId;
+                        break;
+                    case nameof(@this.EntitySearchTime):
+                        entityAbsenceTimer.ChangeTime(600_000_000);
                         break;
                     default:
                         _specialEntityCheck = null;
@@ -305,11 +308,9 @@ namespace EntityCore.Quester.Action
 
             if (extendedDebugInfo)
                 ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: ActionResult={actionResult}");
-            
+
             // Возобновление таймера остановки поиска
-            var entitySearchTime = @this.EntitySearchTime;
-            if (entitySearchTime > 0)
-                entityAbsenceTimer.ChangeTime(entitySearchTime * 1_000);
+            ResetEntitySearchTimer();
 
             if (@this.ResetCurrentHotSpot)
                 @this.CurrentHotSpotIndex = -1;
@@ -618,7 +619,7 @@ namespace EntityCore.Quester.Action
                     return false;
                 }
 
-                if (entityAbsenceTimer != null && entityAbsenceTimer.IsTimedOut)
+                if (entityAbsenceTimer.IsTimedOut)
                 {
                     if (ExtendedDebugInfo)
                     {
@@ -665,7 +666,7 @@ namespace EntityCore.Quester.Action
         {
             targetEntity = null;
             closestEntity = null;
-
+            ResetEntitySearchTimer();
             AstralAccessors.Logic.NW.Combats.RemoveAbortCombatCondition();
 
             if (ExtendedDebugInfo)
@@ -844,9 +845,7 @@ namespace EntityCore.Quester.Action
             var entitySearchTime = @this.EntitySearchTime;
             if (entitySearchTime > 0)
             {
-                if (entityAbsenceTimer is null)
-                    entityAbsenceTimer = new Astral.Classes.Timeout(entitySearchTime);
-                else entityAbsenceTimer.ChangeTime(entitySearchTime);
+                entityAbsenceTimer.ChangeTime(entitySearchTime);
             }
         }
 

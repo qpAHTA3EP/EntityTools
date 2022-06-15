@@ -1,4 +1,5 @@
-﻿using Astral.Logic.NW;
+﻿#define PowerCache
+using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
 using EntityCore.Tools.Powers;
 using EntityTools;
@@ -10,7 +11,8 @@ using MyNW.Internals;
 using System;
 using System.ComponentModel;
 using System.Reflection;
-using System.Xml.Serialization;
+using System.Text;
+using EntityTools.Enums;
 using Unit = Astral.Logic.UCC.Ressources.Enums.Unit;
 
 namespace EntityCore.UCC.Actions
@@ -24,7 +26,9 @@ namespace EntityCore.UCC.Actions
 #endif
         private string label = string.Empty;
         private string _idStr;
-        private readonly PowerCache powerCache = new PowerCache(string.Empty);
+#if PowerCache
+        private readonly PowerCache powerCache = new PowerCache(string.Empty); 
+#endif
         #endregion
 
         internal ExecuteSpecificPowerEngine(ExecuteSpecificPower esp)
@@ -84,7 +88,9 @@ namespace EntityCore.UCC.Actions
                 entity = null;
 #endif
                 label = string.Empty;
-                powerCache.PowerIdPattern = @this.PowerId;
+#if PowerCache
+                powerCache.PowerIdPattern = @this.PowerId; 
+#endif
             }
         }
 
@@ -129,6 +135,9 @@ namespace EntityCore.UCC.Actions
 
             _idStr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
 
+#if PowerCache
+            powerCache.PowerIdPattern = @this.PowerId; 
+#endif
             @this.Engine = this;
 
             return true;
@@ -143,38 +152,122 @@ namespace EntityCore.UCC.Actions
 
                 string actionIdStr = debugInfo
                     ? $"{_idStr}.{MethodBase.GetCurrentMethod()?.Name ?? nameof(NeedToRun)}"
-                    : string.Empty; 
-                
-                var p = powerCache.GetPower();
+                    : string.Empty;
 
-                if (p is null)
+#if PowerCache
+                var pwr = powerCache.GetPower(); 
+#else
+                var pwr = Powers.GetPowerByInternalName(@this.PowerId);
+#endif
+
+                if (pwr is null)
                 {
                     if (debugInfo)
                         ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Power does not found.");
                     return false;
                 }
 
-                if (@this.CheckPowerCooldown && p.IsOnCooldown())
+                if (@this.CheckPowerCooldown && pwr.IsOnCooldown())
                 {
                     if (debugInfo)
                         ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Power is on Cooldown.");
                     return false;
                 }
 
-                if (@this.CheckInTray && !p.IsInTray)
+                if (@this.CheckInTray && !pwr.IsInTray)
                 {
                     if (debugInfo)
                         ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Power is not Slotted.");
                     return false;
                 }
 
-                if (!((ICustomUCCCondition) @this._customConditions).IsOK(@this))
+                if (debugInfo)
                 {
-                    if (debugInfo)
-                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: CustomConditions are False.");
+                    var conditions = @this._customConditions.Conditions;
+                    var sb = new StringBuilder();
+                    bool result = true;
+                    if (conditions.Count > 0)
+                    {
+                        if (@this._customConditions.TestRule == LogicRule.Disjunction)
+                        {
+                            int lockedNum = 0;
+                            int okUnlockedNum = 0;
+                            bool lockedTrue = true;
+                            foreach (var cond in conditions)
+                            {
+                                if (cond.Locked)
+                                    sb.Append("\t[L] ");
+                                else sb.Append("\t[U] ");
+                                sb.Append(cond).Append(" | Result: ");
+                                bool ok;
+                                if (cond is ICustomUCCCondition iCond)
+                                {
+                                    ok = iCond.IsOK(@this);
+                                    if (iCond.Locked)
+                                    {
+                                        if (!ok)
+                                        {
+                                            lockedTrue = false;
+                                        }
+                                        lockedNum++;
+                                    }
+                                    else if (ok)
+                                        okUnlockedNum++;
+                                }
+                                else
+                                {
+                                    ok = cond.IsOK(@this);
+                                    if (cond.Locked)
+                                    {
+                                        if (!ok)
+                                        {
+                                            lockedTrue = false;
+                                        }
+                                        lockedNum++;
+                                    }
+                                    else if (ok)
+                                        okUnlockedNum++;
+                                }
+                                sb.AppendLine(ok.ToString());
+                            }
+                            result = lockedTrue && (conditions.Count == lockedNum || okUnlockedNum > 0);
+                        }
+                        else
+                        {
+                            foreach (UCCCondition cond in conditions)
+                            {
+                                if (cond.Locked)
+                                    sb.Append("\t[L] ");
+                                else sb.Append("\t[U] ");
+                                sb.Append(cond).Append(" | Result: ");
+                                bool ok;
+                                if (cond is ICustomUCCCondition iCond)
+                                {
+                                    ok = iCond.IsOK(@this);
+                                    if (!ok)
+                                    {
+                                        result = false;
+                                    }
+                                }
+                                else
+                                {
+                                    ok = cond.IsOK(@this);
+                                    if (!ok)
+                                    {
+                                        result = false;
+                                    }
+                                }
+                                sb.AppendLine(ok.ToString());
+                            }
+                        }
+                    }
+                    sb.Append("Negation flag (Not): ").AppendLine(@this._customConditions.Not.ToString());
+
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: CustomConditions are {result}:\n{sb.ToString()}");
+                    return result;
                 }
 
-                return true;
+                return @this._customConditions.IsOK(@this);
             }
         }
 
@@ -189,9 +282,13 @@ namespace EntityCore.UCC.Actions
             if(debugInfo)
                 ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: starts");
 
-            var currentPower = powerCache.GetPower();
+#if PowerCache
+            var pwr = powerCache.GetPower(); 
+#else
+            var pwr = Powers.GetPowerByInternalName(@this.PowerId);
+#endif
 
-            if (currentPower is null)
+            if (pwr is null)
             {
                 if(debugInfo)
                     ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Fail to get Power '{@this.PowerId}' by 'PowerId'");
@@ -202,7 +299,7 @@ namespace EntityCore.UCC.Actions
             var targetEntity = UnitRef;
 
 #if true
-            var powResult = currentPower.ExecutePower(targetEntity, @this.CastingTime, @this.Range, @this.ForceMaintain, debugInfo);
+            var powResult = pwr.ExecutePower(targetEntity, @this.CastingTime, @this.Range, @this.ForceMaintain, debugInfo);
 
             switch (powResult)
             {
@@ -361,14 +458,18 @@ namespace EntityCore.UCC.Actions
                 label = $"{nameof(@this.PowerId)} not defined";
             else if (string.IsNullOrEmpty(label))
             {
-                var currentPower = powerCache.GetPower();
+#if PowerCache
+                var pwr = powerCache.GetPower(); 
+#else
+                var pwr = Powers.GetPowerByInternalName(@this.PowerId);
+#endif
 
-                if (currentPower != null)
+                if (pwr != null)
                 {
-                    var powDef = currentPower.PowerDef;
+                    var powDef = pwr.PowerDef;
                     if (powDef != null && powDef.IsValid)
-                        label = string.Concat(@this.CheckInTray && CurrentPowerIsSlotted ? "[Slotted] " : string.Empty,
-                            string.IsNullOrEmpty(powDef.DisplayName) ? powDef.InternalName : $"{powDef.DisplayName} [{powDef.InternalName}]");
+                        label = string.Concat(@this.CheckInTray && pwr.IsInTray ? "[Slotted] " : string.Empty,
+                                              string.IsNullOrEmpty(powDef.DisplayName) ? powDef.InternalName : $"{powDef.DisplayName} [{powDef.InternalName}]");
                 }
                 else
                 {
@@ -379,19 +480,12 @@ namespace EntityCore.UCC.Actions
                     }
                 }
                 if (string.IsNullOrEmpty(label))
-                    label = "Unknown Power";
+                    label = $"{pwrId} (Unknown Power)";
             }
 
             return label;
         }
         #endregion
-
-        #region Вспомогательные функции
-        [XmlIgnore]
-        [Browsable(false)]
-        private bool CurrentPowerIsSlotted => powerCache.GetPower()?.IsInTray == true;
-        #endregion
-
 
 #if EntityTarget
         /// <summary>

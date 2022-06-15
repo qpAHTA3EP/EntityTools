@@ -375,6 +375,43 @@ namespace EntityTools
                 //StopBot();
                 return false;
             }
+
+            public bool TryGet<T>(ref T obj, params object[] args) where T : class
+            {
+                if (InternalInitialize())
+                    return Core.TryGet(ref obj, args);
+                if (Equals(obj, null))
+                    ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing unknown object. Stop bot", true);
+                else ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing '{obj.GetType().Name}'[{obj.GetHashCode():X2}]. Stop bot", true);
+                return false;
+            }
+
+#if false
+            public bool TryGet(ref object obj, params object[] args)
+            {
+                if (InternalInitialize())
+                    return Core.TryGet(ref obj, args);
+                if (Equals(obj, null))
+                    ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing unknown object. Stop bot", true);
+                else ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing '{obj.GetType().Name}'[{obj.GetHashCode():X2}]. Stop bot", true);
+                return false;
+            }  
+#endif
+            public object Get(Type type, params object[] args)
+            {
+                if (InternalInitialize())
+                    return Core.Get(type, args);
+                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing '{type?.Name ?? string.Empty}'. Stop bot", true);
+                return null;
+            }
+
+            public T Get<T>(params object[] args) where T : class
+            {
+                if (InternalInitialize())
+                    return Core.Get<T>(args);
+                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing '{typeof(T).Name}'. Stop bot", true);
+                return default;
+            }
 #if DEVELOPER
             public bool UserRequest_SelectItem<T>(Func<IEnumerable<T>> source, ref T selectedValue, string displayName = "")
             {

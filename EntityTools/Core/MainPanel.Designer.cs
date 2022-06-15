@@ -57,6 +57,7 @@ namespace EntityTools.Core
             this.btnUiViewer = new System.Windows.Forms.Button();
             this.btnAuraViewer = new System.Windows.Forms.Button();
             this.btnMissionMonitor = new System.Windows.Forms.Button();
+            this.btnEntityCacheMonitor = new System.Windows.Forms.Button();
             this.btnEntities = new System.Windows.Forms.Button();
             this.ckbSpellStuckMonitor = new System.Windows.Forms.CheckBox();
             this.gbxExport = new System.Windows.Forms.GroupBox();
@@ -107,7 +108,6 @@ namespace EntityTools.Core
             this.dlgSaveFile = new System.Windows.Forms.SaveFileDialog();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
-            this.btnEntityCacheMonitor = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
             this.tbclMain.SuspendLayout();
             this.tabUtilities.SuspendLayout();
@@ -281,6 +281,20 @@ namespace EntityTools.Core
             this.btnMissionMonitor.Text = "Mission";
             this.btnMissionMonitor.UseVisualStyleBackColor = true;
             this.btnMissionMonitor.Click += new System.EventHandler(this.handler_OpenMissionMonitor);
+            // 
+            // btnEntityCacheMonitor
+            // 
+            this.btnEntityCacheMonitor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnEntityCacheMonitor.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
+            this.btnEntityCacheMonitor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnEntityCacheMonitor.Font = new System.Drawing.Font("Tahoma", 14F, System.Drawing.FontStyle.Bold);
+            this.btnEntityCacheMonitor.Location = new System.Drawing.Point(128, 293);
+            this.btnEntityCacheMonitor.Name = "btnEntityCacheMonitor";
+            this.btnEntityCacheMonitor.Size = new System.Drawing.Size(230, 40);
+            this.btnEntityCacheMonitor.TabIndex = 0;
+            this.btnEntityCacheMonitor.Text = "Entity cache monitor";
+            this.btnEntityCacheMonitor.UseVisualStyleBackColor = true;
+            this.btnEntityCacheMonitor.Click += new System.EventHandler(this.handler_EntityCacheMonitor);
             // 
             // btnEntities
             // 
@@ -503,8 +517,6 @@ namespace EntityTools.Core
             this.tabDebug.Controls.Add(this.btnTest3);
             this.tabDebug.Name = "tabDebug";
             this.tabDebug.Padding = new System.Windows.Forms.Padding(6);
-            this.tabDebug.PageEnabled = false;
-            this.tabDebug.PageVisible = false;
             this.tabDebug.Size = new System.Drawing.Size(368, 391);
             this.tabDebug.Text = "Debug";
             // 
@@ -519,6 +531,7 @@ namespace EntityTools.Core
             this.tbDebugMonitorInfo.Multiline = true;
             this.tbDebugMonitorInfo.Name = "tbDebugMonitorInfo";
             this.tbDebugMonitorInfo.ReadOnly = true;
+            this.tbDebugMonitorInfo.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.tbDebugMonitorInfo.Size = new System.Drawing.Size(346, 265);
             this.tbDebugMonitorInfo.TabIndex = 9;
             // 
@@ -528,9 +541,9 @@ namespace EntityTools.Core
             this.ckbDebugMonitor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ckbDebugMonitor.Location = new System.Drawing.Point(9, 9);
             this.ckbDebugMonitor.Name = "ckbDebugMonitor";
-            this.ckbDebugMonitor.Size = new System.Drawing.Size(165, 17);
+            this.ckbDebugMonitor.Size = new System.Drawing.Size(125, 17);
             this.ckbDebugMonitor.TabIndex = 8;
-            this.ckbDebugMonitor.Text = "DebugMonitor : \'IgnoredFoes\'";
+            this.ckbDebugMonitor.Text = "Enable DebugMonitor";
             this.ckbDebugMonitor.UseVisualStyleBackColor = true;
             this.ckbDebugMonitor.CheckedChanged += new System.EventHandler(this.handler_DebugMonitorActivate);
             // 
@@ -914,21 +927,7 @@ namespace EntityTools.Core
             // backgroundWorker
             // 
             this.backgroundWorker.WorkerSupportsCancellation = true;
-            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.work_BlackList);
-            // 
-            // btnEntityCacheMonitor
-            // 
-            this.btnEntityCacheMonitor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnEntityCacheMonitor.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
-            this.btnEntityCacheMonitor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnEntityCacheMonitor.Font = new System.Drawing.Font("Tahoma", 14F, System.Drawing.FontStyle.Bold);
-            this.btnEntityCacheMonitor.Location = new System.Drawing.Point(128, 293);
-            this.btnEntityCacheMonitor.Name = "btnEntityCacheMonitor";
-            this.btnEntityCacheMonitor.Size = new System.Drawing.Size(230, 40);
-            this.btnEntityCacheMonitor.TabIndex = 0;
-            this.btnEntityCacheMonitor.Text = "Entity cache monitor";
-            this.btnEntityCacheMonitor.UseVisualStyleBackColor = true;
-            this.btnEntityCacheMonitor.Click += new System.EventHandler(this.handler_EntityCacheMonitor);
+            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.work_PowerSearch);
             // 
             // EntityToolsMainPanel
             // 

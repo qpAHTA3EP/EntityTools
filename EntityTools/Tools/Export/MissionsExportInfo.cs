@@ -139,12 +139,13 @@ namespace EntityTools.Tools
 
         public MissionsWrapper(MyNW.Classes.MissionInfo missionsInfo)
         {
-            Missions = new List<MissionInfo>();
-            OpenMissions = new List<MissionInfo>();
-            CompletedMissions = new List<MissionInfo>();
 
             if(missionsInfo != null && missionsInfo.IsValid)
             {
+                Missions = new List<MissionInfo>(missionsInfo.Missions.Count);
+                OpenMissions = new List<MissionInfo>();
+                CompletedMissions = new List<MissionInfo>(missionsInfo.CompletedMissions.Count);
+
                 foreach(Mission mission in missionsInfo.Missions)
                     Missions.Add(new MissionInfo(mission));
 

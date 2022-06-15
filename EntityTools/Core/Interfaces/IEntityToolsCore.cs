@@ -16,6 +16,26 @@ namespace EntityTools.Core.Interfaces
     {
         bool CheckCore();
 
+#if true
+        /// <summary>
+        /// Инициализация  объекта <paramref name="obj"/> типа <typeparamref name="T"/>
+        /// </summary>
+        /// <typeparam name="T">тип объекта, который инициализируется</typeparam>
+        /// <param name="obj">инициализируемый объекта</param>
+        /// <param name="args">аргументы, используемые для инициализации объекта</param>
+        /// <returns>Флаг, указывающий на успех создания/инициализации объекта</returns>
+        bool TryGet<T>(ref T obj, params object[] args) where T : class;
+        //bool TryGet(ref object obj, params object[] args); 
+#endif
+        /// <summary>
+        /// Инициализация  объекта <paramref name="type"/>
+        /// </summary>
+        /// <param name="type">тип создаваемого объекта</param>
+        /// <param name="args">аргументы, используемые для инициализации объекта</param>
+        /// <returns>созданый объекта</returns>
+        object Get(Type type, params object[] args);
+        T Get<T>(params object[] args) where T : class;
+
         bool Initialize(object obj);
         bool Initialize(QuesterAction action);
         bool Initialize(Condition condition);

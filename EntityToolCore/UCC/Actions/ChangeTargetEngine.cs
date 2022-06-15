@@ -1,7 +1,6 @@
 ﻿//#define DEBUG_CHANGE_TARGET
 
 using AcTp0Tools;
-using AcTp0Tools.Classes.Targeting;
 using Astral.Logic.UCC.Classes;
 using EntityCore.Entities;
 using EntityCore.Enums;
@@ -161,14 +160,13 @@ namespace EntityCore.UCC.Actions
             get
             {
                 var target = Astral.Logic.UCC.Core.CurrentTarget;
-
                 bool extendedDebugInfo = ExtendedDebugInfo;
                 if (extendedDebugInfo)
                 {
                     string currentMethodName = string.Concat(_idStr, '.', MethodBase.GetCurrentMethod()?.Name ?? nameof(NeedToRun));
 
-                    bool customConditionOK = ((ICustomUCCCondition)@this.CustomConditions).IsOK(@this);
-                    if (!customConditionOK)
+                    bool customConditionOk = ((ICustomUCCCondition)@this.CustomConditions).IsOK(@this);
+                    if (!customConditionOk)
                     {
                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": CustomConditions check failed. Skip... "), true);
                         return false;
