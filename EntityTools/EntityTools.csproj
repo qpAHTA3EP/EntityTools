@@ -734,9 +734,7 @@
   <ItemGroup>
     <None Include="Resources\miniLoad.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="UCC\Classes\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="Resources\PanelVisibility_16x16.png" />
   </ItemGroup>

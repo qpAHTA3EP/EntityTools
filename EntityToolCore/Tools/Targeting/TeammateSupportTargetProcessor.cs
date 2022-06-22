@@ -11,6 +11,7 @@ using MyNW.Classes;
 using System;
 using System.ComponentModel;
 using System.Reflection;
+using System.Xml.Serialization;
 
 namespace EntityCore.Tools.Targeting
 {
@@ -19,6 +20,8 @@ namespace EntityCore.Tools.Targeting
     /// </summary>
     internal class TeammateSupportTargetProcessor : TargetProcessor
     {
+        [XmlIgnore]
+        [NonSerialized]
         private TeammateSupport _targetHelper;
 
         public TeammateSupportTargetProcessor(TeammateSupport protectMember, Predicate<Entity> specialCheck)
@@ -26,7 +29,7 @@ namespace EntityCore.Tools.Targeting
             _targetHelper = protectMember ?? throw new ArgumentException(nameof(protectMember));
             _targetHelper.PropertyChanged += OnPropertyChanged;
             _specialCheck = specialCheck;
-            GetTeammate = Initializer_GetTeammate;
+            _getTeammate = GetTeammateInitializer;
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -43,13 +46,13 @@ namespace EntityCore.Tools.Targeting
             }
 
             _specialCheck = null;
-            GetTeammate = Initializer_GetTeammate;
+            _getTeammate = GetTeammateInitializer;
         }
 
         public override void Reset()
         {
             _teammateCache = null;
-            GetTeammate = Initializer_GetTeammate;
+            _getTeammate = GetTeammateInitializer;
 
             _targetCache = null;
             _targetSelector = null;
@@ -194,15 +197,21 @@ namespace EntityCore.Tools.Targeting
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public object TargetCache => new SimpleEntityWrapper(_targetCache);//new SimpleEntityWrapper(GetTarget());
 #endif
+        [XmlIgnore]
+        [NonSerialized]
         private Entity _targetCache;
+        [XmlIgnore]
+        [NonSerialized]
         private Func<Entity> _targetSelector;
+        [XmlIgnore]
+        [NonSerialized]
         private readonly Timeout _timeout = new Timeout(0);
 
         /// <summary>
         /// Выбор члена группы, заданного <seealso cref="TeammateSupport.Teammate"/>
         /// </summary>
         /// <returns></returns>
-        public TeamMember Initializer_GetTeammate()
+        private TeamMember GetTeammateInitializer()
         {
             Func <TeamMember> teammateSelector;
             
@@ -258,16 +267,28 @@ namespace EntityCore.Tools.Targeting
                     break;
             }
 
-            GetTeammate = teammateSelector;
+            _getTeammate = teammateSelector;
 
-            return GetTeammate();
+            return _getTeammate();
         }
-        public Func<TeamMember> GetTeammate { get; private set; }
+        [XmlIgnore]
+        [NonSerialized]
+        private Func<TeamMember> _getTeammate;
+
+        public TeamMember GetTeammate()
+        {
+            if (_getTeammate is null)
+                return GetTeammateInitializer();
+            return _getTeammate();
+        }
 
 #if DEBUG_CHANGE_TARGET
+        [XmlIgnore]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public object TeammateCache => new SimpleEntityWrapper(_teammateCache);
 #endif
+        [XmlIgnore]
+        [NonSerialized]
         private TeamMember _teammateCache;
 
         public override string ToString() => Label();
@@ -285,6 +306,7 @@ namespace EntityCore.Tools.Targeting
         /// <summary>
         /// Функтор дополнительной проверки <seealso cref="Entity"/> 
         /// </summary>        
+        [XmlIgnore]
         [Browsable(false)]
         public override Predicate<Entity> SpecialCheck
         {
@@ -292,10 +314,11 @@ namespace EntityCore.Tools.Targeting
             set
             {
                 _specialCheck = value;
-                GetTeammate = Initializer_GetTeammate;
+                _getTeammate = GetTeammateInitializer;
             }
         }
-
+        [XmlIgnore]
+        [NonSerialized]
         private Predicate<Entity> _specialCheck;
 
         /// <summary>

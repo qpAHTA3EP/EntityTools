@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Reflection;
+using System.Xml.Serialization;
 using EntityCore.Entities;
 using static Astral.Quester.Classes.Action;
 // ReSharper disable InconsistentNaming
@@ -31,20 +32,35 @@ namespace EntityCore.Quester.Action
         /// <summary>
         /// ссылка на команду, для которой предоставляется функционал ядра
         /// </summary>
+        [XmlIgnore]
+        [NonSerialized]
         private MoveToTeammate _action;
 
+        [XmlIgnore]
+        [NonSerialized]
         private readonly Timeout _teammateAbsenceTimer = new Timeout(600_000_000);
+        [XmlIgnore]
+        [NonSerialized]
         private TeammateSupportTargetProcessor _targetProcessor;
+        [XmlIgnore]
+        [NonSerialized]
         private float _sqrtDistance;
+        [XmlIgnore]
+        [NonSerialized]
         private float _sqrtAbortCombatDistance;
 
         #region Данные 
+        [XmlIgnore]
+        [NonSerialized]
         private string _idStr = string.Empty;
+        [XmlIgnore]
+        [NonSerialized]
         private string _label = string.Empty;
         #endregion
 
         [TypeConverter(typeof(ExpandableObjectConverter))]
         [Category("Target")]
+        [XmlIgnore]
         public object Target => new SimpleEntityWrapper(_targetProcessor.GetTeammate());
 
 #if DEVELOPER && DEBUG_TARGET
@@ -259,6 +275,8 @@ namespace EntityCore.Quester.Action
 #if MONITORING
         [Category("Engine")] 
 #endif
+
+        [XmlIgnore]
         public bool NeedToRun
         {
             get
@@ -549,6 +567,7 @@ namespace EntityCore.Quester.Action
         }
         #endregion
 
+        [XmlIgnore]
         [Browsable(false)]
         public string ActionLabel
         {
@@ -561,16 +580,22 @@ namespace EntityCore.Quester.Action
             }
         }
 
+
+        [XmlIgnore]
         [Category("Engine")]
         public bool InternalConditions => _action.TeammateSearchTime == 0 
                                           || _teammateAbsenceTimer is null 
                                           || !_teammateAbsenceTimer.IsTimedOut;
 
+        [XmlIgnore]
+        [Category("Engine")]
         public ActionValidity InternalValidity => new ActionValidity();
 
+        [XmlIgnore]
         [Browsable(false)]
         public bool UseHotSpots => false;
 
+        [XmlIgnore]
         [Category("Engine")]
         public Vector3 InternalDestination
         {
@@ -674,6 +699,7 @@ namespace EntityCore.Quester.Action
         /// <summary>
         /// Флаг настроек вывода расширенной отлаточной ниформации
         /// </summary>
+        [XmlIgnore]
         private bool ExtendedDebugInfo
         {
             get

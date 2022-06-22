@@ -5,6 +5,7 @@ using EntityTools.Tools.Targeting;
 using MyNW.Classes;
 using System;
 using System.ComponentModel;
+using System.Xml.Serialization;
 
 namespace EntityCore.Tools.Targeting
 {
@@ -13,18 +14,23 @@ namespace EntityCore.Tools.Targeting
     /// </summary>
     internal class EntityTargetProcessor : TargetProcessor
     {
-        private EntityTarget selector;
+        [XmlIgnore]
+        [NonSerialized]
+        private EntityTarget _entitySelector;
 
 #if DEBUG_CHANGE_TARGET
+        [XmlIgnore]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public object TargetCache => new SimpleEntityWrapper(_targetCache);
 #endif
+        [XmlIgnore]
+        [NonSerialized]
         private Entity _targetCache;
 
         public EntityTargetProcessor(EntityTarget target, Predicate<Entity> specialCheck = null)
         {
-            selector = target ?? throw new ArgumentException(nameof(target));
-            selector.PropertyChanged += OnPropertyChanged;
+            _entitySelector = target ?? throw new ArgumentException(nameof(target));
+            _entitySelector.PropertyChanged += OnPropertyChanged;
 
             _specialCheck = specialCheck;
         }
@@ -38,10 +44,10 @@ namespace EntityCore.Tools.Targeting
 
         public override void Dispose()
         {
-            if (selector != null)
+            if (_entitySelector != null)
             {
-                selector.PropertyChanged -= OnPropertyChanged;
-                selector = null;
+                _entitySelector.PropertyChanged -= OnPropertyChanged;
+                _entitySelector = null;
             }
 
             _specialCheck = null;
@@ -96,31 +102,36 @@ namespace EntityCore.Tools.Targeting
         {
             if (string.IsNullOrEmpty(_label))
             {
-                var entityId = selector.EntityID;
+                var entityId = _entitySelector.EntityID;
                 _label = string.IsNullOrEmpty(entityId)
                     ? GetType().Name
                     : $"Target Entity [{entityId}]";
             }
             return _label;
         }
+        [XmlIgnore]
+        [NonSerialized]
         private string _label;
 
         /// <summary>
         /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
         /// </summary>
+        [XmlIgnore]
         [Browsable(false)]
         public EntityCacheRecordKey EntityKey
         {
             get
             {
                 if (_key is null)
-                    _key = new EntityCacheRecordKey(selector.EntityID, selector.EntityIdType,
-                        selector.EntityNameType);
+                    _key = new EntityCacheRecordKey(_entitySelector.EntityID, _entitySelector.EntityIdType,
+                        _entitySelector.EntityNameType);
                 return _key;
 
             }
         }
 
+        [XmlIgnore]
+        [NonSerialized]
         private EntityCacheRecordKey _key;
 
         /// <summary>
@@ -149,6 +160,8 @@ namespace EntityCore.Tools.Targeting
             }
         }
 
+        [XmlIgnore]
+        [NonSerialized]
         private Predicate<Entity> _specialCheck;
     }
 

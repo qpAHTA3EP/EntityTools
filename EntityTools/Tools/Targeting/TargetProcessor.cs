@@ -1,5 +1,6 @@
 ﻿using MyNW.Classes;
 using System;
+using System.Xml.Serialization;
 
 namespace EntityTools.Tools.Targeting
 {
@@ -34,6 +35,7 @@ namespace EntityTools.Tools.Targeting
         /// <summary>
         /// Дополнительная проверка <seealso cref="Entity"/>, например, расстояние до игрока
         /// </summary>
+        [XmlIgnore]
         public abstract Predicate<Entity> SpecialCheck { get; set; }
 
         /// <summary>
