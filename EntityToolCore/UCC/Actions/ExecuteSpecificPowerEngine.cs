@@ -167,13 +167,6 @@ namespace EntityCore.UCC.Actions
                     return false;
                 }
 
-                if (@this.CheckPowerCooldown && pwr.IsOnCooldown())
-                {
-                    if (debugInfo)
-                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Power is on Cooldown.");
-                    return false;
-                }
-
                 if (@this.CheckInTray && !pwr.IsInTray)
                 {
                     if (debugInfo)
@@ -181,14 +174,21 @@ namespace EntityCore.UCC.Actions
                     return false;
                 }
 
+                if (@this.CheckPowerCooldown && pwr.IsOnCooldown())
+                {
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Power is on Cooldown.");
+                    return false;
+                }
+
                 if (debugInfo)
                 {
-                    var conditions = @this._customConditions.Conditions;
+                    var conditions = @this.CustomConditions.Conditions;
                     var sb = new StringBuilder();
                     bool result = true;
                     if (conditions.Count > 0)
                     {
-                        if (@this._customConditions.TestRule == LogicRule.Disjunction)
+                        if (@this.CustomConditions.TestRule == LogicRule.Disjunction)
                         {
                             int lockedNum = 0;
                             int okUnlockedNum = 0;
@@ -261,13 +261,13 @@ namespace EntityCore.UCC.Actions
                             }
                         }
                     }
-                    sb.Append("Negation flag (Not): ").AppendLine(@this._customConditions.Not.ToString());
+                    sb.Append("Negation flag (Not): ").AppendLine(@this.CustomConditions.Not.ToString());
 
-                    ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: CustomConditions are {result}:\n{sb.ToString()}");
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: CustomConditions are {result}:\n{sb}");
                     return result;
                 }
 
-                return @this._customConditions.IsOK(@this);
+                return @this.CustomConditions.IsOK(@this);
             }
         }
 

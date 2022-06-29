@@ -9,6 +9,7 @@ using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Xml.Serialization;
 using Action = Astral.Quester.Classes.Action;
 // ReSharper disable InconsistentNaming
@@ -261,19 +262,23 @@ namespace EntityTools.Quester.Actions
             _engine = new QuesterActionProxy(this);
             PropertyChanged = null;
         }
+        private IQuesterActionEngine MakeProxy()
+        {
+            return new QuesterActionProxy(this);
+        }
         #endregion
 
         // Интерфейс Quester.Action, реализованный через ActionEngine
-        public override bool NeedToRun => _engine.NeedToRun;
-        public override ActionResult Run() => _engine.Run();
-        public override string ActionLabel => _engine.ActionLabel;
+        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).NeedToRun;
+        public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).Run();
+        public override string ActionLabel => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).ActionLabel;
         public override string InternalDisplayName => string.Empty;
-        public override bool UseHotSpots => _engine.UseHotSpots;
-        protected override bool IntenalConditions => _engine.InternalConditions;
-        protected override Vector3 InternalDestination => _engine.InternalDestination;
-        protected override ActionValidity InternalValidity => _engine.InternalValidity;
-        public override void GatherInfos() => _engine.GatherInfos();
-        public override void InternalReset() => _engine.InternalReset();
-        public override void OnMapDraw(GraphicsNW graph) => _engine.OnMapDraw(graph);
+        public override bool UseHotSpots => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).UseHotSpots;
+        protected override bool IntenalConditions => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).InternalConditions;
+        protected override Vector3 InternalDestination => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).InternalDestination;
+        protected override ActionValidity InternalValidity => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).InternalValidity;
+        public override void GatherInfos() => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).GatherInfos();
+        public override void InternalReset() => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).InternalReset();
+        public override void OnMapDraw(GraphicsNW graph) => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).OnMapDraw(graph);
     }
 }

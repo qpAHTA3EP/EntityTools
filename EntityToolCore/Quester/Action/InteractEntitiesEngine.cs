@@ -32,7 +32,7 @@ namespace EntityCore.Quester.Action
         private Entity targetEntity;
         private Entity closestEntity;
         private readonly Astral.Classes.Timeout internalCacheTimer = new Astral.Classes.Timeout(0);
-        private readonly Astral.Classes.Timeout entityAbsenceTimer = new Astral.Classes.Timeout(600_000_000);
+        private Astral.Classes.Timeout entityAbsenceTimer;
         private string _label = string.Empty;
         private string _idStr = string.Empty;
         #endregion
@@ -96,7 +96,7 @@ namespace EntityCore.Quester.Action
             _idStr = $"{@this.GetType().Name}[{@this.ActionID}]";
 
             internalCacheTimer.ChangeTime(0);
-            entityAbsenceTimer.ChangeTime(600_000_000);
+            entityAbsenceTimer = null;
 
             @this.Bind(this);
 
@@ -118,7 +118,7 @@ namespace EntityCore.Quester.Action
             closestEntity = null;
 
             internalCacheTimer.ChangeTime(0);
-            entityAbsenceTimer.ChangeTime(600_000_000);
+            entityAbsenceTimer = null;
         }
 
 #if false
@@ -781,7 +781,7 @@ namespace EntityCore.Quester.Action
                     return false;
                 }
 
-                if (entityAbsenceTimer.IsTimedOut)
+                if (entityAbsenceTimer?.IsTimedOut == true)
                 {
                     if (ExtendedDebugInfo)
                     {
@@ -978,7 +978,9 @@ namespace EntityCore.Quester.Action
             var entitySearchTime = @this.EntitySearchTime;
             if (entitySearchTime > 0)
             {
-                entityAbsenceTimer.ChangeTime(entitySearchTime);
+                if (entityAbsenceTimer != null)
+                    entityAbsenceTimer.ChangeTime(entitySearchTime);
+                else entityAbsenceTimer = new Astral.Classes.Timeout(entitySearchTime);
             }
         }
 

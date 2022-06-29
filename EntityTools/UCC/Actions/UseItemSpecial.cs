@@ -133,6 +133,7 @@ namespace EntityTools.UCC.Actions
         #endregion
 
         #region Взаимодействие с EntityToolsCore
+        [XmlIgnore]
         [NonSerialized]
         internal IUccActionEngine Engine;
 

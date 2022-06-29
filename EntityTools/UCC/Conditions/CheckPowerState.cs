@@ -68,25 +68,25 @@ namespace EntityTools.UCC.Conditions
 
 
         #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction) =>
+        public new bool IsOK(UCCAction refAction) =>
             LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).IsOK(refAction);
 
-        bool ICustomUCCCondition.Locked { get => base.Locked; set => base.Locked = value; }
+        public new bool Locked { get => base.Locked; set => base.Locked = value; }
 
-        ICustomUCCCondition ICustomUCCCondition.Clone()
+        public new ICustomUCCCondition Clone()
         {
             return new CheckPowerState
             {
                 _powerId = _powerId,
                 checkState = checkState,
                 Sign = Sign,
-                Locked = Locked,
+                Locked = base.Locked,
                 Target = Target,
                 Value = Value
             };
         }
 
-        string ICustomUCCCondition.TestInfos(UCCAction refAction) =>
+        public string TestInfos(UCCAction refAction) =>
             LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).TestInfos(refAction);
         #endregion
 

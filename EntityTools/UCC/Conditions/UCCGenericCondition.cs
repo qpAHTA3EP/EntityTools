@@ -9,7 +9,7 @@ namespace EntityTools.UCC.Conditions
     public class UCCGenericCondition : UCCCondition, ICustomUCCCondition
     {
         #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
+        public new bool IsOK(UCCAction refAction/* = null*/)
         {
             if (Target != Astral.Logic.UCC.Ressources.Enums.Unit.Target
                 || EntityManager.LocalPlayer.Character.CurrentTarget.IsValid)
@@ -17,14 +17,14 @@ namespace EntityTools.UCC.Conditions
             return false;
         }
 
-        bool ICustomUCCCondition.Locked { get => base.Locked; set => base.Locked = value; }
+        public new bool Locked { get => base.Locked; set => base.Locked = value; }
 
-        ICustomUCCCondition ICustomUCCCondition.Clone()
+        public new ICustomUCCCondition Clone()
         {
             var copy = new UCCGenericCondition
             {
                 Sign = Sign,
-                Locked = Locked,
+                Locked = base.Locked,
                 Target = Target,
                 Tested = Tested,
                 Value = Value
@@ -36,7 +36,7 @@ namespace EntityTools.UCC.Conditions
 #if !DEVELOPER
         [Browsable(false)]
 #endif
-        string ICustomUCCCondition.TestInfos(UCCAction refAction)
+        public string TestInfos(UCCAction refAction)
         {
             if (Target != Astral.Logic.UCC.Ressources.Enums.Unit.Target
                 || EntityManager.LocalPlayer.Character.CurrentTarget.IsValid)

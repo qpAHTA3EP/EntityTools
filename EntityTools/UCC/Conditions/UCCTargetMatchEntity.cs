@@ -145,11 +145,11 @@ namespace EntityTools.UCC.Conditions
         #endregion
 
         #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).IsOK(refAction);
+        public new bool IsOK(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).IsOK(refAction);
 
-        bool ICustomUCCCondition.Locked { get => base.Locked; set => base.Locked = value; }
+        public new bool Locked { get => base.Locked; set => base.Locked = value; }
 
-        ICustomUCCCondition ICustomUCCCondition.Clone()
+        public new ICustomUCCCondition Clone()
         {
             return new UCCTargetMatchEntity
             {
@@ -158,14 +158,14 @@ namespace EntityTools.UCC.Conditions
                 _entityNameType = _entityNameType,
                 _match = _match,
                 Sign = Sign,
-                Locked = Locked,
+                Locked = base.Locked,
                 Target = Target,
                 Tested = Tested,
                 Value = Value
             };
         }
 
-        string ICustomUCCCondition.TestInfos(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).TestInfos(refAction);
+        public string TestInfos(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).TestInfos(refAction);
         #endregion
 
         public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Threading;
 using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
 using EntityTools.Core.Interfaces;
@@ -14,8 +15,14 @@ namespace EntityTools.Quester.Conditions
     {
         #region Взаимодействие с ядром EntityTools
         public event PropertyChangedEventHandler PropertyChanged;
-
+        
+        [NonSerialized]
         internal IQuesterConditionEngine Engine;
+
+        private IQuesterConditionEngine MakeProxie()
+        {
+            return new QuesterConditionProxy(this);
+        }
         #endregion
 
         public EntityDistance()
@@ -130,12 +137,12 @@ namespace EntityTools.Quester.Conditions
         internal Relation _sign;
         #endregion
 
-        public override bool IsValid => Engine.IsValid;
+        public override bool IsValid => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).IsValid;
 
-        public override void Reset() => Engine.Reset();
+        public override void Reset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Reset();
 
-        public override string ToString() => Engine.Label();
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Label();
 
-        public override string TestInfos => Engine.TestInfos;
+        public override string TestInfos => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).TestInfos;
     }
 }

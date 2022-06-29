@@ -61,6 +61,9 @@ namespace EntityTools.Patches
                 // Подмена окна выбора Ауры
                 Patch_AuraDetector.Apply();
 
+                // Патч методов UCCCondition
+                Patch_UccCondition.Apply();
+
                 try
                 {
 #if true

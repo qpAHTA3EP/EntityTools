@@ -37,6 +37,7 @@
     <WarningLevel>4</WarningLevel>
     <LangVersion>7.1</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AStar, Version=2.21.508.2127, Culture=neutral, processorArchitecture=AMD64">

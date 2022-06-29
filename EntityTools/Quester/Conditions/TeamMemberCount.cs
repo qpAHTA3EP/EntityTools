@@ -141,6 +141,7 @@ namespace EntityTools.Quester.Conditions
         #endregion
 
         #region взаимодействие с ядром
+        [NonSerialized]
         internal IQuesterConditionEngine Engine;
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = null)

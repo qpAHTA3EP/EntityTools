@@ -19,7 +19,7 @@ namespace EntityTools.UCC.Actions
         #region Опции команды
 #if DEVELOPER
         [Editor(typeof(PowerIdEditor), typeof(UITypeEditor))]
-        [Category("Required")]
+        [Category("Power")]
 #else
         [Browsable(false)]
 #endif
@@ -36,6 +36,45 @@ namespace EntityTools.UCC.Actions
             }
         }
         private string _powerId = string.Empty;
+
+#if DEVELOPER
+        [Category("Power")]
+        [DisplayName("CastingTime (ms)")]
+#else
+        [Browsable(false)]
+#endif
+        public int CastingTime
+        {
+            get => _castingTime;
+            set
+            {
+                if (_castingTime != value)
+                {
+                    _castingTime = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private int _castingTime;
+
+#if DEVELOPER
+        [Category("Power")]
+#else
+        [Browsable(false)]
+#endif
+        public bool ForceMaintain
+        {
+            get => _forceMaintain;
+            set
+            {
+                if (_forceMaintain != value)
+                {
+                    _forceMaintain = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private bool _forceMaintain;
 
 #if DEVELOPER
         [Category("Optional")]
@@ -75,46 +114,9 @@ namespace EntityTools.UCC.Actions
         }
         private bool _checkInTray;
 
-#if DEVELOPER
-        [Category("Optional")]
-        [DisplayName("CastingTime (ms)")]
-#else
-        [Browsable(false)]
-#endif
-        public int CastingTime
-        {
-            get => _castingTime;
-            set
-            {
-                if (_castingTime != value)
-                {
-                    _castingTime = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        private int _castingTime;
-
-#if DEVELOPER
-        [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
-        public bool ForceMaintain
-        {
-            get => _forceMaintain;
-            set
-            {
-                if (_forceMaintain != value)
-                {
-                    _forceMaintain = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        private bool _forceMaintain;
 
 #if EntityTarget
+
 #if DEVELOPER
         [Description("ID of the Entity that is preferred to attack\n" +
             "If Entity does not exist or EntityID is empty then the Target option is used")]
@@ -299,7 +301,6 @@ namespace EntityTools.UCC.Actions
 #if DEVELOPER
         [Category("Optional")]
         [Editor(typeof(UccConditionListEditor), typeof(UITypeEditor))]
-        [Description("Набор нестандартных UCC-условий, которые проверяют после основных")]
         //[TypeConverter(typeof(ExpandableObjectConverter))]
 #else
         [Browsable(false)]
@@ -316,7 +317,7 @@ namespace EntityTools.UCC.Actions
                 NotifyPropertyChanged();
             }
         }
-        internal UCCConditionPack _customConditions = new UCCConditionPack();
+        private UCCConditionPack _customConditions = new UCCConditionPack();
 
         #region Hide Inherited Properties
         [XmlIgnore]

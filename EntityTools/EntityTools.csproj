@@ -95,6 +95,7 @@
     <DebugSymbols>true</DebugSymbols>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>false</Prefer32Bit>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -298,6 +299,7 @@
       <DependentUpon>Patcher.tt</DependentUpon>
     </Compile>
     <Compile Include="Patches\Patch_AuraDetector.cs" />
+    <Compile Include="Patches\Patch_UccCondition.cs" />
     <Compile Include="Patches\Quester\ComplexPatch_Quester_UccEditing.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Quester\Actions\ExecutePowerExt.cs" />

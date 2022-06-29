@@ -33,7 +33,7 @@ namespace EntityTools.UCC.Conditions
         #endregion
 
         #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
+        public new bool IsOK(UCCAction refAction/* = null*/)
         {
             //TODO Заменить Environment.TickCount на DateTime.Ticks 
             if (!string.IsNullOrEmpty(TimerName) && UCCTools.SpecialTimers.ContainsKey(TimerName))
@@ -92,9 +92,9 @@ namespace EntityTools.UCC.Conditions
             return false;
         }
 
-        bool ICustomUCCCondition.Locked { get => base.Locked; set => base.Locked = value; }
+        public new bool Locked { get => base.Locked; set => base.Locked = value; }
 
-        ICustomUCCCondition ICustomUCCCondition.Clone()
+        public new ICustomUCCCondition Clone()
         {
             return new UCCCheckTimer
             {
@@ -102,14 +102,14 @@ namespace EntityTools.UCC.Conditions
                 TestTimer = TestTimer,
                 Time = Time,
                 Sign = Sign,
-                Locked = Locked,
+                Locked = base.Locked,
                 Target = Target,
                 Tested = Tested,
                 Value = Value
             };
         }
 
-        string ICustomUCCCondition.TestInfos(UCCAction refAction)
+        public string TestInfos(UCCAction refAction)
         {
             if (!string.IsNullOrEmpty(TimerName) && UCCTools.SpecialTimers.ContainsKey(TimerName))
             {

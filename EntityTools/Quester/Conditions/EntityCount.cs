@@ -285,21 +285,22 @@ namespace EntityTools.Quester.Conditions
 
 
         #region Взаимодействие с ядром EntityTools
-        private IQuesterConditionEngine Engine;
+        [NonSerialized]
+        private IQuesterConditionEngine engine;
         public event PropertyChangedEventHandler PropertyChanged;
 
         public EntityCount()
         {
-            Engine = new QuesterConditionProxy(this);
+            engine = new QuesterConditionProxy(this);
         }
 
         public void Bind(IQuesterConditionEngine engine)
         {
-            Engine = engine;
+            this.engine = engine;
         }
         public void Unbind()
         {
-            Engine = MakeProxy();
+            engine = MakeProxy();
             PropertyChanged = null;
         }
         private IQuesterConditionEngine MakeProxy()
@@ -308,9 +309,9 @@ namespace EntityTools.Quester.Conditions
         }
         #endregion
 
-        public override bool IsValid => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).IsValid;
-        public override void Reset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Reset();
-        public override string TestInfos => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).TestInfos;
-        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
+        public override bool IsValid => LazyInitializer.EnsureInitialized(ref engine, MakeProxy).IsValid;
+        public override void Reset() => LazyInitializer.EnsureInitialized(ref engine, MakeProxy).Reset();
+        public override string TestInfos => LazyInitializer.EnsureInitialized(ref engine, MakeProxy).TestInfos;
+        public override string ToString() => LazyInitializer.EnsureInitialized(ref engine, MakeProxy).Label();
     }
 }

@@ -40,7 +40,7 @@ namespace EntityCore.Quester.Action
         private Entity targetEntity;
         private Entity closestEntity;
         private readonly Timeout internalCacheTimer = new Timeout(0);
-        private readonly Timeout entityAbsenceTimer = new Timeout(600_000_000);
+        private Timeout entityAbsenceTimer;
         private readonly PowerCache powerCache = new PowerCache(string.Empty);
         #endregion
 
@@ -105,7 +105,7 @@ namespace EntityCore.Quester.Action
             @this.Bind(this);
             powerCache.PowerIdPattern = m2e.PowerId;
             internalCacheTimer.ChangeTime(0);
-            entityAbsenceTimer.ChangeTime(600_000_000);
+            entityAbsenceTimer = null;
 
             return true;
         }
@@ -130,7 +130,7 @@ namespace EntityCore.Quester.Action
                         powerCache.PowerIdPattern = @this.PowerId;
                         break;
                     case nameof(@this.EntitySearchTime):
-                        entityAbsenceTimer.ChangeTime(600_000_000);
+                        entityAbsenceTimer = null;
                         break;
                     default:
                         _specialEntityCheck = null;
@@ -619,7 +619,7 @@ namespace EntityCore.Quester.Action
                     return false;
                 }
 
-                if (entityAbsenceTimer.IsTimedOut)
+                if (entityAbsenceTimer != null && entityAbsenceTimer.IsTimedOut)
                 {
                     if (ExtendedDebugInfo)
                     {
@@ -845,7 +845,9 @@ namespace EntityCore.Quester.Action
             var entitySearchTime = @this.EntitySearchTime;
             if (entitySearchTime > 0)
             {
-                entityAbsenceTimer.ChangeTime(entitySearchTime);
+                if (entityAbsenceTimer != null)
+                    entityAbsenceTimer.ChangeTime(entitySearchTime);
+                else entityAbsenceTimer = new Timeout(entitySearchTime);
             }
         }
 

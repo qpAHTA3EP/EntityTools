@@ -29,10 +29,10 @@ namespace EntityTools.Settings
         private bool navigation = true;
 
         
-            /// <summary>
-            /// Активация или деактивация Патча методов выбора ближайшей точки
-            /// </summary>
-            [Bindable(true)]
+        /// <summary>
+        /// Активация или деактивация Патча методов выбора ближайшей точки
+        /// </summary>
+        [Bindable(true)]
         [Description("Управление патчем, выбора ближайшей точки пути (Logic.General)")]
         public bool GetNearestIndexInPositionList
         {
@@ -125,7 +125,26 @@ namespace EntityTools.Settings
             }
         }
         private bool auraDetector = true;
-        
+
+        /// <summary>
+        /// Активация или деактивация Патча UccCondition
+        /// </summary>
+        [Bindable(true)]
+        [Description("Управление патчем UccCondition")]
+        public bool UccCondition
+        {
+            get => uccCondition;
+            set
+            {
+                if (uccCondition != value)
+                {
+                    uccCondition = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private bool uccCondition = true;
+
         public override string ToString()
         {
             int num = 0;

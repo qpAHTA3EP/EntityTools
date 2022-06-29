@@ -32,24 +32,6 @@ namespace EntityTools.Tools.Targeting
         }
         internal Teammates teammate;
 
-
-#if false
-        [NotifyParentProperty(true)]
-        public int TeammateMinHP
-        {
-            get => teammateMinHP;
-            set
-            {
-                if (value < 0)
-                    value = 0;
-                else if (value > 100)
-                    value = 100;
-                teammateMinHP = value;
-            }
-        }
-        internal int teammateMinHP = 0; 
-#endif
-
         /// <summary>
         /// Задает принцип выбора противника
         /// </summary>

@@ -109,7 +109,7 @@ namespace EntityTools
 
             // Загрузка ядра из ресурса
 #if false
-            Assembly.Load(Properties.Resources.EntityCore);
+            Assembly.Load(Properties.Resources.Realms);
             //if (!File.Exists(@".\Logs\Assemplies.log"))
             //    File.Create(@".\Logs\Assemplies.log");
 
@@ -607,6 +607,7 @@ namespace EntityTools
                 return false;
             }
 
+#if true
             /// <summary>
             /// Загрузка сборки, содержащей реализацию ядра из альтернативного файлового потока
             /// </summary>
@@ -619,7 +620,7 @@ namespace EntityTools
                     AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
                     assemblyResolve_Deletage_Binded = true;
                 }
-                
+
                 try
                 {
                     var @locker = Core;
@@ -645,50 +646,50 @@ namespace EntityTools
                             FileMode.Open, FileAccess.Read))
                         {
                             byte[] coreBytes = new byte[file.Length];
-                            if (file.Read(coreBytes, 0, (int) file.Length) > 0)
+                            if (file.Read(coreBytes, 0, (int)file.Length) > 0)
                             {
 #if ENCRYPTED_CORE
                                 byte[] key = SysInfo.SysInformer.GetMashineID(false).TextToBytes();
                                 if (CryptoHelper.DecryptFile_Rijndael(coreBytes, key, out byte[] decryptedCoreBytes))
                                 {
-        #if DEBUG
+#if DEBUG
                                     File.WriteAllText("EntityCore_key", key.ToHexString());
                                     File.WriteAllBytes("EntityCore_encrypt", coreBytes);
                                     File.WriteAllBytes("EntityCore_decrypt", decryptedCoreBytes);
                                     File.WriteAllText("EntityCore_decrypt.md5", CryptoHelper.MD5_HashString(decryptedCoreBytes));
-        #endif
+#endif
                                     try
                                     {
                                         Assembly assembly = Assembly.Load(decryptedCoreBytes);
                                         CoreHash = CryptoHelper.MD5_HashString(decryptedCoreBytes);
-        #else
-                                        try
-                                        {
-                                            Assembly assembly = Assembly.Load(coreBytes);
-                                            CoreHash = CryptoHelper.MD5_HashString(coreBytes);
+#else
+                                try
+                                {
+                                    Assembly assembly = Assembly.Load(coreBytes);
+                                    CoreHash = CryptoHelper.MD5_HashString(coreBytes);
 #endif
-                                            Type coreType = typeof(IEntityToolsCore);
-                                            foreach (Type type in assembly.GetTypes())
-                                            {
+                                    Type coreType = typeof(IEntityToolsCore);
+                                    foreach (Type type in assembly.GetTypes())
+                                    {
 #if false
                                                 if (type.GetInterface(nameof(IEntityToolsCore)) != null)
 #else
-                                                if (type.GetInterfaces().Contains(coreType))
+                                        if (type.GetInterfaces().Contains(coreType))
 #endif
-                                                {
-                                                    if (Activator.CreateInstance(type) is IEntityToolsCore core)
-                                                    {
-                                                        Core = core;
-                                                        return true;
-                                                    }
-                                                }
+                                        {
+                                            if (Activator.CreateInstance(type) is IEntityToolsCore core)
+                                            {
+                                                Core = core;
+                                                return true;
                                             }
                                         }
+                                    }
+                                }
 #if !ENCRYPTED_CORE
-                                        catch
-                                        {
-                                            // ignored
-                                        }
+                                catch
+                                {
+                                    // ignored
+                                }
 #else
                                     catch (Exception e)
                                     {
@@ -716,9 +717,50 @@ namespace EntityTools
                 {
                     InternalInitialize = DoNothing;
                 }
-                
+
                 return false;
             }
+#else
+            private static bool LoadCore()
+            {
+                // Попытка загрузки ядра производится только после привязки делегата CurrentDomain_AssemblyResolve
+                if (!assemblyResolve_Deletage_Binded)
+                {
+                    AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+                    assemblyResolve_Deletage_Binded = true;
+                }
+
+                try
+                {
+                    var assembly = Assembly.Load(Properties.Resources.Bites);
+
+                    CoreHash = CryptoHelper.MD5_HashString(Properties.Resources.Bites);
+                    Type coreType = typeof(IEntityToolsCore);
+                    foreach (Type type in assembly.GetTypes())
+                    {
+                        if (type.GetInterfaces().Contains(coreType))
+                        {
+                            if (Activator.CreateInstance(type) is IEntityToolsCore core)
+                            {
+                                Core = core;
+                                return Core.CheckCore();
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    ETLogger.WriteLine(LogType.Debug, e.ToString(), true);
+                }
+                finally
+                {
+                    InternalInitialize = DoNothing;
+                }
+
+                return false;
+            }
+#endif
+
             private static bool DoNothing()
             {
                 return false;

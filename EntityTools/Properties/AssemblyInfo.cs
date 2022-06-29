@@ -32,9 +32,9 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 //[assembly: AssemblyVersion("0.1.*")]
-[assembly: AssemblyVersion("0.22.0621.2027")]
+[assembly: AssemblyVersion("0.22.0629.0330")]
 #pragma warning disable CS7035 // The specified version string does not conform to the recommended format - major.minor.build.revision
-[assembly: AssemblyFileVersion("0.22.0621.2027")]
+[assembly: AssemblyFileVersion("0.22.0629.0330")]
 #pragma warning restore CS7035 // The specified version string does not conform to the recommended format - major.minor.build.revision
 [assembly: NeutralResourcesLanguage("")]
 

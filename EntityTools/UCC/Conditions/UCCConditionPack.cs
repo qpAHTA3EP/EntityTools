@@ -48,7 +48,7 @@ namespace EntityTools.UCC.Conditions
         public ConditionList Conditions { get; set; } = new ConditionList();
 
 #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction)
+        public new bool IsOK(UCCAction refAction)
         {
             bool result = true;
             if (Conditions?.Count > 0)
@@ -116,9 +116,9 @@ namespace EntityTools.UCC.Conditions
             return Not ? !result : result;
         }
 
-        bool ICustomUCCCondition.Locked { get => base.Locked; set => base.Locked = value; }
+        public new bool Locked { get => base.Locked; set => base.Locked = value; }
 
-        ICustomUCCCondition ICustomUCCCondition.Clone()
+        public new ICustomUCCCondition Clone()
         {
             var copy = new UCCConditionPack
             {
@@ -126,7 +126,7 @@ namespace EntityTools.UCC.Conditions
                 Not = Not,
                 TestRule = TestRule,
                 Sign = Sign,
-                Locked = Locked,
+                Locked = base.Locked,
                 Target = Target,
                 Tested = Tested,
                 Value = Value,
@@ -145,7 +145,7 @@ namespace EntityTools.UCC.Conditions
             return copy;
         }
 
-        string ICustomUCCCondition.TestInfos(UCCAction refAction/* = null*/)
+        public string TestInfos(UCCAction refAction/* = null*/)
         {
             if (Conditions.Count > 0)
             {

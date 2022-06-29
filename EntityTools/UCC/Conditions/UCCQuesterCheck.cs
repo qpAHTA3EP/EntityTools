@@ -19,20 +19,20 @@ namespace EntityTools.UCC.Conditions
 #endif
         public QuesterCondition Condition { get; set; }
 
-#region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
+        #region ICustomUCCCondition
+        public new bool IsOK(UCCAction refAction/* = null*/)
         {
             return Condition?.IsValid == true;
         }
 
-        bool ICustomUCCCondition.Locked { get => base.Locked; set => base.Locked = value; }
+        public new bool Locked { get => base.Locked; set => base.Locked = value; }
 
-        ICustomUCCCondition ICustomUCCCondition.Clone()
+        public new ICustomUCCCondition Clone()
         {
             var copy = new UCCQuesterCheck
             {
                 Sign = Sign,
-                Locked = Locked,
+                Locked = base.Locked,
                 Target = Target,
                 Tested = Tested,
                 Value = Value,
@@ -43,7 +43,7 @@ namespace EntityTools.UCC.Conditions
             return copy;
         }
 
-        string ICustomUCCCondition.TestInfos(UCCAction refAction)
+        public string TestInfos(UCCAction refAction)
         {
             if (Condition != null)
                 return Condition.TestInfos;

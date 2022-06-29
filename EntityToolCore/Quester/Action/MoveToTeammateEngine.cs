@@ -38,7 +38,7 @@ namespace EntityCore.Quester.Action
 
         [XmlIgnore]
         [NonSerialized]
-        private readonly Timeout _teammateAbsenceTimer = new Timeout(600_000_000);
+        private Timeout teammateAbsenceTimer;
         [XmlIgnore]
         [NonSerialized]
         private TeammateSupportTargetProcessor _targetProcessor;
@@ -229,7 +229,7 @@ namespace EntityCore.Quester.Action
             _sqrtAbortCombatDistance = _action.AbortCombatDistance;
             _sqrtAbortCombatDistance *= _sqrtAbortCombatDistance;
 
-            _teammateAbsenceTimer.ChangeTime(600_000_000);
+            teammateAbsenceTimer = null;
             _label = string.Empty;
 
             _action.Bind(this);
@@ -293,7 +293,7 @@ namespace EntityCore.Quester.Action
 
                     if (teammate is null)
                     {
-                        if (_teammateAbsenceTimer.IsTimedOut)
+                        if (teammateAbsenceTimer?.IsTimedOut == true)
                         {
                             ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, " : Teammate[NULL] and TeammateWaitTime is out"));
                             ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, " : Result 'true'"));
@@ -331,7 +331,7 @@ namespace EntityCore.Quester.Action
                 }
                 else
                 {
-                    if (_teammateAbsenceTimer.IsTimedOut)
+                    if (teammateAbsenceTimer?.IsTimedOut == true)
                         return true;
 
                     double sqrtDistance =
@@ -375,7 +375,7 @@ namespace EntityCore.Quester.Action
                 if (teammate is null)
                 {
                     actionResult = ActionResult.Running;
-                    if (_teammateAbsenceTimer.IsTimedOut)
+                    if (teammateAbsenceTimer?.IsTimedOut == true)
                     {
                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, " : Teammate[NULL] and TeammateWaitTime is out. Stop"));
                         actionResult = ActionResult.Fail;
@@ -402,7 +402,7 @@ namespace EntityCore.Quester.Action
                 if (teammate is null)
                 {
                     
-                    actionResult = _teammateAbsenceTimer.IsTimedOut 
+                    actionResult = teammateAbsenceTimer?.IsTimedOut == true
                         ? ActionResult.Fail
                         : ActionResult.Running;
                 }
@@ -584,8 +584,8 @@ namespace EntityCore.Quester.Action
         [XmlIgnore]
         [Category("Engine")]
         public bool InternalConditions => _action.TeammateSearchTime == 0 
-                                          || _teammateAbsenceTimer is null 
-                                          || !_teammateAbsenceTimer.IsTimedOut;
+                                          || teammateAbsenceTimer is null 
+                                          || !teammateAbsenceTimer.IsTimedOut;
 
         [XmlIgnore]
         [Category("Engine")]
@@ -608,8 +608,10 @@ namespace EntityCore.Quester.Action
                     if (tmEntity.IsValid)
                     {
                         var location = tmEntity.Location;
-                        if (NavigationHelper.SquareDistance3D(EntityManager.LocalPlayer.Location, location) >= _sqrtDistance)
+                        var playerLocation = EntityManager.LocalPlayer.Location;
+                        if (NavigationHelper.SquareDistance3D(playerLocation, location) >= _sqrtDistance)
                             return location.Clone();
+                        return playerLocation.Clone();
                     }
                 }
                 return Vector3.Empty;
@@ -619,7 +621,6 @@ namespace EntityCore.Quester.Action
         public void InternalReset()
         {
             _targetProcessor.Reset();
-            _teammateAbsenceTimer.ChangeTime(int.MaxValue);
 
             ResetSearchTimer();
             AstralAccessors.Logic.NW.Combats.RemoveAbortCombatCondition();
@@ -714,10 +715,12 @@ namespace EntityCore.Quester.Action
         /// </summary>
         private void ResetSearchTimer()
         {
-            var time = _action.TeammateSearchTime;
+            int time = (int)_action.TeammateSearchTime;
             if (time > 0)
             {
-                _teammateAbsenceTimer.ChangeTime((int)time);
+                if (teammateAbsenceTimer != null)
+                    teammateAbsenceTimer.ChangeTime(time);
+                else teammateAbsenceTimer = new Timeout(time);
             }
         }
         private Predicate<Entity> GetSpecialTeammateCheck()
