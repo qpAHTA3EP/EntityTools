@@ -90,6 +90,11 @@ namespace EntityTools.Core
             throw new NotImplementedException();
         }
 
+        public bool UserRequest_Edit(object obj, params object[] param)
+        {
+            throw new NotImplementedException();
+        }
+
         public string EntityDiagnosticInfos(object obj)
         {
             throw new NotImplementedException();

@@ -367,6 +367,7 @@ namespace EntityTools.UCC.Actions
                 _checkInTray = _checkInTray,
                 _castingTime = _castingTime,
                 _forceMaintain = _forceMaintain,
+                _customConditions = _customConditions.Clone() as UCCConditionPack
 #if EntityTarget
                 _entityId = _entityId,
                 _entityIdType = _entityIdType,

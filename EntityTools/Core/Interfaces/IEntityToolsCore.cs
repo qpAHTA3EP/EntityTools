@@ -41,6 +41,7 @@ namespace EntityTools.Core.Interfaces
         bool Initialize(Condition condition);
         bool Initialize(UCCAction action);
         bool Initialize(UCCCondition condition);
+
 #if DEVELOPER
         bool UserRequest_SelectItem<T>(Func<IEnumerable<T>> source, ref T selectedValue, string displayName = "");
 
@@ -70,6 +71,8 @@ namespace EntityTools.Core.Interfaces
         bool UserRequest_GetEntityToInteract(ref Entity entity);
 
         bool UserRequest_GetUccAction(out UCCAction action);
+        
+        bool UserRequest_Edit(object obj, params object[] param);
 
         string EntityDiagnosticInfos(object obj);
 

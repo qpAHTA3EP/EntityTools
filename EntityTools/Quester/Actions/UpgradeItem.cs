@@ -98,6 +98,23 @@ namespace EntityTools.Quester.Actions
 
         private bool _b2a;
 
+        /// <summary>
+        /// Принудительное улочшение без учета ProgressionLogic
+        /// </summary>
+        public bool Forced
+        {
+            get => _forced;
+            set
+            {
+                if (_forced != value)
+                {
+                    _forced = value;
+                    _itemIdPredicate = null;
+                }
+            }
+        }
+
+        private bool _forced;
 
         /// <summary>
         /// Функтор, определяющий соответствие <see cref="InventorySlot"/> группе идентификаторов:
@@ -190,6 +207,7 @@ namespace EntityTools.Quester.Actions
         [Category("Irregular")]
         public bool Irregular { get; set; } = false; 
 #endif
+#if false
         /// <summary>
         /// Количество очков обработки, которыми нужно заполнить предмет, у которого ProgressionLogic не валидно.
         /// К таким предметам относятся обучающие предметы T1_Enchantment_Tutorial и Insignia_Barbed_Tutorial_R1
@@ -198,10 +216,14 @@ namespace EntityTools.Quester.Actions
         [Description("Количество очков обработки, для принудительного заполнения обрабатываемого предмета. \n" +
                      "Используется если количество очков обработки не удалось вычислить, т.к. у предмета не валидно свойство ProgressionLogic.\n" +
                      "Значение -1 отключает принудительное заполнение предмета очками обработки.")]
-        public int Feed { get; set; } = -1;
+        public int Feed { get; set; } = -1; 
 
         [Description("Переключатель типа катализатора, который должен быть использован при обработке.")]
         public WardType Ward { get; set; } = WardType.None;
+#endif
+        [Description("Переключатель типа пылинки, которую нужно использовать при обработке.")]
+        public MoteType Mote { get; set; } = MoteType.None;
+
 
         public override string ActionLabel
         {
@@ -238,37 +260,20 @@ namespace EntityTools.Quester.Actions
 
         public override ActionResult Run()
         {
-
-            bool filled = false;
-            var searchResult = FindSlot(ItemIdPredicate, Ward, out InventorySlot itemSlot, out InventorySlot wardSlot);
+            var searchResult = FindSlot(ItemIdPredicate, Mote, WardType.None, out InventorySlot itemSlot, out InventorySlot moteSlot, out InventorySlot wardSlot);
             
-            switch (searchResult)
-            {
-                case SearchResult.Unfilled:
-                case SearchResult.PartialFilled:
-                case SearchResult.Indefinite:
-                    filled = FeedSlot(itemSlot);
-                    break;
-                case SearchResult.FullFilled:
-                    filled = true;
-                    break;
-                case SearchResult.Absent:
-                    return ActionResult.Skip;
-            }
-
-            if (!filled)
+            if(searchResult == SearchResult.Absent)
                 return ActionResult.Skip;
 
-            if (searchResult != SearchResult.Indefinite
-                && !HaveRequiredCatalysts(itemSlot))
+            if (!Forced && !HaveRequiredCatalysts(itemSlot))
                 return ActionResult.Skip;
 
-            if (Ward != WardType.None)
+            if (Mote != MoteType.None)
             { 
-                if(wardSlot is null)
+                if(moteSlot is null)
                     return ActionResult.Skip;
                 
-                itemSlot.Evolve(wardSlot);
+                itemSlot.Evolve(moteSlot);
             }
             else itemSlot.Evolve();
 
@@ -285,9 +290,9 @@ namespace EntityTools.Quester.Actions
         {
             itemSlot = null;
 
-            InventorySlot fullFilled = null;
-            InventorySlot partialFilled = null;
-            InventorySlot unfilled = null;
+            InventorySlot unboundedItem = null;
+            InventorySlot bounded2CharacterItem = null;
+            InventorySlot bounded2AccountItem = null;
 
             var player = EntityManager.LocalPlayer;
             
@@ -295,67 +300,37 @@ namespace EntityTools.Quester.Actions
             {
                 if (predicate(s))
                 {
-                    itemSlot = s;
+                    var flag = (ItemFlags)s.Item.Flags;
 
-                    var progression = s.Item.ProgressionLogic;
-
-                    if (progression.CurrentRankXP > 0 
-                        && progression.CurrentRankTotalRequiredXP > progression.CurrentRankXP)
-                    {
-                        if (partialFilled is null)
-                            partialFilled = s;
-                        else if (progression.CurrentRankXP > partialFilled.Item.ProgressionLogic.CurrentRankXP)
-                            partialFilled = s;
-                    }
-                    else if (progression.CurrentTier.Index > 0
-                             && Math.Abs(progression.CurrentRankTotalRequiredXP - progression.CurrentRankXP) < 1.0)
-                    {
-                        fullFilled = s;
-                        break;
-                    }
-                    else if (progression.CurrentRankXP == 0)
-                    {
-                        unfilled = s;
-                    }
+                    if ((flag & ItemFlags.Bound) > 0)
+                        bounded2CharacterItem = s;
+                    else if ((flag & ItemFlags.BoundToAccount) > 0)
+                        bounded2AccountItem = s;
+                    else unboundedItem = s;
                 }
             }
 
-            if (fullFilled != null && fullFilled.IsValid && fullFilled.Filled)
+            if (unboundedItem != null && unboundedItem.IsValid && unboundedItem.Filled)
             {
-                itemSlot = fullFilled;
-                Logger.WriteLine(Logger.LogType.Log, $"Found fully filled item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}]");
-                return SearchResult.FullFilled;
+                itemSlot = unboundedItem;
+                Logger.WriteLine(Logger.LogType.Log, $"Found unbounded item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}].");
+                return SearchResult.Unbounded;
             }
 
-            if (partialFilled !=null && partialFilled.IsValid && partialFilled.Filled)
+            if (bounded2AccountItem != null && bounded2AccountItem.IsValid && bounded2AccountItem.Filled)
             {
-                itemSlot = partialFilled;
-                var progression = itemSlot.Item.ProgressionLogic;
-                Logger.WriteLine(Logger.LogType.Log,
-                    string.Concat("Found partial filled ",
-                        (progression.IsValid && progression.CurrentRankTotalRequiredXP != 0)
-                            ? " (" +
-                              (progression.CurrentRankXP / progression.CurrentRankTotalRequiredXP / 100)
-                              .ToString("N1") + "%) "
-                            : string.Empty,
-                        " item '", itemSlot.Item.ItemDef.InternalName, "'[", itemSlot.Item.Id.ToString("X"), "]."
-                    )); 
-                return SearchResult.PartialFilled;
+                itemSlot = bounded2AccountItem;
+                Logger.WriteLine(Logger.LogType.Log, $"Found bounded to account item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}].");
+                return SearchResult.Bounded2Account;
             }
 
-            if (unfilled != null && unfilled.IsValid)
+            if (bounded2CharacterItem != null && bounded2CharacterItem.IsValid && bounded2CharacterItem.Filled)
             {
-                itemSlot = unfilled;
-                Logger.WriteLine(Logger.LogType.Log, $"Found unfilled item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}].");
-                return SearchResult.Unfilled;
+                itemSlot = bounded2CharacterItem;
+                Logger.WriteLine(Logger.LogType.Log, $"Found bounded to character item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}].");
+                return SearchResult.Bounded2Character;
             }
 
-            if (itemSlot != null && itemSlot.IsValid && itemSlot.Filled)
-            {
-                Logger.WriteLine(Logger.LogType.Log, $"Found item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}] with invalid progression logic.");
-                return SearchResult.Indefinite;
-            }
-            
             Logger.WriteLine(Logger.LogType.Log, $"No item found.");
             return SearchResult.Absent;
         }
@@ -364,25 +339,33 @@ namespace EntityTools.Quester.Actions
         /// Поиск слотов инвентаря, содержащих предмет, соответствующий <param name="predicate"/>, и катализатор
         /// </summary>
         /// <param name="predicate">Критерий отбора предметов. Как правило - идентификатор</param>
+        /// <param name="moteType">Тип частицы</param>
         /// <param name="wardType">Тип катализатора</param>
         /// <param name="itemSlot">Слот инвентаря, содержащего искомый предмет</param>
-        /// <param name="wardSlot">Слот инвентаря, содержащий найденный катализацтор</param>
+        /// <param name="moteSlot">Слот инвентаря, содержащий найденную частицу</param>
+        /// <param name="wardSlot">Слот инвентаря, содержащий найденный катализатор</param>
         /// <returns>Перечисление, описывающее результаты поиска</returns>
-        private static SearchResult FindSlot(Predicate<InventorySlot> predicate, WardType wardType, out InventorySlot itemSlot, out InventorySlot wardSlot)
+        private static SearchResult FindSlot(Predicate<InventorySlot> predicate, MoteType moteType, WardType wardType, out InventorySlot itemSlot, out InventorySlot moteSlot, out InventorySlot wardSlot)
         {
             itemSlot = null;
+            moteSlot = null;
             wardSlot = null;
 
-            if (wardType == WardType.None)
+            if (moteType == MoteType.None 
+                && wardType == WardType.None)
                 return FindSlot(predicate, out itemSlot);
 
-            InventorySlot fullFilled = null;
-            InventorySlot partialFilled = null;
-            InventorySlot unfilled = null;
+            InventorySlot unboundedItem = null;
+            InventorySlot bounded2CharacterItem = null;
+            InventorySlot bounded2AccountItem = null;
 
             InventorySlot unboundedWard = null;
             InventorySlot bounded2CharacterWard = null;
             InventorySlot bounded2AccountWard = null;
+
+            InventorySlot unboundedMote = null;
+            InventorySlot bounded2CharacterMote = null;
+            InventorySlot bounded2AccountMote = null;
 
             var player = EntityManager.LocalPlayer;
 
@@ -392,11 +375,41 @@ namespace EntityTools.Quester.Actions
                 case WardType.Preservation:
                     wardPredicate = slot => slot.Item.ItemDef.InternalName.StartsWith("Fuse_Ward_Preservation", StringComparison.Ordinal);
                     break;
+#if false
                 case WardType.Coalescent:
                     wardPredicate = slot => slot.Item.ItemDef.InternalName.StartsWith("Fuse_Ward_Coalescent", StringComparison.Ordinal);
-                    break;
+                    break; 
+#endif
                 default:
                     wardPredicate = slot => false;
+                    break;
+            }
+
+            Predicate<InventorySlot> motePredicate;
+            switch (moteType)
+            {
+                case MoteType.Mote_1:
+                    motePredicate = slot => slot.Item.ItemDef.InternalName.StartsWith("Fuse_Ward_1", StringComparison.Ordinal);
+                    break;
+                case MoteType.Mote_2:
+                    motePredicate = slot => slot.Item.ItemDef.InternalName.StartsWith("Fuse_Ward_2", StringComparison.Ordinal);
+                    break;
+                case MoteType.Mote_5:
+                    motePredicate = slot => slot.Item.ItemDef.InternalName.StartsWith("Fuse_Ward_5", StringComparison.Ordinal);
+                    break;
+                case MoteType.Mote_10:
+                    motePredicate = slot => slot.Item.ItemDef.InternalName.StartsWith("Fuse_Ward_10", StringComparison.Ordinal);
+                    break;
+                case MoteType.Mote_100:
+                    motePredicate = slot => slot.Item.ItemDef.InternalName.StartsWith("Fuse_Ward_Coalescent", StringComparison.Ordinal);
+                    break;
+#if false
+                case WardType.Coalescent:
+                    wardPredicate = slot => slot.Item.ItemDef.InternalName.StartsWith("Fuse_Ward_Coalescent", StringComparison.Ordinal);
+                    break; 
+#endif
+                default:
+                    motePredicate = slot => false;
                     break;
             }
 
@@ -404,39 +417,57 @@ namespace EntityTools.Quester.Actions
             {
                 if (predicate(s))
                 {
-                    itemSlot = s;
+                    var flag = (ItemFlags)s.Item.Flags;
 
-                    var progression = s.Item.ProgressionLogic;
-                    if (progression.CurrentRankXP > 0
-                        && progression.CurrentRankTotalRequiredXP > progression.CurrentRankXP)
-                    {
-                        if (partialFilled is null)
-                            partialFilled = s;
-                        else if (progression.CurrentRankXP > partialFilled.Item.ProgressionLogic.CurrentRankXP)
-                            partialFilled = s;
-                    }
-                    else if (progression.CurrentTier.Index > 0
-                             && Math.Abs(progression.CurrentRankTotalRequiredXP - progression.CurrentRankXP) < 1.0)
-                    {
-                        fullFilled = s;
-                    }
-                    else if (progression.CurrentRankXP == 0)
-                        unfilled = s;
+                    if ((flag & ItemFlags.Bound) > 0)
+                        bounded2CharacterItem = s;
+                    else if ((flag & ItemFlags.BoundToAccount) > 0)
+                        bounded2AccountItem = s;
+                    else unboundedItem = s;
                 }
-                else 
+                else if (bounded2CharacterMote is null
+                         && motePredicate(s))
                 {
-                    if (bounded2CharacterWard is null
-                        && wardPredicate(s))
-                    {
-                        var flag = (ItemFlags) s.Item.Flags;
+                    var flag = (ItemFlags)s.Item.Flags;
 
-                        if ((flag & ItemFlags.Bound) > 0)
-                            bounded2CharacterWard = s;
-                        else if ((flag & ItemFlags.BoundToAccount) > 0)
-                            bounded2AccountWard = s;
-                        else unboundedWard = s;
-                    }
+                    if ((flag & ItemFlags.Bound) > 0)
+                        bounded2CharacterMote = s;
+                    else if ((flag & ItemFlags.BoundToAccount) > 0)
+                        bounded2AccountMote = s;
+                    else unboundedMote = s;
                 }
+                else if (bounded2CharacterWard is null
+                        && wardPredicate(s))
+                {
+                    var flag = (ItemFlags) s.Item.Flags;
+
+                    if ((flag & ItemFlags.Bound) > 0)
+                        bounded2CharacterWard = s;
+                    else if ((flag & ItemFlags.BoundToAccount) > 0)
+                        bounded2AccountWard = s;
+                    else unboundedWard = s;
+                }
+            }
+
+            if (bounded2CharacterMote != null)
+            {
+                moteSlot = bounded2CharacterMote;
+                Logger.WriteLine(Logger.LogType.Log, $"Found mote '{moteSlot.Item.ItemDef.InternalName}' bounded to character.");
+            }
+            else if (bounded2AccountMote != null)
+            {
+                moteSlot = bounded2AccountMote;
+                Logger.WriteLine(Logger.LogType.Log, $"Found mote '{moteSlot.Item.ItemDef.InternalName}' bounded to account.");
+            }
+            else if (unboundedMote != null)
+            {
+                moteSlot = unboundedMote;
+                Logger.WriteLine(Logger.LogType.Log, $"Found unbounded mote '{moteSlot.Item.ItemDef.InternalName}'.");
+            }
+            else if(moteType != MoteType.None)
+            {
+                Logger.WriteLine(Logger.LogType.Log, $"No required mote found.");
+                return SearchResult.Absent;
             }
 
             if (bounded2CharacterWard != null)
@@ -454,51 +485,37 @@ namespace EntityTools.Quester.Actions
                 wardSlot = unboundedWard;
                 Logger.WriteLine(Logger.LogType.Log, $"Found unbounded ward '{wardSlot.Item.ItemDef.InternalName}'.");
             }
-            else
+            else if(wardType != WardType.None)
             {
                 Logger.WriteLine(Logger.LogType.Log, $"No required ward found.");
                 return SearchResult.Absent;
             }
 
-            if (fullFilled != null && fullFilled.IsValid && fullFilled.Filled)
+            if (unboundedItem != null && unboundedItem.IsValid && unboundedItem.Filled)
             {
-                itemSlot = fullFilled;
-                Logger.WriteLine(Logger.LogType.Log, $"Found fully filled item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}].");
-                return SearchResult.FullFilled;
+                itemSlot = unboundedItem;
+                Logger.WriteLine(Logger.LogType.Log, $"Found unbounded item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}].");
+                return SearchResult.Unbounded;
+            }
+            
+            if (bounded2AccountItem != null && bounded2AccountItem.IsValid && bounded2AccountItem.Filled)
+            {
+                itemSlot = bounded2AccountItem;
+                Logger.WriteLine(Logger.LogType.Log, $"Found bounded to account item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}].");
+                return SearchResult.Bounded2Account;
             }
 
-            if (partialFilled != null && partialFilled.IsValid && partialFilled.Filled)
+            if (bounded2CharacterItem != null && bounded2CharacterItem.IsValid && bounded2CharacterItem.Filled)
             {
-                itemSlot = partialFilled;
-                var progression = itemSlot.Item.ProgressionLogic;
-                Logger.WriteLine(Logger.LogType.Log,
-                    string.Concat("Found ", SearchResult.PartialFilled,
-                        (progression.IsValid && progression.CurrentRankTotalRequiredXP != 0)
-                            ? " (" +
-                              (progression.CurrentRankXP / progression.CurrentRankTotalRequiredXP / 100)
-                              .ToString("N1") + "%) "
-                            : string.Empty,
-                        " item '", itemSlot.Item.ItemDef.InternalName, "'[", itemSlot.Item.Id.ToString("X"), "]."
-                    )); 
-                return SearchResult.PartialFilled;
-            }
-
-            if (unfilled != null && unfilled.IsValid && unfilled.Filled)
-            {
-                itemSlot = unfilled;
-                Logger.WriteLine(Logger.LogType.Log, $"Found unfilled item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}].");
-                return SearchResult.Unfilled;
-            }
-
-            if (itemSlot != null && itemSlot.IsValid && itemSlot.Filled)
-            {
-                Logger.WriteLine(Logger.LogType.Log, $"Found item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}] with invalid progression logic.");
-                return SearchResult.Indefinite;
+                itemSlot = bounded2CharacterItem;
+                Logger.WriteLine(Logger.LogType.Log, $"Found bounded to character item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}].");
+                return SearchResult.Bounded2Character;
             }
 
             Logger.WriteLine(Logger.LogType.Log, $"No item found.");
             return SearchResult.Absent;
         }
+#if false
 
         /// <summary>
         /// Заполнение предмета очками обработки
@@ -511,7 +528,7 @@ namespace EntityTools.Quester.Actions
 
             int points;
             if (progress.IsValid)
-                points = (int) (progress.CurrentRankTotalRequiredXP - progress.CurrentRankXP);
+                points = (int)(progress.CurrentRankTotalRequiredXP - progress.CurrentRankXP);
             else
             {
                 var defaultFeed = Feed;
@@ -523,7 +540,7 @@ namespace EntityTools.Quester.Actions
 
                 if (defaultFeed == 0)
                 {
-                    Logger.WriteLine(Logger.LogType.Log, $"Can not calculate required RP and 'ForcedFeedingRPNumber' does not set."); 
+                    Logger.WriteLine(Logger.LogType.Log, $"Can not calculate required RP and 'ForcedFeedingRPNumber' does not set.");
                     return false;
                 }
                 points = defaultFeed;
@@ -545,6 +562,7 @@ namespace EntityTools.Quester.Actions
             return false;
         }
 
+#endif
         /// <summary>
         /// Проверяем наличие всех компонентов, необходимых для обработки предмета <param name="itemSlot" />
         /// </summary>

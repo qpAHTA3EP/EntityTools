@@ -29,6 +29,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using Astral.Quester.Classes;
+using DevExpress.XtraLayout.Resizing;
 using EntityCore.Tools.Powers;
 using EntityTools.Tools;
 using QuesterAction = Astral.Quester.Classes.Action;
@@ -445,6 +446,26 @@ namespace EntityCore
         {
             return AddUccActionForm.GUIRequest(out action);
         }
+
+        /// <summary>
+        /// Запрос редактирования объекта <paramref name="obj"/>
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public bool UserRequest_Edit(object obj, params object[] param)
+        {
+            if (obj is null)
+                return false;
+
+            switch (obj)
+            {
+                case Profil uccProfile:
+                    return UccEditor.Edit(uccProfile, param?.Length > 0 ? param[0].ToString() : string.Empty);
+                default:
+                    return false;
+            }
+        }
+
         #endregion
 
         public string EntityDiagnosticInfos(object obj)
@@ -468,10 +489,10 @@ namespace EntityCore
             switch (monitor)
             {
                 case PlayerTeamMonitor _:
-                    ObjectInfoForm.Show(new PlayerTeamHelper.Monitor(), 500);
+                    ObjectInfoForm.Show(new PlayerTeamHelper.Monitor());
                     break;
                 case EntityCacheMonitor _:
-                    CollectionInfoForm.Show(() => SearchCached.EntityCache, 500);
+                    CollectionInfoForm.Show(() => SearchCached.EntityCache);
                     break;
                 default:
                     ObjectInfoForm.Show(monitor);

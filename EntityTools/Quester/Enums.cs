@@ -36,10 +36,44 @@ namespace EntityTools.Enums
         /// Страхующий катализатор, идентификатор которого начинается с 'Fuse_Ward_Preservation'
         /// </summary>
         Preservation,
+#if false
         /// <summary>
         /// Полный катализатор, идентификатор которого начинается с 'Fuse_Ward_Coalescent'
         /// </summary>
-        Coalescent
+        Coalescent 
+#endif
+    }
+
+    [Flags]
+    public enum MoteType
+    {
+        None,
+        /// <summary>
+        /// Примитивная частица - шанс улучшения: 1%<br/>
+        /// Идентификатор которой начинается с 'Fuse_Ward_1'<br/>
+        /// </summary>
+        Mote_1,
+        /// <summary>
+        /// Обычная частица - шанс улучшения: 2%<br/>
+        /// Идентификатор которой начинается с 'Fuse_Ward_2'<br/>
+        /// </summary>
+        Mote_2,
+        /// <summary>
+        /// Улучшенная частица - шанс улучшения: 5%<br/>
+        /// Идентификатор которой начинается с 'Fuse_Ward_5'<br/>
+        /// </summary>
+        Mote_5,
+        /// <summary>
+        /// Усиленная частица - шанс улучшения: 10%<br/>
+        /// Идентификатор которой начинается с 'Fuse_Ward_10'<br/>
+        /// </summary>
+        Mote_10,
+        /// <summary>
+        /// Цельная пыль - шанс улучшения: 100%<br/>
+        /// Идентификатор которой начинается с 'Fuse_Ward_Coalescent'<br/>
+        /// (бывший Полный катализатор)
+        /// </summary>
+        Mote_100
     }
 
     /// <summary>
@@ -51,6 +85,7 @@ namespace EntityTools.Enums
         /// Предмет не найден
         /// </summary>
         Absent,
+#if false
         /// <summary>
         /// Найден незаполненный предмет
         /// </summary>
@@ -62,11 +97,26 @@ namespace EntityTools.Enums
         /// <summary>
         /// Найден полностью заполненный предмет, готовый к обработке
         /// </summary>
-        FullFilled,
+        FullFilled, 
+#endif
+        /// <summary>
+        /// Непривязанный предмет
+        /// </summary>
+        Unbounded,
+        /// <summary>
+        /// Привязанный к аккаунту предмет
+        /// </summary>
+        Bounded2Account,
+        /// <summary>
+        /// Привязанные к персонажу предмет
+        /// </summary>
+        Bounded2Character,
+#if false
         /// <summary>
         /// Предмет найден, но статус обработки не определен (ProgressionLogic не валидна) 
         /// </summary>
-        Indefinite
+        Indefinite 
+#endif
     }
 
     /// <summary>

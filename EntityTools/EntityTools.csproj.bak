@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>EntityTools</RootNamespace>
     <AssemblyName>EntityTools</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <AssemblyVersion>0.21.0423.1129</AssemblyVersion>
@@ -95,6 +95,7 @@
     <DebugSymbols>true</DebugSymbols>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>false</Prefer32Bit>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -163,35 +164,35 @@
       <HintPath>..\..\..\References\x64\Astral_patched.exe</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Data.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Data.v21.2, Version=21.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Data.Desktop.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Data.Desktop.v21.2, Version=21.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Utils.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Utils.v21.2, Version=21.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraBars.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraBars.v21.2, Version=21.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraEditors.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraEditors.v21.2, Version=21.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraGrid.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraGrid.v21.2, Version=21.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraNavBar.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraNavBar.v21.2, Version=21.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraVerticalGrid.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraVerticalGrid.v21.2, Version=21.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>False</Private>
     </Reference>
     <Reference Include="MyMemory-x64">
@@ -218,9 +219,11 @@
   <ItemGroup>
     <Compile Include="Core\Interfaces\IEntityIdentifier.cs" />
     <Compile Include="Core\Interfaces\IEntityDescriptor.cs" />
+    <Compile Include="Core\Interfaces\IPowerCache.cs" />
     <Compile Include="Editors\ChangePluginSettingValueEditor.cs" />
     <Compile Include="Editors\CheckedListBoxEditor.cs" />
     <Compile Include="Editors\CustomRegionCollectionEditor.cs" />
+    <Compile Include="Editors\QuesterConditionEditor.cs" />
     <Compile Include="Editors\PowerIdEditor.cs" />
     <Compile Include="Editors\MissionGiverInfoEditor.cs" />
     <Compile Include="Editors\PositionEditor.cs" />
@@ -283,12 +286,20 @@
       <DependentUpon>CustomRegionToolForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Patches\Mapper\Tools\ICustomRegionTool.cs" />
+    <Compile Include="Patches\Mapper\Tools\MapperSettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Patches\Mapper\Tools\MapperSettingsForm.Designer.cs">
+      <DependentUpon>MapperSettingsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Patches\Mapper\Tools\AddNodeTool.cs" />
     <Compile Include="Patches\Patcher.tt.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Patcher.tt</DependentUpon>
     </Compile>
     <Compile Include="Patches\Patch_AuraDetector.cs" />
+    <Compile Include="Patches\Patch_UccCondition.cs" />
     <Compile Include="Patches\Quester\ComplexPatch_Quester_UccEditing.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Quester\Actions\ExecutePowerExt.cs" />
@@ -460,11 +471,14 @@
     <Compile Include="Tools\Classes.cs" />
     <Compile Include="Tools\SysInformer.cs" />
     <Compile Include="Tools\Targeting\PlayerTeamMonitor.cs" />
+    <Compile Include="Tools\Targeting\TargetProcessor.cs" />
+    <Compile Include="Tools\Targeting\TargetSelector.cs" />
     <Compile Include="Tools\XmlColor.cs" />
     <Compile Include="UCC\Actions\ChangeTarget.cs" />
     <Compile Include="Tools\Targeting\Enums.cs" />
     <Compile Include="Tools\Targeting\TeammateSupport.cs" />
     <Compile Include="UCC\Actions\PluggedSkill.cs" />
+    <Compile Include="UCC\Conditions\CheckPowerState.cs" />
     <Compile Include="UCC\IUccConditionPack.cs" />
     <Compile Include="UCC\Enums.cs" />
     <Compile Include="UCC\Extensions\UCCActionExtention.cs" />
@@ -513,6 +527,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Patches\Mapper\Tools\CustomRegionToolForm.resx">
       <DependentUpon>CustomRegionToolForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Patches\Mapper\Tools\MapperSettingsForm.resx">
+      <DependentUpon>MapperSettingsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -719,9 +736,7 @@
   <ItemGroup>
     <None Include="Resources\miniLoad.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="UCC\Classes\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="Resources\PanelVisibility_16x16.png" />
   </ItemGroup>

@@ -63,6 +63,9 @@ namespace EntityTools.UCC.Conditions
         [XmlIgnore]
         [Browsable(false)]
         public new Astral.Logic.UCC.Ressources.Enums.ActionCond Tested { get; set; }
+
+        [XmlIgnore] [Browsable(false)] public new Astral.Logic.UCC.Ressources.Enums.Sign Sign { get; set; }
+
         #endregion
         #endregion
 

@@ -27,6 +27,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using AcTp0Tools.Reflection;
 using EntityTools.Core.Interfaces;
 using API = Astral.Quester.API;
 using Task = System.Threading.Tasks.Task;
@@ -180,6 +181,7 @@ namespace EntityTools.Core
 
         private void handler_Test_1(object sender, EventArgs e)
         {
+#if false
             StringBuilder sb = new StringBuilder("Powers:\n");
 
             for (int i = 0; i < 15; i++)
@@ -221,7 +223,14 @@ namespace EntityTools.Core
                 }
             }
 
-            XtraMessageBox.Show(sb.ToString());
+            XtraMessageBox.Show(sb.ToString()); 
+#else
+            var id = tbText.Text;
+            var slot = EntityManager.LocalPlayer.AllItems.FirstOrDefault(s =>
+                s.Filled && s.Item.ItemDef.InternalName == id);
+            if (slot!= null)
+                slot.EvolveWithAutoMoteAndWards();
+#endif
         }
 
         private void handler_Test_2(object sender, EventArgs e)
@@ -1103,6 +1112,11 @@ namespace EntityTools.Core
         private void handler_EntityCacheMonitor(object sender, EventArgs e)
         {
             EntityTools.Core.Monitor(new EntityCacheMonitor());
+        }
+
+        private void handler_EditUcc(object sender, EventArgs e)
+        {
+            EntityTools.Core.UserRequest_Edit(Astral.Logic.UCC.API.CurrentProfile, Astral.API.CurrentSettings.LastUCCProfile);
         }
     }
 }

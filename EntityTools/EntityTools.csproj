@@ -474,6 +474,7 @@
     <Compile Include="Tools\Targeting\TargetProcessor.cs" />
     <Compile Include="Tools\Targeting\TargetSelector.cs" />
     <Compile Include="Tools\XmlColor.cs" />
+    <Compile Include="UCC\Actions\UCCActionPack.cs" />
     <Compile Include="UCC\Actions\ChangeTarget.cs" />
     <Compile Include="Tools\Targeting\Enums.cs" />
     <Compile Include="Tools\Targeting\TeammateSupport.cs" />

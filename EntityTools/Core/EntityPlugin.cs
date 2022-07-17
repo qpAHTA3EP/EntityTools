@@ -319,12 +319,12 @@ namespace EntityTools
         /// </summary>
         internal class EntityCoreProxy : IEntityToolsCore
         {
-            static Func<bool> InternalInitialize = LoadCore;
+            static Func<bool> _internalInitializer = LoadCore;
 
 #if DEVELOPER
             public string EntityDiagnosticInfos(object obj)
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.EntityDiagnosticInfos(obj);
                 ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing '{obj.GetType().Name}'. Stop bot", true);
                 StopBot();
@@ -333,7 +333,7 @@ namespace EntityTools
 #endif
             public bool Initialize(object obj)
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.Initialize(obj);
                 ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing '{obj.GetType().Name}'. Stop bot");
                 //StopBot();
@@ -342,7 +342,7 @@ namespace EntityTools
 
             public bool Initialize(Action action)
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.Initialize(action);
                 ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing in quester action '{action.GetType().Name}'[{action.ActionID}]. Stop bot", true);
                 //StopBot();
@@ -351,7 +351,7 @@ namespace EntityTools
 
             public bool Initialize(Condition condition)
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.Initialize(condition);
                 ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing in quester condition '{condition.GetType().Name}'[{condition.GetHashCode():X2}]. Stop bot", true);
                 //StopBot();
@@ -360,7 +360,7 @@ namespace EntityTools
 
             public bool Initialize(UCCAction action)
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.Initialize(action);
                 ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing in ucc action '{action.GetType().Name}'[{action.GetHashCode():X2}]. Stop bot", true);
                 //StopBot();
@@ -369,7 +369,7 @@ namespace EntityTools
 
             public bool Initialize(UCCCondition condition)
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.Initialize(condition);
                 ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing in ucc condition '{condition.GetType().Name}'[{condition.GetHashCode():X2}]. Stop bot", true);
                 //StopBot();
@@ -378,7 +378,7 @@ namespace EntityTools
 
             public bool TryGet<T>(ref T obj, params object[] args) where T : class
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.TryGet(ref obj, args);
                 if (Equals(obj, null))
                     ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing unknown object. Stop bot", true);
@@ -399,7 +399,7 @@ namespace EntityTools
 #endif
             public object Get(Type type, params object[] args)
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.Get(type, args);
                 ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing '{type?.Name ?? string.Empty}'. Stop bot", true);
                 return null;
@@ -407,7 +407,7 @@ namespace EntityTools
 
             public T Get<T>(params object[] args) where T : class
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.Get<T>(args);
                 ETLogger.WriteLine(LogType.Error, $"EntityToolsCore failed while initializing '{typeof(T).Name}'. Stop bot", true);
                 return default;
@@ -415,7 +415,7 @@ namespace EntityTools
 #if DEVELOPER
             public bool UserRequest_SelectItem<T>(Func<IEnumerable<T>> source, ref T selectedValue, string displayName = "")
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.UserRequest_SelectItem(source, ref selectedValue, displayName);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rItem request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -427,7 +427,7 @@ namespace EntityTools
 
             public bool UserRequest_SelectItem<T>(Func<IEnumerable<T>> source, ref T selectedValue, ListControlConvertEventHandler itemFormatter)
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.UserRequest_SelectItem(source, ref selectedValue, itemFormatter);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rItem request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -439,7 +439,7 @@ namespace EntityTools
 
             public bool UserRequest_SelectItemList<T>(Func<IEnumerable<T>> source, ref IList<T> selectedValues, string caption = "")
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.UserRequest_SelectItemList(source, ref selectedValues);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rItems request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -451,7 +451,7 @@ namespace EntityTools
 
             public bool UserRequest_EditValue(ref string value, string message = "", string caption = "", FormatInfo formatInfo = null)
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.UserRequest_EditValue(ref value, message, caption, formatInfo);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rValue edition request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -463,7 +463,7 @@ namespace EntityTools
 
             public bool UserRequest_SelectAuraId(ref string id)
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.UserRequest_SelectAuraId(ref id);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rAura request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -475,7 +475,7 @@ namespace EntityTools
 
             public bool UserRequest_SelectUIGenId(ref string id)
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.UserRequest_SelectUIGenId(ref id);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rUIGen request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -487,7 +487,7 @@ namespace EntityTools
 
             public bool UserRequest_EditEntityId(ref string entPattern, ref ItemFilterStringType strMatchType, ref EntityNameType nameType)
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.UserRequest_EditEntityId(ref entPattern, ref strMatchType, ref nameType);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rEntityId request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -499,7 +499,7 @@ namespace EntityTools
 
             public bool UserRequest_EditUccConditions(ref List<UCCCondition> list)
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.UserRequest_EditUccConditions(ref list);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rUCC conditions request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -511,7 +511,7 @@ namespace EntityTools
 
             public bool UserRequest_EditUccConditions(ref List<UCCCondition> list, ref LogicRule logic, ref bool negation)
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.UserRequest_EditUccConditions(ref list, ref logic, ref negation);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rUCC conditions request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -523,7 +523,7 @@ namespace EntityTools
             
             public bool UserRequest_EditCustomRegionList(ref List<string> crList)
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.UserRequest_EditCustomRegionList(ref crList);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rCustomRegions request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -535,7 +535,7 @@ namespace EntityTools
 
             public bool UserRequest_GetNodeLocation(ref Vector3 pos, string caption, string message = "")
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.UserRequest_GetNodeLocation(ref pos, caption, message);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\nNodeLocation request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -547,7 +547,7 @@ namespace EntityTools
 
             public bool UserRequest_GetPosition(ref Vector3 pos, string caption, string message = "")
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.UserRequest_GetPosition(ref pos, caption, message);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\nPosition request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -558,7 +558,7 @@ namespace EntityTools
             }
             public bool UserRequest_GetEntityToInteract(ref Entity entity)
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.UserRequest_GetEntityToInteract(ref entity);
 
                 XtraMessageBox.Show("EntityToolsCore is invalid!\n\rEntityToInteract request denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -570,7 +570,7 @@ namespace EntityTools
 
             public bool UserRequest_GetUccAction(out UCCAction action)
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.UserRequest_GetUccAction(out action);
                 action = null;
 
@@ -580,17 +580,32 @@ namespace EntityTools
 
                 return false;
             }
+            public bool UserRequest_Edit(object obj, params object[] param)
+            {
+                if (obj is null)
+                    return false;
+
+                if (_internalInitializer())
+                    return Core.UserRequest_Edit(obj, param);
+
+                XtraMessageBox.Show($"EntityToolsCore is invalid!\n\rThe edition of the object {obj.GetType().Name} denied.", "EntityTools error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid! Forbid an edition of the {obj.GetType().Name}.", true);
+
+                obj = null;
+                return false;
+            }
 
             public void Monitor(object monitor)
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     Core.Monitor(monitor);
             }
 #endif
 #if DEBUG
             public LinkedList<Entity> FindAllEntity(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete, bool healthCheck = false, float range = 0, float zRange = 0, bool regionCheck = false, List<CustomRegion> customRegions = null, Predicate<Entity> specialCheck = null)
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.FindAllEntity(pattern, matchType, nameType, setType, healthCheck, range, zRange, regionCheck, customRegions, specialCheck);
 
                 ToggleRole(false);
@@ -602,7 +617,7 @@ namespace EntityTools
 #endif
             public bool CheckCore()
             {
-                if (InternalInitialize())
+                if (_internalInitializer())
                     return Core.CheckCore();
                 return false;
             }
@@ -715,7 +730,7 @@ namespace EntityTools
                 }
                 finally
                 {
-                    InternalInitialize = DoNothing;
+                    _internalInitializer = DoNothing;
                 }
 
                 return false;
@@ -769,7 +784,7 @@ namespace EntityTools
 
             public void Dispose()
             {
-                InternalInitialize = null;
+                _internalInitializer = null;
             }
         }
     }

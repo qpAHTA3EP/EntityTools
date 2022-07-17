@@ -55,6 +55,7 @@ namespace EntityTools.Core
             this.btnValidate = new System.Windows.Forms.Button();
             this.btnTeamMonitor = new System.Windows.Forms.Button();
             this.btnUiViewer = new System.Windows.Forms.Button();
+            this.btnUcc = new System.Windows.Forms.Button();
             this.btnAuraViewer = new System.Windows.Forms.Button();
             this.btnMissionMonitor = new System.Windows.Forms.Button();
             this.btnEntityCacheMonitor = new System.Windows.Forms.Button();
@@ -145,6 +146,7 @@ namespace EntityTools.Core
             this.tabUtilities.Controls.Add(this.btnValidate);
             this.tabUtilities.Controls.Add(this.btnTeamMonitor);
             this.tabUtilities.Controls.Add(this.btnUiViewer);
+            this.tabUtilities.Controls.Add(this.btnUcc);
             this.tabUtilities.Controls.Add(this.btnAuraViewer);
             this.tabUtilities.Controls.Add(this.btnMissionMonitor);
             this.tabUtilities.Controls.Add(this.btnEntityCacheMonitor);
@@ -253,6 +255,20 @@ namespace EntityTools.Core
             this.btnUiViewer.Text = "Game UI";
             this.btnUiViewer.UseVisualStyleBackColor = true;
             this.btnUiViewer.Click += new System.EventHandler(this.handler_OpenUiViewer);
+            // 
+            // btnUcc
+            // 
+            this.btnUcc.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnUcc.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
+            this.btnUcc.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnUcc.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnUcc.Location = new System.Drawing.Point(126, 247);
+            this.btnUcc.Name = "btnUcc";
+            this.btnUcc.Size = new System.Drawing.Size(113, 40);
+            this.btnUcc.TabIndex = 0;
+            this.btnUcc.Text = "UCC";
+            this.btnUcc.UseVisualStyleBackColor = true;
+            this.btnUcc.Click += new System.EventHandler(this.handler_EditUcc);
             // 
             // btnAuraViewer
             // 
@@ -555,6 +571,7 @@ namespace EntityTools.Core
             this.tbText.Name = "tbText";
             this.tbText.Size = new System.Drawing.Size(164, 21);
             this.tbText.TabIndex = 13;
+            this.tbText.Text = "Enchantment_Standard_B_R1";
             // 
             // btnTest1
             // 
@@ -1021,5 +1038,6 @@ namespace EntityTools.Core
         private DevExpress.XtraGrid.Columns.GridColumn clmnPattern;
         private DevExpress.XtraGrid.Columns.GridColumn clmnReplacement;
         private Button btnEntityCacheMonitor;
+        private Button btnUcc;
     }
 }
