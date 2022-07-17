@@ -10,7 +10,18 @@ namespace AcTp0Tools.Reflection
 {
     public sealed class CopyHelper
     {
-        private static readonly Type array_type = typeof(Array);
+        private static readonly Type tArray = typeof(Array);
+        private static readonly Type tType = typeof(Type);
+        private static readonly Type tPropertyInfo = typeof(PropertyInfo);
+        private static readonly Type tFieldInfo = typeof(FieldInfo);
+        private static readonly Type tMemberInfo = typeof(MemberInfo);
+        private static readonly Type tMethodBase = typeof(MethodBase);
+        private static readonly Type tMethodInfo = typeof(MethodInfo);
+        private static readonly Type tMethodBody = typeof(MethodBody);
+        private static readonly Type tAssembly = typeof(Assembly);
+        //private static readonly Type tAssemblyExtensions = typeof(AssemblyExtensions);
+        private static readonly Type tException = typeof(Exception);
+        private static readonly Type tAttribute = typeof(Attribute);
 
         private static readonly MethodInfo memberwise_clone = typeof(object)
             .GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -65,12 +76,16 @@ namespace AcTp0Tools.Reflection
                 return string_copy;
             }
 
-            Type o_type = o.GetType();
-            if (o_type.IsPrimitive)
+            // Исключаем копирование для типов из Reflection
+            var oType = o.GetType();
+            if (IsReflectionType(oType))
+                return o;
+
+            if (oType.IsPrimitive)
                 return o;
             object copy = memberwise_clone.Invoke(o, null);
             state[o] = copy;
-            foreach (FieldInfo f in o_type.GetFields(
+            foreach (FieldInfo f in oType.GetFields(
                 BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
             {
                 object original = f.GetValue(o);
@@ -78,6 +93,23 @@ namespace AcTp0Tools.Reflection
                     f.SetValue(copy, CreateDeepCopyInternal(state, original));
             }
             return copy;
+        }
+
+        private static bool IsReflectionType(Type type)
+        {
+            return type == tType
+                   || type.IsAssignableFrom(typeof(MemberInfo))
+                   || type == tPropertyInfo
+                   || type == tFieldInfo
+                   || type == tMemberInfo
+                   || type == tMethodBase
+                   || type == tMethodInfo
+                   || type == tMethodBody
+                   || type == tAssembly
+                   //|| oType == tAssemblyExtensions
+                   || type.IsAssignableFrom(tException)
+                   || type.IsAssignableFrom(tAttribute)
+                   || type.Namespace?.StartsWith(nameof(System) + "." + nameof(Reflection)) == true;
         }
 
         public static T CreateDeepCopy<T>(T o)
@@ -115,9 +147,9 @@ namespace AcTp0Tools.Reflection
             try
             {
 #endif
-            if (!typeof(T).IsSerializable)
+                if (!typeof(T).IsSerializable)
                 {
-                    throw new ArgumentException("The type must be serializable.", "source");
+                    throw new ArgumentException("The type must be serializable.", nameof(source));
                 }
 
                 // Don't serialize a null object, simply return the default for that object
