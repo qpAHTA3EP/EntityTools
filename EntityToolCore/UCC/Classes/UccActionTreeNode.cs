@@ -1,13 +1,11 @@
 ﻿using AcTp0Tools.Reflection;
 using Astral.Logic.UCC.Actions;
 using Astral.Logic.UCC.Classes;
+using EntityCore.Tools;
 using EntityTools.UCC.Actions;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Forms;
-using EntityCore.Tools;
 
 namespace EntityCore.UCC.Classes
 {
@@ -130,7 +128,6 @@ namespace EntityCore.UCC.Classes
             //TODO: Добави реконструкцию списка условий
             return new UccActionTreeNode(CopyHelper.CreateDeepCopy(ReconstructInternal()));
         }
-
 
         /// <summary>
         /// Список узлов дерева, соответствующих условиям <see cref="UCCAction"/>

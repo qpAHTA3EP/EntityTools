@@ -36,7 +36,7 @@ namespace EntityCore.Forms
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UccEditor));
-            DevExpress.XtraBars.Docking2010.Views.Tabbed.DockingContainer dockingContainer3 = new DevExpress.XtraBars.Docking2010.Views.Tabbed.DockingContainer();
+            DevExpress.XtraBars.Docking2010.Views.Tabbed.DockingContainer dockingContainer2 = new DevExpress.XtraBars.Docking2010.Views.Tabbed.DockingContainer();
             this.documentGroup = new DevExpress.XtraBars.Docking2010.Views.Tabbed.DocumentGroup(this.components);
             this.docCombat = new DevExpress.XtraBars.Docking2010.Views.Tabbed.Document(this.components);
             this.docPatrol = new DevExpress.XtraBars.Docking2010.Views.Tabbed.Document(this.components);
@@ -48,6 +48,8 @@ namespace EntityCore.Forms
             this.btnDelAction = new DevExpress.XtraBars.BarButtonItem();
             this.btnCopyAction = new DevExpress.XtraBars.BarButtonItem();
             this.btnPasteAction = new DevExpress.XtraBars.BarButtonItem();
+            this.btnTestSelected = new DevExpress.XtraBars.BarButtonItem();
+            this.btnTestAll = new DevExpress.XtraBars.BarButtonItem();
             this.barProfile = new DevExpress.XtraBars.Bar();
             this.btnNewProfile = new DevExpress.XtraBars.BarButtonItem();
             this.btnLoadProfile = new DevExpress.XtraBars.BarButtonItem();
@@ -59,6 +61,9 @@ namespace EntityCore.Forms
             this.barDockControlLeft = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlRight = new DevExpress.XtraBars.BarDockControl();
             this.standaloneBarDockControl1 = new DevExpress.XtraBars.StandaloneBarDockControl();
+            this.panLog = new DevExpress.XtraBars.Docking.DockPanel();
+            this.controlContainer2 = new DevExpress.XtraBars.Docking.ControlContainer();
+            this.txtLog = new System.Windows.Forms.TextBox();
             this.panelContainer1 = new DevExpress.XtraBars.Docking.DockPanel();
             this.panConditions = new DevExpress.XtraBars.Docking.DockPanel();
             this.dockPanel1_Container = new DevExpress.XtraBars.Docking.ControlContainer();
@@ -98,6 +103,8 @@ namespace EntityCore.Forms
             ((System.ComponentModel.ISupportInitialize)(this.docTactic)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dockManager)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).BeginInit();
+            this.panLog.SuspendLayout();
+            this.controlContainer2.SuspendLayout();
             this.panelContainer1.SuspendLayout();
             this.panConditions.SuspendLayout();
             this.dockPanel1_Container.SuspendLayout();
@@ -146,7 +153,7 @@ namespace EntityCore.Forms
             // 
             this.docPatrol.Caption = "Patrol";
             this.docPatrol.ControlName = "panPatrol";
-            this.docPatrol.FloatLocation = new System.Drawing.Point(500, 160);
+            this.docPatrol.FloatLocation = new System.Drawing.Point(492, 163);
             this.docPatrol.FloatSize = new System.Drawing.Size(400, 400);
             this.docPatrol.Properties.AllowClose = DevExpress.Utils.DefaultBoolean.False;
             this.docPatrol.Properties.AllowFloat = DevExpress.Utils.DefaultBoolean.False;
@@ -167,6 +174,7 @@ namespace EntityCore.Forms
             this.dockManager.Form = this;
             this.dockManager.MenuManager = this.barManager;
             this.dockManager.RootPanels.AddRange(new DevExpress.XtraBars.Docking.DockPanel[] {
+            this.panLog,
             this.panelContainer1,
             this.panCombat,
             this.panPatrol,
@@ -206,9 +214,11 @@ namespace EntityCore.Forms
             this.btnNewProfile,
             this.btnSaveProfielAs,
             this.btnCopyAction,
-            this.btnPasteAction});
+            this.btnPasteAction,
+            this.btnTestSelected,
+            this.btnTestAll});
             this.barManager.MainMenu = this.barProfile;
-            this.barManager.MaxItemId = 10;
+            this.barManager.MaxItemId = 12;
             // 
             // barActionTools
             // 
@@ -216,46 +226,76 @@ namespace EntityCore.Forms
             this.barActionTools.DockCol = 1;
             this.barActionTools.DockRow = 0;
             this.barActionTools.DockStyle = DevExpress.XtraBars.BarDockStyle.Top;
-            this.barActionTools.FloatLocation = new System.Drawing.Point(595, 121);
+            this.barActionTools.FloatLocation = new System.Drawing.Point(301, 153);
             this.barActionTools.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
             new DevExpress.XtraBars.LinkPersistInfo(this.bntAddAction),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnDelAction),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnCopyAction),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnPasteAction)});
-            this.barActionTools.Offset = 211;
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnPasteAction),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnTestSelected, true),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnTestAll)});
+            this.barActionTools.Offset = 215;
             this.barActionTools.Text = "Tools";
             // 
             // bntAddAction
             // 
-            this.bntAddAction.Caption = "Add Action";
+            this.bntAddAction.Caption = "Add Item";
+            this.bntAddAction.Hint = "Add new item into active collection (ucc-Action, ucc-Condition or TargetPriority)" +
+    "";
             this.bntAddAction.Id = 0;
             this.bntAddAction.ImageOptions.Image = global::EntityCore.Properties.Resources.miniAdd;
+            this.bntAddAction.ItemShortcut = new DevExpress.XtraBars.BarShortcut(System.Windows.Forms.Keys.Insert);
             this.bntAddAction.Name = "bntAddAction";
             this.bntAddAction.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Add);
             // 
             // btnDelAction
             // 
-            this.btnDelAction.Caption = "Delete Action";
+            this.btnDelAction.Caption = "Delete Item";
+            this.btnDelAction.Hint = "Delete selected item from active collection (ucc-Action, ucc-Condition or TargetP" +
+    "riority)";
             this.btnDelAction.Id = 1;
             this.btnDelAction.ImageOptions.Image = global::EntityCore.Properties.Resources.miniCancel;
+            this.btnDelAction.ItemShortcut = new DevExpress.XtraBars.BarShortcut((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Delete));
             this.btnDelAction.Name = "btnDelAction";
             this.btnDelAction.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_DeleteAction);
             // 
             // btnCopyAction
             // 
-            this.btnCopyAction.Caption = "Copy Action";
+            this.btnCopyAction.Caption = "Copy Item";
+            this.btnCopyAction.Hint = "Copy to clipboard the selected item from active collection (ucc-Action, ucc-Condi" +
+    "tion or TargetPriority)";
             this.btnCopyAction.Id = 7;
             this.btnCopyAction.ImageOptions.Image = global::EntityCore.Properties.Resources.miniCopy;
+            this.btnCopyAction.ItemShortcut = new DevExpress.XtraBars.BarShortcut((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C));
             this.btnCopyAction.Name = "btnCopyAction";
             this.btnCopyAction.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Copy);
             // 
             // btnPasteAction
             // 
-            this.btnPasteAction.Caption = "Paste Action";
+            this.btnPasteAction.Caption = "Paste Item";
+            this.btnPasteAction.Hint = "Pasthe item from the clipboard nto active collection (ucc-Action, ucc-Condition o" +
+    "r TargetPriority)";
             this.btnPasteAction.Id = 8;
             this.btnPasteAction.ImageOptions.Image = global::EntityCore.Properties.Resources.paste;
+            this.btnPasteAction.ItemShortcut = new DevExpress.XtraBars.BarShortcut((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V));
             this.btnPasteAction.Name = "btnPasteAction";
             this.btnPasteAction.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Paste);
+            // 
+            // btnTestSelected
+            // 
+            this.btnTestSelected.Caption = "Test";
+            this.btnTestSelected.Id = 10;
+            this.btnTestSelected.ImageOptions.Image = global::EntityCore.Properties.Resources.miniPlay;
+            this.btnTestSelected.Name = "btnTestSelected";
+            this.btnTestSelected.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_TestSelected);
+            // 
+            // btnTestAll
+            // 
+            this.btnTestAll.Caption = "Test All";
+            this.btnTestAll.Id = 11;
+            this.btnTestAll.ImageOptions.Image = global::EntityCore.Properties.Resources.miniPlayAll;
+            this.btnTestAll.Name = "btnTestAll";
+            this.btnTestAll.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_TestAll);
             // 
             // barProfile
             // 
@@ -269,7 +309,6 @@ namespace EntityCore.Forms
             new DevExpress.XtraBars.LinkPersistInfo(this.btnSaveProfile),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnSaveProfielAs),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnToEngine)});
-            this.barProfile.OptionsBar.MultiLine = true;
             this.barProfile.Text = "Profile";
             // 
             // btnNewProfile
@@ -277,6 +316,7 @@ namespace EntityCore.Forms
             this.btnNewProfile.Caption = "New Profile";
             this.btnNewProfile.Id = 5;
             this.btnNewProfile.ImageOptions.Image = global::EntityCore.Properties.Resources.miniNewFile;
+            this.btnNewProfile.ItemShortcut = new DevExpress.XtraBars.BarShortcut((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N));
             this.btnNewProfile.Name = "btnNewProfile";
             this.btnNewProfile.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_NewProfile);
             // 
@@ -285,6 +325,7 @@ namespace EntityCore.Forms
             this.btnLoadProfile.Caption = "Load Profile";
             this.btnLoadProfile.Id = 3;
             this.btnLoadProfile.ImageOptions.Image = global::EntityCore.Properties.Resources.miniOpen;
+            this.btnLoadProfile.ItemShortcut = new DevExpress.XtraBars.BarShortcut((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O));
             this.btnLoadProfile.Name = "btnLoadProfile";
             this.btnLoadProfile.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_LoadProfile);
             // 
@@ -293,6 +334,7 @@ namespace EntityCore.Forms
             this.btnSaveProfile.Caption = "Save Profile";
             this.btnSaveProfile.Id = 2;
             this.btnSaveProfile.ImageOptions.Image = global::EntityCore.Properties.Resources.miniDisket;
+            this.btnSaveProfile.ItemShortcut = new DevExpress.XtraBars.BarShortcut((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S));
             this.btnSaveProfile.Name = "btnSaveProfile";
             this.btnSaveProfile.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_SaveProfile);
             // 
@@ -307,9 +349,11 @@ namespace EntityCore.Forms
             // btnToEngine
             // 
             this.btnToEngine.Caption = "Export to UccEngine";
+            this.btnToEngine.Hint = "Export currently editing Profile to UccEngine";
             this.btnToEngine.Id = 4;
             this.btnToEngine.ImageOptions.Image = global::EntityCore.Properties.Resources.miniImport;
             this.btnToEngine.Name = "btnToEngine";
+            this.btnToEngine.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_ProfileToEngine);
             // 
             // barDockControlTop
             // 
@@ -354,6 +398,39 @@ namespace EntityCore.Forms
             this.standaloneBarDockControl1.Size = new System.Drawing.Size(340, 0);
             this.standaloneBarDockControl1.Text = "standaloneBarDockControl1";
             // 
+            // panLog
+            // 
+            this.panLog.Controls.Add(this.controlContainer2);
+            this.panLog.Dock = DevExpress.XtraBars.Docking.DockingStyle.Bottom;
+            this.panLog.FloatSize = new System.Drawing.Size(700, 200);
+            this.panLog.FloatVertical = true;
+            this.panLog.ID = new System.Guid("0e9b0b1f-11f2-43d8-9544-8532ec69fd0b");
+            this.panLog.Location = new System.Drawing.Point(0, 488);
+            this.panLog.Name = "panLog";
+            this.panLog.OriginalSize = new System.Drawing.Size(200, 100);
+            this.panLog.Size = new System.Drawing.Size(698, 100);
+            this.panLog.Text = "Log";
+            // 
+            // controlContainer2
+            // 
+            this.controlContainer2.Controls.Add(this.txtLog);
+            this.controlContainer2.Location = new System.Drawing.Point(3, 27);
+            this.controlContainer2.Name = "controlContainer2";
+            this.controlContainer2.Size = new System.Drawing.Size(692, 70);
+            this.controlContainer2.TabIndex = 0;
+            // 
+            // txtLog
+            // 
+            this.txtLog.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtLog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtLog.Location = new System.Drawing.Point(0, 0);
+            this.txtLog.Multiline = true;
+            this.txtLog.Name = "txtLog";
+            this.txtLog.ReadOnly = true;
+            this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtLog.Size = new System.Drawing.Size(692, 70);
+            this.txtLog.TabIndex = 0;
+            // 
             // panelContainer1
             // 
             this.panelContainer1.Controls.Add(this.panConditions);
@@ -363,7 +440,7 @@ namespace EntityCore.Forms
             this.panelContainer1.Location = new System.Drawing.Point(265, 24);
             this.panelContainer1.Name = "panelContainer1";
             this.panelContainer1.OriginalSize = new System.Drawing.Size(433, 200);
-            this.panelContainer1.Size = new System.Drawing.Size(433, 564);
+            this.panelContainer1.Size = new System.Drawing.Size(433, 464);
             this.panelContainer1.Text = "panelContainer1";
             // 
             // panConditions
@@ -376,8 +453,8 @@ namespace EntityCore.Forms
             this.panConditions.Location = new System.Drawing.Point(0, 0);
             this.panConditions.Name = "panConditions";
             this.panConditions.Options.ShowCloseButton = false;
-            this.panConditions.OriginalSize = new System.Drawing.Size(433, 176);
-            this.panConditions.Size = new System.Drawing.Size(433, 174);
+            this.panConditions.OriginalSize = new System.Drawing.Size(433, 143);
+            this.panConditions.Size = new System.Drawing.Size(433, 161);
             this.panConditions.Text = "Conditions";
             this.panConditions.Enter += new System.EventHandler(this.handler_Focused);
             // 
@@ -386,7 +463,7 @@ namespace EntityCore.Forms
             this.dockPanel1_Container.Controls.Add(this.treeConditions);
             this.dockPanel1_Container.Location = new System.Drawing.Point(4, 26);
             this.dockPanel1_Container.Name = "dockPanel1_Container";
-            this.dockPanel1_Container.Size = new System.Drawing.Size(426, 144);
+            this.dockPanel1_Container.Size = new System.Drawing.Size(426, 131);
             this.dockPanel1_Container.TabIndex = 0;
             // 
             // treeConditions
@@ -401,7 +478,7 @@ namespace EntityCore.Forms
             this.treeConditions.Location = new System.Drawing.Point(0, 0);
             this.treeConditions.Name = "treeConditions";
             this.treeConditions.SelectedImageIndex = 0;
-            this.treeConditions.Size = new System.Drawing.Size(426, 144);
+            this.treeConditions.Size = new System.Drawing.Size(426, 131);
             this.treeConditions.TabIndex = 0;
             this.treeConditions.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.handler_NodeCheckedChanged);
             this.treeConditions.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.treeView_ItemDrag);
@@ -446,11 +523,11 @@ namespace EntityCore.Forms
             this.panProperties.Dock = DevExpress.XtraBars.Docking.DockingStyle.Fill;
             this.panProperties.FloatSize = new System.Drawing.Size(400, 400);
             this.panProperties.ID = new System.Guid("75a27416-1cb7-4549-9526-cf83d78dcbc8");
-            this.panProperties.Location = new System.Drawing.Point(0, 174);
+            this.panProperties.Location = new System.Drawing.Point(0, 161);
             this.panProperties.Name = "panProperties";
             this.panProperties.Options.ShowCloseButton = false;
-            this.panProperties.OriginalSize = new System.Drawing.Size(433, 395);
-            this.panProperties.Size = new System.Drawing.Size(433, 390);
+            this.panProperties.OriginalSize = new System.Drawing.Size(433, 321);
+            this.panProperties.Size = new System.Drawing.Size(433, 303);
             this.panProperties.Text = "Properties";
             // 
             // panProperty
@@ -458,7 +535,7 @@ namespace EntityCore.Forms
             this.panProperty.Controls.Add(this.propertyGrid);
             this.panProperty.Location = new System.Drawing.Point(4, 26);
             this.panProperty.Name = "panProperty";
-            this.panProperty.Size = new System.Drawing.Size(426, 361);
+            this.panProperty.Size = new System.Drawing.Size(426, 274);
             this.panProperty.TabIndex = 0;
             // 
             // propertyGrid
@@ -466,7 +543,7 @@ namespace EntityCore.Forms
             this.propertyGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGrid.Location = new System.Drawing.Point(0, 0);
             this.propertyGrid.Name = "propertyGrid";
-            this.propertyGrid.Size = new System.Drawing.Size(426, 361);
+            this.propertyGrid.Size = new System.Drawing.Size(426, 274);
             this.propertyGrid.TabIndex = 0;
             this.propertyGrid.ToolbarVisible = false;
             this.propertyGrid.ViewBackColor = System.Drawing.SystemColors.Control;
@@ -495,7 +572,7 @@ namespace EntityCore.Forms
             this.combatActionsControlContainer.Controls.Add(this.treeCombatActions);
             this.combatActionsControlContainer.Location = new System.Drawing.Point(0, 0);
             this.combatActionsControlContainer.Name = "combatActionsControlContainer";
-            this.combatActionsControlContainer.Size = new System.Drawing.Size(259, 535);
+            this.combatActionsControlContainer.Size = new System.Drawing.Size(259, 435);
             this.combatActionsControlContainer.TabIndex = 0;
             // 
             // treeCombatActions
@@ -508,14 +585,13 @@ namespace EntityCore.Forms
             this.treeCombatActions.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.treeCombatActions.ForeColor = System.Drawing.SystemColors.WindowText;
             this.treeCombatActions.FullRowSelect = true;
-            this.treeCombatActions.HideSelection = false;
             this.treeCombatActions.ImageKey = "Box";
             this.treeCombatActions.ImageList = this.imageList;
             this.treeCombatActions.Indent = 22;
             this.treeCombatActions.Location = new System.Drawing.Point(0, 0);
             this.treeCombatActions.Name = "treeCombatActions";
             this.treeCombatActions.SelectedImageIndex = 0;
-            this.treeCombatActions.Size = new System.Drawing.Size(259, 535);
+            this.treeCombatActions.Size = new System.Drawing.Size(259, 435);
             this.treeCombatActions.TabIndex = 0;
             this.treeCombatActions.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.handler_NodeCheckedChanged);
             this.treeCombatActions.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.treeView_ItemDrag);
@@ -529,7 +605,7 @@ namespace EntityCore.Forms
             // 
             this.panPatrol.Controls.Add(this.patrolActionsControlContainer);
             this.panPatrol.DockedAsTabbedDocument = true;
-            this.panPatrol.FloatLocation = new System.Drawing.Point(500, 160);
+            this.panPatrol.FloatLocation = new System.Drawing.Point(492, 163);
             this.panPatrol.FloatSize = new System.Drawing.Size(400, 400);
             this.panPatrol.ID = new System.Guid("df1cc296-d64d-4aba-b3e4-11a44a1fa366");
             this.panPatrol.Name = "panPatrol";
@@ -537,9 +613,9 @@ namespace EntityCore.Forms
             this.panPatrol.Options.FloatOnDblClick = false;
             this.panPatrol.Options.ShowCloseButton = false;
             this.panPatrol.OriginalSize = new System.Drawing.Size(200, 200);
-            this.panPatrol.SavedIndex = 2;
+            this.panPatrol.SavedIndex = 3;
             this.panPatrol.SavedMdiDocument = true;
-            this.panPatrol.SavedMdiDocumentIndex = 0;
+            this.panPatrol.SavedMdiDocumentIndex = 1;
             this.panPatrol.Text = "Patrol";
             this.panPatrol.Enter += new System.EventHandler(this.handler_Focused);
             // 
@@ -548,7 +624,7 @@ namespace EntityCore.Forms
             this.patrolActionsControlContainer.Controls.Add(this.treePatrolActions);
             this.patrolActionsControlContainer.Location = new System.Drawing.Point(0, 0);
             this.patrolActionsControlContainer.Name = "patrolActionsControlContainer";
-            this.patrolActionsControlContainer.Size = new System.Drawing.Size(259, 535);
+            this.patrolActionsControlContainer.Size = new System.Drawing.Size(259, 435);
             this.patrolActionsControlContainer.TabIndex = 0;
             // 
             // treePatrolActions
@@ -568,7 +644,7 @@ namespace EntityCore.Forms
             this.treePatrolActions.Location = new System.Drawing.Point(0, 0);
             this.treePatrolActions.Name = "treePatrolActions";
             this.treePatrolActions.SelectedImageIndex = 0;
-            this.treePatrolActions.Size = new System.Drawing.Size(259, 535);
+            this.treePatrolActions.Size = new System.Drawing.Size(259, 435);
             this.treePatrolActions.TabIndex = 0;
             this.treePatrolActions.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.handler_NodeCheckedChanged);
             this.treePatrolActions.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.treeView_ItemDrag);
@@ -603,7 +679,7 @@ namespace EntityCore.Forms
             this.controlContainer1.Controls.Add(this.groupPriority);
             this.controlContainer1.Location = new System.Drawing.Point(0, 0);
             this.controlContainer1.Name = "controlContainer1";
-            this.controlContainer1.Size = new System.Drawing.Size(259, 535);
+            this.controlContainer1.Size = new System.Drawing.Size(259, 435);
             this.controlContainer1.TabIndex = 0;
             // 
             // checkerTacticActivator
@@ -619,7 +695,7 @@ namespace EntityCore.Forms
             this.checkerTacticActivator.Properties.Appearance.Options.UseBackColor = true;
             this.checkerTacticActivator.Properties.Appearance.Options.UseFont = true;
             this.checkerTacticActivator.Properties.Caption = "Custom Target Priority settings";
-            this.checkerTacticActivator.Size = new System.Drawing.Size(178, 20);
+            this.checkerTacticActivator.Size = new System.Drawing.Size(243, 20);
             this.checkerTacticActivator.TabIndex = 0;
             this.checkerTacticActivator.CheckedChanged += new System.EventHandler(this.handler_TacticUsageChanged);
             // 
@@ -690,7 +766,7 @@ namespace EntityCore.Forms
             this.groupPriority.Controls.Add(this.editBasePriorityRange);
             this.groupPriority.Location = new System.Drawing.Point(3, 86);
             this.groupPriority.Name = "groupPriority";
-            this.groupPriority.Size = new System.Drawing.Size(253, 446);
+            this.groupPriority.Size = new System.Drawing.Size(253, 346);
             this.groupPriority.TabIndex = 5;
             // 
             // listPriorities
@@ -701,7 +777,7 @@ namespace EntityCore.Forms
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listPriorities.Location = new System.Drawing.Point(6, 106);
             this.listPriorities.Name = "listPriorities";
-            this.listPriorities.Size = new System.Drawing.Size(242, 334);
+            this.listPriorities.Size = new System.Drawing.Size(242, 234);
             this.listPriorities.TabIndex = 3;
             this.listPriorities.SelectedValueChanged += new System.EventHandler(this.listPriorities_SelectedValueChanged);
             this.listPriorities.DragDrop += new System.Windows.Forms.DragEventHandler(this.listPriorities_DragDrop);
@@ -821,12 +897,12 @@ namespace EntityCore.Forms
             this.tabbedView.DocumentProperties.AllowFloatOnDoubleClick = false;
             this.tabbedView.Documents.AddRange(new DevExpress.XtraBars.Docking2010.Views.BaseDocument[] {
             this.docCombat,
-            this.docPatrol,
-            this.docTactic});
+            this.docTactic,
+            this.docPatrol});
             this.tabbedView.EnableFreeLayoutMode = DevExpress.Utils.DefaultBoolean.False;
-            dockingContainer3.Element = this.documentGroup;
+            dockingContainer2.Element = this.documentGroup;
             this.tabbedView.RootContainer.Nodes.AddRange(new DevExpress.XtraBars.Docking2010.Views.Tabbed.DockingContainer[] {
-            dockingContainer3});
+            dockingContainer2});
             // 
             // UccEditor
             // 
@@ -834,6 +910,7 @@ namespace EntityCore.Forms
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(698, 588);
             this.Controls.Add(this.panelContainer1);
+            this.Controls.Add(this.panLog);
             this.Controls.Add(this.barDockControlLeft);
             this.Controls.Add(this.barDockControlRight);
             this.Controls.Add(this.barDockControlBottom);
@@ -842,12 +919,16 @@ namespace EntityCore.Forms
             this.LookAndFeel.TouchUIMode = DevExpress.Utils.DefaultBoolean.False;
             this.Name = "UccEditor";
             this.Text = "UCC Profile Editor";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.handler_Closing);
             ((System.ComponentModel.ISupportInitialize)(this.documentGroup)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.docCombat)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.docPatrol)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.docTactic)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dockManager)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).EndInit();
+            this.panLog.ResumeLayout(false);
+            this.controlContainer2.ResumeLayout(false);
+            this.controlContainer2.PerformLayout();
             this.panelContainer1.ResumeLayout(false);
             this.panConditions.ResumeLayout(false);
             this.dockPanel1_Container.ResumeLayout(false);
@@ -936,5 +1017,10 @@ namespace EntityCore.Forms
         private DevExpress.XtraEditors.CheckEdit checkerUsePotion;
         private DevExpress.XtraEditors.SpinEdit editHealthProcent;
         private DevExpress.XtraEditors.CheckEdit checkerTacticActivator;
+        private BarButtonItem btnTestSelected;
+        private BarButtonItem btnTestAll;
+        private DockPanel panLog;
+        private ControlContainer controlContainer2;
+        private TextBox txtLog;
     }
 }

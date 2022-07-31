@@ -25,21 +25,7 @@ namespace AcTp0Tools
             // Ошибка доступа времени исполнения
             public static class Roles
             {
-#if HARMONY_TRAVERSE
 
-                static Roles()
-                {
-                    Type type = Assembly.GetEntryAssembly()?.GetType("Astral.Controllers.Roles");
-                    if (type != null)
-                    {
-                        currentRole = Traverse.Create(type).Property("CurrentRole"); 
-                        _currentRoleObject = currentRole.GetValue();
-                    }
-                }
-
-                private static readonly Traverse currentRole;
-                private static Role _currentRoleObject; 
-#else
                 static Roles()
                 {
                     var assembly = Assembly.GetEntryAssembly();
@@ -73,6 +59,8 @@ namespace AcTp0Tools
                         else 
                         {
                             currentRoleAccessor = tControler_Roles.GetStaticProperty("CurrentRole", tRole);
+                            isRunningAccessor =
+                                tControler_Roles.GetStaticProperty<bool>(nameof(Astral.Controllers.Roles.IsRunning));
                         }
                     }
                 }
@@ -99,8 +87,11 @@ namespace AcTp0Tools
                 /// Закрытый тип <see cref="Astral.Addons.Role"/>
                 /// </summary>
                 private static readonly Type tRole;
-#endif
 
+                // Astral.Controllers.Roles.IsRunning
+
+                public static bool IsRunning => isRunningAccessor.Value;
+                private static StaticPropertyAccessor<bool> isRunningAccessor;
 
                 public static class CurrentRole
                 {

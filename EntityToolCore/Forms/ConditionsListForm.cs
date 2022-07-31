@@ -1,15 +1,15 @@
-﻿using DevExpress.XtraEditors;
+﻿using AcTp0Tools.Reflection;
+using Astral.Logic.UCC.Classes;
+using DevExpress.XtraEditors;
+using EntityTools.Enums;
+using EntityTools.Extensions;
+using EntityTools.UCC.Actions;
+using EntityTools.UCC.Conditions;
 using System;
 using System.Text;
 using System.Windows.Forms;
-using EntityTools.UCC.Conditions;
-using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
-using Astral.Logic.UCC.Classes;
-using EntityTools.Extensions;
+using ConditionList = System.Collections.ObjectModel.ObservableCollection<Astral.Logic.UCC.Classes.UCCCondition>;
 using UCCEditor = Astral.Logic.UCC.Forms.Editor;
-using EntityTools.UCC.Actions;
-using AcTp0Tools.Reflection;
-using EntityTools.Enums;
 
 namespace EntityCore.Forms
 {
@@ -57,7 +57,7 @@ namespace EntityCore.Forms
             if (@this.ShowDialog() == DialogResult.OK)
             {
                 // Формируем новый список условий
-                ConditionList newConditionList = new ConditionList(@this.lsbxConditions.Items.Count);
+                ConditionList newConditionList = new ConditionList();
                 foreach (object item in @this.lsbxConditions.Items)
                 {
                     if (item is UCCCondition cnd)
@@ -92,7 +92,7 @@ namespace EntityCore.Forms
             {
                 //BUG : Неправильное копирование последнего условия из списка
                 // Формируем новый список условий
-                ConditionList newConditions = new ConditionList(@this.lsbxConditions.Items.Count);
+                ConditionList newConditions = new ConditionList();
                 foreach (object item in @this.lsbxConditions.Items)
                 {
                     if (item is UCCCondition cnd)

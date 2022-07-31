@@ -19,8 +19,6 @@ namespace EntityTools.UCC.Actions
     [Serializable]
     public class UseItemSpecial : UCCAction
     {
-
-
         #region Опции команды
 #if DEVELOPER
         [Editor(typeof(ItemIdEditor), typeof(UITypeEditor))]

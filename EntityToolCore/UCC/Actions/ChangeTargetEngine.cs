@@ -165,12 +165,14 @@ namespace EntityCore.UCC.Actions
                 {
                     string currentMethodName = string.Concat(_idStr, '.', MethodBase.GetCurrentMethod()?.Name ?? nameof(NeedToRun));
 
+#if CUSTOM_UCC_CONDITION_EDITOR
                     bool customConditionOk = ((ICustomUCCCondition)@this.CustomConditions).IsOK(@this);
                     if (!customConditionOk)
                     {
                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": CustomConditions check failed. Skip... "), true);
                         return false;
-                    }
+                    } 
+#endif
 
                     var targetStr = target is null || !target.IsValid
                         ? "Target[NULL]"
@@ -193,9 +195,13 @@ namespace EntityCore.UCC.Actions
                     ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ", targetStr, " MISMATCH. Found ", newTargetStr, ". NeedToRun... "), true);
                     return true;
                 }
-                
+
+#if CUSTOM_UCC_CONDITION_EDITOR
                 return ((ICustomUCCCondition)@this.CustomConditions).IsOK(@this) &&
-                       _targetProcessor.IsTargetMismatchedAndCanBeChanged(target);
+                               _targetProcessor.IsTargetMismatchedAndCanBeChanged(target); 
+#else
+                return _targetProcessor.IsTargetMismatchedAndCanBeChanged(target);
+#endif
             }
         }
 

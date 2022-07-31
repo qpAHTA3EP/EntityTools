@@ -2,8 +2,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Linq;
 using System.Xml.Serialization;
 using Astral.Logic.UCC.Classes;
 using EntityTools.Editors;
@@ -23,7 +26,7 @@ namespace EntityTools.UCC.Actions
     public class SpecializedUCCAction : UCCAction
     {
 #if DEBUG && DEBUG_LOG
-        static StringBuilder debugStr = new StringBuilder(1000);
+        static StringBuilder debugStr = new StringBuilder();
 #endif
 
         #region Опции команды
@@ -37,6 +40,7 @@ namespace EntityTools.UCC.Actions
 #endif
         public UCCAction ManagedAction { get; set; }
 
+#if CUSTOM_UCC_CONDITION_EDITOR
 #if DEVELOPER
         [Category("Custom Conditions")]
         [Description("Список нестандартных условий, реализованных в плагинах")]
@@ -62,7 +66,94 @@ namespace EntityTools.UCC.Actions
 #else
         [Browsable(false)]
 #endif
-        public LogicRule CustomConditionCheck { get; set; }
+        public LogicRule CustomConditionCheck { get; set; } 
+#else
+        /// <summary>
+        /// Данное свойство необходимо в целях обеспечения совместимости со старой версией <see cref="SpecializedUCCAction"/>,
+        /// в которой дополнительные условия содержались в отдельном списке <see cref="CustomConditions"/>.<br/>
+        /// При десериализации <see cref="SpecializedUCCAction"/> стандартные <see cref="XmlSerializer"/> сначала инициализирует пустой список,
+        /// а затем добавляет в него десериализованные элементы методом <see cref="ICollection{UCCCondition}.Add"/>.<br/>
+        /// В новой версии <see cref="SpecializedUCCAction"/> все условия хранятся в одном списке <see cref="UCCAction.Conditions"/>,
+        /// поэтому приходится отслеживать момент добавления условия в список <see cref="CustomConditions"/>, чтобы в этот момент обернуть его в <see cref="UCCConditionPack"/> и добавить его в <see cref="UCCAction.Conditions"/>.<br/>
+        /// 
+        /// </summary>
+        [Browsable(false)]
+        public ObservableCollection<UCCCondition> CustomConditions
+        {
+            get
+            {
+                if (_customConditions is null)
+                {
+                    _customConditions = new UCCConditionPack();
+                    _customConditions.Conditions.CollectionChanged += OnCustomConditionChanged;
+                }
+                return _customConditions.Conditions;
+            }
+            set
+            {
+                if (value != null)
+                {
+                    if (_customConditions is null)
+                    {
+                        _customConditions = new UCCConditionPack { Conditions = value };
+                        if (value.Count > 0)
+                            base.Conditions.Add(_customConditions);
+                        else _customConditions.Conditions.CollectionChanged += OnCustomConditionChanged;
+                        return;
+                    }
+
+                    if (ReferenceEquals(_customConditions.Conditions, value))
+                        return;
+                    
+                    _customConditions.Conditions.CollectionChanged -= OnCustomConditionChanged;
+                    _customConditions.Conditions = value;
+                    if(value.Count > 0)
+                        base.Conditions.Add(_customConditions);
+                    else _customConditions.Conditions.CollectionChanged += OnCustomConditionChanged;
+                }
+                else _customConditions?.Conditions.Clear();
+            }
+        }
+        /// <summary>
+        /// Метод для отследживания момент добавления условия в список <see cref="CustomConditions"/> и добавления в этот момент <see cref="_customConditions"/> в список <see cref="UCCAction.Conditions"/>
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnCustomConditionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (_customConditions is null 
+                || !ReferenceEquals(sender, _customConditions.Conditions))
+            {
+                ((ObservableCollection<UCCCondition>)sender).CollectionChanged -= OnCustomConditionChanged;
+                return;
+            }
+            if (e.Action == NotifyCollectionChangedAction.Add
+                && !base.Conditions.Contains(_customConditions))
+            {
+                base.Conditions.Add(_customConditions);
+                _customConditions.Conditions.CollectionChanged -= OnCustomConditionChanged;
+            }
+        }
+        public bool ShouldSerializeCustomConditions() => false;
+
+        [Browsable(false)]
+        public bool Not
+        {
+            get => _customConditions?.Not ?? false; 
+            set => (_customConditions ?? (_customConditions = new UCCConditionPack())).Not = value;
+        }
+        public bool ShouldSerializeNot() => false;
+
+        [Browsable(false)]
+        public LogicRule CustomConditionCheck
+        {
+            get => _customConditions?.TestRule ?? LogicRule.Conjunction;
+            set => (_customConditions ?? (_customConditions = new UCCConditionPack())).TestRule = value;
+        }
+        public bool ShouldSerializeCustomConditionCheck() => false;
+
+        private UCCConditionPack _customConditions;
+#endif
 
 #if DEVELOPER
         [Category("SpecificTimer")]
@@ -90,6 +181,7 @@ namespace EntityTools.UCC.Actions
             {
                 if (ManagedAction == null) return false;
 
+#if CUSTOM_UCC_CONDITION_EDITOR
                 if (!ManagedAction.NeedToRun)
                     return false;
 
@@ -284,7 +376,10 @@ namespace EntityTools.UCC.Actions
                     return result;
                 }
 
-                return false;
+                return false; 
+#else
+                return ManagedAction.NeedToRun;
+#endif
             }
         }
 
@@ -318,7 +413,9 @@ namespace EntityTools.UCC.Actions
             {
                 ManagedAction = CopyHelper.CreateDeepCopy(ManagedAction),
                 CustomConditionCheck = CustomConditionCheck,
-                CustomConditions = CustomConditions.Clone() ?? new List<UCCCondition>()
+                CustomConditions = new ObservableCollection<UCCCondition>(CustomConditions.Select(cnd => cnd is ICustomUCCCondition cstCnd
+                                                                                                                       ? (UCCCondition)cstCnd.Clone()
+                                                                                                                       : cnd.Clone()))
             });
         }
 
@@ -335,18 +432,7 @@ namespace EntityTools.UCC.Actions
                 base.Random = value;
             }
         }
-        //[XmlIgnore]
-        //[Browsable(false)]
-        //public new bool OneCondMustGood
-        //{
-        //    get => (CurrentAction == null) ? false : CurrentAction.OneCondMustGood;
-        //    set
-        //    {
-        //        if (CurrentAction != null)
-        //            CurrentAction.OneCondMustGood = value;
-        //        base.OneCondMustGood = value;
-        //    }
-        //}
+
         [XmlIgnore]
         [Browsable(false)]
         public new int Range

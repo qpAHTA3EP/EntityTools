@@ -120,12 +120,12 @@ namespace EntityTools.Core
             throw new NotImplementedException();
         }
 
-        public bool UserRequest_EditUccConditions(ref List<UCCCondition> list)
+        public bool UserRequest_EditUccConditions(ref System.Collections.ObjectModel.ObservableCollection<UCCCondition> list)
         {
             throw new NotImplementedException();
         }
 
-        public bool UserRequest_EditUccConditions(ref List<UCCCondition> list, ref LogicRule logic, ref bool negation)
+        public bool UserRequest_EditUccConditions(ref System.Collections.ObjectModel.ObservableCollection<UCCCondition> list, ref LogicRule logic, ref bool negation)
         {
             throw new NotImplementedException();
         }

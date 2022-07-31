@@ -16,13 +16,7 @@ namespace EntityCore.UCC.Actions
         private DodgeFromEntity @this;
 
         private Dodge dodge = new Dodge();
-        /// <summary>
-        /// Функтор, предназначенный для проверки соответствия Entity
-        /// основным критериям: EntityID, EntityIdType, EntityNameType
-        /// </summary>
-#if false
-        private Predicate<Entity> checkEntity { get; set; } = null; 
-#endif
+
         private Entity entity = null;
         private Timeout timeout = new Timeout(0);
         private string _label = string.Empty;

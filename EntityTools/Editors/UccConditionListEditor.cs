@@ -3,7 +3,7 @@ using EntityTools.UCC.Conditions;
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
+using ConditionList = System.Collections.ObjectModel.ObservableCollection<Astral.Logic.UCC.Classes.UCCCondition>;
 
 
 namespace EntityTools.Editors

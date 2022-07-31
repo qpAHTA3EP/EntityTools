@@ -128,9 +128,11 @@ namespace EntityCore.UCC.Actions
                 if (targetMain.Self && Combats.MobCountAround() == 0)
                     return false;
 
+#if CUSTOM_UCC_CONDITION_EDITOR
                 bool customConditionOk = ((ICustomUCCCondition)@this._customConditions).IsOK(@this);
                 if (!customConditionOk)
-                    return false;
+                    return false; 
+#endif
 
                 return !currentPower.IsOnCooldown();
             }

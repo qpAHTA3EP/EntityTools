@@ -127,23 +127,25 @@ namespace EntityTools.Settings
         private bool auraDetector = true;
 
         /// <summary>
-        /// Активация или деактивация Патча UccCondition
+        /// Активация или деактивация Патча UccComplextPatch
         /// </summary>
         [Bindable(true)]
-        [Description("Управление патчем UccCondition")]
-        public bool UccCondition
+        [Description("Управление патчем UccComplextPatch.\n" +
+                     "Обеспечивает функционирования дополнительных UCC-условий.\n" +
+                     "Подменяет редактор UCC-профиля.")]
+        public bool UccComplextPatch
         {
-            get => uccCondition;
+            get => uccComplexPatch;
             set
             {
-                if (uccCondition != value)
+                if (uccComplexPatch != value)
                 {
-                    uccCondition = value;
+                    uccComplexPatch = value;
                     NotifyPropertyChanged();
                 }
             }
         }
-        private bool uccCondition = true;
+        private bool uccComplexPatch = true;
 
         public override string ToString()
         {

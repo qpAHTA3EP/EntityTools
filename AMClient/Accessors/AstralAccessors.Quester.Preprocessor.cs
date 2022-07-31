@@ -250,11 +250,7 @@ namespace AcTp0Tools
                     set
                     {
                         type = value;
-#if false
-                regex = null; 
-#else
                         processor = null;
-#endif
                         OnPropertyChanged();
                     }
                 }
@@ -268,11 +264,7 @@ namespace AcTp0Tools
                     set
                     {
                         pattern = value;
-#if false
-                regex = null; 
-#else
                         processor = null;
-#endif
                         OnPropertyChanged();
                     }
                 }
@@ -297,24 +289,6 @@ namespace AcTp0Tools
                 {
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
                 }
-
-#if false
-        /// <summary>
-        /// Проверка наличия в строке <see cref="input"/>, подстроки <see cref="Pattern"/>
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        public bool IsMatch(string input)
-        {
-            var rgx = GetRegex();
-            if (rgx != null)
-            {
-                return rgx.IsMatch(input);
-            }
-            return false;
-        } 
-#endif
-
                 /// <summary>
                 /// Проверка корректности 
                 /// </summary>
@@ -323,11 +297,7 @@ namespace AcTp0Tools
                 {
                     get
                     {
-#if false
-                return GetRegex() != null; 
-#else
                         return GetProcessor() != null;
-#endif
                     }
                 }
 
@@ -349,57 +319,14 @@ namespace AcTp0Tools
                     return false;
                 }
 
-#if false
-        /// <summary>
-        /// Конструирование и компилирование регулярного выражения <see cref="Regex"/>,
-        /// которое используется для последующего сопоставления или замены
-        /// </summary>
-        /// <returns></returns>
-        private Regex GetRegex()
-        {
-            if (regex is null
-                && !string.IsNullOrEmpty(pattern))
-            {
-                string ptrn;
-                if (type == ItemFilterStringType.Simple)
-                {
-
-                    if (pattern[0] == '*')
-                    {
-                        if (pattern[pattern.Length - 1] == '*')
-                        {
-                            ptrn = @"\b" + pattern.Trim('*') + @"\b";
-                        }
-                        else
-                        {
-                            ptrn = @"\b" + pattern.TrimStart('*');
-                        }
-                    }
-                    else
-                    {
-                        if (pattern[pattern.Length - 1] == '*')
-                        {
-                            ptrn = pattern.TrimEnd('*') + @"\b";
-                        }
-                        else
-                        {
-                            ptrn = pattern;
-                        }
-                    }
-                }
-                else ptrn = pattern;
-                regex = new Regex(ptrn, RegexOptions.Compiled | RegexOptions.Singleline);
-            }
-
-            return regex;
-        }
-        private Regex regex; 
-#endif
-
                 private Func<string, string> GetProcessor()
                 {
                     if (processor is null)
                     {
+                        if (string.IsNullOrEmpty(pattern)
+                            || string.IsNullOrEmpty(replacement))
+                            return null;
+
                         if (type == ItemFilterStringType.Simple)
                         {
                             string SimpleReplace(string input)

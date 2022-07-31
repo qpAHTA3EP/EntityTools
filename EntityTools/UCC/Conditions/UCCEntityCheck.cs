@@ -143,7 +143,7 @@ namespace EntityTools.UCC.Conditions
             get => _reactionRange;
             set
             {
-                if (_reactionRange != value)
+                if (Math.Abs(_reactionRange - value) > 0.1)
                 {
                     _reactionRange = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionRange)));
@@ -164,7 +164,7 @@ namespace EntityTools.UCC.Conditions
             get => _reactionZRange;
             set
             {
-                if (_reactionZRange != value)
+                if (Math.Abs(_reactionZRange - value) > 0.1)
                 {
                     _reactionZRange = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionZRange)));
@@ -192,6 +192,7 @@ namespace EntityTools.UCC.Conditions
             }
         }
         private AuraOption _aura = new AuraOption();
+        public bool ShouldSerializeAura() => !string.IsNullOrEmpty(_aura.AuraName);
 
 #if !DEVELOPER
         [Browsable(false)]
@@ -216,7 +217,7 @@ namespace EntityTools.UCC.Conditions
         {
             get => _propertyValue; set
             {
-                if (_propertyValue != value)
+                if (Math.Abs(_propertyValue - value) > 0.1)
                 {
                     _propertyValue = value;
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PropertyValue)));

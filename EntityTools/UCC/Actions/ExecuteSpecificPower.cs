@@ -298,6 +298,8 @@ namespace EntityTools.UCC.Actions
 #endif
 #endif
 
+
+#if CUSTOM_UCC_CONDITION_EDITOR
 #if DEVELOPER
         [Category("Optional")]
         [Editor(typeof(UccConditionListEditor), typeof(UITypeEditor))]
@@ -314,10 +316,26 @@ namespace EntityTools.UCC.Actions
                     return;
 
                 _customConditions = value;
+                if (value != null)
+                    Conditions.Add(value);
+
                 NotifyPropertyChanged();
             }
         }
-        private UCCConditionPack _customConditions = new UCCConditionPack();
+        private UCCConditionPack _customConditions = new UCCConditionPack(); 
+#else
+        [Browsable(false)]
+        public UCCConditionPack CustomConditions
+        {
+            get => null;
+            set
+            {
+                if (value != null)
+                    Conditions.Add(value);
+            }
+        }
+        public bool ShouldSerializeCustomConditions() => false;
+#endif
 
         #region Hide Inherited Properties
         [XmlIgnore]
@@ -367,7 +385,9 @@ namespace EntityTools.UCC.Actions
                 _checkInTray = _checkInTray,
                 _castingTime = _castingTime,
                 _forceMaintain = _forceMaintain,
-                _customConditions = _customConditions.Clone() as UCCConditionPack
+#if CUSTOM_UCC_CONDITION_EDITOR
+                _customConditions = _customConditions.Clone() as UCCConditionPack 
+#endif
 #if EntityTarget
                 _entityId = _entityId,
                 _entityIdType = _entityIdType,

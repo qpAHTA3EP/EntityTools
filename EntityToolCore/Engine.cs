@@ -2,6 +2,7 @@
 using Astral.Classes.ItemFilter;
 using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
+using Astral.Quester.Classes;
 using DevExpress.Utils;
 using DevExpress.XtraEditors;
 using EntityCore.Entities;
@@ -9,6 +10,7 @@ using EntityCore.Forms;
 using EntityCore.Quester.Action;
 using EntityCore.Quester.Conditions;
 using EntityCore.Tools;
+using EntityCore.Tools.Powers;
 using EntityCore.UCC.Actions;
 using EntityCore.UCC.Conditions;
 using EntityTools;
@@ -17,6 +19,7 @@ using EntityTools.Enums;
 using EntityTools.Forms;
 using EntityTools.Quester.Actions;
 using EntityTools.Quester.Conditions;
+using EntityTools.Tools;
 using EntityTools.Tools.Extensions;
 using EntityTools.Tools.Targeting;
 using EntityTools.UCC.Actions;
@@ -28,13 +31,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
-using Astral.Quester.Classes;
-using DevExpress.XtraLayout.Resizing;
-using EntityCore.Tools.Powers;
-using EntityTools.Tools;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
-using UCCConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
+using UCCConditionList = System.Collections.ObjectModel.ObservableCollection<Astral.Logic.UCC.Classes.UCCCondition>;
 
 namespace EntityCore
 {
@@ -460,7 +459,7 @@ namespace EntityCore
             switch (obj)
             {
                 case Profil uccProfile:
-                    return UccEditor.Edit(uccProfile, param?.Length > 0 ? param[0].ToString() : string.Empty);
+                    return UccEditor.Edit(uccProfile, param);
                 default:
                     return false;
             }

@@ -1,5 +1,4 @@
-﻿#define PowerCache
-using Astral.Logic.NW;
+﻿using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
 using EntityCore.Tools.Powers;
 using EntityTools;
@@ -26,9 +25,7 @@ namespace EntityCore.UCC.Actions
 #endif
         private string label = string.Empty;
         private string _idStr;
-#if PowerCache
         private readonly PowerCache powerCache = new PowerCache(string.Empty); 
-#endif
         #endregion
 
         internal ExecuteSpecificPowerEngine(ExecuteSpecificPower esp)
@@ -88,9 +85,7 @@ namespace EntityCore.UCC.Actions
                 entity = null;
 #endif
                 label = string.Empty;
-#if PowerCache
                 powerCache.PowerIdPattern = @this.PowerId; 
-#endif
             }
         }
 
@@ -135,9 +130,7 @@ namespace EntityCore.UCC.Actions
 
             _idStr = string.Concat(@this.GetType().Name, '[', @this.GetHashCode().ToString("X2"), ']');
 
-#if PowerCache
             powerCache.PowerIdPattern = @this.PowerId; 
-#endif
             @this.Engine = this;
 
             return true;
@@ -154,11 +147,7 @@ namespace EntityCore.UCC.Actions
                     ? $"{_idStr}.{MethodBase.GetCurrentMethod()?.Name ?? nameof(NeedToRun)}"
                     : string.Empty;
 
-#if PowerCache
                 var pwr = powerCache.GetPower(); 
-#else
-                var pwr = Powers.GetPowerByInternalName(@this.PowerId);
-#endif
 
                 if (pwr is null)
                 {
@@ -181,6 +170,7 @@ namespace EntityCore.UCC.Actions
                     return false;
                 }
 
+#if CUSTOM_UCC_CONDITION_EDITOR
                 if (debugInfo)
                 {
                     var conditions = @this.CustomConditions.Conditions;
@@ -267,7 +257,10 @@ namespace EntityCore.UCC.Actions
                     return result;
                 }
 
-                return @this.CustomConditions.IsOK(@this);
+                return @this.CustomConditions.IsOK(@this); 
+#else
+                return true;
+#endif
             }
         }
 
@@ -282,11 +275,7 @@ namespace EntityCore.UCC.Actions
             if(debugInfo)
                 ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: starts");
 
-#if PowerCache
             var pwr = powerCache.GetPower(); 
-#else
-            var pwr = Powers.GetPowerByInternalName(@this.PowerId);
-#endif
 
             if (pwr is null)
             {
@@ -298,7 +287,6 @@ namespace EntityCore.UCC.Actions
 
             var targetEntity = UnitRef;
 
-#if true
             var powResult = pwr.ExecutePower(targetEntity, @this.CastingTime, @this.Range, @this.ForceMaintain, debugInfo);
 
             switch (powResult)
@@ -312,123 +300,6 @@ namespace EntityCore.UCC.Actions
                         ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Result => {powResult}");
                     return false;
             }
-#else
-            var entActivatedPower = currentPower.EntGetActivatedPower();
-            var powerDef = entActivatedPower.EntGetActivatedPower().EffectivePowerDef();
-
-            // Устанавливаем цель для перемещения персонажа к ней
-            if (@this.Target != Unit.Player)
-            {
-                // Вычисляем эффективный радиус действия команды
-                int effectiveRange = Powers.getEffectiveRange(powerDef);
-
-                if (@this.Range > 0)
-                    effectiveRange = @this.Range;
-
-                if (effectiveRange > 1)
-                {
-                    if (effectiveRange < 7)
-                    {
-                        effectiveRange = 7;
-                    }
-
-                    AstralAccessors.Logic.UCC.Controllers.Movements.RequireRange = effectiveRange - 2;
-
-                    // Пытаемся приблизиться к цели
-                    // Запуск Astral.Logic.UCC.Controllers.Movements.Start()
-                    // выполняется перед вызовом метода Run() текущей команды в 
-                    // Astral.Logic.UCC.Classes.ActionsPlayer.playActionList()
-                    var movingTimeout = new Timeout(1050);
-                    while (!AstralAccessors.Logic.UCC.Controllers.Movements.RangeIsOk)
-                    {
-                        if (Astral.Logic.UCC.Core.CurrentTarget.IsDead || movingTimeout.IsTimedOut)
-                        {
-                            // Завершаем команду, если цель мертва, или попытка приблизиться к ней неудачна
-                            return true;
-                        }
-                        Thread.Sleep(100);
-                    }
-                }
-            }
-
-            int castingTime = @this.CastingTime > 0
-                ? @this.CastingTime
-                : Powers.getEffectiveTimeCharge(powerDef);
-
-            if (targetEntity.ContainerId != EntityManager.LocalPlayer.ContainerId && !targetEntity.Location.IsInYawFace)
-            {
-                targetEntity.Location.Face();
-                var timeout = new Timeout(750);
-                while (!targetEntity.Location.IsInYawFace && !timeout.IsTimedOut)
-                {
-                    Thread.Sleep(20);
-                }
-                Thread.Sleep(100);
-            }
-
-            double effectiveTimeActivate = Powers.getEffectiveTimeActivate(powerDef) * 1.5;
-            var castingTimeout = new Timeout(castingTime);
-
-            try
-            {
-                if (!powerDef.GroundTargeted && !powerDef.Categories.Contains(PowerCategory.Ignorepitch))
-                {
-                    targetEntity.Location.Face();
-                    if (debugInfo)
-                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Activate ExecPower '{currentPower.PowerDef.InternalName}' on target {targetEntity.Name}[{targetEntity.InternalName}]");
-                    Powers.ExecPower(currentPower, targetEntity, true);
-                }
-                else
-                {
-                    Vector3 location = targetEntity.Location;
-                    location.Z += 3f;
-                    location.Face();
-                    if (debugInfo)
-                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Activate ExecPower '{currentPower.PowerDef.InternalName}' on location <{location.X.ToString("0,4:N2")}, {location.Y.ToString("0,4:N2")}, {location.Z.ToString("0,4:N2")}>");
-
-                    Powers.ExecPower(currentPower, location, true);
-                }
-                if (debugInfo)
-                    ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Wait casting time ({castingTime} ms)");
-                while (!castingTimeout.IsTimedOut && !Astral.Controllers.AOECheck.PlayerIsInAOE)
-                {
-                    if (Astral.Logic.UCC.Core.CurrentTarget.IsDead)
-                    {
-                        return true;
-                    }
-                    if (!@this._forceMaintain && ((currentPower.UseCharges() && !currentPower.ChargeAvailable()) || currentPower.IsActive))
-                    {
-                        break;
-                    }
-                    Thread.Sleep(20);
-                }
-            }
-            catch (Exception e)
-            {
-                if (debugInfo)
-                    ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Catch an exception trying activate power '{currentPower.PowerDef.InternalName}' \n\r{e.Message}");
-            }
-            finally
-            {
-                if (debugInfo)
-                    ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Deactivate ExecPower '{currentPower.PowerDef.InternalName}' on target {targetEntity.Name}[{targetEntity.InternalName}]");
-                try
-                {
-                    Powers.ExecPower(currentPower, targetEntity, false);
-                }
-                catch (Exception e)
-                {
-                    if (debugInfo)
-                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Catch an exception trying deactivate power '{currentPower.PowerDef.InternalName}'\n\r {e.Message}");
-
-                }
-            }
-            if (!@this._forceMaintain)
-            {
-                Powers.WaitPowerActivation(currentPower, (int)effectiveTimeActivate);
-            } 
-            return true;
-#endif
         }
 
         public Entity UnitRef
@@ -458,11 +329,7 @@ namespace EntityCore.UCC.Actions
                 label = $"{nameof(@this.PowerId)} not defined";
             else if (string.IsNullOrEmpty(label))
             {
-#if PowerCache
                 var pwr = powerCache.GetPower(); 
-#else
-                var pwr = Powers.GetPowerByInternalName(@this.PowerId);
-#endif
 
                 if (pwr != null)
                 {

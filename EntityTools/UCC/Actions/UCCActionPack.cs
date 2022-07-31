@@ -38,6 +38,11 @@ namespace EntityTools.UCC.Actions
         }
         private List<UCCAction> _actions = new List<UCCAction>();
 
+
+        [Category("Optional")]
+        [Description("Execute all ucc-action one after another without interruption after first succeeded one.")]
+        public bool EexecuteSequentially { get; set; } = true;
+#if CUSTOM_UCC_CONDITION_EDITOR
 #if DEVELOPER
         [Category("Optional")]
         [Editor(typeof(UccConditionListEditor), typeof(UITypeEditor))]
@@ -59,25 +64,35 @@ namespace EntityTools.UCC.Actions
                 NotifyPropertyChanged();
             }
         }
-        private UCCConditionPack _customConditions = new UCCConditionPack();
+        private UCCConditionPack _customConditions = new UCCConditionPack(); 
+#endif
 
         #region Hide Inherited Properties
         [XmlIgnore]
         [Browsable(false)]
-        public new string ActionName { get; set; }
+        public new Astral.Logic.UCC.Ressources.Enums.Unit Target { get; set; }
+
         [XmlIgnore]
         [Browsable(false)]
-        public new Astral.Logic.UCC.Ressources.Enums.Unit Target { get; set; }
-        #endregion 
+        public new int Range { get; set; }
+
+        [XmlIgnore]
+        [Browsable(false)]
+        public new int Random { get; set; }
+        #endregion
         #endregion
 
         #region Интерфейс команды
 
-        public override bool NeedToRun => _actions.Count > 0 && _customConditions.IsOK(this);
+#if CUSTOM_UCC_CONDITION_EDITOR
+        public override bool NeedToRun => _actions.Count > 0 && _customConditions.IsOK(this); 
+#else
+        public override bool NeedToRun => _actions.Count > 0;
+#endif
 
         public override bool Run()
         {
-            return (_actionPlayer ?? (_actionPlayer = new ActionsPlayer(_actions))).playActionList() > 0;
+            return (_actionPlayer ?? (_actionPlayer = new ActionsPlayer(_actions))).playActionList(!EexecuteSequentially) > 0;
         }
         private ActionsPlayer _actionPlayer;
 
@@ -85,14 +100,19 @@ namespace EntityTools.UCC.Actions
         {
             return BaseClone(new UCCActionPack
             {
-                _actions = _actions.Select(a => a.Clone()).ToList(), 
-                _customConditions = _customConditions.Clone() as UCCConditionPack
+                _actions = _actions.Select(a => a.Clone()).ToList(),
+#if CUSTOM_UCC_CONDITION_EDITOR
+                _customConditions = _customConditions.Clone() as UCCConditionPack 
+#endif
             });
         }
 
         public override string ToString()
         {
-            return "ActionPack";
+            var name = ActionName;
+            if (string.IsNullOrEmpty(name) || name == "New Action")
+                return "ActionPack";
+            else return "ActionPack: " + name;
         }
         #endregion
 
@@ -117,6 +137,6 @@ namespace EntityTools.UCC.Actions
         {
             return new UccActionProxy(this);
         }
-        #endregion    
+        #endregion
     }
 }

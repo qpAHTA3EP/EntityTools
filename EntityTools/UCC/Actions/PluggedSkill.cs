@@ -40,14 +40,16 @@ namespace EntityTools.UCC.Actions
         }
         internal PluggedSkillSource _source = PluggedSkillSource.Mount;
 
+#if CUSTOM_UCC_CONDITION_EDITOR
 #if DEVELOPER
         [Category("Optional")]
         [Editor(typeof(UccConditionListEditor), typeof(UITypeEditor))]
         [Description("Набор нестандартных UCC-условий, которые проверяют после основных")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
+        [Browsable(false)]
 #else
         [Browsable(false)]
-#endif
+#endif        
         public UCCConditionPack CustomConditions
         {
             get => _customConditions;
@@ -57,11 +59,25 @@ namespace EntityTools.UCC.Actions
                     return;
 
                 _customConditions = value;
+                if (value != null)
+                    Conditions.Add(value);
                 NotifyPropertyChanged();
             }
         }
         internal UCCConditionPack _customConditions = new UCCConditionPack();
-        
+#else
+        [Browsable(false)]
+        public UCCConditionPack CustomConditions
+        {
+            get => null;
+            set
+            {
+                if(value != null)
+                    Conditions.Add(value);
+            }
+        }
+        public bool ShouldSerializeCustomConditions() => false;
+#endif
 
         #region Hide Inherited Properties
         [XmlIgnore]

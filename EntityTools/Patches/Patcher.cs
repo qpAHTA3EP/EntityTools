@@ -44,17 +44,17 @@ namespace EntityTools.Patches
 
                 SlideMonitor.Apply();
 
-                if (Assembly.ReflectionOnlyLoadFrom("AStar.dll").GetName().Version >= requiredAStar)
+                //if (Assembly.ReflectionOnlyLoadFrom("AStar.dll").GetName().Version >= requiredAStar)
                 {
                     // Изменение алгоритмов навигации
                     ComplexPatch_Navigation.Apply();
                     // Подмена штатного окна Mapper'a
                     ComplexPatch_Mapper.Apply(); 
                 }
-                else
-                {
-                    ETLogger.WriteLine($@"Incorrect version of 'AStar.dll' therefore the patches  '{nameof(ComplexPatch_Navigation)}' and '{nameof(ComplexPatch_Mapper)}' did not applied.", true);
-                }
+                //else
+                //{
+                //    ETLogger.WriteLine($@"Incorrect version of 'AStar.dll' therefore the patches  '{nameof(ComplexPatch_Navigation)}' and '{nameof(ComplexPatch_Mapper)}' did not applied.", true);
+                //}
                 // Изменение команды квестера AddUCCAction и сопутствующие патчи
                 ComplexPatch_Quester_UccEditing.Apply();
 
@@ -62,7 +62,7 @@ namespace EntityTools.Patches
                 Patch_AuraDetector.Apply();
 
                 // Патч методов UCCCondition
-                Patch_UccCondition.Apply();
+                ComplexPatch_Ucc.Apply();
 
                 try
                 {

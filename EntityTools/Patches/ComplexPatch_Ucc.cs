@@ -3,10 +3,13 @@ using EntityTools.UCC.Conditions;
 using HarmonyLib;
 using System;
 using System.Reflection;
+using System.Windows.Forms;
+using AcTp0Tools.Reflection;
+using Astral.Logic.UCC.Panels;
 
 namespace EntityTools.Patches
 {
-    internal static class Patch_UccCondition
+    internal static class ComplexPatch_Ucc
     {
         public static bool PatchesWasApplied { get; private set; }
 
@@ -18,6 +21,12 @@ namespace EntityTools.Patches
         private static MethodInfo original_Clone;
         private static MethodInfo prefix_Clone;
 
+        private static Type tMainUcc;
+        private static MethodInfo original_UccEditor;
+        private static MethodInfo prefix_UccEditor;
+        //private static MethodInfo MainUccRefreshAll;
+        private static Action<object> MainUccRefreshAll;
+
         /// <summary>
         /// Патч <see cref="UCCCondition.IsOK"/> для перенаправления обработки в <see cref="ICustomUCCCondition.IsOK"/>.
         /// Данный патч нужен поскольку метод <see cref="UCCCondition.IsOK"/> не является виртуальным.
@@ -28,6 +37,9 @@ namespace EntityTools.Patches
         /// <returns></returns>
         private static bool PrefixIsOK(UCCCondition __instance, ref bool __result, UCCAction refAction)
         {
+            if (__instance is UCCGenericCondition genericCondition)
+                return true;
+
             if (__instance is ICustomUCCCondition customUccCondition)
             {
                 __result = customUccCondition.IsOK(refAction);
@@ -53,42 +65,76 @@ namespace EntityTools.Patches
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Патч <see cref="MainUCC"/> для подмены редактора ucc-профиля
+        /// </summary>
+        private static bool PrefixUccEditor(MainUCC __instance, object sender, EventArgs e)
+        {
+            if (EntityTools.Config.Patches.UccComplextPatch)
+            {
+                EntityTools.Core.UserRequest_Edit(Astral.Logic.UCC.API.CurrentProfile, false);
+                MainUccRefreshAll?.Invoke(__instance);
+                return false;
+            }
+
+            return true;
         }        
 
         internal static void Apply()
         {
-            if (!EntityTools.Config.Patches.UccCondition || PatchesWasApplied) return;
+            if (!EntityTools.Config.Patches.UccComplextPatch || PatchesWasApplied) return;
 
             tUccCondition = typeof(UCCCondition);
+            tPatch = typeof(ComplexPatch_Ucc);
 
             original_IsOK = AccessTools.Method(tUccCondition, nameof(UCCCondition.IsOK));
             if (original_IsOK is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(Patch_UccCondition)}' failed. Method '{nameof(UCCCondition.IsOK)}' not found", true);
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Ucc)}' failed. Method '{nameof(UCCCondition.IsOK)}' not found", true);
                 return;
             }
 
             prefix_IsOK = AccessTools.Method(tPatch, nameof(PrefixIsOK));
             if (prefix_IsOK is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(Patch_UccCondition)}' failed. Method '{nameof(PrefixIsOK)}' not found", true);
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Ucc)}' failed. Method '{nameof(PrefixIsOK)}' not found", true);
                 return;
             }
 
 
             original_Clone = AccessTools.Method(tUccCondition, nameof(UCCCondition.Clone));
-            if (original_IsOK is null)
+            if (original_Clone is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(Patch_UccCondition)}' failed. Method '{nameof(UCCCondition.Clone)}' not found", true);
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Ucc)}' failed. Method '{nameof(UCCCondition.Clone)}' not found", true);
                 return;
             }
 
             prefix_Clone = AccessTools.Method(tPatch, nameof(PrefixClone));
-            if (prefix_IsOK is null)
+            if (prefix_Clone is null)
             {
-                ETLogger.WriteLine($@"Patch '{nameof(Patch_UccCondition)}' failed. Method '{nameof(PrefixClone)}' not found", true);
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Ucc)}' failed. Method '{nameof(PrefixClone)}' not found", true);
                 return;
             }
+
+            tMainUcc = typeof(MainUCC);
+
+            original_UccEditor = AccessTools.Method(tMainUcc, "b_Editor_Click");
+            if (original_UccEditor is null)
+            {
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Ucc)}' failed. Method 'MainUCC.b_Editor_Click' not found", true);
+                return;
+            }
+
+            prefix_UccEditor = AccessTools.Method(tPatch, nameof(PrefixUccEditor));
+            if (prefix_UccEditor is null)
+            {
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Ucc)}' failed. Method '{nameof(PrefixUccEditor)}' not found", true);
+                return;
+            }
+
+
             Action unPatch = null;
 
             try
@@ -101,12 +147,21 @@ namespace EntityTools.Patches
                 };
 
                 AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_Clone, new HarmonyMethod(prefix_Clone));
+                unPatch = () =>
+                {
+                    ETLogger.WriteLine(LogType.Debug, $@"Unpatch method '{original_Clone}'.", true);
+                    AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_Clone, prefix_Clone);
+                };
 
-                ETLogger.WriteLine($@"Patch '{nameof(Patch_UccCondition)}' succeeded", true);
+                AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_UccEditor, new HarmonyMethod(prefix_UccEditor));
+                MainUccRefreshAll = tMainUcc.GetAction("refreshAll");
+
+
+                ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Ucc)}' succeeded", true);
             }
             catch (Exception e)
             {
-                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(Patch_UccCondition)}' failed", true);
+                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Ucc)}' failed", true);
                 unPatch?.Invoke();
                 ETLogger.WriteLine(LogType.Error, e.ToString(), true);
             }

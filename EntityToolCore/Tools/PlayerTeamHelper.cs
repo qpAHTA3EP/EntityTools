@@ -1098,8 +1098,8 @@ namespace EntityCore.Tools
             float maxHealerHealth = 0;
 
             // Разворачиваем цикл в обратном порядке
-            var members = team.Team.Members;
-            var teamCount = members.Count;
+            var members = team.Team.Members.ToArray();
+            var teamCount = members.Length;
 
             switch (teamCount)
             {
@@ -1107,7 +1107,7 @@ namespace EntityCore.Tools
                 case 4: goto TeamMember_3;
                 case 3: goto TeamMember_2;
                 case 2: goto TeamMember_1;
-                case 1: goto TeamMember_0;
+                //case 1: goto TeamMember_0;
                 default: goto RegenerateCacheFinish;
             }
 

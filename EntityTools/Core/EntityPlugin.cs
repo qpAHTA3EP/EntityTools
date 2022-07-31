@@ -497,7 +497,7 @@ namespace EntityTools
                 return false;
             }
 
-            public bool UserRequest_EditUccConditions(ref List<UCCCondition> list)
+            public bool UserRequest_EditUccConditions(ref System.Collections.ObjectModel.ObservableCollection<UCCCondition> list)
             {
                 if (_internalInitializer())
                     return Core.UserRequest_EditUccConditions(ref list);
@@ -509,7 +509,7 @@ namespace EntityTools
                 return false;
             }
 
-            public bool UserRequest_EditUccConditions(ref List<UCCCondition> list, ref LogicRule logic, ref bool negation)
+            public bool UserRequest_EditUccConditions(ref System.Collections.ObjectModel.ObservableCollection<UCCCondition> list, ref LogicRule logic, ref bool negation)
             {
                 if (_internalInitializer())
                     return Core.UserRequest_EditUccConditions(ref list, ref logic, ref negation);

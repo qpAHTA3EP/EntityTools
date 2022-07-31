@@ -5,9 +5,10 @@ using EntityTools.Tools;
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
-using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
+using ConditionList = System.Collections.ObjectModel.ObservableCollection<Astral.Logic.UCC.Classes.UCCCondition>;
 
 namespace EntityTools.UCC.Conditions
 {
@@ -55,7 +56,7 @@ namespace EntityTools.UCC.Conditions
             {
                 if (TestRule == LogicRule.Disjunction)
                 {
-                    int lockedNum = 0;
+                    int okLockedNum = 0;
                     int okUnlockedNum = 0;
                     bool lockedTrue = true;
                     foreach (UCCCondition c in Conditions)
@@ -69,7 +70,7 @@ namespace EntityTools.UCC.Conditions
                                     lockedTrue = false;
                                     break;
                                 }
-                                lockedNum++;
+                                okLockedNum++;
                             }
                             else if (iCond.IsOK(refAction))
                                 okUnlockedNum++;
@@ -83,7 +84,7 @@ namespace EntityTools.UCC.Conditions
                                     lockedTrue = false;
                                     break;
                                 }
-                                lockedNum++;
+                                okLockedNum++;
                             }
                             else if (c.IsOK(refAction))
                                 okUnlockedNum++;
@@ -92,7 +93,7 @@ namespace EntityTools.UCC.Conditions
 
                     // Если множество незалоченных условий пустое, тогда условие истино
                     // Если оно НЕ пустое, тогда должно встретиться хотя бы одно истиное
-                    result = lockedTrue && (Conditions.Count == lockedNum || okUnlockedNum > 0);
+                    result = lockedTrue && (Conditions.Count == okLockedNum || okUnlockedNum > 0);
                 }
                 else
                 {
@@ -130,17 +131,10 @@ namespace EntityTools.UCC.Conditions
                 Target = Target,
                 Tested = Tested,
                 Value = Value,
-                Conditions = new ConditionList(Conditions.Count)
+                Conditions = new ConditionList(Conditions.Select(cnd => cnd is ICustomUCCCondition cstCnd
+                                                                                      ? (UCCCondition)cstCnd.Clone()
+                                                                                      : cnd.Clone()))
             };
-
-            foreach (var cnd in Conditions)
-            {
-                copy.Conditions.Add(
-                    cnd is ICustomUCCCondition cstCnd 
-                        ? (UCCCondition)cstCnd.Clone()
-                        : cnd.Clone()
-                    );
-            }
 
             return copy;
         }
@@ -176,8 +170,8 @@ namespace EntityTools.UCC.Conditions
         public override string ToString()
         {
             if (string.IsNullOrEmpty(Name))
-                return $"ConditionPack [{Conditions.Count}]";
-            return $"ConditionPack: {Name} [{Conditions.Count}]";
+                return $"ConditionPack";
+            return $"ConditionPack: {Name}";
         }
 
         #region Hide Inherited Properties

@@ -76,6 +76,7 @@ namespace EntityTools.UCC.Actions
             }
         }
 
+#if CUSTOM_UCC_CONDITION_EDITOR
 #if DEVELOPER
         [Category("Optional")]
         [Editor(typeof(UccConditionListEditor), typeof(UITypeEditor))]
@@ -84,19 +85,32 @@ namespace EntityTools.UCC.Actions
 #else
         [Browsable(false)]
 #endif
-        public UCCConditionPack CustomConditions 
-        { 
+        public UCCConditionPack CustomConditions
+        {
             get => _customConditions;
             set
             {
-                if(ReferenceEquals(_customConditions, value))
+                if (ReferenceEquals(_customConditions, value))
                     return;
-                
+
                 _customConditions = value;
                 OnPropertyChanged();
             }
         }
-        private UCCConditionPack _customConditions = new UCCConditionPack();
+        private UCCConditionPack _customConditions = new UCCConditionPack(); 
+#else
+        [Browsable(false)]
+        public UCCConditionPack CustomConditions
+        {
+            get => null;
+            set
+            {
+                if (value != null)
+                    Conditions.Add(value);
+            }
+        }
+        public bool ShouldSerializeCustomConditions() => false;
+#endif
 
 #if DEVELOPER && DEBUG_CHANGE_TARGET
         [Category("General")]

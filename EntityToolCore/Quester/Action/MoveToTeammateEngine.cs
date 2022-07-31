@@ -345,8 +345,8 @@ namespace EntityCore.Quester.Action
                             AstralAccessors.Logic.NW.Combats.SetAbortCombatCondition(CheckCombatShouldBeAborted_and_ChangeTarget, ShouldRemoveAbortCombatCondition);
                     }
                 }                    
-                if(NeedToRun)
-                    ResetSearchTimer();
+                if (!needToRun)
+                    StartSearchTimer();
                 return needToRun;
             }
         }
@@ -569,16 +569,7 @@ namespace EntityCore.Quester.Action
 
         [XmlIgnore]
         [Browsable(false)]
-        public string ActionLabel
-        {
-            get
-            {
-                var teammate = _targetProcessor.GetTeammate();
-                return teammate is null
-                    ? $"{_action.GetType().Name} : {_action.SupportOptions.teammate}"
-                    : $"{_action.GetType().Name} : {_action.SupportOptions.teammate} ({teammate.InternalName})";
-            }
-        }
+        public string ActionLabel => $"{_action.GetType().Name} : {_action.SupportOptions.teammate}";
 
 
         [XmlIgnore]
@@ -721,6 +712,19 @@ namespace EntityCore.Quester.Action
                 if (teammateAbsenceTimer != null)
                     teammateAbsenceTimer.ChangeTime(time);
                 else teammateAbsenceTimer = new Timeout(time);
+            }
+        }
+        /// <summary>
+        /// Запуск таймера остановки поиска.
+        /// Если тайме запущен, то отсчет продолжается
+        /// </summary>
+        private void StartSearchTimer()
+        {
+            var searchTime = (int)_action.TeammateSearchTime;
+            if (searchTime > 0)
+            {
+                if (teammateAbsenceTimer is null)
+                    teammateAbsenceTimer = new Astral.Classes.Timeout(searchTime);
             }
         }
         private Predicate<Entity> GetSpecialTeammateCheck()

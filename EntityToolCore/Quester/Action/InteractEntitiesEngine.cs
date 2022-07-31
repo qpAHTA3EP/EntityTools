@@ -366,7 +366,7 @@ namespace EntityCore.Quester.Action
                     }
                     else
                     {
-                        ResetEntitySearchTimer();
+                        StartEntitySearchTimer();
                         if (extendedDebugInfo)
                             ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: ClosestEntity not found");
 
@@ -981,6 +981,19 @@ namespace EntityCore.Quester.Action
                 if (entityAbsenceTimer != null)
                     entityAbsenceTimer.ChangeTime(entitySearchTime);
                 else entityAbsenceTimer = new Astral.Classes.Timeout(entitySearchTime);
+            }
+        }
+        /// <summary>
+        /// Запуск таймера остановки поиска.
+        /// Если тайме запущен, то отсчет продолжается
+        /// </summary>
+        private void StartEntitySearchTimer()
+        {
+            var entitySearchTime = @this.EntitySearchTime;
+            if (entitySearchTime > 0)
+            {
+                if (entityAbsenceTimer is null)
+                    entityAbsenceTimer = new Astral.Classes.Timeout(entitySearchTime);
             }
         }
 

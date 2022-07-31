@@ -345,81 +345,84 @@ namespace EntityTools.Patches.Quester
             {
                 try
                 {
-                    var uccEditor = new Astral.Logic.UCC.Forms.Editor(uccProfile);
-#if false
-                    uccEditor.GetField<SimpleButton>("btn_newProfile").Value.Visible = false;
-                    uccEditor.GetField<SimpleButton>("btn_saveProfile").Value.Visible = true;
-                    uccEditor.GetField<SimpleButton>("bGenerate").Value.Visible = false;
-                    uccEditor.GetField<RadioGroup>("momentChoose").Value.Visible = true;
-                    uccEditor.GetField<XtraTabPage>("tacticTab").Value.PageEnabled = false; 
-#else
-                    var editorTrvs = Traverse.Create(uccEditor);
-
-                    var btnNewProfileVisible = editorTrvs.Field("btn_newProfile").Property("Visible");
-                    if (btnNewProfileVisible.PropertyExists())
-                        btnNewProfileVisible.SetValue(false);
-                    else
+                    if (EntityTools.Config.Patches.UccComplextPatch)
                     {
-                        var msg = "Fail to access to 'Astral.Logic.UCC.Forms.Editor.btn_newProfile'";
-                        ETLogger.WriteLine(LogType.Error, msg);
-                        XtraMessageBox.Show(msg);
-                        return true;
-                    }
-
-                    var btnSaveProfileVisiblity = editorTrvs.Field("btn_saveProfile").Property("Visible");
-                    if (btnSaveProfileVisiblity.PropertyExists())
-                        btnSaveProfileVisiblity.SetValue(true);
-                    else
-                    {
-                        var msg = "Fail to access to 'Astral.Logic.UCC.Forms.Editor.btn_saveProfile'";
-                        ETLogger.WriteLine(LogType.Error, msg);
-                        XtraMessageBox.Show(msg);
-                        return true;
-                    }
-
-                    var btnGenerateVisible = editorTrvs.Field("bGenerate").Property("Visible");
-                    if (btnGenerateVisible.PropertyExists())
-                        btnGenerateVisible.SetValue(false);
-                    else
-                    {
-                        var msg = "Fail to access to 'Astral.Logic.UCC.Forms.Editor.bGenerate'";
-                        ETLogger.WriteLine(LogType.Error, msg);
-                        XtraMessageBox.Show(msg);
-                        return true;
-                    }
-
-                    var momentChooseVisible = editorTrvs.Field("momentChoose").Property("Visible");
-                    if (momentChooseVisible.PropertyExists())
-                        momentChooseVisible.SetValue(true);
-                    else
-                    {
-                        var msg = "Fail to access to 'Astral.Logic.UCC.Forms.Editor.momentChoose'";
-                        ETLogger.WriteLine(LogType.Error, msg);
-                        XtraMessageBox.Show(msg);
-                        return true;
-                    }
-
-                    var tabTactic = editorTrvs.Field("tacticTab");
-                    var tabTacticPageEnabled = tabTactic.Property("PageEnabled");
-                    var tabTacticPageVisible = tabTactic.Property("PageVisible");
-                    if (tabTactic.FieldExists()
-                        && tabTacticPageEnabled.PropertyExists()
-                        && tabTacticPageVisible.PropertyExists())
-                    {
-                        tabTacticPageEnabled.SetValue(false);
-                        tabTacticPageVisible.SetValue(false);
+                        // Вызов собственного ucc-редактора
+                        if(EntityTools.Core.UserRequest_Edit(uccProfile, "", false))
+                            __result = uccProfile;
+                        return false;
                     }
                     else
                     {
-                        var msg = "Fail to access to 'Astral.Logic.UCC.Forms.Editor.tacticTab'";
-                        ETLogger.WriteLine(LogType.Error, msg);
-                        XtraMessageBox.Show(msg);
-                        return true;
-                    }
-#endif
+                        // Модификация и вызов штатного ucc-редактора 
+                        var uccEditor = new Astral.Logic.UCC.Forms.Editor(uccProfile);
+                        var editorTrvs = Traverse.Create(uccEditor);
 
-                    uccEditor.ShowDialog();
-                    __result = uccProfile;
+                        var btnNewProfileVisible = editorTrvs.Field("btn_newProfile").Property("Visible");
+                        if (btnNewProfileVisible.PropertyExists())
+                            btnNewProfileVisible.SetValue(false);
+                        else
+                        {
+                            var msg = "Fail to access to 'Astral.Logic.UCC.Forms.Editor.btn_newProfile'";
+                            ETLogger.WriteLine(LogType.Error, msg);
+                            XtraMessageBox.Show(msg);
+                            return true;
+                        }
+
+                        var btnSaveProfileVisiblity = editorTrvs.Field("btn_saveProfile").Property("Visible");
+                        if (btnSaveProfileVisiblity.PropertyExists())
+                            btnSaveProfileVisiblity.SetValue(true);
+                        else
+                        {
+                            var msg = "Fail to access to 'Astral.Logic.UCC.Forms.Editor.btn_saveProfile'";
+                            ETLogger.WriteLine(LogType.Error, msg);
+                            XtraMessageBox.Show(msg);
+                            return true;
+                        }
+
+                        var btnGenerateVisible = editorTrvs.Field("bGenerate").Property("Visible");
+                        if (btnGenerateVisible.PropertyExists())
+                            btnGenerateVisible.SetValue(false);
+                        else
+                        {
+                            var msg = "Fail to access to 'Astral.Logic.UCC.Forms.Editor.bGenerate'";
+                            ETLogger.WriteLine(LogType.Error, msg);
+                            XtraMessageBox.Show(msg);
+                            return true;
+                        }
+
+                        var momentChooseVisible = editorTrvs.Field("momentChoose").Property("Visible");
+                        if (momentChooseVisible.PropertyExists())
+                            momentChooseVisible.SetValue(true);
+                        else
+                        {
+                            var msg = "Fail to access to 'Astral.Logic.UCC.Forms.Editor.momentChoose'";
+                            ETLogger.WriteLine(LogType.Error, msg);
+                            XtraMessageBox.Show(msg);
+                            return true;
+                        }
+
+                        var tabTactic = editorTrvs.Field("tacticTab");
+                        var tabTacticPageEnabled = tabTactic.Property("PageEnabled");
+                        var tabTacticPageVisible = tabTactic.Property("PageVisible");
+                        if (tabTactic.FieldExists()
+                            && tabTacticPageEnabled.PropertyExists()
+                            && tabTacticPageVisible.PropertyExists())
+                        {
+                            tabTacticPageEnabled.SetValue(false);
+                            tabTacticPageVisible.SetValue(false);
+                        }
+                        else
+                        {
+                            var msg = "Fail to access to 'Astral.Logic.UCC.Forms.Editor.tacticTab'";
+                            ETLogger.WriteLine(LogType.Error, msg);
+                            XtraMessageBox.Show(msg);
+                            return true;
+                        }
+
+                        uccEditor.ShowDialog();
+                        __result = uccProfile;
+                    }
                     return false;
                 }
                 catch { }

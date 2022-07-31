@@ -3,6 +3,7 @@ using Astral.Logic.UCC.Classes;
 using EntityCore.Tools;
 using EntityTools.UCC.Conditions;
 using System;
+using System.Collections.ObjectModel;
 using System.Windows.Forms;
 
 namespace EntityCore.UCC.Classes
@@ -36,7 +37,7 @@ namespace EntityCore.UCC.Classes
         {
             if (Tag is UCCConditionPack conditionPack)
             {
-                conditionPack.Conditions = Nodes.ToUccConditionList();
+                conditionPack.Conditions = Nodes.ToUccConditionCollection<ObservableCollection<UCCCondition>>();
                 return conditionPack;
             }
             throw new Exception($"TreeNode[{Index}] does not contains {nameof(UCCConditionPack)}");
