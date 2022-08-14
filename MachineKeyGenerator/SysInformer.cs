@@ -93,13 +93,13 @@ namespace SysInfo
                     idBuilder.Append('_').Append(diskInfo);
             }
 
-            mc = new ManagementClass("Win32_NetworkAdapterConfiguration");
-            foreach (ManagementObject networkAdaptr in mc.GetInstances())
-            {
-                string val = networkAdaptr.GetPropertyValue("MACAddress")?.ToString();
-                if (!string.IsNullOrEmpty(val))
-                    idBuilder.Append('_').Append(val);
-            }
+            //mc = new ManagementClass("Win32_NetworkAdapterConfiguration");
+            //foreach (ManagementObject networkAdaptr in mc.GetInstances())
+            //{
+            //    string val = networkAdaptr.GetPropertyValue("MACAddress")?.ToString();
+            //    if (!string.IsNullOrEmpty(val))
+            //        idBuilder.Append('_').Append(val);
+            //}
 
             if (idBuilder.Length > 0)
             {

@@ -39,8 +39,7 @@ namespace EntityTools.Tools
                         byte[] IV = new byte[lenIV];
                         Array.Copy(data, offset, IV, 0, IV.Length);
                         offset += IV.Length;
-                        // *2*
-                        //byte[] iv = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16 };
+
 #if DEBUG && !ENTITYTOOLS
                         File.WriteAllText("ir_decrypt", IV.ToHexString());
                         File.WriteAllText("encrDataFull_decrypt", data.ToHexString());
@@ -55,64 +54,64 @@ namespace EntityTools.Tools
                         File.WriteAllText("encrData_decrypt", encryptedData.ToHexString());
 #endif  
 #endif
-
                         using (MemoryStream memStream = new MemoryStream())
                         {
-                            //Create a new instance of the RijndaelManaged class  
-                            // and encrypt the stream.  
-                            RijndaelManaged rijndael = new RijndaelManaged();
-                            rijndael.KeySize = keyHash.Length * 8;
-                            rijndael.BlockSize = rijndael.KeySize;
-                            //rijndael.Key = keyHash;
-                            //rijndael.IV = iv;
-
-                            //Create a CryptoStream, and decrypt MemoryStream with the Rijndael class.  
-                            using (CryptoStream cryptoStream = new CryptoStream(memStream,
-                                                            rijndael.CreateDecryptor(keyHash, IV),
-                                                            CryptoStreamMode.Write))
+                            // Create a new instance of the RijndaelManaged class and encrypt the stream.  
+                            using (RijndaelManaged rijndael = new RijndaelManaged())
                             {
-                                // *4*
-                                // Дешифруем данные без СОЛИ
-                                cryptoStream.Write(data, offset, data.Length - offset);
-                                cryptoStream.FlushFinalBlock();
+                                rijndael.KeySize = keyHash.Length * 8;
+                                rijndael.BlockSize = rijndael.KeySize;
+                                //rijndael.Key = keyHash;
+                                //rijndael.IV = iv;
 
-                                if (memStream.Length > 0)
+                                //Create a CryptoStream, and decrypt MemoryStream with the Rijndael class.  
+                                using (CryptoStream cryptoStream = new CryptoStream(memStream,
+                                           rijndael.CreateDecryptor(keyHash, IV),
+                                           CryptoStreamMode.Write))
                                 {
-                                    decryptedData = memStream.ToArray();
-                                    return decryptedData != null && decryptedData.Length > 0;
-                                }
-                                // *3*
-                                //using (MemoryStream outMemStream = new MemoryStream())
-                                //{
-                                //    int read;
-                                //    while(cryptoStream.CanRead
-                                //          && (read = cryptoStream.ReadByte()) != -1)
-                                //    {
-                                //        outMemStream.WriteByte((byte)read);
-                                //    }
-                                //    decryptedData = outMemStream.ToArray();
-                                //    return decryptedData != null && decryptedData.Length > 0;
-                                //}
-                                // *2*
-                                //if (cryptoStream.CanRead)
-                                //{
-                                //    long len = cryptoStream.Length;
-                                //    decryptedData = new byte[len];
-                                //    int readed = cryptoStream.Read(decryptedData, 0, (int)len);
-                                //    return true;
-                                //}
+                                    // Дешифруем данные без СОЛИ
+                                    cryptoStream.Write(data, offset, data.Length - offset);
+                                    cryptoStream.FlushFinalBlock();
 
-                                // *1*
-                                //using (BinaryReader reader = new BinaryReader(cryptoStream))
-                                //{
-                                //    //Результат записываем в переменную text в вие исходной строки
-                                //    long len = reader.BaseStream.Length;
-                                //    decryptedData = reader.ReadBytes((int)len);
-                                //    return true;
-                                //}
-                                cryptoStream.Close();
+                                    // *3*
+                                    //using (MemoryStream outMemStream = new MemoryStream())
+                                    //{
+                                    //    int read;
+                                    //    while(cryptoStream.CanRead
+                                    //          && (read = cryptoStream.ReadByte()) != -1)
+                                    //    {
+                                    //        outMemStream.WriteByte((byte)read);
+                                    //    }
+                                    //    decryptedData = outMemStream.ToArray();
+                                    //    return decryptedData != null && decryptedData.Length > 0;
+                                    //}
+                                    // *2*
+                                    //if (cryptoStream.CanRead)
+                                    //{
+                                    //    long len = cryptoStream.Length;
+                                    //    decryptedData = new byte[len];
+                                    //    int readed = cryptoStream.Read(decryptedData, 0, (int)len);
+                                    //    return true;
+                                    //}
+
+                                    // *1*
+                                    //using (BinaryReader reader = new BinaryReader(cryptoStream))
+                                    //{
+                                    //    //Результат записываем в переменную text в вие исходной строки
+                                    //    long len = reader.BaseStream.Length;
+                                    //    decryptedData = reader.ReadBytes((int)len);
+                                    //    return true;
+                                    //}
+
+                                    //cryptoStream.Close();
+
+                                    if (memStream.Length > 0)
+                                    {
+                                        decryptedData = memStream.ToArray();
+                                        return decryptedData != null && decryptedData.Length > 0;
+                                    }
+                                }
                             }
-                            memStream.Close();
                         }
                     }
 #if ENCRYPTOR

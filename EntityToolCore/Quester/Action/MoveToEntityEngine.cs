@@ -414,7 +414,7 @@ namespace EntityCore.Quester.Action
                                 ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Activating Power '{powDef.DisplayName}'[{powDef.InternalName}] on {entityStr}");
                             }
 
-                            pow.ExecutePower(targetEntity, @this.CastingTime, (int)@this.Distance, false, extendedDebugInfo);
+                            pow.ExecutePower(entity, @this.CastingTime, (int)@this.Distance, false, extendedDebugInfo);
                         }
                         else if (extendedDebugInfo)
                             ETLogger.WriteLine(LogType.Debug,

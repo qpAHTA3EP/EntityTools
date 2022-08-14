@@ -42,13 +42,13 @@ namespace EntityTools.UCC.Conditions
                 || EntityManager.LocalPlayer.Character.CurrentTarget.IsValid)
                 return $"{Target} {Tested} : {getRefValue(refAction, out ConditionType t)}";
             return "There is no valid Target to test the Condition:\n\r" +
-                   $"{GetType().Name}: {Target} {Tested} {base.Value}";
+                   $"{GetType().Name}:{Target} [{Tested}] {Sign} '{base.Value}'";
         }
         #endregion
 
         public override string ToString()
         {
-            return $"{GetType().Name}: {Target} {Tested} {base.Value}";
+            return $"{Target} [{Tested}] {Sign} '{base.Value}'";
         }
 
 #if DEVELOPER

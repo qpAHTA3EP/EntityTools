@@ -45,7 +45,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEVELOPER, NOT_ENCRYPTED_CORE, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEVELOPER, NOT_ENCRYPTED_CORE, PATCH_ASTRAL, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
@@ -58,7 +58,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>TRACE;DEVELOPER, NOT_ENCRYPTED_CORE, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
+    <DefineConstants>TRACE;DEVELOPER, ENCRYPTED_CORE, PATCH_ASTRAL, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
@@ -107,7 +107,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEVELOPER, NOT_ENCRYPTED_CORE, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEVELOPER, ENCRYPTED_CORE, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
@@ -131,7 +131,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Release|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>DEVELOPER, NOT_ENCRYPTED_CORE, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
+    <DefineConstants>DEVELOPER, ENCRYPTED_CORE, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>

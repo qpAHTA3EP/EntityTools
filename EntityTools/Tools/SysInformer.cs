@@ -15,7 +15,7 @@ namespace SysInfo
     {
         private static readonly string publicKey = "fs5er4z6#'f1dsg3regjuty6k@(";
 
-        internal static string GetMachineId(bool encrypt)
+        internal static string GetMashineID(bool encrypt)
         {
 
             var idBuilder = new StringBuilder();
@@ -99,14 +99,14 @@ namespace SysInfo
                     idBuilder.Append('_').Append(diskInfo);
             }
 
-            mc = new ManagementClass("Win32_NetworkAdapterConfiguration");
-            foreach (var o in mc.GetInstances())
-            {
-                var networkAdapter = (ManagementObject) o;
-                var val = networkAdapter.GetPropertyValue("MACAddress")?.ToString();
-                if (!string.IsNullOrEmpty(val))
-                    idBuilder.Append('_').Append(val);
-            }
+            //mc = new ManagementClass("Win32_NetworkAdapterConfiguration");
+            //foreach (var o in mc.GetInstances())
+            //{
+            //    var networkAdapter = (ManagementObject) o;
+            //    var val = networkAdapter.GetPropertyValue("MACAddress")?.ToString();
+            //    if (!string.IsNullOrEmpty(val))
+            //        idBuilder.Append('_').Append(val);
+            //}
 
             if (idBuilder.Length > 0)
             {

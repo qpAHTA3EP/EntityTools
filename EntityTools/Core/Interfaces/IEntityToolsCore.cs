@@ -78,7 +78,7 @@ namespace EntityTools.Core.Interfaces
 
         void Monitor(object monitor);
 #endif
-#if DEBUG
+#if false
         LinkedList<Entity> FindAllEntity(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, 
                                          EntityNameType nameType = EntityNameType.NameUntranslated, 
                                          EntitySetType setType =  EntitySetType.Complete,

@@ -35,12 +35,11 @@ namespace Encryptor
 
         static int Main(string[] args)
         {
-            //Console.WriteLine(Constants.CompileTime != null ? Constants.CompileTime.ToString() : "Empty");
-
             string dataFile = null;
             string keyFile = null;
             string targetFileName = null;
 
+            start:
             if (args.Length > 0)
             {
                 string arg1 = args[0];
@@ -56,128 +55,134 @@ namespace Encryptor
                 }
                 else 
 #endif
-                if (arg1 == "-e")
+                switch (arg1)
                 {
-                    if (args.Length > 1)
+                    case "-e":
                     {
-                        dataFile = args[1];
-                        if (!File.Exists(dataFile))
+                        if (args.Length > 1)
                         {
-                            Console.WriteLine($"Not found DataFile: {dataFile}");
-                            Console.Read();
-                            return 1;
+                            dataFile = args[1];
+                            if (!File.Exists(dataFile))
+                            {
+                                Console.WriteLine($"Not found DataFile: {dataFile}");
+                                Console.Read();
+                                return 1;
+                            }
                         }
-                    }
-                    if (args.Length > 2)
-                    {
-                        keyFile = args[2];
-                        if (!File.Exists(keyFile))
+                        if (args.Length > 2)
                         {
-                            Console.WriteLine($"Not found KeyFile: {keyFile}");
-                            Console.Read();
-                            return 2;
+                            keyFile = args[2];
+                            if (!File.Exists(keyFile))
+                            {
+                                Console.WriteLine($"Not found KeyFile: {keyFile}");
+                                Console.Read();
+                                return 2;
+                            }
                         }
-                    }
-                    if (args.Length > 4)
-                    {
-                        string arg3 = args[3];
-                        if (arg3 == "-to")
-                            targetFileName = args[4];
-                        else targetFileName = null;
-                    }
-                    else targetFileName = string.Empty;
-                    EncryptFile(dataFile, keyFile, out byte[] decrData, targetFileName);
-                }
-                else   if(arg1 == "-d")
-                {
-                    if (args.Length > 1)
-                    {
-                        dataFile = args[1];
-                        if (!File.Exists(dataFile))
+                        if (args.Length > 4)
                         {
-                            Console.WriteLine($"Not found DataFile: {dataFile}");
-                            Console.Read();
-                            return 1;
+                            string arg3 = args[3];
+                            if (arg3 == "-to")
+                                targetFileName = args[4];
+                            else targetFileName = null;
                         }
+                        else targetFileName = string.Empty;
+                        EncryptFile(dataFile, keyFile, out byte[] decrData, targetFileName);
+                        break;
                     }
-                    if (args.Length > 2)
+                    case "-d":
                     {
-                        keyFile = args[2];
-                        if (!File.Exists(keyFile))
+                        if (args.Length > 1)
                         {
-                            Console.WriteLine($"Not found KeyFile: {keyFile}");
-                            Console.Read();
-                            return 2;
+                            dataFile = args[1];
+                            if (!File.Exists(dataFile))
+                            {
+                                Console.WriteLine($"Not found DataFile: {dataFile}");
+                                Console.Read();
+                                return 1;
+                            }
                         }
-                    }
-                    if (args.Length > 4)
-                    {
-                        string arg3 = args[3];
-                        if (arg3 == "-to")
-                            targetFileName = args[4];
-                        else targetFileName = null;
-                    }
-                    else targetFileName = string.Empty;
-                    DecryptFile(dataFile, keyFile, out byte[] decrData, targetFileName);
-                }
-                else if (arg1 == "-k")
-                {
-                    if (args.Length > 1)
-                        keyFile = args[1];
-                    else
-                    {
-                        keyFile = DefaultKeyFile;
-                        Console.WriteLine($"Generate default: {keyFile}");
-                    }
-                    GenerateKey(keyFile);
-                }
-                else if (arg1 == "-dk")
-                {
-                    if (args.Length > 1)
-                    {
-                        keyFile = args[1];
-                        if (!File.Exists(keyFile))
+                        if (args.Length > 2)
                         {
-                            Console.WriteLine($"Not found KeyFile: {keyFile}");
-                            Console.Read();
+                            keyFile = args[2];
+                            if (!File.Exists(keyFile))
+                            {
+                                Console.WriteLine($"Not found KeyFile: {keyFile}");
+                                Console.Read();
+                                return 2;
+                            }
+                        }
+                        if (args.Length > 4)
+                        {
+                            string arg3 = args[3];
+                            if (arg3 == "-to")
+                                targetFileName = args[4];
+                            else targetFileName = null;
+                        }
+                        else targetFileName = string.Empty;
+                        DecryptFile(dataFile, keyFile, out byte[] decrData, targetFileName);
+                        break;
+                    }
+                    case "-k":
+                    {
+                        if (args.Length > 1)
+                            keyFile = args[1];
+                        else
+                        {
+                            keyFile = DefaultKeyFile;
+                            Console.WriteLine($"Generate default: {keyFile}");
+                        }
+                        GenerateKey(keyFile);
+                        break;
+                    }
+                    case "-dk":
+                    {
+                        if (args.Length > 1)
+                        {
+                            keyFile = args[1];
+                            if (!File.Exists(keyFile))
+                            {
+                                Console.WriteLine($"Not found KeyFile: {keyFile}");
+                                Console.Read();
+                                keyFile = DefaultKeyFile;
+                                Console.WriteLine($"Try default: {keyFile}");
+                            }
+                        }
+                        else
+                        {
                             keyFile = DefaultKeyFile;
                             Console.WriteLine($"Try default: {keyFile}");
                         }
+                        DecryptKey(keyFile);
+                        break;
                     }
-                    else
-                    {
-                        keyFile = DefaultKeyFile;
-                        Console.WriteLine($"Try default: {keyFile}");
-                    }
-                    DecryptKey(keyFile);
-                }
-                else if (arg1 == "-h" || arg1 == "-help")
-                {
-                    Console.WriteLine(@"encrypter -e <DataFile> <KeyFile>");
-                    Console.WriteLine("\tEncrypt <DataFile> with the key information from the <KeyFile>");
-                    Console.WriteLine();
-                    Console.WriteLine(@"encrypter <DataFile> <KeyFile>");
-                    Console.WriteLine("\tEncrypt <DataFile> with the key information from the <KeyFile>");
-                    Console.WriteLine("\tEncrypt mode is used if flag was skipped and specified\n\r" +
-                                      "\tonly <DataFile> and <KeyFile> ");
-                    Console.WriteLine();
-                    Console.WriteLine(@"encrypter -d <DataFile> <KeyFile>");
-                    Console.WriteLine("\tDecrypt <DataFile> with key information from the <KeyFile>");
-                    Console.WriteLine();
-                    Console.WriteLine(@"encrypter -k <KeyFile>");
-                    Console.WriteLine("\tGenerage <KeyFile> for the current PC");
-                    Console.WriteLine();
-                    Console.WriteLine(@"encrypter -dk <KeyFile>");
-                    Console.WriteLine("\tRead <KeyFile>, decrypt it and type the information");
-                    Console.WriteLine();
-                    Console.WriteLine(@"encrypter -md5 <DataFile>");
-                    Console.WriteLine("\tGenerate MD5 hash for the <DataFile>");
-                    Console.WriteLine();
-                    Console.WriteLine(@"encrypter -h | -help");
-                    Console.WriteLine("\tThis help message");
-                    Console.WriteLine();
-                    Console.Read();
-                    return 0;
+                    case "-h":
+                    case "-help":
+                        Console.WriteLine(@"encrypter -e <DataFile> <KeyFile>");
+                        Console.WriteLine("\tEncrypt <DataFile> with the key information from the <KeyFile>");
+                        Console.WriteLine();
+                        Console.WriteLine(@"encrypter <DataFile> <KeyFile>");
+                        Console.WriteLine("\tEncrypt <DataFile> with the key information from the <KeyFile>");
+                        Console.WriteLine("\tEncrypt mode is used if flag was skipped and specified\n\r" +
+                                          "\tonly <DataFile> and <KeyFile> ");
+                        Console.WriteLine();
+                        Console.WriteLine(@"encrypter -d <DataFile> <KeyFile>");
+                        Console.WriteLine("\tDecrypt <DataFile> with key information from the <KeyFile>");
+                        Console.WriteLine();
+                        Console.WriteLine(@"encrypter -k <KeyFile>");
+                        Console.WriteLine("\tGenerage <KeyFile> for the current PC");
+                        Console.WriteLine();
+                        Console.WriteLine(@"encrypter -dk <KeyFile>");
+                        Console.WriteLine("\tRead <KeyFile>, decrypt it and type the information");
+                        Console.WriteLine();
+                        Console.WriteLine(@"encrypter -md5 <DataFile>");
+                        Console.WriteLine("\tGenerate MD5 hash for the <DataFile>");
+                        Console.WriteLine();
+                        Console.WriteLine(@"encrypter -h | -help");
+                        Console.WriteLine("\tThis help message");
+                        Console.WriteLine();
+                        Console.Read();
+                        return 0;
                 }
 #if false
                 else if (arg1 == "-md5")
@@ -227,7 +232,18 @@ namespace Encryptor
                 } 
 #endif
             }
-            Console.Read();
+
+            var inputStr = Console.ReadLine();
+            if (string.IsNullOrEmpty(inputStr))
+                return 0;
+
+            var strings = inputStr.Split(' ');
+            if (strings.Length > 0)
+            {
+                args = strings;
+                goto start;
+            }
+
             return 0;
         }
 
@@ -274,7 +290,7 @@ namespace Encryptor
         /// Если Empty - Имя файл разультата генерируется из имени исходного файла ( с расширением ".encrypted")
         /// Если null - Результат не сохраняется в файл</param>
         /// <returns></returns>
-        private static bool  EncryptFile(string dataFile, string keyFile, out byte[] encryptedData, string targetFile = "")
+        private static bool EncryptFile(string dataFile, string keyFile, out byte[] encryptedData, string targetFile = "")
         {
             if (!string.IsNullOrEmpty(dataFile) && !string.IsNullOrWhiteSpace(dataFile)
                 && File.Exists(dataFile))
@@ -300,14 +316,15 @@ namespace Encryptor
                                 // Необходимо сохранить в файл
                                 // Имя целевого файла может быть задано абсолютным путем, тогда первое вхождение ':' будет относиться к идентификатору диска
                                 int firstInd = targetFile.IndexOf(':');
-                                bool isFullPath = false;
-                                int lastInd = (isFullPath = targetFile.Contains(@":\")) ? targetFile.LastIndexOf(':', firstInd + 1) : targetFile.IndexOf(':');
+                                bool isFullPath = targetFile.Contains(@":\");
+                                int lastInd = isFullPath ? targetFile.LastIndexOf(':', firstInd + 1) 
+                                                         : targetFile.IndexOf(':');
                                 if ((isFullPath && lastInd > firstInd) || (!isFullPath && lastInd > 0))
                                 {
                                     // Проверяем наличие идентификатора альтернативного потока
                                     string targetFileName = targetFile.Substring(0, lastInd);
                                     string targetFileStream = targetFile.Substring(lastInd + 1);
-                                    if (!string.IsNullOrEmpty(targetFileStream) && targetFileStream.Length > 0)
+                                    if (!string.IsNullOrEmpty(targetFileStream))
                                     {
                                         // Сохранить необходимо в альтернативный поток
                                         using (FileStream fs = FileStreamHelper.OpenWithStream(targetFileName, targetFileStream, FileMode.Create, FileAccess.Write))
@@ -375,14 +392,15 @@ namespace Encryptor
                                 // Необходимо сохранить в файл
                                 // Имя целевого файла может быть задано абсолютным путем, тогда первое вхождение ':' будет относиться к идентификатору диска
                                 int firstInd = targetFile.IndexOf(':');
-                                bool isFullPath = false;
-                                int lastInd = (isFullPath = targetFile.Contains(@":\")) ? targetFile.LastIndexOf(':', firstInd + 1) : targetFile.IndexOf(':');
+                                bool isFullPath = targetFile.Contains(@":\");
+                                int lastInd = isFullPath ? targetFile.LastIndexOf(':', firstInd + 1) 
+                                                         : targetFile.IndexOf(':');
                                 if ((isFullPath && lastInd > firstInd) || (!isFullPath && lastInd > 0))
                                 {
                                     // Проверяем наличие идентификатора альтернативного потока
                                     string targetFileName = targetFile.Substring(0, lastInd);
                                     string targetFileStream = targetFile.Substring(lastInd + 1);
-                                    if (!string.IsNullOrEmpty(targetFileStream) && targetFileStream.Length > 0)
+                                    if (!string.IsNullOrEmpty(targetFileStream))
                                     {
                                         // Сохранить необходимо в альтернативный поток
                                         using (FileStream fs = FileStreamHelper.OpenWithStream(targetFileName, targetFileStream, FileMode.Create, FileAccess.Write))
@@ -395,8 +413,7 @@ namespace Encryptor
                                 }
                                 if (!string.IsNullOrEmpty(targetFile))
                                 {
-                                    string fileName = (targetFile != string.Empty) ? targetFile :
-                                                            Path.Combine(Path.GetDirectoryName(encryptedDataFile), Path.GetFileNameWithoutExtension(encryptedDataFile) + ".decrypted");
+                                    string fileName = targetFile;
                                     File.WriteAllBytes(fileName, decryptedData);
                                     Console.WriteLine($"Succeeded! DecryptedFile: {fileName}");
                                 }

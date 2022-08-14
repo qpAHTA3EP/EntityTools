@@ -1,4 +1,5 @@
-﻿using AcTp0Tools.Reflection;
+﻿using AcTp0Tools;
+using AcTp0Tools.Reflection;
 using Astral.Addons;
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;
@@ -27,7 +28,6 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using AcTp0Tools;
 using Action = Astral.Quester.Classes.Action;
 
 [assembly: InternalsVisibleTo("EntityCore")]
@@ -43,8 +43,8 @@ namespace EntityTools
         internal static string CoreHash;
         internal static IEntityToolsCore Core { get; private set; } = new EntityCoreProxy();
 
-        private static bool assemblyResolve_Deletage_Binded;
-        private static readonly string assemblyResolve_Name = $"^{Assembly.GetExecutingAssembly().GetName().Name},";
+        private static bool _assemblyResolveDeletageBinded;
+        private static readonly string AssemblyResolveName = $"^{Assembly.GetExecutingAssembly().GetName().Name},";
 
         public override string Name => "Entity Tools";
         public override string Author => "MichaelProg";
@@ -99,10 +99,10 @@ namespace EntityTools
 
         public override void OnLoad()
         {
-            if (!assemblyResolve_Deletage_Binded)
+            if (!_assemblyResolveDeletageBinded)
             {
                 AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
-                assemblyResolve_Deletage_Binded = true;
+                _assemblyResolveDeletageBinded = true;
             }
             if (Config.Logger.Active)
                 ETLogger.Start();
@@ -199,7 +199,7 @@ namespace EntityTools
                 if (!Directory.Exists(Path.GetDirectoryName(FileTools.SettingsFile)))
                 {
                     var dir = Path.GetDirectoryName(FileTools.SettingsFile);
-                    if (!string.IsNullOrEmpty(dir))
+                    if (string.IsNullOrEmpty(dir))
                     {
                         ETLogger.WriteLine(LogType.Error, $"{nameof(EntityTools)}: Error to save settings file {Path.GetFileName(FileTools.SettingsFile)}", true);
                         return;
@@ -309,7 +309,7 @@ namespace EntityTools
 
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
-            if (Regex.IsMatch(args.Name, assemblyResolve_Name))
+            if (Regex.IsMatch(args.Name, AssemblyResolveName))
                 return typeof(EntityTools).Assembly;
             return null;
         }
@@ -592,7 +592,6 @@ namespace EntityTools
 
                 ETLogger.WriteLine(LogType.Error, $"EntityToolsCore is invalid! Forbid an edition of the {obj.GetType().Name}.", true);
 
-                obj = null;
                 return false;
             }
 
@@ -602,7 +601,7 @@ namespace EntityTools
                     Core.Monitor(monitor);
             }
 #endif
-#if DEBUG
+#if false
             public LinkedList<Entity> FindAllEntity(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete, bool healthCheck = false, float range = 0, float zRange = 0, bool regionCheck = false, List<CustomRegion> customRegions = null, Predicate<Entity> specialCheck = null)
             {
                 if (_internalInitializer())
@@ -630,10 +629,10 @@ namespace EntityTools
             private static bool LoadCore()
             {
                 // Попытка загрузки ядра производится только после привязки делегата CurrentDomain_AssemblyResolve
-                if (!assemblyResolve_Deletage_Binded)
+                if (!_assemblyResolveDeletageBinded)
                 {
                     AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
-                    assemblyResolve_Deletage_Binded = true;
+                    _assemblyResolveDeletageBinded = true;
                 }
 
                 try
@@ -645,11 +644,11 @@ namespace EntityTools
                             return Core.CheckCore();
 
                         var executingAssembly = Assembly.GetExecutingAssembly();
-                        var ETfilename = executingAssembly.GetName().Name + ".dll";
-                        var wrongETLocation = Path.Combine(Directories.AstralStartupPath, ETfilename);
-                        if (File.Exists(wrongETLocation))
+                        var etFilename = executingAssembly.GetName().Name + ".dll";
+                        var etWrongLocation = Path.Combine(Directories.AstralStartupPath, etFilename);
+                        if (File.Exists(etWrongLocation))
                         {
-                            var msg = string.Concat("The file ", ETfilename, " save location is incorrect.\n" +
+                            var msg = string.Concat("The file ", etFilename, " save location is incorrect.\n" +
                                 "You should replace it from the folder: ", Directories.AstralStartupPath,
                                 "\nto the folder: ", Directories.PluginsPath);
 
@@ -678,34 +677,35 @@ namespace EntityTools
                                         Assembly assembly = Assembly.Load(decryptedCoreBytes);
                                         CoreHash = CryptoHelper.MD5_HashString(decryptedCoreBytes);
 #else
-                                try
-                                {
-                                    Assembly assembly = Assembly.Load(coreBytes);
-                                    CoreHash = CryptoHelper.MD5_HashString(coreBytes);
-#endif
-                                    Type coreType = typeof(IEntityToolsCore);
-                                    foreach (Type type in assembly.GetTypes())
+                                    try
                                     {
-#if false
-                                                if (type.GetInterface(nameof(IEntityToolsCore)) != null)
-#else
-                                        if (type.GetInterfaces().Contains(coreType))
+                                        Assembly assembly = Assembly.Load(coreBytes);
+                                        CoreHash = CryptoHelper.MD5_HashString(coreBytes);
 #endif
+                                        Type coreType = typeof(IEntityToolsCore);
+                                        foreach (Type type in assembly.GetTypes())
                                         {
-                                            if (Activator.CreateInstance(type) is IEntityToolsCore core)
+#if false
+                                            if (type.GetInterface(nameof(IEntityToolsCore)) != null)
+#else
+                                            if (type.GetInterfaces().Contains(coreType))
+#endif
                                             {
-                                                Core = core;
-                                                return true;
+                                                if (Activator.CreateInstance(type) is IEntityToolsCore core)
+                                                {
+                                                    Core = core;
+                                                    return true;
+                                                }
                                             }
                                         }
-                                    }
-                                }
 #if !ENCRYPTED_CORE
-                                catch
-                                {
-                                    // ignored
-                                }
+                                    }
+                                    catch
+                                    {
+                                        // ignored
+                                    }
 #else
+                                    }
                                     catch (Exception e)
                                     {
                                         string msg = "Fail to load decrypted EntityToolCore\r\n" + e.Message;

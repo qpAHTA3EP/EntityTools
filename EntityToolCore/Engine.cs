@@ -2,7 +2,6 @@
 using Astral.Classes.ItemFilter;
 using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
-using Astral.Quester.Classes;
 using DevExpress.Utils;
 using DevExpress.XtraEditors;
 using EntityCore.Entities;
@@ -31,6 +30,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using Astral.Quester.Classes;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 using UCCConditionList = System.Collections.ObjectModel.ObservableCollection<Astral.Logic.UCC.Classes.UCCCondition>;
@@ -500,7 +500,7 @@ namespace EntityCore
             
         }
 #endif
-#if DEBUG
+#if false
         public LinkedList<Entity> FindAllEntity(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete,
                                          bool healthCheck = false, float range = 0, float zRange = 0, bool regionCheck = false, List<CustomRegion> customRegions = null,
                                          Predicate<Entity> specialCheck = null)

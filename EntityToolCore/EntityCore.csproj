@@ -47,7 +47,7 @@
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>DEVELOPER, CORE_INTERFACES</DefineConstants>
+    <DefineConstants>DEVELOPER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
@@ -58,7 +58,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEVELOPER, CORE_INTERFACES</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEVELOPER</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -69,7 +69,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Release|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>DEVELOPER, CORE_INTERFACES</DefineConstants>
+    <DefineConstants>DEVELOPER</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -482,8 +482,9 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>type $(TargetFileName)&gt;"EntityTools.dll:Core"
-copy /Y "EntityTools.*" "Plugins\EntityTools.*"</PostBuildEvent>
+    <PostBuildEvent>"$(TargetDir)Encryptor.exe" -e "$(TargetPath)" "$(TargetDir)EntityTools.key"
+type "$(TargetDir)$(TargetName).encrypted" &gt;"$(TargetDir)EntityTools.dll:Core"
+copy /Y "$(TargetDir)EntityTools.*" "$(TargetDir)Plugins\EntityTools.*"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>"$(DevEnvDir)TextTransform.exe" -out "$(ProjectDir)Engine.tt.cs" "$(ProjectDir)Engine.tt"</PreBuildEvent>

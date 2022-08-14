@@ -276,56 +276,62 @@ namespace Encryptor
             if (data == null || data.Length == 0)
                 return null;
 
-            MD5CryptoServiceProvider md5CryptoServiceProvider = new MD5CryptoServiceProvider();
-            byte[] key = md5CryptoServiceProvider.ComputeHash(Encoding.UTF8.GetBytes(cryptKey));
-            TripleDESCryptoServiceProvider tripleDESCryptoServiceProvider = new TripleDESCryptoServiceProvider
+            using (MD5CryptoServiceProvider md5CryptoServiceProvider = new MD5CryptoServiceProvider())
             {
-                Key = key,
-                Mode = CipherMode.ECB,
-                Padding = PaddingMode.PKCS7
-            };
-            byte[] inArray = null;
-            try
-            {
-                inArray = tripleDESCryptoServiceProvider.CreateEncryptor().TransformFinalBlock(data, 0, data.Length);
+                byte[] key = md5CryptoServiceProvider.ComputeHash(Encoding.UTF8.GetBytes(cryptKey));
+                using (TripleDESCryptoServiceProvider tripleDESCryptoServiceProvider =
+                       new TripleDESCryptoServiceProvider {
+                           Key = key,
+                           Mode = CipherMode.ECB,
+                           Padding = PaddingMode.PKCS7
+                       })
+                {
+                    byte[] inArray = null;
+                    try
+                    {
+                        inArray = tripleDESCryptoServiceProvider.CreateEncryptor()
+                            .TransformFinalBlock(data, 0, data.Length);
+                    }
+                    finally
+                    {
+                        tripleDESCryptoServiceProvider.Clear();
+                        md5CryptoServiceProvider.Clear();
+                    }
+
+                    return inArray;
+                }
             }
-            finally
-            {
-                tripleDESCryptoServiceProvider.Clear();
-                md5CryptoServiceProvider.Clear();
-            }
-            return inArray;
         }
 
         public static byte[] Decrypt_Astral(byte[] data, string cryptKey)
         {
             byte[] result = null;
-            try
+            using (MD5CryptoServiceProvider md5CryptoServiceProvider = new MD5CryptoServiceProvider())
             {
-                MD5CryptoServiceProvider md5CryptoServiceProvider = new MD5CryptoServiceProvider();
                 byte[] key = md5CryptoServiceProvider.ComputeHash(Encoding.UTF8.GetBytes(cryptKey));
-                TripleDESCryptoServiceProvider tripleDESCryptoServiceProvider = new TripleDESCryptoServiceProvider
+                using (TripleDESCryptoServiceProvider tripleDESCryptoServiceProvider =
+                       new TripleDESCryptoServiceProvider {
+                           Key = key,
+                           Mode = CipherMode.ECB,
+                           Padding = PaddingMode.PKCS7
+                       })
                 {
-                    Key = key,
-                    Mode = CipherMode.ECB,
-                    Padding = PaddingMode.PKCS7
-                };
-                byte[] bytes;
-                try
-                {
-                    bytes = tripleDESCryptoServiceProvider.CreateDecryptor().TransformFinalBlock(data, 0, data.Length);
+                    byte[] bytes;
+                    try
+                    {
+                        bytes = tripleDESCryptoServiceProvider.CreateDecryptor()
+                            .TransformFinalBlock(data, 0, data.Length);
+                    }
+                    finally
+                    {
+                        tripleDESCryptoServiceProvider.Clear();
+                        md5CryptoServiceProvider.Clear();
+                    }
+
+                    result = bytes;
                 }
-                finally
-                {
-                    tripleDESCryptoServiceProvider.Clear();
-                    md5CryptoServiceProvider.Clear();
-                }
-                result = bytes;
             }
-            catch
-            {
-                result = null;
-            }
+
             return result;
         }
 

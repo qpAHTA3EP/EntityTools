@@ -16,6 +16,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
+using EntityTools.Editors;
 using static Astral.Quester.Classes.Action;
 
 namespace EntityCore.Quester.Action
@@ -289,7 +290,6 @@ namespace EntityCore.Quester.Action
                             @this.CurrentMap = player.MapState.MapName;
                             @this.CurrentRegion = player.RegionInternalName;
 
-#if true
                             var zi = iniPos.Z;
                             var zRange = @this.ZRange;
                             var zDev = @this.ZDeviation;
@@ -298,58 +298,10 @@ namespace EntityCore.Quester.Action
                                 zRange.Min = (float)Math.Floor(zi - zDev);
                                 zRange.Max = (float)Math.Round(zi + zDev);
                             }
-#else
-                            var zRange = @this.ZRange;
-
-                            if (zRange.IsValid && zRange.Within(iniPos.Z))
-                                return;
-
-                            var zi = iniPos.Z;
-                            var zt = tarPos.Z;
-                            var dz = zt - zi;
-
-                            var zDev = @this.ZDeviation;
-                            if (zDev > 0)
-                            {
-                                zRange.Min = (float)Math.Floor(zi - zDev);
-                                zRange.Max = (float)Math.Round(zi + zDev);
-                                return;
-                            }
-
-                            if (dz > 0)
-                            {
-                                zRange.Min = (float)Math.Floor(Math.Min(zRange.Min, zi - 10));
-                                zRange.Max = (float)Math.Round(Math.Max(zRange.Max, zi + 1 + dz / 2));
-                            }
-                            else
-                            {
-                                zRange.Min = (float)Math.Round(Math.Min(zRange.Min, zi - 1 + dz / 2));
-                                zRange.Max = (float)Math.Round(Math.Max(zRange.Max, zi + 10));
-                            } 
-#endif
-                            var pwId = @this.PowerId;
+                            var pwId = PowerIdEditor.GetPowerId(@this.PowerId);
                             if (string.IsNullOrEmpty(pwId))
                             {
-                                if (!string.IsNullOrEmpty(pwId = ExecutePowerExt.PowerIdCache))
-                                {
-                                    @this.PowerId = pwId;
-                                    return;
-                                }
-
-                                IEnumerable<PowerInfo> GetPower()
-                                {
-                                    foreach (var pw in EntityManager.LocalPlayer.Character.Powers)
-                                    {
-                                        yield return new PowerInfo(pw);
-                                    }
-                                }
-
-                                PowerInfo powerInfo = null;
-                                if (ItemSelectForm.GetAnItem(GetPower, ref powerInfo, nameof(PowerInfo.FullName))
-                                    && powerInfo != null)
-                                {
-                                    @this.PowerId = powerInfo.InternalName;
-                                }
+                                @this.PowerId = PowerIdEditor.GetPowerId(@this.PowerId);
                             }
                         }
                     }

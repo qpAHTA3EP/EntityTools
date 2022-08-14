@@ -1,5 +1,4 @@
-﻿using Astral.Logic.NW;
-using EntityTools.Tools.Export;
+﻿using EntityTools.Tools;
 using MyNW.Internals;
 using System;
 using System.Collections.Generic;
@@ -12,22 +11,10 @@ namespace EntityTools.Editors
 #if DEVELOPER
     class PowerIdEditor : UITypeEditor
     {
+        private static List<Tuple<string, string>> powerCache;
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            var powerId = value?.ToString();
-            PowerInfo powerInfo = null;
-            if (!string.IsNullOrEmpty(powerId))
-            {
-                var power = Powers.GetPowerByInternalName(powerId);
-                if (power != null && power.IsValid)
-                    powerInfo = new PowerInfo(power);
-            }
-
-            if (EntityTools.Core.UserRequest_SelectItem(GetPower, ref powerInfo, nameof(PowerInfo.FullName)))
-            {
-                return powerInfo?.InternalName;
-            }
-            return value;
+            return GetPowerId(value?.ToString());
         }
 
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
@@ -35,10 +22,51 @@ namespace EntityTools.Editors
             return UITypeEditorEditStyle.Modal;
         }
 
-        // Оборачиваем список Power в 
-        private static IEnumerable<PowerInfo> GetPower()
+        // Оборачиваем список Power в функтор
+        private static IEnumerable<Tuple<string, string>> GetPowers()
         {
-            return new List<PowerInfo>(EntityManager.LocalPlayer.Character.Powers.Select(p => new PowerInfo(p)));
+            return powerCache;
+        }
+
+        public static string GetPowerId(string powerId)
+        {
+            Tuple<string, string> defaultValue = null;
+            var powers = EntityManager.LocalPlayer.Character.Powers;
+            if (string.IsNullOrEmpty(powerId))
+            {
+                powerCache = powers.Select(p =>
+                {
+                    var powDef = p.PowerDef;
+                    var id = powDef.InternalName;
+                    return Tuple.Create(powDef.InternalName,
+                        string.IsNullOrEmpty(powDef.DisplayName)
+                            ? id
+                            : string.Concat(powDef.DisplayName, " [", id, "]"));
+                }).ToList();
+            }
+            else
+            {
+                var predicate = powerId.GetComparer();
+                powerCache = new List<Tuple<string, string>>(powers.Count);
+                foreach (var pwr in powers)
+                {
+                    var powDef = pwr.PowerDef;
+                    var id = powDef.InternalName;
+                    var tuple = Tuple.Create(powDef.InternalName,
+                        string.IsNullOrEmpty(powDef.DisplayName)
+                            ? id
+                            : string.Concat(powDef.DisplayName, " [", id, "]"));
+                    powerCache.Add(tuple);
+                    if (predicate(pwr.PowerDef.InternalName))
+                        defaultValue = tuple;
+                }
+            }
+            if (EntityTools.Core.UserRequest_SelectItem(GetPowers, ref defaultValue, nameof(Tuple<string, string>.Item2)))
+            {
+                return defaultValue?.Item1;
+            }
+
+            return powerId;
         }
     }
 #endif

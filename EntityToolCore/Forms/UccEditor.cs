@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using EntityTools.Tools;
 using EntityTools.UCC.Conditions;
 
 namespace EntityCore.Forms
@@ -41,6 +42,11 @@ namespace EntityCore.Forms
         {
             InitializeComponent();
             editBasePriority.Properties.Items.AddRange(Enum.GetValues(typeof(Astral.Logic.UCC.Ressources.Enums.TargetPriorityBase)));
+            var settingFile = FileTools.UccEditorSettingsFile;
+            if (File.Exists(settingFile))
+            {
+                dockManager.RestoreLayoutFromXml(settingFile);
+            }
         }
 
         /// <summary>
@@ -97,9 +103,17 @@ namespace EntityCore.Forms
                 Text = "UCC Editor";
                 profileUnsaved = false;
             }
+            txtLog.AppendText(string.Concat("Profile",
+                string.IsNullOrEmpty(profileFileName) ? String.Empty : " '" + this.profileFileName + "'",
+                " opened.",
+                Environment.NewLine));
 
-            tabbedView.ActivateDocument(docCombat.Control);
+
 #if does_not_work
+            documentManager.ContainerControl.ActiveControl = panCombat;
+            docCombat.Control.Focus();
+            dockManager.DockController.Activate(panCombat);
+            tabbedView.ActivateDocument(docCombat.Control);
             selectedControl = treeCombatActions;
             documentManager.DockManager.ActivePanel = panCombat;
             documentGroup.SetSelected(docCombat); 
@@ -650,6 +664,10 @@ namespace EntityCore.Forms
                         profile = prfl;
                         profileFileName = openFileDialog.FileName;
                         Text = string.IsNullOrEmpty(profileFileName) ? "UCC Editor" : profileFileName;
+                        txtLog.AppendText(string.Concat("Profile",
+                            string.IsNullOrEmpty(profileFileName) ? String.Empty : " '" + profileFileName + "'",
+                            " loaded.",
+                            Environment.NewLine));
                         profileUnsaved = false;
                     }
                 }
@@ -660,6 +678,19 @@ namespace EntityCore.Forms
             }
         }
 
+        private void handler_ReloadProfile(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            if (profile != null)
+            {
+                UI_reset();
+                UI_fill(profile);
+                txtLog.AppendText(string.Concat("Profile",
+                    string.IsNullOrEmpty(profileFileName) ? String.Empty : " '" + profileFileName + "'",
+                    " reloaded.",
+                    Environment.NewLine));
+            }
+        }
+
         private void handler_NewProfile(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
             profile = new Profil();
@@ -667,6 +698,7 @@ namespace EntityCore.Forms
             Text = "UCC Editor";
             profileUnsaved = false;
             UI_reset();
+            txtLog.AppendText("Make blank Profile.\n");
         }
 
         private void handler_SaveProfile(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
@@ -682,6 +714,10 @@ namespace EntityCore.Forms
             if (SaveProfile(profileFileName))
             {
                 Text = string.IsNullOrEmpty(profileFileName) ? "UCC Editor" : profileFileName;
+                txtLog.AppendText(string.Concat("Profile",
+                                                string.IsNullOrEmpty(profileFileName) ? String.Empty : " '" + profileFileName +  "'",
+                                                " saved.",
+                                                Environment.NewLine));
                 profileUnsaved = false;
             }
         }
@@ -697,6 +733,10 @@ namespace EntityCore.Forms
                 profileFileName = saveFileDialog.FileName;
 
                 Text = string.IsNullOrEmpty(profileFileName) ? "UCC Editor *" : "* " + profileFileName;
+                txtLog.AppendText(string.Concat("Profile",
+                    string.IsNullOrEmpty(profileFileName) ? String.Empty : " '" + profileFileName + "'",
+                    " saved.",
+                    Environment.NewLine));
                 profileUnsaved = false;
             }
         }
@@ -789,6 +829,20 @@ namespace EntityCore.Forms
             }
         }
 
+        private void handler_ProfileToEngine(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            if (AstralAccessors.Controllers.Roles.IsRunning)
+            {
+                XtraMessageBox.Show("Stop the bot before exporting Ucc-Profile into the UccEngine.");
+                return;
+            }
+            // Пересобираем профиль
+            if (profileUnsaved)
+                SaveProfile("");
+
+            Astral.Logic.UCC.Core.Get.mProfil = CopyHelper.CreateDeepCopy(profile);
+        }
+
         /// <summary>
         /// Отображение профиля <paramref name="profile"/> в окне редактора.
         /// </summary>
@@ -810,7 +864,6 @@ namespace EntityCore.Forms
                 treePatrolActions.Nodes.Clear();
                 treePatrolActions.Nodes.AddRange(profile.ActionsPatrol.ToTreeNodes(true));
             }
-
             // Отображение тактики
             {
                 // Использование зелий
@@ -886,6 +939,7 @@ namespace EntityCore.Forms
             }
         }
 
+        #region List of Priorities
         private void handler_TacticUsageChanged(object sender, EventArgs e = null)
         {
             groupPriority.Enabled = checkerTacticActivator.Checked;
@@ -933,7 +987,7 @@ namespace EntityCore.Forms
             else e.Effect = DragDropEffects.None;
         }
 
-        private void listPriorities_SelectedValueChanged(object sender, EventArgs e)
+        private void handler_SelectedPriorityChanged(object sender, EventArgs e)
         {
             selectedControl = listPriorities;
             conditionCallback = null;
@@ -946,19 +1000,30 @@ namespace EntityCore.Forms
             else propertyCallback = null;
         }
 
-        private void handler_ProfileToEngine(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        private void handler_PriorityAdd(object sender, EventArgs e)
         {
-            if (AstralAccessors.Controllers.Roles.IsRunning)
+            // Добавляем объект TargetPriority
+            TargetPriorityEntry targetPriorityEntry = ChoosePriority.Show();
+            if (targetPriorityEntry != null)
             {
-                XtraMessageBox.Show("Stop the bot before exporting Ucc-Profile into the UccEngine.");
-                return;
-            }
-            // Пересобираем профиль
-            if (profileUnsaved)
-                SaveProfile("");
+                var selectedPriorityInd = listPriorities.SelectedIndex;
+                if (selectedPriorityInd >= 0)
+                    listPriorities.Items.Insert(selectedPriorityInd + 1, targetPriorityEntry);
+                else listPriorities.Items.Add(targetPriorityEntry);
 
-            Astral.Logic.UCC.Core.Get.mProfil = CopyHelper.CreateDeepCopy(profile);
+                Text = string.IsNullOrEmpty(profileFileName) ? "UCC Editor *" : "* " + profileFileName;
+                profileUnsaved = true;
+            }
         }
+
+        private void handler_PriorityDelete(object sender, EventArgs e)
+        {
+            // Удаляем объект TargetPriority
+            var selectedPriorityInd = listPriorities.SelectedIndex;
+            if (selectedPriorityInd >= 0)
+                listPriorities.Items.RemoveAt(selectedPriorityInd);
+        }
+        #endregion
 
         /// <summary>
         /// Тестирование выбранной команды или условия
@@ -979,7 +1044,7 @@ namespace EntityCore.Forms
                         // 
                         UCCAction uccAction = null;
                         if (documentGroup.SelectedDocument == docCombat)
-                            uccAction = treeConditions.SelectedNode?.Tag as UCCAction;
+                            uccAction = treeCombatActions.SelectedNode?.Tag as UCCAction;
                         else if (documentGroup.SelectedDocument == docPatrol)
                             uccAction = treePatrolActions.SelectedNode?.Tag as UCCAction;
                         else
@@ -1054,7 +1119,7 @@ namespace EntityCore.Forms
 
                     UCCAction uccAction = null;
                     if (documentGroup.SelectedDocument == docCombat)
-                        uccAction = treeConditions.SelectedNode?.Tag as UCCAction;
+                        uccAction = treeCombatActions.SelectedNode?.Tag as UCCAction;
                     else if (documentGroup.SelectedDocument == docPatrol)
                         uccAction = treePatrolActions.SelectedNode?.Tag as UCCAction;
                     else
@@ -1077,7 +1142,7 @@ namespace EntityCore.Forms
                     bool lockedTrue = true; // флаг истинности всех залоченных условий 
                     
                     var strBuilder = new StringBuilder();
-                    strBuilder.Append(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss] ")).Append("Testing the list of ").Append(selectedTreeView.Nodes.Count).AppendLine(" ucc-condition:");
+                    strBuilder.Append(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss] ")).Append("Testing the list of ").Append(nodeCount).AppendLine(" ucc-condition:");
                     foreach (TreeNode node in nodes)
                     {
                         if(node.Tag is UCCCondition uccCnd)
@@ -1160,9 +1225,448 @@ namespace EntityCore.Forms
                         break;
                     case DialogResult.Cancel:
                         e.Cancel = true;
-                        break;
+                        return;
+                }
+            }
+
+            dockManager.SaveLayoutToXml(FileTools.UccEditorSettingsFile);
+        }
+
+        #region Conditions
+        private void handler_ConditionAdd(object sender, EventArgs e)
+        {
+            // Добавление UCCCondition
+            if (ItemSelectForm.GetAnInstance(out UCCCondition newCondition, false))
+            {
+                if (newCondition.MakeTreeNode() is IUccTreeNode<UCCCondition> newTreeNode)
+                {
+                    var selectedNode = treeConditions.SelectedNode;
+                    if (selectedNode != null)
+                    {
+                        if (selectedNode is UccActionPackTreeNode actPackNode)
+                            // Если выделенный узел является UccActionPackTreeNode
+                            // добавляем новую команду в список его узлов
+                            actPackNode.Nodes.Add((TreeNode)newTreeNode);
+                        else
+                        {
+                            // добавляем новую команду после выделенного узла
+                            if (selectedNode.Parent is null)
+                                treeConditions.Nodes.Insert(selectedNode.Index + 1, (TreeNode)newTreeNode);
+                            else
+                                selectedNode.Parent.Nodes.Insert(selectedNode.Index + 1, (TreeNode)newTreeNode);
+                        }
+                    }
+                    // добавляем новую команду в конец списка узлов дерева
+                    else treeConditions.Nodes.Add((TreeNode)newTreeNode);
+
+                    propertyGrid.SelectedObject = newCondition;
+                    propertyCallback = newTreeNode.UpdateView;
+
+                    Text = string.IsNullOrEmpty(profileFileName) ? "UCC Editor *" : "* " + profileFileName;
+                    profileUnsaved = true;
                 }
             }
         }
+
+        private void handler_ConditionDelete(object sender, EventArgs e)
+        {
+            if (treeConditions.SelectedNode is UccConditionPackTreeNode)
+            {
+                if (XtraMessageBox.Show("Confirm deleting of the ConditionPack",
+                        "Confirmation",
+                        MessageBoxButtons.YesNo) != DialogResult.Yes)
+                    return;
+            }
+            treeConditions.SelectedNode.Remove();
+        }
+
+        private void handler_ConditionCopy(object sender, EventArgs e)
+        {
+            if (treeConditions.SelectedNode?.Tag is UCCCondition uccCondition)
+                uccConditionCache = CopyHelper.CreateDeepCopy(uccCondition);
+        }
+
+        private void handler_ConditionPaste(object sender, EventArgs e)
+        {
+            if (uccConditionCache != null)
+            {
+                // Добавляем UCC-команду
+                var newCondition = CopyHelper.CreateDeepCopy(uccConditionCache);
+                var newNode = newCondition.MakeTreeNode();
+                var selectedNode = treeConditions.SelectedNode;
+                if (selectedNode != null)
+                {
+                    if (selectedNode is UccConditionPackTreeNode conditionPackNode)
+                        // Если выделенный узел является UccActionPackTreeNode
+                        // добавляем новую команду в список его узлов
+                        conditionPackNode.Nodes.Add(newNode);
+                    else
+                    {
+                        // добавляем новую команду после выделенного узла
+                        if (selectedNode.Parent is null)
+                            treeConditions.Nodes.Insert(selectedNode.Index + 1, newNode);
+                        else selectedNode.Parent.Nodes.Insert(selectedNode.Index + 1, newNode);
+                    }
+                }
+                // добавляем новую команду в конец списка узлов дерева
+                else treeConditions.Nodes.Add(newNode);
+
+                propertyGrid.SelectedObject = newCondition;
+                if (newNode is IUccTreeNode<UCCCondition> uccConditionTreeNode)
+                    propertyCallback = uccConditionTreeNode.UpdateView;
+
+                Text = string.IsNullOrEmpty(profileFileName) ? "UCC Editor *" : "* " + profileFileName;
+                profileUnsaved = true;
+            }
+        }
+
+        private void handler_ConditionTest(object sender, EventArgs e)
+        {
+            if (treeConditions.SelectedNode?.Tag is UCCCondition uccCnd)
+            {
+                // 
+                UCCAction uccAction = null;
+                if (documentGroup.SelectedDocument == docCombat)
+                    uccAction = treeCombatActions.SelectedNode?.Tag as UCCAction;
+                else if (documentGroup.SelectedDocument == docPatrol)
+                    uccAction = treePatrolActions.SelectedNode?.Tag as UCCAction;
+                else
+                {
+                    XtraMessageBox.Show(
+                        "Testing of Tactic is unavailable. Select Combat or Patrol ucc-action list first.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                if (uccAction is null)
+                {
+                    XtraMessageBox.Show(
+                        "No ucc-action selected.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                // Тестирование выбранного условия
+                bool result;
+                string msg;
+                if (uccCnd is ICustomUCCCondition iCond)
+                {
+                    result = iCond.IsOK(uccAction);
+                    msg = iCond.TestInfos(uccAction);
+                }
+                else
+                {
+                    result = uccCnd.IsOK(uccAction);
+                    msg = $"{uccCnd.Target} {uccCnd.Tested} : {uccCnd.Value}";
+                }
+
+                if (string.IsNullOrEmpty(msg))
+                    msg = uccCnd.ToString();
+
+                txtLog.AppendText(string.Concat(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss] "),
+                                                "Testing selected condition:", Environment.NewLine,
+                                                "   ", msg, Environment.NewLine,
+                                                "Result: ", result, Environment.NewLine));
+            }
+            else XtraMessageBox.Show(
+                "No ucc-condition selected.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void handler_ConditionTestAll(object sender, EventArgs e)
+        {
+            var nodes = treeConditions.Nodes;
+            var nodeCount = nodes.Count;
+            if (nodeCount == 0)
+            {
+                XtraMessageBox.Show(
+                    "Ucc-condition list is empty.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            UCCAction uccAction = null;
+            if (documentGroup.SelectedDocument == docCombat)
+                uccAction = treeCombatActions.SelectedNode?.Tag as UCCAction;
+            else if (documentGroup.SelectedDocument == docPatrol)
+                uccAction = treePatrolActions.SelectedNode?.Tag as UCCAction;
+            else
+            {
+                XtraMessageBox.Show(
+                    "Testing of Tactic is unavailable. Select Combat or Patrol ucc-action list first.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            if (uccAction is null)
+            {
+                XtraMessageBox.Show(
+                    "No ucc-action selected.", "Information", MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            int okLockedNum = 0;    // Счетчик количества истиных залоченных условий
+            int okUnlockedNum = 0;  // счетчик количества истиных незалоченных условий
+            bool lockedTrue = true; // флаг истинности всех залоченных условий 
+
+            var strBuilder = new StringBuilder();
+            strBuilder.Append(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss] ")).Append("Testing the list of ").Append(nodeCount).AppendLine(" ucc-condition:");
+            foreach (TreeNode node in nodes)
+            {
+                if (node.Tag is UCCCondition uccCnd)
+                {
+                    bool result;
+                    string msg;
+                    if (uccCnd is ICustomUCCCondition iCond)
+                    {
+                        result = iCond.IsOK(uccAction);
+                        msg = iCond.TestInfos(uccAction);
+                    }
+                    else
+                    {
+                        result = uccCnd.IsOK(uccAction);
+                        msg = $"{uccCnd.Target} {uccCnd.Tested} : {uccCnd.Value}";
+                    }
+
+                    if (string.IsNullOrEmpty(msg))
+                        msg = uccCnd.ToString();
+
+                    if (uccCnd.Locked)
+                    {
+                        strBuilder.Append("   [L] ");
+                        lockedTrue &= result;
+                        if (result)
+                            okLockedNum++;
+                    }
+                    else
+                    {
+                        strBuilder.Append("   [U] ");
+                        if (result)
+                            okUnlockedNum++;
+                    }
+                    strBuilder.Append(msg).Append(" => ").AppendLine(result.ToString());
+                }
+            }
+
+#if true            // Поскольку обработка списка условий производится встроенным алготимом Бота
+            // с флагом uccAction.OneCondMustGood итоговый результат ложный,
+            // если все условия залочены и они истины (т.е. нет ни одного незаложченных истиного условия).
+            bool totalResult = lockedTrue
+                               // Соответствует правилу дизъюнкции с учетом замечания указанного выше 
+                               && (uccAction.OneCondMustGood && okUnlockedNum > 0
+                                   // соответствует правилу конъюнкции
+                                   || nodeCount == okLockedNum + okUnlockedNum);
+#else               // Алтернативный корректный результат проверки с флагом uccAction.OneCondMustGood 
+                    // Вычислялся бы следующим образом
+                    bool totalResult = lockedTrue 
+                                           // Соответствует правилу дизъюнкции
+                                       && (uccAction.OneCondMustGood && (nodeCount == okLockedNum || okUnlockedNum > 0)
+                                           // соответствует правилу конъюнкции
+                                           || nodeCount == okLockedNum + okUnlockedNum);
+#endif
+            strBuilder.Append("Result: ").AppendLine(totalResult.ToString());
+            txtLog.AppendText(strBuilder.ToString());
+        }
+        #endregion
+
+        #region Combat action list
+        private void handler_CombatAdd(object sender, EventArgs e)
+        {
+            // Добавление UCCAction
+            if (AddUccActionForm.GUIRequest(out UCCAction action))
+            {
+                if (action.MakeTreeNode() is IUccActionTreeNode newTreeNode)
+                {
+                    var selectedNode = treeCombatActions.SelectedNode;
+                    if (selectedNode != null)
+                    {
+                        if (selectedNode is UccActionPackTreeNode actPackNode)
+                            // Если выделенный узел является UccActionPackTreeNode
+                            // добавляем новую команду в список его узлов
+                            actPackNode.Nodes.Add((TreeNode)newTreeNode);
+                        else
+                        {
+                            // добавляем новую команду после выделенного узла
+                            if (selectedNode.Parent is null)
+                                treeCombatActions.Nodes.Insert(selectedNode.Index + 1, (TreeNode)newTreeNode);
+                            else
+                                selectedNode.Parent.Nodes.Insert(selectedNode.Index + 1, (TreeNode)newTreeNode);
+                        }
+                    }
+                    // добавляем новую команду в конец списка узлов дерева
+                    else treeCombatActions.Nodes.Add((TreeNode)newTreeNode);
+
+                    propertyGrid.SelectedObject = action;
+                    propertyCallback = newTreeNode.UpdateView;
+
+                    Text = string.IsNullOrEmpty(profileFileName) ? "UCC Editor * " : "* " + profileFileName;
+                    profileUnsaved = true;
+                }
+            }
+        }
+
+        private void handler_CombatDelete(object sender, EventArgs e)
+        {
+            if (treeCombatActions.SelectedNode is UccConditionPackTreeNode)
+            {
+                if (XtraMessageBox.Show("Confirm deleting of the ActionPack",
+                        "Confirmation",
+                        MessageBoxButtons.YesNo) != DialogResult.Yes)
+                    return;
+            }
+            treeCombatActions.SelectedNode.Remove();
+        }
+
+        private void handler_CombatCopy(object sender, EventArgs e)
+        {
+            if (treeCombatActions.SelectedNode?.Tag is UCCAction uccAction)
+                // Копируем ucc-команду
+                uccActionCache = CopyHelper.CreateDeepCopy(uccAction);
+        }
+
+        private void handler_CombatPaste(object sender, EventArgs e)
+        {
+            if (uccActionCache != null)
+            {
+                // Добавляем UCC-команду
+                var newAction = CopyHelper.CreateDeepCopy(uccActionCache);
+                var newNode = newAction.MakeTreeNode();
+                var selectedNode = treeCombatActions.SelectedNode;
+                if (selectedNode != null)
+                {
+                    if (selectedNode is UccActionPackTreeNode actPackNode)
+                        // Если выделенный узел является UccActionPackTreeNode
+                        // добавляем новую команду в список его узлов
+                        actPackNode.Nodes.Add(newNode);
+                    else
+                    {
+                        // добавляем новую команду после выделенного узла
+                        if (selectedNode.Parent is null)
+                            treeCombatActions.Nodes.Insert(selectedNode.Index + 1, newNode);
+                        else selectedNode.Parent.Nodes.Insert(selectedNode.Index + 1, newNode);
+                    }
+                }
+                // добавляем новую команду в конец списка узлов дерева
+                else treeCombatActions.Nodes.Add(newNode);
+
+                propertyGrid.SelectedObject = newAction;
+                if (newNode is IUccActionTreeNode uccActionTreeNode)
+                    propertyCallback = uccActionTreeNode.UpdateView;
+
+                Text = string.IsNullOrEmpty(profileFileName) ? "UCC Editor *" : "* " + profileFileName;
+                profileUnsaved = true;
+            }
+        }
+
+        private void handler_CombatTest(object sender, EventArgs e)
+        {
+            XtraMessageBox.Show(
+                "Not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void handler_CombatTestAll(object sender, EventArgs e)
+        {
+            XtraMessageBox.Show(
+                "Not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        #endregion
+
+        #region Patrol action list
+        private void handler_PatrolAdd(object sender, EventArgs e)
+        {
+            // Добавление UCCAction
+            if (AddUccActionForm.GUIRequest(out UCCAction action))
+            {
+                if (action.MakeTreeNode() is IUccActionTreeNode newTreeNode)
+                {
+                    var selectedNode = treePatrolActions.SelectedNode;
+                    if (selectedNode != null)
+                    {
+                        if (selectedNode is UccActionPackTreeNode actPackNode)
+                            // Если выделенный узел является UccActionPackTreeNode
+                            // добавляем новую команду в список его узлов
+                            actPackNode.Nodes.Add((TreeNode)newTreeNode);
+                        else
+                        {
+                            // добавляем новую команду после выделенного узла
+                            if (selectedNode.Parent is null)
+                                treePatrolActions.Nodes.Insert(selectedNode.Index + 1, (TreeNode)newTreeNode);
+                            else
+                                selectedNode.Parent.Nodes.Insert(selectedNode.Index + 1, (TreeNode)newTreeNode);
+                        }
+                    }
+                    // добавляем новую команду в конец списка узлов дерева
+                    else treePatrolActions.Nodes.Add((TreeNode)newTreeNode);
+
+                    propertyGrid.SelectedObject = action;
+                    propertyCallback = newTreeNode.UpdateView;
+
+                    Text = string.IsNullOrEmpty(profileFileName) ? "UCC Editor * " : "* " + profileFileName;
+                    profileUnsaved = true;
+                }
+            }
+        }
+
+        private void handler_PatrolDelete(object sender, EventArgs e)
+        {
+            if (treePatrolActions.SelectedNode is UccConditionPackTreeNode)
+            {
+                if (XtraMessageBox.Show("Confirm deleting of the ActionPack",
+                        "Confirmation",
+                        MessageBoxButtons.YesNo) != DialogResult.Yes)
+                    return;
+            }
+            treePatrolActions.SelectedNode.Remove();
+        }
+
+        private void handler_PatrolCopy(object sender, EventArgs e)
+        {
+            if (treePatrolActions.SelectedNode?.Tag is UCCAction uccAction)
+                // Копируем ucc-команду
+                uccActionCache = CopyHelper.CreateDeepCopy(uccAction);
+        }
+
+        private void handler_PatrolPaste(object sender, EventArgs e)
+        {
+            if (uccActionCache != null)
+            {
+                // Добавляем UCC-команду
+                var newAction = CopyHelper.CreateDeepCopy(uccActionCache);
+                var newNode = newAction.MakeTreeNode();
+                var selectedNode = treePatrolActions.SelectedNode;
+                if (selectedNode != null)
+                {
+                    if (selectedNode is UccActionPackTreeNode actPackNode)
+                        // Если выделенный узел является UccActionPackTreeNode
+                        // добавляем новую команду в список его узлов
+                        actPackNode.Nodes.Add(newNode);
+                    else
+                    {
+                        // добавляем новую команду после выделенного узла
+                        if (selectedNode.Parent is null)
+                            treePatrolActions.Nodes.Insert(selectedNode.Index + 1, newNode);
+                        else selectedNode.Parent.Nodes.Insert(selectedNode.Index + 1, newNode);
+                    }
+                }
+                // добавляем новую команду в конец списка узлов дерева
+                else treePatrolActions.Nodes.Add(newNode);
+
+                propertyGrid.SelectedObject = newAction;
+                if (newNode is IUccActionTreeNode uccActionTreeNode)
+                    propertyCallback = uccActionTreeNode.UpdateView;
+
+                Text = string.IsNullOrEmpty(profileFileName) ? "UCC Editor *" : "* " + profileFileName;
+                profileUnsaved = true;
+            }
+        }
+
+        private void handler_PatrolTest(object sender, EventArgs e)
+        {
+            XtraMessageBox.Show(
+                "Not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void handler_PatrolTestAll(object sender, EventArgs e)
+        {
+            XtraMessageBox.Show(
+                "Not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        #endregion
     }
 }

@@ -28,6 +28,7 @@ namespace EntityTools.Tools
         public static readonly string DefaultExportFileName = "%character%_%account%_%dateTime%.xml";
 
         public static readonly string SettingsFile = Path.Combine(Directories.SettingsPath, nameof(EntityTools), nameof(EntityTools) + ".xml");
+        public static readonly string UccEditorSettingsFile = Path.Combine(Directories.SettingsPath, nameof(EntityTools), "UccEditor.xml");
 
         public static string ReplaceMask(string str)
         {
