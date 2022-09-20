@@ -201,10 +201,15 @@ namespace AcTp0Tools.Patches
                 //    UccTargetSelectorTypes.Add(type);
                 //}
                 //else 
-                if (tQuesterAction.IsAssignableFrom(type))
+                else if (tQuesterAction.IsAssignableFrom(type))
                     QuesterTypes.Add(type);
                 else if (tTargetPriorityEntry.IsAssignableFrom(type))
+                {
+                    if (tTargetPriorityEntry == type)
+                        continue;
+                    QuesterTypes.Add(type);
                     UccTypes.Add(type);
+                }
                 else if(tMTAction.IsAssignableFrom(type))
                     MultitaskTypes.Add(type);
                 else if (tSkillTrainAction.IsAssignableFrom(type))

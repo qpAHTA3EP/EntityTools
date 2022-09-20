@@ -223,7 +223,8 @@ namespace EntityTools.Quester.Conditions
                             sb.AppendFormat("Item {0} the pattern {1}", isMatch? "matches" : "does not match", _itemFiler).AppendLine();
                         }
 
-                        if (item.ProgressionLogic.IsValid)
+                        var itemTierDef = item.ItemProgression_GetItemTierDef();
+                        if (!itemTierDef.IsValid)
                         {
                             sb.AppendLine("Item is Artifact which level can't be evaluated");
                         }
@@ -232,7 +233,6 @@ namespace EntityTools.Quester.Conditions
                             itemLvl = GetLevel(slot);
                             sb.AppendFormat("Item level of the {0} is {1}", _bag, itemLvl);
                         }
-
                         break;
                 }
 
@@ -422,12 +422,10 @@ namespace EntityTools.Quester.Conditions
         /// <returns></returns>
         private int GetLevel(Item item)
         {
-            if (item is null
-                || !item.IsValid
-                || item.ProgressionLogic.IsValid)
-                return -1;
-
-            return (int)item.ItemDef.Level;
+            var itemDef = item?.ItemDef;
+            if (itemDef?.IsValid == true)
+                return (int)itemDef.Level;
+            return -1;
         }
 
         /// <summary>

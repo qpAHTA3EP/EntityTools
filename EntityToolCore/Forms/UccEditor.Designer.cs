@@ -36,20 +36,13 @@ namespace EntityCore.Forms
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UccEditor));
-            DevExpress.XtraBars.Docking2010.Views.Tabbed.DockingContainer dockingContainer1 = new DevExpress.XtraBars.Docking2010.Views.Tabbed.DockingContainer();
+            DevExpress.XtraBars.Docking2010.Views.Tabbed.DockingContainer dockingContainer2 = new DevExpress.XtraBars.Docking2010.Views.Tabbed.DockingContainer();
             this.documentGroup = new DevExpress.XtraBars.Docking2010.Views.Tabbed.DocumentGroup(this.components);
             this.docCombat = new DevExpress.XtraBars.Docking2010.Views.Tabbed.Document(this.components);
             this.docPatrol = new DevExpress.XtraBars.Docking2010.Views.Tabbed.Document(this.components);
             this.docTactic = new DevExpress.XtraBars.Docking2010.Views.Tabbed.Document(this.components);
             this.dockManager = new DevExpress.XtraBars.Docking.DockManager(this.components);
             this.barManager = new DevExpress.XtraBars.BarManager(this.components);
-            this.barActionTools = new DevExpress.XtraBars.Bar();
-            this.bntAddAction = new DevExpress.XtraBars.BarButtonItem();
-            this.btnDelAction = new DevExpress.XtraBars.BarButtonItem();
-            this.btnCopyAction = new DevExpress.XtraBars.BarButtonItem();
-            this.btnPasteAction = new DevExpress.XtraBars.BarButtonItem();
-            this.btnTestSelected = new DevExpress.XtraBars.BarButtonItem();
-            this.btnTestAll = new DevExpress.XtraBars.BarButtonItem();
             this.barProfile = new DevExpress.XtraBars.Bar();
             this.btnNewProfile = new DevExpress.XtraBars.BarButtonItem();
             this.btnLoadProfile = new DevExpress.XtraBars.BarButtonItem();
@@ -173,17 +166,17 @@ namespace EntityCore.Forms
             // 
             this.docPatrol.Caption = "Patrol";
             this.docPatrol.ControlName = "panPatrol";
-            this.docPatrol.FloatLocation = new System.Drawing.Point(509, 165);
+            this.docPatrol.FloatLocation = new System.Drawing.Point(90, 159);
             this.docPatrol.FloatSize = new System.Drawing.Size(400, 400);
             this.docPatrol.Properties.AllowClose = DevExpress.Utils.DefaultBoolean.False;
-            this.docPatrol.Properties.AllowFloat = DevExpress.Utils.DefaultBoolean.False;
+            this.docPatrol.Properties.AllowFloat = DevExpress.Utils.DefaultBoolean.True;
             this.docPatrol.Properties.AllowFloatOnDoubleClick = DevExpress.Utils.DefaultBoolean.False;
             // 
             // docTactic
             // 
             this.docTactic.Caption = "Tactic";
             this.docTactic.ControlName = "panTactic";
-            this.docTactic.FloatLocation = new System.Drawing.Point(445, 165);
+            this.docTactic.FloatLocation = new System.Drawing.Point(411, 164);
             this.docTactic.FloatSize = new System.Drawing.Size(400, 400);
             this.docTactic.Properties.AllowClose = DevExpress.Utils.DefaultBoolean.False;
             this.docTactic.Properties.AllowFloat = DevExpress.Utils.DefaultBoolean.False;
@@ -216,7 +209,6 @@ namespace EntityCore.Forms
             // barManager
             // 
             this.barManager.Bars.AddRange(new DevExpress.XtraBars.Bar[] {
-            this.barActionTools,
             this.barProfile});
             this.barManager.DockControls.Add(this.barDockControlTop);
             this.barManager.DockControls.Add(this.barDockControlBottom);
@@ -225,98 +217,14 @@ namespace EntityCore.Forms
             this.barManager.DockManager = this.dockManager;
             this.barManager.Form = this;
             this.barManager.Items.AddRange(new DevExpress.XtraBars.BarItem[] {
-            this.bntAddAction,
-            this.btnDelAction,
             this.btnSaveProfile,
             this.btnLoadProfile,
             this.btnToEngine,
             this.btnNewProfile,
             this.btnSaveProfielAs,
-            this.btnCopyAction,
-            this.btnPasteAction,
-            this.btnTestSelected,
-            this.btnTestAll,
             this.btnReloadProfile});
             this.barManager.MainMenu = this.barProfile;
             this.barManager.MaxItemId = 13;
-            // 
-            // barActionTools
-            // 
-            this.barActionTools.BarName = "Tools";
-            this.barActionTools.DockCol = 1;
-            this.barActionTools.DockRow = 0;
-            this.barActionTools.DockStyle = DevExpress.XtraBars.BarDockStyle.Top;
-            this.barActionTools.FloatLocation = new System.Drawing.Point(301, 153);
-            this.barActionTools.LinksPersistInfo.AddRange(new DevExpress.XtraBars.LinkPersistInfo[] {
-            new DevExpress.XtraBars.LinkPersistInfo(this.bntAddAction),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnDelAction),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnCopyAction),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnPasteAction),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnTestSelected, true),
-            new DevExpress.XtraBars.LinkPersistInfo(this.btnTestAll)});
-            this.barActionTools.Offset = 215;
-            this.barActionTools.Text = "Tools";
-            this.barActionTools.Visible = false;
-            // 
-            // bntAddAction
-            // 
-            this.bntAddAction.Caption = "Add Item";
-            this.bntAddAction.Hint = "Add new item into active collection (ucc-Action, ucc-Condition or TargetPriority)" +
-    "";
-            this.bntAddAction.Id = 0;
-            this.bntAddAction.ImageOptions.Image = global::EntityCore.Properties.Resources.miniAdd;
-            this.bntAddAction.ItemShortcut = new DevExpress.XtraBars.BarShortcut(System.Windows.Forms.Keys.Insert);
-            this.bntAddAction.Name = "bntAddAction";
-            this.bntAddAction.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Add);
-            // 
-            // btnDelAction
-            // 
-            this.btnDelAction.Caption = "Delete Item";
-            this.btnDelAction.Hint = "Delete selected item from active collection (ucc-Action, ucc-Condition or TargetP" +
-    "riority)";
-            this.btnDelAction.Id = 1;
-            this.btnDelAction.ImageOptions.Image = global::EntityCore.Properties.Resources.miniCancel;
-            this.btnDelAction.ItemShortcut = new DevExpress.XtraBars.BarShortcut((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Delete));
-            this.btnDelAction.Name = "btnDelAction";
-            this.btnDelAction.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_DeleteAction);
-            // 
-            // btnCopyAction
-            // 
-            this.btnCopyAction.Caption = "Copy Item";
-            this.btnCopyAction.Hint = "Copy to clipboard the selected item from active collection (ucc-Action, ucc-Condi" +
-    "tion or TargetPriority)";
-            this.btnCopyAction.Id = 7;
-            this.btnCopyAction.ImageOptions.Image = global::EntityCore.Properties.Resources.miniCopy;
-            this.btnCopyAction.ItemShortcut = new DevExpress.XtraBars.BarShortcut((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C));
-            this.btnCopyAction.Name = "btnCopyAction";
-            this.btnCopyAction.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Copy);
-            // 
-            // btnPasteAction
-            // 
-            this.btnPasteAction.Caption = "Paste Item";
-            this.btnPasteAction.Hint = "Pasthe item from the clipboard nto active collection (ucc-Action, ucc-Condition o" +
-    "r TargetPriority)";
-            this.btnPasteAction.Id = 8;
-            this.btnPasteAction.ImageOptions.Image = global::EntityCore.Properties.Resources.paste;
-            this.btnPasteAction.ItemShortcut = new DevExpress.XtraBars.BarShortcut((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V));
-            this.btnPasteAction.Name = "btnPasteAction";
-            this.btnPasteAction.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Paste);
-            // 
-            // btnTestSelected
-            // 
-            this.btnTestSelected.Caption = "Test";
-            this.btnTestSelected.Id = 10;
-            this.btnTestSelected.ImageOptions.Image = global::EntityCore.Properties.Resources.miniPlay;
-            this.btnTestSelected.Name = "btnTestSelected";
-            this.btnTestSelected.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_TestSelected);
-            // 
-            // btnTestAll
-            // 
-            this.btnTestAll.Caption = "Test All";
-            this.btnTestAll.Id = 11;
-            this.btnTestAll.ImageOptions.Image = global::EntityCore.Properties.Resources.miniPlayAll;
-            this.btnTestAll.Name = "btnTestAll";
-            this.btnTestAll.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_TestAll);
             // 
             // barProfile
             // 
@@ -477,7 +385,7 @@ namespace EntityCore.Forms
             this.panConditions.Location = new System.Drawing.Point(0, 0);
             this.panConditions.Name = "panConditions";
             this.panConditions.Options.ShowCloseButton = false;
-            this.panConditions.OriginalSize = new System.Drawing.Size(433, 143);
+            this.panConditions.OriginalSize = new System.Drawing.Size(433, 160);
             this.panConditions.Size = new System.Drawing.Size(433, 161);
             this.panConditions.Text = "Conditions";
             this.panConditions.Enter += new System.EventHandler(this.handler_Focused);
@@ -590,12 +498,13 @@ namespace EntityCore.Forms
             this.treeConditions.Size = new System.Drawing.Size(426, 106);
             this.treeConditions.TabIndex = 0;
             this.treeConditions.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.handler_NodeCheckedChanged);
-            this.treeConditions.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.treeView_ItemDrag);
+            this.treeConditions.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.handler_TreeView_ItemDrag);
             this.treeConditions.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.handler_NodeSelected);
-            this.treeConditions.DragDrop += new System.Windows.Forms.DragEventHandler(this.treeView_DragDrop);
-            this.treeConditions.DragEnter += new System.Windows.Forms.DragEventHandler(this.treeView_DragEnter);
-            this.treeConditions.DragOver += new System.Windows.Forms.DragEventHandler(this.treeView_DragOver);
+            this.treeConditions.DragDrop += new System.Windows.Forms.DragEventHandler(this.handler_TreeView_DragDrop);
+            this.treeConditions.DragEnter += new System.Windows.Forms.DragEventHandler(this.handler_TreeView_DragEnter);
+            this.treeConditions.DragOver += new System.Windows.Forms.DragEventHandler(this.handler_TreeView_DragOver);
             this.treeConditions.Enter += new System.EventHandler(this.handler_Focused);
+            this.treeConditions.KeyUp += new System.Windows.Forms.KeyEventHandler(this.handler_ConditionShortCut);
             // 
             // imageList
             // 
@@ -635,7 +544,7 @@ namespace EntityCore.Forms
             this.panProperties.Location = new System.Drawing.Point(0, 161);
             this.panProperties.Name = "panProperties";
             this.panProperties.Options.ShowCloseButton = false;
-            this.panProperties.OriginalSize = new System.Drawing.Size(433, 321);
+            this.panProperties.OriginalSize = new System.Drawing.Size(433, 300);
             this.panProperties.Size = new System.Drawing.Size(433, 303);
             this.panProperties.Text = "Properties";
             // 
@@ -701,7 +610,8 @@ namespace EntityCore.Forms
             this.btnCombatTestAll.Size = new System.Drawing.Size(20, 20);
             this.btnCombatTestAll.TabIndex = 1;
             this.btnCombatTestAll.ToolTip = "Test all listed ucc-Actions.";
-            this.btnCombatTestAll.Click += new System.EventHandler(this.handler_CombatTestAll);
+            this.btnCombatTestAll.Visible = false;
+            this.btnCombatTestAll.Click += new System.EventHandler(this.handler_AcionTestAll);
             // 
             // treeCombatActions
             // 
@@ -724,12 +634,13 @@ namespace EntityCore.Forms
             this.treeCombatActions.Size = new System.Drawing.Size(259, 410);
             this.treeCombatActions.TabIndex = 0;
             this.treeCombatActions.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.handler_NodeCheckedChanged);
-            this.treeCombatActions.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.treeView_ItemDrag);
+            this.treeCombatActions.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.handler_TreeView_ItemDrag);
             this.treeCombatActions.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.handler_NodeSelected);
-            this.treeCombatActions.DragDrop += new System.Windows.Forms.DragEventHandler(this.treeView_DragDrop);
-            this.treeCombatActions.DragEnter += new System.Windows.Forms.DragEventHandler(this.treeView_DragEnter);
-            this.treeCombatActions.DragOver += new System.Windows.Forms.DragEventHandler(this.treeView_DragOver);
+            this.treeCombatActions.DragDrop += new System.Windows.Forms.DragEventHandler(this.handler_TreeView_DragDrop);
+            this.treeCombatActions.DragEnter += new System.Windows.Forms.DragEventHandler(this.handler_TreeView_DragEnter);
+            this.treeCombatActions.DragOver += new System.Windows.Forms.DragEventHandler(this.handler_TreeView_DragOver);
             this.treeCombatActions.Enter += new System.EventHandler(this.handler_Focused);
+            this.treeCombatActions.KeyUp += new System.Windows.Forms.KeyEventHandler(this.handler_ActionShortCut);
             // 
             // btnCombatTest
             // 
@@ -742,7 +653,8 @@ namespace EntityCore.Forms
             this.btnCombatTest.Size = new System.Drawing.Size(20, 20);
             this.btnCombatTest.TabIndex = 1;
             this.btnCombatTest.ToolTip = "Test selected ucc-Actions.";
-            this.btnCombatTest.Click += new System.EventHandler(this.handler_CombatTest);
+            this.btnCombatTest.Visible = false;
+            this.btnCombatTest.Click += new System.EventHandler(this.handler_ActionTest);
             // 
             // btnCombatAdd
             // 
@@ -755,7 +667,7 @@ namespace EntityCore.Forms
             this.btnCombatAdd.Size = new System.Drawing.Size(20, 20);
             this.btnCombatAdd.TabIndex = 1;
             this.btnCombatAdd.ToolTip = "Add ucc-Action after selected one.";
-            this.btnCombatAdd.Click += new System.EventHandler(this.handler_CombatAdd);
+            this.btnCombatAdd.Click += new System.EventHandler(this.handler_ActionAdd);
             // 
             // btnCombatPaste
             // 
@@ -768,7 +680,7 @@ namespace EntityCore.Forms
             this.btnCombatPaste.Size = new System.Drawing.Size(20, 20);
             this.btnCombatPaste.TabIndex = 1;
             this.btnCombatPaste.ToolTip = "Paste ucc-Action from the clipboard after selected one.";
-            this.btnCombatPaste.Click += new System.EventHandler(this.handler_CombatPaste);
+            this.btnCombatPaste.Click += new System.EventHandler(this.handler_ActionPaste);
             // 
             // btnCombatDelete
             // 
@@ -781,7 +693,7 @@ namespace EntityCore.Forms
             this.btnCombatDelete.Size = new System.Drawing.Size(20, 20);
             this.btnCombatDelete.TabIndex = 1;
             this.btnCombatDelete.ToolTip = "Delete selected ucc-Action.";
-            this.btnCombatDelete.Click += new System.EventHandler(this.handler_CombatDelete);
+            this.btnCombatDelete.Click += new System.EventHandler(this.handler_ActionDelete);
             // 
             // btnCombatCopy
             // 
@@ -794,23 +706,22 @@ namespace EntityCore.Forms
             this.btnCombatCopy.Size = new System.Drawing.Size(20, 20);
             this.btnCombatCopy.TabIndex = 1;
             this.btnCombatCopy.ToolTip = "Copy action into the clipboard.";
-            this.btnCombatCopy.Click += new System.EventHandler(this.handler_CombatCopy);
+            this.btnCombatCopy.Click += new System.EventHandler(this.handler_ActionCopy);
             // 
             // panPatrol
             // 
             this.panPatrol.Controls.Add(this.patrolActionsControlContainer);
             this.panPatrol.DockedAsTabbedDocument = true;
-            this.panPatrol.FloatLocation = new System.Drawing.Point(509, 165);
+            this.panPatrol.FloatLocation = new System.Drawing.Point(90, 159);
             this.panPatrol.FloatSize = new System.Drawing.Size(400, 400);
             this.panPatrol.ID = new System.Guid("df1cc296-d64d-4aba-b3e4-11a44a1fa366");
             this.panPatrol.Name = "panPatrol";
-            this.panPatrol.Options.AllowFloating = false;
             this.panPatrol.Options.FloatOnDblClick = false;
             this.panPatrol.Options.ShowCloseButton = false;
             this.panPatrol.OriginalSize = new System.Drawing.Size(200, 200);
             this.panPatrol.SavedIndex = 3;
             this.panPatrol.SavedMdiDocument = true;
-            this.panPatrol.SavedMdiDocumentIndex = 1;
+            this.panPatrol.SavedMdiDocumentIndex = 2;
             this.panPatrol.Text = "Patrol";
             this.panPatrol.Enter += new System.EventHandler(this.handler_Focused);
             // 
@@ -839,7 +750,8 @@ namespace EntityCore.Forms
             this.btnPatrolTestAll.Size = new System.Drawing.Size(20, 20);
             this.btnPatrolTestAll.TabIndex = 1;
             this.btnPatrolTestAll.ToolTip = "Test all listed ucc-Actions.";
-            this.btnPatrolTestAll.Click += new System.EventHandler(this.handler_PatrolTestAll);
+            this.btnPatrolTestAll.Visible = false;
+            this.btnPatrolTestAll.Click += new System.EventHandler(this.handler_AcionTestAll);
             // 
             // treePatrolActions
             // 
@@ -863,12 +775,13 @@ namespace EntityCore.Forms
             this.treePatrolActions.Size = new System.Drawing.Size(259, 410);
             this.treePatrolActions.TabIndex = 0;
             this.treePatrolActions.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.handler_NodeCheckedChanged);
-            this.treePatrolActions.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.treeView_ItemDrag);
+            this.treePatrolActions.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.handler_TreeView_ItemDrag);
             this.treePatrolActions.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.handler_NodeSelected);
-            this.treePatrolActions.DragDrop += new System.Windows.Forms.DragEventHandler(this.treeView_DragDrop);
-            this.treePatrolActions.DragEnter += new System.Windows.Forms.DragEventHandler(this.treeView_DragEnter);
-            this.treePatrolActions.DragOver += new System.Windows.Forms.DragEventHandler(this.treeView_DragOver);
+            this.treePatrolActions.DragDrop += new System.Windows.Forms.DragEventHandler(this.handler_TreeView_DragDrop);
+            this.treePatrolActions.DragEnter += new System.Windows.Forms.DragEventHandler(this.handler_TreeView_DragEnter);
+            this.treePatrolActions.DragOver += new System.Windows.Forms.DragEventHandler(this.handler_TreeView_DragOver);
             this.treePatrolActions.Enter += new System.EventHandler(this.handler_Focused);
+            this.treePatrolActions.KeyUp += new System.Windows.Forms.KeyEventHandler(this.handler_ActionShortCut);
             // 
             // btnPatrolTest
             // 
@@ -881,7 +794,8 @@ namespace EntityCore.Forms
             this.btnPatrolTest.Size = new System.Drawing.Size(20, 20);
             this.btnPatrolTest.TabIndex = 1;
             this.btnPatrolTest.ToolTip = "Test selected ucc-Actions.";
-            this.btnPatrolTest.Click += new System.EventHandler(this.handler_PatrolTest);
+            this.btnPatrolTest.Visible = false;
+            this.btnPatrolTest.Click += new System.EventHandler(this.handler_ActionTest);
             // 
             // btnPatrolAdd
             // 
@@ -894,7 +808,7 @@ namespace EntityCore.Forms
             this.btnPatrolAdd.Size = new System.Drawing.Size(20, 20);
             this.btnPatrolAdd.TabIndex = 1;
             this.btnPatrolAdd.ToolTip = "Add ucc-Action after selected one.";
-            this.btnPatrolAdd.Click += new System.EventHandler(this.handler_PatrolAdd);
+            this.btnPatrolAdd.Click += new System.EventHandler(this.handler_ActionAdd);
             // 
             // btnPatrolPaste
             // 
@@ -907,7 +821,7 @@ namespace EntityCore.Forms
             this.btnPatrolPaste.Size = new System.Drawing.Size(20, 20);
             this.btnPatrolPaste.TabIndex = 1;
             this.btnPatrolPaste.ToolTip = "Paste ucc-Action from the clipboard after selected one.";
-            this.btnPatrolPaste.Click += new System.EventHandler(this.handler_PatrolPaste);
+            this.btnPatrolPaste.Click += new System.EventHandler(this.handler_ActionPaste);
             // 
             // btnPatrolDelete
             // 
@@ -920,7 +834,7 @@ namespace EntityCore.Forms
             this.btnPatrolDelete.Size = new System.Drawing.Size(20, 20);
             this.btnPatrolDelete.TabIndex = 1;
             this.btnPatrolDelete.ToolTip = "Delete selected ucc-Action.";
-            this.btnPatrolDelete.Click += new System.EventHandler(this.handler_PatrolDelete);
+            this.btnPatrolDelete.Click += new System.EventHandler(this.handler_ActionDelete);
             // 
             // btnPatrolCopy
             // 
@@ -933,13 +847,13 @@ namespace EntityCore.Forms
             this.btnPatrolCopy.Size = new System.Drawing.Size(20, 20);
             this.btnPatrolCopy.TabIndex = 1;
             this.btnPatrolCopy.ToolTip = "Copy action into the clipboard.";
-            this.btnPatrolCopy.Click += new System.EventHandler(this.handler_PatrolCopy);
+            this.btnPatrolCopy.Click += new System.EventHandler(this.handler_ActionCopy);
             // 
             // panTactic
             // 
             this.panTactic.Controls.Add(this.controlContainer1);
             this.panTactic.DockedAsTabbedDocument = true;
-            this.panTactic.FloatLocation = new System.Drawing.Point(445, 165);
+            this.panTactic.FloatLocation = new System.Drawing.Point(411, 164);
             this.panTactic.FloatSize = new System.Drawing.Size(400, 400);
             this.panTactic.ID = new System.Guid("29550451-4ac6-403e-98f5-897b622aff1c");
             this.panTactic.Name = "panTactic";
@@ -947,7 +861,7 @@ namespace EntityCore.Forms
             this.panTactic.Options.FloatOnDblClick = false;
             this.panTactic.Options.ShowCloseButton = false;
             this.panTactic.OriginalSize = new System.Drawing.Size(200, 200);
-            this.panTactic.SavedIndex = 3;
+            this.panTactic.SavedIndex = 4;
             this.panTactic.SavedMdiDocument = true;
             this.panTactic.SavedMdiDocumentIndex = 2;
             this.panTactic.Text = "Tactic";
@@ -1055,18 +969,19 @@ namespace EntityCore.Forms
             // listPriorities
             // 
             this.listPriorities.AllowDrop = true;
-            this.listPriorities.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.listPriorities.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listPriorities.Location = new System.Drawing.Point(6, 106);
             this.listPriorities.Name = "listPriorities";
-            this.listPriorities.Size = new System.Drawing.Size(242, 234);
+            this.listPriorities.Size = new System.Drawing.Size(242, 235);
             this.listPriorities.TabIndex = 3;
             this.listPriorities.SelectedValueChanged += new System.EventHandler(this.handler_SelectedPriorityChanged);
-            this.listPriorities.DragDrop += new System.Windows.Forms.DragEventHandler(this.listPriorities_DragDrop);
-            this.listPriorities.DragEnter += new System.Windows.Forms.DragEventHandler(this.listPriorities_DragEnter);
-            this.listPriorities.DragOver += new System.Windows.Forms.DragEventHandler(this.listPriorities_DragOver);
+            this.listPriorities.DragDrop += new System.Windows.Forms.DragEventHandler(this.handler_Priorities_DragDrop);
+            this.listPriorities.DragOver += new System.Windows.Forms.DragEventHandler(this.handler_Priorities_DragOver);
             this.listPriorities.Enter += new System.EventHandler(this.handler_SelectedPriorityChanged);
+            this.listPriorities.KeyUp += new System.Windows.Forms.KeyEventHandler(this.handler_PriorityShortCut);
+            this.listPriorities.MouseDown += new System.Windows.Forms.MouseEventHandler(this.handler_Priorities_MouseDown);
+            this.listPriorities.MouseMove += new System.Windows.Forms.MouseEventHandler(this.handler_Priorities_MouseMove);
             // 
             // labelControl3
             // 
@@ -1205,13 +1120,13 @@ namespace EntityCore.Forms
             this.tabbedView.DocumentProperties.AllowFloat = false;
             this.tabbedView.DocumentProperties.AllowFloatOnDoubleClick = false;
             this.tabbedView.Documents.AddRange(new DevExpress.XtraBars.Docking2010.Views.BaseDocument[] {
-            this.docTactic,
+            this.docCombat,
             this.docPatrol,
-            this.docCombat});
+            this.docTactic});
             this.tabbedView.EnableFreeLayoutMode = DevExpress.Utils.DefaultBoolean.False;
-            dockingContainer1.Element = this.documentGroup;
+            dockingContainer2.Element = this.documentGroup;
             this.tabbedView.RootContainer.Nodes.AddRange(new DevExpress.XtraBars.Docking2010.Views.Tabbed.DockingContainer[] {
-            dockingContainer1});
+            dockingContainer2});
             // 
             // UccEditor
             // 
@@ -1280,10 +1195,7 @@ namespace EntityCore.Forms
 		private TreeView treeConditions;
 		private PropertyGrid propertyGrid;
         private BarManager barManager;
-		private Bar barActionTools;
 		private Bar barProfile;
-		private BarButtonItem bntAddAction;
-		private BarButtonItem btnDelAction;
 		private BarDockControl barDockControlTop;
 		private BarDockControl barDockControlBottom;
 		private BarDockControl barDockControlLeft;
@@ -1293,8 +1205,6 @@ namespace EntityCore.Forms
 		private BarButtonItem btnToEngine;
 		private BarButtonItem btnNewProfile;
 		private BarButtonItem btnSaveProfielAs;
-		private BarButtonItem btnCopyAction;
-		private BarButtonItem btnPasteAction;
 		private OpenFileDialog openFileDialog;
 		private ImageList imageList;
 		private SaveFileDialog saveFileDialog;
@@ -1326,8 +1236,6 @@ namespace EntityCore.Forms
         private DevExpress.XtraEditors.CheckEdit checkerUsePotion;
         private DevExpress.XtraEditors.SpinEdit editHealthProcent;
         private DevExpress.XtraEditors.CheckEdit checkerTacticActivator;
-        private BarButtonItem btnTestSelected;
-        private BarButtonItem btnTestAll;
         private DockPanel panLog;
         private ControlContainer controlContainer2;
         private TextBox txtLog;

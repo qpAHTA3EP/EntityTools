@@ -1,13 +1,13 @@
 ﻿using AcTp0Tools.Reflection;
-using Astral.Controllers;
 using Astral.Logic.UCC.Classes;
 using DevExpress.XtraEditors;
-using DevExpress.XtraTab;
 using HarmonyLib;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
-using System.Windows.Forms;
+
 // ReSharper disable RedundantNameQualifier
 // ReSharper disable InconsistentNaming
 // ReSharper disable RedundantAssignment
@@ -42,6 +42,8 @@ namespace EntityTools.Patches.Quester
         private static Type tPatch;
         private static MethodInfo original_UccProfile_ToString;
         private static MethodInfo prefix_UccProfile_ToString;
+
+        private static KeyValuePair<Profil, List<TargetPriorityEntry>> tempPriorities;
         public static void Apply()
         {
             if (PatchesWasApplied)
@@ -194,14 +196,31 @@ namespace EntityTools.Patches.Quester
         /// </summary>
         private static bool AddUCCAction_Run(Astral.Quester.Classes.Actions.AddUCCActions __instance)
         {
-            Action<UCCAction> setTempActionFlag = a => a.TempAction = true;
-            __instance.Actions.ActionsCombat.ForEach(setTempActionFlag);
-            __instance.Actions.ActionsPatrol.ForEach(setTempActionFlag);
+            var tempUccProfile = __instance.Actions;
+            var currentUccProfile = Astral.Logic.UCC.Core.Get.mProfil;
+            if (tempUccProfile.ActionsCombat?.Count > 0)
+            {
+                currentUccProfile.ActionsCombat.InsertRange(0, tempUccProfile.ActionsCombat.Select(a => {
+                                                                                                                    a.TempAction = true;
+                                                                                                                    return a.Clone();
+                                                                                                                }));
+            }
+            if (tempUccProfile.ActionsPatrol?.Count > 0)
+            {
+                currentUccProfile.ActionsPatrol.InsertRange(0, tempUccProfile.ActionsPatrol.Select(a => {
+                                                                                                                    a.TempAction = true;
+                                                                                                                    return a.Clone();
+                                                                                                                }));
+            }
 
-            var uccProfile = Astral.Logic.UCC.Core.Get.mProfil;
-            uccProfile.ActionsCombat.InsertRange(0, __instance.Actions.ActionsCombat);
-            uccProfile.ActionsPatrol.InsertRange(0, __instance.Actions.ActionsPatrol);
-
+            if (tempUccProfile.TargetPriorities?.Count > 0)
+            {
+                var priorities = tempUccProfile.TargetPriorities.Select(CopyHelper.CreateDeepCopy).ToList();
+                if (tempPriorities.Key != currentUccProfile)
+                    tempPriorities = new KeyValuePair<Profil, List<TargetPriorityEntry>>(currentUccProfile, priorities);
+                else tempPriorities.Value.AddRange(priorities);
+                currentUccProfile.TargetPriorities.InsertRange(0, priorities);
+            }
 #if false
             var enableTargetPriorities = uccProfile.EnableTargetPriorities;
             var potionHealth = uccProfile.PotionHealth;
@@ -224,10 +243,12 @@ namespace EntityTools.Patches.Quester
                                              ref Astral.Quester.Classes.Action.ActionValidity __result)
         {
             var uccProfile = __instance.Actions;
-            if (uccProfile.ActionsCombat.Count == 0
-                && uccProfile.ActionsPatrol.Count == 0)
-                __result = new Astral.Quester.Classes.Action.ActionValidity("Does not contain any actions");
-            else __result = AcTp0Tools.Reflection.Empty.ActionValidity;
+            if (uccProfile is null 
+                || uccProfile.ActionsCombat?.Count == 0
+                && uccProfile.ActionsPatrol?.Count == 0
+                && uccProfile.TargetPriorities?.Count == 0)
+                __result = new Astral.Quester.Classes.Action.ActionValidity("Does not contain any actions or priorities");
+            else __result = Empty.ActionValidity;
             return false;
         }
 
@@ -241,21 +262,46 @@ namespace EntityTools.Patches.Quester
             if (__instance.Action == Astral.Quester.Classes.Actions.SpecialAction.SAction.RemoveAllTempUCCActions)
             {
                 var uccProfile = Astral.Logic.UCC.Core.Get.mProfil;
+                if (uccProfile is null)
+                    return false;
                 int i = 0;
-                while (i < uccProfile.ActionsCombat.Count)
+                var actions = uccProfile.ActionsCombat;
+                if (actions != null)
                 {
-                    var uccAction = uccProfile.ActionsCombat[i];
-                    if (uccAction.TempAction)
-                        uccProfile.ActionsCombat.RemoveAt(i);
-                    else i++;
+                    while (i < actions.Count)
+                    {
+                        var uccAction = actions[i];
+                        if (uccAction.TempAction)
+                            actions.RemoveAt(i);
+                        else i++;
+                    } 
                 }
                 i = 0;
-                while (i < uccProfile.ActionsPatrol.Count)
+                actions = uccProfile.ActionsPatrol;
+                if (actions != null)
                 {
-                    var uccAction = uccProfile.ActionsPatrol[i];
-                    if (uccAction.TempAction)
-                        uccProfile.ActionsPatrol.RemoveAt(i);
-                    else i++;
+                    while (i < actions.Count)
+                    {
+                        var uccAction = actions[i];
+                        if (uccAction.TempAction)
+                            actions.RemoveAt(i);
+                        else i++;
+                    } 
+                }
+                if (tempPriorities.Key == uccProfile)
+                {
+                    i = 0;
+                    var priorities = uccProfile.TargetPriorities;
+                    if (priorities != null)
+                    {
+                        while (i < priorities.Count)
+                        {
+                            var tempPriority = priorities[i];
+                            if (tempPriorities.Value.Contains(tempPriority))
+                                priorities.RemoveAt(i);
+                            else i++;
+                        } 
+                    }
                 }
 
                 __result = Astral.Quester.Classes.Action.ActionResult.Completed;
@@ -268,7 +314,7 @@ namespace EntityTools.Patches.Quester
         /// Патч метода <seealso cref="Astral.Logic.UCC.Classes.Profil.Save()"/>
         /// предназначенный для корректного удаления временных <seealso cref="UCCAction"/> из <seealso cref="Profil.ActionsPatrol"/>
         /// </summary>
-        private static void UccProfile_Save(Astral.Logic.UCC.Classes.Profil __instance)
+        private static void UccProfile_Save(Profil __instance)
         {
 #if false
             SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -313,12 +359,31 @@ namespace EntityTools.Patches.Quester
                 }
                 i = 0; 
 #endif
-                while (i < __instance.ActionsPatrol.Count)
+                var actions = __instance.ActionsPatrol;
+                if (actions != null)
                 {
-                    var uccAction = __instance.ActionsPatrol[i];
-                    if (uccAction.TempAction)
-                        __instance.ActionsPatrol.RemoveAt(i);
-                    else i++;
+                    while (i < actions.Count)
+                    {
+                        var uccAction = actions[i];
+                        if (uccAction.TempAction)
+                            actions.RemoveAt(i);
+                        else i++;
+                    } 
+                }
+                if (tempPriorities.Key == __instance)
+                {
+                    i = 0;
+                    var priorities = __instance.TargetPriorities;
+                    if (priorities != null)
+                    {
+                        while (i < priorities.Count)
+                        {
+                            var tempPriority = priorities[i];
+                            if (tempPriorities.Value.Contains(tempPriority))
+                                priorities.RemoveAt(i);
+                            else i++;
+                        } 
+                    }
                 }
             }
 #endif
@@ -328,16 +393,20 @@ namespace EntityTools.Patches.Quester
         /// Препатч метода <seealso cref="Astral.Logic.UCC.Classes.Profil.ToString()"/>
         /// предназначенный для корректного отображения
         /// </summary>
-        private static bool UccProfile_ToString(Astral.Logic.UCC.Classes.Profil __instance, ref string __result)
+        private static bool UccProfile_ToString(Profil __instance, ref string __result)
         {
-            __result = $"Combat({__instance.ActionsCombat.Count}) and Patrol({__instance.ActionsPatrol.Count})";
+            if(__instance is null)
+                __result =  "Combat | Patrol | Priorities";
+            else __result = string.Concat("Combat(", __instance.ActionsCombat?.Count ?? 0, 
+                                      ") | Patrol(", __instance.ActionsPatrol?.Count ?? 0, 
+                                      ") | Priorities (", __instance.TargetPriorities?.Count ?? 0, ')');
 
             return false;
         }
 
         /// <summary>
         /// Патч метода <seealso cref="Astral.Quester.UIEditors.UCCProfileEditor.EditValue(object,ITypeDescriptorContext, IServiceProvider)" />,
-        /// Модифицирующий окно редактора ucc-профиля <seealso cref="Astral.Logic.UCC.Forms.Editor"/>
+        /// модифицирующий окно редактора ucc-профиля <seealso cref="Astral.Logic.UCC.Forms.Editor"/>
         /// </summary>
         private static bool UCCProfileEditor_EditValue(ref object __result, ITypeDescriptorContext /*__context*/ __0, IServiceProvider /*__provider*/__1, object /*__value*/__2)
         {
@@ -348,85 +417,89 @@ namespace EntityTools.Patches.Quester
                     if (EntityTools.Config.Patches.UccComplextPatch)
                     {
                         // Вызов собственного ucc-редактора
-                        if(EntityTools.Core.UserRequest_Edit(uccProfile, "", false))
+                        if (EntityTools.Core.UserRequest_Edit(uccProfile, "", true))
                             __result = uccProfile;
+                        else __result = __2;
                         return false;
+                    }
+
+                    // Модификация и вызов штатного ucc-редактора 
+                    var uccEditor = new Astral.Logic.UCC.Forms.Editor(uccProfile);
+                    var editorTrvs = Traverse.Create(uccEditor);
+
+                    var btnNewProfileVisible = editorTrvs.Field("btn_newProfile").Property("Visible");
+                    if (btnNewProfileVisible.PropertyExists())
+                        btnNewProfileVisible.SetValue(false);
+                    else
+                    {
+                        var msg = "Fail to access to 'Astral.Logic.UCC.Forms.Editor.btn_newProfile'";
+                        ETLogger.WriteLine(LogType.Error, msg);
+                        XtraMessageBox.Show(msg);
+                        return true;
+                    }
+
+                    var btnSaveProfileVisibility = editorTrvs.Field("btn_saveProfile").Property("Visible");
+                    if (btnSaveProfileVisibility.PropertyExists())
+                        btnSaveProfileVisibility.SetValue(true);
+                    else
+                    {
+                        var msg = "Fail to access to 'Astral.Logic.UCC.Forms.Editor.btn_saveProfile'";
+                        ETLogger.WriteLine(LogType.Error, msg);
+                        XtraMessageBox.Show(msg);
+                        return true;
+                    }
+
+                    var btnGenerateVisibility = editorTrvs.Field("bGenerate").Property("Visible");
+                    if (btnGenerateVisibility.PropertyExists())
+                        btnGenerateVisibility.SetValue(false);
+                    else
+                    {
+                        var msg = "Fail to access to 'Astral.Logic.UCC.Forms.Editor.bGenerate'";
+                        ETLogger.WriteLine(LogType.Error, msg);
+                        XtraMessageBox.Show(msg);
+                        return true;
+                    }
+
+                    var momentChooseVisibility = editorTrvs.Field("momentChoose").Property("Visible");
+                    if (momentChooseVisibility.PropertyExists())
+                        momentChooseVisibility.SetValue(true);
+                    else
+                    {
+                        var msg = "Fail to access to 'Astral.Logic.UCC.Forms.Editor.momentChoose'";
+                        ETLogger.WriteLine(LogType.Error, msg);
+                        XtraMessageBox.Show(msg);
+                        return true;
+                    }
+
+                    var tabTactic = editorTrvs.Field("tacticTab");
+                    var tabTacticPageEnabled = tabTactic.Property("PageEnabled");
+                    var tabTacticPageVisibility = tabTactic.Property("PageVisible");
+                    if (tabTactic.FieldExists()
+                        && tabTacticPageEnabled.PropertyExists()
+                        && tabTacticPageVisibility.PropertyExists())
+                    {
+                        tabTacticPageEnabled.SetValue(false);
+                        tabTacticPageVisibility.SetValue(false);
                     }
                     else
                     {
-                        // Модификация и вызов штатного ucc-редактора 
-                        var uccEditor = new Astral.Logic.UCC.Forms.Editor(uccProfile);
-                        var editorTrvs = Traverse.Create(uccEditor);
-
-                        var btnNewProfileVisible = editorTrvs.Field("btn_newProfile").Property("Visible");
-                        if (btnNewProfileVisible.PropertyExists())
-                            btnNewProfileVisible.SetValue(false);
-                        else
-                        {
-                            var msg = "Fail to access to 'Astral.Logic.UCC.Forms.Editor.btn_newProfile'";
-                            ETLogger.WriteLine(LogType.Error, msg);
-                            XtraMessageBox.Show(msg);
-                            return true;
-                        }
-
-                        var btnSaveProfileVisiblity = editorTrvs.Field("btn_saveProfile").Property("Visible");
-                        if (btnSaveProfileVisiblity.PropertyExists())
-                            btnSaveProfileVisiblity.SetValue(true);
-                        else
-                        {
-                            var msg = "Fail to access to 'Astral.Logic.UCC.Forms.Editor.btn_saveProfile'";
-                            ETLogger.WriteLine(LogType.Error, msg);
-                            XtraMessageBox.Show(msg);
-                            return true;
-                        }
-
-                        var btnGenerateVisible = editorTrvs.Field("bGenerate").Property("Visible");
-                        if (btnGenerateVisible.PropertyExists())
-                            btnGenerateVisible.SetValue(false);
-                        else
-                        {
-                            var msg = "Fail to access to 'Astral.Logic.UCC.Forms.Editor.bGenerate'";
-                            ETLogger.WriteLine(LogType.Error, msg);
-                            XtraMessageBox.Show(msg);
-                            return true;
-                        }
-
-                        var momentChooseVisible = editorTrvs.Field("momentChoose").Property("Visible");
-                        if (momentChooseVisible.PropertyExists())
-                            momentChooseVisible.SetValue(true);
-                        else
-                        {
-                            var msg = "Fail to access to 'Astral.Logic.UCC.Forms.Editor.momentChoose'";
-                            ETLogger.WriteLine(LogType.Error, msg);
-                            XtraMessageBox.Show(msg);
-                            return true;
-                        }
-
-                        var tabTactic = editorTrvs.Field("tacticTab");
-                        var tabTacticPageEnabled = tabTactic.Property("PageEnabled");
-                        var tabTacticPageVisible = tabTactic.Property("PageVisible");
-                        if (tabTactic.FieldExists()
-                            && tabTacticPageEnabled.PropertyExists()
-                            && tabTacticPageVisible.PropertyExists())
-                        {
-                            tabTacticPageEnabled.SetValue(false);
-                            tabTacticPageVisible.SetValue(false);
-                        }
-                        else
-                        {
-                            var msg = "Fail to access to 'Astral.Logic.UCC.Forms.Editor.tacticTab'";
-                            ETLogger.WriteLine(LogType.Error, msg);
-                            XtraMessageBox.Show(msg);
-                            return true;
-                        }
-
-                        uccEditor.ShowDialog();
-                        __result = uccProfile;
+                        var msg = "Fail to access to 'Astral.Logic.UCC.Forms.Editor.tacticTab'";
+                        ETLogger.WriteLine(LogType.Error, msg);
+                        XtraMessageBox.Show(msg);
+                        return true;
                     }
+
+                    uccEditor.ShowDialog();
+                    __result = uccProfile;
+
                     return false;
                 }
-                catch { }
+                catch (Exception e)
+                {
+                    ETLogger.WriteLine(LogType.Error, e.ToString(), true);
+                }
             }
+            else __result = __2;
             return true;
         }
     }

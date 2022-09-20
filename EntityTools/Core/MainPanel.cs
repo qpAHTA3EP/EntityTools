@@ -229,7 +229,8 @@ namespace EntityTools.Core
             var slot = EntityManager.LocalPlayer.AllItems.FirstOrDefault(s =>
                 s.Filled && s.Item.ItemDef.InternalName == id);
             if (slot!= null)
-                slot.EvolveWithAutoMoteAndWards();
+                XtraMessageBox.Show($@"ItemLevel: {slot.Item.ItemProgression_GetItemLevel()}");
+            else XtraMessageBox.Show($@"No item '{id}' found");
 #endif
         }
 

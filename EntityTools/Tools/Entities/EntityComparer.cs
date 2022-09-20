@@ -3,6 +3,7 @@ using EntityTools.Enums;
 using EntityTools.Extensions;
 using MyNW.Classes;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
@@ -13,6 +14,7 @@ namespace EntityTools.Tools.Entities
     /// </summary>
     public static class EntityComparer
     {
+        private static readonly Dictionary<string, Regex> regexCache = new Dictionary<string, Regex>();
         public static Predicate<Entity> Get(string entPattern, ItemFilterStringType strMatchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated)
         {
             if (strMatchType == ItemFilterStringType.Simple)
@@ -60,11 +62,30 @@ namespace EntityTools.Tools.Entities
             }
             else
             {
+#if true
+                if (!regexCache.TryGetValue(entPattern, out Regex regex))
+                {
+                    regex = new Regex(entPattern, RegexOptions.Compiled | RegexOptions.Singleline);
+                    regexCache.Add(entPattern, regex);
+                }
+                switch (nameType)
+                {
+                    case EntityNameType.InternalName:
+                        return (Entity e) => regex.IsMatch(e.InternalName);
+                    case EntityNameType.NameUntranslated:
+                        return (Entity e) => regex.IsMatch(e.NameUntranslated);
+                    case EntityNameType.Empty:
+                        return CompareEmpty;
+                    default:
+                        return CompareFalse;
+                }
+#else
                 if (nameType == EntityNameType.InternalName)
                     return (Entity e) => CompareInternal2Regex(e, entPattern);
                 else if (nameType == EntityNameType.NameUntranslated)
                     return (Entity e) => CompareUntranslated2Regex(e, entPattern);
-                else return CompareEmpty;
+                else return CompareEmpty; 
+#endif
             }
         }
 
@@ -117,6 +138,11 @@ namespace EntityTools.Tools.Entities
         private static bool CompareEmpty(Entity e)
         {
             return string.IsNullOrEmpty(e.InternalName) && string.IsNullOrEmpty(e.NameUntranslated);
+        }
+
+        private static bool CompareFalse(Entity e)
+        {
+            return false;
         }
     }
 }

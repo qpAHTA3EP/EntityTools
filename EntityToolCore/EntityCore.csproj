@@ -166,9 +166,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Engine.tt</DependentUpon>
     </Compile>
-    <Compile Include="Entities\EntityCacheRecordKey.cs" />
     <Compile Include="Entities\EntityCache.cs" />
     <Compile Include="Entities\EntityCacheRecord.cs" />
+    <Compile Include="Entities\EntityCacheRecordKey.cs" />
     <Compile Include="Entities\EntityComparer.cs" />
     <Compile Include="Entities\EntityDiagnosticTools.cs" />
     <Compile Include="Entities\Enums.cs" />
@@ -297,6 +297,7 @@
     <Compile Include="UCC\Actions\UseItemSpecialEngine.cs" />
     <Compile Include="Tools\Targeting\TeammateSupportTargetProcessor.cs" />
     <Compile Include="Tools\Targeting\EntityTargetProcessor.cs" />
+    <Compile Include="UCC\Classes\IUccPriorityTreeNode.cs" />
     <Compile Include="UCC\Classes\IUccActionTreeNode.cs" />
     <Compile Include="UCC\Classes\IUccTreeNode.cs" />
     <Compile Include="UCC\Classes\UccConditionPackTreeNode.cs" />
@@ -482,8 +483,7 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"$(TargetDir)Encryptor.exe" -e "$(TargetPath)" "$(TargetDir)EntityTools.key"
-type "$(TargetDir)$(TargetName).encrypted" &gt;"$(TargetDir)EntityTools.dll:Core"
+    <PostBuildEvent>type "$(TargetDir)$(TargetFileName)" &gt;"$(TargetDir)EntityTools.dll:Core"
 copy /Y "$(TargetDir)EntityTools.*" "$(TargetDir)Plugins\EntityTools.*"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

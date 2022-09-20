@@ -58,7 +58,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>TRACE;DEVELOPER, ENCRYPTED_CORE, PATCH_ASTRAL, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
+    <DefineConstants>TRACE;DEVELOPER, NOT_ENCRYPTED_CORE, PATCH_ASTRAL, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
@@ -411,6 +411,8 @@
     <Compile Include="Tools\Extensions\CollectionTExtentions.cs" />
     <Compile Include="Tools\Extensions\StringBuilderExtentions.cs" />
     <Compile Include="Tools\Inventory\InventoryHelper.cs" />
+    <Compile Include="Tools\Inventory\InventorySlotBoundComparer.cs" />
+    <Compile Include="Tools\Inventory\ItemFilterCoreExtension.cs" />
     <Compile Include="Tools\Missions\Enums.cs" />
     <Compile Include="Tools\Missions\MissionGiverRemote.cs" />
     <Compile Include="Tools\Missions\MissionGiverNPC.cs" />

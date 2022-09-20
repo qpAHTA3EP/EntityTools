@@ -1383,7 +1383,7 @@ namespace EntityCore.Tools
                 }
             }
             
-        TeamMember_0:
+        //TeamMember_0:
             teamMember = members[0];
             if (teamMember.EntityId == selfId)
             {

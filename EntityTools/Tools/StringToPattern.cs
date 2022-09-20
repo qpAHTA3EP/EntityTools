@@ -112,7 +112,5 @@ namespace EntityTools.Tools
 
             return obj => predicate(selector(obj));
         }
-
-
     }
 }

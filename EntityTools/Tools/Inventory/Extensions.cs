@@ -134,7 +134,7 @@ namespace EntityTools.Extensions
         /// и вычисление количества предметов storeItem, которые необходимо (до)купить
         /// </summary>
         /// <param name="storeItem"></param>
-        /// <param name="slotCache"></param>
+        /// <param name="bags"></param>
         /// <param name="filterEntry"></param>
         /// <returns></returns>
         public static uint NumberOfItem2Buy(this StoreItemInfo storeItem, BagsList bags, ItemFilterEntryExt filterEntry)

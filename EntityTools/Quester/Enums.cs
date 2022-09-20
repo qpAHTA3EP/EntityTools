@@ -27,6 +27,7 @@ namespace EntityTools.Enums
         Any
     }
 
+#if false
     [Flags]
     public enum WardType
     {
@@ -42,49 +43,72 @@ namespace EntityTools.Enums
         /// </summary>
         Coalescent 
 #endif
-    }
+    } 
+#endif
 
+    /// <summary>
+    /// Частицы, повышающие шанс улучшения предметов
+    /// </summary>
     [Flags]
     public enum MoteType
     {
-        None,
+        None = 0,
         /// <summary>
-        /// Примитивная частица - шанс улучшения: 1%<br/>
-        /// Идентификатор которой начинается с 'Fuse_Ward_1'<br/>
+        /// Примитивная частица - шанс улучшения: 1%.<br/>
+        /// Идентификатор которой начинается с 'Fuse_Ward_1'.
         /// </summary>
-        Mote_1,
+        Mote_1 = 1,
         /// <summary>
-        /// Обычная частица - шанс улучшения: 2%<br/>
-        /// Идентификатор которой начинается с 'Fuse_Ward_2'<br/>
+        /// Обычная частица - шанс улучшения: 2%.<br/>
+        /// Идентификатор которой начинается с 'Fuse_Ward_2'.
         /// </summary>
-        Mote_2,
+        Mote_2 = 2,
         /// <summary>
-        /// Улучшенная частица - шанс улучшения: 5%<br/>
-        /// Идентификатор которой начинается с 'Fuse_Ward_5'<br/>
+        /// Улучшенная частица - шанс улучшения: 5%.<br/>
+        /// Идентификатор которой начинается с 'Fuse_Ward_5'.
         /// </summary>
-        Mote_5,
+        Mote_5 = 4,
         /// <summary>
-        /// Усиленная частица - шанс улучшения: 10%<br/>
-        /// Идентификатор которой начинается с 'Fuse_Ward_10'<br/>
+        /// Усиленная частица - шанс улучшения: 10%.<br/>
+        /// Идентификатор которой начинается с 'Fuse_Ward_10'.
         /// </summary>
-        Mote_10,
+        Mote_10 = 8,
+        /// <summary>
+        /// Любая частица, дающая шанс улучшения менее 100%.<br/>
+        /// Идентификатор которой начинается с 'Fuse_Ward_'.
+        /// </summary>
+        AnyProbableMote = 16,
         /// <summary>
         /// Цельная пыль - шанс улучшения: 100%<br/>
-        /// Идентификатор которой начинается с 'Fuse_Ward_Coalescent'<br/>
+        /// Идентификатор которой начинается с 'Fuse_Ward_Coalescent'.<br/>
         /// (бывший Полный катализатор)
         /// </summary>
-        Mote_100
+        Mote_100 = 256
+    }
+
+
+    /// <summary>
+    /// Слоты компонентов для улучшения предметов (Evolving)
+    /// </summary>
+    [Flags]
+    public  enum CatalystSlots
+    {
+        None = 0,
+        First = 1,
+        Second = 2,
+        Third = 3
     }
 
     /// <summary>
     /// Результаты поиска предмета
     /// </summary>
+    [Flags]
     public enum SearchResult
     {
         /// <summary>
         /// Предмет не найден
         /// </summary>
-        Absent,
+        Absent = 0,
 #if false
         /// <summary>
         /// Найден незаполненный предмет
@@ -102,21 +126,20 @@ namespace EntityTools.Enums
         /// <summary>
         /// Непривязанный предмет
         /// </summary>
-        Unbounded,
+        Unbounded = 1,
         /// <summary>
         /// Привязанный к аккаунту предмет
         /// </summary>
-        Bounded2Account,
+        Bounded2Account = 2,
         /// <summary>
         /// Привязанные к персонажу предмет
         /// </summary>
-        Bounded2Character,
-#if false
+        Bounded2Character = 4,
+
         /// <summary>
         /// Предмет найден, но статус обработки не определен (ProgressionLogic не валидна) 
         /// </summary>
-        Indefinite 
-#endif
+        Indefinite = 256
     }
 
     /// <summary>

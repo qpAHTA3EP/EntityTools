@@ -1,0 +1,7 @@
+PostBuildEvent для шифрования ядра.
+
+"$(TargetDir)Encryptor.exe" -e "$(TargetPath)" "$(TargetDir)EntityTools.key"
+type "$(TargetDir)$(TargetName).encrypted" >"$(TargetDir)EntityTools.dll:Core"
+copy /Y "$(TargetDir)EntityTools.*" "$(TargetDir)Plugins\EntityTools.*"
+
+Кроме того, для включения дешифровки при инициализации ядра нужно в проекте EntityTools использовать дирректриву условной компиляции ENCRYPTED_CORE
