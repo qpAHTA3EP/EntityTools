@@ -42,7 +42,7 @@ namespace EntityCore.Forms
 
         public static Entity GUIRequest(ref string entPattern, ref ItemFilterStringType strMatchType, ref EntityNameType nameType)
         {
-            if (@this == null)
+            if (@this == null || @this.IsDisposed)
                 @this = new EntityViewer();
 
             //@this.entityCheck = EntityToPatternComparer.Get(entPattern, strMatchType, nameType);
@@ -61,11 +61,12 @@ namespace EntityCore.Forms
             @this.FillEntitiesDgv(EntityComparer.Get(entPattern, strMatchType, nameType)); 
 #endif
 
-            if (@this.ShowDialog() == DialogResult.OK)
+            DataGridViewRow currentRow = null;
+            if (@this.ShowDialog() == DialogResult.OK
+                && (currentRow = @this.dgvEntities.CurrentRow ) != null)
             {
                 if (string.IsNullOrEmpty(@this.tbPattern.Text))
                 {
-                    var currentRow = @this.dgvEntities.CurrentRow;
                     switch (@this.cbNameType.SelectedItem)
                     {
                         case EntityNameType.InternalName:
@@ -84,7 +85,7 @@ namespace EntityCore.Forms
                 strMatchType = (ItemFilterStringType)@this.cbStrMatch.SelectedItem;
                 nameType = (EntityNameType)@this.cbNameType.SelectedItem;
 
-                return @this.dgvEntities.CurrentRow.Tag as Entity; 
+                return currentRow.Tag as Entity; 
             }
             return null;
         }

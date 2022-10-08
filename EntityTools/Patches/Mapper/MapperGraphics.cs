@@ -21,7 +21,7 @@ namespace EntityTools.Patches.Mapper
             GetWorldPosition(0, 0, out double left, out double top);
             GetWorldPosition(width, height, out double right, out double down);
             if(_cache is null)
-                _cache = new MapperGraphCache(() => AcTp0Tools.AstralAccessors.Quester.Core.Meshes, 
+                _cache = new MapperGraphCache(() => ACTP0Tools.AstralAccessors.Quester.Core.Meshes, 
                     EntityTools.Config.Mapper.CacheActive);
             _cache.SetCacheArea(left, top, right, down);
         }

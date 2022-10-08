@@ -1,5 +1,6 @@
-﻿using AcTp0Tools;
-using AcTp0Tools.Patches;
+﻿using ACTP0Tools;
+using ACTP0Tools.Classes.TypeDescriptorTools;
+using ACTP0Tools.Patches;
 using Astral;
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;
@@ -8,18 +9,23 @@ using Astral.Logic.Classes.FSM;
 using Astral.Logic.NW;
 using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Controls;
+using EntityTools.Core.Interfaces;
+using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Forms;
+using EntityTools.Quester.Conditions;
 using EntityTools.Services;
 using EntityTools.Tools;
+using EntityTools.Tools.CustomRegions;
 using EntityTools.Tools.Export;
 using EntityTools.Tools.Targeting;
 using Microsoft.Win32;
 using MyNW.Internals;
-using MyNW.Patchables.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing.Design;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -27,8 +33,6 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using AcTp0Tools.Reflection;
-using EntityTools.Core.Interfaces;
 using API = Astral.Quester.API;
 using Task = System.Threading.Tasks.Task;
 
@@ -384,7 +388,7 @@ namespace EntityTools.Core
             var currentChangeWPDistance = changeWPDistance.Value;
 
             XtraMessageBox.Show($"Текущее значение 'Navigation.ChangeWPDist' равно {currentChangeWPDistance}");
-#elif true
+#elif false
             var pwr = Powers.GetPowerBySlot(22);
             if (pwr != null && pwr.IsValid)
             {
@@ -400,9 +404,99 @@ namespace EntityTools.Core
             {
                 XtraMessageBox.Show("Power does not slotted");
             }
-#endif
+#elif false
+            //var editor = TypeDescriptor.GetEditor(typeof(CustomRegionCollection), typeof(UITypeEditor));
+            ////EntityTools.Core.CheckCore();
+            ////var editor2 = TypeDescriptor.GetEditor(typeof(CustomRegionCollection), typeof(UITypeEditor));
+            //var properties = TypeDescriptor.GetProperties(typeof(IsInCustomRegionSet));
+            //var p = properties[nameof(IsInCustomRegionSet.CustomRegions)];
+            //var editorAttribute = p.Attributes[typeof(EditorAttribute)];
+            //XtraMessageBox.Show($"{editor?.GetType().FullName}\n{editorAttribute.}");
 
+            ViewModelDecorator<IsInCustomRegionSet> CustomRegionCollectionDecorator = new ViewModelDecorator<IsInCustomRegionSet>((
+                    typeof(CustomRegionCollection),
+                    new[] { new EditorAttribute(typeof(CustomRegionCollectionEditor), typeof(UITypeEditor)) }));
+
+            var cond = new IsInCustomRegionSet();
+            var typeDef = CustomRegionCollectionDecorator.Decorate(cond);
+
+            var editor1 = TypeDescriptor.GetEditor(cond.CustomRegions, typeof(UITypeEditor));
+            var editor2 = typeDef.GetProperties()[nameof(cond.CustomRegions)].GetEditor(typeof(UITypeEditor));
+
+            XtraMessageBox.Show($"{editor1?.GetType().FullName}\n{editor2?.GetType().FullName}");
+#elif false
+            //var cond = new IsInCustomRegionSet();
+            var condType = typeof(IsInCustomRegionSet);//cond.GetType();
+            // prepare our property overriding type descriptor
+            PropertyOverridingTypeDescriptor ctd = new PropertyOverridingTypeDescriptor(TypeDescriptor.GetProvider(condType).GetTypeDescriptor(condType));
+            // iterate through properies in the supplied object/type
+            foreach (PropertyDescriptor pd in TypeDescriptor.GetProperties(condType)) {
+                // for every property that complies to our criteria
+                if (pd.PropertyType ==  typeof(CustomRegionCollection) ) {
+                    // we first construct the custom PropertyDescriptor with the TypeDescriptor's built-in capabilities
+                    PropertyDescriptor pd2 = TypeDescriptor.CreateProperty(
+                        condType, // or just _settings, if it's already a type
+                        pd,                  // base property descriptor to which we want to add attributes
+                        // The PropertyDescriptor which we'll get will just wrap that
+                        // base one returning attributes we need.
+                        new EditorAttribute( // the attribute in question
+                            typeof(CustomRegionCollectionEditor),
+                            typeof(System.Drawing.Design.UITypeEditor)
+                        )
+                        // this method really can take as many attributes as you like, not just one
+                    );
+                
+                    // and then we tell our new PropertyOverridingTypeDescriptor to override that property
+                    ctd.OverrideProperty(pd2);
+                }
+            }
+            
+            // then we add new descriptor provider that will return our descriptor instead of default
+            TypeDescriptor.AddProvider(new TypeDescriptorOverridingProvider(ctd), condType);
+
+            propertyGrid.SelectedObject = new IsInCustomRegionSet(); //cond;
+#elif false
+            // Декорирование свойств типов для вызова корректного редактора
+            var tCustomRegionCollection = typeof(CustomRegionCollection);
+            var tCustomRegionCollectionEditor = typeof(CustomRegionCollectionEditor);
+            var tUITypeEditor = typeof(UITypeEditor);
+            //var editorAttribute = new EditorAttribute(typeof(CustomRegionSetEditor),
+            //                                         typeof(UITypeEditor));
+            foreach (Type type in ACTP0Serializer.QuesterTypes)
+            {
+                bool shouldOverrideProperty = false;
+                PropertyOverridingTypeDescriptor ctd = new PropertyOverridingTypeDescriptor(TypeDescriptor.GetProvider(type).GetTypeDescriptor(type));
+                // iterate through properties in the supplied object/type
+                foreach (PropertyDescriptor pd in TypeDescriptor.GetProperties(type))
+                {
+                    // for every property that complies to our criteria
+                    if (pd.PropertyType == tCustomRegionCollection)
+                    {
+                        // we first construct the custom PropertyDescriptor with the TypeDescriptor's built-in capabilities
+                        var newPD = TypeDescriptor.CreateProperty(
+                                tCustomRegionCollection, // or just _settings, if it's already a type
+                                pd,                      // base property descriptor to which we want to add attributes
+                                                         // The PropertyDescriptor which we'll get will just wrap that
+                                                         // base one returning attributes we need.
+                                new EditorAttribute(tCustomRegionCollectionEditor,tUITypeEditor));
+
+                        // and then we tell our new PropertyOverridingTypeDescriptor to override that property
+                        ctd.OverrideProperty(newPD);
+                        shouldOverrideProperty = true;
+                    }
+                }
+
+                // then we add new descriptor provider that will return our descriptor instead of default
+                if (shouldOverrideProperty)
+                {
+                    var descriptor = new TypeDescriptorOverridingProvider(ctd);
+                    descriptorProvider.Add(descriptor);
+                    TypeDescriptor.AddProvider(descriptor, type);
+                }
+            }
+#endif
         }
+        private static readonly List<TypeDescriptionProvider> descriptorProvider = new List<TypeDescriptionProvider>();
 
         private void handler_Test_4(object sender, EventArgs e)
         {
@@ -824,7 +918,7 @@ namespace EntityTools.Core
             }
         }
 
-        private void btnSetMachineId_Click(object sender, EventArgs e)
+        private void handler_SetMachineId(object sender, EventArgs e)
         {
 
         }
@@ -940,7 +1034,7 @@ namespace EntityTools.Core
 
                     using (var stream = zipProfileEntry.Open())
                     {
-                        Astral_Functions_XmlSerializer_GetExtraTypes.GetExtraTypes(out List<Type> types, 2);
+                        ACTP0Serializer.GetExtraTypes(out List<Type> types, 2);
 
                         int lineNum = -1;
                         int matchNum = 0;
@@ -1118,6 +1212,11 @@ namespace EntityTools.Core
         private void handler_EditUcc(object sender, EventArgs e)
         {
             EntityTools.Core.UserRequest_Edit(Astral.Logic.UCC.API.CurrentProfile, Astral.API.CurrentSettings.LastUCCProfile);
+        }
+
+        private void handler_EditQuester(object sender, EventArgs e)
+        {
+            EntityTools.Core.UserRequest_Edit(Astral.Quester.API.CurrentProfile, Astral.API.CurrentSettings.LastQuesterProfile);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using AcTp0Tools.Reflection;
+﻿using ACTP0Tools.Reflection;
 using Astral.Logic.UCC.Classes;
 using EntityCore.Tools;
 using EntityTools.UCC.Actions;
@@ -60,6 +60,9 @@ namespace EntityCore.UCC.Classes
 
         public void UpdateView()
         {
+            if (TreeView is null)
+                return;
+
             if (Tag is UCCActionPack actionPack)
             {
                 Text = actionPack.ToString();

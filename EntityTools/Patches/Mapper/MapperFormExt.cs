@@ -26,7 +26,7 @@ using Action = System.Action;
 using GoldenPath = Astral.Logic.NW.GoldenPath;
 using MinimapWaypoint = MyNW.Classes.MinimapWaypoint;
 using Timeout = Astral.Classes.Timeout;
-using AcTp0Tools;
+using ACTP0Tools;
 #if PATCH_ASTRAL
 using Astral.Logic.NW;
 using Astral.Quester.Classes;
@@ -1164,7 +1164,7 @@ namespace EntityTools.Patches.Mapper
             //TODO переделать с использованием Core.CurrentProfileZipMeshFile и внешних мешей
 
             string meshName = EntityManager.LocalPlayer.MapState.MapName + ".bin";
-            string profileName = Astral.Controllers.Settings.Get.LastQuesterProfile;
+            string profileName = Astral.API.CurrentSettings.LastQuesterProfile;
             if (File.Exists(profileName))
             {
                 var currentProfile = Astral.Quester.API.CurrentProfile;
@@ -1184,7 +1184,7 @@ namespace EntityTools.Patches.Mapper
                         // Сохраняем в архив файл профиля "profile.xml"
                         lock (currentProfile)
                         {
-                            AstralAccessors.Quester.Core.SaveProfile(zipFile);
+                            AstralAccessors.Quester.Core.SaveProfile(currentProfile, zipFile);
                             currentProfile.Saved = true; 
                         }
 

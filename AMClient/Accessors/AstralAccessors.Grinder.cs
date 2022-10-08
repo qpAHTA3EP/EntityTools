@@ -1,7 +1,7 @@
 ﻿using Astral.Grinder.Classes;
-using AcTp0Tools.Reflection;
+using ACTP0Tools.Reflection;
 
-namespace AcTp0Tools
+namespace ACTP0Tools
 {
     /// <summary>
     /// Доступ к закрытым членам и методам Astral'a

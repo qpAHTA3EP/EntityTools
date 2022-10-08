@@ -1,7 +1,7 @@
 ﻿using Astral.Quester.Classes.Conditions;
 using HarmonyLib;
 
-namespace AcTp0Tools.Patches
+namespace ACTP0Tools.Patches
 {
     /// <summary>
     /// Патч метода Astral.Quester.Classes.Conditions.QuestInfo.ToString()

@@ -2,7 +2,7 @@
 using System.Reflection;
 
 // ReSharper disable once CheckNamespace
-namespace AcTp0Tools.Reflection
+namespace ACTP0Tools.Reflection
 {
     /// <summary>
     /// Фабрика делегатов, осуществляющих через механизм рефлексии 

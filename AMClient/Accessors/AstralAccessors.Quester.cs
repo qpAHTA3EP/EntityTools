@@ -1,5 +1,4 @@
-﻿using AcTp0Tools.Patches;
-using AcTp0Tools.Reflection;
+﻿using ACTP0Tools.Patches;
 using AStar;
 using Astral;
 using Astral.Controllers;
@@ -15,9 +14,11 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using ACTP0Tools.Reflection;
+
 // ReSharper disable InconsistentNaming
 
-namespace AcTp0Tools
+namespace ACTP0Tools
 {
     /// <summary>
     /// Доступ к закрытым членам и методам Astral'a
@@ -127,7 +128,7 @@ namespace AcTp0Tools
                         && prefixOnLoadMethod != null
                         && postfixOnLoadMethod != null)
                     {
-                        AcTp0Patcher.Harmony.Patch(originalOnLoadMethod, new HarmonyMethod(prefixOnLoadMethod), new HarmonyMethod(postfixOnLoadMethod));
+                        ACTP0Patcher.Harmony.Patch(originalOnLoadMethod, new HarmonyMethod(prefixOnLoadMethod), new HarmonyMethod(postfixOnLoadMethod));
                     }
                 }
             }  

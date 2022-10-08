@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace AcTp0Tools.Reflection.Tests
+namespace ACTP0Tools.Reflection.Tests
 {
     public class PropertyAccessTester
     {

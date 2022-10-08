@@ -5,7 +5,7 @@ using Astral.Logic.UCC.Classes;
 using EntityTools.Extensions;
 using UCCEditor = Astral.Logic.UCC.Forms.Editor;
 using System.Collections.Generic;
-using AcTp0Tools.Reflection;
+using ACTP0Tools.Reflection;
 
 namespace EntityCore.Forms
 {
@@ -21,7 +21,7 @@ namespace EntityCore.Forms
         static AddUccActionForm()
         {
             // Формируем список типов uccAction;
-            AcTp0Tools.Patches.Astral_Functions_XmlSerializer_GetExtraTypes.GetExtraTypes(out List<Type> uccTypes, 1);
+            ACTP0Tools.Patches.ACTP0Serializer.GetExtraTypes(out List<Type> uccTypes, 1);
             if(uccTypes != null && uccTypes.Count > 0)
             {
                 foreach (Type t in uccTypes)

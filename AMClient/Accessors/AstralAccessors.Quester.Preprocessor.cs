@@ -1,5 +1,4 @@
-﻿using AcTp0Tools.Annotations;
-using Astral;
+﻿using Astral;
 using Astral.Classes.ItemFilter;
 using System;
 using System.Collections.ObjectModel;
@@ -9,8 +8,9 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
+using ACTP0Tools.Annotations;
 
-namespace AcTp0Tools
+namespace ACTP0Tools
 {
     public static partial class AstralAccessors
     {

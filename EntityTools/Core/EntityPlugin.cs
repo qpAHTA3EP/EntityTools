@@ -1,5 +1,5 @@
-﻿using AcTp0Tools;
-using AcTp0Tools.Reflection;
+﻿using ACTP0Tools;
+using ACTP0Tools.Reflection;
 using Astral.Addons;
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;
@@ -20,7 +20,9 @@ using EntityTools.Tools;
 using MyNW.Classes;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Design;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -306,6 +308,14 @@ namespace EntityTools
         //}
         #endregion
 
+        //public static void AddAttributes(Type type, params Attribute[] attributes)
+        //{
+        //    TypeDescriptor.AddAttributes(type, attributes);
+        //}
+        //public static void AddAttributes(object obj, params Attribute[] attributes)
+        //{
+        //    TypeDescriptor.AddAttributes(obj, attributes);
+        //}
 
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {

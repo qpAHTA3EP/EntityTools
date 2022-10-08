@@ -1,14 +1,14 @@
-﻿using AcTp0Tools.Patches;
-using Astral.Classes;
+﻿using Astral.Classes;
 using HarmonyLib;
 using MyNW.Classes;
 using System;
 using System.Collections.Generic;
-using AcTp0Tools.Reflection;
+using ACTP0Tools.Patches;
+using ACTP0Tools.Reflection;
 
 // ReSharper disable CheckNamespace
 
-namespace AcTp0Tools
+namespace ACTP0Tools
 {
     /// <summary>
     /// Доступ к закрытым членам и методам Astral'a
@@ -146,7 +146,7 @@ namespace AcTp0Tools
                         blAttackersList = tAstralCombats.GetStaticField<Func<List<string>>>("BLAttackersList");
 
                         if (originalCombatUnit != null)
-                            AcTp0Patcher.Harmony.Patch(originalCombatUnit, new HarmonyMethod(prefixCombatUnit), new HarmonyMethod(postfixCombatUnit));
+                            ACTP0Patcher.Harmony.Patch(originalCombatUnit, new HarmonyMethod(prefixCombatUnit), new HarmonyMethod(postfixCombatUnit));
                     }
                 }
             }

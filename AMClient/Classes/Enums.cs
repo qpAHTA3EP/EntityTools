@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AcTp0Tools.Classes
+namespace ACTP0Tools.Classes
 {
-#if false   // Не принимает вместо аргумента типа int в Astral_Functions_XmlSerializer_GetExtraTypes.GetExtraTypes()
+#if false   // Не принимает вместо аргумента типа int в ACTP0Serializer.GetExtraTypes()
     public enum AstralExtraTypes : int
     {
         UCCTypes = 1,

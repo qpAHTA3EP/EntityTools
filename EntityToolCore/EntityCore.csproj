@@ -240,6 +240,12 @@
     <Compile Include="Forms\MultipleItemSelectForm.Designer.cs">
       <DependentUpon>MultipleItemSelectForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\QuesterEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\QuesterEditor.Designer.cs">
+      <DependentUpon>QuesterEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\TargetSelectForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -268,6 +274,13 @@
     <Compile Include="Quester\Action\MoveToTeammateEngine.cs" />
     <Compile Include="Quester\Action\MoveToEntityEngine.cs" />
     <Compile Include="Quester\Action\TurnInMissionEngine.cs" />
+    <Compile Include="Quester\Classes\IActionTreeNode.cs" />
+    <Compile Include="Quester\Classes\ITreeNode.cs" />
+    <Compile Include="Quester\Classes\ActionPackTreeNode.cs" />
+    <Compile Include="Quester\Classes\ActionTreeNode.cs" />
+    <Compile Include="Quester\Classes\ConditionPackTreeNode.cs" />
+    <Compile Include="Quester\Classes\ConditionTreeNode.cs" />
+    <Compile Include="Quester\Classes\ProfileProxy.cs" />
     <Compile Include="Quester\Conditions\CheckGameGUIEngine.cs" />
     <Compile Include="Quester\Conditions\EntityDistanceEngine.cs" />
     <Compile Include="Quester\Conditions\TeamMembersCountEngine.cs" />
@@ -281,6 +294,7 @@
     <Compile Include="Quester\Action\PickUpMissionEngine.cs" />
     <Compile Include="Quester\Conditions\EntityPropertyEngine.cs" />
     <Compile Include="Quester\Conditions\EntityCountEngine.cs" />
+    <Compile Include="Tools\ListExtensions.cs" />
     <Compile Include="Tools\Powers\PowerCache.cs" />
     <Compile Include="Tools\Powers\PowerHelper.cs" />
     <Compile Include="Tools\Enums.cs" />
@@ -288,7 +302,7 @@
     <Compile Include="Tools\MissionHelper.cs" />
     <Compile Include="Tools\Navigation\NavigationHelper.cs" />
     <Compile Include="Tools\PlayerTeamHelper.cs" />
-    <Compile Include="Tools\UccHelper.cs" />
+    <Compile Include="Tools\TreeViewHelper.cs" />
     <Compile Include="UCC\Actions\ApproachEntityEngine.cs" />
     <Compile Include="UCC\Actions\ChangeTargetEngine.cs" />
     <Compile Include="UCC\Actions\DodgeFromEntityEngine.cs" />
@@ -308,6 +322,7 @@
     <Compile Include="UCC\Conditions\CheckPowerStateEngine.cs" />
     <Compile Include="UCC\Conditions\UCCTargetMatchEntityEngine.cs" />
     <Compile Include="UCC\Conditions\UCCEntityCheckEngine.cs" />
+    <Compile Include="PropertyEditors\CustomRegionSetEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\AuraViewer.resx">
@@ -340,6 +355,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MultipleItemSelectForm.resx">
       <DependentUpon>MultipleItemSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\QuesterEditor.resx">
+      <DependentUpon>QuesterEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TargetSelectForm.resx">
       <DependentUpon>TargetSelectForm.cs</DependentUpon>

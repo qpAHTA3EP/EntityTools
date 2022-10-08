@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Astral.Classes.ItemFilter;
-using AcTp0Tools.Reflection;
+using ACTP0Tools.Reflection;
 using EntityTools.Tools.Inventory;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
 using Inventory = Astral.Logic.NW.Inventory;
-using AcTp0Tools;
+using ACTP0Tools;
 
 namespace EntityTools.Extensions
 {

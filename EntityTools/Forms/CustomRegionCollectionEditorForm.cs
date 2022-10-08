@@ -3,9 +3,12 @@ using DevExpress.XtraEditors;
 using EntityTools.Enums;
 using EntityTools.Tools.CustomRegions;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
+using Astral.Quester.Classes;
+using Action = System.Action;
 
 namespace EntityTools.Forms
 {
@@ -38,7 +41,7 @@ namespace EntityTools.Forms
         }
 
 
-        public static bool GUIRequiest(ref CustomRegionCollection crCollection)
+        public static bool RequestUser(ref CustomRegionCollection crCollection)
         {
             if (@this == null || @this.IsDisposed)
                 @this = new CustomRegionCollectionEditorForm();
@@ -46,6 +49,7 @@ namespace EntityTools.Forms
 
             // Копирование исходной коллекции для возможности отказа от внесения изменений
             var originalCrCollection = crCollection;
+            var customRegions = originalCrCollection.DebugContext.CustomRegions;
             if (crCollection?.Count > 0)
                 @this.fillList = () =>
                 {
@@ -60,7 +64,7 @@ namespace EntityTools.Forms
 
                     @this.crList.Items.Clear();
 
-                    foreach (var cr in Astral.Quester.API.CurrentProfile.CustomRegions)
+                    foreach (var cr in customRegions)
                     {
                         if (originalCrCollection.TryGetValue(cr.Name, out CustomRegionEntry crEntry))
                         {
@@ -79,7 +83,7 @@ namespace EntityTools.Forms
             else @this.fillList = () =>
             {
                 @this.crList.Items.Clear();
-                foreach (var cr in Astral.Quester.API.CurrentProfile.CustomRegions)
+                foreach (var cr in customRegions)
                 {
                     @this.crList.Items.Add(new CustomRegionEntry(cr.Name, InclusionType.Ignore), CheckState.Unchecked);
                 }

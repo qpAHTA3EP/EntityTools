@@ -1,4 +1,4 @@
-﻿using AcTp0Tools.Reflection;
+﻿using ACTP0Tools.Reflection;
 using Astral.Logic.UCC.Classes;
 using EntityCore.Tools;
 using EntityTools.UCC.Conditions;
@@ -45,6 +45,9 @@ namespace EntityCore.UCC.Classes
 
         public void UpdateView()
         {
+            if (TreeView is null)
+                return;
+
             if (Tag is UCCConditionPack actionPack)
             {
                 if (string.IsNullOrEmpty(actionPack.Name))

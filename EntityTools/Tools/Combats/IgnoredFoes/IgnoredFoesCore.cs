@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using AcTp0Tools;
-using AcTp0Tools.Reflection;
+using ACTP0Tools;
+using ACTP0Tools.Reflection;
 
 namespace EntityTools.Tools.Combats.IgnoredFoes
 {
@@ -30,7 +30,7 @@ namespace EntityTools.Tools.Combats.IgnoredFoes
             var Quester_Core_Load_Postfix = typeof(IgnoredFoesCore).GetMethod(nameof(SetExtendedFoeBlackList));
 
             if (Quester_Core_Load != null && Quester_Core_Load_Postfix != null)
-                AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(Quester_Core_Load, null, new HarmonyMethod(Quester_Core_Load_Postfix)); 
+                AcTp0Tools.Patches.ACTP0Patcher.Harmony.Patch(Quester_Core_Load, null, new HarmonyMethod(Quester_Core_Load_Postfix)); 
 #else
             AstralAccessors.Quester.Core.OnProfileChanged += OnQuesterProfileChanged;
             Astral.Quester.API.BeforeStartEngine += API_BeforeStartEngine;

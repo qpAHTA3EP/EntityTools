@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace AcTp0Tools.Reflection
+namespace ACTP0Tools.Reflection
 {
     public sealed class CopyHelper
     {

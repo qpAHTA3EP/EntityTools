@@ -4,7 +4,7 @@ using HarmonyLib;
 using System;
 using System.Reflection;
 using System.Windows.Forms;
-using AcTp0Tools.Reflection;
+using ACTP0Tools.Reflection;
 using Astral.Logic.UCC.Panels;
 
 namespace EntityTools.Patches
@@ -139,21 +139,21 @@ namespace EntityTools.Patches
 
             try
             {
-                AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_IsOK, new HarmonyMethod(prefix_IsOK));
+                ACTP0Tools.Patches.ACTP0Patcher.Harmony.Patch(original_IsOK, new HarmonyMethod(prefix_IsOK));
                 unPatch = () =>
                 {
                     ETLogger.WriteLine(LogType.Debug, $@"Unpatch method '{original_IsOK}'.", true);
-                    AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_IsOK, prefix_IsOK);
+                    ACTP0Tools.Patches.ACTP0Patcher.Harmony.Unpatch(original_IsOK, prefix_IsOK);
                 };
 
-                AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_Clone, new HarmonyMethod(prefix_Clone));
+                ACTP0Tools.Patches.ACTP0Patcher.Harmony.Patch(original_Clone, new HarmonyMethod(prefix_Clone));
                 unPatch = () =>
                 {
                     ETLogger.WriteLine(LogType.Debug, $@"Unpatch method '{original_Clone}'.", true);
-                    AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_Clone, prefix_Clone);
+                    ACTP0Tools.Patches.ACTP0Patcher.Harmony.Unpatch(original_Clone, prefix_Clone);
                 };
 
-                AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_UccEditor, new HarmonyMethod(prefix_UccEditor));
+                ACTP0Tools.Patches.ACTP0Patcher.Harmony.Patch(original_UccEditor, new HarmonyMethod(prefix_UccEditor));
                 MainUccRefreshAll = tMainUcc.GetAction("refreshAll");
 
 

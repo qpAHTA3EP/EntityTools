@@ -41,7 +41,7 @@ namespace EntityTools.UCC.Actions
 
         [Category("Optional")]
         [Description("Execute all ucc-action one after another without interruption after first succeeded one.")]
-        public bool EexecuteSequentially { get; set; } = true;
+        public bool ExecuteSequentially { get; set; } = true;
 #if CUSTOM_UCC_CONDITION_EDITOR
 #if DEVELOPER
         [Category("Optional")]
@@ -79,6 +79,10 @@ namespace EntityTools.UCC.Actions
         [XmlIgnore]
         [Browsable(false)]
         public new int Random { get; set; }
+
+        [XmlIgnore]
+        [Browsable(false)]
+        public new string Label { get; set; }
         #endregion
         #endregion
 
@@ -92,7 +96,7 @@ namespace EntityTools.UCC.Actions
 
         public override bool Run()
         {
-            return (_actionPlayer ?? (_actionPlayer = new ActionsPlayer(_actions))).playActionList(!EexecuteSequentially) > 0;
+            return (_actionPlayer ?? (_actionPlayer = new ActionsPlayer(_actions))).playActionList(!ExecuteSequentially) > 0;
         }
         private ActionsPlayer _actionPlayer;
 
@@ -119,8 +123,7 @@ namespace EntityTools.UCC.Actions
         #region Взаимодействие с EntityToolsCore
         [NonSerialized]
         internal IUccActionEngine Engine;
-
-
+        
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")

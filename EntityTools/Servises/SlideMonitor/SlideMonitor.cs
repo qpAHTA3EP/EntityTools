@@ -50,12 +50,12 @@ namespace EntityTools.Servises.SlideMonitor
 
             try
             {
-                AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_Navigation_ChangeWPDist,
+                ACTP0Tools.Patches.ACTP0Patcher.Harmony.Patch(original_Navigation_ChangeWPDist,
                     new HarmonyMethod(prefix_Navigation_ChangeWPDist));
                 unPatch = () =>
                 {
                     ETLogger.WriteLine(LogType.Debug, $@"Unpatch method '{original_Navigation_ChangeWPDist}'.");
-                    AcTp0Tools.Patches.AcTp0Patcher.Harmony.Unpatch(original_Navigation_ChangeWPDist,
+                    ACTP0Tools.Patches.ACTP0Patcher.Harmony.Unpatch(original_Navigation_ChangeWPDist,
                         prefix_Navigation_ChangeWPDist);
                 };
             }

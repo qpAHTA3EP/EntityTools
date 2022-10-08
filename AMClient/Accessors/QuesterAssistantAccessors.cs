@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using AcTp0Tools.Reflection;
+using ACTP0Tools.Reflection;
 
-namespace AcTp0Tools
+namespace ACTP0Tools
 {
     public static class QuesterAssistantAccessors
     {

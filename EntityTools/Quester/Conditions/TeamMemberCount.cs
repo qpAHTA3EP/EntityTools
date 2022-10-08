@@ -1,13 +1,14 @@
 ﻿using Astral.Quester.Classes;
 using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
-using EntityTools.Editors;
 using EntityTools.Tools.CustomRegions;
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using EntityTools.Editors;
+using EntityTools.PropertyEditors;
 
 namespace EntityTools.Quester.Conditions
 {

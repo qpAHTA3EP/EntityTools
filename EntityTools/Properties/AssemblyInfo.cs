@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("EntityTools")]
-[assembly: AssemblyCopyright("MichaelProg ©  2019")]
+[assembly: AssemblyCopyright("MichaelProg ©  2022")]
 [assembly: AssemblyTrademark("MichaelProg")]
 [assembly: AssemblyCulture("")]
 
@@ -32,9 +32,9 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 //[assembly: AssemblyVersion("0.1.*")]
-[assembly: AssemblyVersion("0.22.0920.1236")]
+[assembly: AssemblyVersion("0.22.1007.2056")]
 #pragma warning disable CS7035 // The specified version string does not conform to the recommended format - major.minor.build.revision
-[assembly: AssemblyFileVersion("0.22.0920.1236")]
+[assembly: AssemblyFileVersion("0.22.1007.2056")]
 #pragma warning restore CS7035 // The specified version string does not conform to the recommended format - major.minor.build.revision
 [assembly: NeutralResourcesLanguage("")]
 

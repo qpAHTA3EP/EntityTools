@@ -1,4 +1,4 @@
-﻿using AcTp0Tools.Patches;
+﻿using ACTP0Tools.Patches;
 
 namespace AMClient
 {
@@ -6,7 +6,7 @@ namespace AMClient
 	{
         static Client()
         {
-            AcTp0Patcher.Apply();
+            ACTP0Patcher.Apply();
         }
 
 		public Client(string PrivateKey)

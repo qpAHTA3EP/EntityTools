@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace AcTp0Tools.Reflection
+namespace ACTP0Tools.Reflection
 {
     /// <summary>
     /// Инферфейс объекта, предоставляющего доступ к члену типа <typeparamref name="T"/>

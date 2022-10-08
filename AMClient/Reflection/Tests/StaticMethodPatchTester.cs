@@ -6,11 +6,11 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using AcTp0Tools.Patches;
+using ACTP0Tools.Patches;
 using HarmonyLib;
 // ReSharper disable RedundantAssignment
 
-namespace AcTp0Tools.Reflection.Tests
+namespace ACTP0Tools.Reflection.Tests
 {
     public class StaticMethodPatchTester
     {
@@ -147,7 +147,7 @@ namespace AcTp0Tools.Reflection.Tests
             originalMethod = AccessTools.Method(target, nameof(TestTarget.Method1));
             patchMethod = AccessTools.Method(typeof(HarmonyTestPatch), nameof(HarmonyPatch_Method));
 
-            AcTp0Patcher.Harmony.Patch(originalMethod, new HarmonyMethod(patchMethod));
+            ACTP0Patcher.Harmony.Patch(originalMethod, new HarmonyMethod(patchMethod));
         }
 
         public static bool HarmonyPatch_Method(ref string __result, int i)

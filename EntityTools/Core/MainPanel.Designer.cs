@@ -55,6 +55,7 @@ namespace EntityTools.Core
             this.btnValidate = new System.Windows.Forms.Button();
             this.btnTeamMonitor = new System.Windows.Forms.Button();
             this.btnUiViewer = new System.Windows.Forms.Button();
+            this.btnQuesterEditor = new System.Windows.Forms.Button();
             this.btnUcc = new System.Windows.Forms.Button();
             this.btnAuraViewer = new System.Windows.Forms.Button();
             this.btnMissionMonitor = new System.Windows.Forms.Button();
@@ -109,6 +110,7 @@ namespace EntityTools.Core
             this.dlgSaveFile = new System.Windows.Forms.SaveFileDialog();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
+            this.propertyGrid = new System.Windows.Forms.PropertyGrid();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
             this.tbclMain.SuspendLayout();
             this.tabUtilities.SuspendLayout();
@@ -146,6 +148,7 @@ namespace EntityTools.Core
             this.tabUtilities.Controls.Add(this.btnValidate);
             this.tabUtilities.Controls.Add(this.btnTeamMonitor);
             this.tabUtilities.Controls.Add(this.btnUiViewer);
+            this.tabUtilities.Controls.Add(this.btnQuesterEditor);
             this.tabUtilities.Controls.Add(this.btnUcc);
             this.tabUtilities.Controls.Add(this.btnAuraViewer);
             this.tabUtilities.Controls.Add(this.btnMissionMonitor);
@@ -220,9 +223,9 @@ namespace EntityTools.Core
             this.btnValidate.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnValidate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnValidate.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnValidate.Location = new System.Drawing.Point(127, 339);
+            this.btnValidate.Location = new System.Drawing.Point(126, 339);
             this.btnValidate.Name = "btnValidate";
-            this.btnValidate.Size = new System.Drawing.Size(113, 40);
+            this.btnValidate.Size = new System.Drawing.Size(114, 40);
             this.btnValidate.TabIndex = 0;
             this.btnValidate.Text = "Validate";
             this.btnValidate.UseVisualStyleBackColor = true;
@@ -256,13 +259,27 @@ namespace EntityTools.Core
             this.btnUiViewer.UseVisualStyleBackColor = true;
             this.btnUiViewer.Click += new System.EventHandler(this.handler_OpenUiViewer);
             // 
+            // btnQuesterEditor
+            // 
+            this.btnQuesterEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnQuesterEditor.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
+            this.btnQuesterEditor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnQuesterEditor.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnQuesterEditor.Location = new System.Drawing.Point(9, 247);
+            this.btnQuesterEditor.Name = "btnQuesterEditor";
+            this.btnQuesterEditor.Size = new System.Drawing.Size(113, 40);
+            this.btnQuesterEditor.TabIndex = 0;
+            this.btnQuesterEditor.Text = "Quester";
+            this.btnQuesterEditor.UseVisualStyleBackColor = true;
+            this.btnQuesterEditor.Click += new System.EventHandler(this.handler_EditQuester);
+            // 
             // btnUcc
             // 
             this.btnUcc.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnUcc.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnUcc.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUcc.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnUcc.Location = new System.Drawing.Point(126, 247);
+            this.btnUcc.Location = new System.Drawing.Point(9, 201);
             this.btnUcc.Name = "btnUcc";
             this.btnUcc.Size = new System.Drawing.Size(113, 40);
             this.btnUcc.TabIndex = 0;
@@ -276,9 +293,9 @@ namespace EntityTools.Core
             this.btnAuraViewer.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnAuraViewer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAuraViewer.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnAuraViewer.Location = new System.Drawing.Point(9, 247);
+            this.btnAuraViewer.Location = new System.Drawing.Point(126, 247);
             this.btnAuraViewer.Name = "btnAuraViewer";
-            this.btnAuraViewer.Size = new System.Drawing.Size(113, 40);
+            this.btnAuraViewer.Size = new System.Drawing.Size(114, 40);
             this.btnAuraViewer.TabIndex = 0;
             this.btnAuraViewer.Text = "Auras";
             this.btnAuraViewer.UseVisualStyleBackColor = true;
@@ -304,9 +321,9 @@ namespace EntityTools.Core
             this.btnEntityCacheMonitor.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnEntityCacheMonitor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnEntityCacheMonitor.Font = new System.Drawing.Font("Tahoma", 14F, System.Drawing.FontStyle.Bold);
-            this.btnEntityCacheMonitor.Location = new System.Drawing.Point(128, 293);
+            this.btnEntityCacheMonitor.Location = new System.Drawing.Point(126, 293);
             this.btnEntityCacheMonitor.Name = "btnEntityCacheMonitor";
-            this.btnEntityCacheMonitor.Size = new System.Drawing.Size(230, 40);
+            this.btnEntityCacheMonitor.Size = new System.Drawing.Size(232, 40);
             this.btnEntityCacheMonitor.TabIndex = 0;
             this.btnEntityCacheMonitor.Text = "Entity cache monitor";
             this.btnEntityCacheMonitor.UseVisualStyleBackColor = true;
@@ -504,7 +521,7 @@ namespace EntityTools.Core
             this.btnSetMachineId.Size = new System.Drawing.Size(50, 23);
             this.btnSetMachineId.TabIndex = 1;
             this.btnSetMachineId.Text = "Set";
-            this.btnSetMachineId.Click += new System.EventHandler(this.btnSetMachineId_Click);
+            this.btnSetMachineId.Click += new System.EventHandler(this.handler_SetMachineId);
             // 
             // tbMashineId
             // 
@@ -518,6 +535,7 @@ namespace EntityTools.Core
             // 
             // tabDebug
             // 
+            this.tabDebug.Controls.Add(this.propertyGrid);
             this.tabDebug.Controls.Add(this.tbDebugMonitorInfo);
             this.tabDebug.Controls.Add(this.ckbDebugMonitor);
             this.tabDebug.Controls.Add(this.tbText);
@@ -548,7 +566,7 @@ namespace EntityTools.Core
             this.tbDebugMonitorInfo.Name = "tbDebugMonitorInfo";
             this.tbDebugMonitorInfo.ReadOnly = true;
             this.tbDebugMonitorInfo.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.tbDebugMonitorInfo.Size = new System.Drawing.Size(346, 265);
+            this.tbDebugMonitorInfo.Size = new System.Drawing.Size(346, 129);
             this.tbDebugMonitorInfo.TabIndex = 9;
             // 
             // ckbDebugMonitor
@@ -946,6 +964,16 @@ namespace EntityTools.Core
             this.backgroundWorker.WorkerSupportsCancellation = true;
             this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.work_PowerSearch);
             // 
+            // propertyGrid
+            // 
+            this.propertyGrid.CommandsVisibleIfAvailable = false;
+            this.propertyGrid.HelpVisible = false;
+            this.propertyGrid.Location = new System.Drawing.Point(9, 167);
+            this.propertyGrid.Name = "propertyGrid";
+            this.propertyGrid.Size = new System.Drawing.Size(346, 130);
+            this.propertyGrid.TabIndex = 14;
+            this.propertyGrid.ToolbarVisible = false;
+            // 
             // EntityToolsMainPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1039,5 +1067,7 @@ namespace EntityTools.Core
         private DevExpress.XtraGrid.Columns.GridColumn clmnReplacement;
         private Button btnEntityCacheMonitor;
         private Button btnUcc;
+        private Button btnQuesterEditor;
+        private PropertyGrid propertyGrid;
     }
 }

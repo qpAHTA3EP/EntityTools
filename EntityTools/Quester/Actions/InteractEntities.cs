@@ -15,6 +15,7 @@ using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
+using EntityTools.PropertyEditors;
 using EntityTools.Tools.CustomRegions;
 using MyNW.Classes;
 using Action = Astral.Quester.Classes.Action;

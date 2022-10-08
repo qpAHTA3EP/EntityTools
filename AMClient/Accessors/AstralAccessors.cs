@@ -1,9 +1,9 @@
-﻿using AcTp0Tools.Reflection;
+﻿using ACTP0Tools.Reflection;
 using Astral.Classes.ItemFilter;
 using MyNW.Classes;
 using System;
 
-namespace AcTp0Tools
+namespace ACTP0Tools
 {
     /// <summary>
     /// Доступ к закрытым членам и методам Astral'a

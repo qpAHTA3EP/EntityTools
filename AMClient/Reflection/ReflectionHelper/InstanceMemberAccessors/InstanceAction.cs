@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace AcTp0Tools.Reflection
+namespace ACTP0Tools.Reflection
 {
     /// <summary>
     /// Фабрика делегатов, осуществляющих через механизм рефлексии 

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static Astral.Quester.Classes.Action;
 
-namespace AcTp0Tools.Reflection
+namespace ACTP0Tools.Reflection
 {
     public static class Empty
     {

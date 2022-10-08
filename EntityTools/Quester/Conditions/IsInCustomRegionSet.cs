@@ -1,31 +1,18 @@
-﻿using System;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Linq;
-using System.Text;
-using Astral.Quester.Classes;
+﻿using Astral.Quester.Classes;
 using EntityTools.Editors;
-using EntityTools.Patches;
 using EntityTools.Tools.CustomRegions;
 using MyNW.Internals;
+using System;
+using System.ComponentModel;
+using System.Drawing.Design;
+using System.Text;
+using EntityTools.PropertyEditors;
 
 namespace EntityTools.Quester.Conditions
 {
     [Serializable]
     public class IsInCustomRegionSet : Condition
     {
-        public IsInCustomRegionSet()
-        {
-
-        }
-#if PATCH_ASTRAL
-        static IsInCustomRegionSet()
-        {
-            // Пременение патча на этапе десериализации (до инициализации плагина)
-            //ETPatcher.Apply();
-        }
-#endif
-
         [Description("A set of CustomRegion, the combination of which defines an area on the map")]
         [Editor(typeof(CustomRegionCollectionEditor), typeof(UITypeEditor))]
         //[TypeConverter(typeof(ExpandableObjectConverter))]
@@ -128,21 +115,13 @@ namespace EntityTools.Quester.Conditions
                 if (count > 0)
                 {
                     var sb = new StringBuilder();
-                    sb.Append("Totaly ").Append(count).AppendLine(" " + nameof(CustomRegions));
-                    //sb.Append("Player '").Append(EntityManager.LocalPlayer.InternalName).AppendLine("' located in the following of them:");
-#if false
-                    using (var enumerator = Astral.Quester.API.CurrentProfile.CustomRegions.Where(cr => cr.IsIn).GetEnumerator()) 
-#elif false
-                    using (var enumerator = Astral.Quester.API.CurrentProfile.CustomRegions.Where(cr => cr.IsIn && _customRegions.Contains(cr.Name)).GetEnumerator())
-#else
+                    sb.Append("Total ").Append(count).AppendLine(" " + nameof(CustomRegions));
                     using (var enumerator = _customRegions.GetEnumerator())
-#endif
                     {
                         if (enumerator.MoveNext())
                         {
-                            sb.AppendLine("{");
                             var crEntry = enumerator.Current;
-                            sb.Append("\t[").Append(crEntry.Inclusion).Append("] ").Append(crEntry.Name);
+                            sb.AppendLine("{").Append("\t[").Append(crEntry.Inclusion).Append("] ").Append(crEntry.Name);
                             var cr = crEntry.CustomRegion;
                             if (cr != null)
                                 sb.Append(cr.IsIn ? " : within" : " : outside");
@@ -162,7 +141,7 @@ namespace EntityTools.Quester.Conditions
                     }
                     return sb.ToString();
                 }
-                else return nameof(CustomRegions)+" is empty";
+                return nameof(CustomRegions)+" is empty";
             }
         }
     }

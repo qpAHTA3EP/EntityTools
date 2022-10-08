@@ -28,8 +28,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AMClient", "AMClient\AMClie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyComparer", "AssemblyComparer\AssemblyComparer.csproj", "{B38FCAC7-7F79-4E2F-980E-435921D2AF2A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AstralLanucher", "AstralLanucher\AstralLanucher.csproj", "{857C63FE-2AA8-4AF5-B14E-E9ACAE8E4B18}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -154,38 +152,11 @@ Global
 		{B38FCAC7-7F79-4E2F-980E-435921D2AF2A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B38FCAC7-7F79-4E2F-980E-435921D2AF2A}.Release|x64.ActiveCfg = Release|Any CPU
 		{B38FCAC7-7F79-4E2F-980E-435921D2AF2A}.Release|x64.Build.0 = Release|Any CPU
-		{857C63FE-2AA8-4AF5-B14E-E9ACAE8E4B18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{857C63FE-2AA8-4AF5-B14E-E9ACAE8E4B18}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{857C63FE-2AA8-4AF5-B14E-E9ACAE8E4B18}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{857C63FE-2AA8-4AF5-B14E-E9ACAE8E4B18}.Debug|x64.Build.0 = Debug|Any CPU
-		{857C63FE-2AA8-4AF5-B14E-E9ACAE8E4B18}.Encrypted_Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{857C63FE-2AA8-4AF5-B14E-E9ACAE8E4B18}.Encrypted_Debug|Any CPU.Build.0 = Debug|Any CPU
-		{857C63FE-2AA8-4AF5-B14E-E9ACAE8E4B18}.Encrypted_Debug|x64.ActiveCfg = Debug|Any CPU
-		{857C63FE-2AA8-4AF5-B14E-E9ACAE8E4B18}.Encrypted_Debug|x64.Build.0 = Debug|Any CPU
-		{857C63FE-2AA8-4AF5-B14E-E9ACAE8E4B18}.Encrypted_Release|Any CPU.ActiveCfg = Release|Any CPU
-		{857C63FE-2AA8-4AF5-B14E-E9ACAE8E4B18}.Encrypted_Release|Any CPU.Build.0 = Release|Any CPU
-		{857C63FE-2AA8-4AF5-B14E-E9ACAE8E4B18}.Encrypted_Release|x64.ActiveCfg = Release|Any CPU
-		{857C63FE-2AA8-4AF5-B14E-E9ACAE8E4B18}.Encrypted_Release|x64.Build.0 = Release|Any CPU
-		{857C63FE-2AA8-4AF5-B14E-E9ACAE8E4B18}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{857C63FE-2AA8-4AF5-B14E-E9ACAE8E4B18}.Release|Any CPU.Build.0 = Release|Any CPU
-		{857C63FE-2AA8-4AF5-B14E-E9ACAE8E4B18}.Release|x64.ActiveCfg = Release|Any CPU
-		{857C63FE-2AA8-4AF5-B14E-E9ACAE8E4B18}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {390F9F67-D5D8-480F-92F1-BC844646E658}
-	EndGlobalSection
-	GlobalSection(AutomaticVersions) = postSolution
-		UpdateAssemblyVersion = True
-		UpdateAssemblyFileVersion = True
-		UpdateAssemblyInfoVersion = True
-		AssemblyVersionSettings = None.ShortYearStamp.YearMonth.TimeStamp
-		AssemblyFileVersionSettings = None.ShortYearStamp.MMddStamp.TimeStamp
-		AssemblyInfoVersionSettings = None.ShortYearStamp.MMddStamp.YearMonth
-		UpdatePackageVersion = False
-		AssemblyInfoVersionType = SettingsVersion
-		InheritWinAppVersionFrom = None
 	EndGlobalSection
 EndGlobal

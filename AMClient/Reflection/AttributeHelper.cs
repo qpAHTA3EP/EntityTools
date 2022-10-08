@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace AcTp0Tools.Reflection
+namespace ACTP0Tools.Reflection
 {
     /// <summary>
     /// <see href="https://stackoverflow.com/questions/5015830/get-the-value-of-displayname-attribute"/>

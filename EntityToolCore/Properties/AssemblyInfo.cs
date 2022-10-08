@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("MichaelProg")]
 [assembly: AssemblyProduct("EntityToolCore")]
-[assembly: AssemblyCopyright("MichaelProg ©  2020")]
+[assembly: AssemblyCopyright("MichaelProg ©  2022")]
 [assembly: AssemblyTrademark("MichaelProg")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.22.2209.1239")]
-[assembly: AssemblyFileVersion("0.22.0920.1239")]
+[assembly: AssemblyVersion("0.22.2210.2102")]
+[assembly: AssemblyFileVersion("0.22.1007.2102")]

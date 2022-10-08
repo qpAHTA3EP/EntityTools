@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 
-namespace AcTp0Tools.Reflection
+namespace ACTP0Tools.Reflection
 {
     /// <summary>
     /// Основано на статье 

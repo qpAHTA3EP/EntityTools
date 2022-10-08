@@ -1,21 +1,19 @@
-﻿using AcTp0Tools;
-using AcTp0Tools.Reflection;
+﻿using ACTP0Tools;
+using ACTP0Tools.Reflection;
 using Astral.Logic.UCC.Classes;
 using Astral.Logic.UCC.Forms;
 using DevExpress.XtraEditors;
 using EntityCore.Tools;
 using EntityCore.UCC.Classes;
+using EntityTools.Tools;
+using EntityTools.UCC.Conditions;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using DevExpress.Utils.Design;
-using EntityTools.Tools;
-using EntityTools.UCC.Conditions;
 
 namespace EntityCore.Forms
 {
@@ -28,7 +26,7 @@ namespace EntityCore.Forms
         private bool profileUnsaved;
         // Функтор, выполняемый при изменении propertyGrid
         private Action propertyCallback;
-        // Функтор, выполняемый при изменении списка propertyConditions
+        // Функтор, выполняемый при изменении списка listConditions
         private Action conditionCallback;
         // Скопированная ucc-команда
         private UCCAction uccActionCache;
@@ -38,7 +36,7 @@ namespace EntityCore.Forms
         private TargetPriorityEntry targetPriorityCache;
         // Активный (выбранный) TreeView
         private Control selectedControl;
-        // UCC-умение, с которым сопоставлен список ucc-условий
+        // UCC-команда, с которым сопоставлен список ucc-условий
         private UCCAction selectedUccAction;
 
         private UccEditor()
@@ -86,7 +84,6 @@ namespace EntityCore.Forms
             }
             return uccEditor.Show(profile, profileName, modal);
         }
-
         public new void Show()
         {
             Show(null);
@@ -138,6 +135,9 @@ namespace EntityCore.Forms
         #region Drag & Drop
         private void handler_TreeView_ItemDrag(object sender, ItemDragEventArgs e)
         {
+            conditionCallback?.Invoke();
+            propertyCallback?.Invoke();
+
             // Move the dragged node when the left mouse button is used.
             if (e.Button == MouseButtons.Left)
             {
@@ -176,84 +176,84 @@ namespace EntityCore.Forms
 
                 // Проверяем что перемещаемый узел не является родительским по отношению к целевому узлу,
                 // расположенному под курсором мыши
-                if (!draggedNode.Equals(targetNode)
-                    && !ContainsNode(draggedNode, targetNode))
+                if (targetNode != null)
                 {
-                    if (targetNode is UccActionPackTreeNode actionPackNode
-                        && !altHolded)
+                    if (!draggedNode.Equals(targetNode)
+                        && !ContainsNode(draggedNode, targetNode))
                     {
-                        // Если удерживается ALT, то dtaggedNode помещается после actionPack'a
-
-                        // Целевой узел является UCCActionPack'ом
-                        // Пепремещаем узел во нутрь целевого узла
-                        if (e.Effect == DragDropEffects.Move)
+                        if (targetNode is UccActionPackTreeNode actionPackNode
+                            && !altHolded)
                         {
-                            //Logger.WriteLine(Logger.LogType.Debug, $"Move [{draggedNode.Index}]'{draggedNode.Text}' into Children of [{targetNode.Index}]'{targetNode.Text}'");
-                            draggedNode.Remove();
-                            actionPackNode.Nodes.Add(draggedNode);
+                            // Если удерживается ALT, то dtaggedNode помещается после actionPack'a
+
+                            // Целевой узел является UCCActionPack'ом
+                            // Пепремещаем узел во нутрь целевого узла
+                            if (e.Effect == DragDropEffects.Move)
+                            {
+                                //Logger.WriteLine(Logger.LogType.Debug, $"Move [{draggedNode.Index}]'{draggedNode.Text}' into Children of [{targetNode.Index}]'{targetNode.Text}'");
+                                draggedNode.Remove();
+                                actionPackNode.Nodes.Insert(0, draggedNode);
+                            }
+                            // Вставляем копию перетаскиваемого узла во внутрь целевого узла
+                            else if (e.Effect == DragDropEffects.Copy)
+                            {
+                                //Logger.WriteLine(Logger.LogType.Debug, $"Copy [{draggedNode.Index}]'{draggedNode.Text}' into Children of [{targetNode.Index}]'{targetNode.Text}'");
+                                targetNode.Nodes.Insert(0, (TreeNode)draggedNode.Clone());//Add((TreeNode)draggedNode.Clone());
+                            }
                             ChangeWindowCaption();
+
+                            // Раскрываем целевой узел дерева, в который перемещен/скопирован перетаскиваемый узел
+                            targetNode.Expand();
                         }
-                        // Вставляем копию перетаскиваемого узла во внутрь целевого узла
-                        else if (e.Effect == DragDropEffects.Copy)
+                        else if (targetNode is UccConditionPackTreeNode conditionPackNode
+                                 && !altHolded)
                         {
-                            //Logger.WriteLine(Logger.LogType.Debug, $"Copy [{draggedNode.Index}]'{draggedNode.Text}' into Children of [{targetNode.Index}]'{targetNode.Text}'");
-                            targetNode.Nodes.Add((TreeNode)draggedNode.Clone());
+                            // Если удерживается ALT, то dtaggedNode помещается после actionPack'a
+
+                            // Целевой узел является UCCActionPack'ом
+                            // Пепремещаем узел во нутрь целевого узла
+                            if (e.Effect == DragDropEffects.Move)
+                            {
+                                //Logger.WriteLine(Logger.LogType.Debug, $"Move [{draggedNode.Index}]'{draggedNode.Text}' into Children of [{targetNode.Index}]'{targetNode.Text}'");
+                                draggedNode.Remove();
+                                conditionPackNode.Nodes.Insert(0, draggedNode);
+                            }
+                            // Вставляем копию перетаскиваемого узла во внутрь целевого узла
+                            else if (e.Effect == DragDropEffects.Copy)
+                            {
+                                //Logger.WriteLine(Logger.LogType.Debug, $"Copy [{draggedNode.Index}]'{draggedNode.Text}' into Children of [{targetNode.Index}]'{targetNode.Text}'");
+                                targetNode.Nodes.Insert(0, (TreeNode)draggedNode.Clone());//Add((TreeNode)draggedNode.Clone());
+                            }
                             ChangeWindowCaption();
+
+                            // Раскрываем целевой узел дерева, в который перемещен/скопирован перетаскиваемый узел
+                            targetNode.Expand();
                         }
-
-                        // Раскрываем целевой узел дерева, в который перемещен/скопирован перетаскиваемый узел
-                        targetNode.Expand();
-                    }
-                    else if (targetNode is UccConditionPackTreeNode conditionPackNode
-                        && !altHolded)
-                    {
-                        // Если удерживается ALT, то dtaggedNode помещается после actionPack'a
-
-                        // Целевой узел является UCCActionPack'ом
-                        // Пепремещаем узел во нутрь целевого узла
-                        if (e.Effect == DragDropEffects.Move)
+                        else
                         {
-                            //Logger.WriteLine(Logger.LogType.Debug, $"Move [{draggedNode.Index}]'{draggedNode.Text}' into Children of [{targetNode.Index}]'{targetNode.Text}'");
-                            draggedNode.Remove();
-                            conditionPackNode.Nodes.Add(draggedNode);
-                            ChangeWindowCaption();
-                        }
-                        // Вставляем копию перетаскиваемого узла во внутрь целевого узла
-                        else if (e.Effect == DragDropEffects.Copy)
-                        {
-                            //Logger.WriteLine(Logger.LogType.Debug, $"Copy [{draggedNode.Index}]'{draggedNode.Text}' into Children of [{targetNode.Index}]'{targetNode.Text}'");
-                            targetNode.Nodes.Add((TreeNode)draggedNode.Clone());
-                            ChangeWindowCaption();
-                        }
+                            // Выбираем коллекцию узлов, в которую нужно добавить перетаскиваемый узел
+                            var treeNodeCollection = targetNode.Parent?.Nodes ?? treeView.Nodes;
 
-                        // Раскрываем целевой узел дерева, в который перемещен/скопирован перетаскиваемый узел
-                        targetNode.Expand();
-                    }
-                    else
-                    {
-                        // Выбираем коллекцию узлов, в которую нужно добавить перетаскиваемый узел
-                        var treeNodeCollection = targetNode.Parent?.Nodes ?? treeView.Nodes;
+                            // Если нажата клавиша ALT, вставляем ПЕРЕД targetNode.
+                            // В противном случае - после targetNode.
+                            //var targetInd = targetNode.Index + (e.KeyState & 32) == 32 ? 0 : 1;// Проверяем нажатие клавиши ALT
 
-                        // Если нажата клавиша ALT, вставляем ПЕРЕД targetNode.
-                        // В противном случае - после targetNode.
-                        //var targetInd = targetNode.Index + (e.KeyState & 32) == 32 ? 0 : 1;// Проверяем нажатие клавиши ALT
+                            // Перемещение узла
+                            if (e.Effect == DragDropEffects.Move)
+                            {
+                                //Logger.WriteLine(Logger.LogType.Debug, $"Move [{draggedNode.Index}]'{draggedNode.Text}' after [{targetNode.Index}]'{targetNode.Text}'");
+                                draggedNode.Remove();
 
-                        // Перемещение узла
-                        if (e.Effect == DragDropEffects.Move)
-                        {
-                            //Logger.WriteLine(Logger.LogType.Debug, $"Move [{draggedNode.Index}]'{draggedNode.Text}' after [{targetNode.Index}]'{targetNode.Text}'");
-                            draggedNode.Remove();
-
-                            treeNodeCollection.Insert(targetNode.Index + 1, draggedNode);
+                                treeNodeCollection.Insert(targetNode.Index + 1, draggedNode);
+                            }
+                            // Копирование узла
+                            else if (e.Effect == DragDropEffects.Copy)
+                            {
+                                //Logger.WriteLine(Logger.LogType.Debug, $"Copy [{draggedNode.Index}]'{draggedNode.Text}' after [{targetNode.Index}]'{targetNode.Text}'");
+                                treeNodeCollection.Insert(targetNode.Index + 1, (TreeNode)draggedNode.Clone());
+                            }
                             ChangeWindowCaption();
-                        }
-                        // Копирование узла
-                        else if (e.Effect == DragDropEffects.Copy)
-                        {
-                            //Logger.WriteLine(Logger.LogType.Debug, $"Copy [{draggedNode.Index}]'{draggedNode.Text}' after [{targetNode.Index}]'{targetNode.Text}'");
-                            treeNodeCollection.Insert(targetNode.Index + 1, (TreeNode)draggedNode.Clone());
-                            ChangeWindowCaption();
-                        }
+                        } 
                     }
                 }
                 else
@@ -264,16 +264,15 @@ namespace EntityCore.Forms
                         //Logger.WriteLine(Logger.LogType.Debug, $"Move [{draggedNode.Index}]'{draggedNode.Text}' at the of action list");
                         draggedNode.Remove();
 
-                        treeCombatActions.Nodes.Add(draggedNode);
-                        ChangeWindowCaption();
+                        treeView.Nodes.Add(draggedNode);
                     }
                     // Копирование узла
                     else if (e.Effect == DragDropEffects.Copy)
                     {
                         //Logger.WriteLine(Logger.LogType.Debug, $"Copy [{draggedNode.Index}]'{draggedNode.Text}' at the of action list");
                         treeView.Nodes.Add((TreeNode)draggedNode.Clone());
-                        ChangeWindowCaption();
                     }
+                    ChangeWindowCaption();
                 } 
             }
         }
@@ -304,8 +303,8 @@ namespace EntityCore.Forms
                 Point targetPoint = treeView.PointToClient(new Point(e.X, e.Y));
 
                 // Select the node at the mouse position.
-                var targeTreeNode = treeView.GetNodeAt(targetPoint);
-                propertyGrid.SelectedObject = targeTreeNode;
+                var targetTreeNode = treeView.GetNodeAt(targetPoint);
+                propertyGrid.SelectedObject = targetTreeNode;
                 e.Effect = e.AllowedEffect; 
             }
         }
@@ -364,7 +363,6 @@ namespace EntityCore.Forms
             if (tag is UCCAction uccAction)
                 selectedUccAction = uccAction;
         }
-
         private void SetTreeNodeCallback(TreeNode treeNode)
         {
             switch (treeNode)
@@ -372,7 +370,7 @@ namespace EntityCore.Forms
                 case IUccActionTreeNode uccActionNode:
                     conditionCallback?.Invoke();
                     treeConditions.Nodes.Clear();
-                    treeConditions.Nodes.AddRange(uccActionNode.ConditionTreeNodes.ToArray());
+                    treeConditions.Nodes.AddRange(uccActionNode.ConditionTreeNodes);
                     propertyCallback = uccActionNode.UpdateView;
                     conditionCallback = () =>
                     {
@@ -577,7 +575,7 @@ namespace EntityCore.Forms
 #else
                 using (TextWriter fileStream = new StreamWriter(fileName, false))
                 {
-                    //Astral_Functions_XmlSerializer_GetExtraTypes.GetExtraTypes(out List<Type> types, 2);
+                    //ACTP0Serializer.GetExtraTypes(out List<Type> types, 2);
 
                     profileSerializer.Serialize(fileStream, profile); 
                     return true;
@@ -615,6 +613,8 @@ namespace EntityCore.Forms
             if(profile is null)
                 return;
 
+            propertyGrid.SelectedObject = null;
+            treeConditions.Nodes.Clear();
             // Отображение дерева умений, используемых в бою
             if (profile.ActionsCombat?.Count > 0)
             {
@@ -645,7 +645,9 @@ namespace EntityCore.Forms
                     listPriorities.Items.AddRange(profile.TargetPriorities.ToArray());
             }
         }
-
+        /// <summary>
+        /// Очистка содержимого списков и деревьев
+        /// </summary>
         private void UI_reset()
         {
             treeCombatActions.Nodes.Clear();
@@ -654,6 +656,7 @@ namespace EntityCore.Forms
             listPriorities.Items.Clear();
             propertyGrid.SelectedObject = null;
             selectedControl = null;
+            selectedUccAction = null;
             propertyCallback = null;
             conditionCallback = null;
         }
@@ -685,162 +688,6 @@ namespace EntityCore.Forms
             dockManager.SaveLayoutToXml(FileTools.UccEditorSettingsFile);
         }
        #endregion
-
-
-        
-        #region List of Priorities
-        private int selectedTargetPriorityInd;
-        private Point pointPrioritiesItem;
-
-        private void handler_TacticUsageChanged(object sender, EventArgs e = null)
-        {
-            groupPriority.Enabled = checkerTacticActivator.Checked;
-        }
-
-        private void handler_Priorities_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left
-                && ReferenceEquals(sender, listPriorities))
-            {
-                pointPrioritiesItem = new Point(e.X, e.Y);
-                selectedTargetPriorityInd = listPriorities.IndexFromPoint(pointPrioritiesItem);
-                if (selectedTargetPriorityInd >= 0)
-                    return;
-            }
-            pointPrioritiesItem = Point.Empty;
-            selectedTargetPriorityInd = -1;
-        }
-
-        private void handler_Priorities_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-                if (pointPrioritiesItem != Point.Empty
-                    && Math.Abs(e.Y - pointPrioritiesItem.Y) > SystemInformation.DragSize.Height)
-                    listPriorities.DoDragDrop(sender, DragDropEffects.Move);
-        }
-
-        private void handler_Priorities_DragOver(object sender, DragEventArgs e)
-        {
-            if (ReferenceEquals(sender, listPriorities))
-            {
-                pointPrioritiesItem = new Point(e.X, e.Y);
-                selectedTargetPriorityInd = listPriorities.IndexFromPoint(pointPrioritiesItem);
-                if (selectedTargetPriorityInd >= 0)
-                    listPriorities.SelectedIndex = selectedTargetPriorityInd;
-            }
-            e.Effect = DragDropEffects.Move;
-        }
-
-        private void handler_Priorities_DragDrop(object sender, DragEventArgs e)
-        {
-            if (ReferenceEquals(sender, listPriorities)
-                && selectedTargetPriorityInd >= 0)
-            {
-                Point newPoint = new Point(e.X, e.Y);
-                newPoint = listPriorities.PointToClient(newPoint);
-                int currentInd = listPriorities.IndexFromPoint(newPoint);
-                object item = listPriorities.Items[selectedTargetPriorityInd];
-                if (currentInd == -1)
-                {
-                    listPriorities.Items.RemoveAt(selectedTargetPriorityInd);
-                    listPriorities.Items.Add(item);
-                    ChangeWindowCaption();
-                }
-                else if (selectedTargetPriorityInd != currentInd)
-                {
-                    if (selectedTargetPriorityInd > currentInd)
-                    {
-                        listPriorities.Items.RemoveAt(selectedTargetPriorityInd);
-                        listPriorities.Items.Insert(currentInd + 1, item);
-                    }
-                    else
-                    {
-                        listPriorities.Items.RemoveAt(selectedTargetPriorityInd);
-                        listPriorities.Items.Insert(currentInd, item);
-                    }
-                    ChangeWindowCaption();
-                }
-                pointPrioritiesItem = Point.Empty;
-                selectedTargetPriorityInd = -1;
-            }
-        }
-
-        private void handler_SelectedPriorityChanged(object sender, EventArgs e)
-        {
-            selectedControl = listPriorities;
-            conditionCallback = null;
-            var obj = listPriorities.SelectedItem;
-            if (obj != null)
-            {
-                propertyGrid.SelectedObject = obj;
-                propertyCallback = () => listPriorities.Refresh();
-            }
-            else propertyCallback = null;
-        }
-
-        private void handler_PriorityAdd(object sender, EventArgs e = null)
-        {
-            // Добавляем объект TargetPriority
-            TargetPriorityEntry targetPriorityEntry = ChoosePriority.Show();
-            if (targetPriorityEntry != null)
-            {
-                var selectedPriorityInd = listPriorities.SelectedIndex;
-                if (selectedPriorityInd >= 0)
-                    listPriorities.Items.Insert(selectedPriorityInd + 1, targetPriorityEntry);
-                else listPriorities.Items.Add(targetPriorityEntry);
-
-                ChangeWindowCaption();
-            }
-        }
-
-        private void handler_PriorityDelete(object sender, EventArgs e = null)
-        {
-            // Удаляем объект TargetPriority
-            var selectedPriorityInd = listPriorities.SelectedIndex;
-            if (selectedPriorityInd >= 0)
-            {
-                listPriorities.Items.RemoveAt(selectedPriorityInd);
-                ChangeWindowCaption();
-            }
-        }
-
-        private void handler_PriorityShortCut(object sender, KeyEventArgs e)
-        {
-            if (ReferenceEquals(sender, listPriorities))
-            {
-                if (e.Control)
-                {
-                    if (e.KeyCode == Keys.C || e.KeyData == Keys.C)
-                    {
-                        if (listPriorities.SelectedItem is TargetPriorityEntry priorityEntry)
-                            targetPriorityCache = CopyHelper.CreateDeepCopy(priorityEntry);
-                    }
-                    else if (e.KeyCode == Keys.V || e.KeyData == Keys.V)
-                    {
-                        if (targetPriorityCache != null)
-                        {
-                            var targetPriorityEntry = CopyHelper.CreateDeepCopy(targetPriorityCache);
-                            var selectedPriorityInd = listPriorities.SelectedIndex;
-                            if (selectedPriorityInd >= 0)
-                                listPriorities.Items.Insert(selectedPriorityInd + 1, targetPriorityEntry);
-                            else listPriorities.Items.Add(targetPriorityEntry);
-
-                            ChangeWindowCaption();
-                        }
-                    }
-                    else if (e.KeyCode == Keys.Delete || e.KeyData == Keys.Delete)
-                    {
-                        handler_PriorityDelete(sender);
-                    } 
-                    return;
-                }
-                if (e.KeyCode == Keys.Insert || e.KeyData == Keys.Insert)
-                {
-                    handler_PriorityAdd(sender);
-                }
-            }
-        }
-        #endregion
 
 
 
@@ -895,11 +742,13 @@ namespace EntityCore.Forms
 
 
         #region Conditions
-        private void handler_ConditionAdd(object sender, EventArgs e = null)
+        private void handler_Condition_Add(object sender, EventArgs e = null)
         {
             // Добавление UCCCondition
             if (ItemSelectForm.GetAnInstance(out UCCCondition newCondition, false))
             {
+                propertyCallback?.Invoke();
+
                 if (newCondition.MakeTreeNode() is IUccTreeNode<UCCCondition> newTreeNode)
                 {
                     var selectedNode = treeConditions.SelectedNode;
@@ -908,7 +757,7 @@ namespace EntityCore.Forms
                         if (selectedNode is UccActionPackTreeNode actPackNode)
                             // Если выделенный узел является UccActionPackTreeNode
                             // добавляем новую команду в список его узлов
-                            actPackNode.Nodes.Add((TreeNode)newTreeNode);
+                            actPackNode.Nodes.Insert(0, (TreeNode)newTreeNode);
                         else
                         {
                             // добавляем новую команду после выделенного узла
@@ -929,12 +778,14 @@ namespace EntityCore.Forms
             }
         }
 
-        private void handler_ConditionDelete(object sender, EventArgs e = null)
+        private void handler_Condition_Delete(object sender, EventArgs e = null)
         {
             var conditionNode = treeConditions.SelectedNode;
 
             if (conditionNode != null)
             {
+                propertyCallback?.Invoke();
+
                 if (conditionNode is UccConditionPackTreeNode)
                 {
                     if (XtraMessageBox.Show("Confirm deleting of the ConditionPack",
@@ -945,20 +796,27 @@ namespace EntityCore.Forms
                 if (ReferenceEquals(propertyGrid.SelectedObject, conditionNode.Tag))
                     propertyCallback = null;
                 propertyGrid.SelectedObject = null;
-                conditionNode.Remove(); 
+                conditionNode.Remove();
+
+                ChangeWindowCaption();
             }
         }
 
-        private void handler_ConditionCopy(object sender, EventArgs e = null)
+        private void handler_Condition_Copy(object sender, EventArgs e = null)
         {
             if (treeConditions.SelectedNode?.Tag is UCCCondition uccCondition)
+            {
+                propertyCallback?.Invoke();
                 uccConditionCache = CopyHelper.CreateDeepCopy(uccCondition);
+            }
         }
 
-        private void handler_ConditionPaste(object sender, EventArgs e = null)
+        private void handler_Condition_Paste(object sender, EventArgs e = null)
         {
             if (uccConditionCache != null)
             {
+                propertyCallback?.Invoke();
+
                 // Добавляем UCC-команду
                 var newCondition = CopyHelper.CreateDeepCopy(uccConditionCache);
                 var newNode = newCondition.MakeTreeNode();
@@ -968,7 +826,7 @@ namespace EntityCore.Forms
                     if (selectedNode is UccConditionPackTreeNode conditionPackNode)
                         // Если выделенный узел является UccActionPackTreeNode
                         // добавляем новую команду в список его узлов
-                        conditionPackNode.Nodes.Add(newNode);
+                        conditionPackNode.Nodes.Insert(0, newNode);
                     else
                     {
                         // добавляем новую команду после выделенного узла
@@ -988,7 +846,7 @@ namespace EntityCore.Forms
             }
         }
 
-        private void handler_ConditionShortCut(object sender, KeyEventArgs e)
+        private void handler_Condition_ShortCut(object sender, KeyEventArgs e)
         {
             if (ReferenceEquals(sender, treeConditions))
             {
@@ -996,30 +854,33 @@ namespace EntityCore.Forms
                 {
                     if (e.KeyCode == Keys.C || e.KeyData == Keys.C)
                     {
-                        handler_ConditionCopy(sender);
+                        handler_Condition_Copy(sender);
                     }
                     else if (e.KeyCode == Keys.V || e.KeyData == Keys.V)
                     {
-                        handler_ConditionPaste(sender);
+                        handler_Condition_Paste(sender);
                     }
                     else if (e.KeyCode == Keys.Delete || e.KeyData == Keys.Delete)
                     {
-                        handler_ConditionDelete(sender);
+                        handler_Condition_Delete(sender);
                     } 
                     return;
                 }
 
                 if (e.KeyCode == Keys.Insert || e.KeyData == Keys.Insert)
                 {
-                    handler_ConditionAdd(sender);
+                    handler_Condition_Add(sender);
                 }
             }
         }
 
-        private void handler_ConditionTest(object sender, EventArgs e)
+        private void handler_Condition_Test(object sender, EventArgs e)
         {
             if (treeConditions?.SelectedNode?.Tag is UCCCondition uccCnd)
             {
+                conditionCallback?.Invoke();
+                propertyCallback?.Invoke();
+
                 UCCAction uccAction = selectedUccAction;
                 //if (documentGroup.SelectedDocument == docCombat)
                 //    uccAction = treeCombatActions.SelectedNode?.Tag as UCCAction;
@@ -1068,8 +929,11 @@ namespace EntityCore.Forms
                 "No ucc-condition selected.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void handler_ConditionTestAll(object sender, EventArgs e)
+        private void handler_Condition_TestAll(object sender, EventArgs e)
         {
+            conditionCallback?.Invoke();
+            propertyCallback?.Invoke();
+
             var nodes = treeConditions.Nodes;
             var nodeCount = nodes.Count;
             if (nodeCount == 0)
@@ -1170,18 +1034,21 @@ namespace EntityCore.Forms
 
 
         #region Action lists
-        private void handler_ActionAdd(object sender, EventArgs e = null)
+        private void handler_Action_Add(object sender, EventArgs e = null)
         {
             TreeView selectedTreeView;
-            if (ReferenceEquals(sender, treeCombatActions))
+            if (ReferenceEquals(sender, btnCombatAdd))
                 selectedTreeView = treeCombatActions;
-            else if (ReferenceEquals(sender, treePatrolActions))
+            else if (ReferenceEquals(sender, btnPatrolAdd))
                 selectedTreeView = treePatrolActions;
             else return;
             
             // Добавление UCCAction
             if (AddUccActionForm.GUIRequest(out UCCAction action))
             {
+                propertyCallback?.Invoke();
+                conditionCallback?.Invoke();
+
                 if (action.MakeTreeNode() is IUccActionTreeNode newTreeNode)
                 {
                     var selectedNode = selectedTreeView.SelectedNode;
@@ -1190,7 +1057,7 @@ namespace EntityCore.Forms
                         if (selectedNode is UccActionPackTreeNode actPackNode)
                             // Если выделенный узел является UccActionPackTreeNode
                             // добавляем новую команду в список его узлов
-                            actPackNode.Nodes.Add((TreeNode)newTreeNode);
+                            actPackNode.Nodes.Insert(0, (TreeNode)newTreeNode);
                         else
                         {
                             // добавляем новую команду после выделенного узла
@@ -1203,6 +1070,9 @@ namespace EntityCore.Forms
                     // добавляем новую команду в конец списка узлов дерева
                     else selectedTreeView.Nodes.Add((TreeNode)newTreeNode);
 
+
+                    propertyCallback?.Invoke();
+                    conditionCallback?.Invoke();
                     propertyGrid.SelectedObject = action;
                     propertyCallback = newTreeNode.UpdateView;
 
@@ -1211,12 +1081,12 @@ namespace EntityCore.Forms
             }
         }
 
-        private void handler_ActionDelete(object sender, EventArgs e = null)
+        private void handler_Action_Delete(object sender, EventArgs e = null)
         {
             TreeView selectedTreeView;
-            if (ReferenceEquals(sender, treeCombatActions))
+            if (ReferenceEquals(sender, btnCombatDelete))
                 selectedTreeView = treeCombatActions;
-            else if (ReferenceEquals(sender, treePatrolActions))
+            else if (ReferenceEquals(sender, btnPatrolDelete))
                 selectedTreeView = treePatrolActions;
             else return;
 
@@ -1236,29 +1106,45 @@ namespace EntityCore.Forms
                 treeConditions.Nodes.Clear();
                 selectedUccAction = null;
                 propertyGrid.SelectedObject = null;
-                actionNode.Remove(); 
+                actionNode.Remove();
+
+                ChangeWindowCaption();
             }
         }
 
-        private void handler_ActionCopy(object sender, EventArgs e = null)
-        {
-            if (sender is TreeView selectedTreeView
-                && selectedTreeView.SelectedNode?.Tag is UCCAction uccAction)
-                // Копируем ucc-команду
-                uccActionCache = uccAction.Clone();//CopyHelper.CreateDeepCopy(uccAction);
-        }
-
-        private void handler_ActionPaste(object sender, EventArgs e = null)
+        private void handler_Action_Copy(object sender, EventArgs e = null)
         {
             TreeView selectedTreeView;
-            if (ReferenceEquals(sender, treeCombatActions))
+            if (ReferenceEquals(sender, btnCombatCopy))
                 selectedTreeView = treeCombatActions;
-            else if (ReferenceEquals(sender, treePatrolActions))
+            else if (ReferenceEquals(sender, btnPatrolCopy))
+                selectedTreeView = treePatrolActions;
+            else return;
+
+            if (selectedTreeView.SelectedNode?.Tag is UCCAction uccAction)
+            {
+                conditionCallback?.Invoke();
+                propertyCallback?.Invoke();
+
+                // Копируем ucc-команду
+                uccActionCache = uccAction.Clone(); //CopyHelper.CreateDeepCopy(uccAction);
+            }
+        }
+
+        private void handler_Action_Paste(object sender, EventArgs e = null)
+        {
+            TreeView selectedTreeView;
+            if (ReferenceEquals(sender, btnCombatPaste))
+                selectedTreeView = treeCombatActions;
+            else if (ReferenceEquals(sender, btnPatrolPaste))
                 selectedTreeView = treePatrolActions;
             else return;
 
             if (uccActionCache != null)
             {
+                conditionCallback?.Invoke();
+                propertyCallback?.Invoke();
+
                 // Добавляем UCC-команду
                 var newAction = uccActionCache.Clone();//CopyHelper.CreateDeepCopy(uccActionCache);
                 var newNode = newAction.MakeTreeNode();
@@ -1268,7 +1154,7 @@ namespace EntityCore.Forms
                     if (selectedNode is UccActionPackTreeNode actPackNode)
                         // Если выделенный узел является UccActionPackTreeNode
                         // добавляем новую команду в список его узлов
-                        actPackNode.Nodes.Add(newNode);
+                        actPackNode.Nodes.Insert(0, newNode);
                     else
                     {
                         // добавляем новую команду после выделенного узла
@@ -1288,43 +1174,233 @@ namespace EntityCore.Forms
             }
         }
 
-        private void handler_ActionShortCut(object sender, KeyEventArgs e)
+        private void handler_CombatAction_ShortCut(object sender, KeyEventArgs e)
         {
-            if (!ReferenceEquals(sender, treeCombatActions)
-                && !ReferenceEquals(sender, treePatrolActions))
-                return;
-
             if (e.Control)
             {
                 if (e.KeyCode == Keys.C || e.KeyData == Keys.C)
                 {
-                    handler_ActionCopy(sender);
+                    handler_Action_Copy(btnCombatCopy);
                 }
                 else if (e.KeyCode == Keys.V || e.KeyData == Keys.V)
                 {
-                    handler_ActionPaste(sender);
+                    handler_Action_Paste(btnCombatPaste);
                 }
                 else if (e.KeyCode == Keys.Delete || e.KeyData == Keys.Delete)
                 {
-                    handler_ActionDelete(sender);
+                    handler_Action_Delete(btnCombatDelete);
                 }
             }
+
             if (e.KeyCode == Keys.Insert || e.KeyData == Keys.Insert)
             {
-                handler_ActionAdd(sender);
+                handler_Action_Add(btnCombatAdd);
             }
         }
 
-        private void handler_ActionTest(object sender, EventArgs e)
+        private void handler_PatrolAction_ShortCut(object sender, KeyEventArgs e)
         {
-            XtraMessageBox.Show(
-                "Not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (e.Control)
+            {
+                if (e.KeyCode == Keys.C || e.KeyData == Keys.C)
+                {
+                    handler_Action_Copy(btnPatrolCopy);
+                }
+                else if (e.KeyCode == Keys.V || e.KeyData == Keys.V)
+                {
+                    handler_Action_Paste(btnPatrolPaste);
+                }
+                else if (e.KeyCode == Keys.Delete || e.KeyData == Keys.Delete)
+                {
+                    handler_Action_Delete(btnPatrolDelete);
+                }
+            }
+
+            if (e.KeyCode == Keys.Insert || e.KeyData == Keys.Insert)
+            {
+                handler_Action_Add(btnPatrolAdd);
+            }
         }
 
-        private void handler_AcionTestAll(object sender, EventArgs e)
+        private void handler_Action_Test(object sender, EventArgs e)
         {
             XtraMessageBox.Show(
                 "Not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            conditionCallback?.Invoke();
+            propertyCallback?.Invoke();
+        }
+
+        private void handler_ActionTestAll(object sender, EventArgs e)
+        {
+            XtraMessageBox.Show(
+                "Not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            conditionCallback?.Invoke();
+            propertyCallback?.Invoke();
+
+        }
+        #endregion
+
+
+
+        #region List of Priorities
+        private int selectedTargetPriorityInd;
+        private Point pointPrioritiesItem;
+
+        private void handler_TacticUsageChanged(object sender, EventArgs e = null)
+        {
+            groupPriority.Enabled = checkerTacticActivator.Checked;
+        }
+
+        private void handler_Priorities_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left
+                && ReferenceEquals(sender, listPriorities))
+            {
+                pointPrioritiesItem = new Point(e.X, e.Y);
+                selectedTargetPriorityInd = listPriorities.IndexFromPoint(pointPrioritiesItem);
+                if (selectedTargetPriorityInd >= 0)
+                    return;
+            }
+            pointPrioritiesItem = Point.Empty;
+            selectedTargetPriorityInd = -1;
+        }
+
+        private void handler_Priorities_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left
+                && pointPrioritiesItem != Point.Empty
+                && Math.Abs(e.Y - pointPrioritiesItem.Y) > SystemInformation.DragSize.Height)
+            {
+                propertyCallback?.Invoke();
+
+                listPriorities.DoDragDrop(sender, DragDropEffects.Move);
+            }
+        }
+
+        private void handler_Priorities_DragOver(object sender, DragEventArgs e)
+        {
+            if (ReferenceEquals(sender, listPriorities))
+            {
+                pointPrioritiesItem = new Point(e.X, e.Y);
+                selectedTargetPriorityInd = listPriorities.IndexFromPoint(pointPrioritiesItem);
+                if (selectedTargetPriorityInd >= 0)
+                    listPriorities.SelectedIndex = selectedTargetPriorityInd;
+            }
+            e.Effect = DragDropEffects.Move;
+        }
+
+        private void handler_Priorities_DragDrop(object sender, DragEventArgs e)
+        {
+            if (ReferenceEquals(sender, listPriorities)
+                && selectedTargetPriorityInd >= 0)
+            {
+                Point newPoint = new Point(e.X, e.Y);
+                newPoint = listPriorities.PointToClient(newPoint);
+                int currentInd = listPriorities.IndexFromPoint(newPoint);
+                object item = listPriorities.Items[selectedTargetPriorityInd];
+                if (currentInd == -1)
+                {
+                    listPriorities.Items.RemoveAt(selectedTargetPriorityInd);
+                    listPriorities.Items.Add(item);
+                    ChangeWindowCaption();
+                }
+                else if (selectedTargetPriorityInd != currentInd)
+                {
+                    if (selectedTargetPriorityInd > currentInd)
+                    {
+                        listPriorities.Items.RemoveAt(selectedTargetPriorityInd);
+                        listPriorities.Items.Insert(currentInd + 1, item);
+                    }
+                    else
+                    {
+                        listPriorities.Items.RemoveAt(selectedTargetPriorityInd);
+                        listPriorities.Items.Insert(currentInd, item);
+                    }
+                    ChangeWindowCaption();
+                }
+                pointPrioritiesItem = Point.Empty;
+                selectedTargetPriorityInd = -1;
+            }
+        }
+
+        private void handler_SelectedPriorityChanged(object sender, EventArgs e)
+        {
+            propertyCallback?.Invoke();
+
+            selectedControl = listPriorities;
+            conditionCallback = null;
+            var obj = listPriorities.SelectedItem;
+            if (obj != null)
+            {
+                propertyGrid.SelectedObject = obj;
+                propertyCallback = () => listPriorities.Refresh();
+            }
+            else propertyCallback = null;
+        }
+
+        private void handler_PriorityAdd(object sender, EventArgs e = null)
+        {
+            // Добавляем объект TargetPriority
+            TargetPriorityEntry targetPriorityEntry = ChoosePriority.Show();
+            if (targetPriorityEntry != null)
+            {
+                propertyCallback?.Invoke();
+
+                var selectedPriorityInd = listPriorities.SelectedIndex;
+                if (selectedPriorityInd >= 0)
+                    listPriorities.Items.Insert(selectedPriorityInd + 1, targetPriorityEntry);
+                else listPriorities.Items.Add(targetPriorityEntry);
+
+                ChangeWindowCaption();
+            }
+        }
+
+        private void handler_PriorityDelete(object sender, EventArgs e = null)
+        {
+            // Удаляем объект TargetPriority
+            var selectedPriorityInd = listPriorities.SelectedIndex;
+            if (selectedPriorityInd >= 0)
+            {
+                listPriorities.Items.RemoveAt(selectedPriorityInd);
+                ChangeWindowCaption();
+            }
+        }
+
+        private void handler_PriorityShortCut(object sender, KeyEventArgs e)
+        {
+            if (ReferenceEquals(sender, listPriorities))
+            {
+                if (e.Control)
+                {
+                    if (e.KeyCode == Keys.C || e.KeyData == Keys.C)
+                    {
+                        if (listPriorities.SelectedItem is TargetPriorityEntry priorityEntry)
+                            targetPriorityCache = CopyHelper.CreateDeepCopy(priorityEntry);
+                    }
+                    else if (e.KeyCode == Keys.V || e.KeyData == Keys.V)
+                    {
+                        if (targetPriorityCache != null)
+                        {
+                            var targetPriorityEntry = CopyHelper.CreateDeepCopy(targetPriorityCache);
+                            var selectedPriorityInd = listPriorities.SelectedIndex;
+                            if (selectedPriorityInd >= 0)
+                                listPriorities.Items.Insert(selectedPriorityInd + 1, targetPriorityEntry);
+                            else listPriorities.Items.Add(targetPriorityEntry);
+
+                            ChangeWindowCaption();
+                        }
+                    }
+                    else if (e.KeyCode == Keys.Delete || e.KeyData == Keys.Delete)
+                    {
+                        handler_PriorityDelete(sender);
+                    }
+                    return;
+                }
+                if (e.KeyCode == Keys.Insert || e.KeyData == Keys.Insert)
+                {
+                    handler_PriorityAdd(sender);
+                }
+            }
         }
         #endregion
     }

@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{FD0C9E2A-5D26-43AA-A227-BDDAF9C30705}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>AcTp0Tools</RootNamespace>
+    <RootNamespace>ACTP0Tools</RootNamespace>
     <AssemblyName>AMClient</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -95,6 +95,7 @@
     </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <AppDesigner Include="Properties\" />
@@ -107,6 +108,13 @@
     <Compile Include="Classes\Credentials\CredAccountExt.cs" />
     <Compile Include="Classes\Credentials\CredentialsExt.cs" />
     <Compile Include="Classes\Enums.cs" />
+    <Compile Include="Classes\Quester\ActiveProfileProxy.cs" />
+    <Compile Include="Classes\Quester\QuesterProfileProxy.cs" />
+    <Compile Include="Classes\SortableBindingList.cs" />
+    <Compile Include="Classes\TypeDescriptorTools\PropertyOverridingTypeDescriptor.cs" />
+    <Compile Include="Classes\TypeDescriptorTools\TypeDescriptorHelper.cs" />
+    <Compile Include="Classes\TypeDescriptorTools\TypeDescriptorOverridingProvider.cs" />
+    <Compile Include="Classes\TypeDescriptorTools\ViewModel.cs" />
     <Compile Include="Harmony\Extras\DelegateTypeFactory.cs" />
     <Compile Include="Harmony\Extras\FastAccess.cs" />
     <Compile Include="Harmony\Extras\MethodInvoker.cs" />
@@ -127,7 +135,7 @@
     <Compile Include="Harmony\Internal\PatchSorter.cs" />
     <Compile Include="Harmony\Internal\PatchTools.cs" />
     <Compile Include="Harmony\Internal\StructReturnBufferCheck.cs" />
-    <Compile Include="Patches\Astr0Patcher.cs" />
+    <Compile Include="Patches\ACTP0Patcher.cs" />
     <Compile Include="Patches\Astral.Quester.Classes.Conditions.QuestInfo.ToString.cs" />
     <Compile Include="Patches\Astral.Functions.XmlSerializer.GetExtraTypes.cs" />
     <Compile Include="Patches\Astral.Core.Before3DDraw.cs" />

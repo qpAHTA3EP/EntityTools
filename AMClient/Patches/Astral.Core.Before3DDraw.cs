@@ -2,12 +2,12 @@
 using System.Globalization;
 using System.Reflection;
 using System.Text;
-using AcTp0Tools.Reflection;
+using ACTP0Tools.Reflection;
 using Astral;
 using Astral.Classes;
 using HarmonyLib;
 
-namespace AcTp0Tools.Patches
+namespace ACTP0Tools.Patches
 {
     /// <summary>
     /// Попытка перехватить исключение <see cref="NullReferenceException "/> в 
@@ -95,9 +95,9 @@ namespace AcTp0Tools.Patches
                 //unPatch = () =>
                 //{
                 //    Logger.WriteLine(Logger.LogType.Debug, $@"Unpatch '{nameof(Astral_Core_Before3DDraw)}'");
-                //    AcTp0Patcher.Harmony.Unpatch(original_Before3DDraw, finalizer);
+                //    ACTP0Patcher.Harmony.Unpatch(original_Before3DDraw, finalizer);
                 //};
-                AcTp0Patcher.Harmony.Patch(original_Before3DDraw, null, null, null, harPatch);
+                ACTP0Patcher.Harmony.Patch(original_Before3DDraw, null, null, null, harPatch);
                 Logger.WriteLine(Logger.LogType.Debug, $@"Patch '{nameof(Astral_Core_Before3DDraw)}' succeeded.");
             }
             catch (Exception e)

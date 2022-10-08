@@ -1,6 +1,4 @@
-﻿using AcTp0Tools.Patches;
-using AcTp0Tools.Reflection;
-using AStar;
+﻿using AStar;
 using Astral;
 using Astral.Addons;
 using Astral.Logic.Classes.Map;
@@ -8,9 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Reflection;
+using ACTP0Tools.Patches;
+using ACTP0Tools.Reflection;
 
 // ReSharper disable once CheckNamespace
-namespace AcTp0Tools
+namespace ACTP0Tools
 {
     /// <summary>
     /// Доступ к закрытым членам и методам Astral'a
@@ -414,7 +414,7 @@ namespace AcTp0Tools
                 private static readonly List<Assembly> emptyAssemblyList = new List<Assembly>();
 
                 public static IEnumerable<Type> UccTargetSelectors =>
-                    Astral_Functions_XmlSerializer_GetExtraTypes.UccTargetSelectorTypes;
+                    ACTP0Serializer.UccTargetSelectorTypes;
 
                 //static Func<List<Type>> getTypes = typeof(Plugins).GetStaticFunction<List<Type>>("GetTypes");
 

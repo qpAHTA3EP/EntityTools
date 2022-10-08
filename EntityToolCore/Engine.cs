@@ -1,4 +1,4 @@
-﻿using AcTp0Tools;
+﻿using ACTP0Tools;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
@@ -27,10 +27,16 @@ using MyNW.Classes;
 using MyNW.Internals;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing.Design;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using ACTP0Tools.Classes.TypeDescriptorTools;
+using ACTP0Tools.Patches;
 using Astral.Quester.Classes;
+using EntityCore.PropertyEditors;
+using EntityTools.Tools.CustomRegions;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 using UCCConditionList = System.Collections.ObjectModel.ObservableCollection<Astral.Logic.UCC.Classes.UCCCondition>;
@@ -51,7 +57,6 @@ namespace EntityCore
         {
             if (!isValid)
                 throw new ReflectionTypeLoadException(new []{typeof(IEntityToolsCore) }, new Exception[] { null });
-
             AstralAccessors.Quester.Core.OnProfileChanged += ResetQuesterCache;
             ETLogger.WriteLine("EntityToolsCore loaded");
         }
@@ -232,7 +237,6 @@ namespace EntityCore
             return false;
         }
 
-#if true
         public bool TryGet<T>(ref T obj, params object[] args) where T : class
         {
 
@@ -243,7 +247,6 @@ namespace EntityCore
             }
             return false;
         } 
-#endif
         public object Get(Type type, params object[] args)
         {
             if (type == typeof(IPowerCache))
@@ -422,16 +425,6 @@ namespace EntityCore
                 Entity betterEntityToInteract = Interact.GetBetterEntityToInteract();
                 if (betterEntityToInteract.IsValid)
                 {
-#if false
-                    entity = new NPCInfos()
-                    {
-                        CostumeName = betterEntityToInteract.CostumeRef.CostumeName,
-                        DisplayName = betterEntityToInteract.Name,
-                        Position = betterEntityToInteract.Location.Clone(),
-                        MapName = EntityManager.LocalPlayer.MapState.MapName,
-                        RegionName = EntityManager.LocalPlayer.RegionInternalName
-                    }; 
-#endif
                     entity = betterEntityToInteract;
                     return true;
                 }
@@ -460,11 +453,12 @@ namespace EntityCore
             {
                 case Profil uccProfile:
                     return UccEditor.Edit(uccProfile, param);
+                case Profile questerProfile:
+                    return QuesterEditor.Edit(questerProfile, param);
                 default:
                     return false;
             }
         }
-
         #endregion
 
         public string EntityDiagnosticInfos(object obj)

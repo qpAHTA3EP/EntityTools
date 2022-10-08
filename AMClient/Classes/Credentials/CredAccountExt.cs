@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AcTp0Tools.Classes.Credentials
+namespace ACTP0Tools.Classes.Credentials
 {
     public class CredAccountExt : Astral.Functions.CredAccount
     {

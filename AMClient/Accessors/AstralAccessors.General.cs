@@ -1,8 +1,8 @@
-﻿using AcTp0Tools.Reflection;
+﻿using ACTP0Tools.Reflection;
 using Astral;
 using Astral.Functions;
 
-namespace AcTp0Tools
+namespace ACTP0Tools
 {
     public static partial class AstralAccessors
     {

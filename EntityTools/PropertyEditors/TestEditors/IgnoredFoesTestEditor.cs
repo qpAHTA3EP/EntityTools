@@ -1,13 +1,13 @@
 ﻿using DevExpress.XtraEditors;
 using EntityTools.Quester.Actions;
-using AcTp0Tools.Reflection;
+using ACTP0Tools.Reflection;
 using EntityTools.Tools.Combats.IgnoredFoes;
 using EntityTools.Tools.Extensions;
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Text;
-using AcTp0Tools;
+using ACTP0Tools;
 
 namespace EntityTools.Editors
 {

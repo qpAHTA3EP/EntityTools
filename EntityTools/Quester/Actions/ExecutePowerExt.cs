@@ -13,6 +13,7 @@ using System.Threading;
 using System.Xml.Serialization;
 using Astral.Quester.Forms;
 using Astral.Quester.UIEditors;
+using EntityTools.PropertyEditors;
 using EntityTools.Tools.Classes;
 using EntityTools.Tools.CustomRegions;
 using Action = Astral.Quester.Classes.Action;

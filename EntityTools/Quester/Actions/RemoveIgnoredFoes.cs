@@ -10,11 +10,11 @@ using EntityTools.Core.Interfaces;
 using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
-using AcTp0Tools.Reflection;
+using ACTP0Tools.Reflection;
 using EntityTools.Tools.Combats.IgnoredFoes;
 using MyNW.Classes;
 using Action = Astral.Quester.Classes.Action;
-using AcTp0Tools;
+using ACTP0Tools;
 
 namespace EntityTools.Quester.Actions
 {

@@ -2,12 +2,10 @@
 using EntityTools.Tools.CustomRegions;
 using MyNW.Classes;
 using System.Collections.Generic;
-using System.Windows.Forms;
-using System.Linq;
 
 namespace EntityTools.Extensions
 {
-    public static class CustomRegionExtentions
+    public static class CustomRegionExtensions
     {
         /// <summary>
         /// Проверка нахождения объекта <paramref name="position"/> в границах региона <paramref name="region"/>
@@ -122,7 +120,7 @@ namespace EntityTools.Extensions
 
             CustomRegion cReg = Astral.Quester.API.CurrentProfile.CustomRegions.Find(cr => cr.Name == customRegionName);
 
-            return cReg != null || IsInCustomRegion(entity, cReg);
+            return cReg != null && IsInCustomRegion(entity, cReg);
         }
         public static bool IsInCustomRegion(Vector3 position, string customRegionName)
         {
@@ -131,14 +129,14 @@ namespace EntityTools.Extensions
 
             CustomRegion cReg = Astral.Quester.API.CurrentProfile.CustomRegions.Find(cr => cr.Name == customRegionName);
 
-            return cReg != null || IsInCustomRegion(position, cReg);
+            return cReg != null && IsInCustomRegion(position, cReg);
         }
         public static List<CustomRegion> GetCustomRegions(List<string> names)
         {
             if (names != null && names.Count > 0)
-                return Astral.Quester.API.CurrentProfile.CustomRegions.FindAll((CustomRegion cr) =>
-                                        names.Exists((string regName) => regName == cr.Name));
-            else return null;
+                return Astral.Quester.API.CurrentProfile.CustomRegions.FindAll(cr =>
+                                        names.Exists(regName => regName == cr.Name));
+            return null;
         }
 
         /// <summary>

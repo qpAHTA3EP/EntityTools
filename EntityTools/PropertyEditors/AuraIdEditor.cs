@@ -1,21 +1,19 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using EntityTools.Forms;
-using EntityTools.Tools.CustomRegions;
 
 namespace EntityTools.Editors
 {
 #if DEVELOPER
-    class CustomRegionCollectionEditor : UITypeEditor
+    public class AuraIdEditor : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            var crCollection = value as CustomRegionCollection;
-            if (CustomRegionCollectionEditorForm.GUIRequiest(ref crCollection))
-            {
-                return crCollection;
-            }
+            string auraId = value?.ToString();
+            if (EntityTools.Core.UserRequest_SelectAuraId(ref auraId) &&
+                !string.IsNullOrEmpty(auraId))
+                return auraId;
+
             return value;
         }
 

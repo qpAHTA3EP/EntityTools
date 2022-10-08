@@ -67,7 +67,7 @@ namespace EntityTools.Patches
                 try
                 {
 #if true
-                    AcTp0Tools.Patches.AcTp0Patcher.Harmony.PatchAll();
+                    ACTP0Tools.Patches.ACTP0Patcher.Harmony.PatchAll();
 #else
                     var harmony = new HarmonyLib.Harmony(nameof(EntityTools));
                     harmony.PatchAll(); 

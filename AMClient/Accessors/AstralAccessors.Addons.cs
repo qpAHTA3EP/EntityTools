@@ -1,8 +1,8 @@
 ﻿using System;
-using AcTp0Tools.Reflection;
+using ACTP0Tools.Reflection;
 using Astral.Logic.Classes.Map;
 
-namespace AcTp0Tools
+namespace ACTP0Tools
 {
     /// <summary>
     /// Доступ к закрытым членам и методам Astral'a

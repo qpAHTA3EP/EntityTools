@@ -29,6 +29,7 @@ namespace EntityTools.Tools
 
         public static readonly string SettingsFile = Path.Combine(Directories.SettingsPath, nameof(EntityTools), nameof(EntityTools) + ".xml");
         public static readonly string UccEditorSettingsFile = Path.Combine(Directories.SettingsPath, nameof(EntityTools), "UccEditor.xml");
+        public static readonly string QuesterEditorSettingsFile = Path.Combine(Directories.SettingsPath, nameof(EntityTools), "QuesterEditor.xml");
 
         public static string ReplaceMask(string str)
         {

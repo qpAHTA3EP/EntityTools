@@ -23,7 +23,7 @@ namespace EntityTools.Patches
 
             try
             {
-                tAuraDetector = AcTp0Tools.Reflection.ReflectionHelper.GetTypeByName("\u0003.\u0004", true);
+                tAuraDetector = ACTP0Tools.Reflection.ReflectionHelper.GetTypeByName("\u0003.\u0004", true);
 
                 if (tAuraDetector is null)
                 {
@@ -56,7 +56,7 @@ namespace EntityTools.Patches
                     return;
                 }
 
-                AcTp0Tools.Patches.AcTp0Patcher.Harmony.Patch(original_AuraDetector_GetAura, new HarmonyMethod(prefix_AuraDetector_GetAura));
+                ACTP0Tools.Patches.ACTP0Patcher.Harmony.Patch(original_AuraDetector_GetAura, new HarmonyMethod(prefix_AuraDetector_GetAura));
 
                 ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' succeeded", true);
             }
