@@ -7,12 +7,85 @@ using QuesterAction = Astral.Quester.Classes.Action;
 
 namespace ACTP0Tools.Classes.Quester
 {
+    /// <summary>
+    /// Синглтон прокси-объекта, опосредующего доступ к активному загруженному профилю Quester'a: <br/>
+    /// <see cref="AstralAccessors.Quester.Core.Profile"/>
+    /// </summary>
     public class ActiveProfileProxy : QuesterProfileProxy, INotifyPropertyChanged
     {
-        [Browsable(false)]
-        public override Profile Profile => AstralAccessors.Quester.Core.Profile;
+        // ReSharper disable once InconsistentNaming
+        private static readonly ActiveProfileProxy @this = new ActiveProfileProxy();
+        
+        private ActiveProfileProxy(){}
+
+        public static ActiveProfileProxy Get() => @this;
 
         [Browsable(false)]
+        public override Profile GetProfile()
+        {
+            ReconstructProfile();
+            return AstralAccessors.Quester.Core.Profile;
+        }
+        public override void SetProfile(Profile _, string __)
+        {
+            var profile = AstralAccessors.Quester.Core.Profile;
+            if (profile != null)
+            {
+                if (_customRegions != null)
+                {
+                    _customRegions.ListChanged -= CustomRegions_Changed;
+                    _customRegions.Clear();
+                    foreach (var cr in profile.CustomRegions)
+                        _customRegions.Add(cr);
+                    _customRegions.ListChanged += CustomRegions_Changed;
+                    OnPropertyChanged(nameof(CustomRegions));
+                }
+
+                if (_blackList != null)
+                {
+                    _blackList.ListChanged -= BlackList_Changed;
+                    _blackList.Clear();
+                    foreach (var bl in profile.BlackList)
+                        _blackList.Add(bl);
+                    _blackList.ListChanged += BlackList_Changed;
+                    OnPropertyChanged(nameof(BlackList));
+
+                }
+
+                if (_vendors != null)
+                {
+                    _vendors.ListChanged -= Vendors_Changed;
+                    _vendors.Clear();
+                    foreach (var vendor in profile.Vendors)
+                        _vendors.AddUnique(vendor);
+                    OnPropertyChanged(nameof(Vendors));
+                    _vendors.ListChanged += Vendors_Changed;
+                }
+            }
+            OnPropertyChanged(nameof(Actions));
+            OnPropertyChanged(nameof(FileName));
+            OnPropertyChanged(nameof(MapsMeshes));
+            OnPropertyChanged(nameof(CurrentProfileZipMeshFile));
+            OnPropertyChanged(nameof(CurrentMesh));
+            OnPropertyChanged(nameof(KillRadius));
+            OnPropertyChanged(nameof(UseExternalMeshFile));
+            OnPropertyChanged(nameof(ExternalMeshFileName));
+            OnPropertyChanged(nameof(DisablePet));
+            OnPropertyChanged(nameof(FollowerDistance));
+            OnPropertyChanged(nameof(DisableFollow));
+            OnPropertyChanged(nameof(AssociateMissionsDefault));
+
+            _customRegionsChangeNum = 0;
+            _vendorsChangeNum = 0;
+            _blackListChangeNum = 0;
+        }
+
+#if DEBUG
+        [Browsable(true)]
+        [Category("File")]
+#else
+        [Browsable(false)] 
+#endif
         public override string FileName
         {
             get => Astral.API.CurrentSettings.LastQuesterProfile;
@@ -23,7 +96,12 @@ namespace ACTP0Tools.Classes.Quester
             }
         }
 
-        [Browsable(false)]
+#if DEBUG
+        [Browsable(true)]
+        [Category("File")]
+#else
+        [Browsable(false)] 
+#endif
         public override bool Saved
         {
             get => AstralAccessors.Quester.Core.Profile.Saved;
@@ -49,7 +127,12 @@ namespace ACTP0Tools.Classes.Quester
         /// <summary>
         /// Имя файла, в котором хранятся файлы путевых графов
         /// </summary>
-        [Browsable(false)]
+#if DEBUG
+        [Browsable(true)]
+        [Category("File")]
+#else
+        [Browsable(false)] 
+#endif
         public override string CurrentProfileZipMeshFile => AstralAccessors.Quester.Core.CurrentProfileZipMeshFile;
 
         /// <summary>
@@ -248,16 +331,18 @@ namespace ACTP0Tools.Classes.Quester
         /// </summary>
         public override void Save()
         {
-            if (_customRegions != null && _customRegionsChangeNum > 0)
-                AstralAccessors.Quester.Core.Profile.CustomRegions = _customRegions.ToList();
-            if (_blackList != null && _blackListChangeNum > 0)
-                AstralAccessors.Quester.Core.Profile.BlackList = _blackList.ToList();
-            if (_vendors != null && _vendorsChangeNum > 0)
-                AstralAccessors.Quester.Core.Profile.Vendors = _vendors.ToList();
+            ReconstructProfile();
 
+            string externalMeshes = ExternalMeshFileName;
             AstralAccessors.Quester.Core.Save();
             _customRegionsChangeNum = 0;
+            _vendorsChangeNum = 0;
             _blackListChangeNum = 0;
+            if (UseExternalMeshFile
+                && externalMeshes != ExternalMeshFileName)
+            {
+                OnPropertyChanged(nameof(ExternalMeshFileName));
+            }
         }
 
         /// <summary>
@@ -265,16 +350,28 @@ namespace ACTP0Tools.Classes.Quester
         /// </summary>
         public override void SaveAs()
         {
+            ReconstructProfile();
+
+            string externalMeshes = ExternalMeshFileName;
+            AstralAccessors.Quester.Core.Save(true);
+            if (UseExternalMeshFile
+                && externalMeshes != ExternalMeshFileName)
+            {
+                OnPropertyChanged(nameof(ExternalMeshFileName));
+            }
+            _customRegionsChangeNum = 0;
+            _vendorsChangeNum = 0;
+            _blackListChangeNum = 0;
+        }
+
+        private void ReconstructProfile()
+        {
             if (_customRegions != null && _customRegionsChangeNum > 0)
                 AstralAccessors.Quester.Core.Profile.CustomRegions = _customRegions.ToList();
             if (_blackList != null && _blackListChangeNum > 0)
                 AstralAccessors.Quester.Core.Profile.BlackList = _blackList.ToList();
             if (_vendors != null && _vendorsChangeNum > 0)
                 AstralAccessors.Quester.Core.Profile.Vendors = _vendors.ToList();
-
-            AstralAccessors.Quester.Core.Save(true);
-            _customRegionsChangeNum = 0;
-            _blackListChangeNum = 0;
         }
     }
 }

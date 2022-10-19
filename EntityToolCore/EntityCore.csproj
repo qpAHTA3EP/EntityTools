@@ -270,17 +270,23 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Editors\RelativeMeshesFilePathEditor.cs" />
     <Compile Include="Quester\Action\ExecutePowerEngine.cs" />
     <Compile Include="Quester\Action\MoveToTeammateEngine.cs" />
     <Compile Include="Quester\Action\MoveToEntityEngine.cs" />
     <Compile Include="Quester\Action\TurnInMissionEngine.cs" />
     <Compile Include="Quester\Classes\IActionTreeNode.cs" />
+    <Compile Include="Quester\Classes\IQuesterAction.cs" />
+    <Compile Include="Quester\Classes\IQuesterCondition.cs" />
+    <Compile Include="Quester\Classes\ConditionBaseTreeNode.cs" />
+    <Compile Include="Quester\Classes\IsInCustomRegionMetadataType.cs" />
     <Compile Include="Quester\Classes\ITreeNode.cs" />
     <Compile Include="Quester\Classes\ActionPackTreeNode.cs" />
     <Compile Include="Quester\Classes\ActionTreeNode.cs" />
     <Compile Include="Quester\Classes\ConditionPackTreeNode.cs" />
     <Compile Include="Quester\Classes\ConditionTreeNode.cs" />
     <Compile Include="Quester\Classes\ProfileProxy.cs" />
+    <Compile Include="Quester\Classes\PushProfileToStackAndLoadMetadataType.cs" />
     <Compile Include="Quester\Conditions\CheckGameGUIEngine.cs" />
     <Compile Include="Quester\Conditions\EntityDistanceEngine.cs" />
     <Compile Include="Quester\Conditions\TeamMembersCountEngine.cs" />
@@ -322,7 +328,6 @@
     <Compile Include="UCC\Conditions\CheckPowerStateEngine.cs" />
     <Compile Include="UCC\Conditions\UCCTargetMatchEntityEngine.cs" />
     <Compile Include="UCC\Conditions\UCCEntityCheckEngine.cs" />
-    <Compile Include="PropertyEditors\CustomRegionSetEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\AuraViewer.resx">
@@ -478,6 +483,7 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Engine.tt.cs</LastGenOutput>
     </Content>
+    <None Include="Resources\miniRoad.png" />
     <None Include="Resources\miniCube.png" />
     <None Include="Resources\miniNewFile.png" />
     <None Include="Resources\miniSaveas.png" />

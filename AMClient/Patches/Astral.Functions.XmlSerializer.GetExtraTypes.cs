@@ -24,7 +24,6 @@ namespace ACTP0Tools.Patches
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static class ACTP0Serializer
     {
-
         public static List<Type> UccTypes
         {
             get
@@ -78,7 +77,10 @@ namespace ACTP0Tools.Patches
         }
         private static readonly List<Type> _uccTargetSelectorTypes = new List<Type>(4);
 
-        public static Type QuesterConditionPack;
+        public static Type QuesterConditionPack => _questerConditionPack;
+        private static Type _questerConditionPack;
+        public static Type PushProfileToStackAndLoad => _pushProfileToStackAndLoad;
+        private static Type _pushProfileToStackAndLoad;
 
         internal static Type Before3DDraw_Wrapper;
 
@@ -274,7 +276,9 @@ namespace ACTP0Tools.Patches
                 }
 
                 if (type.FullName == "QuesterAssistant.Conditions.ConditionPack")
-                    QuesterConditionPack = type;
+                    _questerConditionPack = type;
+                if (type.FullName == "QuesterAssistant.Actions.PushProfileToStackAndLoad")
+                    _pushProfileToStackAndLoad = type;
             }
         }
 

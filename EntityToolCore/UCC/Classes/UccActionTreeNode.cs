@@ -119,7 +119,7 @@ namespace EntityCore.UCC.Classes
         {
             if (Tag is UCCAction action)
             {
-                if(_conditionTreeNodes?.Length > 0)
+                if(_conditionTreeNodes != null)
                     action.Conditions = _conditionTreeNodes.ToUccConditionList();
                 return action;
             }
@@ -137,7 +137,9 @@ namespace EntityCore.UCC.Classes
         /// </summary>
         public TreeNode[] ConditionTreeNodes
         {
-            get => _conditionTreeNodes ?? (_conditionTreeNodes = ReconstructInternal().Conditions.ToTreeNodes().ToArray()); set => _conditionTreeNodes = value; }
+            get => _conditionTreeNodes ?? (_conditionTreeNodes = ReconstructInternal().Conditions.ToTreeNodes().ToArray()); 
+            set => _conditionTreeNodes = value;
+        }
         private TreeNode[] _conditionTreeNodes;
     }
 }

@@ -2,30 +2,36 @@
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Windows.Forms;
+using ACTP0Tools.Classes.Quester;
 using ACTP0Tools.Reflection;
-using EntityCore.Forms;
 using EntityTools.Forms;
 using EntityTools.Tools.CustomRegions;
 
-namespace EntityCore.PropertyEditors
+namespace EntityTools.Editors
 {
 #if DEVELOPER
-    class CustomRegionSetEditor : UITypeEditor
+    class CustomRegionCollectionEditor : UITypeEditor
     {
         private PropertyAccessor<PropertyGrid> pgAccessor;
+        private PropertyAccessor<QuesterProfileProxy> profileProxyAccessor;
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            //((PropertyGrid)((System.Windows.Forms.PropertyGridInternal.PropertyDescriptorGridEntry)context).OwnerGrid).ParentForm
             if (value is CustomRegionCollection crCollection)
             {
-                
+
                 if (pgAccessor is null)
                     pgAccessor = context.GetProperty<PropertyGrid>("OwnerGrid");
 
-                if (pgAccessor.IsValid
-                    && pgAccessor.Value?.ParentForm is QuesterEditor qeForm)
+                if (pgAccessor.IsValid)
                 {
-                    crCollection.DebugContext = qeForm.Profile;
+                    var parentForm = pgAccessor.Value?.ParentForm;
+                    if (parentForm != null)
+                    {
+                        if (profileProxyAccessor is null)
+                            profileProxyAccessor = parentForm.GetProperty<QuesterProfileProxy>("Profile");
+                        if (profileProxyAccessor.IsValid)
+                            crCollection.DebugContext = profileProxyAccessor.Value;
+                    }
                 }
 
                 if (CustomRegionCollectionEditorForm.RequestUser(ref crCollection))

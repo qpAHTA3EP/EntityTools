@@ -1,15 +1,12 @@
-﻿using QuesterAction = Astral.Quester.Classes.Action;
-using QuesterCondition = Astral.Quester.Classes.Condition;
-
-namespace EntityCore.Quester.Classes
+﻿namespace EntityCore.Quester.Classes
 {
     /// <summary>
     /// Вспомогательный интерфейс для отображения элементов quester-профиля
     /// </summary>
     /// <typeparam name="T">Тип отображаемых элементом данных</typeparam>
-    interface ITreeNode<T>
+    internal interface ITreeNode<T>
     {
-        //UCCAction Data { get; }
+        
         /// <summary>
         /// Допустимость дочерних узлов
         /// </summary>

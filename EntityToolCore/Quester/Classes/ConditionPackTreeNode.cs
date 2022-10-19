@@ -13,17 +13,14 @@ namespace EntityCore.Quester.Classes
     /// <summary>
     /// Узел дерева, отображающий <see cref="ConditionPack"/>
     /// </summary>
-    public class ConditionPackTreeNode : TreeNode, ITreeNode<QuesterCondition>
+    internal class ConditionPackTreeNode : ConditionBaseTreeNode
     {
-        public bool AllowChildren => true;
-
         public ConditionPackTreeNode(QuesterCondition conditionPack)
         {
             if (!conditionPack.IsConditionPack())
                 throw new ArgumentException($"Argument cannot be casted to type {TreeViewHelper.QuesterConditionPackType.FullName}", nameof(conditionPack));
             Tag = conditionPack;
             Text = conditionPack.ToString();
-            //BackColor = SystemColors.ControlDark;
             ImageKey = "ConditionList";
             SelectedImageKey = "ConditionList";
             Checked = conditionPack.Locked;
@@ -32,12 +29,23 @@ namespace EntityCore.Quester.Classes
                 Nodes.AddRange(conditions.ToTreeNodes());
         }
 
+        public override bool IsValid => ((QuesterCondition)Tag).IsValid;
+
+        public override string TestInfo => ((QuesterCondition)Tag).TestInfos;
+
+        public override bool Locked
+        {
+            get => ((QuesterCondition)Tag).Locked;
+            set => ((QuesterCondition)Tag).Locked = value;
+        }
+        public override bool AllowChildren => true;
+
         public override object Clone()
         {
             return new ConditionPackTreeNode(CopyHelper.CreateDeepCopy((QuesterCondition)Tag));
         }
 
-        public QuesterCondition ReconstructInternal()
+        public override QuesterCondition ReconstructInternal()
         {
             if (Tag is QuesterCondition conditionPack
                 && conditionPack.IsConditionPack())
@@ -48,7 +56,7 @@ namespace EntityCore.Quester.Classes
             throw new InvalidCastException($"TreeNode[{Index}]({Tag?.GetType().FullName ?? "NULL"}) does not contains {TreeViewHelper.QuesterConditionPackType.FullName}");
         }
 
-        public void UpdateView()
+        public override void UpdateView()
         {
             if (TreeView is null)
                 return;
@@ -64,8 +72,6 @@ namespace EntityCore.Quester.Classes
 
                 ImageKey = "ConditionList";
                 SelectedImageKey = "ConditionList";
-
-                //TreeView.Refresh();
             }
             else throw new InvalidCastException($"TreeNode[{Index}]({Tag?.GetType().FullName ?? "NULL"}) does not contains {TreeViewHelper.QuesterConditionPackType.FullName}");
         }

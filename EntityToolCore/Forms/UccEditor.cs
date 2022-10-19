@@ -413,21 +413,24 @@ namespace EntityCore.Forms
         #region Profile manipucation
         private void handler_LoadProfile(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
-            openFileDialog.InitialDirectory = Path.Combine(Astral.Controllers.Directories.SettingsPath,"CC");
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            var openDialog = ACTP0Tools.Classes.FileTools.GetOpenDialog(filter: "UсcProfile|*.xml",
+                                                                        defaultExtension:"xml",
+                                                                        initialDir: Path.Combine(Astral.Controllers.Directories.SettingsPath, "CC"));
+
+            if (openDialog.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    var prfl = Astral.Functions.XmlSerializer.Deserialize<Profil>(openFileDialog.FileName, false, 1);
-                    if (prfl != null)
+                    var prof = Astral.Functions.XmlSerializer.Deserialize<Profil>(openDialog.FileName, false, 1);
+                    if (prof != null)
                     {
                         UI_reset();
-                        UI_fill(prfl);
-                        uccProfile = prfl;
-                        uccProfileFileName = openFileDialog.FileName;
+                        UI_fill(prof);
+                        uccProfile = prof;
+                        uccProfileFileName = openDialog.FileName;
                         Text = string.IsNullOrEmpty(uccProfileFileName) ? "UCC Editor" : uccProfileFileName;
                         txtLog.AppendText(string.Concat("Profile",
-                            string.IsNullOrEmpty(uccProfileFileName) ? String.Empty : " '" + uccProfileFileName + "'",
+                            string.IsNullOrEmpty(uccProfileFileName) ? string.Empty : " '" + uccProfileFileName + "'",
                             " loaded.",
                             Environment.NewLine));
                         profileUnsaved = false;
@@ -465,19 +468,11 @@ namespace EntityCore.Forms
 
         private void handler_SaveProfile(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
-            /*if (string.IsNullOrEmpty(uccProfileFileName))
-            {
-                saveFileDialog.InitialDirectory = Path.Combine(Astral.Controllers.Directories.SettingsPath, "CC");
-                if (saveFileDialog.ShowDialog() != DialogResult.OK)
-                    return;
-                uccProfileFileName = saveFileDialog.FileName;
-            }*/
-
             if (SaveProfile(uccProfileFileName))
             {
                 Text = string.IsNullOrEmpty(uccProfileFileName) ? "UCC Editor" : uccProfileFileName;
                 txtLog.AppendText(string.Concat("Profile",
-                                                string.IsNullOrEmpty(uccProfileFileName) ? String.Empty : " '" + uccProfileFileName +  "'",
+                                                string.IsNullOrEmpty(uccProfileFileName) ? string.Empty : " '" + uccProfileFileName +  "'",
                                                 " saved.",
                                                 Environment.NewLine));
                 profileUnsaved = false;
@@ -486,16 +481,19 @@ namespace EntityCore.Forms
 
         private void handler_SaveProfileAs(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
-            saveFileDialog.InitialDirectory = Path.Combine(Astral.Controllers.Directories.SettingsPath, "CC");
-            if (saveFileDialog.ShowDialog() != DialogResult.OK)
+            var saveDialog = ACTP0Tools.Classes.FileTools.GetSaveDialog(filter: "UсcProfile|*.xml",
+                defaultExtension: "xml",
+                initialDir: Path.Combine(Astral.Controllers.Directories.SettingsPath, "CC"));
+
+            if (saveDialog.ShowDialog() != DialogResult.OK)
                 return;
 
-            if (SaveProfile(saveFileDialog.FileName))
+            if (SaveProfile(saveDialog.FileName))
             {
-                uccProfileFileName = saveFileDialog.FileName;
+                uccProfileFileName = saveDialog.FileName;
 
                 txtLog.AppendText(string.Concat("Profile",
-                    string.IsNullOrEmpty(uccProfileFileName) ? String.Empty : " '" + uccProfileFileName + "'",
+                    string.IsNullOrEmpty(uccProfileFileName) ? string.Empty : " '" + uccProfileFileName + "'",
                     " saved.",
                     Environment.NewLine));
                 ChangeWindowCaption();
@@ -523,7 +521,7 @@ namespace EntityCore.Forms
                 }
                 return actionList;
             }
-            return null;
+            return new List<UCCAction>();
         }
 
         /// <summary>

@@ -17,7 +17,7 @@ namespace EntityCore.Tools
 {
     public static class TreeViewHelper
     {
-        #region ConditionPack
+        #region QuesterAssistant.ConditionPack access and manipulation
         /// <summary>
         /// Тип группирующего quester-условия ConditionPack, реализованного в плагине QuesterAssistant
         /// </summary>
@@ -50,7 +50,7 @@ namespace EntityCore.Tools
                 return QuesterConditionPackItemsAccessor.GetValueFrom(conditionPack);
             }
 
-            return new List<Condition>();
+            return new List<QuesterCondition>();
         }
         /// <summary>
         /// Присвоение свойству Conditions объекта <paramref name="conditionPack"/> значения <paramref name="conditions"/>

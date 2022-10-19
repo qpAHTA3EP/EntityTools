@@ -64,7 +64,8 @@ namespace EntityCore.Quester.Classes
                 }
                 actionPack.Actions = actList;
 
-                actionPack.Conditions = _conditionTreeNodes.ToQuesterConditionList();
+                if(_conditionTreeNodes != null)
+                    actionPack.Conditions = _conditionTreeNodes.ToQuesterConditionList();
 
                 return actionPack;
             }
@@ -104,7 +105,6 @@ namespace EntityCore.Quester.Classes
                 }
                 if(Parent is ActionPackTreeNode parentActionPackNode)
                     parentActionPackNode.UpdateViewInternal(this);
-                //TreeView.Refresh();
             }
             else throw new InvalidCastException($"TreeNode[{Index}]({Tag?.GetType().FullName ?? "NULL"}) does not contains {typeof(ActionPack).FullName}");
         }

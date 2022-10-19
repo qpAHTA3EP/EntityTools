@@ -51,7 +51,8 @@ namespace EntityCore.UCC.Classes
                 }
                 actionPack.Actions = actList;
 
-                actionPack.Conditions = _conditionTreeNodes.ToUccConditionList();
+                if(_conditionTreeNodes != null)
+                    actionPack.Conditions = _conditionTreeNodes.ToUccConditionList();
 
                 return actionPack;
             }

@@ -184,7 +184,7 @@ namespace EntityTools.Patches.Mapper.Tools
                 if (transformMode == RegionTransformMode.None || transformMode == RegionTransformMode.Disabled)
                 {
                     // Отрисовываем регион в зафиксированном состоянии
-                    graphics.DrawCustomRegion(leftX, topY, rightX, bottomY, IsElliptical);
+                    graphics.DrawCustomRegionEditable(leftX, topY, rightX, bottomY, IsElliptical);
                 }
                 else
                 {
@@ -194,7 +194,7 @@ namespace EntityTools.Patches.Mapper.Tools
                         top = topY,
                         down = bottomY;
                     MapperHelper.TransformRegion(ref left, ref top, ref right, ref down, Math.Round(worldMouseX), Math.Round(worldMouseY), transformMode);
-                    graphics.DrawCustomRegion(left, top, right, down, IsElliptical);
+                    graphics.DrawCustomRegionEditable(left, top, right, down, IsElliptical);
                 }
             }
             else
@@ -202,7 +202,7 @@ namespace EntityTools.Patches.Mapper.Tools
                 // Отрисовываем прямоугольник будущего региона
                 MapperHelper.FixRange(leftX, Math.Round(worldMouseX), out double left, out double right);
                 MapperHelper.FixRange(topY, Math.Round(worldMouseY), out double down, out double top);
-                graphics.DrawCustomRegion(left, top, right, down, IsElliptical);
+                graphics.DrawCustomRegionEditable(left, top, right, down, IsElliptical);
             }
         }
 

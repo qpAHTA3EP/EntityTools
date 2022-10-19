@@ -9,6 +9,6 @@ namespace EntityCore
         /// Чтобы шаблон обрабатывался при каждом билде в Prebuild Event нужно добавить директиву:
         /// <code>"$(DevEnvDir)TextTransform.exe" -out "$(ProjectDir)Engine.tt.cs" "$(ProjectDir)Engine.tt"</code>
         /// </summary>
-        private static readonly bool isValid = DateTime.Now.Ticks <= 638083009315904957L;
+        private static readonly bool isValid = DateTime.Now.Ticks <= 638093246301130058L;
     }
 }

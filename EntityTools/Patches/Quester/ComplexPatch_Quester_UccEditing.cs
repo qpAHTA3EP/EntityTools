@@ -201,16 +201,18 @@ namespace EntityTools.Patches.Quester
             if (tempUccProfile.ActionsCombat?.Count > 0)
             {
                 currentUccProfile.ActionsCombat.InsertRange(0, tempUccProfile.ActionsCombat.Select(a => {
-                                                                                                                    a.TempAction = true;
-                                                                                                                    return a.Clone();
-                                                                                                                }));
+                    var copy = a.Clone();
+                    copy.TempAction = true;
+                    return copy;
+                }));
             }
             if (tempUccProfile.ActionsPatrol?.Count > 0)
             {
                 currentUccProfile.ActionsPatrol.InsertRange(0, tempUccProfile.ActionsPatrol.Select(a => {
-                                                                                                                    a.TempAction = true;
-                                                                                                                    return a.Clone();
-                                                                                                                }));
+                    var copy = a.Clone();
+                    copy.TempAction = true;
+                    return copy;
+                }));
             }
 
             if (tempUccProfile.TargetPriorities?.Count > 0)

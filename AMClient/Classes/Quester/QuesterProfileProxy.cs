@@ -3,7 +3,6 @@ using AStar;
 using Astral.Quester.Classes;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using QuesterAction = Astral.Quester.Classes.Action;
 
@@ -11,13 +10,30 @@ namespace ACTP0Tools.Classes.Quester
 {
     public abstract class QuesterProfileProxy
     {
-        [Browsable(false)]
-        public abstract Profile Profile { get; }
+        /// <summary>
+        /// Получение ссылки на проксируемый экземпляр профиля с принудительным отображением в нем всех изменений.
+        /// </summary>
+        /// <returns></returns>
+        public abstract Profile GetProfile();
+        /// <summary>
+        /// Инициализация новым экземпляром профиля <paramref name="profile"/> без удаления привязок
+        /// </summary>
+        public abstract void SetProfile(Profile profile, string fileName);
 
+#if DEBUG
+        [Browsable(true)]
+        [Category("File")]
+#else
         [Browsable(false)] 
+#endif
         public abstract string FileName { get; set; }
 
-        [Browsable(false)]
+#if DEBUG
+        [Browsable(true)]
+        [Category("File")]
+#else
+        [Browsable(false)] 
+#endif        
         public abstract bool Saved { get; set; }
 
         /// <summary>
@@ -35,7 +51,12 @@ namespace ACTP0Tools.Classes.Quester
         /// <summary>
         /// Имя файла, в котором хранятся файлы путевых графов
         /// </summary>
-        [Browsable(false)]
+#if DEBUG
+        [Browsable(true)]
+        [Category("File")]
+#else
+        [Browsable(false)] 
+#endif
         public abstract string CurrentProfileZipMeshFile { get; }
 
         /// <summary>

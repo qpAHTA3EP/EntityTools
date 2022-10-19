@@ -16,12 +16,14 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using ACTP0Tools.Classes;
 
 namespace EntityTools.Forms
 {
-    public partial class ItemFilterEditorForm : /* Form //*/XtraForm
+    public partial class ItemFilterEditorForm : XtraForm
     {
         static ItemFilterEditorForm @this;
+        private static XmlSerializer ItemFilterEntryListSerializer = new XmlSerializer(typeof(List<ItemFilterEntryExt>));
 
         /// <summary>
         /// Список категорий предметов
@@ -197,26 +199,22 @@ namespace EntityTools.Forms
         /// <param name="e"></param>
         private void btnImport_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.InitialDirectory = Directories.SettingsPath;
-            openFileDialog.DefaultExt = "xml";
-            openFileDialog.Filter = nameof(ItemFilterEntryExt) + " filter profile (*.xml)|*.xml";
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            OpenFileDialog openDialog = FileTools.GetOpenDialog(filter: nameof(ItemFilterEntryExt) + " filter profile (*.xml)|*.xml",
+                                                                defaultExtension: "xml",
+                                                                initialDir: Directories.SettingsPath);
+            
+            if (openDialog.ShowDialog() == DialogResult.OK)
             {
-#if false
-                List<ItemFilterEntryExt> newFilter = Astral.Functions.XmlSerializer.Deserialize<List<ItemFilterEntryExt>>(openFileDialog.FileName, false);
-#else
                 List<ItemFilterEntryExt> newFilter = null;
 
-                XmlSerializer serialiser = new XmlSerializer(typeof(List<ItemFilterEntryExt>));
-                using (StreamReader fileStream = new StreamReader(openFileDialog.FileName))
+                XmlSerializer serializer = ItemFilterEntryListSerializer;
+                using (StreamReader fileStream = new StreamReader(openDialog.FileName))
                 {
-                    if(serialiser.Deserialize(fileStream) is List<ItemFilterEntryExt> list)
+                    if(serializer.Deserialize(fileStream) is List<ItemFilterEntryExt> list)
                     {
                         newFilter = list;
                     }
                 }
-#endif
                 if (newFilter != null && newFilter.Count > 0)
                 {
                     if (filter.Count > 0)
@@ -242,7 +240,7 @@ namespace EntityTools.Forms
                 }
                 else
                 {
-                    ItemFilterCore newFilterCore = Astral.Functions.XmlSerializer.Deserialize<ItemFilterCore>(openFileDialog.FileName);
+                    ItemFilterCore newFilterCore = Astral.Functions.XmlSerializer.Deserialize<ItemFilterCore>(openDialog.FileName);
 
                     if (newFilterCore != null && newFilterCore.Entries.Count > 0)
                     {

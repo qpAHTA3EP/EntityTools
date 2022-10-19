@@ -124,7 +124,6 @@ namespace EntityCore.Quester.Classes
                 Text = txt;
                 Checked = !action.Disabled;
                 SelectIcon(action);
-                //TreeView.Refresh();
             }
             else throw new InvalidCastException($"TreeNode[{Index}]({Tag?.GetType().FullName ?? "NULL"}) does not contains {typeof(QuesterAction).FullName}");
         }
@@ -133,7 +132,8 @@ namespace EntityCore.Quester.Classes
         {
             if (Tag is QuesterAction action)
             {
-                action.Conditions = _conditionTreeNodes.ToQuesterConditionList();
+                if(_conditionTreeNodes != null)
+                    action.Conditions = _conditionTreeNodes.ToQuesterConditionList();
                 return action;
             }
             throw new InvalidCastException($"TreeNode[{Index}]({Tag?.GetType().FullName ?? "NULL"}) does not contains {typeof(QuesterAction).FullName}");

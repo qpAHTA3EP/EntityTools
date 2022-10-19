@@ -10,7 +10,6 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.Threading;
 using System.Xml.Serialization;
-using EntityTools.PropertyEditors;
 
 namespace EntityTools.Quester.Conditions
 {

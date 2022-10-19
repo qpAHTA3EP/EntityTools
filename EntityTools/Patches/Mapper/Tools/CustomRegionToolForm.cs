@@ -2,8 +2,13 @@
 using DevExpress.XtraEditors;
 using EntityTools.Properties;
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using ACTP0Tools;
+using ACTP0Tools.Classes.Quester;
+using AStar;
+
 // ReSharper disable InconsistentNaming
 
 
@@ -187,6 +192,23 @@ namespace EntityTools.Patches.Mapper.Tools
             }
         }
 
+        protected BindingList<CustomRegion> CustomRegions
+        {
+            get
+            {
+                if (_profile is null)
+                {
+                    if (Owner is MapperFormExt mapper)
+                        return (_profile = mapper.Profile).CustomRegions;
+                    _profile = AstralAccessors.Quester.Core.ActiveProfileProxy;
+                }
+
+                return _profile.CustomRegions;
+            }
+        }
+
+        private QuesterProfileProxy _profile;
+
         public void Show(ViewMode viewMode, MapperFormExt owner = null, CustomRegion customRegion = null)
         {
             Mode = viewMode;
@@ -348,7 +370,7 @@ namespace EntityTools.Patches.Mapper.Tools
                 var selectedItem = customRegion ?? CustomRegionSelector.SelectedItem;
                 CustomRegionSelector.DataSource = null;
                 CustomRegionSelector.DisplayMember = nameof(CustomRegion.Name);
-                CustomRegionSelector.DataSource = Astral.Quester.API.CurrentProfile.CustomRegions;
+                CustomRegionSelector.DataSource = CustomRegions;
                 CustomRegionSelector.SelectedItem = selectedItem;
                 if (customRegion != null
                     && Owner is MapperFormExt mapper)

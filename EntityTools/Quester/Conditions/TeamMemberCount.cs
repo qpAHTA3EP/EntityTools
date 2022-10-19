@@ -8,7 +8,6 @@ using System.Drawing.Design;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using EntityTools.Editors;
-using EntityTools.PropertyEditors;
 
 namespace EntityTools.Quester.Conditions
 {

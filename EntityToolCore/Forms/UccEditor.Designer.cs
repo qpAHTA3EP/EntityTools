@@ -106,8 +106,6 @@ namespace EntityCore.Forms
             this.btnPriorityAdd = new DevExpress.XtraEditors.SimpleButton();
             this.lblBaseTargetPriority = new DevExpress.XtraEditors.LabelControl();
             this.editBasePriorityRange = new DevExpress.XtraEditors.SpinEdit();
-            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this.documentManager = new DevExpress.XtraBars.Docking2010.DocumentManager(this.components);
             this.tabbedView = new DevExpress.XtraBars.Docking2010.Views.Tabbed.TabbedView(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.documentGroup)).BeginInit();
@@ -487,16 +485,18 @@ namespace EntityCore.Forms
             this.treeConditions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.treeConditions.BackColor = System.Drawing.SystemColors.Control;
-            this.treeConditions.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.treeConditions.BackColor = System.Drawing.SystemColors.Window;
+            this.treeConditions.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.treeConditions.CheckBoxes = true;
             this.treeConditions.Font = new System.Drawing.Font("Tahoma", 9.75F);
+            this.treeConditions.FullRowSelect = true;
+            this.treeConditions.HideSelection = false;
             this.treeConditions.ImageIndex = 0;
             this.treeConditions.ImageList = this.imageList;
-            this.treeConditions.Location = new System.Drawing.Point(0, 25);
+            this.treeConditions.Location = new System.Drawing.Point(0, 23);
             this.treeConditions.Name = "treeConditions";
             this.treeConditions.SelectedImageIndex = 0;
-            this.treeConditions.Size = new System.Drawing.Size(426, 106);
+            this.treeConditions.Size = new System.Drawing.Size(426, 108);
             this.treeConditions.TabIndex = 0;
             this.treeConditions.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.handler_NodeCheckedChanged);
             this.treeConditions.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.handler_TreeView_ItemDrag);
@@ -526,15 +526,15 @@ namespace EntityCore.Forms
             this.imageList.Images.SetKeyName(12, "List");
             this.imageList.Images.SetKeyName(13, "Cancel");
             this.imageList.Images.SetKeyName(14, "Dodge");
-            this.imageList.Images.SetKeyName(15, "Art");
-            this.imageList.Images.SetKeyName(16, "Gem");
-            this.imageList.Images.SetKeyName(17, "miniBoxedArrow.png");
-            this.imageList.Images.SetKeyName(18, "Gear");
-            this.imageList.Images.SetKeyName(19, "Recycle");
-            this.imageList.Images.SetKeyName(20, "Target");
-            this.imageList.Images.SetKeyName(21, "Condition");
-            this.imageList.Images.SetKeyName(22, "ConditionList");
-            this.imageList.Images.SetKeyName(23, "Power");
+            this.imageList.Images.SetKeyName(15, "miniBoxedArrow.png");
+            this.imageList.Images.SetKeyName(16, "Gear");
+            this.imageList.Images.SetKeyName(17, "Recycle");
+            this.imageList.Images.SetKeyName(18, "Target");
+            this.imageList.Images.SetKeyName(19, "Condition");
+            this.imageList.Images.SetKeyName(20, "ConditionList");
+            this.imageList.Images.SetKeyName(21, "Power");
+            this.imageList.Images.SetKeyName(22, "Art.png");
+            this.imageList.Images.SetKeyName(23, "Gem.png");
             // 
             // panProperties
             // 
@@ -559,13 +559,13 @@ namespace EntityCore.Forms
             // 
             // propertyGrid
             // 
+            this.propertyGrid.CategorySplitterColor = System.Drawing.SystemColors.Window;
             this.propertyGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGrid.Location = new System.Drawing.Point(0, 0);
             this.propertyGrid.Name = "propertyGrid";
             this.propertyGrid.Size = new System.Drawing.Size(426, 274);
             this.propertyGrid.TabIndex = 0;
             this.propertyGrid.ToolbarVisible = false;
-            this.propertyGrid.ViewBackColor = System.Drawing.SystemColors.Control;
             this.propertyGrid.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.handler_PropertyChanged);
             // 
             // panCombat
@@ -620,19 +620,20 @@ namespace EntityCore.Forms
             this.treeCombatActions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.treeCombatActions.BackColor = System.Drawing.SystemColors.Control;
-            this.treeCombatActions.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.treeCombatActions.BackColor = System.Drawing.SystemColors.Window;
+            this.treeCombatActions.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.treeCombatActions.CheckBoxes = true;
             this.treeCombatActions.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.treeCombatActions.ForeColor = System.Drawing.SystemColors.WindowText;
             this.treeCombatActions.FullRowSelect = true;
+            this.treeCombatActions.HideSelection = false;
             this.treeCombatActions.ImageKey = "Box";
             this.treeCombatActions.ImageList = this.imageList;
             this.treeCombatActions.Indent = 22;
-            this.treeCombatActions.Location = new System.Drawing.Point(0, 25);
+            this.treeCombatActions.Location = new System.Drawing.Point(0, 23);
             this.treeCombatActions.Name = "treeCombatActions";
             this.treeCombatActions.SelectedImageIndex = 0;
-            this.treeCombatActions.Size = new System.Drawing.Size(259, 410);
+            this.treeCombatActions.Size = new System.Drawing.Size(259, 412);
             this.treeCombatActions.TabIndex = 0;
             this.treeCombatActions.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.handler_NodeCheckedChanged);
             this.treeCombatActions.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.handler_TreeView_ItemDrag);
@@ -760,8 +761,8 @@ namespace EntityCore.Forms
             this.treePatrolActions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.treePatrolActions.BackColor = System.Drawing.SystemColors.Control;
-            this.treePatrolActions.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.treePatrolActions.BackColor = System.Drawing.SystemColors.Window;
+            this.treePatrolActions.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.treePatrolActions.CheckBoxes = true;
             this.treePatrolActions.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.treePatrolActions.ForeColor = System.Drawing.SystemColors.WindowText;
@@ -770,10 +771,10 @@ namespace EntityCore.Forms
             this.treePatrolActions.ImageIndex = 0;
             this.treePatrolActions.ImageList = this.imageList;
             this.treePatrolActions.Indent = 22;
-            this.treePatrolActions.Location = new System.Drawing.Point(0, 25);
+            this.treePatrolActions.Location = new System.Drawing.Point(0, 23);
             this.treePatrolActions.Name = "treePatrolActions";
             this.treePatrolActions.SelectedImageIndex = 0;
-            this.treePatrolActions.Size = new System.Drawing.Size(259, 410);
+            this.treePatrolActions.Size = new System.Drawing.Size(259, 412);
             this.treePatrolActions.TabIndex = 0;
             this.treePatrolActions.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.handler_NodeCheckedChanged);
             this.treePatrolActions.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.handler_TreeView_ItemDrag);
@@ -973,7 +974,7 @@ namespace EntityCore.Forms
             this.listPriorities.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.listPriorities.Appearance.BackColor = System.Drawing.SystemColors.Control;
+            this.listPriorities.Appearance.BackColor = System.Drawing.SystemColors.Window;
             this.listPriorities.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F);
             this.listPriorities.Appearance.Options.UseBackColor = true;
             this.listPriorities.Appearance.Options.UseFont = true;
@@ -1097,19 +1098,6 @@ namespace EntityCore.Forms
             this.editBasePriorityRange.TabIndex = 2;
             this.editBasePriorityRange.ToolTip = "The chance to apply the basic targeting.\r\n";
             // 
-            // openFileDialog
-            // 
-            this.openFileDialog.DefaultExt = "xml";
-            this.openFileDialog.Filter = "UсcProfile|*.xml";
-            this.openFileDialog.InitialDirectory = "Settings\\CC\\";
-            // 
-            // saveFileDialog
-            // 
-            this.saveFileDialog.DefaultExt = "xml";
-            this.saveFileDialog.FileName = "UccProfile.xml";
-            this.saveFileDialog.Filter = "UucProfile|*.xml";
-            this.saveFileDialog.InitialDirectory = "Settings\\CC\\";
-            // 
             // documentManager
             // 
             this.documentManager.ContainerControl = this;
@@ -1211,9 +1199,7 @@ namespace EntityCore.Forms
 		private BarButtonItem btnToEngine;
 		private BarButtonItem btnNewProfile;
 		private BarButtonItem btnSaveProfielAs;
-		private OpenFileDialog openFileDialog;
 		private ImageList imageList;
-		private SaveFileDialog saveFileDialog;
 		private ControlContainer combatActionsControlContainer;
 		private ControlContainer patrolActionsControlContainer;
 		private DocumentManager documentManager;

@@ -6,7 +6,6 @@ using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Text;
-using EntityTools.PropertyEditors;
 
 namespace EntityTools.Quester.Conditions
 {

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Windows.Forms;
-using ACTP0Tools.Reflection;
-using Astral.Logic.UCC.Classes;
-using EntityCore.UCC.Classes;
-using QuesterAction = Astral.Quester.Classes.Action;
+﻿using ACTP0Tools.Reflection;
+using System;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
 namespace EntityCore.Quester.Classes
@@ -11,10 +7,8 @@ namespace EntityCore.Quester.Classes
     /// <summary>
     /// Узел дерева, отображающий <see cref="QuesterCondition"/>
     /// </summary>
-    public class ConditionTreeNode : TreeNode, ITreeNode<QuesterCondition>
+    internal class ConditionTreeNode : ConditionBaseTreeNode
     {
-        public bool AllowChildren => false;
-
         public ConditionTreeNode(QuesterCondition condition)
         {
             Tag = condition;
@@ -28,12 +22,23 @@ namespace EntityCore.Quester.Classes
             Checked = condition.Locked;
         }
 
+        public override bool IsValid => ((QuesterCondition) Tag).IsValid;
+
+        public override string TestInfo => ((QuesterCondition) Tag).TestInfos;
+
+        public override bool Locked
+        {
+            get => ((QuesterCondition)Tag).Locked; 
+            set => ((QuesterCondition)Tag).Locked = value;
+        }
+        public override bool AllowChildren => false;
+
         private void SelectIcon(QuesterCondition condition)
         {
             ImageKey = "Condition";
             SelectedImageKey = "Condition";
         }
-        public void UpdateView()
+        public override void UpdateView()
         {
             if (TreeView is null)
                 return;
@@ -48,12 +53,11 @@ namespace EntityCore.Quester.Classes
                 Text = txt;
                 Checked = condition.Locked;
                 SelectIcon(condition);
-                //TreeView.Refresh();
             }
             else throw new InvalidCastException($"TreeNode[{Index}]({Tag?.GetType().FullName ?? "NULL"}) does not contains {typeof(QuesterCondition).FullName}");
         }
 
-        public QuesterCondition ReconstructInternal()
+        public override QuesterCondition ReconstructInternal()
         {
             return Tag as QuesterCondition;
         }

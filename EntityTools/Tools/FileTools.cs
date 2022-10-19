@@ -1,7 +1,7 @@
-﻿using System;
-using System.IO;
-using Astral.Controllers;
+﻿using Astral.Controllers;
 using MyNW.Internals;
+using System;
+using System.IO;
 
 namespace EntityTools.Tools
 {
@@ -13,6 +13,7 @@ namespace EntityTools.Tools
         public static readonly string MaskAccount = "%account%";
         public static readonly string MaskCharacter = "%character%";
         public static readonly string MaskDateTime = "%dateTime%";
+        public static readonly string MaskAstralRoot = "%astral%";
 
         public static readonly string MaskAD = "%AD%";
         public static readonly string MaskRAD = "%rAD%";
@@ -37,12 +38,15 @@ namespace EntityTools.Tools
             {
                 if (str.IndexOf('%') != -1)
                 {
-                    string result = str.Replace(MaskAccount, EntityManager.LocalPlayer.AccountLoginUsername);
-                    result = result.Replace(MaskCharacter, EntityManager.LocalPlayer.Name);
+                    var player = EntityManager.LocalPlayer;
+                    string result = str.Replace(MaskAccount, player.AccountLoginUsername);
+                    result = result.Replace(MaskCharacter, player.Name);
                     result = result.Replace(MaskDateTime, DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss"));
-                    result = result.Replace(MaskAD, EntityManager.LocalPlayer.Inventory.AstralDiamonds.ToString());
-                    result = result.Replace(MaskRAD, EntityManager.LocalPlayer.Inventory.AstralDiamondsRough.ToString());
-
+                    var inventory = player.Inventory;
+                    result = result.Replace(MaskAD, inventory.AstralDiamonds.ToString());
+                    result = result.Replace(MaskRAD, inventory.AstralDiamondsRough.ToString());
+                    if(str.StartsWith(MaskAstralRoot, StringComparison.OrdinalIgnoreCase))
+                        result = result.Replace(MaskAstralRoot, Astral.Controllers.Directories.AstralStartupPath);
                     return result;
                 }
                 return str;

@@ -1,4 +1,5 @@
-﻿using AStar.Tools;
+﻿//#define USE_GRAPH_CACHE
+using AStar.Tools;
 using Astral.Logic.Classes.Map;
 using EntityTools.Settings;
 using MyNW.Classes;
@@ -13,17 +14,25 @@ namespace EntityTools.Patches.Mapper
     /// </summary>
     public partial class MapperGraphics : GraphicsNW
     {
-        public MapperGraphics(int width, int height) : base(width, height)
+        public MapperGraphics(int width, int height
+#if USE_GRAPH_CACHE
+        , MapperGraphCache graphCache = null 
+#endif
+            ) : base(width, height)
         {
-            backColor = EntityTools.Config.Mapper.MapperForm.BackgroundColor;
+            var mapperFormConfig = EntityTools.Config.Mapper.MapperForm;
+            backColor = mapperFormConfig.BackgroundColor;
 
-            EntityTools.Config.Mapper.MapperForm.PropertyChanged += handler_PropertyChanged;
+            mapperFormConfig.PropertyChanged += handler_PropertyChanged;
+#if USE_GRAPH_CACHE
             GetWorldPosition(0, 0, out double left, out double top);
             GetWorldPosition(width, height, out double right, out double down);
-            if(_cache is null)
-                _cache = new MapperGraphCache(() => ACTP0Tools.AstralAccessors.Quester.Core.Meshes, 
+            if (graphCache is null)
+                cache = new MapperGraphCache(() => ACTP0Tools.AstralAccessors.Quester.Core.Meshes,
                     EntityTools.Config.Mapper.CacheActive);
-            _cache.SetCacheArea(left, top, right, down);
+            else cache = graphCache;
+            cache.SetCacheArea(left, top, right, down); 
+#endif
         }
 
         private void handler_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -42,7 +51,9 @@ namespace EntityTools.Patches.Mapper
             set
             {
                 base.ImageHeight = value;
-                _cache.CacheDistanceY = value / 1.8d / Zoom;
+#if USE_GRAPH_CACHE
+                cache.CacheDistanceY = value / 1.8d / Zoom; 
+#endif
             }
         }
         public override int ImageWidth
@@ -51,7 +62,9 @@ namespace EntityTools.Patches.Mapper
             set
             {
                 base.ImageWidth = value;
-                _cache.CacheDistanceX = value / 1.8d / Zoom;
+#if USE_GRAPH_CACHE
+                cache.CacheDistanceX = value / 1.8d / Zoom; 
+#endif
             }
         }
 
@@ -61,11 +74,16 @@ namespace EntityTools.Patches.Mapper
             get => base.Zoom;
             set
             {
-                if(base.Zoom != value)
+                if (Math.Abs(base.Zoom - value) > 0.05f)
                 {
                     base.Zoom = value;
-                    _cache.CacheDistanceX = base.ImageWidth / 1.8d / value;
-                    _cache.CacheDistanceY = base.ImageHeight / 1.8d / value;
+#if USE_GRAPH_CACHE
+                    if (cache != null)
+                    {
+                        cache.CacheDistanceX = base.ImageWidth / 1.8d / value;
+                        cache.CacheDistanceY = base.ImageHeight / 1.8d / value;
+                    } 
+#endif
                 }
             }
         }
@@ -77,7 +95,9 @@ namespace EntityTools.Patches.Mapper
             set
             {
                 base.CenterPosition = value;
-                _cache.SetCacheInitialPosition(value);
+#if USE_GRAPH_CACHE
+                cache?.SetCacheInitialPosition(value); 
+#endif
             }
         }
         /// <summary>
@@ -88,7 +108,9 @@ namespace EntityTools.Patches.Mapper
             base.CenterPosition.X += (float)dx;
             base.CenterPosition.Y += (float)dy;
             base.CenterPosition.Z += (float)dz;
-            GraphCache.MoveCenterPosition(dx, dy, dz);
+#if USE_GRAPH_CACHE
+            cache.MoveCenterPosition(dx, dy, dz); 
+#endif
         }
 
         /// <summary>
@@ -132,13 +154,15 @@ namespace EntityTools.Patches.Mapper
 
             if (imgWidth != width || imgHeight != height || !base.Zoom.Equals(zoom))
             {
-                if (_cache.CacheDistanceX > dx * 1.25
-                    || _cache.CacheDistanceY > dy * 1.25
-                    || !_cache.InCacheArea(x1, y1)
-                    || !_cache.InCacheArea(x2, y2))
+#if USE_GRAPH_CACHE
+                if (cache.CacheDistanceX > dx * 1.25
+                            || cache.CacheDistanceY > dy * 1.25
+                            || !cache.InCacheArea(x1, y1)
+                            || !cache.InCacheArea(x2, y2))
                 {
-                    _cache.SetCacheArea(x1, y1, x2, y2);
-                }
+                    cache.SetCacheArea(x1, y1, x2, y2);
+                } 
+#endif
 
                 base.ImageHeight = height;
                 base.ImageWidth = width;
@@ -170,21 +194,18 @@ namespace EntityTools.Patches.Mapper
                 || Math.Abs(pos.Y - centerY) > 0.1
                 || Math.Abs(pos.Z - centerZ) > 0.1)
             {
-                if (_cache.CacheDistanceX > dx * 1.25
-                    || _cache.CacheDistanceY > dy * 1.25
-                    || !_cache.InCacheArea(x1, y1)
-                    || !_cache.InCacheArea(x2, y2))
-                    _cache.SetCacheArea(x1, y1, centerZ + _cache.CacheDistanceZ, x2, y2, centerZ - _cache.CacheDistanceZ);
+#if USE_GRAPH_CACHE
+                if (cache.CacheDistanceX > dx * 1.25
+                            || cache.CacheDistanceY > dy * 1.25
+                            || !cache.InCacheArea(x1, y1)
+                            || !cache.InCacheArea(x2, y2))
+                    cache.SetCacheArea(x1, y1, centerZ + cache.CacheDistanceZ, x2, y2, centerZ - cache.CacheDistanceZ); 
+#endif
 
-#if false
-                base.CenterPosition.X = (float)centerX;
-                base.CenterPosition.Y = (float)centerY;
-                base.CenterPosition.Z = (float)centerZ; 
-#else
                 pos.X = (float)centerX;
                 pos.Y = (float)centerY;
                 pos.Z = (float)centerZ;
-#endif
+
                 base.ImageHeight = height;
                 base.ImageWidth = width;
                 base.Zoom = zoom;
@@ -211,11 +232,13 @@ namespace EntityTools.Patches.Mapper
         public RWLocker.WriteLockToken WriteLock() => new RWLocker.WriteLockToken(@lock);
         #endregion
 
+#if false
         /// <summary>
         /// Отображаемый подграф (часть карты путей, на которой находится персонаж)
         /// </summary>
-        public MapperGraphCache GraphCache => _cache;
-        private readonly MapperGraphCache _cache = new MapperGraphCache();
+        public MapperGraphCache GraphCache => cache;
+        private readonly MapperGraphCache cache; 
+#endif
 
         public MapperDrawingTools DrawingTools { get; } = new MapperDrawingTools();
 
@@ -279,10 +302,6 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public void GetWorldPosition(Point imgPos, out double x, out double y)
         {
-            double scale = Zoom;
-
-            x = CenterPosition.X - (ImageWidth / 2.0 - imgPos.X /*- 0.75*/) / scale;
-            y = CenterPosition.Y + (ImageHeight / 2.0 - imgPos.Y /*- 0.75*/) / scale;
 #if false
         public static Vector3 getWorldPos(Point imgPoint, int boxWidth, int boxHeight, Vector3 centerPos, double Zoom)
 		{
@@ -298,6 +317,10 @@ namespace EntityTools.Patches.Mapper
 			return vector;
 		}
 #endif
+            double scale = Zoom;
+
+            x = CenterPosition.X - (ImageWidth / 2.0 - imgPos.X /*- 0.75*/) / scale;
+            y = CenterPosition.Y + (ImageHeight / 2.0 - imgPos.Y /*- 0.75*/) / scale;
         }
         /// <summary>
         /// Перевод координат изображения <paramref name="imgX"/>, <paramref name="imgY"/> 
@@ -400,7 +423,7 @@ namespace EntityTools.Patches.Mapper
         /// Нарисовать закрашенный прямоугольник со сторонами <paramref name="width"/> и <paramref name="height"/>, 
         /// верхняя правая вершина которого задана координатами игрового мира <paramref name="worldX"/>, <paramref name="worldY"/>
         /// </summary>
-        public void FillRectangle(Brush brush, double worldX, double worldY, double width, double height, bool useScale = false)
+        public void FillRectangle(Brush brush, double worldX, double worldY, double width, double height, bool useScale)
         {
             GetImagePosition(worldX, worldY, out double x, out double y);
             if (useScale)
@@ -456,7 +479,7 @@ namespace EntityTools.Patches.Mapper
         /// Нарисовать прямоугольник со сторонами <paramref name="width"/> и <paramref name="height"/>, 
         /// верхняя правая вершина которого задана координатами игрового мира <paramref name="worldX"/>, <paramref name="worldY"/>
         /// </summary>
-        public void DrawRectangle(Pen pen, double worldX, double worldY, double width, double height, bool useScale = false)
+        public void DrawRectangle(Pen pen, double worldX, double worldY, double width, double height, bool useScale)
         {
             GetImagePosition(worldX, worldY, out double x, out double y);
             if (useScale)

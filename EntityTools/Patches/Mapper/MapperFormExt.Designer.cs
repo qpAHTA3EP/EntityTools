@@ -661,6 +661,8 @@ namespace EntityTools.Patches.Mapper
             this.lblPlayerPos.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("lblPlayerPos.ImageOptions.Image")));
             this.lblPlayerPos.Name = "lblPlayerPos";
             this.lblPlayerPos.PaintStyle = DevExpress.XtraBars.BarItemPaintStyle.CaptionGlyph;
+            this.lblPlayerPos.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
+            this.lblPlayerPos.VisibleInSearchMenu = false;
             // 
             // lblMousePos
             // 
@@ -674,6 +676,8 @@ namespace EntityTools.Patches.Mapper
             this.lblMousePos.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("lblMousePos.ImageOptions.Image")));
             this.lblMousePos.Name = "lblMousePos";
             this.lblMousePos.PaintStyle = DevExpress.XtraBars.BarItemPaintStyle.CaptionGlyph;
+            this.lblMousePos.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
+            this.lblMousePos.VisibleInSearchMenu = false;
             // 
             // lblDrawInfo
             // 
@@ -686,6 +690,8 @@ namespace EntityTools.Patches.Mapper
             this.lblDrawInfo.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("lblDrawInfo.ImageOptions.Image")));
             this.lblDrawInfo.Name = "lblDrawInfo";
             this.lblDrawInfo.PaintStyle = DevExpress.XtraBars.BarItemPaintStyle.CaptionGlyph;
+            this.lblDrawInfo.Visibility = DevExpress.XtraBars.BarItemVisibility.Never;
+            this.lblDrawInfo.VisibleInSearchMenu = false;
             // 
             // barDockControlTop
             // 

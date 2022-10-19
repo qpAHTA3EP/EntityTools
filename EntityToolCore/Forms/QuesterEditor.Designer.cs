@@ -74,24 +74,25 @@ namespace EntityCore.Forms
             this.dockManager = new DevExpress.XtraBars.Docking.DockManager(this.components);
             this.hideContainerRight = new DevExpress.XtraBars.Docking.AutoHideContainer();
             this.panelContainer3 = new DevExpress.XtraBars.Docking.DockPanel();
-            this.panVendor = new DevExpress.XtraBars.Docking.DockPanel();
-            this.controlContainer5 = new DevExpress.XtraBars.Docking.ControlContainer();
-            this.listVendor = new DevExpress.XtraEditors.ListBoxControl();
-            this.panSettings = new DevExpress.XtraBars.Docking.DockPanel();
-            this.dockPanel1_Container = new DevExpress.XtraBars.Docking.ControlContainer();
-            this.pgSettings = new System.Windows.Forms.PropertyGrid();
             this.panCustomRegions = new DevExpress.XtraBars.Docking.DockPanel();
             this.controlContainer3 = new DevExpress.XtraBars.Docking.ControlContainer();
             this.listCustomRegions = new DevExpress.XtraEditors.ListBoxControl();
+            this.panSettings = new DevExpress.XtraBars.Docking.DockPanel();
+            this.dockPanel1_Container = new DevExpress.XtraBars.Docking.ControlContainer();
+            this.pgSettings = new System.Windows.Forms.PropertyGrid();
             this.panBlackList = new DevExpress.XtraBars.Docking.DockPanel();
             this.controlContainer4 = new DevExpress.XtraBars.Docking.ControlContainer();
             this.listBlackList = new DevExpress.XtraEditors.ListBoxControl();
+            this.panVendor = new DevExpress.XtraBars.Docking.DockPanel();
+            this.controlContainer5 = new DevExpress.XtraBars.Docking.ControlContainer();
+            this.listVendor = new DevExpress.XtraEditors.ListBoxControl();
             this.barManager = new DevExpress.XtraBars.BarManager(this.components);
             this.barProfile = new DevExpress.XtraBars.Bar();
             this.btnNewProfile = new DevExpress.XtraBars.BarButtonItem();
             this.btnOpen = new DevExpress.XtraBars.BarButtonItem();
             this.btnSave = new DevExpress.XtraBars.BarButtonItem();
             this.btnSaveAs = new DevExpress.XtraBars.BarButtonItem();
+            this.btnShowMapper = new DevExpress.XtraBars.BarButtonItem();
             this.barDockControlTop = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlBottom = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlLeft = new DevExpress.XtraBars.BarDockControl();
@@ -113,7 +114,6 @@ namespace EntityCore.Forms
             this.controlContainer1 = new DevExpress.XtraBars.Docking.ControlContainer();
             this.gridHotSpots = new DevExpress.XtraGrid.GridControl();
             this.gridViewHotSpots = new DevExpress.XtraGrid.Views.Grid.GridView();
-            this.clmnPoint = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmnPointX = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmnPointY = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmnPointZ = new DevExpress.XtraGrid.Columns.GridColumn();
@@ -122,22 +122,20 @@ namespace EntityCore.Forms
             this.pgProperties = new System.Windows.Forms.PropertyGrid();
             this.behaviorManager = new DevExpress.Utils.Behaviors.BehaviorManager(this.components);
             this.hotSpotsDragDropEvent = new DevExpress.Utils.DragDrop.DragDropEvents(this.components);
-            this.bar1 = new DevExpress.XtraBars.Bar();
-            this.barButtonItem1 = new DevExpress.XtraBars.BarButtonItem();
             ((System.ComponentModel.ISupportInitialize)(this.dockManager)).BeginInit();
             this.hideContainerRight.SuspendLayout();
             this.panelContainer3.SuspendLayout();
-            this.panVendor.SuspendLayout();
-            this.controlContainer5.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.listVendor)).BeginInit();
-            this.panSettings.SuspendLayout();
-            this.dockPanel1_Container.SuspendLayout();
             this.panCustomRegions.SuspendLayout();
             this.controlContainer3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.listCustomRegions)).BeginInit();
+            this.panSettings.SuspendLayout();
+            this.dockPanel1_Container.SuspendLayout();
             this.panBlackList.SuspendLayout();
             this.controlContainer4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.listBlackList)).BeginInit();
+            this.panVendor.SuspendLayout();
+            this.controlContainer5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.listVendor)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).BeginInit();
             this.panLog.SuspendLayout();
             this.controlContainer2.SuspendLayout();
@@ -192,7 +190,7 @@ namespace EntityCore.Forms
             // 
             // panelContainer3
             // 
-            this.panelContainer3.ActiveChild = this.panVendor;
+            this.panelContainer3.ActiveChild = this.panCustomRegions;
             this.panelContainer3.Controls.Add(this.panSettings);
             this.panelContainer3.Controls.Add(this.panCustomRegions);
             this.panelContainer3.Controls.Add(this.panBlackList);
@@ -212,89 +210,12 @@ namespace EntityCore.Forms
             this.panelContainer3.Text = "panelContainer3";
             this.panelContainer3.Visibility = DevExpress.XtraBars.Docking.DockVisibility.AutoHide;
             // 
-            // panVendor
-            // 
-            this.panVendor.Controls.Add(this.controlContainer5);
-            customHeaderButtonImageOptions1.Image = global::EntityCore.Properties.Resources.miniCancel;
-            customHeaderButtonImageOptions2.Image = global::EntityCore.Properties.Resources.miniAdd;
-            this.panVendor.CustomHeaderButtons.AddRange(new DevExpress.XtraBars.Docking2010.IButton[] {
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete Vendor", false, customHeaderButtonImageOptions1, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete Vendor form list", -1, true, null, true, false, true, serializableAppearanceObject1, null, -1),
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Add Vendor", false, customHeaderButtonImageOptions2, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Add Vendor to list", -1, true, null, true, false, true, serializableAppearanceObject2, null, -1)});
-            this.panVendor.Dock = DevExpress.XtraBars.Docking.DockingStyle.Fill;
-            this.panVendor.ID = new System.Guid("38123327-94b3-4fd0-830e-ce78d708b1c9");
-            this.panVendor.Location = new System.Drawing.Point(4, 32);
-            this.panVendor.Name = "panVendor";
-            this.panVendor.Options.ShowCloseButton = false;
-            this.panVendor.Options.ShowMaximizeButton = false;
-            this.panVendor.Options.ShowMinimizeButton = false;
-            this.panVendor.OriginalSize = new System.Drawing.Size(301, 659);
-            this.panVendor.Size = new System.Drawing.Size(301, 659);
-            this.panVendor.Text = "Vendor";
-            this.panVendor.CustomButtonClick += new DevExpress.XtraBars.Docking2010.ButtonEventHandler(this.handler_Vendor_ButtonClick);
-            // 
-            // controlContainer5
-            // 
-            this.controlContainer5.Controls.Add(this.listVendor);
-            this.controlContainer5.Location = new System.Drawing.Point(0, 0);
-            this.controlContainer5.Name = "controlContainer5";
-            this.controlContainer5.Size = new System.Drawing.Size(301, 659);
-            this.controlContainer5.TabIndex = 0;
-            // 
-            // listVendor
-            // 
-            this.listVendor.Appearance.BackColor = System.Drawing.SystemColors.Control;
-            this.listVendor.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F);
-            this.listVendor.Appearance.Options.UseBackColor = true;
-            this.listVendor.Appearance.Options.UseFont = true;
-            this.listVendor.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
-            this.listVendor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listVendor.ItemHeight = 18;
-            this.listVendor.Location = new System.Drawing.Point(0, 0);
-            this.listVendor.Name = "listVendor";
-            this.listVendor.Size = new System.Drawing.Size(301, 659);
-            this.listVendor.SortOrder = System.Windows.Forms.SortOrder.Ascending;
-            this.listVendor.TabIndex = 13;
-            this.listVendor.SelectedValueChanged += new System.EventHandler(this.handler_ListBox_ItemSelected);
-            this.listVendor.Enter += new System.EventHandler(this.handler_ListBox_ItemSelected);
-            // 
-            // panSettings
-            // 
-            this.panSettings.Controls.Add(this.dockPanel1_Container);
-            this.panSettings.Dock = DevExpress.XtraBars.Docking.DockingStyle.Fill;
-            this.panSettings.ID = new System.Guid("8b25caa9-0147-43b5-bd93-f4f0022222ea");
-            this.panSettings.Location = new System.Drawing.Point(4, 32);
-            this.panSettings.Name = "panSettings";
-            this.panSettings.Options.ShowCloseButton = false;
-            this.panSettings.Options.ShowMaximizeButton = false;
-            this.panSettings.Options.ShowMinimizeButton = false;
-            this.panSettings.OriginalSize = new System.Drawing.Size(301, 659);
-            this.panSettings.Size = new System.Drawing.Size(301, 659);
-            this.panSettings.Text = "Settings";
-            // 
-            // dockPanel1_Container
-            // 
-            this.dockPanel1_Container.Controls.Add(this.pgSettings);
-            this.dockPanel1_Container.Location = new System.Drawing.Point(0, 0);
-            this.dockPanel1_Container.Name = "dockPanel1_Container";
-            this.dockPanel1_Container.Size = new System.Drawing.Size(301, 659);
-            this.dockPanel1_Container.TabIndex = 0;
-            // 
-            // pgSettings
-            // 
-            this.pgSettings.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pgSettings.Location = new System.Drawing.Point(0, 0);
-            this.pgSettings.Name = "pgSettings";
-            this.pgSettings.Size = new System.Drawing.Size(301, 659);
-            this.pgSettings.TabIndex = 6;
-            this.pgSettings.ToolbarVisible = false;
-            this.pgSettings.ViewBackColor = System.Drawing.SystemColors.Control;
-            // 
             // panCustomRegions
             // 
             this.panCustomRegions.Controls.Add(this.controlContainer3);
-            customHeaderButtonImageOptions3.Image = global::EntityCore.Properties.Resources.miniCancel;
+            customHeaderButtonImageOptions1.Image = global::EntityCore.Properties.Resources.miniCancel;
             this.panCustomRegions.CustomHeaderButtons.AddRange(new DevExpress.XtraBars.Docking2010.IButton[] {
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete CustomRegion", false, customHeaderButtonImageOptions3, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete selected CustomRegion", -1, true, null, true, false, true, serializableAppearanceObject3, null, -1)});
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete CustomRegion", false, customHeaderButtonImageOptions1, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete selected CustomRegion", -1, true, null, true, false, true, serializableAppearanceObject1, null, -1)});
             this.panCustomRegions.Dock = DevExpress.XtraBars.Docking.DockingStyle.Fill;
             this.panCustomRegions.ID = new System.Guid("9d3814b3-6012-4d5c-9296-9d1cd3bb3671");
             this.panCustomRegions.Location = new System.Drawing.Point(4, 32);
@@ -302,7 +223,7 @@ namespace EntityCore.Forms
             this.panCustomRegions.Options.ShowCloseButton = false;
             this.panCustomRegions.Options.ShowMaximizeButton = false;
             this.panCustomRegions.Options.ShowMinimizeButton = false;
-            this.panCustomRegions.OriginalSize = new System.Drawing.Size(301, 659);
+            this.panCustomRegions.OriginalSize = new System.Drawing.Size(301, 665);
             this.panCustomRegions.Size = new System.Drawing.Size(301, 659);
             this.panCustomRegions.Text = "Custom Regions";
             this.panCustomRegions.CustomButtonClick += new DevExpress.XtraBars.Docking2010.ButtonEventHandler(this.handler_CustomRegions_ButtonClick);
@@ -317,12 +238,13 @@ namespace EntityCore.Forms
             // 
             // listCustomRegions
             // 
-            this.listCustomRegions.Appearance.BackColor = System.Drawing.SystemColors.Control;
+            this.listCustomRegions.Appearance.BackColor = System.Drawing.SystemColors.Window;
             this.listCustomRegions.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F);
             this.listCustomRegions.Appearance.Options.UseBackColor = true;
             this.listCustomRegions.Appearance.Options.UseFont = true;
-            this.listCustomRegions.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.listCustomRegions.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.listCustomRegions.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listCustomRegions.HotTrackSelectMode = DevExpress.XtraEditors.HotTrackSelectMode.SelectItemOnClick;
             this.listCustomRegions.ItemHeight = 18;
             this.listCustomRegions.Location = new System.Drawing.Point(0, 0);
             this.listCustomRegions.Name = "listCustomRegions";
@@ -332,14 +254,46 @@ namespace EntityCore.Forms
             this.listCustomRegions.SelectedValueChanged += new System.EventHandler(this.handler_ListBox_ItemSelected);
             this.listCustomRegions.Enter += new System.EventHandler(this.handler_ListBox_ItemSelected);
             // 
+            // panSettings
+            // 
+            this.panSettings.Controls.Add(this.dockPanel1_Container);
+            this.panSettings.Dock = DevExpress.XtraBars.Docking.DockingStyle.Fill;
+            this.panSettings.ID = new System.Guid("8b25caa9-0147-43b5-bd93-f4f0022222ea");
+            this.panSettings.Location = new System.Drawing.Point(4, 32);
+            this.panSettings.Name = "panSettings";
+            this.panSettings.Options.ShowCloseButton = false;
+            this.panSettings.Options.ShowMaximizeButton = false;
+            this.panSettings.Options.ShowMinimizeButton = false;
+            this.panSettings.OriginalSize = new System.Drawing.Size(301, 665);
+            this.panSettings.Size = new System.Drawing.Size(301, 659);
+            this.panSettings.Text = "Settings";
+            // 
+            // dockPanel1_Container
+            // 
+            this.dockPanel1_Container.Controls.Add(this.pgSettings);
+            this.dockPanel1_Container.Location = new System.Drawing.Point(0, 0);
+            this.dockPanel1_Container.Name = "dockPanel1_Container";
+            this.dockPanel1_Container.Size = new System.Drawing.Size(301, 659);
+            this.dockPanel1_Container.TabIndex = 0;
+            // 
+            // pgSettings
+            // 
+            this.pgSettings.CategorySplitterColor = System.Drawing.SystemColors.Window;
+            this.pgSettings.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pgSettings.Location = new System.Drawing.Point(0, 0);
+            this.pgSettings.Name = "pgSettings";
+            this.pgSettings.Size = new System.Drawing.Size(301, 659);
+            this.pgSettings.TabIndex = 6;
+            this.pgSettings.ToolbarVisible = false;
+            // 
             // panBlackList
             // 
             this.panBlackList.Controls.Add(this.controlContainer4);
-            customHeaderButtonImageOptions4.Image = global::EntityCore.Properties.Resources.miniCancel;
-            customHeaderButtonImageOptions5.Image = global::EntityCore.Properties.Resources.miniAdd;
+            customHeaderButtonImageOptions2.Image = global::EntityCore.Properties.Resources.miniCancel;
+            customHeaderButtonImageOptions3.Image = global::EntityCore.Properties.Resources.miniAdd;
             this.panBlackList.CustomHeaderButtons.AddRange(new DevExpress.XtraBars.Docking2010.IButton[] {
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete Enemy", false, customHeaderButtonImageOptions4, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete Enemy from BlackList", -1, true, null, true, false, true, serializableAppearanceObject4, null, -1),
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Add Enemy", false, customHeaderButtonImageOptions5, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Add Enemy to BlackList", -1, true, null, true, false, true, serializableAppearanceObject5, null, -1)});
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete Enemy", false, customHeaderButtonImageOptions2, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete Enemy from BlackList", -1, true, null, true, false, true, serializableAppearanceObject2, null, -1),
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Add Enemy", false, customHeaderButtonImageOptions3, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Add Enemy to BlackList", -1, true, null, true, false, true, serializableAppearanceObject3, null, -1)});
             this.panBlackList.Dock = DevExpress.XtraBars.Docking.DockingStyle.Fill;
             this.panBlackList.ID = new System.Guid("a0fa556c-be73-48c5-9d86-eb532780077a");
             this.panBlackList.Location = new System.Drawing.Point(4, 32);
@@ -347,7 +301,7 @@ namespace EntityCore.Forms
             this.panBlackList.Options.ShowCloseButton = false;
             this.panBlackList.Options.ShowMaximizeButton = false;
             this.panBlackList.Options.ShowMinimizeButton = false;
-            this.panBlackList.OriginalSize = new System.Drawing.Size(301, 659);
+            this.panBlackList.OriginalSize = new System.Drawing.Size(301, 665);
             this.panBlackList.SavedIndex = 3;
             this.panBlackList.SavedSizeFactor = 0.70549D;
             this.panBlackList.Size = new System.Drawing.Size(301, 659);
@@ -364,18 +318,65 @@ namespace EntityCore.Forms
             // 
             // listBlackList
             // 
-            this.listBlackList.Appearance.BackColor = System.Drawing.SystemColors.Control;
+            this.listBlackList.Appearance.BackColor = System.Drawing.SystemColors.Window;
             this.listBlackList.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F);
             this.listBlackList.Appearance.Options.UseBackColor = true;
             this.listBlackList.Appearance.Options.UseFont = true;
-            this.listBlackList.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.NoBorder;
+            this.listBlackList.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
             this.listBlackList.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listBlackList.HotTrackSelectMode = DevExpress.XtraEditors.HotTrackSelectMode.SelectItemOnClick;
             this.listBlackList.ItemHeight = 18;
             this.listBlackList.Location = new System.Drawing.Point(0, 0);
             this.listBlackList.Name = "listBlackList";
             this.listBlackList.Size = new System.Drawing.Size(301, 659);
             this.listBlackList.SortOrder = System.Windows.Forms.SortOrder.Ascending;
             this.listBlackList.TabIndex = 12;
+            // 
+            // panVendor
+            // 
+            this.panVendor.Controls.Add(this.controlContainer5);
+            customHeaderButtonImageOptions4.Image = global::EntityCore.Properties.Resources.miniCancel;
+            customHeaderButtonImageOptions5.Image = global::EntityCore.Properties.Resources.miniAdd;
+            this.panVendor.CustomHeaderButtons.AddRange(new DevExpress.XtraBars.Docking2010.IButton[] {
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete Vendor", false, customHeaderButtonImageOptions4, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete Vendor form list", -1, true, null, true, false, true, serializableAppearanceObject4, null, -1),
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Add Vendor", false, customHeaderButtonImageOptions5, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Add Vendor to list", -1, true, null, true, false, true, serializableAppearanceObject5, null, -1)});
+            this.panVendor.Dock = DevExpress.XtraBars.Docking.DockingStyle.Fill;
+            this.panVendor.ID = new System.Guid("38123327-94b3-4fd0-830e-ce78d708b1c9");
+            this.panVendor.Location = new System.Drawing.Point(4, 32);
+            this.panVendor.Name = "panVendor";
+            this.panVendor.Options.ShowCloseButton = false;
+            this.panVendor.Options.ShowMaximizeButton = false;
+            this.panVendor.Options.ShowMinimizeButton = false;
+            this.panVendor.OriginalSize = new System.Drawing.Size(301, 665);
+            this.panVendor.Size = new System.Drawing.Size(301, 659);
+            this.panVendor.Text = "Vendor";
+            this.panVendor.CustomButtonClick += new DevExpress.XtraBars.Docking2010.ButtonEventHandler(this.handler_Vendor_ButtonClick);
+            // 
+            // controlContainer5
+            // 
+            this.controlContainer5.Controls.Add(this.listVendor);
+            this.controlContainer5.Location = new System.Drawing.Point(0, 0);
+            this.controlContainer5.Name = "controlContainer5";
+            this.controlContainer5.Size = new System.Drawing.Size(301, 659);
+            this.controlContainer5.TabIndex = 0;
+            // 
+            // listVendor
+            // 
+            this.listVendor.Appearance.BackColor = System.Drawing.SystemColors.Window;
+            this.listVendor.Appearance.Font = new System.Drawing.Font("Tahoma", 9.75F);
+            this.listVendor.Appearance.Options.UseBackColor = true;
+            this.listVendor.Appearance.Options.UseFont = true;
+            this.listVendor.BorderStyle = DevExpress.XtraEditors.Controls.BorderStyles.Simple;
+            this.listVendor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listVendor.HotTrackSelectMode = DevExpress.XtraEditors.HotTrackSelectMode.SelectItemOnClick;
+            this.listVendor.ItemHeight = 18;
+            this.listVendor.Location = new System.Drawing.Point(0, 0);
+            this.listVendor.Name = "listVendor";
+            this.listVendor.Size = new System.Drawing.Size(301, 659);
+            this.listVendor.SortOrder = System.Windows.Forms.SortOrder.Ascending;
+            this.listVendor.TabIndex = 13;
+            this.listVendor.SelectedValueChanged += new System.EventHandler(this.handler_ListBox_ItemSelected);
+            this.listVendor.Enter += new System.EventHandler(this.handler_ListBox_ItemSelected);
             // 
             // barManager
             // 
@@ -392,7 +393,7 @@ namespace EntityCore.Forms
             this.btnSave,
             this.btnSaveAs,
             this.btnNewProfile,
-            this.barButtonItem1});
+            this.btnShowMapper});
             this.barManager.MaxItemId = 7;
             // 
             // barProfile
@@ -406,7 +407,7 @@ namespace EntityCore.Forms
             new DevExpress.XtraBars.LinkPersistInfo(this.btnOpen),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnSave),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnSaveAs),
-            new DevExpress.XtraBars.LinkPersistInfo(this.barButtonItem1)});
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnShowMapper, true)});
             this.barProfile.Text = "Tools";
             // 
             // btnNewProfile
@@ -440,6 +441,15 @@ namespace EntityCore.Forms
             this.btnSaveAs.ImageOptions.Image = global::EntityCore.Properties.Resources.miniSaveas;
             this.btnSaveAs.Name = "btnSaveAs";
             this.btnSaveAs.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Profile_SaveAs);
+            // 
+            // btnShowMapper
+            // 
+            this.btnShowMapper.Caption = "Mapper";
+            this.btnShowMapper.Hint = "Open Mapper";
+            this.btnShowMapper.Id = 6;
+            this.btnShowMapper.ImageOptions.Image = global::EntityCore.Properties.Resources.miniRoad;
+            this.btnShowMapper.Name = "btnShowMapper";
+            this.btnShowMapper.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_OpenMapper);
             // 
             // barDockControlTop
             // 
@@ -556,21 +566,23 @@ namespace EntityCore.Forms
             this.treeActions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.treeActions.BackColor = System.Drawing.SystemColors.Control;
-            this.treeActions.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.treeActions.BackColor = System.Drawing.SystemColors.Window;
+            this.treeActions.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.treeActions.CausesValidation = false;
             this.treeActions.CheckBoxes = true;
             this.treeActions.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.treeActions.ForeColor = System.Drawing.SystemColors.WindowText;
             this.treeActions.FullRowSelect = true;
+            this.treeActions.HideSelection = false;
             this.treeActions.ImageKey = "Cube";
             this.treeActions.ImageList = this.imageList;
             this.treeActions.Indent = 22;
             this.treeActions.ItemHeight = 18;
-            this.treeActions.Location = new System.Drawing.Point(3, 24);
+            this.treeActions.Location = new System.Drawing.Point(0, 23);
             this.treeActions.Name = "treeActions";
             this.treeActions.SelectedImageIndex = 0;
             this.treeActions.ShowNodeToolTips = true;
-            this.treeActions.Size = new System.Drawing.Size(349, 531);
+            this.treeActions.Size = new System.Drawing.Size(355, 536);
             this.treeActions.TabIndex = 4;
             this.treeActions.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.handler_TreeView_NodeCheckedChanged);
             this.treeActions.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.handler_TreeView_ItemDrag);
@@ -603,16 +615,16 @@ namespace EntityCore.Forms
             this.imageList.Images.SetKeyName(15, "List");
             this.imageList.Images.SetKeyName(16, "Cancel");
             this.imageList.Images.SetKeyName(17, "Dodge");
-            this.imageList.Images.SetKeyName(18, "Art");
-            this.imageList.Images.SetKeyName(19, "Gem");
-            this.imageList.Images.SetKeyName(20, "miniBoxedArrow.png");
-            this.imageList.Images.SetKeyName(21, "Gear");
-            this.imageList.Images.SetKeyName(22, "Recycle");
-            this.imageList.Images.SetKeyName(23, "Target");
-            this.imageList.Images.SetKeyName(24, "Condition");
-            this.imageList.Images.SetKeyName(25, "ConditionList");
-            this.imageList.Images.SetKeyName(26, "Power");
-            this.imageList.Images.SetKeyName(27, "Error");
+            this.imageList.Images.SetKeyName(18, "miniBoxedArrow.png");
+            this.imageList.Images.SetKeyName(19, "Gear");
+            this.imageList.Images.SetKeyName(20, "Recycle");
+            this.imageList.Images.SetKeyName(21, "Target");
+            this.imageList.Images.SetKeyName(22, "Condition");
+            this.imageList.Images.SetKeyName(23, "ConditionList");
+            this.imageList.Images.SetKeyName(24, "Power");
+            this.imageList.Images.SetKeyName(25, "Error");
+            this.imageList.Images.SetKeyName(26, "Art.png");
+            this.imageList.Images.SetKeyName(27, "Gem.png");
             // 
             // txtActionFilter
             // 
@@ -629,6 +641,8 @@ namespace EntityCore.Forms
             new DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Clear)});
             this.txtActionFilter.Size = new System.Drawing.Size(355, 20);
             this.txtActionFilter.TabIndex = 10;
+            this.txtActionFilter.ButtonPressed += new DevExpress.XtraEditors.Controls.ButtonPressedEventHandler(this.handler_Filter_ButtonPressed);
+            this.txtActionFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.handler_Filter_KeyDown);
             // 
             // panelContainer1
             // 
@@ -701,11 +715,13 @@ namespace EntityCore.Forms
             // treeConditions
             // 
             this.treeConditions.AllowDrop = true;
-            this.treeConditions.BackColor = System.Drawing.SystemColors.Control;
-            this.treeConditions.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.treeConditions.BackColor = System.Drawing.SystemColors.Window;
+            this.treeConditions.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.treeConditions.CheckBoxes = true;
             this.treeConditions.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeConditions.Font = new System.Drawing.Font("Tahoma", 9.75F);
+            this.treeConditions.FullRowSelect = true;
+            this.treeConditions.HideSelection = false;
             this.treeConditions.ImageKey = "Condition";
             this.treeConditions.ImageList = this.imageList;
             this.treeConditions.ItemHeight = 18;
@@ -773,12 +789,11 @@ namespace EntityCore.Forms
             this.behaviorManager.SetBehaviors(this.gridViewHotSpots, new DevExpress.Utils.Behaviors.Behavior[] {
             ((DevExpress.Utils.Behaviors.Behavior)(DevExpress.Utils.DragDrop.DragDropBehavior.Create(typeof(DevExpress.XtraGrid.Extensions.ColumnViewDragDropSource), true, true, true, true, this.hotSpotsDragDropEvent)))});
             this.gridViewHotSpots.Columns.AddRange(new DevExpress.XtraGrid.Columns.GridColumn[] {
-            this.clmnPoint,
             this.clmnPointX,
             this.clmnPointY,
             this.clmnPointZ});
             this.gridViewHotSpots.GridControl = this.gridHotSpots;
-            this.gridViewHotSpots.IndicatorWidth = 30;
+            this.gridViewHotSpots.IndicatorWidth = 45;
             this.gridViewHotSpots.Name = "gridViewHotSpots";
             this.gridViewHotSpots.OptionsBehavior.AllowAddRows = DevExpress.Utils.DefaultBoolean.False;
             this.gridViewHotSpots.OptionsBehavior.AllowDeleteRows = DevExpress.Utils.DefaultBoolean.False;
@@ -794,20 +809,6 @@ namespace EntityCore.Forms
             this.gridViewHotSpots.VertScrollVisibility = DevExpress.XtraGrid.Views.Base.ScrollVisibility.Never;
             this.gridViewHotSpots.CustomDrawRowIndicator += new DevExpress.XtraGrid.Views.Grid.RowIndicatorCustomDrawEventHandler(this.handler_HotSpot_RowIndicator);
             // 
-            // clmnPoint
-            // 
-            this.clmnPoint.Caption = "Point";
-            this.clmnPoint.FieldName = "clmnPoint";
-            this.clmnPoint.Name = "clmnPoint";
-            this.clmnPoint.OptionsColumn.AllowEdit = false;
-            this.clmnPoint.OptionsColumn.AllowGroup = DevExpress.Utils.DefaultBoolean.False;
-            this.clmnPoint.OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False;
-            this.clmnPoint.OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
-            this.clmnPoint.OptionsColumn.ReadOnly = true;
-            this.clmnPoint.UnboundDataType = typeof(string);
-            this.clmnPoint.UnboundExpression = "Concat(ToStr([X]), Char(59), Char(32), ToStr([Y]), Char(59), Char(32), ToStr([Z])" +
-    ")";
-            // 
             // clmnPointX
             // 
             this.clmnPointX.AppearanceHeader.Options.UseTextOptions = true;
@@ -822,6 +823,8 @@ namespace EntityCore.Forms
             this.clmnPointX.OptionsColumn.AllowMove = false;
             this.clmnPointX.OptionsColumn.AllowShowHide = false;
             this.clmnPointX.OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
+            this.clmnPointX.OptionsFilter.AllowAutoFilter = false;
+            this.clmnPointX.OptionsFilter.AllowFilter = false;
             this.clmnPointX.Visible = true;
             this.clmnPointX.VisibleIndex = 0;
             this.clmnPointX.Width = 100;
@@ -840,6 +843,8 @@ namespace EntityCore.Forms
             this.clmnPointY.OptionsColumn.AllowMove = false;
             this.clmnPointY.OptionsColumn.AllowShowHide = false;
             this.clmnPointY.OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
+            this.clmnPointY.OptionsFilter.AllowAutoFilter = false;
+            this.clmnPointY.OptionsFilter.AllowFilter = false;
             this.clmnPointY.Visible = true;
             this.clmnPointY.VisibleIndex = 1;
             this.clmnPointY.Width = 100;
@@ -858,6 +863,8 @@ namespace EntityCore.Forms
             this.clmnPointZ.OptionsColumn.AllowMove = false;
             this.clmnPointZ.OptionsColumn.AllowShowHide = false;
             this.clmnPointZ.OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
+            this.clmnPointZ.OptionsFilter.AllowAutoFilter = false;
+            this.clmnPointZ.OptionsFilter.AllowFilter = false;
             this.clmnPointZ.Visible = true;
             this.clmnPointZ.VisibleIndex = 2;
             this.clmnPointZ.Width = 100;
@@ -886,34 +893,20 @@ namespace EntityCore.Forms
             // 
             // pgProperties
             // 
+            this.pgProperties.BackColor = System.Drawing.SystemColors.Control;
+            this.pgProperties.CategorySplitterColor = System.Drawing.SystemColors.Window;
             this.pgProperties.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pgProperties.Location = new System.Drawing.Point(0, 0);
             this.pgProperties.Name = "pgProperties";
             this.pgProperties.Size = new System.Drawing.Size(609, 316);
             this.pgProperties.TabIndex = 4;
             this.pgProperties.ToolbarVisible = false;
-            this.pgProperties.ViewBackColor = System.Drawing.SystemColors.Control;
             this.pgProperties.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.handler_PropertyChanged);
             // 
             // hotSpotsDragDropEvent
             // 
             this.hotSpotsDragDropEvent.DragOver += new DevExpress.Utils.DragDrop.DragOverEventHandler(this.handler_HotSpot_DragOver);
             this.hotSpotsDragDropEvent.DragDrop += new DevExpress.Utils.DragDrop.DragDropEventHandler(this.handler_HotSpot_DragDrop);
-            // 
-            // bar1
-            // 
-            this.bar1.BarName = "Custom 3";
-            this.bar1.DockCol = 0;
-            this.bar1.DockRow = 1;
-            this.bar1.DockStyle = DevExpress.XtraBars.BarDockStyle.Top;
-            this.bar1.Text = "Custom 3";
-            // 
-            // barButtonItem1
-            // 
-            this.barButtonItem1.Caption = "SetEditor";
-            this.barButtonItem1.Id = 6;
-            this.barButtonItem1.Name = "barButtonItem1";
-            this.barButtonItem1.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.barButtonItem1_ItemClick);
             // 
             // QuesterEditor
             // 
@@ -932,20 +925,21 @@ namespace EntityCore.Forms
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "QuesterEditor";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.handler_Form_Closing);
+            this.Load += new System.EventHandler(this.handler_Form_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dockManager)).EndInit();
             this.hideContainerRight.ResumeLayout(false);
             this.panelContainer3.ResumeLayout(false);
-            this.panVendor.ResumeLayout(false);
-            this.controlContainer5.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.listVendor)).EndInit();
-            this.panSettings.ResumeLayout(false);
-            this.dockPanel1_Container.ResumeLayout(false);
             this.panCustomRegions.ResumeLayout(false);
             this.controlContainer3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.listCustomRegions)).EndInit();
+            this.panSettings.ResumeLayout(false);
+            this.dockPanel1_Container.ResumeLayout(false);
             this.panBlackList.ResumeLayout(false);
             this.controlContainer4.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.listBlackList)).EndInit();
+            this.panVendor.ResumeLayout(false);
+            this.controlContainer5.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.listVendor)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.barManager)).EndInit();
             this.panLog.ResumeLayout(false);
             this.controlContainer2.ResumeLayout(false);
@@ -1014,7 +1008,6 @@ namespace EntityCore.Forms
         private DevExpress.XtraBars.Docking.AutoHideContainer hideContainerRight;
         private DevExpress.XtraGrid.GridControl gridHotSpots;
         private DevExpress.XtraGrid.Views.Grid.GridView gridViewHotSpots;
-        private DevExpress.XtraGrid.Columns.GridColumn clmnPoint;
         private DevExpress.XtraGrid.Columns.GridColumn clmnPointX;
         private DevExpress.XtraGrid.Columns.GridColumn clmnPointY;
         private DevExpress.XtraGrid.Columns.GridColumn clmnPointZ;
@@ -1022,7 +1015,6 @@ namespace EntityCore.Forms
         private DevExpress.Utils.DragDrop.DragDropEvents hotSpotsDragDropEvent;
         private System.Windows.Forms.ImageList imageList;
         private DevExpress.XtraBars.BarButtonItem btnNewProfile;
-        private DevExpress.XtraBars.Bar bar1;
-        private DevExpress.XtraBars.BarButtonItem barButtonItem1;
+        private DevExpress.XtraBars.BarButtonItem btnShowMapper;
     }
 }

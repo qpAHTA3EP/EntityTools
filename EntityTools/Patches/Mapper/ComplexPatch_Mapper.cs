@@ -6,7 +6,10 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using ACTP0Tools;
 using AStar;
+using Astral.Logic.Classes.FSM;
+using DevExpress.Data.Filtering.Helpers;
 
 // ReSharper disable InconsistentNaming
 
@@ -174,18 +177,53 @@ namespace EntityTools.Patches.Mapper
         internal static bool OpenMapper()
         {
             if (!EntityTools.Config.Mapper.Patch) return true;
-            
+
             if (mapperForm is null || mapperForm.IsDisposed)
+            {
                 mapperForm = new MapperFormExt();
+                mapperForm.OnDraw += DrawRunningRole;
+            }
             mapperForm.Show();
             return false;
-            //Astral.Quester.Forms.MapperForm.Open();
         }
 
         internal static void CloseMapper()
         {
             if (mapperForm != null && !mapperForm.IsDisposed)
                 mapperForm.Close();
+        }
+
+
+
+        private static void DrawRunningRole(MapperGraphics graphics)
+        {
+            if (AstralAccessors.Controllers.Roles.IsRunning)
+            {
+                var profile = AstralAccessors.Quester.Core.Profile;
+                if (profile != null)
+                {
+                    bool hotSpotsNotYetDrawn = true;
+                    foreach (var action in profile.GetCurrentActions)
+                    {
+                        action.OnMapDraw(graphics);
+                        if (hotSpotsNotYetDrawn && action.UseHotSpots)
+                        {
+                            DrawHotSpots(action.HotSpots, graphics);
+                            hotSpotsNotYetDrawn = false;
+                        }
+                    }
+                }
+
+                var road = AstralAccessors.Controllers.Engine.MainEngine.Navigation.road;
+                if (road != null)
+                {
+                    var waypoints = road.Waypoints;
+                    if (waypoints?.Count > 0)
+                    {
+                        DrawRoad(waypoints, graphics, defaultPen, defaultBrush);
+                    }
+                }
+            }
         }
 
         #region DrawRoad
@@ -392,6 +430,8 @@ public static void Astral.Logic.Classes.Map.Functions.Picture.DrawMeshes(Graphic
         /// </summary>
         public static bool DrawMeshes(GraphicsNW graph, Graph meshes)
         {
+            if (graph is null || meshes is null)
+                return false;
             if (graph is MapperGraphics mapGraphics)
             {
                 var bidirBrush = mapGraphics.DrawingTools.BidirectionalPathBrush;
@@ -399,22 +439,19 @@ public static void Astral.Logic.Classes.Map.Functions.Picture.DrawMeshes(Graphic
                 var bidirPen = mapGraphics.DrawingTools.BidirectionalPathPen;
                 var unidirPen = mapGraphics.DrawingTools.UnidirectionalPathPen;
 
-                var graphCache = mapGraphics.GraphCache;
-                using (graphCache.ReadLock())
+                //var graphCache = mapGraphics.GraphCache;
+                using (meshes.ReadLock())
                 {
                     mapGraphics.GetWorldPosition(0, 0, out double left, out double top);
                     mapGraphics.GetWorldPosition(mapGraphics.ImageWidth, mapGraphics.ImageHeight, out double right, out double down);
 
-                    foreach (Node node in graphCache.NodesCollection)
+                    foreach (Node node in meshes.NodesCollection)
                     {
                         if (node.Passable)
                         {
                             // Отсеиваем и не отрисовываем вершины и ребра, расположенные за пределами видимого изображения
-#if false
-                            // Отрисовываются только кэшированные вершины, попадающие в отображаемую область
                             if (left <= node.X && node.X <= right
                                 && down <= node.Y && node.Y <= top) 
-#endif
                             {
                                 bool uniPath = node.IncomingArcsCount <= 1 && node.OutgoingArcsCount <= 1;
                                 Brush brush = (uniPath) ? unidirBrush : bidirBrush;
@@ -436,21 +473,6 @@ public static void Astral.Logic.Classes.Map.Functions.Picture.DrawMeshes(Graphic
                 using (meshes.ReadLock())
                 {
                     double num = graph.getWorldPos(new Point(graph.ImageWidth, graph.ImageHeight)).Distance2D(graph.CenterPosition);
-#if false
-                    foreach (Arc arc in meshes.Arcs)
-                    {
-                        if (arc.StartNode.Passable && arc.EndNode.Passable)
-                        {
-                            Vector3 startPos = new Vector3((float)arc.StartNode.X, (float)arc.StartNode.Y, (float)arc.StartNode.Z);
-                            Vector3 endPos = new Vector3((float)arc.EndNode.X, (float)arc.EndNode.Y, (float)arc.EndNode.Z);
-                            if (startPos.Distance2D(graph.CenterPosition) < num)
-                            {
-                                graph.drawLine(startPos, endPos, Pens.Red);
-                            }
-                        }
-                    } 
-#endif
-
                     var nodeSize = new Size(5, 5);
                     foreach (Node node in meshes.Nodes)
                     {
@@ -473,7 +495,6 @@ public static void Astral.Logic.Classes.Map.Functions.Picture.DrawMeshes(Graphic
                                         graph.drawLine(nodePos, endPos, Pens.Red);
                                     }
                                 }
-#if true
                                 foreach (Arc arc in node.IncomingArcs)
                                 {
                                     if (arc.StartNode.Passable)
@@ -482,7 +503,6 @@ public static void Astral.Logic.Classes.Map.Functions.Picture.DrawMeshes(Graphic
                                         graph.drawLine(startPos, nodePos, Pens.Red);
                                     }
                                 }
-#endif
                                 graph.drawFillEllipse(nodePos, nodeSize, brush);
                             }
                         }

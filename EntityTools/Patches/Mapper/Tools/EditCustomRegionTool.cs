@@ -1,8 +1,11 @@
 ﻿using AStar;
 using Astral.Quester.Classes;
 using System;
+using System.ComponentModel;
+using System.Linq;
 using System.Windows.Forms;
 using ACTP0Tools;
+using ACTP0Tools.Classes.Quester;
 using DevExpress.XtraEditors;
 // ReSharper disable InconsistentNaming
 
@@ -20,10 +23,14 @@ namespace EntityTools.Patches.Mapper.Tools
         /// <typeparam name="IMapperTool">Объект для отката изменений</typeparam>
         private readonly System.Action<CustomRegion, IMapperTool> onComplete;
 
+        public BindingList<CustomRegion> CustomRegions => _profile.CustomRegions;
+        private QuesterProfileProxy _profile;
+
         public EditCustomRegionTool(CustomRegion cr = null, MapperFormExt mapperForm = null, System.Action<CustomRegion, IMapperTool> onCompleteCallback = null)
         {
             onComplete = onCompleteCallback;
             AttachTo(cr);
+            _profile = mapperForm?.Profile ?? AstralAccessors.Quester.Core.ActiveProfileProxy;
             toolForm.Mode = CustomRegionToolForm.ViewMode.Edit;
             toolForm.Show(CustomRegionToolForm.ViewMode.Edit, mapperForm, cr);
         }
@@ -213,10 +220,10 @@ namespace EntityTools.Patches.Mapper.Tools
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            var crList = Astral.Quester.API.CurrentProfile.CustomRegions;
+            var crList = CustomRegions;
 
             if (crList.Count > 0
-                && crList.Find(cr => !ReferenceEquals(customRegion, cr) && cr.Name == name) != null)
+                && crList.FirstOrDefault(cr => !ReferenceEquals(customRegion, cr) && cr.Name == name) != null)
             {
                 XtraMessageBox.Show($"There are exists another CustomRegion named '{name}'!,\n" +
                                     $"Set different name.", "Naming error !",
@@ -285,9 +292,9 @@ namespace EntityTools.Patches.Mapper.Tools
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-                var crList = Astral.Quester.API.CurrentProfile.CustomRegions;
+                var crList = CustomRegions;
                 if (crList.Count > 0
-                    && crList.Find(cr => !ReferenceEquals(customRegion, cr) && cr.Name == name) != null)
+                    && crList.FirstOrDefault(cr => !ReferenceEquals(customRegion, cr) && cr.Name == name) != null)
                 {
                     XtraMessageBox.Show($"There are exists another CustomRegion named '{name}'!,\n" +
                                         "Set different name.", "Naming error !",

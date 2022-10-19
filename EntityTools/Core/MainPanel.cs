@@ -1009,17 +1009,14 @@ namespace EntityTools.Core
             if(replacement.Count == 0)
                 return;
 
-            OpenFileDialog openFileDialog = new OpenFileDialog
-            {
-                InitialDirectory = Directories.ProfilesPath,
-                DefaultExt = "amp.zip",
-                Filter = @"Astral mission profile (*.amp.zip)|*.amp.zip"
-            };
+            OpenFileDialog openDialog = ACTP0Tools.Classes.FileTools.GetOpenDialog( filter: @"Astral mission profile (*.amp.zip)|*.amp.zip",
+                                                                                    defaultExtension: "amp.zip",
+                                                                                    initialDir: Directories.ProfilesPath );
 
-            if (openFileDialog.ShowDialog() != DialogResult.OK)
+            if (openDialog.ShowDialog() != DialogResult.OK)
                 return;
 
-            var profilePath = openFileDialog.FileName;
+            var profilePath = openDialog.FileName;
 
             using (var zipFile = ZipFile.Open(profilePath, ZipArchiveMode.Read))
             {
@@ -1146,16 +1143,16 @@ namespace EntityTools.Core
 
         private void handler_ImportPreprocessingProfile(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.InitialDirectory = Directories.SettingsPath;
-            openFileDialog.DefaultExt = "xml";
-            openFileDialog.Filter = "Replacements (*.xml)|*.xml";
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            OpenFileDialog openDialog = ACTP0Tools.Classes.FileTools.GetOpenDialog(filter: "Replacements (*.xml)|*.xml",
+                                                                                   defaultExtension: "xml",
+                                                                                   initialDir: Directories.SettingsPath);
+                
+            if (openDialog.ShowDialog() == DialogResult.OK)
             {
                 List<AstralAccessors.Quester.ReplacementItem> items = null;
 
                 XmlSerializer serialiser = new XmlSerializer(typeof(List<AstralAccessors.Quester.ReplacementItem>));
-                using (StreamReader fileStream = new StreamReader(openFileDialog.FileName))
+                using (StreamReader fileStream = new StreamReader(openDialog.FileName))
                 {
                     if (serialiser.Deserialize(fileStream) is List<AstralAccessors.Quester.ReplacementItem> list)
                     {

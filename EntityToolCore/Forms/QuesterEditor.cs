@@ -21,12 +21,20 @@ using MyNW.Internals;
 using MyNW.Patchables.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using ACTP0Tools.Classes.Quester;
+using ACTP0Tools.Patches;
+using Astral.Quester.Classes.Conditions;
+using DevExpress.Utils;
+using DevExpress.XtraBars.Docking2010;
+using EntityTools.Annotations;
+using EntityTools.Patches.Mapper;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
@@ -37,9 +45,9 @@ namespace EntityCore.Forms
         /// <summary>
         /// Редактируемый профиль
         /// </summary>
-        public QuesterProfileProxy Profile => profile;
+        public QuesterProfileProxy Profile => _profile;
 
-        private ProfileProxy profile;
+        private readonly ProfileProxy _profile;
 
         // Функтор, выполняемый при изменении pgProperties
         private System.Action propertyCallback;
@@ -48,7 +56,7 @@ namespace EntityCore.Forms
         private System.Action conditionCallback;
 
         // Функтор, выполняемый при изменении списка treeConditions
-        //private System.Action hotSpotCallback;
+        private System.Action hotSpotCallback;
 
         // Скопированная команда
         private QuesterAction actionCache;
@@ -125,9 +133,13 @@ namespace EntityCore.Forms
         } 
 #endif
 
-        public QuesterEditor()
+        public QuesterEditor(Profile profile, string fileName)
         {
             InitializeComponent();
+
+            _profile = profile is null 
+                ? new ProfileProxy()
+                : new ProfileProxy(profile, fileName);
 
             var settingFile = FileTools.QuesterEditorSettingsFile;
             if (File.Exists(settingFile))
@@ -149,7 +161,6 @@ namespace EntityCore.Forms
         /// <returns></returns>
         public static bool Edit(Profile profile = null, params object[] param)
         {
-            var editor = new QuesterEditor();
             string profileName = string.Empty;
             bool modal = false;
             if (param != null)
@@ -168,49 +179,11 @@ namespace EntityCore.Forms
                 }
             }
 
-            return editor.Show(profile, profileName, modal);
-        }
-
-        public new void Show()
-        {
-            Show(null);
-        }
-
-        private new void ShowDialog() { }
-
-        private bool Show(Profile profile, string profileName = "", bool modal = false)
-        {
-            UI_reset();
-
-            this.profile = new ProfileProxy(profile, profileName);
-
-            UI_fill(this.profile);
-
-            if (string.IsNullOrEmpty(this.profile.FileName))
-                Text = "* New profile";
-            else
-            {
-                Text = this.profile.FileName;
-                txtLog.AppendText(string.Concat("Profile '",
-                    this.profile.FileName,
-                    "' opened.",
-                    Environment.NewLine));
-            }
-
-#if does_not_work
-            documentManager.ContainerControl.ActiveControl = panCombat;
-            docCombat.Control.Focus();
-            dockManager.DockController.Activate(panCombat);
-            tabbedView.ActivateDocument(docCombat.Control);
-            selectedControl = treeCombatActions;
-            documentManager.DockManager.ActivePanel = panCombat;
-            documentGroup.SetSelected(docCombat);
-#endif
+            var editor = new QuesterEditor(profile, profileName);
             if (modal)
-                base.ShowDialog();
-            else base.Show();
-
-            return !this.profile.Saved;
+                return editor.ShowDialog() == DialogResult.OK;
+            editor.Show();
+            return true;
         }
 
         /// <summary>
@@ -220,47 +193,24 @@ namespace EntityCore.Forms
         private void UI_fill(ProfileProxy profile)
         {
             if (profile is null)
+            {
+                UI_reset();
                 return;
+            }
 
             // Отображение набора команд
+            treeActions.Nodes.Clear();
             if (profile.Actions.Any())
-            {
-                treeActions.Nodes.Clear();
                 treeActions.Nodes.AddRange(profile.Actions.ToTreeNodes(true));
-            }
 
             treeConditions.Nodes.Clear();
 
-#if true
             listBlackList.DataSource = profile.BlackList;
-#else
-            if (profile.BlackList.Any())
-            {
-                listBlackList.Items.Clear();
-                listBlackList.Items.AddRange(profile.BlackList.ToArray());
-            }
-#endif
-
-#if true
             listCustomRegions.DataSource = profile.CustomRegions;
-#else
-            if (profile.CustomRegions.Any())
-            {
-                listCustomRegions.Items.Clear();
-                listCustomRegions.Items.AddRange(profile.CustomRegions.ToArray());
-            }
-#endif
-
-#if true
             listVendor.DataSource = profile.Vendors;
-#else
-            if (profile.Vendors.Any())
-            {
-                listVendor.Items.Clear();
-                listVendor.Items.AddRange(profile.Vendors.ToArray());
-            }
-#endif
 
+            gridHotSpots.DataSource = null;
+            
             pgSettings.SelectedObject = profile;
             pgProperties.SelectedObject = null;
 
@@ -268,8 +218,10 @@ namespace EntityCore.Forms
             selectedAction = null;
             propertyCallback = null;
             conditionCallback = null;
+            hotSpotCallback = null;
 
             ChangeWindowCaption();
+            ResetFilter();
         }
 
         /// <summary>
@@ -280,11 +232,8 @@ namespace EntityCore.Forms
             treeActions.Nodes.Clear();
             treeConditions.Nodes.Clear();
 
-            //listBlackList.Items.Clear();
             listBlackList.DataSource = null;
-            //listCustomRegions.Items.Clear();
             listCustomRegions.DataSource = null;
-            //listVendor.Items.Clear();
             listVendor.DataSource = null;
 
             gridHotSpots.DataSource = null;
@@ -298,20 +247,43 @@ namespace EntityCore.Forms
             conditionCallback = null;
 
             ChangeWindowCaption();
+            ResetFilter();
         }
 
         private void ChangeWindowCaption()
         {
-            if (profile is null
-                || string.IsNullOrEmpty(profile.FileName))
+            if (_profile is null
+                || string.IsNullOrEmpty(_profile.FileName))
                 Text = "* New profile";
-            else Text = (profile.Saved ? string.Empty : "* ")
-                       + profile.FileName;
+            else Text = (_profile.Saved ? string.Empty : "* ")
+                       + _profile.FileName;
+        }
+
+        private void handler_Form_Load(object sender, EventArgs e)
+        {
+            // Подмена метаданных для IsInCustomRegion
+            // https://stackoverflow.com/questions/46099675/can-you-how-to-specify-editor-at-runtime-for-propertygrid-for-pcl
+            var provider = new AssociatedMetadataTypeTypeDescriptionProvider(
+                typeof(IsInCustomRegion),
+                typeof(IsInCustomRegionMetadataType));
+            TypeDescriptor.AddProvider(provider, typeof(IsInCustomRegion));
+
+            var tPushProfileToStackAndLoad = ACTP0Serializer.PushProfileToStackAndLoad;
+            if (tPushProfileToStackAndLoad != null)
+            {
+                provider = new AssociatedMetadataTypeTypeDescriptionProvider(
+                    tPushProfileToStackAndLoad,
+                    typeof(PushProfileToStackAndLoadMetadataType));
+                TypeDescriptor.AddProvider(provider, tPushProfileToStackAndLoad);
+            }
+
+
+            UI_fill(_profile);
         }
 
         private void handler_Form_Closing(object sender, FormClosingEventArgs e)
         {
-            if (!profile.Saved)
+            if (!_profile.Saved)
             {
                 switch (XtraMessageBox.Show("Profile was modified but did not saved!\n" +
                                             "Would you like to save it ?\n" +
@@ -328,6 +300,7 @@ namespace EntityCore.Forms
             }
 
             dockManager.SaveLayoutToXml(FileTools.QuesterEditorSettingsFile);
+            mapperForm?.Close();
         }
         #endregion
 
@@ -400,14 +373,14 @@ namespace EntityCore.Forms
                             if(parent is ActionPackTreeNode parentActionPackTreeNode)
                                 parentActionPackTreeNode.UpdateView();
                             actionPackNode.Nodes.Insert(0, draggedNode);
-                            profile.Saved = false;
+                            _profile.Saved = false;
                         }
                         // Вставляем копию перетаскиваемого узла во внутрь целевого узла
                         else if (e.Effect == DragDropEffects.Copy)
                         {
                             //Logger.WriteLine(Logger.LogType.Debug, $"Copy [{draggedNode.Index}]'{draggedNode.Text}' into Children of [{targetNode.Index}]'{targetNode.Text}'");
                             targetNode.Nodes.Insert(0, (TreeNode) draggedNode.Clone());
-                            profile.Saved = false;
+                            _profile.Saved = false;
                         }
 
                         actionPackNode.UpdateView();
@@ -427,14 +400,14 @@ namespace EntityCore.Forms
                             //Logger.WriteLine(Logger.LogType.Debug, $"Move [{draggedNode.Index}]'{draggedNode.Text}' into Children of [{targetNode.Index}]'{targetNode.Text}'");
                             draggedNode.Remove();
                             conditionPackNode.Nodes.Insert(0, draggedNode);
-                            profile.Saved = false;
+                            _profile.Saved = false;
                         }
                         // Вставляем копию перетаскиваемого узла во внутрь целевого узла
                         else if (e.Effect == DragDropEffects.Copy)
                         {
                             //Logger.WriteLine(Logger.LogType.Debug, $"Copy [{draggedNode.Index}]'{draggedNode.Text}' into Children of [{targetNode.Index}]'{targetNode.Text}'");
                             targetNode.Nodes.Insert(0, (TreeNode) draggedNode.Clone());
-                            profile.Saved = false;
+                            _profile.Saved = false;
                         }
 
                         // Раскрываем целевой узел дерева, в который перемещен/скопирован перетаскиваемый узел
@@ -457,13 +430,13 @@ namespace EntityCore.Forms
                             if (parent is ActionPackTreeNode draggedParentTreeNode)
                                 draggedParentTreeNode.UpdateView();
                             treeNodeCollection.Insert(targetNode.Index + 1, draggedNode);
-                            profile.Saved = false;
+                            _profile.Saved = false;
                         }
                         // Копирование узла
                         else if (e.Effect == DragDropEffects.Copy)
                         {
                             treeNodeCollection.Insert(targetNode.Index + 1, (TreeNode)draggedNode.Clone());
-                            profile.Saved = false;
+                            _profile.Saved = false;
                         }
                         if (targetNode.Parent is ActionPackTreeNode targetParentTreeNode)
                             targetParentTreeNode.UpdateView();
@@ -480,14 +453,14 @@ namespace EntityCore.Forms
                         draggedNode.Remove();
 
                         treeView.Nodes.Add(draggedNode);
-                        profile.Saved = false;
+                        _profile.Saved = false;
                         ChangeWindowCaption();
                     }
                     // Копирование узла
                     else if (e.Effect == DragDropEffects.Copy)
                     {
                         treeView.Nodes.Add((TreeNode) draggedNode.Clone());
-                        profile.Saved = false;
+                        _profile.Saved = false;
                         ChangeWindowCaption();
                     }
                     treeView.EndUpdate();
@@ -656,7 +629,7 @@ namespace EntityCore.Forms
 #endif
                 } 
 #endif
-                profile.Saved = false;
+                _profile.Saved = false;
                 pgProperties.SelectedObject = newCondition;
                 if (newTreeNode is ITreeNode<QuesterCondition> conditionPackNode)
                     propertyCallback = conditionPackNode.UpdateView;
@@ -684,7 +657,7 @@ namespace EntityCore.Forms
                     propertyCallback = null;
                 pgProperties.SelectedObject = null;
                 conditionNode.Remove();
-                profile.Saved = false;
+                _profile.Saved = false;
                 ChangeWindowCaption();
             }
         }
@@ -749,7 +722,7 @@ namespace EntityCore.Forms
                 if (newNode is ITreeNode<QuesterCondition> conditionTreeNode)
                     propertyCallback = conditionTreeNode.UpdateView;
 
-                profile.Saved = false;
+                _profile.Saved = false;
                 ChangeWindowCaption();
             }
         }
@@ -842,10 +815,12 @@ namespace EntityCore.Forms
         private void handler_Condition_GetFocus(object sender, EventArgs e)
         {
             var node = treeConditions.SelectedNode;
-            var tag = node?.Tag;
-            if (tag != null && !ReferenceEquals(tag, pgProperties.SelectedObject))
+            if (node != null)
             {
-                ChangeTreeNodeCallback(node);
+                var tag = node.Tag;
+                if (tag != null && !ReferenceEquals(tag, pgProperties.SelectedObject))
+                {
+                    ChangeTreeNodeCallback(node);
 #if false
                 if (tag is IsInCustomRegionSet crSet)
                 {
@@ -866,7 +841,9 @@ namespace EntityCore.Forms
 #endif
                 } 
 #endif
-                pgProperties.SelectedObject = tag;
+                    pgProperties.SelectedObject = tag;
+                }
+                //node.BackColor = treeConditions.BackColor; 
             }
         }
         #endregion
@@ -932,7 +909,7 @@ namespace EntityCore.Forms
                         parentActionPack.UpdateView();
                 }
 
-                profile.Saved = false;
+                _profile.Saved = false;
 
                 treeActions.SelectedNode = newNode;
                 selectedAction = newAction;
@@ -958,13 +935,16 @@ namespace EntityCore.Forms
 
                 conditionCallback = null;
                 propertyCallback = null;
+                hotSpotCallback = null;
+
                 treeConditions.Nodes.Clear();
                 selectedAction = null;
                 pgProperties.SelectedObject = null;
+                
                 actionNode.Remove();
                 parentNode?.UpdateView();
 
-                profile.Saved = false;
+                _profile.Saved = false;
 
                 ChangeWindowCaption();
             }
@@ -1096,16 +1076,22 @@ namespace EntityCore.Forms
         private void handler_Action_GetFocus(object sender, EventArgs e)
         {
             var node = treeActions.SelectedNode;
-            var tag = node?.Tag;
-            if (tag != null && !ReferenceEquals(tag, pgProperties.SelectedObject))
+            if (node != null)
             {
-                ChangeTreeNodeCallback(node);
-                pgProperties.SelectedObject = tag;
-                if (tag is QuesterAction action)
+                var tag = node.Tag;
+                if (tag != null && !ReferenceEquals(tag, pgProperties.SelectedObject))
                 {
-                    selectedAction = action;
-                    gridHotSpots.DataSource = action.HotSpots;
+                    ChangeTreeNodeCallback(node);
+                    pgProperties.SelectedObject = tag;
+                    if (tag is QuesterAction action)
+                    {
+                        selectedAction = action;
+                        gridHotSpots.DataSource = action.HotSpots;
+                    }
                 }
+                //node.BackColor = highlightedTreeNodes.Contains(node)
+                //    ? Color.Yellow
+                //    : Color.Empty; 
             }
         }
         #endregion
@@ -1146,10 +1132,20 @@ namespace EntityCore.Forms
                 pgProperties.SelectedObject = Engine.CustomRegionCollectionDecorator.Decorate(crSet);
                 return; 
 #else
-                crSet.CustomRegions.DebugContext = profile;
+                crSet.CustomRegions.DebugContext = _profile;
 #endif
             }
             pgProperties.SelectedObject = tag;
+        }
+
+        void handler_TreeView_Leave(object sender, EventArgs e)
+        {
+            if (sender is TreeView treeView)
+            {
+                var selectedNode = treeView.SelectedNode;
+                if (selectedNode != null)
+                    selectedNode.BackColor = SystemColors.Highlight;
+            }
         }
 
         private void ChangeTreeNodeCallback(TreeNode treeNode)
@@ -1161,18 +1157,21 @@ namespace EntityCore.Forms
             {
                 case IActionTreeNode actionNode:
                     conditionCallback?.Invoke();
-                    //hotSpotCallback?.Invoke();
+                    hotSpotCallback?.Invoke();
                     treeConditions.Nodes.Clear();
                     treeConditions.Nodes.AddRange(actionNode.ConditionTreeNodes);
                     propertyCallback = actionNode.UpdateView;
                     if (treeNode.Parent is IActionTreeNode parentPackNode)
                         propertyCallback += parentPackNode.UpdateView;
-                    conditionCallback = () =>
-                    {
+                    conditionCallback = () => {
                         TreeNode[] condNodes = new TreeNode[treeConditions.Nodes.Count];
                         treeConditions.Nodes.CopyTo(condNodes, 0);
                         actionNode.ConditionTreeNodes = condNodes;
                     };
+                    if (treeNode.Tag is QuesterAction action
+                        && action.UseHotSpots)
+                        hotSpotCallback = actionNode.UpdateView;
+                    else hotSpotCallback = null;
                     break;
                 case ITreeNode<QuesterCondition> conditionNode:
                     propertyCallback = conditionNode.UpdateView;
@@ -1196,7 +1195,7 @@ namespace EntityCore.Forms
                     break;
             }
 
-            profile.Saved = false;
+            _profile.Saved = false;
         }
 
         private void handler_PropertyChanged(object sender, PropertyValueChangedEventArgs e)
@@ -1207,7 +1206,7 @@ namespace EntityCore.Forms
 
             }
             propertyCallback?.Invoke();
-            profile.Saved = false;
+            _profile.Saved = false;
             ChangeWindowCaption();
         }
         #endregion
@@ -1218,7 +1217,7 @@ namespace EntityCore.Forms
         #region Profile manipulation
         private void handler_Profile_New(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
-            if (!profile.Saved)
+            if (!_profile.Saved)
             {
                 switch (XtraMessageBox.Show("Profile was modified but did not saved!\n" +
                                             "Would you like to save it ?\n" +
@@ -1233,15 +1232,15 @@ namespace EntityCore.Forms
                 }
             }
 
-            profile = new ProfileProxy();
-            UI_fill(profile);
+            _profile.SetProfile(new Profile { Saved = true }, string.Empty);
+            UI_fill(_profile);
 
             txtLog.AppendText($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Make new Profile.");
         }
 
         private void handler_Profile_Load(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
-            if (!profile.Saved)
+            if (!_profile.Saved)
             {
                 switch (XtraMessageBox.Show("Profile was modified but did not saved!\n" +
                                             "Would you like to save it ?\n" +
@@ -1260,9 +1259,9 @@ namespace EntityCore.Forms
             var prof = AstralAccessors.Quester.Core.Load(ref path);
             if (prof != null)
             {
-                profile = new ProfileProxy(prof, path);
+                _profile.SetProfile(prof, path);
                 txtLog.AppendText($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Profile '{path}' loaded.");
-                UI_fill(profile);
+                UI_fill(_profile);
             }
         }
 
@@ -1272,9 +1271,9 @@ namespace EntityCore.Forms
             {
                 txtLog.AppendText(string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                     "] Profile",
-                    string.IsNullOrEmpty(profile.FileName)
+                    string.IsNullOrEmpty(_profile.FileName)
                         ? string.Empty
-                        : " '" + profile.FileName + "'",
+                        : " '" + _profile.FileName + "'",
                     " saved.",
                     Environment.NewLine));
                 ChangeWindowCaption();
@@ -1287,9 +1286,9 @@ namespace EntityCore.Forms
             {
                 txtLog.AppendText(string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                     "] Profile",
-                    string.IsNullOrEmpty(profile.FileName)
+                    string.IsNullOrEmpty(_profile.FileName)
                         ? string.Empty
-                        : " '" + profile.FileName + "'",
+                        : " '" + _profile.FileName + "'",
                     " saved.",
                     Environment.NewLine));
                 ChangeWindowCaption();
@@ -1309,7 +1308,7 @@ namespace EntityCore.Forms
                 conditionCallback?.Invoke();
 
                 // Восстановление команд
-                profile.Actions = ListReconstruction(treeActions.Nodes);
+                _profile.Actions = ListReconstruction(treeActions.Nodes);
 
                 // Восстановление не требуется, т.к. списки реализованы через BindingList<T>
                 //profile.Vendors = ListReconstruction<NPCInfos>(listVendor.Items);
@@ -1317,11 +1316,11 @@ namespace EntityCore.Forms
                 //profile.BlackList = ListReconstruction<string>(listBlackList.Items);
 
                 if (saveAs)
-                    profile.SaveAs();
-                else profile.Save();
+                    _profile.SaveAs();
+                else _profile.Save();
 
                 DialogResult = DialogResult.OK;
-                return profile.Saved;
+                return _profile.Saved;
             }
             catch (Exception exc)
             {
@@ -1369,8 +1368,7 @@ namespace EntityCore.Forms
 
 
         #region HotSpots manipulation
-        private void handler_HotSpot_RowIndicator(object sender,
-            DevExpress.XtraGrid.Views.Grid.RowIndicatorCustomDrawEventArgs e)
+        private void handler_HotSpot_RowIndicator(object sender, RowIndicatorCustomDrawEventArgs e)
         {
             if (e.Info.IsRowIndicator && e.RowHandle >= 0)
             {
@@ -1490,7 +1488,7 @@ namespace EntityCore.Forms
             args.Handled = true;
         }
 
-        private void handler_HotSpot_DragDrop(object sender, DevExpress.Utils.DragDrop.DragDropEventArgs e)
+        private void handler_HotSpot_DragDrop(object sender, DragDropEventArgs e)
         {
             if (e.Target is GridView targetGrid
                 && e.Source is GridView sourceGrid)
@@ -1529,7 +1527,7 @@ namespace EntityCore.Forms
                                 hotSpotsList.Remove(spot);
                                 hotSpotsList.Insert(newSpotIndex, spot);
                             }
-                            profile.Saved = false;
+                            _profile.Saved = false;
                             ChangeWindowCaption();
                             break;
                         case InsertType.After:
@@ -1540,7 +1538,7 @@ namespace EntityCore.Forms
                                 hotSpotsList.Remove(spot);
                                 hotSpotsList.Insert(newSpotIndex, spot);
                             }
-                            profile.Saved = false;
+                            _profile.Saved = false;
                             ChangeWindowCaption();
                             break;
                         default:
@@ -1557,60 +1555,73 @@ namespace EntityCore.Forms
             }
         }
 #endif
-        private void handler_HotSpots_ButtonClick(object sender, DevExpress.XtraBars.Docking2010.ButtonEventArgs e)
+        private void handler_HotSpots_ButtonClick(object sender, [NotNull] DevExpress.XtraBars.Docking2010.ButtonEventArgs e)
         {
+            if (e == null) throw new ArgumentNullException(nameof(e));
             var btn = e.Button;
             switch (btn.Properties.Caption)
             {
                 case "Add HotSpot":
-                {
-                    if (gridHotSpots.DataSource is List<Vector3> hotSpots)
-                    {
-                        var pos = EntityManager.LocalPlayer.Location.Clone();
-                        Node node = profile.CurrentMesh.ClosestNode(pos.X, pos.Y, pos.Z, out double distance, false);
-                        gridViewHotSpots.BeginUpdate();
-                        if (node != null
-                            && distance < 10)
-                            hotSpots.Add(node.Position);
-                        else hotSpots.Add(pos);
-
-                        profile.Saved = false;
-                        ChangeWindowCaption();
-
-                        gridViewHotSpots.RefreshData();
-                        gridViewHotSpots.EndUpdate();
-                    }
-
+                    AddHotSpot();
                     break;
-                }
                 case "Delete HotSpot":
-                {
-                    var selectedRows = gridViewHotSpots.GetSelectedRows();
-                    if (gridHotSpots.DataSource is List<Vector3> hotSpots
-                        && selectedRows.Length > 0)
-                    {
-                        gridViewHotSpots.BeginUpdate();
-                        for (int i = 0; i < selectedRows.Length; i++)
-                        {
-                            int ind = selectedRows[i] - i;
-                            hotSpots.RemoveAt(ind);
-                        }
-
-                        profile.Saved = false;
-                        ChangeWindowCaption();
-
-                        gridViewHotSpots.RefreshData();
-                        gridViewHotSpots.EndUpdate();
-                    }
-
+                    DeleteHotSpot();
                     break;
-                }
                 case "Edit Coordinates":
-                    bool isChecked = btn.IsChecked == true;
-                    gridViewHotSpots.OptionsBehavior.Editable = isChecked;
+                    ChangeHotSpotCoordinateEditMode(btn.IsChecked == true);
                     break;
             }
         }
+
+        private void AddHotSpot()
+        {
+            if (gridHotSpots.DataSource is List<Vector3> hotSpots)
+            {
+                var pos = EntityManager.LocalPlayer.Location.Clone();
+                Node node = _profile.CurrentMesh.ClosestNode(pos.X, pos.Y, pos.Z, out double distance, false);
+                gridViewHotSpots.BeginUpdate();
+                if (node != null
+                    && distance < 10)
+                    hotSpots.Add(node.Position);
+                else hotSpots.Add(pos);
+
+                _profile.Saved = false;
+                ChangeWindowCaption();
+
+                gridViewHotSpots.RefreshData();
+                gridViewHotSpots.EndUpdate();
+
+                hotSpotCallback?.Invoke();
+            }
+        }
+
+        private void DeleteHotSpot()
+        {
+            var selectedRows = gridViewHotSpots.GetSelectedRows();
+            if (gridHotSpots.DataSource is List<Vector3> hotSpots
+                && selectedRows.Length > 0)
+            {
+                gridViewHotSpots.BeginUpdate();
+                for (int i = 0; i < selectedRows.Length; i++)
+                {
+                    int ind = selectedRows[i] - i;
+                    hotSpots.RemoveAt(ind);
+                }
+
+                _profile.Saved = false;
+                ChangeWindowCaption();
+
+                gridViewHotSpots.RefreshData();
+                gridViewHotSpots.EndUpdate();
+
+                hotSpotCallback?.Invoke();
+            }
+        }
+        private void ChangeHotSpotCoordinateEditMode(bool allowEdit)
+        {
+            gridViewHotSpots.OptionsBehavior.Editable = allowEdit;
+        }
+
         #endregion
 
 
@@ -1666,13 +1677,13 @@ namespace EntityCore.Forms
                             RegionName = player.RegionInternalName
                         };
 
-                        var vendors = profile.Vendors;
+                        var vendors = _profile.Vendors;
                         if (!vendors.Contains(npcInfos))
                         {
                             vendors.Add(npcInfos);
                             listVendor.SelectedItem = npcInfos;
 
-                            profile.Saved = false;
+                            _profile.Saved = false;
                             ChangeWindowCaption();
                             return;
                         }
@@ -1684,8 +1695,8 @@ namespace EntityCore.Forms
                     {
                         if (listVendor.SelectedItem is NPCInfos item)
                         {
-                            profile.Vendors.Remove(item);
-                            profile.Saved = false;
+                            _profile.Vendors.Remove(item);
+                            _profile.Saved = false;
                             ChangeWindowCaption();
                         }
                         break;
@@ -1700,8 +1711,8 @@ namespace EntityCore.Forms
             {
                 if (listCustomRegions.SelectedItem is CustomRegion item)
                 {
-                    profile.CustomRegions.Remove(item);
-                    profile.Saved = false;
+                    _profile.CustomRegions.Remove(item);
+                    _profile.Saved = false;
                     ChangeWindowCaption();
                 }
             }
@@ -1731,11 +1742,11 @@ namespace EntityCore.Forms
                             return;
                         }
 
-                        var blackList = profile.BlackList;
+                        var blackList = _profile.BlackList;
                         if (!blackList.Contains(target.InternalName))
                         {
                             blackList.Add(target.InternalName);
-                            profile.Saved = false;
+                            _profile.Saved = false;
                             ChangeWindowCaption();
                             return;
                         }
@@ -1748,8 +1759,8 @@ namespace EntityCore.Forms
                         var item = listBlackList.SelectedItem?.ToString();
                         if (!string.IsNullOrEmpty(item))
                         {
-                            profile.BlackList.Remove(item);
-                            profile.Saved = false;
+                            _profile.BlackList.Remove(item);
+                            _profile.Saved = false;
                             ChangeWindowCaption();
                         }
                         break;
@@ -1758,41 +1769,198 @@ namespace EntityCore.Forms
         }
         #endregion
 
-        private void barButtonItem1_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
-        {
-#if true
-            
-#else
-            var condType = typeof(IsInCustomRegionSet);//cond.GetType();
-            // prepare our property overriding type descriptor
-            PropertyOverridingTypeDescriptor ctd = new PropertyOverridingTypeDescriptor(TypeDescriptor.GetProvider(condType).GetTypeDescriptor(condType));
-            // iterate through properties in the supplied object/type
-            foreach (PropertyDescriptor pd in TypeDescriptor.GetProperties(condType))
-            {
-                // for every property that complies to our criteria
-                if (pd.PropertyType == typeof(CustomRegionCollection))
-                {
-                    // we first construct the custom PropertyDescriptor with the TypeDescriptor's built-in capabilities
-                    PropertyDescriptor pd2 = TypeDescriptor.CreateProperty(
-                        condType, // or just _settings, if it's already a type
-                        pd,                  // base property descriptor to which we want to add attributes
-                                             // The PropertyDescriptor which we'll get will just wrap that
-                                             // base one returning attributes we need.
-                        new EditorAttribute( // the attribute in question
-                            typeof(CustomRegionCollectionEditor),
-                            typeof(System.Drawing.Design.UITypeEditor)
-                        )
-                    // this method really can take as many attributes as you like, not just one
-                    );
 
-                    // and then we tell our new PropertyOverridingTypeDescriptor to override that property
-                    ctd.OverrideProperty(pd2);
-                }
+
+
+        #region Mapper manupulation
+        private MapperFormExt mapperForm;
+        private void handler_OpenMapper(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            if (mapperForm is null || mapperForm.IsDisposed)
+            {
+                mapperForm = new MapperFormExt(_profile);
+                mapperForm.OnDraw += DrawSelectedAction;
             }
 
-            // then we add new descriptor provider that will return our descriptor instead of default
-            TypeDescriptor.AddProvider(new TypeDescriptorOverridingProvider(ctd), condType); 
-#endif
+            mapperForm.Show();
+            mapperForm.Focus();
         }
+
+        private void DrawSelectedAction(MapperGraphics graphics)
+        {
+            var tag = treeActions.SelectedNode?.Tag;
+            switch (tag)
+            {
+                case ActionPack actionPack when actionPack.SimultaneousActions:
+                    bool shouldDrawHotSpots = true;
+                    foreach (var action in actionPack.Actions)
+                    {
+                        if (shouldDrawHotSpots && action.UseHotSpots)
+                        {
+                            ComplexPatch_Mapper.DrawHotSpots(action.HotSpots, graphics);
+                            shouldDrawHotSpots = false;
+                        }
+                        action.OnMapDraw(graphics);
+                    }
+                    break;
+                case QuesterAction action:
+                    if (action.UseHotSpots)
+                    {
+                        ComplexPatch_Mapper.DrawHotSpots(action.HotSpots, graphics);
+                    }
+                    action.OnMapDraw(graphics);
+                    break;
+            }
+        }
+        #endregion
+
+        #region ActionNode Highlighting
+
+        private readonly LinkedList<TreeNode> highlightedTreeNodes = new LinkedList<TreeNode>();
+        private LinkedListNode<TreeNode> selectedHighlightedNode;
+
+        private void handler_Filter_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Enter)
+                FilterActionNodes(txtActionFilter.Text);
+        }
+
+        private void handler_Filter_ButtonPressed(object sender, ButtonPressedEventArgs e)
+        {
+            switch (e.Button.Kind)
+            {
+                case ButtonPredefines.Search:
+                    FilterActionNodes(txtActionFilter.Text);
+                    SelectFirstHighlightedNode();
+                    break;
+                case ButtonPredefines.SpinUp:
+                    SelectPreviousHighlightedNode();
+                    break;
+                case ButtonPredefines.SpinDown:
+                    SelectNextHighlightedNode();
+                    break;
+                case ButtonPredefines.Clear:
+                    ResetFilter();
+                    ClearTreeNodeHighlighting(treeActions.Nodes);
+                    break;
+            }
+        }
+
+        private void FilterActionNodes(string filter)
+        {
+            highlightedTreeNodes.Clear();
+            selectedHighlightedNode = null;
+            treeActions.BeginUpdate();
+            if (string.IsNullOrEmpty(filter))
+                ClearTreeNodeHighlighting(treeActions.Nodes);
+            else HighlightTreeNodes(treeActions.Nodes, filter);
+            treeActions.EndUpdate();
+        }
+
+        private void ClearTreeNodeHighlighting(TreeNodeCollection nodes)
+        {
+            foreach (TreeNode node in nodes)
+            {
+                node.BackColor = Color.Empty;
+                if (node.Nodes.Count > 0)
+                    ClearTreeNodeHighlighting(node.Nodes);
+            }
+        }
+
+        private void HighlightTreeNodes(TreeNodeCollection nodes, string filter)
+        {
+            foreach (TreeNode node in nodes)
+            {
+                if (IsNodeMatchFilter(node, filter))
+                {
+                    highlightedTreeNodes.AddLast(node);
+                    node.BackColor = Color.Yellow;
+                }
+                else node.BackColor = Color.Empty;
+                if (node.Nodes.Count > 0)
+                    HighlightTreeNodes(node.Nodes, filter);
+            }
+        }
+
+        private void SelectFirstHighlightedNode()
+        {
+            if (highlightedTreeNodes.Count == 0)
+                NotifyNoActionsMatchesFilter();
+            selectedHighlightedNode = highlightedTreeNodes.First;
+            var node = selectedHighlightedNode?.Value;
+            if (node != null)
+            {
+                treeActions.SelectedNode = node;
+                node.EnsureVisible();
+            }
+        }
+
+        private void SelectLastHighlightedNode()
+        {
+            if (highlightedTreeNodes.Count == 0)
+                NotifyNoActionsMatchesFilter();
+            selectedHighlightedNode = highlightedTreeNodes.Last;
+            var node = selectedHighlightedNode?.Value;
+            if (node != null)
+            {
+                treeActions.SelectedNode = node;
+                node.EnsureVisible();
+            }
+        }
+        private void SelectNextHighlightedNode()
+        {
+            if (highlightedTreeNodes.Count == 0)
+                NotifyNoActionsMatchesFilter();
+
+            selectedHighlightedNode = selectedHighlightedNode?.Next;
+            var node = selectedHighlightedNode?.Value;
+            if (node != null)
+            {
+                treeActions.SelectedNode = node;
+                node.EnsureVisible();
+            }
+            else SelectFirstHighlightedNode();
+            
+        }
+        private void SelectPreviousHighlightedNode()
+        {
+            if (highlightedTreeNodes.Count == 0)
+                NotifyNoActionsMatchesFilter();
+
+            selectedHighlightedNode = selectedHighlightedNode?.Previous;
+            var node = selectedHighlightedNode?.Value;
+            if (node != null)
+            {
+                treeActions.SelectedNode = node;
+                node.EnsureVisible();
+            }
+            else SelectLastHighlightedNode();
+            
+        }
+        private bool IsNodeMatchFilter(TreeNode node, string filter)
+        {
+            if (node.Text.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0)
+                return true;
+            var tag = node.Tag;
+            if (tag is null)
+                return false;
+            if (tag.GetType().Name.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0)
+                return true;
+            if (tag is QuesterAction action
+                && action.ActionID.ToString().IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0)
+                return true;
+            return false;
+        }
+        private void ResetFilter()
+        {
+            txtActionFilter.Text = string.Empty;
+            highlightedTreeNodes.Clear();
+            selectedHighlightedNode = null;
+        }
+        private void NotifyNoActionsMatchesFilter()
+        {
+            XtraMessageBox.Show($"No one actions matches filter '{txtActionFilter.Text}'", "Filtering info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        #endregion
     }
 }

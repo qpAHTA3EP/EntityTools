@@ -1,4 +1,4 @@
-﻿using Astral;
+﻿using ACTP0Tools.Annotations;
 using Astral.Classes.ItemFilter;
 using System;
 using System.Collections.ObjectModel;
@@ -8,7 +8,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
-using ACTP0Tools.Annotations;
 
 namespace ACTP0Tools
 {

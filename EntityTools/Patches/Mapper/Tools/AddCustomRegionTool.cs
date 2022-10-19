@@ -4,7 +4,11 @@ using Astral.Quester.Classes;
 using DevExpress.XtraEditors;
 using MyNW.Classes;
 using System;
+using System.ComponentModel;
+using System.Linq;
 using System.Windows.Forms;
+using ACTP0Tools;
+using ACTP0Tools.Classes.Quester;
 
 namespace EntityTools.Patches.Mapper.Tools
 {
@@ -15,9 +19,13 @@ namespace EntityTools.Patches.Mapper.Tools
     {
         private readonly Action<CustomRegion, IMapperTool> onComplete;
 
+        public BindingList<CustomRegion> CustomRegions => _profile.CustomRegions;
+        private readonly QuesterProfileProxy _profile;
+
         public AddCustomRegionTool(MapperFormExt mapperForm = null, Action<CustomRegion, IMapperTool> onCompleteCallback = null)
         {
             onComplete = onCompleteCallback;
+            _profile = mapperForm?.Profile ?? AstralAccessors.Quester.Core.ActiveProfileProxy;
             toolForm.Show(CustomRegionToolForm.ViewMode.Add, mapperForm);
             toolForm.SetCustomRegionSize(0, 0, 0, 0);
         }
@@ -137,9 +145,9 @@ namespace EntityTools.Patches.Mapper.Tools
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            var crList = Astral.Quester.API.CurrentProfile.CustomRegions;
+            var crList = CustomRegions;
             if (crList.Count > 0
-                && crList.Find(cr => cr.Name == name) != null)
+                && crList.FirstOrDefault(cr => cr.Name == name) != null)
             {
                 XtraMessageBox.Show($"There are exists another CustomRegion named '{name}'!,\n" +
                                     $"Set different name.", "Naming error !",

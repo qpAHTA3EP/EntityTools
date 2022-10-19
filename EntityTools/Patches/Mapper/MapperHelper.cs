@@ -4,6 +4,8 @@ using MyNW.Internals;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using Astral.Quester.Classes;
+using DevExpress.Emf;
 
 namespace EntityTools.Patches.Mapper
 {
@@ -108,7 +110,7 @@ namespace EntityTools.Patches.Mapper
         }
 
         /// <summary>
-        /// Из двух числе <paramref name="num1"/> и <paramref name="num2"/> определяем минимальное <paramref name="min"/> и максимальное <paramref name="max"/>
+        /// Из двух чисел <paramref name="num1"/> и <paramref name="num2"/> определяем минимальное <paramref name="min"/> и максимальное <paramref name="max"/>
         /// </summary>
         public static void FixRange(double num1, double num2, out double min, out double max)
         {
@@ -252,7 +254,7 @@ namespace EntityTools.Patches.Mapper
         {
 
             double dx = x2 - x1;
-            double dy = z2 - y1;
+            double dy = y2 - y1;
             double dz = z2 - z1;
 
             return dx * dx + dy * dy + dz * dz;
@@ -344,20 +346,17 @@ namespace EntityTools.Patches.Mapper
             {
                 TPoint point = selector(element);
 
-                if (point != null)
+                if (!Equals(point, default(TPoint)))
                 {
                     MapperGraphics.PointHelper.GetXYZ(point, out pX, out pY, out pZ);
                     double sqDist = SquareDistance2D(x, y, pX, pY);
 
                     if (distance > sqDist)
-                    {
-                        distance = sqDist;
                         return element;
-                    }
                 }
             }
             pX = 0; pY = 0;  pZ = 0;
-            return default(T);
+            return default;
         }
 
         public static void ClosestNodeOxyProjection(this IGraph graph, double x, double y, out Node node, out int hash,
@@ -512,11 +511,13 @@ namespace EntityTools.Patches.Mapper
         }
 
         /// <summary>
-        /// Отрисовка региона, ограниченного прямоугольником с верхней левой точкой с координатами <paramref name="leftX"/>, <paramref name="topY"/> 
-        /// и правой нижней точкой с координатами <paramref name="rightX"/>, <paramref name="downY"/>.
+        /// Отрисовка региона в режиме редактирования, ограниченного прямоугольником с верхней левой точкой с координатами <paramref name="leftX"/>, <paramref name="topY"/> 
+        /// и правой нижней точкой с координатами <paramref name="rightX"/>, <paramref name="downY"/>.<br/>
+        /// В режиме редактирования дополнительно отображаются якори (квадраты в углах прямоугольника, по середине ребер и в центре),
+        /// а для эллиптического региона - опорный прямоугольник<br/>
         /// Тип региона задается флагом <paramref name="isElliptical"/>
         /// </summary>
-        public static void DrawCustomRegion(this MapperGraphics graphics, double leftX, double topY, double rightX, double downY, bool isElliptical, bool drawAnchors = true)
+        public static void DrawCustomRegionEditable(this MapperGraphics graphics, double leftX, double topY, double rightX, double downY, bool isElliptical, bool drawAnchors = true)
         {
             // Ось Oy в игровых координатах инвертирована по сравнению с координатами экрана windows (MapPicture)
             // Поэтому координата верхнего правого в экранных координатах имеет минимальное значение
@@ -572,12 +573,59 @@ namespace EntityTools.Patches.Mapper
                 graphics.DrawEllipse(penCR, leftX, Math.Max(topY, downY), width, height, true);
         }
 
+        /// <summary>
+        /// Отрисовка <paramref name="customRegion"/>
+        /// </summary>
+        /// <param name="graphics"></param>
+        /// <param name="customRegion"></param>
+        /// <param name="pen"></param>
+        public static void DrawCustomRegion(this MapperGraphics graphics, CustomRegion customRegion, Pen pen = null, Font font = null)
+        {
+            // Ось Oy в игровых координатах инвертирована по сравнению с координатами экрана windows (MapPicture)
+            // Поэтому координата верхнего правого в экранных координатах имеет минимальное значение
+
+            var pos = customRegion.Position;
+            double width = customRegion.Width;
+            double height = -customRegion.Height;
+            double x1 = pos.X;
+            double y1 = pos.Y;
+            //double x2 = x1 + width;
+            //double y2 = y1 - height;
+
+            //bool isVisible = cr.Eliptic
+            //    ? 
+            //    : leftBorder <= x1 || x1 <= rightBorder || leftBorder <= x2 || x2 <= rightBorder
+            //      || topBorder >= y1 || y1 >= downBorder || topBorder >= y2 || y2 >= downBorder;
+            if (pen is null)
+            {
+                pen = customRegion.IsIn
+                    ? Pens.Red
+                    : Pens.White;
+            }
+
+            if (font is null)
+            {
+                font = new Font(SystemFonts.DefaultFont.FontFamily, 8.75f, FontStyle.Bold);
+            }
+
+
+            if (customRegion.Eliptic)
+            {
+                graphics.DrawEllipse(pen, x1, y1, width, height, true);
+                graphics.DrawText(customRegion.Name, x1 + width / 2d, y1 + 2, Alignment.BottomCenter, font, Brushes.White);
+            }
+            else
+            {
+                graphics.DrawRectangle(pen, x1, y1, width, height, true);
+                graphics.DrawText(customRegion.Name, x1, y1, Alignment.BottomLeft, font, Brushes.White);
+            }
+        }
 
         /// <summary>
         /// Поиск объекта, проекция которого на Oxy расположена не далее <paramref name="distance"/> 
         /// от точки, заданной координатами <paramref name="worldX"/>, <paramref name="worldY"/>
         /// </summary>
-        public  static object SelectObjectByPosition(double worldX, double worldY, out double x, out double y, out double z, double distance = -1, IGraph graph = null)
+        public static object SelectObjectByPosition(double worldX, double worldY, out double x, out double y, out double z, double distance = -1, IGraph graph = null)
         {
             if (distance <= 0)
                 distance = double.MaxValue;

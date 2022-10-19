@@ -55,9 +55,6 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Полный граф
         /// </summary>
-#if FullGraph
-        private IGraph FullGraph => getGraph(); 
-#endif
         private readonly Func<IGraph> getGraph;
 
         public int Version { get; private set; }
@@ -190,17 +187,21 @@ namespace EntityTools.Patches.Mapper
                     using (_nodesLocker.ReadLock())
                     {
                         if (ignorePassableProperty)
+                        {
                             foreach (Node node in _nodes)
                             {
                                 action(node);
                                 num++;
                             }
+                        }
                         else foreach (Node node in _nodes)
-                                if (node.Passable)
-                                {
-                                    action(node);
-                                    num++;
-                                }
+                        {
+                            if (node.Passable)
+                            {
+                                action(node);
+                                num++;
+                            }
+                        }
                     }
                 }
             }
@@ -466,14 +467,6 @@ namespace EntityTools.Patches.Mapper
         }
         bool _holdPlayer;
 
-#if LastAddedNode
-        /// <summary>
-        /// Последняя добавленная вершина (узел)
-        /// </summary>
-        public Node LastAddedNode { get => lastAddedNode; set => lastAddedNode = value; }
-        private Node lastAddedNode; 
-#endif
-
         /// <summary>
         /// Флаг проверки необходимости обновления кэша
         /// </summary>
@@ -564,27 +557,6 @@ namespace EntityTools.Patches.Mapper
             cacheTimeout.ChangeTime(EntityTools.Config.Mapper.CacheRegenTimeout);
             Version++;
         }
-
-#if false
-        /// <summary>
-        /// Остановка кэширования
-        /// </summary>
-        public void StopCache()
-        {
-            _active = false;
-            lastAddedNode = null;
-        }
-
-        /// <summary>
-        /// Старт кэширования 
-        /// </summary>
-        public void StartCache()
-        {
-            _active = true;
-            cacheTimeout.ChangeTime(0);
-            RegenerateCache();
-        } 
-#endif
 
         /// <summary>
         /// Проверка попадания узла node в кэшируемый объем
@@ -692,30 +664,12 @@ namespace EntityTools.Patches.Mapper
         }
         private double cacheZ = 30, cacheZ_0_75;
 
-#if false
-        /// <summary>
-        /// Центр кэшированной области
-        /// </summary>
-        public Vector3 CenterPosition
-        {
-            get => cacheInitialPosition.Clone();
-            set
-            {
-                if (!Equals(cacheInitialPosition, value))
-                    SetCacheInitialPosition(value);
-            }
-        } 
-#endif
+
         public void MoveCenterPosition(double dx, double dy, double dz)
         {
             _holdPlayer = false;
 
             //TODO: добавить проверку переполнения в MoveCenterPosition, в SetCacheArea и в SetCacheInitialPosition
-#if cacheInitialPosition
-            cacheInitialPosition.X += (float)dx;
-            cacheInitialPosition.Y += (float)dy;
-            cacheInitialPosition.Z += (float)dz; 
-#endif
             centerX += dx;
             
             if (!cacheX.Equals(double.MaxValue))
@@ -818,12 +772,6 @@ namespace EntityTools.Patches.Mapper
                 centerY = y;
                 centerZ = z;
 
-#if cacheInitialPosition
-                cacheInitialPosition.X = (float)x;
-                cacheInitialPosition.Y = (float)y;
-                cacheInitialPosition.Z = (float)z; 
-#endif
-
                 if (cacheX.Equals(double.MaxValue))
                 {
                     minX = double.MinValue;
@@ -857,9 +805,6 @@ namespace EntityTools.Patches.Mapper
             }
         }
 
-#if cacheInitialPosition
-        private Vector3 cacheInitialPosition = new Vector3(0, 0, 0); 
-#endif
         private double centerX, centerY, centerZ;
 
         /// <summary>

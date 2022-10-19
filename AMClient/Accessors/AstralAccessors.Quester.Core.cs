@@ -3,7 +3,6 @@ using ACTP0Tools.Patches;
 using ACTP0Tools.Reflection;
 using AStar;
 using Astral;
-using Astral.Controllers;
 using Astral.Quester.Classes;
 using HarmonyLib;
 using MyNW.Internals;
@@ -16,6 +15,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using ACTP0Tools.Classes;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable RedundantAssignment
@@ -224,18 +224,18 @@ namespace ACTP0Tools
                 #region Profile
                 private static readonly MethodInfo originalSetProfile;
 
-                private static readonly SaveFileDialog saveFileDialog = new SaveFileDialog
-                {
-                    InitialDirectory = Astral.Controllers.Directories.ProfilesPath,
-                    DefaultExt = "amp.zip",
-                    Filter = @"Astral mission profile (*.amp.zip)|*.amp.zip",
-                };
-                private static readonly OpenFileDialog openFileDialog = new OpenFileDialog
-                {
-                    InitialDirectory = Directories.ProfilesPath,
-                    DefaultExt = "amp.zip",
-                    Filter = @"Astral mission profile (*.amp.zip)|*.amp.zip"
-                };
+                //private static readonly SaveFileDialog saveFileDialog = new SaveFileDialog
+                //{
+                //    InitialDirectory = Astral.Controllers.Directories.ProfilesPath,
+                //    DefaultExt = "amp.zip",
+                //    Filter = @"Astral mission profile (*.amp.zip)|*.amp.zip",
+                //};
+                //private static readonly OpenFileDialog openFileDialog = new OpenFileDialog
+                //{
+                //    InitialDirectory = Directories.ProfilesPath,
+                //    DefaultExt = "amp.zip",
+                //    Filter = @"Astral mission profile (*.amp.zip)|*.amp.zip"
+                //};
 
                 private static XmlSerializer profileXmlSerializer
                 {
@@ -262,16 +262,26 @@ namespace ACTP0Tools
                         if (value is null)
                             throw new ArgumentNullException(nameof(value));
                         originalSetProfile?.Invoke(null, new object[] { value });
-                        _activeProfileProxy = new ActiveProfileProxy();
+                        ActiveProfileProxy.SetProfile(value, null);
                     }
                 }
 
                 /// <summary>
-                /// Прокси-Объект, опосредующий доступ к активному quester-профилю, выполняемому в роли Quester
+                /// Прокси-объект, опосредующий доступ к активному quester-профилю, выполняемому в роли Quester
                 /// </summary>
-                public static QuesterProfileProxy ActiveProfileProxy => _activeProfileProxy;
-                private static ActiveProfileProxy _activeProfileProxy = new ActiveProfileProxy();
+                public static ActiveProfileProxy ActiveProfileProxy => ActiveProfileProxy.Get();
 
+
+                public static string GetFullPathOfExternalMapsMeshes(string profilePath, string meshesFile)
+                {
+                    profilePath = Path.GetFullPath(profilePath);
+                    string profileDir = Path.GetDirectoryName(profilePath);
+                    if (string.IsNullOrEmpty(profileDir))
+                        profileDir = Astral.Controllers.Directories.ProfilesPath;
+                    
+                    meshesFile = Path.GetFullPath(Path.Combine(profileDir, meshesFile));
+                    return meshesFile;
+                }
 
                 /// <summary>
                 /// Имя файла загруженного (выполняемого) Quester-профиля (без пути)
@@ -329,15 +339,16 @@ namespace ACTP0Tools
                 /// Загрузка Quester-профиля, заданного <param name="profilePath"/> в 
                 /// Аналог <seealso cref="Astral.Quester.Core.Load(string, bool)"/>
                 /// </summary>
-#if true
                 public static Profile Load(ref string profilePath)
                 {
                     if (string.IsNullOrEmpty(profilePath))
                     {
-                        if (openFileDialog.ShowDialog() != DialogResult.OK)
+                        var openDialog = FileTools.GetOpenDialog(initialDir: Astral.Controllers.Directories.ProfilesPath,
+                                                                 filter: @"Astral mission profile (*.amp.zip)|*.amp.zip", defaultExtension: "amp.zip");
+                        if (openDialog.ShowDialog() != DialogResult.OK)
                             return null;
 
-                        profilePath = openFileDialog.FileName;
+                        profilePath = openDialog.FileName;
                     }
 
                     int readTries = 2;
@@ -408,138 +419,6 @@ namespace ACTP0Tools
 
                     return null;
                 }
-#else
-                public static void Load(string profilePath)
-                {
-                    if (string.IsNullOrEmpty(profilePath))
-                    {
-                        OpenFileDialog openFileDialog = new OpenFileDialog
-                        {
-                            InitialDirectory = Directories.ProfilesPath,
-                            DefaultExt = "amp.zip",
-                            Filter = @"Astral mission profile (*.amp.zip)|*.amp.zip"
-                        };
-
-                        if (openFileDialog.ShowDialog() != DialogResult.OK)
-                            return;
-
-                        profilePath = openFileDialog.FileName;
-                    }
-
-                    int readTries = 2;
-                    while (readTries > 0)
-                    {
-                        try
-                        {
-                            int mods = 0;
-                            using (var zipFile = ZipFile.Open(profilePath, ZipArchiveMode.Read))
-                            {
-                                ZipArchiveEntry zipProfileEntry = zipFile.GetEntry("profile.xml");
-                                if (zipProfileEntry is null)
-                                {
-                                    Logger.Notify(
-                                        $"File '{Path.GetFileName(profilePath)}' does not contain 'profile.xml'", true);
-                                    return;
-                                }
-
-                                Profile profile;
-                                using (var stream = zipProfileEntry.Open())
-                                {
-                                    ACTP0Serializer.GetExtraTypes(out List<Type> types, 2);
-                                    XmlSerializer serializer = new XmlSerializer(typeof(Profile), types.ToArray());
-                                    if (Preprocessor.Active)
-                                    {
-                                        using (var profileStream = Preprocessor.Replace(stream, out mods))
-                                        {
-                                            profile = serializer.Deserialize(profileStream) as Profile;
-                                            if (mods > 0)
-                                                Logger.Notify(
-                                                    $"There are {mods} modifications in the profile '{Path.GetFileName(profilePath)}'");
-                                        }
-                                    }
-                                    else profile = serializer.Deserialize(stream) as Profile;
-
-                                    if (profile is null)
-                                    {
-                                        Logger.Notify(
-                                            $"Unable to load {profilePath}'. Deserialization of 'profile.xml' failed",
-                                            true);
-                                        return;
-                                    }
-                                }
-#if load_mapMeshes
-                            var mapName = EntityManager.LocalPlayer.MapState.MapName;
-                            if (string.IsNullOrEmpty(mapName))
-                                return;
-                            var mapMeshesName = mapName + ".bin";
-                            Graph meshes = null;
-
-                            ZipArchiveEntry zipMeshEntry = zipFile.GetEntry(mapMeshesName);
-                            if (zipMeshEntry != null)
-                            {
-                                using (var stream = zipMeshEntry.Open())
-                                {
-                                    BinaryFormatter binaryFormatter = new BinaryFormatter();
-                                    if (binaryFormatter.Deserialize(stream) is Graph meshesFromFile)
-                                        meshes = meshesFromFile;
-                                }
-                            }
-                            //else Logger.Notify($"File '{Path.GetFileName(profilePath)}' does not contain '{mapMeshesName}'");  
-#endif
-
-                                Profile?.ResetCompleted();
-                                Profile = profile;
-
-                                API.CurrentSettings.LastQuesterProfile = profilePath;
-                                // TODO Проверить не приводит ли следующая строка к некорректной работе AddIgnoredFoes
-                                Logic.NW.Combats.BLAttackersList = null;
-
-
-                                var allProfileMeshes = _mapsMeshes;
-                                lock (allProfileMeshes)
-                                {
-                                    allProfileMeshes.Clear();
-#if load_mapMeshes
-                                if (meshes != null)
-                                    allProfileMeshes.Add(mapName, meshes);
-#endif
-                                }
-
-                                if (Controllers.BotComs.BotServer.Server.IsRunning)
-                                {
-                                    Controllers.BotComs.BotServer.SendQuesterProfileInfos();
-                                }
-                            }
-
-                            if (Preprocessor.Active && Preprocessor.AutoSave && mods > 0)
-                            {
-                                // Сохраняем преобразованный файл профиля
-                                using (var zipFile = ZipFile.Open(profilePath, ZipArchiveMode.Update))
-                                {
-                                    SaveProfile(zipFile);
-                                }
-                            }
-                            return;
-                        }
-                        catch (ThreadAbortException ex)
-                        {
-                            Logger.Notify(ex.ToString(), true);
-                            break;
-                        }
-                        //catch (IOException ex)
-                        //{
-                        //    Logger.Notify(ex.ToString(), true);
-                        //}
-                        catch (Exception ex)
-                        {
-                            Logger.Notify(ex.ToString(), true);
-                        }
-                        Thread.Sleep(500);
-                        readTries--;
-                    }
-                } 
-#endif
-
 
                 private static bool PrefixSave(bool saveas = false)
                 {
@@ -565,55 +444,45 @@ namespace ACTP0Tools
                 /// <param name="currentProfileName">Имя файла, содержащего профиль.</param>
                 /// <param name="newProfileName">Имя файла, в который должен быть сохранен профиль.<br/>
                 /// Если имя файла не задано, то открывается диалог сохранения файла для того, чтобы пользователь .</param>
-#if true
                 public static bool Save(Profile profile, Dictionary<string, Graph> profileMeshes, string currentProfileName, ref string newProfileName)
                 {
                     if (profile is null)
                         return false;
 
-                    bool needLoadAllMeshes = false;
+                    bool needLoadAllInternalMeshes = false;
                     if (string.IsNullOrEmpty(currentProfileName) || string.IsNullOrEmpty(newProfileName))
                     {
-                        string profileNameWithoutExtension = currentProfileName;
-                        if (string.IsNullOrEmpty(profileNameWithoutExtension))
-                        {
-                            profileNameWithoutExtension = EntityManager.LocalPlayer.MapState.MapName;
-                        }
-                        else
-                        {
-                            profileNameWithoutExtension = Path.GetFileName(currentProfileName);
-                            if (profileNameWithoutExtension.EndsWith("amp.zip"))
-                                profileNameWithoutExtension = profileNameWithoutExtension.Substring(0, profileNameWithoutExtension.Length - 8);
-                        }
-
-#if false
-                        SaveFileDialog saveFileDialog = new SaveFileDialog
-                        {
-                            InitialDirectory = dirName,
-                            DefaultExt = "amp.zip",
-                            Filter = @"Astral mission profile (*.amp.zip)|*.amp.zip",
-                            FileName = string.IsNullOrEmpty(currentProfileName)
-                                                ? EntityManager.LocalPlayer.MapState.MapName
-                                                : currentProfileName
-                        }; 
-#else
-                        saveFileDialog.FileName = profileNameWithoutExtension;
-#endif
-                        if (saveFileDialog.ShowDialog() != DialogResult.OK)
+                        newProfileName = RequestUserForNewProfileFileName(currentProfileName);
+                        if (string.IsNullOrEmpty(newProfileName)) 
                             return false;
-                        newProfileName = saveFileDialog.FileName;
-                        needLoadAllMeshes = true;
+                        needLoadAllInternalMeshes = currentProfileName != newProfileName;
                     }
-                    bool useExternalMeshes = !string.IsNullOrEmpty(currentProfileName)
-                                           && profile.UseExternalMeshFile
-                                           && profile.ExternalMeshFileName.Length >= ".mesh.bin".Length + 1;
 
-                    string externalMeshFileName = string.Empty;
+                    bool useExternalMeshes = profile.UseExternalMeshFile
+                                          && profile.ExternalMeshFileName.Length >= ".mesh.bin".Length + 1;
+
+                    string externalMeshesFullFilePath = string.Empty;
                     if (useExternalMeshes)
-                        externalMeshFileName = Path.Combine(Path.GetDirectoryName(currentProfileName) ?? string.Empty, profile.ExternalMeshFileName);
+                    {
+                        string currentDir = string.Empty;    
+                        if (!string.IsNullOrEmpty(currentProfileName))
+                            currentDir = Path.GetDirectoryName(currentProfileName);
+                        if (string.IsNullOrEmpty(currentDir))
+                            currentDir = Astral.Controllers.Directories.ProfilesPath;
 
-                    if (needLoadAllMeshes && !useExternalMeshes)
-                        LoadAllMeshes(ref profileMeshes, externalMeshFileName);
+                        externalMeshesFullFilePath = Path.GetFullPath(Path.Combine(currentDir,  profile.ExternalMeshFileName));
+
+                        // изменяем путь к файлу внешних мешей, поскольку новое имя файла профиля отличается от текущего
+                        if (currentProfileName != newProfileName)
+                        {
+                            var newRelativeExternalMeshesFilePath =
+                                newProfileName.GetRelativePathTo(externalMeshesFullFilePath);
+                            if (!string.IsNullOrEmpty(newRelativeExternalMeshesFilePath))
+                                profile.ExternalMeshFileName = newRelativeExternalMeshesFilePath;
+                        }
+                    }
+                    else if (needLoadAllInternalMeshes)
+                        LoadAllMeshes(ref profileMeshes, externalMeshesFullFilePath);
 
                     ZipArchive zipFile = null;
                     try
@@ -622,36 +491,25 @@ namespace ACTP0Tools
                         zipFile = ZipFile.Open(newProfileName, File.Exists(newProfileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create);
 
                         // Сохраняем в архив файл профиля "profile.xml"
-                        // TODO : Для поддержки относительных путей к внешнему файл мешей перед сохранением профиля в новый файл нужно изменять путь к файлу внешних мешей
                         lock (profile)
                         {
-                            if (SaveProfile(profile, zipFile))
-                                profile.Saved = true;
+                            profile.Saved = true;
+                            if (!SaveProfile(profile, zipFile))
+                            {
+                                profile.Saved = false;
+                                return false;
+                            }
                         }
 
                         var binaryFormatter = new BinaryFormatter();
                         // Сохраняем файлы путевых графов (меши)
                         lock (profileMeshes)
                         {
-                            // Локальная функция сохранения мешей профиля в заданный zipArchive
-                            void SaveAllMeshes(ZipArchive zipArchive, Dictionary<string, Graph> meshes, BinaryFormatter binFormatter)
-                            {
-                                foreach (var mesh in meshes)
-                                {
-                                    // удаляем мусор (скрытые вершины и ребра)
-                                    mesh.Value.RemoveUnpassable();
-
-                                    string meshName = mesh.Key + ".bin";
-
-                                    SaveMesh(zipArchive, meshName, mesh.Value, binFormatter);
-                                }
-                            }
-
                             if (useExternalMeshes)
                             {
                                 // открываем архив с внешними путевыми графами
-                                using (var externalMeshesZipFile = ZipFile.Open(externalMeshFileName,
-                                    File.Exists(externalMeshFileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create))
+                                using (var externalMeshesZipFile = ZipFile.Open(externalMeshesFullFilePath,
+                                    File.Exists(externalMeshesFullFilePath) ? ZipArchiveMode.Update : ZipArchiveMode.Create))
                                 {
                                     // сохраняем все загруженные меши во внешний архивный файл
                                     SaveAllMeshes(externalMeshesZipFile, profileMeshes, binaryFormatter);
@@ -708,8 +566,6 @@ namespace ACTP0Tools
                             }
                         }
 
-                        API.CurrentSettings.LastQuesterProfile = newProfileName;
-
                         Logger.Notify($"Profile '{newProfileName}' saved");
 
                         return profile.Saved;
@@ -725,167 +581,47 @@ namespace ACTP0Tools
 
                     return false;
                 }
-#else
-                public static void Save(bool saveAs = false)
+
+                private static string  RequestUserForNewProfileFileName(string currentProfileName)
                 {
-                    string fullProfileName = Astral.API.CurrentSettings.LastQuesterProfile;
-                    string currentProfileName;
-                    if (string.IsNullOrEmpty(fullProfileName))
+                    string profileNameWithoutExtension = currentProfileName;
+                    if (string.IsNullOrEmpty(profileNameWithoutExtension))
                     {
-                        currentProfileName = EntityManager.LocalPlayer.MapState.MapName;
+                        profileNameWithoutExtension = EntityManager.LocalPlayer.MapState.MapName;
                     }
                     else
                     {
-                        currentProfileName = Path.GetFileName(fullProfileName);
-                        if (currentProfileName.EndsWith("amp.zip"))
-                            currentProfileName = currentProfileName.Substring(0, currentProfileName.Length - 8);
+                        profileNameWithoutExtension = Path.GetFileName(currentProfileName);
+                        if (profileNameWithoutExtension.EndsWith("amp.zip"))
+                            profileNameWithoutExtension =
+                                profileNameWithoutExtension.Substring(0, profileNameWithoutExtension.Length - 8);
                     }
 
+                    var saveDialog = FileTools.GetSaveDialog(fileName: profileNameWithoutExtension,
+                        filter: @"Astral mission profile (*.amp.zip)|*.amp.zip",
+                        defaultExtension: "amp.zip");
 
-                    string dirName = Path.GetDirectoryName(fullProfileName);
-                    if (string.IsNullOrEmpty(dirName))
-                        dirName = Directories.ProfilesPath;
-                    var currentProfile = Profile;
-
-                    bool useExternalMeshes = currentProfile.UseExternalMeshFile && currentProfile.ExternalMeshFileName.Length >= ".mesh.bin".Length + 1;
-
-                    string externalMeshFileName = string.Empty;
-                    bool needLoadAllMeshes = false;
-
-                    if (!currentProfile.Saved || saveAs)
+                    if (saveDialog.ShowDialog() != DialogResult.OK)
+                        return string.Empty;
+                    return saveDialog.FileName;
+                }
+                private static void SaveAllMeshes(ZipArchive zipArchive, Dictionary<string, Graph> meshes, BinaryFormatter binFormatter)
+                {
+                    foreach (var mesh in meshes)
                     {
-                        SaveFileDialog saveFileDialog = new SaveFileDialog
-                        {
-                            InitialDirectory = dirName,
-                            DefaultExt = "amp.zip",
-                            Filter = @"Astral mission profile (*.amp.zip)|*.amp.zip",
-                            FileName = string.IsNullOrEmpty(currentProfileName)
-                                ? EntityManager.LocalPlayer.MapState.MapName
-                                : currentProfileName
-                        };
-                        if (saveFileDialog.ShowDialog() != DialogResult.OK)
-                            return;
-                        fullProfileName = saveFileDialog.FileName;
-                        needLoadAllMeshes = true;
+                        // удаляем мусор (скрытые вершины и ребра)
+                        mesh.Value.RemoveUnpassable();
+
+                        string meshName = mesh.Key + ".bin";
+
+                        SaveMesh(zipArchive, meshName, mesh.Value, binFormatter);
                     }
-                    if (useExternalMeshes)
-                        externalMeshFileName = Path.Combine(Path.GetDirectoryName(fullProfileName) ?? string.Empty, currentProfile.ExternalMeshFileName);
-
-                    if (needLoadAllMeshes && !useExternalMeshes)
-                        AstralAccessors.Quester.Core.LoadAllMeshes();
-
-                    ZipArchive zipFile = null;
-                    try
-                    {
-                        // Открываем архивный файл профиля
-                        zipFile = ZipFile.Open(fullProfileName, File.Exists(fullProfileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create);
-
-                        // Сохраняем в архив файл профиля "profile.xml"
-                        lock (currentProfile)
-                        {
-                            if (SaveProfile(zipFile))
-                                currentProfile.Saved = true;
-                        }
-
-                        var binaryFormatter = new BinaryFormatter();
-                        // Сохраняем файлы мешей
-                        var currentProfileMeshes = _mapsMeshes;
-                        lock (currentProfileMeshes)
-                        {
-                            // Локальная функция сохранения мешей профиля в заданный zipArchive
-                            void SaveAllMeshes(ZipArchive zipArchive, Dictionary<string, Graph> meshes, BinaryFormatter binFormatter)
-                            {
-                                foreach (var mesh in meshes)
-                                {
-                                    // удаляем мусор (скрытые вершины и ребра)
-                                    mesh.Value.RemoveUnpassable();
-
-                                    string meshName = mesh.Key + ".bin";
-
-                                    SaveMesh(zipArchive, meshName, mesh.Value, binFormatter);
-                                }
-                            }
-
-                            if (useExternalMeshes)
-                            {
-                                // открываем архив с внешними мешами
-                                using (var externalMeshesZipFile = ZipFile.Open(externalMeshFileName,
-                                    File.Exists(externalMeshFileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create))
-                                {
-                                    // сохраняем все загруженные меши во внешний архивный файл
-                                    SaveAllMeshes(externalMeshesZipFile, currentProfileMeshes, binaryFormatter);
-
-                                    // Копируем файлы мешей из файла профиля во внешний архив
-                                    if (zipFile.Mode != ZipArchiveMode.Create)
-                                    {
-                                        // 1/ Нельзя обращаться к zipFile.Entries в режиме ZipArchiveMode.Create
-                                        // 2/ Нельзя использовать итератор (foreach) для удаления мешей из исходного архива
-                                        for (int i = 0; i < zipFile.Entries.Count;)
-                                        {
-                                            var entry = zipFile.Entries[i];
-
-                                            // Если используется внешние меши, в файле профиля нужно удалить все "лишние" файлы
-                                            var entryName = entry.Name;
-                                            if (!entryName.Equals("profile.xml", StringComparison.OrdinalIgnoreCase)
-                                                && entryName.EndsWith(".bin"))
-                                            {
-                                                var meshName = entryName.Substring(0, entryName.Length - ".bin".Length);
-                                                if (!currentProfileMeshes.ContainsKey(meshName))
-                                                {
-                                                    // Меш карты, соответствующей entry, ОТСУТСТВУЕТ в currentProfileMeshes 
-                                                    // и не был сохранен во внешний архивный файл
-                                                    ZipArchiveEntry externalMeshEntry = null;
-                                                    if (externalMeshesZipFile.Mode == ZipArchiveMode.Update)
-                                                        externalMeshEntry = externalMeshesZipFile.GetEntry(entryName);
-                                                    if (externalMeshEntry is null)
-                                                        externalMeshEntry = externalMeshesZipFile.CreateEntry(entryName);
-
-                                                    // копирование меша из архива профиля во внешний архив 
-                                                    using (var internalMeshStream = entry.Open())
-                                                    using (var externalMeshStream = externalMeshEntry.Open())
-                                                    {
-                                                        internalMeshStream.CopyTo(externalMeshStream);
-                                                    }
-                                                }
-
-                                                // Удаление скопированного (дублирующегося) меша из архива профиля
-                                                if (zipFile.Mode == ZipArchiveMode.Update)
-                                                {
-                                                    entry.Delete();
-                                                    continue;
-                                                }
-                                            }
-                                            i++;
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                // сохраняем меши в архив профиля
-                                SaveAllMeshes(zipFile, currentProfileMeshes, binaryFormatter);
-                            }
-                        }
-
-                        API.CurrentSettings.LastQuesterProfile = fullProfileName;
-
-                        Logger.Notify($"Profile '{fullProfileName}' saved");
-                    }
-                    catch (Exception exc)
-                    {
-                        Logger.Notify($"Catch an exception while saving profile '{fullProfileName}':\n{exc}", true);
-                    }
-                    finally
-                    {
-                        zipFile?.Dispose();
-                    }
-                } 
-#endif
+                }
 
                 /// <summary>
                 /// Сохранение мешей <paramref name="mesh"/> в архивный файл <paramref name="zipFile"/> под именем <paramref name="meshName"/>
                 /// </summary>
-                public static bool SaveMesh(ZipArchive zipFile, string meshName, Graph mesh, BinaryFormatter binaryFormatter = null)
+                private static bool SaveMesh(ZipArchive zipFile, string meshName, Graph mesh, BinaryFormatter binaryFormatter = null)
                 {
                     if (zipFile is null)
                         return false;
@@ -937,7 +673,7 @@ namespace ACTP0Tools
                 /// <summary>
                 /// Сохранение профиля в архивный файл <paramref name="zipFile"/>
                 /// </summary>
-                public static bool SaveProfile(Profile profile, ZipArchive zipFile)
+                private static bool SaveProfile(Profile profile, ZipArchive zipFile)
                 {
                     if (zipFile.Mode != ZipArchiveMode.Update
                         && zipFile.Mode != ZipArchiveMode.Create)
@@ -1043,7 +779,7 @@ namespace ACTP0Tools
                 {
                     _mapsMeshes.Clear();
                     OnProfileChanged?.Invoke();
-                    _activeProfileProxy = new ActiveProfileProxy();
+                    ActiveProfileProxy.SetProfile(value, null);
                 }
                 #endregion
 

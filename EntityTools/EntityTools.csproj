@@ -220,15 +220,17 @@
     <Compile Include="Core\Interfaces\IEntityIdentifier.cs" />
     <Compile Include="Core\Interfaces\IEntityDescriptor.cs" />
     <Compile Include="Core\Interfaces\IPowerCache.cs" />
-    <Compile Include="PropertyEditors\ChangePluginSettingValueEditor.cs" />
-    <Compile Include="PropertyEditors\CheckedListBoxEditor.cs" />
-    <Compile Include="PropertyEditors\CustomRegionCollectionEditor.cs" />
-    <Compile Include="PropertyEditors\QuesterConditionEditor.cs" />
-    <Compile Include="PropertyEditors\PowerIdEditor.cs" />
-    <Compile Include="PropertyEditors\MissionGiverInfoEditor.cs" />
-    <Compile Include="PropertyEditors\PositionEditor.cs" />
-    <Compile Include="PropertyEditors\ZRangeEditor.cs" />
-    <Compile Include="PropertyEditors\TestEditors\TargetSelectorTestEditor.cs" />
+    <Compile Include="Editors\ChangePluginSettingValueEditor.cs" />
+    <Compile Include="Editors\CheckedListBoxEditor.cs" />
+    <Compile Include="Editors\CustomRegionCollectionEditor.cs" />
+    <Compile Include="Editors\CustomRegionEditor.cs" />
+    <Compile Include="Editors\QuesterConditionEditor.cs" />
+    <Compile Include="Editors\PowerIdEditor.cs" />
+    <Compile Include="Editors\MissionGiverInfoEditor.cs" />
+    <Compile Include="Editors\PositionEditor.cs" />
+    <Compile Include="Editors\RelativeProfileFilePathEditor.cs" />
+    <Compile Include="Editors\ZRangeEditor.cs" />
+    <Compile Include="Editors\TestEditors\TargetSelectorTestEditor.cs" />
     <Compile Include="Forms\CredentialManager2.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -247,25 +249,25 @@
     <Compile Include="Forms\MissionMonitorForm.Designer.cs">
       <DependentUpon>MissionMonitorForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="PropertyEditors\TestEditors\IgnoredFoesTestEditor.cs" />
+    <Compile Include="Editors\TestEditors\IgnoredFoesTestEditor.cs" />
     <Compile Include="Forms\ItemFilterEditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\ItemFilterEditorForm.Designer.cs">
       <DependentUpon>ItemFilterEditorForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="PropertyEditors\TestEditors\EntityTestEditor.cs" />
+    <Compile Include="Editors\TestEditors\EntityTestEditor.cs" />
     <Compile Include="Forms\CustomRegionCollectionEditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\CustomRegionCollectionEditorForm.Designer.cs">
       <DependentUpon>CustomRegionCollectionEditorForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="PropertyEditors\ItemFilterEntryListEditor.cs" />
-    <Compile Include="PropertyEditors\MissionGiverInfoExtendedEditor.cs" />
-    <Compile Include="PropertyEditors\FoeListEditor.cs" />
-    <Compile Include="PropertyEditors\VendorInfoEditor.cs" />
-    <Compile Include="PropertyEditors\UccTargetSelectorEditor.cs" />
+    <Compile Include="Editors\ItemFilterEntryListEditor.cs" />
+    <Compile Include="Editors\MissionGiverInfoExtendedEditor.cs" />
+    <Compile Include="Editors\FoeListEditor.cs" />
+    <Compile Include="Editors\VendorInfoEditor.cs" />
+    <Compile Include="Editors\UccTargetSelectorEditor.cs" />
     <Compile Include="Logger\EntityToolLogger.cs" />
     <Compile Include="Core\Interfaces\IUCCConditionEngine.cs" />
     <Compile Include="Core\Interfaces\IUCCActionEngine.cs" />
@@ -367,20 +369,20 @@
     <Compile Include="Quester\Conditions\EntityCount.cs" />
     <Compile Include="Quester\Conditions\TeamLeaderMapInstance.cs" />
     <Compile Include="Quester\Conditions\TeamMemberCount.cs" />
-    <Compile Include="PropertyEditors\CampaignTaskEditor.cs" />
-    <Compile Include="PropertyEditors\AddTypeCommonEditor.cs" />
-    <Compile Include="PropertyEditors\UccConditionListEditor.cs" />
+    <Compile Include="Editors\CampaignTaskEditor.cs" />
+    <Compile Include="Editors\AddTypeCommonEditor.cs" />
+    <Compile Include="Editors\UccConditionListEditor.cs" />
     <Compile Include="Core\MainPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Core\MainPanel.Designer.cs">
       <DependentUpon>MainPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="PropertyEditors\NodePositionEditor.cs" />
-    <Compile Include="PropertyEditors\AuraIdEditor.cs" />
-    <Compile Include="PropertyEditors\UccGenericConditionEditor.cs" />
-    <Compile Include="PropertyEditors\UccActionEditor.cs" />
-    <Compile Include="PropertyEditors\UiIdEditor.cs" />
+    <Compile Include="Editors\NodePositionEditor.cs" />
+    <Compile Include="Editors\AuraIdEditor.cs" />
+    <Compile Include="Editors\UccGenericConditionEditor.cs" />
+    <Compile Include="Editors\UccActionEditor.cs" />
+    <Compile Include="Editors\UiIdEditor.cs" />
     <Compile Include="Patches\Mapper\Tools\MappingToolHelper.cs" />
     <Compile Include="Patches\Mapper\Enums.cs" />
     <Compile Include="Patches\Mapper\MapperFormExt.cs">
@@ -465,9 +467,9 @@
     <Compile Include="Core\EntityPlugin.cs" />
     <Compile Include="Quester\Actions\MoveToEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PropertyEditors\EntityIdEditor.cs" />
-    <Compile Include="PropertyEditors\CustomRegionListEditor.cs" />
-    <Compile Include="PropertyEditors\ShardEditor.cs" />
+    <Compile Include="Editors\EntityIdEditor.cs" />
+    <Compile Include="Editors\CustomRegionListEditor.cs" />
+    <Compile Include="Editors\ShardEditor.cs" />
     <Compile Include="Tools\Export\MissionsExportInfo.cs" />
     <Compile Include="Settings\PluginSettingsBase.cs" />
     <Compile Include="Tools\Classes.cs" />
